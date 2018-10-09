@@ -11,6 +11,9 @@ package de.uka.ilkd.key.macros.scripts.meta;
  * @version 1 (02.05.17)
  */
 public class NoSpecifiedConverterException extends InjectionException {
+
+    private static final long serialVersionUID = -4808272101189047873L;
+
     /**
      * Creates an exception with the given {@code message} and {@code argument}.
      *
@@ -18,7 +21,7 @@ public class NoSpecifiedConverterException extends InjectionException {
      * @param argument the argument for which the conversion failed
      */
     public NoSpecifiedConverterException(String message,
-                                         ProofScriptArgument argument) {
+                                         ProofScriptArgument<?> argument) {
         super(message, argument);
     }
 
@@ -30,7 +33,7 @@ public class NoSpecifiedConverterException extends InjectionException {
      * @param argument the argument for which the conversion failed
      */
     public NoSpecifiedConverterException(String message, Throwable cause,
-                                         ProofScriptArgument argument) {
+                                         ProofScriptArgument<?> argument) {
         super(message, cause, argument);
     }
 }

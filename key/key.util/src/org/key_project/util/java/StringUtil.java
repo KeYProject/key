@@ -346,4 +346,13 @@ public final class StringUtil {
              && prefix != null 
              && ((String) obj).startsWith(prefix);
    }
+
+   public static boolean isNumber(String val) {
+       try {
+           Long.parseLong(val);
+       } catch (NumberFormatException e) {
+           return false;
+       }
+       return true;
+   }
 }

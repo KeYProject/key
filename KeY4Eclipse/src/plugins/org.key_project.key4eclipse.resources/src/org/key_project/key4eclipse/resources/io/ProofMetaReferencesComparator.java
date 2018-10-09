@@ -13,6 +13,7 @@ import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.MemberDeclaration;
@@ -27,7 +28,7 @@ import de.uka.ilkd.key.util.Pair;
 
 /**
  * Compares {@link ProofMetaReferences} with the current code state
- * @author Stefan Käsdorf
+ * @author Stefan Kaesdorf
  */
 public class ProofMetaReferencesComparator {
 
@@ -200,8 +201,9 @@ public class ProofMetaReferencesComparator {
                boolean isFinal = fieldDecl.isFinal();
                if(type.equals(access.getType()) && visibility.equals(access.getVisibility()) 
                      && isStatic == access.isStatic() && isFinal == access.isFinal()) {
-                  if(isFinal) {
-                     String initializer = fieldDecl.getFieldSpecifications().get(0).getInitializer().toString();
+                  if(isFinal) {                     
+                     final Expression initExpr = fieldDecl.getFieldSpecifications().get(0).getInitializer();
+                     final String initializer  = initExpr == null ? "" : initExpr.toString();
                      return !initializer.equals(access.getInitializer());
                   }
                   return false;

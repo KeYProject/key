@@ -124,12 +124,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * </p>
     */
    public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = false;
-   
+
    /**
     * If the fast mode is enabled the step wise creation of models is disabled.
     */
    public static final boolean FAST_MODE = true;
-   
+
    /**
     * Number of executed SET nodes to execute all in one.
     */
@@ -144,17 +144,17 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * Default stop conditions of executed SET nodes.
     */
    public static final int[] DEFAULT_MAXIMAL_SET_NODES_PER_RUN;
-   
+
    /**
     * The used temporary oracle directory.
     */
    protected static final File tempNewOracleDirectory;
-   
+
    /**
     * The directory which contains the KeY repository.
     */
    public static final File testCaseDirectory;
-   
+
    static {
       File projectRoot = IOUtil.getProjectRoot(AbstractSymbolicExecutionTestCase.class);
       // Update path in Eclipse Plug-ins executed as JUnit Test.
@@ -169,7 +169,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       testCaseDirectory = new File(projectRoot + File.separator + "resources"+ File.separator + "testcase");
    }
-   
+
    /**
     * Creates the temporary oracle directory if required.
     */
@@ -194,7 +194,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       tempNewOracleDirectory = directory;
    }
-   
+
    /**
     * Creates a new oracle file.
     * @param node The node to save as oracle file.
@@ -206,8 +206,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws IOException Occurred Exception
     * @throws ProofInputException Occurred Exception
     */
-   protected static void createOracleFile(IExecutionNode<?> node, 
-                                          String oraclePathInBaseDirFile, 
+   protected static void createOracleFile(IExecutionNode<?> node,
+                                          String oraclePathInBaseDirFile,
                                           boolean saveConstraints,
                                           boolean saveVariables,
                                           boolean saveCallStack,
@@ -223,7 +223,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          printOracleDirectory();
       }
    }
-   
+
    /**
     * Prints {@link #tempNewOracleDirectory} to the user via {@link System#out}.
     */
@@ -253,7 +253,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param compareConstraints Compare constraints?
     * @throws ProofInputException Occurred Exception.
     */
-   public static void assertExecutionNodes(IExecutionNode<?> expected, 
+   public static void assertExecutionNodes(IExecutionNode<?> expected,
                                            IExecutionNode<?> current,
                                            boolean compareVariables,
                                            boolean compareCallStack,
@@ -295,7 +295,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertTrue(currentVisitedNodes.isEmpty());
       }
    }
-   
+
    /**
     * Searches the direct or indirect child in subtree of the node to search in.
     * @param toSearchIn The node to search in.
@@ -327,7 +327,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       assertNotNull("Direct or indirect Child " + childToSearch + " is not contained in " + toSearchIn + ".", toSearchIn);
       return toSearchIn;
    }
-   
+
    /**
     * Searches the direct child. Nodes are equal if the name and the element type is equal.
     * @param parentToSearchIn The parent to search in its children.
@@ -376,8 +376,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param compareConstraints Compare constraints?
     * @throws ProofInputException Occurred Exception.
     */
-   protected static void assertExecutionNode(IExecutionNode<?> expected, 
-                                             IExecutionNode<?> current, 
+   protected static void assertExecutionNode(IExecutionNode<?> expected,
+                                             IExecutionNode<?> current,
                                              boolean compareParent,
                                              boolean compareVariables,
                                              boolean compareCallStack,
@@ -738,14 +738,14 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertConstraints(expectedVariables, currentVariables);
       }
    }
-   
+
    /**
     * Makes sure that the given constraints are the same.
     * @param expected The expected constraints.
     * @param current The current constraints.
     * @throws ProofInputException Occurred Exception.
     */
-   protected static void assertConstraints(IExecutionConstraint[] expected, 
+   protected static void assertConstraints(IExecutionConstraint[] expected,
                                            IExecutionConstraint[] current) throws ProofInputException {
       TestCase.assertEquals(expected.length, current.length);
       // Compare ignore order
@@ -778,7 +778,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param current The current constraint.
     * @throws ProofInputException Occurred Exception.
     */
-   protected static void assertConstraint(IExecutionConstraint expected, 
+   protected static void assertConstraint(IExecutionConstraint expected,
                                           IExecutionConstraint current) throws ProofInputException {
       if (expected != null) {
          assertNotNull(current);
@@ -826,7 +826,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertVariables(expectedVariables, currentVariables, true, true, compareConstraints);
       }
    }
-   
+
    /**
     * Makes sure that the given variables are the same.
     * @param expected The expected variables.
@@ -836,9 +836,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param compareConstraints Compare constraints?
     * @throws ProofInputException Occurred Exception.
     */
-   protected static void assertVariables(IExecutionVariable[] expected, 
+   protected static void assertVariables(IExecutionVariable[] expected,
                                          IExecutionVariable[] current,
-                                         boolean compareParent, 
+                                         boolean compareParent,
                                          boolean compareChildren,
                                          boolean compareConstraints) throws ProofInputException {
       TestCase.assertEquals(expected.length, current.length);
@@ -875,9 +875,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param compareConstraints Compare constraints?
     * @throws ProofInputException Occurred Exception.
     */
-   protected static void assertVariable(IExecutionVariable expected, 
+   protected static void assertVariable(IExecutionVariable expected,
                                         IExecutionVariable current,
-                                        boolean compareParent, 
+                                        boolean compareParent,
                                         boolean compareChildren,
                                         boolean compareConstraints) throws ProofInputException {
       if (expected != null) {
@@ -901,7 +901,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertNull(current);
       }
    }
-   
+
    /**
     * Makes sure that the given values are the same.
     * @param expected The expected values.
@@ -911,9 +911,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param compareConstraints Compare constraints?
     * @throws ProofInputException Occurred Exception.
     */
-   protected static void assertValues(IExecutionValue[] expected, 
+   protected static void assertValues(IExecutionValue[] expected,
                                       IExecutionValue[] current,
-                                      boolean compareParent, 
+                                      boolean compareParent,
                                       boolean compareChildren,
                                       boolean compareConstraints) throws ProofInputException {
       TestCase.assertEquals(expected.length, current.length);
@@ -941,7 +941,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       TestCase.assertTrue(availableCurrentVariables.isEmpty());
    }
-   
+
    /**
     * Makes sure that the given values are the same.
     * @param expected The expected variable.
@@ -951,9 +951,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param compareConstraints Compare constraints?
     * @throws ProofInputException Occurred Exception.
     */
-   protected static void assertValue(IExecutionValue expected, 
+   protected static void assertValue(IExecutionValue expected,
                                      IExecutionValue current,
-                                     boolean compareParent, 
+                                     boolean compareParent,
                                      boolean compareChildren,
                                      boolean compareConstraints) throws ProofInputException {
       if (expected != null) {
@@ -986,7 +986,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertNull(current);
       }
    }
-   
+
    /**
     * Executes an "step return" global on all goals on the given {@link SymbolicExecutionTreeBuilder}.
     * @param ui The {@link DefaultUserInterfaceControl} to use.
@@ -1000,11 +1000,11 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     */
-   protected static void stepReturn(DefaultUserInterfaceControl ui, 
-                                    SymbolicExecutionTreeBuilder builder, 
-                                    String oraclePathInBaseDirFile, 
-                                    int oracleIndex, 
-                                    String oracleFileExtension, 
+   protected static void stepReturn(DefaultUserInterfaceControl ui,
+                                    SymbolicExecutionTreeBuilder builder,
+                                    String oraclePathInBaseDirFile,
+                                    int oracleIndex,
+                                    String oracleFileExtension,
                                     File baseDir) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
       // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
       Proof proof = builder.getProof();
@@ -1014,14 +1014,14 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
       ui.getProofControl().startAndWaitForAutoMode(proof);
-      // Update symbolic execution tree 
+      // Update symbolic execution tree
       builder.analyse();
       // Test result
       assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex, oracleFileExtension, baseDir);
    }
-   
-   
-   
+
+
+
    /**
     * Executes an "step return" global on all goals on the given {@link SymbolicExecutionTreeBuilder}.
     * @param ui The {@link DefaultUserInterfaceControl} to use.
@@ -1035,11 +1035,11 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     */
-   protected static void stepReturnWithBreakpoints(DefaultUserInterfaceControl ui, 
-                                    SymbolicExecutionTreeBuilder builder, 
-                                    String oraclePathInBaseDirFile, 
-                                    int oracleIndex, 
-                                    String oracleFileExtension, 
+   protected static void stepReturnWithBreakpoints(DefaultUserInterfaceControl ui,
+                                    SymbolicExecutionTreeBuilder builder,
+                                    String oraclePathInBaseDirFile,
+                                    int oracleIndex,
+                                    String oracleFileExtension,
                                     File baseDir,
                                     CompoundStopCondition lineBreakpoints) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
       // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
@@ -1051,12 +1051,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
       ui.getProofControl().startAndWaitForAutoMode(proof);
-      // Update symbolic execution tree 
+      // Update symbolic execution tree
       builder.analyse();
       // Test result
       assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex, oracleFileExtension, baseDir);
    }
-   
+
    /**
     * Executes an "step over" global on all goals on the given {@link SymbolicExecutionTreeBuilder}.
     * @param ui The {@link DefaultUserInterfaceControl} to use.
@@ -1070,11 +1070,11 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     */
-   protected static void stepOver(DefaultUserInterfaceControl ui, 
-                                  SymbolicExecutionTreeBuilder builder, 
-                                  String oraclePathInBaseDirFile, 
-                                  int oracleIndex, 
-                                  String oracleFileExtension, 
+   protected static void stepOver(DefaultUserInterfaceControl ui,
+                                  SymbolicExecutionTreeBuilder builder,
+                                  String oraclePathInBaseDirFile,
+                                  int oracleIndex,
+                                  String oracleFileExtension,
                                   File baseDir) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
       // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
       Proof proof = builder.getProof();
@@ -1084,12 +1084,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
       ui.getProofControl().startAndWaitForAutoMode(proof);
-      // Update symbolic execution tree 
+      // Update symbolic execution tree
       builder.analyse();
       // Test result
       assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex, oracleFileExtension, baseDir);
    }
-   
+
    /**
     * Executes an "step into" global on all goals on the given {@link SymbolicExecutionTreeBuilder}.
     * @param ui The {@link DefaultUserInterfaceControl} to use.
@@ -1104,11 +1104,11 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     */
-   protected static SymbolicExecutionCompletions stepInto(DefaultUserInterfaceControl ui, 
-                                                          SymbolicExecutionTreeBuilder builder, 
-                                                          String oraclePathInBaseDirFile, 
-                                                          int oracleIndex, 
-                                                          String oracleFileExtension, 
+   protected static SymbolicExecutionCompletions stepInto(DefaultUserInterfaceControl ui,
+                                                          SymbolicExecutionTreeBuilder builder,
+                                                          String oraclePathInBaseDirFile,
+                                                          int oracleIndex,
+                                                          String oracleFileExtension,
                                                           File baseDir) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
       // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
       Proof proof = builder.getProof();
@@ -1116,13 +1116,13 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
       ui.getProofControl().startAndWaitForAutoMode(proof);
-      // Update symbolic execution tree 
+      // Update symbolic execution tree
       SymbolicExecutionCompletions completions = builder.analyse();
       // Test result
       assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex, oracleFileExtension, baseDir);
       return completions;
    }
-   
+
    /**
     * Executes an "step into" global on all goals on the given {@link SymbolicExecutionTreeBuilder}.
     * @param ui The {@link DefaultUserInterfaceControl} to use.
@@ -1136,9 +1136,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     */
-   protected static void resume(DefaultUserInterfaceControl ui, 
-                                SymbolicExecutionTreeBuilder builder, 
-                                String oraclePathInBaseDirFile, 
+   protected static void resume(DefaultUserInterfaceControl ui,
+                                SymbolicExecutionTreeBuilder builder,
+                                String oraclePathInBaseDirFile,
                                 File baseDir) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
       // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
       Proof proof = builder.getProof();
@@ -1146,12 +1146,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
       ui.getProofControl().startAndWaitForAutoMode(proof);
-      // Update symbolic execution tree 
+      // Update symbolic execution tree
       builder.analyse();
       // Test result
       assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, baseDir);
    }
-   
+
    /**
     * Makes sure that after a step the correct set tree is created.
     * @param builder The {@link SymbolicExecutionTreeBuilder} to test.
@@ -1164,8 +1164,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     */
-   protected static void assertSetTreeAfterStep(SymbolicExecutionTreeBuilder builder, 
-                                                String oraclePathInBaseDirFile, 
+   protected static void assertSetTreeAfterStep(SymbolicExecutionTreeBuilder builder,
+                                                String oraclePathInBaseDirFile,
                                                 File baseDir) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
       if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
          createOracleFile(builder.getStartNode(), oraclePathInBaseDirFile, false, false, false, false);
@@ -1180,7 +1180,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertExecutionNodes(oracleRoot, builder.getStartNode(), false, false, false, false, false);
       }
    }
-   
+
    /**
     * Makes sure that after a step the correct set tree is created.
     * @param builder The {@link SymbolicExecutionTreeBuilder} to test.
@@ -1193,14 +1193,14 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     */
-   protected static void assertSetTreeAfterStep(SymbolicExecutionTreeBuilder builder, 
-                                                String oraclePathInBaseDirFile, 
-                                                int oracleIndex, 
-                                                String oracleFileExtension, 
+   protected static void assertSetTreeAfterStep(SymbolicExecutionTreeBuilder builder,
+                                                String oraclePathInBaseDirFile,
+                                                int oracleIndex,
+                                                String oracleFileExtension,
                                                 File baseDir) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
       assertSetTreeAfterStep(builder, oraclePathInBaseDirFile + "_" + oracleIndex + oracleFileExtension, baseDir);
    }
-   
+
    /**
     * Searches a {@link IProgramMethod} in the given {@link Services}.
     * @param services The {@link Services} to search in.
@@ -1208,12 +1208,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param methodFullName The method name to search.
     * @return The first found {@link IProgramMethod} in the type.
     */
-   public static IProgramMethod searchProgramMethod(Services services, 
-                                                    String containerTypeName, 
+   public static IProgramMethod searchProgramMethod(Services services,
+                                                    String containerTypeName,
                                                     final String methodFullName) {
       return HelperClassForTests.searchProgramMethod(services, containerTypeName, methodFullName);
    }
-   
+
    /**
     * Creates a {@link SymbolicExecutionEnvironment} which consists
     * of loading a file to load, finding the method to proof, instantiation
@@ -1225,7 +1225,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvarints Use loop invariants?
     * @param blockTreatmentContract Block contracts or expand otherwise?
-    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels.
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
@@ -1236,8 +1236,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
-   protected static SymbolicExecutionEnvironment<DefaultUserInterfaceControl> createSymbolicExecutionEnvironment(File baseDir, 
-                                                                                                                 String javaPathInBaseDir, 
+   protected static SymbolicExecutionEnvironment<DefaultUserInterfaceControl> createSymbolicExecutionEnvironment(File baseDir,
+                                                                                                                 String javaPathInBaseDir,
                                                                                                                  String baseContractName,
                                                                                                                  boolean mergeBranchConditions,
                                                                                                                  boolean useOperationContracts,
@@ -1270,7 +1270,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
    }
-   
+
    /**
     * Creates a {@link SymbolicExecutionEnvironment} which consists
     * of loading a file to load, finding the method to proof, instantiation
@@ -1284,7 +1284,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvarints Use loop invariants?
     * @param blockTreatmentContract Block contracts or expand otherwise?
-    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels.
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
@@ -1294,9 +1294,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
-   protected static SymbolicExecutionEnvironment<DefaultUserInterfaceControl> createSymbolicExecutionEnvironment(File baseDir, 
-                                                                                                                 String javaPathInBaseDir, 
-                                                                                                                 String containerTypeName, 
+   protected static SymbolicExecutionEnvironment<DefaultUserInterfaceControl> createSymbolicExecutionEnvironment(File baseDir,
+                                                                                                                 String javaPathInBaseDir,
+                                                                                                                 String containerTypeName,
                                                                                                                  String methodFullName,
                                                                                                                  String precondition,
                                                                                                                  boolean mergeBranchConditions,
@@ -1329,7 +1329,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
    }
-   
+
    /**
     * Creates a {@link SymbolicExecutionEnvironment} which consists
     * of loading a proof file to load and creation with configuration of {@link SymbolicExecutionTreeBuilder}.
@@ -1339,7 +1339,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvarints Use loop invariants?
     * @param blockTreatmentContract Block contracts or expand otherwise?
-    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels.
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
@@ -1349,8 +1349,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProblemLoaderException Occurred Exception.
     */
-   protected static SymbolicExecutionEnvironment<DefaultUserInterfaceControl> createSymbolicExecutionEnvironment(File baseDir, 
-                                                                                                                 String proofPathInBaseDir, 
+   protected static SymbolicExecutionEnvironment<DefaultUserInterfaceControl> createSymbolicExecutionEnvironment(File baseDir,
+                                                                                                                 String proofPathInBaseDir,
                                                                                                                  boolean mergeBranchConditions,
                                                                                                                  boolean useOperationContracts,
                                                                                                                  boolean useLoopInvarints,
@@ -1378,7 +1378,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
    }
-   
+
    /**
     * Creates a {@link SymbolicExecutionEnvironment} which consists
     * of loading a file to load, finding the method to proof, instantiation
@@ -1394,7 +1394,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvarints Use loop invariants?
     * @param blockTreatmentContract Block contracts or expand otherwise?
-    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels.
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
@@ -1404,9 +1404,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
-   protected static SymbolicExecutionEnvironment<DefaultUserInterfaceControl> createSymbolicExecutionEnvironment(File baseDir, 
-                                                                                                                 String javaPathInBaseDir, 
-                                                                                                                 String containerTypeName, 
+   protected static SymbolicExecutionEnvironment<DefaultUserInterfaceControl> createSymbolicExecutionEnvironment(File baseDir,
+                                                                                                                 String javaPathInBaseDir,
+                                                                                                                 String containerTypeName,
                                                                                                                  String methodFullName,
                                                                                                                  String precondition,
                                                                                                                  Position startPosition,
@@ -1441,7 +1441,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
    }
-   
+
    /**
     * Extracts the content of the try block from the initial {@link Sequent}.
     * @param proof The {@link Proof} which contains the initial {@link Sequent}:
@@ -1465,7 +1465,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       assertEquals(1, tryStatement.getBranchCount());
       return ProofSaver.printAnything(tryStatement.getBody(), proof.getServices());
    }
-   
+
    /**
     * Makes sure that the save and loading process works.
     * @param baseDir The base directory which contains test and oracle file.
@@ -1478,9 +1478,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws SAXException Occurred Exception
     * @throws ProblemLoaderException Occurred Exception
     */
-   protected void assertSaveAndReload(File baseDir, 
-                                      String javaPathInBaseDir, 
-                                      String oraclePathInBaseDirFile, 
+   protected void assertSaveAndReload(File baseDir,
+                                      String javaPathInBaseDir,
+                                      String oraclePathInBaseDirFile,
                                       SymbolicExecutionEnvironment<?> env) throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
@@ -1513,7 +1513,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          }
       }
    }
-   
+
    /**
     * Executes a test with the following steps:
     * <ol>
@@ -1540,7 +1540,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
     * @param blockTreatmentContract Block contracts or expand otherwise?
-    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels.
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
@@ -1575,14 +1575,14 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                             boolean simplifyConditions) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       assertNotNull(maximalNumberOfExecutedSetNodesPerRun);
       for (int i = 0; i < maximalNumberOfExecutedSetNodesPerRun.length; i++) {
-         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(baseDir, 
-                                                                                   javaPathInBaseDir, 
-                                                                                   containerTypeName, 
-                                                                                   methodFullName, 
+         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(baseDir,
+                                                                                   javaPathInBaseDir,
+                                                                                   containerTypeName,
+                                                                                   methodFullName,
                                                                                    precondition,
-                                                                                   oraclePathInBaseDirFile, 
+                                                                                   oraclePathInBaseDirFile,
                                                                                    includeConstraints,
-                                                                                   includeVariables, 
+                                                                                   includeVariables,
                                                                                    includeCallStack,
                                                                                    includeReturnValues,
                                                                                    maximalNumberOfExecutedSetNodesPerRun[i],
@@ -1599,9 +1599,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          env.dispose();
       }
    }
-   
+
    /**
-    * Executes {@link #doSETTest(File, String, String, String, String, boolean, boolean, int, boolean, boolean, boolean)} and disposes the created {@link SymbolicExecutionEnvironment}. 
+    * Executes {@link #doSETTest(File, String, String, String, String, boolean, boolean, int, boolean, boolean, boolean)} and disposes the created {@link SymbolicExecutionEnvironment}.
     * @param baseDir The base directory which contains test and oracle file.
     * @param javaPathInBaseDir The path to the java file inside the base directory.
     * @param containerTypeName The java class to test.
@@ -1617,7 +1617,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
     * @param blockTreatmentContract Block contracts or expand otherwise?
-    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels.
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
@@ -1677,7 +1677,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
     * @param blockTreatmentContract Block contracts or expand otherwise?
-    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels.
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
@@ -1733,7 +1733,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
     * @param blockTreatmentContract Block contracts or expand otherwise?
-    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels.
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
@@ -1794,7 +1794,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          setOneStepSimplificationEnabled(null, originalOneStepSimplification);
       }
    }
-   
+
    /**
     * Executes a test with the following steps:
     * <ol>
@@ -1821,7 +1821,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
     * @param blockTreatmentContract Block contracts or expand otherwise?
-    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels.
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
@@ -1882,7 +1882,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          restoreTacletOptions(originalTacletOptions);
       }
    }
-   
+
    /**
     * Executes a test with the following steps:
     * <ol>
@@ -1907,7 +1907,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
     * @param blockTreatmentContract Block contracts or expand otherwise?
-    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels.
     * @param aliasChecks Do alias checks?
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
@@ -1977,11 +1977,11 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       int nodeCount;
       // Execute auto mode until no more symbolic execution tree nodes are found or no new rules are applied.
       do {
-         // Store the number of nodes before start of the auto mode 
+         // Store the number of nodes before start of the auto mode
          nodeCount = env.getProof().countNodes();
          // Run proof
          env.getProofControl().startAndWaitForAutoMode(env.getProof());
-         // Update symbolic execution tree 
+         // Update symbolic execution tree
          env.getBuilder().analyse();
          // Make sure that not to many set nodes are executed
          Map<Goal, Integer> executedSetNodesPerGoal = stopCondition.getExectuedSetNodesPerGoal();
@@ -1999,7 +1999,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Make sure that the created symbolic execution tree matches the expected one.
       assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables, includeCallStack, false, includeReturnValues, includeConstraints);
    }
-   
+
    /**
     * Ensures that the default taclet options are defined.
     * @param baseDir The base directory which contains the java file.
@@ -2073,7 +2073,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
 
    /**
     * creates a new factory that should be used by others afterwards
-    * @return 
+    * @return
     */
    protected ITermProgramVariableCollectorFactory createNewProgramVariableCollectorFactory(final SymbolicExecutionBreakpointStopCondition breakpointParentStopCondition) {
       ITermProgramVariableCollectorFactory programVariableCollectorFactory = new ITermProgramVariableCollectorFactory() {
