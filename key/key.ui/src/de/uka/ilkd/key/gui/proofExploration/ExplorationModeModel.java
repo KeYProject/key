@@ -1,6 +1,12 @@
 package de.uka.ilkd.key.gui.proofExploration;
 
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.proof.Proof;
+
 public class ExplorationModeModel {
+
+
+
     /**
      * Mode which rules to use in exploration mode
      */

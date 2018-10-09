@@ -79,6 +79,7 @@ public class AddFormulaToSequentAction extends ExplorationAction {
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
         app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), getMediator().getServices(), true);
         ImmutableList<Goal> result = g.apply(app);
+        //set the explroation flag
         result.forEach(goal -> goal.node().getNodeInfo().setExploration(true));
         assert result.size() == 2;
         if(antecedent){

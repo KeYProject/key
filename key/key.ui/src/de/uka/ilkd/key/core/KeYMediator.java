@@ -106,7 +106,7 @@ public class KeYMediator {
      */
     private boolean inAutoMode = false;
     /**
-     * boolean flag whether explorationmode is turned on
+     * Model aof teh exploration mode  state
      */
     private ExplorationModeModel explorationModeModel;
 

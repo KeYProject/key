@@ -1,8 +1,12 @@
 package de.uka.ilkd.key.gui.proofExploration;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.ShowExplorationStepAction;
+import de.uka.ilkd.key.proof.Proof;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -19,6 +23,9 @@ public class ExplorationModeToolBar extends JToolBar {
     private JCheckBox showSecondBranch;
 
     private ExplorationModeModel explorationModeModel;
+
+    private JButton showExplorationSteps;
+
     /**
      * Combobox for choosing which kind of taclets to apply
      */
@@ -102,6 +109,10 @@ public class ExplorationModeToolBar extends JToolBar {
             showSecondBranch.setEnabled(false);
         }*/
         this.add(showSecondBranch);
+
+        this.showExplorationSteps = new JButton(new ShowExplorationStepAction(mw));
+
+        this.add(showExplorationSteps);
         this.setEnabled(true);
 
     }
