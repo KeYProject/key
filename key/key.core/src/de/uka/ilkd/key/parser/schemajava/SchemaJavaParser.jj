@@ -4184,6 +4184,17 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
     return result;
 }
    )
+   |
+   (
+    "#forInitUnfoldTransformer" "(" ( loopStat=ForStatement() ) ")" ";"
+   {
+       result = factory.createRKeYMetaConstruct();
+       setPrefixInfo(result);
+       result.setChild(loopStat);  
+       result.setName("#forInitUnfoldTransformer");
+       return result;
+   }
+   )
      |
    (
     <UNPACK> "("
@@ -4197,7 +4208,7 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
        return result;
    }
    )
-      |
+  |
 (      "#for-to-while" "(" innerLabel = JumpLabelSV() "," outerLabel = JumpLabelSV() ","
       (   stat = Statement()
       ) ")"

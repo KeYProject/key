@@ -63,7 +63,7 @@ public class JavaProfile extends AbstractProfile {
      * Other instances of this class are typically only required to
      * use them in different {@link Thread}s (not the UI {@link Thread}).
      * </p>
-     */
+     */ 
     public static JavaProfile defaultInstance;
     public static JavaProfile defaultInstancePermissions;
 
