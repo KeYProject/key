@@ -435,6 +435,7 @@ public class ContractFactory {
                         t.originalAtPreVars),
                    oriPost));
            }
+           
            if(oriFreePost != null) {
                freePosts.put(h, tb.imp(atPreify(t.originalFreePres.get(h), t.originalAtPreVars),
                                        oriFreePost));
@@ -500,7 +501,14 @@ public class ContractFactory {
                     // if the first or the other contract do not have a
                     // measured-by-clause, assume no clause at all
                     if(mby == null || otherMby == null) {
-                        mby = null;
+                        if (mby != null) {
+                            mby = tb.ife(t.getPre(h, t.originalSelfVar, t.originalParamVars, t.originalAtPreVars, services), mby, tb.zero());
+                        } else if (otherMby != null) {
+                            System.out.println(otherMby.sort());
+                            mby = tb.ife(otherPre, otherMby, tb.zero());                        
+                        } else {
+                            mby = null;                            
+                        }
                     } else {
                         mby = tb.ife(otherPre, otherMby, mby);
                     }
