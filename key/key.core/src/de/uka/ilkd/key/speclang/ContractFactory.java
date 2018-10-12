@@ -502,8 +502,8 @@ public class ContractFactory {
                     // measured-by-clause, assume no clause at all
                     if(mby == null || otherMby == null) {
                         if (mby != null) {
-                            mby = tb.ife(t.getPre(h, t.originalSelfVar, 
-                                    t.originalParamVars, t.originalAtPreVars, 
+                            mby = tb.ife(t.getPre(h, t.originalSelfVar,
+                                    t.originalParamVars, t.originalAtPreVars,
                                     services), mby, tb.zero());
                         } else if (otherMby != null) {
                             System.out.println(otherMby.sort());
