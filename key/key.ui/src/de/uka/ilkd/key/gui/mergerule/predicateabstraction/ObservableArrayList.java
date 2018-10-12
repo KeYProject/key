@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * An observable {@link ArrayList}; poor reimplementation of the JavaFX class.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class ObservableArrayList<E> extends ArrayList<E> {
     private static final long serialVersionUID = 1L;
