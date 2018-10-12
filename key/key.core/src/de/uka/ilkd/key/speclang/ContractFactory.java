@@ -506,7 +506,6 @@ public class ContractFactory {
                                     t.originalParamVars, t.originalAtPreVars,
                                     services), mby, tb.zero());
                         } else if (otherMby != null) {
-                            System.out.println(otherMby.sort());
                             mby = tb.ife(otherPre, otherMby, tb.zero());
                         } else {
                             mby = null;
