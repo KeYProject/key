@@ -342,7 +342,7 @@ public class MergeRule implements BuiltInRule {
             MergeProcedure mergeRule, SymbolicExecutionState state1,
             SymbolicExecutionState state2, Term programCounter,
             Term distinguishingFormula, Services services) {
-
+        
         final TermBuilder tb = services.getTermBuilder();
 
         // Newly introduced names
