@@ -82,7 +82,7 @@ public final class MainWindow extends JFrame  {
 
     /** the second toolbar */
     private JToolBar fileOpToolBar;
-    
+
     /** JScrollPane for displaying SequentViews*/
     private final MainFrame mainFrame;
 
@@ -91,7 +91,7 @@ public final class MainWindow extends JFrame  {
 
     /** SequentView for the current goal */
     public final CurrentGoalView currentGoalView;
-    
+
     /** Use this SequentView in case no proof is loaded. */
     private final EmptySequent emptySequent;
 
@@ -111,7 +111,7 @@ public final class MainWindow extends JFrame  {
 
     /** listener to global proof events */
     private final MainProofListener proofListener;
-    
+
     private final RecentFileMenu recentFileMenu;
 
     public boolean frozen = false;
@@ -152,7 +152,7 @@ public final class MainWindow extends JFrame  {
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
 
     private final NotificationManager notificationManager;
-    
+
     private final PreferenceSaver prefSaver =
         new PreferenceSaver(Preferences.userNodeForPackage(MainWindow.class));
 
@@ -166,9 +166,9 @@ public final class MainWindow extends JFrame  {
     private UnicodeToggleAction unicodeToggleAction;
     private final HidePackagePrefixToggleAction hidePackagePrefixToggleAction =
         new HidePackagePrefixToggleAction(this);
-    
+
     private final TermLabelMenu termLabelMenu;
-    
+
     public TermLabelVisibilityManager getVisibleTermLabels(){
         return termLabelMenu.getVisibleTermLabels();
     }
@@ -223,7 +223,7 @@ public final class MainWindow extends JFrame  {
         }
         return instance;
     }
-    
+
     /**
      * <p>
      * Checks if an instance of the main window is already created or not.
@@ -237,7 +237,7 @@ public final class MainWindow extends JFrame  {
     public static boolean hasInstance() {
        return instance != null;
     }
-    
+
     /**
      * Workaround to an issue with the Gnome window manager.
      * This sets the application title in the app menu (in the top bar)
@@ -415,13 +415,85 @@ public final class MainWindow extends JFrame  {
         ComplexButton comp = createSMTComponent();
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
-        toolBar.addSeparator();        
+        toolBar.addSeparator();
         toolBar.add(new CounterExampleAction(this));
         toolBar.add(new TestGenerationAction(this));
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this));
+        toolBar.addSeparator();
+        toolBar.add(createHeatmapToggle());
+        toolBar.add(createHeatmapMenuOpener());
+
         return toolBar;
+    }
+
+    private JToggleButton createHeatmapToggle() {
+        JToggleButton toggleHeatmapButton = new JToggleButton();
+        toggleHeatmapButton.setEnabled(getMediator().getSelectedProof() != null);
+        toggleHeatmapButton.setToolTipText("Enable or disable "
+            + "age heatmaps in the sequent view.");
+        toggleHeatmapButton.setIcon(IconFactory.heatmapIcon(TOOLBAR_ICON_SIZE));
+
+        de.uka.ilkd.key.settings.ViewSettings vs =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        toggleHeatmapButton.setSelected(vs.isShowHeatmap());
+        final SettingsListener setListener = new SettingsListener() {
+            @Override
+            public void settingsChanged(EventObject e) {
+                toggleHeatmapButton.setSelected(vs.isShowHeatmap());
+            }
+        };
+        vs.addSettingsListener(setListener);
+
+        final KeYSelectionListener selListener = new KeYSelectionListener() {
+            @Override
+            public void selectedNodeChanged(KeYSelectionEvent e) {
+                final Proof proof = getMediator().getSelectedProof();
+                toggleHeatmapButton.setEnabled(proof != null);
+            }
+
+            @Override
+            public void selectedProofChanged(KeYSelectionEvent e) {
+                selectedNodeChanged(e);
+            }
+        };
+        getMediator().addKeYSelectionListener(selListener);
+
+        toggleHeatmapButton.addActionListener(new AbstractAction() {
+            /**
+             * version id
+             */
+            private static final long serialVersionUID = 8366752959467104985L;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                vs.setHeatmapOptions(!vs.isShowHeatmap(), vs.isHeatmapSF(),
+                    vs.isHeatmapNewest(), vs.getMaxAgeForHeatmap());
+            }
+        });
+        return toggleHeatmapButton;
+    }
+
+    private JButton createHeatmapMenuOpener() {
+        JButton openMenuButton = new JButton();
+        HeatmapSettingsAction a = new HeatmapSettingsAction(this);
+        openMenuButton.addActionListener(a);
+        openMenuButton.setEnabled(getMediator().getSelectedProof() != null);
+        openMenuButton.setIcon(IconFactory.selectDecProcArrow(TOOLBAR_ICON_SIZE));
+        final KeYSelectionListener selListener = new KeYSelectionListener() {
+            @Override
+            public void selectedNodeChanged(KeYSelectionEvent e) {
+                final Proof proof = getMediator().getSelectedProof();
+                openMenuButton.setEnabled(proof != null);
+            }
+            @Override
+            public void selectedProofChanged(KeYSelectionEvent e) {
+                selectedNodeChanged(e);
+            }
+        };
+        getMediator().addKeYSelectionListener(selListener);
+        return openMenuButton;
     }
 
     private ComplexButton createSMTComponent() {
@@ -619,7 +691,7 @@ public final class MainWindow extends JFrame  {
             }});
 //        view.add(laf); // uncomment this line to include the option in the menu
 
-        
+
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
         view.add(new JCheckBoxMenuItem(unicodeToggleAction));
         view.add(new JCheckBoxMenuItem(new SyntaxHighlightingToggleAction(this)));
@@ -630,7 +702,7 @@ public final class MainWindow extends JFrame  {
         {
             JMenu fontSize = new JMenu("Font Size");
             fontSize.add(new DecreaseFontSizeAction(this));
-            fontSize.add(new IncreaseFontSizeAction(this));        
+            fontSize.add(new IncreaseFontSizeAction(this));
             view.add(fontSize);
         }
         view.add(new ToolTipOptionsAction(this));
@@ -1090,14 +1162,14 @@ public final class MainWindow extends JFrame  {
                @Override
                public void keyReleased(KeyEvent e) {
                   e.consume();
-                  
+
                }
 
                @Override
                public void keyTyped(KeyEvent e) {
-                  e.consume();                  
+                  e.consume();
                }
-               
+
             });
         }
     }
@@ -1378,7 +1450,7 @@ public final class MainWindow extends JFrame  {
     public Action getUnicodeToggleAction() {
     	return unicodeToggleAction;
     }
-    
+
     public Action getHidePackagePrefixToggleAction() {
         return hidePackagePrefixToggleAction;
     }
@@ -1483,7 +1555,7 @@ public final class MainWindow extends JFrame  {
      * list of them.
      */
     public List<Name> getSortedTermLabelNames() {
-        /* 
+        /*
          * Get list of labels from profile. This list is not always identical,
          * since the used Profile may change during execution.
          */
@@ -1499,7 +1571,7 @@ public final class MainWindow extends JFrame  {
    public JToolBar getControlToolBar() {
       return controlToolBar;
    }
-   
+
    /**
     * Defines if talcet infos are shown or not.
     * <p>

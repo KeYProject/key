@@ -40,7 +40,7 @@
          </variable>
          <loopInvariant name="invariant: i &gt;= 0
 &amp; \forall int j_5;
-    (   j_5 &lt; i &amp; 0 &lt;= j_5 &amp; inInt(j_5)
+    (   (j_5 &lt; i &amp; 0 &lt;= j_5)&lt;&lt;SC&gt;&gt; &amp; inInt(j_5)
      -&gt; self.passwords[j_5] &gt;= 0);
 variant: javaSubInt(self.passwords.length, i)
 mod: {}" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
