@@ -4,7 +4,7 @@ import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -29,9 +29,9 @@ public class ForInitUnfoldTransformer extends ProgramTransformer {
 	 /** creates a typeof ProgramTransformer 
      * @param loop the instance of expression contained by 
      * the meta construct 
-     */
-    public ForInitUnfoldTransformer(For loop) {
-    	super("forInitUnfoldTransformer", loop); 
+     */ 
+    public ForInitUnfoldTransformer(LoopInit loopInit) {
+    	super("forInitUnfoldTransformer", loopInit); 
     } 
 
     /** 
@@ -40,19 +40,16 @@ public class ForInitUnfoldTransformer extends ProgramTransformer {
      * @return the transformated program
      */
 	public ProgramElement transform(ProgramElement pe, Services services, SVInstantiations svInst) {
-		Debug.assertTrue(pe instanceof For, 
+		Debug.assertTrue(pe instanceof LoopInit, 
 			"ForInitUnfoldTransformer cannot handle ", pe);
-		final For astFor  = (For)pe;
+		final LoopInit astLoopInit  = (LoopInit) pe;
 		final Statement[] loopInitStatementList = 
-		    new Statement[astFor.getInitializers().size() + 1];
-		for (int i = 0; i<loopInitStatementList.length-1; i++) {
+		    new Statement[astLoopInit.getStatementCount()];
+		for (int i = 0; i<loopInitStatementList.length; i++) {
 		    loopInitStatementList[i] = 
-			astFor.getInitializers().get(i);
+		    astLoopInit.getStatementAt(i);
 		}
-	
-		loopInitStatementList[loopInitStatementList.length - 1] = KeYJavaASTFactory
-			.forLoop(astFor.getGuard(), astFor.getIForUpdates(),
-				astFor.getBody());
+		
 		return KeYJavaASTFactory.block(loopInitStatementList);
 	} 
 }

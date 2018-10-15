@@ -3670,6 +3670,7 @@ Statement Statement() :
 | result = WhileStatement()
 | result = DoStatement()
 | result = ForStatement()
+| result = ForLoopInitStatement()
 | result = TransactionStatement()
 | result = BreakStatement()
 | result = ContinueStatement()
@@ -4242,7 +4243,7 @@ Do DoStatement() :
     setPostfixInfo(result);
     return result;
   }
-}
+} 
 
 LoopStatement ForStatement() :
 {
@@ -4252,6 +4253,13 @@ LoopStatement ForStatement() :
     ASTList<Expression> update = null;
     Statement body;
 }
+
+LoopStatement ForLoopInitStatement() :
+{
+    LoopStatement result;
+    ASTList<LoopInitializer> init = null;
+}
+
 {
   "for"
 //  {

@@ -591,6 +591,7 @@ TOKEN :
 		    | < TYPEOF: "#typeof" >
 		    | < SWITCHTOIF: "#switch-to-if" >
 		    | < UNPACK: "#unpack" >
+		    | < FORINITUNFOLDTRANSFORMER: "#forInitUnfoldTransformer" >
 		    | < SET: "#set" >
 		    }
 
@@ -3598,6 +3599,7 @@ Statement Statement() :
      | result = KeYMetaConstructStatement()
      | result = DoStatement()
      | result = ForStatement()
+     | result = ForLoopInitStatement()
      | result = TransactionStatement()
      | result = BreakStatement()
      | result = ContinueStatement()
@@ -3628,7 +3630,7 @@ StatementSVWrapper StatementSV() :
 LabeledStatement LabeledStatement() :
 {
     LabeledStatement result;
-    Identifier id;
+    Identifier id; 
     Statement stat;
 }
 {
@@ -4178,7 +4180,7 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
     result = factory.createRKeYMetaConstruct(); //chrisg
     setPrefixInfo(result);
     result.setChild(loopStat);
-    result.addSV(innerLabel);
+    result.addSV(innerLabel); 
     result.addSV(outerLabel);
     result.setName("#unwind-loop-bounded");
     return result;
@@ -4186,13 +4188,13 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
    )
    |
    (
-    "#forInitUnfoldTransformer" "(" ( loopStat=ForStatement() ) ")" ";"
+    <FORINITUNFOLDTRANSFORMER> "(" ( loopStat=ForLoopInitStatement() ) ")" ";"
    {
        result = factory.createRKeYMetaConstruct();
        setPrefixInfo(result);
        result.setChild(loopStat);  
        result.setName("#forInitUnfoldTransformer");
-       return result;
+       return result; 
    }
    )
      |
@@ -4526,6 +4528,12 @@ LoopStatement ForStatement() :
     Expression guard = null;
     ASTList<Expression> update = null;
     Statement body;
+}
+
+LoopStatement ForLoopInitStatement() :
+{
+    LoopStatement result;
+    ASTList<LoopInitializer> init = null;
 }
 {
     "for"
