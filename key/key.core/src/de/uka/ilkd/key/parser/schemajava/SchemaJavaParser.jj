@@ -4188,7 +4188,7 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
    )
    |
    (
-    <FORINITUNFOLDTRANSFORMER> "(" ( loopStat=ForLoopInitStatement() ) ")" ";"
+    <FORINITUNFOLDTRANSFORMER> "(" ( loopStat=ForLoopInitStatement() ) ")" ";" 
    {
        result = factory.createRKeYMetaConstruct();
        setPrefixInfo(result);
