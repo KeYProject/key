@@ -138,7 +138,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         } else if ("#unpack".equals(mcName)) {
             return new Unpack(list.get(For.class));
         } else if ("#forInitUnfoldTransformer".equals(mcName)) {
-            return new ForInitUnfoldTransformer(list.get(LoopInit.class));
+            return new ForInitUnfoldTransformer(list.get(For.class));
         } else if ("#for-to-while".equals(mcName)) {
             final ProgramSV[] labels = mc.getSV();
             return new ForToWhile(labels[0], labels[1],   

@@ -3670,7 +3670,6 @@ Statement Statement() :
 | result = WhileStatement()
 | result = DoStatement()
 | result = ForStatement()
-| result = ForLoopInitStatement()
 | result = TransactionStatement()
 | result = BreakStatement()
 | result = ContinueStatement()
@@ -4252,12 +4251,6 @@ LoopStatement ForStatement() :
     Expression guard = null;
     ASTList<Expression> update = null;
     Statement body;
-}
-
-LoopStatement ForLoopInitStatement() :
-{
-    LoopStatement result;
-    ASTList<LoopInitializer> init = null;
 }
 
 {
