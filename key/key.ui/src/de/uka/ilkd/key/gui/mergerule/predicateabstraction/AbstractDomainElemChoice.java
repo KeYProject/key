@@ -15,51 +15,53 @@ package de.uka.ilkd.key.gui.mergerule.predicateabstraction;
 
 import java.util.Optional;
 
-import javafx.beans.property.SimpleObjectProperty;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionDomainElement;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * Model class for the manual choice of an abstract domain element by the user.
  *
- * @author Dominic Scheurer
+ * @author Dominic Steinhoefel
  */
 public class AbstractDomainElemChoice {
     /**
      * The program variable for which an abstract domain element has been
      * chosen.
      */
-    private final SimpleObjectProperty<ProgramVariable> progVar;
+    private ProgramVariable progVar;
 
     /**
      * The chosen abstract domain element. May be null if no choice has been
      * done for the program variable {@link #progVar}.
      */
-    private final SimpleObjectProperty<Optional<AbstractPredicateAbstractionDomainElement>> abstrDomElem;
+    private Optional<AbstractPredicateAbstractionDomainElement> abstrDomElem;
 
     public AbstractDomainElemChoice(ProgramVariable progVar,
             Optional<AbstractPredicateAbstractionDomainElement> abstrDomElem) {
-        this.progVar = new SimpleObjectProperty<ProgramVariable>(progVar);
-        this.abstrDomElem =
-                new SimpleObjectProperty<Optional<AbstractPredicateAbstractionDomainElement>>(
-                        abstrDomElem);
+        this.progVar = progVar;
+        this.abstrDomElem = abstrDomElem;
     }
 
-    public SimpleObjectProperty<ProgramVariable> getProgVar() {
+    public ProgramVariable getProgVar() {
         return progVar;
     }
 
     public void setProgVar(ProgramVariable progVar) {
-        this.progVar.set(progVar);
+        this.progVar = progVar;
     }
 
-    public SimpleObjectProperty<Optional<AbstractPredicateAbstractionDomainElement>> getAbstrDomElem() {
+    public Optional<AbstractPredicateAbstractionDomainElement> getAbstrDomElem() {
         return abstrDomElem;
     }
 
     public void setAbstrDomElem(
+            AbstractPredicateAbstractionDomainElement abstrDomElem) {
+        this.abstrDomElem = Optional.of(abstrDomElem);
+    }
+
+    public void setAbstrDomElem(
             Optional<AbstractPredicateAbstractionDomainElement> abstrDomElem) {
-        this.abstrDomElem.set(abstrDomElem);
+        this.abstrDomElem = abstrDomElem;
     }
 
     /**
@@ -67,6 +69,10 @@ public class AbstractDomainElemChoice {
      *         not Empty.
      */
     public boolean isChoiceMade() {
-        return abstrDomElem.get().isPresent();
+        return abstrDomElem.isPresent();
+    }
+    
+    public String choiceToString() {
+        return abstrDomElem.isPresent() ? abstrDomElem.toString() : "(no choice)";
     }
 }
