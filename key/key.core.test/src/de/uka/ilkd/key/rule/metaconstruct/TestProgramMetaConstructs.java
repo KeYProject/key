@@ -18,6 +18,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -25,6 +26,7 @@ import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.Break;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -113,5 +115,26 @@ public class TestProgramMetaConstructs extends TestCase {
 	}
 	
     }
-
+    
+    public void testForInitUnfoldTransformer1() {
+    	ProgramElement block = ( ProgramElement ) TacletForTests.parsePrg ( "{ for (int i = 4, y = 42; i <= 6; i++) { } }" );
+    	JavaASTCollector coll = new JavaASTCollector(block, de.uka.ilkd.key.java.statement.LoopInit.class);
+	 	coll.start();
+	 	assertTrue(coll.getNodes().size() == 1);
+	 	ForInitUnfoldTransformer tf = new ForInitUnfoldTransformer((LoopInit) coll.getNodes().head());
+	 	StatementBlock sb = (StatementBlock) tf.transform(coll.getNodes().head(), new Services(AbstractProfile.getDefaultProfile()), SVInstantiations.EMPTY_SVINSTANTIATIONS);
+	 	assertTrue(sb.getChildCount() == 1);
+	 	assertTrue(sb.toString().equals((( ProgramElement ) TacletForTests.parsePrg ("{int i = 4,y = 42;}")).toString()));
+    }
+    
+    public void testForInitUnfoldTransformer2() {
+    	ProgramElement block = ( ProgramElement ) TacletForTests.parsePrg ( "{ for (int i = 4; i <= 6; i++) { } }" );
+    	JavaASTCollector coll = new JavaASTCollector(block, de.uka.ilkd.key.java.statement.LoopInit.class);
+	 	coll.start();
+	 	assertTrue(coll.getNodes().size() == 1);
+	 	ForInitUnfoldTransformer tf = new ForInitUnfoldTransformer((LoopInit) coll.getNodes().head());
+	 	StatementBlock sb = (StatementBlock) tf.transform(coll.getNodes().head(), new Services(AbstractProfile.getDefaultProfile()), SVInstantiations.EMPTY_SVINSTANTIATIONS);
+	 	assertTrue(sb.getChildCount() == 1);
+	 	assertTrue(sb.toString().equals((( ProgramElement ) TacletForTests.parsePrg ("{int i = 4;}")).toString()));
+    }
 }
