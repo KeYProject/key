@@ -4145,6 +4145,7 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
     ProgramVariableSVWrapper sv = null;
     ExecCtxtSVWrapper execsv = null;
     JumpLabelSVWrapper innerLabel, outerLabel;
+    ASTList<LoopInitializer> loopInit;
 }
 { (
    "#unwind-loop" "("
@@ -4187,11 +4188,11 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
    )
    |
    (
-    <FORINITUNFOLDTRANSFORMER> "(" ( loopStat=ForStatement() ) ")" ";" 
+    <FORINITUNFOLDTRANSFORMER> "(" ( loopInit=ForInit() ) ")" ";" 
    {
        result = factory.createRKeYMetaConstruct();
        setPrefixInfo(result);
-       result.setChild(loopStat);  
+       result.setChild(loopInit.get(0));  
        result.setName("#forInitUnfoldTransformer");
        return result; 
    }
