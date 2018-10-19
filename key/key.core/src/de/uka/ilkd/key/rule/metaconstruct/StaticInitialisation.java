@@ -39,7 +39,7 @@ public class StaticInitialisation extends ProgramTransformer {
      * program transformation 
      * @return the transformated program
      */
-    public ProgramElement transform(ProgramElement pe,
+    public ProgramElement[] transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations insts) {	
 	KeYJavaType typeToBeInitialised = null;
@@ -97,6 +97,6 @@ public class StaticInitialisation extends ProgramTransformer {
 		typeToBeInitialised,
 		ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER);
 
-	return KeYJavaASTFactory.passiveExpression(methodCall);
+	return new ProgramElement[] { KeYJavaASTFactory.passiveExpression(methodCall) };
     }
 }

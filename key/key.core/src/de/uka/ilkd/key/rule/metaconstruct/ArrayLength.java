@@ -34,10 +34,10 @@ public class ArrayLength extends ProgramTransformer {
      * program transformation 
      * @return the transformated program
      */
-    public ProgramElement transform(ProgramElement pe,
+    public ProgramElement[] transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations insts) {
-	return KeYJavaASTFactory.fieldReference(services, "length",
-		(Expression) pe, insts.getExecutionContext());
+	return new ProgramElement[] { KeYJavaASTFactory.fieldReference(services, "length",
+		(Expression) pe, insts.getExecutionContext()) };
     }
 }

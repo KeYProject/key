@@ -96,7 +96,7 @@ public class ForToWhile extends ProgramTransformer {
     /**
      * performs the necessary transformation using a LoopToWhileTransformation
      */
-    public ProgramElement transform(ProgramElement pe,
+    public ProgramElement[] transform(ProgramElement pe,
             Services services, SVInstantiations svInst) {
 
         WhileLoopTransformation w = new ForToWhileTransformation(pe,
@@ -105,7 +105,7 @@ public class ForToWhile extends ProgramTransformer {
                 services);
 
         w.start();
-        return w.result();
+        return new ProgramElement[] { w.result() };
     }
 
     /**

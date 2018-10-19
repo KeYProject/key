@@ -99,7 +99,7 @@ public class ConstructorCall extends ProgramTransformer {
      * unneccessary proof branches. As <code>newObject</code> can never be
      * <code>null</code> no null pointer check is necessary.
      */
-    public ProgramElement transform
+    public ProgramElement[] transform
 	(ProgramElement pe, Services services, SVInstantiations svInst) {
 
 	final New constructorReference = (New) pe;
@@ -107,13 +107,13 @@ public class ConstructorCall extends ProgramTransformer {
 
 	if (!(classType.getJavaType() instanceof ClassDeclaration)) {
 	    // no implementation available
-	    return pe;
+	    return new ProgramElement[] { pe };
 	}
 
 	final List<Statement> stmnts = constructorCallSequence(constructorReference,
                 classType, svInst, services);
 
-	return KeYJavaASTFactory.block(stmnts);
+	return new ProgramElement[] { KeYJavaASTFactory.block(stmnts) };
     }
 
     /**

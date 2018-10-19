@@ -38,7 +38,7 @@ public class TypeOf extends ProgramTransformer {
 	 * program transformation 
 	 * @return the transformated program
 	 */
-	public ProgramElement transform(ProgramElement pe,
+	public ProgramElement[] transform(ProgramElement pe,
 			Services services,
 			SVInstantiations insts) {
 
@@ -58,13 +58,13 @@ public class TypeOf extends ProgramTransformer {
 
 		if (!(kjt.getJavaType() instanceof PrimitiveType)) {
 			if (kjt.getJavaType() instanceof ArrayType) {
-		return KeYJavaASTFactory.typeRef(kjt,
-			((ArrayType) kjt.getJavaType()).getDimension());
+		return new ProgramElement[] { KeYJavaASTFactory.typeRef(kjt,
+			((ArrayType) kjt.getJavaType()).getDimension()) };
 			}
 		}
 
 
 
-	return KeYJavaASTFactory.typeRef(kjt);
+	return new ProgramElement[] { KeYJavaASTFactory.typeRef(kjt) };
 	}
 }

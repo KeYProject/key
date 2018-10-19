@@ -154,13 +154,13 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             final SVInstantiations svInst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
             // construct what would be produced from rule instanceCreationAssignment
-            final Expression init = (Expression) (new CreateObject(n)).transform(n, services, svInst);
+            final Expression init = (Expression) (new CreateObject(n)).transform(n, services, svInst)[0];
             final Statement assignTmp = declare(selfVar,init,type);
             result[0] = new StatementBlock(assignTmp);
 
             // try block
-            final Statement constructorCall = (Statement)(new ConstructorCall(selfVar, n)).transform(n, services, svInst);
-            final Statement setInitialized = (Statement) (new PostWork(selfVar)).transform(selfVar, services, svInst);
+            final Statement constructorCall = (Statement)(new ConstructorCall(selfVar, n)).transform(n, services, svInst)[0];
+            final Statement setInitialized = (Statement) (new PostWork(selfVar)).transform(selfVar, services, svInst)[0];
             result[1] = new StatementBlock(constructorCall, setInitialized);
         } else {
             final MethodBodyStatement call =

@@ -78,7 +78,7 @@ public class DoBreak extends ProgramTransformer {
      * about the java programs
      * @return the transformated program
      */
-    public ProgramElement transform(ProgramElement pe,
+    public ProgramElement[] transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations insts) {	
 	// get label of break
@@ -93,7 +93,7 @@ public class DoBreak extends ProgramTransformer {
 	    breakStmnt = (Break) 
 		((StatementBlock) lst.getChildAt(1)).getChildAt(0);
 	}
-	return doBreak((NonTerminalProgramElement)pe, breakStmnt.getLabel(),
-		       breakStmnt);
+	return new ProgramElement[] { doBreak((NonTerminalProgramElement)pe, breakStmnt.getLabel(),
+		       breakStmnt) };
     }
 }

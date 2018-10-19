@@ -67,7 +67,7 @@ public class SwitchToIf extends ProgramTransformer {
      * program transformation 
      * @return the transformated program
      */
-    public ProgramElement transform(ProgramElement pe,
+    public ProgramElement[] transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations insts) {
 	Switch sw = (Switch) pe;
@@ -125,9 +125,9 @@ public class SwitchToIf extends ProgramTransformer {
 	}
 	result = KeYJavaASTFactory.insertStatementInBlock(result, ifs);
 	if(noNewBreak){
-	    return result;
+	    return new ProgramElement[] { result };
 	}else{
-	    return KeYJavaASTFactory.labeledStatement(l, result, PositionInfo.UNDEFINED);
+	    return new ProgramElement[] { KeYJavaASTFactory.labeledStatement(l, result, PositionInfo.UNDEFINED) };
 	}
     }
 

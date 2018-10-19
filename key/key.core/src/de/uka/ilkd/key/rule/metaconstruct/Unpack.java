@@ -37,7 +37,7 @@ public class Unpack extends ProgramTransformer {
      * program transformation 
      * @return the transformated program
      */
-    public ProgramElement transform(ProgramElement pe,
+    public ProgramElement[] transform(ProgramElement pe,
 	    Services services,
 	    SVInstantiations svInst) {
 	Debug.assertTrue(pe instanceof For, 
@@ -53,6 +53,6 @@ public class Unpack extends ProgramTransformer {
 	loopInitStatementList[loopInitStatementList.length - 1] = KeYJavaASTFactory
 		.forLoop(astFor.getGuard(), astFor.getIForUpdates(),
 			astFor.getBody());
-	return KeYJavaASTFactory.block(loopInitStatementList);
+	return new ProgramElement[] { KeYJavaASTFactory.block(loopInitStatementList) };
     }
 }

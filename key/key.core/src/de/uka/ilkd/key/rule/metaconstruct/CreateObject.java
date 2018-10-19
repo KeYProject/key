@@ -44,7 +44,7 @@ public class CreateObject extends ProgramTransformer {
      * creates and returns a method reference to the implicit '<createObject>'
      * method 
      */
-    public ProgramElement transform(ProgramElement pe, 
+    public ProgramElement[] transform(ProgramElement pe, 
 					    Services services,
 					    SVInstantiations svInst) {
 	
@@ -53,10 +53,10 @@ public class CreateObject extends ProgramTransformer {
   	if (!(classReference.getKeYJavaType().getJavaType() 
 	      instanceof ClassDeclaration)) {
   	    // no implementation available
-  	    return pe;
+  	    return new ProgramElement[] { pe };
   	}	
  	
-	return KeYJavaASTFactory.methodCall(
-		classReference, CreateObjectBuilder.IMPLICIT_OBJECT_CREATE);
+	return new ProgramElement[] { KeYJavaASTFactory.methodCall(
+		classReference, CreateObjectBuilder.IMPLICIT_OBJECT_CREATE) };
     }
 }

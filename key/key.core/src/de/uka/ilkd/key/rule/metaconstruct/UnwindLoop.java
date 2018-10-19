@@ -63,11 +63,11 @@ public class UnwindLoop extends ProgramTransformer {
      * @param svInst the instantiations esp. of the inner and outer label 
      * @return the transformated program
      */
-    public ProgramElement transform(ProgramElement pe,
+    public ProgramElement[] transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations svInst) {
 	if (!(pe instanceof LoopStatement)) {
-	    return pe;
+	    return new ProgramElement[] { pe };
 	}
 	final LoopStatement originalLoop = (LoopStatement)pe;
                         
@@ -79,7 +79,7 @@ public class UnwindLoop extends ProgramTransformer {
 					svInst.getInstantiation(innerLabel),
                                         services);
 	w.start();
-	return w.result();
+	return new ProgramElement[] { w.result() };
     }
 
     /** @deprecated */

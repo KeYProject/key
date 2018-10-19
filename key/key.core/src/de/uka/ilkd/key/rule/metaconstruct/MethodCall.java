@@ -175,7 +175,7 @@ public class MethodCall extends ProgramTransformer {
      * @param svInst the instantiations esp. of the inner and outer label 
      * @return the transformed program
      */
-    public ProgramElement transform(ProgramElement pe,
+    public ProgramElement[] transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations svInst) {
 
@@ -290,8 +290,8 @@ public class MethodCall extends ProgramTransformer {
 		}
 	    }
 	}
-	return KeYJavaASTFactory.insertStatementInBlock(paramDecl,
-		KeYJavaASTFactory.block(result));
+	return new ProgramElement[] { KeYJavaASTFactory.insertStatementInBlock(paramDecl,
+		KeYJavaASTFactory.block(result)) };
     }
 
 

@@ -56,7 +56,7 @@ public class ExpandMethodBody extends ProgramTransformer {
      * @param svInst the instantiations esp. of the inner and outer label 
      * @return the transformed program
      */
-    public ProgramElement transform(ProgramElement pe,
+    public ProgramElement[] transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations svInst) {
 
@@ -97,9 +97,9 @@ public class ExpandMethodBody extends ProgramTransformer {
 	result = (StatementBlock) paramRepl.result();
 	
 
-	return KeYJavaASTFactory.methodFrame(mbs.getResultVariable(),
+	return new ProgramElement[] { KeYJavaASTFactory.methodFrame(mbs.getResultVariable(),
 		KeYJavaASTFactory.executionContext(mbs.getBodySource(), pm,
-			newCalled), result, PositionInfo.UNDEFINED);
+			newCalled), result, PositionInfo.UNDEFINED) };
     }
 
 }

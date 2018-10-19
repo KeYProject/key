@@ -43,7 +43,7 @@ public class ArrayPostDecl extends ProgramTransformer {
      * @param svInst the instantiations of the schema variables
      * @return the transformed program
      */
-    public ProgramElement transform(ProgramElement pe,
+    public ProgramElement[] transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations svInst) {
 
@@ -58,12 +58,12 @@ public class ArrayPostDecl extends ProgramTransformer {
 	    declaration.getVariables().get(0);
 
 	final IProgramVariable variable = var.getProgramVariable();
-	return KeYJavaASTFactory.declare(modifiers, variable,
+	return new ProgramElement[] { KeYJavaASTFactory.declare(modifiers, variable,
 		var.getInitializer(),
 		originalTypeReference.getProgramElementName(),
 		originalTypeReference.getDimensions() + var.getDimensions(),
 		originalTypeReference.getReferencePrefix(),
-		variable.getKeYJavaType());
+		variable.getKeYJavaType()) };
     }
 
 }

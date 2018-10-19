@@ -38,14 +38,14 @@ public class IsStatic extends ProgramTransformer{
      * @param svInst the instantiations esp. of the inner and outer label 
      * @return the transformed program
      */
-    public ProgramElement transform(ProgramElement pe,
+    public ProgramElement[] transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations svInst) {
 	if(pe instanceof VariableReference){
 	    if(((VariableReference) pe).getProgramVariable().isStatic()){
-		return KeYJavaASTFactory.trueLiteral();
+		return new ProgramElement[] { KeYJavaASTFactory.trueLiteral() };
 	    }
 	}
-	return KeYJavaASTFactory.falseLiteral();
+	return new ProgramElement[] { KeYJavaASTFactory.falseLiteral() };
     }
 }

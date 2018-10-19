@@ -64,7 +64,7 @@ public class EvaluateArgs extends ProgramTransformer{
 
 
     @Override
-    public ProgramElement transform(ProgramElement pe,
+    public ProgramElement[] transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations svInst) {
 
@@ -125,6 +125,6 @@ public class EvaluateArgs extends ProgramTransformer{
 	    res[res.length-1] = resMR;
 	}
 
-	return KeYJavaASTFactory.block(res);
+	return new ProgramElement[] { KeYJavaASTFactory.block(res) };
     }
 }

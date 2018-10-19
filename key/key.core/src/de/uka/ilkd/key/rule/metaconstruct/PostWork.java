@@ -54,7 +54,7 @@ public class PostWork extends ProgramTransformer {
      * program transformation
      * @return the transformated program
      */
-    public ProgramElement transform(ProgramElement pe,
+    public ProgramElement[] transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations svInst) {
 	final ProgramVariable newObject =
@@ -65,8 +65,8 @@ public class PostWork extends ProgramTransformer {
 	final ProgramVariable initialized = services.getJavaInfo().getAttribute
 	    (ImplicitFieldAdder.IMPLICIT_INITIALIZED,
              services.getJavaInfo().getJavaLangObject());
-	return KeYJavaASTFactory.assign(
+	return new ProgramElement[] { KeYJavaASTFactory.assign(
 		KeYJavaASTFactory.fieldReference(newObject, initialized),
-		BooleanLiteral.TRUE);
+		BooleanLiteral.TRUE) };
     }
 }

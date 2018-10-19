@@ -44,7 +44,7 @@ public class MultipleVarDecl extends ProgramTransformer {
      * @param svInst the instantiations esp. of the inner and outer label 
      * @return the transformed program
      */
-    public ProgramElement transform(ProgramElement pe,
+    public ProgramElement[] transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations svInst) {
 	VariableDeclaration vardecl = (VariableDeclaration)pe;
@@ -63,7 +63,7 @@ public class MultipleVarDecl extends ProgramTransformer {
 		    modifiers, tref, headVar);
 	    LocalVariableDeclaration newVarDeclList = KeYJavaASTFactory
 		    .declare(modifiers, tref, tailVars);
-	    return KeYJavaASTFactory.block(newVarDecl, newVarDeclList);
+	    return new ProgramElement[] { KeYJavaASTFactory.block(newVarDecl, newVarDeclList) };
 	} 
 	throw new RuntimeException("Meta-construct MultipleVarDecl could "+
 				   "not handle program element "+pe);

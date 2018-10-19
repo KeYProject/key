@@ -49,7 +49,7 @@ public class SpecialConstructorCall extends ProgramTransformer {
      * returns the result. Thereby all necessary references are
      * resolved.     
      */
-    public ProgramElement transform
+    public ProgramElement[] transform
 	(ProgramElement pe, Services services, SVInstantiations svInst) {
 
 	SpecialConstructorReference constructorReference = 
@@ -62,8 +62,8 @@ public class SpecialConstructorCall extends ProgramTransformer {
 	    prefix = KeYJavaASTFactory.superReference();
 	}
 
-	return KeYJavaASTFactory.methodCall(prefix, NORMALFORM_IDENTIFIER,
-		constructorReference.getArguments());
+	return new ProgramElement[] { KeYJavaASTFactory.methodCall(prefix, NORMALFORM_IDENTIFIER,
+		constructorReference.getArguments()) };
     }
 
 }

@@ -56,7 +56,7 @@ public class TestProgramMetaConstructs extends TestCase {
 	ProgramElement result = rmLabel.
 	    transform
 	    (rmLabel.body(), new Services(AbstractProfile.getDefaultProfile()),
-	     SVInstantiations.EMPTY_SVINSTANTIATIONS);
+	     SVInstantiations.EMPTY_SVINSTANTIATIONS)[0];
 	assertTrue(result instanceof Break);
     }
 
@@ -92,7 +92,7 @@ public class TestProgramMetaConstructs extends TestCase {
 	    .getChildAt(1);
 	ProgramTransformer typeof = new TypeOf(expr);
 	assertTrue(((TypeRef) typeof.transform(expr, services,
-            SVInstantiations.EMPTY_SVINSTANTIATIONS)).getName().equals("int"));
+            SVInstantiations.EMPTY_SVINSTANTIATIONS)[0]).getName().equals("int"));
     }
 
     public void testBugId183 () {

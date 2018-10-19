@@ -208,7 +208,7 @@ public class InitArrayCreation extends InitArray {
     }
     
 
-    public ProgramElement transform(ProgramElement pe, 
+    public ProgramElement[] transform(ProgramElement pe, 
 					    Services services,
 					    SVInstantiations svInst) {
 
@@ -220,7 +220,7 @@ public class InitArrayCreation extends InitArray {
 	if ( pe instanceof NewArray ) {
 	    na = (NewArray) pe;
 	    if (na.getArrayInitializer() == null) {
-		return arrayCreationWithoutInitializers(array, na, services);
+		return new ProgramElement[] { arrayCreationWithoutInitializers(array, na, services) };
 	    }
 	} else if (pe instanceof ArrayInitializer) {
 	    final KeYJavaType kjt = 
@@ -243,7 +243,7 @@ public class InitArrayCreation extends InitArray {
         assert baseTypeRef != null;
 	    na = KeYJavaASTFactory.newArray(baseTypeRef, dimension, init, kjt);
 	} else {
-	    return pe;
+	    return new ProgramElement[] { pe };
 	}
 
 	final int arrayLength =
@@ -258,7 +258,7 @@ public class InitArrayCreation extends InitArray {
 	createArrayAssignments(arrayLength + 1, body, vars,
 		(ReferencePrefix) array, na);
 
-	return KeYJavaASTFactory.block(body);
+	return new ProgramElement[] { KeYJavaASTFactory.block(body) };
     }
     
 
