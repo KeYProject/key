@@ -48,11 +48,7 @@ public class ArrayPostDecl extends ProgramTransformer {
         final ImmutableArray<Modifier> modifiers = declaration.getModifiers();
         final TypeReference originalTypeReference = declaration
                 .getTypeReference();
-        /*
-         * Debug.assertTrue (declaration.getVariables().size() == 1,
-         * "ArrayPostDecl metaconsstruct can only treat single variable declarations"
-         * );
-         */
+
         final VariableSpecification var = declaration.getVariables().get(0);
 
         final IProgramVariable variable = var.getProgramVariable();
