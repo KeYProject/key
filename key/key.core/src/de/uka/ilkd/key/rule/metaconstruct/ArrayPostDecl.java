@@ -32,7 +32,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * Replaces a local variable declaration <code> #t #v[]; </code> with
  * <code>#t[] #v;</code>
  *
- * @author Dominic Steinhöfel
+ * @author N/A
  */
 public class ArrayPostDecl extends ProgramTransformer {
 
