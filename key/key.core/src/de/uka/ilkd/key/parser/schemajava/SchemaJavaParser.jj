@@ -591,6 +591,7 @@ TOKEN :
 		    | < TYPEOF: "#typeof" >
 		    | < SWITCHTOIF: "#switch-to-if" >
 		    | < UNPACK: "#unpack" >
+		    | < FORINITUNFOLDTRANSFORMER: "#forInitUnfoldTransformer" >
 		    | < SET: "#set" >
 		    }
 
@@ -3628,7 +3629,7 @@ StatementSVWrapper StatementSV() :
 LabeledStatement LabeledStatement() :
 {
     LabeledStatement result;
-    Identifier id;
+    Identifier id; 
     Statement stat;
 }
 {
@@ -4144,6 +4145,7 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
     ProgramVariableSVWrapper sv = null;
     ExecCtxtSVWrapper execsv = null;
     JumpLabelSVWrapper innerLabel, outerLabel;
+    ASTList<LoopInitializer> loopInit;
 }
 { (
    "#unwind-loop" "("
@@ -4178,11 +4180,22 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
     result = factory.createRKeYMetaConstruct(); //chrisg
     setPrefixInfo(result);
     result.setChild(loopStat);
-    result.addSV(innerLabel);
+    result.addSV(innerLabel); 
     result.addSV(outerLabel);
     result.setName("#unwind-loop-bounded");
     return result;
 }
+   )
+   |
+   (
+    <FORINITUNFOLDTRANSFORMER> "(" ( loopInit=ForInit() ) ")" ";" 
+   {
+       result = factory.createRKeYMetaConstruct();
+       setPrefixInfo(result);
+       result.setChild(loopInit.get(0));  
+       result.setName("#forInitUnfoldTransformer");
+       return result; 
+   }
    )
      |
    (
@@ -4197,7 +4210,7 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
        return result;
    }
    )
-      |
+  |
 (      "#for-to-while" "(" innerLabel = JumpLabelSV() "," outerLabel = JumpLabelSV() ","
       (   stat = Statement()
       ) ")"
@@ -4516,6 +4529,7 @@ LoopStatement ForStatement() :
     ASTList<Expression> update = null;
     Statement body;
 }
+
 {
     "for"
 //  {
