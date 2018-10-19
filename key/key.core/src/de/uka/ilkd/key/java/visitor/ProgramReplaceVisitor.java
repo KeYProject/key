@@ -137,7 +137,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
                 x.transform(body, services, svinsts);
         if (transformResult == null) {
             /*
-             * NOTE (DS, 2018-10-19): This is awkward. But there are
+             * NOTE (DS, 2018-10-19): This is awkward... But there are
              * transformers returning null since "no work is needed" (see
              * StaticInitialization transformer). And obviously, addChild(null)
              * has a different behavior than addChildren(<emptyArray>), since in
