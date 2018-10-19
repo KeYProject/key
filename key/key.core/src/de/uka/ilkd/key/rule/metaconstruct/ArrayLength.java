@@ -20,24 +20,22 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class ArrayLength extends ProgramTransformer {
-    
-     /** creates a typeof ProgramTransformer 
-     * @param expr the instance of expression contained by 
-     * the meta construct 
+
+    /**
+     * creates a typeof ProgramTransformer
+     *
+     * @param expr
+     *            the instance of expression contained by the meta construct
      */
     public ArrayLength(Expression expr) {
-	super("#length-reference", expr); 
-	
+        super("#length-reference", expr);
+
     }
 
-    /** performs the program transformation needed for symbolic
-     * program transformation 
-     * @return the transformated program
-     */
-    public ProgramElement[] transform(ProgramElement pe,
-					    Services services,
-					    SVInstantiations insts) {
-	return new ProgramElement[] { KeYJavaASTFactory.fieldReference(services, "length",
-		(Expression) pe, insts.getExecutionContext()) };
+    @Override
+    public ProgramElement[] transform(ProgramElement pe, Services services,
+            SVInstantiations insts) {
+        return new ProgramElement[] { KeYJavaASTFactory.fieldReference(services,
+            "length", (Expression) pe, insts.getExecutionContext()) };
     }
 }

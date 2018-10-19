@@ -141,7 +141,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             return new ForInitUnfoldTransformer(list.get(ProgramSV.class));
         } else if ("#for-to-while".equals(mcName)) {
             final ProgramSV[] labels = mc.getSV();
-            return new ForToWhile(labels[0], labels[1],   
+            return new ForToWhile(labels[0], labels[1],
                     list.get(Statement.class));      
         }  else if ("#enhancedfor-elim".equals(mcName)){ 
             EnhancedFor efor = list.get(EnhancedFor.class);

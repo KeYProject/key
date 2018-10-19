@@ -19,33 +19,32 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+/**
+ * Creates a true or false literal if the given program element is or is not a
+ * static variable reference.
+ *
+ * @author N/A
+ */
+public class IsStatic extends ProgramTransformer {
 
-public class IsStatic extends ProgramTransformer{
-
-    /** creates a typeof ProgramTransformer 
-     * @param pe the instance of expression contained by 
-     * the meta construct 
+    /**
+     * creates a typeof ProgramTransformer
+     *
+     * @param pe
+     *            the instance of expression contained by the meta construct
      */
     public IsStatic(ProgramElement pe) {
-	super("#isstatic", pe); 
+        super("#isstatic", pe);
     }
 
-
-    /** performs the program transformation needed for symbolic
-     * program execution 
-     * @param services the Services with all necessary information 
-     * about the java programs
-     * @param svInst the instantiations esp. of the inner and outer label 
-     * @return the transformed program
-     */
-    public ProgramElement[] transform(ProgramElement pe,
-					    Services services,
-					    SVInstantiations svInst) {
-	if(pe instanceof VariableReference){
-	    if(((VariableReference) pe).getProgramVariable().isStatic()){
-		return new ProgramElement[] { KeYJavaASTFactory.trueLiteral() };
-	    }
-	}
-	return new ProgramElement[] { KeYJavaASTFactory.falseLiteral() };
+    @Override
+    public ProgramElement[] transform(ProgramElement pe, Services services,
+            SVInstantiations svInst) {
+        if (pe instanceof VariableReference) {
+            if (((VariableReference) pe).getProgramVariable().isStatic()) {
+                return new ProgramElement[] { KeYJavaASTFactory.trueLiteral() };
+            }
+        }
+        return new ProgramElement[] { KeYJavaASTFactory.falseLiteral() };
     }
 }

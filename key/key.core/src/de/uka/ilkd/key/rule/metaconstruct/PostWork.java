@@ -36,37 +36,40 @@ public class PostWork extends ProgramTransformer {
     private final boolean schema;
 
     public PostWork(SchemaVariable newObjectSV) {
-	super(POST_WORK, (Expression)newObjectSV);
-	schema = true;
+        super(POST_WORK, (Expression) newObjectSV);
+        schema = true;
     }
 
     /**
-     * Used to create this Java statement programmatically.
-     * Do not use in taclet meta constructs!
+     * Used to create this Java statement programmatically. Do not use in taclet
+     * meta constructs!
+     *
+     * @param pv The {@link ProgramVariable}
      */
-    public PostWork (ProgramVariable pv) {
+    public PostWork(ProgramVariable pv) {
         super(POST_WORK, pv);
         schema = false;
     }
 
     /**
-     * performs the program transformation needed for symbolic
-     * program transformation
+     * performs the program transformation needed for symbolic program
+     * transformation
+     *
      * @return the transformated program
      */
-    public ProgramElement[] transform(ProgramElement pe,
-					    Services services,
-					    SVInstantiations svInst) {
-	final ProgramVariable newObject =
-	        schema ?
-	                (ProgramVariable) svInst.getInstantiation((SchemaVariable)body())
-	                : (ProgramVariable)body();
+    @Override
+    public ProgramElement[] transform(ProgramElement pe, Services services,
+            SVInstantiations svInst) {
+        final ProgramVariable newObject = schema
+                ? (ProgramVariable) svInst
+                        .getInstantiation((SchemaVariable) body())
+                : (ProgramVariable) body();
 
-	final ProgramVariable initialized = services.getJavaInfo().getAttribute
-	    (ImplicitFieldAdder.IMPLICIT_INITIALIZED,
-             services.getJavaInfo().getJavaLangObject());
-	return new ProgramElement[] { KeYJavaASTFactory.assign(
-		KeYJavaASTFactory.fieldReference(newObject, initialized),
-		BooleanLiteral.TRUE) };
+        final ProgramVariable initialized = services.getJavaInfo().getAttribute(
+            ImplicitFieldAdder.IMPLICIT_INITIALIZED,
+            services.getJavaInfo().getJavaLangObject());
+        return new ProgramElement[] { KeYJavaASTFactory.assign(
+            KeYJavaASTFactory.fieldReference(newObject, initialized),
+            BooleanLiteral.TRUE) };
     }
 }

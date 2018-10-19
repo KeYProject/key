@@ -12,6 +12,7 @@
 //
 
 package de.uka.ilkd.key.rule.metaconstruct;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -22,20 +23,13 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-/** 
- * This class is used to perform program transformations needed 
- * for the symbolic execution of a loop. It unwinds the loop:
- * e.g. 
- * <code>
+/**
+ * This class is used to perform program transformations needed for the symbolic
+ * execution of a loop. It unwinds the loop: e.g. <code>
  * while ( i<10 ) {
  *   i++
- * }  
- * </code> becomes 
- * if (i<10) 
- *   l1:{
- *      l2:{ i++; }
- *      while (i<10) { i++; }
- *   }
+ * }
+ * </code> becomes if (i<10) l1:{ l2:{ i++; } while (i<10) { i++; } }
  *
  */
 public class UnwindLoop extends ProgramTransformer {
@@ -44,68 +38,69 @@ public class UnwindLoop extends ProgramTransformer {
     private final SchemaVariable outerLabel;
     /** the inner label ('l2') */
     private final SchemaVariable innerLabel;
-    
 
-    /** creates an unwind-loop ProgramTransformer 
-     * @param loop the LoopStatement contained by the meta construct 
+    /**
+     * creates an unwind-loop ProgramTransformer
+     *
+     * @param loop
+     *            the LoopStatement contained by the meta construct
+     * @param innerLabel The inner label SV
+     * @param outerLabel The outer label SV
      */
-    public UnwindLoop(SchemaVariable innerLabel, SchemaVariable outerLabel, 
-                      LoopStatement loop) {
-	super("#unwind-loop", loop); 
+    public UnwindLoop(SchemaVariable innerLabel, SchemaVariable outerLabel,
+            LoopStatement loop) {
+        super("#unwind-loop", loop);
         this.innerLabel = innerLabel;
         this.outerLabel = outerLabel;
     }
 
-    /** performs the program transformation needed for symbolic
-     * program transformation 
-     * @param services the Services with all necessary information 
-     * about the java programs
-     * @param svInst the instantiations esp. of the inner and outer label 
-     * @return the transformated program
-     */
-    public ProgramElement[] transform(ProgramElement pe,
-					    Services services,
-					    SVInstantiations svInst) {
-	if (!(pe instanceof LoopStatement)) {
-	    return new ProgramElement[] { pe };
-	}
-	final LoopStatement originalLoop = (LoopStatement)pe;
-                        
-	final WhileLoopTransformation w = 
-	    new WhileLoopTransformation(originalLoop,
-					(ProgramElementName)
-					svInst.getInstantiation(outerLabel),
-					(ProgramElementName)
-					svInst.getInstantiation(innerLabel),
-                                        services);
-	w.start();
-	return new ProgramElement[] { w.result() };
+    @Override
+    public ProgramElement[] transform(ProgramElement pe, Services services,
+            SVInstantiations svInst) {
+        if (!(pe instanceof LoopStatement)) {
+            return new ProgramElement[] { pe };
+        }
+        final LoopStatement originalLoop = (LoopStatement) pe;
+
+        final WhileLoopTransformation w = new WhileLoopTransformation(
+            originalLoop,
+            (ProgramElementName) svInst.getInstantiation(outerLabel),
+            (ProgramElementName) svInst.getInstantiation(innerLabel), services);
+        w.start();
+        return new ProgramElement[] { w.result() };
     }
 
-    /** @deprecated */
-    public SchemaVariable getInnerLabelSV() {        
+    @Deprecated
+    public SchemaVariable getInnerLabelSV() {
         return innerLabel;
-    }        
+    }
 
-    /** @deprecated */
-    public SchemaVariable getOuterLabelSV() {        
+    @Deprecated
+    public SchemaVariable getOuterLabelSV() {
         return outerLabel;
     }
 
     /**
-     * return a list of the SV that are relevant to this UnwindLoop 
-     * @param svInst the instantiations so far - ignored
+     * return a list of the SV that are relevant to this UnwindLoop
+     *
+     * @param svInst
+     *            the instantiations so far - ignored
      * @return a list of 0 to 2 schema variables (outer/inner label)
      */
-    public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
-		ImmutableList<SchemaVariable> ret = ImmutableSLList.<SchemaVariable>nil();
-		
-		if(innerLabel != null)
-			ret = ret.prepend(innerLabel);
-		
-		if(outerLabel != null)
-			ret = ret.prepend(outerLabel);
-		
-		return ret;
-	}        
+    @Override
+    public ImmutableList<SchemaVariable> neededInstantiations(
+            SVInstantiations svInst) {
+        ImmutableList<SchemaVariable> ret = ImmutableSLList
+                .<SchemaVariable> nil();
+
+        if (innerLabel != null) {
+            ret = ret.prepend(innerLabel);
+        }
+
+        if (outerLabel != null) {
+            ret = ret.prepend(outerLabel);
+        }
+
+        return ret;
+    }
 }

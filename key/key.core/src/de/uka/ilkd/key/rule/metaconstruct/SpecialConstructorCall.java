@@ -25,45 +25,43 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
  * The constructor call meta construct is used to handle a allocation expression
- * like <code>new Class(...)</code>. Thereby it replaces the allocation 
+ * like <code>new Class(...)</code>. Thereby it replaces the allocation
  * expression by a method reference to an implict method called
  * <code>&lt;init&gt;</code> that is mainly the constructor but in its
  * normalform.
  */
 public class SpecialConstructorCall extends ProgramTransformer {
 
-    private static final ProgramElementName NORMALFORM_IDENTIFIER = 
-        new ProgramElementName
-        (de.uka.ilkd.key.java.recoderext.
-         ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER);
-    
-    /** 
-     * creates the metaconstruct
+    /**
+     * The normal form identifier {@link ProgramElementName}.
+     */
+    private static final ProgramElementName NORMALFORM_IDENTIFIER = new ProgramElementName(
+        de.uka.ilkd.key.java.recoderext.//
+                ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER);
+
+    /**
+     * @param consRef
+     *            The constructor reference.
      */
     public SpecialConstructorCall(ProgramElement consRef) {
-	super(new Name("special-constructor-call"), consRef);
+        super(new Name("special-constructor-call"), consRef);
     }
 
-    /** 
-     * transforms the constructor's body into its normalform and
-     * returns the result. Thereby all necessary references are
-     * resolved.     
-     */
-    public ProgramElement[] transform
-	(ProgramElement pe, Services services, SVInstantiations svInst) {
+    @Override
+    public ProgramElement[] transform(ProgramElement pe, Services services,
+            SVInstantiations svInst) {
 
-	SpecialConstructorReference constructorReference = 
-	    (SpecialConstructorReference) pe;
+        SpecialConstructorReference constructorReference = (SpecialConstructorReference) pe;
 
-	ReferencePrefix prefix;
-	if (constructorReference instanceof ThisConstructorReference) {
-	    prefix = KeYJavaASTFactory.thisReference();
-	} else {
-	    prefix = KeYJavaASTFactory.superReference();
-	}
+        ReferencePrefix prefix;
+        if (constructorReference instanceof ThisConstructorReference) {
+            prefix = KeYJavaASTFactory.thisReference();
+        } else {
+            prefix = KeYJavaASTFactory.superReference();
+        }
 
-	return new ProgramElement[] { KeYJavaASTFactory.methodCall(prefix, NORMALFORM_IDENTIFIER,
-		constructorReference.getArguments()) };
+        return new ProgramElement[] { KeYJavaASTFactory.methodCall(prefix,
+            NORMALFORM_IDENTIFIER, constructorReference.getArguments()) };
     }
 
 }

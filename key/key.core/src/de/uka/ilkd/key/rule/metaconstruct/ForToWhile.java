@@ -26,12 +26,12 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  * converts a for-loop to a while loop. Invariant and other rules cannot be
  * performed on for but only on while loops.
- * 
+ *
  * It makes uses of the {@link ForToWhileTransformation} to create a transformed
  * loop body which is then put into the corresponding context.
- * 
+ *
  * <h2>Example</h2>
- * 
+ *
  * <pre>
  * for (int i = 0; i &lt; 100; i++) {
  *     if (i == 2)
@@ -40,9 +40,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *         break;
  * }
  * </pre>
- * 
+ *
  * is translated to
- * 
+ *
  * <pre>
  * _label1: {
  *     int i = 0;
@@ -57,7 +57,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *     }
  * }
  * </pre>
- * 
+ *
  * @see ForToWhileTransformation
  * @author MU
  */
@@ -76,7 +76,7 @@ public class ForToWhile extends ProgramTransformer {
 
     /**
      * creates an loop to while - ProgramTransformer
-     * 
+     *
      * @param loop
      *            the LoopStatement contained by the meta construct
      * @param innerLabel
@@ -93,9 +93,7 @@ public class ForToWhile extends ProgramTransformer {
 
     }
 
-    /**
-     * performs the necessary transformation using a LoopToWhileTransformation
-     */
+    @Override
     public ProgramElement[] transform(ProgramElement pe,
             Services services, SVInstantiations svInst) {
 
@@ -110,11 +108,12 @@ public class ForToWhile extends ProgramTransformer {
 
     /**
      * return a list of the SV that are relevant to this UnwindLoop
-     * 
+     *
      * @param svInst
      *            the instantiations so far - ignored
      * @return a list of 0 to 2 schema variables (outer/inner label)
      */
+    @Override
     public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
         ImmutableList<SchemaVariable> ret = ImmutableSLList.<SchemaVariable>nil();
 
