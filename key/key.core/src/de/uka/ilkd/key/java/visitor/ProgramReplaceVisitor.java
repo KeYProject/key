@@ -41,8 +41,10 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
      *
      * @param root
      *            the ProgramElement where to begin
-     * @param services The Services object.
-     * @param svi Schema Variable Instantiations
+     * @param services
+     *            The Services object.
+     * @param svi
+     *            Schema Variable Instantiations
      */
     public ProgramReplaceVisitor(ProgramElement root, Services services,
             SVInstantiations svi) {
@@ -131,7 +133,21 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 
         assert body != null : "A program transformer without program to transform?";
 
-        addChildren(new ImmutableArray<>(x.transform(body, services, svinsts)));
+        final ProgramElement[] transformResult = //
+                x.transform(body, services, svinsts);
+        if (transformResult == null) {
+            /*
+             * NOTE (DS, 2018-10-19): This is awkward. But there are
+             * transformers returning null since "no work is needed" (see
+             * StaticInitialization transformer). And obviously, addChild(null)
+             * has a different behavior than addChildren(<emptyArray>), since in
+             * the first case, a null value is added to the stack. So we add
+             * null on top.
+             */
+            addChild(null);
+        } else {
+            addChildren(new ImmutableArray<>(transformResult));
+        }
         changed();
     }
 
