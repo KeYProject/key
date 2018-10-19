@@ -82,7 +82,7 @@ public final class ProgramSV extends AbstractSV
         return isListSV;
     }
 
-    /** 
+    /**
      * this method tests on object identity
      */
     @Override
