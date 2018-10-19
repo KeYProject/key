@@ -116,9 +116,8 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 
 	assert body != null : "A program transformer without program to transform?";
 
-	for (ProgramElement pe : x.transform(body, services, svinsts)) {
-	    addChild(pe);
-	}
+	
+	addChildren(new ImmutableArray<>(x.transform(body, services, svinsts)));
 	changed();
     }
 
