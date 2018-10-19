@@ -48,7 +48,7 @@ public class LoopInit extends JavaNonTerminalProgramElement
 	    exps[i] = (LoopInitializer)ups.get(i);
 	}
 	inits = new ImmutableArray<LoopInitializer>(exps);
-    }
+    } 
     
 
     /**

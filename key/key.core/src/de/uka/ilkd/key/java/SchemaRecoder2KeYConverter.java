@@ -43,6 +43,7 @@ import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.IGuard;
 import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
@@ -64,6 +65,7 @@ import de.uka.ilkd.key.rule.metaconstruct.DoBreak;
 import de.uka.ilkd.key.rule.metaconstruct.EnhancedForElimination;
 import de.uka.ilkd.key.rule.metaconstruct.EvaluateArgs;
 import de.uka.ilkd.key.rule.metaconstruct.ExpandMethodBody;
+import de.uka.ilkd.key.rule.metaconstruct.ForInitUnfoldTransformer;
 import de.uka.ilkd.key.rule.metaconstruct.ForToWhile;
 import de.uka.ilkd.key.rule.metaconstruct.InitArrayCreation;
 import de.uka.ilkd.key.rule.metaconstruct.IsStatic;
@@ -135,9 +137,11 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
                     .get(LoopStatement.class));
         } else if ("#unpack".equals(mcName)) {
             return new Unpack(list.get(For.class));
+        } else if ("#forInitUnfoldTransformer".equals(mcName)) {
+            return new ForInitUnfoldTransformer(list.get(ProgramSV.class));
         } else if ("#for-to-while".equals(mcName)) {
             final ProgramSV[] labels = mc.getSV();
-            return new ForToWhile(labels[0], labels[1], 
+            return new ForToWhile(labels[0], labels[1],   
                     list.get(Statement.class));      
         }  else if ("#enhancedfor-elim".equals(mcName)){ 
             EnhancedFor efor = list.get(EnhancedFor.class);
