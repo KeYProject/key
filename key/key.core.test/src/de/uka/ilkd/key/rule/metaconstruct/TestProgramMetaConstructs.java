@@ -19,6 +19,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.TypeRef;
@@ -52,10 +53,9 @@ public class TestProgramMetaConstructs extends TestCase {
         ("{l4:break l3; int i = 0; int j=1;}")).getChildAt(0);
         DoBreak rmLabel = new DoBreak(labeledBlock);
 
-	ProgramElement result = rmLabel.
-	    transform
-	    (rmLabel.body(), new Services(AbstractProfile.getDefaultProfile()),
-	     SVInstantiations.EMPTY_SVINSTANTIATIONS)[0];
+        ProgramElement result = rmLabel.transform(rmLabel.body(),
+            new Services(AbstractProfile.getDefaultProfile()),
+            SVInstantiations.EMPTY_SVINSTANTIATIONS)[0];
         assertTrue(result instanceof Break);
     }
 
@@ -86,7 +86,8 @@ public class TestProgramMetaConstructs extends TestCase {
                 .getChildAt(1);
         ProgramTransformer typeof = new TypeOf(expr);
         assertTrue(((TypeRef) typeof.transform(expr, services,
-            SVInstantiations.EMPTY_SVINSTANTIATIONS)[0]).getName().equals("int"));
+            SVInstantiations.EMPTY_SVINSTANTIATIONS)[0]).getName()
+                    .equals("int"));
     }
 
     public void testBugId183() {
@@ -112,47 +113,26 @@ public class TestProgramMetaConstructs extends TestCase {
     }
 
     public void testForInitUnfoldTransformer1() {
-        ProgramElement block = (ProgramElement) TacletForTests
-                .parsePrg("{ for (int i = 4, y = 42; i <= 6; i++) { } }");
-        JavaASTCollector coll = new JavaASTCollector(block,
-            de.uka.ilkd.key.java.statement.LoopInit.class);
-        coll.start();
-        assertTrue(coll.getNodes().size() == 1);
-        ForInitUnfoldTransformer tf = new ForInitUnfoldTransformer(
-            (LoopInit) coll.getNodes().head());
-        StatementBlock sb = (StatementBlock) tf.transform(
-            coll.getNodes().head(),
-            new Services(AbstractProfile.getDefaultProfile()),
-            SVInstantiations.EMPTY_SVINSTANTIATIONS);
-        assertTrue(sb.getChildCount() == 1);
-        assertTrue(sb.toString().equals(
-            ((ProgramElement) TacletForTests.parsePrg("{int i = 4,y = 42;}"))
-                    .toString()));
+        forInitUnfoldTransformerTest(
+            "{ for (int i = 4, y = 42; i <= 6; i++) { } }",
+            new String[] { "int i = 4,y = 42;" });
     }
 
     public void testForInitUnfoldTransformer2() {
-        ProgramElement block = (ProgramElement) TacletForTests
-                .parsePrg("{ for (int i = 4; i <= 6; i++) { } }");
-        JavaASTCollector coll = new JavaASTCollector(block,
-            de.uka.ilkd.key.java.statement.LoopInit.class);
-        coll.start();
-        assertTrue(coll.getNodes().size() == 1);
-        ForInitUnfoldTransformer tf = new ForInitUnfoldTransformer(
-            (LoopInit) coll.getNodes().head());
-        StatementBlock sb = (StatementBlock) tf.transform(
-            coll.getNodes().head(),
-            new Services(AbstractProfile.getDefaultProfile()),
-            SVInstantiations.EMPTY_SVINSTANTIATIONS);
-        assertTrue(sb.getChildCount() == 1);
-        assertTrue(sb.toString().equals(
-            ((ProgramElement) TacletForTests.parsePrg("{int i = 4;}"))
-                    .toString()));
+        forInitUnfoldTransformerTest("{ for (int i = 4; i <= 6; i++) { } }",
+            new String[] { "int i = 4;" });
     }
 
     // By Dominic
     public void testForInitUnfoldTransformer3() {
-        final ProgramElement block = TacletForTests.parsePrg(
-            "{ int i = 4, z = 42; for (i++, i--, z = 17; i <= 6; i++) { } }");
+        forInitUnfoldTransformerTest(
+            "{ int i = 4, z = 42; for (i++, i--, z = 17; i <= 6; i++) { } }",
+            new String[] { "i++;", "i--;", "z=17;" });
+    }
+
+    private void forInitUnfoldTransformerTest(String programBlock,
+            String[] expectedStmts) {
+        final ProgramElement block = TacletForTests.parsePrg(programBlock);
 
         final JavaASTCollector coll = new JavaASTCollector(block,
             LoopInit.class);
@@ -162,12 +142,16 @@ public class TestProgramMetaConstructs extends TestCase {
 
         final ForInitUnfoldTransformer tf = new ForInitUnfoldTransformer(
             (LoopInit) coll.getNodes().head());
-        final StatementBlock sb = (StatementBlock) tf.transform(
+        final Statement[] stmts = (Statement[]) tf.transform(
             coll.getNodes().head(),
             new Services(AbstractProfile.getDefaultProfile()),
             SVInstantiations.EMPTY_SVINSTANTIATIONS);
-        
-        assertEquals(3, sb.getChildCount());
-        assertEquals("{i++;i--;z=17;}", sb.toString());
+
+        assertEquals(expectedStmts.length, stmts.length);
+
+        int i = 0;
+        for (String stmt : expectedStmts) {
+            assertEquals(stmt, stmts[i++].toString());
+        }
     }
 }
