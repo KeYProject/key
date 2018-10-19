@@ -816,10 +816,13 @@ public class JMLSpecFactory {
                                     tb.convertToFormula(clauses.signalsOnly))
                             : tb.imp(tb.not(excNull), tb.and(tb.convertToFormula(clauses.signals),
                                     tb.convertToFormula(clauses.signalsOnly))));
-                    result.put(heap,
-                            heap == services.getTypeConverter().getHeapLDT().getHeap()
-                                    ? tb.and(post1, post2)
-                                    : post1);
+
+                    Term post = heap == services.getTypeConverter().getHeapLDT().getHeap()
+                            ? tb.and(post1, post2)
+                                    : post1;
+                    post = tb.addLabelToAllSubs(post, ParameterlessTermLabel.POST_CONDITION_LABEL);
+
+                    result.put(heap, post);
                 } else {
                     if (clauses.assignables.get(heap) != null) {
                         result.put(heap, tb.tt());
@@ -871,7 +874,8 @@ public class JMLSpecFactory {
         Map<LocationVariable, Term> pres = new LinkedHashMap<LocationVariable, Term>();
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             if (clauses.requires.get(heap) != null) {
-                final Term pre = tb.convertToFormula(clauses.requires.get(heap));
+                Term pre = tb.convertToFormula(clauses.requires.get(heap));
+                pre = tb.addLabelToAllSubs(pre, ParameterlessTermLabel.PRE_CONDITION_LABEL);
                 pres.put(heap, pre);
             } else {
                 if (clauses.assignables.get(heap) != null) {

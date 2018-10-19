@@ -42,6 +42,10 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
+import de.uka.ilkd.key.rule.label.PerpetualChildTermLabelPolicy;
+import de.uka.ilkd.key.rule.label.PerpetualTermLabelPolicy;
+import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -93,6 +97,11 @@ public class JavaProfile extends AbstractProfile {
      */
     @Override
     protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
+        ImmutableList<TermLabelPolicy> perpetualPolicyList =
+                ImmutableSLList.<TermLabelPolicy>nil().prepend(new PerpetualTermLabelPolicy());
+        ImmutableList<ChildTermLabelPolicy> perpetualChildPolicyList =
+                ImmutableSLList.<ChildTermLabelPolicy>nil().prepend(new PerpetualChildTermLabelPolicy());
+
         ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
         result = result.prepend(
             new TermLabelConfiguration(
@@ -132,13 +141,34 @@ public class JavaProfile extends AbstractProfile {
             ));
         result = result.prepend(
             new TermLabelConfiguration(
-                    ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
+                    ParameterlessTermLabel.PRE_CONDITION_LABEL_NAME,
                     new SingletonLabelFactory<TermLabel>(
-                            ParameterlessTermLabel.POST_CONDITION_LABEL)
+                            ParameterlessTermLabel.PRE_CONDITION_LABEL),
+                    perpetualPolicyList,
+                    perpetualPolicyList,
+                    perpetualChildPolicyList,
+                    perpetualChildPolicyList,
+                    null,
+                    null,
+                    null
             ));
+        result = result.prepend(
+                new TermLabelConfiguration(
+                        ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
+                        new SingletonLabelFactory<TermLabel>(
+                                ParameterlessTermLabel.POST_CONDITION_LABEL),
+                        perpetualPolicyList,
+                        perpetualPolicyList,
+                        perpetualChildPolicyList,
+                        perpetualChildPolicyList,
+                        null,
+                        null,
+                        null
+                ));
         return result;
     }
 
+    @Override
     protected ImmutableSet<StrategyFactory> getStrategyFactories() {
         ImmutableSet<StrategyFactory> set = super.getStrategyFactories();
         set = set.add(DEFAULT);
@@ -146,6 +176,7 @@ public class JavaProfile extends AbstractProfile {
     }
 
 
+    @Override
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
         ImmutableList<BuiltInRule> builtInRules = super.initBuiltInRules();
 
@@ -197,6 +228,7 @@ public class JavaProfile extends AbstractProfile {
      * @param r the rule described above
      * @return justification for the given rule
      */
+    @Override
     public RuleJustification getJustification(Rule r) {
         return r == UseOperationContractRule.INSTANCE
                || r == UseDependencyContractRule.INSTANCE
@@ -211,6 +243,7 @@ public class JavaProfile extends AbstractProfile {
      * the name of the profile
      * @return the name
      */
+    @Override
     public String name() {
         return permissions ? NAME_WITH_PERMISSIONS : NAME;
     }
@@ -219,6 +252,7 @@ public class JavaProfile extends AbstractProfile {
      * the default strategy factory to be used
      * @return the default strategy factory
      */
+    @Override
     public StrategyFactory getDefaultStrategyFactory() {
         return DEFAULT;
     }
