@@ -35,8 +35,20 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JTree;
+import javax.swing.KeyStroke;
+import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.TreeUI;
@@ -657,196 +669,215 @@ public class ProofTreeView extends JPanel {
     }
 
     class ProofRenderer extends DefaultTreeCellRenderer
-    implements TreeCellRenderer,
-    java.io.Serializable {
+    implements TreeCellRenderer, java.io.Serializable {
 
         /**
          *
          */
         private static final long serialVersionUID = -4990023575036168279L;
         private Icon keyHole20x20 = IconFactory.keyHole(20, 20);
+        
+        private void renderLeaf(Node leaf, DefaultTreeCellRenderer renderer) {
+            Goal goal = proof.getGoal(leaf);
+            if ( goal == null || leaf.isClosed() ) {
+                renderer.setForeground(DARK_GREEN_COLOR);
+                renderer.setIcon(IconFactory.keyHoleClosed(20,20));
+                ProofTreeView.this.setToolTipText("Closed Goal");
+                renderer.setToolTipText("A closed goal");
+            } else {
+                if ( goal.isLinked() ) {
+                    renderer.setForeground(PINK_COLOR);
+                    renderer.setIcon(IconFactory.keyHoleLinked(20, 20));
+                    ProofTreeView.this.setToolTipText("Linked Goal");
+                    renderer.setToolTipText("Linked goal - no automatic rule application");
+                } else if ( !goal.isAutomatic() ) {
+                    renderer.setForeground(ORANGE_COLOR);
+                    renderer.setIcon(IconFactory.keyHoleInteractive(20, 20));
+                    ProofTreeView.this.setToolTipText("Disabled Goal");
+                    renderer.setToolTipText("Interactive goal - no automatic rule application");
+                } else {
+                    renderer.setForeground(DARK_RED_COLOR);
+                    renderer.setIcon(keyHole20x20);
+                    ProofTreeView.this.setToolTipText("Open Goal");
+                    renderer.setToolTipText("An open goal");
+                }
+            }
+        }
+        
+        private void renderNonLeaf(Node node, DefaultTreeCellRenderer renderer, boolean isBranch) {
+            renderer.setForeground(Color.black);
+            String tooltipText = "An inner node of the proof";
+            final String notes = node.getNodeInfo().getNotes();
+            
+            if (notes!=null) {
+                tooltipText += ".\nNotes: "+notes;
+            }
+
+            Icon defaultIcon;
+            if (notes != null) {
+                defaultIcon = IconFactory.editFile(16);
+            } else if (node.getNodeInfo().getInteractiveRuleApplication()) {
+                defaultIcon = IconFactory.interactiveAppLogo(16);
+            } else {
+                defaultIcon = null;
+            }
+            
+            if (isBranch && node.childrenCount() > 1) {
+                defaultIcon = getOpenIcon();
+                tooltipText = "A branch node with all children hidden";
+            }
+            
+            renderer.setIcon(defaultIcon);
+            renderer.setToolTipText(tooltipText);
+        }
+        
+        private void checkNotes(Node node, DefaultTreeCellRenderer renderer) {
+            if (node.getNodeInfo().getNotes() != null) {
+                renderer.setBackgroundNonSelectionColor(ORANGE_COLOR);
+            } else {
+                if (node.getNodeInfo().getActiveStatement() != null ) {
+                    renderer.setBackgroundNonSelectionColor(LIGHT_BLUE_COLOR);
+                } else {
+                    renderer.setBackgroundNonSelectionColor(Color.white);
+                }
+            }
+        }
+        
+        private void checkExploration(Node node, DefaultTreeCellRenderer renderer) {
+            if(node.getNodeInfo().isExploration()) {
+                renderer.setBorder(BorderFactory.createLineBorder(DARK_PURPLE_COLOR, 2, true));
+                renderer.setBackgroundNonSelectionColor(LIGHT_PURPLE_COLOR);
+                renderer.setToolTipText("Exploration Action Performed");
+            } else {
+                renderer.setBorder(null);
+            }
+        }
+        
+        private Component getTreeCellRendererComponent(JTree tree,
+                GUIBranchNode node,
+                boolean selected,
+                boolean expanded,
+                boolean leaf,
+                int row,
+                boolean hasFocus) {
+            super.getTreeCellRendererComponent(tree, node, selected, expanded, leaf, row, hasFocus);
+            
+            setBackgroundNonSelectionColor(BISQUE_COLOR);
+            
+            if ( node.isClosed() ) {
+                // all goals below this node are closed
+                this.setIcon(IconFactory.provedFolderIcon());
+            } else {
+                // Find leaf goal for node and check whether this is a linked goal.
+
+                // TODO (DS): This marks all "folder" nodes as linked that have
+                //            at least one linked child. Check whether this is
+                //            an acceptable behavior.
+
+                class FindGoalVisitor implements ProofVisitor {
+                    private boolean isLinked = false;
+
+                    public boolean isLinked() {
+                        return this.isLinked;
+                    }
+
+                    @Override
+                    public void visit(Proof proof, Node visitedNode) {
+                        Goal g;
+                        if ((g = proof.getGoal(visitedNode)) != null &&
+                                g.isLinked()) {
+                            this.isLinked = true;
+                        }
+                    }
+                }
+
+                FindGoalVisitor v = new FindGoalVisitor();
+
+                proof.breadthFirstSearch(node.getNode(), v);
+                if (v.isLinked()) {
+                    this.setIcon(IconFactory.linkedFolderIcon());
+                }
+            }
+            
+            checkExploration(node.getNode(), this);
+
+            return this;
+        }
+        
+        private Component getTreeCellRendererComponent(JTree tree,
+                GUIOneStepChildTreeNode node,
+                boolean selected,
+                boolean expanded,
+                boolean leaf,
+                int row,
+                boolean hasFocus) {
+            super.getTreeCellRendererComponent(tree, node, selected, expanded, leaf, row, hasFocus);
+
+            setForeground(GRAY_COLOR);
+            setIcon(IconFactory.oneStepSimplifier(16));
+            setText(node.toString());
+            
+            checkExploration(node.getNode(), this);
+            
+            return this;
+        }
 
         public Component getTreeCellRendererComponent(JTree tree,
                 Object value,
-                boolean sel,
+                boolean selected,
                 boolean expanded,
                 boolean leaf,
                 int row,
                 boolean hasFocus) {
             if (proof == null) {
                 // print dummy tree;
-                return super.getTreeCellRendererComponent(tree, value, sel,
+                return super.getTreeCellRendererComponent(tree, value, selected,
                         expanded, leaf, row, hasFocus);
             }
-
+            
             if (value instanceof GUIBranchNode) {
-                GUIBranchNode node = (GUIBranchNode) value;
-                super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-                setBackgroundNonSelectionColor(BISQUE_COLOR);
-                if ( ((GUIBranchNode)value).isClosed() ) {
-                    // all goals below this node are closed
-                    this.setIcon(IconFactory.provedFolderIcon());
-                } else {
-
-                    // Find leaf goal for node and check whether this is a linked goal.
-
-                    // TODO (DS): This marks all "folder" nodes as linked that have
-                    //            at least one linked child. Check whether this is
-                    //            an acceptable behavior.
-
-                    class FindGoalVisitor implements ProofVisitor {
-                        private boolean isLinked = false;
-
-                        public boolean isLinked() {
-                            return this.isLinked;
-                        }
-
-                        @Override
-                        public void visit(Proof proof, Node visitedNode) {
-                            Goal g;
-                            if ((g = proof.getGoal(visitedNode)) != null &&
-                                    g.isLinked()) {
-                                this.isLinked = true;
-                            }
-                        }
-                    }
-
-                    FindGoalVisitor v = new FindGoalVisitor();
-
-                    proof.breadthFirstSearch(((GUIBranchNode)value).getNode(), v);
-                    if (v.isLinked()) {
-                        this.setIcon(IconFactory.linkedFolderIcon());
+                return getTreeCellRendererComponent(tree, (GUIBranchNode) value,
+                        selected, expanded, leaf, row, hasFocus);
+            } else if (value instanceof GUIOneStepChildTreeNode) {
+                return getTreeCellRendererComponent(tree, (GUIOneStepChildTreeNode) value,
+                        selected, expanded, leaf, row, hasFocus);
+            } else {
+                // now GUIProofTreeNode / GUIOneStepSimpTreeNode
+                
+                Node node = ((GUIAbstractTreeNode)value).getNode();
+                
+                String nodeText = node.serialNr()+":"+node.name();
+                boolean isBranch = false;
+                {
+                    final Node child = ((GUIAbstractTreeNode)value).findChild( node );
+                    if (child != null && child.getNodeInfo().getBranchLabel () != null ) {
+                        isBranch = true;
+                        nodeText += ": " + child.getNodeInfo().getBranchLabel();
                     }
                 }
-                
-                if (node.getNode().getNodeInfo().isExploration()) {
-                    setBorder(BorderFactory.createLineBorder(DARK_PURPLE_COLOR, 2, true));
-                    setBackgroundNonSelectionColor(LIGHT_PURPLE_COLOR);
-                    setToolTipText("Exploration Action Performed");
-                } else {
-                    setBorder(null);
-                }
 
-                return this;
-            }
+                DefaultTreeCellRenderer renderer =
+                        (DefaultTreeCellRenderer) super.getTreeCellRendererComponent(
+                                tree, nodeText, selected, expanded, leaf, row, hasFocus);
 
-            if (value instanceof GUIOneStepChildTreeNode) {
-                super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-                GUIOneStepChildTreeNode node = (GUIOneStepChildTreeNode) value;
-                setForeground(GRAY_COLOR);
-                setIcon(IconFactory.oneStepSimplifier(16));
-                setText(value.toString());
-                
-                if (node.getNode().getNodeInfo().isExploration()) {
-                    setBorder(BorderFactory.createLineBorder(DARK_PURPLE_COLOR, 2, true));
-                    setBackgroundNonSelectionColor(LIGHT_PURPLE_COLOR);
-                    setToolTipText("Exploration Action Performed");
+                if (node.leaf()) {
+                    renderLeaf(node, renderer);
                 } else {
-                    setBorder(null);
+                    renderNonLeaf(node, renderer, isBranch);
                 }
                 
-                return this;
-            }
-
-            // now GUIProofTreeNode / GUIOneStepSimpTreeNode
-            Node node = ((GUIAbstractTreeNode)value).getNode();
-            String nodeText = node.serialNr()+":"+node.name();
-            boolean isBranch = false;
-            {
-                final Node child = ((GUIAbstractTreeNode)value).findChild( node );
-                if ( child != null && child.getNodeInfo()
-                        .getBranchLabel () != null ) {
-                    isBranch = true;
-                    nodeText += ": " + child.getNodeInfo().getBranchLabel ();
-                }
-            }
-
-            DefaultTreeCellRenderer tree_cell =
-                    (DefaultTreeCellRenderer) super.getTreeCellRendererComponent
-                    (tree, nodeText, sel, expanded, leaf, row, hasFocus);
-
-            if (node.leaf()) {
-                Goal goal = proof.getGoal(node);
-                if ( goal == null || node.isClosed() ) {
-                    tree_cell.setForeground(DARK_GREEN_COLOR);
-                    tree_cell.setIcon(IconFactory.keyHoleClosed(20,20));
-                    ProofTreeView.this.setToolTipText("Closed Goal");
-                    tree_cell.setToolTipText("A closed goal");
-                } else {
-                    if ( goal.isLinked() ) {
-                        tree_cell.setForeground(PINK_COLOR);
-                        tree_cell.setIcon(IconFactory.keyHoleLinked(20, 20));
-                        ProofTreeView.this.setToolTipText("Linked Goal");
-                        tree_cell.setToolTipText("Linked goal - no automatic rule application");
-                    } else if ( !goal.isAutomatic() ) {
-                        tree_cell.setForeground(ORANGE_COLOR);
-                        tree_cell.setIcon(IconFactory.keyHoleInteractive(20, 20));
-                        ProofTreeView.this.setToolTipText("Disabled Goal");
-                        tree_cell.setToolTipText("Interactive goal - no automatic rule application");
-                    } else {
-                        tree_cell.setForeground(DARK_RED_COLOR);
-                        tree_cell.setIcon(keyHole20x20);
-                        ProofTreeView.this.setToolTipText("Open Goal");
-                        tree_cell.setToolTipText("An open goal");
-                    }
-                }
-            } else {
-                /*
-		if ( node.getBranchSink ().getResetConstraint ().isSatisfiable () )
-		    tree_cell.setForeground(Color.blue);
-		else
-                 */
-                tree_cell.setForeground(Color.black);
-                String tooltipText = "An inner node of the proof";
-                final String notes = node.getNodeInfo().getNotes();
-                if (notes!=null) {
-                    tooltipText += ".\nNotes: "+notes;
+                checkNotes(node, renderer);
+                checkExploration(node, renderer);
+                
+                if (selected) {
+                    renderer.setBackground(DARK_BLUE_COLOR);
                 }
 
-                Icon defaultIcon;
-                if (notes != null) {
-                    defaultIcon = IconFactory.editFile(16);
-                } else if (node.getNodeInfo().getInteractiveRuleApplication()) {
-                    defaultIcon = IconFactory.interactiveAppLogo(16);
-                } else {
-                    defaultIcon = null;
-                }
-                if (isBranch && node.childrenCount() > 1) {
-                    defaultIcon = getOpenIcon();
-                    tooltipText = "A branch node with all children hidden";
-                }
-                tree_cell.setIcon(defaultIcon);
+                renderer.setFont(tree.getFont());
+                renderer.setText(nodeText);
 
-                tree_cell.setToolTipText(tooltipText);
+                return renderer;
             }
-            
-            if (node.getNodeInfo().getNotes() != null) {
-                tree_cell.setBackgroundNonSelectionColor(ORANGE_COLOR);
-            } else {
-                if (node.getNodeInfo().getActiveStatement() != null ) {
-                    tree_cell.setBackgroundNonSelectionColor(LIGHT_BLUE_COLOR);
-
-                } else {
-                    tree_cell.setBackgroundNonSelectionColor(Color.white);
-                }
-            }
-            
-            if(node.getNodeInfo().isExploration()) {
-                tree_cell.setBorder(BorderFactory.createLineBorder(DARK_PURPLE_COLOR, 2, true));
-                tree_cell.setBackgroundNonSelectionColor(LIGHT_PURPLE_COLOR);
-                tree_cell.setToolTipText("Exploration Action Performed");
-            } else {
-                tree_cell.setBorder(null);
-            }
-            
-            if (sel) {
-                tree_cell.setBackground(DARK_BLUE_COLOR);
-            }
-
-            tree_cell.setFont(tree.getFont());
-            tree_cell.setText(nodeText);
-
-            return tree_cell;
         }
     }
 
