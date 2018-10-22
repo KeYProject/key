@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.Visitor;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
@@ -40,6 +41,16 @@ import de.uka.ilkd.key.util.MiscTools;
  * @author christoph
  */
 abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
+
+    /**
+     * Constant name for eqAtLocs function.
+     */
+    private static final Name EQUAL_LOCS = new Name("__EQUALS__LOCS__");
+
+    /**
+     * Constant name for eqAtLocsPost function.
+     */
+    private static final Name EQUAL_LOCS_POST = new Name("__EQUALS__LOCS__POST__");
 
     public AbstractInfFlowTacletBuilder(final Services services) {
         super(services.getTermFactory(), services);
@@ -120,6 +131,47 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
         return quantifiableVarsToSchemaVars;
     }
 
+    // -------------------------------------------------------------------------
+    // information flow operators
+    // -------------------------------------------------------------------------
+
+    /**
+     * Get eqAtLocs function as a term.
+     * @param services the Services object.
+     * @param heap1 the first heap term.
+     * @param locset1 the first location set term.
+     * @param heap2 the first heap term.
+     * @param locset2 the first location set term.
+     * @return The eqAtLocs function term.
+     */
+    public Term eqAtLocs(Services services, Term heap1, Term locset1,
+                         Term heap2, Term locset2) {
+        return (locset1.equals(empty()) && locset2.equals(empty())) ? tt()
+                : func((Function) services.getNamespaces().functions()
+                        .lookup(EQUAL_LOCS),
+                        heap1, locset1, heap2, locset2);
+    }
+
+    /**
+     * Get eqAtLocsPost function as a term.
+     * @param services the Services object.
+     * @param heap1Pre the first pre-heap term.
+     * @param heap1Post the first post-heap term.
+     * @param locset1 the first location set term.
+     * @param heap2Pre the second pre-heap term.
+     * @param heap2Post the second post-heap term.
+     * @param locset2 the second location set term.
+     * @return The eqAtLocsPost function term.
+     */
+    public Term eqAtLocsPost(Services services,
+                             Term heap1Pre, Term heap1Post, Term locset1,
+                             Term heap2Pre, Term heap2Post, Term locset2) {
+        return (locset1.equals(empty()) && locset2.equals(empty())) ? tt()
+                : func((Function) services.getNamespaces().functions()
+                        .lookup(EQUAL_LOCS_POST),
+                        heap1Pre, heap1Post, locset1, heap2Pre, heap2Post,
+                        locset2);
+    }
 
     class QuantifiableVariableVisitor implements Visitor {
 

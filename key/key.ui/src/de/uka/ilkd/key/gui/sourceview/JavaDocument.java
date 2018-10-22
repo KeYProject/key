@@ -20,6 +20,9 @@ import javax.swing.text.StyleConstants;
  * @author Wolfram Pfeifer
  */
 public class JavaDocument extends DefaultStyledDocument {
+
+    private static final long serialVersionUID = -1856296532743892931L;
+
     /**
      * Enum to indicate the current mode (environment) of the parser.
      * Examples are STRING ("..."), COMMENT (&#47;&#42; ... &#42;&#47;),

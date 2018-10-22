@@ -86,7 +86,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @param svInst the instantiations of the schemavariables 
      * @return the transformated program
      */
-    public abstract ProgramElement transform
+    public abstract ProgramElement[] transform
 	(ProgramElement pe, Services services, SVInstantiations svInst);
     
     /** returns the name of the meta construct 

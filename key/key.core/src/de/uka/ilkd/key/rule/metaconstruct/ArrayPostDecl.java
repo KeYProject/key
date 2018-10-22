@@ -28,42 +28,36 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+/**
+ * Replaces a local variable declaration <code> #t #v[]; </code> with
+ * <code>#t[] #v;</code>
+ *
+ * @author N/A
+ */
 public class ArrayPostDecl extends ProgramTransformer {
 
     public ArrayPostDecl(SchemaVariable sv) {
-	super(new Name("array-post-declaration"), (ProgramSV)sv);
+        super(new Name("array-post-declaration"), (ProgramSV) sv);
     }
 
+    @Override
+    public ProgramElement[] transform(ProgramElement pe, Services services,
+            SVInstantiations svInst) {
 
-    /** 
-     * Replaces a local variable declaration <code> #t #v[]; </code> with
-     * <code>#t[] #v;</code>
-     * @param services the Services with all necessary information 
-     * about the java programs
-     * @param svInst the instantiations of the schema variables
-     * @return the transformed program
-     */
-    public ProgramElement transform(ProgramElement pe,
-					    Services services,
-					    SVInstantiations svInst) {
+        final LocalVariableDeclaration declaration = (LocalVariableDeclaration) pe;
+        final ImmutableArray<Modifier> modifiers = declaration.getModifiers();
+        final TypeReference originalTypeReference = declaration
+                .getTypeReference();
 
+        final VariableSpecification var = declaration.getVariables().get(0);
 
-	final LocalVariableDeclaration declaration = (LocalVariableDeclaration)pe;
-	final ImmutableArray<Modifier> modifiers = declaration.getModifiers();
-	final TypeReference originalTypeReference = declaration.getTypeReference();
-	/*	Debug.assertTrue
-	    (declaration.getVariables().size() == 1,
-	    "ArrayPostDecl metaconsstruct can only treat single variable declarations");*/
-	final VariableSpecification var = 
-	    declaration.getVariables().get(0);
-
-	final IProgramVariable variable = var.getProgramVariable();
-	return KeYJavaASTFactory.declare(modifiers, variable,
-		var.getInitializer(),
-		originalTypeReference.getProgramElementName(),
-		originalTypeReference.getDimensions() + var.getDimensions(),
-		originalTypeReference.getReferencePrefix(),
-		variable.getKeYJavaType());
+        final IProgramVariable variable = var.getProgramVariable();
+        return new ProgramElement[] {
+            KeYJavaASTFactory.declare(modifiers, variable, var.getInitializer(),
+                originalTypeReference.getProgramElementName(),
+                originalTypeReference.getDimensions() + var.getDimensions(),
+                originalTypeReference.getReferencePrefix(),
+                variable.getKeYJavaType()) };
     }
 
 }

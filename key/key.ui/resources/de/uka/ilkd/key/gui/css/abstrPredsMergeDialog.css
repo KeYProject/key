@@ -1,0 +1,17 @@
+p, dd, dt, h4 { font-family: sans-serif; }
+
+body { background-color: white; }
+
+p, dd { font-weight: normal; }
+
+dt { font-weight: bold; }
+
+h4 { font-size: 14px; font-weight: normal; }
+
+code { 
+  padding: 2px 4px; 
+  font-size: 90%; 
+  color: #c7254e; 
+  background-color: #f9f2f4; 
+  border-radius: 4px; 
+}

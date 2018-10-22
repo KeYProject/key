@@ -24,7 +24,7 @@ import java.util.Properties;
  * 2) the maximal number of lines a tooltip with instantiated SchemaVariables
  *    is allowed to have. If this number is exceeded no SchemaVariables get
  *    instantiated in the displayed tooltip.
- * 3) wether intermediate proofsteps should be hidden in the proof tree view
+ * 3) whether intermediate proofsteps should be hidden in the proof tree view
  */
 public class ViewSettings implements Settings, Cloneable {
     private static final String MAX_TOOLTIP_LINES_KEY = "[View]MaxTooltipLines";
@@ -50,7 +50,7 @@ public class ViewSettings implements Settings, Cloneable {
     /** do not print the find, varcond and heuristics part of taclets in
      * the TacletMenu by default */
     private boolean showWholeTaclet = false;
-    /** default fontsize */
+    /** default font size */
     private int sizeIndex = 2;
     /** do not hide intermediate proofsteps by default */
     private boolean hideIntermediateProofsteps = false;
@@ -71,7 +71,7 @@ public class ViewSettings implements Settings, Cloneable {
     /**Show Taclet uninstantiated in tooltip -- for learning  */
     private boolean showUninstantiatedTaclet = false;
     /** Show heatmap of most recently used sequent formulae*/
-    private boolean showHeatmap = true;
+    private boolean showHeatmap = false;
     /** Show heatmap for sequent formulas (true) or terms (false) */
     private boolean heatmapSF = true;
     /** Highlight newest formulas/terms (true) or all formulas/terms below specified age (false) */
@@ -218,7 +218,7 @@ public class ViewSettings implements Settings, Cloneable {
     }
 
     /**
-     * @param hide Wether closed subtrees should be hidden
+     * @param hide Whether closed subtrees should be hidden
      */
     public void setHideClosedSubtrees(boolean hide) {
         if (hide != hideClosedSubtrees) {

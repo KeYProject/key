@@ -76,7 +76,7 @@ public class TacletIfSelectionDialog extends JPanel{
 	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 	panel.setBorder(new TitledBorder("Please instantiate the taclet's assumptions:"));
 
-	// If the if-sequent matches to diffferent parts of the sequent
+	// If the if-sequent matches to different parts of the sequent
 	// the user is given the possibility to choose the right one
 	// or to enter an instantiation manually in which case a cut
 	// is performed if the manual entry does not match any other
@@ -98,7 +98,7 @@ public class TacletIfSelectionDialog extends JPanel{
 		}
 	    };
 	    p.add(label);
-	    JComboBox ifChoice = new JComboBox(model.ifChoiceModel(i)) {
+	    JComboBox<Object> ifChoice = new JComboBox(model.ifChoiceModel(i)) {
                 /**
              * 
              */
@@ -114,7 +114,7 @@ public class TacletIfSelectionDialog extends JPanel{
 	    ifChoice.setRenderer(rend);	    
 	    ifChoice.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
-			JComboBox cb = (JComboBox)e.getSource();
+			JComboBox<?> cb = (JComboBox<?>)e.getSource();
 			updateInputField(p, cb);
 		    }
 		});	    
@@ -159,7 +159,7 @@ public class TacletIfSelectionDialog extends JPanel{
     } 
 
 
-    private void updateInputField(JPanel parent, JComboBox cb) {
+    private void updateInputField(JPanel parent, JComboBox<?> cb) {
 	TacletAssumesModel icm = (TacletAssumesModel)cb.getModel();
 	int nr = parent.getComponentCount();
 	if (icm.isManualInputSelected() && (nr==2)) {
@@ -203,39 +203,37 @@ public class TacletIfSelectionDialog extends JPanel{
     }
     
 
-    static class IfComboRenderer extends JLabel implements ListCellRenderer {
+    static class IfComboRenderer extends JLabel implements ListCellRenderer<Object> {
 	
         /**
          * 
          */
         private static final long serialVersionUID = -7145932915948630147L;
         private final Services services;
-        private final ListCellRenderer defaultRenderer;
+        private final ListCellRenderer<Object> defaultRenderer;
         
-        public IfComboRenderer(ListCellRenderer renderer, Services services) {
-	    setOpaque(true);
+        public IfComboRenderer(ListCellRenderer<Object> renderer, Services services) {
+            setOpaque(true);
             this.services = services;
             this.defaultRenderer = renderer;
-	}
-	
-	public Component getListCellRendererComponent(JList list,
-						      Object value,
-						      int index,
-						      boolean isSelected,
-						      boolean cellHasFocus)
-	{                       
-            final String valStr = value instanceof IfFormulaInstantiation ? 
-                    ((IfFormulaInstantiation)value).toString(services) : 
-                        value.toString();
+        }
 
-            
-            if (isSelected) {		
-	        list.setToolTipText(valStr);                
-	    }
-                       	 
-	    return defaultRenderer.getListCellRendererComponent(
-                list, valStr, index, isSelected, cellHasFocus);
-	}
+        public Component getListCellRendererComponent(JList<? extends Object> list,
+                                                      Object value,
+                                                      int index,
+                                                      boolean isSelected,
+                                                      boolean cellHasFocus) {
+            final String valStr =
+                    value instanceof IfFormulaInstantiation ?
+                            ((IfFormulaInstantiation)value).toString(services) :
+                                value.toString();
+            if (isSelected) {
+                list.setToolTipText(valStr);
+            }
+
+            return defaultRenderer
+                    .getListCellRendererComponent(list, (Object)valStr, index,
+                                                  isSelected, cellHasFocus);
+        }
     }
-
 }
