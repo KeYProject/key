@@ -39,6 +39,7 @@ import javax.swing.text.SimpleAttributeSet;
 
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
+
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -173,7 +174,9 @@ public final class SourceView extends JComponent {
         mainWindow.getMediator().addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
-                updateGUI();
+                if (!mainWindow.getMediator().isInAutoMode()) {
+                    updateGUI();
+                }
             }
 
             @Override
