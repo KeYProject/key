@@ -60,24 +60,31 @@ class GUIBranchNode extends GUIAbstractTreeNode
     }
 
     private void fillChildrenCache() {
-        if ( childrenCache == null ) createChildrenCache ();
-        if ( childrenCache.length == 0 || childrenCache[0] != null ) return;
+        if (childrenCache == null) {
+            createChildrenCache();
+        }
+        
+        if (childrenCache.length == 0 || childrenCache[0] != null) {
+            return;
+        }
             
         int count = 0;
         Node n = getNode();
-        if(n==null){
+        
+        if(n==null) {
             return;
         }
-        while ( true ) {
-            childrenCache[count] = getProofTreeModel ().getProofTreeNode(n);
+        
+        while (true) {
+            childrenCache[count] = getProofTreeModel().getProofTreeNode(n);
             count++;
-            final Node nextN = findChild ( n );
+            final Node nextN = findChild(n);
             if ( nextN == null ) break;
             n = nextN;
         }
 
-        for (int i = 0; i != n.childrenCount(); ++i) {
-            if (!getProofTreeModel().hideClosedSubtrees() || !n.child ( i ).isClosed() ) {
+        for (int i = 0; i != n.childrenCount(); ++i) {            
+            if (!ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i))) {
                 childrenCache[count] = findBranch ( n.child(i) );
                 count++;
             }
@@ -97,21 +104,24 @@ class GUIBranchNode extends GUIAbstractTreeNode
     private int getChildCountHelp() {
         int count = 0;
         Node n = getNode();
+        
         if(n==null){
             return 0;
         }
+        
         while ( true ) {
             count++;
             final Node nextN = findChild ( n );
             if ( nextN == null ) break;
             n = nextN;
         }
-       
+        
         for (int i = 0; i != n.childrenCount(); ++i) {
-            if (!getProofTreeModel().hideClosedSubtrees() || !n.child ( i ).isClosed() ) {
+            if (!ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i))) {
                 count++;
             }
         }
+        
         return count;
     }
 

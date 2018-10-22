@@ -121,12 +121,12 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
     protected Node findChild (Node n) {
         if ( n.childrenCount () == 1 ) return n.child ( 0 );
         
-        if ( !getProofTreeModel ().hideClosedSubtrees () )
+        if ( !getProofTreeModel().globalFilterActive() )
             return null;
         
         Node nextN = null;
         for ( int i = 0; i != n.childrenCount (); ++i ) {
-            if ( ! n.child ( i ).isClosed() ) {
+            if ( ! ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i)) ) {
                 if ( nextN != null ) return null;
                 nextN = n.child ( i );
             }

@@ -58,6 +58,8 @@ public class ViewSettings implements Settings, Cloneable {
     private boolean hideAutomodeProofsteps = false;
     /** do not hide closed subtrees by default */
     private boolean hideClosedSubtrees = false;
+    /** do not hide subtrees whose goals are interactive by default */
+    private boolean hideInteractiveGoals = false;
     /** whether to use system look and feel */
     private boolean useSystemLaF = false;
     private boolean notifyLoadBehaviour = true;
@@ -177,7 +179,7 @@ public class ViewSettings implements Settings, Cloneable {
     }
 
     /**
-     * @return true iff intermediate proof steps should be hidden
+     * @return {@code true} iff intermediate proof steps should be hidden
      */
     public boolean getHideIntermediateProofsteps() {
         return hideIntermediateProofsteps;
@@ -194,7 +196,7 @@ public class ViewSettings implements Settings, Cloneable {
     }
 
     /**
-     * @return true iff non-interactive proof steps should be hidden
+     * @return {@code true} iff non-interactive proof steps should be hidden
      */
     public boolean getHideAutomodeProofsteps() {
         return hideAutomodeProofsteps;
@@ -211,18 +213,35 @@ public class ViewSettings implements Settings, Cloneable {
     }
 
     /**
-     * @return true iff closed subtrees should be hidden
+     * @return {@code true} iff closed subtrees should be hidden
      */
     public boolean getHideClosedSubtrees() {
         return hideClosedSubtrees;
     }
 
     /**
-     * @param hide Wether closed subtrees should be hidden
+     * @param hide whether closed subtrees should be hidden
      */
     public void setHideClosedSubtrees(boolean hide) {
         if (hide != hideClosedSubtrees) {
             hideClosedSubtrees = hide;
+            fireSettingsChanged();
+        }
+    }
+
+    /**
+     * @return {@code true} iff subtrees whose goals are interactive should be hidden.
+     */
+    public boolean getHideInteractiveGoals() {
+        return hideInteractiveGoals;
+    }
+
+    /**
+     * @param hide whether subtrees whose goals are interactive should be hidden.
+     */
+    public void setHideInteractiveGoals(boolean hide) {
+        if (hide != hideInteractiveGoals) {
+            hideInteractiveGoals = hide;
             fireSettingsChanged();
         }
     }

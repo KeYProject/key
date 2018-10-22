@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.gui.prooftree;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Stack;
@@ -116,7 +117,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 
       public void proofGoalRemoved (ProofTreeEvent e) {
               if (pruningInProcess != null) return;
-              if ( hideClosedSubtrees () ) {
+              if ( globalFilterActive() ) {
                       updateTree((TreeNode) null);
               } else
                       proofStructureChanged ( e );
@@ -154,7 +155,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 	    if ( b ) {
 		proof.addProofTreeListener(proofTreeListener);
 		//		updateTree(null);
-                if ( hideClosedSubtrees () ) {
+                if ( globalFilterActive() ) {
                     updateTree((TreeNode) null);
                 }
 	    } else {
@@ -191,9 +192,30 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 	listenerList.remove(TreeModelListener.class, l);
     }
 
-
-    public boolean hideClosedSubtrees () {
+    /**
+     * 
+     * @return whether or not {@link ProofTreeViewFilter#HIDE_CLOSED_SUBTREES} is active.
+     */
+    public boolean hideClosedSubtrees() {
         return ProofTreeViewFilter.HIDE_CLOSED_SUBTREES.isActive();
+    }
+
+
+    /**
+     * 
+     * @return whether or not {@link ProofTreeViewFilter#HIDE_INTERACTIVE_GOALS} is active.
+     */
+    public boolean hideInteractiveGoals() {
+        return ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS.isActive();
+    }
+    
+    /**
+     * 
+     * @return whether or nor one of {@link ProofTreeViewFilter#ALL_GLOBAL_FILTERS} is active.
+     */
+    public boolean globalFilterActive() {
+        return Arrays.stream(ProofTreeViewFilter.ALL_GLOBAL_FILTERS).anyMatch(
+                ProofTreeViewFilter::isActive);
     }
 
     /**
@@ -368,10 +390,11 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
                 node = nextN;
             }
 
-            for ( int i = 0; i != node.childrenCount (); ++i )
-                if (!treeNode.getProofTreeModel().hideClosedSubtrees() ||
-                	!node.child ( i ).isClosed () )
-                workingList.add ( node.child ( i ) );
+            for ( int i = 0; i != node.childrenCount(); ++i ) {
+                if (!ProofTreeViewFilter.hiddenByGlobalFilters(node.child(i))) {
+                    workingList.add ( node.child ( i ) );
+                }
+            }    
         }
     }
 
