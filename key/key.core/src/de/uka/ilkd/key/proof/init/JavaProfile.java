@@ -17,6 +17,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -42,8 +44,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
-import de.uka.ilkd.key.rule.label.PerpetualChildTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.PerpetualTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.merge.MergeRule;
@@ -99,8 +99,6 @@ public class JavaProfile extends AbstractProfile {
     protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
         ImmutableList<TermLabelPolicy> perpetualPolicyList =
                 ImmutableSLList.<TermLabelPolicy>nil().prepend(new PerpetualTermLabelPolicy());
-        ImmutableList<ChildTermLabelPolicy> perpetualChildPolicyList =
-                ImmutableSLList.<ChildTermLabelPolicy>nil().prepend(new PerpetualChildTermLabelPolicy());
 
         ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
         result = result.prepend(
@@ -140,27 +138,26 @@ public class JavaProfile extends AbstractProfile {
                             ParameterlessTermLabel.SELF_COMPOSITION_LABEL)
             ));
         result = result.prepend(
-            new TermLabelConfiguration(
-                    ParameterlessTermLabel.PRE_CONDITION_LABEL_NAME,
-                    new SingletonLabelFactory<TermLabel>(
-                            ParameterlessTermLabel.PRE_CONDITION_LABEL),
-                    perpetualPolicyList,
-                    perpetualPolicyList,
-                    perpetualChildPolicyList,
-                    perpetualChildPolicyList,
-                    null,
-                    null,
-                    null
-            ));
-        result = result.prepend(
                 new TermLabelConfiguration(
                         ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
                         new SingletonLabelFactory<TermLabel>(
                                 ParameterlessTermLabel.POST_CONDITION_LABEL),
                         perpetualPolicyList,
                         perpetualPolicyList,
-                        perpetualChildPolicyList,
-                        perpetualChildPolicyList,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                ));
+        result = result.prepend(
+                new TermLabelConfiguration(
+                        OriginTermLabel.NAME,
+                        new OriginTermLabelFactory(),
+                        perpetualPolicyList,
+                        perpetualPolicyList,
+                        null,
+                        null,
                         null,
                         null,
                         null

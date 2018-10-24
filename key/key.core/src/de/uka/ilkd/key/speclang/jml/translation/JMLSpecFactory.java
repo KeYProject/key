@@ -52,6 +52,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -820,7 +821,8 @@ public class JMLSpecFactory {
                     Term post = heap == services.getTypeConverter().getHeapLDT().getHeap()
                             ? tb.and(post1, post2)
                                     : post1;
-                    post = tb.addLabelToAllSubs(post, ParameterlessTermLabel.POST_CONDITION_LABEL);
+                    post =tb.addLabelToAllSubs(
+                            post, new OriginTermLabel(OriginTermLabel.SpecType.POST, null));
 
                     result.put(heap, post);
                 } else {
@@ -875,7 +877,7 @@ public class JMLSpecFactory {
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             if (clauses.requires.get(heap) != null) {
                 Term pre = tb.convertToFormula(clauses.requires.get(heap));
-                pre = tb.addLabelToAllSubs(pre, ParameterlessTermLabel.PRE_CONDITION_LABEL);
+                pre = tb.addLabelToAllSubs(pre, new OriginTermLabel(OriginTermLabel.SpecType.PRE, null));
                 pres.put(heap, pre);
             } else {
                 if (clauses.assignables.get(heap) != null) {

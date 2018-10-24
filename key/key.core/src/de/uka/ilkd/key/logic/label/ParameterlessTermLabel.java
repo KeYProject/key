@@ -100,17 +100,6 @@ public final class ParameterlessTermLabel implements TermLabel {
            new ParameterlessTermLabel(SELF_COMPOSITION_LABEL_NAME);
 
    /**
-    * Name of {@link #PRE_CONDITION_LABEL}.
-    */
-   public static final Name PRE_CONDITION_LABEL_NAME = new Name("preCondition");
-
-   /**
-    * Label attached to the pre-condition.
-    */
-   public static final TermLabel PRE_CONDITION_LABEL =
-           new ParameterlessTermLabel(PRE_CONDITION_LABEL_NAME);
-
-   /**
     * Name of {@link #POST_CONDITION_LABEL}.
     */
    public static final Name POST_CONDITION_LABEL_NAME = new Name("postCondition");
