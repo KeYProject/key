@@ -44,7 +44,6 @@ public class EditFormulaAction extends ExplorationAction {
     /**
      *
      * If action is chosen in context menu
-     * If action is chosen in context menu
      * @param e
      */
     @Override
@@ -74,6 +73,7 @@ public class EditFormulaAction extends ExplorationAction {
         ImmutableList<Goal> result = g.apply(app);
         result.forEach(goal -> {
             goal.node().getNodeInfo().setExploration(true);
+            goal.node().getNodeInfo().setExplorationAction("Edit " + term + " to " + newTerm);
             String s = goal.node().getNodeInfo().getBranchLabel();
             goal.node().getNodeInfo().setBranchLabel("ExplorationNode: " + s);
         });

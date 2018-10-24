@@ -101,6 +101,10 @@ public class ProofTreeView extends JPanel {
     /** the model that is displayed by the delegateView */
     GUIProofTreeModel delegateModel;
 
+    public GUIProofTreeModel getDelegateModel() {
+        return delegateModel;
+    }
+
     private WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<Proof, GUIProofTreeModel>(20);
 
     /** the proof this view shows */
@@ -747,15 +751,6 @@ public class ProofTreeView extends JPanel {
 		(DefaultTreeCellRenderer) super.getTreeCellRendererComponent
 		(tree, nodeText, sel, expanded, leaf, row, hasFocus);
 
-        if(node.getNodeInfo().isExploration()) {
-
-            tree_cell.setBorder(BorderFactory.createLineBorder(DARK_PURPLE_COLOR, 2, true));
-            tree_cell.setBackgroundNonSelectionColor(LIGHT_PURPLE_COLOR);
-            tree_cell.setToolTipText("Exploration Action Performed");
-        }
-        else {
-            tree_cell.setBorder(null);
-        }
 	    if (node.leaf()) {
 		Goal goal = proof.getGoal(node);
 		if ( goal == null || node.isClosed() ) {
@@ -787,6 +782,15 @@ public class ProofTreeView extends JPanel {
 		    tree_cell.setForeground(Color.blue);
 		else
 		*/
+		//wrong place
+		if(node.getNodeInfo().isExploration() && node.childrenCount() <= 1){
+                tree_cell.setBorder(BorderFactory.createLineBorder(DARK_PURPLE_COLOR, 2, true));
+                tree_cell.setBackgroundNonSelectionColor(LIGHT_PURPLE_COLOR);
+                tree_cell.setToolTipText("Exploration Action Performed");
+        } else {
+		    tree_cell.setBorder(null);
+        }
+
 		tree_cell.setForeground(Color.black);
                 String tooltipText = "An inner node of the proof";
                 final String notes = node.getNodeInfo().getNotes();
@@ -821,6 +825,8 @@ public class ProofTreeView extends JPanel {
                 tree_cell.setBackgroundNonSelectionColor(Color.white);
             }
 	    if (sel) tree_cell.setBackground(DARK_BLUE_COLOR);
+
+
 
 	    tree_cell.setFont(tree.getFont());
 	    tree_cell.setText(nodeText);

@@ -215,4 +215,27 @@ public abstract class ProofTreeViewFilter {
 			return true;
 		}
 	}
+
+	private static class HideClosedSubtreesFilter1 extends ProofTreeViewFilter {
+
+		@Override
+		public boolean isActive() {
+			return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getHideClosedSubtrees();
+		}
+
+		@Override
+		void setActive(boolean active) {
+			ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHideClosedSubtrees(active);
+		}
+
+		@Override
+		public String name() {
+			return "Hide Closed Subtrees1";
+		}
+
+		@Override
+		boolean global() {
+			return true;
+		}
+	}
 }

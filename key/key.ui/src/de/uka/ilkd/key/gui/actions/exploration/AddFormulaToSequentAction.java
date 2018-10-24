@@ -79,8 +79,15 @@ public class AddFormulaToSequentAction extends ExplorationAction {
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
         app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), getMediator().getServices(), true);
         ImmutableList<Goal> result = g.apply(app);
-        //set the explroation flag
-        result.forEach(goal -> goal.node().getNodeInfo().setExploration(true));
+        //set the exploration flag
+        result.forEach(goal -> {
+            goal.node().getNodeInfo().setExploration(true);
+            goal.node().getNodeInfo().setExplorationAction("Add "+t);
+            String s = goal.node().getNodeInfo().getBranchLabel();
+            goal.node().getNodeInfo().setBranchLabel("ExplorationNode: " + s);
+
+        });
+
         assert result.size() == 2;
         if(antecedent){
             Goal first = result.head();
@@ -93,6 +100,18 @@ public class AddFormulaToSequentAction extends ExplorationAction {
                 Goal second = result.tail().head();
                 second.setEnabled(false);
             }
+        } else {
+            Goal first = result.head();
+            if(first.node().getNodeInfo().getBranchLabel().endsWith("TRUE")){
+                first.setEnabled(false);
+                if(!showSecondBranch) {
+                    //TODO now hide the branch
+                }
+            } else {
+                Goal second = result.tail().head();
+                second.setEnabled(false);
+            }
+
         }
 
     }

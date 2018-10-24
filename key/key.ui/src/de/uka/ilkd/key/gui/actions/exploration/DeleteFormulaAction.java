@@ -55,6 +55,8 @@ public class DeleteFormulaAction extends ExplorationAction {
         ImmutableList<Goal> result = g.apply(app);
         result.forEach(goal -> {
             goal.node().getNodeInfo().setExploration(true);
+            goal.node().getNodeInfo().setExplorationAction("Hide "+term);
+
         });
     }
 
