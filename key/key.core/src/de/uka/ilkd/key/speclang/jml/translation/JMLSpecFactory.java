@@ -52,7 +52,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -164,7 +164,8 @@ public class JMLSpecFactory {
                 invariant = tb.tt();
                 for (PositionedString expr : originalInvariant) {
                     Term translated = JMLTranslator.translate(expr, pm.getContainerType(), selfVar,
-                            allVars, null, null, atPres, atPres, Term.class, services);
+                            allVars, null, null, atPres, atPres,
+                            SpecType.LOOP_INVARIANT, Term.class, services);
                     invariant = tb.andSC(invariant, tb.convertToFormula(translated));
                 }
             }
@@ -190,7 +191,8 @@ public class JMLSpecFactory {
                 freeInvariant = tb.tt();
                 for (PositionedString expr : originalFreeInvariant) {
                     Term translated = JMLTranslator.translate(expr, pm.getContainerType(), selfVar,
-                            allVars, null, null, atPres, atPres, Term.class, services);
+                            allVars, null, null, atPres, atPres,
+                            SpecType.LOOP_INVARIANT_FREE, Term.class, services);
                     freeInvariant = tb.andSC(freeInvariant, tb.convertToFormula(translated));
                 }
             }
@@ -473,7 +475,7 @@ public class JMLSpecFactory {
             clauses.ensuresFree.put(heap,
                     translateAndClauses(pm, progVars.selfVar, progVars.paramVars,
                             progVars.resultVar, progVars.excVar, progVars.atPres,
-                            progVars.atBefores, ensuresFree));
+                            progVars.atBefores, ensuresFree, SpecType.ENSURES_FREE));
         }
     }
 
@@ -486,14 +488,15 @@ public class JMLSpecFactory {
             clauses.requires.put(heap, null);
         } else {
             clauses.requires.put(heap, translateAndClauses(pm, progVars.selfVar, progVars.paramVars,
-                    null, null, progVars.atPres, progVars.atBefores, requires));
+                    null, null, progVars.atPres, progVars.atBefores, requires, SpecType.REQUIRES));
         }
         if (heap == savedHeap && requiresFree.isEmpty()) {
             clauses.requiresFree.put(heap, null);
         } else {
             clauses.requiresFree.put(heap,
                     translateAndClauses(pm, progVars.selfVar, progVars.paramVars, null, null,
-                            progVars.atPres, progVars.atBefores, requiresFree));
+                            progVars.atPres, progVars.atBefores, requiresFree,
+                            SpecType.REQUIRES_FREE));
         }
     }
 
@@ -536,7 +539,7 @@ public class JMLSpecFactory {
             // parameter
             final Term rhs = JMLTranslator.translate(abbrv.third, inClass, progVars.selfVar,
                     progVars.paramVars, progVars.resultVar, progVars.excVar, progVars.atPres,
-                    progVars.atBefores, Term.class, services);
+                    progVars.atBefores, null, Term.class, services);
             clauses.abbreviations
                     = clauses.abbreviations.append(tb.elementary(tb.var(abbrVar), rhs));
         }
@@ -569,7 +572,8 @@ public class JMLSpecFactory {
     private Term translateAndClauses(IProgramMethod pm, ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
             ProgramVariable excVar, Map<LocationVariable, Term> atPres,
-            Map<LocationVariable, Term> atBefores, ImmutableList<PositionedString> originalClauses)
+            Map<LocationVariable, Term> atBefores, ImmutableList<PositionedString> originalClauses,
+            SpecType specType)
             throws SLTranslationException {
         // The array is used to invert the order in which the elements are read.
         PositionedString[] array = new PositionedString[originalClauses.size()];
@@ -578,7 +582,8 @@ public class JMLSpecFactory {
         Term result = tb.tt();
         for (int i = array.length - 1; i >= 0; i--) {
             Term translated = JMLTranslator.translate(array[i], pm.getContainerType(), selfVar,
-                    paramVars, resultVar, excVar, atPres, atBefores, Term.class, services);
+                    paramVars, resultVar, excVar, atPres, atBefores,
+                    specType, Term.class, services);
             Term translatedFormula = tb.convertToFormula(translated);
             result = tb.andSC(translatedFormula, result);
         }
@@ -599,12 +604,13 @@ public class JMLSpecFactory {
 
     private Term translateUnionClauses(IProgramMethod pm, ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, Map<LocationVariable, Term> atPres,
-            Map<LocationVariable, Term> atBefores, ImmutableList<PositionedString> originalClauses)
+            Map<LocationVariable, Term> atBefores, ImmutableList<PositionedString> originalClauses,
+            SpecType specType)
             throws SLTranslationException {
         Term result = tb.empty();
         for (PositionedString expr : originalClauses) {
             Term translated = JMLTranslator.translate(expr, pm.getContainerType(), selfVar,
-                    paramVars, null, null, atPres, atBefores, Term.class, services);
+                    paramVars, null, null, atPres, atBefores, specType, Term.class, services);
 
             // less than nothing is marked by some special term;
             if (translated == tb.strictlyNothing()) {
@@ -634,7 +640,8 @@ public class JMLSpecFactory {
         for (int i = array.length - 1; i >= 0; i--) {
             @SuppressWarnings("unchecked")
             Pair<Label, Term> translation = JMLTranslator.translate(array[i], pm.getContainerType(),
-                    selfVar, paramVars, resultVar, excVar, atPres, atBefores, Pair.class, services);
+                    selfVar, paramVars, resultVar, excVar, atPres, atBefores,
+                    SpecType.BREAKS, Pair.class, services);
             result.put(translation.first, translation.second);
         }
         return result;
@@ -651,7 +658,8 @@ public class JMLSpecFactory {
         for (int i = array.length - 1; i >= 0; i--) {
             @SuppressWarnings("unchecked")
             Pair<Label, Term> translation = JMLTranslator.translate(array[i], pm.getContainerType(),
-                    selfVar, paramVars, resultVar, excVar, atPres, atBefores, Pair.class, services);
+                    selfVar, paramVars, resultVar, excVar, atPres, atBefores,
+                    SpecType.CONTINUES, Pair.class, services);
             result.put(translation.first, translation.second);
         }
         return result;
@@ -667,7 +675,7 @@ public class JMLSpecFactory {
             return tb.ff();
         } else {
             return translateAndClauses(pm, selfVar, paramVars, resultVar, excVar, atPres, atBefores,
-                    originalClauses);
+                    originalClauses, SpecType.RETURNS);
         }
     }
 
@@ -681,7 +689,7 @@ public class JMLSpecFactory {
             return tb.ff();
         } else {
             return translateAndClauses(pm, selfVar, paramVars, resultVar, excVar, atPres, atBefores,
-                    originalClauses);
+                    originalClauses, SpecType.SIGNALS);
         }
     }
 
@@ -702,7 +710,7 @@ public class JMLSpecFactory {
             return tb.ff();
         } else {
             return translateAndClauses(pm, selfVar, paramVars, resultVar, excVar, atPres, atBefores,
-                    originalClauses);
+                    originalClauses, SpecType.ENSURES);
         }
     }
 
@@ -715,7 +723,7 @@ public class JMLSpecFactory {
             return tb.allLocs();
         } else {
             return translateUnionClauses(pm, selfVar, paramVars, atPres, atBefores,
-                    originalClauses);
+                    originalClauses, SpecType.ACCESSIBLE);
         }
     }
 
@@ -728,7 +736,7 @@ public class JMLSpecFactory {
             return tb.allLocs();
         } else {
             return translateUnionClauses(pm, selfVar, paramVars, atPres, atBefores,
-                    originalClauses);
+                    originalClauses, SpecType.ASSIGNABLE);
         }
     }
 
@@ -775,7 +783,8 @@ public class JMLSpecFactory {
         if (!originalDecreases.isEmpty()) {
             for (PositionedString expr : originalDecreases) {
                 Term translated = JMLTranslator.translate(expr, pm.getContainerType(), selfVar,
-                        paramVars, null, null, atPres, atBefores, Term.class, services);
+                        paramVars, null, null, atPres, atBefores,
+                        SpecType.DECREASES, Term.class, services);
                 if (decreases == null) {
                     decreases = translated;
                 } else {
@@ -821,8 +830,6 @@ public class JMLSpecFactory {
                     Term post = heap == services.getTypeConverter().getHeapLDT().getHeap()
                             ? tb.and(post1, post2)
                                     : post1;
-                    post =tb.addLabelToAllSubs(
-                            post, new OriginTermLabel(OriginTermLabel.SpecType.POST, null));
 
                     result.put(heap, post);
                 } else {
@@ -877,7 +884,6 @@ public class JMLSpecFactory {
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             if (clauses.requires.get(heap) != null) {
                 Term pre = tb.convertToFormula(clauses.requires.get(heap));
-                pre = tb.addLabelToAllSubs(pre, new OriginTermLabel(OriginTermLabel.SpecType.PRE, null));
                 pres.put(heap, pre);
             } else {
                 if (clauses.assignables.get(heap) != null) {
@@ -1257,8 +1263,8 @@ public class JMLSpecFactory {
 
             final MergeParamsSpec specs = JMLTranslator.translate(mergeParamsParseStr, kjt,
                     progVars.selfVar, append(ImmutableSLList.<ProgramVariable>nil(), params),
-                    progVars.resultVar, progVars.excVar, atPres, atPres, MergeParamsSpec.class,
-                    services);
+                    progVars.resultVar, progVars.excVar, atPres, atPres,
+                    null, MergeParamsSpec.class, services);
 
             result = result.add(new PredicateAbstractionMergeContract(mps, atPres, kjt,
                     specs.getLatticeType(),
@@ -1513,7 +1519,8 @@ public class JMLSpecFactory {
             variant = null;
         } else {
             Term translated = JMLTranslator.translate(originalVariant, pm.getContainerType(),
-                    selfVar, allVars, null, null, atPres, atPres, Term.class, services);
+                    selfVar, allVars, null, null, atPres, atPres,
+                    SpecType.DECREASES, Term.class, services);
             variant = translated;
         }
         return variant;
@@ -1560,7 +1567,8 @@ public class JMLSpecFactory {
                 a = tb.empty();
                 for (PositionedString expr : as) {
                     Term translated = JMLTranslator.translate(expr, pm.getContainerType(), selfVar,
-                            allVars, null, null, atPres, atPres, Term.class, services);
+                            allVars, null, null, atPres, atPres,
+                            SpecType.ASSIGNABLE, Term.class, services);
                     a = tb.union(a, translated);
                 }
             }
