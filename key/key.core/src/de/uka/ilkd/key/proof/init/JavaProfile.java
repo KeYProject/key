@@ -44,8 +44,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.rule.label.PerpetualTermLabelPolicy;
-import de.uka.ilkd.key.rule.label.TermLabelPolicy;
+import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
+import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -97,8 +97,9 @@ public class JavaProfile extends AbstractProfile {
      */
     @Override
     protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
-        ImmutableList<TermLabelPolicy> perpetualPolicyList =
-                ImmutableSLList.<TermLabelPolicy>nil().prepend(new PerpetualTermLabelPolicy());
+        ImmutableList<TermLabelRefactoring> originTermLabelRefactorings =
+                ImmutableSLList.<TermLabelRefactoring>nil().prepend(
+                        new OriginTermLabelRefactoring());
 
         ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
         result = result.prepend(
@@ -141,25 +142,18 @@ public class JavaProfile extends AbstractProfile {
                 new TermLabelConfiguration(
                         ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
                         new SingletonLabelFactory<TermLabel>(
-                                ParameterlessTermLabel.POST_CONDITION_LABEL),
-                        perpetualPolicyList,
-                        perpetualPolicyList,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
+                                ParameterlessTermLabel.POST_CONDITION_LABEL)
                 ));
         result = result.prepend(
                 new TermLabelConfiguration(
                         OriginTermLabel.NAME,
                         new OriginTermLabelFactory(),
-                        perpetualPolicyList,
-                        perpetualPolicyList,
                         null,
                         null,
                         null,
                         null,
+                        null,
+                        originTermLabelRefactorings,
                         null
                 ));
         return result;

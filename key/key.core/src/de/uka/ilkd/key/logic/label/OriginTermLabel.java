@@ -2,6 +2,7 @@ package de.uka.ilkd.key.logic.label;
 
 import java.nio.file.Paths;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.StringJoiner;
@@ -27,7 +28,7 @@ public class OriginTermLabel implements TermLabel {
         this.origins.add(new Origin(specType, filename, line));
     }
 
-    public OriginTermLabel(OriginTermLabel... labels) {
+    public OriginTermLabel(List<OriginTermLabel> labels) {
         this.origins = new TreeSet<>();
 
         for (OriginTermLabel label : labels) {

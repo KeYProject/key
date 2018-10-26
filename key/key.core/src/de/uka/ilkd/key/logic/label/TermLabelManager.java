@@ -1670,7 +1670,7 @@ public class TermLabelManager {
       }
       // Give all TermLabelInstantiator instances the chance to remove or to add labels from/to the list
       for (TermLabelRefactoring refactoring : activeRefactorings) {
-         refactoring.refactoreLabels(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, term, newLabels);
+         refactoring.refactorLabels(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, term, newLabels);
       }
       return new ImmutableArray<TermLabel>(newLabels);
    }

@@ -185,7 +185,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     * {@inheritDoc}
     */
    @Override
-   public void refactoreLabels(TermLabelState state,
+   public void refactorLabels(TermLabelState state,
                                Services services, 
                                PosInOccurrence applicationPosInOccurrence, 
                                Term applicationTerm, 
