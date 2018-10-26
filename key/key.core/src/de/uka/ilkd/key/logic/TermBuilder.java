@@ -1648,14 +1648,17 @@ public class TermBuilder {
     }
 
     /**
-     * Applies the labels to the term and every (direct or indirect) sub-term recursively.
+     * Applies the labels to the term and almost every (direct or indirect) sub-term recursively.
+     *
+     * <p> The labels are not added to heap variables. </p>
      *
      * @param term term to label.
      * @param labels the labels to apply.
      * @return a labeled term.
      */
     public Term addLabelToAllSubs(Term term, ImmutableArray<TermLabel> labels) {
-        if (labels == null || labels.isEmpty()) {
+        if (labels == null || labels.isEmpty()
+                || services.getTypeConverter().getHeapLDT().getHeap().sort().equals(term.sort())) {
             return term;
         }
 
@@ -1678,7 +1681,9 @@ public class TermBuilder {
     }
 
     /**
-     * Applies the label to the term and every (direct or indirect) sub-term recursively.
+     * Applies the label to the term and almost every (direct or indirect) sub-term recursively.
+     *
+     * <p> The label is not added to heap variables. </p>
      *
      * @param term term to label.
      * @param label the label to apply.
