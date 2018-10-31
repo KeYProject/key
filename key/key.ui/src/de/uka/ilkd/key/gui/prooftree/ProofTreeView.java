@@ -113,6 +113,10 @@ public class ProofTreeView extends JPanel {
     /** the model that is displayed by the delegateView */
     GUIProofTreeModel delegateModel;
 
+    public GUIProofTreeModel getDelegateModel() {
+        return delegateModel;
+    }
+
     private WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<Proof, GUIProofTreeModel>(20);
 
     /** the proof this view shows */

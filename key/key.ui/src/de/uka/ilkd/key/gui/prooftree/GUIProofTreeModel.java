@@ -48,7 +48,7 @@ import de.uka.ilkd.key.util.Debug;
  * representing branching points.  (There is also one at the root.)
  */
 
-class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
+public class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 
 	private static final long serialVersionUID = 4253914848471158358L;
 	private Proof proof;

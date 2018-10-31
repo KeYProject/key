@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui.actions.exploration;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.proofExploration.ExplorationModeModel;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -10,6 +11,8 @@ import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -78,9 +81,17 @@ public class AddFormulaToSequentAction extends ExplorationAction {
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
         app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), getMediator().getServices(), true);
+        g.node().getNodeInfo().setExploration(true);
         ImmutableList<Goal> result = g.apply(app);
-        //set the explroation flag
-        result.forEach(goal -> goal.node().getNodeInfo().setExploration(true));
+        //set the exploration flag
+        result.forEach(goal -> {
+          //  goal.node().getNodeInfo().setExploration(true);
+            goal.node().getNodeInfo().setExplorationAction("Add "+t);
+            String s = goal.node().getNodeInfo().getBranchLabel();
+            goal.node().getNodeInfo().setBranchLabel("ExplorationNode: " + s);
+
+        });
+
         assert result.size() == 2;
         if(antecedent){
             Goal first = result.head();
@@ -93,6 +104,18 @@ public class AddFormulaToSequentAction extends ExplorationAction {
                 Goal second = result.tail().head();
                 second.setEnabled(false);
             }
+        } else {
+            Goal first = result.head();
+            if(first.node().getNodeInfo().getBranchLabel().endsWith("TRUE")){
+                first.setEnabled(false);
+                if(!showSecondBranch) {
+                    //TODO now hide the branch
+                }
+            } else {
+                Goal second = result.tail().head();
+                second.setEnabled(false);
+            }
+
         }
 
     }

@@ -75,7 +75,10 @@ public class NodeInfo {
 
     /** Information about changes respective to the parent of this node. */
     private SequentChangeInfo sequentChangeInfo;
+
     private boolean exploration;
+
+    private String explorationAction;
 
     public NodeInfo(Node node) {
         this.node = node;
@@ -375,11 +378,22 @@ public class NodeInfo {
         this.sequentChangeInfo = sequentChangeInfo;
     }
 
+    /**
+     * Information for the explorationmode
+     */
     public boolean isExploration() {
         return exploration;
     }
 
     public void setExploration(boolean exploration) {
         this.exploration = exploration;
+    }
+
+    public String getExplorationAction() {
+        return explorationAction;
+    }
+
+    public void setExplorationAction(String explorationAction) {
+        this.explorationAction = explorationAction;
     }
 }
