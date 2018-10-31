@@ -7,8 +7,9 @@
                <branchCondition name="not(equals(y,null))" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="true" branchCondition="not(equals(y,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="int add = sub(x,y);" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false">
                      <operationContract name="result_0 = sub(x, y) catch(exc_0)
-pre: !x = null &amp; !y = null
-post: result_0 = javaAddInt(x.value, y.value) &amp; exc_0 = null
+pre: ((!x = null)&lt;&lt;impl&gt;&gt; &amp; (!y = null)&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
+post: result_0 = javaAddInt(x.value, y.value)
+&amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;
 mod: {}, creates no new objects
 termination: diamond" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x, y" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                         <statement name="return add_1;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false">

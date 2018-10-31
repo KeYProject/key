@@ -82,7 +82,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * </p>
     */
    public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = false;
-   
+
    /**
     * The used temporary oracle directory.
     */
@@ -102,7 +102,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       }
       oracleDirectory = directory;
    }
-   
+
    /**
     * {@inheritDoc}
     */
@@ -126,8 +126,8 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @throws IOException Occurred Exception.
     * @throws DebugException Occurred Exception.
     */
-   protected static void createOracleFile(ISEDebugTarget target, 
-                                          String expectedModelPathInBundle, 
+   protected static void createOracleFile(ISEDebugTarget target,
+                                          String expectedModelPathInBundle,
                                           boolean saveVariables,
                                           boolean saveCallStack,
                                           boolean saveConstraints) throws IOException, DebugException {
@@ -136,7 +136,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       }
    }
 
-   
+
    /**
     * Creates a new oracle file for the given {@link ISEDebugTarget}.
     * @param oracleDirectory The oracle directory to create file in.
@@ -149,8 +149,8 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @throws DebugException Occurred Exception.
     */
    protected static void createOracleFile(File oracleDirectory,
-                                          ISEDebugTarget target, 
-                                          String expectedModelPathInBundle, 
+                                          ISEDebugTarget target,
+                                          String expectedModelPathInBundle,
                                           boolean saveVariables,
                                           boolean saveCallStack,
                                           boolean saveConstraints) throws IOException, DebugException {
@@ -163,8 +163,8 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       // Print message to the user.
       printOracleDirectory();
    }
-   
-   
+
+
    /**
     * Prints {@link #oracleDirectory} to the user via {@link System#out}.
     */
@@ -190,7 +190,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
    public static File getOracledirectory() {
       return oracleDirectory;
    }
-   
+
    /**
     * Utility class to select an {@link IMethod} in a given {@link IJavaProject}.
     * @author Martin Hentschel
@@ -204,7 +204,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
        */
       public IMethod getMethod(IJavaProject project) throws Exception;
    }
-   
+
    /**
     * Creates a default {@link IMethodSelector} which uses
     * {@link TestUtilsUtil#getJdtMethod(IJavaProject, String, String, String...)}
@@ -214,8 +214,8 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param parameters The method parameters.
     * @return The created {@link IMethodSelector}.
     */
-   public static IMethodSelector createMethodSelector(final String typeName, 
-                                                      final String methodName, 
+   public static IMethodSelector createMethodSelector(final String typeName,
+                                                      final String methodName,
                                                       final String... parameters) {
       return new IMethodSelector() {
          @Override
@@ -224,7 +224,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          }
       };
    }
-   
+
    /**
     * makes sure that the given {@link ISEDebugTarget} contains the
     * same model as defined by the oracle file.
@@ -251,8 +251,8 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          TestSedCoreUtil.compareDebugTarget(expectedDebugTarget, target, false, includeVariables, includeCallStack, includeConstraints);
       }
    }
-   
-   
+
+
    /**
     * Makes sure that one test step is correctly done.
     * @param target The {@link ISEDebugTarget} to use.
@@ -272,7 +272,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                     String expectedModelFileExtension) throws DebugException, IOException, ParserConfigurationException, SAXException {
       assertDebugTargetViaOracle(target, bundleId, expectedModelPathInBundle + modelIndex + expectedModelFileExtension, false, false, false);
    }
-   
+
    /**
     * Makes sure that a step into was done correctly.
     * @param bot The {@link SWTWorkbenchBot} to use.
@@ -287,8 +287,8 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     */
-   protected void assertStepInto(SWTWorkbenchBot bot, 
-                                 SWTBotTreeItem launchTreeItem, 
+   protected void assertStepInto(SWTWorkbenchBot bot,
+                                 SWTBotTreeItem launchTreeItem,
                                  ISEDebugTarget target,
                                  String bundleId,
                                  String expectedModelPathInBundle,
@@ -297,15 +297,15 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       stepInto(bot, launchTreeItem, target);
       assertStep(target, bundleId, expectedModelPathInBundle, modelIndex, expectedModelFileExtension);
    }
-   
+
    /**
     * Performs a step into on the given {@link SWTBotTreeItem}.
     * @param bot The {@link SWTWorkbenchBot} to use.
     * @param launchTreeItem The {@link SWTBotTreeItem} to perform step into on.
     * @param target The {@link ISEDebugTarget} to use.
     */
-   protected static void stepInto(SWTWorkbenchBot bot, 
-                                  final SWTBotTreeItem launchTreeItem, 
+   protected static void stepInto(SWTWorkbenchBot bot,
+                                  final SWTBotTreeItem launchTreeItem,
                                   ISEDebugTarget target) {
       assertNotNull(bot);
       assertNotNull(launchTreeItem);
@@ -319,14 +319,14 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
-               SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Into"); 
+               SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Into");
                menuItem.click();
             }
          });
          waitUntilDeselected(bot, launchTreeItem);
       }
    }
-   
+
    /**
     * Waits until the given {@link SWTBotTreeItem} is no longer selected.
     * @param bot The {@link SWTWorkbenchBot} to use.
@@ -335,7 +335,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
    protected static void waitUntilDeselected(SWTWorkbenchBot bot, SWTBotTreeItem item) {
       TestUtilsUtil.waitUntilDeselected(bot, item);
    }
-   
+
    /**
     * Makes sure that a step over was done correctly.
     * @param bot The {@link SWTWorkbenchBot} to use.
@@ -350,8 +350,8 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     */
-   protected void assertStepOver(SWTWorkbenchBot bot, 
-                                 SWTBotTreeItem launchTreeItem, 
+   protected void assertStepOver(SWTWorkbenchBot bot,
+                                 SWTBotTreeItem launchTreeItem,
                                  ISEDebugTarget target,
                                  String bundleId,
                                  String expectedModelPathInBundle,
@@ -360,15 +360,15 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       stepOver(bot, launchTreeItem, target);
       assertStep(target, bundleId, expectedModelPathInBundle, modelIndex, expectedModelFileExtension);
    }
-   
+
    /**
     * Performs a step over on the given {@link SWTBotTreeItem}.
     * @param bot The {@link SWTWorkbenchBot} to use.
     * @param launchTreeItem The {@link SWTBotTreeItem} to perform step over on.
     * @param target The {@link ISEDebugTarget} to use.
     */
-   protected static void stepOver(SWTWorkbenchBot bot, 
-                                  final SWTBotTreeItem launchTreeItem, 
+   protected static void stepOver(SWTWorkbenchBot bot,
+                                  final SWTBotTreeItem launchTreeItem,
                                   ISEDebugTarget target) {
       assertNotNull(bot);
       assertNotNull(launchTreeItem);
@@ -382,14 +382,14 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
-               SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Over"); 
+               SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Over");
                menuItem.click();
             }
          });
          waitUntilDeselected(bot, launchTreeItem);
       }
    }
-   
+
    /**
     * Makes sure that a step return was done correctly.
     * @param bot The {@link SWTWorkbenchBot} to use.
@@ -404,8 +404,8 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     */
-   protected void assertStepReturn(SWTWorkbenchBot bot, 
-                                   SWTBotTreeItem launchTreeItem, 
+   protected void assertStepReturn(SWTWorkbenchBot bot,
+                                   SWTBotTreeItem launchTreeItem,
                                    ISEDebugTarget target,
                                    String bundleId,
                                    String expectedModelPathInBundle,
@@ -414,15 +414,15 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       stepReturn(bot, launchTreeItem, target);
       assertStep(target, bundleId, expectedModelPathInBundle, modelIndex, expectedModelFileExtension);
    }
-   
+
    /**
     * Performs a step return on the given {@link SWTBotTreeItem}.
     * @param bot The {@link SWTWorkbenchBot} to use.
     * @param launchTreeItem The {@link SWTBotTreeItem} to perform step return on.
     * @param target The {@link ISEDebugTarget} to use.
     */
-   protected static void stepReturn(SWTWorkbenchBot bot, 
-                                    final SWTBotTreeItem launchTreeItem, 
+   protected static void stepReturn(SWTWorkbenchBot bot,
+                                    final SWTBotTreeItem launchTreeItem,
                                     ISEDebugTarget target) {
       assertNotNull(bot);
       assertNotNull(launchTreeItem);
@@ -436,14 +436,14 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
-               SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Return"); 
+               SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Return");
                menuItem.click();
             }
          });
          waitUntilDeselected(bot, launchTreeItem);
       }
    }
-   
+
    /**
     * Makes sure that a resume was done correctly.
     * @param bot The {@link SWTWorkbenchBot} to use.
@@ -458,8 +458,8 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     */
-   protected void assertResume(SWTWorkbenchBot bot, 
-                               SWTBotTreeItem launchTreeItem, 
+   protected void assertResume(SWTWorkbenchBot bot,
+                               SWTBotTreeItem launchTreeItem,
                                ISEDebugTarget target,
                                String bundleId,
                                String expectedModelPathInBundle,
@@ -468,15 +468,15 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       resume(bot, launchTreeItem, target);
       assertStep(target, bundleId, expectedModelPathInBundle, modelIndex, expectedModelFileExtension);
    }
-   
+
    /**
     * Performs a resume on the given {@link SWTBotTreeItem}.
     * @param bot The {@link SWTWorkbenchBot} to use.
     * @param launchTreeItem The {@link SWTBotTreeItem} to perform resume on.
     * @param target The {@link ISEDebugTarget} to use.
     */
-   protected static void resume(SWTWorkbenchBot bot, 
-                                final SWTBotTreeItem launchTreeItem, 
+   protected static void resume(SWTWorkbenchBot bot,
+                                final SWTBotTreeItem launchTreeItem,
                                 ISEDebugTarget target) {
       assertNotNull(bot);
       assertNotNull(launchTreeItem);
@@ -490,13 +490,13 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
-               SWTBotMenu menuItem = launchTreeItem.contextMenu("Resume"); 
+               SWTBotMenu menuItem = launchTreeItem.contextMenu("Resume");
                menuItem.click();
             }
          });
       }
    }
-   
+
    /**
     * Performs a test on a {@link KeYDebugTarget}. This methods setups
     * the environment an the real test is done in the given {@link IKeYDebugTargetTestExecutor}.
@@ -539,19 +539,19 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean truthValueTracingEnabled,
                                        Boolean simplifyConditions,
                                        Boolean hideFullBranchConditionIfAdditionalLabelIsAvailable,
-                                       int timeoutFactor, 
+                                       int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       doKeYDebugTargetTest(projectName,
-                           Activator.PLUGIN_ID, 
-                           pathInBundle, 
+                           Activator.PLUGIN_ID,
+                           pathInBundle,
                            closePropertiesView,
-                           closeExecutionTreeViews, 
-                           selector, 
+                           closeExecutionTreeViews,
+                           selector,
                            useExistingContract,
                            preconditionOrExistingContract,
-                           showMethodReturnValues, 
-                           showVariablesOfSelectedDebugNode, 
-                           showKeYMainWindow, 
+                           showMethodReturnValues,
+                           showVariablesOfSelectedDebugNode,
+                           showKeYMainWindow,
                            mergeBranchConditions,
                            useUnicode,
                            usePrettyPrinting,
@@ -560,7 +560,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            truthValueTracingEnabled,
                            simplifyConditions,
                            hideFullBranchConditionIfAdditionalLabelIsAvailable,
-                           timeoutFactor, 
+                           timeoutFactor,
                            executor);
    }
 
@@ -611,19 +611,19 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean hideFullBranchConditionIfAdditionalLabelIsAvailable,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
-      doKeYDebugTargetTest(projectName, 
-                           plugin, 
-                           pathInBundle, 
-                           null, 
-                           closePropertiesView, 
-                           closeExecutionTreeViews, 
-                           selector, 
-                           useExistingContract, 
-                           preconditionOrExistingContract, 
-                           showMethodReturnValues, 
-                           showVariablesOfSelectedDebugNode, 
-                           showKeYMainWindow, 
-                           mergeBranchConditions, 
+      doKeYDebugTargetTest(projectName,
+                           plugin,
+                           pathInBundle,
+                           null,
+                           closePropertiesView,
+                           closeExecutionTreeViews,
+                           selector,
+                           useExistingContract,
+                           preconditionOrExistingContract,
+                           showMethodReturnValues,
+                           showVariablesOfSelectedDebugNode,
+                           showKeYMainWindow,
+                           mergeBranchConditions,
                            useUnicode,
                            usePrettyPrinting,
                            showSignatureOnMethodReturnNodes,
@@ -631,10 +631,10 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            truthValueTracingEnabled,
                            simplifyConditions,
                            hideFullBranchConditionIfAdditionalLabelIsAvailable,
-                           timeoutFactor, 
+                           timeoutFactor,
                            executor);
    }
-   
+
    /**
     * Performs a test on a {@link KeYDebugTarget}. This methods setups
     * the environment an the real test is done in the given {@link IKeYDebugTargetTestExecutor}.
@@ -692,7 +692,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       // Do test steps
       doKeYDebugTargetTest(project, closePropertiesView, closeExecutionTreeViews, selector, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, higlightReachedSourceCode, truthValueTracingEnabled, simplifyConditions, hideFullBranchConditionIfAdditionalLabelIsAvailable, timeoutFactor, executor);
    }
-   
+
    /**
     * Performs a test on a {@link KeYDebugTarget}. This methods setups
     * the environment an the real test is done in the given {@link IKeYDebugTargetTestExecutor}.
@@ -760,8 +760,8 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          // Get method
          assertNotNull(selector);
          IMethod method = selector.getMethod(project);
-         String targetName = useExistingContract != null && useExistingContract.booleanValue() ? 
-                             preconditionOrExistingContract : 
+         String targetName = useExistingContract != null && useExistingContract.booleanValue() ?
+                             preconditionOrExistingContract :
                              TestSEDKeyCoreUtil.computeTargetName(method);
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * timeoutFactor;
@@ -807,7 +807,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          TestUtilsUtil.openPerspective(defaultPerspective);
       }
    }
-   
+
    protected IKeYDebugTargetTestExecutor createResumeExecutor(final boolean clearProofListInKeYBeforeResume,
                                                               final String bundleId,
                                                               final String expectedModelPathInBundle,
@@ -819,7 +819,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                                               final boolean useMethodContracts,
                                                               final boolean useLoopInvariants,
                                                               final boolean useBlockContracts,
-                                                              final boolean nonExecutionBranchHidingSideProofs, 
+                                                              final boolean nonExecutionBranchHidingSideProofs,
                                                               final boolean aliasChecks) {
       return new AbstractKeYDebugTargetTestExecutor() {
          @Override
@@ -943,7 +943,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          }
       };
    }
-   
+
    /**
     * Instances of this class can be used to configure an {@link IJavaProject}.
     * @author Martin Hentschel
@@ -955,7 +955,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
        */
       public void configure(IJavaProject javaProject) throws Exception;
    }
-   
+
    /**
     * Does a test in an environment configured via
     * {@link AbstractKeYDebugTargetTestCase#doKeYDebugTargetTest(String, String, IMethodSelector, boolean, int, IKeYDebugTargetTestExecutor)}.
@@ -968,7 +968,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
        * @throws Exception Occurred Exception.
        */
       public void configureDebugPerspective(SWTWorkbenchBot bot) throws Exception;
-      
+
       /**
        * Does the test.
        * @param bot The {@link SWTWorkbenchBot} to use.
@@ -981,15 +981,15 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
        * @param launch The {@link ILaunch} which is executed.
        * @throws Exception Occurred Exception.
        */
-      public void test(SWTWorkbenchBot bot, 
-                       IJavaProject project, 
-                       IMethod method, 
-                       String targetName, 
-                       SWTBotView debugView, 
-                       SWTBotTree debugTree, 
-                       ISEDebugTarget target, 
+      public void test(SWTWorkbenchBot bot,
+                       IJavaProject project,
+                       IMethod method,
+                       String targetName,
+                       SWTBotView debugView,
+                       SWTBotTree debugTree,
+                       ISEDebugTarget target,
                        ILaunch launch) throws Exception;
-      
+
       /**
        * Reverts all changes done on the debug perspective.
        * @param bot The {@link SWTWorkbenchBot} to use.
@@ -1024,7 +1024,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       public void cleanupDebugPerspective(SWTWorkbenchBot bot) throws Exception {
       }
    }
-   
+
    /**
     * Performs a test on a {@link KeYDebugTarget}. This methods setups
     * the environment an the real test is done in the given {@link IKeYDebugTargetTestExecutor}.
@@ -1129,7 +1129,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          TestUtilsUtil.openPerspective(defaultPerspective);
       }
    }
-   
+
    /**
     * Utility class to select an {@link IFile} in a given {@link IJavaProject}.
     * @author Martin Hentschel
@@ -1143,7 +1143,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
        */
       public IFile getFile(IJavaProject project) throws Exception;
    }
-   
+
    /**
     * Does a test in an environment configured via
     * {@link AbstractKeYDebugTargetTestCase#doKeYDebugTargetTest(String, String, String, boolean, boolean, IFileSelector, Boolean, Boolean, Boolean, Boolean, int, IKeYDebugTargetProofFileTestExecutor)}.
@@ -1162,13 +1162,13 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
        * @param launch The {@link ILaunch} which is executed.
        * @throws Exception Occurred Exception.
        */
-      public void test(SWTWorkbenchBot bot, 
-                       IJavaProject project, 
-                       IFile file, 
-                       String targetName, 
-                       SWTBotView debugView, 
-                       SWTBotTree debugTree, 
-                       ISEDebugTarget target, 
+      public void test(SWTWorkbenchBot bot,
+                       IJavaProject project,
+                       IFile file,
+                       String targetName,
+                       SWTBotView debugView,
+                       SWTBotTree debugTree,
+                       ISEDebugTarget target,
                        ILaunch launch) throws Exception;
    }
 }

@@ -118,12 +118,12 @@
                   </value>
                </variable>
                <operationContract name="result = self.mod(var, var_1) catch(exc_0)
-pre: var &gt;= 0 &amp; var_1 &gt;  0 &amp; self.&lt;inv&gt;
-post: \exists int k;
-    (  inInt(k)
-     &amp; javaAddInt(javaMulInt(var_1, k), result) = var)
-&amp; self.&lt;inv&gt;
-&amp; exc_0 = null
+pre: ((var &gt;= 0 &amp; var_1 &gt;  0)&lt;&lt;SC&gt;&gt; &amp; self.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
+post: (\exists int k;
+     ((  inInt(k)
+       &amp; javaAddInt(javaMulInt(var_1, k), result) = var)&lt;&lt;SC&gt;&gt;)
+&amp; self.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
+&amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;
 mod: allLocs
 termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="false" resultTerm="result" exceptionTerm="exc_0" selfTerm="self" contractParameters="var, var_1" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
                   <constraint name="geq(m,Z(1(1(#))))"/>
@@ -192,13 +192,13 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                      <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                      <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                      <constraint name="wellFormed(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;)"/>
-                     <constraint name="update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(m_1)(self)),elem-update(var)(int::select(heap,self,MethodContract::$h1))),elem-update(var_1)(int::select(heap,self,MethodContract::$h2))),update-application(elem-update(heapBefore_mod)(heap),and(equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod),update-application(elem-update(heap)(heapAfter_mod),and(and(equals(exc_0,null),inInt(result)),and(and(exists{k:int}(and(inInt(k),equals(javaAddInt(javaMulInt(var_1,k),result),var))),java.lang.Object::&lt;inv&gt;(heap,self)),equals(exc_0,null)))))))"/>
+                     <constraint name="update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(m_1)(self)),elem-update(var)(int::select(heap,self,MethodContract::$h1))),elem-update(var_1)(int::select(heap,self,MethodContract::$h2))),update-application(elem-update(heapBefore_mod)(heap),and(equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod),update-application(elem-update(heap)(heapAfter_mod),and(and(equals(exc_0,null),inInt(result)),and(and(exists{k:int}(and(inInt(k),equals(javaAddInt(javaMulInt(var_1,k),result),var))&lt;&lt;SC&gt;&gt;),java.lang.Object::&lt;inv&gt;(heap,self)&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;,equals(exc_0,null)&lt;&lt;impl&gt;&gt;))))))"/>
                      <constraint name="not(equals(self,null))"/>
                      <variable name="self" isArrayIndex="false">
                         <value name="self {true}" typeString="MethodContract" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                            <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
-                           <constraint name="update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(m_1)(self)),elem-update(var)(int::select(heap,self,MethodContract::$h1))),elem-update(var_1)(int::select(heap,self,MethodContract::$h2))),update-application(elem-update(heapBefore_mod)(heap),and(equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod),update-application(elem-update(heap)(heapAfter_mod),and(and(equals(exc_0,null),inInt(result)),and(and(exists{k:int}(and(inInt(k),equals(javaAddInt(javaMulInt(var_1,k),result),var))),java.lang.Object::&lt;inv&gt;(heap,self)),equals(exc_0,null)))))))"/>
+                           <constraint name="update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(m_1)(self)),elem-update(var)(int::select(heap,self,MethodContract::$h1))),elem-update(var_1)(int::select(heap,self,MethodContract::$h2))),update-application(elem-update(heapBefore_mod)(heap),and(equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod),update-application(elem-update(heap)(heapAfter_mod),and(and(equals(exc_0,null),inInt(result)),and(and(exists{k:int}(and(inInt(k),equals(javaAddInt(javaMulInt(var_1,k),result),var))&lt;&lt;SC&gt;&gt;),java.lang.Object::&lt;inv&gt;(heap,self)&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;,equals(exc_0,null)&lt;&lt;impl&gt;&gt;))))))"/>
                            <constraint name="not(equals(self,null))"/>
                            <variable name="h1" isArrayIndex="false">
                               <value name="h1 {true}" typeString="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
@@ -227,7 +227,7 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                         <value name="m_1 {true}" typeString="MethodContract" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                            <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
-                           <constraint name="update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(m_1)(self)),elem-update(var)(int::select(heap,self,MethodContract::$h1))),elem-update(var_1)(int::select(heap,self,MethodContract::$h2))),update-application(elem-update(heapBefore_mod)(heap),and(equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod),update-application(elem-update(heap)(heapAfter_mod),and(and(equals(exc_0,null),inInt(result)),and(and(exists{k:int}(and(inInt(k),equals(javaAddInt(javaMulInt(var_1,k),result),var))),java.lang.Object::&lt;inv&gt;(heap,self)),equals(exc_0,null)))))))"/>
+                           <constraint name="update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(m_1)(self)),elem-update(var)(int::select(heap,self,MethodContract::$h1))),elem-update(var_1)(int::select(heap,self,MethodContract::$h2))),update-application(elem-update(heapBefore_mod)(heap),and(equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod),update-application(elem-update(heap)(heapAfter_mod),and(and(equals(exc_0,null),inInt(result)),and(and(exists{k:int}(and(inInt(k),equals(javaAddInt(javaMulInt(var_1,k),result),var))&lt;&lt;SC&gt;&gt;),java.lang.Object::&lt;inv&gt;(heap,self)&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;,equals(exc_0,null)&lt;&lt;impl&gt;&gt;))))))"/>
                            <constraint name="not(equals(self,null))"/>
                            <variable name="h1" isArrayIndex="false">
                               <value name="h1 {true}" typeString="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
@@ -245,12 +245,12 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                      </variable>
                      <variable name="var" isArrayIndex="false">
                         <value name="var {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                           <constraint name="update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(m_1)(self)),elem-update(var)(int::select(heap,self,MethodContract::$h1))),elem-update(var_1)(int::select(heap,self,MethodContract::$h2))),update-application(elem-update(heapBefore_mod)(heap),and(equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod),update-application(elem-update(heap)(heapAfter_mod),and(and(equals(exc_0,null),inInt(result)),and(and(exists{k:int}(and(inInt(k),equals(javaAddInt(javaMulInt(var_1,k),result),var))),java.lang.Object::&lt;inv&gt;(heap,self)),equals(exc_0,null)))))))"/>
+                           <constraint name="update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(m_1)(self)),elem-update(var)(int::select(heap,self,MethodContract::$h1))),elem-update(var_1)(int::select(heap,self,MethodContract::$h2))),update-application(elem-update(heapBefore_mod)(heap),and(equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod),update-application(elem-update(heap)(heapAfter_mod),and(and(equals(exc_0,null),inInt(result)),and(and(exists{k:int}(and(inInt(k),equals(javaAddInt(javaMulInt(var_1,k),result),var))&lt;&lt;SC&gt;&gt;),java.lang.Object::&lt;inv&gt;(heap,self)&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;,equals(exc_0,null)&lt;&lt;impl&gt;&gt;))))))"/>
                         </value>
                      </variable>
                      <variable name="var_1" isArrayIndex="false">
                         <value name="var_1 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                           <constraint name="update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(m_1)(self)),elem-update(var)(int::select(heap,self,MethodContract::$h1))),elem-update(var_1)(int::select(heap,self,MethodContract::$h2))),update-application(elem-update(heapBefore_mod)(heap),and(equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod),update-application(elem-update(heap)(heapAfter_mod),and(and(equals(exc_0,null),inInt(result)),and(and(exists{k:int}(and(inInt(k),equals(javaAddInt(javaMulInt(var_1,k),result),var))),java.lang.Object::&lt;inv&gt;(heap,self)),equals(exc_0,null)))))))"/>
+                           <constraint name="update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(m_1)(self)),elem-update(var)(int::select(heap,self,MethodContract::$h1))),elem-update(var_1)(int::select(heap,self,MethodContract::$h2))),update-application(elem-update(heapBefore_mod)(heap),and(equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod),update-application(elem-update(heap)(heapAfter_mod),and(and(equals(exc_0,null),inInt(result)),and(and(exists{k:int}(and(inInt(k),equals(javaAddInt(javaMulInt(var_1,k),result),var))&lt;&lt;SC&gt;&gt;),java.lang.Object::&lt;inv&gt;(heap,self)&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;,equals(exc_0,null)&lt;&lt;impl&gt;&gt;))))))"/>
                         </value>
                      </variable>
                      <variable name="heapBefore_mod" isArrayIndex="false">

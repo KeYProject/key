@@ -5,13 +5,13 @@
          <branchCondition name="not(equals(obj,null))" pathCondition="not(equals(obj,null))" pathConditionChanged="true" branchCondition="not(equals(obj,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <operationContract name="result_0 = doubleValue(1) catch(exc_1)
 pre: 1 &gt;= 0
-post: result_0 = javaAddInt(1, 1) &amp; exc_1 = null
+post: result_0 = javaAddInt(1, 1) &amp; (exc_1 = null)&lt;&lt;impl&gt;&gt;
 mod: allLocs
 termination: diamond" pathCondition="not(equals(obj,null))" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_1" contractParameters="Z(1(#))" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                <statement name="int result = 0;" pathCondition="not(equals(obj,null))" pathConditionChanged="false">
                   <loopStatement name="for ( int i = 0; i==0; i++ )" pathCondition="not(equals(obj,null))" pathConditionChanged="false" blockOpened="true">
                      <statement name="int i = 0;" pathCondition="not(equals(obj,null))" pathConditionChanged="false">
-                        <loopInvariant name="invariant: i &gt;= 0 &amp; i &lt;= 1;
+                        <loopInvariant name="invariant: (i &gt;= 0 &amp; i &lt;= 1)&lt;&lt;SC&gt;&gt;;
 variant: javaSubInt(2, i)
 mod: false" pathCondition="not(equals(obj,null))" pathConditionChanged="false" initiallyValid="true">
                            <branchCondition name="equals(i_0,Z(0(#)))" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(0(#))))" pathConditionChanged="true" branchCondition="equals(i_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
