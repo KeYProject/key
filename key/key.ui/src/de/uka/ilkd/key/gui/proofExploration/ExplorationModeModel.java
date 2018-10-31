@@ -48,7 +48,7 @@ public class ExplorationModeModel {
     }
 
     /**
-     * Check whether exploration mode is slected
+     * Check whether exploration mode is selected
      * @return
      */
     public boolean isExplorationModeSelected() {

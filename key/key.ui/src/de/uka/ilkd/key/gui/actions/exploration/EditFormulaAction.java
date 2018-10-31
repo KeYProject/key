@@ -52,6 +52,7 @@ public class EditFormulaAction extends ExplorationAction {
 
         PosInOccurrence pio = posInSeq.getPosInOccurrence();
         Term term = pio.subTerm();
+        SequentFormula sf = pio.sequentFormula();
         Goal g = getMediator().getSelectedGoal();
         //g.node().getNodeInfo().setExploration(true);
 
@@ -62,10 +63,21 @@ public class EditFormulaAction extends ExplorationAction {
             return;
         }
 
+        //TODO SemiSequent class
+        //final FormulaChangeInfo fci = new FormulaChangeInfo ( pos, sequentFormula );
+        //complete(insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), fci));
+
+
         TacletApp app;
         //  boolean isSoundMode = getMediator().getExplorationModeModel().getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.SOUND_APPS;
         //if(isSoundMode){
         app = soundChange(pio, term, newTerm);
+
+        //TODO use this afterwards
+        //app = soundChange(pio, sf.formula(), sfnew.formula());
+
+
+
         //} else {
         //   app = changeFormula(pio, newTerm);
 
@@ -112,6 +124,7 @@ public class EditFormulaAction extends ExplorationAction {
 
     private TacletApp soundChange(PosInOccurrence pio, Term term, Term newTerm) {
         Taclet cut = getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
+        getMediator().getServices().getTermBuilder().equals(term, newTerm);
         Semisequent semisequent = new Semisequent(new SequentFormula(newTerm));
 
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
