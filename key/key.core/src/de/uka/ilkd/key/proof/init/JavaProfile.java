@@ -44,8 +44,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
-import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -97,10 +95,6 @@ public class JavaProfile extends AbstractProfile {
      */
     @Override
     protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
-        ImmutableList<TermLabelRefactoring> originTermLabelRefactorings =
-                ImmutableSLList.<TermLabelRefactoring>nil().prepend(
-                        new OriginTermLabelRefactoring());
-
         ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
         result = result.prepend(
             new TermLabelConfiguration(
@@ -153,7 +147,7 @@ public class JavaProfile extends AbstractProfile {
                         null,
                         null,
                         null,
-                        originTermLabelRefactorings,
+                        null,
                         null
                 ));
         return result;

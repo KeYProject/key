@@ -1,12 +1,6 @@
 package de.uka.ilkd.key.logic.label;
 
 import java.nio.file.Paths;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.StringJoiner;
-import java.util.TreeSet;
 
 import de.uka.ilkd.key.logic.Name;
 
@@ -14,37 +8,18 @@ public class OriginTermLabel implements TermLabel {
 
     public final static Name NAME = new Name("Origin");
 
-    private SortedSet<Origin> origins;
-
-    public OriginTermLabel(Set<Origin> set) {
-        this.origins = new TreeSet<>(set);
-    }
+    private Origin origin;
 
     public OriginTermLabel(SpecType specType, String file, int line) {
         // Just the file name, without any directories
         String filename = Paths.get(file).getFileName().toString();
 
-        this.origins = new TreeSet<>();
-        this.origins.add(new Origin(specType, filename, line));
-    }
-
-    public OriginTermLabel(List<OriginTermLabel> labels) {
-        this.origins = new TreeSet<>();
-
-        for (OriginTermLabel label : labels) {
-            this.origins.addAll(label.origins);
-        }
+        this.origin = new Origin(specType, filename, line);
     }
 
     @Override
     public String toString() {
-        StringJoiner sj = new StringJoiner(", ", "" + NAME + "(", ")");
-
-        for (Origin origin : origins) {
-            sj.add(origin.specType.toString());
-        }
-
-        return sj.toString();
+        return "" + NAME + "(" + origin + ")";
     }
 
     @Override
@@ -54,22 +29,16 @@ public class OriginTermLabel implements TermLabel {
 
     @Override
     public Object getChild(int i) {
-        if (i > getChildCount()) {
-            return null;
+        if (i == 0) {
+            return origin; 
         } else {
-            Iterator<Origin> it = origins.iterator();
-
-            for (; i > 0; --i) {
-                it.next();
-            }
-
-            return it.next();
+            return null;
         }
     }
 
     @Override
     public int getChildCount() {
-        return origins.size();
+        return 1;
     }
 
     public static class Origin implements Comparable<Origin> {
@@ -106,6 +75,7 @@ public class OriginTermLabel implements TermLabel {
     }
 
     public static enum SpecType {
+        
         ACCESSIBLE("accessible"),
         ASSIGNABLE("assignable"),
         DECREASES("decreases"),
