@@ -17,7 +17,6 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import java.awt.event.ActionEvent;
 
-import static de.uka.ilkd.key.gui.actions.exploration.AddFormulaToAntecedentAction.promptForTerm;
 
 /**
  * @author Alexander Weigl
@@ -45,7 +44,7 @@ public class AddFormulaToSuccedentAction extends AddFormulaToSequentAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Term t = promptForTerm(mainWindow, "");
+        Term t = promptForTerm(mainWindow, null);
         if (t == null) return;
         if(getMediator().getExplorationModeModel().getExplorationTacletAppState()
                 == ExplorationModeModel.ExplorationState.SIMPLIFIED_APP) {

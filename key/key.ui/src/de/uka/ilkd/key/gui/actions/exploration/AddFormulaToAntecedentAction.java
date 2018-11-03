@@ -42,7 +42,7 @@ public class AddFormulaToAntecedentAction extends AddFormulaToSequentAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Term t = promptForTerm(mainWindow, "");
+        Term t = promptForTerm(mainWindow, null);
         if (t == null) return;
         if(getMediator().getExplorationModeModel().getExplorationTacletAppState()
                 == (ExplorationModeModel.ExplorationState.SIMPLIFIED_APP)) {

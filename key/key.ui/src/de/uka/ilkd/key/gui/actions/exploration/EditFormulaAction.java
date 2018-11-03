@@ -56,8 +56,7 @@ public class EditFormulaAction extends ExplorationAction {
         Goal g = getMediator().getSelectedGoal();
         //g.node().getNodeInfo().setExploration(true);
 
-        Term newTerm = promptForTerm(mainWindow,
-                LogicPrinter.quickPrintTerm(term, getMediator().getServices()));
+        Term newTerm = promptForTerm(mainWindow, term);
 
         if (newTerm == null) {
             return;
