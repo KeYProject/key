@@ -2088,6 +2088,42 @@ public class TermBuilder {
     // -------------------------------------------------------------------------
     // misc (moved from key.util.MiscTools)
     // -------------------------------------------------------------------------
+    
+    /**
+     * Replaces a child term by another one.
+     * 
+     * @param term the term in which to perform the replacement.
+     * @param pos the position at which to perform the replacement.
+     * @param replacement the replacement term.
+     * @return {@code term}, with the child at {@code pos} replaced by {@code replacement}.
+     */
+    public Term replace(Term term, PosInTerm pos, Term replacement) {
+        return replace(term, pos, replacement, 0);
+    }
+    
+    private Term replace(Term term, PosInTerm pos, Term replacement, int depth) {
+        if (depth == pos.depth()) {
+            return replacement;
+        }
+        
+        ImmutableArray<Term> oldSubs = term.subs();
+        Term[] newSubs = new Term[oldSubs.size()];
+
+        for (int i = 0; i < newSubs.length; ++i) {
+            if (pos.getIndexAt(depth) == i) {
+                newSubs[i] = replace(oldSubs.get(i), pos, replacement, depth + 1);
+            } else {
+                newSubs[i] = oldSubs.get(i);
+            }
+        }
+
+        return tf.createTerm(
+                term.op(),
+                newSubs,
+                term.boundVars(),
+                term.javaBlock(),
+                term.getLabels());
+    }
 
     public ImmutableSet<Term> unionToSet(Term s) {
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();

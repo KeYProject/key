@@ -50,6 +50,7 @@ public class EditFormulaAction extends ExplorationAction {
     public void actionPerformed(ActionEvent e) {
         if (posInSeq.isSequent()) return;
 
+        TermBuilder tb = getMediator().getServices().getTermBuilder();
         PosInOccurrence pio = posInSeq.getPosInOccurrence();
         Term term = pio.subTerm();
         SequentFormula sf = pio.sequentFormula();
@@ -58,23 +59,15 @@ public class EditFormulaAction extends ExplorationAction {
 
         Term newTerm = promptForTerm(mainWindow, term);
 
-        if (newTerm == null) {
-            return;
-        }
-
         //TODO SemiSequent class
         //final FormulaChangeInfo fci = new FormulaChangeInfo ( pos, sequentFormula );
         //complete(insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), fci));
 
-
         TacletApp app;
         //  boolean isSoundMode = getMediator().getExplorationModeModel().getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.SOUND_APPS;
         //if(isSoundMode){
-        app = soundChange(pio, term, newTerm);
 
-        //TODO use this afterwards
-        //app = soundChange(pio, sf.formula(), sfnew.formula());
-
+        app = soundChange(pio, sf.formula(), tb.replace(sf.formula(), pio.posInTerm(), newTerm));
 
 
         //} else {
