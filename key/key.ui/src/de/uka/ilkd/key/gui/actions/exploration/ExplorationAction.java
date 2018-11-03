@@ -46,7 +46,7 @@ public class ExplorationAction extends MainWindowAction {
             try {
                 result = dtp.parse(reader, null, services, nss, scm);
                 
-                if (!result.sort().equals(term.sort())) {
+                if (term != null && !result.sort().equals(term.sort())) {
                     JOptionPane.showMessageDialog(window,
                             "" + result + " is of sort " + result.sort()
                             + ", but we need a term of sort " + term.sort(), 
