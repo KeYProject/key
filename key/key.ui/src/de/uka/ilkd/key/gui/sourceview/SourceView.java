@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 
 import javax.swing.JComponent;
@@ -44,6 +45,8 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -56,7 +59,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 
-// TODO: doc: singleton, statusbar
 /**
  * This class is responsible for showing the source code and visualizing the symbolic execution
  * path of the currently selected node. This is done by adding tabs containing the source code and
@@ -96,14 +98,14 @@ public final class SourceView extends JComponent {
     private static final int TAB_SIZE = 4;
 
     /**
-     * The color of normal highlights in source code (yellow).
+     * The color of normal highlights in source code (light green).
      */
-    private static final Color NORMAL_HIGHLIGHT_COLOR = Color.YELLOW;
+    private static final Color NORMAL_HIGHLIGHT_COLOR = new Color(194, 245, 194);
 
     /**
-     * The color of the most recent highlight in source code (a light orange).
+     * The color of the most recent highlight in source code (green).
      */
-    private static final Color MOST_RECENT_HIGHLIGHT_COLOR = new Color(255, 153, 0);
+    private static final Color MOST_RECENT_HIGHLIGHT_COLOR = new Color(57, 210, 81);
 
     /**
      * The main window of KeY (needed to get the mediator).
@@ -114,6 +116,11 @@ public final class SourceView extends JComponent {
      * The container for the tabs containing source code.
      */
     private final JTabbedPane tabs;
+
+    /**
+     * Stores the actual textPanes of the tabs. Needed for correct updates when font (size) changes.
+     */
+    private final List<JTextPane> textPanes = new LinkedList<JTextPane>();
 
     /**
      * The status bar for displaying information about the current proof branch.
@@ -169,6 +176,16 @@ public final class SourceView extends JComponent {
         setLayout(new BorderLayout());
         add(tabs, BorderLayout.CENTER);
         add(sourceStatusBar, BorderLayout.SOUTH);
+
+        // react to font changes
+        Config.DEFAULT.addConfigChangeListener(new ConfigChangeListener() {
+            @Override
+            public void configChanged(ConfigChangeEvent e) {
+                for (JTextPane tp : textPanes) {
+                    tp.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
+                }
+            }
+        });
 
         // add a listener for changes in the proof tree
         mainWindow.getMediator().addKeYSelectionListener(new KeYSelectionListener() {
@@ -392,6 +409,7 @@ public final class SourceView extends JComponent {
     private void initTextPane(Entry<String, File> entry) {
         try {
             JTextPane textPane = new JTextPane();
+            textPanes.add(textPane);
 
             // We use the same font as in SequentView for consistency.
             textPane.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
@@ -501,6 +519,7 @@ public final class SourceView extends JComponent {
      */
     private void updateGUI() {
         Node currentNode = mainWindow.getMediator().getSelectedNode();
+        textPanes.clear();
         tabs.removeAll();
 
         if (currentNode == null) {
