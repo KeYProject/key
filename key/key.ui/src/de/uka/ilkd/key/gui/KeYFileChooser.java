@@ -35,11 +35,12 @@ public class KeYFileChooser {
                             || "java".equals(IOUtil.getFileExtension(f))
                             || "key".equals(IOUtil.getFileExtension(f))
                             || "proof".equals(IOUtil.getFileExtension(f))
-                            || f.getName().endsWith(".proof.gz");
+                            || f.getName().endsWith(".proof.gz")
+                            || f.getName().endsWith(".zproof");
         }
 
         public String getDescription() {
-            return "Java files, (compressed) KeY files and source directories";
+            return "Java files, (compressed) KeY files, proof packages, and source directories";
         }
     };
 
@@ -53,13 +54,13 @@ public class KeYFileChooser {
         }
     };
 
-    private static final FileFilter PROOF_BUNDLE_FILTER = new FileFilter() {
+    private static final FileFilter PROOF_PACKAGE_FILTER = new FileFilter() {
         public boolean accept(File f) {
             return f.getName().endsWith(".zproof") || f.isDirectory();
         }
 
         public String getDescription() {
-            return "KeY proof bundles (.zproof)";
+            return "KeY proof packages (.zproof)";
         }
     };
 
@@ -75,7 +76,7 @@ public class KeYFileChooser {
         return getSelectedFile().getName().endsWith(".proof.gz");
     }
 
-    public boolean isProofBundle() {
+    public boolean isProofPackage() {
         return getSelectedFile().getName().endsWith(".zproof");
     }
 
@@ -93,7 +94,7 @@ public class KeYFileChooser {
             }
         };
         fileChooser.addChoosableFileFilter(COMPRESSED_FILTER);
-        fileChooser.addChoosableFileFilter(PROOF_BUNDLE_FILTER);
+        fileChooser.addChoosableFileFilter(PROOF_PACKAGE_FILTER);
         fileChooser.setFileFilter(FILTER);
     }
 

@@ -18,12 +18,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import org.antlr.runtime.MismatchedTokenException;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
@@ -363,6 +368,31 @@ public abstract class AbstractProblemLoader {
                 return new SLEnvInput(file.getParentFile().getAbsolutePath(),
                                 classPath, bootClassPath, profileOfNewProofs, includes);
             }
+        }
+        else if (filename.endsWith(".zproof")) {
+            // unzip to temp dir
+            Path tmpDir = Files.createTempDirectory("KeYunzip");
+            ZipFile zipFile = new ZipFile(file);
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
+                if (entry.isDirectory()) {
+                    Files.createDirectory(tmpDir.resolve(entry.getName()));
+                } else {
+                    Files.createDirectories(tmpDir.resolve(entry.getName()).getParent());
+                    Files.copy(zipFile.getInputStream(entry), tmpDir.resolve(entry.getName()));
+                }
+            }
+            zipFile.close();
+
+            // update FileRepo basepath
+            fileRepo.setBaseDir(tmpDir);
+
+            // create new KeYUserProblemFile pointing to the new (unzipped) file
+            Path unzippedProof = tmpDir.resolve(Paths.get("proof.proof"));
+            //this.file = unzippedProof.toFile();   // TODO: remove final modifier necessary?
+            return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof.toFile(),
+                    fileRepo, control, profileOfNewProofs, false);
         }
         else if (filename.endsWith(".key") || filename.endsWith(".proof")
               || filename.endsWith(".proof.gz")) {
