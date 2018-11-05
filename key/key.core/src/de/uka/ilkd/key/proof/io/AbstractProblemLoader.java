@@ -173,7 +173,10 @@ public abstract class AbstractProblemLoader {
      * The {@link ReplayResult} if available or {@code null} otherwise.
      */
     private ReplayResult result;
-    
+
+    /**
+     * The FileRepo used to ensure consistency of proof and source code.
+     */
     private FileRepo fileRepo;          // TODO: WP
 
     /**
@@ -237,7 +240,7 @@ public abstract class AbstractProblemLoader {
     public void load() throws ProofInputException, IOException, ProblemLoaderException {
             control.loadingStarted(this);
             // Read environment
-            fileRepo = new DiskFileRepo("test123");
+            fileRepo = new DiskFileRepo("KeYTmpFileRepo");
             envInput = createEnvInput(fileRepo);
             problemInitializer = createProblemInitializer(fileRepo);
             initConfig = createInitConfig();
@@ -342,7 +345,7 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Instantiates the {@link EnvInput} which represents the file to load.
-     * @param fileRepo 
+     * @param fileRepo the FileRepo used to ensure consistency between proof and source code
      * @return The created {@link EnvInput}.
      * @throws IOException Occurred Exception.
      */
@@ -389,7 +392,7 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Instantiates the {@link ProblemInitializer} to use.
-     * @param fileRepo 
+     * @param fileRepo the FileRepo used to ensure consistency between proof and source code
      * @param registerProof Register loaded {@link Proof}
      * @return The {@link ProblemInitializer} to use.
      */
@@ -397,7 +400,7 @@ public abstract class AbstractProblemLoader {
         Profile profile = forceNewProfileOfNewProofs ? profileOfNewProofs : envInput.getProfile();
         ProblemInitializer pi = new ProblemInitializer(control, new Services(profile), control);
         pi.setFileRepo(fileRepo);
-        return pi;        
+        return pi;
     }
 
     /**

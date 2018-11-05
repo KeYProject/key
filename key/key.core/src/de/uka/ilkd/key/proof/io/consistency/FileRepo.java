@@ -3,6 +3,7 @@ package de.uka.ilkd.key.proof.io.consistency;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -21,7 +22,14 @@ public interface FileRepo {
      * @throws FileNotFoundException if the file does not exist
      * @throws IOException on IO errors, e.g. if the user has no permission to read the file
      */
-    public InputStream getFile(Path path) throws FileNotFoundException, IOException;
+    public InputStream getFile(Path path) throws FileNotFoundException, IOException; // TODO: naming
+
+    /**
+     * This method can be used to write a file to the FileRepo.
+     * @param path the path of the file to store (relative to the base directory of the proof)
+     * @return an OutputStream to the file in the FileRepo
+     */
+    public OutputStream createOutputStream(Path path);
 
     /**
      * Sets the boot class path (containing available classes from the Java Class Library).
@@ -44,13 +52,11 @@ public interface FileRepo {
     /**
      * Stores the given proof and all files relevant for the proof in a consistent bundle as a ZIP
      * archive at the given target path.
-     * @param path the target path of the ZIP archive
+     * @param savePath the target path of the ZIP archive
      * @param proof the given proof to save
      * @throws IOException on IO errors, e.g. if the user has no permission to write at the path
      */
-    public void saveProof(Path path, Proof proof) throws IOException;
-    
-    //public RuleSource getRuleSource(Path p);
+    public void saveProof(Path savePath, Proof proof) throws IOException;
 
     /**
      * Sets the base directory of the proof, i.e. the main directory where the proof is loaded from.
@@ -72,7 +78,7 @@ public interface FileRepo {
     public Path getBaseDir();
 
     /**
-     * Clears all data in the FileRepo and marks it as disposed. 
+     * Clears all data in the FileRepo and marks it as disposed.
      */
     public void dispose();
 }

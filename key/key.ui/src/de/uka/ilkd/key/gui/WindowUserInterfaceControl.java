@@ -357,7 +357,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
            final String filename = file.getAbsolutePath();
            ProofSaver saver;
            if (jFC.isProofBundle()) {
-               saver = new BundleProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
+               saver = new ProofPackageSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
            } else if (jFC.useCompression()) {
                saver = new GZipProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
            } else {
