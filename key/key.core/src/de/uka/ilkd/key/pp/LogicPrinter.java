@@ -24,6 +24,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -136,7 +137,7 @@ public class LogicPrinter {
 
     private final SelectPrinter selectPrinter = new SelectPrinter(this);
     private final StorePrinter storePrinter = new StorePrinter(this);
-    
+
     protected HeapLDT getHeapLDT() {
         return services == null ? null : services.getTypeConverter().getHeapLDT();
     }
@@ -154,9 +155,14 @@ public class LogicPrinter {
         if (services != null) {
             ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
         }
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(),
-                                          ni,
-                                          services);
+
+        // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
+        // because the SequentViewLogicPrinter respects default TermLabel visibility settings.
+        LogicPrinter p = new SequentViewLogicPrinter(
+                new ProgramPrinter(),
+                ni, services,
+                new TermLabelVisibilityManager());
+
         try {
             p.printTerm(t);
         } catch (IOException ioe) {
@@ -170,9 +176,13 @@ public class LogicPrinter {
         if (services != null) {
             ni.refresh(services);
         }
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(),
-                                          ni,
-                                          services);
+
+        // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
+        // because the SequentViewLogicPrinter respects default TermLabel visibility settings.
+        LogicPrinter p = new SequentViewLogicPrinter(
+                new ProgramPrinter(),
+                ni, services,
+                new TermLabelVisibilityManager());
 
         try {
 			p.printSemisequent(s);
@@ -433,7 +443,7 @@ public class LogicPrinter {
 
         if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty() || !varsNewDependingOn.isEmpty()) {
             layouter.brk().beginC(2).print("\\varcond (").brk();
-            
+
             int countNewDependingOn = varsNewDependingOn.size() - 1;
             for (NewDependingOn ndo: varsNewDependingOn) {
                 printNewVarDepOnCond(ndo);
@@ -445,7 +455,7 @@ public class LogicPrinter {
                 }
                 --countNewDependingOn;
             }
-            
+
             int countVarsNew = varsNew.size() - 1;
             for (final NewVarcond nvc: varsNew) {
                 printNewVarcond(nvc);
@@ -453,7 +463,7 @@ public class LogicPrinter {
                     layouter.print(",").brk();
                 }
             }
-            
+
             int countNotFreeIn = varsNotFreeIn.size() - 1;
             for (final NotFreeIn pair: varsNotFreeIn) {
                 printNotFreeIn(pair);
@@ -466,9 +476,9 @@ public class LogicPrinter {
             final int countVC = variableConditions.size() - 1;
             for (final VariableCondition vc : variableConditions) {
                 printVariableCondition(vc);
-                if (countVC > 0) { 
+                if (countVC > 0) {
                     layouter.print(",").brk();
-                } 
+                }
             }
             layouter.brk(1,-2).print(")").end();
         }
@@ -994,8 +1004,8 @@ public class LogicPrinter {
            Function measuredByEmpty =  services.getTermBuilder().getMeasuredByEmpty();
            BooleanLDT bool = services.getTypeConverter().getBooleanLDT();
            IntegerLDT integer = services.getTypeConverter().getIntegerLDT();
-           
-           isKeyword = (t.op() == getHeapLDT().getWellFormed() || t.op() == measuredByEmpty 
+
+           isKeyword = (t.op() == getHeapLDT().getWellFormed() || t.op() == measuredByEmpty
                  || t.op() == bool.getFalseConst() || t.op() == bool.getTrueConst()
                  || t.op() == integer.getBsum());
         }
@@ -1008,7 +1018,7 @@ public class LogicPrinter {
             int index = name.lastIndexOf(".");
             String prettyFieldName = name.substring(index+1);
             if (isKeyword) {
-               markStartKeyword(); 
+               markStartKeyword();
              }
             layouter.print(prettyFieldName);
             if (isKeyword) {
@@ -1019,7 +1029,7 @@ public class LogicPrinter {
             String name = t.op().name().toString();
             startTerm(t.arity());
             boolean alreadyPrinted = false;
-            if (t.op() instanceof SortDependingFunction) {  
+            if (t.op() instanceof SortDependingFunction) {
                SortDependingFunction op = (SortDependingFunction) t.op();
                if (op.getKind().compareTo(AbstractSort.EXACT_INSTANCE_NAME) == 0) {
                   layouter.print(op.getSortDependingOn().declarationString());
@@ -1031,7 +1041,7 @@ public class LogicPrinter {
                }
             }
             if (isKeyword) {
-              markStartKeyword(); 
+              markStartKeyword();
             }
             if (!alreadyPrinted) {
                layouter.print(name);
@@ -1175,7 +1185,7 @@ public class LogicPrinter {
     public void printStore(Term t, boolean closingBrace) throws IOException {
         storePrinter.printStore(t, closingBrace);
     }
-    
+
     /*
      * Print a term of the form: T::seqGet(Seq, int).
      */
@@ -1356,26 +1366,26 @@ public class LogicPrinter {
     public void printElementOf(Term t) throws IOException {
    	assert t.arity() == 3;
    	startTerm(3);
-   
+
    	layouter.print("(").beginC(0);
-   
+
    	markStartSub();
    	printTerm(t.sub(0));
    	markEndSub();
-   
+
    	layouter.print(",").brk(1,0);
-   
+
    	markStartSub();
    	printTerm(t.sub(1));
    	markEndSub();
-   
+
    	layouter.print(")").end();
    	layouter.print(" ");
    	markStartKeyword();
    	layouter.print("\\in");
    	markEndKeyword();
    	layouter.print(" ");
-   
+
    	markStartSub();
    	printTerm(t.sub(2));
    	markEndSub();
@@ -1506,7 +1516,7 @@ public class LogicPrinter {
         boolean isKeyword = false;
         if (services != null) {
            LocSetLDT loc = services.getTypeConverter().getLocSetLDT();
-           isKeyword = (t.op() == Junctor.AND || t.op() == Junctor.OR || t.op() == Junctor.IMP 
+           isKeyword = (t.op() == Junctor.AND || t.op() == Junctor.OR || t.op() == Junctor.IMP
                  || t.op() == Equality.EQV || t.op() == loc.getUnion());
         }
         int indent = name.length()+1;
@@ -1656,7 +1666,7 @@ public class LogicPrinter {
     public void printIfThenElseTerm(Term t, String keyword) throws IOException {
         startTerm(t.arity());
 
-        layouter.beginC ( 0 ); 
+        layouter.beginC ( 0 );
         markStartKeyword();
         layouter.print(keyword);
         markEndKeyword();
@@ -1787,7 +1797,7 @@ public class LogicPrinter {
         startTerm(0);
         boolean isKeyword = false;
         if (getHeapLDT() != null) {
-           isKeyword = (t.op() == Junctor.FALSE || t.op() == Junctor.TRUE 
+           isKeyword = (t.op() == Junctor.FALSE || t.op() == Junctor.TRUE
                  || t.op() == getHeapLDT().getCreated());
         }
         if (isKeyword) {
@@ -1798,7 +1808,7 @@ public class LogicPrinter {
            markEndKeyword();
         }
     }
- 
+
     /**
      * Print a Java block.  This is formatted using the ProgramPrinter
      * given to the constructor.  The result is indented according to
@@ -1838,7 +1848,7 @@ public class LogicPrinter {
      *
      * @param s   the string containing a program
      * @param r   the range of the first statement
-     * @param keywords the ranges of the java keywords in this program 
+     * @param keywords the ranges of the java keywords in this program
      */
     private void printMarkingFirstStatement(String s,Range r, Range[] keywords)
           throws IOException    {
@@ -1853,7 +1863,7 @@ public class LogicPrinter {
           int firstTotal = firstStmt.length();
           int endTotal = end.length();
           layouter.beginC(0);
-          // mark keywords and print the string before the first statement 
+          // mark keywords and print the string before the first statement
           for (int i = 0; i < keywords.length; i++) {
              Range keyword = keywords[i];
              if (keyword.start() < iStart && keyword.end() < iStart) {
@@ -1866,7 +1876,7 @@ public class LogicPrinter {
                 printVerbatim(key);
                 markEndKeyword();
              }
-          }        
+          }
           printVerbatim(start);
           // mark keywords in first statement and print it
           mark(MarkType.MARK_START_FIRST_STMT);
@@ -2414,10 +2424,10 @@ public class LogicPrinter {
 
         /** Remembers the start of an update to create a range */
         private final Stack<Integer> updateStarts = new Stack<Integer>();
-        
+
         /** Remembers the start of a keyword to create a range. */
         private final Stack<Integer> keywordStarts = new Stack<Integer>();
-        
+
         /** Remembers the start of a java block to create a range. */
         private final Stack<Integer> javaBlockStarts = new Stack<Integer>();
 
