@@ -1638,8 +1638,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 add(eqMonomialFeature, longConst(2)));
 
         //
-        bindRuleSet(d, "defOps_expandModulo", add(longConst(-600),
-                ifZero(isBelow(ff.ifThenElse), inftyConst(), IsInRangeProvable.INSTANCE)));
+        bindRuleSet(d, "defOps_expandModulo", add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(-600)));
 
         // category "saturate"
 
