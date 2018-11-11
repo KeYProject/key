@@ -17,6 +17,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -118,7 +119,7 @@ public final class SortDependingFunction extends Function {
     }
         
 
-    public SortDependingFunction getInstanceFor(Sort sort, 
+    public synchronized SortDependingFunction getInstanceFor(Sort sort, 
 	    				        TermServices services) {
 	if(sort == this.sortDependingOn) {
 	    return this;
@@ -127,33 +128,42 @@ public final class SortDependingFunction extends Function {
 	assert !(sort instanceof ProgramSVSort);
 	assert sort != AbstractTermTransformer.METASORT;
 	
-	SortDependingFunction result
-		= (SortDependingFunction) 
-		      services.getNamespaces()
-	                      .lookup(instantiateName(getKind(), 
-	                	      		      sort));
+
 	
-	//ugly: multiple generic sorts with the same name may exist over time 
-	Namespace<Function> functions = services.getNamespaces().functions();
-	if(result != null 
-	   && sort instanceof GenericSort
-	   && result.getSortDependingOn() != sort) {
-	    result = new SortDependingFunction(template,
-		    			       sort);
-	    functions.add(result);
-	}
+	final NamespaceSet namespaces = services.getNamespaces();
+    Namespace<Function> functions = namespaces.functions();
+   
+	SortDependingFunction result;
+	synchronized(namespaces) {
+	    result = (SortDependingFunction) 
+	            namespaces.lookup(instantiateName(getKind(), sort));
+	    //ugly: multiple generic sorts with the same name may exist over time 
 
-	if(result == null) {
-	    result = new SortDependingFunction(template, sort);
-	    // The namespaces may be wrapped for local symbols
-	    // Sort depending functions are to be added to the "root" namespace, however.
-	    // Therefore, let's rewind to the root (MU, 2017-03)
-	    while(functions.parent() != null) {
-	        functions = functions.parent();
+	    if(result != null 
+	            && sort instanceof GenericSort
+	            && result.getSortDependingOn() != sort) {
+	        result = new SortDependingFunction(template, sort);
+	        synchronized(functions) {
+	            functions.add(result);
+	        }
+	    } else if(result == null) {
+	        result = new SortDependingFunction(template, sort);
+	        // The namespaces may be wrapped for local symbols
+	        // Sort depending functions are to be added to the "root" namespace, however.
+	        // Therefore, let's rewind to the root (MU, 2017-03)
+	        synchronized(functions) {
+	            while(functions.parent() != null) {
+	                functions = functions.parent();
+	            }
+	            synchronized(functions) {
+	                functions.addSafely(result);
+	            }
+	        }
 	    }
-	    functions.addSafely(result);
 	}
 
+
+    
         assert result.getSortDependingOn() == sort 
                : result + " depends on " + result.getSortDependingOn() 
                  + " (hash " + result.hashCode() + ")" 
@@ -161,7 +171,7 @@ public final class SortDependingFunction extends Function {
                  + " (hash " + sort.hashCode() + ")";
         assert isSimilar(result) 
                : result + " should be similar to " + this;
-        assert services.getNamespaces()
+        assert namespaces
 	                      .lookup(instantiateName(getKind(), 
 	                	      		      sort)) == result;
 	
