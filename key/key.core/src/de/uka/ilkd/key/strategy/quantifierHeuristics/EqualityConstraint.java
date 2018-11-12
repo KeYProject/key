@@ -194,7 +194,7 @@ public class EqualityConstraint implements Constraint {
     private Term instantiate ( Term p ) {
 	ConstraintAwareSyntacticalReplaceVisitor srVisitor =
 	    new ConstraintAwareSyntacticalReplaceVisitor(new TermLabelState(),
-	                                  new Services(new JavaProfile()), // Any services can be used because it is only used for allquantor instantiation. TODO: Rewrite quantifier heuristics and strategies 
+	                                  null, // Any services can be used because it is only used for allquantor instantiation. TODO: Rewrite quantifier heuristics and strategies 
 	                                  this, 
 	                                  null,
 	                                  null,
