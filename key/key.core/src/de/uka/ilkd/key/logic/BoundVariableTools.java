@@ -38,7 +38,7 @@ public class BoundVariableTools {
      * <code>newBoundVars</code> component-wise, and in case of differences
      * substitute variables from the former array with the ones of the latter
      * array (in <code>originalTerm</code>)
-    * @param services TODO
+    * @param services the Services
      */
     public Term renameVariables (Term originalTerm,
                                  ImmutableArray<QuantifiableVariable> oldBoundVars,
