@@ -52,7 +52,7 @@ public class BoundVariableTools {
                     services.getTermFactory().createTerm( newBoundVars.get ( i ) );
                 final ClashFreeSubst subst =
                     new ClashFreeSubst ( oldBoundVars.get ( i ),
-                                         newVarTerm, services );
+                                         newVarTerm, services.getTermBuilder() );
                 res = subst.apply ( res );
             }
         }
