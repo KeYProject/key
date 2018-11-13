@@ -30,6 +30,7 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -159,7 +160,7 @@ public class EqualityConstraint implements Constraint {
      * @return the term by which p_mv is instantiated by the most
      * general substitution satisfying the constraint
      */
-    public synchronized Term getInstantiation (Metavariable p_mv, TermServices services) {
+    public synchronized Term getInstantiation (Metavariable p_mv, TermBuilder tb) {
         Term t = null;
         if ( instantiationCache == null )
             instantiationCache = new LinkedHashMap<Metavariable, Term> ();
@@ -169,9 +170,9 @@ public class EqualityConstraint implements Constraint {
         if ( t == null ) {
             t = map.get ( p_mv );
             if ( t == null )
-                t = services.getTermBuilder().var ( p_mv );
+                t = tb.var ( p_mv );
             else
-                t = instantiate ( t );
+                t = instantiate ( t, tb );
 
             instantiationCache.put ( p_mv, t );
         }
@@ -191,10 +192,10 @@ public class EqualityConstraint implements Constraint {
      * @param p the Term p to be instantiated
      * @return the instantiated term 
      */
-    private Term instantiate ( Term p ) {
+    private Term instantiate ( Term p, TermBuilder tb ) {
 	ConstraintAwareSyntacticalReplaceVisitor srVisitor =
 	    new ConstraintAwareSyntacticalReplaceVisitor(new TermLabelState(),
-	                                  null, // Any services can be used because it is only used for allquantor instantiation. TODO: Rewrite quantifier heuristics and strategies 
+	                                  tb,  
 	                                  this, 
 	                                  null,
 	                                  null,

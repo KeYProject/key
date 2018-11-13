@@ -49,9 +49,9 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
 
     public void visited(Term visited) {
         if (visited.op() instanceof Metavariable
-                && metavariableInst.getInstantiation((Metavariable) visited.op(), services)
+                && metavariableInst.getInstantiation((Metavariable) visited.op(), services.getTermBuilder())
                         .op() != visited.op()) {
-            pushNew(metavariableInst.getInstantiation((Metavariable) visited.op(), services));
+            pushNew(metavariableInst.getInstantiation((Metavariable) visited.op(), services.getTermBuilder()));
         } else {
             super.visit(visited);
         }        
