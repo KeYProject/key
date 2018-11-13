@@ -20,6 +20,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -58,12 +59,18 @@ public final class DependencyContractFeature extends BinaryFeature {
          return false;
       }
 
+      
       // remove previously used steps
       removePreviouslyUsedSteps(focus, goal, steps);
+      
       if (steps.isEmpty()) {
          return false;
       }
 
+      if (pos.isTopLevel() && focus.sort()==Sort.FORMULA && pos.isInAntec() == steps.get(0).isInAntec()) { 
+          return false; 
+      }
+      
       // instantiate with arbitrary remaining step
       bapp = bapp.setIfInsts(ImmutableSLList.<PosInOccurrence> nil().prepend(
             steps.get(0)));
