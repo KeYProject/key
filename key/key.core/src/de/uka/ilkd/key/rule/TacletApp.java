@@ -403,7 +403,7 @@ public abstract class TacletApp implements RuleApp {
 	if (t.op() instanceof SchemaVariable) {
 	    if (!(t.op() instanceof VariableSV)) {
 		SchemaVariable sv = (SchemaVariable) t.op();
-		ClashFreeSubst cfSubst = new ClashFreeSubst(x, y, services);
+		ClashFreeSubst cfSubst = new ClashFreeSubst(x, y, services.getTermBuilder());
 		result = result.replace(sv, 
 					cfSubst.apply((Term) insts.getInstantiation(sv)),
 					services);

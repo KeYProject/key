@@ -15,7 +15,7 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.WaryClashFreeSubst;
 
 
@@ -33,9 +33,9 @@ public final class WarySubstOp extends SubstOp {
 
 
     @Override
-    public Term apply ( Term term, TermServices services ) {
+    public Term apply ( Term term, TermBuilder tb ) {
 	QuantifiableVariable v=term.varsBoundHere(1).get(0);
-	WaryClashFreeSubst cfSubst = new WaryClashFreeSubst(v, term.sub(0), services);
+	WaryClashFreeSubst cfSubst = new WaryClashFreeSubst(v, term.sub(0), tb);
 	return cfSubst.apply(term.sub(1));
     }
 }

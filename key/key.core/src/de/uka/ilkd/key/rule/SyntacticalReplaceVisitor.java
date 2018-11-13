@@ -33,10 +33,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
-import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -62,6 +59,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     public static final String SUBSTITUTION_WITH_LABELS_HINT = "SUBSTITUTION_WITH_LABELS";
     protected final SVInstantiations svInst;
     protected final Services services;
+    protected final TermBuilder tb;
     private Term computedResult = null;
     protected final PosInOccurrence applicationPosInOccurrence;
     protected final Rule rule;
@@ -94,7 +92,33 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             Services services) {
         this.termLabelState   = termLabelState;
         this.services         = services;
+        this.tb               = services.getTermBuilder();
         this.svInst           = svInst;
+        this.applicationPosInOccurrence = applicationPosInOccurrence;
+        this.rule = rule;
+        this.ruleApp = ruleApp;
+        this.labelHint = labelHint;
+        this.goal = goal;
+        subStack = new Stack<Object>(); // of Term
+        if (labelHint instanceof TacletLabelHint) {
+           ((TacletLabelHint) labelHint).setTacletTermStack(tacletTermStack);
+        }
+    }
+    
+    /**
+     * only allowed to be called by subclass (unsafe) as services is null
+     */
+    protected SyntacticalReplaceVisitor(TermLabelState termLabelState,
+            TacletLabelHint labelHint,
+            PosInOccurrence applicationPosInOccurrence,
+            Goal goal,                                     
+            Rule rule,
+            RuleApp ruleApp,
+            TermBuilder tb) {
+        this.termLabelState   = termLabelState;
+        this.services = null;
+        this.tb               = tb;
+        this.svInst           = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         this.applicationPosInOccurrence = applicationPosInOccurrence;
         this.rule = rule;
         this.ruleApp = ruleApp;
@@ -107,12 +131,12 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     }
 
     public SyntacticalReplaceVisitor(TermLabelState termLabelState,
-            Services services,
+            TacletLabelHint labelHint,
             PosInOccurrence applicationPosInOccurrence,
+            Goal goal,
             Rule rule,
-            RuleApp ruleApp,
-            TacletLabelHint labelHint, 
-            Goal goal) {
+            RuleApp ruleApp, 
+            Services services) {
         this(termLabelState,
                 labelHint,
                 applicationPosInOccurrence,
@@ -324,7 +348,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                 final ImmutableArray<TermLabel> labels =
                         instantiateLabels(visited, newOp, new ImmutableArray<Term>(neededsubs),
                                 boundVars, jb, visited.getLabels());
-                final Term newTerm = services.getTermFactory().createTerm(newOp, neededsubs, boundVars, jb, labels);
+                final Term newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, jb, labels);
                 pushNew(resolveSubst(newTerm));
             } else {
                 Term t;
@@ -335,7 +359,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                     t = visited;
                 }
                 else {
-                    t = services.getTermFactory().createTerm(visitedOp, visited.subs(),
+                    t = tb.tf().createTerm(visitedOp, visited.subs(),
                             visited.boundVars(),
                             visited.javaBlock(), labels);
                 }
@@ -375,8 +399,8 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
 
     private Term resolveSubst(Term t) {
         if (t.op() instanceof SubstOp) {
-           Term resolved = ((SubstOp)t.op ()).apply ( t, services );
-           resolved = services.getTermBuilder().label(resolved, t.sub(1).getLabels());
+           Term resolved = ((SubstOp)t.op ()).apply ( t, tb );
+           resolved = tb.label(resolved, t.sub(1).getLabels());
            if (t.hasLabels()) {
               resolved = TermLabelManager.refactorTerm(termLabelState, services, null, resolved, rule, goal, SUBSTITUTION_WITH_LABELS_HINT, t);
            }

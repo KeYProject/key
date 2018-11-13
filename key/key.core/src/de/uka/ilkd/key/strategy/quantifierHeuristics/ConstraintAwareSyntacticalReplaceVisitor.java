@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
@@ -24,12 +24,12 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
     private final Constraint metavariableInst;
 
     public ConstraintAwareSyntacticalReplaceVisitor(
-            TermLabelState termLabelState, Services services,
+            TermLabelState termLabelState, TermBuilder tb,
             Constraint metavariableInst,
             PosInOccurrence applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
             TacletLabelHint labelHint, Goal goal) {
-        super(termLabelState, services,
-                applicationPosInOccurrence, rule, ruleApp, labelHint, goal);
+        super(termLabelState, labelHint,
+                applicationPosInOccurrence, goal, rule, ruleApp, tb);
         this.metavariableInst = metavariableInst;
     }
     
@@ -38,7 +38,7 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
             // use the visitor recursively for replacing metavariables that
             // might occur in the term (if possible)
             final ConstraintAwareSyntacticalReplaceVisitor srv =
-                    new ConstraintAwareSyntacticalReplaceVisitor (termLabelState, services, metavariableInst, 
+                    new ConstraintAwareSyntacticalReplaceVisitor (termLabelState, tb, metavariableInst, 
                             applicationPosInOccurrence, rule, ruleApp, labelHint, goal);
             t.execPostOrder ( srv );
             return srv.getTerm ();

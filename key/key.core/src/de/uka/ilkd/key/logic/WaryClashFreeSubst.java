@@ -38,8 +38,8 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * term to be substituted */
     private ImmutableSet<QuantifiableVariable> warysvars            = null;
 
-    public WaryClashFreeSubst ( QuantifiableVariable v, Term s, TermServices services ) {
-	super ( v, s, services );
+    public WaryClashFreeSubst ( QuantifiableVariable v, Term s, TermBuilder tb ) {
+	super ( v, s, tb );
 	warysvars = null;
     }
 
@@ -98,7 +98,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 	        newVar = newVarFor ( getVariable (), warysvars );
 	    else
 	        newVar = getVariable ();
-	    newVarTerm = services.getTermBuilder().var ( newVar );
+	    newVarTerm = tb.var ( newVar );
 	}
     }
 
@@ -180,7 +180,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
         newSubterms[UpdateApplication.targetPos ()] = addSubst ? substWithNewVar ( target )
                                                    : target;
 
-        return services.getTermBuilder().tf().createTerm ( t.op (),
+        return tb.tf().createTerm ( t.op (),
                                	    newSubterms,
                                	    getSingleArray(newBoundVars),
                                	    t.javaBlock ());
@@ -206,7 +206,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      */
     private Term addWarySubst (Term t) {
         createVariable ();
-        return services.getTermBuilder().subst(WarySubstOp.SUBST,
+        return tb.subst(WarySubstOp.SUBST,
         	        newVar,
         	        getSubstitutedTerm (),
         	        t );
@@ -218,7 +218,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
     private Term substWithNewVar (Term t) {
         createVariable ();
         final ClashFreeSubst cfs = new ClashFreeSubst ( getVariable (),
-                                                        newVarTerm, services );
+                                                        newVarTerm, tb );
         return cfs.apply ( t );
     }
 }
