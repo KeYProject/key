@@ -200,7 +200,7 @@ public class TriggeredInstantiations implements TermGenerator {
             boolean addToInstances = true;
             Constraint c = EqualityConstraint.BOTTOM.unify(trigger, t, services);
             if (c.isSatisfiable()) {
-                final Term middle = c.getInstantiation(mv, services.getTermBuilder());
+                final Term middle = c.getInstantiation(mv, services);
                 if (middle != null && !alreadyChecked.contains(middle)) {
                     alreadyChecked.add(middle);
                     if (!checkConditions && app.taclet().getTrigger().hasAvoidConditions()) {

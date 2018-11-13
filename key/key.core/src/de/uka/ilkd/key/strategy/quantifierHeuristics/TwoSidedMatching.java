@@ -18,8 +18,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -43,7 +43,7 @@ class TwoSidedMatching {
     private final Substitution triggerSubstWithMVs;
     private final Term targetWithMVs;
     
-    TwoSidedMatching(UniTrigger trigger, Term targetTerm, TermServices services) {
+    TwoSidedMatching(UniTrigger trigger, Term targetTerm, Services services) {
         this.trigger = trigger;
         this.targetSubstWithMVs =
             ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars ( targetTerm, services );
@@ -64,7 +64,7 @@ class TwoSidedMatching {
         }
     }
     
-    ImmutableSet<Substitution> getSubstitutions(TermServices services) {
+    ImmutableSet<Substitution> getSubstitutions(Services services) {
         if (triggerWithMVs == null || targetWithMVs == null) {
             // non ground subs not supported yet
             return DefaultImmutableSet.<Substitution>nil();
@@ -72,7 +72,7 @@ class TwoSidedMatching {
 	return getAllSubstitutions ( targetWithMVs, services );
     }
     
-    private ImmutableSet<Substitution> getAllSubstitutions(Term target, TermServices services) {
+    private ImmutableSet<Substitution> getAllSubstitutions(Term target, Services services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
         Substitution sub = match ( triggerWithMVs, target, services );
         if ( sub != null
@@ -93,7 +93,7 @@ class TwoSidedMatching {
     
     /** find a substitution in a allterm by using unification */
     private Substitution match(Term triggerTerm, Term targetTerm, 
-            TermServices services) {
+            Services services) {
         final Constraint c =
             Constraint.BOTTOM.unify ( targetTerm, triggerTerm,
                                       services );
@@ -103,7 +103,7 @@ class TwoSidedMatching {
             for (QuantifiableVariable quantifiableVariable : trigger.getUniVariables()) {
                 QuantifiableVariable q = quantifiableVariable;
                 Term mv = triggerSubstWithMVs.getSubstitutedTerm(q);
-                Term t = c.getInstantiation((Metavariable) (mv.op()), services.getTermBuilder());
+                Term t = c.getInstantiation((Metavariable) (mv.op()), services);
                 if (t == null || t.op() instanceof Metavariable)
                     return null;
                 if (isGround(t))

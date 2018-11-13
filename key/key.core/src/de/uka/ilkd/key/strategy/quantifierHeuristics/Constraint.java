@@ -13,9 +13,9 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 
 /**
@@ -56,14 +56,14 @@ public interface Constraint {
     boolean isSatisfiable();
 
     /**
-     * @param tb TODO
+     * @param services TODO
     * @return Find a term the given metavariable can be instantiated with which
      *         is consistent with every instantiation that satisfies this
      *         constraint (that means, the term such an instantiation
      *         substitutes the metavariable with can always be unified with the
      *         returned term).
      */
-    Term getInstantiation(Metavariable p_mv, TermBuilder tb);
+    Term getInstantiation(Metavariable p_mv, Services services);
 
     /**
      * tries to unify the terms t1 and t2
@@ -172,10 +172,10 @@ public interface Constraint {
 	    return false;
 	}
 
-	public Term getInstantiation(Metavariable p_mv, TermBuilder tb) {
+	public Term getInstantiation(Metavariable p_mv, Services services) {
 	    // As there is in fact no instantiation satisfying this
 	    // constraint, we could return everything
-	    return tb.var(p_mv);
+	    return services.getTermBuilder().var(p_mv);
 	}
 
 	/**

@@ -51,7 +51,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
-import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 
@@ -94,31 +93,6 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         this.services         = services;
         this.tb               = services.getTermBuilder();
         this.svInst           = svInst;
-        this.applicationPosInOccurrence = applicationPosInOccurrence;
-        this.rule = rule;
-        this.ruleApp = ruleApp;
-        this.labelHint = labelHint;
-        this.goal = goal;
-        subStack = new Stack<Object>(); // of Term
-        if (labelHint instanceof TacletLabelHint) {
-           labelHint.setTacletTermStack(tacletTermStack);
-        }
-    }
-
-    /**
-     * only allowed to be called by subclass (unsafe) as services is null
-     */
-    protected SyntacticalReplaceVisitor(TermLabelState termLabelState,
-            TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence,
-            Goal goal,
-            Rule rule,
-            RuleApp ruleApp,
-            TermBuilder tb) {
-        this.termLabelState   = termLabelState;
-        this.services = null;
-        this.tb               = tb;
-        this.svInst           = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         this.applicationPosInOccurrence = applicationPosInOccurrence;
         this.rule = rule;
         this.ruleApp = ruleApp;
