@@ -78,8 +78,9 @@ public class Substitution {
             final Function quantifiedVarSortCast =
                 quantifiedVarSort.getCastSymbol (services);
             Term instance = getSubstitutedTerm( var );
-            if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) )
-            	instance = tb.func ( quantifiedVarSortCast, instance );
+            if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) ) {
+                instance = tb.func ( quantifiedVarSortCast, instance );
+            }
             t = applySubst ( var, instance, t, tb );
         }
         return t;

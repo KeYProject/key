@@ -28,14 +28,14 @@ public final class WarySubstOp extends SubstOp {
 
 
     private WarySubstOp(Name name) {
-	super(name);
+        super(name);
     }
 
 
     @Override
     public Term apply ( Term term, TermBuilder tb ) {
-	QuantifiableVariable v=term.varsBoundHere(1).get(0);
-	WaryClashFreeSubst cfSubst = new WaryClashFreeSubst(v, term.sub(0), tb);
-	return cfSubst.apply(term.sub(1));
+        QuantifiableVariable v=term.varsBoundHere(1).get(0);
+        WaryClashFreeSubst cfSubst = new WaryClashFreeSubst(v, term.sub(0), tb);
+        return cfSubst.apply(term.sub(1));
     }
 }

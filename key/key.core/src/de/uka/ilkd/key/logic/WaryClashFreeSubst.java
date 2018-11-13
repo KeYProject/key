@@ -53,16 +53,21 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
         Term res;
 
         if ( depth == 0 ) {
-            if ( !getSubstitutedTerm ().isRigid () )
+            if ( !getSubstitutedTerm ().isRigid () ) {
                 findUsedVariables ( t );
+            }
         }
 
         ++depth;
         try {
             res = super.apply ( t );
-        } finally { --depth; }
+        } finally { 
+            --depth; 
+        }
 
-        if ( createQuantifier && depth == 0 ) res = addWarySubst ( res );
+        if ( createQuantifier && depth == 0 ) {
+            res = addWarySubst ( res );
+        }
 
         return res;
     }
@@ -92,13 +97,14 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
         if ( !createQuantifier ) {
             createQuantifier = true;
 
-            if ( getSubstitutedTerm ().freeVars ().contains ( getVariable () ) )
+            if ( getSubstitutedTerm ().freeVars ().contains ( getVariable () ) ) {
                 // in this case one might otherwise get collisions, as the
                 // substitution might be carried out partially within the scope
                 // of the original substitution operator
                 newVar = newVarFor ( getVariable (), warysvars );
-            else
+            } else {
                 newVar = getVariable ();
+            }
             newVarTerm = tb.var ( newVar );
         }
     }
@@ -114,13 +120,16 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
     protected Term apply1(Term t) {
         // don't move to a different modality level
         if ( !getSubstitutedTerm ().isRigid () ) {
-            if ( t.op () instanceof Modality )
+            if ( t.op () instanceof Modality ) {
                 return applyOnModality ( t );
-            if ( t.op () instanceof UpdateApplication )
+            }
+            if ( t.op () instanceof UpdateApplication ) {
                 return applyOnUpdate   ( t );
+            }
         }
-        if ( t.op() instanceof Transformer)
+        if ( t.op() instanceof Transformer) {
             return applyOnTransformer ( t );
+        }
         return super.apply1 ( t );
     }
 
@@ -163,23 +172,26 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 
         // only the last child is below the update
         final Term target = UpdateApplication.getTarget ( t );
-        if ( !target.freeVars ().contains ( getVariable () ) )
+        if ( !target.freeVars ().contains ( getVariable () ) ) {
             return super.apply1 ( t );
+        }
 
         final Term[] newSubterms = new Term[t.arity()];
         @SuppressWarnings("unchecked")
         final ImmutableArray<QuantifiableVariable>[] newBoundVars =
         new ImmutableArray[t.arity()];
 
+        final int targetPos = UpdateApplication.targetPos();
         for ( int i = 0; i < t.arity (); i++ ) {
-            if ( i != UpdateApplication.targetPos () )
+            if ( i != targetPos ) {
                 applyOnSubterm ( t, i, newSubterms, newBoundVars );
+            }
         }
 
-        newBoundVars[UpdateApplication.targetPos()] = t.varsBoundHere ( UpdateApplication.targetPos() );
+        newBoundVars[targetPos] = t.varsBoundHere(targetPos);
         final boolean addSubst =
-                subTermChanges ( t.varsBoundHere ( UpdateApplication.targetPos () ), target );
-        newSubterms[UpdateApplication.targetPos ()] = addSubst ? substWithNewVar ( target )
+                subTermChanges ( t.varsBoundHere ( targetPos ), target );
+        newSubterms[targetPos] = addSubst ? substWithNewVar ( target )
                 : target;
 
         return tb.tf().createTerm ( t.op (),

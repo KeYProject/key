@@ -155,8 +155,14 @@ public class EqualityConstraint implements Constraint {
 
 
     /**
-     * @return the term by which p_mv is instantiated by the most
-     * general substitution satisfying the constraint
+     * Find a term the given metavariable can be instantiated with which
+     *         is consistent with every instantiation that satisfies this
+     *         constraint (that means, the term such an instantiation
+     *         substitutes the metavariable with can always be unified with the
+     *         returned term).
+     * @param p_mv the Metavariable 
+     * @param services the Services
+     * @return a term the given metavariable can be instantiated with
      */
     public synchronized Term getInstantiation (Metavariable p_mv, Services services) {
         Term t = null;
@@ -185,7 +191,7 @@ public class EqualityConstraint implements Constraint {
     }
 
     /**
-     * instantiatiates term <code>p</code> according to the instantiations
+     * instantiates term <code>p</code> according to the instantiations
      * of the metavariables described by this constraint. 
      * @param p the Term p to be instantiated
      * @return the instantiated term 
@@ -193,8 +199,8 @@ public class EqualityConstraint implements Constraint {
     private Term instantiate ( Term p, Services services ) {
 	ConstraintAwareSyntacticalReplaceVisitor srVisitor =
 	    new ConstraintAwareSyntacticalReplaceVisitor(new TermLabelState(),
-	                                  services,  
-	                                  this, 
+	                                  services,
+	                                  this,
 	                                  null,
 	                                  null,
 	                                  null,
