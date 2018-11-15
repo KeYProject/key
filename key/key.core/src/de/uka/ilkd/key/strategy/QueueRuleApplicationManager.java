@@ -77,7 +77,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         queue = null;
         previousMinimum = null;
         if (goal != null) {
-            goal.node().proof().getServices().getCaches().getIfInstantiationCache().releaseAll();
+            goal.proof().getServices().getCaches().getIfInstantiationCache().releaseAll();
         }
         clearNextRuleApp();
     }
