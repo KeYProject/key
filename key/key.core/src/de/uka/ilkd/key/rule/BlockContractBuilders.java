@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -21,6 +22,7 @@ import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -36,6 +38,7 @@ import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
@@ -43,15 +46,17 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -65,6 +70,7 @@ import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.rule.AbstractBlockContractRule.BlockContractHint;
 import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule.Instantiation;
+import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 import de.uka.ilkd.key.speclang.BlockSpecificationElement.Variables;
@@ -351,7 +357,7 @@ public final class BlockContractBuilders {
         /**
          * Services.
          */
-        private final TermServices services;
+        private final Services services;
 
         /**
          *
@@ -363,7 +369,7 @@ public final class BlockContractBuilders {
          * @param services services.
          */
         public VariablesCreatorAndRegistrar(final Goal goal,
-                final BlockContract.Variables placeholderVariables, final TermServices services) {
+                final BlockContract.Variables placeholderVariables, final Services services) {
             this.goal = goal;
             this.placeholderVariables = placeholderVariables;
             this.services = services;
@@ -379,6 +385,23 @@ public final class BlockContractBuilders {
          * @return the registered variables.
          */
         public Variables createAndRegister(Term self, boolean existingPO) {
+            return createAndRegister(self, existingPO, null);
+        }
+
+        /**
+        *
+        * @param self
+        *            the self term
+        * @param existingPO
+        *            {@code true} if we are applying a rule in an existing proof obligation,
+        *            {@code false} if we are creating a new proof obligation.
+        * @param pe
+        *              if {@code existingPO == false}, all contracts on blocks in this
+        *              program element  will have their remembrance variables replaced by
+        *              the one created here.
+        * @return the registered variables.
+        */
+        public Variables createAndRegister(Term self, boolean existingPO, ProgramElement pe) {
             if (existingPO) {
                 // In an existing PO, the outer remembrance vars already exist and refer to the
                 // current method's prestate.
@@ -397,6 +420,16 @@ public final class BlockContractBuilders {
                         placeholderVariables.outerRemembranceVariables, services);
             } else {
                 // In a new PO, the outer remembrance vars don't exist yet.
+                Map<LocationVariable, LocationVariable> outerRemembranceHeaps =
+                        createAndRegisterRemembranceVariables(
+                                placeholderVariables.outerRemembranceHeaps);
+                Map<LocationVariable, LocationVariable> outerRemembranceVariables =
+                        createAndRegisterRemembranceVariables(
+                                placeholderVariables.outerRemembranceVariables);
+
+                replaceOuterRemembranceVarsInInnerContracts(
+                        pe, outerRemembranceHeaps, outerRemembranceVariables);
+
                 return new BlockContract.Variables(
                         self != null ? self.op(ProgramVariable.class) : null,
                         createAndRegisterFlags(placeholderVariables.breakFlags),
@@ -408,10 +441,8 @@ public final class BlockContractBuilders {
                                 placeholderVariables.remembranceHeaps),
                         createAndRegisterRemembranceVariables(
                                 placeholderVariables.remembranceLocalVariables),
-                        createAndRegisterRemembranceVariables(
-                                placeholderVariables.outerRemembranceHeaps),
-                        createAndRegisterRemembranceVariables(
-                                placeholderVariables.outerRemembranceVariables),
+                        outerRemembranceHeaps,
+                        outerRemembranceVariables,
                         services);
             }
         }
@@ -525,6 +556,45 @@ public final class BlockContractBuilders {
                 return null;
             }
         }
+
+        /**
+         * Replace the outer remembrance variables of all contracts on blocks in {@code pe}.
+         *
+         * @param pe the program elements.
+         * @param outerRemembranceHeaps the new outer remembrance heaps.
+         * @param outerRemembranceVariables the new outer remembrance variables.
+         * @see #createAndRegister(Term, boolean, ProgramElement)
+         */
+        private void replaceOuterRemembranceVarsInInnerContracts(
+                ProgramElement pe,
+                Map<LocationVariable, LocationVariable> outerRemembranceHeaps,
+                Map<LocationVariable, LocationVariable> outerRemembranceVariables) {
+            ImmutableSet<StatementBlock> innerBlocks =
+                    new JavaASTVisitor(pe, services) {
+                private ImmutableSet<StatementBlock> blocks = DefaultImmutableSet.nil();
+
+                @Override
+                protected void doDefaultAction(SourceElement node) {
+                    if (node instanceof StatementBlock) {
+                        blocks = blocks.add((StatementBlock) node);
+                    }
+                }
+
+                public ImmutableSet<StatementBlock> run() {
+                    walk(root());
+                    return blocks;
+                }
+            }.run();
+
+            IntroAtPreDefsOp transformer = (IntroAtPreDefsOp)
+                    AbstractTermTransformer.INTRODUCE_ATPRE_DEFINITIONS;
+            final Map<LocationVariable, LocationVariable> atPreVars =
+                    new LinkedHashMap<LocationVariable, LocationVariable>();
+            atPreVars.putAll(outerRemembranceHeaps);
+            atPreVars.putAll(outerRemembranceVariables);
+            transformer.updateBlockAndLoopContracts(
+                    innerBlocks, atPreVars, outerRemembranceHeaps, services);
+        }
     }
 
     /**
@@ -578,7 +648,13 @@ public final class BlockContractBuilders {
         public Term buildOuterRemembranceUpdate() {
             Term result = skip();
 
-            for (LocationVariable var : variables.outerRemembranceVariables.keySet()) {
+            for (LocationVariable var: variables.outerRemembranceHeaps.keySet()) {
+                final Term update
+                        = elementary(variables.outerRemembranceHeaps.get(var), var(var));
+                result = parallel(result, update);
+            }
+
+            for (LocationVariable var: variables.outerRemembranceVariables.keySet()) {
                 final Term update
                         = elementary(variables.outerRemembranceVariables.get(var), var(var));
                 result = parallel(result, update);
@@ -865,7 +941,7 @@ public final class BlockContractBuilders {
             }
 
             LoopContract lc = (LoopContract) contract;
-            Term decreases = lc.getDecreases();
+            Term decreases = lc.getDecreases(getBaseHeap(), terms.self, services);
 
             if (decreases == null) {
                 return tt();
@@ -1029,7 +1105,7 @@ public final class BlockContractBuilders {
 
                 Term exactType = exactInstance(selfKJT.getSort(), self);
 
-                return or(notNull, created, exactType);
+                return and(notNull, created, exactType);
             } else {
                 return tt();
             }
@@ -1514,6 +1590,17 @@ public final class BlockContractBuilders {
             if (goal != null) {
                 goal.setBranchLabel("Validity");
                 addInfFlow(goal);
+
+                Sequent seq = goal.sequent();
+                for (int i = 1; i <= seq.size(); ++i) {
+                    PosInOccurrence pos =
+                            PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
+
+                    if (!pos.eqEquals(occurrence)) {
+                        goal.removeFormula(pos);
+                    }
+                }
+
                 goal.changeFormula(new SequentFormula(term), occurrence);
             }
             return term;

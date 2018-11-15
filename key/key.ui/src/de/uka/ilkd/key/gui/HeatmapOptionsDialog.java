@@ -15,7 +15,6 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -24,8 +23,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
-import java.text.NumberFormat;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -37,13 +34,16 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -114,8 +114,8 @@ public class HeatmapOptionsDialog extends JDialog {
             + "according to their position in the list,"
             + " with the most recent term receiving the strongest highlight." };
 
-    /** Error message on invalid textfield input */
-    private static final String INPUT_ERROR_MESSAGE = "Please enter a number bwetween 1 and 1000";
+    /** Error message on invalid textfield input */ // Not needed atm
+//    private static final String INPUT_ERROR_MESSAGE = "Please enter a number bwetween 1 and 1000";
 
     /** number of radioButtons in the group */
     private static final int NUMRADIOBUTTONS = 5;
@@ -123,11 +123,12 @@ public class HeatmapOptionsDialog extends JDialog {
     /** question mark icon */
     private static final Icon HELPICON = IconFactory
         .scaleIcon(IconFactory.getImage("images/questionIcon.png"), 20, 20);
+
     /**
      * Opens a dialog for choosing if and how to display heatmap highlighting.
      */
     public HeatmapOptionsDialog() {
-        setTitle("Heatmap Options");
+        super(MainWindow.getInstance(), "Heatmap Options", true);
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
@@ -140,8 +141,11 @@ public class HeatmapOptionsDialog extends JDialog {
         JButton okButton = new JButton("OK");
         JButton cancelButton = new JButton("Cancel");
 
-        // set up age textfield
-        JFormattedTextField textField = setupTextfield();
+        // set up spinner for age value
+
+        JSpinner valueSpinner = setupSpinner();
+
+
 
         for (int i = 0; i < NUMRADIOBUTTONS; i++) {
             radioButtons[i] = new JRadioButton(BUTTON_NAMES[i]);
@@ -152,9 +156,15 @@ public class HeatmapOptionsDialog extends JDialog {
         // Display the current settings
         loadSettings(radioButtons);
 
+        //save current settings in case the user escapes
+        boolean isShow = VS.isShowHeatmap();
+        boolean isSF = VS.isHeatmapSF();
+        boolean isNew = VS.isHeatmapNewest();
+        int age = VS.getMaxAgeForHeatmap();
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                VS.setHeatmapOptions(isShow, isSF, isNew, age);
                 dispose();
             }
         });
@@ -164,7 +174,7 @@ public class HeatmapOptionsDialog extends JDialog {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         JPanel radioBoxes = setupRadioPanel(radioButtons, panel.getBackground(), this);
-        JPanel tfPanel = setupTextfieldPanel(textField, panel.getBackground());
+        JPanel spPanel = setupSpinnerPanel(valueSpinner, panel.getBackground());
         JPanel buttonPanel = setupButtonPanel(okButton, cancelButton);
 
         c.gridy = 0;
@@ -177,21 +187,19 @@ public class HeatmapOptionsDialog extends JDialog {
         c.gridy++;
         panel.add(radioBoxes, c);
         c.gridy++;
-        panel.add(tfPanel, c);
+        panel.add(spPanel, c);
         c.gridy++;
         panel.add(buttonPanel, c);
 
         add(panel);
         getRootPane().setDefaultButton(okButton);
 
-        // action for okButton and textfield
-        Action action = setupOkAction(panel, group, textField);
-
+        // action for okButton
+        Action action = setupOkAction(panel, group, valueSpinner);
         okButton.addActionListener(action);
-        textField.addActionListener(action);
 
         pack();
-        setLocationRelativeTo(null);
+        setLocation(123,122);
         setAlwaysOnTop(true);
         setVisible(true);
         setResizable(false);
@@ -222,22 +230,27 @@ public class HeatmapOptionsDialog extends JDialog {
     }
 
     /**
-     * @return a textfield with the correct input constraints
+     * @return a jSpinner with the correct input constraints
      */
-    private JFormattedTextField setupTextfield() {
-        NumberFormat format = NumberFormat.getInstance();
-        NumberFormatter formatter = new NumberFormatter(format);
-        formatter.setValueClass(Integer.class);
-        formatter.setMinimum(MIN_AGE);
-        formatter.setMaximum(MAX_AGE);
-        formatter.setAllowsInvalid(true);
-        JFormattedTextField textField = new JFormattedTextField(formatter);
-        textField.setPreferredSize(new Dimension(40, 20));
-        textField.setMaximumSize(textField.getPreferredSize());
-        textField.setFocusLostBehavior(JFormattedTextField.COMMIT);
-        textField.setValue(VS.getMaxAgeForHeatmap());
-        textField.setToolTipText(TOOLTIP_TEXT);
-        return textField;
+    private JSpinner setupSpinner() {
+        JSpinner valueSpinner = new JSpinner(new SpinnerNumberModel(5, MIN_AGE, MAX_AGE, 1));
+        valueSpinner.setValue(VS.getMaxAgeForHeatmap());
+        valueSpinner.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                VS.setHeatmapOptions(VS.isShowHeatmap(), VS.isHeatmapSF(), VS.isHeatmapNewest(), (int) valueSpinner.getValue());
+            }
+        });
+        JFormattedTextField txt = ((JSpinner.NumberEditor) valueSpinner.getEditor()).getTextField();
+        NumberFormatter nf = (NumberFormatter) txt.getFormatter();
+        nf.setAllowsInvalid(false);
+        nf.setValueClass(Integer.class);
+        nf.setMinimum(MIN_AGE);
+        nf.setMaximum(MAX_AGE);
+        nf.setCommitsOnValidEdit(true);
+        valueSpinner.setToolTipText(TOOLTIP_TEXT);
+        return valueSpinner;
     }
 
     /**
@@ -257,11 +270,11 @@ public class HeatmapOptionsDialog extends JDialog {
     }
 
     /**
-     * @param textField
-     *            the textfield shown on the panel
-     * @return a panel with textfield and explanation
+     * @param spinner
+     *            the spinner shown on the panel
+     * @return a panel with spinner and explanation
      */
-    private JPanel setupTextfieldPanel(JFormattedTextField textField, Color bg) {
+    private JPanel setupSpinnerPanel(JSpinner spinner, Color bg) {
         JPanel tfPanel = new JPanel();
         tfPanel.setLayout(new BorderLayout());
         JTextArea l = new JTextArea(TEXTFIELD_LABEL, 2, 20);
@@ -272,7 +285,7 @@ public class HeatmapOptionsDialog extends JDialog {
         tfPanel.add(l, BorderLayout.NORTH);
         JPanel tmp = new JPanel();
         tmp.add(new JLabel("k = "));
-        tmp.add(textField);
+        tmp.add(spinner);
         tfPanel.add(tmp, BorderLayout.CENTER);
         tfPanel.setBorder(BorderFactory.createBevelBorder(0));
         return tfPanel;
@@ -337,12 +350,12 @@ public class HeatmapOptionsDialog extends JDialog {
      *            the main panel
      * @param group
      *            the radio button group
-     * @param textField
-     *            the age textfield
+     * @param spinner
+     *            the age spinner
      * @return
      */
     private Action setupOkAction(JPanel panel, final ButtonGroup group,
-        JFormattedTextField textField) {
+        JSpinner spinner) {
         Action action = new AbstractAction() {
 
             private static final long serialVersionUID = -5840137383763071948L;
@@ -375,20 +388,9 @@ public class HeatmapOptionsDialog extends JDialog {
                     sf = false;
                     newest = true;
                 }
-                if (textField.getValue() != null) {
-                    if (textField.isEditValid()) {
-                        VS.setHeatmapOptions(showHm, sf, newest, (int) textField.getValue());
-                        dispose();
-                    } else {
-                        if (VS.isShowHeatmap()) {
-                            JOptionPane.showMessageDialog(panel,
-                                INPUT_ERROR_MESSAGE,
-                                "Invalid Input",
-                                JOptionPane.ERROR_MESSAGE);
-                        } else {
-                            dispose();
-                        }
-                    }
+                if (spinner.getValue() != null) {
+                    VS.setHeatmapOptions(showHm, sf, newest, (int) spinner.getValue());
+                    dispose();
                 }
             }
         };

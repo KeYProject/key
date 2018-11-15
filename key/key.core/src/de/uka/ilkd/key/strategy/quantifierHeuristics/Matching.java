@@ -15,8 +15,8 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 
 /**
  * Two kind of matching algorithm are coded in two nested classes BaseMatching
@@ -40,7 +40,7 @@ class Matching {
 
     public static ImmutableSet<Substitution> twoSidedMatching(UniTrigger trigger,
                                                      Term targetTerm, 
-                                                     TermServices services) {
+                                                     Services services) {
         TwoSidedMatching tsm = new TwoSidedMatching ( trigger, targetTerm, services );
         return tsm.getSubstitutions (services);
     }      

@@ -17,14 +17,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -709,13 +705,6 @@ public final class Goal  {
 	return lp.toString();
     }
 
-    private <T extends Named> ImmutableSet<Name> names(ImmutableSet<T> set) {
-        ImmutableList<Name> names = ImmutableSLList.nil();
-        for (T elem : set) {
-            names = names.prepend(elem.name());
-        }
-        return DefaultImmutableSet.fromImmutableList(names);
-    }
 
     public <T> T getStrategyInfo(Property<T> property) {
         return strategyInfos.get(property);

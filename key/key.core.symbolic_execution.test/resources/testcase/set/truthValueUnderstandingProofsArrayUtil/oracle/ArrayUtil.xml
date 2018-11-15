@@ -35,12 +35,12 @@
                               <statement name="int minIndex = 0;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),not(equals(length(array),Z(0(#))))),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false">
                                  <loopStatement name="for ( int i = 1; i&lt;_array.length; i++ )" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),not(equals(length(array),Z(0(#))))),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false" blockOpened="true">
                                     <statement name="int i = 1;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),not(equals(length(array),Z(0(#))))),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false">
-                                       <loopInvariant name="invariant: i &gt;= 1
-&amp; i &lt;= _array.length
-&amp; (minIndex &gt;= 0 &amp; minIndex &lt; i)
-&amp; \forall int j;
-    (   j &gt;= 0 &amp; j &lt; i &amp; inInt(j)
-     -&gt; _array[minIndex] &lt;= _array[j]);
+                                       <loopInvariant name="invariant: (  ((i &gt;= 1
+ &amp; i &lt;= _array.length)&lt;&lt;SC&gt;&gt;
+ &amp; ((minIndex &gt;= 0 &amp; minIndex &lt; i)&lt;&lt;SC&gt;&gt;))&lt;&lt;SC&gt;&gt;
+ &amp; \forall int j;
+     (   (j &gt;= 0 &amp; j &lt; i)&lt;&lt;SC&gt;&gt; &amp; inInt(j)
+      -&gt; _array[minIndex] &lt;= _array[j]))&lt;&lt;SC&gt;&gt;;
 variant: javaSubInt(_array.length, i)
 mod: {}" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),not(equals(length(array),Z(0(#))))),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false" initiallyValid="true">
                                           <branchCondition name="or(not(equals(int::select(heap,array,arr(minIndex_0)),arr_0)),and(gt(length(array),i_0),and(and(and(and(geq(i_0,Z(1(#))),geq(minIndex_0,Z(0(#)))),lt(minIndex_0,i_0)),geq(length(array),i_0)),all{j:int}(or(or(leq(j,Z(neglit(1(#)))),geq(j,i_0)),geq(int::select(anon(heap,empty,anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;),array,arr(j)),arr_0))))))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),not(equals(length(array),Z(0(#))))),not(equals(length(array),Z(1(#))))),or(not(equals(int::select(heap,array,arr(minIndex_0)),arr_0)),and(gt(length(array),i_0),and(and(and(and(geq(i_0,Z(1(#))),geq(minIndex_0,Z(0(#)))),lt(minIndex_0,i_0)),geq(length(array),i_0)),all{j:int}(or(or(leq(j,Z(neglit(1(#)))),geq(j,i_0)),geq(int::select(anon(heap,empty,anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;),array,arr(j)),arr_0))))))))" pathConditionChanged="true" branchCondition="or(not(equals(int::select(heap,array,arr(minIndex_0)),arr_0)),and(gt(length(array),i_0),and(and(and(and(geq(i_0,Z(1(#))),geq(minIndex_0,Z(0(#)))),lt(minIndex_0,i_0)),geq(length(array),i_0)),all{j:int}(or(or(leq(j,Z(neglit(1(#)))),geq(j,i_0)),geq(int::select(anon(heap,empty,anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;),array,arr(j)),arr_0))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">

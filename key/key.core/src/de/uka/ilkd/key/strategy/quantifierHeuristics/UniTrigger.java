@@ -22,8 +22,8 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
@@ -51,13 +51,13 @@ class UniTrigger implements Trigger {
     }
         
     public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm, 
-            TermServices services) {
+            Services services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
         for (Term aTargetTerm : targetTerm) allsubs = allsubs.union(getSubstitutionsFromTerm(aTargetTerm, services));
         return allsubs;
     }
 
-    private ImmutableSet<Substitution> getSubstitutionsFromTerm(Term t, TermServices services) {
+    private ImmutableSet<Substitution> getSubstitutionsFromTerm(Term t, Services services) {
         ImmutableSet<Substitution> res = matchResults.get ( t );
         if ( res == null ) {
             res = getSubstitutionsFromTermHelp ( t, services );
@@ -66,7 +66,7 @@ class UniTrigger implements Trigger {
         return res;
     }
 
-    private ImmutableSet<Substitution> getSubstitutionsFromTermHelp(Term t, TermServices services) {
+    private ImmutableSet<Substitution> getSubstitutionsFromTermHelp(Term t, Services services) {
         ImmutableSet<Substitution> newSubs = DefaultImmutableSet.<Substitution>nil();
         if ( t.freeVars ().size () > 0 || t.op () instanceof Quantifier )
             newSubs = Matching.twoSidedMatching ( this, t, services );

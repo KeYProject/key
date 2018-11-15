@@ -24,14 +24,14 @@ public class Trigger {
     private final Term trigger;
     private final ImmutableList<Term> avoidConditions;
     private final SchemaVariable triggerVar;
-    
-    
+
+
     public Trigger(SchemaVariable triggerVar, Term trigger,  
             ImmutableList<Term> avoidConditions) {
         assert triggerVar != null;
         assert trigger != null;
         assert avoidConditions != null;
-        
+
         this.triggerVar = triggerVar;
         this.trigger = trigger;
         this.avoidConditions = avoidConditions;
@@ -53,5 +53,5 @@ public class Trigger {
     public boolean hasAvoidConditions() {
         return !avoidConditions.isEmpty();
     }
-    
+
 }

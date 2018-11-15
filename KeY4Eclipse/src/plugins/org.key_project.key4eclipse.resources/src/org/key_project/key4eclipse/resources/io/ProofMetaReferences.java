@@ -9,6 +9,7 @@ import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
@@ -26,7 +27,7 @@ import de.uka.ilkd.key.util.Pair;
 
 /**
  * Creates the representation of all references used by a particular {@link ProofElement}
- * @author Stefan Käsdorf
+ * @author Stefan Kaesdorf
  */
 public class ProofMetaReferences {
 
@@ -136,7 +137,8 @@ public class ProofMetaReferences {
                boolean isFinal = fieldDecl.isFinal();
                String initializer =  "";
                if(isFinal) {
-                  initializer = fieldDecl.getFieldSpecifications().get(0).getInitializer().toString();
+                  final Expression initExpr = fieldDecl.getFieldSpecifications().get(0).getInitializer();
+                  initializer = (initExpr == null ? "" : initExpr.toString());
                }
                ptRefs.addAccess(new ProofMetaReferenceAccess(kjt.getFullName(), name, type, visibility, isStatic, isFinal, initializer));
             }

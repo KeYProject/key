@@ -40,7 +40,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
  *  <LI>Anonymous Inner Class definition and construction
  *  <BR><tt>new XYZ(a<sub>1</sub>, ..., a<sub>n</sub>)
  *  { m<sub>1</sub>, ..., m<sub>k</sub> }</tt>
- *  <BR>if getType() instanceof UserType && getClassDeclaration() != <tt>null</tt>
+ *  <BR>if getType() instanceof UserType
+ *  {@literal &&} getClassDeclaration() {@literal !=} <tt>null</tt>
  *  </OL>
  *  The access path is <tt>null</tt> in most cases, except when an inner class
  *  constructor is invoked from an outer instance.

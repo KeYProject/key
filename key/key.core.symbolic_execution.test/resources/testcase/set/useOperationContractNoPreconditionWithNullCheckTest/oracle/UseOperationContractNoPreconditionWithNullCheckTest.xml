@@ -3,8 +3,10 @@
    <methodCall name="&lt;call UseOperationContractNoPreconditionWithNullCheckTest.main(obj)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicNumber = obj.magic(123);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = obj.magic(123) catch(exc_0)
-pre: obj.&lt;inv&gt;
-post: result_0 = 42 &amp; obj.&lt;inv&gt; &amp; exc_0 = null
+pre: obj.&lt;inv&gt;&lt;&lt;impl&gt;&gt;
+post: (result_0 = 42
+&amp; obj.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
+&amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" selfTerm="obj" contractParameters="Z(3(2(1(#))))" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
             <branchCondition name="and(equals(exc_0,null),not(equals(obj,null)))" pathCondition="and(equals(exc_0,null),not(equals(obj,null)))" pathConditionChanged="true" branchCondition="and(equals(exc_0,null),not(equals(obj,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">

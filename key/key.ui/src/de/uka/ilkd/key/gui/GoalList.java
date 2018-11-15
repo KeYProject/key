@@ -478,14 +478,6 @@ public class GoalList extends JList<Goal> {
             }
         }
 
-        public void add(Goal g) {
-            if (g != null) {
-                goals.add(g);
-                int index = goals.indexOf(g);
-                fireIntervalAdded(this, index, index);
-            }
-        }
-
         public void remove(Goal g) {
             int index = goals.indexOf(g);
             if (index > -1) {
@@ -836,9 +828,9 @@ public class GoalList extends JList<Goal> {
             GoalList.this.setToolTipText("GOAL");
         }
 
-        public Component getListCellRendererComponent(JList list, Object value, // value
-                                                                                // to
-                                                                                // display
+        public Component getListCellRendererComponent(JList<?> list, Object value, // value
+                                                                                   // to
+                                                                                   // display
                 int index, // cell index
                 boolean isSelected, // is the cell selected
                 boolean cellHasFocus) // the list and the cell have the focus

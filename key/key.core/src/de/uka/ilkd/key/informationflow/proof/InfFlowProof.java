@@ -149,7 +149,7 @@ public class InfFlowProof extends Proof {
 
     /**
      * returns statistics of possible side proofs that contributed to this proof
-     * @return sie proof statistics
+     * @return the proof statistics
      */
     public SideProofStatistics getSideProofStatistics() {
         return sideProofStatistics;

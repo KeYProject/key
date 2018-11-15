@@ -373,10 +373,15 @@ public final class StrategyProperties extends Properties {
      */
     private static Object readSingleOption(Properties p, String key) {
         String o = (String)p.get(STRATEGY_PROPERTY + key);
+        if (o != null) {
+            o = getUniqueString(o);
+        }
         if (o == null) {
             o = (String)DEFAULT_MAP.get(key);
+            // remove this line if always satisfied. add another assignment if not.
+            assert o == getUniqueString(o);
         }
-        return getUniqueString(o);
+        return o;
     }
 
     /**
@@ -391,9 +396,15 @@ public final class StrategyProperties extends Properties {
                 return id;
             }
         }
+
+        // CAUTION:
+        // If you changed something in the settings:Perhaps you need to update
+        // the string pool in StrategyProperties.
+
         System.err.println("The string \"" + in + "\" is not registered in the" +
-                           " string pool of StrategyProperties. Update the" +
-                           " string pool!");
+                           " string pool of StrategyProperties. Probably you are loading" +
+                           " properties stored with a different KeY version. This setting" +
+                           " is ignored, default value is taken!");
         return null;
     }
 

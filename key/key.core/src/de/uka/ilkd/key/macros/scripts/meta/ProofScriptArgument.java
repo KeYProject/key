@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
 public class ProofScriptArgument<T> {
     private ProofScriptCommand<T> command;
     private String name;
-    private Class type;
+    private Class<?> type;
     private boolean required;
     private boolean flag;
     private Field field;
@@ -28,7 +28,7 @@ public class ProofScriptArgument<T> {
         return command;
     }
 
-    public ProofScriptArgument setCommand(ProofScriptCommand<T> command) {
+    public ProofScriptArgument<T> setCommand(ProofScriptCommand<T> command) {
         this.command = command;
         return this;
     }
@@ -37,16 +37,16 @@ public class ProofScriptArgument<T> {
         return name;
     }
 
-    public ProofScriptArgument setName(String name) {
+    public ProofScriptArgument<T> setName(String name) {
         this.name = name;
         return this;
     }
 
-    public Class getType() {
+    public Class<?> getType() {
         return type;
     }
 
-    public ProofScriptArgument setType(Class type) {
+    public ProofScriptArgument<T> setType(Class<?> type) {
         this.type = type;
         return this;
     }
@@ -55,7 +55,7 @@ public class ProofScriptArgument<T> {
         return required;
     }
 
-    public ProofScriptArgument setRequired(boolean required) {
+    public ProofScriptArgument<T> setRequired(boolean required) {
         this.required = required;
         return this;
     }
@@ -64,7 +64,7 @@ public class ProofScriptArgument<T> {
         return flag;
     }
 
-    public ProofScriptArgument setFlag(boolean flag) {
+    public ProofScriptArgument<T> setFlag(boolean flag) {
         this.flag = flag;
         return this;
     }
@@ -130,12 +130,12 @@ public class ProofScriptArgument<T> {
      * @param documentation a string
      * @return this
      */
-    public ProofScriptArgument setDocumentation(String documentation) {
+    public ProofScriptArgument<T> setDocumentation(String documentation) {
         this.documentation = documentation;
         return this;
     }
 
-    public ProofScriptArgument setVariableArguments(boolean hasVariableArguments) {
+    public ProofScriptArgument<T> setVariableArguments(boolean hasVariableArguments) {
         this.variableArguments = hasVariableArguments;
         return this;
     }

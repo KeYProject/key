@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.uka.ilkd.key.informationflow.po;
 
 import java.util.HashMap;
@@ -17,9 +13,9 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 /**
  * This class contains the set of four sets of ProofObligationVars necessary for
  * information flow proofs.
- * <p/>
+ *
  * @author christoph
- * <p/>
+ *
  */
 public class IFProofObligationVars {
 

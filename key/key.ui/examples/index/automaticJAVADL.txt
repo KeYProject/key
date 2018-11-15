@@ -736,6 +736,76 @@ group modelMethods {
    provable ./heap/model_methods/Recell_undo.key
 }
 
+# Well-Definedness check problems:
+# FIXME: Needs to be commented out for now
+#        as loading different taclet options
+#        does currently not work
+#group wdChecks {
+#   provable ./heap/vstte10_01_SumAndMax/SumAndMax_sumAndMaxWD.key
+#   provable ./heap/vstte10_01_SumAndMax/SumAndMax_sumAndMaxWithWDLoop.key
+#   provable ./heap/vstte10_03_LinkedList/Node_consWD.key
+#   provable ./heap/vstte10_03_LinkedList/Node_invWD.key
+#   provable ./heap/vstte10_03_LinkedList/Node_searchWD.key
+#   notprovable ./firstTouch/05-ReverseArray/reverse2WD.key
+#   provable ./firstTouch/05-ReverseArray/reverse2WD_Y.key
+#   notprovable ./firstTouch/06-BinarySearch/searchWD.key
+#   notprovable ./firstTouch/07-Cell/CellClient_mWD.key
+#   provable ./firstTouch/07-Cell/Cell_CellWD.key
+#   provable ./firstTouch/07-Cell/Cell_getXWD.key
+#   provable ./firstTouch/07-Cell/Cell_setXWD.key
+#   provable ./firstTouch/08-Java5/For_infiniteLoopWD.key
+#   provable ./firstTouch/08-Java5/For_infiniteLoopWithWDLoop.key
+#   provable ./firstTouch/08-Java5/For_invariantWD.key
+#   provable ./firstTouch/08-Java5/For_sumWD.key
+#   notprovable ./firstTouch/08-Java5/For_sumWithWDLoop.key
+#   provable ./firstTouch/09-Quicktour/CardException_getCauseWD.key
+#   provable ./firstTouch/09-Quicktour/CardException_getMessageWD.key
+#   provable ./firstTouch/09-Quicktour/CardException_initCauseWD.key
+#   provable ./firstTouch/09-Quicktour/LogFile_LogFileWD.key
+#   provable ./firstTouch/09-Quicktour/LogFile_LogFileWithWDLoop.key
+#   provable ./firstTouch/09-Quicktour/LogFile_addRecordWD.key
+#   provable ./firstTouch/09-Quicktour/LogFile_getMaximumRecordWD.key
+#   provable ./firstTouch/09-Quicktour/LogFile_getMaximumRecordWithWDLoop.key
+#   provable ./firstTouch/09-Quicktour/LogFile_invariantWD.key
+#   provable ./firstTouch/09-Quicktour/LogRecord_getBalanceWD.key
+#   provable ./firstTouch/09-Quicktour/LogRecord_getTransactionIdWD.key
+#   provable ./firstTouch/09-Quicktour/LogRecord_invariantWD.key
+#   provable ./firstTouch/09-Quicktour/LogRecord_setRecordWD.key
+#   provable ./firstTouch/09-Quicktour/PayCard_PayCardWD.key
+#   provable ./firstTouch/09-Quicktour/PayCard_PayCardintWD.key
+#   provable ./firstTouch/09-Quicktour/PayCard__chargeExcWD.key
+#   provable ./firstTouch/09-Quicktour/PayCard_chargeAndRecordWD.key
+#   provable ./firstTouch/09-Quicktour/PayCard_chargeWD.0.key
+#   provable ./firstTouch/09-Quicktour/PayCard_chargeWD.1.key
+#   provable ./firstTouch/09-Quicktour/PayCard_createJuniorCardWD.key
+#   provable ./firstTouch/09-Quicktour/PayCard_invariantWD.key
+#   provable ./firstTouch/09-Quicktour/PayCard_isValidWD.key
+#   provable ./firstTouch/10-SITA/SITA3_commonEntryWD.key
+#   provable ./firstTouch/10-SITA/SITA3_commonEntryWithWDLoop.key
+#   provable ./firstTouch/10-SITA/SITA3_invariantWD.key
+#   provable ./firstTouch/10-SITA/SITA3_rearrangeWD.key
+#   provable ./firstTouch/10-SITA/SITA3_rearrangeWithWDLoop.key
+#   provable ./firstTouch/10-SITA/SITA3_swapWD.key
+#   notprovable ./heap/block_contracts/GreatestCommonDivisor_ofWithWD.key
+#   notprovable ./heap/fm12_01_LRS/LCP_lcpWD.key
+#   notprovable ./heap/fm12_01_LRS/LRS_doLRSWD.key
+#   notprovable ./heap/fm12_01_LRS/SuffixArray_invariantWD.key
+#   notprovable ./heap/fm12_02_PrefixSum/PrefixSumRec_minWD.key
+#   notprovable ./heap/list_recursiveSpec/ListOperationsNonNull_getNextNNWD.key
+#   notprovable ./heap/list_seq/ArrayList_newArrayWD.key
+#   provable ./heap/list_seq/ArrayList_newArrayWD_Y.key
+#   notprovable ./heap/list_seq/SimplifiedLinkedList_getNextWD.key
+#   notprovable ./heap/list_seq/SimplifiedLinkedList_invariantWD.key
+#   notprovable ./heap/list_seq/TestLists_appendWD.key
+#   notprovable ./heap/observer/ExampleSubject_valueWD.key
+#   notprovable ./heap/saddleback_search/Saddleback_searchWD.key
+#   provable ./heap/saddleback_search/Saddleback_searchWithWDLoop.key
+#   notprovable ./heap/vacid0_01_SparseArray/Harness_sparseArrayTestHarness1WD.key
+#   notprovable ./heap/vstte10_04_Queens/Queens_nQueensWD.key
+#   notprovable ./heap/vstte10_04_Queens/Queens_searchWD.key
+#   notprovable ./heap/vstte10_05_Queue/LinkedList_tailWD.key
+#}
+
 # Permission heap problems:
 group permissionHeap {
    provable ./heap/permissions/permissions_method0.key

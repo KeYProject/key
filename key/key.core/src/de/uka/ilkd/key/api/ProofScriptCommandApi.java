@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
-import de.uka.ilkd.key.macros.scripts.ScriptCommand;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,7 +43,7 @@ public class ProofScriptCommandApi {
      * @param name the non-null name of the search proof script command
      * @return the proof script command or null
      */
-    public ProofScriptCommand getScriptCommands(String name) {
+    public ProofScriptCommand<?> getScriptCommands(String name) {
         return commandMap.get(name);
     }
 }
