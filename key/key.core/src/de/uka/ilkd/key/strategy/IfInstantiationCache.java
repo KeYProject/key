@@ -2,7 +2,11 @@ package de.uka.ilkd.key.strategy;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.proof.Node;
@@ -18,23 +22,90 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
  * Keys: Long Values: IList<IfFormulaInstantiation>
  */
 class IfInstantiationCache {
-    public Node cacheKey = null;
-
-    public final HashMap<Long, ImmutableList<IfFormulaInstantiation>> antecCache = new LinkedHashMap<>();
-    public final HashMap<Long, ImmutableList<IfFormulaInstantiation>> succCache = new LinkedHashMap<>();
-
     /**
      * This field causes a memory leak (that is ad-hoc-ly fixed in
-     * QueueRuleApplicationManager.clearCache()) because it is static and it has
-     * a reference to node which has again a reference to proof. Can this field
+     * QueueRuleApplicationManager.clearCache()) because it is static and has
+     * references to node which has again a reference to proof. Can this field
      * be made non-static by putting it in some other class? This field was
      * private before the fix
      */
-    public static final IfInstantiationCache ifInstCache = new IfInstantiationCache();
+    private final static LRUCache<Node, IfInstantiationCache> cacheMgr = new LRUCache<>(10);
 
-    public void reset(Node n) {
-        cacheKey = n;
-        antecCache.clear();
-        succCache.clear();
+    public static IfInstantiationCache getCache(Node n) {
+        IfInstantiationCache cache;
+        synchronized(cacheMgr) {
+            cache = cacheMgr.get(n);
+        }
+        
+        if (cache != null) {
+            return cache;
+        }
+        
+        cache = new IfInstantiationCache();
+        
+        IfInstantiationCache cache2;
+        synchronized(cacheMgr) {
+            cache2 = cacheMgr.putIfAbsent(n, cache);
+        }
+        
+        if (cache2 != null) {
+            cache = cache2;
+        }
+        
+        return cache;
     }
+    
+    public static void releaseAll() {
+        synchronized(cacheMgr) {
+            cacheMgr.clear();
+        }
+    }  
+    
+    public static void release(Node n) {
+        IfInstantiationCache cache = null;
+        synchronized(cacheMgr) {
+           cache = cacheMgr.remove(n);           
+        }
+        if (cache != null) {
+            cache.reset();
+        }
+    }
+    
+    private HashMap<Long, ImmutableList<IfFormulaInstantiation>> antecCache = new LinkedHashMap<>();
+    private HashMap<Long, ImmutableList<IfFormulaInstantiation>> succCache = new LinkedHashMap<>();
+
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private final ReadLock readLock = lock.readLock();
+    private final WriteLock writeLock = lock.writeLock();
+
+    public ImmutableList<IfFormulaInstantiation> get(boolean antec, Node cacheKey, Long key) {
+        try {
+            readLock.lock();
+            final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cache = antec ? antecCache : succCache;
+            return cache.get(key);
+        } finally {
+            readLock.unlock();
+        }        
+    }
+
+    public void put(boolean antec, Node cacheKey, 
+            Long key, ImmutableList<IfFormulaInstantiation> value) {
+        final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cache = antec ? antecCache : succCache;
+        try {
+            writeLock.lock();
+            cache.put(key, value);            
+        } finally {
+            writeLock.unlock();
+        }        
+    }
+
+    private void reset() {
+        try {
+            writeLock.lock();
+            antecCache.clear();
+            succCache.clear();        
+        } finally {
+            writeLock.unlock();
+        } 
+    }  
 }
