@@ -76,7 +76,9 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     public void clearCache() {
         queue = null;
         previousMinimum = null;
-        IfInstantiationCache.releaseAll();
+        if (goal != null) {
+            goal.node().proof().getServices().getCaches().getIfInstantiationCache().releaseAll();
+        }
         clearNextRuleApp();
     }
 

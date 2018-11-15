@@ -21,7 +21,7 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
  *
  * Keys: Long Values: IList<IfFormulaInstantiation>
  */
-class IfInstantiationCache {
+public class IfInstantiationCachePool {
     /**
      * This field causes a memory leak (that is ad-hoc-ly fixed in
      * QueueRuleApplicationManager.clearCache()) because it is static and has
@@ -29,9 +29,9 @@ class IfInstantiationCache {
      * be made non-static by putting it in some other class? This field was
      * private before the fix
      */
-    private final static LRUCache<Node, IfInstantiationCache> cacheMgr = new LRUCache<>(10);
+    public final static LRUCache<Node, IfInstantiationCache> cacheMgr = new LRUCache<>(10);
 
-    public static IfInstantiationCache getCache(Node n) {
+    public IfInstantiationCache getCache(Node n) {
         IfInstantiationCache cache;
         synchronized(cacheMgr) {
             cache = cacheMgr.get(n);
@@ -55,13 +55,13 @@ class IfInstantiationCache {
         return cache;
     }
     
-    public static void releaseAll() {
+    public void releaseAll() {
         synchronized(cacheMgr) {
             cacheMgr.clear();
         }
     }  
     
-    public static void release(Node n) {
+    public void release(Node n) {
         IfInstantiationCache cache = null;
         synchronized(cacheMgr) {
            cache = cacheMgr.remove(n);           
@@ -71,41 +71,47 @@ class IfInstantiationCache {
         }
     }
     
-    private HashMap<Long, ImmutableList<IfFormulaInstantiation>> antecCache = new LinkedHashMap<>();
-    private HashMap<Long, ImmutableList<IfFormulaInstantiation>> succCache = new LinkedHashMap<>();
+    public static class IfInstantiationCache {
 
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private final ReadLock readLock = lock.readLock();
-    private final WriteLock writeLock = lock.writeLock();
+        private final HashMap<Long, ImmutableList<IfFormulaInstantiation>> antecCache = new LinkedHashMap<>();
+        private final HashMap<Long, ImmutableList<IfFormulaInstantiation>> succCache = new LinkedHashMap<>();
 
-    public ImmutableList<IfFormulaInstantiation> get(boolean antec, Node cacheKey, Long key) {
-        try {
-            readLock.lock();
-            final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cache = antec ? antecCache : succCache;
-            return cache.get(key);
-        } finally {
-            readLock.unlock();
-        }        
+        private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+        private final ReadLock readLock = lock.readLock();
+        private final WriteLock writeLock = lock.writeLock();
+
+        public ImmutableList<IfFormulaInstantiation> get(boolean antec, Long key) {
+            try {
+                readLock.lock();
+                final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cache = antec
+                        ? antecCache
+                        : succCache;
+                return cache.get(key);
+            } finally {
+                readLock.unlock();
+            }
+        }
+
+        public void put(boolean antec, Long key, ImmutableList<IfFormulaInstantiation> value) {
+            final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cache = antec
+                    ? antecCache
+                    : succCache;
+            try {
+                writeLock.lock();
+                cache.put(key, value);
+            } finally {
+                writeLock.unlock();
+            }
+        }
+
+        private void reset() {
+            try {
+                writeLock.lock();
+                antecCache.clear();
+                succCache.clear();
+            } finally {
+                writeLock.unlock();
+            }
+        }
     }
-
-    public void put(boolean antec, Node cacheKey, 
-            Long key, ImmutableList<IfFormulaInstantiation> value) {
-        final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cache = antec ? antecCache : succCache;
-        try {
-            writeLock.lock();
-            cache.put(key, value);            
-        } finally {
-            writeLock.unlock();
-        }        
-    }
-
-    private void reset() {
-        try {
-            writeLock.lock();
-            antecCache.clear();
-            succCache.clear();        
-        } finally {
-            writeLock.unlock();
-        } 
-    }  
 }

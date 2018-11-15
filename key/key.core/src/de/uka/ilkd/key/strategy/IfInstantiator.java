@@ -19,6 +19,7 @@ import de.uka.ilkd.key.rule.IfMatchResult;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.strategy.IfInstantiationCachePool.IfInstantiationCache;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -38,12 +39,13 @@ public class IfInstantiator {
     IfInstantiator(TacletAppContainer tacletAppContainer, final Goal goal) {
         this.goal = goal;
         this.tacletAppContainer = tacletAppContainer;
-        this.ifInstCache = IfInstantiationCache.getCache(goal.node());
+        this.ifInstCache = goal.proof().getServices().getCaches().getIfInstantiationCache().getCache(goal.node());
     }
 
     private void addResult(NoPosTacletApp app) {
-        if (app == null)
+        if (app == null) {
             return;
+        }
         results = results.prepend(app);
         /*
          * final RuleAppContainer cont = TacletAppContainer.createContainer (
@@ -66,8 +68,9 @@ public class IfInstantiator {
         if (ifSequent.isEmpty()) {
             addResult(tacletAppContainer.getTacletApp());
         } else {
-            allAntecFormulas = IfFormulaInstSeq.createList(p_seq, true);
-            allSuccFormulas  = IfFormulaInstSeq.createList(p_seq, false);
+            final Services services = getServices();
+            allAntecFormulas = IfFormulaInstSeq.createList(p_seq, true, services);
+            allSuccFormulas  = IfFormulaInstSeq.createList(p_seq, false, services);
             findIfFormulaInstantiationsHelp(
                     ifSequent.succedent().asList().reverse(), //// Matching with the last formula
                     ifSequent.antecedent().asList().reverse(),
@@ -161,11 +164,11 @@ public class IfInstantiator {
     }
 
     private ImmutableList<IfFormulaInstantiation> getNewSequentFormulasFromCache(boolean p_antec) {
-        return ifInstCache.get(p_antec, goal.node(), tacletAppContainer.getAge());
+        return ifInstCache.get(p_antec, tacletAppContainer.getAge());
     }
 
     private void addNewSequentFormulasToCache(ImmutableList<IfFormulaInstantiation> p_list, boolean p_antec) {
-        ifInstCache.put(p_antec, goal.node(), tacletAppContainer.getAge(), p_list);        
+        ifInstCache.put(p_antec, tacletAppContainer.getAge(), p_list);        
     }
 
 
