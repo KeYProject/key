@@ -20,6 +20,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.Set;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -63,12 +64,18 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
                     OriginTermLabel originLabel =
                             (OriginTermLabel) t.getLabel(OriginTermLabel.NAME);
 
-                    if (originLabel != null) {
-                        info += ", Origin: " + originLabel.getChild(0);
-                    }
-
                     Sequent seq = sequentView.getMainWindow().getMediator().getSelectedNode().sequent();
                     info += ProofSaver.posInOccurrence2Proof(seq, posInOcc);
+
+                    if (originLabel != null) {
+                        info += ", Origin: " + originLabel.getChild(0);
+
+                        info += ", CO: ";
+
+                        for (Object obj : (Set<?>) originLabel.getChild(1)) {
+                            info += obj + " ";
+                        }
+                    }
                 }
             }
 

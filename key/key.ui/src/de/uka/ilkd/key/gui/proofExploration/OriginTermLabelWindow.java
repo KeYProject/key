@@ -6,9 +6,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.util.SortedSet;
-import java.util.StringJoiner;
-import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -51,10 +48,7 @@ public class OriginTermLabelWindow extends JFrame {
      */
     public static final int TREE_CELL_GAP = 20;
 
-    private JLabel childrenOriginsLabel;
-    private JLabel originLabel;
     private Services services;
-    private SortedSet<Origin> allOrigins = new TreeSet<>();
 
     public OriginTermLabelWindow(Term term, Services services) {
         this.services = services;
@@ -110,58 +104,12 @@ public class OriginTermLabelWindow extends JFrame {
             Node childNode = new Node(childTerm);
 
             treeModel.insertNodeInto(childNode, parentNode, i);
-
-            Origin origin = getOrigin(childTerm);
-            if (origin != null) {
-                allOrigins.add(origin);
-            }
-
             buildModel(childNode, childTerm, treeModel);
         }
     }
 
-    private void collectChildOrigins(Term term) {
-        Origin origin = getOrigin(term);
-        if (origin != null) {
-            allOrigins.add(origin);
-        }
-
-        ImmutableArray<Term> children = term.subs();
-
-        for (int i = 0; i < children.size(); ++i) {
-            Term childTerm = children.get(i);
-            collectChildOrigins(childTerm);
-        }
-    }
-
     private void selectionChanged(Term selectedTerm) {
-        allOrigins.clear();
-        collectChildOrigins(selectedTerm);
-
-        StringJoiner allOriginsStr = new StringJoiner("<br>", "<html>", "</html>");
-
-        for (Origin origin : allOrigins) {
-            allOriginsStr.add(origin.toString());
-        }
-
-        childrenOriginsLabel.setText(allOriginsStr.toString());
-
-        originLabel.setText(getOriginAsString(selectedTerm));
-    }
-
-    private Origin getOrigin(Term term) {
-        TermLabel label = term.getLabel(OriginTermLabel.NAME);
-
-        if (label == null) {
-            return null;
-        } else {
-            return (Origin) label.getChild(0);
-        }
-    }
-
-    private String getOriginAsString(Term term) {
-        Origin origin = getOrigin(term);
-        return origin == null ? "" : origin.toString();
+        //TODO
     }
 
     private class CellRenderer extends DefaultTreeCellRenderer {

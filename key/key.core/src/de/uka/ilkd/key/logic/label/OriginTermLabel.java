@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.logic.label;
 
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import de.uka.ilkd.key.logic.Name;
 
@@ -9,12 +12,25 @@ public class OriginTermLabel implements TermLabel {
     public final static Name NAME = new Name("Origin");
 
     private Origin origin;
+    private Set<Origin> subtermOrigins;
+
+    public OriginTermLabel(SpecType specType, String file, int line, Set<Origin> subtermOrigins) {
+        this(specType, file, line);
+        this.subtermOrigins.addAll(subtermOrigins);
+    }
 
     public OriginTermLabel(SpecType specType, String file, int line) {
-        // Just the file name, without any directories
         String filename = Paths.get(file).getFileName().toString();
 
         this.origin = new Origin(specType, filename, line);
+        this.subtermOrigins = new HashSet<>();
+        this.subtermOrigins.add(origin);
+    }
+
+    public OriginTermLabel(Set<Origin> subtermOrigins) {
+        this.origin = new Origin(SpecType.NONE, "no file", -1);
+        this.subtermOrigins = new HashSet<>();
+        subtermOrigins.add(origin);
     }
 
     @Override
@@ -30,7 +46,9 @@ public class OriginTermLabel implements TermLabel {
     @Override
     public Object getChild(int i) {
         if (i == 0) {
-            return origin; 
+            return origin;
+        } else if (i == 1) {
+            return subtermOrigins;
         } else {
             return null;
         }
@@ -39,6 +57,23 @@ public class OriginTermLabel implements TermLabel {
     @Override
     public int getChildCount() {
         return 1;
+    }
+
+    /**
+     *
+     * @return the term's origin.
+     */
+    public Origin getOrigin() {
+        return origin;
+    }
+
+    /**
+     *
+     * @return the origins of the term's sub-terms and former sub-terms.
+     * @see OriginTermLabelRefactoring
+     */
+    public Set<Origin> getSubtermOrigins() {
+        return Collections.unmodifiableSet(subtermOrigins);
     }
 
     public static class Origin implements Comparable<Origin> {
@@ -72,10 +107,41 @@ public class OriginTermLabel implements TermLabel {
 
             return result;
         }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
+            result = prime * result + line;
+            result = prime * result + ((specType == null) ? 0 : specType.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Origin other = (Origin) obj;
+            if (fileName == null) {
+                if (other.fileName != null)
+                    return false;
+            } else if (!fileName.equals(other.fileName))
+                return false;
+            if (line != other.line)
+                return false;
+            if (specType != other.specType)
+                return false;
+            return true;
+        }
     }
 
     public static enum SpecType {
-        
+
         ACCESSIBLE("accessible"),
         ASSIGNABLE("assignable"),
         DECREASES("decreases"),
@@ -91,7 +157,8 @@ public class OriginTermLabel implements TermLabel {
         SIGNALS_ONLY("signals_only"),
         BREAKS("breaks"),
         CONTINUES("continues"),
-        RETURNS("returns");
+        RETURNS("returns"),
+        NONE("<none>");
 
         private String name;
 
