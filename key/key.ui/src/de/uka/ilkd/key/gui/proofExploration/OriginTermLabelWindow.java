@@ -1,19 +1,23 @@
 package de.uka.ilkd.key.gui.proofExploration;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.SortedSet;
 import java.util.StringJoiner;
 import java.util.TreeSet;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
+import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -40,8 +44,12 @@ public class OriginTermLabelWindow extends JFrame {
     public static final int WIDTH = 1280;
     public static final int HEIGHT = 720;
 
-    public static final int HEADING_FONT_SIZE = 16;
-    public static final int GAP_BELOW_HEADING = 20;
+    public static final boolean PRINT_LINE_BREAKS_IN_TREE_NODES = true;
+
+    /**
+     * The gap between a term and its origin in the tree view.
+     */
+    public static final int TREE_CELL_GAP = 20;
 
     private JLabel childrenOriginsLabel;
     private JLabel originLabel;
@@ -50,11 +58,17 @@ public class OriginTermLabelWindow extends JFrame {
 
     public OriginTermLabelWindow(Term term, Services services) {
         this.services = services;
+        setLayout(new BorderLayout());
+        setSize(WIDTH, HEIGHT);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setTitle("Term Origin");
+        setIconImage(IconFactory.keyLogo());
+        setLocationRelativeTo(null);
+        setVisible(true);
 
         DefaultTreeModel treeModel = buildModel(term);
-        setLayout(new BorderLayout());
+        JTree tree = new JTree(treeModel);
         {
-            JTree tree = new JTree(treeModel);
             tree.setCellRenderer(new CellRenderer());
             tree.addTreeSelectionListener(e -> {
                 Node source = (Node) tree.getLastSelectedPathComponent();
@@ -62,59 +76,21 @@ public class OriginTermLabelWindow extends JFrame {
             });
 
             JScrollPane treeScrollPane = new JScrollPane(tree,
-                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-            add(treeScrollPane, BorderLayout.CENTER);
+            add(treeScrollPane, BorderLayout.LINE_START);
         }
 
-        {
-            JPanel topPanel = new JPanel(new BorderLayout());
+        //TODO add SequentView at BorderLayout.LINE_END
 
-            {
-                JPanel topLeftPanel = new JPanel(new BorderLayout(0, GAP_BELOW_HEADING));
+        addComponentListener(new ComponentAdapter() {
 
-                originLabel = new JLabel();
-
-                JLabel originTitle = new JLabel("Origin of selected term", SwingConstants.CENTER);
-                originTitle.setFont(originTitle.getFont().deriveFont(
-                        Font.BOLD, HEADING_FONT_SIZE));
-                topLeftPanel.add(originTitle, BorderLayout.PAGE_START);
-
-                originLabel.setPreferredSize(new Dimension(WIDTH / 2, 100));
-                topLeftPanel.add(originLabel, BorderLayout.CENTER);
-
-                topPanel.add(topLeftPanel, BorderLayout.LINE_START);
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // resize tree nodes
+                tree.setUI(new BasicTreeUI());
             }
-
-            {
-                JPanel topRightPanel = new JPanel(new BorderLayout(0, GAP_BELOW_HEADING));
-
-                childrenOriginsLabel = new JLabel();
-
-                JLabel childrenOriginsTitle = new JLabel("Origins of child terms", SwingConstants.CENTER);
-                childrenOriginsTitle.setFont(childrenOriginsTitle.getFont().deriveFont(
-                        Font.BOLD, HEADING_FONT_SIZE));
-                topRightPanel.add(childrenOriginsTitle, BorderLayout.PAGE_START);
-
-                JScrollPane childrenOriginsScrollPane = new JScrollPane(childrenOriginsLabel,
-                        JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-                childrenOriginsScrollPane.setPreferredSize(new Dimension(WIDTH / 2, 100));
-                topRightPanel.add(childrenOriginsScrollPane, BorderLayout.CENTER);
-
-                topPanel.add(topRightPanel, BorderLayout.LINE_END);
-            }
-
-            topPanel.setPreferredSize(new Dimension(WIDTH, 100));
-            add(topPanel, BorderLayout.PAGE_START);
-        }
-
-        setSize(WIDTH, HEIGHT);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setTitle("Term Origin");
-        setIconImage(IconFactory.keyLogo());
-        setLocationRelativeTo(null);
-        setVisible(true);
+        });
 
         selectionChanged(term);
     }
@@ -197,14 +173,67 @@ public class OriginTermLabelWindow extends JFrame {
                 JTree tree, Object value,
                 boolean selected, boolean expanded,
                 boolean leaf, int row, boolean hasFocus) {
-            JLabel label = (JLabel) super.getTreeCellRendererComponent(
+            Node node = (Node) value;
+            Term term = node.term;
+            BasicTreeUI ui = (BasicTreeUI) tree.getUI();
+
+            JLabel termTextLabel = (JLabel) super.getTreeCellRendererComponent(
                     tree, value, selected, expanded,
                     leaf, row, hasFocus);
-            Node node = (Node) value;
+            termTextLabel.setText(getTermText(term));
+            termTextLabel.setBackground(OriginTermLabelWindow.this.getBackground());
 
-            label.setText(LogicPrinter.quickPrintTerm(node.term, services));
+            JLabel originTextLabel = new JLabel();
+            TermLabel originLabel = term.getLabel(OriginTermLabel.NAME);
 
-            return label;
+            if (originLabel != null) {
+                originTextLabel.setText(getOriginText((Origin) originLabel.getChild(0)));
+                originTextLabel.setHorizontalAlignment(SwingConstants.TRAILING);
+            }
+
+            JPanel result = new JPanel(new BorderLayout(TREE_CELL_GAP, TREE_CELL_GAP));
+
+            final int indent =
+                    (ui.getLeftChildIndent() + ui.getRightChildIndent()) * node.getLevel();
+
+            result.setPreferredSize(new Dimension(
+                    OriginTermLabelWindow.this.getWidth() - indent,
+                    super.getPreferredSize().height));
+
+            result.add(termTextLabel, BorderLayout.LINE_START);
+            result.add(originTextLabel, BorderLayout.LINE_END);
+
+            result.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            return result;
+        }
+
+        private String getOriginText(Origin origin) {
+            String line = origin.line == -1 ? "" : " (line " + origin.line + ")";
+
+            if (PRINT_LINE_BREAKS_IN_TREE_NODES) {
+                return "<html>"
+                        + origin.specType + "<br>"
+                        + origin.fileName + line
+                        + "</html>";
+            } else {
+                return origin.specType + ", " + origin.fileName + line;
+            }
+        }
+
+        private String getTermText(Term term) {
+            if (PRINT_LINE_BREAKS_IN_TREE_NODES) {
+                return "<html>"
+                        + LogicPrinter.quickPrintTerm(term, services)
+                            .replace("&", "&amp;")
+                            .replace("<", "&lt;")
+                            .replace(">", "&gt;")
+                            .replace(" ", "&nbsp;")
+                            .replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+                            .replace("\n", "<br>")
+                        + "</html>";
+            } else {
+                return LogicPrinter.quickPrintTerm(term, services).replaceAll("\\s+", " ");
+            }
         }
     }
 
