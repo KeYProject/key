@@ -1465,7 +1465,7 @@ public final class BlockContractBuilders {
             Term newPost = tb.and(postconditions);
             newPost = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services,
                     newPost, ImmutableSLList.<LocationVariable>nil()
-                            .prepend(terms.remembranceLocalVariables.keySet()),
+                            .prependReverse(terms.remembranceLocalVariables.keySet()),
                     terms.exception);
             if (goal != null) {
                 goal.setBranchLabel("Validity");
@@ -1794,7 +1794,7 @@ public final class BlockContractBuilders {
             Term post = tb.and(postconditions);
             post = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services, post,
                     ImmutableSLList.<LocationVariable>nil()
-                            .prepend(terms.remembranceLocalVariables.keySet()),
+                            .prependReverse(terms.remembranceLocalVariables.keySet()),
                     terms.exception);
             post = TermLabelManager.refactorTerm(termLabelState, services, null, post, rule, goal,
                     AbstractBlockSpecificationElementRule.NEW_POSTCONDITION_TERM_HINT, null);
@@ -1802,7 +1802,7 @@ public final class BlockContractBuilders {
             Term postNext = tb.and(postconditionsNext);
             postNext = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services,
                     postNext, ImmutableSLList.<LocationVariable>nil()
-                            .prepend(terms.remembranceLocalVariables.keySet()),
+                            .prependReverse(terms.remembranceLocalVariables.keySet()),
                     terms.exception);
             postNext = TermLabelManager.refactorTerm(termLabelState, services, null, postNext, rule,
                     goal, AbstractBlockSpecificationElementRule.NEW_POSTCONDITION_TERM_HINT, null);
