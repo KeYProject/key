@@ -506,11 +506,7 @@ public abstract class TacletApp implements RuleApp {
                     localMissingVars = localMissingVars.add(var);
                 }
             }
-            synchronized(this) {
-                if (missingVars == null) {
-                    missingVars = localMissingVars;
-                }
-            }
+            missingVars = localMissingVars;
         }
 
 	return missingVars;	
@@ -953,7 +949,7 @@ public abstract class TacletApp implements RuleApp {
 		&& ifInstantiations == null : "If instantiations list has wrong size or is null "
 		+ "or the if formulas have already been instantiated";
 
-	MatchConditions mc = taclet().getMatcher().matchIf(p_list, matchConditions(), p_services);
+	MatchConditions mc = taclet().getMatcher().matchIf(p_list, matchConditions, p_services);
 
 	return mc == null ? null : setAllInstantiations(mc, p_list, p_services);
     }
