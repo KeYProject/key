@@ -125,15 +125,15 @@
             <callStackEntry path="/0"/>
             <statement name="return -1;" pathCondition="!(x = TRUE &amp; y = TRUE)" pathConditionChanged="false">
                <variable name="x" isArrayIndex="false">
-                  <value name="x {y = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="y = TRUE">
+                  <value name="x {x = TRUE}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="x = TRUE">
                   </value>
-                  <value name="x {!y = TRUE}" typeString="boolean" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="!y = TRUE">
+                  <value name="x {!x = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="!x = TRUE">
                   </value>
                </variable>
                <variable name="y" isArrayIndex="false">
-                  <value name="y {y = TRUE}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="y = TRUE">
+                  <value name="y {x = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="x = TRUE">
                   </value>
-                  <value name="y {!y = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="!y = TRUE">
+                  <value name="y {!x = TRUE}" typeString="boolean" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="!x = TRUE">
                   </value>
                </variable>
                <variable name="exc" isArrayIndex="false">
@@ -145,15 +145,15 @@
                   <methodReturnValue name="-1" returnValueString="-1" hasCondition="false">
                   </methodReturnValue>
                   <variable name="x" isArrayIndex="false">
-                     <value name="x {y = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="y = TRUE">
+                     <value name="x {x = TRUE}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="x = TRUE">
                      </value>
-                     <value name="x {!y = TRUE}" typeString="boolean" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="!y = TRUE">
+                     <value name="x {!x = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="!x = TRUE">
                      </value>
                   </variable>
                   <variable name="y" isArrayIndex="false">
-                     <value name="y {y = TRUE}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="y = TRUE">
+                     <value name="y {x = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="x = TRUE">
                      </value>
-                     <value name="y {!y = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="!y = TRUE">
+                     <value name="y {!x = TRUE}" typeString="boolean" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="!x = TRUE">
                      </value>
                   </variable>
                   <variable name="exc" isArrayIndex="false">
@@ -168,15 +168,15 @@
                      </variable>
                   </termination>
                   <callStateVariable name="x" isArrayIndex="false">
-                     <value name="x {y = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="y = TRUE">
+                     <value name="x {x = TRUE}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="x = TRUE">
                      </value>
-                     <value name="x {!y = TRUE}" typeString="boolean" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="!y = TRUE">
+                     <value name="x {!x = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="!x = TRUE">
                      </value>
                   </callStateVariable>
                   <callStateVariable name="y" isArrayIndex="false">
-                     <value name="y {y = TRUE}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="y = TRUE">
+                     <value name="y {x = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="x = TRUE">
                      </value>
-                     <value name="y {!y = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="!y = TRUE">
+                     <value name="y {!x = TRUE}" typeString="boolean" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="!x = TRUE">
                      </value>
                   </callStateVariable>
                   <callStateVariable name="exc" isArrayIndex="false">
