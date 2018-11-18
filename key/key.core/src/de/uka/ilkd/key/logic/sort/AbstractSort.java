@@ -27,9 +27,8 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 public abstract class AbstractSort implements Sort {
     
     private final Name name;
-    private final ImmutableSet<Sort> ext;    
+    private ImmutableSet<Sort> ext;    
     private final boolean isAbstract;
-
     
     public AbstractSort(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
     	this.name = name;
@@ -40,11 +39,14 @@ public abstract class AbstractSort implements Sort {
 
     @Override    
     public final ImmutableSet<Sort> extendsSorts() {
-	return this == Sort.FORMULA || this == Sort.UPDATE || this == Sort.ANY
-	       ? DefaultImmutableSet.<Sort>nil()
-	       : ext.isEmpty()
-	         ? ext.add(Sort.ANY)
-	         : ext;
+        if (this == Sort.FORMULA || this == Sort.UPDATE || this == Sort.ANY) {
+            return DefaultImmutableSet.<Sort>nil();
+        } else {
+            if (ext.isEmpty()) {
+                ext = DefaultImmutableSet.<Sort>nil().add(ANY);
+            } 
+            return ext;
+        }
     }
     
     
@@ -60,17 +62,11 @@ public abstract class AbstractSort implements Sort {
             return true;
         } else if(this == Sort.FORMULA || this == Sort.UPDATE) {
             return false;
-        } else if(sort == Sort.ANY) {
+        } else if (sort == Sort.ANY) {
             return true;
         }
         
-        for(Sort superSort : extendsSorts()) {
-            if(superSort == sort || superSort.extendsTrans(sort)) {
-        	return true;
-            }
-        }
-        
-        return false;
+        return extendsSorts().exists((Sort superSort)-> superSort == sort || superSort.extendsTrans(sort));
     }
     
 

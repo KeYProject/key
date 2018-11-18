@@ -259,10 +259,10 @@ public final class Goal  {
 	if ( node ().sequent () != p_node.sequent () ) {
 	    node = p_node;
 	    resetTagManager();
-	} else
+	} else {
 	    node = p_node;
+	}
 	ruleAppIndex.setup ( this );
-
     }
 
     /**
