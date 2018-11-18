@@ -155,7 +155,7 @@ public class Semisequent implements Iterable<SequentFormula> {
 
 	// Search for equivalent formulas and weakest constraint
 	ImmutableList<SequentFormula> searchList = semiCI.getFormulaList();
-	ImmutableList<SequentFormula> newSeqList = ImmutableSLList.<SequentFormula>nil();
+	final SequentFormula[] newSeqList = new SequentFormula[searchList.size()];
 	SequentFormula       cf;
 	int                      pos        = -1;
 
@@ -165,12 +165,11 @@ public class Semisequent implements Iterable<SequentFormula> {
 	    searchList = searchList.tail();
 
 	    if (sequentFormula != null && cf.formula().equalsModRenaming(sequentFormula.formula())) {
-
-	    semiCI.rejectedFormula( sequentFormula );
-		return semiCI; // semisequent already contains formula
+	        semiCI.rejectedFormula( sequentFormula );
+	        return semiCI; // semisequent already contains formula
 
 	    }
-	    newSeqList = newSeqList.prepend ( cf );
+	    newSeqList[pos] = cf;
 	}
 
 
@@ -184,9 +183,8 @@ public class Semisequent implements Iterable<SequentFormula> {
 	    searchList = searchList.prepend ( sequentFormula );
 	}
 
-	while ( !newSeqList.isEmpty() ) {
-	    searchList = searchList.prepend ( newSeqList.head () );
-	    newSeqList = newSeqList.tail ();
+	while ( pos >= 0 ) {
+	    searchList = searchList.prepend ( newSeqList[pos] );
 	    if ( idx == pos ) {
 		searchList = searchList.prepend ( sequentFormula );
 	    }
