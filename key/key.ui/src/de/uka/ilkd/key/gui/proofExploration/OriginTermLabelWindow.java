@@ -34,7 +34,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
@@ -60,11 +59,7 @@ public class OriginTermLabelWindow extends JFrame {
 
     public static final int WIDTH = 1280;
     public static final int HEIGHT = 720;
-
     public static final boolean PRINT_LINE_BREAKS_IN_TREE_NODES = true;
-    
-    public static final Dimension INITIAL_COMPONENT_SIZE = new Dimension(WIDTH / 2, HEIGHT);
-    
     public static final Color HIGHLIGHT_COLOR = Color.ORANGE;
     
     private View view;
@@ -83,12 +78,10 @@ public class OriginTermLabelWindow extends JFrame {
     private Services services;
 
     private PosInOccurrence termPosInSequent;
-    private Term term;
 
     public OriginTermLabelWindow(PosInOccurrence pos, Node node, Services services) {
         this.services = services;
         this.termPosInSequent = pos;
-        this.term = termPosInSequent.subTerm();
         
         setLayout(new GridLayout(1, 2, COMPONENT_GAP, COMPONENT_GAP));
         setSize(WIDTH, HEIGHT);
@@ -110,13 +103,13 @@ public class OriginTermLabelWindow extends JFrame {
             JScrollPane treeScrollPane = new JScrollPane(tree,
                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-            treeScrollPane.setPreferredSize(INITIAL_COMPONENT_SIZE);
+            treeScrollPane.setPreferredSize(new Dimension(WIDTH / 2, HEIGHT));
             add(treeScrollPane);
         }
 
         {
             view = new View(pos, node, MainWindow.getInstance());
-            view.setPreferredSize(INITIAL_COMPONENT_SIZE);
+            view.setPreferredSize(new Dimension(WIDTH / 2, HEIGHT));
             
             view.addMouseListener(new MouseAdapter() {
                 
@@ -146,7 +139,7 @@ public class OriginTermLabelWindow extends JFrame {
                     }
 
                     highlightInView(pos);
-                    selectTreePath(pos);
+                    highlightInTree(pos);
                 }
             });
             
@@ -186,7 +179,7 @@ public class OriginTermLabelWindow extends JFrame {
         }
     }
     
-    private void selectTreePath(PosInOccurrence pos) {
+    private void highlightInTree(PosInOccurrence pos) {
         tree.getSelectionModel().setSelectionPath(getTreePath(pos));
     }
     
