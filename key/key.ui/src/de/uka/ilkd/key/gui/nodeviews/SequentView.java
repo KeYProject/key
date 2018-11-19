@@ -106,7 +106,7 @@ public abstract class SequentView extends JEditorPane {
     /** the last observed mouse position for which a highlight was created */
     private Point lastMousePosition;
 
-    SequentView(MainWindow mainWindow) {
+    protected SequentView(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
 
         setContentType("text/html");
@@ -191,7 +191,7 @@ public abstract class SequentView extends JEditorPane {
      * @param range the Range to be highlighted
      * @param highlighter the Object painting the highlight
      */
-    void paintHighlight(Range range, Object highlighter) {
+    public void paintHighlight(Range range, Object highlighter) {
         try {
             if (range != null) {
                 getHighlighter()
@@ -484,7 +484,10 @@ public abstract class SequentView extends JEditorPane {
 		    this.filter.setSequent(selectedNode.sequent());
 		}
 		printSequent();
-        getParent().revalidate();
+		
+		if (getParent() != null) {
+	        getParent().revalidate();
+		}
 	}
 
     protected SequentPrintFilter getFilter() {

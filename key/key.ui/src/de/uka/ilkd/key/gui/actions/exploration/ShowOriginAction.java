@@ -26,6 +26,9 @@ public class ShowOriginAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        new OriginTermLabelWindow(pos.getPosInOccurrence().subTerm(), getMediator().getServices());
+        new OriginTermLabelWindow(
+                pos.getPosInOccurrence(),
+                getMediator().getSelectedNode(),
+                getMediator().getServices());
     }
 }
