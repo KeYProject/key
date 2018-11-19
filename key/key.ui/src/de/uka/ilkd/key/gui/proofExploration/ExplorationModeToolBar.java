@@ -2,6 +2,8 @@ package de.uka.ilkd.key.gui.proofExploration;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.ShowExplorationStepAction;
+import de.uka.ilkd.key.gui.prooftree.GUIProofTreeModel;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
 import de.uka.ilkd.key.proof.Proof;
 
 import javax.swing.*;
@@ -18,9 +20,9 @@ import java.awt.event.ItemListener;
 public class ExplorationModeToolBar extends JToolBar {
     private MainWindow mw;
 
-    private JRadioButton explorationMode;
+    private JButton explorationMode;
 
-    private JCheckBox showSecondBranch;
+    private JButton showSecondBranch;
 
     private ExplorationModeModel explorationModeModel;
 
@@ -53,20 +55,30 @@ public class ExplorationModeToolBar extends JToolBar {
     private void initialize() {
         this.setName("Exploration Mode Settings");
 
-        explorationMode = new JRadioButton("Exploration Mode");
+        explorationMode = new JButton("Exploration Mode");
         explorationMode.setToolTipText("Choose to start ExplorationMode");
-        explorationMode.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
+        
+        explorationMode.addActionListener(new ActionListener() {
+            
+            boolean active = false;
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                active = !active;
+                
+                if (active) {
                     explorationModeModel.setExplorationModeSelected(true);
                     //soundExploration.setEnabled(true);
                     showSecondBranch.setEnabled(true);
-                } else if (e.getStateChange() == ItemEvent.DESELECTED) {
+                    explorationMode.getModel().setPressed(true);
+                } else {
                     explorationModeModel.setExplorationModeSelected(false);
+                    explorationMode.getModel().setPressed(false);
                     //soundExploration.setEnabled(true);
                 }
             }
         });
+        
         this.add(explorationMode);
         //soundExploration = new JComboBox<>();
         //soundExploration.setToolTipText("Some exploration rules need a justification branch to be sound. Choose whether to see this branch or hide it.");
@@ -87,16 +99,25 @@ public class ExplorationModeToolBar extends JToolBar {
         //soundExploration.setEnabled(false);
         //this.add(soundExploration);
 
-        showSecondBranch = new JCheckBox("Show Second Branch");
+        showSecondBranch = new JButton("Show Second Branch");
         showSecondBranch.setToolTipText("Exploration actions are \noften done using a cut. Choose to hide\n " +
                 "the second cut-branches from the view \nto focus on the exploration. Uncheck to focus on these branches.");
-        showSecondBranch.addItemListener(new ItemListener() {
+        showSecondBranch.addActionListener(new ActionListener() {
+            
+            boolean active = false;
+
             @Override
-            public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange() == ItemEvent.SELECTED){
-                    explorationModeModel.setShowSecondBranches(true);
+            public void actionPerformed(ActionEvent arg0) {
+                GUIProofTreeModel delegateModel = MainWindow.getInstance().getProofTreeView().getDelegateModel();
+                active = !active;
+                
+                if (active) {
+                    showSecondBranch.getModel().setPressed(true);
+                    delegateModel.setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS, true);
                     explorationModeModel.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.WHOLE_APP);
                 } else {
+                    showSecondBranch.getModel().setPressed(false);
+                    delegateModel.setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS, false);
                     explorationModeModel.setShowSecondBranches(false);
                     explorationModeModel.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.SIMPLIFIED_APP);
                 }
