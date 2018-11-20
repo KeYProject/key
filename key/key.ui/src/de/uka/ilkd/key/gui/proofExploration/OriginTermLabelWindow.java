@@ -61,28 +61,32 @@ public class OriginTermLabelWindow extends JFrame {
     public static final int HEIGHT = 720;
     public static final boolean PRINT_LINE_BREAKS_IN_TREE_NODES = true;
     public static final Color HIGHLIGHT_COLOR = Color.ORANGE;
-    
+    public static final String ORIGIN_HEADER = "Origin of term";
+    public static final String SUBTERM_ORIGINS_HEADER = "Origins of (former) subterms";
+
     private View view;
     private JTree tree;
+
+    private JLabel originJLabel;
+    private JLabel subtermOriginsJLabel;
 
     /**
      * The gap between a term and its origin in the tree view.
      */
     public static final int TREE_CELL_GAP = 20;
-    
+
     /**
-     * The gap between the {@link JTree} and the {@link View}
+     * The gap between the window's components
      */
     public static final int COMPONENT_GAP = 20;
 
     private Services services;
-
     private PosInOccurrence termPosInSequent;
 
     public OriginTermLabelWindow(PosInOccurrence pos, Node node, Services services) {
         this.services = services;
         this.termPosInSequent = pos;
-        
+
         setLayout(new GridLayout(1, 2, COMPONENT_GAP, COMPONENT_GAP));
         setSize(WIDTH, HEIGHT);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -98,6 +102,7 @@ public class OriginTermLabelWindow extends JFrame {
             tree.addTreeSelectionListener(e -> {
                 TreeNode source = (TreeNode) tree.getLastSelectedPathComponent();
                 highlightInView(source.pos);
+                updateJLabels(source.pos);
             });
 
             JScrollPane treeScrollPane = new JScrollPane(tree,
@@ -108,44 +113,57 @@ public class OriginTermLabelWindow extends JFrame {
         }
 
         {
+            JPanel rightPanel = new JPanel(new GridLayout(2, 1, COMPONENT_GAP, COMPONENT_GAP));
+            JPanel bottomRightPanel = new JPanel(new GridLayout(1, 2, COMPONENT_GAP, COMPONENT_GAP));
+
+            originJLabel = new JLabel();
+            subtermOriginsJLabel = new JLabel();
+
             view = new View(pos, node, MainWindow.getInstance());
             view.setPreferredSize(new Dimension(WIDTH / 2, HEIGHT));
-            
+
             view.addMouseListener(new MouseAdapter() {
-                
+
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     PosInOccurrence pos = view
                             .getLastPosInSequent()
                             .getPosInOccurrence();
-                    
+
                     if (pos == null) {
                         pos = new PosInOccurrence(
                                 termPosInSequent.sequentFormula(),
-                                termPosInSequent.posInTerm(), 
+                                termPosInSequent.posInTerm(),
                                 termPosInSequent.isInAntec());
                     } else {
                         PosInTerm completePos = termPosInSequent.posInTerm();
-                        
+
                         IntIterator it = pos.posInTerm().iterator();
                         while (it.hasNext()) {
                             completePos = completePos.down(it.next());
                         }
-                        
+
                         pos = new PosInOccurrence(
                                 termPosInSequent.sequentFormula(),
-                                completePos, 
+                                completePos,
                                 termPosInSequent.isInAntec());
                     }
 
                     highlightInView(pos);
                     highlightInTree(pos);
+                    updateJLabels(pos);
                 }
             });
-            
-            add(view);
-            
+
+            rightPanel.add(view);
+
             view.printSequent();
+
+            bottomRightPanel.add(originJLabel);
+            bottomRightPanel.add(subtermOriginsJLabel);
+            rightPanel.add(bottomRightPanel);
+
+            add(rightPanel);
         }
 
         addComponentListener(new ComponentAdapter() {
@@ -178,23 +196,47 @@ public class OriginTermLabelWindow extends JFrame {
             buildModel(childNode, parentPos.down(i), treeModel);
         }
     }
-    
+
     private void highlightInTree(PosInOccurrence pos) {
         tree.getSelectionModel().setSelectionPath(getTreePath(pos));
     }
-    
+
     private void highlightInView(PosInOccurrence pos) {
         view.removeHighlight(view.getColorHighlight(HIGHLIGHT_COLOR));
         view.printSequent();
 
         ImmutableList<Integer> path = getPosTablePath(pos);
-        
+
         Range range = view.posTable.rangeForPath(path);
         range = new Range(range.start() + 1, range.end() + 1);
 
         view.paintHighlight(range, view.getColorHighlight(HIGHLIGHT_COLOR));
     }
-    
+
+    private void updateJLabels(PosInOccurrence pos) {
+        OriginTermLabel label = (OriginTermLabel) pos.subTerm().getLabel(OriginTermLabel.NAME);
+
+        StringBuilder originText = new StringBuilder(
+                "<html>" + "<b>" + ORIGIN_HEADER + ":</b><br>");
+
+        StringBuilder subtermOriginsText = new StringBuilder(
+                "<html>" + "<b>" + SUBTERM_ORIGINS_HEADER + ":</b><br>");
+
+        if (label != null) {
+            originText.append(getOriginText(label.getOrigin()));
+
+            for (Origin origin : label.getSubtermOrigins()) {
+                subtermOriginsText.append(getOriginText(origin) + "<br>");
+            }
+        }
+
+        originText.append("</html>");
+        subtermOriginsText.append("</html>");
+
+        originJLabel.setText(originText.toString());
+        subtermOriginsJLabel.setText(subtermOriginsText.toString());
+    }
+
     private ImmutableList<Integer> getPosTablePath(PosInOccurrence pos) {
         InitialPositionTable posTable = view.posTable;
 
@@ -216,24 +258,45 @@ public class OriginTermLabelWindow extends JFrame {
 
         return path;
     }
-    
+
     private TreePath getTreePath(PosInOccurrence pos) {
         ImmutableList<Integer> intPath = getPosTablePath(pos);
-        
+
         intPath = intPath.tail().tail();
-        
+
         TreeNode lastNode = (TreeNode) tree.getModel().getRoot();
         TreePath result = new TreePath(lastNode);
-        
+
         if (intPath != null) {
             for (int i : intPath) {
                 lastNode = (TreeNode) lastNode.getChildAt(i);
-                
+
                 result = result.pathByAddingChild(lastNode);
             }
         }
-        
+
         return result;
+    }
+
+    private String getOriginText(Origin origin) {
+        String line = origin.line == -1 ? "" : " (line " + origin.line + ")";
+        return origin.specType + ", " + origin.fileName + line;
+    }
+
+    private String getTermText(Term term) {
+        if (PRINT_LINE_BREAKS_IN_TREE_NODES) {
+            return "<html>"
+                    + LogicPrinter.quickPrintTerm(term, services)
+                        .replace("&", "&amp;")
+                        .replace("<", "&lt;")
+                        .replace(">", "&gt;")
+                        .replace(" ", "&nbsp;")
+                        .replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+                        .replace("\n", "<br>")
+                    + "</html>";
+        } else {
+            return LogicPrinter.quickPrintTerm(term, services).replaceAll("\\s+", " ");
+        }
     }
 
     private class CellRenderer extends DefaultTreeCellRenderer {
@@ -278,27 +341,6 @@ public class OriginTermLabelWindow extends JFrame {
             result.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             return result;
         }
-
-        private String getOriginText(Origin origin) {
-            String line = origin.line == -1 ? "" : " (line " + origin.line + ")";
-            return origin.specType + ", " + origin.fileName + line;
-        }
-
-        private String getTermText(Term term) {
-            if (PRINT_LINE_BREAKS_IN_TREE_NODES) {
-                return "<html>"
-                        + LogicPrinter.quickPrintTerm(term, services)
-                            .replace("&", "&amp;")
-                            .replace("<", "&lt;")
-                            .replace(">", "&gt;")
-                            .replace(" ", "&nbsp;")
-                            .replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
-                            .replace("\n", "<br>")
-                        + "</html>";
-            } else {
-                return LogicPrinter.quickPrintTerm(term, services).replaceAll("\\s+", " ");
-            }
-        }
     }
 
     private class TreeNode extends DefaultMutableTreeNode {
@@ -314,40 +356,40 @@ public class OriginTermLabelWindow extends JFrame {
             this.term = pos.subTerm();
         }
     }
-    
+
     private class View extends SequentView {
-        
+
         private static final long serialVersionUID = 2048113301808983374L;
-        
+
         private InitialPositionTable posTable;
         private Node node;
 
         View(PosInOccurrence pos, Node node, MainWindow mainWindow) {
             super(mainWindow);
             this.node = node;
-            
+
             final NotationInfo ni = new NotationInfo();
             if (services != null) {
                 ni.refresh(services,
                         NotationInfo.DEFAULT_PRETTY_SYNTAX, NotationInfo.DEFAULT_UNICODE_ENABLED);
             }
-            
+
             setLogicPrinter(new SequentViewLogicPrinter(
                     new ProgramPrinter(), ni, services, new TermLabelVisibilityManager()));
-            
+
             setFilter0(new ShowSelectedSequentPrintFilter(pos));
         }
-        
+
         // This is very ugly, but it prevents any filters from the main window's search bar being
         // applied to this view.
-        
+
         @Override
         public void setFilter(SequentPrintFilter sequentPrintFilter) { }
-        
+
         private void setFilter0(ShowSelectedSequentPrintFilter sequentPrintFilter) {
             super.setFilter(sequentPrintFilter);
         }
-        
+
         @Override
         public SequentPrintFilter getFilter() {
             return super.getFilter();
