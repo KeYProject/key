@@ -377,17 +377,7 @@ public class OriginTermLabelWindow extends JFrame {
             setLogicPrinter(new SequentViewLogicPrinter(
                     new ProgramPrinter(), ni, services, new TermLabelVisibilityManager()));
 
-            setFilter0(new ShowSelectedSequentPrintFilter(pos));
-        }
-
-        // This is very ugly, but it prevents any filters from the main window's search bar being
-        // applied to this view.
-
-        @Override
-        public void setFilter(SequentPrintFilter sequentPrintFilter) { }
-
-        private void setFilter0(ShowSelectedSequentPrintFilter sequentPrintFilter) {
-            super.setFilter(sequentPrintFilter);
+            setFilter(new ShowSelectedSequentPrintFilter(pos));
         }
 
         @Override
@@ -398,6 +388,11 @@ public class OriginTermLabelWindow extends JFrame {
         @Override
         public String getTitle() {
             return "Selected term";
+        }
+        
+        @Override
+        public boolean isMainSequentView() {
+            return false;
         }
 
         @Override
