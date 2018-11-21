@@ -89,12 +89,12 @@ public class OriginTermLabelWindow extends JFrame {
     protected JLabel subtermOriginsJLabel;
 
     protected Services services;
-    protected PosInOccurrence termPosInSequent;
+    protected PosInOccurrence termPio;
     protected Sequent sequent;
 
     public OriginTermLabelWindow(PosInOccurrence pos, Node node, Services services) {
         this.services = services;
-        this.termPosInSequent = pos;
+        this.termPio = pos;
         this.sequent = node.sequent();
 
         setLayout(new GridLayout(1, 2, COMPONENT_GAP, COMPONENT_GAP));
@@ -111,7 +111,10 @@ public class OriginTermLabelWindow extends JFrame {
             tree.setCellRenderer(new CellRenderer());
             tree.addTreeSelectionListener(e -> {
                 TreeNode source = (TreeNode) tree.getLastSelectedPathComponent();
-                highlightInView(source.pos);
+
+                ImmutableList<Integer> path = getPosTablePath(source.pos);
+
+                highlightInView(path);
                 updateJLabels(source.pos);
             });
 
@@ -137,23 +140,23 @@ public class OriginTermLabelWindow extends JFrame {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     PosInSequent pis = view.getLastPosInSequent();
-                    
+
                     if (pis == null) {
                         return;
                     }
-                    
+
                     PosInOccurrence pos = pis.getPosInOccurrence();
 
                     if (pos == null) {
-                        if (termPosInSequent != null) {
+                        if (termPio != null) {
                             pos = new PosInOccurrence(
-                                    termPosInSequent.sequentFormula(),
-                                    termPosInSequent.posInTerm(),
-                                    termPosInSequent.isInAntec());
+                                    termPio.sequentFormula(),
+                                    termPio.posInTerm(),
+                                    termPio.isInAntec());
                         }
                     } else {
-                        if (termPosInSequent != null) {
-                            PosInTerm completePos = termPosInSequent.posInTerm();
+                        if (termPio != null) {
+                            PosInTerm completePos = termPio.posInTerm();
 
                             IntIterator it = pos.posInTerm().iterator();
                             while (it.hasNext()) {
@@ -161,14 +164,16 @@ public class OriginTermLabelWindow extends JFrame {
                             }
 
                             pos = new PosInOccurrence(
-                                    termPosInSequent.sequentFormula(),
+                                    termPio.sequentFormula(),
                                     completePos,
-                                    termPosInSequent.isInAntec());
+                                    termPio.isInAntec());
                         }
                     }
 
-                    highlightInView(pos);
-                    highlightInTree(pos);
+                    ImmutableList<Integer> path = getPosTablePath(pos);
+
+                    highlightInView(path);
+                    highlightInTree(getTreePath(path));
                     updateJLabels(pos);
                 }
             });
@@ -206,29 +211,29 @@ public class OriginTermLabelWindow extends JFrame {
             PosInOccurrence parentPos,
             DefaultTreeModel treeModel) {
         if (parentPos == null) {
-            ImmutableList<SequentFormula> children = sequent.antecedent().asList();
             int index = 0;
-            
+
+            ImmutableList<SequentFormula> children = sequent.antecedent().asList();
+
             for (SequentFormula child : children) {
                 PosInOccurrence childPos = new PosInOccurrence(child, PosInTerm.getTopLevel(), true);
                 TreeNode childNode = new TreeNode(childPos);
 
                 treeModel.insertNodeInto(childNode, parentNode, index);
                 buildModel(childNode, childPos, treeModel);
-                
+
                 ++index;
             }
-            
+
             children = sequent.succedent().asList();
-            index = 0;
-            
+
             for (SequentFormula child : children) {
                 PosInOccurrence childPos = new PosInOccurrence(child, PosInTerm.getTopLevel(), false);
                 TreeNode childNode = new TreeNode(childPos);
 
                 treeModel.insertNodeInto(childNode, parentNode, index);
                 buildModel(childNode, childPos, treeModel);
-                
+
                 ++index;
             }
         } else {
@@ -243,15 +248,13 @@ public class OriginTermLabelWindow extends JFrame {
         }
     }
 
-    private void highlightInTree(PosInOccurrence pos) {
-        tree.getSelectionModel().setSelectionPath(getTreePath(pos));
+    private void highlightInTree(TreePath path) {
+        tree.getSelectionModel().setSelectionPath(path);
     }
 
-    private void highlightInView(PosInOccurrence pos) {
+    private void highlightInView(ImmutableList<Integer> path) {
         view.removeHighlight(view.getColorHighlight(HIGHLIGHT_COLOR));
         view.printSequent();
-
-        ImmutableList<Integer> path = getPosTablePath(pos);
 
         Range range = view.posTable.rangeForPath(path);
         range = new Range(range.start() + 1, range.end() + 1);
@@ -264,8 +267,9 @@ public class OriginTermLabelWindow extends JFrame {
             originJLabel.setText("<html>" + "<b>" + ORIGIN_HEADER + ":</b><br></html>");
             subtermOriginsJLabel.setText(
                     "<html>" + "<b>" + SUBTERM_ORIGINS_HEADER + ":</b><br></html>");
+            return;
         }
-        
+
         OriginTermLabel label = (OriginTermLabel) pos.subTerm().getLabel(OriginTermLabel.NAME);
 
         StringBuilder originText = new StringBuilder(
@@ -292,16 +296,16 @@ public class OriginTermLabelWindow extends JFrame {
 
     private ImmutableList<Integer> getPosTablePath(PosInOccurrence pos) {
         if (pos == null) {
-            return ImmutableSLList.<Integer>nil().prepend(0).prepend(0);
+            return ImmutableSLList.<Integer>nil().prepend(0);
         }
-        
+
         InitialPositionTable posTable = view.posTable;
 
         ImmutableList<Integer> path = posTable.pathForPosition(pos, view.getFilter());
 
-        if (termPosInSequent != null) {
+        if (termPio != null) {
             ImmutableList<Integer> prefixPath = posTable.pathForPosition(
-                    termPosInSequent, view.getFilter());
+                    termPio, view.getFilter());
 
             final int n = prefixPath.size();
 
@@ -318,16 +322,18 @@ public class OriginTermLabelWindow extends JFrame {
         return path;
     }
 
-    private TreePath getTreePath(PosInOccurrence pos) {
-        ImmutableList<Integer> intPath = getPosTablePath(pos);
-
-        intPath = intPath.tail().tail();
+    private TreePath getTreePath(ImmutableList<Integer> posTablePath) {
+        if (termPio != null) {
+            posTablePath = posTablePath.tail().tail();
+        } else {
+            posTablePath = posTablePath.tail();
+        }
 
         TreeNode lastNode = (TreeNode) tree.getModel().getRoot();
         TreePath result = new TreePath(lastNode);
 
-        if (intPath != null) {
-            for (int i : intPath) {
+        if (posTablePath != null) {
+            for (int i : posTablePath) {
                 lastNode = (TreeNode) lastNode.getChildAt(i);
 
                 result = result.pathByAddingChild(lastNode);
@@ -339,13 +345,13 @@ public class OriginTermLabelWindow extends JFrame {
 
     private String getTermText(Term term) {
         String text;
-        
+
         if (term == null) {
             text = LogicPrinter.quickPrintSequent(sequent, services);
         } else {
             text = LogicPrinter.quickPrintTerm(term, services);
         }
-        
+
         if (PRINT_LINE_BREAKS_IN_TREE_NODES) {
             return "<html>"
                     + text
@@ -415,7 +421,7 @@ public class OriginTermLabelWindow extends JFrame {
         private TreeNode(PosInOccurrence pos) {
             super(pos);
             this.pos = pos;
-            
+
             if (pos != null) {
                 this.term = pos.subTerm();
             }
@@ -441,7 +447,8 @@ public class OriginTermLabelWindow extends JFrame {
 
             setLogicPrinter(new SequentViewLogicPrinter(
                     new ProgramPrinter(), ni, services, new TermLabelVisibilityManager()) {
-                
+
+                @Override
                 public void printSequent(SequentPrintFilter filter,
                         boolean finalbreak) {
                     try {
@@ -451,11 +458,11 @@ public class OriginTermLabelWindow extends JFrame {
                         startTerm(antec.size()+succ.size());
                         layouter.beginC(1).ind();
                         printSemisequent(antec);
-                        
+
                         if (pos == null) {
                             layouter.brk(1,-1).print("==>").brk(1);
                         }
-                        
+
                         printSemisequent(succ);
                         if (finalbreak) {
                             layouter.brk(0);
@@ -471,7 +478,7 @@ public class OriginTermLabelWindow extends JFrame {
                     }
                 }
             });
-            
+
             if (pos != null) {
                 setFilter(new ShowSelectedSequentPrintFilter(pos));
             } else {
@@ -488,7 +495,7 @@ public class OriginTermLabelWindow extends JFrame {
         public String getTitle() {
             return "Selected term";
         }
-        
+
         @Override
         public boolean isMainSequentView() {
             return false;

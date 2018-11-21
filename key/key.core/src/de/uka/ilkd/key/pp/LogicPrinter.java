@@ -198,9 +198,14 @@ public class LogicPrinter {
         if (services != null) {
             ni.refresh(services);
         }
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(),
-                                          ni,
-                                          services);
+
+        // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
+        // because the SequentViewLogicPrinter respects default TermLabel visibility settings.
+        LogicPrinter p = new SequentViewLogicPrinter(
+                new ProgramPrinter(),
+                ni, services,
+                new TermLabelVisibilityManager());
+
         p.printSequent(s);
         return p.result().toString();
     }
