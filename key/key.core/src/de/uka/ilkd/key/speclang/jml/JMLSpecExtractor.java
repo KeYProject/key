@@ -52,7 +52,9 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -501,23 +503,27 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 final String invString = pm.isStatic() ? "\\inv" : "<inv>";
                 if (!pm.isConstructor()) {
                     specCase.addRequires(new PositionedString(invString).label(
-                            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)
+                            .label(new OriginTermLabel(SpecType.REQUIRES, null, -1)));
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
                     specCase.addRequires(new PositionedString(
                             "" + pm.getName() + ".\\inv").label(
-                                    ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                                    ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)
+                            .label(new OriginTermLabel(SpecType.REQUIRES, null, -1)));
                 }
                 if (specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                     specCase.addEnsures(
                             new PositionedString("ensures " + invString).label(
-                                    ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                                    ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)
+                            .label(new OriginTermLabel(SpecType.ENSURES, null, -1)));
                 }
                 if (specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR
                         && !pm.isModel()) {
                     specCase.addSignals(new PositionedString(
                             "signals (Throwable e) " + invString).label(
-                                    ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                                    ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)
+                            .label(new OriginTermLabel(SpecType.SIGNALS, null, -1)));
                 }
             }
 
@@ -535,7 +541,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
                             false, fileName, pm.getStartPosition(), services);
                     for (PositionedString nonNull : nonNullParams) {
                         specCase.addRequires(nonNull.label(
-                                ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                                ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)
+                                .label(new OriginTermLabel(SpecType.REQUIRES, null, -1)));
                     }
                 }
             }
@@ -551,7 +558,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
                         pm.getStartPosition(), services);
                 for (PositionedString nonNull : resultNonNull) {
                     specCase.addEnsures(nonNull.prepend("ensures ").label(
-                            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)
+                            .label(new OriginTermLabel(SpecType.ENSURES, null, -1)));
                 }
             }
 
