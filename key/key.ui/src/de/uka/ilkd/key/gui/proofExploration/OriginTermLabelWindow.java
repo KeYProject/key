@@ -9,6 +9,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -41,12 +42,15 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.SequentPrintFilterEntry;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.ShowSelectedSequentPrintFilter;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
 /**
  * This window visualizes the {@link OriginTermLabel}s of a term and its sub-terms.
@@ -64,7 +68,7 @@ public class OriginTermLabelWindow extends JFrame {
     public static final String ORIGIN_HEADER = "Origin of term";
     public static final String SUBTERM_ORIGINS_HEADER = "Origins of (former) subterms";
 
-    private View view;
+    private TermView view;
     private JTree tree;
 
     private JLabel originJLabel;
@@ -119,16 +123,20 @@ public class OriginTermLabelWindow extends JFrame {
             originJLabel = new JLabel();
             subtermOriginsJLabel = new JLabel();
 
-            view = new View(pos, node, MainWindow.getInstance());
+            view = new TermView(pos, node, MainWindow.getInstance());
             view.setPreferredSize(new Dimension(WIDTH / 2, HEIGHT));
 
             view.addMouseListener(new MouseAdapter() {
 
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    PosInOccurrence pos = view
-                            .getLastPosInSequent()
-                            .getPosInOccurrence();
+                    PosInSequent pis = view.getLastPosInSequent();
+                    
+                    if (pis == null) {
+                        return;
+                    }
+                    
+                    PosInOccurrence pos = pis.getPosInOccurrence();
 
                     if (pos == null) {
                         pos = new PosInOccurrence(
@@ -223,10 +231,11 @@ public class OriginTermLabelWindow extends JFrame {
                 "<html>" + "<b>" + SUBTERM_ORIGINS_HEADER + ":</b><br>");
 
         if (label != null) {
-            originText.append(getOriginText(label.getOrigin()));
+            originText.append(label.getOrigin());
 
             for (Origin origin : label.getSubtermOrigins()) {
-                subtermOriginsText.append(getOriginText(origin) + "<br>");
+                subtermOriginsText.append(origin);
+                subtermOriginsText.append("<br>");
             }
         }
 
@@ -278,11 +287,6 @@ public class OriginTermLabelWindow extends JFrame {
         return result;
     }
 
-    private String getOriginText(Origin origin) {
-        String line = origin.line == -1 ? "" : " (line " + origin.line + ")";
-        return origin.specType + ", " + origin.fileName + line;
-    }
-
     private String getTermText(Term term) {
         if (PRINT_LINE_BREAKS_IN_TREE_NODES) {
             return "<html>"
@@ -322,7 +326,7 @@ public class OriginTermLabelWindow extends JFrame {
             TermLabel originLabel = term.getLabel(OriginTermLabel.NAME);
 
             if (originLabel != null) {
-                originTextLabel.setText(getOriginText((Origin) originLabel.getChild(0)));
+                originTextLabel.setText(originLabel.getChild(0).toString());
                 originTextLabel.setHorizontalAlignment(SwingConstants.TRAILING);
             }
 
@@ -357,14 +361,14 @@ public class OriginTermLabelWindow extends JFrame {
         }
     }
 
-    private class View extends SequentView {
+    private class TermView extends SequentView {
 
         private static final long serialVersionUID = 2048113301808983374L;
 
         private InitialPositionTable posTable;
         private Node node;
 
-        View(PosInOccurrence pos, Node node, MainWindow mainWindow) {
+        TermView(PosInOccurrence pos, Node node, MainWindow mainWindow) {
             super(mainWindow);
             this.node = node;
 
@@ -375,7 +379,38 @@ public class OriginTermLabelWindow extends JFrame {
             }
 
             setLogicPrinter(new SequentViewLogicPrinter(
-                    new ProgramPrinter(), ni, services, new TermLabelVisibilityManager()));
+                    new ProgramPrinter(), ni, services, new TermLabelVisibilityManager()) {
+                
+                public void printSequent(SequentPrintFilter filter,
+                        boolean finalbreak) {
+                    try {
+                        ImmutableList<SequentPrintFilterEntry> antec = filter.getFilteredAntec();
+                        ImmutableList<SequentPrintFilterEntry> succ  = filter.getFilteredSucc();
+                        markStartSub();
+                        startTerm(antec.size()+succ.size());
+                        layouter.beginC(1).ind();
+                        printSemisequent(antec);
+                        
+                        // Because of the filter we're using, we are only printing a single
+                        // sub-formula or sub-term instead of an actual sequent.
+                        // Thus, we should not be printing the sequent arrow.
+                        //layouter.brk(1,-1).print("==>").brk(1);
+                        
+                        printSemisequent(succ);
+                        if (finalbreak) {
+                            layouter.brk(0);
+                        }
+                        markEndSub();
+                        layouter.end();
+                    } catch (IOException e) {
+                        throw new RuntimeException (
+                                "IO Exception in pretty printer:\n"+e);
+                    } catch (UnbalancedBlocksException e) {
+                        throw new RuntimeException (
+                                "Unbalanced blocks in pretty printer:\n"+e);
+                    }
+                }
+            });
 
             setFilter(new ShowSelectedSequentPrintFilter(pos));
         }
