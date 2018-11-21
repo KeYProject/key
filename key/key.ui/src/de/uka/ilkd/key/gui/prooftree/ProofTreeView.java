@@ -761,7 +761,7 @@ public class ProofTreeView extends JPanel {
         }
 
         private void checkExploration(Node node, DefaultTreeCellRenderer renderer) {
-            if(node.getNodeInfo().isExploration()) {
+            if(node != null && node.getNodeInfo().isExploration()) {
                 renderer.setBorder(BorderFactory.createLineBorder(DARK_PURPLE_COLOR, 2, true));
                 renderer.setBackgroundNonSelectionColor(LIGHT_PURPLE_COLOR);
                 renderer.setToolTipText("Exploration Action Performed");
@@ -778,8 +778,6 @@ public class ProofTreeView extends JPanel {
                 int row,
                 boolean hasFocus) {
             super.getTreeCellRendererComponent(tree, node, selected, expanded, leaf, row, hasFocus);
-
-            setBackgroundNonSelectionColor(BISQUE_COLOR);
 
             if ( node.isClosed() ) {
                 // all goals below this node are closed
@@ -816,7 +814,8 @@ public class ProofTreeView extends JPanel {
                 }
             }
 
-            checkExploration(node.getNode(), this);
+            checkExploration(node.getNode().parent(), this);
+            setBackgroundNonSelectionColor(BISQUE_COLOR);
 
             return this;
         }

@@ -360,13 +360,15 @@ public abstract class ProofTreeViewFilter {
         public boolean showSubtree(Node node) {
             Proof proof = node.proof();
 
+            // Show subtrees with at least one automatic goal.
             for (Goal goal : proof.getSubtreeGoals(node)) {
                 if (goal.isAutomatic()) {
                     return true;
                 }
             }
 
-            return false;
+            // Also show closed subtrees.
+            return proof.getSubtreeGoals(node).isEmpty();
         }
     }
 }

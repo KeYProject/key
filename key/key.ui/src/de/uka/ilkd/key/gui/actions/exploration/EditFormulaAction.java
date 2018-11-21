@@ -55,7 +55,7 @@ public class EditFormulaAction extends ExplorationAction {
         Term term = pio.subTerm();
         SequentFormula sf = pio.sequentFormula();
         Goal g = getMediator().getSelectedGoal();
-        //g.node().getNodeInfo().setExploration(true);
+        g.node().getNodeInfo().setExploration(true);
 
         Term newTerm = promptForTerm(mainWindow, term);
 
@@ -76,7 +76,7 @@ public class EditFormulaAction extends ExplorationAction {
         //}
         ImmutableList<Goal> result = g.apply(app);
         result.forEach(goal -> {
-            goal.node().getNodeInfo().setExploration(true);
+            //goal.node().getNodeInfo().setExploration(true);
             goal.node().getNodeInfo().setExplorationAction("Edit " + term + " to " + newTerm);
             String s = goal.node().getNodeInfo().getBranchLabel();
             goal.node().getNodeInfo().setBranchLabel("ExplorationNode: " + s);
@@ -104,7 +104,7 @@ public class EditFormulaAction extends ExplorationAction {
 
             if (goal.node().getNodeInfo().getBranchLabel().contains(posToWeakening)) {
                 ImmutableList<Goal> apply = goal.apply(weakening);
-                //apply.forEach(goal1 -> goal1.node().getNodeInfo().setExploration(true));
+                goal.node().parent().getNodeInfo().setExploration(true);
             } else {
                 goal.setEnabled(false);
             }

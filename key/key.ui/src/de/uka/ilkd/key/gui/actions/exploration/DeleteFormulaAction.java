@@ -48,13 +48,14 @@ public class DeleteFormulaAction extends ExplorationAction {
         PosInOccurrence pio = posInSeq.getPosInOccurrence();
         Term term = pio.subTerm();
         Goal g = getMediator().getSelectedGoal();
+        g.node().getNodeInfo().setExploration(true);
 
         TacletApp app;
         //boolean isSoundMode = getMediator().getExplorationModeModel().getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.WHOLE_APP;
         app = soundWeakening(pio, term);
         ImmutableList<Goal> result = g.apply(app);
         result.forEach(goal -> {
-            goal.node().getNodeInfo().setExploration(true);
+            //goal.node().getNodeInfo().setExploration(true);
             goal.node().getNodeInfo().setExplorationAction("Hide "+term);
 
         });
