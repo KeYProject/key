@@ -36,17 +36,18 @@ public class OriginTermLabelUpdate implements TermLabelUpdate {
             JavaBlock newTermJavaBlock, Set<TermLabel> labels) {
         OriginTermLabel oldLabel = null;
         OriginTermLabel newLabel;
+        
+        System.out.println("applicationTerm " + applicationTerm);
+        System.out.println("tacletTerm      " + tacletTerm);
 
         Set<Origin> subtermOrigins = collectSubtermOrigins(newTermSubs, new HashSet<>());
 
         for (TermLabel label : labels) {
             if (label instanceof OriginTermLabel) {
-                if (oldLabel != null) {
-                    assert false;
-                }
-
                 oldLabel = (OriginTermLabel) label;
+                //break;
             }
+            System.out.println("\t" + label);
         }
 
         if (oldLabel != null) {
