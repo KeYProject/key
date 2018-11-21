@@ -103,7 +103,7 @@ public class JavaProfile extends AbstractProfile {
                 ImmutableSLList.<TermLabelPolicy>nil().append(new OriginTermLabelPolicy());
         ImmutableList<TermLabelRefactoring> originTermLabelRefactorings =
                 ImmutableSLList.<TermLabelRefactoring>nil().append(new OriginTermLabelRefactoring());
-        
+
         ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
         result = result.prepend(
             new TermLabelConfiguration(

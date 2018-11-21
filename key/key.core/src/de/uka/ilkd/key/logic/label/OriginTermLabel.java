@@ -19,12 +19,12 @@ import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
  * ({@link #getOrigin()}) as well as the origins of all of its subterms and former
  * subterms ({@link #getSubtermOrigins()}). </p>
  *
- * <p> For this to work correctly, you should call
+ * <p> For this to work correctly, you must call
  * {@link #collectSubtermOrigins(Term, TermBuilder)} for every top-level formula in your
  * original proof obligation. </p>
  *
  * <p> Before doing this, you can call {@link TermBuilder#addLabelToAllSubs(Term, TermLabel)}
- * for every term you have added to the orginal contract in your PO to add an {@link OriginTermLabel}
+ * for every term you have added to the original contract in your PO to add an {@link OriginTermLabel}
  * of your choosing. Terms for which you do not do this get a label of the form
  * {@code new OriginTermLabel(SpecType.NONE, null, -1)}. </p>
  *
@@ -116,7 +116,7 @@ public class OriginTermLabel implements TermLabel {
 
     @Override
     public String toString() {
-        return "" + NAME + "(" + origin + ")";
+        return "" + NAME + "(" + origin + ") (" + subtermOrigins + ")";
     }
 
     @Override

@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.rule.label;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
@@ -11,12 +8,13 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.Rule;;
 
 public class OriginTermLabelPolicy implements TermLabelPolicy {
 
@@ -26,30 +24,34 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
             Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs,
             ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock,
             ImmutableArray<TermLabel> newTermOriginalLabels, TermLabel label) {
-        //System.out.println("newTermOriginalLabels " + newTermOriginalLabels);
-        //System.out.println("label                 " + label);
-
         OriginTermLabel newLabel = (OriginTermLabel) label;
         OriginTermLabel oldLabel = null;
-        
+
         for (TermLabel l : newTermOriginalLabels) {
             if (l instanceof OriginTermLabel && l != newLabel) {
                 oldLabel = (OriginTermLabel) l;
+                break;
             }
         }
-        
+
+        OriginTermLabel result;
+
         if (oldLabel == null) {
-            return newLabel;
+            result = newLabel;
         } else {
-            Set<Origin> origins = new HashSet<>();
-            origins.add(newLabel.getOrigin());
-            origins.addAll(newLabel.getSubtermOrigins());
-            return new OriginTermLabel(
-                    oldLabel.getOrigin().specType,
-                    oldLabel.getOrigin().fileName,
-                    oldLabel.getOrigin().line,
-                    origins);
+            result = oldLabel;
         }
+
+        //TODO This is probably not correct, but it prevents the origin being lost in some cases
+        // (like for OneStepSimplification).
+        if (result.getSubtermOrigins().size() == 1
+                && result.getOrigin().specType == SpecType.NONE) {
+            Origin origin = result.getSubtermOrigins().iterator().next();
+
+            result = new OriginTermLabel(origin.specType, origin.fileName, origin.line,
+                    result.getSubtermOrigins());
+        }
+
+        return result;
     }
 }
-

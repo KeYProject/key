@@ -12,9 +12,9 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 
@@ -38,10 +38,6 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             List<TermLabel> labels) {
         OriginTermLabel oldLabel = null;
         OriginTermLabel newLabel;
-        
-        //System.out.println("applicationTerm " + applicationTerm);
-        //System.out.println("term            " + term);
-        //System.out.println("tacletTer       " + tacletTerm);
 
         Set<Origin> subtermOrigins = collectSubtermOrigins(term.subs(), new HashSet<>());
 
@@ -50,11 +46,11 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
                 oldLabel = (OriginTermLabel) label;
                 break;
             }
-            //System.out.println("\t" + label);
         }
 
         if (oldLabel != null) {
             labels.remove(oldLabel);
+
             newLabel = new OriginTermLabel(
                     oldLabel.getOrigin().specType,
                     oldLabel.getOrigin().fileName,
