@@ -3,17 +3,92 @@ package de.uka.ilkd.key.logic.label;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.logic.Name;
+import org.key_project.util.collection.ImmutableArray;
 
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
+
+/**
+ * <p> An {@link OriginTermLabel} saves a term's origin in the JML specification
+ * ({@link #getOrigin()}) as well as the origins of all of its subterms and former
+ * subterms ({@link #getSubtermOrigins()}). </p>
+ *
+ * <p> For this to work correctly, you should call
+ * {@link #collectSubtermOrigins(Term, TermBuilder)} for every top-level formula in your
+ * original proof obligation. </p>
+ *
+ * <p> Before doing this, you can call {@link TermBuilder#addLabelToAllSubs(Term, TermLabel)}
+ * for every term you have added to the orginal contract in your PO to add an {@link OriginTermLabel}
+ * of your choosing. Terms for which you do not do this get a label of the form
+ * {@code new OriginTermLabel(SpecType.NONE, null, -1)}. </p>
+ *
+ * @author lanzinger
+ */
 public class OriginTermLabel implements TermLabel {
 
     public final static Name NAME = new Name("Origin");
 
     private Origin origin;
     private Set<Origin> subtermOrigins;
+
+    /**
+     * This method transforms a term in such a way that
+     *
+     * <ol>
+     *  <li> every sub-term of has a {@link OriginTermLabel}
+     *      (sub-terms that did not have one previously get a label with
+     *      SpecType {@link SpecType#NONE}). </li>
+     *  <li> every {@link OriginTermLabel} contains all of the correct
+     *      {@link #getSubtermOrigins()}. </li>
+     * </ol>
+     *
+     * @param term the term to transform.
+     * @param tb the term builder to use for the transformation.
+     * @return the transformed term.
+     */
+    public static Term collectSubtermOrigins(Term term, TermBuilder tb) {
+        ImmutableArray<Term> oldSubs = term.subs();
+        Term[] newSubs = new Term[oldSubs.size()];
+        Set<Origin> origins = new HashSet<>();
+
+        for (int i = 0; i < newSubs.length; ++i) {
+            newSubs[i] = collectSubtermOrigins(oldSubs.get(i), tb);
+            OriginTermLabel subLabel = (OriginTermLabel) newSubs[i].getLabel(NAME);
+            origins.add(subLabel.getOrigin());
+            origins.addAll(subLabel.getSubtermOrigins());
+        }
+
+        List<TermLabel> labels = term.getLabels().toList();
+        OriginTermLabel oldLabel = (OriginTermLabel) term.getLabel(NAME);
+
+        if (oldLabel != null) {
+            labels.remove(oldLabel);
+            labels.add(new OriginTermLabel(
+                    oldLabel.getOrigin().specType,
+                    oldLabel.getOrigin().fileName,
+                    oldLabel.getOrigin().line,
+                    origins));
+        } else {
+            labels.add(new OriginTermLabel(
+                    SpecType.NONE,
+                    null,
+                    -1,
+                    origins));
+        }
+
+        return tb.tf().createTerm(
+                term.op(),
+                newSubs,
+                term.boundVars(),
+                term.javaBlock(),
+                new ImmutableArray<>(labels));
+    }
 
     public OriginTermLabel(SpecType specType, String file, int line, Set<Origin> subtermOrigins) {
         this(specType, file, line);
@@ -74,6 +149,10 @@ public class OriginTermLabel implements TermLabel {
     }
 
     /**
+     * <p> Returns the origins of the term's sub-terms and former sub-terms. </p>
+     *
+     * <p> Note that you need to have called {@link #collectSubtermOrigins(Term, TermBuilder)}
+     * for this method to work correctly. </p>
      *
      * @return the origins of the term's sub-terms and former sub-terms.
      * @see OriginTermLabelRefactoring
@@ -97,7 +176,7 @@ public class OriginTermLabel implements TermLabel {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(specType.toString());
-            
+
             if (fileName != null) {
                 sb.append(" @ ");
                 sb.append(fileName);
@@ -106,7 +185,7 @@ public class OriginTermLabel implements TermLabel {
             } else if (specType != SpecType.NONE) {
                 sb.append(" (implicit)");
             }
-            
+
             return sb.toString();
         }
 

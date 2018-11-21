@@ -260,6 +260,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             frameTerm = tb.and(frameTerm, ft);
           }
        }
+
        return frameTerm;
     }
 
