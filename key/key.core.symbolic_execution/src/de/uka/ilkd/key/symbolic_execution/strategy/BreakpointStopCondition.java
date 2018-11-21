@@ -18,12 +18,12 @@ import java.util.Iterator;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.GoalChooser;
+import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
@@ -59,7 +59,7 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
     * {@inheritDoc}
     */
    @Override
-   public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
+   public int getMaximalWork(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser) {
       breakpointHit = false;
       return 0;
    }
@@ -68,7 +68,7 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
     * {@inheritDoc}
     */
    @Override
-   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
       for (IBreakpoint breakpoint : breakpoints) {
          breakpoint.updateState(maxApplications, timeout, proof, goalChooser, startTime, countApplied, goal);
       }
@@ -86,7 +86,7 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
     * {@inheritDoc}
     */
    @Override
-   public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+   public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
       return "Breakpoint hit!";
    }
 
@@ -94,7 +94,7 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
     * {@inheritDoc}
     */
    @Override
-   public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+   public boolean shouldStop(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
       return false;
    }
 
@@ -120,7 +120,7 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
     * {@inheritDoc}
     */
    @Override
-   public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+   public String getStopMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
       return "Breakpoint hit!";
    }
    

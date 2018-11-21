@@ -17,17 +17,17 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
-import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.GoalChooser;
+import de.uka.ilkd.key.prover.StopCondition;
+import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Provides the basic functionality for {@link IStopCondition}s which stops
+ * Provides the basic functionality for {@link StopCondition}s which stops
  * the auto mode when the call stack size of the starting set node has
  * a special difference to the call stack size of the current set node, e.g.
  * "step over" or "step return".
@@ -35,7 +35,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * @see StepOverSymbolicExecutionTreeNodesStopCondition
  * @see StepReturnSymbolicExecutionTreeNodesStopCondition
  */
-public abstract class AbstractCallStackBasedStopCondition implements IStopCondition {
+public abstract class AbstractCallStackBasedStopCondition implements StopCondition {
    /**
     * Maps a {@link Goal} to the initial call stack size at which the auto mode was started.
     */
@@ -48,7 +48,7 @@ public abstract class AbstractCallStackBasedStopCondition implements IStopCondit
    public int getMaximalWork(int maxApplications, 
                              long timeout, 
                              Proof proof, 
-                             IGoalChooser goalChooser) {
+                             GoalChooser goalChooser) {
       startingCallStackSizePerGoal.clear(); // Reset initial call stack size of all goals. Will be filled in isGoalAllowed.
       return 0; // Return unknown because there is no relation between applied rules and step over functionality.
    }
@@ -60,7 +60,7 @@ public abstract class AbstractCallStackBasedStopCondition implements IStopCondit
    public boolean isGoalAllowed(int maxApplications, 
                                 long timeout, 
                                 Proof proof, 
-                                IGoalChooser goalChooser, 
+                                GoalChooser goalChooser, 
                                 long startTime, 
                                 int countApplied, 
                                 Goal goal) {
@@ -130,7 +130,7 @@ public abstract class AbstractCallStackBasedStopCondition implements IStopCondit
    public boolean shouldStop(int maxApplications, 
                              long timeout, 
                              Proof proof, 
-                             IGoalChooser goalChooser, 
+                             GoalChooser goalChooser, 
                              long startTime, 
                              int countApplied, 
                              SingleRuleApplicationInfo singleRuleApplicationInfo) {
@@ -170,7 +170,7 @@ public abstract class AbstractCallStackBasedStopCondition implements IStopCondit
    public String getStopMessage(int maxApplications, 
                                 long timeout, 
                                 Proof proof, 
-                                IGoalChooser goalChooser, 
+                                GoalChooser goalChooser, 
                                 long startTime, 
                                 int countApplied, 
                                 SingleRuleApplicationInfo singleRuleApplicationInfo) {

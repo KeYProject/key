@@ -11,8 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof;
-
+package de.uka.ilkd.key.prover;
 
 /**
  * Listener for longer tasks, which may be run in a separate worker thread.

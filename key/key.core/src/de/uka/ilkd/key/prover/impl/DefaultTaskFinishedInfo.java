@@ -14,8 +14,10 @@
 /**
  * 
  */
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.prover.impl;
 
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.TaskFinishedInfo;
 
 public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
 

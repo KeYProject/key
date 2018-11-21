@@ -18,53 +18,53 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.proof.ApplyStrategy;
-import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
-import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.GoalChooser;
+import de.uka.ilkd.key.prover.StopCondition;
+import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 
 /**
- * This {@link IStopCondition} contains other {@link IStopCondition} as
+ * This {@link StopCondition} contains other {@link StopCondition} as
  * children and stops the auto mode if at least on of its children force it.
  * @author Martin Hentschel
  */
-public class CompoundStopCondition implements IStopCondition {
+public class CompoundStopCondition implements StopCondition {
    /**
-    * The child {@link IStopCondition}s to use.
+    * The child {@link StopCondition}s to use.
     */
-   private List<IStopCondition> children = new LinkedList<ApplyStrategy.IStopCondition>();
+   private List<StopCondition> children = new LinkedList<StopCondition>();
    
    /**
-    * The last {@link IStopCondition} treated in {@link #isGoalAllowed(ApplyStrategy, int, long, Proof, IGoalChooser, long, int, Goal)}
-    * which will provide the reason via {@link #getGoalNotAllowedMessage(ApplyStrategy, int, long, Proof, IGoalChooser, long, int, Goal)}.
+    * The last {@link StopCondition} treated in {@link #isGoalAllowed(ApplyStrategy, int, long, Proof, GoalChooser, long, int, Goal)}
+    * which will provide the reason via {@link #getGoalNotAllowedMessage(ApplyStrategy, int, long, Proof, GoalChooser, long, int, Goal)}.
     */
-   private IStopCondition lastGoalAllowedChild;
+   private StopCondition lastGoalAllowedChild;
    
    /**
-    * The last {@link IStopCondition} treated in {@link #shouldStop(ApplyStrategy, int, long, Proof, IGoalChooser, long, int, SingleRuleApplicationInfo)}
-    * which will provide the reason via {@link #getStopMessage(ApplyStrategy, int, long, Proof, IGoalChooser, long, int, SingleRuleApplicationInfo)}.
+    * The last {@link StopCondition} treated in {@link #shouldStop(ApplyStrategy, int, long, Proof, GoalChooser, long, int, SingleRuleApplicationInfo)}
+    * which will provide the reason via {@link #getStopMessage(ApplyStrategy, int, long, Proof, GoalChooser, long, int, SingleRuleApplicationInfo)}.
     */
-   private IStopCondition lastShouldStopChild;
+   private StopCondition lastShouldStopChild;
 
    /**
     * Constructor.
-    * @param children The child {@link IStopCondition}s to use.
+    * @param children The child {@link StopCondition}s to use.
     */
-   public CompoundStopCondition(IStopCondition... children) {
+   public CompoundStopCondition(StopCondition... children) {
       Collections.addAll(this.children, children);
    }
    
    /**
-    * Adds new child {@link IStopCondition}s.
-    * @param children The child {@link IStopCondition}s to use.
+    * Adds new child {@link StopCondition}s.
+    * @param children The child {@link StopCondition}s to use.
     */
-   public void addChildren(IStopCondition... children) {
+   public void addChildren(StopCondition... children) {
       Collections.addAll(this.children, children);
    }
    
-   public void removeChild(IStopCondition child){
+   public void removeChild(StopCondition child){
       children.remove(child);
    }
 
@@ -75,9 +75,9 @@ public class CompoundStopCondition implements IStopCondition {
    public int getMaximalWork(int maxApplications, 
                              long timeout, 
                              Proof proof, 
-                             IGoalChooser goalChooser) {
+                             GoalChooser goalChooser) {
       // Get maximal work on each child because they might use this method for initialization purpose.
-      for (IStopCondition child : children) {
+      for (StopCondition child : children) {
          child.getMaximalWork(maxApplications, timeout, proof, goalChooser);
       }
       lastGoalAllowedChild = null;
@@ -92,12 +92,12 @@ public class CompoundStopCondition implements IStopCondition {
    public boolean isGoalAllowed(int maxApplications, 
                                 long timeout, 
                                 Proof proof, 
-                                IGoalChooser goalChooser, 
+                                GoalChooser goalChooser, 
                                 long startTime, 
                                 int countApplied, 
                                 Goal goal) {
       boolean allowed = true;
-      Iterator<IStopCondition> childIter = children.iterator();
+      Iterator<StopCondition> childIter = children.iterator();
       while (allowed && childIter.hasNext()) {
          lastGoalAllowedChild = childIter.next();
          allowed = lastGoalAllowedChild.isGoalAllowed(maxApplications, timeout, proof, goalChooser, startTime, countApplied, goal);
@@ -112,7 +112,7 @@ public class CompoundStopCondition implements IStopCondition {
    public String getGoalNotAllowedMessage(int maxApplications, 
                                           long timeout, 
                                           Proof proof, 
-                                          IGoalChooser goalChooser, 
+                                          GoalChooser goalChooser, 
                                           long startTime, 
                                           int countApplied, 
                                           Goal goal) {
@@ -128,12 +128,12 @@ public class CompoundStopCondition implements IStopCondition {
    public boolean shouldStop(int maxApplications, 
                              long timeout, 
                              Proof proof, 
-                             IGoalChooser goalChooser, 
+                             GoalChooser goalChooser, 
                              long startTime, 
                              int countApplied, 
                              SingleRuleApplicationInfo singleRuleApplicationInfo) {
       boolean stop = false;
-      Iterator<IStopCondition> childIter = children.iterator();
+      Iterator<StopCondition> childIter = children.iterator();
       while (!stop && childIter.hasNext()) {
          lastShouldStopChild = childIter.next();
          stop = lastShouldStopChild.shouldStop(maxApplications, timeout, proof, goalChooser, startTime, countApplied, singleRuleApplicationInfo);
@@ -148,7 +148,7 @@ public class CompoundStopCondition implements IStopCondition {
    public String getStopMessage(int maxApplications, 
                                 long timeout, 
                                 Proof proof, 
-                                IGoalChooser goalChooser, 
+                                GoalChooser goalChooser, 
                                 long startTime, 
                                 int countApplied, 
                                 SingleRuleApplicationInfo singleRuleApplicationInfo) {
@@ -157,7 +157,7 @@ public class CompoundStopCondition implements IStopCondition {
              null;
    }
 
-   public List<IStopCondition> getChildren() {
+   public List<StopCondition> getChildren() {
       return children;
    }
 }

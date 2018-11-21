@@ -24,10 +24,10 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -96,7 +96,7 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
    public void updateState(int maxApplications, 
                           long timeout, 
                           Proof proof, 
-                          IGoalChooser goalChooser, 
+                          GoalChooser goalChooser, 
                           long startTime, 
                           int countApplied, 
                           Goal goal) {

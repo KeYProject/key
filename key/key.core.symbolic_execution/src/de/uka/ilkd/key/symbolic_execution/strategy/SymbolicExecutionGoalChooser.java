@@ -19,18 +19,18 @@ import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
-import de.uka.ilkd.key.proof.DepthFirstGoalChooser;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.GoalChooser;
+import de.uka.ilkd.key.prover.StopCondition;
+import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooser;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * <p>
- * This {@link IGoalChooser} is a special implementation of the default
+ * This {@link GoalChooser} is a special implementation of the default
  * {@link DepthFirstGoalChooser}. The difference is that a rule which
  * creates a new symbolic execution tree node on a {@link Goal} is only applied
  * if all other {@link Goal}s will also creates new symbolic execution tree
@@ -39,14 +39,14 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * </p>
  * <p>
  * The order in which new symbolic execution tree nodes are created is also
- * managed by this {@link IGoalChooser}. The idea is that on each {@link Goal}
+ * managed by this {@link GoalChooser}. The idea is that on each {@link Goal}
  * a new symbolic execution tree node is created before on one {@link Goal}
  * a second one will be created. This has the affect that for instance on all 
  * branches of a branch statement the next statement is evaluated before the first  
  * branch executes the second statement.
  * </p>
  * <p>
- * A second criteria is the used custom {@link IStopCondition} of the current
+ * A second criteria is the used custom {@link StopCondition} of the current
  * {@link Proof}. {@link Goal}s on that the next set node is allowed are
  * preferred to branches on which is not allowed. This is required to make
  * sure that for instance a step over or step return result is completely
@@ -72,7 +72,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
    /**
     * The optional custom stop condition used in the current proof.
     */
-   private IStopCondition stopCondition;
+   private StopCondition stopCondition;
    
    /**
     * {@inheritDoc}

@@ -11,24 +11,20 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof;
-
+package de.uka.ilkd.key.prover;
 
 /**
- * An information object with additional information about the 
- * finished task.
+ * interface to be implemented by builders returning a 
+ * goal chooser
  */
-public interface TaskFinishedInfo {
-    Object getSource();
+public interface GoalChooserBuilder {
 
-    Object getResult();
+    /** returns a new goal chooser */
+    GoalChooser create();
 
-    long getTime();
+    /** returns a clone of this goal chooser */
+    GoalChooserBuilder copy();
     
-    int getAppliedRules();
-
-    int getClosedGoals();
-
-    Proof getProof();
-    
+    /** returns the name of the goal chooser */
+    String name();
 }

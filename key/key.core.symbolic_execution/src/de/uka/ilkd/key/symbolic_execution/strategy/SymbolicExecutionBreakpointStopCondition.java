@@ -19,10 +19,10 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
@@ -57,7 +57,7 @@ public class SymbolicExecutionBreakpointStopCondition extends ExecutedSymbolicEx
    public int getMaximalWork(int maxApplications, 
                              long timeout, 
                              Proof proof, 
-                             IGoalChooser goalChooser) {
+                             GoalChooser goalChooser) {
       setMaximalNumberOfSetNodesToExecutePerGoal(Integer.MAX_VALUE);
       return super.getMaximalWork(maxApplications, timeout, proof, goalChooser);
    }
@@ -66,7 +66,7 @@ public class SymbolicExecutionBreakpointStopCondition extends ExecutedSymbolicEx
     * {@inheritDoc}
     */
    @Override
-   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
       for (IBreakpoint breakpoint : breakpoints) {
          breakpoint.updateState(maxApplications, timeout, proof, goalChooser, startTime, countApplied, goal);
       }
@@ -80,7 +80,7 @@ public class SymbolicExecutionBreakpointStopCondition extends ExecutedSymbolicEx
    protected void handleNodeLimitNotExceeded(int maxApplications, 
                                              long timeout, 
                                              Proof proof, 
-                                             IGoalChooser goalChooser, 
+                                             GoalChooser goalChooser, 
                                              long startTime, 
                                              int countApplied, 
                                              Goal goal,

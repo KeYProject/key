@@ -17,14 +17,14 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProverTaskListener;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
-import de.uka.ilkd.key.proof.TaskStartedInfo;
-import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
+import de.uka.ilkd.key.prover.ProverTaskListener;
+import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
+import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 /**
  * The interface ProofMacro is the entry point to a general strategy extension

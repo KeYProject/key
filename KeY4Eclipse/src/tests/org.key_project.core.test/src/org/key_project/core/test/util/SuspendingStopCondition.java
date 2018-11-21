@@ -15,17 +15,17 @@ package org.key_project.core.test.util;
 
 import org.key_project.util.test.util.TestUtilsUtil;
 
-import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
-import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.GoalChooser;
+import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
+import de.uka.ilkd.key.prover.StopCondition;
 
 /**
  * This {@link IStopCondition} can be used to block the the auto mode temporary.
  * @author Martin Hentschel
  */
-public class SuspendingStopCondition implements IStopCondition {
+public class SuspendingStopCondition implements StopCondition {
    /**
     * {@code true} block the current {@link Thread}, {@code false} do not block current {@link Thread}.
     */
@@ -64,7 +64,7 @@ public class SuspendingStopCondition implements IStopCondition {
     * {@inheritDoc}
     */
    @Override
-   public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
+   public int getMaximalWork(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser) {
       return 0;
    }
 
@@ -72,7 +72,7 @@ public class SuspendingStopCondition implements IStopCondition {
     * {@inheritDoc}
     */
    @Override
-   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
       if (sleep) {
          TestUtilsUtil.sleep(sleepTime);
       }
@@ -83,7 +83,7 @@ public class SuspendingStopCondition implements IStopCondition {
     * {@inheritDoc}
     */
    @Override
-   public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+   public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
       return null;
    }
 
@@ -91,7 +91,7 @@ public class SuspendingStopCondition implements IStopCondition {
     * {@inheritDoc}
     */
    @Override
-   public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+   public boolean shouldStop(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
       if (sleep) {
          TestUtilsUtil.sleep(sleepTime);
       }
@@ -102,7 +102,7 @@ public class SuspendingStopCondition implements IStopCondition {
     * {@inheritDoc}
     */
    @Override
-   public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+   public String getStopMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
       return null;
    }
 

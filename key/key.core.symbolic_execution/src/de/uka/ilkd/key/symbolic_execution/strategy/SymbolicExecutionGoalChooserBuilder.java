@@ -13,11 +13,11 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import de.uka.ilkd.key.proof.GoalChooserBuilder;
-import de.uka.ilkd.key.proof.IGoalChooser;
+import de.uka.ilkd.key.prover.GoalChooserBuilder;
+import de.uka.ilkd.key.prover.GoalChooser;
 
 /**
- * This {@link GoalChooserBuilder} creates a special {@link IGoalChooser}
+ * This {@link GoalChooserBuilder} creates a special {@link GoalChooser}
  * for symbolic execution.
  * @author Martin Hentschel
  * @see SymbolicExecutionGoalChooser
@@ -32,7 +32,7 @@ public class SymbolicExecutionGoalChooserBuilder implements GoalChooserBuilder {
     * {@inheritDoc}
     */
    @Override
-   public IGoalChooser create() {
+   public GoalChooser create() {
       return new SymbolicExecutionGoalChooser();
    }
 

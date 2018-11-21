@@ -11,15 +11,19 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.prover;
 
 import org.key_project.util.collection.ImmutableList;
+
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Interface to be implemented by classes in order to customize the goal selection
  * strategy of the automatic prover environment.
  */
-public interface IGoalChooser {
+public interface GoalChooser {
 
     /**
      * Initialise this DefaultGoalChooser for use with a given Proof and a list of goals.
