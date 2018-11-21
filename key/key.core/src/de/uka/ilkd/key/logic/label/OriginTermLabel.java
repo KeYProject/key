@@ -4,6 +4,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.Name;
 
@@ -17,20 +18,25 @@ public class OriginTermLabel implements TermLabel {
     public OriginTermLabel(SpecType specType, String file, int line, Set<Origin> subtermOrigins) {
         this(specType, file, line);
         this.subtermOrigins.addAll(subtermOrigins);
+        this.subtermOrigins = this.subtermOrigins.stream()
+                .filter(o -> o.specType != SpecType.NONE).collect(Collectors.toSet());
     }
 
     public OriginTermLabel(SpecType specType, String file, int line) {
-        String filename = Paths.get(file).getFileName().toString();
+        String filename = file == null || file.equals("no file")
+                ? null
+                : Paths.get(file).getFileName().toString();
 
         this.origin = new Origin(specType, filename, line);
         this.subtermOrigins = new HashSet<>();
-        this.subtermOrigins.add(origin);
     }
 
     public OriginTermLabel(Set<Origin> subtermOrigins) {
-        this.origin = new Origin(SpecType.NONE, "no file", -1);
+        this.origin = new Origin(SpecType.NONE, null, -1);
         this.subtermOrigins = new HashSet<>();
-        subtermOrigins.add(origin);
+        this.subtermOrigins.addAll(subtermOrigins);
+        this.subtermOrigins = this.subtermOrigins.stream()
+                .filter(o -> o.specType != SpecType.NONE).collect(Collectors.toSet());
     }
 
     @Override
@@ -90,7 +96,18 @@ public class OriginTermLabel implements TermLabel {
 
         @Override
         public String toString() {
-            return "(" + specType + ", (" + fileName + ", " + line + "))";
+            StringBuilder sb = new StringBuilder(specType.toString());
+            
+            if (fileName != null) {
+                sb.append(" @ ");
+                sb.append(fileName);
+                sb.append(", line ");
+                sb.append(line);
+            } else if (specType != SpecType.NONE) {
+                sb.append(" (implicit)");
+            }
+            
+            return sb.toString();
         }
 
         @Override
