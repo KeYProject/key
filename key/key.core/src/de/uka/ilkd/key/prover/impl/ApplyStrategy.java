@@ -87,10 +87,10 @@ public class ApplyStrategy extends AbstractProverCore {
         Goal                  g;
         while ( ( g = goalChooser.getNextGoal () ) != null ) {
             if (!stopCondition.isGoalAllowed(maxApplications, timeout, proof,
-                                             goalChooser, time, countApplied, g)) {
+                                             time, countApplied, g)) {
                return new SingleRuleApplicationInfo(
                        stopCondition.getGoalNotAllowedMessage(maxApplications, timeout, proof,
-                                                              goalChooser, time, countApplied, g),
+                                                              time, countApplied, g),
                        g, null);
             }
             app = g.getRuleAppManager().next();
@@ -134,7 +134,7 @@ public class ApplyStrategy extends AbstractProverCore {
         try{
             Debug.out("Strategy started.");
             boolean shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof,
-                                                          goalChooser, time, countApplied, srInfo);
+                                                          time, countApplied, srInfo);
 
             while (!shouldStop) {
                 srInfo = applyAutomaticRule(goalChooser, stopCondition, stopAtFirstNonCloseableGoal);
@@ -148,13 +148,13 @@ public class ApplyStrategy extends AbstractProverCore {
                 if (Thread.interrupted()) {
                     throw new InterruptedException();
                 }
-                shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof, goalChooser,
-                                                      time, countApplied, srInfo);
+                shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof, time,
+                                                      countApplied, srInfo);
             }
             if (shouldStop) {
                 return new ApplyStrategyInfo(
-                        stopCondition.getStopMessage(maxApplications, timeout, proof, goalChooser,
-                                                     time, countApplied, srInfo),
+                        stopCondition.getStopMessage(maxApplications, timeout, proof, time,
+                                                     countApplied, srInfo),
                         proof, null, (Goal) null, System.currentTimeMillis()-time,
                         countApplied, closedGoals);
             }
@@ -190,7 +190,7 @@ public class ApplyStrategy extends AbstractProverCore {
         assert goalChooser != null;
         goalChooser.init ( newProof, goals );
         setAutoModeActive(true);
-        fireTaskStarted (stopCondition.getMaximalWork(maxSteps, timeout, newProof, goalChooser));
+        fireTaskStarted (stopCondition.getMaximalWork(maxSteps, timeout, newProof));
     }
 
     /* (non-Javadoc)
@@ -291,14 +291,14 @@ public class ApplyStrategy extends AbstractProverCore {
             if (!isAutoModeActive()) {
                 return;
             }
-            RuleAppInfo rai = e.getRuleAppInfo();
+            RuleAppInfo rai = e.getRuleAppInfo ();
             if (rai == null) {
                 return;
             }
 
             final GoalChooser goalChooser = getGoalChooserForProof(rai.getOriginalNode().proof());
 
-            synchronized (goalChooser) {
+            synchronized ( goalChooser ) {
                 goalChooser.updateGoalList(rai.getOriginalNode (), e.getNewGoals().reverse()); // reverse just to keep old order
             }
         }
@@ -319,7 +319,7 @@ public class ApplyStrategy extends AbstractProverCore {
 	public void clear(){
         final GoalChooser goalChooser = getGoalChooserForProof(proof);
         proof = null;
-        if(goalChooser != null) {
+        if(goalChooser != null){
             goalChooser.init(null, ImmutableSLList.<Goal>nil());
         }
     }

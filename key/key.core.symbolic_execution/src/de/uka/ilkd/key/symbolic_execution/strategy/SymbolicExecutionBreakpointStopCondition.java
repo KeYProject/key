@@ -22,7 +22,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
@@ -56,21 +55,20 @@ public class SymbolicExecutionBreakpointStopCondition extends ExecutedSymbolicEx
    @Override
    public int getMaximalWork(int maxApplications, 
                              long timeout, 
-                             Proof proof, 
-                             GoalChooser goalChooser) {
+                             Proof proof) {
       setMaximalNumberOfSetNodesToExecutePerGoal(Integer.MAX_VALUE);
-      return super.getMaximalWork(maxApplications, timeout, proof, goalChooser);
+      return super.getMaximalWork(maxApplications, timeout, proof);
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, Goal goal) {
       for (IBreakpoint breakpoint : breakpoints) {
-         breakpoint.updateState(maxApplications, timeout, proof, goalChooser, startTime, countApplied, goal);
+         breakpoint.updateState(maxApplications, timeout, proof, startTime, countApplied, goal);
       }
-      return super.isGoalAllowed(maxApplications, timeout, proof, goalChooser, startTime, countApplied, goal);
+      return super.isGoalAllowed(maxApplications, timeout, proof, startTime, countApplied, goal);
    }
 
    /**
@@ -80,14 +78,13 @@ public class SymbolicExecutionBreakpointStopCondition extends ExecutedSymbolicEx
    protected void handleNodeLimitNotExceeded(int maxApplications, 
                                              long timeout, 
                                              Proof proof, 
-                                             GoalChooser goalChooser, 
                                              long startTime, 
                                              int countApplied, 
-                                             Goal goal,
+                                             Goal goal, 
                                              Node node,
                                              RuleApp ruleApp,
                                              Integer executedNumberOfSetNodes) {
-      super.handleNodeLimitNotExceeded(maxApplications, timeout, proof, goalChooser, startTime, countApplied, goal, node, ruleApp, executedNumberOfSetNodes);
+      super.handleNodeLimitNotExceeded(maxApplications, timeout, proof, startTime, countApplied, goal, node, ruleApp, executedNumberOfSetNodes);
       SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
       if (isBreakpointHit(activeStatement, ruleApp, proof, node)) {
          setMaximalNumberOfSetNodesToExecutePerGoal(executedNumberOfSetNodes.intValue());

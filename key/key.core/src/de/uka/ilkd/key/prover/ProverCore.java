@@ -9,7 +9,9 @@ import de.uka.ilkd.key.settings.StrategySettings;
 
 public interface ProverCore {
 
-	ApplyStrategyInfo start(Proof proof, Goal goal);
+	String PROCESSING_STRATEGY = "Processing Strategy";
+
+    ApplyStrategyInfo start(Proof proof, Goal goal);
 
 	ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals);
 

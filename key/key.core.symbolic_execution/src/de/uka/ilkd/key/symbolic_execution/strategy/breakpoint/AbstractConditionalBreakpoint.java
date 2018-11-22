@@ -53,7 +53,6 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -146,11 +145,10 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
    public void updateState(int maxApplications, 
                           long timeout, 
                           Proof proof, 
-                          GoalChooser goalChooser, 
                           long startTime, 
                           int countApplied, 
                           Goal goal) {
-      super.updateState(maxApplications, timeout, proof, goalChooser, startTime, countApplied, goal);
+      super.updateState(maxApplications, timeout, proof, startTime, countApplied, goal);
       if (goal != null) {
          Node node = goal.node();
          RuleApp ruleApp = goal.getRuleAppManager().peekNext();
