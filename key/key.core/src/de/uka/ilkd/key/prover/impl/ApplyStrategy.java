@@ -39,10 +39,14 @@ import de.uka.ilkd.key.util.Debug;
 
 /**
  * Applies rules in an automated fashion.
- * The caller should ensure that the strategy runs in its one thread
+ * The caller should ensure that the strategy runs in its own thread
+ * @author Richard Bubel
  */
 public class ApplyStrategy extends AbstractProverCore {
-    /** the proof that is worked with */
+
+    /**
+     * the proof that is worked with
+     */
     private Proof proof;
     /** the maximum of allowed rule applications */
     private int maxApplications;
@@ -57,15 +61,15 @@ public class ApplyStrategy extends AbstractProverCore {
 
     /** time in ms after which rule application shall be aborted, -1 disables timeout */
     private long timeout = -1;
-
-    private boolean stopAtFirstNonCloseableGoal;
-
+    /** true if the prover should stop as soon as a non closable goal is detected */
+    private boolean stopAtFirstNonClosableGoal;
+    /** the number of (so far) closed goal by the current running strategy */
     private int closedGoals;
-
+    /** indicates whether the prover has been interrupted and should stop */
     private boolean cancelled;
-
+    /** a configurable condition indicating that the prover has to stop, */
     private StopCondition stopCondition;
-
+    /** the goal choose picks the next goal to work on*/
     private GoalChooser goalChooser;
 
     // Please create this object beforehand and re-use it.
@@ -137,7 +141,7 @@ public class ApplyStrategy extends AbstractProverCore {
                                                           time, countApplied, srInfo);
 
             while (!shouldStop) {
-                srInfo = applyAutomaticRule(goalChooser, stopCondition, stopAtFirstNonCloseableGoal);
+                srInfo = applyAutomaticRule(goalChooser, stopCondition, stopAtFirstNonClosableGoal);
                 if (!srInfo.isSuccess()) {
                     return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(),
                                                  System.currentTimeMillis()-time, countApplied,
@@ -239,7 +243,7 @@ public class ApplyStrategy extends AbstractProverCore {
                                                 boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
 
-        this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal;
+        this.stopAtFirstNonClosableGoal = stopAtFirstNonCloseableGoal;
 
         init(proof, goals, maxSteps, timeout);
         ApplyStrategyInfo result = executeStrategy();
@@ -297,9 +301,9 @@ public class ApplyStrategy extends AbstractProverCore {
             }
 
             final GoalChooser goalChooser = getGoalChooserForProof(rai.getOriginalNode().proof());
-
-            synchronized ( goalChooser ) {
-                goalChooser.updateGoalList(rai.getOriginalNode (), e.getNewGoals().reverse()); // reverse just to keep old order
+            synchronized (goalChooser) {
+                // reverse just to keep old order
+                goalChooser.updateGoalList(rai.getOriginalNode (), e.getNewGoals().reverse());
             }
         }
     }
@@ -319,7 +323,7 @@ public class ApplyStrategy extends AbstractProverCore {
 	public void clear(){
         final GoalChooser goalChooser = getGoalChooserForProof(proof);
         proof = null;
-        if(goalChooser != null){
+        if(goalChooser != null) {
             goalChooser.init(null, ImmutableSLList.<Goal>nil());
         }
     }

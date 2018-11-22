@@ -1259,8 +1259,6 @@ public class Proof implements Named {
        ProofSaver saver = new ProofSaver(this, file);
        saver.save();
     }
-    
-  
 
    public StrategyFactory getActiveStrategyFactory() {
       Name activeStrategyName = getActiveStrategy() != null ? getActiveStrategy().name() : null;

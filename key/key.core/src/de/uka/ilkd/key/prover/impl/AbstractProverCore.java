@@ -8,14 +8,18 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 
+/**
+ * Common class for provers which takes care of listener registration and task event propagation
+ * @author Richard Bubel
+ */
 public abstract class AbstractProverCore implements ProverCore {
 
     /** number of rules automatically applied */
     protected int countApplied = 0;
-    
+
     /**
      * We use an immutable list to store listeners to allow for
-     * addition/removal within listener code without causing a deadlock 
+     * addition/removal within listener code without causing a deadlock
      */
     private ImmutableList<ProverTaskListener> proverTaskObservers = ImmutableSLList.nil();
 
@@ -26,9 +30,10 @@ public abstract class AbstractProverCore implements ProverCore {
      */
     protected void fireTaskStarted(int maxSteps) {
         // no need to synchronize here as we use immutable list and hence
-        // the add/remove task observer methods won't interfere        
-        for (ProverTaskListener ptl : proverTaskObservers) {
-            ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Strategy, PROCESSING_STRATEGY, maxSteps));
+        // the add/remove task observer methods won't interfere
+        for (final ProverTaskListener ptl : proverTaskObservers) {
+            ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Strategy,
+                    PROCESSING_STRATEGY, maxSteps));
         }
     }
 
@@ -37,21 +42,21 @@ public abstract class AbstractProverCore implements ProverCore {
      */
     protected void fireTaskProgress() {
         // no need to synchronize here as we use immutable list and hence
-        // the add/remove task observer methods won't interfere        
-        for (ProverTaskListener ptl : proverTaskObservers) {
+        // the add/remove task observer methods won't interfere
+        for (final ProverTaskListener ptl : proverTaskObservers) {
             ptl.taskProgress(countApplied);
         }
     }
 
     /**
      * propagation method for the event that a task has finished
-     * @param info an information object about the work done by the task e.g. 
+     * @param info an information object about the work done by the task e.g.
      *  number of applied rules
      */
     protected void fireTaskFinished(TaskFinishedInfo info) {
         // no need to synchronize here as we use immutable list and hence
-        // the add/remove task observer methods won't interfere        
-        for (ProverTaskListener ptl : proverTaskObservers) {
+        // the add/remove task observer methods won't interfere
+        for (final ProverTaskListener ptl : proverTaskObservers) {
             ptl.taskFinished(info);
         }
     }
