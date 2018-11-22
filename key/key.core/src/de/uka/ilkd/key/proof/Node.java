@@ -560,17 +560,22 @@ public class Node  {
 
             RuleApp rap = getAppliedRuleApp();
             if (rap == null) {
-                Goal goal = proof().getGoal(this);
-                if ( goal == null || this.isClosed() )
+                Goal goal = proof().getGoal(this);                
+                if ( this.isClosed() )
                     return CLOSED_GOAL; // don't cache this
-                else if(goal.isLinked())
+                else if (goal == null) { 
+                    // should never happen (please check)
+                    return "UNKNOWN GOAL KIND (Probably a bug)";
+                } else if (goal.isLinked())
                    cachedName = LINKED_GOAL;
-                else if(goal.isAutomatic())
+                else if (goal.isAutomatic())
                     cachedName = OPEN_GOAL;
-                else
+                else if (goal != null) {
                     cachedName = INTERACTIVE_GOAL;
+                }
                 return cachedName;
             }
+            
             if (rap.rule() == null) {
                 cachedName = RULE_APPLICATION_WITHOUT_RULE;
                 return cachedName;
