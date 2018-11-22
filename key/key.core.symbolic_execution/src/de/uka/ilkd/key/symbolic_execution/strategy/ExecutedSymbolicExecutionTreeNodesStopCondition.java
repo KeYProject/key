@@ -17,20 +17,20 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.proof.ApplyStrategy;
-import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
-import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.GoalChooser;
+import de.uka.ilkd.key.prover.StopCondition;
+import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * <p>
- * This {@link IStopCondition} stops the auto mode ({@link ApplyStrategy}) if
+ * This {@link StopCondition} stops the auto mode ({@link ApplyStrategy}) if
  * a given number ({@link #getMaximalNumberOfSetNodesToExecutePerGoal()}) of maximal
  * executed symbolic execution tree nodes is reached in a goal. 
  * </p>
@@ -45,7 +45,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * </p>
  * @author Martin Hentschel
  */
-public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCondition {
+public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCondition {
    /**
     * The default maximal number of steps to simulate a complete program execution.
     */
@@ -70,7 +70,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
    
    /**
     * Stores for each {@link Node} which is a symbolic execution tree node the computed result
-    * of {@link #isGoalAllowed(int, long, Proof, IGoalChooser, long, int, Goal)} to make
+    * of {@link #isGoalAllowed(int, long, Proof, GoalChooser, long, int, Goal)} to make
     * sure that it is only computed once and that the number of executed set statements is
     * not increased multiple times for the same {@link Node}.
     */
@@ -98,7 +98,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
    public int getMaximalWork(int maxApplications, 
                              long timeout, 
                              Proof proof, 
-                             IGoalChooser goalChooser) {
+                             GoalChooser goalChooser) {
       executedNumberOfSetNodesPerGoal.clear(); // Reset number of already detected symbolic execution tree nodes for all goals.
       goalAllowedResultPerSetNode.clear(); // Remove no longer needed references.
       return 0; // Return unknown because there is no relation between applied rules and executed symbolic execution tree nodes.
@@ -111,7 +111,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
    public boolean isGoalAllowed(int maxApplications, 
                                 long timeout, 
                                 Proof proof, 
-                                IGoalChooser goalChooser, 
+                                GoalChooser goalChooser, 
                                 long startTime, 
                                 int countApplied, 
                                 Goal goal) {
@@ -160,7 +160,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
     * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
     * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
     * @param proof The current {@link Proof}.
-    * @param goalChooser The current {@link IGoalChooser}.
+    * @param goalChooser The current {@link GoalChooser}.
     * @param startTime The timestamp when the apply strategy has started, computed via {@link System#nanoTime()}
     * @param countApplied The number of already applied rules.
     * @param goal The current {@link Goal} on which the next rule will be applied.
@@ -171,7 +171,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
    protected void handleNodeLimitExceeded(int maxApplications, 
                                           long timeout, 
                                           Proof proof, 
-                                          IGoalChooser goalChooser, 
+                                          GoalChooser goalChooser, 
                                           long startTime, 
                                           int countApplied, 
                                           Goal goal,
@@ -186,7 +186,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
     * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
     * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
     * @param proof The current {@link Proof}.
-    * @param goalChooser The current {@link IGoalChooser}.
+    * @param goalChooser The current {@link GoalChooser}.
     * @param startTime The timestamp when the apply strategy has started, computed via {@link System#nanoTime()}
     * @param countApplied The number of already applied rules.
     * @param goal The current {@link Goal} on which the next rule will be applied.
@@ -197,7 +197,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
    protected void handleNodeLimitNotExceeded(int maxApplications, 
                                              long timeout, 
                                              Proof proof, 
-                                             IGoalChooser goalChooser, 
+                                             GoalChooser goalChooser, 
                                              long startTime, 
                                              int countApplied, 
                                              Goal goal,
@@ -214,7 +214,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
    public String getGoalNotAllowedMessage(int maxApplications, 
                                           long timeout, 
                                           Proof proof, 
-                                          IGoalChooser goalChooser, 
+                                          GoalChooser goalChooser, 
                                           long startTime, 
                                           int countApplied, 
                                           Goal goal) {
@@ -233,7 +233,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
    public boolean shouldStop(int maxApplications, 
                              long timeout, 
                              Proof proof, 
-                             IGoalChooser goalChooser, 
+                             GoalChooser goalChooser, 
                              long startTime, 
                              int countApplied, 
                              SingleRuleApplicationInfo singleRuleApplicationInfo) {
@@ -273,7 +273,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
    public String getStopMessage(int maxApplications, 
                                 long timeout, 
                                 Proof proof, 
-                                IGoalChooser goalChooser, 
+                                GoalChooser goalChooser, 
                                 long startTime, 
                                 int countApplied, 
                                 SingleRuleApplicationInfo singleRuleApplicationInfo) {

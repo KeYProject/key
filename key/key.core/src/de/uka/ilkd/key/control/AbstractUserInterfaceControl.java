@@ -21,12 +21,8 @@ import java.util.logging.Logger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.ProverTaskListener;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
-import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -39,6 +35,10 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.prover.ProverTaskListener;
+import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 
 /**
  * Provides a basic implementation of {@link UserInterfaceControl}.

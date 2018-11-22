@@ -14,11 +14,11 @@
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.GoalChooser;
+import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
 
@@ -35,12 +35,12 @@ public interface IBreakpoint {
    
    /**
     * This method is called from 
-    * {@link IStopCondition#isGoalAllowed(int, long, Proof, IGoalChooser, long, int, Goal)}
+    * {@link StopCondition#isGoalAllowed(int, long, Proof, GoalChooser, long, int, Goal)}
     * and can be used to update the state of the {@link IBreakpoint}.
     * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
     * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
     * @param proof The current {@link Proof}.
-    * @param goalChooser The current {@link IGoalChooser}.
+    * @param goalChooser The current {@link GoalChooser}.
     * @param startTime The timestamp when the apply strategy has started, computed via {@link System#currentTimeMillis()}
     * @param countApplied The number of already applied rules.
     * @param goal The current {@link Goal} on which the next rule will be applied.
@@ -48,7 +48,7 @@ public interface IBreakpoint {
    public void updateState(int maxApplications, 
                            long timeout, 
                            Proof proof, 
-                           IGoalChooser goalChooser, 
+                           GoalChooser goalChooser, 
                            long startTime, 
                            int countApplied, 
                            Goal goal);

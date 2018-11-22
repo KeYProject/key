@@ -31,12 +31,12 @@ import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
-import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
+import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.StopCondition;
+import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -58,31 +58,31 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                        "data/paycard",
                        true,
                        TestKeYUIUtil.createOperationContractId("PayCard", "PayCard", "isValid()", "0", "normal_behavior"),
-                       new IStopCondition() {
+                       new StopCondition() {
                           @Override
-                          public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                          public boolean shouldStop(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
                               return false;
                           }
                         
                           @Override
-                          public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                          public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                              RuleApp ruleApp = goal.getRuleAppManager().peekNext();
                              return !"closeFalse".equals(MiscTools.getRuleName(ruleApp)) ||
                                     proof.openEnabledGoals().size() >= 2; // Stop before last goal is closed with closeFalse
                           }
                         
                           @Override
-                          public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                          public String getStopMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
                               return null;
                           }
                         
                           @Override
-                          public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
+                          public int getMaximalWork(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser) {
                               return 0;
                           }
                         
                           @Override
-                          public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                          public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                              return null;
                           }
                        },
@@ -151,38 +151,38 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             "data/paycard",
             true,
             TestKeYUIUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"), 
-            new IStopCondition() {
+            new StopCondition() {
                
                @Override
                public boolean shouldStop(int maxApplications, long timeout, Proof proof,
-                     IGoalChooser goalChooser, long startTime, int countApplied,
+                     GoalChooser goalChooser, long startTime, int countApplied,
                      SingleRuleApplicationInfo singleRuleApplicationInfo) {
                   return false;
                }
                
                @Override
                public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
-                     IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                     GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                   RuleApp ruleApp = goal.getRuleAppManager().peekNext();
                   return !"Use Operation Contract".equals(MiscTools.getRuleName(ruleApp));
                }
                
                @Override
                public String getStopMessage(int maxApplications, long timeout, Proof proof,
-                     IGoalChooser goalChooser, long startTime, int countApplied,
+                     GoalChooser goalChooser, long startTime, int countApplied,
                      SingleRuleApplicationInfo singleRuleApplicationInfo) {
                   return null;
                }
                
                @Override
                public int getMaximalWork(int maxApplications, long timeout, Proof proof,
-                     IGoalChooser goalChooser) {
+                     GoalChooser goalChooser) {
                   return 0;
                }
                
                @Override
                public String getGoalNotAllowedMessage(int maxApplications, long timeout,
-                     Proof proof, IGoalChooser goalChooser, long startTime,
+                     Proof proof, GoalChooser goalChooser, long startTime,
                      int countApplied, Goal goal) {
                   return null;
                }
@@ -226,38 +226,38 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             "data/paycard",
             true,
             TestKeYUIUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"), 
-            new IStopCondition() {
+            new StopCondition() {
                
                @Override
                public boolean shouldStop(int maxApplications, long timeout, Proof proof,
-                     IGoalChooser goalChooser, long startTime, int countApplied,
+                     GoalChooser goalChooser, long startTime, int countApplied,
                      SingleRuleApplicationInfo singleRuleApplicationInfo) {
                   return false;
                }
                
                @Override
                public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
-                     IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                     GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                   RuleApp ruleApp = goal.getRuleAppManager().peekNext();
                   return !"Use Operation Contract".equals(MiscTools.getRuleName(ruleApp));
                }
                
                @Override
                public String getStopMessage(int maxApplications, long timeout, Proof proof,
-                     IGoalChooser goalChooser, long startTime, int countApplied,
+                     GoalChooser goalChooser, long startTime, int countApplied,
                      SingleRuleApplicationInfo singleRuleApplicationInfo) {
                   return null;
                }
                
                @Override
                public int getMaximalWork(int maxApplications, long timeout, Proof proof,
-                     IGoalChooser goalChooser) {
+                     GoalChooser goalChooser) {
                   return 0;
                }
                
                @Override
                public String getGoalNotAllowedMessage(int maxApplications, long timeout,
-                     Proof proof, IGoalChooser goalChooser, long startTime,
+                     Proof proof, GoalChooser goalChooser, long startTime,
                      int countApplied, Goal goal) {
                   return null;
                }
@@ -290,30 +290,30 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                         "data/paycard",
                         true,
                         TestKeYUIUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"),
-                        new IStopCondition() {
+                        new StopCondition() {
                            @Override
-                           public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                           public boolean shouldStop(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
                               return false;
                            }
                            
                            @Override
-                           public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                           public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                               RuleApp ruleApp = goal.getRuleAppManager().peekNext();
                               return !"Use Operation Contract".equals(MiscTools.getRuleName(ruleApp));
                            }
                            
                            @Override
-                           public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                           public String getStopMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
                               return null;
                            }
                            
                            @Override
-                           public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
+                           public int getMaximalWork(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser) {
                               return 0;
                            }
                            
                            @Override
-                           public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                           public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                               return null;
                            }
                         },
@@ -350,30 +350,30 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             "data/blockContract",
             true,
             TestKeYUIUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
-            new IStopCondition() {
+            new StopCondition() {
                @Override
-               public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public boolean shouldStop(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
                   return false;
                }
                
                @Override
-               public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+               public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                   RuleApp ruleApp = goal.getRuleAppManager().peekNext();
                   return !"Block Contract".equals(MiscTools.getRuleName(ruleApp));
                }
                
                @Override
-               public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public String getStopMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
                   return null;
                }
                
                @Override
-               public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
+               public int getMaximalWork(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser) {
                   return 0;
                }
                
                @Override
-               public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+               public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                   return null;
                }
             },
@@ -408,30 +408,30 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             "data/blockContract",
             true,
             TestKeYUIUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
-            new IStopCondition() {
+            new StopCondition() {
                @Override
-               public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public boolean shouldStop(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
                   return false;
                }
                
                @Override
-               public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+               public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                   RuleApp ruleApp = goal.getRuleAppManager().peekNext();
                   return !"Block Contract".equals(MiscTools.getRuleName(ruleApp));
                }
                
                @Override
-               public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public String getStopMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
                   return null;
                }
                
                @Override
-               public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
+               public int getMaximalWork(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser) {
                   return 0;
                }
                
                @Override
-               public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+               public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                   return null;
                }
             },
@@ -466,30 +466,30 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             "data/blockContract",
             true,
             TestKeYUIUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
-            new IStopCondition() {
+            new StopCondition() {
                @Override
-               public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public boolean shouldStop(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
                   return false;
                }
                
                @Override
-               public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+               public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                   RuleApp ruleApp = goal.getRuleAppManager().peekNext();
                   return !"Block Contract".equals(MiscTools.getRuleName(ruleApp));
                }
                
                @Override
-               public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public String getStopMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
                   return null;
                }
                
                @Override
-               public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
+               public int getMaximalWork(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser) {
                   return 0;
                }
                
                @Override
-               public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+               public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                   return null;
                }
             },
@@ -537,30 +537,30 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             "data/dependencyContract",
             false,
             "DependencyContractExample.proof", 
-            new IStopCondition() {
+            new StopCondition() {
                @Override
-               public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public boolean shouldStop(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
                   return false;
                }
                
                @Override
-               public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+               public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                   RuleApp ruleApp = goal.getRuleAppManager().peekNext();
                   return !"Use Dependency Contract".equals(MiscTools.getRuleName(ruleApp));
                }
                
                @Override
-               public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public String getStopMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
                   return null;
                }
                
                @Override
-               public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
+               public int getMaximalWork(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser) {
                   return 0;
                }
                
                @Override
-               public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+               public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                   return null;
                }
             }, 
@@ -600,30 +600,30 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             "data/dependencyContract",
             false,
             "DependencyContractExample.proof", 
-            new IStopCondition() {
+            new StopCondition() {
                @Override
-               public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public boolean shouldStop(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
                   return false;
                }
                
                @Override
-               public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+               public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                   RuleApp ruleApp = goal.getRuleAppManager().peekNext();
                   return !"Use Dependency Contract".equals(MiscTools.getRuleName(ruleApp));
                }
                
                @Override
-               public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public String getStopMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
                   return null;
                }
                
                @Override
-               public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
+               public int getMaximalWork(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser) {
                   return 0;
                }
                
                @Override
-               public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+               public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                   return null;
                }
             }, 
@@ -691,7 +691,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
     * @param pathToSourceCodeInTestPlugin The path to the source code in the test plug-in which will be extracted into the created project.
     * @param isContract {@code true} is contract, {@code false} is proof file.
     * @param contractNameOrProofFile The name of the contract to prove or the path to the proof file to load.
-    * @param stopCondition An optional custom {@link IStopCondition} which stops the started auto mode at a node on which the rule to test can be applied.
+    * @param stopCondition An optional custom {@link StopCondition} which stops the started auto mode at a node on which the rule to test can be applied.
     * @param useOperationContracts {@code true} use operation contracts, {@code false} inline methods instead
     * @param useDependencyContracts Use dependency contracts?
     * @param useBlockContracts {@code true} use block contracts, {@code false} expand blocks
@@ -707,7 +707,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                                    String pathToSourceCodeInTestPlugin,
                                    boolean isContract,
                                    String contractNameOrProofFile,
-                                   final IStopCondition stopCondition,
+                                   final StopCondition stopCondition,
                                    final boolean useOperationContracts,
                                    final boolean useDependencyContracts,
                                    final boolean useBlockContracts,
@@ -811,7 +811,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
    }
 
    /**
-    * Some additional test steps used by {@link SWTBotManualRuleApplicationTest#doStartProofTest(String, IStopCondition, int, int, String, IAppliedRuleTest, boolean)} to finish and test an applied rule.
+    * Some additional test steps used by {@link SWTBotManualRuleApplicationTest#doStartProofTest(String, StopCondition, int, int, String, IAppliedRuleTest, boolean)} to finish and test an applied rule.
     * @author Martin Hentschel
     */
    protected static interface IAppliedRuleTest {

@@ -11,7 +11,10 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.prover.impl;
+
+import de.uka.ilkd.key.prover.GoalChooserBuilder;
+import de.uka.ilkd.key.prover.GoalChooser;
 
 /**
  * creates the default goal chooser used in KeY
@@ -22,7 +25,7 @@ public class DefaultGoalChooserBuilder implements GoalChooserBuilder {
     
     public DefaultGoalChooserBuilder() {}
     
-    public IGoalChooser create() {      
+    public GoalChooser create() {      
         return new DefaultGoalChooser();
     }
     

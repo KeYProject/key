@@ -28,12 +28,12 @@ import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.ProofMacroListener;
-import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProverTaskListener;
-import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
+import de.uka.ilkd.key.prover.ProverTaskListener;
+import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
+import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 /**
  * The abstract class ExhaustiveProofMacro can be used to create compound macros

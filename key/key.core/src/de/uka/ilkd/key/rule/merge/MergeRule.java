@@ -740,23 +740,7 @@ public class MergeRule implements BuiltInRule {
     }
 
     /**
-     * Finds all suitable merge partners.
-     * 
-     * @param goal
-     *            Current goal to merge.
-     * @param pio
-     *            Position of update-program counter formula in goal.
-     * @param services
-     *            The services object.
-     * @return A list of suitable merge partners. May be empty if none exist.
-     */
-    public static ImmutableList<MergePartner> findPotentialMergePartners(
-            Goal goal, PosInOccurrence pio) {
-        return findPotentialMergePartners(goal, pio, goal.proof().root());
-    }
-
-    /**
-     * Finds all suitable merge partners below the start node.
+     * Finds all suitable merge partners 
      * 
      * @param goal
      *            Current goal to merge.
@@ -769,12 +753,11 @@ public class MergeRule implements BuiltInRule {
      * @return A list of suitable merge partners. May be empty if none exist.
      */
     public static ImmutableList<MergePartner> findPotentialMergePartners(
-            Goal goal, PosInOccurrence pio, Node start) {
+            Goal goal, PosInOccurrence pio) {
 
         final Services services = goal.proof().getServices();
 
-        final ImmutableList<Goal> allGoals = services.getProof()
-                .getSubtreeGoals(start);
+        final ImmutableList<Goal> allGoals = services.getProof().openGoals();
 
         final Triple<Term, Term, Term> ownSEState = sequentToSETriple(
                 goal.node(), pio, services);

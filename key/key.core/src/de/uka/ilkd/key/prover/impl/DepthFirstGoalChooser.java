@@ -11,10 +11,13 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.prover.impl;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 
 /**
  * Helper class for managing a list of goals on which rules are applied.

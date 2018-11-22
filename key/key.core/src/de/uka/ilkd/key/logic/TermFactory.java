@@ -44,6 +44,11 @@ public final class TermFactory {
     //constructors
     //-------------------------------------------------------------------------
     
+    
+    public TermFactory() {
+        this.cache = null;
+    }
+    
     public TermFactory(Map<Term, Term> cache) {
         this.cache = cache;
     }
@@ -52,6 +57,8 @@ public final class TermFactory {
     //public interface
     //-------------------------------------------------------------------------
     
+
+
     /**
      * Master method for term creation. Should be the only place where terms 
      * are created in the entire system.
@@ -150,9 +157,8 @@ public final class TermFactory {
         // Check if caching is possible. It is not possible if a non empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
-        if (!newTerm.containsJavaBlockRecursive()) {
-           
-           Term term;  
+        if (cache != null && !newTerm.containsJavaBlockRecursive()) {
+           Term term;           
            synchronized(cache) { 
                term = cache.get(newTerm);
            }

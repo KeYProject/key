@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.macros;
 
-import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
-import de.uka.ilkd.key.proof.ProverTaskListener;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
-import de.uka.ilkd.key.proof.TaskStartedInfo;
-import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
+import de.uka.ilkd.key.prover.ProverTaskListener;
+import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
+import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 /**
  * Listener for the application of proof macros (which may be run in

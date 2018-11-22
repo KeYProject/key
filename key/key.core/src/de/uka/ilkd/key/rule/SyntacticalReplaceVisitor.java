@@ -80,6 +80,44 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     private final Boolean newMarker = new Boolean(true);
     private final Deque<Term> tacletTermStack = new ArrayDeque<Term>();
 
+    
+    /**
+     * constructs a term visitor replacing any occurrence of a schemavariable found
+     * in {@code svInst} by its instantiation
+     * @param termLabelState the termlabel state
+     * @param labelHint hints about how to deal with labels
+     * @param applicationPosInOccurrence the application position
+     * @param svInst mapping of schemavariables to their instantiation
+     * @param goal the current goal
+     * @param rule the applied rule
+     * @param ruleApp the rule application
+     * @param services the Services
+     * @param termBuilder the TermBuilder to use (allows to use the non cached version)
+     */
+    private SyntacticalReplaceVisitor(TermLabelState termLabelState,
+            TacletLabelHint labelHint,
+            PosInOccurrence applicationPosInOccurrence,
+            SVInstantiations svInst,
+            Goal goal,
+            Rule rule,
+            RuleApp ruleApp,
+            Services services,
+            TermBuilder termBuilder) {
+        this.termLabelState   = termLabelState;
+        this.services         = services;
+        this.tb               = termBuilder;
+        this.svInst           = svInst;
+        this.applicationPosInOccurrence = applicationPosInOccurrence;
+        this.rule = rule;
+        this.ruleApp = ruleApp;
+        this.labelHint = labelHint;
+        this.goal = goal;
+        subStack = new Stack<Object>(); // of Term
+        if (labelHint instanceof TacletLabelHint) {
+            labelHint.setTacletTermStack(tacletTermStack);
+        }
+    }
+    
     /**
      * constructs a term visitor replacing any occurrence of a schemavariable found
      * in {@code svInst} by its instantiation
@@ -100,19 +138,8 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             Rule rule,
             RuleApp ruleApp,
             Services services) {
-        this.termLabelState   = termLabelState;
-        this.services         = services;
-        this.tb               = services.getTermBuilder();
-        this.svInst           = svInst;
-        this.applicationPosInOccurrence = applicationPosInOccurrence;
-        this.rule = rule;
-        this.ruleApp = ruleApp;
-        this.labelHint = labelHint;
-        this.goal = goal;
-        subStack = new Stack<Object>(); // of Term
-        if (labelHint instanceof TacletLabelHint) {
-            labelHint.setTacletTermStack(tacletTermStack);
-        }
+        this(termLabelState, labelHint, applicationPosInOccurrence, svInst, 
+                goal, rule, ruleApp, services, services.getTermBuilder());    
     }
 
     public SyntacticalReplaceVisitor(TermLabelState termLabelState,
@@ -121,7 +148,8 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             Goal goal,
             Rule rule,
             RuleApp ruleApp,
-            Services services) {
+            Services services,
+            TermBuilder termBuilder) {
         this(termLabelState,
                 labelHint,
                 applicationPosInOccurrence,
