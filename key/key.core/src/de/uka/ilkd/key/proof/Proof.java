@@ -223,16 +223,14 @@ public class Proof implements Named {
 
         this ( new Name ( name ), initConfig );
 
-        localMgt = new ProofCorrectnessMgt(this);
-
         Node rootNode = new Node(this, problem);
-        setRoot(rootNode);
 
         Goal firstGoal = new Goal(rootNode,
                         new RuleAppIndex(new TacletAppIndex(rules, getServices()),
                                         new BuiltInRuleAppIndex(builtInRules), getServices())
                         );
         openGoals = openGoals.prepend(firstGoal);
+        setRoot(rootNode);
 
         if (closed())
             fireProofClosed();
@@ -431,9 +429,6 @@ public class Proof implements Named {
         } else {
             this.root = root;
             fireProofStructureChanged();
-
-            if (closed())
-                fireProofClosed();
         }
     }
 
