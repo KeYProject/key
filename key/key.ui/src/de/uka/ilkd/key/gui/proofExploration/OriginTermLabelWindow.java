@@ -16,8 +16,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
+import javax.swing.ToolTipManager;
+import javax.swing.border.TitledBorder;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -41,7 +44,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -69,8 +71,13 @@ public class OriginTermLabelWindow extends JFrame {
     public static final int HEIGHT = 720;
     public static final boolean PRINT_LINE_BREAKS_IN_TREE_NODES = true;
     public static final Color HIGHLIGHT_COLOR = Color.ORANGE;
-    public static final String ORIGIN_HEADER = "Origin of term";
-    public static final String SUBTERM_ORIGINS_HEADER = "Origins of (former) subterms";
+
+    public static final String TREE_TITLE = "Selected terms as tree";
+    public static final String VIEW_TITLE = "Selected terms";
+    public static final String ORIGIN_INFO_TITLE = "Origin information";
+
+    public static final String ORIGIN_TITLE = "Origin of term";
+    public static final String SUBTERM_ORIGINS_TITLE = "Origins of (former) subterms";
 
     /**
      * The gap between a term and its origin in the tree view.
@@ -97,7 +104,9 @@ public class OriginTermLabelWindow extends JFrame {
         this.termPio = pos;
         this.sequent = node.sequent();
 
-        setLayout(new GridLayout(1, 2, COMPONENT_GAP, COMPONENT_GAP));
+        JSplitPane contentPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        setContentPane(contentPane);
+
         setSize(WIDTH, HEIGHT);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setTitle("Term Origin");
@@ -109,6 +118,8 @@ public class OriginTermLabelWindow extends JFrame {
         {
             tree = new JTree(treeModel);
             tree.setCellRenderer(new CellRenderer());
+            ToolTipManager.sharedInstance().registerComponent(tree);
+
             tree.addTreeSelectionListener(e -> {
                 TreeNode source = (TreeNode) tree.getLastSelectedPathComponent();
 
@@ -121,12 +132,23 @@ public class OriginTermLabelWindow extends JFrame {
             JScrollPane treeScrollPane = new JScrollPane(tree,
                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
+            treeScrollPane.setBorder(new TitledBorder(TREE_TITLE));
+
             treeScrollPane.setPreferredSize(new Dimension(WIDTH / 2, HEIGHT));
             add(treeScrollPane);
+
+            treeScrollPane.addComponentListener(new ComponentAdapter() {
+
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    tree.setSize(treeScrollPane.getViewport().getSize());
+                    tree.setUI(new BasicTreeUI());
+                }
+            });
         }
 
         {
-            JPanel rightPanel = new JPanel(new GridLayout(2, 1, COMPONENT_GAP, COMPONENT_GAP));
+            JSplitPane rightPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
             JPanel bottomRightPanel = new JPanel(new GridLayout(1, 2, COMPONENT_GAP, COMPONENT_GAP));
 
             originJLabel = new JLabel();
@@ -178,25 +200,37 @@ public class OriginTermLabelWindow extends JFrame {
                 }
             });
 
-            rightPanel.add(view);
+            JScrollPane viewScrollPane = new JScrollPane(view,
+                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            viewScrollPane.setBorder(new TitledBorder(VIEW_TITLE));
+            rightPanel.add(viewScrollPane);
 
             view.printSequent();
 
             bottomRightPanel.add(originJLabel);
-            bottomRightPanel.add(subtermOriginsJLabel);
+            JScrollPane subtermOriginsScrollPane = new JScrollPane(subtermOriginsJLabel,
+                    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            bottomRightPanel.add(subtermOriginsScrollPane);
+            bottomRightPanel.setBorder(new TitledBorder(ORIGIN_INFO_TITLE));
+            originJLabel.setBorder(new TitledBorder(ORIGIN_TITLE));
+            subtermOriginsScrollPane.setBorder(new TitledBorder(SUBTERM_ORIGINS_TITLE));
             rightPanel.add(bottomRightPanel);
 
+            rightPanel.setDividerLocation(HEIGHT / 4 * 3);
             add(rightPanel);
+
+            viewScrollPane.addComponentListener(new ComponentAdapter() {
+
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    view.printSequent();
+                }
+            });
         }
 
-        addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                tree.setUI(new BasicTreeUI());
-                view.printSequent();
-            }
-        });
+        contentPane.setDividerLocation(WIDTH / 2);
     }
 
     private DefaultTreeModel buildModel(PosInOccurrence pos) {
@@ -264,19 +298,16 @@ public class OriginTermLabelWindow extends JFrame {
 
     private void updateJLabels(PosInOccurrence pos) {
         if (pos == null) {
-            originJLabel.setText("<html>" + "<b>" + ORIGIN_HEADER + ":</b><br></html>");
-            subtermOriginsJLabel.setText(
-                    "<html>" + "<b>" + SUBTERM_ORIGINS_HEADER + ":</b><br></html>");
+            originJLabel.setText("");
+            subtermOriginsJLabel.setText("");
             return;
         }
 
         OriginTermLabel label = (OriginTermLabel) pos.subTerm().getLabel(OriginTermLabel.NAME);
 
-        StringBuilder originText = new StringBuilder(
-                "<html>" + "<b>" + ORIGIN_HEADER + ":</b><br>");
+        StringBuilder originText = new StringBuilder("<html>");
 
-        StringBuilder subtermOriginsText = new StringBuilder(
-                "<html>" + "<b>" + SUBTERM_ORIGINS_HEADER + ":</b><br>");
+        StringBuilder subtermOriginsText = new StringBuilder("<html>");
 
         if (label != null) {
             originText.append(label.getOrigin());
@@ -343,30 +374,6 @@ public class OriginTermLabelWindow extends JFrame {
         return result;
     }
 
-    private String getTermText(Term term) {
-        String text;
-
-        if (term == null) {
-            text = LogicPrinter.quickPrintSequent(sequent, services);
-        } else {
-            text = LogicPrinter.quickPrintTerm(term, services);
-        }
-
-        if (PRINT_LINE_BREAKS_IN_TREE_NODES) {
-            return "<html>"
-                    + text
-                        .replace("&", "&amp;")
-                        .replace("<", "&lt;")
-                        .replace(">", "&gt;")
-                        .replace(" ", "&nbsp;")
-                        .replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
-                        .replace("\n", "<br>")
-                    + "</html>";
-        } else {
-            return text.replaceAll("\\s+", " ");
-        }
-    }
-
     private class CellRenderer extends DefaultTreeCellRenderer {
 
         private static final long serialVersionUID = -7479404026154193661L;
@@ -383,14 +390,16 @@ public class OriginTermLabelWindow extends JFrame {
             JLabel termTextLabel = (JLabel) super.getTreeCellRendererComponent(
                     tree, value, selected, expanded,
                     leaf, row, hasFocus);
-            termTextLabel.setText(getTermText(term));
+            termTextLabel.setText(getShortTermText(term));
             termTextLabel.setBackground(OriginTermLabelWindow.this.getBackground());
 
             JLabel originTextLabel = new JLabel();
-            TermLabel originLabel = term == null ? null : term.getLabel(OriginTermLabel.NAME);
+            OriginTermLabel originLabel = term == null
+                    ? null
+                    : (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
 
             if (originLabel != null) {
-                originTextLabel.setText(originLabel.getChild(0).toString());
+                originTextLabel.setText(getShortOriginText(originLabel.getOrigin()));
                 originTextLabel.setHorizontalAlignment(SwingConstants.TRAILING);
             }
 
@@ -407,7 +416,46 @@ public class OriginTermLabelWindow extends JFrame {
             result.add(originTextLabel, BorderLayout.LINE_END);
 
             result.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+            result.setToolTipText(getFullText(term, originLabel.getOrigin()));
+
             return result;
+        }
+
+        private String getShortOriginText(Origin origin) {
+            return origin.specType.toString();
+        }
+
+        private String getFullText(Term term, Origin origin) {
+            String text;
+
+            if (term == null) {
+                text = LogicPrinter.quickPrintSequent(sequent, services);
+            } else {
+                text = LogicPrinter.quickPrintTerm(term, services);
+            }
+
+            return "<html><b>" + origin + "</b><hr>"
+                + text
+                    .replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace(" ", "&nbsp;")
+                    .replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+                    .replace("\n", "<br>")
+                + "</html>";
+        }
+
+        private String getShortTermText(Term term) {
+            String text;
+
+            if (term == null) {
+                text = LogicPrinter.quickPrintSequent(sequent, services);
+            } else {
+                text = LogicPrinter.quickPrintTerm(term, services);
+            }
+
+            return text.substring(0, text.indexOf("\n")).replaceAll("\\s+", " ") + "...";
         }
     }
 
