@@ -445,9 +445,6 @@ public class Proof implements Named {
         return pis;
     }
 
-    
-    
-    
     /**
      * returns the list of open goals
      * @return list with the open goals
@@ -1263,22 +1260,7 @@ public class Proof implements Named {
        saver.save();
     }
     
-   /**
-    * Extracts java source directory from {@link #header()}, if it exists.
-    */
-   public File getJavaSourceLocation() {
-      String header = header();
-      int i = header.indexOf("\\javaSource");
-      if (i >= 0) {
-         int begin = header.indexOf('\"', i);
-         int end = header.indexOf('\"', begin + 1);
-         String sourceLocation = header.substring(begin + 1, end);
-         if (sourceLocation.length() > 0) {
-            return new File(sourceLocation);
-         }
-      }
-      return null;
-   }
+  
 
    public StrategyFactory getActiveStrategyFactory() {
       Name activeStrategyName = getActiveStrategy() != null ? getActiveStrategy().name() : null;

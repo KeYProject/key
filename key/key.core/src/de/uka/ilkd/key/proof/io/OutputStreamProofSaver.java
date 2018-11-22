@@ -15,6 +15,7 @@ package de.uka.ilkd.key.proof.io;
 
 import static de.uka.ilkd.key.proof.io.IProofFileParser.ProofElementID;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -84,9 +85,27 @@ import de.uka.ilkd.key.util.MiscTools;
  */
 public class OutputStreamProofSaver {
 
+    
+    /**
+     * Extracts java source directory from {@link #header()}, if it exists.
+     */
+    public static File getJavaSourceLocation(Proof proof) {
+       String header = proof.header();
+       int i = header.indexOf("\\javaSource");
+       if (i >= 0) {
+          int begin = header.indexOf('\"', i);
+          int end = header.indexOf('\"', begin + 1);
+          String sourceLocation = header.substring(begin + 1, end);
+          if (sourceLocation.length() > 0) {
+             return new File(sourceLocation);
+          }
+       }
+       return null;
+    }
+
+    
     protected final Proof proof;
     protected final String internalVersion;
-
     LogicPrinter printer;
 
     public OutputStreamProofSaver(Proof proof) {
@@ -230,7 +249,7 @@ public class OutputStreamProofSaver {
     }
 
     protected String getBasePath() throws IOException {
-        return proof.getJavaSourceLocation().getCanonicalPath();
+        return getJavaSourceLocation(proof).getCanonicalPath();
     }
 
     /**
