@@ -31,10 +31,6 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.StopCondition;
-import de.uka.ilkd.key.prover.ProverCore;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
@@ -45,9 +41,7 @@ import de.uka.ilkd.key.util.Debug;
  * Applies rules in an automated fashion.
  * The caller should ensure that the strategy runs in its one thread
  */
-public class ApplyStrategy implements ProverCore {
-    public static final String PROCESSING_STRATEGY = "Processing Strategy";
-
+public class ApplyStrategy extends AbstractProverCore {
     /** the proof that is worked with */
     private Proof proof;
     /** the maximum of allowed rule applications */
@@ -56,30 +50,23 @@ public class ApplyStrategy implements ProverCore {
     /** The default {@link GoalChooser} to choose goals to which rules are applied if the {@link StrategySettings} of the proof provides no customized one.*/
     private GoalChooser defaultGoalChooser;
 
-    /** number of rules automatically applied */
-    private int countApplied = 0;
     private long time;
 
     /** interrupted by the user? */
     private boolean autoModeActive = false;
-
-    /** We use an immutable list to store listeners to allow for
-     * addition/removal within listener code */
-    private ImmutableList<ProverTaskListener> proverTaskObservers = ImmutableSLList.nil();
 
     /** time in ms after which rule application shall be aborted, -1 disables timeout */
     private long timeout = -1;
 
     private boolean stopAtFirstNonCloseableGoal;
 
-    protected int closedGoals;
+    private int closedGoals;
 
     private boolean cancelled;
 
     private StopCondition stopCondition;
 
     private GoalChooser goalChooser;
-
 
     // Please create this object beforehand and re-use it.
     // Otherwise the addition/removal of the InteractiveProofListener
@@ -190,24 +177,6 @@ public class ApplyStrategy implements ProverCore {
                                      countApplied, closedGoals);
     }
 
-    private synchronized void fireTaskStarted (int maxSteps) {
-        for (ProverTaskListener ptl : proverTaskObservers) {
-            ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Strategy, PROCESSING_STRATEGY, maxSteps));
-        }
-    }
-
-    private synchronized void fireTaskProgress () {
-        for (ProverTaskListener ptl : proverTaskObservers) {
-            ptl.taskProgress(countApplied);
-        }
-    }
-
-    private synchronized void fireTaskFinished (TaskFinishedInfo info) {
-        for (ProverTaskListener ptl : proverTaskObservers) {
-            ptl.taskFinished(info);
-        }
-    }
-
     private void init(Proof newProof, ImmutableList<Goal> goals, int maxSteps, long timeout) {
         this.proof      = newProof;
         maxApplications = maxSteps;
@@ -315,23 +284,6 @@ public class ApplyStrategy implements ProverCore {
        }
        return chooser != null ? chooser : defaultGoalChooser;
     }
-    /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.prover.ProverCore#addProverTaskObserver(de.uka.ilkd.key.prover.ProverTaskListener)
-	 */
-    @Override
-	public synchronized void addProverTaskObserver(ProverTaskListener observer) {
-        proverTaskObservers = proverTaskObservers.prepend(observer);
-    }
-
-    /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.prover.ProverCore#removeProverTaskObserver(de.uka.ilkd.key.prover.ProverTaskListener)
-	 */
-    @Override
-	public synchronized void removeProverTaskObserver(ProverTaskListener observer) {
-        proverTaskObservers = proverTaskObservers.removeAll(observer);
-    }
-
-
     private class ProofListener implements RuleAppListener {
 
         /** invoked when a rule has been applied */
