@@ -20,17 +20,14 @@ http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
 
 package de.uka.ilkd.key.prover.impl;
 
-import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
-import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.StopCondition;
@@ -339,26 +336,18 @@ public class ApplyStrategy implements ProverCore {
 
         /** invoked when a rule has been applied */
         public void ruleApplied(ProofEvent e) {
-            if (!isAutoModeActive()) return;
-            RuleAppInfo rai = e.getRuleAppInfo ();
-            if ( rai == null )
+            if (!isAutoModeActive()) {
                 return;
+            }
+            RuleAppInfo rai = e.getRuleAppInfo();
+            if (rai == null) {
+                return;
+            }
 
-            synchronized ( ApplyStrategy.this ) {
-                ImmutableList<Goal>                newGoals = ImmutableSLList.<Goal>nil();
-                Iterator<NodeReplacement> it       = rai.getReplacementNodes ();
-                Node                      node;
-                Goal                      goal;
+            final GoalChooser goalChooser = getGoalChooserForProof(rai.getOriginalNode().proof());
 
-                while ( it.hasNext () ) {
-                    node = it.next ().getNode ();
-                    goal = proof.getGoal ( node );
-                    if ( goal != null )
-                        newGoals = newGoals.prepend ( goal );
-                }
-
-                final GoalChooser goalChooser = getGoalChooserForProof(proof);
-                goalChooser.updateGoalList ( rai.getOriginalNode (), newGoals );
+            synchronized (goalChooser) {
+                goalChooser.updateGoalList(rai.getOriginalNode (), e.getNewGoals().reverse()); // reverse just to keep old order
             }
         }
     }
@@ -378,7 +367,7 @@ public class ApplyStrategy implements ProverCore {
 	public void clear(){
         final GoalChooser goalChooser = getGoalChooserForProof(proof);
         proof = null;
-        if(goalChooser!=null){
+        if(goalChooser != null) {
             goalChooser.init(null, ImmutableSLList.<Goal>nil());
         }
     }

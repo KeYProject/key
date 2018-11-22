@@ -663,7 +663,7 @@ public final class Goal  {
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
 
         if ( goalList != null )
-            proof.fireRuleApplied( new ProofEvent ( proof, ruleAppInfo ) );
+            proof.fireRuleApplied( new ProofEvent ( proof, ruleAppInfo, goalList ) );
         return goalList;
     }
 
