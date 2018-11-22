@@ -9,39 +9,80 @@ import de.uka.ilkd.key.settings.StrategySettings;
 
 public interface ProverCore {
 
-	ApplyStrategyInfo start(Proof proof, Goal goal);
+    /**
+     * constant used by some listeners to determine if a proof macro is running
+     */
+    String PROCESSING_STRATEGY = "Processing Strategy";
 
-	ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals);
+    /**
+     * starts a proof search for a given goals using the given strategy settings
+     * instead the ones configures in the proof
+     * @param proof the Proof instance
+     * @param goal the goal to prove
+     * @return an information object about the performed work (e.g. number of rules applied)
+     */
+    ApplyStrategyInfo start(Proof proof, Goal goal);
 
-	ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, StrategySettings stratSet);
+    /**
+     * starts a proof search for a set of goals using the given strategy settings
+     * instead the ones configures in the proof
+     * @param proof the Proof instance
+     * @param goals list of goals to prove
+     * @return an information object about the performed work (e.g. number of rules applied)
+     */
+    ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals);
 
-	/**
-	 * This entry point to the proof may provide inconsistent data. The
-	 * properties within the proof may differ to the explicit data. This is
-	 * discouraged.
-	 *
-	 * @return
-	 */
-	ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout,
-			boolean stopAtFirstNonCloseableGoal);
+    /**
+     * starts a proof search for a set of goals using the given strategy settings
+     * instead the ones configures in the proof
+     * @param proof the Proof instance
+     * @param goals list of goals to prove
+     * @param stratSet the strategy settings to use
+     * @return an information object about the performed work (e.g. number of rules applied)
+     */
+    ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, StrategySettings stratSet);
 
-	void addProverTaskObserver(ProverTaskListener observer);
+    /**
+     * This entry point to the proof may provide inconsistent data. The
+     * properties within the proof may differ to the explicit data. This is
+     * discouraged.
+     * starts a proof search for a set of goals
+     * @param proof the Proof instance
+     * @param goals list of goals to prove
+     * @param maxSteps an int with the maximal number of rule applications to be performed
+     * @param timeout a long with a timeout when tyo stop the proof search at latest
+     * @param stopAtFirstNonCloseableGoal true if the prover shall stop at the first
+     * encountered non-closable goal
+     * @return an information object about the performed work (e.g. number of rules applied)
+     */
+    ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout,
+            boolean stopAtFirstNonCloseableGoal);
 
-	void removeProverTaskObserver(ProverTaskListener observer);
+    /**
+     * adds a task listener
+     * @param observer the listener to add
+     */
+    void addProverTaskObserver(ProverTaskListener observer);
 
-	/**Used by, e.g., {@code InteractiveProver.clear()} in order to prevent memory leaking.
-	 * When a proof obligation is abandoned all references to the proof must be reset.
-	 * @author gladisch */
-	void clear();
+    /**
+     * removes a task listener
+     * @param observer the listener to remove
+     */
+    void removeProverTaskObserver(ProverTaskListener observer);
 
-	/**
-	 * Returns true iff the last run has been stopped due to a received
-	 * {@link InterruptedException}. This exception would have been swallowed by
-	 * the system. However, the cancelled flag is set in this case which allows
-	 * detection of such a condition.
-	 *
-	 * @return whether the last run has been interrupted
-	 */
-	boolean hasBeenInterrupted();
+    /**Used by, e.g., {@code InteractiveProver.clear()} in order to prevent memory leaking.
+     * When a proof obligation is abandoned all references to the proof must be reset.
+     * @author gladisch */
+    void clear();
+
+    /**
+     * Returns true iff the last run has been stopped due to a received
+     * {@link InterruptedException}. This exception would have been swallowed by
+     * the system. However, the cancelled flag is set in this case which allows
+     * detection of such a condition.
+     *
+     * @return whether the last run has been interrupted
+     */
+    boolean hasBeenInterrupted();
 
 }

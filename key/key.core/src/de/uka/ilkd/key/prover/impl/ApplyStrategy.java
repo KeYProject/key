@@ -20,24 +20,17 @@ http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
 
 package de.uka.ilkd.key.prover.impl;
 
-import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
-import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.StopCondition;
-import de.uka.ilkd.key.prover.ProverCore;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
@@ -46,12 +39,14 @@ import de.uka.ilkd.key.util.Debug;
 
 /**
  * Applies rules in an automated fashion.
- * The caller should ensure that the strategy runs in its one thread
+ * The caller should ensure that the strategy runs in its own thread
+ * @author Richard Bubel
  */
-public class ApplyStrategy implements ProverCore {
-    public static final String PROCESSING_STRATEGY = "Processing Strategy";
+public class ApplyStrategy extends AbstractProverCore {
 
-    /** the proof that is worked with */
+    /**
+     * the proof that is worked with
+     */
     private Proof proof;
     /** the maximum of allowed rule applications */
     private int maxApplications;
@@ -59,30 +54,23 @@ public class ApplyStrategy implements ProverCore {
     /** The default {@link GoalChooser} to choose goals to which rules are applied if the {@link StrategySettings} of the proof provides no customized one.*/
     private GoalChooser defaultGoalChooser;
 
-    /** number of rules automatically applied */
-    private int countApplied = 0;
     private long time;
 
     /** interrupted by the user? */
     private boolean autoModeActive = false;
 
-    /** We use an immutable list to store listeners to allow for
-     * addition/removal within listener code */
-    private ImmutableList<ProverTaskListener> proverTaskObservers = ImmutableSLList.nil();
-
     /** time in ms after which rule application shall be aborted, -1 disables timeout */
     private long timeout = -1;
-
-    private boolean stopAtFirstNonCloseableGoal;
-
-    protected int closedGoals;
-
+    /** true if the prover should stop as soon as a non closable goal is detected */
+    private boolean stopAtFirstNonClosableGoal;
+    /** the number of (so far) closed goal by the current running strategy */
+    private int closedGoals;
+    /** indicates whether the prover has been interrupted and should stop */
     private boolean cancelled;
-
+    /** a configurable condition indicating that the prover has to stop, */
     private StopCondition stopCondition;
-
+    /** the goal choose picks the next goal to work on*/
     private GoalChooser goalChooser;
-
 
     // Please create this object beforehand and re-use it.
     // Otherwise the addition/removal of the InteractiveProofListener
@@ -103,10 +91,10 @@ public class ApplyStrategy implements ProverCore {
         Goal                  g;
         while ( ( g = goalChooser.getNextGoal () ) != null ) {
             if (!stopCondition.isGoalAllowed(maxApplications, timeout, proof,
-                                             goalChooser, time, countApplied, g)) {
+                                             time, countApplied, g)) {
                return new SingleRuleApplicationInfo(
                        stopCondition.getGoalNotAllowedMessage(maxApplications, timeout, proof,
-                                                              goalChooser, time, countApplied, g),
+                                                              time, countApplied, g),
                        g, null);
             }
             app = g.getRuleAppManager().next();
@@ -150,10 +138,10 @@ public class ApplyStrategy implements ProverCore {
         try{
             Debug.out("Strategy started.");
             boolean shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof,
-                                                          goalChooser, time, countApplied, srInfo);
+                                                          time, countApplied, srInfo);
 
             while (!shouldStop) {
-                srInfo = applyAutomaticRule(goalChooser, stopCondition, stopAtFirstNonCloseableGoal);
+                srInfo = applyAutomaticRule(goalChooser, stopCondition, stopAtFirstNonClosableGoal);
                 if (!srInfo.isSuccess()) {
                     return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(),
                                                  System.currentTimeMillis()-time, countApplied,
@@ -164,13 +152,13 @@ public class ApplyStrategy implements ProverCore {
                 if (Thread.interrupted()) {
                     throw new InterruptedException();
                 }
-                shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof, goalChooser,
-                                                      time, countApplied, srInfo);
+                shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof, time,
+                                                      countApplied, srInfo);
             }
             if (shouldStop) {
                 return new ApplyStrategyInfo(
-                        stopCondition.getStopMessage(maxApplications, timeout, proof, goalChooser,
-                                                     time, countApplied, srInfo),
+                        stopCondition.getStopMessage(maxApplications, timeout, proof, time,
+                                                     countApplied, srInfo),
                         proof, null, (Goal) null, System.currentTimeMillis()-time,
                         countApplied, closedGoals);
             }
@@ -193,24 +181,6 @@ public class ApplyStrategy implements ProverCore {
                                      countApplied, closedGoals);
     }
 
-    private synchronized void fireTaskStarted (int maxSteps) {
-        for (ProverTaskListener ptl : proverTaskObservers) {
-            ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Strategy, PROCESSING_STRATEGY, maxSteps));
-        }
-    }
-
-    private synchronized void fireTaskProgress () {
-        for (ProverTaskListener ptl : proverTaskObservers) {
-            ptl.taskProgress(countApplied);
-        }
-    }
-
-    private synchronized void fireTaskFinished (TaskFinishedInfo info) {
-        for (ProverTaskListener ptl : proverTaskObservers) {
-            ptl.taskFinished(info);
-        }
-    }
-
     private void init(Proof newProof, ImmutableList<Goal> goals, int maxSteps, long timeout) {
         this.proof      = newProof;
         maxApplications = maxSteps;
@@ -224,7 +194,7 @@ public class ApplyStrategy implements ProverCore {
         assert goalChooser != null;
         goalChooser.init ( newProof, goals );
         setAutoModeActive(true);
-        fireTaskStarted (stopCondition.getMaximalWork(maxSteps, timeout, newProof, goalChooser));
+        fireTaskStarted (stopCondition.getMaximalWork(maxSteps, timeout, newProof));
     }
 
     /* (non-Javadoc)
@@ -273,7 +243,7 @@ public class ApplyStrategy implements ProverCore {
                                                 boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
 
-        this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal;
+        this.stopAtFirstNonClosableGoal = stopAtFirstNonCloseableGoal;
 
         init(proof, goals, maxSteps, timeout);
         ApplyStrategyInfo result = executeStrategy();
@@ -318,47 +288,22 @@ public class ApplyStrategy implements ProverCore {
        }
        return chooser != null ? chooser : defaultGoalChooser;
     }
-    /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.prover.ProverCore#addProverTaskObserver(de.uka.ilkd.key.prover.ProverTaskListener)
-	 */
-    @Override
-	public synchronized void addProverTaskObserver(ProverTaskListener observer) {
-        proverTaskObservers = proverTaskObservers.prepend(observer);
-    }
-
-    /* (non-Javadoc)
-	 * @see de.uka.ilkd.key.prover.ProverCore#removeProverTaskObserver(de.uka.ilkd.key.prover.ProverTaskListener)
-	 */
-    @Override
-	public synchronized void removeProverTaskObserver(ProverTaskListener observer) {
-        proverTaskObservers = proverTaskObservers.removeAll(observer);
-    }
-
-
     private class ProofListener implements RuleAppListener {
 
         /** invoked when a rule has been applied */
         public void ruleApplied(ProofEvent e) {
-            if (!isAutoModeActive()) return;
-            RuleAppInfo rai = e.getRuleAppInfo ();
-            if ( rai == null )
+            if (!isAutoModeActive()) {
                 return;
+            }
+            RuleAppInfo rai = e.getRuleAppInfo ();
+            if (rai == null) {
+                return;
+            }
 
-            synchronized ( ApplyStrategy.this ) {
-                ImmutableList<Goal>                newGoals = ImmutableSLList.<Goal>nil();
-                Iterator<NodeReplacement> it       = rai.getReplacementNodes ();
-                Node                      node;
-                Goal                      goal;
-
-                while ( it.hasNext () ) {
-                    node = it.next ().getNode ();
-                    goal = proof.getGoal ( node );
-                    if ( goal != null )
-                        newGoals = newGoals.prepend ( goal );
-                }
-
-                final GoalChooser goalChooser = getGoalChooserForProof(proof);
-                goalChooser.updateGoalList ( rai.getOriginalNode (), newGoals );
+            final GoalChooser goalChooser = getGoalChooserForProof(rai.getOriginalNode().proof());
+            synchronized (goalChooser) {
+                // reverse just to keep old order
+                goalChooser.updateGoalList(rai.getOriginalNode (), e.getNewGoals().reverse());
             }
         }
     }
@@ -378,7 +323,7 @@ public class ApplyStrategy implements ProverCore {
 	public void clear(){
         final GoalChooser goalChooser = getGoalChooserForProof(proof);
         proof = null;
-        if(goalChooser!=null){
+        if(goalChooser != null) {
             goalChooser.init(null, ImmutableSLList.<Goal>nil());
         }
     }

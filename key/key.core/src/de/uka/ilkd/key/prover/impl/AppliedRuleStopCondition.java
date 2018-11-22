@@ -2,7 +2,6 @@ package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.StopCondition;
 
 /**
@@ -22,8 +21,7 @@ public final class AppliedRuleStopCondition implements StopCondition {
     @Override
     public int getMaximalWork(int maxApplications,
                               long timeout,
-                              Proof proof,
-                              GoalChooser goalChooser) {
+                              Proof proof) {
         return maxApplications;
     }
 
@@ -34,7 +32,6 @@ public final class AppliedRuleStopCondition implements StopCondition {
     public boolean isGoalAllowed(int maxApplications,
                                  long timeout,
                                  Proof proof,
-                                 GoalChooser goalChooser,
                                  long startTime,
                                  int countApplied,
                                  Goal goal) {
@@ -48,7 +45,6 @@ public final class AppliedRuleStopCondition implements StopCondition {
     public String getGoalNotAllowedMessage(int maxApplications,
                                            long timeout,
                                            Proof proof,
-                                           GoalChooser goalChooser,
                                            long startTime,
                                            int countApplied,
                                            Goal goal) {
@@ -62,7 +58,6 @@ public final class AppliedRuleStopCondition implements StopCondition {
     public boolean shouldStop(int maxApplications,
                               long timeout,
                               Proof proof,
-                              GoalChooser goalChooser,
                               long startTime,
                               int countApplied,
                               SingleRuleApplicationInfo singleRuleApplicationInfo) {
@@ -77,7 +72,6 @@ public final class AppliedRuleStopCondition implements StopCondition {
     public String getStopMessage(int maxApplications,
                                  long timeout,
                                  Proof proof,
-                                 GoalChooser goalChooser,
                                  long startTime,
                                  int countApplied,
                                  SingleRuleApplicationInfo singleRuleApplicationInfo) {

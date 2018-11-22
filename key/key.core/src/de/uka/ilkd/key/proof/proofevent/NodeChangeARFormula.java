@@ -29,6 +29,7 @@ public abstract class NodeChangeARFormula implements NodeChange {
     /**
      * @return the position of the formula
      */
+    @Override
     public PosInOccurrence getPos () {
 	return pos;
     }

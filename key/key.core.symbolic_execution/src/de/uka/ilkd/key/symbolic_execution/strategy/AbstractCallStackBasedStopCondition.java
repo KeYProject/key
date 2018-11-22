@@ -20,7 +20,6 @@ import java.util.Map;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -47,8 +46,7 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
    @Override
    public int getMaximalWork(int maxApplications, 
                              long timeout, 
-                             Proof proof, 
-                             GoalChooser goalChooser) {
+                             Proof proof) {
       startingCallStackSizePerGoal.clear(); // Reset initial call stack size of all goals. Will be filled in isGoalAllowed.
       return 0; // Return unknown because there is no relation between applied rules and step over functionality.
    }
@@ -60,7 +58,6 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
    public boolean isGoalAllowed(int maxApplications, 
                                 long timeout, 
                                 Proof proof, 
-                                GoalChooser goalChooser, 
                                 long startTime, 
                                 int countApplied, 
                                 Goal goal) {
@@ -130,7 +127,6 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
    public boolean shouldStop(int maxApplications, 
                              long timeout, 
                              Proof proof, 
-                             GoalChooser goalChooser, 
                              long startTime, 
                              int countApplied, 
                              SingleRuleApplicationInfo singleRuleApplicationInfo) {
@@ -170,7 +166,6 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
    public String getStopMessage(int maxApplications, 
                                 long timeout, 
                                 Proof proof, 
-                                GoalChooser goalChooser, 
                                 long startTime, 
                                 int countApplied, 
                                 SingleRuleApplicationInfo singleRuleApplicationInfo) {

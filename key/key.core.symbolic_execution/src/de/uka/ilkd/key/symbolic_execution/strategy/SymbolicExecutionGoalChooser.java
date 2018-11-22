@@ -84,7 +84,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
          // Reinitialize preferred set if required: Only with the goals where the stop condition accepts the next rule
          if (stopCondition != null && goalsToPrefer.isEmpty()) {
             for (Goal goalToPrefer: selectedList) {
-               if (stopCondition.isGoalAllowed(-1, -1l, proof, this, -1l, -1, goalToPrefer)) {
+               if (stopCondition.isGoalAllowed(-1, -1l, proof, -1l, -1, goalToPrefer)) {
                   goalsToPrefer.add(goalToPrefer);
                }
             }
@@ -113,7 +113,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
                if (goalsToPrefer.remove(next) || goalsToPrefer.isEmpty()) {
                   // Goal is preferred, so check if next rule is allowed
                   if (stopCondition == null || 
-                      stopCondition.isGoalAllowed(-1, -1l, proof, this, -1l, -1, next)) {
+                      stopCondition.isGoalAllowed(-1, -1l, proof, -1l, -1, next)) {
                      // Next rule allowed, goal is preferred so return it as result
                      goal = next;
                   }

@@ -17,7 +17,6 @@ import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.prover.StopCondition;
 
@@ -64,7 +63,7 @@ public class SuspendingStopCondition implements StopCondition {
     * {@inheritDoc}
     */
    @Override
-   public int getMaximalWork(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser) {
+   public int getMaximalWork(int maxApplications, long timeout, Proof proof) {
       return 0;
    }
 
@@ -72,7 +71,7 @@ public class SuspendingStopCondition implements StopCondition {
     * {@inheritDoc}
     */
    @Override
-   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, Goal goal) {
       if (sleep) {
          TestUtilsUtil.sleep(sleepTime);
       }
@@ -83,7 +82,7 @@ public class SuspendingStopCondition implements StopCondition {
     * {@inheritDoc}
     */
    @Override
-   public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+   public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, Goal goal) {
       return null;
    }
 
@@ -91,7 +90,7 @@ public class SuspendingStopCondition implements StopCondition {
     * {@inheritDoc}
     */
    @Override
-   public boolean shouldStop(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+   public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
       if (sleep) {
          TestUtilsUtil.sleep(sleepTime);
       }
@@ -102,7 +101,7 @@ public class SuspendingStopCondition implements StopCondition {
     * {@inheritDoc}
     */
    @Override
-   public String getStopMessage(int maxApplications, long timeout, Proof proof, GoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+   public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
       return null;
    }
 

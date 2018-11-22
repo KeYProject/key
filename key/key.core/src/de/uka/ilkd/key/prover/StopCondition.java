@@ -38,13 +38,11 @@ public interface StopCondition {
      * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
      * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
      * @param proof The current {@link Proof}.
-     * @param goalChooser The current {@link GoalChooser}.
      * @return The maximal amount of work or {@code 0} if it is unknown.
      */
     public int getMaximalWork(int maxApplications,
                               long timeout,
-                              Proof proof,
-                              GoalChooser goalChooser);
+                              Proof proof);
 
     /**
      * Checks if it is allowed to apply the next rule on the selected {@link Goal}
@@ -53,7 +51,6 @@ public interface StopCondition {
      * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
      * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
      * @param proof The current {@link Proof}.
-     * @param goalChooser The current {@link GoalChooser}.
      * @param startTime The timestamp when the apply strategy has started, computed via {@link System#currentTimeMillis()}
      * @param countApplied The number of already applied rules.
      * @param goal The current {@link Goal} on which the next rule will be applied.
@@ -62,7 +59,6 @@ public interface StopCondition {
     public boolean isGoalAllowed(int maxApplications,
                                  long timeout,
                                  Proof proof,
-                                 GoalChooser goalChooser,
                                  long startTime,
                                  int countApplied,
                                  Goal goal);
@@ -74,7 +70,6 @@ public interface StopCondition {
      * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
      * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
      * @param proof The current {@link Proof}.
-     * @param goalChooser The current {@link GoalChooser}.
      * @param startTime The timestamp when the apply strategy has started, computed via {@link System#currentTimeMillis()}
      * @param countApplied The number of already applied rules.
      * @param goal The current {@link Goal} on which the next rule will be applied.
@@ -83,7 +78,6 @@ public interface StopCondition {
     public String getGoalNotAllowedMessage(int maxApplications,
                                            long timeout,
                                            Proof proof,
-                                           GoalChooser goalChooser,
                                            long startTime,
                                            int countApplied,
                                            Goal goal);
@@ -93,7 +87,6 @@ public interface StopCondition {
      * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
      * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
      * @param proof The current {@link Proof}.
-     * @param goalChooser The current {@link GoalChooser}.
      * @param startTime The timestamp when the apply strategy has started, computed via {@link System#currentTimeMillis()}
      * @param countApplied The number of already applied rules.
      * @param singleRuleApplicationInfo An optional {@link SingleRuleApplicationInfo}.
@@ -102,7 +95,6 @@ public interface StopCondition {
     public boolean shouldStop(int maxApplications,
                               long timeout,
                               Proof proof,
-                              GoalChooser goalChooser,
                               long startTime,
                               int countApplied,
                               SingleRuleApplicationInfo singleRuleApplicationInfo);
@@ -114,7 +106,6 @@ public interface StopCondition {
      * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
      * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
      * @param proof The current {@link Proof}.
-     * @param goalChooser The current {@link GoalChooser}.
      * @param startTime The timestamp when the apply strategy has started, computed via {@link System#currentTimeMillis()}
      * @param countApplied The number of already applied rules.
      * @param singleRuleApplicationInfo An optional {@link SingleRuleApplicationInfo}.
@@ -123,7 +114,6 @@ public interface StopCondition {
     public String getStopMessage(int maxApplications,
                                  long timeout,
                                  Proof proof,
-                                 GoalChooser goalChooser,
                                  long startTime,
                                  int countApplied,
                                  SingleRuleApplicationInfo singleRuleApplicationInfo);

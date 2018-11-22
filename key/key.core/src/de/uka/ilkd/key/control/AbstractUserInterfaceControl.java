@@ -35,10 +35,10 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
-import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 
 /**
  * Provides a basic implementation of {@link UserInterfaceControl}.
@@ -178,7 +178,7 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
         @Override
         public void taskStarted(TaskStartedInfo info) {
             if (TaskStartedInfo.TaskKind.Macro == info.getKind()
-                    && !info.getMessage().contains(ApplyStrategy.PROCESSING_STRATEGY)) {
+                    && !info.getMessage().contains(ProverCore.PROCESSING_STRATEGY)) {
                 macroStarted(info);
             }
         }
