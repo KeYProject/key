@@ -417,7 +417,9 @@ public class OriginTermLabelWindow extends JFrame {
 
             result.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-            result.setToolTipText(getFullText(term, originLabel.getOrigin()));
+            if (originLabel != null) {
+                result.setToolTipText(getFullText(term, originLabel.getOrigin()));
+            }
 
             return result;
         }
@@ -455,7 +457,7 @@ public class OriginTermLabelWindow extends JFrame {
                 text = LogicPrinter.quickPrintTerm(term, services);
             }
 
-            return text.substring(0, text.indexOf("\n")).replaceAll("\\s+", " ") + "...";
+            return text.substring(0, text.indexOf("\n")).replaceAll("\\s+", " ");
         }
     }
 
