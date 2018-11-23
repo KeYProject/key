@@ -515,7 +515,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
         }
         // initalize OriginTermLabels
         termPOs = termPOs.stream().map(
-                t -> OriginTermLabel.collectSubtermOrigins(t, tb)).collect(Collectors.toList());
+                t -> OriginTermLabel.collectSubtermOrigins(t, proofServices))
+                .collect(Collectors.toList());
 
         // save in field
         assignPOTerms(termPOs.toArray(new Term[termPOs.size()]));

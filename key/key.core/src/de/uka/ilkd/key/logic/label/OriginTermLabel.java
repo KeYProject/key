@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -52,16 +53,24 @@ public class OriginTermLabel implements TermLabel {
      * @param tb the term builder to use for the transformation.
      * @return the transformed term.
      */
-    public static Term collectSubtermOrigins(Term term, TermBuilder tb) {
+    public static Term collectSubtermOrigins(Term term, Services services) {
+        if (services.getTypeConverter().getHeapLDT().getHeap().sort().equals(term.sort())) {
+            return term;
+        }
+
+        TermBuilder tb = services.getTermBuilder();
         ImmutableArray<Term> oldSubs = term.subs();
         Term[] newSubs = new Term[oldSubs.size()];
         Set<Origin> origins = new HashSet<>();
 
         for (int i = 0; i < newSubs.length; ++i) {
-            newSubs[i] = collectSubtermOrigins(oldSubs.get(i), tb);
+            newSubs[i] = collectSubtermOrigins(oldSubs.get(i), services);
             OriginTermLabel subLabel = (OriginTermLabel) newSubs[i].getLabel(NAME);
-            origins.add(subLabel.getOrigin());
-            origins.addAll(subLabel.getSubtermOrigins());
+
+            if (subLabel != null) {
+                origins.add(subLabel.getOrigin());
+                origins.addAll(subLabel.getSubtermOrigins());
+            }
         }
 
         List<TermLabel> labels = term.getLabels().toList();
