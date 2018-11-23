@@ -164,7 +164,8 @@ public class Semisequent implements Iterable<SequentFormula> {
             cf         = searchList.head ();
             searchList = searchList.tail();
 
-            if (sequentFormula != null && cf.formula().equalsModRenaming(sequentFormula.formula())) {
+            if (sequentFormula != null && 
+                    cf.formula().equalsModRenaming(sequentFormula.formula())) {
                 semiCI.rejectedFormula( sequentFormula );
                 return semiCI; // semisequent already contains formula
 
@@ -241,8 +242,7 @@ public class Semisequent implements Iterable<SequentFormula> {
 
 
     /** .
-     * inserts new SequentFormula at index idx and removes
-     * duplicates, perform simplifications etc.
+     * inserts new SequentFormula at index {@code idx} and removes duplicates, perform simplifications etc.
      * @param sequentFormula the SequentFormula to be inserted at position idx
      * @param idx an int that means insert sequentFormula at the idx-th
      * position in the semisequent
@@ -252,7 +252,8 @@ public class Semisequent implements Iterable<SequentFormula> {
     private SemisequentChangeInfo removeRedundance(int idx,
             SequentFormula sequentFormula) {
         return complete
-                (insertAndRemoveRedundancyHelper ( idx, sequentFormula, new SemisequentChangeInfo(seqList), null ));
+                (insertAndRemoveRedundancyHelper(idx, sequentFormula, 
+                        new SemisequentChangeInfo(seqList), null));
     }
 
 
@@ -303,6 +304,12 @@ public class Semisequent implements Iterable<SequentFormula> {
         return insertAndRemoveRedundancy(idx, replacements, remove(idx));
     }
 
+    /**
+     * replaces the formula at position {@code idx} by the given list of formulas
+     * @param idx the position 
+     * @param replacements the new formulas
+     * @return change information including the resulting semisequent after the replacement
+     */
     public SemisequentChangeInfo replace(int idx, ImmutableList<SequentFormula> replacements) {
         return insertAndRemoveRedundancy(idx, replacements, remove(idx));
     }
