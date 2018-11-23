@@ -179,18 +179,16 @@ public class Semisequent implements Iterable<SequentFormula> {
 	else
 	    semiCI.modifiedFormula(idx, fci);
 
-	if ( idx > pos ) {
-	    searchList = searchList.prepend ( sequentFormula );
-	}
-
-	while ( pos >= 0 ) {
+	final ImmutableList<SequentFormula> orig = semiCI.getFormulaList();
+	pos = idx > orig.size() ? orig.size() : idx;
+    
+	searchList = semiCI.getFormulaList().take(pos).prepend(sequentFormula);  	    
+	
+    while ( pos > 0 ) {
+        --pos;
 	    searchList = searchList.prepend ( newSeqList[pos] );
-	    if ( idx == pos ) {
-		searchList = searchList.prepend ( sequentFormula );
-	    }
-	    --pos;
-	}      
-
+	}
+	
 	// add new formula list to result object
 	semiCI.setFormulaList ( searchList );
 
