@@ -22,14 +22,8 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
  * Keys: Long Values: IList<IfFormulaInstantiation>
  */
 public class IfInstantiationCachePool {
-    /**
-     * This field causes a memory leak (that is ad-hoc-ly fixed in
-     * QueueRuleApplicationManager.clearCache()) because it is static and has
-     * references to node which has again a reference to proof. Can this field
-     * be made non-static by putting it in some other class? This field was
-     * private before the fix
-     */
-    public final static LRUCache<Node, IfInstantiationCache> cacheMgr = new LRUCache<>(10);
+    
+    public final LRUCache<Node, IfInstantiationCache> cacheMgr = new LRUCache<>(10);
 
     public IfInstantiationCache getCache(Node n) {
         IfInstantiationCache cache;
