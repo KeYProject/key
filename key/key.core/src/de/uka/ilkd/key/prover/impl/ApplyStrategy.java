@@ -27,6 +27,9 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.prover.GoalChooser;
@@ -119,9 +122,7 @@ public class ApplyStrategy extends AbstractProverCore {
                                                  g, app);
         } else {
             assert g != null;
-            if (g.apply(app).isEmpty()) {
-            	closedGoals++;
-            }
+            g.apply(app);
             return new SingleRuleApplicationInfo(g, app);
         }
     }
@@ -180,6 +181,7 @@ public class ApplyStrategy extends AbstractProverCore {
         return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(), time,
                                      countApplied, closedGoals);
     }
+
 
     private void init(Proof newProof, ImmutableList<Goal> goals, int maxSteps, long timeout) {
         this.proof      = newProof;
@@ -245,13 +247,34 @@ public class ApplyStrategy extends AbstractProverCore {
 
         this.stopAtFirstNonClosableGoal = stopAtFirstNonCloseableGoal;
 
-        init(proof, goals, maxSteps, timeout);
-        ApplyStrategyInfo result = executeStrategy();
+        ProofTreeListener treeListener =
+                prepareStrategy(proof, goals, maxSteps, timeout);
+        ApplyStrategyInfo result = executeStrategy(treeListener);
         finishStrategy(result);
         return result;
     }
 
-    private ApplyStrategyInfo executeStrategy() {
+
+    private ProofTreeListener prepareStrategy(Proof proof, ImmutableList<Goal> goals,
+                                              int maxSteps, long timeout) {
+        ProofTreeListener treeListener = new ProofTreeAdapter() {
+            @Override
+            public void proofGoalsAdded(ProofTreeEvent e) {
+                ImmutableList<Goal> newGoals = e.getGoals();
+                // Check for a closed goal ...
+                if (newGoals.size() == 0){
+                    // No new goals have been generated ...
+                    closedGoals++;
+                }
+            }
+        };
+        proof.addProofTreeListener(treeListener);
+        init(proof, goals, maxSteps, timeout);
+
+        return treeListener;
+    }
+
+    private ApplyStrategyInfo executeStrategy(ProofTreeListener treeListener) {
         assert proof != null;
 
         ProofListener pl = new ProofListener();
@@ -260,6 +283,7 @@ public class ApplyStrategy extends AbstractProverCore {
         try {
             result = doWork(goalChooser, stopCondition);
         } finally {
+            proof.removeProofTreeListener(treeListener);
             proof.removeRuleAppListener(pl);
             setAutoModeActive(false);
         }
@@ -298,7 +322,7 @@ public class ApplyStrategy extends AbstractProverCore {
             RuleAppInfo rai = e.getRuleAppInfo ();
             if (rai == null) {
                 return;
-            }
+                }
 
             final GoalChooser goalChooser = getGoalChooserForProof(rai.getOriginalNode().proof());
             synchronized (goalChooser) {
@@ -323,7 +347,7 @@ public class ApplyStrategy extends AbstractProverCore {
 	public void clear(){
         final GoalChooser goalChooser = getGoalChooserForProof(proof);
         proof = null;
-        if(goalChooser != null) {
+        if(goalChooser!=null){
             goalChooser.init(null, ImmutableSLList.<Goal>nil());
         }
     }
