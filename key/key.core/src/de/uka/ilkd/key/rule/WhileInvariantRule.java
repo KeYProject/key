@@ -687,8 +687,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         initGoal.changeFormula(initFormula(termLabelState, inst, invTerm,
                                            reachableState, services, initGoal),
                                ruleApp.posInOccurrence());
-        TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(),
-                                      this, initGoal, null, null);
     }
 
 
@@ -966,7 +964,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                 tb.applySequential(uAnon,
                                    tb.and(tb.and(invTerm, reachableOut),
                                           invFreeTerm));
-
+        
         final ImmutableList<Goal> result;
         Goal wdGoal;
         if (WellDefinednessCheck.isOn()) {
@@ -1027,6 +1025,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         // (#v1=FALSE -> \[{.. ...}\]post)),anon2))
         prepareUseCaseBranch(termLabelState, services, ruleApp, inst, wellFormedAnon, useGoal,
                              guardJb, guardFalseTerm, uAnon, uAnonInv);
+        
         return result;
     }
 

@@ -26,7 +26,13 @@ import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 
 /**
  * <p>
@@ -44,6 +50,46 @@ import de.uka.ilkd.key.rule.Rule;
  * @see TermLabelManager
  */
 public interface TermLabelRefactoring extends RuleSpecificTask {
+
+    /**
+     * Determines whether any refatorings should be applied on an application of the given {@link BuiltInRule}.
+     * 
+     * If you perform refactorings despite this method returning false, KeY will throw an exception
+     * because the formula that contains the modality in which the contract was applied does not have
+     * a FormulaTag.
+     * //TODO Find out why this is.
+     * 
+     * @param rule
+     * @param goal
+     * @param hint
+     * @return whether any refactorings should be applied on an application of the given rule.
+     */
+    public static boolean shouldRefactorOnBuiltInRule(Rule rule, Goal goal, Object hint) {
+        if (goal != null) {
+            Proof proof = goal.proof();
+            if ((rule instanceof WhileInvariantRule && WhileInvariantRule.INITIAL_INVARIANT_ONLY_HINT.equals(hint)) ||
+                (rule instanceof WhileInvariantRule && WhileInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint)) ||
+                (rule instanceof UseOperationContractRule && UseOperationContractRule.FINAL_PRE_TERM_HINT.equals(hint)) ||
+                (rule instanceof AbstractBlockSpecificationElementRule && AbstractBlockSpecificationElementRule.FULL_PRECONDITION_TERM_HINT.equals(hint)) ||
+                (rule instanceof AbstractBlockSpecificationElementRule && AbstractBlockSpecificationElementRule.NEW_POSTCONDITION_TERM_HINT.equals(hint)) ||
+                (rule instanceof CloseAfterMerge && CloseAfterMerge.FINAL_WEAKENING_TERM_HINT.equals(hint))) {
+               ProofOblInput problem = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+               if (problem instanceof AbstractOperationPO) {
+                  return ((AbstractOperationPO) problem).isAddSymbolicExecutionLabel();
+               }
+               else {
+                  return false;
+               }
+            }
+            else {
+               return false;
+            }
+         }
+         else {
+            return false;
+         }
+    }
+    
    /**
     * Defines if a refactoring is required and if so in which {@link RefactoringScope}.
     * @param state The {@link TermLabelState} of the current rule application.
