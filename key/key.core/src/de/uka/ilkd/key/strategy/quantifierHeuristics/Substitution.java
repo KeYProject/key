@@ -71,7 +71,7 @@ public class Substitution {
         assert isGround() :
             "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
-        final TermBuilder tb = services.getTermBuilder(false);
+        final TermBuilder tb = services.getTermBuilder();
         while ( it.hasNext () ) {
             final QuantifiableVariable var = it.next ();
             final Sort quantifiedVarSort = var.sort ();
@@ -98,7 +98,7 @@ public class Substitution {
     public Term applyWithoutCasts(Term t, TermServices services) {
         assert isGround() :
             "non-ground substitutions are not yet implemented: " + this;
-        final TermBuilder tb = services.getTermBuilder(false);
+        final TermBuilder tb = services.getTermBuilder();
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
         while ( it.hasNext () ) {
             final QuantifiableVariable var = it.next ();
