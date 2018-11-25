@@ -160,13 +160,13 @@ public class TacletMatchProgram {
 
         MatchConditions mc = p_matchCond;
         
-        final TermNavigator navi = new TermNavigator(p_toMatch);
+        final TermNavigator navi = TermNavigator.get(p_toMatch);
         int instrPtr = 0;
         while (mc != null && instrPtr < instruction.length && navi.hasNext()) {
             mc = instruction[instrPtr].match(navi, mc, services);
             instrPtr++;
         }
-
+        navi.release();
         return mc;
     }
 

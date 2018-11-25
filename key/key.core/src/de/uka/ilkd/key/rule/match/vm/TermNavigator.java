@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.rule.match.vm;
 
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 
 import de.uka.ilkd.key.logic.Term;
 
@@ -8,6 +8,38 @@ import de.uka.ilkd.key.logic.Term;
  * An iterator that walks in first-depth order through the term. It allows to jump to siblings.
  */
 public class TermNavigator {
+    
+    
+    private static final int POOL_SIZE = 100;
+    /** 
+     * TERM_NAVIGATOR_POOL of TermNavigator as these are created very often and short-living
+     * we reuse them as far as possible 
+     * 
+     * The used TermNavigator have to be explicitly released by the user via {@link #release()}
+     */
+    private static ArrayDeque<TermNavigator> TERM_NAVIGATOR_POOL = new ArrayDeque<>();
+    static {
+        for (int i = 0; i<POOL_SIZE; i++) {
+            TERM_NAVIGATOR_POOL.push(new TermNavigator());
+        }
+    }
+
+    /**
+     * returns a pooled {@link TermNavigator} or a new one if the TERM_NAVIGATOR_POOL is currently empty
+     * The used TermNavigator have to be explicitly released by the user via {@link #release()}
+     * @return a pooled {@link TermNavigator} or a new one if the TERM_NAVIGATOR_POOL is currently empty
+     */
+    public static TermNavigator get(Term term) {
+        synchronized(TERM_NAVIGATOR_POOL) {
+            if (!TERM_NAVIGATOR_POOL.isEmpty()) {
+                final TermNavigator tn = TERM_NAVIGATOR_POOL.pop();
+                tn.stack.push(MutablePair.get(term, 0));
+                return tn;
+            }
+        }
+        return new TermNavigator(term);
+    }
+    
 
     /** 
      * top element on stack contains always the pair whose
@@ -19,10 +51,13 @@ public class TermNavigator {
      * the second component is less than the arity of the term in the 
      * first component
      */
-    private final LinkedList<TermNavigator.MutablePair<Term,Integer>> stack = new LinkedList<>();
+    private final ArrayDeque<MutablePair> stack = new ArrayDeque<>();
     
-    public TermNavigator(Term term) {
-        stack.push(new TermNavigator.MutablePair<Term,Integer>(term, 0));
+    private TermNavigator() {
+    }
+
+    private TermNavigator(Term term) {
+        stack.push(MutablePair.get(term, 0));
     }
     
     public boolean hasNext() {
@@ -43,19 +78,20 @@ public class TermNavigator {
             return;
         }
         do {
-            TermNavigator.MutablePair<Term, Integer> el = stack.peek();            
+            MutablePair el = stack.peek();            
             if (el.second < el.first.arity()) {
                 final int oldPos = el.second;
+                final Term oldTerm = el.first;
                 el.second += 1;
-                if (el.second >= el.first.arity()) {
+                if (el.second >= oldTerm.arity()) {
                     // we visited all children of that term
                     // so it can be removed from the stack
-                    stack.pop();
+                    stack.pop().release(); // el's components are set to null 
                 }
-                el = new TermNavigator.MutablePair<Term, Integer>(el.first.sub(oldPos), 0);
+                el = MutablePair.get(oldTerm.sub(oldPos), 0);
                 stack.push(el);
             } else {
-                stack.pop();  
+                stack.pop().release();
             }
         } while (!stack.isEmpty() && stack.peek().second != 0);
     }
@@ -65,24 +101,81 @@ public class TermNavigator {
     }
     
     public void gotoNextSibling() {
-        stack.pop();
+        stack.pop().release();;
         gotoNextHelper();            
     }
+    
+    public void release() {
+        stack.forEach((e)->e.release());
+        stack.clear();
+        if (TERM_NAVIGATOR_POOL.size() < POOL_SIZE) {
+            synchronized(TERM_NAVIGATOR_POOL) {
+                TERM_NAVIGATOR_POOL.push(this);
+            }
+        }
+    }
+
 
     /** 
      * A mutable tuple of two types
-     * @param <Fst> the type of the first component of the tuple
-     * @param <Snd> the type of the second component of the tuple
      */
-    private static class MutablePair<Fst,Snd> {
-        private Fst first;
-        private Snd second;
+    private static class MutablePair {
         
-        public MutablePair(Fst first, Snd second) {
+        private static final int PAIR_POOL_SIZE = 1000;
+
+        /** 
+         * TERM_NAVIGATOR_POOL of TermNavigator.MutablePair as these are created very often and short-living
+         * we reuse them as far as possible 
+         * 
+         * The used TermNavigator have to be explicitly released by the user via {@link #release()}
+         */
+        private static ArrayDeque<MutablePair> PAIR_POOL = new ArrayDeque<>();
+        static {
+            for (int i = 0; i<PAIR_POOL_SIZE; i++) {
+                PAIR_POOL.push(new MutablePair(null,null));
+            }
+        }
+        /**
+         * returns a pooled {@link MutablePair} or a new one if the TERM_NAVIGATOR_POOL is currently empty
+         * The used MutablePair have to be explicitly released by the user via {@link #release()}
+         * @return a pooled {@link MutablePair} or a new one if the TERM_NAVIGATOR_POOL is currently empty
+         */
+        static MutablePair get(Term first, Integer second) {
+            synchronized(PAIR_POOL) {
+                if (!PAIR_POOL.isEmpty()) {
+                    final MutablePair pair = PAIR_POOL.pop();
+                    pair.set(first, second);
+                    return pair;
+                }
+            }
+            System.out.println("empty");
+            return new MutablePair(first, second);
+        }
+        
+        
+        Term first;
+        Integer second;
+        
+        public MutablePair(Term first, Integer second) {
+            this.first = first;
+            this.second = second;
+        }
+        
+        public final void set(Term first, Integer second) {
             this.first = first;
             this.second = second;
         }
 
+        public final void release() {
+            first = null;
+            second = null;
+            if (PAIR_POOL.size() < PAIR_POOL_SIZE) {
+                synchronized(PAIR_POOL) { 
+                    PAIR_POOL.push(this);
+                }
+            }
+        }
+        
         @Override
         public String toString() {
             return "MutablePair [first=" + first + ", second=" + second
