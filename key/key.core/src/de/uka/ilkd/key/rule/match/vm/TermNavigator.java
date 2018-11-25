@@ -30,14 +30,18 @@ public class TermNavigator {
      * @return a pooled {@link TermNavigator} or a new one if the TERM_NAVIGATOR_POOL is currently empty
      */
     public static TermNavigator get(Term term) {
+        TermNavigator tn = null;
         synchronized(TERM_NAVIGATOR_POOL) {
             if (!TERM_NAVIGATOR_POOL.isEmpty()) {
-                final TermNavigator tn = TERM_NAVIGATOR_POOL.pop();
-                tn.stack.push(MutablePair.get(term, 0));
-                return tn;
-            }
+                tn = TERM_NAVIGATOR_POOL.pop();
+            }            
         }
-        return new TermNavigator(term);
+        if (tn != null) {
+            tn.stack.push(MutablePair.get(term, 0));
+        } else { 
+            tn = new TermNavigator(term);
+        }
+        return tn;
     }
     
 
@@ -141,15 +145,18 @@ public class TermNavigator {
          * @return a pooled {@link MutablePair} or a new one if the TERM_NAVIGATOR_POOL is currently empty
          */
         static MutablePair get(Term first, Integer second) {
+            MutablePair pair = null;
             synchronized(PAIR_POOL) {
                 if (!PAIR_POOL.isEmpty()) {
-                    final MutablePair pair = PAIR_POOL.pop();
-                    pair.set(first, second);
-                    return pair;
+                    pair = PAIR_POOL.pop();
                 }
             }
-            System.out.println("empty");
-            return new MutablePair(first, second);
+            if (pair != null) {
+                pair.set(first, second);
+            } else {
+                pair = new MutablePair(first, second);
+            }
+            return pair;
         }
         
         
