@@ -1,7 +1,7 @@
 #!/bin/sh -x
 export KEY_VERSION="2.7.$BUILD_NUMBER"
 export ANT_HOME=/opt/ant/
-export ANT_OPTS="-Xmx5120m -Xms512m"
+export ANT_OPTS="-Xmx4096m -Xms512m -XX:-UseGCOverheadLimit"
 export PATH=$PATH:/home/hudson/key/bin/
 export STATISTICS_DIR="$JENKINS_HOME/userContent/statistics-$JOB_NAME"
 unset DISPLAY
