@@ -18,6 +18,7 @@
 		       showoutput="yes" dir="${basedir}">
 			<jvmarg value="-Xmx2048m"/>
 			<jvmarg value="-XX:MaxPermSize=256m"/>
+			<jvmarg value="-XX:-UseGCOverheadLimit"/>
 			<jvmarg value="-Dkey.disregardSettings=true"/>
 			<jvmarg value="-ea"/>
 			<classpath>
@@ -60,6 +61,7 @@
 		       showoutput="yes" dir="${basedir}">
 			<jvmarg value="-Xmx2048m"/>
 			<jvmarg value="-XX:MaxPermSize=256m"/>
+			<jvmarg value="-XX:-UseGCOverheadLimit"/>
 			<jvmarg value="-Dkey.disregardSettings=true"/>
 			<jvmarg value="-ea"/>
 			<classpath>
