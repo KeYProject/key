@@ -16,7 +16,7 @@
 		       fork="yes" forkMode="once" haltonerror="no"
 		       enableTestListenerEvents="false"
 		       showoutput="yes" dir="${basedir}">
-			<jvmarg value="-Xmx3072m"/>
+			<jvmarg value="-Xmx4096m"/>
 			<jvmarg value="-XX:MaxPermSize=256m"/>
 			<jvmarg value="-Dkey.disregardSettings=true"/>
 			<jvmarg value="-ea"/>
