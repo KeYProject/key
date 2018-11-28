@@ -63,7 +63,7 @@ import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
  *
  * @author lanzinger
  */
-public class OriginTermLabelWindow extends JFrame {
+public final class OriginTermLabelWindow extends JFrame {
 
     private static final long serialVersionUID = -2791483814174192622L;
 
@@ -124,15 +124,15 @@ public class OriginTermLabelWindow extends JFrame {
      */
     public static final int COMPONENT_GAP = 20;
 
-    protected TermView view;
-    protected JTree tree;
+    private TermView view;
+    private JTree tree;
 
-    protected JLabel originJLabel;
-    protected JLabel subtermOriginsJLabel;
+    private JLabel originJLabel;
+    private JLabel subtermOriginsJLabel;
 
-    protected Services services;
-    protected PosInOccurrence termPio;
-    protected Sequent sequent;
+    private Services services;
+    private PosInOccurrence termPio;
+    private Sequent sequent;
 
     /**
      * Creates a new {@link OriginTermLabelWindow}.
