@@ -58,10 +58,10 @@ public class EditFormulaAction extends ExplorationAction {
         g.node().getNodeInfo().setExploration(true);
 
         Term newTerm = promptForTerm(mainWindow, term);
-
-        //TODO SemiSequent class
-        //final FormulaChangeInfo fci = new FormulaChangeInfo ( pos, sequentFormula );
-        //complete(insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), fci));
+        
+        if (newTerm.equals(term)) {
+            return;
+        }
 
         TacletApp app;
         //  boolean isSoundMode = getMediator().getExplorationModeModel().getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.SOUND_APPS;
@@ -103,7 +103,7 @@ public class EditFormulaAction extends ExplorationAction {
         result.forEach(goal -> {
 
             if (goal.node().getNodeInfo().getBranchLabel().contains(posToWeakening)) {
-                ImmutableList<Goal> apply = goal.apply(weakening);
+                goal.apply(weakening);
                 goal.node().parent().getNodeInfo().setExploration(true);
             } else {
                 goal.setEnabled(false);

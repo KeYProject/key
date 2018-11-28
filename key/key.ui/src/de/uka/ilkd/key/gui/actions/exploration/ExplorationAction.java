@@ -1,6 +1,11 @@
 package de.uka.ilkd.key.gui.actions.exploration;
 
-import de.uka.ilkd.key.core.Main;
+import java.awt.event.ActionEvent;
+import java.io.Reader;
+import java.io.StringReader;
+
+import javax.swing.JOptionPane;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.java.Services;
@@ -11,12 +16,9 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.LogicPrinter;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.io.Reader;
-import java.io.StringReader;
-
 public class ExplorationAction extends MainWindowAction {
+
+    private static final long serialVersionUID = -1662459714803539089L;
 
     public ExplorationAction(MainWindow mw){
         super(mw);
@@ -26,7 +28,7 @@ public class ExplorationAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {}
 
     Term promptForTerm(MainWindow window, Term term) {
-        String initialValue = term == null
+        final String initialValue = term == null
                 ? ""
                 : LogicPrinter.quickPrintTerm(term, getMediator().getServices());
         
