@@ -265,6 +265,9 @@ public class TacletMenu extends JMenu {
 
         //        addPopFrameItem(control);
         addExplorationMenu();
+        
+        addSeparator();
+        add(new ShowOriginAction(pos));
 
         addClipboardItem(control);
 
@@ -474,8 +477,6 @@ public class TacletMenu extends JMenu {
             menuExploration.add(new AddFormulaToSuccedentAction());
             menuExploration.add(new EditFormulaAction(pos));
             menuExploration.add(new DeleteFormulaAction(pos));
-            menuExploration.addSeparator();
-            menuExploration.add(new ShowOriginAction(pos));
             add(menuExploration);
         }
     }
