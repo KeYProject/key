@@ -16,6 +16,13 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;;
 
+/**
+ * Policy for {@link OriginTermLabel}s.
+ * 
+ * This ensures that every term always has a valid term label, i.e., that no labels are lost.
+ * 
+ * @author lanzinger
+ */
 public class OriginTermLabelPolicy implements TermLabelPolicy {
 
     @Override
@@ -24,10 +31,6 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
             Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs,
             ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock,
             ImmutableArray<TermLabel> newTermOriginalLabels, TermLabel label) {
-        //TODO
-        // If we change the labels for BuiltInRules, KeY will throw an exception because the formula
-        // that contains the modality in which the contract was applied does not have a FormulaTag.
-        // I'm not sure why this is, or if this is the best way to fix it.
         if (!TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
             return label;
         }

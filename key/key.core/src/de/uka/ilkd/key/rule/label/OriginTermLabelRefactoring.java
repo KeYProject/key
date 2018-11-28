@@ -18,6 +18,14 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 
+/**
+ * Refactoring for {@link OriginTermLabel}s.
+ * 
+ * This ensures that {@link OriginTermLabel#getSubtermOrigins()}
+ * always returns an up-to-date value.
+ * 
+ * @author lanzinger
+ */
 public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
     @Override
@@ -36,10 +44,6 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     public void refactorLabels(TermLabelState state, Services services, PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Term term,
             List<TermLabel> labels) {
-        //TODO
-        // If we change the labels for BuiltInRules, KeY will throw an exception because the formula
-        // that contains the modality in which the contract was applied does not have a FormulaTag.
-        // I'm not sure why this is, or if this is the best way to fix it.
         if (!TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
             return;
         }

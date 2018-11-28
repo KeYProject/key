@@ -1692,6 +1692,13 @@ public class TermBuilder {
         return addLabelToAllSubs(term, new ImmutableArray<TermLabel>(label));
     }
 
+    /**
+     * Adds labels to a term.
+     * 
+     * @param term the term.
+     * @param labels the labels to add.
+     * @return the term with the labels added.
+     */
     public Term addLabel(Term term, ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty()) && !term.hasLabels()) {
             return term;
@@ -1714,6 +1721,13 @@ public class TermBuilder {
         }
     }
 
+    /**
+     * Adds a label to a term.
+     * 
+     * @param term the term.
+     * @param label the label to add.
+     * @return the term with the label added.
+     */
     public Term addLabel(Term term, TermLabel label) {
         if (label == null && !term.hasLabels()) {
             return term;
@@ -1722,6 +1736,13 @@ public class TermBuilder {
         }
     }
 
+    /**
+     * Applies labels to a term, removing any existing labels.
+     * 
+     * @param term the term.
+     * @param labels the labels to apply.
+     * @return the modified term.
+     */
     public Term label(Term term, ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty())) {
             return term;
@@ -1731,6 +1752,13 @@ public class TermBuilder {
         }
     }
 
+    /**
+     * Applies a label to a term, removing any existing labels.
+     * 
+     * @param term the term.
+     * @param label the label to apply.
+     * @return the modified term.
+     */
     public Term label(Term term, TermLabel label) {
         if (label == null) {
             return term;

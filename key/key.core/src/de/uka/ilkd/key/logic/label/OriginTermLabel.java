@@ -33,6 +33,9 @@ import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
  */
 public class OriginTermLabel implements TermLabel {
 
+    /**
+     * Display name for {@link OriginTermLabel}s.
+     */
     public final static Name NAME = new Name("Origin");
 
     private Origin origin;
@@ -99,6 +102,14 @@ public class OriginTermLabel implements TermLabel {
                 new ImmutableArray<>(labels));
     }
 
+    /**
+     * Creates a new {@link OriginTermLabel}.
+     * 
+     * @param specType the JML spec type the term originates from.
+     * @param file the file the term originates from.
+     * @param line the line in the file.
+     * @param subtermOrigins the origins of the term's (former) subterms.
+     */
     public OriginTermLabel(SpecType specType, String file, int line, Set<Origin> subtermOrigins) {
         this(specType, file, line);
         this.subtermOrigins.addAll(subtermOrigins);
@@ -106,6 +117,13 @@ public class OriginTermLabel implements TermLabel {
                 .filter(o -> o.specType != SpecType.NONE).collect(Collectors.toSet());
     }
 
+    /**
+     * Creates a new {@link OriginTermLabel}.
+     * 
+     * @param specType the JML spec type the term originates from.
+     * @param file the file the term originates from.
+     * @param line the line in the file.
+     */
     public OriginTermLabel(SpecType specType, String file, int line) {
         String filename = file == null || file.equals("no file")
                 ? null
@@ -115,6 +133,11 @@ public class OriginTermLabel implements TermLabel {
         this.subtermOrigins = new HashSet<>();
     }
 
+    /**
+     * Creates a new {@link OriginTermLabel}.
+     * 
+     * @param subtermOrigins the origins of the term's (former) subterms.
+     */
     public OriginTermLabel(Set<Origin> subtermOrigins) {
         this.origin = new Origin(SpecType.NONE, null, -1);
         this.subtermOrigins = new HashSet<>();
@@ -170,12 +193,36 @@ public class OriginTermLabel implements TermLabel {
         return Collections.unmodifiableSet(subtermOrigins);
     }
 
+    /**
+     * An origin encapsulates some information about where in the JML specification a term
+     * originates from.
+     * 
+     * @author lanzinger
+     */
     public static class Origin implements Comparable<Origin> {
 
+        /**
+         * The JML spec type the term originates from.
+         */
         public final SpecType specType;
+        
+        /**
+         * The file the term originates from.
+         */
         public final String fileName;
+        
+        /**
+         * The line in the file the term originates from.
+         */
         public final int line;
 
+        /**
+         * Creates a new {@link OriginTermLabel.Origin}.
+         * 
+         * @param specType the JML spec type the term originates from.
+         * @param file the file the term originates from.
+         * @param line the line in the file.
+         */
         public Origin(SpecType specType, String fileName, int line) {
             this.specType = specType;
             this.fileName = fileName;
@@ -245,6 +292,12 @@ public class OriginTermLabel implements TermLabel {
         }
     }
 
+    /**
+     * A {@code SpecType} is any type of JML specification which gets translated into JavaDL.
+     * 
+     * @author lanzinger
+     * @see OriginTermLabel.Origin
+     */
     public static enum SpecType {
 
         ACCESSIBLE("accessible"),
