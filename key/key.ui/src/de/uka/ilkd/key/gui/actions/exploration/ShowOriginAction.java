@@ -18,6 +18,11 @@ public class ShowOriginAction extends MainWindowAction {
 
     private PosInSequent pos;
 
+    /**
+     * Creates a new {@link ShowOriginAction}.
+     * 
+     * @param pos the position of the term whose origin shall be shown.
+     */
     public ShowOriginAction(PosInSequent pos) {
         super(MainWindow.getInstance());
         this.pos = pos;

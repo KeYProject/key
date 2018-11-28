@@ -528,8 +528,8 @@ public abstract class SequentView extends JEditorPane {
 
     /**
      * 
-     * @return {@code true} if this sequent view is suppossed to be shown in the {@link MainFrame},
-     *  {@code false} if it is only suppossed to be shown in some other frame.
+     * @return {@code true} if this sequent view is supposed to be shown in the {@link MainFrame},
+     *  {@code false} if it is only supposed to be shown in some other frame.
      */
     public boolean isMainSequentView() {
         return true;

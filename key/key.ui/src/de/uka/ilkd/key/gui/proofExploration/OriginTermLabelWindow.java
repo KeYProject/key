@@ -67,16 +67,51 @@ public class OriginTermLabelWindow extends JFrame {
 
     private static final long serialVersionUID = -2791483814174192622L;
 
+    /**
+     * The window's initial width.
+     */
     public static final int WIDTH = 1280;
+    
+    /**
+     * The window's initial height.
+     */
     public static final int HEIGHT = 720;
-    public static final boolean PRINT_LINE_BREAKS_IN_TREE_NODES = true;
+
+    /**
+     * The background color to use to highlight a sub-term.
+     */
     public static final Color HIGHLIGHT_COLOR = Color.ORANGE;
 
+    /**
+     * The title of the tree view.
+     */
     public static final String TREE_TITLE = "Selected terms as tree";
+    
+    /**
+     * The title of the term view.
+     */
     public static final String VIEW_TITLE = "Selected terms";
+    
+    /**
+     * The title for the origin information for the selected term.
+     * 
+     * @see #ORIGIN_TITLE
+     * @see #SUBTERM_ORIGINS_TITLE
+     */
     public static final String ORIGIN_INFO_TITLE = "Origin information";
 
+    /**
+     * The title for the selected term's origin.
+     * 
+     * @see #ORIGIN_INFO_TITLE
+     */
     public static final String ORIGIN_TITLE = "Origin of term";
+    
+    /**
+     * The title for the origin of the selected term's sub-terms and former sub-terms.
+     * 
+     * @see #ORIGIN_INFO_TITLE
+     */
     public static final String SUBTERM_ORIGINS_TITLE = "Origins of (former) subterms";
 
     /**
@@ -99,6 +134,14 @@ public class OriginTermLabelWindow extends JFrame {
     protected PosInOccurrence termPio;
     protected Sequent sequent;
 
+    /**
+     * Creates a new {@link OriginTermLabelWindow}.
+     * 
+     * @param pos the position of the term whose origin shall be visualized.
+     * @param node the node representing the proof state for which the term's origins shall be
+     *  visualized.
+     * @param services services.
+     */
     public OriginTermLabelWindow(PosInOccurrence pos, Node node, Services services) {
         this.services = services;
         this.termPio = pos;
