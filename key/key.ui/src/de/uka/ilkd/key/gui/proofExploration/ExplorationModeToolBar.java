@@ -18,6 +18,9 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
  * @author Sarah Grebing
  */
 public class ExplorationModeToolBar extends JToolBar {
+
+    private static final long serialVersionUID = 2882840652498904204L;
+
     private MainWindow mw;
 
     private JToggleButton explorationMode;
@@ -56,6 +59,12 @@ public class ExplorationModeToolBar extends JToolBar {
         this.setName("Exploration Mode Settings");
 
         explorationMode = new JToggleButton("Exploration Mode");
+        showSecondBranch = new JToggleButton("Show Second Branch");
+        showExplorationSteps = new JButton(new ShowExplorationStepAction(mw));
+
+        showSecondBranch.setEnabled(false);
+        showExplorationSteps.setEnabled(false);
+
         explorationMode.setToolTipText("Choose to start ExplorationMode");
 
         explorationMode.addActionListener(new ActionListener() {
@@ -65,6 +74,9 @@ public class ExplorationModeToolBar extends JToolBar {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 active = !active;
+
+                showSecondBranch.setEnabled(active);
+                showExplorationSteps.setEnabled(active);
 
                 if (active) {
                     explorationModeModel.setExplorationModeSelected(true);
@@ -98,8 +110,6 @@ public class ExplorationModeToolBar extends JToolBar {
         });*/
         //soundExploration.setEnabled(false);
         //this.add(soundExploration);
-
-        showSecondBranch = new JToggleButton("Show Second Branch");
         showSecondBranch.setToolTipText("Exploration actions are \noften done using a cut. Choose to hide\n " +
                 "the second cut-branches from the view \nto focus on the exploration. Uncheck to focus on these branches.");
         showSecondBranch.addActionListener(new ActionListener() {
@@ -133,8 +143,6 @@ public class ExplorationModeToolBar extends JToolBar {
             showSecondBranch.setEnabled(false);
         }*/
         this.add(showSecondBranch);
-
-        this.showExplorationSteps = new JButton(new ShowExplorationStepAction(mw));
 
         this.add(showExplorationSteps);
         this.setEnabled(true);
