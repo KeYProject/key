@@ -155,31 +155,42 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
 
    /**
     * adds the sequent of the add part of the Taclet to the goal sequent
- * @param add
+    * @param add
     *           the Sequent to be added
- * @param termLabelState The {@link TermLabelState} of the current rule application.
- * @param currentSequent
+    * @param termLabelState The {@link TermLabelState} of the current rule application.
+    * @param currentSequent
     *           the Sequent which is the current (intermediate) result of
     *           applying the taclet
- * @param posOfFind
+    * @param posOfFind describes the application position of the find expression 
+    *           in the original sequent
+    * @param whereToAdd
     *           the PosInOccurrence describes the place where to add the
     *           semisequent
- * @param matchCond
+    * @param matchCond
     *           the MatchConditions with all required instantiations
- * @param services
+    * @param goal 
+    *           the Goal the taclet is applied to
+    * @param ruleApp 
+    *           the rule application to apply
+    * @param services
     *           the Services encapsulating all java information
     */
    @Override
    protected void applyAdd(Sequent add, TermLabelState termLabelState,
-         SequentChangeInfo currentSequent, PosInOccurrence posOfFind,
+         SequentChangeInfo currentSequent, 
+         PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
          MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
       if (posOfFind.isInAntec()) {
-         addToAntec(add.antecedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, posOfFind, posOfFind, matchCond, goal, ruleApp, services);
-         addToSucc(add.succedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, null, posOfFind, matchCond, goal, ruleApp, services);
+         addToAntec(add.antecedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), 
+                 currentSequent, whereToAdd, posOfFind, matchCond, goal, ruleApp, services);
+         addToSucc(add.succedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), 
+                 currentSequent, null, posOfFind, matchCond, goal, ruleApp, services);
       }
       else {
-         addToAntec(add.antecedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, null, posOfFind, matchCond, goal, ruleApp, services);
-         addToSucc(add.succedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, posOfFind, posOfFind, matchCond, goal, ruleApp, services);
+         addToAntec(add.antecedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), 
+                 currentSequent, null, posOfFind, matchCond, goal, ruleApp, services);
+         addToSucc(add.succedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), 
+                 currentSequent, whereToAdd, posOfFind, matchCond, goal, ruleApp, services);
       }
    }
 }

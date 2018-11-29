@@ -5,9 +5,12 @@ import java.util.Iterator;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
@@ -56,6 +59,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
      * @param services the {@link Services} encapsulating all Java model information
      */
     protected abstract void applyAdd(Sequent add, TermLabelState termLabelState, SequentChangeInfo currentSequent,
+                     PosInOccurrence whereToAdd, 
                      PosInOccurrence posOfFind,
                      MatchConditions matchCond,
                      Goal goal,
@@ -91,24 +95,13 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
     
     Iterator<TacletGoalTemplate> it               = taclet.goalTemplates().iterator(); 
     Iterator<Goal>               goalIt           = newGoals.iterator();
-   Iterator<SequentChangeInfo> newSequentsIt = newSequentsForGoals.iterator();
+    Iterator<SequentChangeInfo> newSequentsIt = newSequentsForGoals.iterator();
 
     while (it.hasNext()) {
         TacletGoalTemplate gt          = it    .next();
         Goal               currentGoal = goalIt.next();
-       SequentChangeInfo  currentSequent = newSequentsIt.next();
-
-        // add first because we want to use pos information that
-        // is lost applying replacewith
-        
-        applyAdd(gt.sequent(), termLabelState,
-                  currentSequent,
-                  tacletApp.posInOccurrence(),
-                  mc,
-                  goal,
-                  ruleApp,
-                  services);
-
+        SequentChangeInfo  currentSequent = newSequentsIt.next();
+ 
         applyReplacewith(gt, 
                  termLabelState, currentSequent,
                  tacletApp.posInOccurrence(),
@@ -117,18 +110,33 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
                  ruleApp,
                  services);
 
+        /* update position information, as original formula may no longer be in the current sequent */
+        final PosInOccurrence posWhereToAdd = 
+                updatePositionInformation(tacletApp, gt, currentSequent);
+        
+        applyAdd(gt.sequent(), termLabelState,
+                  currentSequent,
+                  posWhereToAdd,
+                  tacletApp.posInOccurrence(),
+                  mc,
+                  goal,
+                  ruleApp,
+                  services);
+        
         applyAddrule( gt.rules(),
                   currentGoal,
                   services,
                   mc );
 
-        
+        // using position of find here as an eventual program of the subterm needs to be 
+        // found; this is taken directly from the posinoccurrence and not searched for 
+        // in the new sequent
         applyAddProgVars( gt.addedProgVars(),
                 currentSequent,
-                  currentGoal,
-               tacletApp.posInOccurrence(),
-               services,
-                  mc);
+                currentGoal,
+                tacletApp.posInOccurrence(),
+                services,
+                mc);
        
        TermLabelManager.mergeLabels(currentSequent, services);
        
@@ -152,5 +160,35 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
     assert !goalIt.hasNext();
 
     return newGoals;
+    }
+
+    
+    /** 
+     * creates a new position information object, describing where to add the formulas or {@code null}
+     * if it shoudl just be added to the beginning
+     * @param tacletApp  a TacletApp with application information 
+     * @param gt the TacletGoalTemplate to be applied
+     * @param currentSequent the current sequent (the one of the new goal)
+     * @return the PosInOccurrence object describing where to add the formula
+     */
+    private PosInOccurrence updatePositionInformation(TacletApp tacletApp, TacletGoalTemplate gt,
+            SequentChangeInfo currentSequent) {
+        PosInOccurrence result = tacletApp.posInOccurrence();
+        
+        if (result != null && gt.replaceWithExpressionAsObject() != null) { 
+            final boolean inAntec = result.isInAntec();
+            final ImmutableList<FormulaChangeInfo> modifiedFormulas = 
+                    currentSequent.modifiedFormulas(inAntec);
+            if (modifiedFormulas != null && modifiedFormulas.size() > 0) {
+                // add it close to the modified formula
+                final FormulaChangeInfo head = modifiedFormulas.head();
+                result = new PosInOccurrence(head.getNewFormula(), 
+                        PosInTerm.getTopLevel(), inAntec);
+            } else {
+                // just add it
+                result = null;
+            }
+        }
+        return result;
     }
 }

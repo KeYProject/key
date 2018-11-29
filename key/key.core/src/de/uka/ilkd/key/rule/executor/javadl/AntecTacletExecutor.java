@@ -61,12 +61,13 @@ extends FindTacletExecutor<TacletKind> {
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState, 
             SequentChangeInfo currentSequent,
+            PosInOccurrence whereToAdd,
             PosInOccurrence posOfFind,
             MatchConditions matchCond,
             Goal goal,
             RuleApp ruleApp,
             Services services) {
-        addToAntec(add.antecedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, posOfFind, posOfFind, matchCond, goal, ruleApp, services);
+        addToAntec(add.antecedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, whereToAdd, posOfFind, matchCond, goal, ruleApp, services);
         addToSucc(add.succedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, null, posOfFind, matchCond, goal, ruleApp, services);
     }
 
