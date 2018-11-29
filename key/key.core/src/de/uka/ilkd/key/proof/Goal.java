@@ -84,7 +84,7 @@ public final class Goal  {
 
     /** a goal has been excluded from automatic rule application iff automatic == false */
     private boolean automatic = true;
-    
+
     /** Marks this goal as linked (-> {@link MergeRule}) */
     private Goal linkedGoal   = null;
 
@@ -134,7 +134,7 @@ public final class Goal  {
         this.tagManager      = new FormulaTagManager(this);
         this.localNamespaces = localNamespace;
       }
-    
+
     /**
      * creates a new goal referencing the given node
      * @param namespaceSet
@@ -244,7 +244,7 @@ public final class Goal  {
 	}
     }
 
-   protected void fireAautomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
+   protected void fireAutomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
       for (GoalListener listener : listeners) {
          listener.automaticStateChanged(this, oldAutomatic, newAutomatic);
       }
@@ -331,7 +331,7 @@ public final class Goal  {
         boolean oldAutomatic = automatic;
         automatic = t;
         node().clearNameCache();
-        fireAautomaticStateChanged(oldAutomatic, automatic);
+        fireAutomaticStateChanged(oldAutomatic, automatic);
     }
 
     /**
@@ -356,11 +356,11 @@ public final class Goal  {
     /**
      * Sets the node that this goal is linked to; also sets this for
      * all parents.
-     * 
+     *
      * TODO: Check whether it is problematic when multiple child nodes
      * of a node are linked; in this case, the linkedNode field would
      * be overwritten.
-     * 
+     *
      * @param linkedGoal The goal that this goal is linked to.
      */
     public void setLinkedGoal(final Goal linkedGoal) {
@@ -525,13 +525,13 @@ public final class Goal  {
 
     /** like the clone method but returns right type
      * @return Goal clone of this Goal
-     * @throws CloneNotSupportedException 
+     * @throws CloneNotSupportedException
      */
     public Goal copy() throws CloneNotSupportedException {
         return (Goal)clone();
     }
 
-    
+
     /**
      * puts a RuleApp to the list of the applied rule apps at this goal
      * and stores it in the node of the goal
@@ -560,10 +560,10 @@ public final class Goal  {
      */
     public ImmutableList<Goal> split(int n) {
         ImmutableList<Goal> goalList = ImmutableSLList.<Goal>nil();
-	
+
 	final Node parent = node; // has to be stored because the node
 	// of this goal will be replaced
-	
+
 	if (n == 1) {
 	    Node newNode = new Node(parent.proof(),
                 parent.sequent(),
@@ -571,7 +571,7 @@ public final class Goal  {
 
         parent.add(newNode);
         this.setNode(newNode);
-        goalList = goalList.prepend(this);  
+        goalList = goalList.prepend(this);
 	} else if (n > 1) { // this would also work for n ==1 but the above avoids unnecessary creation of arrays
 	    Node[] newNode = new Node[n];
 
@@ -585,11 +585,11 @@ public final class Goal  {
         parent.addAll(newNode);
 
         this.setNode(newNode[0]);
-        goalList = goalList.prepend(this);      
-	    
+        goalList = goalList.prepend(this);
+
         for (int i = 1; i<n; i++) {
-            goalList = goalList.prepend(clone(newNode[i]));	    
-        }	    
+            goalList = goalList.prepend(clone(newNode[i]));
+        }
 	}
 
 	fireGoalReplaced ( this, parent, goalList );
@@ -632,7 +632,7 @@ public final class Goal  {
 
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
         addGoalListener(journal);
-      
+
 
         final Node n = node;
 
@@ -696,6 +696,7 @@ public final class Goal  {
         }
     }
 
+    @Override
     public String toString() {
         de.uka.ilkd.key.pp.LogicPrinter lp = (new de.uka.ilkd.key.pp.LogicPrinter
                 (new de.uka.ilkd.key.pp.ProgramPrinter(null),

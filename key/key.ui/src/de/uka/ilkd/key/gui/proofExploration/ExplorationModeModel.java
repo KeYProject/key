@@ -1,7 +1,8 @@
 package de.uka.ilkd.key.gui.proofExploration;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.prooftree.GUIProofTreeModel;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
 
 public class ExplorationModeModel {
 
@@ -77,6 +78,11 @@ public class ExplorationModeModel {
      */
     public void setShowSecondBranches(boolean showSecondBranches) {
         this.showSecondBranches = showSecondBranches;
+
+        GUIProofTreeModel delegateModel =
+                MainWindow.getInstance().getProofTreeView().getDelegateModel();
+
+        delegateModel.setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS, showSecondBranches);
     }
 
 

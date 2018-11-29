@@ -9,8 +9,6 @@ import javax.swing.JToolBar;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.ShowExplorationStepAction;
-import de.uka.ilkd.key.gui.prooftree.GUIProofTreeModel;
-import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
 
 /**
  * Button Toolbar for Exploration mode controls
@@ -59,7 +57,9 @@ public class ExplorationModeToolBar extends JToolBar {
         this.setName("Exploration Mode Settings");
 
         explorationMode = new JToggleButton("Exploration Mode");
+
         showSecondBranch = new JToggleButton("Show Second Branch");
+
         showExplorationSteps = new JButton(new ShowExplorationStepAction(mw));
 
         showSecondBranch.setEnabled(false);
@@ -86,7 +86,10 @@ public class ExplorationModeToolBar extends JToolBar {
                 } else {
                     explorationModeModel.setExplorationModeSelected(false);
                     explorationMode.getModel().setPressed(false);
-                    //soundExploration.setEnabled(true);
+
+                    if (showSecondBranch.getModel().isPressed()) {
+                        showSecondBranch.doClick();
+                    }
                 }
             }
         });
@@ -118,19 +121,18 @@ public class ExplorationModeToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                GUIProofTreeModel delegateModel =
-                        MainWindow.getInstance().getProofTreeView().getDelegateModel();
+                if (MainWindow.getInstance().getProofTreeView().getDelegateModel() == null) {
+                    // No proof loaded, so we cannot register the filter.
+                    return;
+                }
 
                 active = !active;
+                explorationModeModel.setShowSecondBranches(active);
+                showSecondBranch.getModel().setPressed(active);
 
                 if (active) {
-                    showSecondBranch.getModel().setPressed(true);
-                    delegateModel.setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS, true);
                     explorationModeModel.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.WHOLE_APP);
                 } else {
-                    showSecondBranch.getModel().setPressed(false);
-                    delegateModel.setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS, false);
-                    explorationModeModel.setShowSecondBranches(false);
                     explorationModeModel.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.SIMPLIFIED_APP);
                 }
 
