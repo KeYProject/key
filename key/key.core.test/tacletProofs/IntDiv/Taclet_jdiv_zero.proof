@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Fri Nov 02 16:11:57 CET 2018
+#Thu Nov 29 09:22:16 CET 2018
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
 [SMTSettings]invariantForall=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
@@ -10,16 +10,16 @@
 [StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
 [Choice]DefaultChoices=assertions-assertions\\:safe , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:ban , JavaCard-JavaCard\\:off , Strings-Strings\\:on , modelFields-modelFields\\:treatAsAxiom , bigint-bigint\\:on , sequences-sequences\\:on , moreSeqRules-moreSeqRules\\:off , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , permissions-permissions\\:off , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off
-[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_NONE
 [StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
 [SMTSettings]UseBuiltUniqueness=false
 [SMTSettings]explicitTypeHierarchy=false
 [SMTSettings]instantiateHierarchyAssumptions=true
-[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
 [SMTSettings]SelectedTaclets=
-[StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF
-[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_RESTRICTED
-[Strategy]MaximumNumberOfAutomaticApplications=2000
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[Strategy]MaximumNumberOfAutomaticApplications=50000
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
 [StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
 [SMTSettings]useConstantsForBigOrSmallIntegers=true
@@ -27,9 +27,9 @@
 [StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
 [Strategy]Timeout=-1
 [StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
-[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_ON
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
 [SMTSettings]useUninterpretedMultiplication=true
-[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT_INTERNAL
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_EXPAND
 [StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
 [SMTSettings]maxGenericSorts=2
@@ -42,46 +42,21 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Fri Nov 02 16:11:57 CET 2018
+#Thu Nov 29 09:22:16 CET 2018
 name=jdiv_zero
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
 
 \proof {
-(keyLog "0" (keyUser "pschmitt" ) (keyVersion "1321e9557786d570114c4bc549c3b8abcb65e022"))
+(keyLog "0" (keyUser "pschmitt" ) (keyVersion "a8b3a0df3e31b4cb44172bd979e157f65ff35904"))
 
-(autoModeTime "1739")
+(autoModeTime "0")
 
 (branch "dummy ID"
-(rule "cut" (newnames "f_divDenom") (inst "cutFormula=f_divDenom = Z(0(#))") (userinteraction))
-(branch "CUT: f_divDenom = 0 TRUE"
-   (rule "replace_known_left" (formula "2") (term "0,0,1") (ifseqformula "1") (userinteraction))
-   (builtin "One Step Simplification" (formula "2"))
-   (builtin "One Step Simplification" (formula "2"))
-   (rule "cut_direct" (formula "2") (term "0,1") (userinteraction))
-   (branch "CUT: !true TRUE"
-      (builtin "One Step Simplification" (formula "1"))
-      (rule "closeFalse" (formula "1"))
-   )
-   (branch "CUT: !true FALSE"
-      (builtin "One Step Simplification" (formula "3") (ifInst ""  (formula "2")))
-      (rule "applyEqRigid" (formula "3") (term "1,0") (ifseqformula "1") (userinteraction))
-      (builtin "One Step Simplification" (formula "3") (ifInst ""  (formula "2")))
-      (rule "jdiv_axiom" (formula "3") (term "0") (userinteraction))
-      (rule "qeq_literals" (formula "1") (term "0,1") (userinteraction))
-      (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "3")) (ifInst ""  (formula "4")))
-      (rule "closeFalse" (formula "1") (userinteraction))
-   )
-)
-(branch "CUT: f_divDenom = 0 FALSE"
-   (rule "replace_known_right" (formula "2") (term "0,0,1") (ifseqformula "1") (userinteraction))
-   (builtin "One Step Simplification" (formula "2"))
-   (rule "jdiv_axiom" (formula "2") (term "0") (userinteraction))
-   (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "2")))
-   (rule "qeq_literals" (formula "1") (term "0,1"))
-   (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "3")))
-   (rule "closeFalse" (formula "1"))
-)
+(rule "jdiv_axiom_inline" (formula "1") (term "0") (newnames "f_divDenom") (userinteraction))
+(rule "qeq_literals" (formula "1") (term "0,0") (userinteraction))
+(builtin "One Step Simplification" (formula "1"))
+(rule "closeTrue" (formula "1") (userinteraction))
 )
 
 }
