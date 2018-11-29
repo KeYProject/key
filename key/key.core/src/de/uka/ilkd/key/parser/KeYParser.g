@@ -2391,7 +2391,8 @@ sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> _sort_id_check_he
 // Generic and non-generic sorts
 any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null]
     :
-        name = simple_sort_name 
+        name = simple_sort_name
+        ( OPENTYPEPARAMS parameter=any_sortId_check[checkSort] CLOSETYPEPARAMS )?
         {
             //Special handling for byte, char, short, long:
             //these are *not* sorts, but they are nevertheless valid
@@ -2427,7 +2428,13 @@ any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null
                   throw new NotDeclException(input, "sort", name);
                 }
             }
-            
+
+            if(parameter != null) {
+                s = ParametricSort.get(s, parameter);
+            }
+
+             System.out.println("Sort " + s);
+
             result = new Pair<Sort,Type>(s, t);
         }
     ;

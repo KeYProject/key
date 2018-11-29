@@ -15,6 +15,7 @@ package org.key_project.util.collection;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -161,6 +162,14 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	return rest;
     }
 
+	@Override
+	public <U> ImmutableList<U> map(Function<T, U> f) {
+		ImmutableList<U> result = nil();
+		for (T t : reverse()) {
+			result = result.prepend(f.apply(t));
+		}
+		return result;
+	}
 
     // Implemented imperatively to avoid arbitrarily deep recursion
     @Override

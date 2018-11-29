@@ -494,6 +494,12 @@ GREATEREQUAL
 RGUILLEMETS
       :   '>' '>'
       ;
+
+OPENTYPEPARAMS
+      :  '<' '[' ;
+
+CLOSETYPEPARAMS
+      :  ']' '>' ;
       
 WS
 :       (' '

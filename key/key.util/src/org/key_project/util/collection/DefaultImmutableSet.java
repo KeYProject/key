@@ -15,6 +15,7 @@ package org.key_project.util.collection;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -198,8 +199,13 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     public boolean exists(Predicate<T> predicate) {        
         return elementList.exists(predicate);
     }
-    
-    /** @return int the cardinality of the set */
+
+	@Override
+	public <U> ImmutableSet<U> map(Function<T, U> f) {
+		return new DefaultImmutableSet<U>(elementList.map(f));
+	}
+
+	/** @return int the cardinality of the set */
     public int size() {
 	return elementList.size();
     }

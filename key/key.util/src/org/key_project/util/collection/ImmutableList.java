@@ -14,6 +14,7 @@
 package org.key_project.util.collection;
 
 import java.util.Iterator;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -96,7 +97,19 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @return <T> the first element in list
      */
     T head();
-    
+
+
+    /**
+     * Apply a function f to the elements of the list.
+     * The resulting list contains the elements in the same order, but after the
+     * application of f.
+     *
+     * @param f the function to apply to the elements
+     * @param <U> result type of the mapping
+     * @return a new immutable list instance, not null.
+     */
+    <U> ImmutableList<U> map(Function<T,U> f);
+
     /**
      * return true if predicate is fullfilled for at least one element
      * @param predicate the predicate
