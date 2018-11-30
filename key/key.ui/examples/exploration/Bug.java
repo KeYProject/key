@@ -1,32 +1,18 @@
 //TODO
-// The block contract below is not provable on the exploration branch
-// (it works on the master branch).
-// I believe this is because some rule that should rename all occurrences of a particular
-// program variable only renames those occurrences that do not have a term label attached.
+// The contracts below are not provable on the exploration branch.
+// This is because when applying a method contranct, the formal parameters are not correctly replaced by the actual parameters.
 // -- lanzinger
 public class Bug {
     
     /*@ normal_behavior
-      @ requires idx <= arr.length && idx >= 0;
-      @ ensures \result == arr.length - idx;
-      @ measured_by arr.length - idx;
+      @ requires a >= 0;
       @*/
-    public static int lengthFrom(int[] arr, int idx) {
-        if (idx == arr.length) {
-            return 0;
-        } else {
-            ++idx;
-            /*@ return_behavior
-              @ requires arr != null;
-              @ requires \old(arr.length - (idx + 1)) == arr.length - idx;
-              @ requires \old(arr.length - idx) > 0;
-              @ requires idx <= arr.length && idx >= 0;
-              @ returns \result == arr.length - idx + 1;
-              @ measured_by arr.length - idx;
-              @*/
-            {
-                return lengthFrom(arr, idx) + 1;
-            }
-        }
+    public static void caller(int a) {
+        callee(a);
     }
+    
+    /*@ normal_behavior
+      @ requires count >= 0;
+      @*/
+    public static void callee(int count) { }
 }
