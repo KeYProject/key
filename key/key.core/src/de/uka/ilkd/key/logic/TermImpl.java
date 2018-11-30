@@ -460,7 +460,7 @@ class TermImpl implements Term {
        }
        
 
-       if(o == null || !(o instanceof TermImpl)
+       if(o == null || o.getClass() != getClass()
              || hashCode() != o.hashCode()) {
           return false;	
        }
@@ -468,6 +468,7 @@ class TermImpl implements Term {
        final TermImpl t = (TermImpl) o;
 
        return op.equals(t.op)
+             && t.hasLabels() == hasLabels()
              && subs.equals(t.subs)
              && boundVars.equals(t.boundVars)
              && javaBlock.equals(t.javaBlock);

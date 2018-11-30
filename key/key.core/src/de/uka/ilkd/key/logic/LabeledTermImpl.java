@@ -99,6 +99,39 @@ class LabeledTermImpl extends TermImpl {
 	/**
 	 * {@inheritDoc}
 	 */
+	public boolean equals(Object o) {
+	   if (!super.equals(o)) {
+	      return false;
+	   }
+		
+	   final LabeledTermImpl cmp = (LabeledTermImpl) o;
+		if (labels.size() == cmp.labels.size()) {
+			for (int i = 0, sz = labels.size(); i<sz; i++) { 
+			   // this is not optimal, but as long as number of labels limited ok
+				if (!cmp.labels.contains(labels.get(i))) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int computeHashCode() {
+	    int hash = super.computeHashCode();
+	    for (int i = 0, sz=labels.size(); i<sz; i++) {
+	        hash += 7*labels.get(i).hashCode(); 
+	    }
+	    return hash;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public String toString() {
 		StringBuilder result = new StringBuilder(super.toString());
 		result.append("<<");
