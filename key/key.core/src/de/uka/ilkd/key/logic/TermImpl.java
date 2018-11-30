@@ -473,6 +473,25 @@ class TermImpl implements Term {
              && boundVars.equals(t.boundVars)
              && javaBlock.equals(t.javaBlock);
     }
+    
+    @Override
+    public boolean equalsModTermLabels(Object o) {
+       if(o == this) {
+          return true;
+       }
+       
+
+       if(o == null || !(o instanceof TermImpl)) {
+          return false; 
+       }
+       
+       final TermImpl t = (TermImpl) o;
+
+       return op.equals(t.op)
+             && subs.equals(t.subs)
+             && boundVars.equals(t.boundVars)
+             && javaBlock.equals(t.javaBlock);
+    }
 
 
     @Override

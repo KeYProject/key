@@ -177,4 +177,14 @@ public interface Term extends SVSubstitute, Sorted {
      * @return {@code true} The {@link Term} or one of its direct or indirect children contains a non empty {@link JavaBlock}, {@code false} no {@link JavaBlock} available.
      */
     public boolean containsJavaBlockRecursive();
+
+    /**
+     * Checks if {@code o} is a term syntactically equal to this one,
+     * except for their labels.
+     * 
+     * @param o an object
+     * @return {@code true} iff {@code o} is a term syntactically equal to this one,
+     * except for their labels.
+     */
+    boolean equalsModTermLabels(Object o);
 }
