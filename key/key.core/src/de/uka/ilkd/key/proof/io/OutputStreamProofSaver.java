@@ -203,8 +203,10 @@ public class OutputStreamProofSaver {
 
             // \problem or \proofObligation
             if (po instanceof IPersistablePO
-                    && (!(po instanceof AbstractInfFlowPO) || (!(po instanceof InfFlowCompositePO) && ((InfFlowProof) proof)
-                            .getIFSymbols().isFreshContract()))) {
+                    && (!(po instanceof AbstractInfFlowPO)
+                            || (!(po instanceof InfFlowCompositePO)
+                                    && ((InfFlowProof) proof)
+                                    .getIFSymbols().isFreshContract()))) {
                 final Properties properties = new Properties();
                 ((IPersistablePO) po).fillSaveProperties(properties);
                 final StringWriter writer = new StringWriter();
@@ -346,12 +348,11 @@ public class OutputStreamProofSaver {
         return " (newnames \"" + s.substring(1) + "\")";
     }
 
-    private void printSingleNode(Node node, String prefix, Appendable output) throws IOException {
-
+    private void printSingleNode(Node node, String prefix, Appendable output)
+            throws IOException {
         final RuleApp appliedRuleApp = node.getAppliedRuleApp();
         if (appliedRuleApp == null && (proof.getGoal(node) != null)) {
-            // open
-            // goal
+            // open goal
             output.append(prefix);
             output.append("(opengoal \"");
             final LogicPrinter logicPrinter =
@@ -404,7 +405,8 @@ public class OutputStreamProofSaver {
                         .getJustification(appliedRuleApp,
                                 proof.getServices());
 
-                assert ruleJusti instanceof RuleJustificationBySpec : "Please consult bug #1111 if this fails.";
+                assert ruleJusti instanceof RuleJustificationBySpec :
+                    "Please consult bug #1111 if this fails.";
 
                 final RuleJustificationBySpec ruleJustiBySpec =
                         (RuleJustificationBySpec) ruleJusti;
@@ -611,7 +613,9 @@ public class OutputStreamProofSaver {
 
             final Object value = pair.value().getInstantiation();
 
-            if (!(value instanceof Term || value instanceof ProgramElement || value instanceof Name)) {
+            if (!(value instanceof Term
+                    || value instanceof ProgramElement
+                    || value instanceof Name)) {
                 throw new RuntimeException("Saving failed.\n"
                         + "FIXME: Unhandled instantiation type: "
                         + value.getClass());
