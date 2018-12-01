@@ -31,7 +31,6 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractBlockContractRule;
 import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
@@ -72,7 +71,6 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
                             Term modalityTerm,
                             Rule rule,
                             RuleApp ruleApp,
-                            Goal goal,
                             Object hint,
                             Term tacletTerm,
                             Operator newTermOp,

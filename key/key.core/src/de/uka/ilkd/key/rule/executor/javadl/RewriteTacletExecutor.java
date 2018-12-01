@@ -27,9 +27,9 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
         super(taclet);
     }
 
-    
+
     /**
-     * does the work for applyReplacewith (wraps recursion) 
+     * does the work for applyReplacewith (wraps recursion)
      */
     private Term replace(Term term,
             Term with,
@@ -57,8 +57,8 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
                     mc,
                     newMaxSort,
                     goal,
-                    services, 
-                    ruleApp);            
+                    services,
+                    ruleApp);
 
             return services.getTermFactory().createTerm(term.op(),
                     subs,
@@ -78,42 +78,43 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
 
 
     private SequentFormula applyReplacewithHelper(Goal goal,
-               TermLabelState termLabelState, 
-                    RewriteTacletGoalTemplate gt, 
-                    PosInOccurrence    posOfFind,
-                    Services           services,
-                    MatchConditions    matchCond,
-                    RuleApp ruleApp) {
-    final Term term = posOfFind.sequentFormula().formula();
-    final IntIterator it = posOfFind.posInTerm().iterator();
-    final Term rwTemplate = gt.replaceWith();
+            TermLabelState termLabelState,
+            RewriteTacletGoalTemplate gt,
+            PosInOccurrence    posOfFind,
+            Services           services,
+            MatchConditions    matchCond,
+            RuleApp ruleApp) {
+        final Term term = posOfFind.sequentFormula().formula();
+        final IntIterator it = posOfFind.posInTerm().iterator();
+        final Term rwTemplate = gt.replaceWith();
 
-    Term formula = replace(term,
-                           rwTemplate,
-                           termLabelState,
-                           new TacletLabelHint(rwTemplate),
-                           posOfFind,
-                           it,
-                           matchCond,
-                           term.sort(),
-                           goal,
-                           services,
-                           ruleApp);
-    formula = TermLabelManager.refactorSequentFormula(termLabelState, services, formula, posOfFind, taclet, goal, null, rwTemplate);
-    if(term == formula) {
-        return posOfFind.sequentFormula();
-    } else {
-        return new SequentFormula(formula);
+        Term formula = replace(term,
+                rwTemplate,
+                termLabelState,
+                new TacletLabelHint(rwTemplate),
+                posOfFind,
+                it,
+                matchCond,
+                term.sort(),
+                goal,
+                services,
+                ruleApp);
+        formula = TermLabelManager.refactorSequentFormula(termLabelState, services, formula,
+                posOfFind, taclet, goal, null, rwTemplate);
+        if(term == formula) {
+            return posOfFind.sequentFormula();
+        } else {
+            return new SequentFormula(formula);
+        }
     }
-    }
-    
-    
+
+
     public SequentFormula getRewriteResult(Goal goal, TermLabelState termLabelState, Services services, TacletApp app) {
         assert taclet.goalTemplates().size() == 1;
-        assert taclet.goalTemplates().head().sequent().isEmpty();  
+        assert taclet.goalTemplates().head().sequent().isEmpty();
         assert taclet.getApplicationRestriction() != RewriteTaclet.IN_SEQUENT_STATE;
         assert app.complete();
-        RewriteTacletGoalTemplate gt 
+        final RewriteTacletGoalTemplate gt
         = (RewriteTacletGoalTemplate) taclet.goalTemplates().head();
         return applyReplacewithHelper(goal, termLabelState,
                 gt,
@@ -124,62 +125,76 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
     }
 
 
-    /** 
+    /**
      * {@inheritDoc}
      */
-   @Override
-   protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, 
-           SequentChangeInfo currentSequent, PosInOccurrence posOfFind,
-           MatchConditions matchCond,
-           Goal goal,
-           RuleApp ruleApp,
-           Services services) {
-      if (gt instanceof RewriteTacletGoalTemplate) {
-         SequentFormula cf = applyReplacewithHelper(goal, termLabelState,
-               (RewriteTacletGoalTemplate) gt, posOfFind, services, matchCond, ruleApp);
+    @Override
+    protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
+            SequentChangeInfo currentSequent, PosInOccurrence posOfFind,
+            MatchConditions matchCond,
+            Goal goal,
+            RuleApp ruleApp,
+            Services services) {
+        if (gt instanceof RewriteTacletGoalTemplate) {
+            final SequentFormula cf = applyReplacewithHelper(goal, termLabelState,
+                    (RewriteTacletGoalTemplate) gt, posOfFind, services, matchCond, ruleApp);
 
-         currentSequent.combine(currentSequent.sequent().changeFormula(cf, posOfFind));
-      }
-      else {
-         // Then there was no replacewith...
-         // This is strange in a RewriteTaclet, but who knows...
-         // However, term label refactorings have to be performed.
-         Term oldFormula = posOfFind.sequentFormula().formula();
-         Term newFormula = TermLabelManager.refactorSequentFormula(termLabelState, services, oldFormula, 
-                 posOfFind, taclet, goal, null, null);
-         if (oldFormula != newFormula) {
-            currentSequent.combine(currentSequent.sequent().changeFormula(new SequentFormula(newFormula), posOfFind));
-         }
-      }
-   }
+            currentSequent.combine(currentSequent.sequent().changeFormula(cf, posOfFind));
+        } else {
+            // Then there was no replacewith...
+            // This is strange in a RewriteTaclet, but who knows...
+            // However, term label refactorings have to be performed.
+            final Term oldFormula = posOfFind.sequentFormula().formula();
+            final Term newFormula = TermLabelManager.refactorSequentFormula(termLabelState,
+                    services, oldFormula, posOfFind, taclet, goal, null, null);
+            if (oldFormula != newFormula) {
+                currentSequent.combine(currentSequent.sequent().
+                        changeFormula(new SequentFormula(newFormula), posOfFind));
+            }
+        }
+    }
 
-   /**
-    * adds the sequent of the add part of the Taclet to the goal sequent
- * @param add
-    *           the Sequent to be added
- * @param termLabelState The {@link TermLabelState} of the current rule application.
- * @param currentSequent
-    *           the Sequent which is the current (intermediate) result of
-    *           applying the taclet
- * @param posOfFind
-    *           the PosInOccurrence describes the place where to add the
-    *           semisequent
- * @param matchCond
-    *           the MatchConditions with all required instantiations
- * @param services
-    *           the Services encapsulating all java information
-    */
-   @Override
-   protected void applyAdd(Sequent add, TermLabelState termLabelState,
-         SequentChangeInfo currentSequent, PosInOccurrence posOfFind,
-         MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
-      if (posOfFind.isInAntec()) {
-         addToAntec(add.antecedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, posOfFind, posOfFind, matchCond, goal, ruleApp, services);
-         addToSucc(add.succedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, null, posOfFind, matchCond, goal, ruleApp, services);
-      }
-      else {
-         addToAntec(add.antecedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, null, posOfFind, matchCond, goal, ruleApp, services);
-         addToSucc(add.succedent(), termLabelState, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, posOfFind, posOfFind, matchCond, goal, ruleApp, services);
-      }
-   }
+    /**
+     * adds the sequent of the add part of the Taclet to the goal sequent
+     * @param add
+     *           the Sequent to be added
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
+     * @param currentSequent
+     *           the Sequent which is the current (intermediate) result of
+     *           applying the taclet
+     * @param posOfFind describes the application position of the find expression
+     *           in the original sequent
+     * @param whereToAdd
+     *           the PosInOccurrence describes the place where to add the
+     *           semisequent
+     * @param matchCond
+     *           the MatchConditions with all required instantiations
+     * @param goal
+     *           the Goal the taclet is applied to
+     * @param ruleApp
+     *           the rule application to apply
+     * @param services
+     *           the Services encapsulating all java information
+     */
+    @Override
+    protected void applyAdd(Sequent add, TermLabelState termLabelState,
+            SequentChangeInfo currentSequent,
+            PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
+            MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
+        if (posOfFind.isInAntec()) {
+            addToAntec(add.antecedent(), termLabelState,
+                    new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add),
+                    currentSequent, whereToAdd, posOfFind, matchCond, goal, ruleApp, services);
+            addToSucc(add.succedent(), termLabelState,
+                    new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add),
+                    currentSequent, null, posOfFind, matchCond, goal, ruleApp, services);
+        } else {
+            addToAntec(add.antecedent(), termLabelState,
+                    new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add),
+                    currentSequent, null, posOfFind, matchCond, goal, ruleApp, services);
+            addToSucc(add.succedent(), termLabelState,
+                    new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add),
+                    currentSequent, whereToAdd, posOfFind, matchCond, goal, ruleApp, services);
+        }
+    }
 }
