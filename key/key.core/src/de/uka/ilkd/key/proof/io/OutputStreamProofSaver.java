@@ -382,6 +382,77 @@ public class OutputStreamProofSaver {
     }
 
     /**
+     * Print predicates for applied merge rule application into the passed writer.
+     * @param predAbstrRule the rule application with the predicates to be printed
+     * @param output the writer in which the rule is printed
+     * @throws IOException an exception thrown when printing fails
+     */
+    private void printPredicatesForSingleMergeRuleApp(MergeWithPredicateAbstraction predAbstrRule,
+                                                      Appendable output)
+            throws IOException {
+        output.append(" (")
+                .append(ProofElementID.MERGE_ABSTRACTION_PREDICATES
+                        .getRawName()).append(" \"");
+        boolean first = true;
+        for (final Map.Entry<Sort, ArrayList<AbstractionPredicate>> predsForSorts :
+            predAbstrRule.getPredicates().entrySet()) {
+            for (final AbstractionPredicate pred : predsForSorts
+                    .getValue()) {
+                if (first) {
+                    first = false;
+                } else {
+                    output.append(", ");
+                }
+                output.append(pred.toParseableString(proof.getServices()));
+            }
+        }
+
+        output.append("\")");
+
+        output.append(" (")
+            .append(ProofElementID.MERGE_PREDICATE_ABSTRACTION_LATTICE_TYPE
+                    .getRawName()).append(" \"");
+        output.append(predAbstrRule.getLatticeType().getName());
+        output.append("\")");
+    }
+
+    /**
+     * Print predicates for applied merge rule application into the passed writer.
+     * @param concreteRule the rule application with the abstract domain to be printed
+     * @param output the writer in which the rule is printed
+     * @throws IOException an exception thrown when printing fails
+     */
+    private void printLatticeAbstractionForSingleMergeRuleApp(
+                    MergeWithLatticeAbstraction concreteRule, Appendable output)
+            throws IOException {
+        final Map<ProgramVariable, AbstractDomainElement> userChoices =
+                concreteRule.getUserChoices();
+        if (!userChoices.isEmpty()) {
+            output.append(" (")
+                    .append(ProofElementID.MERGE_USER_CHOICES
+                            .getRawName()).append(" \"");
+            boolean first = true;
+            for (final ProgramVariable v : userChoices.keySet()) {
+                if (first) {
+                    first = false;
+                } else {
+                    output.append("`), ");
+                }
+                final AbstractDomainElement elem = userChoices.get(v);
+                output.append("('")
+                    .append(v.sort().toString())
+                    .append(" ")
+                    .append(v.toString())
+                    .append("', `")
+                    .append(elem.toParseableString(proof
+                            .getServices())).append("`), ");
+            }
+
+            output.append("\")");
+        }
+    }
+
+    /**
      * Print applied merge rule for a single merge rule application into the passed writer.
      * @param mergeApp the rule application to be printed
      * @param prefix a string which the printed rule is concatenated to
@@ -424,63 +495,15 @@ public class OutputStreamProofSaver {
         // Predicates for merges with predicate abstraction.
         MergeWithPredicateAbstraction predAbstrRule;
         if (concreteRule instanceof MergeWithPredicateAbstraction
-                && (predAbstrRule =
-                (MergeWithPredicateAbstraction) concreteRule)
+                && ((MergeWithPredicateAbstraction) concreteRule)
                 .getPredicates().size() > 0) {
-
-            output.append(" (")
-                    .append(ProofElementID.MERGE_ABSTRACTION_PREDICATES
-                            .getRawName()).append(" \"");
-            boolean first = true;
-            for (final Map.Entry<Sort, ArrayList<AbstractionPredicate>> predsForSorts :
-                predAbstrRule.getPredicates().entrySet()) {
-                for (final AbstractionPredicate pred : predsForSorts
-                        .getValue()) {
-                    if (first) {
-                        first = false;
-                    } else {
-                        output.append(", ");
-                    }
-                    output.append(pred.toParseableString(proof.getServices()));
-                }
-            }
-
-            output.append("\")");
-
-            output.append(" (")
-                .append(ProofElementID.MERGE_PREDICATE_ABSTRACTION_LATTICE_TYPE
-                        .getRawName()).append(" \"");
-            output.append(predAbstrRule.getLatticeType().getName());
-            output.append("\")");
+            printPredicatesForSingleMergeRuleApp((MergeWithPredicateAbstraction) concreteRule,
+                                                 output);
         }
 
         if (concreteRule instanceof MergeWithLatticeAbstraction) {
-            final Map<ProgramVariable, AbstractDomainElement> userChoices =
-                    ((MergeWithLatticeAbstraction) concreteRule)
-                    .getUserChoices();
-            if (!userChoices.isEmpty()) {
-                output.append(" (")
-                        .append(ProofElementID.MERGE_USER_CHOICES
-                                .getRawName()).append(" \"");
-                boolean first = true;
-                for (final ProgramVariable v : userChoices.keySet()) {
-                    if (first) {
-                        first = false;
-                    } else {
-                        output.append("`), ");
-                    }
-                    final AbstractDomainElement elem = userChoices.get(v);
-                    output.append("('")
-                        .append(v.sort().toString())
-                        .append(" ")
-                        .append(v.toString())
-                        .append("', `")
-                        .append(elem.toParseableString(proof
-                                .getServices())).append("`), ");
-                }
-
-                output.append("\")");
-            }
+            printLatticeAbstractionForSingleMergeRuleApp((MergeWithLatticeAbstraction) concreteRule,
+                                                 output);
         }
     }
 
@@ -506,6 +529,31 @@ public class OutputStreamProofSaver {
     }
 
     /**
+     * Print rule justification for applied built-in rule application into the passed writer.
+     * @param appliedRuleApp the rule application to be printed
+     * @param output the writer in which the rule is printed
+     * @throws IOException an exception thrown when printing fails
+     */
+    private void printRuleJustification(IBuiltInRuleApp appliedRuleApp,
+                                        Appendable output)
+            throws IOException {
+        final RuleJustification ruleJusti =
+                proof.getInitConfig()
+                .getJustifInfo()
+                .getJustification(appliedRuleApp,
+                        proof.getServices());
+
+        assert ruleJusti instanceof RuleJustificationBySpec :
+            "Please consult bug #1111 if this fails.";
+
+        final RuleJustificationBySpec ruleJustiBySpec =
+                (RuleJustificationBySpec) ruleJusti;
+        output.append(" (contract \"");
+        output.append(ruleJustiBySpec.getSpec().getName());
+        output.append("\")");
+    }
+
+    /**
      * Print applied built-in rule for a single built-in rule application into the passed writer.
      * @param appliedRuleApp the rule application to be printed
      * @param prefix a string which the printed rule is concatenated to
@@ -523,25 +571,11 @@ public class OutputStreamProofSaver {
                 appliedRuleApp.posInOccurrence()));
 
         output.append(newNames2Proof(node));
-        output.append(builtinRuleIfInsts(node,
-                ((IBuiltInRuleApp) appliedRuleApp).ifInsts()));
+        output.append(builtinRuleIfInsts(node, appliedRuleApp.ifInsts()));
 
         if (appliedRuleApp.rule() instanceof UseOperationContractRule
                 || appliedRuleApp.rule() instanceof UseDependencyContractRule) {
-            final RuleJustification ruleJusti =
-                    proof.getInitConfig()
-                    .getJustifInfo()
-                    .getJustification(appliedRuleApp,
-                            proof.getServices());
-
-            assert ruleJusti instanceof RuleJustificationBySpec :
-                "Please consult bug #1111 if this fails.";
-
-            final RuleJustificationBySpec ruleJustiBySpec =
-                    (RuleJustificationBySpec) ruleJusti;
-            output.append(" (contract \"");
-            output.append(ruleJustiBySpec.getSpec().getName());
-            output.append("\")");
+            printRuleJustification(appliedRuleApp, output);
         }
 
         if (appliedRuleApp instanceof MergeRuleBuiltInRuleApp) {
@@ -637,12 +671,26 @@ public class OutputStreamProofSaver {
         }
     }
 
+    /**
+     * Check whether the applied rule of the passed proof node was performed interactively.
+     * If this is the case, a user interaction label is appended.
+     * @param node the proof node to be checked
+     * @param output the writer to which the label is appended
+     * @throws IOException an exception thrown when printing fails
+     */
     private void userInteraction2Proof(Node node, Appendable output) throws IOException {
         if (node.getNodeInfo().getInteractiveRuleApplication()) {
             output.append(" (userinteraction)");
         }
     }
 
+    /**
+     * Print applied rule(s) for a proof node and its decendants into the passed writer
+     * such that in can be loaded again as a proof.
+     * @param node the proof node from which to be printed
+     * @param ps the writer in which the rule(s) is/are printed
+     * @throws IOException an exception thrown when printing fails
+     */
     public void node2Proof(Node node, Appendable ps) throws IOException {
         ps.append("(branch \"dummy ID\"\n");
         collectProof(node, "", ps);
