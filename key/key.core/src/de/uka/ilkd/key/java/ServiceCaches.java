@@ -27,8 +27,10 @@ import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TermTacletAppIndex;
 import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
+import de.uka.ilkd.key.rule.IfFormulaInstantiationCache;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
+import de.uka.ilkd.key.strategy.IfInstantiationCachePool;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature.TermInfo;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesGraph;
@@ -126,19 +128,25 @@ public class ServiceCaches {
    /**
     * Caches used bu HandleArith to cache proof results
     */
-   private LRUCache<Term, Term> provedByArithFstCache = new LRUCache<Term, Term>(5000);
+   private final LRUCache<Term, Term> provedByArithFstCache = new LRUCache<Term, Term>(5000);
 
-   private LRUCache<Pair<Term, Term>, Term> provedByArithSndCache = new LRUCache<Pair<Term, Term>, Term>(5000);
+   private final LRUCache<Pair<Term, Term>, Term> provedByArithSndCache = new LRUCache<Pair<Term, Term>, Term>(5000);
 
    /** Cache used by the exhaustive macro */
-   private Map<Node, PosInOccurrence> exhaustiveMacroCache = new WeakHashMap<Node, PosInOccurrence>();;
+   private final Map<Node, PosInOccurrence> exhaustiveMacroCache = new WeakHashMap<Node, PosInOccurrence>();
+
+   /** Cache used by the ifinstantiator */
+   private final IfInstantiationCachePool ifInstantiationCache = new IfInstantiationCachePool();
+
+   /** Cache used IfFormulaInstSeq */
+   private final IfFormulaInstantiationCache ifFormulaInstantiationCache = new IfFormulaInstantiationCache();
 
    
    /**
     * Returns the cache used by {@link TermTacletAppIndexCacheSet} instances.
     * @return The cache used by {@link TermTacletAppIndexCacheSet} instances.
     */
-   public Map<CacheKey, TermTacletAppIndex> getTermTacletAppIndexCache() {
+   public final Map<CacheKey, TermTacletAppIndex> getTermTacletAppIndexCache() {
       return termTacletAppIndexCache;
    }
 
@@ -194,5 +202,12 @@ public class ServiceCaches {
        return exhaustiveMacroCache;
    }
 
+   public final IfInstantiationCachePool getIfInstantiationCache() {
+       return ifInstantiationCache;
+    }
+
+   public final IfFormulaInstantiationCache getIfFormulaInstantiationCache() {
+       return ifFormulaInstantiationCache;
+    }
    
 }

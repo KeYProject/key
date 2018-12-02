@@ -247,7 +247,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testSubst() {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("g(v,x)");
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
 	assertEquals("substitution",
 		     parseTerm("g(f(x),x)"),
 		     cfs.apply(t));
@@ -256,7 +256,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testSubstWary() {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("q(v,x)");
-	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
+	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services.getTermBuilder());
 	assertEquals("substitution",
 		     parseTerm("q(f(x),x)"),
 		     cfs.apply(t));
@@ -265,7 +265,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testShare() {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("g(v,f(x))");
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
 	assertSame("share unchanged subterms",
 		   t.sub(1), cfs.apply(t).sub(1));
     }
@@ -273,7 +273,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testShareWary() {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("q(v,f(x))");
-	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
+	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services.getTermBuilder());
 	assertSame("share unchanged subterms",
 		   t.sub(1), cfs.apply(t).sub(1));
     }
@@ -299,7 +299,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testClash() {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("\\exists x; q(x,v)");
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 =
 	    res.varsBoundHere(0).get(0);
@@ -315,7 +315,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testSubstInSubstTerm() {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("{\\subst y; f(v)}g(y,v)");
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
 	assertEquals("substitute into substitution term",
 		     parseTerm("{\\subst y; f(f(x))}g(y,f(x))"),
 		     cfs.apply(t));
@@ -324,7 +324,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testClashInSubstTerm() {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("{\\subst x; f(v)}g(x,v)");
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 =
 	    res.varsBoundHere(1).get(0);
@@ -341,7 +341,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testMultiSubst() {
 	Term s = parseTerm("f(x)");
 	Term t = toMulti(parseFma("\\forall y; \\forall z; q(y,g(v,z))"));
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
 	assertEquals("substitution on multi",
 		     toMulti(parseFma("\\forall y; \\forall z; q(y,g(f(x),z))")),
 		     cfs.apply(t));
@@ -350,7 +350,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testMultiShareBound() {
 	Term s = parseTerm("f(x)");
 	Term t = toMulti(parseFma("\\forall y; \\forall v; \\forall z; q(y,g(v,z))"));
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
 	assertSame("sharing on multi",
 		   cfs.apply(t), t);
     }
@@ -360,7 +360,7 @@ public class TestClashFreeSubst extends TestCase {
     public void xtestMultiClash() {
 	Term s = parseTerm("f(x)");
 	Term t = toMulti(parseFma("\\forall y; \\forall x; \\forall z; q(g(x,y),g(v,z))"));
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 =
 	    res.varsBoundHere(0).get(1);
@@ -379,7 +379,7 @@ public class TestClashFreeSubst extends TestCase {
     public void xtestMultiClash1() {
 	Term s = parseTerm("f(x)");
 	Term t = toMulti(parseFma("\\forall y; \\forall x;\\forall z; q(g(x,y),g(v,z))"));
-	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services);
+	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 =
 	    res.varsBoundHere(0).get(2);
@@ -397,7 +397,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testWary0() {
 	Term s = parseTerm("f(pv0)");
 	Term t = parseTerm("q(v,x)");
-	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
+	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services.getTermBuilder());
 	assertEquals("substitution",
 		     parseTerm("q(f(pv0),x)"),
 		     cfs.apply(t));
@@ -406,7 +406,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testWary1() {
 	Term s = parseTerm("f(pv0)");
 	Term t = parseTerm("q(v,x) & {pv0:=v}q(x,x)");
-	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
+	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services.getTermBuilder());
 	assertEquals("substitution",
 		     parseTerm("q(f(pv0),x) & {pv0:=f(pv0)}q(x,x)"),
 		     cfs.apply(t));
@@ -415,7 +415,7 @@ public class TestClashFreeSubst extends TestCase {
     public void testWary2() {
 	Term s = parseTerm("f(pv0)");
 	Term t = parseTerm("q(v,x) & {pv0:=v}q(x,v)");
-	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services);
+	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services.getTermBuilder());
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 =
 	    res.varsBoundHere(1).get(0);

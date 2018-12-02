@@ -269,12 +269,9 @@ public final class RuleAppIndex  {
 						Services        services) { 
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
-	    result = result.prepend 
-		( interactiveTacletAppIndex.getNoFindTaclet
-		  (filter,
-		   services) ); 
+	    result = interactiveTacletAppIndex.getNoFindTaclet(filter, services) ; 
 	}
-	result = result.prepend 
+	result = result.prepend
 	    ( automatedTacletAppIndex.getNoFindTaclet
 	      (filter,
 	       services) ); 
@@ -308,6 +305,7 @@ public final class RuleAppIndex  {
 	      (pos,
 	       filter,
 	       services) ); 
+	
 	return result;
     }
 

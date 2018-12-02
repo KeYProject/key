@@ -11,7 +11,10 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.prover.impl;
+
+import de.uka.ilkd.key.prover.GoalChooserBuilder;
+import de.uka.ilkd.key.prover.GoalChooser;
 
 public class DepthFirstGoalChooserBuilder implements GoalChooserBuilder {
  
@@ -19,7 +22,7 @@ public class DepthFirstGoalChooserBuilder implements GoalChooserBuilder {
 	
 	public DepthFirstGoalChooserBuilder(){}
 
-    public IGoalChooser create() {
+    public GoalChooser create() {
         return new DepthFirstGoalChooser();
     }
     

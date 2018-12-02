@@ -104,6 +104,8 @@ public class Services implements TermServices {
     
     private final TermBuilder termBuilder;
 
+    private final TermBuilder termBuilderWithoutCache;
+
     /**
      * creates a new Services object with a new TypeConverter and a new
      * JavaInfo object with no information stored at none of these.
@@ -114,6 +116,7 @@ public class Services implements TermServices {
     	this.counters = new LinkedHashMap<String, Counter>();
     	this.caches = new ServiceCaches();
     	this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+    	this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
     	this.specRepos = new SpecificationRepository(this);
     	cee = new ConstantExpressionEvaluator(this);
     	typeconverter = new TypeConverter(this);
@@ -132,6 +135,7 @@ public class Services implements TermServices {
     	this.counters = counters;
     	this.caches = caches;
     	this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+        this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
     	this.specRepos = new SpecificationRepository(this);
     	cee = new ConstantExpressionEvaluator(this);
     	typeconverter = new TypeConverter(this);
@@ -154,6 +158,7 @@ public class Services implements TermServices {
         this.factory = s.factory;
         this.caches = s.caches;
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+        this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
     }
 
     public Services getOverlay(NamespaceSet namespaces) {
@@ -386,7 +391,23 @@ public class Services implements TermServices {
     }
     
     /**
+     * 
+     * Returns either the cache backed or raw {@link TermBuilder} used to create {@link Term}s.  
+     * Usually the cache backed version is the intended one. The non-cached version is for 
+     * use cases where a lot of intermediate terms are created of which most exist only for a 
+     * very short time. To avoid polluting the cache it is then recommended to use the non-cache
+     * version
+     * 
+     * @return The {@link TermBuilder} used to create {@link Term}s.
+     */
+    @Override
+    public TermBuilder getTermBuilder(boolean withCache) {
+       return withCache ? termBuilder : termBuilderWithoutCache;
+    }
+    
+    /**
      * Returns the {@link TermBuilder} used to create {@link Term}s.
+     * Same as {@link #getTermBuilder(true).
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
     @Override

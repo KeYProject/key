@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.prover;
 
 /** 
  * Used as an event object to inform about a prover task

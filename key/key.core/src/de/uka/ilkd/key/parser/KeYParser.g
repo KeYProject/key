@@ -3540,9 +3540,7 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
         //args.size()==0 indicates open-close-parens ()
                 
         {  
-            if(varfuncid.equals("inReachableState") && args == null) {
-	        a = getServices().getTermBuilder().wellFormed(getServices().getTypeConverter().getHeapLDT().getHeap());
-	    } else if(varfuncid.equals("skip") && args == null) {
+            if(varfuncid.equals("skip") && args == null) {
 	        a = getTermFactory().createTerm(UpdateJunctor.SKIP);
 	    } else {
 	            Operator op;

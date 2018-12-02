@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.java.ServiceCaches;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -37,10 +35,6 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
 
     private final QuanEliminationAnalyser quanAnalyser =
         new QuanEliminationAnalyser ();
-    
-    // ugly
-    private PosInOccurrence        focus = null;
-    private Services               services = null;
 
     private final LiteralsSmallerThanFeature litComparator;
     
@@ -61,29 +55,21 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
         final Term leftTerm = left.toTerm ( app, pos, goal );
         final Term rightTerm = right.toTerm ( app, pos, goal );
-
-        focus = pos;
-        services = goal.proof ().getServices ();
         
         final ClauseCollector m1 = new ClauseCollector ();
         m1.collect ( leftTerm );
         final ClauseCollector m2 = new ClauseCollector ();
         m2.collect ( rightTerm );
 
-        final boolean res = lessThan ( m1.getResult(), m2.getResult(), goal.proof().getServices().getCaches() );
-        
-        focus = null;
-        services = null;
-        
-        return res;
+        return lessThan ( m1.getResult(), m2.getResult(), pos, goal );
     }
     
     /**
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(Term t1, Term t2, ServiceCaches caches) {
-
+    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, Goal goal) {
+        
         final int t1Def = quanAnalyser.eliminableDefinition ( t1, focus );
         final int t2Def = quanAnalyser.eliminableDefinition ( t2, focus );
 
@@ -92,7 +78,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
 
         if ( t1.op () == Junctor.OR ) {
             if ( t2.op () == Junctor.OR ) {
-                return super.lessThan ( t1, t2, caches );
+                return super.lessThan ( t1, t2, focus, goal );
             } else {
                 return false;
             }
@@ -100,7 +86,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
             if ( t2.op () == Junctor.OR ) {
                 return true;
             } else {
-                return litComparator.compareTerms ( t1, t2, focus, services );
+                return litComparator.compareTerms ( t1, t2, focus, goal );
             }
         }        
     }

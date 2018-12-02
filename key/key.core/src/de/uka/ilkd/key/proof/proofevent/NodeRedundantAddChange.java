@@ -36,11 +36,13 @@ public class NodeRedundantAddChange implements NodeChange {
      * returns the PosInOccurrence of the formula that has been tried to add
      * @return the PosInOccurrrence 
      */
+    @Override
     public PosInOccurrence getPos() {
         return pio;
     }
     
     /** toString */
+    @Override
     public String toString() {
         return "Redundant formula:" + pio;
     }
