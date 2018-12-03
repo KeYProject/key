@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;;
 
 /**
@@ -31,7 +32,8 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
             Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs,
             ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock,
             ImmutableArray<TermLabel> newTermOriginalLabels, TermLabel label) {
-        if (!TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
+        if (rule instanceof BuiltInRule
+                && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
             return label;
         }
         

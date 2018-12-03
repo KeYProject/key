@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 
 /**
@@ -44,7 +45,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     public void refactorLabels(TermLabelState state, Services services, PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Term term,
             List<TermLabel> labels) {
-        if (!TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
+        if (rule instanceof BuiltInRule
+                && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
             return;
         }
         
