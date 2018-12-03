@@ -37,6 +37,11 @@ public class OriginTermLabel implements TermLabel {
      * Display name for {@link OriginTermLabel}s.
      */
     public final static Name NAME = new Name("Origin");
+    
+    /**
+     * @see #getChildCount()
+     */
+    public final static int CHILD_COUNT = 2;
 
     private Origin origin;
     private Set<Origin> subtermOrigins;
@@ -169,7 +174,7 @@ public class OriginTermLabel implements TermLabel {
 
     @Override
     public int getChildCount() {
-        return 1;
+        return CHILD_COUNT;
     }
 
     /**
