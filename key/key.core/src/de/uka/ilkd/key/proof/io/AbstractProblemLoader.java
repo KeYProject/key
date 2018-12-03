@@ -21,15 +21,13 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import org.antlr.runtime.MismatchedTokenException;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -370,27 +368,16 @@ public abstract class AbstractProblemLoader {
             }
         }
         else if (filename.endsWith(".zproof")) {
-            // unzip to temp dir
+            // zipped proof package
+            // unzip to a temporary directory
             Path tmpDir = Files.createTempDirectory("KeYunzip");
-            ZipFile zipFile = new ZipFile(file);
-            Enumeration<? extends ZipEntry> entries = zipFile.entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry entry = entries.nextElement();
-                if (entry.isDirectory()) {
-                    Files.createDirectory(tmpDir.resolve(entry.getName()));
-                } else {
-                    Files.createDirectories(tmpDir.resolve(entry.getName()).getParent());
-                    Files.copy(zipFile.getInputStream(entry), tmpDir.resolve(entry.getName()));
-                }
-            }
-            zipFile.close();
+            IOUtil.extractZip(file.toPath(), tmpDir);
 
-            // update FileRepo basepath
+            // point the FileRepo to the temporary directory
             fileRepo.setBaseDir(tmpDir);
 
-            // create new KeYUserProblemFile pointing to the new (unzipped) file
+            // create new KeYUserProblemFile pointing to the (unzipped) proof file
             Path unzippedProof = tmpDir.resolve(Paths.get("proof.proof"));
-            //this.file = unzippedProof.toFile();   // TODO: remove final modifier necessary?
             return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof.toFile(),
                     fileRepo, control, profileOfNewProofs, false);
         }
