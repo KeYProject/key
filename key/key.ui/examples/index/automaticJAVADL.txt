@@ -924,5 +924,5 @@ group reload_examples {
    loadable ./heap/verifyThis15_1_RelaxedPrefix/relax.proof
    loadable ./heap/verifyThis15_3_DLL/doUndo.proof
    loadable ./heap/verifyThis15_2_ParallelGcd/parallelGcd.proof
-   loadable ./heap/verifyThis17_1_PairInsertionSort/sort.proof
+   loadable ./heap/verifyThis17_1_PairInsertionSort/sort.proof.gz
 }

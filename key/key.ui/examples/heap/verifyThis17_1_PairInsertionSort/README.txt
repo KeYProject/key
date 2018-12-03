@@ -2,7 +2,7 @@ example.name = Pair Insertion Sort
 example.path = Benchmarks/VerifyThis2017
 example.additionalFile.1 = src/PairInsertionSort.java
 # Please ensure that the following file is included into the group reload_examples within automaticJAVADL.txt.
-example.proofFile = sort.proof
+example.proofFile = sort.proof.gz
 
 This is the first challenge from the VerifyThis competition
 @ ETAPS 2017 organized by M. Huisman, R. Monahan, W. Mostowski,
