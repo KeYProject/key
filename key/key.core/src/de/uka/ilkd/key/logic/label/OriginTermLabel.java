@@ -110,6 +110,29 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Creates a new {@link OriginTermLabel}.
      * 
+     * @param origin the term's origin.
+     */
+    public OriginTermLabel(Origin origin) {
+        this.origin = origin;
+        this.subtermOrigins = new HashSet<>();
+    }
+
+    /**
+     * Creates a new {@link OriginTermLabel}.
+     * 
+     * @param origin the term's origin.
+     * @param subtermOrigins the origins of the term's (former) subterms.
+     */
+    public OriginTermLabel(Origin origin, Set<Origin> subtermOrigins) {
+        this(origin);
+        this.subtermOrigins.addAll(subtermOrigins);
+        this.subtermOrigins = this.subtermOrigins.stream()
+                .filter(o -> o.specType != SpecType.NONE).collect(Collectors.toSet());
+    }
+
+    /**
+     * Creates a new {@link OriginTermLabel}.
+     * 
      * @param specType the JML spec type the term originates from.
      * @param file the file the term originates from.
      * @param line the line in the file.
@@ -241,7 +264,7 @@ public class OriginTermLabel implements TermLabel {
             if (fileName != null) {
                 sb.append(" @ ");
                 sb.append(fileName);
-                sb.append(", line ");
+                sb.append(" @ line ");
                 sb.append(line);
             } else if (specType != SpecType.NONE) {
                 sb.append(" (implicit)");
@@ -309,7 +332,7 @@ public class OriginTermLabel implements TermLabel {
         ASSIGNABLE("assignable"),
         DECREASES("decreases"),
         MEASURED_BY("measured_by"),
-        CLASS_INVARIANT("invariant"),
+        INVARIANT("invariant"),
         LOOP_INVARIANT("loop_invariant"),
         LOOP_INVARIANT_FREE("loop_invariant_free"),
         REQUIRES("requires"),
