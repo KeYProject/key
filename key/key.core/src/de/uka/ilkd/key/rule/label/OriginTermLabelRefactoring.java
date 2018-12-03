@@ -38,7 +38,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint,
             Term tacletTerm) {
-        return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE;
+        return RefactoringScope.SEQUENT;
     }
 
     @Override
