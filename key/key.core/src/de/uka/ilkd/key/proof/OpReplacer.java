@@ -107,6 +107,12 @@ public class OpReplacer {
             return newTerm;
         }
 
+        for (SVSubstitute svs : map.keySet()) {
+            if (term.equalsModTermLabels(svs)) {
+                return (Term) map.get(svs);
+            }
+        }
+
         final Operator newOp = replace(term.op());
         
         final int arity = term.arity();

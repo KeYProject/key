@@ -57,7 +57,7 @@ class FieldPrinter {
              *
              * Example syntax: object.(package.class::field)
              */
-            return "(" + fieldTerm.toString().replace("::$", "::") + ")";
+            return "(" + fieldTerm.op().toString().replace("::$", "::") + ")";
         }
     }
 
@@ -65,10 +65,10 @@ class FieldPrinter {
      * Determine whether class can be omitted when printing a field
      * in a select term. A field can be omitted, if it is canonic for
      * the associated object.
-     * 
+     *
      * For more information on canonic, see
      * {@link de.uka.ilkd.key.java.JavaInfo#getCanonicalFieldProgramVariable(String,KeYJavaType)}
-     * 
+     *
      * (Kai Wallisch 09/2014)
      */
     private boolean isCanonicField(Term objectTerm,

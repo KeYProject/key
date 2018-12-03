@@ -14,6 +14,7 @@
 package org.key_project.util.collection;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -51,7 +52,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     public ImmutableArray(List<S> list) {
         content = (S[]) list.toArray();
     }
-    
+
     /** gets the element at the specified position
      * @param pos an int describing the position
      * @return the element at pos
@@ -78,10 +79,10 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	System.arraycopy(content, srcIdx, dest, destIndex, length);
     }
 
-    public final boolean isEmpty() {  
+    public final boolean isEmpty() {
        return content.length == 0;
     }
-    
+
     public boolean contains(S op) {
 	for (S el : content) {
 	   if (el.equals(op)) {
@@ -90,7 +91,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	}
 	return false;
     }
-    
+
     /**
      * Convert the array to a Java array (O(n))
      * @throws ClassCastException if T is not a supertype of S
@@ -105,12 +106,14 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	}
 	System.arraycopy(content, 0, result, 0, content.length);
 	return result;
-    }    
+    }
 
+    @Override
     public int hashCode() {
 	return Arrays.hashCode(content);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public boolean equals (Object o) {
 	if (o == this) {
@@ -135,6 +138,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	return true;
     }
 
+    @Override
     public String toString() {
 	StringBuilder sb = new StringBuilder();
 	sb.append("[");
@@ -146,6 +150,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	return sb.toString();
     }
 
+    @Override
     public Iterator<S> iterator() {
 	return new ArrayIterator<S>(this);
     }
@@ -159,19 +164,22 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	    this.coll = coll;
 	}
 
-	public boolean hasNext() {
+	@Override
+    public boolean hasNext() {
 	    return i < coll.size();
 	}
 
-	public T next() {
+	@Override
+    public T next() {
 	    return coll.get(i++);
 	}
 
-	public void remove() {
+	@Override
+    public void remove() {
 	    throw new UnsupportedOperationException("Illegal modification access on unmodifiable array.");
 	}
     }
-    
+
     /**
      * Convert an {@link ImmutableArray} to an {@link ImmutableList}.
      *
@@ -185,5 +193,19 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
         }
         return ret.reverse();
     }
-    
+
+    /**
+     * Convert an {@link ImmutableArray} to a {@link List}.
+     *
+     * @return This element converted to a {@link List}.
+     */
+    public List<S> toList() {
+        List<S> result = new ArrayList<>();
+        Iterator<S> it = iterator();
+        while (it.hasNext()) {
+            result.add(it.next());
+        }
+        return result;
+    }
+
 }

@@ -156,36 +156,14 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     * @return {@code true} perform refactoring, {@code false} do not perform refactoring.
     */
    protected boolean shouldRefactorSpecificationApplication(Rule rule, Goal goal, Object hint) {
-      if (goal != null) {
-         Proof proof = goal.proof();
-         if ((rule instanceof WhileInvariantRule && WhileInvariantRule.INITIAL_INVARIANT_ONLY_HINT.equals(hint)) ||
-             (rule instanceof WhileInvariantRule && WhileInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint)) ||
-             (rule instanceof UseOperationContractRule && UseOperationContractRule.FINAL_PRE_TERM_HINT.equals(hint)) ||
-             (rule instanceof AbstractBlockSpecificationElementRule && AbstractBlockSpecificationElementRule.FULL_PRECONDITION_TERM_HINT.equals(hint)) ||
-             (rule instanceof AbstractBlockSpecificationElementRule && AbstractBlockSpecificationElementRule.NEW_POSTCONDITION_TERM_HINT.equals(hint)) ||
-             (rule instanceof CloseAfterMerge && CloseAfterMerge.FINAL_WEAKENING_TERM_HINT.equals(hint))) {
-            ProofOblInput problem = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-            if (problem instanceof AbstractOperationPO) {
-               return ((AbstractOperationPO) problem).isAddSymbolicExecutionLabel();
-            }
-            else {
-               return false;
-            }
-         }
-         else {
-            return false;
-         }
-      }
-      else {
-         return false;
-      }
+      return TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint);
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public void refactoreLabels(TermLabelState state,
+   public void refactorLabels(TermLabelState state,
                                Services services, 
                                PosInOccurrence applicationPosInOccurrence, 
                                Term applicationTerm, 

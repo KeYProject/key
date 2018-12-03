@@ -193,7 +193,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * not null and in case of a reference array type that also its elements are
      * non-null In case of implicit fields or primitive typed fields/variables
      * the empty set is returned
-     * 
+     *
      * @param varName
      *            the String specifying the variable/field name
      * @param kjt
@@ -396,7 +396,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     /**
      * Extracts method specifications (i.e., contracts) from Java+JML input.
-     * 
+     *
      * @param pm
      *            method to extract for
      * @param addInvariant

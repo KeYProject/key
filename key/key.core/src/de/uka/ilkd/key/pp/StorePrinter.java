@@ -123,6 +123,7 @@ class StorePrinter extends FieldPrinter {
         lp.markStartSub();
         lp.startTerm(0);
         lp.layouter.print(getPrettySyntaxForFieldConstant(objectTerm, fieldTerm));
+        lp.printLabels(fieldTerm);
         lp.markEndSub();
 
         finishPrettyPrint(valueTerm, closingBrace);

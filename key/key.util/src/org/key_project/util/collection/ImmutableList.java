@@ -13,8 +13,10 @@
 
 package org.key_project.util.collection;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.function.Predicate;
+import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -176,4 +178,17 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
         return StreamSupport.stream(this.spliterator(), false);
     }
 
+    /**
+     * Convert an {@link ImmutableList} to a {@link List}.
+     *
+     * @return This element converted to a {@link List}.
+     */
+    default List<T> toList() {
+        List<T> result = new ArrayList<>();
+        Iterator<T> it = iterator();
+        while (it.hasNext()) {
+            result.add(it.next());
+        }
+        return result;
+    }
 }
