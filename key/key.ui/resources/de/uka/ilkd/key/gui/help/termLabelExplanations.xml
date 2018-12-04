@@ -15,5 +15,13 @@ For instance, both conjunction operators in JML (i.e., &amp;&amp; and &amp;) are
 This is relevant for welldefinedness checks.
 </entry>
 
-</properties>
+<entry key="origin">
+This label saves a term's origin in the JML specification as well as the origins of all of its subterms and former subterms.
 
+For example, if the file "Example.java" contains the clause "requires R" at line 20, then every JavaDL term that is generated from R will have the origin 
+"requires @ example.java @ line 20".
+
+Origin labels are invisible by default. To see a term's origin, you can mouse over it while holding the ALT button. If you want more detailed information, left click on the term and then on "Show Origin".
+</entry>
+
+</properties>
