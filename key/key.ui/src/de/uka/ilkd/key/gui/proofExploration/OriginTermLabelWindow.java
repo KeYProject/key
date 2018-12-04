@@ -44,6 +44,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -71,7 +72,7 @@ public final class OriginTermLabelWindow extends JFrame {
      * The window's initial width.
      */
     public static final int WIDTH = 1280;
-    
+
     /**
      * The window's initial height.
      */
@@ -85,16 +86,16 @@ public final class OriginTermLabelWindow extends JFrame {
     /**
      * The title of the tree view.
      */
-    public static final String TREE_TITLE = "Selected terms as tree";
-    
+    public static final String TREE_TITLE = "Selected formula as tree";
+
     /**
      * The title of the term view.
      */
-    public static final String VIEW_TITLE = "Selected terms";
-    
+    public static final String VIEW_TITLE = "Selected formula";
+
     /**
      * The title for the origin information for the selected term.
-     * 
+     *
      * @see #ORIGIN_TITLE
      * @see #SUBTERM_ORIGINS_TITLE
      */
@@ -102,17 +103,17 @@ public final class OriginTermLabelWindow extends JFrame {
 
     /**
      * The title for the selected term's origin.
-     * 
+     *
      * @see #ORIGIN_INFO_TITLE
      */
-    public static final String ORIGIN_TITLE = "Origin of term";
-    
+    public static final String ORIGIN_TITLE = "Origin of formula";
+
     /**
      * The title for the origin of the selected term's sub-terms and former sub-terms.
-     * 
+     *
      * @see #ORIGIN_INFO_TITLE
      */
-    public static final String SUBTERM_ORIGINS_TITLE = "Origins of (former) subterms";
+    public static final String SUBTERM_ORIGINS_TITLE = "Origins of (former) subformula and subterms";
 
     /**
      * The gap between a term and its origin in the tree view.
@@ -136,13 +137,18 @@ public final class OriginTermLabelWindow extends JFrame {
 
     /**
      * Creates a new {@link OriginTermLabelWindow}.
-     * 
+     *
      * @param pos the position of the term whose origin shall be visualized.
      * @param node the node representing the proof state for which the term's origins shall be
      *  visualized.
      * @param services services.
      */
     public OriginTermLabelWindow(PosInOccurrence pos, Node node, Services services) {
+        // TermView can only print sequents or formulas, not terms.
+        while (!pos.subTerm().sort().equals(Sort.FORMULA)) {
+            pos = pos.up();
+        }
+
         this.services = services;
         this.termPio = pos;
         this.sequent = node.sequent();
@@ -170,6 +176,9 @@ public final class OriginTermLabelWindow extends JFrame {
 
                 highlightInView(path);
                 updateJLabels(source.pos);
+
+                revalidate();
+                repaint();
             });
 
             JScrollPane treeScrollPane = new JScrollPane(tree,
@@ -240,6 +249,9 @@ public final class OriginTermLabelWindow extends JFrame {
                     highlightInView(path);
                     highlightInTree(getTreePath(path));
                     updateJLabels(pos);
+
+                    revalidate();
+                    repaint();
                 }
             });
 
@@ -259,6 +271,10 @@ public final class OriginTermLabelWindow extends JFrame {
             bottomRightPanel.setBorder(new TitledBorder(ORIGIN_INFO_TITLE));
             originJLabel.setBorder(new TitledBorder(ORIGIN_TITLE));
             subtermOriginsScrollPane.setBorder(new TitledBorder(SUBTERM_ORIGINS_TITLE));
+
+            originJLabel.setBackground(Color.WHITE);
+            subtermOriginsJLabel.setBackground(Color.WHITE);
+
             rightPanel.add(bottomRightPanel);
 
             rightPanel.setDividerLocation(HEIGHT / 4 * 3);
@@ -340,24 +356,30 @@ public final class OriginTermLabelWindow extends JFrame {
     }
 
     private void updateJLabels(PosInOccurrence pos) {
+        originJLabel.setOpaque(false);
+        subtermOriginsJLabel.setOpaque(false);
+
         if (pos == null) {
             originJLabel.setText("");
+
             subtermOriginsJLabel.setText("");
+
             return;
         }
 
         OriginTermLabel label = (OriginTermLabel) pos.subTerm().getLabel(OriginTermLabel.NAME);
 
         StringBuilder originText = new StringBuilder("<html>");
-
         StringBuilder subtermOriginsText = new StringBuilder("<html>");
 
         if (label != null) {
             originText.append(label.getOrigin());
+            originJLabel.setOpaque(true);
 
             for (Origin origin : label.getSubtermOrigins()) {
                 subtermOriginsText.append(origin);
                 subtermOriginsText.append("<br>");
+                subtermOriginsJLabel.setOpaque(true);
             }
         }
 
@@ -365,6 +387,7 @@ public final class OriginTermLabelWindow extends JFrame {
         subtermOriginsText.append("</html>");
 
         originJLabel.setText(originText.toString());
+
         subtermOriginsJLabel.setText(subtermOriginsText.toString());
     }
 
@@ -459,6 +482,7 @@ public final class OriginTermLabelWindow extends JFrame {
             result.add(originTextLabel, BorderLayout.LINE_END);
 
             result.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            result.setBackground(Color.WHITE);
 
             if (originLabel != null) {
                 result.setToolTipText(getFullText(term, originLabel.getOrigin()));
@@ -500,7 +524,13 @@ public final class OriginTermLabelWindow extends JFrame {
                 text = LogicPrinter.quickPrintTerm(term, services);
             }
 
-            return text.substring(0, text.indexOf("\n")).replaceAll("\\s+", " ");
+            int endIndex = text.indexOf("\n");
+
+            if (endIndex != text.length() - 1) {
+                return text.replaceAll("\\s+", " ") + " ...";
+            } else {
+                return text.substring(0, text.indexOf("\n")).replaceAll("\\s+", " ");
+            }
         }
     }
 
