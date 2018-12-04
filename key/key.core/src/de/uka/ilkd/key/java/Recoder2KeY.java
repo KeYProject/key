@@ -23,13 +23,21 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -606,7 +614,7 @@ public class Recoder2KeY implements JavaReader {
      * @throws IOException
      * @throws ParseException
      */
-    private List<recoder.java.CompilationUnit> parseLibs() throws ParseException, IOException, ParserException {
+    private List<recoder.java.CompilationUnit> parseLibs(FileRepo fileRepo) throws ParseException, IOException, ParserException {
         
         recoder.ProgramFactory pf = servConf.getProgramFactory();
         List<recoder.java.CompilationUnit> rcuList = new LinkedList<recoder.java.CompilationUnit>();
@@ -616,12 +624,29 @@ public class Recoder2KeY implements JavaReader {
 
         if(classPath != null) {
             for(File cp : classPath) {
-                if(cp.isDirectory())
+                // register file in fileRepo if the repo is set
+                if (fileRepo != null) {
+                    // TODO: should this be a separate method in FileRepo?
+                    // iterate to make sure that only files are requested to repo
+                    Files.walkFileTree(cp.toPath(), new SimpleFileVisitor<Path>() {
+                        @Override
+                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                            throws IOException
+                        {
+                            if (!Files.isDirectory(file)) {
+                                fileRepo.getFile(file).close();
+                            }
+                            return FileVisitResult.CONTINUE;
+                        }
+                    });
+                }
+                if(cp.isDirectory()) {
                     //sources.add(fileRepository.classpathDirectoryCollection(cp));     // TODO
                     sources.add(new DirectoryFileCollection(cp));
-                else
+                } else {
                     //sources.add(fileRepository.classpathZIPCollection(cp));
                     sources.add(new ZipFileCollection(cp));
+                }
             }
         }
 
@@ -767,14 +792,23 @@ public class Recoder2KeY implements JavaReader {
      */
     public void parseSpecialClasses() {
         try {
-            parseLibraryClasses0();
+            parseLibraryClasses0(null);
+        } catch (Exception e) {
+            reportError("An error occurred while parsing the libraries", e);
+        }
+    }
+    
+    // TODO: doc
+    public void parseSpecialClasses(FileRepo fileRepo) {
+        try {
+            parseLibraryClasses0(fileRepo);
         } catch (Exception e) {
             reportError("An error occurred while parsing the libraries", e);
         }
     }
     
     
-    private void parseLibraryClasses0() throws ParseException, IOException, ParserException {
+    private void parseLibraryClasses0(FileRepo fileRepo) throws ParseException, IOException, ParserException {
         if (mapping.parsedSpecial()) {
             return;
         }
@@ -782,7 +816,7 @@ public class Recoder2KeY implements JavaReader {
         // go to special mode -> used by the converter!
         setParsingLibs(true);
 
-        List<recoder.java.CompilationUnit> specialClasses = parseLibs();
+        List<recoder.java.CompilationUnit> specialClasses = parseLibs(fileRepo);
 
 //        for (recoder.java.CompilationUnit compilationUnit : specialClasses) {
 //            System.out.println(compilationUnit.toSource());

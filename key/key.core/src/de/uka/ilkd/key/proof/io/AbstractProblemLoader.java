@@ -355,6 +355,8 @@ public abstract class AbstractProblemLoader {
     protected EnvInput createEnvInput(FileRepo fileRepo) throws IOException {
 
         final String filename = file.getName();
+
+        // set the root directory of the FileRepo (used for resolving paths)
         fileRepo.setBaseDir(file.toPath());
 
         if (filename.endsWith(".java")) {

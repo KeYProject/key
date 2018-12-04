@@ -200,10 +200,16 @@ public class KeYFile implements EnvInput {
         //input = file.getNewStream();
         System.out.println("trying to get new stream of " + file.file());
         try {
-            if (fileRepo == null)
-                input = file.getNewStream();
-            else
+            if (fileRepo != null) {
                 input = fileRepo.getFile(file.file().toPath());
+                if (input == null) {
+                    // fileRepo could not provide a file (internal rule file?)
+                    input = file.getNewStream();
+                }
+            } else {
+                input = file.getNewStream();
+            }
+                
         }
         catch (IOException e) {
             // TODO Auto-generated catch block

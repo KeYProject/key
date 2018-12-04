@@ -49,7 +49,6 @@ public class FileRuleSource extends RuleSource {
     @Override
     public InputStream getNewStream() {
         try {
-            System.out.println("trying to get new stream of rule source " + ruleFile);
             return new FileInputStream(ruleFile);
         } catch (final FileNotFoundException exception) {
             throw new RuntimeException("Error while reading rules.", exception);

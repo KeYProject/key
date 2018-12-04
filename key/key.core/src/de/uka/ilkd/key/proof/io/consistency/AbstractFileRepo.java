@@ -2,6 +2,8 @@ package de.uka.ilkd.key.proof.io.consistency;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,8 +12,10 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,13 +37,13 @@ public abstract class AbstractFileRepo implements FileRepo {
     protected Path javaPath;
 
     /** The original class path. */
-    protected Path classPath;
+    protected List<Path> classpath;
 
     /**
      * The boot class path, that is, the path to the folder where stubs of library classes
      * (e.g. Object, List, ...) used in KeY are stored.
      */
-    protected Path bootClassPath;
+    protected Path bootclasspath;
 
     /**
      * The base directory of the loaded proof (needed to calculate relative paths).
@@ -87,6 +91,7 @@ public abstract class AbstractFileRepo implements FileRepo {
                 is = getInputStream(p);
             }
 
+            // we use a this method instead of IOUtil.copy() because zos must not be closed
             copy(is, zos);
             is.close();
 
@@ -100,8 +105,9 @@ public abstract class AbstractFileRepo implements FileRepo {
      * of the resource.
      * @param p the filename of the requested file
      * @return an InputStream of the resource or null if it has not been stored in the repo before.
+     * @throws FileNotFoundException if the file exists, is a directory, or can not be opened
      */
-    public abstract InputStream getInputStream(Path p);
+    protected abstract InputStream getInputStream(Path p) throws FileNotFoundException;
 
     /**
      * Variation of the method IOUtil.copy():
@@ -136,14 +142,19 @@ public abstract class AbstractFileRepo implements FileRepo {
         // get the concrete source from the repo
         InputStream is = getInputStream(p);
 
+        // TODO: adapt include/includeFile
         try (Stream<String> lines = new BufferedReader(new InputStreamReader(is)).lines()) {
+            // TODO: may produce multiple occurrences of same classpath statement
             // create an in-memory copy of the file, modify it, and return an InputStream
-            String rep = lines.map(
-                // TODO: line break removed here!
-                // TODO: semicolon may be part of filename
-                l -> l.replaceAll("\\\\javaSource [^;\\n\\r]*;", "\\\\javaSource \"src\";"))
+            String rep = lines                  // TODO: check regular expressions
+                .map(l -> l.replaceAll("\\\\javaSource \\\".*\\\";",
+                                       "\\\\javaSource \"src\";"))
+                .map(l -> l.replaceAll("\\\\classpath \\\".*\\\";",
+                                       "\\\\classpath \"classpath\";"))
+                .map(l -> l.replaceAll("\\\\bootclasspath \\\".*\\\";",
+                                       "\\\\bootclasspath \"bootclasspath\";"))
                 .collect(Collectors.joining(System.lineSeparator()));
-            is.close(); // TODO: ensures this is executed
+            is.close(); // TODO: ensure this is executed
 
             ByteArrayInputStream bais = new ByteArrayInputStream(rep.getBytes("UTF-8"));
             return bais;
@@ -151,27 +162,37 @@ public abstract class AbstractFileRepo implements FileRepo {
     }
 
     @Override
-    public void setBootClassPath(Path path) {
-        bootClassPath = path;
+    public void setBootClassPath(File path) {
+        if (path != null) {
+            bootclasspath = path.toPath().toAbsolutePath().normalize();
+        }
     }
 
     @Override
-    public void setClassPath(Path path) {
-        classPath = path;
+    public void setClassPath(List<File> paths) {
+        if (paths != null) {
+            classpath = paths.stream()
+                    .filter(p -> p != null)             // to be sure it contains no null elements
+                    .map(                               // convert Files to Paths and normalize
+                        p -> p.toPath().toAbsolutePath().normalize())
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override
-    public void setJavaPath(Path path) {
-        javaPath = path;
+    public void setJavaPath(String path) {
+        if (path != null) {
+            javaPath = Paths.get(path).toAbsolutePath().normalize();
+        }
     }
 
     @Override
     public void setBaseDir(Path path) {
         // path can be a file or a directory
         if (Files.isDirectory(path)) {
-            baseDir = path.toAbsolutePath();
+            baseDir = path.toAbsolutePath().normalize();
         } else {
-            baseDir = path.getParent().toAbsolutePath();
+            baseDir = path.getParent().toAbsolutePath().normalize();
         }
     }
 
@@ -184,8 +205,8 @@ public abstract class AbstractFileRepo implements FileRepo {
     public void dispose() {
         // delete all references
         javaPath = null;
-        classPath = null;
-        bootClassPath = null;
+        classpath = null;
+        bootclasspath = null;
         baseDir = null;
 
         disposed = true;

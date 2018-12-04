@@ -1,10 +1,12 @@
 package de.uka.ilkd.key.proof.io.consistency;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
+import java.util.List;
 
 import de.uka.ilkd.key.proof.Proof;
 
@@ -28,26 +30,27 @@ public interface FileRepo {
      * This method can be used to write a file to the FileRepo.
      * @param path the path of the file to store (relative to the base directory of the proof)
      * @return an OutputStream to the file in the FileRepo
+     * @throws FileNotFoundException if a file with the given path exists
      */
-    public OutputStream createOutputStream(Path path);
+    public OutputStream createOutputStream(Path path) throws FileNotFoundException;
 
     /**
-     * Sets the boot class path (containing available classes from the Java Class Library).
-     * @param path the boot class path to set
+     * Sets the bootclasspath (containing available classes from the Java Class Library).
+     * @param path the bootclasspath to set
      */
-    public void setBootClassPath(Path path);
+    public void setBootClassPath(File path);
 
     /**
-     * Sets the class path.
-     * @param path the class path to set
+     * Sets the classpath.
+     * @param classPath the classpath to set
      */
-    public void setClassPath(Path path);
+    public void setClassPath(List<File> classPath);
 
     /**
      * Sets the java path (where the source files are located).
-     * @param path the java path to set
+     * @param javaPath the java path to set
      */
-    public void setJavaPath(Path path);
+    public void setJavaPath(String javaPath);
 
     /**
      * Stores the given proof and all files relevant for the proof in a consistent bundle as a ZIP
@@ -66,7 +69,8 @@ public interface FileRepo {
      *
      * This is needed by the FileRepo for resolving pathnames.
      *
-     * @param path the path of the base directory
+     * @param path The path of the base directory. If a file is given, then its parent directory is
+     *             set as base path
      */
     public void setBaseDir(Path path);
 

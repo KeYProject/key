@@ -15,7 +15,6 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -302,9 +301,8 @@ public final class ProblemInitializer {
 
         //read Java source and classpath settings
         envInput.setInitConfig(initConfig);
-        //envInput.setFileRepo(fileRepo);
         final String javaPath = envInput.readJavaPath();
-        fileRepo.setJavaPath(Paths.get(javaPath));
+        
         final List<File> classPath = envInput.readClassPath();
 
         final File bootClassPath;
@@ -315,6 +313,11 @@ public final class ProblemInitializer {
         }
 
         final Includes includes = envInput.readIncludes();
+
+        // set the paths in the FileRepo (all three methods can deal with null parameters)
+        fileRepo.setJavaPath(javaPath);
+        fileRepo.setClassPath(classPath);
+        fileRepo.setBootClassPath(bootClassPath);
 
         //create Recoder2KeY, set classpath
         final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(),
@@ -344,7 +347,7 @@ public final class ProblemInitializer {
             }
         } else {
             reportStatus("Reading Java libraries");
-            r2k.parseSpecialClasses();
+            r2k.parseSpecialClasses(fileRepo);
         }
         File initialFile = envInput.getInitialFile();
         initConfig.getServices().setJavaModel(JavaModel.createJavaModel(javaPath,

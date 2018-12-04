@@ -7,10 +7,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -27,6 +27,30 @@ public class DiskFileRepo extends AbstractFileRepo {
      * Needed to prevent built-in rules from getting cached.
      */
     protected static final Path KEYPATH = RuleSourceFactory.fromDefaultLocation("").file().toPath();
+
+    /**
+     * This matcher matches *.java files.
+     */
+    private static final PathMatcher JAVA_MATCHER =
+            FileSystems.getDefault().getPathMatcher("glob:**.java");
+
+    /**
+     * A matcher matches *.key and *.proof files.
+     */
+    private static final PathMatcher KEY_MATCHER =
+            FileSystems.getDefault().getPathMatcher("glob:**.{key,proof}");
+
+    /**
+     * This matcher matches *.zip and *.jar files.
+     */
+    private static final PathMatcher ZIP_MATCHER =
+            FileSystems.getDefault().getPathMatcher("glob:**.{zip,jar}");
+
+    /**
+     * This matcher matches *.class files.
+     */
+    private static final PathMatcher CLASS_MATCHER =
+            FileSystems.getDefault().getPathMatcher("glob:**.class");
 
     /**
      * The temporary directory used as a cache.
@@ -48,78 +72,265 @@ public class DiskFileRepo extends AbstractFileRepo {
         tmpDir = Files.createTempDirectory(proofName);
     }
 
-    // TODO: care about links
+    /* InputStream getFile(Path path)
+     * path can be:
+     *      *.java          copy to src/classpath/bootclasspath
+     *      *.class         copy to corresponding dir in classpath
+     *      *.key/*.proof   copy to toplevel
+     *      *.jml           ?
+     *      *.zip/*.jar     extract to classpath folder
+     *      directory       should not happen
+     *
+     * 1. lookup path in map (done if entry exists)
+     * 2. check if internal file -> no copy, map entry
+     * 3.
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     */
     @Override
-    public InputStream getFile(Path path) throws FileNotFoundException, IOException {
-        System.out.println("getFile() -> path: " + path);
+    public InputStream getFile(Path path) throws IOException {
+        // ignore URL files (those are internal files shipped with KeY)
+        if (isURLFile(path)) {
+            return null;
+        }
+
         final Path norm = path.toAbsolutePath().normalize();
 
+        // map lookup if the current path was already requested
         final Path p = map.get(norm);
-        System.out.println("    norm: " + norm + "\n    p: " + p);
-        if (p != null) {                             // already in map -> everything already done
-            System.out.println("    Already existing: " + p);
+        if (p != null) {
             return new FileInputStream(p.toFile());
-        } else {                                     // create new temp file
-            // where is the file?
-            // .java files: (javapath, classpath, bootclasspath)
-            // .proof/.key files
-            FileSystem fs = FileSystems.getDefault();
-            if (fs.getPathMatcher("glob:**.java").matches(norm)) {                // *.java
-                if (javaPath != null && norm.startsWith(javaPath)) {
-                    Path srcDir = tmpDir.resolve(Paths.get("src"));
-                    final Path rel = javaPath.relativize(norm);
-                    System.out.println("    rel: " + rel);
-                    System.out.println("    srcDir: " + srcDir);
+        }
 
-                    Path newFile = srcDir.resolve(rel);
+        // internal files are not copied to repo (but added to map for faster lookup)
+        if (isInternalFile(norm)) {
+            // generate map entry
+            map.put(norm, norm);
 
-                    if (!Files.exists(newFile.getParent())) {   // create parent dir if not existing
-                        Files.createDirectories(newFile.getParent());
-                    }
+            // directly return an InputStream to the file
+            return new FileInputStream(norm.toFile());
+        }
 
-                    System.out.println("    Copying " + norm + " to " + newFile);
-                    Files.copy(norm, newFile);
-
-                    System.out.println("    Put to map: key: " + norm.getFileName()
-                        + " val: " + newFile);
-                    map.put(norm, newFile);
-                    files.add(Paths.get("src").resolve(rel));
-
-                    return new FileInputStream(newFile.toFile());
-                } else if (classPath != null && norm.startsWith(classPath)) {
-                    System.out.println("Not yet implemented: CP");
-                } else if (bootClassPath != null && norm.startsWith(bootClassPath)) {
-                    System.out.println("Not yet implemented: BCP");
-                } else {
-                    // TODO: should not happen
-                    System.out.println("Should not happen");
-                }
-            } else if (fs.getPathMatcher("glob:**.{key,proof}").matches(norm)) {  //.key/.proof
-                Path newFile;
-                final Path rel;
-                if (isBuiltInRuleFile(norm) || baseDir == null) {            // don't cache
-                    System.out.println("        internal rule file (don't cache)!");
-                    map.put(path, path);
-                    return new FileInputStream(path.toFile());    // InputStream from original file!
-                }
-
-                rel = baseDir.relativize(norm);
-                newFile = tmpDir.resolve(rel);
-
-                System.out.println("Copying " + norm + " to " + newFile);
-                if (!Files.exists(newFile.getParent())) {
-                    Files.createDirectories(newFile.getParent());
-                }
-                Files.copy(norm, newFile);
-                map.put(norm, newFile);
-                files.add(rel);
-
-                //files.add(new Source(newFile, new FileInputStream(newFile.toFile())));
-                return new FileInputStream(newFile.toFile());    // TODO: many streams to same file?
-            }
+        if (JAVA_MATCHER.matches(norm)) {                                    // .java
+            // copy to src/classpath/bootclasspath (depending on path)
+            return getJavaFileInputStream(norm);
+        } else if (KEY_MATCHER.matches(norm)) {                              // .key/.proof
+            // copy to top level
+            // adapt file references
+            return getKeyFileInputStream(norm);
+        } else if (ZIP_MATCHER.matches(norm)) {                              // .zip/.jar
+            // extract to classpath folder (new folder with archive name)
+            return getZipFileInputStream(norm);
+        } else if (CLASS_MATCHER.matches(norm)) {                            // .class
+            // copy to classpath
+            return getClassFileInputStream(norm);
+        } else {
+            out("Error! Unsupported file extension: " + norm);
         }
         return null;
     }
+
+    // TODO: move to IOUtil
+    private static void createDirsAndCopy(Path source, Path target) throws IOException {
+        Files.createDirectories(target.getParent());
+        Files.copy(source, target);
+    }
+
+    // norm: absolute and normalized path of the requested file
+    // containing: src, classpath, or bootclasspath folder containing norm (absolute and normalized)
+    // target: src, classpath, or bootclasspath in repo (relative to repo base dir)
+    private Path resolveAndCopy(Path norm, Path containing, Path relTarget) throws IOException {
+        // compute relative path from containing to norm
+        Path rel = containing.relativize(norm);
+
+        // compute the absolute target path of the file in repo
+        Path absTarget = tmpDir.resolve(relTarget).resolve(rel);
+
+        // copy the old file to target path
+        createDirsAndCopy(norm, absTarget);
+
+        // register in map and list (for lookup and saving)
+        map.put(norm, absTarget);
+        files.add(norm);
+
+        // return the path of the copied file
+        return absTarget;
+    }
+
+    private InputStream getJavaFileInputStream(Path javaFile) throws IOException {
+        // assumes that javaFile is an actual *.java file, path has to be absolute and normalized
+
+        Path newFile = null;
+
+        // where is the file located in (src, classpath, bootclasspath)
+        if (javaPath != null && javaFile.startsWith(javaPath)) {                  // src
+            newFile = resolveAndCopy(javaFile, javaPath, Paths.get("src"));
+        } else if (bootclasspath != null && javaFile.startsWith(bootclasspath)) { // bootclasspath
+            newFile = resolveAndCopy(javaFile, bootclasspath, Paths.get("bootclasspath"));
+        } else if (classpath != null) {                                           // classpath
+            // search for matching classpath in the list
+            for (Path cp : classpath) {
+                // TODO: how to deal with zips/jars?
+                if (javaFile.startsWith(cp)) {            // only consider directories in classpath
+                    // we found the file location, so copy it
+                    newFile = resolveAndCopy(javaFile, cp, Paths.get("classpath"));
+                    break;
+                }
+            }
+        } else {
+            out("Error! None of the paths is set.");
+        }
+
+        if (newFile != null) {
+            return new FileInputStream(newFile.toFile());
+        }
+
+        return null;
+    }
+
+    private InputStream getKeyFileInputStream(Path keyFile) throws IOException {
+        // compute the absolute target path (top level in repo)
+        Path absTarget = tmpDir.resolve(keyFile.getFileName());
+
+        // copy the key file to target path
+        // IMPORTANT: Do not call adapteFileRefs here. This should be done when saving a repo.
+        createDirsAndCopy(keyFile, absTarget);
+
+        // register in map and list (for lookup and saving)
+        map.put(keyFile, absTarget);
+        files.add(keyFile);
+
+        // return a FileInputStream to the copied file
+        return new FileInputStream(absTarget.toFile());
+    }
+
+    private InputStream getZipFileInputStream(Path zipFile) throws IOException {
+        // copy to classpath folder (zip/jar may only occur in classpath)
+        Path newFile = resolveAndCopy(zipFile, zipFile.getParent(), Paths.get("classpath"));
+        // TODO: do we really want a FileInputStream here?
+        return new FileInputStream(newFile.toFile());
+    }
+
+    private InputStream getClassFileInputStream(Path classFile) {
+        // TODO:
+        return null;
+    }
+
+    private boolean isInternalFile(Path path) {
+        return isBuiltInRuleFile(path);     // TODO: add check for internal java files and URLs
+    }
+
+//    // TODO: care about links
+//    @Override
+//    public InputStream getFile(Path path) throws FileNotFoundException, IOException {
+//        out("getFile() -> path: " + path);
+//        final Path norm = path.toAbsolutePath().normalize();
+//
+//        final Path p = map.get(norm);
+//        //out("    norm: " + norm + "\n    p: " + p);
+//        if (p != null) {                             // already in map -> everything already done
+//            //out("    Already existing: " + p);
+//            return new FileInputStream(p.toFile());
+//        } else {                                     // create new temp file
+//            // where is the file located?
+//            // .java files: (javapath, classpath, bootclasspath)
+//            // .proof/.key files
+//            FileSystem fs = FileSystems.getDefault();
+//            if (fs.getPathMatcher("glob:**.java").matches(norm)) {                // *.java
+//                if (javaPath != null && norm.startsWith(javaPath)) {
+//                    Path srcDir = tmpDir.resolve(Paths.get("src"));
+//                    final Path rel = javaPath.relativize(norm);
+//                    //out("    rel: " + rel);
+//                    //out("    srcDir: " + srcDir);
+//
+//                    Path newFile = srcDir.resolve(rel);
+//
+//                    if (!Files.exists(newFile.getParent())) { // create parent dir if not existing
+//                        Files.createDirectories(newFile.getParent());
+//                    }
+//
+//                    //out("    Copying " + norm + " to " + newFile);
+//                    Files.copy(norm, newFile);
+//
+//                    //out("    Put to map: key: " + norm.getFileName()
+//                    //    + " val: " + newFile);
+//                    map.put(norm, newFile);
+//                    files.add(Paths.get("src").resolve(rel));
+//
+//                    return new FileInputStream(newFile.toFile());
+//                } else if (bootClassPath != null && norm.startsWith(bootClassPath)) {
+//                    out("Not yet implemented: BCP");
+//                    // TODO: implement BCP
+//                    return null;
+//                } else if (classPath != null) {
+//                    // check for every path in classpath if it contains the requested file
+//                    for (Path cp : classPath) {
+//                        if (fs.getPathMatcher("glob:**.{zip/jar}").matches(cp)) {   // archive (zip/jar)
+//                            ZipFile zf = new ZipFile(cp.toFile());
+//                            if (zf.stream().anyMatch(z -> norm.startsWith(z.getName()))) {
+//                                // file is in cp, so we copy the whole cp to the classpath directory
+//                                //Path newFile = cp.resolve();
+//                                //Files.copy(cp, newFile);
+//                            }
+//                        } else {
+//                            if (norm.startsWith(cp)) {                              // directory
+//                                // TODO: cp can be zip or jar
+//                                // construct the path for the new file in the temporary directory
+//                                Path cpDir = tmpDir.resolve(Paths.get("classpath"));
+//                                final Path rel = javaPath.relativize(norm);
+//                                Path newFile = cpDir.resolve(rel);
+//                                // create parent dir if not existing
+//                                //if (!Files.exists(newFile.getParent())) {
+//                                    Files.createDirectories(newFile.getParent());
+//                                //}
+//
+//                                Files.copy(norm, newFile);
+//
+//                                // register the file for lookup
+//                                map.put(norm, newFile);
+//                                files.add(Paths.get("classpath").resolve(rel));
+//
+//                                // TODO: can a file be in more than one classpath?
+//                                return new FileInputStream(newFile.toFile());
+//                            }
+//                        }
+//                        // TODO: can be *.class files (see doc/README.classpath)
+//                    }
+//                } else {
+//                    // TODO: should not happen
+//                    out("Should not happen");
+//                }
+//            } else if (fs.getPathMatcher("glob:**.{key,proof}").matches(norm)) {  //.key/.proof
+//                Path newFile;
+//                final Path rel;
+//                if (isBuiltInRuleFile(norm) || baseDir == null) {            // don't cache
+//                    out("        internal rule file (don't cache): " + path);
+//                    map.put(path, path);
+//                    return new FileInputStream(path.toFile());  // InputStream from original file!
+//                }
+//
+//                rel = baseDir.relativize(norm);
+//                newFile = tmpDir.resolve(rel);
+//
+//                out("Copying " + norm + " to " + newFile);
+//                if (!Files.exists(newFile.getParent())) {
+//                    Files.createDirectories(newFile.getParent());
+//                }
+//                Files.copy(norm, newFile);
+//                map.put(norm, newFile);
+//                files.add(rel);
+//
+//                //files.add(new Source(newFile, new FileInputStream(newFile.toFile())));
+//                return new FileInputStream(newFile.toFile());  // TODO: many streams to same file?
+//            }
+//        }
+//        return null;
+//    }
 
 
     @Override
@@ -138,6 +349,10 @@ public class DiskFileRepo extends AbstractFileRepo {
         return null;
     }
 
+    private static boolean isURLFile(Path path) {
+        return path.startsWith("file:/");
+    }
+
     private static boolean isBuiltInRuleFile(Path file) {
         // TODO: check for URL
         return file.normalize().startsWith(KEYPATH);
@@ -151,7 +366,7 @@ public class DiskFileRepo extends AbstractFileRepo {
 
         try {
             // delete the temporary directory with all contained files
-            Files.walk(baseDir)
+            Files.walk(tmpDir)
                 .sorted(Comparator.reverseOrder())
                 .map(Path::toFile)
                 .forEach(File::delete);
@@ -168,7 +383,7 @@ public class DiskFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    public InputStream getInputStream(Path p) {
+    protected InputStream getInputStream(Path p) throws FileNotFoundException {
         // convert given path to actual file path
         Path concrete = tmpDir.resolve(p);
         if (concrete == null) {
@@ -176,12 +391,12 @@ public class DiskFileRepo extends AbstractFileRepo {
         }
 
         // open new FileInputStream of the converted path
-        try {
-            return new FileInputStream(concrete.toFile());
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
+        return new FileInputStream(concrete.toFile());
+
+    }
+
+    // shortcut for debug output
+    private void out(String s) {
+        System.out.println(s);
     }
 }
