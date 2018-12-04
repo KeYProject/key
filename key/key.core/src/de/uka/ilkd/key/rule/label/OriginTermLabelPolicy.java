@@ -19,9 +19,9 @@ import de.uka.ilkd.key.rule.Rule;;
 
 /**
  * Policy for {@link OriginTermLabel}s.
- * 
+ *
  * This ensures that every term always has a valid term label, i.e., that no labels are lost.
- * 
+ *
  * @author lanzinger
  */
 public class OriginTermLabelPolicy implements TermLabelPolicy {
@@ -36,7 +36,7 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
                 && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
             return label;
         }
-        
+
         OriginTermLabel newLabel = (OriginTermLabel) label;
         OriginTermLabel oldLabel = null;
 

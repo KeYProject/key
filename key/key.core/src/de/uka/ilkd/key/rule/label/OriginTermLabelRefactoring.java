@@ -21,10 +21,10 @@ import de.uka.ilkd.key.rule.Rule;
 
 /**
  * Refactoring for {@link OriginTermLabel}s.
- * 
+ *
  * This ensures that {@link OriginTermLabel#getSubtermOrigins()}
  * always returns an up-to-date value.
- * 
+ *
  * @author lanzinger
  */
 public class OriginTermLabelRefactoring implements TermLabelRefactoring {
@@ -49,7 +49,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
                 && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
             return;
         }
-        
+
         OriginTermLabel oldLabel = null;
         OriginTermLabel newLabel;
 
@@ -74,7 +74,9 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             newLabel = new OriginTermLabel(subtermOrigins);
         }
 
-        labels.add(newLabel);
+        if (!services.getTypeConverter().getHeapLDT().getHeap().sort().equals(term.sort())) {
+            labels.add(newLabel);
+        }
     }
 
     private Set<Origin> collectSubtermOrigins(ImmutableArray<Term> terms,
