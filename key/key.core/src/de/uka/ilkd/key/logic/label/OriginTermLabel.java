@@ -36,8 +36,8 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Display name for {@link OriginTermLabel}s.
      */
-    public final static Name NAME = new Name("Origin");
-    
+    public final static Name NAME = new Name("origin");
+
     /**
      * @see #getChildCount()
      */
@@ -109,7 +109,7 @@ public class OriginTermLabel implements TermLabel {
 
     /**
      * Creates a new {@link OriginTermLabel}.
-     * 
+     *
      * @param origin the term's origin.
      */
     public OriginTermLabel(Origin origin) {
@@ -119,7 +119,7 @@ public class OriginTermLabel implements TermLabel {
 
     /**
      * Creates a new {@link OriginTermLabel}.
-     * 
+     *
      * @param origin the term's origin.
      * @param subtermOrigins the origins of the term's (former) subterms.
      */
@@ -132,7 +132,7 @@ public class OriginTermLabel implements TermLabel {
 
     /**
      * Creates a new {@link OriginTermLabel}.
-     * 
+     *
      * @param specType the JML spec type the term originates from.
      * @param file the file the term originates from.
      * @param line the line in the file.
@@ -147,7 +147,7 @@ public class OriginTermLabel implements TermLabel {
 
     /**
      * Creates a new {@link OriginTermLabel}.
-     * 
+     *
      * @param specType the JML spec type the term originates from.
      * @param file the file the term originates from.
      * @param line the line in the file.
@@ -163,7 +163,7 @@ public class OriginTermLabel implements TermLabel {
 
     /**
      * Creates a new {@link OriginTermLabel}.
-     * 
+     *
      * @param subtermOrigins the origins of the term's (former) subterms.
      */
     public OriginTermLabel(Set<Origin> subtermOrigins) {
@@ -224,7 +224,7 @@ public class OriginTermLabel implements TermLabel {
     /**
      * An origin encapsulates some information about where in the JML specification a term
      * originates from.
-     * 
+     *
      * @author lanzinger
      */
     public static class Origin implements Comparable<Origin> {
@@ -233,12 +233,12 @@ public class OriginTermLabel implements TermLabel {
          * The JML spec type the term originates from.
          */
         public final SpecType specType;
-        
+
         /**
          * The file the term originates from.
          */
         public final String fileName;
-        
+
         /**
          * The line in the file the term originates from.
          */
@@ -246,7 +246,7 @@ public class OriginTermLabel implements TermLabel {
 
         /**
          * Creates a new {@link OriginTermLabel.Origin}.
-         * 
+         *
          * @param specType the JML spec type the term originates from.
          * @param file the file the term originates from.
          * @param line the line in the file.
@@ -322,7 +322,7 @@ public class OriginTermLabel implements TermLabel {
 
     /**
      * A {@code SpecType} is any type of JML specification which gets translated into JavaDL.
-     * 
+     *
      * @author lanzinger
      * @see OriginTermLabel.Origin
      */
