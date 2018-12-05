@@ -998,7 +998,7 @@ public class TermBuilder {
         if (lhss.length != values.length) {
             throw new TermCreationException(
                     "Tried to create parallel update with " + lhss.length
-                            + " locs and " + values.length + " values");
+                    + " locs and " + values.length + " values");
         }
         Term[] updates = new Term[lhss.length];
         for (int i = 0; i < updates.length; i++) {
@@ -1694,7 +1694,7 @@ public class TermBuilder {
 
     /**
      * Adds labels to a term.
-     * 
+     *
      * @param term the term.
      * @param labels the labels to add.
      * @return the term with the labels added.
@@ -1723,7 +1723,7 @@ public class TermBuilder {
 
     /**
      * Adds a label to a term.
-     * 
+     *
      * @param term the term.
      * @param label the label to add.
      * @return the term with the label added.
@@ -1738,7 +1738,7 @@ public class TermBuilder {
 
     /**
      * Applies labels to a term, removing any existing labels.
-     * 
+     *
      * @param term the term.
      * @param labels the labels to apply.
      * @return the modified term.
@@ -1754,7 +1754,7 @@ public class TermBuilder {
 
     /**
      * Applies a label to a term, removing any existing labels.
-     * 
+     *
      * @param term the term.
      * @param label the label to apply.
      * @return the modified term.
@@ -1769,7 +1769,7 @@ public class TermBuilder {
 
     public Term shortcut(Term term) {
         return addLabel(term,
-                        ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL);
+                ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL);
     }
 
     public Term unlabel(Term term) {
@@ -1888,7 +1888,7 @@ public class TermBuilder {
 
     public Term reachableValue(Term h, Term t, KeYJavaType kjt) {
         assert t.sort().extendsTrans(kjt.getSort())
-                || t.sort() instanceof ProgramSVSort;
+        || t.sort() instanceof ProgramSVSort;
         final Sort s = t.sort() instanceof ProgramSVSort ? kjt.getSort()
                 : t.sort();
         final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
@@ -1944,14 +1944,14 @@ public class TermBuilder {
                 equals(select(
                         permissionHeap ? services.getTypeConverter()
                                 .getPermissionLDT().targetSort() : Sort.ANY,
-                        heapTerm, objVarTerm, fieldVarTerm),
+                                heapTerm, objVarTerm, fieldVarTerm),
                         select(
                                 permissionHeap
-                                        ? services.getTypeConverter()
-                                                .getPermissionLDT().targetSort()
+                                ? services.getTypeConverter()
+                                        .getPermissionLDT().targetSort()
                                         : Sort.ANY,
-                                or.replace(heapTerm), objVarTerm,
-                                fieldVarTerm))));
+                                        or.replace(heapTerm), objVarTerm,
+                                        fieldVarTerm))));
     }
 
     /**
@@ -1988,17 +1988,17 @@ public class TermBuilder {
         return all(quantVars,
                 equals(select(
                         permissionHeap
-                                ? services.getTypeConverter()
-                                        .getPermissionLDT().targetSort()
+                        ? services.getTypeConverter()
+                                .getPermissionLDT().targetSort()
                                 : Sort.ANY,
-                        heapTerm, objVarTerm, fieldVarTerm),
+                                heapTerm, objVarTerm, fieldVarTerm),
                         select(
                                 permissionHeap
-                                        ? services.getTypeConverter()
-                                                .getPermissionLDT().targetSort()
+                                ? services.getTypeConverter()
+                                        .getPermissionLDT().targetSort()
                                         : Sort.ANY,
-                                or.replace(heapTerm), objVarTerm,
-                                fieldVarTerm)));
+                                        or.replace(heapTerm), objVarTerm,
+                                        fieldVarTerm)));
     }
 
     public Term anonUpd(LocationVariable heap, Term mod, Term anonHeap) {
@@ -2333,22 +2333,22 @@ public class TermBuilder {
         return (locset1.equals(empty()) && locset2.equals(empty())) ? tt
                 : func(services.getNamespaces().functions()
                         .lookup(new Name("__EQUALS__LOCS__")), // TODO: define
-                                                               // string
-                                                               // constant
-                                                               // elsewhere
+                        // string
+                        // constant
+                        // elsewhere
                         heap1, locset1, heap2, locset2);
     }
 
-    public Term eqAtLocsPost(Services services, Term heap1_pre, Term heap1_post,
-            Term locset1, Term heap2_pre, Term heap2_post, Term locset2) {
+    public Term eqAtLocsPost(Services services, Term heap1Pre, Term heap1Post,
+            Term locset1, Term heap2Pre, Term heap2Post, Term locset2) {
         return (locset1.equals(empty()) && locset2.equals(empty())) ? tt
                 : func(services.getNamespaces().functions()
                         .lookup(new Name("__EQUALS__LOCS__POST__")), // TODO:
-                                                                     // define
-                                                                     // string
-                                                                     // constant
-                                                                     // elsewhere
-                        heap1_pre, heap1_post, locset1, heap2_pre, heap2_post,
+                        // define
+                        // string
+                        // constant
+                        // elsewhere
+                        heap1Pre, heap1Post, locset1, heap2Pre, heap2Post,
                         locset2);
     }
 }

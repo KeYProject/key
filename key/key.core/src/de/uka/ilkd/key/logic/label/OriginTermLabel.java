@@ -25,7 +25,8 @@ import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
  * original proof obligation. </p>
  *
  * <p> Before doing this, you can call {@link TermBuilder#addLabelToAllSubs(Term, TermLabel)}
- * for every term you have added to the original contract in your PO to add an {@link OriginTermLabel}
+ * for every term you have added to the original contract in your PO to add an
+ * {@link OriginTermLabel}
  * of your choosing. Terms for which you do not do this get a label of the form
  * {@code new OriginTermLabel(SpecType.NONE, null, -1)}. </p>
  *
@@ -43,69 +44,17 @@ public class OriginTermLabel implements TermLabel {
      */
     public final static int CHILD_COUNT = 2;
 
+    /**
+     * The term's origin.
+     * @see #getOrigin()
+     */
     private Origin origin;
-    private Set<Origin> subtermOrigins;
 
     /**
-     * This method transforms a term in such a way that
-     *
-     * <ol>
-     *  <li> every sub-term of has a {@link OriginTermLabel}
-     *      (sub-terms that did not have one previously get a label with
-     *      SpecType {@link SpecType#NONE}). </li>
-     *  <li> every {@link OriginTermLabel} contains all of the correct
-     *      {@link #getSubtermOrigins()}. </li>
-     * </ol>
-     *
-     * @param term the term to transform.
-     * @param tb the term builder to use for the transformation.
-     * @return the transformed term.
+     * The origins of the term's sub-terms and former sub-terms.
+     * @see #getSubtermOrigins()
      */
-    public static Term collectSubtermOrigins(Term term, Services services) {
-        if (services.getTypeConverter().getHeapLDT().getHeap().sort().equals(term.sort())) {
-            return term;
-        }
-
-        TermBuilder tb = services.getTermBuilder();
-        ImmutableArray<Term> oldSubs = term.subs();
-        Term[] newSubs = new Term[oldSubs.size()];
-        Set<Origin> origins = new HashSet<>();
-
-        for (int i = 0; i < newSubs.length; ++i) {
-            newSubs[i] = collectSubtermOrigins(oldSubs.get(i), services);
-            OriginTermLabel subLabel = (OriginTermLabel) newSubs[i].getLabel(NAME);
-
-            if (subLabel != null) {
-                origins.add(subLabel.getOrigin());
-                origins.addAll(subLabel.getSubtermOrigins());
-            }
-        }
-
-        List<TermLabel> labels = term.getLabels().toList();
-        OriginTermLabel oldLabel = (OriginTermLabel) term.getLabel(NAME);
-
-        if (oldLabel != null) {
-            labels.remove(oldLabel);
-            labels.add(new OriginTermLabel(
-                    oldLabel.getOrigin().specType,
-                    oldLabel.getOrigin().fileName,
-                    oldLabel.getOrigin().line,
-                    origins));
-        } else {
-            labels.add(new OriginTermLabel(
-                    SpecType.NONE,
-                    null,
-                    -1,
-                    origins));
-        }
-
-        return tb.tf().createTerm(
-                term.op(),
-                newSubs,
-                term.boundVars(),
-                term.javaBlock(),
-                new ImmutableArray<>(labels));
-    }
+    private Set<Origin> subtermOrigins;
 
     /**
      * Creates a new {@link OriginTermLabel}.
@@ -155,7 +104,7 @@ public class OriginTermLabel implements TermLabel {
     public OriginTermLabel(SpecType specType, String file, int line) {
         String filename = file == null || file.equals("no file")
                 ? null
-                : Paths.get(file).getFileName().toString();
+                        : Paths.get(file).getFileName().toString();
 
         this.origin = new Origin(specType, filename, line);
         this.subtermOrigins = new HashSet<>();
@@ -172,6 +121,67 @@ public class OriginTermLabel implements TermLabel {
         this.subtermOrigins.addAll(subtermOrigins);
         this.subtermOrigins = this.subtermOrigins.stream()
                 .filter(o -> o.specType != SpecType.NONE).collect(Collectors.toSet());
+    }
+
+    /**
+     * This method transforms a term in such a way that
+     *
+     * <ol>
+     *  <li> every sub-term of has a {@link OriginTermLabel}
+     *      (sub-terms that did not have one previously get a label with
+     *      SpecType {@link SpecType#NONE}). </li>
+     *  <li> every {@link OriginTermLabel} contains all of the correct
+     *      {@link #getSubtermOrigins()}. </li>
+     * </ol>
+     *
+     * @param term the term to transform.
+     * @param services services.
+     * @return the transformed term.
+     */
+    public static Term collectSubtermOrigins(Term term, Services services) {
+        if (services.getTypeConverter().getHeapLDT().getHeap().sort().equals(term.sort())) {
+            return term;
+        }
+
+        TermBuilder tb = services.getTermBuilder();
+        ImmutableArray<Term> oldSubs = term.subs();
+        Term[] newSubs = new Term[oldSubs.size()];
+        Set<Origin> origins = new HashSet<>();
+
+        for (int i = 0; i < newSubs.length; ++i) {
+            newSubs[i] = collectSubtermOrigins(oldSubs.get(i), services);
+            OriginTermLabel subLabel = (OriginTermLabel) newSubs[i].getLabel(NAME);
+
+            if (subLabel != null) {
+                origins.add(subLabel.getOrigin());
+                origins.addAll(subLabel.getSubtermOrigins());
+            }
+        }
+
+        List<TermLabel> labels = term.getLabels().toList();
+        OriginTermLabel oldLabel = (OriginTermLabel) term.getLabel(NAME);
+
+        if (oldLabel != null) {
+            labels.remove(oldLabel);
+            labels.add(new OriginTermLabel(
+                    oldLabel.getOrigin().specType,
+                    oldLabel.getOrigin().fileName,
+                    oldLabel.getOrigin().line,
+                    origins));
+        } else {
+            labels.add(new OriginTermLabel(
+                    SpecType.NONE,
+                    null,
+                    -1,
+                    origins));
+        }
+
+        return tb.tf().createTerm(
+                term.op(),
+                newSubs,
+                term.boundVars(),
+                term.javaBlock(),
+                new ImmutableArray<>(labels));
     }
 
     @Override
@@ -248,7 +258,7 @@ public class OriginTermLabel implements TermLabel {
          * Creates a new {@link OriginTermLabel.Origin}.
          *
          * @param specType the JML spec type the term originates from.
-         * @param file the file the term originates from.
+         * @param fileName the file the term originates from.
          * @param line the line in the file.
          */
         public Origin(SpecType specType, String fileName, int line) {
@@ -300,22 +310,36 @@ public class OriginTermLabel implements TermLabel {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
+            if (this == obj) {
                 return true;
-            if (obj == null)
+            }
+
+            if (obj == null) {
                 return false;
-            if (getClass() != obj.getClass())
+            }
+
+            if (getClass() != obj.getClass()) {
                 return false;
+            }
+
             Origin other = (Origin) obj;
+
             if (fileName == null) {
-                if (other.fileName != null)
+                if (other.fileName != null) {
                     return false;
-            } else if (!fileName.equals(other.fileName))
+                }
+            } else if (!fileName.equals(other.fileName)) {
                 return false;
-            if (line != other.line)
+            }
+
+            if (line != other.line) {
                 return false;
-            if (specType != other.specType)
+            }
+
+            if (specType != other.specType) {
                 return false;
+            }
+
             return true;
         }
     }
@@ -328,26 +352,102 @@ public class OriginTermLabel implements TermLabel {
      */
     public static enum SpecType {
 
+        /**
+         * accessible
+         */
         ACCESSIBLE("accessible"),
+
+        /**
+         * assignable
+         */
         ASSIGNABLE("assignable"),
+
+        /**
+         * decreases
+         */
         DECREASES("decreases"),
+
+        /**
+         * measured_by
+         */
         MEASURED_BY("measured_by"),
+
+        /**
+         * invariant
+         */
         INVARIANT("invariant"),
+
+        /**
+         * loop_invariant
+         */
         LOOP_INVARIANT("loop_invariant"),
+
+        /**
+         * loop_invariant_free
+         */
         LOOP_INVARIANT_FREE("loop_invariant_free"),
+
+        /**
+         * requires
+         */
         REQUIRES("requires"),
+
+        /**
+         * requires_free
+         */
         REQUIRES_FREE("requires_free"),
+
+        /**
+         * ensures
+         */
         ENSURES("ensures"),
+
+        /**
+         * ensures_free
+         */
         ENSURES_FREE("ensures_free"),
+
+        /**
+         * signals
+         */
         SIGNALS("signals"),
+
+        /**
+         * signals_only
+         */
         SIGNALS_ONLY("signals_only"),
+
+        /**
+         * breaks
+         */
         BREAKS("breaks"),
+
+        /**
+         * continues
+         */
         CONTINUES("continues"),
+
+        /**
+         * returns
+         */
         RETURNS("returns"),
+
+        /**
+         * None. Used for terms that do not originate from a JML spec and terms whose origin was
+         * not set upon their creation.
+         */
         NONE("<none>");
 
+        /**
+         * This {@code SpecType}'s string representation.
+         */
         private String name;
 
+        /**
+         * Creates a new {@code SpecType}
+         *
+         * @param name the {@code SpecType}'s string representation.
+         */
         private SpecType(String name) {
             this.name = name;
         }

@@ -36,13 +36,15 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
     @Override
     public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint,
-            Term tacletTerm) {
+            PosInOccurrence applicationPosInOccurrence, Term applicationTerm,
+            Rule rule, Goal goal, Object hint, Term tacletTerm) {
         return RefactoringScope.SEQUENT;
     }
 
     @Override
-    public void refactorLabels(TermLabelState state, Services services, PosInOccurrence applicationPosInOccurrence,
+    public void refactorLabels(
+            TermLabelState state, Services services,
+            PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Term term,
             List<TermLabel> labels) {
         if (rule instanceof BuiltInRule
