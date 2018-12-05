@@ -76,10 +76,19 @@ class TermImpl implements Term {
     //constructors
     //-------------------------------------------------------------------------
 
+    /**
+     * Constructs a term for the given operator, with the given sub terms,
+     * bounded variables and (if applicable) the code block on this term.
+     * @param op the operator of the term, e.g., some arithmetic operation
+     * @param subs the sub terms of the constructed term (whose type is
+     *             constrained by the used operator)
+     * @param boundVars the bounded variables (if applicable), e.g., for quantifiers
+     * @param javaBlock the code block (if applicable) after which the term is evaluated
+     */
     public TermImpl(Operator op,
-            ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            JavaBlock javaBlock) {
+                    ImmutableArray<Term> subs,
+                    ImmutableArray<QuantifiableVariable> boundVars,
+                    JavaBlock javaBlock) {
         assert op != null;
         assert subs != null;
         this.op = op;

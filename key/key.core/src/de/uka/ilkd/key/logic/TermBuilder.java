@@ -2323,32 +2323,4 @@ public class TermBuilder {
             return tf.createTerm(Junctor.OR, t1, t2);
         }
     }
-
-    // -------------------------------------------------------------------------
-    // information flow operators
-    // -------------------------------------------------------------------------
-
-    public Term eqAtLocs(Services services, Term heap1, Term locset1,
-            Term heap2, Term locset2) {
-        return (locset1.equals(empty()) && locset2.equals(empty())) ? tt
-                : func(services.getNamespaces().functions()
-                        .lookup(new Name("__EQUALS__LOCS__")), // TODO: define
-                        // string
-                        // constant
-                        // elsewhere
-                        heap1, locset1, heap2, locset2);
-    }
-
-    public Term eqAtLocsPost(Services services, Term heap1Pre, Term heap1Post,
-            Term locset1, Term heap2Pre, Term heap2Post, Term locset2) {
-        return (locset1.equals(empty()) && locset2.equals(empty())) ? tt
-                : func(services.getNamespaces().functions()
-                        .lookup(new Name("__EQUALS__LOCS__POST__")), // TODO:
-                        // define
-                        // string
-                        // constant
-                        // elsewhere
-                        heap1Pre, heap1Post, locset1, heap2Pre, heap2Post,
-                        locset2);
-    }
 }
