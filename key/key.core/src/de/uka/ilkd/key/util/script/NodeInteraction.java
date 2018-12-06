@@ -4,17 +4,21 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 
 public abstract class NodeInteraction implements Interaction {
-    private Node node;
+    private NodeIdentifier node;
 
     public NodeInteraction() { }
 
-    protected NodeInteraction(Node node) {
+    protected NodeInteraction(NodeIdentifier node) {
         this.node = node;
+    }
+
+    public NodeInteraction(Node node) {
+        this(NodeIdentifier.get(node));
     }
 
     public abstract String getProofScriptRepresentation(Services services);
 
-    public Node getNode() {
+    public NodeIdentifier getNode() {
         return node;
     }
 }

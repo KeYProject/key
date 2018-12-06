@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 public class BuiltInRuleInteraction extends NodeInteraction {
     public BuiltInRule rule;
@@ -12,7 +13,7 @@ public class BuiltInRuleInteraction extends NodeInteraction {
     public BuiltInRuleInteraction() {
     }
 
-    public BuiltInRuleInteraction(Node node, BuiltInRule rule, PosInOccurrence pos) {
+    public BuiltInRuleInteraction(Node node, IBuiltInRuleApp app, BuiltInRule rule, PosInOccurrence pos) {
         super(node);
         this.rule = rule;
         this.pos = pos;

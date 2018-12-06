@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.util.script;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -17,51 +18,64 @@ import java.util.Iterator;
  * @author weigl
  */
 public final class RuleInteraction extends NodeInteraction {
-    private RuleApp app;
+    private PosInOccurrence posInOccurence;
+    //private NodeIdentifier appliedOn;
     private String ruleName;
     private HashMap<String, String> arguments = new HashMap<>();
 
-
     public RuleInteraction() {
-        super(null);
+        super((NodeIdentifier) null);
     }
 
     public RuleInteraction(Node node, RuleApp app) {
-        super(node);
-        this.app = app;
-    }
+        super(NodeIdentifier.get(node));
 
-    @Override
-    public String getProofScriptRepresentation(Services services) {
+        this.ruleName = app.rule().displayName();
+        this.posInOccurence = app.posInOccurrence();
+
         StringBuilder sb = new StringBuilder();
         if (app instanceof TacletApp) {
             TacletApp tapp = (TacletApp) app;
-            sb.append(tapp.taclet().name().toString()).append(" ");
             /*SequentFormula seqForm = pos.getPosInOccurrence().sequentFormula();
             String sfTerm = LogicPrinter.quickPrintTerm(seqForm.formula(), services);
             String onTerm = LogicPrinter.quickPrintTerm(pos.getPosInOccurrence().subTerm(), services);
-
-
             sb.append("\n    formula=`").append(sfTerm).append("`");
             sb.append("\n    on=`").append(onTerm).append("`");
             sb.append("\n    occ=?;");
             */
-
             Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> iter = tapp.instantiations().pairIterator();
             while (iter.hasNext()) {
                 ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = iter.next();
-                String p = "inst_" + entry.key().toString();
-                String v = LogicPrinter.quickPrintTerm((Term) entry.value().getInstantiation(), services);
-                sb.append("\n    ").append(p).append("=`").append(v).append("`");
+                String p = entry.key().toString();
+                String v = LogicPrinter.quickPrintTerm((Term) entry.value().getInstantiation(), null);
+                arguments.put(p, v);
             }
-
-            return sb.toString();
-        } else {
-            return app.toString();
         }
     }
 
-    public RuleApp getApp() {
-        return app;
+    @Override
+    public String toString() {
+        return ruleName;
+    }
+
+    @Override
+    public String getProofScriptRepresentation(Services services) {
+        return "";
+    }
+
+    public String getRuleName() {
+        return ruleName;
+    }
+
+    public void setRuleName(String ruleName) {
+        this.ruleName = ruleName;
+    }
+
+    public PosInOccurrence getPosInOccurence() {
+        return posInOccurence;
+    }
+
+    public void setPosInOccurence(PosInOccurrence posInOccurence) {
+        this.posInOccurence = posInOccurence;
     }
 }

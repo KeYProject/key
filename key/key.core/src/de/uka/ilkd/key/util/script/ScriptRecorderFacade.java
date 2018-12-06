@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -75,9 +76,9 @@ public class ScriptRecorderFacade {
         emit(interaction);
     }
 
-    public static void runBuiltIn(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced) {
+    public static void runBuiltIn(Goal goal, IBuiltInRuleApp app, BuiltInRule rule, PosInOccurrence pos, boolean forced) {
         InteractionLog state = get(goal.proof());
-        NodeInteraction interaction = new BuiltInRuleInteraction(goal.node(), rule, pos);
+        NodeInteraction interaction = new BuiltInRuleInteraction(goal.node(), app, rule, pos);
         state.getInteractions().add(interaction);
         emit(interaction);
     }

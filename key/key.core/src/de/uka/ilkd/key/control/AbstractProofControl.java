@@ -376,7 +376,7 @@ public abstract class AbstractProofControl implements ProofControl {
       }
 
       if (app != null && app.rule() == rule) {
-          ScriptRecorderFacade.runBuiltIn(goal, rule, pos, forced);
+          ScriptRecorderFacade.runBuiltIn(goal, app, rule, pos, forced);
           goal.apply(app);
           return;
       }

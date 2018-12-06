@@ -144,9 +144,9 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
     @Override
     public void onInteraction(Interaction event) {
         if (event instanceof NodeInteraction) {
-            if (((NodeInteraction) event).getNode().proof() == currentProof) {
-                rebuildList();
-            }
+            //TODO if (((NodeInteraction) event).getNode().proof() == currentProof) {
+            rebuildList();
+            //}
         }
     }
 

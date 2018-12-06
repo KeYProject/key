@@ -4,7 +4,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * depcrated in favor interaction log
@@ -32,7 +31,7 @@ public final class ScriptRecorderState {
 
     public List<List<NodeInteraction>> getInteractionsByDepth() {
         final Map<Integer, List<Interaction>> seq = new HashMap<>();
-        int maxDepth = 0;
+        /*int maxDepth = 0;
         for (Interaction event : interactions) {
             if (event instanceof NodeInteraction) {
                 int depth = getDepth(((NodeInteraction) event).getNode());
@@ -42,7 +41,7 @@ public final class ScriptRecorderState {
         }
         for (int d = 0; d < maxDepth; d++) {
 
-        }
+        }*/
         return null;
     }
 
@@ -56,7 +55,7 @@ public final class ScriptRecorderState {
     }
 
     public HashMap<Interaction, List<Interaction>> getInteractionTree() {
-        final HashMap<Interaction, List<Interaction>> map = new HashMap<>();
+        final HashMap<Interaction, List<Interaction>> map = new HashMap<>();/*
         final Set<Node> interactiveNodes = interactions.stream()
                 .filter(e -> e instanceof NodeInteraction)
                 .map(e -> (NodeInteraction) e)
@@ -71,7 +70,7 @@ public final class ScriptRecorderState {
                 map.computeIfAbsent(parent, n -> new ArrayList<>()).add(inter);
             }
         }
-
+*/
         return map;
     }
 
@@ -84,7 +83,7 @@ public final class ScriptRecorderState {
                 return interactions.stream()
                         .filter(e -> e instanceof NodeInteraction)
                         .map(e -> (NodeInteraction) e)
-                        .filter((NodeInteraction a) -> a.getNode().serialNr() == finalN.serialNr())
+                        //.filter((NodeInteraction a) -> a.getNode().serialNr() == finalN.serialNr())
                         .findFirst()
                         .orElse(null);
             }
