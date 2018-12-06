@@ -325,7 +325,7 @@ public final class NotationInfo {
        refresh(services, DEFAULT_PRETTY_SYNTAX, DEFAULT_UNICODE_ENABLED);
     }
 
-    public void refresh(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+    public void refresh(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {    	
         this.unicodeEnabled = useUnicodeSymbols;
         this.prettySyntax = usePrettyPrinting;
         if (usePrettyPrinting && services != null) {

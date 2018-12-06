@@ -151,12 +151,13 @@ public class LogicPrinter {
 
     public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         final NotationInfo ni = new NotationInfo();
-        if (services != null) {
-            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
-        }
+        
         LogicPrinter p = new LogicPrinter(new ProgramPrinter(),
                                           ni,
                                           services);
+        if (services != null) {
+            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
+        }
         try {
             p.printTerm(t);
         } catch (IOException ioe) {

@@ -54,7 +54,12 @@ import javax.swing.table.TableCellRenderer;
 import de.uka.ilkd.key.control.InstantiationFileHandler;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.nodeviews.PosInSequentTransferable;
 import de.uka.ilkd.key.gui.utilities.BracketMatchingTextArea;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ModelChangeListener;
 import de.uka.ilkd.key.proof.ModelEvent;
@@ -212,7 +217,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     private JPanel createInstantiationDisplay(int i) {
 	JPanel panel = new JPanel(new BorderLayout());
 	// show instantiation
-	dataTable[i] = new DataTable(this, i);
+	dataTable[i] = new DataTable(this, i, mediator);
         dataTable[i].setRowHeight(48);
         tablePane = new JScrollPane(dataTable[i]);
         adaptSizes(dataTable[i]);       
@@ -362,6 +367,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	private int modelNr;
 	/** the enclosing dialog */	
 	private TacletMatchCompletionDialog owner;
+	
+	private KeYMediator mediator;
 	/** the TacletIfSelectionPanel that shows the different possible
 	 * instantiations of the if-sequent or a manual entered
 	 * instantiation. The value is null if and only if
@@ -370,17 +377,20 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	private TacletIfSelectionDialog ifSelectionPanel;
 
 	private DataTable(TacletMatchCompletionDialog owner,
-			  int modelNr) {
+			  int modelNr, KeYMediator mediator) {
 
 	    super(owner.model[modelNr].tableModel());
 	    this.modelNr = modelNr;
 	    this.owner = owner;
+	    this.mediator = mediator;
 	    owner.model[modelNr].addModelChangeListener(this);
 	    setUpEditor();
 
 	    // And now the Drag'n'drop stuff ...
 	    DropTarget aDropTarget = 
 		new DropTarget(this, new DropTargetListener() {
+			
+
 			public void dragEnter (DropTargetDragEvent event) {}
 	
 			public void dragExit (DropTargetEvent event) {}
@@ -400,9 +410,24 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
 				try {
 				    Transferable transferable = event.getTransferable();
-						   
-				    // we accept only Strings      
-				    if (transferable.isDataFlavorSupported (DataFlavor.stringFlavor)){
+				    if(transferable.isDataFlavorSupported(PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER)) {
+				    	
+				    	event.acceptDrop(DnDConstants.ACTION_MOVE);
+				    	PosInSequent pis = (PosInSequent) transferable.getTransferData(PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
+				    	
+				    	Term term = pis.getPosInOccurrence().subTerm();
+
+				    	droppedString = LogicPrinter.quickPrintTerm(term, mediator.getServices(), mediator.getNotationInfo().isPrettySyntax(), false);
+				    	
+						if(droppedString != null){
+								   
+						    DataTable.this.setValueAt(droppedString, row, column);
+						    DataTable.this.repaint();
+						}
+						event.getDropTargetContext().dropComplete(true);
+				    	
+				    }        
+				    else if (transferable.isDataFlavorSupported (DataFlavor.stringFlavor)){
 						       
 					event.acceptDrop(DnDConstants.ACTION_MOVE);
 					droppedString = (String)transferable.getTransferData ( DataFlavor.stringFlavor);
@@ -584,7 +609,31 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 			    
 			    public void drop (DropTargetDropEvent event) {
 				Transferable transferable = event.getTransferable();
-				if (transferable.isDataFlavorSupported 
+				if(transferable.isDataFlavorSupported(PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER)) {
+			    	
+			    	
+					try {
+						event.acceptDrop(DnDConstants.ACTION_MOVE);
+				    	PosInSequent pis = (PosInSequent) transferable.getTransferData(PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
+						Term term = pis.getPosInOccurrence().subTerm();				    	
+				    	String droppedString = LogicPrinter.quickPrintTerm(term, mediator.getServices(), mediator.getNotationInfo().isPrettySyntax(), false);
+				    	
+						if(droppedString != null){
+								   
+							int pos=textarea.viewToModel
+								    (event.getLocation());
+								textarea.insert(droppedString, pos);
+						}
+						event.getDropTargetContext().dropComplete(true);
+					} catch (Exception e) {
+						event.rejectDrop();
+					} 
+			    	
+			    	
+			    	
+			    }
+				else 
+					if (transferable.isDataFlavorSupported 
 				    (DataFlavor.stringFlavor)){	  
 				    event.acceptDrop(DnDConstants.ACTION_MOVE);
 				    try {
