@@ -4,13 +4,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -39,28 +42,48 @@ public class ConsistencyChecker {
         // point the FileRepo to the temporary directory
         fileRepo.setBaseDir(tmpDir);
 
-        // create new KeYUserProblemFile pointing to the (unzipped) proof file
-        Path unzippedProof = tmpDir.resolve(Paths.get("proof.proof"));
 
-        KeYFile keyFile = new KeYUserProblemFile(unzippedProof.toString(), unzippedProof.toFile(),
-                fileRepo, ProgressMonitor.Empty.getInstance(), AbstractProfile.getDefaultProfile(), false);
-
-
-        ProofSettings settings = null;
+        List<Path> proofFiles = null;
         try {
-            settings = keyFile.readPreferences();
+            proofFiles = Files.list(tmpDir).filter(name -> name.getFileName().toString().toLowerCase().endsWith(".proof")).collect(Collectors.toList());
         }
-        catch (ProofInputException e) {
-            e.printStackTrace();
+        catch (IOException e1) {
+            e1.printStackTrace();
         }
 
-        //System.out.println(settings.settingsToString());
+        ImmutableList<KeYUserProblemFile> problemFiles = ImmutableSLList.nil();
 
-        //System.out.println(settings.getChoiceSettings().getDefaultChoices().get("assertions"));
-        //System.out.println(settings.getChoiceSettings().getChoices());
+        for (Path p : proofFiles) {
+            problemFiles = problemFiles.append(new KeYUserProblemFile(p.toString(), p.toFile(),
+                    fileRepo, ProgressMonitor.Empty.getInstance(), AbstractProfile.getDefaultProfile(), false));
+        }
 
+
+        ImmutableList<ProofSettings> proofSettings = ImmutableSLList.nil();
+
+        for (KeYUserProblemFile f : problemFiles) {
+            try {
+                proofSettings = proofSettings.append(f.readPreferences());
+            }
+            catch (ProofInputException e) {
+                e.printStackTrace();
+            }
+        }
+
+        for (ProofSettings settings : proofSettings) {
+
+            System.out.println(settings.settingsToString());
+
+            //System.out.println(settings.getChoiceSettings().getDefaultChoices().get("assertions"));
+            //System.out.println(settings.getChoiceSettings().getChoices());
+        }
+
+
+        return consistent(proofSettings);
+    }
+
+    public static boolean consistent(ImmutableList<ProofSettings> settings) {
         return false;
-
     }
 
 }
