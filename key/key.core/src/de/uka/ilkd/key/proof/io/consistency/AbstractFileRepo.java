@@ -173,8 +173,8 @@ public abstract class AbstractFileRepo implements FileRepo {
         if (paths != null) {
             classpath = paths.stream()
                     .filter(p -> p != null)             // to be sure it contains no null elements
-                    .map(                               // convert Files to Paths and normalize
-                        p -> p.toPath().toAbsolutePath().normalize())
+                                                        // convert Files to Paths and normalize
+                    .map(p -> p.toPath().toAbsolutePath().normalize())
                     .collect(Collectors.toList());
         }
     }

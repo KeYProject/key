@@ -56,14 +56,14 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     //constructors
     //------------------------------------------------------------------------- 
     
-//    /** 
+//    /**
 //     * Creates a new representation of a KeYUserFile with the given name,
 //     * a rule source representing the physical source of the input, and
 //     * a graphical representation to call back in order to report the progress
 //     * while reading.
 //     */
-//    public KeYUserProblemFile(String name, 
-//                              File file, 
+//    public KeYUserProblemFile(String name,
+//                              File file,
 //                              ProgressMonitor monitor,
 //                              Profile profile) {
 //        this(name, file, monitor, profile, false);
@@ -85,12 +85,13 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 //                              boolean compressed) {
 //        super(name, file, monitor, profile, compressed);
 //    }
-    
+
     /**
      * Instantiates a new user problem file.
      *
      * @param name the name of the file
      * @param file the file tp read from
+     * @param fileRepo the fileRepo which will store the file
      * @param monitor the possibly <tt>null</tt> monitor for progress
      * @param profile the KeY profile under which to load
      * @param compressed {@code true} iff the file is compressed

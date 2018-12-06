@@ -92,8 +92,9 @@ public final class ProblemInitializer {
     private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
     private final ProblemInitializerListener listener;
 
+    /** the FileRepo responsible for consistency between source code and proofs */
     private FileRepo fileRepo;
-    
+
     private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
 
     //-------------------------------------------------------------------------
@@ -195,14 +196,10 @@ public final class ProblemInitializer {
         int i = 0;
         reportStatus("Read LDT Includes", in.getIncludes().size());
         for (String name : in.getLDTIncludes()) {
-            
-            System.out.println("LDT -----------------------------------------------------------------------------------------");
-            keyFile[i++] = new KeYFile(name, in.get(name), progMon, initConfig.getProfile(), fileRepo);
-            
-            //RuleSource rs = fileRepo.getRuleSource(in.get(name).file().toPath());           // TODO:
-            //keyFile[i++] = new KeYFile(name, rs, progMon, initConfig.getProfile());
 
-            //keyFile[i++] = new KeYFile(name, in.get(name), progMon, initConfig.getProfile());
+            keyFile[i] = new KeYFile(name, in.get(name), progMon, initConfig.getProfile(),
+                    fileRepo);
+            i++;
             setProgress(i);
         }
 
@@ -236,20 +233,8 @@ public final class ProblemInitializer {
         reportStatus("Read Includes", in.getIncludes().size());
         int i = 0;
         for (String fileName : in.getIncludes()) {
-            // RuleSource rs = fileRepo.getRuleSource(in.get(fileName));            // TODO:
-            //fileRepo.setJavaPath(Paths.get(envInput.readJavaPath()));
-            //fileRepo.setClassPath(envInput.readClassPath().get(0).toPath());        // TODO: multiple directories
-            //try {
-            //    fileRepo.setBootClassPath(envInput.readBootClassPath().toPath());
-            //}
-            //catch (IOException e) {
-            //    // TODO Auto-generated catch block
-            //    e.printStackTrace();
-            //}
-
-            //RuleSource rs = fileRepo.getRuleSource(in.get(fileName).file().toPath());
-            //KeYFile keyFile = new KeYFile(fileName, rs, progMon, envInput.getProfile());
-            KeYFile keyFile = new KeYFile(fileName, in.get(fileName), progMon, envInput.getProfile(), fileRepo);
+            KeYFile keyFile = new KeYFile(fileName, in.get(fileName), progMon,
+                    envInput.getProfile(), fileRepo);
             readEnvInput(keyFile, initConfig);
             setProgress(++i);
         }
@@ -302,9 +287,7 @@ public final class ProblemInitializer {
         //read Java source and classpath settings
         envInput.setInitConfig(initConfig);
         final String javaPath = envInput.readJavaPath();
-        
         final List<File> classPath = envInput.readClassPath();
-
         final File bootClassPath;
         try {
          bootClassPath = envInput.readBootClassPath();
@@ -638,7 +621,11 @@ public final class ProblemInitializer {
       return warnings;
    }
 
-   public void setFileRepo(FileRepo fileRepo) {
-       this.fileRepo = fileRepo;
-   }
+    /**
+     * Sets the FileRepo responsible for consistency between source code and proof.
+     * @param fileRepo the FileRepo to set
+     */
+    public void setFileRepo(FileRepo fileRepo) {
+        this.fileRepo = fileRepo;
+    }
 }

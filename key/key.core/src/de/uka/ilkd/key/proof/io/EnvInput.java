@@ -54,10 +54,9 @@ public interface EnvInput {
      * Reads the include section and returns an Includes object.
      */
     Includes readIncludes() throws ProofInputException;
-    
-    /** 
+
+    /**
      * Reads the Java path.
-     * @param fileRepo 
      */
     String readJavaPath() throws ProofInputException;
 
@@ -91,6 +90,4 @@ public interface EnvInput {
      * @return The initial {@link File} which is loaded or {@code null} otherwise.
      */
     File getInitialFile();
-
-    void setFileRepo(FileRepo fileRepo);
 }

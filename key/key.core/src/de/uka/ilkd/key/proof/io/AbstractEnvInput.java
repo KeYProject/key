@@ -37,8 +37,6 @@ public abstract class AbstractEnvInput implements EnvInput {
     protected final Profile profile;
     
     protected InitConfig initConfig;
-    
-    private FileRepo fileRepo;
 
 
     //-------------------------------------------------------------------------
@@ -115,9 +113,5 @@ public abstract class AbstractEnvInput implements EnvInput {
     @Override
     public Profile getProfile() {
         return profile;
-    }
-
-    public void setFileRepo(FileRepo fileRepo) {
-        this.fileRepo = fileRepo;
     }
 }

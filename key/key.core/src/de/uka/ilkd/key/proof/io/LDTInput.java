@@ -46,9 +46,6 @@ public class LDTInput implements EnvInput {
 
     private InitConfig initConfig = null;
 
-    //protected FileRepository fileRepository;
-
-
     /** creates a representation of the LDT files to be used as input
      * to the KeY prover.
      * @param keyFiles an array containing the LDT .key files
@@ -198,11 +195,5 @@ public class LDTInput implements EnvInput {
     @Override
     public File getInitialFile() {
        return null;
-    }
-
-    @Override
-    public void setFileRepo(FileRepo fileRepo) {
-        // TODO Auto-generated method stub
-        
     }
 }

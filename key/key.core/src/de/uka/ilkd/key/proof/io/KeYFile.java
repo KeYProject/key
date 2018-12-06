@@ -79,7 +79,10 @@ public class KeYFile implements EnvInput {
     private String bootClassPath;
 
     private Includes includes;
-    
+
+    /**
+     * The FileRepo that will store the files.
+     */
     private FileRepo fileRepo;
 
     //-------------------------------------------------------------------------
@@ -101,11 +104,16 @@ public class KeYFile implements EnvInput {
         this.monitor = monitor;
         this.profile = profile;
     }
-    
+
     /** creates a new representation for a given file by indicating a name
      * and a RuleSource representing the physical source of the .key file.
+     * @param name the name of the file
+     * @param file the physical rule source of the .key file
+     * @param monitor monitor for reporting progress
+     * @param profile the profile
+     * @param fileRepo the FileRepo which will store the file
      */
-    public KeYFile(String name, 
+    public KeYFile(String name,
                    RuleSource file,
                    ProgressMonitor monitor,
                    Profile profile,
@@ -157,6 +165,7 @@ public class KeYFile implements EnvInput {
      *            the name of the resource
      * @param file
      *            the file to find it
+     * @param fileRepo the FileRepo which will store the file
      * @param monitor
      *            a possibly null reference to a monitor for the loading
      *            progress
@@ -176,9 +185,7 @@ public class KeYFile implements EnvInput {
              monitor, profile);
         this.fileRepo = fileRepo;
     }
-    
 
-    
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
@@ -195,8 +202,8 @@ public class KeYFile implements EnvInput {
     protected InputStream getNewStream() throws FileNotFoundException {
         close();
         if (!file.isAvailable()) {
-            throw new FileNotFoundException("File/Resource " + file + " not found.");  
-        } 
+            throw new FileNotFoundException("File/Resource " + file + " not found.");
+        }
         //input = file.getNewStream();
         System.out.println("trying to get new stream of " + file.file());
         try {
@@ -209,9 +216,7 @@ public class KeYFile implements EnvInput {
             } else {
                 input = file.getNewStream();
             }
-                
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -594,10 +599,5 @@ public class KeYFile implements EnvInput {
     @Override
     public File getInitialFile() {
        return file != null ? file.file() : null;
-    }
-
-    @Override
-    public void setFileRepo(FileRepo fileRepo) {
-        this.fileRepo = fileRepo;
     }
 }

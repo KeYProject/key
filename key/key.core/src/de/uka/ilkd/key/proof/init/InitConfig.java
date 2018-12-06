@@ -93,7 +93,8 @@ public class InitConfig {
 
     /** HashMap for quick lookups taclet name->taclet */
     private Map<Name, Taclet> activatedTacletCache = null;
-    
+
+    /** the fileRepo which is responsible for consistency between source code and proof */
     private FileRepo fileRepo;
     
     private String originalKeYFileName;

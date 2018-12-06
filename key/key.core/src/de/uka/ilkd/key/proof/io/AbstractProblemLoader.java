@@ -241,60 +241,58 @@ public abstract class AbstractProblemLoader {
      * @throws ProblemLoaderException Occurred Exception.
      */
     public void load() throws ProofInputException, IOException, ProblemLoaderException {
-            control.loadingStarted(this);
-            // Read environment
-            fileRepo = new DiskFileRepo("KeYTmpFileRepo");
-            envInput = createEnvInput(fileRepo);
-            problemInitializer = createProblemInitializer(fileRepo);
-            initConfig = createInitConfig();
-            initConfig.setFileRepo(fileRepo);
-            if (!problemInitializer.getWarnings().isEmpty()) {
-               control.reportWarnings(problemInitializer.getWarnings());
-            }
-            // Read proof obligation settings
-            LoadedPOContainer poContainer = createProofObligationContainer();
-            ProofAggregate proofList = null;
-            try {
-                if (poContainer == null) {
-                    if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
-                        if (control.selectProofObligation(initConfig)) {
-                            return;
-                        } else {
-                            // That message would be reported otherwise. Undesired.
-                            // return new ProblemLoaderException(this, "Aborted.");
-                            return;
-                        }
-                    }
-                    else {
-                        // Do not instantiate any proof but allow the user of the DefaultProblemLoader
-                        // to access the loaded InitConfig.
+        control.loadingStarted(this);
+        // Read environment
+        fileRepo = new DiskFileRepo("KeYTmpFileRepo");
+        envInput = createEnvInput(fileRepo);
+        problemInitializer = createProblemInitializer(fileRepo);
+        initConfig = createInitConfig();
+        initConfig.setFileRepo(fileRepo);
+        if (!problemInitializer.getWarnings().isEmpty()) {
+            control.reportWarnings(problemInitializer.getWarnings());
+        }
+        // Read proof obligation settings
+        LoadedPOContainer poContainer = createProofObligationContainer();
+        ProofAggregate proofList = null;
+        try {
+            if (poContainer == null) {
+                if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
+                    if (control.selectProofObligation(initConfig)) {
+                        return;
+                    } else {
+                        // That message would be reported otherwise. Undesired.
+                        // return new ProblemLoaderException(this, "Aborted.");
                         return;
                     }
+                } else {
+                    // Do not instantiate any proof but allow the user of the DefaultProblemLoader
+                    // to access the loaded InitConfig.
+                    return;
                 }
-                
-                // Create and register proof at specification repository                    
-                proofList = createProof(poContainer); 
-                
-                // try to replay first proof
-                proof = proofList.getProof(poContainer.getProofNum());
-                
-                
-                if (proof != null) {
-                 OneStepSimplifier.refreshOSS(proof);
-                    result = replayProof(proof);
-                }
-                                      
-                // this message is propagated to the top level in console mode
-                return; // Everything fine
-            } catch (Throwable t) {
-                // Throw this exception; otherwise, it can for instance occur
-                // that "result" will be null (if replayProof(...) fails) and
-                // we get a NullPointerException that is hard to analyze.
-                throw t;
             }
-            finally {
-               control.loadingFinished(this, poContainer, proofList, result);
+
+            // Create and register proof at specification repository
+            proofList = createProof(poContainer);
+
+            // try to replay first proof
+            proof = proofList.getProof(poContainer.getProofNum());
+
+
+            if (proof != null) {
+                OneStepSimplifier.refreshOSS(proof);
+                result = replayProof(proof);
             }
+
+            // this message is propagated to the top level in console mode
+            return; // Everything fine
+        } catch (Throwable t) {
+            // Throw this exception; otherwise, it can for instance occur
+            // that "result" will be null (if replayProof(...) fails) and
+            // we get a NullPointerException that is hard to analyze.
+            throw t;
+        } finally {
+            control.loadingFinished(this, poContainer, proofList, result);
+        }
     }
 
     /**
@@ -363,13 +361,11 @@ public abstract class AbstractProblemLoader {
             // java file, probably enriched by specifications
             if (file.getParentFile() == null) {
                 return new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs, includes);
-            }
-            else {
+            } else {
                 return new SLEnvInput(file.getParentFile().getAbsolutePath(),
                                 classPath, bootClassPath, profileOfNewProofs, includes);
             }
-        }
-        else if (filename.endsWith(".zproof")) {
+        } else if (filename.endsWith(".zproof")) {
             // zipped proof package
             // unzip to a temporary directory
             Path tmpDir = Files.createTempDirectory("KeYunzip");
@@ -382,27 +378,24 @@ public abstract class AbstractProblemLoader {
             Path unzippedProof = tmpDir.resolve(Paths.get("proof.proof"));
             return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof.toFile(),
                     fileRepo, control, profileOfNewProofs, false);
-        }
-        else if (filename.endsWith(".key") || filename.endsWith(".proof")
+        } else if (filename.endsWith(".key") || filename.endsWith(".proof")
               || filename.endsWith(".proof.gz")) {
             // KeY problem specification or saved proof
             return new KeYUserProblemFile(filename, file, fileRepo, control,
                         profileOfNewProofs, filename.endsWith(".proof.gz"));
-        }
-        else if (file.isDirectory()) {
+        } else if (file.isDirectory()) {
             // directory containing java sources, probably enriched
             // by specifications
-            return new SLEnvInput(file.getPath(), classPath, bootClassPath, profileOfNewProofs, includes);
-        }
-        else {
+            return new SLEnvInput(file.getPath(), classPath, bootClassPath, profileOfNewProofs,
+                    includes);
+        } else {
             if (filename.lastIndexOf('.') != -1) {
                 throw new IllegalArgumentException("Unsupported file extension \'"
                                 + filename.substring(filename.lastIndexOf('.'))
                                 + "\' of read-in file " + filename
                                 + ". Allowed extensions are: .key, .proof, .java or "
                                 + "complete directories.");
-            }
-            else {
+            } else {
                 throw new FileNotFoundException("File or directory\n\t " + filename
                                 + "\n not found.");
             }
