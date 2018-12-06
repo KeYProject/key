@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -82,8 +83,24 @@ public class ConsistencyChecker {
         return consistent(proofSettings);
     }
 
-    public static boolean consistent(ImmutableList<ProofSettings> settings) {
-        return false;
+    public static boolean consistent(ImmutableList<ProofSettings> proofSettings) {
+        ImmutableList<ChoiceSettings> choiceSettings = ImmutableSLList.nil();
+        for (ProofSettings settings : proofSettings) {
+            choiceSettings = choiceSettings.append(settings.getChoiceSettings());
+        }
+
+        return choiceConsistent(choiceSettings);
+    }
+
+    private static boolean choiceConsistent(ImmutableList<ChoiceSettings> choiceSettings) {
+        //TODO this does not yet work as intended
+        for (ChoiceSettings cs: choiceSettings) {
+            if (!( cs.getDefaultChoices().equals(choiceSettings.head().getDefaultChoices())
+                    || cs.getChoices().equals(choiceSettings.head().getChoices()))) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

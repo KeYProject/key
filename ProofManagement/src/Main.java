@@ -8,7 +8,11 @@ public class Main {
         if (args.length != 0) {
 
             if (args[0].equals("check") && (args.length == 2)) {
-                ConsistencyChecker.consistent(args[1]);
+                if (ConsistencyChecker.consistent(args[1])) {
+                    System.out.println("Consistent!");
+                } else {
+                    System.out.println("Inconsistent!");
+                }
                 return;
             }
 
