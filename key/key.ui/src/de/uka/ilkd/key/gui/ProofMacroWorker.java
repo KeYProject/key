@@ -9,7 +9,7 @@
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 package de.uka.ilkd.key.gui;
 
 import javax.swing.SwingWorker;
@@ -24,9 +24,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.script.ScriptRecorderFacade;
 
 /**
  * The Class ProofMacroWorker is a swing worker for the application of proof
@@ -35,7 +35,7 @@ import de.uka.ilkd.key.util.Debug;
  * It decouples proof macros from the GUI event thread. It registers with the
  * mediator to receive Stop-Button events
  */
-public class ProofMacroWorker extends SwingWorker<Void, Void> implements InterruptListener {
+public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> implements InterruptListener {
 
     /**
      * This flag decides whether after a macro an open is selected or not.
@@ -49,20 +49,20 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
      * The {@link Node} to start macro at.
      */
     private final Node node;
-    
+
     /**
      * The macro which is to be executed
      */
     private final ProofMacro macro;
-    
+
     /**
      * The resulting information of the task or null if the task was cancelled an exception was thrown
      */
-    private TaskFinishedInfo info;
+    private ProofMacroFinishedInfo info;
 
     /** The thrown exception leading to cancellation of the task */
     private Exception exception;
-    
+
     /**
      * The mediator of the environment
      */
@@ -91,7 +91,7 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
     }
 
     @Override
-    protected Void doInBackground() throws Exception {
+    protected ProofMacroFinishedInfo doInBackground() throws Exception {
         final ProverTaskListener ptl = mediator.getUI();
         Proof selectedProof = node.proof();
         info = ProofMacroFinishedInfo.getDefaultInfo(macro, selectedProof);
@@ -103,12 +103,14 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
         } catch (final InterruptedException exception) {
             Debug.out("Proof macro has been interrupted:");
             Debug.out(exception);
+            info = new ProofMacroFinishedInfo(macro, selectedProof, true);
             this.exception = exception;
         } catch (final Exception exception) {
             // This should actually never happen.
             this.exception = exception;
-        } 
-        return null;
+        }
+
+        return info;
     }
 
     @Override
@@ -123,16 +125,18 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
             if ( ! isCancelled() && exception != null ) { // user cancelled task is fine, we do not report this
                 // This should actually never happen.
                 ExceptionDialog.showDialog(MainWindow.getInstance(), exception);
-            }                        
-            
+            }
+
             mediator.getUI().taskFinished(info);
 
             if(SELECT_GOAL_AFTER_MACRO) {
                 selectOpenGoalBelow();
             }
-                        
+
             mediator.setInteractive(true);
             mediator.startInterface(true);
+
+            ScriptRecorderFacade.runMacro(node, macro, posInOcc, info);
         }
     }
 
