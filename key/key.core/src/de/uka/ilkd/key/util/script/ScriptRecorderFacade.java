@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -94,13 +92,11 @@ public class ScriptRecorderFacade {
         listeners.forEach(l -> l.onInteraction(interaction));
     }
 
-    public static void runAutoMode(Proof proof, ImmutableList<Goal> goals, ApplyStrategyInfo info) {
+    public static void runAutoMode(List<Node> initialGoals, Proof proof, ApplyStrategyInfo info) {
         InteractionLog state = get(proof);
-        goals.stream().forEach(g -> {
-            AutoModeInteraction interaction = new AutoModeInteraction(g.node(), info);
-            state.getInteractions().add(interaction);
-            emit(interaction);
-        });
+        AutoModeInteraction interaction = new AutoModeInteraction(initialGoals, info);
+        state.getInteractions().add(interaction);
+        emit(interaction);
     }
 
     public static void runRule(Goal goal, RuleApp app) {

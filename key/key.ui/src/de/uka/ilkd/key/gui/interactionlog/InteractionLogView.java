@@ -1,22 +1,44 @@
 package de.uka.ilkd.key.gui.interactionlog;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.script.*;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.script.Interaction;
+import de.uka.ilkd.key.util.script.InteractionListeners;
+import de.uka.ilkd.key.util.script.InteractionLog;
+import de.uka.ilkd.key.util.script.InteractionLogFacade;
+import de.uka.ilkd.key.util.script.LogPrinter;
+import de.uka.ilkd.key.util.script.NodeInteraction;
+import de.uka.ilkd.key.util.script.ScriptRecorderFacade;
 
 public class InteractionLogView extends JPanel implements InteractionListeners {
     private final Action actionExportProofScript = new ExportProofScriptAction();
@@ -143,11 +165,10 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
 
     @Override
     public void onInteraction(Interaction event) {
-        if (event instanceof NodeInteraction) {
-            if (((NodeInteraction) event).getNode().proof() == currentProof) {
-                rebuildList();
-            }
-        }
+        InteractionLog currentLog = ScriptRecorderFacade.get(currentProof);
+        addInteractionLog(currentLog);
+
+        rebuildList();
     }
 
     public Optional<InteractionLog> getDisplayedInteractionLog() {
@@ -242,7 +263,7 @@ class InteractionCellRenderer extends DefaultListCellRenderer {
         JLabel lbl = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         lbl.setText(
                 String.format("<html><pre>", index) +
-                        ((NodeInteraction) value).getProofScriptRepresentation(services) + "</pre></html>");
+                        ((Interaction) value).getProofScriptRepresentation(services) + "</pre></html>");
         return lbl;
     }
 }

@@ -7,7 +7,6 @@ public class PruneInteraction extends NodeInteraction {
 
     protected PruneInteraction(Node node) {
         super(node);
-        // TODO Auto-generated constructor stub
     }
 
     @Override
