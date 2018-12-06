@@ -527,7 +527,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
         // check for strictly pure loops
         final Term anonUpdate;
-        if (tb.strictlyNothing().equals(mod)) {
+        if (tb.strictlyNothing().equalsModTermLabels(mod)) {
             anonUpdate = tb.skip();
         } else {
             anonUpdate = tb.anonUpd(heap, mod, anonHeapTerm);
@@ -596,7 +596,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             final Term m = mods.get(heap);
             final Term fc;
 
-            if (tb.strictlyNothing().equals(m)) {
+            if (tb.strictlyNothing().equalsModTermLabels(m)) {
                 fc = tb.frameStrictlyEmpty(tb.var(heap),
                         heapToBeforeLoop.get(heap));
             } else {

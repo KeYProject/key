@@ -678,7 +678,7 @@ public final class BlockContractBuilders {
                     .entrySet()) {
                 Term anonymisationUpdate = skip();
                 final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
-                if (!modifiesClause.equals(strictlyNothing())) {
+                if (!modifiesClause.equalsModTermLabels(strictlyNothing())) {
                     anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause,
                             services.getTermBuilder().label(
                                     services.getTermBuilder().func(anonymisationHeap.getValue()),
@@ -715,7 +715,7 @@ public final class BlockContractBuilders {
                     .entrySet()) {
                 Term anonymisationUpdate = skip();
                 final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
-                if (!modifiesClause.equals(strictlyNothing())) {
+                if (!modifiesClause.equalsModTermLabels(strictlyNothing())) {
                     anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause,
                             services.getTermBuilder().label(
                                     services.getTermBuilder().func(anonymisationHeap.getValue()),
@@ -981,7 +981,7 @@ public final class BlockContractBuilders {
             for (LocationVariable heap : heaps) {
                 final Term modifiesClause = modifiesClauses.get(heap);
                 final Term frameCondition;
-                if (modifiesClause.equals(strictlyNothing())) {
+                if (modifiesClause.equalsModTermLabels(strictlyNothing())) {
                     frameCondition = frameStrictlyEmpty(var(heap), remembranceVariables.get(heap));
                 } else {
                     frameCondition

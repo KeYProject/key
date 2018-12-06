@@ -432,10 +432,11 @@ public abstract class WellDefinednessCheck implements Contract {
         final boolean showSig = !isInv && !modelField();
         if (getAssignable() != null && showSig) {
             String printMods =
-                    LogicPrinter.quickPrintTerm(getAssignable(null).equals(TB.strictlyNothing()) ?
-                                                    TB.empty() :
-                                                        this.getAssignable(null),
-                                                services);
+                    LogicPrinter
+                    .quickPrintTerm(getAssignable(null).equalsModTermLabels(TB.strictlyNothing())
+                            ? TB.empty()
+                                    : this.getAssignable(null),
+                                    services);
             mods = mods
                     + (includeHtmlMarkup ? "<br><b>" : "\n")
                     + "mod"
@@ -815,17 +816,20 @@ public abstract class WellDefinednessCheck implements Contract {
 
     final void setAssignable(Term ass, TermServices services) {
         this.assignable = ass;
-        if (ass == null || TB.strictlyNothing().equals(ass) || TB.FALSE().equals(ass)) {
+        if (ass == null
+                || TB.strictlyNothing().equalsModTermLabels(ass)
+                || TB.FALSE().equalsModTermLabels(ass)) {
             this.assignable = TB.strictlyNothing();
-        } else if (TB.tt().equals(ass) || TB.TRUE().equals(ass)) {
+        } else if (TB.tt().equalsModTermLabels(ass)
+                || TB.TRUE().equalsModTermLabels(ass)) {
             this.assignable = TB.allLocs();
         }
     }
 
     final void combineAssignable(Term ass1, Term ass2, TermServices services) {
-        if (ass1 == null || TB.strictlyNothing().equals(ass1)) {
+        if (ass1 == null || TB.strictlyNothing().equalsModTermLabels(ass1)) {
             setAssignable(ass2, services);
-        } else if(ass2 == null || TB.strictlyNothing().equals(ass2)) {
+        } else if(ass2 == null || TB.strictlyNothing().equalsModTermLabels(ass2)) {
             setAssignable(ass1, services);
         } else {
             setAssignable(TB.union(ass1, ass2), services);
@@ -1077,8 +1081,8 @@ public abstract class WellDefinednessCheck implements Contract {
                                  ProgramVariable heapAtPre,
                                  Term anonHeap, TermServices services) {
         assert mod != null;
-        assert anonHeap != null || TB.strictlyNothing().equals(mod);
-        final Term havocUpd = TB.strictlyNothing().equals(mod) ?
+        assert anonHeap != null || TB.strictlyNothing().equalsModTermLabels(mod);
+        final Term havocUpd = TB.strictlyNothing().equalsModTermLabels(mod) ?
                 TB.skip()
                 : TB.elementary(heap, TB.anon(TB.var(heap), mod, anonHeap));
         final Term oldUpd = heapAtPre != heap ?

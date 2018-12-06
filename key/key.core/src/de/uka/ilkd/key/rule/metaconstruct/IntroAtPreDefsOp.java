@@ -418,15 +418,13 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 Map<LocationVariable, Term> newInvariants
                         = new LinkedHashMap<LocationVariable, Term>();
                 Map<LocationVariable, Term> newFreeInvariants
-                        = new LinkedHashMap<LocationVariable, Term>(); // TODO
-                                                                       // Jonas:
-                                                                       // init
+                        = new LinkedHashMap<LocationVariable, Term>();
                 for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                         .getAllHeaps()) {
                     if (heap == services.getTypeConverter().getHeapLDT().getSavedHeap()
                             && spec.getInternalModifies()
                                     .get(services.getTypeConverter().getHeapLDT().getHeap())
-                                    .equals(tb.strictlyNothing())) {
+                                    .equalsModTermLabels(tb.strictlyNothing())) {
                         continue;
                     }
                     final Term m = spec.getModifies(heap, selfTerm, atPres, services);
