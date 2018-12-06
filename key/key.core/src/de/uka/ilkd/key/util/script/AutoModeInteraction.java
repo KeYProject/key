@@ -13,6 +13,7 @@ public class AutoModeInteraction extends NodeInteraction {
 
     public AutoModeInteraction(Node node, ApplyStrategyInfo info) {
         super(node);
+        this.info = info;
     }
 
     @Override
