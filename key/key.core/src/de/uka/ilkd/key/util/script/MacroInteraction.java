@@ -10,9 +10,12 @@ import de.uka.ilkd.key.proof.Node;
  * @author weigl
  */
 public final class MacroInteraction extends NodeInteraction {
-    private final ProofMacro macro;
-    private final PosInOccurrence pos;
+    private ProofMacro macro;
+    private PosInOccurrence pos;
     private ProofMacroFinishedInfo info;
+
+    public MacroInteraction() {
+    }
 
     public MacroInteraction(Node node, ProofMacro macro, PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
         super(node);

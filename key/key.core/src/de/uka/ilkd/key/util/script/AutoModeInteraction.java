@@ -8,6 +8,9 @@ public class AutoModeInteraction extends NodeInteraction {
 
     private ApplyStrategyInfo info;
 
+    public AutoModeInteraction() {
+    }
+
     public AutoModeInteraction(Node node, ApplyStrategyInfo info) {
         super(node);
     }

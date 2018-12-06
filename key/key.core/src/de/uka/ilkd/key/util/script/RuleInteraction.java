@@ -14,7 +14,11 @@ import java.util.Iterator;
  * @author weigl
  */
 public final class RuleInteraction extends NodeInteraction {
-    private final RuleApp app;
+    private RuleApp app;
+
+    public RuleInteraction() {
+        super(null);
+    }
 
     public RuleInteraction(Node node, RuleApp app) {
         super(node);

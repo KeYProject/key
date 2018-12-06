@@ -4,7 +4,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 
 public abstract class NodeInteraction implements Interaction {
-    private final Node node;
+    private Node node;
+
+    public NodeInteraction() { }
 
     protected NodeInteraction(Node node) {
         this.node = node;
