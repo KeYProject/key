@@ -36,7 +36,7 @@ public class ScriptRecorderFacade {
 
     public static void runBuiltIn(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced) {
         ScriptRecorderState state = get(goal.proof());
-        Interaction interaction = new BuiltInRuleInteraction(goal.node(), rule, pos);
+        NodeInteraction interaction = new BuiltInRuleInteraction(goal.node(), rule, pos);
         state.getInteractions().add(interaction);
         emit(interaction);
     }
@@ -67,5 +67,6 @@ public class ScriptRecorderFacade {
         RuleInteraction interaction = (new RuleInteraction(
                 goal.node().parent(), app));
         state.getInteractions().add(interaction);
-        emit(interaction);    }
+        emit(interaction);
+    }
 }

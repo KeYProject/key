@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui.interactionlog;
+package de.uka.ilkd.key.util.script;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;

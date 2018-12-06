@@ -1,13 +1,8 @@
-package de.uka.ilkd.key.gui.interactionlog;
-
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.script.InteractionLog;
+package de.uka.ilkd.key.util.script;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.*;
-import java.util.Optional;
 
 /**
  * @author Alexander Weigl
@@ -16,16 +11,16 @@ import java.util.Optional;
 public final class InteractionLogFacade {
     public static InteractionLog readInteractionLog(File inputFile)
             throws IOException {
-        try (InputStream is = new FileInputStream(inputFile)) {
-            XMLDecoder decoder = new XMLDecoder(is);
+        try (InputStream is = new FileInputStream(inputFile);
+             XMLDecoder decoder = new XMLDecoder(is)) {
             return (InteractionLog) decoder.readObject();
         }
     }
 
     public static void storeInteractionLog(InteractionLog log, File output)
             throws IOException {
-        try (OutputStream os = new FileOutputStream(output)) {
-            XMLEncoder encoder = new XMLEncoder(os);
+        try (OutputStream os = new FileOutputStream(output);
+             XMLEncoder encoder = new XMLEncoder(os)) {
             encoder.writeObject(log);
         }
     }

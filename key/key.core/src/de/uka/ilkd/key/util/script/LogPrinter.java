@@ -81,7 +81,7 @@ public class LogPrinter {
                       Interaction interaction) {
 
         newline();
-        out.write(interaction.getProofScriptRepresentation(services));
+        //TODO out.write(interaction.getProofScriptRepresentation(services));
 
         List<Interaction> children = tree.get(interaction);
         if (children != null) {
@@ -97,7 +97,7 @@ public class LogPrinter {
                     for (Interaction c : children) {
                         newline();
                         out.write("case \"");
-                        out.write(matchExpr.apply(c.getNode()));
+                        //TODO out.write(matchExpr.apply(c.getNode()));
                         out.write("\" {");
                         indent++;
                         body(tree, c);

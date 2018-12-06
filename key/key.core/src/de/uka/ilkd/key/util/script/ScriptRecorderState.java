@@ -1,14 +1,7 @@
 package de.uka.ilkd.key.util.script;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.macros.ProofMacro;
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.TacletApp;
-import org.key_project.util.collection.ImmutableList;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,13 +11,13 @@ import java.util.stream.Collectors;
  */
 public final class ScriptRecorderState {
     private final Proof proof;
-    private List<Interaction> interactions = new LinkedList<>();
+    private List<NodeInteraction> interactions = new LinkedList<>();
 
     public ScriptRecorderState(Proof proof) {
         this.proof = proof;
     }
 
-    public List<Interaction> getInteractions() {
+    public List<NodeInteraction> getInteractions() {
         return interactions;
     }
 
@@ -34,10 +27,10 @@ public final class ScriptRecorderState {
         return proof;
     }
 
-    public List<List<Interaction>> getInteractionsByDepth() {
+    public List<List<NodeInteraction>> getInteractionsByDepth() {
         final Map<Integer, List<Interaction>> seq = new HashMap<>();
         int maxDepth = 0;
-        for (Interaction event : interactions) {
+        for (NodeInteraction event : interactions) {
             int depth = getDepth(event.getNode());
             maxDepth = Math.max(maxDepth, depth);
             seq.computeIfAbsent(depth, n -> new ArrayList<>()).add(event);
@@ -60,24 +53,24 @@ public final class ScriptRecorderState {
     public HashMap<Interaction, List<Interaction>> getInteractionTree() {
         final HashMap<Interaction, List<Interaction>> map = new HashMap<>();
         final Set<Node> interactiveNodes = interactions.stream().map(
-                Interaction::getNode).collect(Collectors.toSet());
+                NodeInteraction::getNode).collect(Collectors.toSet());
 
-        for (Interaction inter : interactions) {
-            Interaction parent = findNearestAncestor(interactiveNodes, inter.getNode());
+        for (NodeInteraction inter : interactions) {
+            NodeInteraction parent = findNearestAncestor(interactiveNodes, inter.getNode());
             map.computeIfAbsent(parent, n -> new ArrayList<>()).add(inter);
         }
 
         return map;
     }
 
-    private Interaction findNearestAncestor(Set<Node> parents, Node n) {
+    private NodeInteraction findNearestAncestor(Set<Node> parents, Node n) {
         do {
             n = n.parent();
             if (n == null) break;
             if (parents.contains(n)) {
                 Node finalN = n;
                 return interactions.stream()
-                        .filter((Interaction a) -> a.getNode().serialNr() == finalN.serialNr())
+                        .filter((NodeInteraction a) -> a.getNode().serialNr() == finalN.serialNr())
                         .findFirst()
                         .orElse(null);
             }
