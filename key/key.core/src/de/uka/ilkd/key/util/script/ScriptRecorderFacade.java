@@ -1,8 +1,11 @@
 package de.uka.ilkd.key.util.script;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
-import de.uka.ilkd.key.settings.Settings;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -12,8 +15,11 @@ import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.settings.Settings;
 
 /**
  * @author Alexander Weigl <weigl@kit.edu>
@@ -59,6 +65,13 @@ public class ScriptRecorderFacade {
         emit(sci);
     }
 
+    public static void runPrune(Node node) {
+        ScriptRecorderState state = get(node.proof());
+        PruneInteraction interaction = new PruneInteraction(node);
+        state.getInteractions().add(interaction);
+        emit(interaction);
+    }
+
     public static void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
         ScriptRecorderState state = get(node.proof());
         MacroInteraction interaction = new MacroInteraction(node, macro, posInOcc, info);
@@ -71,6 +84,20 @@ public class ScriptRecorderFacade {
         NodeInteraction interaction = new BuiltInRuleInteraction(goal.node(), rule, pos);
         state.getInteractions().add(interaction);
         emit(interaction);
+    }
+
+    public static void registerOnProofTree(Proof proof) {
+        if (proof.containsProofTreeListener(null)) {
+            return;
+        }
+
+        proof.addProofTreeListener(new ProofTreeAdapter() {
+
+            @Override
+            public void proofPruned(ProofTreeEvent e) {
+                runPrune(e.getNode());
+            }
+        });
     }
 
     public static void addListener(InteractionListeners listener) {
