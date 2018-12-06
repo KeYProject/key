@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.Settings;
 
@@ -73,9 +74,9 @@ public class ScriptRecorderFacade {
         emit(interaction);
     }
 
-    public static void runBuiltIn(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced) {
+    public static void runBuiltIn(Goal goal, IBuiltInRuleApp app, BuiltInRule rule, PosInOccurrence pos, boolean forced) {
         InteractionLog state = get(goal.proof());
-        NodeInteraction interaction = new BuiltInRuleInteraction(goal.node(), rule, pos);
+        NodeInteraction interaction = new BuiltInRuleInteraction(goal.node(), app, rule, pos);
         state.getInteractions().add(interaction);
         emit(interaction);
     }

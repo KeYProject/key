@@ -25,11 +25,11 @@ public final class RuleInteraction extends NodeInteraction {
     private HashMap<String, String> arguments = new HashMap<>();
 
     public RuleInteraction() {
-        super((NodeIdentifier) null);
+        super((Node) null);
     }
 
     public RuleInteraction(Node node, RuleApp app) {
-        super(NodeIdentifier.get(node));
+        super(node);
 
         this.ruleName = app.rule().displayName();
         this.posInOccurence = app.posInOccurrence();
@@ -62,14 +62,6 @@ public final class RuleInteraction extends NodeInteraction {
     @Override
     public String getProofScriptRepresentation(Services services) {
         return "";
-    }
-
-    public String getRuleName() {
-        return ruleName;
-    }
-
-    public void setRuleName(String ruleName) {
-        this.ruleName = ruleName;
     }
 
     public PosInOccurrence getPosInOccurence() {
