@@ -48,4 +48,40 @@ public class AutoModeInteraction implements Interaction {
     public ApplyStrategyInfo getInfo() {
         return info;
     }
+
+    public void setInfo(ApplyStrategyInfo info) {
+        this.info = info;
+    }
+
+    public List<Integer> getInitialNodeSerialNumbers() {
+        return initialNodeSerialNumbers;
+    }
+
+    public void setInitialNodeSerialNumbers(List<Integer> initialNodeSerialNumbers) {
+        this.initialNodeSerialNumbers = initialNodeSerialNumbers;
+    }
+
+    public List<NodeIdentifier> getInitialNodeIds() {
+        return initialNodeIds;
+    }
+
+    public void setInitialNodeIds(List<NodeIdentifier> initialNodeIds) {
+        this.initialNodeIds = initialNodeIds;
+    }
+
+    public List<Integer> getOpenGoalSerialNumbers() {
+        return openGoalSerialNumbers;
+    }
+
+    public void setOpenGoalSerialNumbers(List<Integer> openGoalSerialNumbers) {
+        this.openGoalSerialNumbers = openGoalSerialNumbers;
+    }
+
+    public List<NodeIdentifier> getOpenGoalNodeIds() {
+        return openGoalNodeIds;
+    }
+
+    public void setOpenGoalNodeIds(List<NodeIdentifier> openGoalNodeIds) {
+        this.openGoalNodeIds = openGoalNodeIds;
+    }
 }

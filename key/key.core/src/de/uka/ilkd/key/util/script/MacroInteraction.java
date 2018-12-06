@@ -1,9 +1,15 @@
 package de.uka.ilkd.key.util.script;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.key_project.util.collection.ImmutableList;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
 /**
@@ -11,8 +17,13 @@ import de.uka.ilkd.key.proof.Node;
  */
 public final class MacroInteraction extends NodeInteraction {
     private String macroName;
+
+    private ProofMacro macro;
     private PosInOccurrence pos;
     private ProofMacroFinishedInfo info;
+
+    private List<Integer> openGoalSerialNumbers;
+    private List<NodeIdentifier> openGoalNodeIds;
 
     public MacroInteraction() {
     }
@@ -23,6 +34,10 @@ public final class MacroInteraction extends NodeInteraction {
         this.macroName = macro.getScriptCommandName();
         this.pos = posInOcc;
         this.info = info;
+
+        ImmutableList<Goal> openGoals = info.getProof().openGoals();
+        this.openGoalSerialNumbers = openGoals.stream().map(g -> g.node().serialNr()).collect(Collectors.toList());
+        this.openGoalNodeIds = openGoals.stream().map(g -> NodeIdentifier.get(g.node())).collect(Collectors.toList());
     }
 
 
@@ -46,11 +61,39 @@ public final class MacroInteraction extends NodeInteraction {
         return macroName;
     }
 
+    public void setMacro(ProofMacro macro) {
+        this.macro = macro;
+    }
+
     public PosInOccurrence getPos() {
         return pos;
     }
 
+    public void setPos(PosInOccurrence pos) {
+        this.pos = pos;
+    }
+
     public ProofMacroFinishedInfo getInfo() {
         return info;
+    }
+
+    public void setInfo(ProofMacroFinishedInfo info) {
+        this.info = info;
+    }
+
+    public List<Integer> getOpenGoalSerialNumbers() {
+        return openGoalSerialNumbers;
+    }
+
+    public void setOpenGoalSerialNumbers(List<Integer> openGoalSerialNumbers) {
+        this.openGoalSerialNumbers = openGoalSerialNumbers;
+    }
+
+    public List<NodeIdentifier> getOpenGoalNodeIds() {
+        return openGoalNodeIds;
+    }
+
+    public void setOpenGoalNodeIds(List<NodeIdentifier> openGoalNodeIds) {
+        this.openGoalNodeIds = openGoalNodeIds;
     }
 }
