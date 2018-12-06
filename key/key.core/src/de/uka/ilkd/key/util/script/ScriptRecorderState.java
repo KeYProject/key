@@ -11,13 +11,13 @@ import java.util.stream.Collectors;
  */
 public final class ScriptRecorderState {
     private final Proof proof;
-    private List<NodeInteraction> interactions = new LinkedList<>();
+    private List<Interaction> interactions = new LinkedList<>();
 
     public ScriptRecorderState(Proof proof) {
         this.proof = proof;
     }
 
-    public List<NodeInteraction> getInteractions() {
+    public List<Interaction> getInteractions() {
         return interactions;
     }
 
@@ -30,10 +30,12 @@ public final class ScriptRecorderState {
     public List<List<NodeInteraction>> getInteractionsByDepth() {
         final Map<Integer, List<Interaction>> seq = new HashMap<>();
         int maxDepth = 0;
-        for (NodeInteraction event : interactions) {
-            int depth = getDepth(event.getNode());
-            maxDepth = Math.max(maxDepth, depth);
-            seq.computeIfAbsent(depth, n -> new ArrayList<>()).add(event);
+        for (Interaction event : interactions) {
+            if (event instanceof NodeInteraction) {
+                int depth = getDepth(((NodeInteraction) event).getNode());
+                maxDepth = Math.max(maxDepth, depth);
+                seq.computeIfAbsent(depth, n -> new ArrayList<>()).add(event);
+            }
         }
         for (int d = 0; d < maxDepth; d++) {
 
@@ -52,12 +54,19 @@ public final class ScriptRecorderState {
 
     public HashMap<Interaction, List<Interaction>> getInteractionTree() {
         final HashMap<Interaction, List<Interaction>> map = new HashMap<>();
-        final Set<Node> interactiveNodes = interactions.stream().map(
-                NodeInteraction::getNode).collect(Collectors.toSet());
+        final Set<Node> interactiveNodes = interactions.stream()
+                .filter(e -> e instanceof NodeInteraction)
+                .map(e -> (NodeInteraction) e)
+                .map(NodeInteraction::getNode)
+                .collect(Collectors.toSet());
 
-        for (NodeInteraction inter : interactions) {
-            NodeInteraction parent = findNearestAncestor(interactiveNodes, inter.getNode());
-            map.computeIfAbsent(parent, n -> new ArrayList<>()).add(inter);
+
+        for (Interaction inter : interactions) {
+            if (inter instanceof NodeInteraction) {
+                NodeInteraction parent = findNearestAncestor(interactiveNodes,
+                        ((NodeInteraction) inter).getNode());
+                map.computeIfAbsent(parent, n -> new ArrayList<>()).add(inter);
+            }
         }
 
         return map;
@@ -70,6 +79,8 @@ public final class ScriptRecorderState {
             if (parents.contains(n)) {
                 Node finalN = n;
                 return interactions.stream()
+                        .filter(e -> e instanceof NodeInteraction)
+                        .map(e -> (NodeInteraction) e)
                         .filter((NodeInteraction a) -> a.getNode().serialNr() == finalN.serialNr())
                         .findFirst()
                         .orElse(null);

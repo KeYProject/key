@@ -56,7 +56,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         panelButtons.add(new JButton(saveAction));
 
         if(loadedInteractionLogs.isEmpty()) {
-            loadedInteractionLogs.add(new InteractionLog());
+            loadedInteractionLogs.add(new InteractionLog(name));
             setWritingActionInteractionLog(0);
             setDisplayedInteractionLog(0);
             System.out.println(getDisplayedInteractionLog());

@@ -54,14 +54,12 @@ public class ScriptRecorderFacade {
         );
     }
 
-    public static void settingChanged(Proof proof,
-                                      Settings settings,
-                                      SettingChangeInteraction.SettingType type) {
+    public static void settingChanged(Proof proof, Settings settings, SettingChangeInteraction.SettingType type) {
         Properties p = new Properties();
         settings.writeSettings(p, p);
-
         SettingChangeInteraction sci = new SettingChangeInteraction(p, type);
-        //TODO
+        ScriptRecorderState log = get(proof);
+        log.getInteractions().add(sci);
         emit(sci);
     }
 
