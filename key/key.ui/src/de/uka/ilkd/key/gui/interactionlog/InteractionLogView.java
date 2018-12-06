@@ -8,6 +8,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.script.*;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -29,15 +30,14 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
      */
     private final DefaultListModel<Interaction> interactionListModel = new DefaultListModel<>();
     //private final Box panelButtons = new Box(BoxLayout.X_AXIS);
-    private final JPanel panelButtons= new JPanel();
-    private final Services services;
-    private Proof currentProof;
+    private final JToolBar panelButtons = new JToolBar();
 
+    private final Services services;
     /**
      * contains a List of all opened InteractionLogs, which are selectable in the ComboBox
      */
     private final List<InteractionLog> loadedInteractionLogs = new ArrayList<InteractionLog>();
-
+    private Proof currentProof;
     /**
      * index of InteractionLog, that is written to in current proof.
      */
@@ -57,7 +57,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         panelButtons.add(new JButton(actionExportProofScript));
         panelButtons.add(new JButton(saveAction));
 
-        if(loadedInteractionLogs.isEmpty()) {
+        if (loadedInteractionLogs.isEmpty()) {
             loadedInteractionLogs.add(new InteractionLog());
             setWritingActionInteractionLog(0);
             setDisplayedInteractionLog(0);
@@ -75,7 +75,6 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         ScriptRecorderFacade.addListener(this);
 
         setBorder(BorderFactory.createTitledBorder("Interactions"));
-
 
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
@@ -129,12 +128,9 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         return writingActionInteractionLog.map(loadedInteractionLogs::get);
     }
 
-    private void setDisplayedInteractionLog(int i) {
-        this.displayedInteractionLog = Optional.of(i);
-    }
-
     /**
      * change InteractionLog that should be written to
+     *
      * @param index index of InteractionLog in getLoadedInteractionLogs()
      */
     public void setWritingActionInteractionLog(int index) {
@@ -158,6 +154,10 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         return displayedInteractionLog.map(loadedInteractionLogs::get);
     }
 
+    private void setDisplayedInteractionLog(int i) {
+        this.displayedInteractionLog = Optional.of(i);
+    }
+
     private class ExportProofScriptAction extends AbstractAction {
         public ExportProofScriptAction() {
             putValue(Action.NAME, "Export as KPS");
@@ -174,13 +174,15 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
     private class LoadAction extends AbstractAction {
         public LoadAction() {
             putValue(Action.NAME, "Load Interaction Log");
+            putValue(Action.SMALL_ICON,
+                    new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/database_add.png")));
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setFileFilter(new FileNameExtensionFilter(
-                "InteractionLog", "xml"));
+                    "InteractionLog", "xml"));
             int returnValue = fileChooser.showOpenDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 try {
@@ -189,9 +191,9 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
                     addInteractionLog(importedLog);
                 } catch (IOException exception) {
                     JOptionPane.showMessageDialog(null,
-                        exception.getCause(),
-                        "IOException",
-                        JOptionPane.WARNING_MESSAGE);
+                            exception.getCause(),
+                            "IOException",
+                            JOptionPane.WARNING_MESSAGE);
                     exception.printStackTrace();
                 }
             }
@@ -201,13 +203,15 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
     private class SaveAction extends AbstractAction {
         public SaveAction() {
             putValue(Action.NAME, "Save");
+            putValue(Action.SMALL_ICON,
+                    new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/database_save.png")));
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setFileFilter(new FileNameExtensionFilter(
-                "InteractionLog", "xml"));
+                    "InteractionLog", "xml"));
             int returnValue = fileChooser.showSaveDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 getDisplayedInteractionLog().ifPresent((displayedInteractionLog) -> {
@@ -215,9 +219,9 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
                         InteractionLogFacade.storeInteractionLog(displayedInteractionLog, fileChooser.getSelectedFile());
                     } catch (IOException exception) {
                         JOptionPane.showMessageDialog(null,
-                            exception.getCause(),
-                            "IOException",
-                            JOptionPane.WARNING_MESSAGE);
+                                exception.getCause(),
+                                "IOException",
+                                JOptionPane.WARNING_MESSAGE);
                         exception.printStackTrace();
                     }
                 });
