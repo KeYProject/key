@@ -664,12 +664,12 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 		if (obj==null) obj="";	
 		ta.setRows(getRowHeight(row)/16);
 		ta.setText(obj.toString());
-		if (table.isCellEditable(row,1)) { 
-		    //	    ta.setBackground(Color.yellow.brighter());
+		if (table.isCellEditable(row,column)) { 
+		    ta.setBackground(Color.white);
 		    ta.setForeground(Color.black);
 		} else {
-		    ta.setBackground(Color.white);
-		    ta.setForeground(Color.gray);
+		    ta.setBackground(new Color(215, 215, 215));
+		    ta.setForeground(Color.black);
 		}
 		return ta;
 	    }
