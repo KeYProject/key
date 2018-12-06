@@ -8,7 +8,7 @@ import de.uka.ilkd.key.proof.Node;
 /**
  * @author weigl
  */
-public final class MacroInteraction extends Interaction {
+public final class MacroInteraction extends NodeInteraction {
     private final ProofMacro macro;
     private final PosInOccurrence pos;
 

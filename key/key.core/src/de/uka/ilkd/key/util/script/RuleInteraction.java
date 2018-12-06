@@ -13,7 +13,7 @@ import java.util.Iterator;
 /**
  * @author weigl
  */
-public final class RuleInteraction extends Interaction {
+public final class RuleInteraction extends NodeInteraction {
     private final RuleApp app;
 
     public RuleInteraction(Node node, RuleApp app) {

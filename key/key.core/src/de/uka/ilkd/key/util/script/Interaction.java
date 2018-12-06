@@ -6,16 +6,4 @@ import de.uka.ilkd.key.proof.Node;
 /**
  * @author weigl
  */
-public abstract class Interaction {
-    private final Node node;
-
-    protected Interaction(Node node) {
-        this.node = node;
-    }
-
-    public abstract String getProofScriptRepresentation(Services services);
-
-    public Node getNode() {
-        return node;
-    }
-}
+public interface Interaction { }
