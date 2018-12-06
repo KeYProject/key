@@ -20,6 +20,7 @@ import java.util.Optional;
 public class InteractionLogView extends JPanel implements InteractionListeners {
     private final Action actionExportProofScript = new ExportProofScriptAction();
     private final Action saveAction = new SaveAction();
+    private final Action loadAction = new LoadAction();
 
     private final JList<Interaction> listInteraction = new JList<>();
     private final JComboBox<Integer> interactionLogSelection = new JComboBox<>();
@@ -63,30 +64,8 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
             System.out.println(getDisplayedInteractionLog());
         }
 
-        JButton load = new JButton("Load");
 
-        load.addActionListener((event) -> {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileFilter(new FileNameExtensionFilter(
-                "InteractionLog", "xml"));
-            int returnValue = fileChooser.showOpenDialog(null);
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
-                try {
-                    File file = fileChooser.getSelectedFile();
-                    InteractionLog importedLog = InteractionLogFacade.readInteractionLog(file);
-                    this.addInteractionLog(importedLog);
-                    this.loadedInteractionLogs.add(importedLog);
-                } catch (IOException e) {
-                    JOptionPane.showMessageDialog(null,
-                            e.getCause(),
-                        "IOException",
-                            JOptionPane.WARNING_MESSAGE);
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        panelButtons.add(load);
+        panelButtons.add(new JButton(loadAction));
         panelButtons.add(interactionLogSelection);
 
 
@@ -114,10 +93,18 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
 
     private void addInteractionLog(InteractionLog importedLog) {
         this.loadedInteractionLogs.add(importedLog);
-        this.displayedInteractionLog = Optional.ofNullable(
-            this.loadedInteractionLogs.indexOf(importedLog));
+        int index = this.loadedInteractionLogs.indexOf(importedLog);
+        this.displayedInteractionLog = Optional.of(index);
+        this.interactionLogSelection.addItem(index);
     }
 
+    private void addInteractionsIoInteractionLog(List<NodeInteraction> nodeInteractions) {
+
+        getWritingInteractionLog().ifPresent(interactionLog -> {
+            List<Interaction> interactions = new ArrayList<>(nodeInteractions);
+            interactionLog.setInteractions(interactions);
+        });
+    }
 
     private void setCurrentProof(Proof proof) {
         currentProof = proof;
@@ -136,6 +123,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
             state.getInteractions().forEach(interactionListModel::addElement);
         }
     }
+
 
     private Optional<InteractionLog> getWritingInteractionLog() {
         return writingActionInteractionLog.map(loadedInteractionLogs::get);
@@ -180,6 +168,33 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
             LogPrinter lp = new LogPrinter(services);
             InteractionLog state = ScriptRecorderFacade.get(currentProof);
             String ps = lp.print(state);
+        }
+    }
+
+    private class LoadAction extends AbstractAction {
+        public LoadAction() {
+            putValue(Action.NAME, "Load Interaction Log");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileFilter(new FileNameExtensionFilter(
+                "InteractionLog", "xml"));
+            int returnValue = fileChooser.showOpenDialog(null);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                try {
+                    File file = fileChooser.getSelectedFile();
+                    InteractionLog importedLog = InteractionLogFacade.readInteractionLog(file);
+                    addInteractionLog(importedLog);
+                } catch (IOException exception) {
+                    JOptionPane.showMessageDialog(null,
+                        exception.getCause(),
+                        "IOException",
+                        JOptionPane.WARNING_MESSAGE);
+                    exception.printStackTrace();
+                }
+            }
         }
     }
 

@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.util.script;
 
-import com.sun.istack.internal.Nullable;
 import de.uka.ilkd.key.proof.Proof;
 import org.key_project.util.RandomName;
 
@@ -14,7 +13,7 @@ import java.util.List;
  * @version 1 (06.12.18)
  */
 public class InteractionLog implements Serializable {
-    @Nullable
+
     private WeakReference<Proof> proof;
 
     private String name;
