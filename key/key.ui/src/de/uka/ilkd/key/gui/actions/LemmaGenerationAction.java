@@ -328,7 +328,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                             ImmutableList<Taclet> base =
                                     proof.getInitConfig()
                                     .getTaclets();
-                            base = base.prepend(taclets);
+                            base = base.prependReverse(taclets);
                             proof.getInitConfig().setTaclets(base);
                             for (Taclet taclet : taclets) {
                                 for (Goal goal : proof.openGoals()) {

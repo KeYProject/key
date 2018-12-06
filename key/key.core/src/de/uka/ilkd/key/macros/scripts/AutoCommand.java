@@ -3,9 +3,11 @@ package de.uka.ilkd.key.macros.scripts;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
-import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.prover.ProverCore;
+import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -48,7 +50,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
 
         //
         // create the rule application engine
-        final ApplyStrategy applyStrategy = new ApplyStrategy(
+        final ProverCore applyStrategy = new ApplyStrategy(
                 profile.getSelectedGoalChooserBuilder().create());
 
         //

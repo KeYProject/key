@@ -136,7 +136,26 @@ public class TestSemisequent extends TestCase {
 	assertTrue("con[0] has wrong index in semisequent",seq.indexOf(con[0])==0);
 	assertTrue("con[2] has wrong index in semisequent",seq.indexOf(con[2])==1);		
     }
+    
+    public void testRemoveOrder() {
 
+        Semisequent seq=Semisequent.EMPTY_SEMISEQUENT;
+        seq=extract(seq.insert(0,con[0]));
+        seq=extract(seq.insert(1,con[1]));
+        seq=extract(seq.insert(2,con[2]));
+        seq=extract(seq.insert(3,con[4]));
+        seq=extract(seq.insert(4,con[5]));
+        seq=extract(seq.remove(2));
+        
+        assertTrue("Semisequent has wrong size.", seq.size()==4);
+        assertTrue("Semisequent contains deleted element.",!seq.contains(con[2]));
+        assertTrue("con[1] has wrong index in semisequent",seq.indexOf(con[2])==-1);
+        assertTrue("con[0] has wrong index in semisequent",seq.indexOf(con[0])==0);
+        assertTrue("con[2] has wrong index in semisequent",seq.indexOf(con[1])==1);
+        assertTrue("con[4] has wrong index in semisequent",seq.indexOf(con[4])==2);
+        assertTrue("con[4] has wrong index in semisequent",seq.indexOf(con[5])==3);
+    }
+    
     public void testReplace() {
 	Semisequent seq=Semisequent.EMPTY_SEMISEQUENT;
 	seq=extract(seq.insert(0,con[0]));

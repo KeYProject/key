@@ -11,12 +11,19 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.prover.impl;
 
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.prover.GoalChooser;
 
 
 /**
@@ -24,7 +31,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * The class provides methods for removing a goal, and for updating the internal
  * data structures after a rule has been applied. 
  */
-public class DefaultGoalChooser implements IGoalChooser {
+public class DefaultGoalChooser implements GoalChooser {
     
     /** the proof that is worked with */
     protected Proof      proof;

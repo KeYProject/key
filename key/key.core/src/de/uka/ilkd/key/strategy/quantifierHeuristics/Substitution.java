@@ -18,10 +18,7 @@ import java.util.Iterator;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.ClashFreeSubst;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -74,21 +71,23 @@ public class Substitution {
         assert isGround() :
             "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
+        final TermBuilder tb = services.getTermBuilder();
         while ( it.hasNext () ) {
             final QuantifiableVariable var = it.next ();
             final Sort quantifiedVarSort = var.sort ();
             final Function quantifiedVarSortCast =
                 quantifiedVarSort.getCastSymbol (services);
             Term instance = getSubstitutedTerm( var );
-            if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) )
-            	instance = services.getTermBuilder().func ( quantifiedVarSortCast, instance );
-            t = applySubst ( var, instance, t, services );
+            if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) ) {
+                instance = tb.func ( quantifiedVarSortCast, instance );
+            }
+            t = applySubst ( var, instance, t, tb );
         }
         return t;
     }
 
-    private Term applySubst(QuantifiableVariable var, Term instance, Term t, TermServices services) {
-        final ClashFreeSubst subst = new ClashFreeSubst ( var,  instance, services);
+    private Term applySubst(QuantifiableVariable var, Term instance, Term t, TermBuilder tb) {
+        final ClashFreeSubst subst = new ClashFreeSubst ( var,  instance, tb);
         return subst.apply ( t );
     }
     
@@ -99,20 +98,20 @@ public class Substitution {
     public Term applyWithoutCasts(Term t, TermServices services) {
         assert isGround() :
             "non-ground substitutions are not yet implemented: " + this;
+        final TermBuilder tb = services.getTermBuilder();
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
         while ( it.hasNext () ) {
             final QuantifiableVariable var = it.next ();
-            Term instance = getSubstitutedTerm( var );
-            
+            Term instance = getSubstitutedTerm( var );            
             try {
-                t = applySubst ( var, instance, t, services );
+                t = applySubst ( var, instance, t, tb );
             } catch (TermCreationException e) {
                 final Sort quantifiedVarSort = var.sort ();                
                 if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) ) {
                     final Function quantifiedVarSortCast =
                         quantifiedVarSort.getCastSymbol (services);
-                    instance = services.getTermBuilder().func ( quantifiedVarSortCast, instance );
-                    t = applySubst ( var, instance, t, services );
+                    instance = tb.func ( quantifiedVarSortCast, instance );
+                    t = applySubst ( var, instance, t, tb );
                 } else {
                     throw e;
                 }

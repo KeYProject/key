@@ -72,8 +72,8 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         public boolean storeSMTTranslationToFile    = false;
         public boolean storeTacletTranslationToFile = false;
         
-        public long    timeout                      = 5000;
-        public int     maxConcurrentProcesses       = 5;
+        public long    timeout                      = 2000;
+        public int     maxConcurrentProcesses       = 2;
     
         public int     modeOfProgressDialog         = PROGRESS_MODE_USER;
 

@@ -27,7 +27,7 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 public class BuiltInRuleAppIndex {
 
-    private BuiltInRuleIndex index;
+    private final BuiltInRuleIndex index;
 
     private NewRuleListener  newRuleListener =
         NullNewRuleListener.INSTANCE;
@@ -49,12 +49,14 @@ public class BuiltInRuleAppIndex {
      * for the given goal and position
      */
     public ImmutableList<IBuiltInRuleApp> getBuiltInRule(Goal            goal, 
-						 PosInOccurrence pos) {
+						         PosInOccurrence pos) {
 
 	ImmutableList<IBuiltInRuleApp> result = ImmutableSLList.<IBuiltInRuleApp>nil();
 
-        for (BuiltInRule builtInRule : index.rules()) {
-            BuiltInRule bir = builtInRule;
+        ImmutableList<BuiltInRule> rules = index.rules();
+        while (!rules.isEmpty()) {
+            final BuiltInRule bir = rules.head();
+            rules = rules.tail();
             if (bir.isApplicable(goal, pos)) {
                 IBuiltInRuleApp app = bir.createApp(pos, goal.proof().getServices());
                 result = result.prepend(app);
@@ -89,58 +91,71 @@ public class BuiltInRuleAppIndex {
 
     private void scanSimplificationRule ( Goal       goal,
 					  NewRuleListener listener ) {
-        for (BuiltInRule builtInRule : index.rules()) {
-            if(builtInRule.isApplicable(goal, null)) {
-                IBuiltInRuleApp app = builtInRule.createApp( null, goal.proof().getServices() );                            
-                listener.ruleAdded ( app, null );
-            }
-            
-            
-            scanSimplificationRule(builtInRule, goal, false, listener);
-            scanSimplificationRule(builtInRule, goal, true, listener);
+        ImmutableList<BuiltInRule> rules = index.rules();
+        if (!rules.isEmpty()) {
+            do {
+                final BuiltInRule builtInRule = rules.head();
+                rules = rules.tail();
+                if(builtInRule.isApplicable(goal, null)) {
+                    IBuiltInRuleApp app = builtInRule.createApp( null, goal.proof().getServices() );                            
+                    listener.ruleAdded ( app, null );
+                }
+            } while (!rules.isEmpty());
+            scanSimplificationRule(index.rules(), goal, false, listener);
+            scanSimplificationRule(index.rules(), goal, true, listener);
         }
     }
 
   
 
-    private void scanSimplificationRule ( BuiltInRule rule,
+    private void scanSimplificationRule ( ImmutableList<BuiltInRule> rules,
 					  Goal        goal,
 					  boolean     antec,
 					  NewRuleListener listener ) {
 	final Node                   node = goal.node ();
 	final Sequent                seq  = node.sequent ();
 
-        for (Object o : (antec ? seq.antecedent() : seq.succedent())) {
-            final SequentFormula cfma = (SequentFormula) o;
-            scanSimplificationRule(rule, goal, antec, cfma, listener);
+        for (final SequentFormula sf : (antec ? seq.antecedent() : seq.succedent())) {
+            scanSimplificationRule(rules, goal, antec, sf, listener);
         }
     }
 
-    private void scanSimplificationRule ( BuiltInRule rule, 
+    private void scanSimplificationRule ( ImmutableList<BuiltInRule> rules, 
                                           Goal goal, 
                                           boolean antec, 
                                           SequentFormula cfma, 
                                           NewRuleListener listener ) {
         final PosInOccurrence pos = new PosInOccurrence( cfma, PosInTerm.getTopLevel(), antec );
-        if(rule.isApplicableOnSubTerms()) {
-            scanSimplificationRule(rule, goal, pos, listener);
-        } else if (rule.isApplicable ( goal, pos ) ) {
-            IBuiltInRuleApp app = rule.createApp( pos, goal.proof().getServices() );
-            listener.ruleAdded ( app, pos );
+        ImmutableList<BuiltInRule> subrules = ImmutableSLList.nil();
+        while (!rules.isEmpty()) {
+            final BuiltInRule rule = rules.head();
+            rules = rules.tail();
+            if(rule.isApplicableOnSubTerms()) {
+                subrules = subrules.prepend(rule);
+            } else if (rule.isApplicable ( goal, pos ) ) {
+                final IBuiltInRuleApp app = rule.createApp( pos, goal.proof().getServices() );
+                listener.ruleAdded ( app, pos );                
+            }
         }
+        scanSimplificationRule(subrules, goal, pos, listener);
     }
     
     //TODO: optimise?
-    private void scanSimplificationRule ( BuiltInRule rule,
+    private void scanSimplificationRule ( ImmutableList<BuiltInRule> rules,
 	    				  Goal goal,
                                           PosInOccurrence pos,
                                           NewRuleListener listener ) {
-        if (rule.isApplicable ( goal, pos ) ) {
-            IBuiltInRuleApp app = rule.createApp( pos, goal.proof().getServices() );                            
-            listener.ruleAdded ( app, pos );
+        ImmutableList<BuiltInRule> it = rules;
+        while (!it.isEmpty()) {
+            final BuiltInRule rule = it.head();
+            it = it.tail();
+            if (rule.isApplicable ( goal, pos ) ) {
+                IBuiltInRuleApp app = rule.createApp( pos, goal.proof().getServices() );                            
+                listener.ruleAdded ( app, pos );
+            }
         }
         for(int i = 0, n = pos.subTerm().arity(); i < n; i++) {
-            scanSimplificationRule(rule, goal, pos.down(i), listener);
+            scanSimplificationRule(rules, goal, pos.down(i), listener);
         }
     }     
 
@@ -166,11 +181,7 @@ public class BuiltInRuleAppIndex {
         final NewRuleListener listener = getNewRulePropagator();
         while ( !cfmas.isEmpty() ) {
             final SequentFormula cfma = cfmas.head();
-            for (BuiltInRule builtInRule : index.rules()) {
-                final BuiltInRule rule = builtInRule;
-                scanSimplificationRule(rule, goal, antec,
-                        cfma, listener);
-            }
+                scanSimplificationRule(index.rules(), goal, antec, cfma, listener);
             cfmas = cfmas.tail();
         }
     }
@@ -183,11 +194,8 @@ public class BuiltInRuleAppIndex {
 
         while ( !fcis.isEmpty() ) {
             final FormulaChangeInfo fci = fcis.head();               
-            final SequentFormula cfma = fci.getNewFormula();
-            for (BuiltInRule builtInRule : index.rules()) {
-                final BuiltInRule rule = builtInRule;
-                scanSimplificationRule(rule, goal, antec, cfma, listener);
-            }
+            final SequentFormula cfma = fci.getNewFormula();            
+            scanSimplificationRule(index.rules(), goal, antec, cfma, listener);
             fcis = fcis.tail();
         }
     }

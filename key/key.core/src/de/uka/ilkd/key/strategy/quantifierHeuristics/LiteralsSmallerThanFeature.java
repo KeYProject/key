@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -38,9 +37,6 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     private final QuanEliminationAnalyser quanAnalyser =
         new QuanEliminationAnalyser ();
     
-    // ugly, but we need some services
-    private Services               services = null;
-    private PosInOccurrence        focus = null;
 
     private LiteralsSmallerThanFeature(ProjectionToTerm left,
                                        ProjectionToTerm right,
@@ -60,39 +56,30 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         final Term leftTerm = left.toTerm ( app, pos, goal );
         final Term rightTerm = right.toTerm ( app, pos, goal );
 
-        return compareTerms ( leftTerm, rightTerm, pos, goal.proof ().getServices () );
+        return compareTerms ( leftTerm, rightTerm, pos, goal );
     }
 
     protected boolean compareTerms(Term leftTerm, Term rightTerm,
-                                   PosInOccurrence pos, Services p_services) {
-        services = p_services;
-        focus = pos;
-        
+                                   PosInOccurrence pos, Goal goal) {
         final LiteralCollector m1 = new LiteralCollector ();
         m1.collect ( leftTerm );
         final LiteralCollector m2 = new LiteralCollector ();
         m2.collect ( rightTerm );
 
-        final boolean res = lessThan ( m1.getResult(), m2.getResult(), p_services.getCaches() );
-        
-        services = null;
-        focus = null;
-        
-        return res;
+        return lessThan ( m1.getResult(), m2.getResult(), pos, goal );
     }
     
     /**
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(Term t1, Term t2, ServiceCaches caches) {
-
+    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, Goal goal) {
         final int t1Def = quanAnalyser.eliminableDefinition ( t1, focus );
         final int t2Def = quanAnalyser.eliminableDefinition ( t2, focus );
 
         if ( t1Def > t2Def ) return true;
         if ( t1Def < t2Def ) return false;
-                
+
         // HACK: we move literals that do not contain any variables to the left,
         // so that they can be moved out of the scope of the quantifiers
         if ( t1.freeVars ().size () == 0 ) {
@@ -100,25 +87,26 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         } else {
             if ( t2.freeVars ().size () == 0 ) return true;
         }
-        
+
         t1 = discardNegation ( t1 );
         t2 = discardNegation ( t2 );
-        
+
         if ( isBinaryIntRelation ( t2 ) ) {
             if ( !isBinaryIntRelation ( t1 ) ) return true;
-            
+
             int c = compare ( t1.sub ( 0 ), t2.sub ( 0 ) );
             if ( c < 0 ) return true;
             if ( c > 0 ) return false;
-            
+
             c = comparePolynomials ( t1.sub ( 1 ), t2.sub ( 1 ) );
             if ( c < 0 ) return true;
             if ( c > 0 ) return false;
-            
+
+            final Services services = goal.proof().getServices();
             final Polynomial t1RHS =
-                Polynomial.create ( t1.sub ( 1 ), services );
+                    Polynomial.create ( t1.sub ( 1 ), services );
             final Polynomial t2RHS =
-                Polynomial.create ( t2.sub ( 1 ), services );
+                    Polynomial.create ( t2.sub ( 1 ), services );
             if ( t1RHS.valueLess ( t2RHS ) ) return true;
             if ( t2RHS.valueLess ( t1RHS ) ) return false;
 
@@ -128,8 +116,8 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         } else {
             if ( isBinaryIntRelation ( t1 ) ) return false;
         }
-        
-        return super.lessThan ( t1, t2, caches );
+
+        return super.lessThan ( t1, t2, focus, goal );
     }
 
     private int comparePolynomials(Term t1, Term t2) {

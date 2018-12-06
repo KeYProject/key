@@ -16,6 +16,8 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.key_project.util.collection.ImmutableList;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -41,8 +43,16 @@ public class RuleSetDispatchFeature implements Feature {
         if ( ! ( app instanceof TacletApp ) ) return NumberRuleAppCost.getZeroCost();
 
         RuleAppCost res = NumberRuleAppCost.getZeroCost();
-        for (RuleSet rs : ( (TacletApp)app ).taclet ().getRuleSets ()) {
-            final Feature partialF = rulesetToFeature.get ( rs );
+        ImmutableList<RuleSet> ruleSetsOfAppliedTaclet = ( (TacletApp)app ).taclet ().getRuleSets ();
+        /*
+         * do not use iterator here, as this method is called a lot when proving such that avoiding
+         * object creation helps to reduce the load put on the garbage collector
+         */
+        while (!ruleSetsOfAppliedTaclet.isEmpty()) {
+        	final RuleSet rs = ruleSetsOfAppliedTaclet.head();
+        	ruleSetsOfAppliedTaclet = ruleSetsOfAppliedTaclet.tail();
+            
+        	final Feature partialF = rulesetToFeature.get ( rs );
             if ( partialF != null ) {
                 res = res.add (partialF.computeCost ( app, pos, goal ) );
                 if ( res instanceof TopRuleAppCost ) {

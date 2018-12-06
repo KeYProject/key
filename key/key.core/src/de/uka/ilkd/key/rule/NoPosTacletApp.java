@@ -123,11 +123,7 @@ public class NoPosTacletApp extends TacletApp {
 						    null,
 						    services);
 	// Make the given SVs fixed
-	if ( res != null ) {
-	    final Iterator<SchemaVariable> it = instantiations.svIterator ();
-	    while ( it.hasNext () ) {
-		res.fixedVars = res.fixedVars.add ( it.next () );
-            }
+	if ( res != null ) {	
             res.updateContextFixed = true;
         }
 	return res;

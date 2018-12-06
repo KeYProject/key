@@ -38,7 +38,7 @@ public class BoundVariableTools {
      * <code>newBoundVars</code> component-wise, and in case of differences
      * substitute variables from the former array with the ones of the latter
      * array (in <code>originalTerm</code>)
-    * @param services TODO
+    * @param services the Services
      */
     public Term renameVariables (Term originalTerm,
                                  ImmutableArray<QuantifiableVariable> oldBoundVars,
@@ -52,7 +52,7 @@ public class BoundVariableTools {
                     services.getTermFactory().createTerm( newBoundVars.get ( i ) );
                 final ClashFreeSubst subst =
                     new ClashFreeSubst ( oldBoundVars.get ( i ),
-                                         newVarTerm, services );
+                                         newVarTerm, services.getTermBuilder() );
                 res = subst.apply ( res );
             }
         }

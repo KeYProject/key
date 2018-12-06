@@ -1,7 +1,6 @@
-/**
- * 
- */
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.prover.impl;
+
+import de.uka.ilkd.key.prover.TaskStartedInfo;
 
 /**
  * Default implementation of a {@link TaskStartedInfo}. 
@@ -48,5 +47,4 @@ public class DefaultTaskStartedInfo implements TaskStartedInfo {
    public int getSize() {
       return size;
    }
-
 }
