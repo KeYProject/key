@@ -1,15 +1,29 @@
 package de.uka.ilkd.key.util.script;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Node;
 
 public class AutoModeInteraction extends NodeInteraction {
-    public AutoModeInteraction(Node node) {
+
+    private ApplyStrategyInfo info;
+
+    public AutoModeInteraction(Node node, ApplyStrategyInfo info) {
         super(node);
     }
 
     @Override
     public String getProofScriptRepresentation(Services services) {
-        return "auto;";
+        StringBuilder sb = new StringBuilder("auto");
+
+        sb.append("\n\t");
+        sb.append(info);
+
+        sb.append(";");
+        return sb.toString();
+    }
+
+    public ApplyStrategyInfo getInfo() {
+        return info;
     }
 }

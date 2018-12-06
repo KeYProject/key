@@ -5,7 +5,6 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 
-import de.uka.ilkd.key.util.script.ScriptRecorderFacade;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -25,6 +24,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.script.ScriptRecorderFacade;
 
 /**
  * A {@link ProofControl} which performs the automode in a {@link SwingWorker}.
@@ -41,7 +41,7 @@ public class MediatorProofControl extends AbstractProofControl {
    }
 
    private AutoModeWorker worker;
-   
+
    /**
     * {@inheritDoc}
     */
@@ -53,7 +53,7 @@ public class MediatorProofControl extends AbstractProofControl {
       }
       return result;
    }
-   
+
    @Override
    public void fireAutoModeStarted(ProofEvent e) {
       super.fireAutoModeStarted(e);
@@ -72,12 +72,13 @@ public class MediatorProofControl extends AbstractProofControl {
       if (goals.isEmpty()) {
          ui.notify(new GeneralInformationEvent("No enabled goals available."));
          return;
-     }
-     worker = new AutoModeWorker(proof, goals, ptl);
-     ui.getMediator().stopInterface(true);
-     ui.getMediator().setInteractive(false);
-       ScriptRecorderFacade.runAutoMode(proof, goals);
-     worker.execute();
+      }
+
+      worker = new AutoModeWorker(proof, goals, ptl);
+      ui.getMediator().stopInterface(true);
+      ui.getMediator().setInteractive(false);
+
+      worker.execute();
    }
 
    /**
@@ -118,7 +119,7 @@ public class MediatorProofControl extends AbstractProofControl {
     */
    @Override
    public boolean isAutoModeSupported(Proof proof) {
-      return super.isAutoModeSupported(proof) && 
+      return super.isAutoModeSupported(proof) &&
              ui.getMediator().getSelectedProof() == proof;
    }
 
@@ -141,11 +142,13 @@ public class MediatorProofControl extends AbstractProofControl {
     */
    private class AutoModeWorker extends SwingWorker<ApplyStrategyInfo, Object> {
        private final Proof proof;
-       
+
+       private ApplyStrategyInfo info;
+
        private final ImmutableList<Goal> goals;
 
        private final ApplyStrategy applyStrategy;
-       
+
        public AutoModeWorker(final Proof proof,
                              final ImmutableList<Goal> goals,
                              ProverTaskListener ptl) {
@@ -183,6 +186,8 @@ public class MediatorProofControl extends AbstractProofControl {
               }
               ui.getMediator().setInteractive(true);
               ui.getMediator().startInterface(true);
+
+              ScriptRecorderFacade.runAutoMode(proof, goals, info);
            }
        }
 
@@ -197,8 +202,12 @@ public class MediatorProofControl extends AbstractProofControl {
                    .getActiveStrategyProperties().getProperty(
                            StrategyProperties.STOPMODE_OPTIONS_KEY)
                    .equals(StrategyProperties.STOPMODE_NONCLOSE);
-           return applyStrategy.start(proof, goals, ui.getMediator().getMaxAutomaticSteps(),
+
+           info = applyStrategy.start(
+                   proof, goals, ui.getMediator().getMaxAutomaticSteps(),
                  ui.getMediator().getAutomaticApplicationTimeout(), stopMode);
+
+           return info;
        }
    }
 
@@ -212,8 +221,6 @@ public class MediatorProofControl extends AbstractProofControl {
       mediator.stopInterface(true);
       mediator.setInteractive(false);
       mediator.addInterruptedListener(worker);
-
-      ScriptRecorderFacade.runMacro(node, macro, posInOcc);
 
       worker.execute();
    }
