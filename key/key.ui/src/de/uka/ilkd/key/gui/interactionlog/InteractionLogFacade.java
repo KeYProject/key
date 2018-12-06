@@ -19,7 +19,7 @@ public final class InteractionLogFacade {
         }
     }
 
-    public static InteractionLog storeInteractionLog(InteractionLog log, File output)
+    public static void storeInteractionLog(InteractionLog log, File output)
             throws IOException {
         try (OutputStream os = new FileOutputStream(output)) {
             XMLEncoder encoder = new XMLEncoder(os);
