@@ -1,9 +1,13 @@
 package de.uka.ilkd.key.util.script;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-
-import java.util.*;
 
 /**
  * depcrated in favor interaction log
@@ -34,7 +38,7 @@ public final class ScriptRecorderState {
         /*int maxDepth = 0;
         for (Interaction event : interactions) {
             if (event instanceof NodeInteraction) {
-                int depth = getDepth(((NodeInteraction) event).getNode());
+                int depth = getDepth(((NodeInteraction) event).getNode(proof));
                 maxDepth = Math.max(maxDepth, depth);
                 seq.computeIfAbsent(depth, n -> new ArrayList<>()).add(event);
             }
@@ -59,14 +63,14 @@ public final class ScriptRecorderState {
         final Set<Node> interactiveNodes = interactions.stream()
                 .filter(e -> e instanceof NodeInteraction)
                 .map(e -> (NodeInteraction) e)
-                .map(NodeInteraction::getNode)
+                .map(e -> e.getNode(proof))
                 .collect(Collectors.toSet());
 
 
         for (Interaction inter : interactions) {
             if (inter instanceof NodeInteraction) {
                 NodeInteraction parent = findNearestAncestor(interactiveNodes,
-                        ((NodeInteraction) inter).getNode());
+                        ((NodeInteraction) inter).getNode(proof));
                 map.computeIfAbsent(parent, n -> new ArrayList<>()).add(inter);
             }
         }
@@ -83,7 +87,7 @@ public final class ScriptRecorderState {
                 return interactions.stream()
                         .filter(e -> e instanceof NodeInteraction)
                         .map(e -> (NodeInteraction) e)
-                        //.filter((NodeInteraction a) -> a.getNode().serialNr() == finalN.serialNr())
+                        .filter((NodeInteraction a) -> a.getSerialNr() == finalN.serialNr())
                         .findFirst()
                         .orElse(null);
             }

@@ -50,7 +50,7 @@ public final class MacroInteraction extends NodeInteraction {
     public String getProofScriptRepresentation(Services services) {
         StringBuilder sb = new StringBuilder(macroName);
 
-        sb.append("\n\t" + getNode().serialNr());
+        sb.append("\n\t" + getSerialNr());
         sb.append("\n\t" + info);
 
         sb.append(";");
