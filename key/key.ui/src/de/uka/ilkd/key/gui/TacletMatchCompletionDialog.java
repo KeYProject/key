@@ -437,6 +437,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
         
 	    this.setDropTarget(aDropTarget);
+	    new TableRowResizer(this);
 
 	} // end constructor
         
@@ -532,15 +533,15 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 					      .VERTICAL_SCROLLBAR_AS_NEEDED,
 					      ScrollPaneConstants
 					      .HORIZONTAL_SCROLLBAR_AS_NEEDED));
-		JPanel buttonPanel=new JPanel(new BorderLayout());
+		//JPanel buttonPanel=new JPanel(new BorderLayout());
 		Insets zeroIn=new Insets(0,0,0,0);
 		JButton less=new JButton("-");
 		less.setMargin(zeroIn);
 		JButton more=new JButton("+");
 		more.setMargin(zeroIn);
  		Dimension small=new Dimension(20,9999);
- 		buttonPanel.setMaximumSize(small);
- 		buttonPanel.setPreferredSize(small);
+ 		//buttonPanel.setMaximumSize(small);
+ 		//buttonPanel.setPreferredSize(small);
  		Dimension smallSq=new Dimension(20,20);
  		less.setMaximumSize(smallSq);
  		less.setMinimumSize(smallSq);
@@ -568,9 +569,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 				       getSelectedColumn());
 			}
 		    }); 
-		buttonPanel.add(less, BorderLayout.NORTH);
-		buttonPanel.add(more, BorderLayout.SOUTH);
-		editPanel.add(buttonPanel);
+		//buttonPanel.add(less, BorderLayout.SOUTH);
+		//buttonPanel.add(more, BorderLayout.NORTH);
+		//editPanel.add(buttonPanel);
 		editorComponent=editPanel;
 		setClickCountToStart(1);
 		DropTarget aDropTarget = 
