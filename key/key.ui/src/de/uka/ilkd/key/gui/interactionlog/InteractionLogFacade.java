@@ -1,10 +1,13 @@
 package de.uka.ilkd.key.gui.interactionlog;
 
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.script.InteractionLog;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.*;
+import java.util.Optional;
 
 /**
  * @author Alexander Weigl
