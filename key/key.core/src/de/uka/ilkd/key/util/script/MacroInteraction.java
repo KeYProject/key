@@ -3,6 +3,7 @@ package de.uka.ilkd.key.util.script;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Node;
 
 /**
@@ -11,16 +12,24 @@ import de.uka.ilkd.key.proof.Node;
 public final class MacroInteraction extends NodeInteraction {
     private final ProofMacro macro;
     private final PosInOccurrence pos;
+    private ProofMacroFinishedInfo info;
 
-    public MacroInteraction(Node node, ProofMacro macro, PosInOccurrence posInOcc) {
+    public MacroInteraction(Node node, ProofMacro macro, PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
         super(node);
         this.macro = macro;
         this.pos = posInOcc;
+        this.info = info;
     }
 
     @Override
     public String getProofScriptRepresentation(Services services) {
-        return macro.getScriptCommandName() + ";";
+        StringBuilder sb = new StringBuilder(macro.getScriptCommandName());
+
+        sb.append("\n\t");
+        sb.append(info);
+
+        sb.append(";");
+        return sb.toString();
     }
 
     public ProofMacro getMacro() {
@@ -29,5 +38,9 @@ public final class MacroInteraction extends NodeInteraction {
 
     public PosInOccurrence getPos() {
         return pos;
+    }
+
+    public ProofMacroFinishedInfo getInfo() {
+        return info;
     }
 }
