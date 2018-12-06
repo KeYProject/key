@@ -1,10 +1,8 @@
 package de.uka.ilkd.key.util.script;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import de.uka.ilkd.key.settings.Settings;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -61,7 +59,6 @@ public class ScriptRecorderFacade {
         emit(sci);
     }
 
-    public static void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc) {
     public static void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
         ScriptRecorderState state = get(node.proof());
         MacroInteraction interaction = new MacroInteraction(node, macro, posInOcc, info);
