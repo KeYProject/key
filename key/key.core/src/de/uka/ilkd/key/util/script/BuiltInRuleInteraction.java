@@ -5,7 +5,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.BuiltInRule;
 
-public class BuiltInRuleInteraction extends Interaction {
+public class BuiltInRuleInteraction extends NodeInteraction {
     public final BuiltInRule rule;
     public final PosInOccurrence pos;
 
