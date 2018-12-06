@@ -10,6 +10,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import org.key_project.util.collection.ImmutableMapEntry;
 
+import java.util.HashMap;
 import java.util.Iterator;
 
 /**
@@ -18,6 +19,8 @@ import java.util.Iterator;
 public final class RuleInteraction extends NodeInteraction {
     private RuleApp app;
     private String ruleName;
+    private HashMap<String, String> arguments = new HashMap<>();
+
 
     public RuleInteraction() {
         super(null);
