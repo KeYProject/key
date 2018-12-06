@@ -1,9 +1,5 @@
 package de.uka.ilkd.key.util.script;
 
-import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableMapEntry;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -12,12 +8,16 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
+import org.key_project.util.collection.ImmutableMapEntry;
+
+import java.util.Iterator;
 
 /**
  * @author weigl
  */
 public final class RuleInteraction extends NodeInteraction {
     private RuleApp app;
+    private String ruleName;
 
     public RuleInteraction() {
         super(null);

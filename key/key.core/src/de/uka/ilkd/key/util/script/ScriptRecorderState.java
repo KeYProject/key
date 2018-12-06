@@ -7,8 +7,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * depcrated in favor interaction log
+ *
  * @author weigl
  */
+@Deprecated
 public final class ScriptRecorderState {
     private final Proof proof;
     private List<Interaction> interactions = new LinkedList<>();

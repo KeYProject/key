@@ -447,8 +447,6 @@ public class Proof implements Named {
     }
 
 
-
-
     /**
      * returns the list of open goals
      * @return list with the open goals

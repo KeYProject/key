@@ -24,11 +24,11 @@ import de.uka.ilkd.key.settings.Settings;
  */
 public class ScriptRecorderFacade {
     private static List<InteractionListeners> listeners = new ArrayList<>();
-    private static Map<Proof, ScriptRecorderState> instances = new HashMap<>();
+    private static Map<Proof, InteractionLog> instances = new HashMap<>();
 
-    public static ScriptRecorderState get(Proof proof) {
+    public static InteractionLog get(Proof proof) {
         return instances.computeIfAbsent(proof, key ->
-                new ScriptRecorderState(proof)
+                new InteractionLog(proof)
         );
     }
 
@@ -56,27 +56,27 @@ public class ScriptRecorderFacade {
         Properties p = new Properties();
         settings.writeSettings(p, p);
         SettingChangeInteraction sci = new SettingChangeInteraction(p, type);
-        ScriptRecorderState log = get(proof);
+        InteractionLog log = get(proof);
         log.getInteractions().add(sci);
         emit(sci);
     }
 
     public static void runPrune(Node node) {
-        ScriptRecorderState state = get(node.proof());
+        InteractionLog state = get(node.proof());
         PruneInteraction interaction = new PruneInteraction(node);
         state.getInteractions().add(interaction);
         emit(interaction);
     }
 
     public static void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
-        ScriptRecorderState state = get(node.proof());
+        InteractionLog state = get(node.proof());
         MacroInteraction interaction = new MacroInteraction(node, macro, posInOcc, info);
         state.getInteractions().add(interaction);
         emit(interaction);
     }
 
     public static void runBuiltIn(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced) {
-        ScriptRecorderState state = get(goal.proof());
+        InteractionLog state = get(goal.proof());
         NodeInteraction interaction = new BuiltInRuleInteraction(goal.node(), rule, pos);
         state.getInteractions().add(interaction);
         emit(interaction);
@@ -95,7 +95,7 @@ public class ScriptRecorderFacade {
     }
 
     public static void runAutoMode(Proof proof, ImmutableList<Goal> goals, ApplyStrategyInfo info) {
-        ScriptRecorderState state = get(proof);
+        InteractionLog state = get(proof);
         goals.stream().forEach(g -> {
             AutoModeInteraction interaction = new AutoModeInteraction(g.node(), info);
             state.getInteractions().add(interaction);
@@ -104,7 +104,7 @@ public class ScriptRecorderFacade {
     }
 
     public static void runRule(Goal goal, RuleApp app) {
-        ScriptRecorderState state = get(goal.proof());
+        InteractionLog state = get(goal.proof());
         RuleInteraction interaction = (new RuleInteraction(
                 goal.node().parent(), app));
         state.getInteractions().add(interaction);

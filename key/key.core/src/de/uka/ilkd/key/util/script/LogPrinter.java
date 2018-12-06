@@ -23,7 +23,7 @@ public class LogPrinter {
     private PrintWriter out;
     private Function<Node, String> matchExpr = LogPrinter::getBranchingLabel;
     private int indent = 0;
-    private ScriptRecorderState state;
+    private InteractionLog state;
     private final Services services;
 
     public LogPrinter(Services services) {
@@ -54,7 +54,7 @@ public class LogPrinter {
      * @param state a state
      * @return
      */
-    public String print(ScriptRecorderState state) {
+    public String print(InteractionLog state) {
         w = new StringWriter();
         out = new PrintWriter(w);
         this.state = state;
@@ -72,8 +72,8 @@ public class LogPrinter {
 
     private void body() {
         if (state.getInteractions().size() != 0) {
-            HashMap<Interaction, List<Interaction>> tree = state.getInteractionTree();
-            body(tree, state.getInteractions().get(0));
+            //HashMap<Interaction, List<Interaction>> tree = state.getInteractionTree();
+            //body(tree, state.getInteractions().get(0));
         }
     }
 

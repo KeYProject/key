@@ -27,7 +27,8 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
      * list of interactions, will be replaced on every change of the interactionLogSelection
      */
     private final DefaultListModel<Interaction> interactionListModel = new DefaultListModel<>();
-    private final Box panelButtons = new Box(BoxLayout.Y_AXIS);
+    //private final Box panelButtons = new Box(BoxLayout.X_AXIS);
+    private final JPanel panelButtons= new JPanel();
     private final Services services;
     private Proof currentProof;
 
@@ -56,13 +57,13 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         panelButtons.add(new JButton(saveAction));
 
         if(loadedInteractionLogs.isEmpty()) {
-            loadedInteractionLogs.add(new InteractionLog(name));
+            loadedInteractionLogs.add(new InteractionLog());
             setWritingActionInteractionLog(0);
             setDisplayedInteractionLog(0);
             System.out.println(getDisplayedInteractionLog());
         }
 
-        JButton load = new JButton("Load InteractionLog");
+        JButton load = new JButton("Load");
 
         load.addActionListener((event) -> {
             JFileChooser fileChooser = new JFileChooser();
@@ -126,7 +127,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
     private void rebuildList() {
         interactionListModel.clear();
         if (currentProof != null) {
-            ScriptRecorderState state = ScriptRecorderFacade.get(currentProof);
+            InteractionLog state = ScriptRecorderFacade.get(currentProof);
             getWritingInteractionLog().ifPresent(interactionLog -> {
                 List<Interaction> interactions = new ArrayList<>();
                 interactions.addAll(state.getInteractions());
@@ -177,14 +178,14 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         @Override
         public void actionPerformed(ActionEvent e) {
             LogPrinter lp = new LogPrinter(services);
-            ScriptRecorderState state = ScriptRecorderFacade.get(currentProof);
+            InteractionLog state = ScriptRecorderFacade.get(currentProof);
             String ps = lp.print(state);
         }
     }
 
     private class SaveAction extends AbstractAction {
         public SaveAction() {
-            putValue(Action.NAME, "Save Interaction Log");
+            putValue(Action.NAME, "Save");
         }
 
         @Override

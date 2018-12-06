@@ -12,7 +12,7 @@ import java.io.IOException;
 public class InteractionLogFacadeTest {
     @org.junit.Test
     public void storeAndReadInteractionLogEmpty() throws IOException {
-        InteractionLog il = new InteractionLog(name);
+        InteractionLog il = new InteractionLog();
         File file = File.createTempFile("interaction_log", "xml");
         InteractionLogFacade.storeInteractionLog(il, file);
         InteractionLog readIl = InteractionLogFacade.readInteractionLog(file);
