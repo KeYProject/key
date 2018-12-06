@@ -43,6 +43,7 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -442,6 +443,10 @@ public final class SourceView extends JComponent {
             textScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             textScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             tabs.addTab(entry.getValue().getName(), textScrollPane);
+
+            //add Line numbers to each Scrollview
+            TextLineNumber tln = new TextLineNumber(textPane, 4);
+            textScrollPane.setRowHeaderView(tln);
 
             // add the full path as tooltip for the tab
             int index = tabs.indexOfTab(entry.getValue().getName());
