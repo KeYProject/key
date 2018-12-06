@@ -20,7 +20,7 @@ public final class MacroInteraction extends NodeInteraction {
 
     private ProofMacro macro;
     private PosInOccurrence pos;
-    private ProofMacroFinishedInfo info;
+    private String info;
 
     private List<Integer> openGoalSerialNumbers;
     private List<NodeIdentifier> openGoalNodeIds;
@@ -31,9 +31,10 @@ public final class MacroInteraction extends NodeInteraction {
     public MacroInteraction(Node node, ProofMacro macro,
                             PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
         super(node);
+        System.out.println("macro");
         this.macroName = macro.getScriptCommandName();
         this.pos = posInOcc;
-        this.info = info;
+        this.info = info.toString();
 
         ImmutableList<Goal> openGoals = info.getProof().openGoals();
         this.openGoalSerialNumbers = openGoals.stream().map(g -> g.node().serialNr()).collect(Collectors.toList());
@@ -51,6 +52,7 @@ public final class MacroInteraction extends NodeInteraction {
         StringBuilder sb = new StringBuilder(macroName);
 
         sb.append("\n\t" + getSerialNr());
+
         sb.append("\n\t" + info);
 
         sb.append(";");
@@ -73,11 +75,11 @@ public final class MacroInteraction extends NodeInteraction {
         this.pos = pos;
     }
 
-    public ProofMacroFinishedInfo getInfo() {
+    public String getInfo() {
         return info;
     }
 
-    public void setInfo(ProofMacroFinishedInfo info) {
+    public void setInfo(String info) {
         this.info = info;
     }
 
