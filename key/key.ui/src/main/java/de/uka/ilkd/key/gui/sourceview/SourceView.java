@@ -469,6 +469,10 @@ public final class SourceView extends JComponent {
 
             tabs.addTab(entry.getValue().getName(), textScrollPane);
 
+            //add Line numbers to each Scrollview
+            TextLineNumber tln = new TextLineNumber(textPane, 4);
+            textScrollPane.setRowHeaderView(tln);
+
             // add the full path as tooltip for the tab
             int index = tabs.indexOfTab(entry.getValue().getName());
             tabs.setToolTipTextAt(index, entry.getValue().getAbsolutePath());
@@ -629,7 +633,7 @@ public final class SourceView extends JComponent {
             SourceElement activeStatement = cur.getNodeInfo().getActiveStatement();
             if (activeStatement != null) {
                 if (activeStatement instanceof SourceElement) {
-                    PositionInfo pos = joinPositionsRec((SourceElement)activeStatement);
+                    PositionInfo pos = joinPositionsRec(activeStatement);
 
                     // we are only interested in well defined PositionInfo objects with a file name
                     if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
