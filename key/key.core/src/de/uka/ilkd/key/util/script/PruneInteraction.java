@@ -15,7 +15,7 @@ public class PruneInteraction extends NodeInteraction {
         StringBuilder sb = new StringBuilder("prune");
 
         sb.append("\n\t");
-        sb.append(getNode());
+        sb.append(getNode().serialNr());
 
         sb.append(";");
         return sb.toString();

@@ -148,7 +148,6 @@ import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.util.ThreadUtilities;
-import de.uka.ilkd.key.util.script.ScriptRecorderFacade;
 
 public final class MainWindow extends JFrame {
 
@@ -1478,8 +1477,6 @@ public final class MainWindow extends JFrame {
             if (proof != null) {
                 proof.getSettings().getStrategySettings().addSettingsListener(this);
             }
-
-            ScriptRecorderFacade.registerOnProofTree(proof);
 
             disableCurrentGoalView = false;
             updateSequentView();

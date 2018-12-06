@@ -15,8 +15,6 @@ import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.Settings;
@@ -82,20 +80,6 @@ public class ScriptRecorderFacade {
         NodeInteraction interaction = new BuiltInRuleInteraction(goal.node(), rule, pos);
         state.getInteractions().add(interaction);
         emit(interaction);
-    }
-
-    public static void registerOnProofTree(Proof proof) {
-        if (proof.containsProofTreeListener(null)) {
-            return;
-        }
-
-        proof.addProofTreeListener(new ProofTreeAdapter() {
-
-            @Override
-            public void proofPruned(ProofTreeEvent e) {
-                runPrune(e.getNode());
-            }
-        });
     }
 
     public static void addListener(InteractionListeners listener) {
