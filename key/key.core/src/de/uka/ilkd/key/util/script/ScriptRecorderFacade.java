@@ -7,12 +7,10 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.settings.Settings;
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Alexander Weigl <weigl@kit.edu>
@@ -25,6 +23,37 @@ public class ScriptRecorderFacade {
         return instances.computeIfAbsent(proof, key ->
                 new ScriptRecorderState(proof)
         );
+    }
+
+    public static void registerOnSettings(Proof proof) {
+        proof.getSettings().getStrategySettings().addSettingsListener(
+                (evt) -> settingChanged(proof,
+                        proof.getSettings().getSMTSettings(),
+                        SettingChangeInteraction.SettingType.STRATEGY)
+        );
+
+        proof.getSettings().getChoiceSettings().addSettingsListener(
+                (evt) -> settingChanged(proof,
+                        proof.getSettings().getChoiceSettings(),
+                        SettingChangeInteraction.SettingType.CHOICE)
+        );
+
+        proof.getSettings().getSMTSettings().addSettingsListener(
+                (evt) -> settingChanged(proof,
+                        proof.getSettings().getSMTSettings(),
+                        SettingChangeInteraction.SettingType.SMT)
+        );
+    }
+
+    public static void settingChanged(Proof proof,
+                                      Settings settings,
+                                      SettingChangeInteraction.SettingType type) {
+        Properties p = new Properties();
+        settings.writeSettings(p, p);
+
+        SettingChangeInteraction sci = new SettingChangeInteraction(p, type);
+        //TODO
+        emit(sci);
     }
 
     public static void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc) {
