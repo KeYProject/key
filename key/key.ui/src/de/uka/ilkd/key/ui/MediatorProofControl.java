@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.ui;
 
+import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import javax.swing.SwingWorker;
 
@@ -145,6 +147,8 @@ public class MediatorProofControl extends AbstractProofControl {
 
        private ApplyStrategyInfo info;
 
+       private final List<Node> initialGoals;
+
        private final ImmutableList<Goal> goals;
 
        private final ApplyStrategy applyStrategy;
@@ -154,6 +158,7 @@ public class MediatorProofControl extends AbstractProofControl {
                              ProverTaskListener ptl) {
            this.proof = proof;
            this.goals = goals;
+           this.initialGoals = goals.stream().map(Goal::node).collect(Collectors.toList());
            this.applyStrategy = new ApplyStrategy(proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
            if (ptl != null) {
               applyStrategy.addProverTaskObserver(ptl);
@@ -187,7 +192,7 @@ public class MediatorProofControl extends AbstractProofControl {
               ui.getMediator().setInteractive(true);
               ui.getMediator().startInterface(true);
 
-              ScriptRecorderFacade.runAutoMode(proof, goals, info);
+              ScriptRecorderFacade.runAutoMode(initialGoals, proof, info);
            }
        }
 

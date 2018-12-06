@@ -1,18 +1,36 @@
 package de.uka.ilkd.key.util.script;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.key_project.util.collection.ImmutableList;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
-public class AutoModeInteraction extends NodeInteraction {
+public class AutoModeInteraction implements Interaction {
 
     private ApplyStrategyInfo info;
+
+    private List<Integer> initialNodeSerialNumbers;
+    private List<NodeIdentifier> initialNodeIds;
+
+    private List<Integer> openGoalSerialNumbers;
+    private List<NodeIdentifier> openGoalNodeIds;
 
     public AutoModeInteraction() {
     }
 
-    public AutoModeInteraction(Node node, ApplyStrategyInfo info) {
-        super(node);
+    public AutoModeInteraction(List<Node> initialNodes, ApplyStrategyInfo info) {
+        this.initialNodeSerialNumbers = initialNodes.stream().map(Node::serialNr).collect(Collectors.toList());
+        this.initialNodeIds = initialNodes.stream().map(NodeIdentifier::get).collect(Collectors.toList());
+
+        ImmutableList<Goal> openGoals = info.getProof().openGoals();
+        this.openGoalSerialNumbers = openGoals.stream().map(g -> g.node().serialNr()).collect(Collectors.toList());
+        this.openGoalNodeIds = openGoals.stream().map(g -> NodeIdentifier.get(g.node())).collect(Collectors.toList());
+
         this.info = info;
     }
 
@@ -20,8 +38,8 @@ public class AutoModeInteraction extends NodeInteraction {
     public String getProofScriptRepresentation(Services services) {
         StringBuilder sb = new StringBuilder("auto");
 
-        sb.append("\n\t");
-        sb.append(info);
+        initialNodeSerialNumbers.forEach(nr -> { sb.append("\n\t" + nr); });
+        sb.append("\n\t" + info);
 
         sb.append(";");
         return sb.toString();
