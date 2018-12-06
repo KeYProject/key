@@ -38,12 +38,21 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 class TermImpl implements Term {
 
+    /**
+     * A static empty list of terms used for memory reasons.
+     */
     private static final ImmutableArray<Term> EMPTY_TERM_LIST
         = new ImmutableArray<Term>();
 
+    /**
+     * A static empty list of quantifiable variables used for memory reasons.
+     */
     private static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST
         = new ImmutableArray<QuantifiableVariable>();
 
+    /**
+     * A static empty list of term labels used for memory reasons.
+     */
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST
         = new ImmutableArray<TermLabel>();
 
@@ -59,6 +68,9 @@ class TermImpl implements Term {
     //caches
     private static enum ThreeValuedTruth { TRUE, FALSE, UNKNOWN }
     private int depth = -1;
+    /**
+     * A cached value for computing the term's rigidness.
+     */
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN;
     private ImmutableSet<QuantifiableVariable> freeVars = null;
     private int hashcode = -1;

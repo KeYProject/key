@@ -26,23 +26,44 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      */
     private static final Name[] HIDDEN_BY_DEFAULT = { OriginTermLabel.NAME };
 
+    /**
+     * A switch to choose whether labels are to be shown or not.
+     */
     private boolean showLabels = true;
 
+    /**
+     * The names of all term labels that should not be printed, this contains
+     * also the labels in {@link TermLabelVisibilityManager#HIDDEN_BY_DEFAULT}.
+     */
     private final Set<Name> hiddenLabels = new HashSet<Name>();
 
+    /**
+     * All available {@link TermLabelVisibilityManagerListener}s.
+     */
     private final List<TermLabelVisibilityManagerListener> listeners
         = new LinkedList<TermLabelVisibilityManagerListener>();
 
+    /**
+     * Constructs a new TermLabelVisibilityManager.
+     */
     public TermLabelVisibilityManager() {
         for (Name name : HIDDEN_BY_DEFAULT) {
             hiddenLabels.add(name);
         }
     }
 
+    /**
+     * Gives the information whether currently term labels should be shown or not.
+     * @return A boolean value whether currently term labels should be shown.
+     */
     public boolean isShowLabels() {
         return showLabels;
     }
 
+    /**
+     * Set the switch whether term labels should be shown to passed value.
+     * @param showLabels A boolean value whether term labels should be shown
+     */
     public void setShowLabels(boolean showLabels) {
         if (this.showLabels != showLabels) {
             this.showLabels = showLabels;
@@ -50,10 +71,20 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
         }
     }
 
+    /**
+     * Gives the information whether the term label with the passed name is currently hidden.
+     * @param labelName The name of a term label
+     * @return A boolean value whether the investigated term label is hidden.
+     */
     public boolean isHidden(Name labelName) {
         return hiddenLabels.contains(labelName);
     }
 
+    /**
+     * Sets the state of the term label with the passed name to hidden or not.
+     * @param labelName The name of a term label
+     * @param hidden The boolean value whether the term label should be hidden or not
+     */
     public void setHidden(Name labelName, boolean hidden) {
         if (hidden) {
             if (hiddenLabels.add(labelName)) {

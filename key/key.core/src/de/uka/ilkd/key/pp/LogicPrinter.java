@@ -1536,9 +1536,9 @@ public class LogicPrinter {
     {
         boolean isKeyword = false;
         if (services != null) {
-           LocSetLDT loc = services.getTypeConverter().getLocSetLDT();
-           isKeyword = (t.op() == Junctor.AND || t.op() == Junctor.OR || t.op() == Junctor.IMP
-                 || t.op() == Equality.EQV || t.op() == loc.getUnion());
+            LocSetLDT loc = services.getTypeConverter().getLocSetLDT();
+            isKeyword = (t.op() == Junctor.AND || t.op() == Junctor.OR || t.op() == Junctor.IMP
+                    || t.op() == Equality.EQV || t.op() == loc.getUnion());
         }
         int indent = name.length()+1;
         startTerm(2);
@@ -1807,11 +1807,11 @@ public class LogicPrinter {
         startTerm(0);
         layouter.print(s);
     }
-    /** Print a constant.  This just prints the string <code>s</code> and
+    /** Print a constant. This just prints the string <code>s</code> and
      * marks it as a nullary term.
      * @param t constant as term to be printed
      * @param s name of the constant
-     * @throws IOException
+     * @throws IOException in case the layout printing fails
      */
     public void printConstant(Term t, String s) throws IOException {
         startTerm(0);

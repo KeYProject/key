@@ -306,6 +306,14 @@ public class Sequent implements Iterable<SequentFormula> {
         return antecedent.equals(o1.antecedent) && succedent.equals(o1.succedent);
     }
 
+    /**
+     * Computes the position of the given sequent formula on the proof sequent,
+     * starting with one for the very first sequent formula.
+     * @param inAntec a boolean stating whether we search in the antecedent or the succedent
+     * @param cfma the given sequent formula
+     * @return an integer strictly greater than zero for the position of the given
+     *         sequent formula on the proof sequent.
+     */
     public int formulaNumberInSequent(boolean inAntec, SequentFormula cfma) {
         int n = inAntec ? 0 : antecedent.size();
         final Iterator<SequentFormula> formIter = inAntec
@@ -379,6 +387,10 @@ public class Sequent implements Iterable<SequentFormula> {
         return sci;
     }
 
+    /**
+     * Computes the size of the proof sequent recursively (decends to antecedent and succedent).
+     * @return the size of the proof sequent as an integer number
+     */
     public int size() {
         return antecedent().size() + succedent().size();
     }
@@ -438,9 +450,20 @@ public class Sequent implements Iterable<SequentFormula> {
 
     static class SequentIterator implements Iterator<SequentFormula> {
 
+        /**
+         * The iterator over the ancedent of the proof sequent.
+         */
         private final Iterator<SequentFormula> anteIt;
+        /**
+         * The iterator over the succedent of the proof sequent.
+         */
         private final Iterator<SequentFormula> succIt;
 
+        /**
+         * Constructs a new iterator over a proof sequent.
+         * @param ante The antecedent of the sequent.
+         * @param succ The succedent of the sequent.
+         */
         SequentIterator(Semisequent ante, Semisequent succ) {
             this.anteIt = ante.iterator();
             this.succIt = succ.iterator();
