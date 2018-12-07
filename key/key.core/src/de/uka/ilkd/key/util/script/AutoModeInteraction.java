@@ -106,4 +106,9 @@ public class AutoModeInteraction extends Interaction {
     public void setOpenGoalNodeIds(List<NodeIdentifier> openGoalNodeIds) {
         this.openGoalNodeIds = openGoalNodeIds;
     }
+
+    @Override
+    public String toString() {
+        return "Auto Mode";
+    }
 }

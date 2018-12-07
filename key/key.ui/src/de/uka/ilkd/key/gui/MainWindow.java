@@ -302,7 +302,8 @@ public final class MainWindow extends JFrame {
         ToolTipManager.sharedInstance().setDismissDelay(30000);
         addWindowListener(exitMainAction.windowListener);
         MacroKeyBinding.registerMacroKeyBindings(mediator, currentGoalView, getRootPane());
-    }
+
+         }
 
     public static MainWindow getInstance() {
         return getInstance(true);

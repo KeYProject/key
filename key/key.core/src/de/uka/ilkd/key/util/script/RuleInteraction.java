@@ -48,7 +48,16 @@ public final class RuleInteraction extends NodeInteraction {
             while (iter.hasNext()) {
                 ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = iter.next();
                 String p = entry.key().toString();
-                String v = LogicPrinter.quickPrintTerm((Term) entry.value().getInstantiation(), null);
+
+                Object inst = entry.value().getInstantiation();
+                String v;
+
+                if (inst instanceof Term) {
+                    v = LogicPrinter.quickPrintTerm((Term) inst, null);
+                } else {
+                    v = inst.toString();
+                }
+
                 arguments.put(p, v);
             }
         }
@@ -104,4 +113,19 @@ public final class RuleInteraction extends NodeInteraction {
         this.posInOccurence = posInOccurence;
     }
 
+    public String getRuleName() {
+        return ruleName;
+    }
+
+    public void setRuleName(String ruleName) {
+        this.ruleName = ruleName;
+    }
+
+    public HashMap<String, String> getArguments() {
+        return arguments;
+    }
+
+    public void setArguments(HashMap<String, String> arguments) {
+        this.arguments = arguments;
+    }
 }
