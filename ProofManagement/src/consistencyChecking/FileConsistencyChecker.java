@@ -1,4 +1,4 @@
-package merging;
+package consistencyChecking;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -6,10 +6,12 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import org.key_project.util.collection.ImmutableList;
 
-public class ProofMerger {
+public class FileConsistencyChecker {
     
     private boolean filesConsistent(ImmutableList<Path> paths) {
-        
+        for (Path p : paths) {
+            PackageHandler ph;
+        }
         return false;
     }
     
