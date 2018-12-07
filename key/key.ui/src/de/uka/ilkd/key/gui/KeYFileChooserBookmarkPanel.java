@@ -139,7 +139,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
     private void addBookmarkButton(File f) {
         JToggleButton button = new JToggleButton(f.getName());
         button.setToolTipText(f.getAbsolutePath());
-        button.setForeground(Color.BLUE);
+        //button.setForeground(Color.BLUE);
         button.addActionListener(e -> {
             chooser.setCurrentDirectory(f);
         });
