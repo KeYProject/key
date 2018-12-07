@@ -93,9 +93,10 @@ public class ConsistencyChecker {
 
     private static boolean choiceConsistent(ImmutableList<ChoiceSettings> choiceSettings) {
         //TODO this does not yet work as intended
-        for (ChoiceSettings cs: choiceSettings) {
-            if (!( cs.getDefaultChoices().equals(choiceSettings.head().getDefaultChoices())
-                    || cs.getChoices().equals(choiceSettings.head().getChoices()))) {
+        ChoiceSettings reference = choiceSettings.head();
+        for (ChoiceSettings cs: choiceSettings.tail()) {
+            //TODO: check what kind of choices getChoices (not getDefaultChoices)returns, whether that is used at all and how it matters to us
+            if (! cs.getDefaultChoicesAsSet().equals(reference.getDefaultChoicesAsSet())) {
                 return false;
             }
         }
