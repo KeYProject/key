@@ -53,7 +53,7 @@ public class Main {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                if (ConsistencyChecker.consistent(proofFiles, ph.getFileRepo())) {
+                if (new ConsistencyChecker().check(proofFiles)) {
                     System.out.println("Consistent!");
                 } else {
                     System.out.println("Inconsistent!");

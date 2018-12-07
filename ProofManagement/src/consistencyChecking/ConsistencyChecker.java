@@ -12,13 +12,13 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 //TODO: precise user feedback
-public class ConsistencyChecker {
+public class ConsistencyChecker implements Checker{
 
     //TODO: maybe make something Java 8 compatible here
     //TODO: it is not checked that this is a equivalence relation, but thats probably okay.
@@ -31,13 +31,14 @@ public class ConsistencyChecker {
 
     //TODO: Carry file info with the data to allow for good user feedback
     //TODO: Consistency Checker should work on a higher abstraction level and not handle files, do file handling separately (we'll also need to reuse that)
-    public static boolean consistent(ImmutableList<Path> proofFiles, FileRepo fileRepo) {
+    @Override
+    public boolean check(ImmutableList<Path> proofFiles) {
 
         ImmutableList<KeYUserProblemFile> problemFiles = ImmutableSLList.nil();
 
         for (Path p : proofFiles) {
             problemFiles = problemFiles.append(new KeYUserProblemFile(p.toString(), p.toFile(),
-                    fileRepo, ProgressMonitor.Empty.getInstance(), AbstractProfile.getDefaultProfile(), false));
+                    new TrivialFileRepo(), ProgressMonitor.Empty.getInstance(), AbstractProfile.getDefaultProfile(), false));
         }
 
 
@@ -89,17 +90,18 @@ public class ConsistencyChecker {
         if (a.category().equals(b.category())) {
             return true;
         }
-        if (!choiceCompatibilityClasses.containsKey(a.name())) {
-            return false;
-        }
 
-        for (Set<String> compatibilityClass: choiceCompatibilityClasses.get(a.name().toString())) {
-            System.out.println(a.name());
+        if (choiceCompatibilityClasses.containsKey(a.name().toString())) {
 
-            if (compatibilityClass.contains(a.category()) && compatibilityClass.contains(b.category())){
-                return true;
+            for (Set<String> compatibilityClass: choiceCompatibilityClasses.get(a.name().toString())) {
+
+                if (compatibilityClass.contains(a.category()) && compatibilityClass.contains(b.category())){
+                    return true;
+                }
             }
+
         }
+
 
         return false;
     }
