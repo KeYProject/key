@@ -318,7 +318,7 @@ class InteractionCellRenderer extends DefaultListCellRenderer {
         lbl.setText(df.format(inter.getCreated()) + " " + inter);
         if (inter.isFavoured()) {
             lbl.setIcon(new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/heart.png")));
-            lbl.setBackground(SystemColor.ORANGE);
+            lbl.setBackground(new Color(0xFFD373));
         } else {
             lbl.setBackground(SystemColor.WHITE);
         }
