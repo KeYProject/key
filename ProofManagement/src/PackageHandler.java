@@ -45,10 +45,10 @@ public class PackageHandler {
     private static final PathMatcher BOOTCLASSPATH_MATCHER =
             FileSystems.getDefault().getPathMatcher("glob:**.java");
     
-    Path zipPath;
-    boolean isInitialized = false;
-    FileRepo fileRepo;
-    Path tmpDir;
+    private Path zipPath;
+    private boolean isInitialized = false;
+    private FileRepo fileRepo;      // TODO: not needed?
+    private Path tmpDir;
     
     public PackageHandler(Path zipPath) {
         this.zipPath = zipPath;
@@ -69,10 +69,11 @@ public class PackageHandler {
     
     private ImmutableList<Path> getFiles(Path dir, PathMatcher matcher) throws IOException {
         ImmutableList<Path> files = ImmutableSLList.nil();
-        files = files
-                .append(Files.list(dir)
+        if (Files.isDirectory(dir)) {
+            files = files.append(Files.list(dir)
                              .filter(name -> matcher.matches(name))
                              .collect(Collectors.toList()));
+        }
         return files;
     }
 
