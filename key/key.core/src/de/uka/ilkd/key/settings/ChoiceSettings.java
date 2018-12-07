@@ -37,7 +37,7 @@ import de.uka.ilkd.key.logic.Namespace;
  * TODO: the "default choices" in this class are apparently not default choices, but the actual,
  * specific choices for the proof the choice set belongs to. Constants and methods should be renamed accordingly.
  * The (non default) "choices" as in category2Choices might be intended to map choice categories to all their
- * possible values, but this map seems to be empty and unused.
+ * possible values, but this map seems to be empty and unused. It is also unclear what a category is.
  */
 public class ChoiceSettings implements Settings, Cloneable {
 
