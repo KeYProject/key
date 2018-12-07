@@ -126,5 +126,9 @@ public class PackageHandler {
         return fileRepo;
     }
 
+    public Path getDir() {
+        return tmpDir;
+    }
+
 
 }

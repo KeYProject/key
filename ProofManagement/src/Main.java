@@ -6,12 +6,13 @@ import java.util.zip.ZipException;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import consistencyChecking.FileConsistencyChecker;
 import consistencyChecking.SettingsChecker;
 import io.PackageHandler;
 
 public class Main {
 
-    final static String PATH = "/home/wolfram/Schreibtisch/Cycle(Cycle__m()).JML operation contract.0.proof";
+//    final static String PATH = "/home/wolfram/Schreibtisch/Cycle(Cycle__m()).JML operation contract.0.proof";
 
     private static final String USAGE = "Usage: TODO";
     public static void main(String[] args) {
@@ -38,6 +39,16 @@ public class Main {
                 }
                 return;
             }
+            
+            if (args[0].equals("merge") && args.length > 2) {
+                Path newBaseDir = Paths.get("/home/jonas/tmp/hackeython/testtest/");
+                Path proofA = Paths.get("/home/jonas/tmp/hackeython/proof42.zip");
+                Path proofB = Paths.get("/home/jonas/tmp/hackeython/proof43.zip");
+                ImmutableList<Path> zproofs = ImmutableSLList.nil();
+                zproofs = zproofs.append(proofA, proofB);
+                FileConsistencyChecker.merge(zproofs, newBaseDir);
+            }
+            
             System.out.println(USAGE);
         }
     }
