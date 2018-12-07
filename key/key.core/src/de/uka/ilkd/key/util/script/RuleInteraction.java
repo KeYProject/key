@@ -25,7 +25,7 @@ public final class RuleInteraction extends NodeInteraction {
     private HashMap<String, String> arguments = new HashMap<>();
 
     public RuleInteraction() {
-        super((Node) null);
+        super(null);
     }
 
     public RuleInteraction(Node node, RuleApp app) {
@@ -70,13 +70,5 @@ public final class RuleInteraction extends NodeInteraction {
 
     public void setPosInOccurence(PosInOccurrence posInOccurence) {
         this.posInOccurence = posInOccurence;
-    }
-
-    public void setRuleName(String ruleName) {
-        this.ruleName = ruleName;
-    }
-
-    public String getRuleName() {
-        return ruleName;
     }
 }

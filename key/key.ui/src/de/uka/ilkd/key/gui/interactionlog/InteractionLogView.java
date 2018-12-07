@@ -17,6 +17,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.script.Interaction;
+import de.uka.ilkd.key.util.script.InteractionListeners;
+import de.uka.ilkd.key.util.script.InteractionLog;
+import de.uka.ilkd.key.util.script.InteractionLogFacade;
+import de.uka.ilkd.key.util.script.LogPrinter;
+import de.uka.ilkd.key.util.script.NodeInteraction;
+import de.uka.ilkd.key.util.script.ScriptRecorderFacade;
+
 public class InteractionLogView extends JPanel implements InteractionListeners {
     private final Action actionExportProofScript = new ExportProofScriptAction();
     private final Action saveAction = new SaveAction();
@@ -28,24 +44,10 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
      * list of interactions, will be replaced on every change of the interactionLogSelection
      */
     private final DefaultListModel<Interaction> interactionListModel = new DefaultListModel<>();
-    //private final Box panelButtons = new Box(BoxLayout.X_AXIS);
     private final JToolBar panelButtons = new JToolBar();
 
     private final Services services;
-    /**
-     * contains a List of all opened InteractionLogs, which are selectable in the ComboBox
-     */
-    private final List<InteractionLog> loadedInteractionLogs = new ArrayList<InteractionLog>();
     private Proof currentProof;
-    /**
-     * index of InteractionLog, that is written to in current proof.
-     */
-    private Optional<Integer> writingActionInteractionLog = Optional.empty();
-
-    /**
-     * currently displayed InteractionLog
-     */
-    private Optional<Integer> displayedInteractionLog = Optional.empty();
 
     public InteractionLogView(KeYMediator mediator) {
         services = mediator.getServices();
@@ -56,12 +58,24 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         panelButtons.add(new JButton(actionExportProofScript));
         panelButtons.add(new JButton(saveAction));
 
-        if (loadedInteractionLogs.isEmpty()) {
-            loadedInteractionLogs.add(new InteractionLog());
-            setWritingActionInteractionLog(0);
-            setDisplayedInteractionLog(0);
-            System.out.println(getDisplayedInteractionLog());
-        }
+
+        ScriptRecorderFacade.addListener(this::onInteraction);
+
+
+        interactionLogSelection.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> jList, Object o, int i, boolean b, boolean b1) {
+                String name = "-";
+                if (o != null) {
+                    name = o.toString();
+                }
+
+                return super.getListCellRendererComponent(jList, name, i, b, b1);
+            }
+        });
+
+        interactionLogSelection.setModel(ScriptRecorderFacade.getLoadedInteractionLogs());
+        interactionLogSelection.addActionListener(this::handleSelectionChange);
 
 
         panelButtons.add(new JButton(loadAction));
@@ -91,69 +105,44 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         setCurrentProof(mediator.getSelectedProof());
     }
 
+    private void handleSelectionChange(ActionEvent actionEvent) {
+        InteractionLog selectedLog = (InteractionLog) interactionLogSelection.getModel().getSelectedItem();
 
-    /*private void addInteractionLog(InteractionLog importedLog) {
-        this.loadedInteractionLogs.add(importedLog);
-        int index = this.loadedInteractionLogs.indexOf(importedLog);
-        this.displayedInteractionLog = Optional.of(index);
-        this.interactionLogSelection.addItem(index);
-    }*/
-
-    private void addInteractionsIoInteractionLog(List<NodeInteraction> nodeInteractions) {
-
-        getWritingInteractionLog().ifPresent(interactionLog -> {
-            List<Interaction> interactions = new ArrayList<>(nodeInteractions);
-            interactionLog.setInteractions(interactions);
-        });
+        updateList(selectedLog);
     }
+
 
     private void setCurrentProof(Proof proof) {
         currentProof = proof;
         rebuildList();
     }
 
+
     private void rebuildList() {
-        interactionListModel.clear();
+        InteractionLog currentInteractionLog = (InteractionLog) interactionLogSelection.getSelectedItem();
         if (currentProof != null) {
             InteractionLog state = ScriptRecorderFacade.get(currentProof);
-            getWritingInteractionLog().ifPresent(interactionLog -> {
-                List<Interaction> interactions = new ArrayList<>();
-                interactions.addAll(state.getInteractions());
-                interactionLog.setInteractions(interactions);
-            });
-            state.getInteractions().forEach(interactionListModel::addElement);
+            updateList(currentInteractionLog);
         }
     }
 
-    private Optional<InteractionLog> getWritingInteractionLog() {
-        return writingActionInteractionLog.map(loadedInteractionLogs::get);
+    private void updateList(InteractionLog interactionLog) {
+        interactionListModel.clear();
+        interactionLog.getInteractions().forEach(interactionListModel::addElement);
     }
 
     /**
-     * change InteractionLog that should be written to
-     *
-     * @param index index of InteractionLog in getLoadedInteractionLogs()
+     * gets called on every change to the interaction
+     * @param interaction
      */
-    public void setWritingActionInteractionLog(int index) {
-        this.writingActionInteractionLog = Optional.of(index);
-    }
-
-    public List<InteractionLog> getLoadedInteractionLogs() {
-        return this.loadedInteractionLogs;
-    }
-
     @Override
-    public void onInteraction(Interaction event) {
-        InteractionLog currentLog = ScriptRecorderFacade.get(currentProof);
+    public void onInteraction(Interaction interaction) {
+        System.out.println("interactionlog added");
+        ((InteractionLog) interactionLogSelection.getSelectedItem()).getInteractions().add(interaction);
         rebuildList();
     }
 
-    public Optional<InteractionLog> getDisplayedInteractionLog() {
-        return displayedInteractionLog.map(loadedInteractionLogs::get);
-    }
-
-    private void setDisplayedInteractionLog(int i) {
-        this.displayedInteractionLog = Optional.of(i);
+    private class InteractionLogModelItem extends DefaultComboBoxModel<InteractionLog> {
     }
 
     private class ExportProofScriptAction extends AbstractAction {
@@ -186,7 +175,6 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
                 try {
                     File file = fileChooser.getSelectedFile();
                     ScriptRecorderFacade.readInteractionLog(file);
-                    //addInteractionLog(importedLog);
                 } catch (IOException exception) {
                     JOptionPane.showMessageDialog(null,
                             exception.getCause(),
@@ -212,17 +200,16 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
                     "InteractionLog", "xml"));
             int returnValue = fileChooser.showSaveDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
-                getDisplayedInteractionLog().ifPresent((displayedInteractionLog) -> {
-                    try {
-                        InteractionLogFacade.storeInteractionLog(displayedInteractionLog, fileChooser.getSelectedFile());
-                    } catch (IOException exception) {
-                        JOptionPane.showMessageDialog(null,
-                                exception.getCause(),
-                                "IOException",
-                                JOptionPane.WARNING_MESSAGE);
-                        exception.printStackTrace();
-                    }
-                });
+                InteractionLog activeInteractionLog = ((InteractionLog) interactionLogSelection.getSelectedItem());
+                try {
+                    InteractionLogFacade.storeInteractionLog(activeInteractionLog, fileChooser.getSelectedFile());
+                } catch (IOException exception) {
+                    JOptionPane.showMessageDialog(null,
+                            exception.getCause(),
+                            "IOException",
+                            JOptionPane.WARNING_MESSAGE);
+                    exception.printStackTrace();
+                }
             }
         }
     }
