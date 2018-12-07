@@ -40,6 +40,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
     private final Action actionExportProofScript = new ExportProofScriptAction();
     private final Action saveAction = new SaveAction();
     private final Action loadAction = new LoadAction();
+    private final Action addUserNoteAction = new AddUserNoteAction();
 
     /**
      * the list of individual interactions (like impRight, auto, ...) in currently selected
@@ -62,6 +63,10 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
      * contains a List of all opened InteractionLogs, which are selectable in the ComboBox
      */
     private final List<InteractionLog> loadedInteractionLogs = new ArrayList<InteractionLog>();
+    private final JButton btnExport;
+    private final JButton btnSave;
+    private final JButton btnAddNote;
+    private final JButton btnLoad;
     private Proof currentProof;
     /**
      * index of InteractionLog, that is written to in current proof.
@@ -79,8 +84,15 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         listInteraction.setCellRenderer(new InteractionCellRenderer(mediator.getServices()));
 
         panelButtons.add(Box.createHorizontalGlue());
-        panelButtons.add(new JButton(actionExportProofScript));
-        panelButtons.add(new JButton(saveAction));
+        panelButtons.add(btnExport = new JButton(actionExportProofScript));
+        panelButtons.add(btnSave = new JButton(saveAction));
+        panelButtons.add(btnAddNote = new JButton(addUserNoteAction));
+        panelButtons.add(btnLoad = new JButton(loadAction));
+
+        btnExport.setHideActionText(true);
+        btnSave.setHideActionText(true);
+        btnAddNote.setHideActionText(true);
+        btnLoad.setHideActionText(true);
 
         JPopupMenu popup = new JPopupMenu();
         JMenuItem favouriteButton = new JMenuItem("toggle favourites");
@@ -93,7 +105,6 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
 
 
         ScriptRecorderFacade.addListener(this::onInteraction);
-
 
         interactionLogSelection.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -109,8 +120,6 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
 
         interactionLogSelection.setModel(ScriptRecorderFacade.getLoadedInteractionLogs());
         interactionLogSelection.addActionListener(this::handleSelectionChange);
-
-        panelButtons.add(new JButton(loadAction));
 
         interactionLogSelection.setModel(ScriptRecorderFacade.getLoadedInteractionLogs());
         panelButtons.add(interactionLogSelection);
@@ -187,6 +196,9 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
     private class ExportProofScriptAction extends AbstractAction {
         public ExportProofScriptAction() {
             putValue(Action.NAME, "Export as KPS");
+            putValue(Action.SMALL_ICON,
+                    new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/database_add.png")));
+
         }
 
         @Override
@@ -253,6 +265,39 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
                 }
             }
         }
+    }
+
+    private class AddUserNoteAction extends AbstractAction {
+        public AddUserNoteAction() {
+            super("Add Note");
+            putValue(Action.SMALL_ICON,
+                    new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/book_add.png")));
+
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Optional<String> note = MultiLineInputPrompt.show(InteractionLogView.this, "Enter note...");
+            if (note.isPresent()) {
+                UserNoteInteraction interaction = new UserNoteInteraction(note.get());
+                InteractionLog interactionLog = (InteractionLog) interactionLogSelection.getSelectedItem();
+                if (interactionLog.getInteractions() != null)
+                    interactionLog.getInteractions().add(interaction);
+                onInteraction(interaction);
+            }
+        }
+    }
+}
+
+class MultiLineInputPrompt {
+    public static Optional<String> show(JComponent parent, String title) {
+        JPanel panel = new JPanel(new BorderLayout());
+        JTextArea area = new JTextArea();
+        panel.add(new JScrollPane(area));
+        int c = JOptionPane.showConfirmDialog(parent, panel, "Enter note...", JOptionPane.OK_CANCEL_OPTION);
+        if (c == JOptionPane.OK_OPTION) {
+            return Optional.of(area.getText());
+        } else return Optional.empty();
     }
 }
 
