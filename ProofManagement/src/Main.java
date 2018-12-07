@@ -22,14 +22,28 @@ import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import consistencyChecking.ConsistencyChecker;
 
 public class Main {
 
     final static String PATH = "/home/wolfram/Schreibtisch/Cycle(Cycle__m()).JML operation contract.0.proof";
     
+    private static final String USAGE = "Usage: TODO";
     public static void main(String[] args) {
 
+        if (args.length != 0) {
         System.out.println("Hallo HacKeYthon!");
+
+            if (args[0].equals("check") && (args.length == 2)) {
+                if (ConsistencyChecker.consistent(args[1])) {
+                    System.out.println("Consistent!");
+                } else {
+                    System.out.println("Inconsistent!");
+                }
+                return;
+            }
+            System.out.println(USAGE);
+        }
 
         try {
             loadFile(PATH);
