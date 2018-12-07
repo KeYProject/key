@@ -23,7 +23,8 @@ import java.util.*;
 public class ScriptRecorderFacade {
     private static List<InteractionListeners> listeners = new ArrayList<>();
     private static Map<Proof, InteractionLog> instances = new HashMap<>();
-    private static DefaultListModel<InteractionLog> loadedInteractionLogs = new DefaultListModel<>();
+    private static DefaultComboBoxModel<InteractionLog> loadedInteractionLogs
+            = new DefaultComboBoxModel<>();
 
     public static InteractionLog get(Proof proof) {
         if (!instances.containsKey(proof)) {
@@ -34,7 +35,7 @@ public class ScriptRecorderFacade {
         return instances.get(proof);
     }
 
-    public static ListModel<InteractionLog> getLoadedInteractionLogs() {
+    public static ComboBoxModel<InteractionLog> getLoadedInteractionLogs() {
         return loadedInteractionLogs;
     }
 

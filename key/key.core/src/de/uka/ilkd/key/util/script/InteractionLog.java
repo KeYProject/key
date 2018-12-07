@@ -39,4 +39,9 @@ public class InteractionLog implements Serializable {
     public void setInteractions(List<Interaction> interactions) {
         this.interactions = interactions;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

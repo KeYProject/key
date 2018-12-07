@@ -1,7 +1,15 @@
 package de.uka.ilkd.key.gui.interactionlog;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.script.*;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
@@ -9,44 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.script.Interaction;
-import de.uka.ilkd.key.util.script.InteractionListeners;
-import de.uka.ilkd.key.util.script.InteractionLog;
-import de.uka.ilkd.key.util.script.InteractionLogFacade;
-import de.uka.ilkd.key.util.script.LogPrinter;
-import de.uka.ilkd.key.util.script.NodeInteraction;
-import de.uka.ilkd.key.util.script.ScriptRecorderFacade;
-
 public class InteractionLogView extends JPanel implements InteractionListeners {
     private final Action actionExportProofScript = new ExportProofScriptAction();
     private final Action saveAction = new SaveAction();
     private final Action loadAction = new LoadAction();
 
     private final JList<Interaction> listInteraction = new JList<>();
-    private final JComboBox<Integer> interactionLogSelection = new JComboBox<>();
+    private final JComboBox<InteractionLog> interactionLogSelection = new JComboBox<>();
     /**
      * list of interactions, will be replaced on every change of the interactionLogSelection
      */
@@ -90,6 +67,9 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         panelButtons.add(new JButton(loadAction));
         panelButtons.add(interactionLogSelection);
 
+        interactionLogSelection.setModel(
+                ScriptRecorderFacade.getLoadedInteractionLogs()
+        );
 
         setLayout(new BorderLayout());
         add(panelButtons, BorderLayout.NORTH);
@@ -112,12 +92,12 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
     }
 
 
-    private void addInteractionLog(InteractionLog importedLog) {
+    /*private void addInteractionLog(InteractionLog importedLog) {
         this.loadedInteractionLogs.add(importedLog);
         int index = this.loadedInteractionLogs.indexOf(importedLog);
         this.displayedInteractionLog = Optional.of(index);
         this.interactionLogSelection.addItem(index);
-    }
+    }*/
 
     private void addInteractionsIoInteractionLog(List<NodeInteraction> nodeInteractions) {
 
@@ -145,7 +125,6 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         }
     }
 
-
     private Optional<InteractionLog> getWritingInteractionLog() {
         return writingActionInteractionLog.map(loadedInteractionLogs::get);
     }
@@ -166,8 +145,6 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
     @Override
     public void onInteraction(Interaction event) {
         InteractionLog currentLog = ScriptRecorderFacade.get(currentProof);
-        addInteractionLog(currentLog);
-
         rebuildList();
     }
 
@@ -208,8 +185,8 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 try {
                     File file = fileChooser.getSelectedFile();
-                    InteractionLog importedLog = InteractionLogFacade.readInteractionLog(file);
-                    addInteractionLog(importedLog);
+                    ScriptRecorderFacade.readInteractionLog(file);
+                    //addInteractionLog(importedLog);
                 } catch (IOException exception) {
                     JOptionPane.showMessageDialog(null,
                             exception.getCause(),
