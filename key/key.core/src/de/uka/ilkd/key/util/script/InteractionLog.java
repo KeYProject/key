@@ -28,7 +28,9 @@ public class InteractionLog implements Serializable {
     }
 
     public InteractionLog(Proof proof) {
-        this(RandomName.getRandomName(" ") + " (" + proof.name().toString() + ")");
+        int pos = Math.max(proof.name().toString().length(), 25);
+        name = RandomName.getRandomName(" ")
+                + " (" + proof.name().toString().substring(0, pos) + ")";
         this.proof = new WeakReference<>(proof);
     }
 
