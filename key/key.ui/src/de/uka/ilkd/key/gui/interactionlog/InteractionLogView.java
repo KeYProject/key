@@ -82,6 +82,15 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         panelButtons.add(new JButton(actionExportProofScript));
         panelButtons.add(new JButton(saveAction));
 
+        JPopupMenu popup = new JPopupMenu();
+        JMenuItem favouriteButton = new JMenuItem("add to favourites");
+        favouriteButton.setIcon(new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/star.png")));
+        favouriteButton.addActionListener(actionEvent -> {
+          listInteraction.getSelectedValue().setFavoured(true);
+        });
+        popup.add(favouriteButton);
+        listInteraction.setComponentPopupMenu(popup);
+
 
         ScriptRecorderFacade.addListener(this::onInteraction);
 
