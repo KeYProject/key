@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.util.script;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -19,7 +18,7 @@ import java.util.Iterator;
  * @author weigl
  */
 public final class RuleInteraction extends NodeInteraction implements Serializable {
-    private PosInOccurrence posInOccurence;
+    private String posInOccurence;
     //private NodeIdentifier appliedOn;
     private String ruleName;
     private HashMap<String, String> arguments = new HashMap<>();
@@ -32,7 +31,7 @@ public final class RuleInteraction extends NodeInteraction implements Serializab
         super(node);
 
         this.ruleName = app.rule().displayName();
-        this.posInOccurence = app.posInOccurrence();
+        this.posInOccurence = InteractionLogFacade.serializePosInOccurence(app.posInOccurrence());
 
         StringBuilder sb = new StringBuilder();
         if (app instanceof TacletApp) {
@@ -64,11 +63,11 @@ public final class RuleInteraction extends NodeInteraction implements Serializab
         return toString();
     }
 
-    public PosInOccurrence getPosInOccurence() {
+    public String getPosInOccurence() {
         return posInOccurence;
     }
 
-    public void setPosInOccurence(PosInOccurrence posInOccurence) {
+    public void setPosInOccurence(String posInOccurence) {
         this.posInOccurence = posInOccurence;
     }
 }
