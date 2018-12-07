@@ -83,10 +83,10 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         panelButtons.add(new JButton(saveAction));
 
         JPopupMenu popup = new JPopupMenu();
-        JMenuItem favouriteButton = new JMenuItem("add to favourites");
-        favouriteButton.setIcon(new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/star.png")));
+        JMenuItem favouriteButton = new JMenuItem("toggle favourites");
+        favouriteButton.setIcon(new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/heart.png")));
         favouriteButton.addActionListener(actionEvent -> {
-          listInteraction.getSelectedValue().setFavoured(true);
+          listInteraction.getSelectedValue().setFavoured(!listInteraction.getSelectedValue().isFavoured());
         });
         popup.add(favouriteButton);
         listInteraction.setComponentPopupMenu(popup);
@@ -140,13 +140,17 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
     }
 
     private void handleSelectionChange(ActionEvent actionEvent) {
-        InteractionLog selectedLog = (InteractionLog) interactionLogSelection.getModel().getSelectedItem();
+        InteractionLog selectedLog = getSelectedItem();
 
         updateList(selectedLog);
     }
 
+  private InteractionLog getSelectedItem() {
+    return (InteractionLog) interactionLogSelection.getSelectedItem();
+  }
 
-    private void setCurrentProof(Proof proof) {
+
+  private void setCurrentProof(Proof proof) {
         if (proof == null) return;
         currentProof = proof;
         ScriptRecorderFacade.get(currentProof);
@@ -155,7 +159,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
 
 
     private void rebuildList() {
-        InteractionLog currentInteractionLog = (InteractionLog) interactionLogSelection.getSelectedItem();
+        InteractionLog currentInteractionLog = getSelectedItem();
         if (currentProof != null) {
             InteractionLog state = ScriptRecorderFacade.get(currentProof);
             updateList(state);
@@ -237,7 +241,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
                     "InteractionLog", "xml"));
             int returnValue = fileChooser.showSaveDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
-                InteractionLog activeInteractionLog = ((InteractionLog) interactionLogSelection.getSelectedItem());
+                InteractionLog activeInteractionLog = getSelectedItem();
                 try {
                     InteractionLogFacade.storeInteractionLog(activeInteractionLog, fileChooser.getSelectedFile());
                 } catch (IOException exception) {
@@ -268,6 +272,7 @@ class InteractionCellRenderer extends DefaultListCellRenderer {
         Interaction inter = (Interaction) value;
         lbl.setText(df.format(inter.getCreated()) + " " + inter);
         if (inter.isFavoured()) {
+            lbl.setIcon(new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/heart.png")));
             lbl.setBackground(SystemColor.ORANGE);
         } else {
             lbl.setBackground(SystemColor.WHITE);
