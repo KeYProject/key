@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.util.script;
 
-import de.uka.ilkd.key.proof.Proof;
-import org.key_project.util.RandomName;
-
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.key_project.util.RandomName;
+
+import de.uka.ilkd.key.proof.Proof;
 
 /**
  * @author Alexander Weigl

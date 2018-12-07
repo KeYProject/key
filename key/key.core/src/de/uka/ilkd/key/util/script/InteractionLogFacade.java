@@ -33,7 +33,12 @@ public final class InteractionLogFacade {
             throws IOException {
         try (OutputStream os = new FileOutputStream(output);
              XMLEncoder encoder = new XMLEncoder(os)) {
+            encoder.setExceptionListener(e -> {
+                e.printStackTrace();
+            });
             encoder.writeObject(log);
+        } catch(Exception e) {
+            System.err.println(e.getMessage());
         }
     }
 
