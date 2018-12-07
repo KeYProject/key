@@ -1,8 +1,8 @@
 package consistencyChecking;
 
 import java.nio.file.Path;
-import java.util.List;
+import org.key_project.util.collection.ImmutableList;
 
 public interface Checker {
-    public boolean check(List<Path> paths);
+    public boolean check(ImmutableList<Path> paths);
 }
