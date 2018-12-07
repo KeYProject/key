@@ -6,10 +6,8 @@ import java.util.Date;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
-public abstract class NodeInteraction implements Interaction {
+public abstract class NodeInteraction extends Interaction {
     private transient int serialNr;
-
-    private Date created = new Date();
 
     private NodeIdentifier nodeId;
 
@@ -20,10 +18,7 @@ public abstract class NodeInteraction implements Interaction {
         this.nodeId = NodeIdentifier.get(node);
     }
 
-    @Override
-    public Date created() { return created; }
-
-    @Transient(true)
+    @Transient()
     public int getSerialNr() {
         return serialNr;
     }
@@ -38,13 +33,5 @@ public abstract class NodeInteraction implements Interaction {
 
     public Node getNode(Proof proof) {
         return nodeId.findNode(proof).orElse(null);
-    }
-
-    public Date getCreated() {
-        return created;
-    }
-
-    public void setCreated(Date created) {
-        this.created = created;
     }
 }

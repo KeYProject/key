@@ -19,22 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.script.Interaction;
-import de.uka.ilkd.key.util.script.InteractionListeners;
-import de.uka.ilkd.key.util.script.InteractionLog;
-import de.uka.ilkd.key.util.script.InteractionLogFacade;
-import de.uka.ilkd.key.util.script.LogPrinter;
-import de.uka.ilkd.key.util.script.NodeInteraction;
-import de.uka.ilkd.key.util.script.ScriptRecorderFacade;
-
 public class InteractionLogView extends JPanel implements InteractionListeners {
     private final Action actionExportProofScript = new ExportProofScriptAction();
     private final Action saveAction = new SaveAction();
@@ -150,6 +134,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
 
     /**
      * gets called on every change to the interaction
+     *
      * @param interaction
      */
     @Override
@@ -246,9 +231,13 @@ class InteractionCellRenderer extends DefaultListCellRenderer {
     @Override
     public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         JLabel lbl = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-        lbl.setText(
-                String.format("<html><pre>", index) +
-                        ((Interaction) value).getProofScriptRepresentation(services) + "</pre></html>");
+        Interaction inter = (Interaction) value;
+        lbl.setText(df.format(inter.getCreated()) + " " + inter);
+        if (inter.isFavoured()) {
+            lbl.setBackground(SystemColor.ORANGE);
+        } else {
+            lbl.setBackground(SystemColor.WHITE);
+        }
         return lbl;
     }
 }

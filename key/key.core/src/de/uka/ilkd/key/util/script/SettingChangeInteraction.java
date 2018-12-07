@@ -7,20 +7,16 @@ import java.util.Properties;
  * @author Alexander Weigl
  * @version 1 (06.12.18)
  */
-public class SettingChangeInteraction implements Interaction {
+public class SettingChangeInteraction extends Interaction {
     private String message;
     private Properties savedSettings;
     private SettingType type;
-    private Date created = new Date();
 
     public SettingChangeInteraction(Properties settings, SettingType t) {
         savedSettings = settings;
         type = t;
     }
 
-
-    @Override
-    public Date created() { return created; }
 
     public String getMessage() {
         return message;

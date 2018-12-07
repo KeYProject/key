@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AutoModeInteraction implements Interaction {
+public class AutoModeInteraction extends Interaction {
 
     private ApplyStrategyInfo info;
 
@@ -35,11 +35,6 @@ public class AutoModeInteraction implements Interaction {
         this.info = info;
     }
 
-
-    @Override
-    public Date created() {
-        return created;
-    }
 
     @Override
     public String getProofScriptRepresentation(Services services) {
