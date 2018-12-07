@@ -3,6 +3,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
+import java.util.zip.ZipException;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import consistencyChecking.ConsistencyChecker;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -23,6 +27,7 @@ import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import io.PackageHandler;
 
 public class Main {
 
@@ -35,7 +40,20 @@ public class Main {
 
 
             if (args[0].equals("check") && (args.length == 2)) {
-                if (ConsistencyChecker.consistent(args[1])) {
+                PackageHandler ph = new PackageHandler(Paths.get(args[1]));
+                ImmutableList<Path> proofFiles = ImmutableSLList.nil();
+                try {
+                    proofFiles = proofFiles.append(ph.getProofFiles());
+                }
+                catch (ZipException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                if (ConsistencyChecker.consistent(proofFiles, ph.getFileRepo())) {
                     System.out.println("Consistent!");
                 } else {
                     System.out.println("Inconsistent!");
