@@ -1,16 +1,14 @@
-package consistencyChecking;
+package consistencyChecking.dependency;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import consistencyChecking.Checker;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;

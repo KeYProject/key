@@ -1,0 +1,59 @@
+package consistencyChecking.dependency;
+
+import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
+
+public class NodeIntermediateNodeWalker {
+    /** the root the walker starts */
+    private NodeIntermediate root;
+
+    /** the current visited level */
+    private int depth = -1;
+
+    /** create the Walker 
+     * @param root the NodeIntermediate where to begin
+     */
+    public NodeIntermediateNodeWalker(NodeIntermediate root) {
+        this.root = root;
+    }
+
+    /** returns start point of the walker
+     * @return root of the AST to walk through
+     */
+    public NodeIntermediate root() {
+        return root;
+    }
+
+    /** starts the walker*/
+    public void start() {
+        walk(root);
+    }
+
+    /** 
+     * returns the current vistted level
+     */
+    public int depth() {
+        return depth;
+    }
+
+    /** walks through the AST. While keeping track of the current node
+     * @param node the JavaProgramElement the walker is at 
+     */
+    protected void walk(NodeIntermediate node) {
+        doAction(node);
+        
+        for (NodeIntermediate child : node.getChildren()) {
+            walk(child);
+        }
+    }
+
+    /** the action that is performed just before leaving the node the
+     * last time 
+     */
+    protected void doAction(NodeIntermediate node) {
+        // check if node is UseContractRule
+        if (node instanceof AppNodeIntermediate) {
+            System.out.println(((AppNodeIntermediate) node).getIntermediateRuleApp().getRuleName());
+        }
+    }
+}
