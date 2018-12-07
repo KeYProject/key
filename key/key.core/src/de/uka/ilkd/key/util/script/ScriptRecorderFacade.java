@@ -7,6 +7,8 @@ import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -31,8 +33,37 @@ public class ScriptRecorderFacade {
             InteractionLog il = new InteractionLog(proof);
             loadedInteractionLogs.addElement(il);
             instances.put(proof, il);
+            registerOnSettings(proof);
+            registerDisposeListener(proof);
+            createInitialSettingsEntry(proof);
         }
         return instances.get(proof);
+    }
+
+    private static void createInitialSettingsEntry(Proof proof) {
+        settingChanged(proof,
+                proof.getSettings().getStrategySettings(),
+                SettingChangeInteraction.SettingType.STRATEGY, "Initial Config");
+        settingChanged(proof,
+                proof.getSettings().getSMTSettings(),
+                SettingChangeInteraction.SettingType.SMT, "Initial Config");
+        settingChanged(proof,
+                proof.getSettings().getChoiceSettings(),
+                SettingChangeInteraction.SettingType.CHOICE, "Initial Config");
+    }
+
+    private static void registerDisposeListener(Proof proof) {
+        proof.getEnv().addProofEnvironmentListener(new ProofEnvironmentListener() {
+            @Override
+            public void proofRegistered(ProofEnvironmentEvent event) {
+
+            }
+
+            @Override
+            public void proofUnregistered(ProofEnvironmentEvent event) {
+                //TODO check how to find out wheteher proof was removed or a different instance
+            }
+        });
     }
 
     public static ComboBoxModel<InteractionLog> getLoadedInteractionLogs() {
@@ -48,27 +79,29 @@ public class ScriptRecorderFacade {
     public static void registerOnSettings(Proof proof) {
         proof.getSettings().getStrategySettings().addSettingsListener(
                 (evt) -> settingChanged(proof,
-                        proof.getSettings().getSMTSettings(),
-                        SettingChangeInteraction.SettingType.STRATEGY)
+                        proof.getSettings().getStrategySettings(),
+                        SettingChangeInteraction.SettingType.STRATEGY, null)
         );
 
         proof.getSettings().getChoiceSettings().addSettingsListener(
                 (evt) -> settingChanged(proof,
                         proof.getSettings().getChoiceSettings(),
-                        SettingChangeInteraction.SettingType.CHOICE)
+                        SettingChangeInteraction.SettingType.CHOICE, null)
         );
 
         proof.getSettings().getSMTSettings().addSettingsListener(
                 (evt) -> settingChanged(proof,
                         proof.getSettings().getSMTSettings(),
-                        SettingChangeInteraction.SettingType.SMT)
+                        SettingChangeInteraction.SettingType.SMT, null)
         );
     }
 
-    public static void settingChanged(Proof proof, Settings settings, SettingChangeInteraction.SettingType type) {
+    public static void settingChanged(Proof proof, Settings settings,
+                                      SettingChangeInteraction.SettingType type, String message) {
         Properties p = new Properties();
         settings.writeSettings(p, p);
         SettingChangeInteraction sci = new SettingChangeInteraction(p, type);
+        if (message != null) sci.setMessage(message);
         InteractionLog log = get(proof);
         log.getInteractions().add(sci);
         emit(sci);

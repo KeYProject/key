@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.util.script;
 
-import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -17,6 +16,10 @@ public class SettingChangeInteraction extends Interaction {
         type = t;
     }
 
+    @Override
+    public String toString() {
+        return message + " : " + type;
+    }
 
     public String getMessage() {
         return message;

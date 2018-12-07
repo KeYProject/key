@@ -11,6 +11,8 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -19,28 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.script.Interaction;
-import de.uka.ilkd.key.util.script.InteractionListeners;
-import de.uka.ilkd.key.util.script.InteractionLog;
-import de.uka.ilkd.key.util.script.InteractionLogFacade;
-import de.uka.ilkd.key.util.script.LogPrinter;
-import de.uka.ilkd.key.util.script.NodeInteraction;
-import de.uka.ilkd.key.util.script.ScriptRecorderFacade;
-import sun.font.Script;
-
 public class InteractionLogView extends JPanel implements InteractionListeners {
     private final Action actionExportProofScript = new ExportProofScriptAction();
     private final Action saveAction = new SaveAction();
     private final Action loadAction = new LoadAction();
     private final Action addUserNoteAction = new AddUserNoteAction();
+
 
     /**
      * the list of individual interactions (like impRight, auto, ...) in currently selected
@@ -100,7 +86,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         JMenuItem favouriteButton = new JMenuItem("toggle favourites");
         favouriteButton.setIcon(new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/heart.png")));
         favouriteButton.addActionListener(actionEvent -> {
-          listInteraction.getSelectedValue().setFavoured(!listInteraction.getSelectedValue().isFavoured());
+            listInteraction.getSelectedValue().setFavoured(!listInteraction.getSelectedValue().isFavoured());
         });
         popup.add(favouriteButton);
         popup.addSeparator();
@@ -124,8 +110,21 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
 
         interactionLogSelection.setModel(ScriptRecorderFacade.getLoadedInteractionLogs());
         interactionLogSelection.addActionListener(this::handleSelectionChange);
-
         interactionLogSelection.setModel(ScriptRecorderFacade.getLoadedInteractionLogs());
+
+        listInteraction.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                JList l = (JList) e.getSource();
+                ListModel m = l.getModel();
+                int index = l.locationToIndex(e.getPoint());
+                if (index > -1) {
+                    Interaction inter = (Interaction) m.getElementAt(index);
+                    l.setToolTipText("<html><pre>" + inter.getMarkdownText() + "</pre></html>");
+                }
+            }
+        });
+
 
         interactionLogSelection.setModel(
                 ScriptRecorderFacade.getLoadedInteractionLogs()
@@ -157,12 +156,12 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         updateList(selectedLog);
     }
 
-  private InteractionLog getSelectedItem() {
-    return (InteractionLog) interactionLogSelection.getSelectedItem();
-  }
+    private InteractionLog getSelectedItem() {
+        return (InteractionLog) interactionLogSelection.getSelectedItem();
+    }
 
 
-  private void setCurrentProof(Proof proof) {
+    private void setCurrentProof(Proof proof) {
         if (proof == null) return;
         currentProof = proof;
         ScriptRecorderFacade.get(currentProof);
