@@ -54,22 +54,6 @@ public final class RuleInteraction extends NodeInteraction {
         }
     }
 
-    public String getRuleName() {
-        return ruleName;
-    }
-
-    public void setRuleName(String ruleName) {
-        this.ruleName = ruleName;
-    }
-
-    public HashMap<String, String> getArguments() {
-        return arguments;
-    }
-
-    public void setArguments(HashMap<String, String> arguments) {
-        this.arguments = arguments;
-    }
-
     @Override
     public String toString() {
         return ruleName;
