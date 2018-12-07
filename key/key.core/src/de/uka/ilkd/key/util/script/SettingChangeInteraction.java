@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.util.script;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Properties;
 
 /**
@@ -41,6 +43,13 @@ public class SettingChangeInteraction extends Interaction {
     public String getMarkdownText() {
         StringBuilder sb = new StringBuilder();
 
+        StringWriter writer = new StringWriter();
+        try {
+            savedSettings.store(writer,null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         sb
             .append("------\n")
             .append("## SettingChangeInteraction ")
@@ -49,7 +58,7 @@ public class SettingChangeInteraction extends Interaction {
             .append("### message\n")
             .append(message)
             .append("### savedSettings: \n")
-            .append(savedSettings)
+            .append(writer)
             .append("\n\n");
 
         return sb.toString();
