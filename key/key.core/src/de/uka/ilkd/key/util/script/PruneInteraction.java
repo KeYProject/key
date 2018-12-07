@@ -21,6 +21,11 @@ public class PruneInteraction extends NodeInteraction {
     }
 
     @Override
+    public String toString() {
+        return "prune;";
+    }
+
+    @Override
     public String getMarkdownText() {
         StringBuilder sb = new StringBuilder();
 
