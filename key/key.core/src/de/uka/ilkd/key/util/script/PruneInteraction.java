@@ -20,4 +20,18 @@ public class PruneInteraction extends NodeInteraction {
         return sb.toString();
     }
 
+    @Override
+    public String getMarkdownText() {
+        StringBuilder sb = new StringBuilder();
+
+        sb
+            .append("------\n")
+            .append("## PruneInteraction ")
+            .append(getNodeId())
+            .append("\n\n");
+
+        return sb.toString();
+    }
+
+
 }

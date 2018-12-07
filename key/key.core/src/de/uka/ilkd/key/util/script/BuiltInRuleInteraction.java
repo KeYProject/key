@@ -24,6 +24,23 @@ public class BuiltInRuleInteraction extends NodeInteraction {
         return rule.displayName() + ";";
     }
 
+    @Override
+    public String getMarkdownText() {
+        StringBuilder sb = new StringBuilder();
+
+        sb
+            .append("------\n")
+            .append("## BuiltInRuleInteraction ")
+            .append(rule.name())
+            .append("\n\n")
+            .append("### PosInOccurence\n")
+            .append("```\n")
+            .append(pos)
+            .append("\n```\n\n");
+
+        return sb.toString();
+    }
+
 
     public BuiltInRule getRule() {
         return rule;

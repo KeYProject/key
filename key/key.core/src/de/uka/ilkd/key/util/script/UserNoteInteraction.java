@@ -27,4 +27,21 @@ public class UserNoteInteraction extends Interaction {
     public String toString() {
         return note;
     }
+
+    @Override
+    public String getMarkdownText() {
+        StringBuilder sb = new StringBuilder();
+
+        sb
+            .append("------\n")
+            .append("## UserNoteInteraction ")
+            .append("\n")
+            .append("### Content:\n")
+            .append("```\n")
+            .append(note)
+            .append("\n```")
+            .append("\n\n");
+
+        return sb.toString();
+    }
 }

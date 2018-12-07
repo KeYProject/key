@@ -48,6 +48,25 @@ public class AutoModeInteraction extends Interaction {
         return sb.toString();
     }
 
+    @Override
+    public String getMarkdownText() {
+        StringBuilder sb = new StringBuilder("---------\n");
+        sb.append("## `auto`\n");
+        sb.append("initial nodes:\n");
+
+        initialNodeSerialNumbers.forEach( nr -> {
+            sb.append("- ").append(nr).append("\n");
+        });
+
+        sb.append("\n");
+
+        sb.append("```\n");
+        sb.append(info);
+        sb.append("\n```\n");
+
+        return sb.toString();
+    }
+
     public ApplyStrategyInfo getInfo() {
         return info;
     }

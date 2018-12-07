@@ -42,6 +42,8 @@ public final class MacroInteraction extends NodeInteraction {
     }
 
 
+
+
     @Override
     public String toString() {
         return macroName;
@@ -56,6 +58,24 @@ public final class MacroInteraction extends NodeInteraction {
         sb.append("\n\t" + info);
 
         sb.append(";");
+        return sb.toString();
+    }
+
+    @Override
+    public String getMarkdownText() {
+        StringBuilder sb = new StringBuilder();
+
+        sb
+            .append("------\n")
+            .append("## MacroInteraction ")
+            .append(macroName)
+            .append("\n")
+            .append(getSerialNr())
+            .append("\n")
+            .append("```\n")
+            .append(info)
+            .append("\n```");
+
         return sb.toString();
     }
 

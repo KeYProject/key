@@ -34,6 +34,24 @@ public class SettingChangeInteraction extends Interaction {
         this.savedSettings = savedSettings;
     }
 
+    @Override
+    public String getMarkdownText() {
+        StringBuilder sb = new StringBuilder();
+
+        sb
+            .append("------\n")
+            .append("## SettingChangeInteraction ")
+            .append(type.name())
+            .append("\n")
+            .append("### message\n")
+            .append(message)
+            .append("### savedSettings: \n")
+            .append(savedSettings)
+            .append("\n\n");
+
+        return sb.toString();
+    }
+
     enum SettingType {
         SMT, CHOICE, STRATEGY
     }

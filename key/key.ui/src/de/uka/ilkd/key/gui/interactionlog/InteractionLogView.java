@@ -169,6 +169,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
 
     private void rebuildList() {
         InteractionLog currentInteractionLog = getSelectedItem();
+        System.out.println(currentInteractionLog.getMarkdownText());
         if (currentProof != null) {
             InteractionLog state = ScriptRecorderFacade.get(currentProof);
             updateList(state);

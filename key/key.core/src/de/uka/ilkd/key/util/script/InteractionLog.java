@@ -44,4 +44,15 @@ public class InteractionLog implements Serializable {
     public String toString() {
         return name;
     }
+
+    public String getMarkdownText() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("# InteractionLog: ")
+            .append(name)
+            .append("\n");
+
+        interactions.forEach(interaction -> sb.append(interaction.getMarkdownText()));
+
+        return sb.toString();
+    }
 }

@@ -64,6 +64,38 @@ public final class RuleInteraction extends NodeInteraction implements Serializab
         return toString();
     }
 
+    @Override
+    public String getMarkdownText() {
+        StringBuilder sb = new StringBuilder();
+
+        sb
+            .append("------\n")
+            .append("## RuleInteraction ")
+            .append(ruleName)
+            .append("\n\n")
+            .append("### PosInOccurence\n")
+            .append("```\n")
+            .append(posInOccurence)
+            .append("\n```\n\n")
+            .append("### arguments:\n")
+
+            .append("| parameter | value |\n")
+            .append("| --- | --- |\n");
+
+        arguments.forEach((key, value) -> {
+            sb
+                .append("| ")
+                .append(key)
+                .append(" | ")
+                .append(value)
+                .append(" |")
+                .append("\n");
+        });
+
+
+        return sb.toString();
+    }
+
     public PosInOccurrence getPosInOccurence() {
         return posInOccurence;
     }

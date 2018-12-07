@@ -18,6 +18,8 @@ public abstract class Interaction implements Serializable {
     throw new UnsupportedOperationException();
   }
 
+  public abstract String getMarkdownText();
+
 
   public Date getCreated() {
     return created;
