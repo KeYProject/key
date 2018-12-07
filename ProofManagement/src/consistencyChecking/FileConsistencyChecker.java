@@ -26,7 +26,7 @@ public class FileConsistencyChecker {
 
             try {
                 for (Path sourceFile : referencePh.getClasspathFiles()) {
-                    Path relativePath = paths.head().relativize(sourceFile);
+                    Path relativePath = referencePh.getDir().relativize(sourceFile);
                     Path newAbsolutePath = newZProofDir.resolve(relativePath);
                     Files.copy(sourceFile, newAbsolutePath);
                 }
@@ -36,12 +36,12 @@ public class FileConsistencyChecker {
                     PackageHandler ph = new PackageHandler(p);
 
                     for (Path proofFilePath : ph.getProofFiles()) {
-                        Path relativePath = p.relativize(proofFilePath);
+                        Path relativePath = ph.getDir().relativize(proofFilePath);
                         Path newAbsolutePath = newZProofDir.resolve(relativePath);
                         Files.copy(proofFilePath, newAbsolutePath);
                     }
                     for (Path keyFilePath : ph.getKeYFiles()) {
-                        Path relativePath = p.relativize(keyFilePath);
+                        Path relativePath = ph.getDir().relativize(keyFilePath);
                         Path newAbsolutePath = newZProofDir.resolve(relativePath);
                         Files.copy(keyFilePath, newAbsolutePath);
                     }

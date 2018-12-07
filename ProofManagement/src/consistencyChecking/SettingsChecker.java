@@ -1,6 +1,7 @@
 package consistencyChecking;
 
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,9 +24,10 @@ public class SettingsChecker implements Checker{
     //TODO: maybe make something Java 8 compatible here
     //TODO: it is not checked that this is a equivalence relation, but thats probably okay.
     // Setting not explicitly listed here are assumed to be compatible iff equal
-    private static final Map<String, Set<Set<String>>> choiceCompatibilityClasses = Map.ofEntries(
-            Map.entry("moreSeqRules", Set.of(Set.of("moreSeqRules:off", "moreSeqRules:on")))
-            );
+    private static final Map<String, Set<Set<String>>> choiceCompatibilityClasses = new HashMap<String, Set<Set<String>>>(); 
+//            Map.ofEntries(
+//            Map.entry("moreSeqRules", Set.of(Set.of("moreSeqRules:off", "moreSeqRules:on")))
+//            );
 
 
 
