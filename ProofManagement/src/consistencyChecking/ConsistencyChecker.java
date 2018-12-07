@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
@@ -21,8 +20,8 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class ConsistencyChecker {
-
-    //TODO: Consistency Checker should work on a higher abstraction level and not handle files
+    //TODO: Carry file info with the data to allow for good user feedback
+    //TODO: Consistency Checker should work on a higher abstraction level and not handle files, do file handling separately (we'll also need to reuse that)
     public static boolean consistent(String sPath) {
         Path path = Paths.get(sPath);
 
@@ -44,9 +43,9 @@ public class ConsistencyChecker {
         fileRepo.setBaseDir(tmpDir);
 
 
-        List<Path> proofFiles = null;
+        ImmutableList<Path> proofFiles = ImmutableSLList.nil();
         try {
-            proofFiles = Files.list(tmpDir).filter(name -> name.getFileName().toString().toLowerCase().endsWith(".proof")).collect(Collectors.toList());
+            proofFiles = proofFiles.append(Files.list(tmpDir).filter(name -> name.getFileName().toString().toLowerCase().endsWith(".proof")).collect(Collectors.toList()));
         }
         catch (IOException e1) {
             e1.printStackTrace();
