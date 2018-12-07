@@ -90,12 +90,12 @@ public class RandomName {
                     "Sardine,Sea,lion,Sea,urchin,Seahorse,Seal,Shark,Sheep,,Ram,Shrew,Skunk,Sloth,Snail,Snake,,Spider,,Squirrel,Starling,Stegosaurus,Swan,Tapir," +
                     "Tarsier,Termite,Tiger,Toad,Turkey,,Turtle,Vicuña,Wallaby,Walrus,Wasp,Water,buffalo,Weasel,Whale,Wolf,Wolverine,Wombat,Wren,Yak,Zebra").split(",");
 
-    public static String getRandomName(String suffx) {
-        return getRandomName() + suffx;
+    public static String getRandomName() {
+        return getRandomName("");
     }
 
-    public static String getRandomName() {
-        return (ADJECTIVES[random.nextInt(ADJECTIVES.length)] + "_"
+    public static String getRandomName(String separator) {
+        return (ADJECTIVES[random.nextInt(ADJECTIVES.length)] + separator
                 + ANIMALS[random.nextInt(ANIMALS.length)]).toLowerCase();
     }
 }

@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.util.script;
 
+import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -10,11 +11,16 @@ public class SettingChangeInteraction implements Interaction {
     private String message;
     private Properties savedSettings;
     private SettingType type;
+    private Date created = new Date();
 
     public SettingChangeInteraction(Properties settings, SettingType t) {
         savedSettings = settings;
         type = t;
     }
+
+
+    @Override
+    public Date created() { return created; }
 
     public String getMessage() {
         return message;

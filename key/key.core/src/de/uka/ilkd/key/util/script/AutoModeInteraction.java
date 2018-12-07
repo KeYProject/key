@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.util.script;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import org.key_project.util.collection.ImmutableList;
+
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class AutoModeInteraction implements Interaction {
 
@@ -19,6 +19,7 @@ public class AutoModeInteraction implements Interaction {
 
     private List<Integer> openGoalSerialNumbers;
     private List<NodeIdentifier> openGoalNodeIds;
+    private Date created = new Date();
 
     public AutoModeInteraction() {
     }
@@ -34,11 +35,19 @@ public class AutoModeInteraction implements Interaction {
         this.info = info;
     }
 
+
+    @Override
+    public Date created() {
+        return created;
+    }
+
     @Override
     public String getProofScriptRepresentation(Services services) {
         StringBuilder sb = new StringBuilder("auto");
 
-        initialNodeSerialNumbers.forEach(nr -> { sb.append("\n\t" + nr); });
+        initialNodeSerialNumbers.forEach(nr -> {
+            sb.append("\n\t" + nr);
+        });
         sb.append("\n\t" + info);
 
         sb.append(";");

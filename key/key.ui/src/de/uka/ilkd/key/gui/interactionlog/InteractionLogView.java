@@ -13,6 +13,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -44,10 +46,24 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
      * list of interactions, will be replaced on every change of the interactionLogSelection
      */
     private final DefaultListModel<Interaction> interactionListModel = new DefaultListModel<>();
+    //private final Box panelButtons = new Box(BoxLayout.X_AXIS);
     private final JToolBar panelButtons = new JToolBar();
 
     private final Services services;
+    /**
+     * contains a List of all opened InteractionLogs, which are selectable in the ComboBox
+     */
+    private final List<InteractionLog> loadedInteractionLogs = new ArrayList<InteractionLog>();
     private Proof currentProof;
+    /**
+     * index of InteractionLog, that is written to in current proof.
+     */
+    private Optional<Integer> writingActionInteractionLog = Optional.empty();
+
+    /**
+     * currently displayed InteractionLog
+     */
+    private Optional<Integer> displayedInteractionLog = Optional.empty();
 
     public InteractionLogView(KeYMediator mediator) {
         services = mediator.getServices();
@@ -77,8 +93,9 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         interactionLogSelection.setModel(ScriptRecorderFacade.getLoadedInteractionLogs());
         interactionLogSelection.addActionListener(this::handleSelectionChange);
 
-
         panelButtons.add(new JButton(loadAction));
+
+        interactionLogSelection.setModel(ScriptRecorderFacade.getLoadedInteractionLogs());
         panelButtons.add(interactionLogSelection);
 
         interactionLogSelection.setModel(
@@ -175,6 +192,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
                 try {
                     File file = fileChooser.getSelectedFile();
                     ScriptRecorderFacade.readInteractionLog(file);
+                    //addInteractionLog(importedLog);
                 } catch (IOException exception) {
                     JOptionPane.showMessageDialog(null,
                             exception.getCause(),
@@ -217,10 +235,13 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
 
 class InteractionCellRenderer extends DefaultListCellRenderer {
     private final Services services;
+    private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
 
     InteractionCellRenderer(Services services) {
         this.services = services;
     }
+
 
     @Override
     public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {

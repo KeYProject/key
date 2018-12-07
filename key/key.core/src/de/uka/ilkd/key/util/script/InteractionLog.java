@@ -13,6 +13,7 @@ import java.util.List;
  * @version 1 (06.12.18)
  */
 public class InteractionLog implements Serializable {
+    private boolean favoured;
 
     private WeakReference<Proof> proof;
 
@@ -29,6 +30,7 @@ public class InteractionLog implements Serializable {
     }
 
     public InteractionLog(Proof proof) {
+        this(RandomName.getRandomName(" ") + " (" + proof.name().toString() + ")");
         this.proof = new WeakReference<>(proof);
     }
 

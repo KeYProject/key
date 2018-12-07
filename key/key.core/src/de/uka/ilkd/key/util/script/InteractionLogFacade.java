@@ -1,8 +1,15 @@
 package de.uka.ilkd.key.util.script;
 
+import de.uka.ilkd.key.logic.PosInOccurrence;
+
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -23,5 +30,17 @@ public final class InteractionLogFacade {
              XMLEncoder encoder = new XMLEncoder(os)) {
             encoder.writeObject(log);
         }
+    }
+
+    public static String serializePosInOccurence(PosInOccurrence p) {
+        List<Integer> indices = new ArrayList<>();
+        PosInOccurrence current = p;
+        while (current != null) {
+            indices.add(p.getIndex());
+            current = current.up();
+        }
+        Collections.reverse(indices);
+        return indices.stream().map(Objects::toString)
+                .collect(Collectors.joining("."));
     }
 }
