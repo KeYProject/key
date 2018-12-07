@@ -8,7 +8,7 @@ import java.util.zip.ZipException;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import consistencyChecking.ConsistencyChecker;
+import consistencyChecking.SettingsChecker;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
@@ -53,7 +53,7 @@ public class Main {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                if (new ConsistencyChecker().check(proofFiles)) {
+                if (new SettingsChecker().check(proofFiles)) {
                     System.out.println("Consistent!");
                 } else {
                     System.out.println("Inconsistent!");

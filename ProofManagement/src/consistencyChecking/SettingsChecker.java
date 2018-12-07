@@ -18,7 +18,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 //TODO: precise user feedback
-public class ConsistencyChecker implements Checker{
+public class SettingsChecker implements Checker{
 
     //TODO: maybe make something Java 8 compatible here
     //TODO: it is not checked that this is a equivalence relation, but thats probably okay.
