@@ -13,6 +13,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.Settings;
 
 import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -34,6 +36,12 @@ public class ScriptRecorderFacade {
 
     public static ListModel<InteractionLog> getLoadedInteractionLogs() {
         return loadedInteractionLogs;
+    }
+
+    public static InteractionLog readInteractionLog(File file) throws IOException {
+        InteractionLog log = InteractionLogFacade.readInteractionLog(file);
+        loadedInteractionLogs.addElement(log);
+        return log;
     }
 
     public static void registerOnSettings(Proof proof) {
