@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -17,7 +18,7 @@ import io.PackageHandler;
 
 public class FileConsistencyChecker {
     
-    public Path merge(ImmutableList<Path> paths, Path newZProofDir) {
+    public static Path merge(ImmutableList<Path> paths, Path newZProofDir) {
         if (new SettingsChecker().check(paths) && listOfPathsConsistent(paths)) {
 
             // only add source files from first package
@@ -52,7 +53,7 @@ public class FileConsistencyChecker {
         return newZProofDir;
     }
     
-    private boolean listOfPathsConsistent(ImmutableList<Path> paths) {
+    private static boolean listOfPathsConsistent(ImmutableList<Path> paths) {
         boolean res = true;
         Path reference = paths.head();
         for (Path p : paths.tail()) {
@@ -61,7 +62,7 @@ public class FileConsistencyChecker {
         return res;
     }
     
-    private boolean classpathsConsistent(Path pathA, Path pathB) {
+    private static boolean classpathsConsistent(Path pathA, Path pathB) {
         PackageHandler pa = new PackageHandler(pathA);
         PackageHandler pb = new PackageHandler(pathB);
         ImmutableList<Path> classpathFilesA = null;
@@ -90,7 +91,7 @@ public class FileConsistencyChecker {
         }
         
         for (Path p : mapA.keySet()) {
-            if (!mapB.containsKey(p) || !(mapA.get(p) == mapB.get(p))) {
+            if (!mapB.containsKey(p) || !(Arrays.equals(mapA.get(p), mapB.get(p)))) {
                 return false;
             }
         }
