@@ -83,11 +83,13 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         listInteraction.setModel(interactionListModel);
         listInteraction.setCellRenderer(new InteractionCellRenderer(mediator.getServices()));
 
-        panelButtons.add(Box.createHorizontalGlue());
-        panelButtons.add(btnExport = new JButton(actionExportProofScript));
-        panelButtons.add(btnSave = new JButton(saveAction));
-        panelButtons.add(btnAddNote = new JButton(addUserNoteAction));
+        panelButtons.add(interactionLogSelection);
         panelButtons.add(btnLoad = new JButton(loadAction));
+        panelButtons.add(btnSave = new JButton(saveAction));
+        panelButtons.add(Box.createHorizontalGlue());
+
+        panelButtons.add(btnExport = new JButton(actionExportProofScript));
+        panelButtons.add(btnAddNote = new JButton(addUserNoteAction));
 
         btnExport.setHideActionText(true);
         btnSave.setHideActionText(true);
@@ -101,6 +103,8 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
           listInteraction.getSelectedValue().setFavoured(!listInteraction.getSelectedValue().isFavoured());
         });
         popup.add(favouriteButton);
+        popup.addSeparator();
+        popup.add(new JMenuItem(addUserNoteAction));
         listInteraction.setComponentPopupMenu(popup);
 
 
@@ -122,7 +126,6 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         interactionLogSelection.addActionListener(this::handleSelectionChange);
 
         interactionLogSelection.setModel(ScriptRecorderFacade.getLoadedInteractionLogs());
-        panelButtons.add(interactionLogSelection);
 
         interactionLogSelection.setModel(
                 ScriptRecorderFacade.getLoadedInteractionLogs()
@@ -198,7 +201,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         public ExportProofScriptAction() {
             putValue(Action.NAME, "Export as KPS");
             putValue(Action.SMALL_ICON,
-                    new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/database_add.png")));
+                    new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/link.png")));
 
         }
 

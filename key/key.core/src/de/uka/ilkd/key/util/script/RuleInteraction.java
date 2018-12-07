@@ -1,7 +1,11 @@
 package de.uka.ilkd.key.util.script;
 
+import java.util.HashMap;
+import java.util.Iterator;
+
+import org.key_project.util.collection.ImmutableMapEntry;
+
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -9,32 +13,28 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import org.key_project.util.collection.ImmutableMapEntry;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * @author weigl
  */
-public final class RuleInteraction extends NodeInteraction implements Serializable {
-    private PosInOccurrence posInOccurence;
+public final class RuleInteraction extends NodeInteraction {
+
+    private String posInOccurence;
     //private NodeIdentifier appliedOn;
     private String ruleName;
     private HashMap<String, String> arguments = new HashMap<>();
 
     public RuleInteraction() {
-        super(null);
+        super();
     }
 
     public RuleInteraction(Node node, RuleApp app) {
         super(node);
 
         this.ruleName = app.rule().displayName();
-        this.posInOccurence = app.posInOccurrence();
+        this.posInOccurence = InteractionLogFacade
+                .serializePosInOccurence(app.posInOccurrence());
 
-        StringBuilder sb = new StringBuilder();
         if (app instanceof TacletApp) {
             TacletApp tapp = (TacletApp) app;
             /*SequentFormula seqForm = pos.getPosInOccurrence().sequentFormula();
@@ -61,7 +61,7 @@ public final class RuleInteraction extends NodeInteraction implements Serializab
 
     @Override
     public String getProofScriptRepresentation(Services services) {
-        return toString();
+        return ruleName + ";";
     }
 
     @Override
@@ -96,11 +96,27 @@ public final class RuleInteraction extends NodeInteraction implements Serializab
         return sb.toString();
     }
 
-    public PosInOccurrence getPosInOccurence() {
+    public String getPosInOccurence() {
         return posInOccurence;
     }
 
-    public void setPosInOccurence(PosInOccurrence posInOccurence) {
+    public void setPosInOccurence(String posInOccurence) {
         this.posInOccurence = posInOccurence;
+    }
+
+    public String getRuleName() {
+        return ruleName;
+    }
+
+    public void setRuleName(String ruleName) {
+        this.ruleName = ruleName;
+    }
+
+    public HashMap<String, String> getArguments() {
+        return arguments;
+    }
+
+    public void setArguments(HashMap<String, String> arguments) {
+        this.arguments = arguments;
     }
 }
