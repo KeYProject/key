@@ -1,11 +1,5 @@
 package de.uka.ilkd.key.util.script;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -18,17 +12,28 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.Settings;
 
+import javax.swing.*;
+import java.util.*;
+
 /**
  * @author Alexander Weigl <weigl@kit.edu>
  */
 public class ScriptRecorderFacade {
     private static List<InteractionListeners> listeners = new ArrayList<>();
     private static Map<Proof, InteractionLog> instances = new HashMap<>();
+    private static DefaultListModel<InteractionLog> loadedInteractionLogs = new DefaultListModel<>();
 
     public static InteractionLog get(Proof proof) {
-        return instances.computeIfAbsent(proof, key ->
-                new InteractionLog(proof)
-        );
+        if (!instances.containsKey(proof)) {
+            InteractionLog il = new InteractionLog(proof);
+            loadedInteractionLogs.addElement(il);
+            instances.put(proof, il);
+        }
+        return instances.get(proof);
+    }
+
+    public static ListModel<InteractionLog> getLoadedInteractionLogs() {
+        return loadedInteractionLogs;
     }
 
     public static void registerOnSettings(Proof proof) {
@@ -74,7 +79,8 @@ public class ScriptRecorderFacade {
         emit(interaction);
     }
 
-    public static void runBuiltIn(Goal goal, IBuiltInRuleApp app, BuiltInRule rule, PosInOccurrence pos, boolean forced) {
+    public static void runBuiltIn(Goal goal, IBuiltInRuleApp app, BuiltInRule rule,
+                                  PosInOccurrence pos, boolean forced) {
         InteractionLog state = get(goal.proof());
         NodeInteraction interaction = new BuiltInRuleInteraction(goal.node(), app, rule, pos);
         state.getInteractions().add(interaction);
