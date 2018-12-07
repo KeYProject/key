@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.util.script;
 
+import java.awt.*;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Properties;
@@ -14,16 +15,19 @@ public class SettingChangeInteraction extends Interaction {
     private SettingType type;
 
     public SettingChangeInteraction() {
+        graphicalStyle.setBackgroundColor(Color.WHITE);
+        graphicalStyle.setForegroundColor(Color.gray);
     }
 
     public SettingChangeInteraction(Properties settings, SettingType t) {
+        this();
         savedSettings = settings;
         type = t;
     }
 
     @Override
     public String toString() {
-        return message + " : " + type;
+        return (message != null ? message + " : " : "" ) + type;
     }
 
     public String getMessage() {

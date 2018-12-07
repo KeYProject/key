@@ -1,10 +1,7 @@
 package de.uka.ilkd.key.util.script;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -14,7 +11,7 @@ import de.uka.ilkd.key.proof.Proof;
  * @version 1 (06.12.18)
  */
 public class NodeIdentifier implements Serializable {
-    private List<Integer> list = new ArrayList<>();
+    List<Integer> list = new ArrayList<>();
 
     public NodeIdentifier() {
     }

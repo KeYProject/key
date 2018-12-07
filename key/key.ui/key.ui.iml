@@ -16,5 +16,16 @@
     <orderEntry type="module" module-name="key.util" exported="" />
     <orderEntry type="module" module-name="key.core.testgen" exported="" />
     <orderEntry type="module" module-name="key.core.symbolic_execution" />
+    <orderEntry type="module-library">
+      <library name="commonmark-0.12.1">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/libs/commonmark-0.12.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/jackson-core-2.9.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="commonmark-ext-gfm-tables-0.12.1" level="project" />
   </component>
 </module>

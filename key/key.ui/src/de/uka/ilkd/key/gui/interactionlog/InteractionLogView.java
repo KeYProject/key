@@ -3,16 +3,17 @@ package de.uka.ilkd.key.gui.interactionlog;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.Markdown;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.script.*;
+import sun.swing.DefaultLookup;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -53,6 +54,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
     private final JButton btnSave;
     private final JButton btnAddNote;
     private final JButton btnLoad;
+    private final ToggleFavouriteAction toggleFavouriteAction = new ToggleFavouriteAction();
     private Proof currentProof;
     /**
      * index of InteractionLog, that is written to in current proof.
@@ -67,7 +69,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
     public InteractionLogView(KeYMediator mediator) {
         services = mediator.getServices();
         listInteraction.setModel(interactionListModel);
-        listInteraction.setCellRenderer(new InteractionCellRenderer(mediator.getServices()));
+        listInteraction.setCellRenderer(new InteractionCellRenderer());
 
         panelButtons.add(interactionLogSelection);
         panelButtons.add(btnLoad = new JButton(loadAction));
@@ -83,7 +85,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         btnLoad.setHideActionText(true);
 
         JPopupMenu popup = new JPopupMenu();
-        JMenuItem favouriteButton = new JMenuItem("toggle favourites");
+        JMenuItem favouriteButton = new JMenuItem(toggleFavouriteAction);
         favouriteButton.setIcon(new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/heart.png")));
         favouriteButton.addActionListener(actionEvent -> {
             listInteraction.getSelectedValue().setFavoured(!listInteraction.getSelectedValue().isFavoured());
@@ -120,7 +122,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
                 int index = l.locationToIndex(e.getPoint());
                 if (index > -1) {
                     Interaction inter = (Interaction) m.getElementAt(index);
-                    l.setToolTipText("<html><pre>" + inter.getMarkdownText() + "</pre></html>");
+                    l.setToolTipText("<html>" + Markdown.html(inter.getMarkdownText()) + "</html>");
                 }
             }
         });
@@ -290,6 +292,21 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
             }
         }
     }
+
+    private class ToggleFavouriteAction extends AbstractAction {
+        public ToggleFavouriteAction() {
+            setName("Toggle Fav");
+            putValue(Action.MNEMONIC_KEY, KeyEvent.VK_F);
+            putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_MASK));
+            putValue(Action.SMALL_ICON,
+                    new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/heart.png")));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+        }
+    }
 }
 
 class MultiLineInputPrompt {
@@ -304,27 +321,68 @@ class MultiLineInputPrompt {
     }
 }
 
-class InteractionCellRenderer extends DefaultListCellRenderer {
-    private final Services services;
-    private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+class InteractionCellRenderer extends JPanel implements ListCellRenderer<Interaction> {
+    private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final Color COLOR_FAVOURED = new Color(0xFFD373);
+    private JLabel lblIconLeft = new JLabel(), lblIconRight = new JLabel(), lblText = new JLabel();
+    private ImageIcon iconHeart = new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/heart.png"));
 
-
-    InteractionCellRenderer(Services services) {
-        this.services = services;
+    InteractionCellRenderer() {
+        setLayout(new BorderLayout());
+        add(lblIconLeft, BorderLayout.WEST);
+        add(lblIconRight, BorderLayout.EAST);
+        add(lblText);
     }
 
-
     @Override
-    public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        JLabel lbl = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-        Interaction inter = (Interaction) value;
-        lbl.setText(df.format(inter.getCreated()) + " " + inter);
-        if (inter.isFavoured()) {
-            lbl.setIcon(new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/heart.png")));
-            lbl.setBackground(new Color(0xFFD373));
+    public Component getListCellRendererComponent(JList<? extends Interaction> list, Interaction value, int index, boolean isSelected, boolean cellHasFocus) {
+        lblText.setText(
+                value != null ?
+                        df.format(value.getCreated()) + " " + value.toString() : "");
+        lblIconRight.setIcon(value != null && value.isFavoured() ? iconHeart : null);
+        //TODO
+        setBorder(value != null && value.isFavoured() ? BorderFactory.createLineBorder(COLOR_FAVOURED) : null);
+
+        setComponentOrientation(list.getComponentOrientation());
+
+        if (isSelected) {
+            setBackground(list.getSelectionBackground());
+            setForeground(list.getSelectionForeground());
         } else {
-            lbl.setBackground(SystemColor.WHITE);
+            if (value != null) {
+                setBackground(value.getGraphicalStyle().getBackgroundColor() != null ?
+                        value.getGraphicalStyle().getBackgroundColor()
+                        : list.getBackground());
+
+                setForeground(value.getGraphicalStyle().getForegroundColor() != null ?
+                        value.getGraphicalStyle().getForegroundColor()
+                        : list.getForeground());
+            }
         }
-        return lbl;
+
+        lblIconRight.setForeground(getForeground());
+        lblIconLeft.setForeground(getForeground());
+        lblText.setForeground(getForeground());
+
+        lblIconRight.setBackground(getBackground());
+        lblIconLeft.setBackground(getBackground());
+        lblText.setBackground(getBackground());
+
+
+        setEnabled(list.isEnabled());
+        setFont(list.getFont());
+
+        Border border = null;
+        if (cellHasFocus) {
+            if (isSelected) {
+                border = DefaultLookup.getBorder(this, ui, "List.focusSelectedCellHighlightBorder");
+            }
+            if (border == null) {
+                border = DefaultLookup.getBorder(this, ui, "List.focusCellHighlightBorder");
+            }
+        } else {
+        }
+
+        return this;
     }
 }
