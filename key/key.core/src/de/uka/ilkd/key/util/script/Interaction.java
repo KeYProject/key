@@ -5,31 +5,33 @@ import de.uka.ilkd.key.java.Services;
 import java.io.Serializable;
 import java.util.Date;
 
+import de.uka.ilkd.key.java.Services;
+
 /**
  * @author weigl
  */
 public abstract class Interaction implements Serializable {
-    private Date created = new Date();
-    private boolean favoured = false;
+  private Date created = new Date();
+  private boolean favoured = false;
 
-    public String getProofScriptRepresentation(Services services) {
-        throw new UnsupportedOperationException();
-    }
+  public String getProofScriptRepresentation(Services services) {
+    throw new UnsupportedOperationException();
+  }
 
 
-    public Date getCreated() {
-        return created;
-    }
+  public Date getCreated() {
+    return created;
+  }
 
-    public void setCreated(Date created) {
-        this.created = created;
-    }
+  public void setCreated(Date created) {
+    this.created = created;
+  }
 
-    public boolean isFavoured() {
-        return favoured;
-    }
+  public boolean isFavoured() {
+    return favoured;
+  }
 
-    public void setFavoured(boolean favoured) {
-        this.favoured = favoured;
-    }
+  public void setFavoured(boolean favoured) {
+    this.favoured = favoured;
+  }
 }

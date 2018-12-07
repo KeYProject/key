@@ -35,7 +35,6 @@ public class AutoModeInteraction extends Interaction {
         this.info = info;
     }
 
-
     @Override
     public String getProofScriptRepresentation(Services services) {
         StringBuilder sb = new StringBuilder("auto");

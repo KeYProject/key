@@ -19,12 +19,36 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.script.Interaction;
+import de.uka.ilkd.key.util.script.InteractionListeners;
+import de.uka.ilkd.key.util.script.InteractionLog;
+import de.uka.ilkd.key.util.script.InteractionLogFacade;
+import de.uka.ilkd.key.util.script.LogPrinter;
+import de.uka.ilkd.key.util.script.NodeInteraction;
+import de.uka.ilkd.key.util.script.ScriptRecorderFacade;
+import sun.font.Script;
+
 public class InteractionLogView extends JPanel implements InteractionListeners {
     private final Action actionExportProofScript = new ExportProofScriptAction();
     private final Action saveAction = new SaveAction();
     private final Action loadAction = new LoadAction();
 
+    /**
+     * the list of individual interactions (like impRight, auto, ...) in currently selected
+     * interactionLog
+     */
     private final JList<Interaction> listInteraction = new JList<>();
+    /**
+     * ComboBox for selecting a active InteractionLog
+     */
     private final JComboBox<InteractionLog> interactionLogSelection = new JComboBox<>();
     /**
      * list of interactions, will be replaced on every change of the interactionLogSelection
@@ -114,8 +138,10 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
 
 
     private void setCurrentProof(Proof proof) {
+        if (proof == null) return;
         currentProof = proof;
-        rebuildList();
+        ScriptRecorderFacade.get(currentProof);
+        //rebuildList();
     }
 
 
@@ -123,7 +149,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         InteractionLog currentInteractionLog = (InteractionLog) interactionLogSelection.getSelectedItem();
         if (currentProof != null) {
             InteractionLog state = ScriptRecorderFacade.get(currentProof);
-            updateList(currentInteractionLog);
+            updateList(state);
         }
     }
 
@@ -139,8 +165,6 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
      */
     @Override
     public void onInteraction(Interaction interaction) {
-        System.out.println("interactionlog added");
-        ((InteractionLog) interactionLogSelection.getSelectedItem()).getInteractions().add(interaction);
         rebuildList();
     }
 
@@ -157,6 +181,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
             LogPrinter lp = new LogPrinter(services);
             InteractionLog state = ScriptRecorderFacade.get(currentProof);
             String ps = lp.print(state);
+            System.out.println(ps);
         }
     }
 
