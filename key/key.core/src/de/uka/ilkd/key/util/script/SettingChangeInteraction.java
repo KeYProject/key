@@ -13,6 +13,9 @@ public class SettingChangeInteraction extends Interaction {
     private Properties savedSettings;
     private SettingType type;
 
+    public SettingChangeInteraction() {
+    }
+
     public SettingChangeInteraction(Properties settings, SettingType t) {
         savedSettings = settings;
         type = t;
