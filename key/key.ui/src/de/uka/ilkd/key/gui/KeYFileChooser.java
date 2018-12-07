@@ -253,8 +253,16 @@ public class KeYFileChooser {
             INSTANCE = new KeYFileChooser(initDir);
         }
 
+        KeYFileChooserBookmarkPanel bookmarkPanel = new KeYFileChooserBookmarkPanel(INSTANCE);
+        INSTANCE.fileChooser.setAccessory(bookmarkPanel);
+        INSTANCE.fileChooser.addPropertyChangeListener(bookmarkPanel);
+
         INSTANCE.setDialogTitle(title);
         INSTANCE.prepare();
         return INSTANCE;
+    }
+
+    public void setCurrentDirectory(File f) {
+        fileChooser.setCurrentDirectory(f);
     }
 }
