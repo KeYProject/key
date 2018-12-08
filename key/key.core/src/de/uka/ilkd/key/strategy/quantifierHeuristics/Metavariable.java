@@ -82,7 +82,6 @@ public final class Metavariable extends AbstractSortedOperator
 	return compareTo((Metavariable)o) == 0;
     }
     
-        
     /**
      * @return Returns the isTemporaryVariable.
      */

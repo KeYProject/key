@@ -92,11 +92,6 @@ public class LoopScopeBlock extends JavaStatement
     }
 
     @Override
-    public int hashCode() {
-        return 17 * super.hashCode() + body.hashCode();
-    }
-
-    @Override
     public boolean hasNextPrefixElement() {
         return !body.isEmpty()
                 && body.getStatementAt(0) instanceof ProgramPrefix;
