@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.util;
 
+@Deprecated
 public class Heading extends MarkdownElement {
   private String text;
   private int level;

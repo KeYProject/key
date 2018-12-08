@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.util.script;
 
+import java.awt.*;
+
 /**
  * @author Alexander Weigl
  * @version 1 (07.12.18)
@@ -8,9 +10,12 @@ public class UserNoteInteraction extends Interaction {
     private String note;
 
     public UserNoteInteraction() {
+        graphicalStyle.setBackgroundColor(Color.red.brighter().brighter().brighter());
+        //TODO graphicalStyle.setIcon();
     }
 
     public UserNoteInteraction(String note) {
+        this();
         this.note = note;
     }
 
@@ -33,14 +38,14 @@ public class UserNoteInteraction extends Interaction {
         StringBuilder sb = new StringBuilder();
 
         sb
-            .append("------\n")
-            .append("## UserNoteInteraction ")
-            .append("\n")
-            .append("### Content:\n")
-            .append("```\n")
-            .append(note)
-            .append("\n```")
-            .append("\n\n");
+                .append("------\n")
+                .append("## UserNoteInteraction ")
+                .append("\n")
+                .append("### Content:\n")
+                .append("```\n")
+                .append(note)
+                .append("\n```")
+                .append("\n\n");
 
         return sb.toString();
     }

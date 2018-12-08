@@ -1,23 +1,21 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
-
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.KeyStroke;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
+import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.interactionlog.InteractionLogView;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+
 /**
  * {@link JTabbedPane} displayed in {@link MainWindow}, to the left of
  * {@link de.uka.ilkd.key.gui.nodeviews.SequentView}.
- * 
+ *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class MainWindowTabbedPane extends JTabbedPane {
@@ -26,27 +24,26 @@ public class MainWindowTabbedPane extends JTabbedPane {
      *
      */
     private static final long serialVersionUID = 334677113533050832L;
+    private static final float TAB_ICON_SIZE = 16f;
+    private static final Icon PROOF_ICON = IconFontSwing.buildIcon(FontAwesomeBold.TREE, TAB_ICON_SIZE);
+    private static final Icon INTERACTION_LOG_ICON =
+            IconFontSwing.buildIcon(FontAwesomeBold.BOOK, TAB_ICON_SIZE);
+    private static final Icon PROOF_SEARCH_STRATEGY_ICON = IconFontSwing.buildIcon(FontAwesomeBold.COGS, TAB_ICON_SIZE);
+    private static final Icon INFO_ICON = IconFontSwing.buildIcon(FontAwesomeBold.INFO_CIRCLE, TAB_ICON_SIZE);
 
     /**
      * the current proof tree
      */
     private final ProofTreeView proofTreeView;
     private final InteractionLogView interactionLogView;
-
-    public ProofTreeView getProofTreeView() {
-        return proofTreeView;
-    }
-
     /**
      * the list of current open goals
      */
     private final JScrollPane openGoalsView;
-
     /**
      * the strategy selection view
      */
     private final StrategySelectionView strategySelectionView;
-
     /**
      * the rule view
      */
@@ -60,7 +57,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
         proofTreeView = new ProofTreeView(mediator);
         proofTreeView.setSize(proofTreeView.getPreferredSize());
         proofTreeView.setVisible(true);
-        addTab("Proof", null, proofTreeView,
+        addTab("Proof", PROOF_ICON, proofTreeView,
                 "The current state of the proof as tree");
 
         // set openGoalsView
@@ -76,17 +73,17 @@ public class MainWindowTabbedPane extends JTabbedPane {
         // set strategySelectionView
         strategySelectionView = new StrategySelectionView(autoModeAction);
         strategySelectionView.setMediator(mediator);
-        addTab("Proof Search Strategy", null, strategySelectionView,
+        addTab("Proof Search Strategy", PROOF_SEARCH_STRATEGY_ICON, strategySelectionView,
                 "Select strategy for automated proof search");
 
         // set ruleView
         infoView = new InfoView(mediator, mainWindow);
-        addTab("Info", null, infoView,
+        addTab("Info", INFO_ICON, infoView,
                 "Documentation on taclets and symbols");
 
         // interaction log
         interactionLogView = new InteractionLogView(mediator);
-        addTab("Interaction Log", null, interactionLogView);
+        addTab("Interaction Log", INTERACTION_LOG_ICON, interactionLogView);
 
         setSelectedIndex(0);
         setPreferredSize(new java.awt.Dimension(250, 440));
@@ -94,12 +91,16 @@ public class MainWindowTabbedPane extends JTabbedPane {
         // change some key mappings which collide with font settings.
         getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .getParent().remove(
-                        KeyStroke.getKeyStroke(KeyEvent.VK_UP, Toolkit
-                                .getDefaultToolkit().getMenuShortcutKeyMask()));
+                KeyStroke.getKeyStroke(KeyEvent.VK_UP, Toolkit
+                        .getDefaultToolkit().getMenuShortcutKeyMask()));
         getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(
                 KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit
                         .getDefaultToolkit().getMenuShortcutKeyMask()));
         setName("leftTabbed");
+    }
+
+    public ProofTreeView getProofTreeView() {
+        return proofTreeView;
     }
 
     protected void setEnabledForAllTabs(boolean b) {
@@ -107,6 +108,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
         openGoalsView.setEnabled(b);
         strategySelectionView.setEnabled(b);
         infoView.setEnabled(b);
+        interactionLogView.setEnabled(b);
     }
 
 }

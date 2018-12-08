@@ -4,6 +4,9 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.Markdown;
+import de.uka.ilkd.key.gui.fonticons.FontAwesome;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
+import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.script.*;
@@ -23,10 +26,14 @@ import java.util.List;
 import java.util.Optional;
 
 public class InteractionLogView extends JPanel implements InteractionListeners {
-    private final Action actionExportProofScript = new ExportProofScriptAction();
-    private final Action saveAction = new SaveAction();
-    private final Action loadAction = new LoadAction();
-    private final Action addUserNoteAction = new AddUserNoteAction();
+    private static final float SMALL_ICON_SIZE = 16f;
+    private final ExportProofScriptAction actionExportProofScript = new ExportProofScriptAction();
+    private final SaveAction saveAction = new SaveAction();
+    private final LoadAction loadAction = new LoadAction();
+    private final AddUserNoteAction addUserNoteAction = new AddUserNoteAction();
+    private final ToggleFavouriteAction toggleFavouriteAction = new ToggleFavouriteAction();
+    private final JumpIntoTreeAction jumpIntoTreeAction = new JumpIntoTreeAction();
+    private final TryReapplyAction tryReapplyAction = new TryReapplyAction();
 
 
     /**
@@ -54,7 +61,6 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
     private final JButton btnSave;
     private final JButton btnAddNote;
     private final JButton btnLoad;
-    private final ToggleFavouriteAction toggleFavouriteAction = new ToggleFavouriteAction();
     private Proof currentProof;
     /**
      * index of InteractionLog, that is written to in current proof.
@@ -85,12 +91,9 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         btnLoad.setHideActionText(true);
 
         JPopupMenu popup = new JPopupMenu();
-        JMenuItem favouriteButton = new JMenuItem(toggleFavouriteAction);
-        favouriteButton.setIcon(new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/heart.png")));
-        favouriteButton.addActionListener(actionEvent -> {
-            listInteraction.getSelectedValue().setFavoured(!listInteraction.getSelectedValue().isFavoured());
-        });
-        popup.add(favouriteButton);
+        popup.add(new JMenuItem(toggleFavouriteAction));
+        popup.add(new JMenuItem(jumpIntoTreeAction));
+        popup.add(new JMenuItem(tryReapplyAction));
         popup.addSeparator();
         popup.add(new JMenuItem(addUserNoteAction));
         listInteraction.setComponentPopupMenu(popup);
@@ -202,8 +205,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         public ExportProofScriptAction() {
             putValue(Action.NAME, "Export as KPS");
             putValue(Action.SMALL_ICON,
-                    new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/link.png")));
-
+                    IconFontSwing.buildIcon(FontAwesomeBold.FILE_EXPORT, SMALL_ICON_SIZE));
         }
 
         @Override
@@ -217,9 +219,11 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
 
     private class LoadAction extends AbstractAction {
         public LoadAction() {
-            putValue(Action.NAME, "Load Interaction Log");
+            putValue(Action.NAME, "Load");
+            putValue(Action.SHORT_DESCRIPTION, "Load Interaction Log");
             putValue(Action.SMALL_ICON,
-                    new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/database_add.png")));
+                    IconFontSwing.buildIcon(FontAwesomeBold.TRUCK_LOADING, SMALL_ICON_SIZE));
+            // new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/database_add.png")));
         }
 
         @Override
@@ -248,7 +252,8 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         public SaveAction() {
             putValue(Action.NAME, "Save");
             putValue(Action.SMALL_ICON,
-                    new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/database_save.png")));
+                    IconFontSwing.buildIcon(FontAwesome.SAVE, SMALL_ICON_SIZE));
+            //new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/database_save.png")));
         }
 
         @Override
@@ -276,7 +281,8 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         public AddUserNoteAction() {
             super("Add Note");
             putValue(Action.SMALL_ICON,
-                    new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/book_add.png")));
+                    IconFontSwing.buildIcon(FontAwesome.STICKY_NOTE, SMALL_ICON_SIZE));
+            //new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/book_add.png")));
 
         }
 
@@ -295,16 +301,45 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
 
     private class ToggleFavouriteAction extends AbstractAction {
         public ToggleFavouriteAction() {
+            super("Toggle Fav");
             setName("Toggle Fav");
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_F);
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_MASK));
             putValue(Action.SMALL_ICON,
-                    new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/heart.png")));
+                    IconFontSwing.buildIcon(FontAwesomeBold.HEART, SMALL_ICON_SIZE, Color.red));
+            //    new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/heart.png")));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (listInteraction.getSelectedValue() != null) {
+                listInteraction.getSelectedValue().setFavoured(!listInteraction.getSelectedValue().isFavoured());
+            }
+        }
+    }
+
+    private class JumpIntoTreeAction extends AbstractAction {
+        public JumpIntoTreeAction() {
+            super("Jump into tree");
+            putValue(SMALL_ICON, IconFontSwing.buildIcon(FontAwesome.CODE, SMALL_ICON_SIZE));
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
 
+        }
+    }
+
+    private class TryReapplyAction extends AbstractAction {
+        public TryReapplyAction() {
+            putValue(NAME, "Re-apply action");
+            putValue(SMALL_ICON, IconFontSwing.buildIcon(FontAwesome.APPER, SMALL_ICON_SIZE));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JOptionPane.showMessageDialog(null, "Not Implemented",
+                    "A very expected error.", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
@@ -325,7 +360,7 @@ class InteractionCellRenderer extends JPanel implements ListCellRenderer<Interac
     private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final Color COLOR_FAVOURED = new Color(0xFFD373);
     private JLabel lblIconLeft = new JLabel(), lblIconRight = new JLabel(), lblText = new JLabel();
-    private ImageIcon iconHeart = new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/heart.png"));
+    private Icon iconHeart = IconFontSwing.buildIcon(FontAwesome.HEART, 16f, Color.RED);
 
     InteractionCellRenderer() {
         setLayout(new BorderLayout());

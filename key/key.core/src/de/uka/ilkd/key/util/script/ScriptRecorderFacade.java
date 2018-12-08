@@ -149,10 +149,9 @@ public class ScriptRecorderFacade {
     }
 
     public static void runRule(Goal goal, RuleApp app) {
-        System.out.println(app);
         InteractionLog state = get(goal.proof());
         RuleInteraction interaction = (new RuleInteraction(
-                goal.node().parent(), app));
+                goal.node(), app));
         state.getInteractions().add(interaction);
         emit(interaction);
     }

@@ -27,7 +27,7 @@ public class SettingChangeInteraction extends Interaction {
 
     @Override
     public String toString() {
-        return (message != null ? message + " : " : "" ) + type;
+        return (message != null ? message + " : " : "") + type;
     }
 
     public String getMessage() {
@@ -52,21 +52,20 @@ public class SettingChangeInteraction extends Interaction {
 
         StringWriter writer = new StringWriter();
         try {
-            savedSettings.store(writer,null);
+            savedSettings.store(writer, null);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         sb
-            .append("------\n")
-            .append("## SettingChangeInteraction ")
-            .append(type.name())
-            .append("\n")
-            .append("### message\n")
-            .append(message)
-            .append("### savedSettings: \n")
-            .append(writer)
-            .append("\n\n");
+                .append("------\n")
+                .append("## Change of the ")
+                .append(type.name())
+                .append(" settings")
+                .append("\n")
+                .append(message)
+                .append("\n\n").append("```\n").append(writer).append("\n```")
+                .append("\n\n");
 
         return sb.toString();
     }
