@@ -1,9 +1,8 @@
 package consistencyChecking.dependency;
 
-import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 
-public class NodeIntermediateNodeWalker {
+public abstract class NodeIntermediateWalker {
     /** the root the walker starts */
     private NodeIntermediate root;
 
@@ -13,7 +12,7 @@ public class NodeIntermediateNodeWalker {
     /** create the Walker 
      * @param root the NodeIntermediate where to begin
      */
-    public NodeIntermediateNodeWalker(NodeIntermediate root) {
+    public NodeIntermediateWalker(NodeIntermediate root) {
         this.root = root;
     }
 
@@ -50,10 +49,5 @@ public class NodeIntermediateNodeWalker {
     /** the action that is performed just before leaving the node the
      * last time 
      */
-    protected void doAction(NodeIntermediate node) {
-        // check if node is UseContractRule
-        if (node instanceof AppNodeIntermediate) {
-            System.out.println(((AppNodeIntermediate) node).getIntermediateRuleApp().getRuleName());
-        }
-    }
+    protected abstract void doAction(NodeIntermediate node);
 }

@@ -33,6 +33,7 @@ public class DependencyChecker implements Checker {
     ImmutableList<BranchNodeIntermediate> rootNodes = ImmutableSLList.nil();
     
     final static String PATH = "/home/wolfram/Schreibtisch/Cycle(Cycle__m()).JML operation contract.0.proof";
+    //final static String PATH = "/home/jakob/Desktop/Problems/Test(Test__m1()).JML operation contract.0.proof";
     
     @Override
     public boolean check(ImmutableList<Path> proofFiles) {
@@ -41,12 +42,15 @@ public class DependencyChecker implements Checker {
             for (Path proofPath : proofFiles) {
                 rootNodes.prepend(loadFile(proofPath));
             }
-            
-            buildDependencyGraph();
-            
-            // TODO: check if dependency graph contains problematic structures,
-            //          e.g. cycles, unproven dependencies, ...
-            
+            // construct dependency graph from proofs
+            DependencyGraph dependencyGraph = buildDependencyGraph();
+            // check if graph contains illegal structures,
+            //			e.g. cycles, unproven dependencies, ...
+            if(!dependencyGraph.isLegal()) {
+            	// if graph illegal, report problem(s)
+            	// TODO: what exactly are the problems
+            	//			and how can they be extracted?
+            }
         } catch (IOException e) {
             // TODO:
         } catch (ProofInputException e) {
@@ -55,8 +59,10 @@ public class DependencyChecker implements Checker {
         return true;
     }
     
-    private void buildDependencyGraph() {
-        // TODO:
+    public DependencyGraph buildDependencyGraph() {
+    	DependencyGraphFactory dependencyGraphFactory = new DependencyGraphFactory(rootNodes);
+    	dependencyGraphFactory.start();
+    	return dependencyGraphFactory.getResult();
     }
 
     public BranchNodeIntermediate loadFile(Path path) throws IOException, ProofInputException {

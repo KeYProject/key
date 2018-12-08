@@ -4,46 +4,41 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 public class DependencyNode {
 
-	private String myName;
-	private Modality myModality;
-	private Set<DependencyNode> myDependencies;
+	private FunctionalOperationContract myContract;
+	private Set<FunctionalOperationContract> myDependencies;
 
-	public DependencyNode(String name, Modality modality, Set<DependencyNode> dependencies) {
-		myName = name;
-		myModality = modality;
+	public DependencyNode(FunctionalOperationContract contract, Set<FunctionalOperationContract> dependencies) {
+		myContract = contract;
 		myDependencies = dependencies;
 	}
 
-	public DependencyNode(String name, Modality modality) {
-		this(name, modality, new HashSet<>());
+	public DependencyNode(FunctionalOperationContract contract) {
+		this(contract, new HashSet<>());
 	}
 
-	public void addDependency(DependencyNode node) {
-		myDependencies.add(node);
+	public void addDependency(FunctionalOperationContract contract) {
+		myDependencies.add(contract);
 	}
 
-	public String getName() {
-		return myName;
+	public FunctionalOperationContract getContract() {
+		return myContract;
 	}
 
-	public Modality getModality() {
-		return myModality;
-	}
-
-	public Set<DependencyNode> getDependencies() {
+	public Set<FunctionalOperationContract> getDependencies() {
 		return myDependencies;
 	}
 
 	// adapted from the classes: UseOperationContractRule and ProofCorrectnessMgt
 	public boolean isLegal() {
-		if (myModality == Modality.BOX) {
+		if (myContract.getModality() == Modality.BOX) {
 			return true;
 		}
-		for (DependencyNode currentNode : myDependencies) {
-			// TODO: implement according to UseOperationContractRule and ProofCorrectnessMgt
+		for (FunctionalOperationContract currentDependency : myDependencies) {
+			// TODO: implement ProofCorrectnessMgt.isContractApplicable() here
 		}
 		return true;
 	}
@@ -52,10 +47,8 @@ public class DependencyNode {
 	public boolean equals(Object o) {
 		if (o instanceof DependencyNode) {
 			DependencyNode node = (DependencyNode) o;
-			if (node.myName.equals(myName)) {
-				if (node.myModality == myModality) {
-					return true;
-				}
+			if (node.myContract.equals(myContract)) {
+				return true;
 			}
 		}
 		return false;
@@ -64,9 +57,12 @@ public class DependencyNode {
 	@Override
 	public String toString() {
 		String result = "";
-		result = result + myName + " " + myModality + " (";
-		for (DependencyNode currentDependency : myDependencies) {
-			result = result + currentDependency.myName + "," + currentDependency.myModality + " ";
+		result = result + myContract.getBaseName() + " -> (";
+		boolean first = true;
+		for (FunctionalOperationContract currentDependency : myDependencies) {
+			if(!first) result = result + " ";
+			result = result + currentDependency.getBaseName();
+			first = false;
 		}
 		result = result + ")";
 		return result;
