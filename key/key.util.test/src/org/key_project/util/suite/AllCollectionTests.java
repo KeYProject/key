@@ -16,6 +16,7 @@ package org.key_project.util.suite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.util.collection.TestImmutables;
+import org.key_project.util.collection.TestSLList;
 import org.key_project.util.testcase.collection.TestLeftistHeapOfInteger;
 import org.key_project.util.testcase.collection.TestMapAsListFromIntegerToString;
 import org.key_project.util.testcase.collection.TestSLListOfString;
@@ -31,6 +32,7 @@ import org.key_project.util.testcase.collection.TestSetAsListOfString;
     TestMapAsListFromIntegerToString.class,
     TestSetAsListOfString.class,
     TestSLListOfString.class,
+    TestSLList.class,
     TestImmutables.class
 })
 public class AllCollectionTests {
