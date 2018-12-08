@@ -1028,10 +1028,6 @@ public abstract class ProgramSVSort extends AbstractSort {
           return new MethodNameSort(new ProgramElementName(parameter));
         }
 
-        public String declarationString() {
-           return name().toString();
-        }
-
     }
 
     /**

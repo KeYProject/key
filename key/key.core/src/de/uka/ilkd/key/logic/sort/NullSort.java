@@ -71,6 +71,12 @@ public final class NullSort implements Sort  {
 	assert objectSort == services.getJavaInfo().objectSort();
 	
 	ImmutableSet<Sort> result = extCache.get();
+
+	// FIXME: This cache may be illegal.
+        // The service object may be the same, yet some types
+        // may have been added to the sort namespace.
+        // MU 2018
+
 	if(result == null || lastServices.get() != services) {
 	    result = DefaultImmutableSet.<Sort>nil();
 
@@ -104,42 +110,8 @@ public final class NullSort implements Sort  {
     
     
     @Override
-    public final SortDependingFunction getCastSymbol(TermServices services) {
-        SortDependingFunction result
-            = SortDependingFunction.getFirstInstance(CAST_NAME, services)
-        			   .getInstanceFor(this, services);
-        assert result.getSortDependingOn() == this && result.sort() == this;
-        return result;
-    }
-    
-    
-    @Override    
-    public final SortDependingFunction getInstanceofSymbol(TermServices services) {
-	SortDependingFunction result
-	    = SortDependingFunction.getFirstInstance(INSTANCE_NAME, services)
-                                   .getInstanceFor(this, services);
-	assert result.getSortDependingOn() == this; 
-	return result;
-    }    
-    
-    
-    @Override
-    public final SortDependingFunction getExactInstanceofSymbol(TermServices services) {
-	SortDependingFunction result
-            = SortDependingFunction.getFirstInstance(EXACT_INSTANCE_NAME, services)
-                                   .getInstanceFor(this, services);
-	assert result.getSortDependingOn() == this;
-	return result;
-    }
-    
-    
-    @Override
     public final String toString() {
         return NAME.toString();
     }
 
-    @Override
-    public String declarationString() {
-        return NAME.toString();
-    }
 }

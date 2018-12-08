@@ -27,28 +27,41 @@ public interface Sort extends Named {
     /**
      * Formulas are represented as "terms" of this sort.
      */
-    final Sort FORMULA = new SortImpl(new Name("Formula"));
+    Sort FORMULA = new SortImpl(new Name("Formula"));
     
     /**
      * Updates are represented as "terms" of this sort.
      */
-    final Sort UPDATE = new SortImpl(new Name("Update"));
+    Sort UPDATE = new SortImpl(new Name("Update"));
 
     /**
      * Term labels are represented as "terms" of this sort.
      */
-    final Sort TERMLABEL = new SortImpl(new Name("TermLabel"));
+    Sort TERMLABEL = new SortImpl(new Name("TermLabel"));
 
     /**
      * Any is a supersort of all sorts.
      */
-    final Sort ANY = new SortImpl(new Name("any"));    
-    
-    public final Name CAST_NAME = new Name("cast");
-    final Name INSTANCE_NAME = new Name("instance");
-    final Name EXACT_INSTANCE_NAME = new Name("exactInstance");    
-    
-    
+    Sort ANY = new SortImpl(new Name("any"));
+
+    /**
+     * The base name for the cast function family.
+     * Individual functions are called e.g. "C::cast" for sort C.
+     */
+    Name CAST_NAME = new Name("cast");
+
+    /**
+     * The base name for the instance (type membership) function family.
+     * Individual functions are called e.g. "C::instance" for sort C.
+     */
+    Name INSTANCE_NAME = new Name("instance");
+
+    /**
+     * The base name for the exact type membership function family.
+     * Individual functions are called e.g. "C::exactInstace" for sort C.
+     */
+    Name EXACT_INSTANCE_NAME = new Name("exactInstance");
+
     /**
      * Returns the direct supersorts of this sort. Not supported by NullSort.
      */
@@ -73,17 +86,42 @@ public interface Sort extends Named {
     /**
      * returns the cast symbol of this Sort
      */
-    SortDependingFunction getCastSymbol(TermServices services);
+    default SortDependingFunction getCastSymbol(TermServices services) {
+        SortDependingFunction result
+                = SortDependingFunction.getFirstInstance(CAST_NAME, services)
+                .getInstanceFor(this, services);
+        assert result.getSortDependingOn() == this && result.sort() == this;
+        return result;
+    }
     
     /**
      * returns the instanceof symbol of this Sort
      */
-    SortDependingFunction getInstanceofSymbol(TermServices services);
-    
+    default SortDependingFunction getInstanceofSymbol(TermServices services) {
+        SortDependingFunction result
+                = SortDependingFunction.getFirstInstance(INSTANCE_NAME, services)
+                .getInstanceFor(this, services);
+        assert result.getSortDependingOn() == this;
+        return result;
+    }
+
     /**
      * returns the exactinstanceof symbol of this Sort
      */
-    SortDependingFunction getExactInstanceofSymbol(TermServices services);
+    default SortDependingFunction getExactInstanceofSymbol(TermServices services)     {
+        SortDependingFunction result
+                = SortDependingFunction.getFirstInstance(EXACT_INSTANCE_NAME, services)
+                .getInstanceFor(this, services);
+        assert result.getSortDependingOn() == this;
+        return result;
+    }
 
-    String declarationString();
+    /**
+     * returns the string to be used for declarations.
+     *
+     * As of Dec 2018, all implementations use {@link #name()} for this value.
+     */
+    default String declarationString() {
+        return name().toString();
+    }
 }

@@ -80,44 +80,10 @@ public abstract class AbstractSort implements Sort {
     public final boolean isAbstract() {
 	return isAbstract;
     }
-    
 
-    @Override
-    public final SortDependingFunction getCastSymbol(TermServices services) {
-        SortDependingFunction result
-            = SortDependingFunction.getFirstInstance(CAST_NAME, services)
-        			   .getInstanceFor(this, services);
-        assert result.getSortDependingOn() == this && result.sort() == this;
-        return result;
-    }
-    
-    
-    @Override    
-    public final SortDependingFunction getInstanceofSymbol(TermServices services) {
-	SortDependingFunction result
-	    = SortDependingFunction.getFirstInstance(INSTANCE_NAME, services)
-                                   .getInstanceFor(this, services);
-	assert result.getSortDependingOn() == this; 
-	return result;
-    }    
-    
-    
-    @Override
-    public final SortDependingFunction getExactInstanceofSymbol(TermServices services) {
-	SortDependingFunction result
-            = SortDependingFunction.getFirstInstance(EXACT_INSTANCE_NAME, services)
-                                   .getInstanceFor(this, services);
-	assert result.getSortDependingOn() == this;
-	return result;
-    }
-    
-    
     @Override
     public final String toString() {
         return name.toString();
     }
 
-    public String declarationString() {
-        return name.toString();
-    }
 }
