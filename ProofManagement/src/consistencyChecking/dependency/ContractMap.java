@@ -7,7 +7,14 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 public class ContractMap {
 	
-	private Map<String, FunctionalOperationContract> myContractMap = new HashMap<>();
+	private Map<String, FunctionalOperationContract> myContractMap;
+	
+	public ContractMap(Map<String, FunctionalOperationContract> contractMap) {
+		myContractMap = contractMap;
+	}
+	public ContractMap() {
+		this(new HashMap<>());
+	}
 	
 	public FunctionalOperationContract lookup(String contractName) {
 		if(!myContractMap.containsKey(contractName)) {

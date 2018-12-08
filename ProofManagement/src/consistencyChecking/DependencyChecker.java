@@ -1,4 +1,4 @@
-package consistencyChecking.dependency;
+package consistencyChecking;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -8,7 +8,8 @@ import java.util.Properties;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import consistencyChecking.Checker;
+import consistencyChecking.dependency.DependencyGraph;
+import consistencyChecking.dependency.DependencyGraphFactory;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
@@ -26,11 +27,12 @@ import de.uka.ilkd.key.proof.io.IntermediatePresentationProofFileParser;
 import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class DependencyChecker implements Checker {
 
-    ImmutableList<BranchNodeIntermediate> rootNodes = ImmutableSLList.nil();
+    ImmutableList<Pair<String, BranchNodeIntermediate>> contractProofPairs = ImmutableSLList.nil();
     
     final static String PATH = "/home/wolfram/Schreibtisch/Cycle(Cycle__m()).JML operation contract.0.proof";
     //final static String PATH = "/home/jakob/Desktop/Problems/Test(Test__m1()).JML operation contract.0.proof";
@@ -40,10 +42,13 @@ public class DependencyChecker implements Checker {
         try {
             // for each proof: construct AST
             for (Path proofPath : proofFiles) {
-                rootNodes.prepend(loadFile(proofPath));
+            	Pair<String, BranchNodeIntermediate> currentContractAndProof = loadFile(proofPath);
+                contractProofPairs = contractProofPairs.prepend(currentContractAndProof);
             }
             // construct dependency graph from proofs
-            DependencyGraph dependencyGraph = buildDependencyGraph();
+            DependencyGraphFactory dependencyGraphFactory = new DependencyGraphFactory(contractProofPairs);
+        	dependencyGraphFactory.start();
+        	DependencyGraph dependencyGraph =  dependencyGraphFactory.getResult();
             // check if graph contains illegal structures,
             //			e.g. cycles, unproven dependencies, ...
             if(!dependencyGraph.isLegal()) {
@@ -58,14 +63,8 @@ public class DependencyChecker implements Checker {
         }
         return true;
     }
-    
-    public DependencyGraph buildDependencyGraph() {
-    	DependencyGraphFactory dependencyGraphFactory = new DependencyGraphFactory(rootNodes);
-    	dependencyGraphFactory.start();
-    	return dependencyGraphFactory.getResult();
-    }
 
-    public BranchNodeIntermediate loadFile(Path path) throws IOException, ProofInputException {
+    public Pair<String, BranchNodeIntermediate> loadFile(Path path) throws IOException, ProofInputException {
         Profile profile = AbstractProfile.getDefaultProfile();
         FileRepo fileRepo = new DiskFileRepo("testProof");
         fileRepo.setBaseDir(path);
@@ -107,7 +106,9 @@ public class DependencyChecker implements Checker {
         
         parser = new IntermediatePresentationProofFileParser(proof);
         pi.tryReadProof(parser, keyFile);
-        BranchNodeIntermediate result = parser.getParsedResult();
-        return result;
+        // TODO: check if this is really always the proper contract name
+        String contractString = path.getFileName().toString();
+        BranchNodeIntermediate proofTree = parser.getParsedResult();
+        return new Pair<String,BranchNodeIntermediate>(contractString, proofTree);
     }
 }

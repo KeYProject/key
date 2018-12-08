@@ -7,6 +7,7 @@ import de.uka.ilkd.key.proof.io.intermediate.AppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediateWalker;
 
 public class ContractApplicationCollector extends NodeIntermediateWalker {
 

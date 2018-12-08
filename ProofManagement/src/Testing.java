@@ -1,10 +1,10 @@
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import consistencyChecking.dependency.DependencyChecker;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import consistencyChecking.DependencyChecker;
 
 public class Testing {
 
@@ -12,11 +12,8 @@ public class Testing {
 	
 	public static void main(String[] args) {
 		DependencyChecker myDependencyChecker = new DependencyChecker();
-		try {
-			BranchNodeIntermediate root =  myDependencyChecker.loadFile(PATH);
-			
-		} catch (ProofInputException | IOException e) {
-			e.printStackTrace();
-		}
+		ImmutableList<Path> proofFiles = ImmutableSLList.nil();
+		proofFiles = proofFiles.prepend(PATH);
+		myDependencyChecker.check(proofFiles);
 	}	
 }

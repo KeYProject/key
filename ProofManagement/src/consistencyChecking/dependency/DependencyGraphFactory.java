@@ -6,28 +6,31 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.util.Pair;
 
 public class DependencyGraphFactory {
 	
 	private ContractMap myContractMap;
-	private ImmutableList<BranchNodeIntermediate> myRootNodes;
+	private ImmutableList<Pair<String, BranchNodeIntermediate>> myContractProofPairs;
 	private DependencyGraph myDependencyGraph = new DependencyGraph();
 	
-	public DependencyGraphFactory(ImmutableList<BranchNodeIntermediate> rootNodes, ContractMap contractMap) {
-    	myRootNodes = rootNodes;
+	public DependencyGraphFactory(ImmutableList<Pair<String, BranchNodeIntermediate>> contractProofPairs, ContractMap contractMap) {
+    	myContractProofPairs = contractProofPairs;
     	myContractMap = contractMap;
     }
-	public DependencyGraphFactory(ImmutableList<BranchNodeIntermediate> rootNodes) {
-		this(rootNodes, new ContractMap());
+	public DependencyGraphFactory(ImmutableList<Pair<String, BranchNodeIntermediate>> contractProofPairs) {
+		this(contractProofPairs, new ContractMap());
 	}
 
 	public void start() {
-		for(BranchNodeIntermediate currentIntermediate : myRootNodes) {
+		for(Pair<String,BranchNodeIntermediate> currentContractProofPair : myContractProofPairs) {
+			String currentContractString = currentContractProofPair.first;
+			BranchNodeIntermediate currentIntermediateNode = currentContractProofPair.second;
 			// TODO: we need here the string of the contract that this proof belongs to instead of null
-			FunctionalOperationContract currentContract = null;
+			FunctionalOperationContract currentContract = myContractMap.lookup(currentContractString);
 			DependencyNode currentDependencyNode = new DependencyNode(currentContract);
 			// collect all contracts referenced in the proof
-			ContractApplicationCollector contractApplicationCollector = new ContractApplicationCollector(currentIntermediate);
+			ContractApplicationCollector contractApplicationCollector = new ContractApplicationCollector(currentIntermediateNode);
 			contractApplicationCollector.start();
 			Set<String> dependentContractsAsStrings = contractApplicationCollector.getResult();
 			// get contract from string and add it to the dependency set
