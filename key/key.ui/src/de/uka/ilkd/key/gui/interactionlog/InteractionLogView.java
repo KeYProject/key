@@ -16,6 +16,12 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
@@ -101,18 +107,6 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
 
         ScriptRecorderFacade.addListener(this::onInteraction);
 
-        interactionLogSelection.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> jList, Object o, int i, boolean b, boolean b1) {
-                String name = "-";
-                if (o != null) {
-                    name = o.toString();
-                }
-
-                return super.getListCellRendererComponent(jList, name, i, b, b1);
-            }
-        });
-
         interactionLogSelection.setModel(ScriptRecorderFacade.getLoadedInteractionLogs());
         interactionLogSelection.addActionListener(this::handleSelectionChange);
         interactionLogSelection.setModel(ScriptRecorderFacade.getLoadedInteractionLogs());
@@ -134,6 +128,25 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         interactionLogSelection.setModel(
                 ScriptRecorderFacade.getLoadedInteractionLogs()
         );
+
+        new DropTarget(listInteraction, 0, new DropTargetAdapter() {
+            @Override
+            public void drop(DropTargetDropEvent dtde) {
+                Transferable tr = dtde.getTransferable();
+                try {
+                    Object textFlavour = tr.getTransferData(DataFlavor.stringFlavor);
+                    dtde.acceptDrop(dtde.getDropAction());
+                    dtde.dropComplete(true);
+                    SwingUtilities.invokeLater(() -> {
+                        addUserNoteAction.doAddNote(textFlavour.toString());
+                    });
+                    return;
+                } catch (UnsupportedFlavorException | IOException e) {
+                    e.printStackTrace();
+                }
+                dtde.rejectDrop();
+            }
+        });
 
         setLayout(new BorderLayout());
         add(panelButtons, BorderLayout.NORTH);
@@ -288,7 +301,11 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Optional<String> note = MultiLineInputPrompt.show(InteractionLogView.this, "Enter note...");
+            doAddNote("");
+        }
+
+        public void doAddNote(String prefilled) {
+            Optional<String> note = new MultiLineInputPrompt(InteractionLogView.this, prefilled).show();
             if (note.isPresent()) {
                 UserNoteInteraction interaction = new UserNoteInteraction(note.get());
                 InteractionLog interactionLog = (InteractionLog) interactionLogSelection.getSelectedItem();
@@ -296,7 +313,10 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
                     interactionLog.getInteractions().add(interaction);
                 onInteraction(interaction);
             }
+
         }
+
+
     }
 
     private class ToggleFavouriteAction extends AbstractAction {
@@ -345,14 +365,68 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
 }
 
 class MultiLineInputPrompt {
-    public static Optional<String> show(JComponent parent, String title) {
-        JPanel panel = new JPanel(new BorderLayout());
-        JTextArea area = new JTextArea();
-        panel.add(new JScrollPane(area));
-        int c = JOptionPane.showConfirmDialog(parent, panel, "Enter note...", JOptionPane.OK_CANCEL_OPTION);
-        if (c == JOptionPane.OK_OPTION) {
-            return Optional.of(area.getText());
-        } else return Optional.empty();
+    private final String text;
+    private JComponent parent;
+    private JDialog dialog;
+    private String acceptedAnswer;
+
+    public MultiLineInputPrompt(JComponent parent, String prefilled) {
+        this.parent = parent;
+        this.text = prefilled;
+    }
+
+    protected JDialog getDialog() {
+        if (dialog == null) {
+            dialog = new JDialog(JOptionPane.getFrameForComponent(parent));
+            dialog.setModal(true);
+            dialog.setTitle("Enter note...");
+
+            JPanel root = new JPanel(new BorderLayout(10, 10));
+            JPanel box = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            root.add(box, BorderLayout.SOUTH);
+            JTextArea area = new JTextArea(text);
+            JButton btnOk = new JButton("Ok");
+            JButton btnCancel = new JButton("Cancel");
+            box.add(btnOk);
+            box.add(btnCancel);
+
+            btnOk.addActionListener((evt) -> accept(area.getText()));
+            btnCancel.addActionListener((evt) -> cancel());
+            dialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+            dialog.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    cancel();
+                }
+            });
+            dialog.setContentPane(root);
+
+            root.add(new JScrollPane(area), BorderLayout.CENTER);
+
+            dialog.setSize(300, 200);
+            dialog.setLocationRelativeTo(parent);
+
+        }
+        return dialog;
+    }
+
+    private void cancel() {
+        acceptedAnswer = null;
+        getDialog().setVisible(false);
+    }
+
+    private void accept(String text) {
+        acceptedAnswer = text;
+        getDialog().setVisible(false);
+    }
+
+    public Optional<String> show() {
+        getDialog().setVisible(true);
+        return Optional.ofNullable(acceptedAnswer);
+    }
+
+    public void setParent(JComponent parent) {
+        this.parent = parent;
     }
 }
 
