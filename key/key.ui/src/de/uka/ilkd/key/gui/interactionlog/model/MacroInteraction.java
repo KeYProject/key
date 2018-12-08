@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.util.script;
+package de.uka.ilkd.key.gui.interactionlog.model;
 
 import java.util.List;
 import java.util.stream.Collectors;

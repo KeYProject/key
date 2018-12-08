@@ -62,7 +62,6 @@ import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.script.ScriptRecorderFacade;
 
 
 /**
@@ -830,7 +829,6 @@ public class Proof implements Named {
         }
         ImmutableList<Node> result = pruner.prune(cuttingPoint);
         if (fireChanges) {
-            ScriptRecorderFacade.runPrune(cuttingPoint);
             fireProofGoalsChanged();
             fireProofPruned(cuttingPoint);
         }

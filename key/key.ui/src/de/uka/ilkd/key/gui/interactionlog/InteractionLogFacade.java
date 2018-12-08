@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.util.script;
+package de.uka.ilkd.key.gui.interactionlog;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.gui.interactionlog.model.InteractionLog;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 
 /**

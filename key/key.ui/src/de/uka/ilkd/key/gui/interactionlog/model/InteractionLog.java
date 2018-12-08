@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.util.script;
+package de.uka.ilkd.key.gui.interactionlog.model;
 
 import java.io.Serializable;
 import java.lang.ref.WeakReference;

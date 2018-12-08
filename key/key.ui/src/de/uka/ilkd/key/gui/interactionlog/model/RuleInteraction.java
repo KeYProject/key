@@ -1,8 +1,9 @@
-package de.uka.ilkd.key.util.script;
+package de.uka.ilkd.key.gui.interactionlog.model;
 
 import java.util.HashMap;
 import java.util.Iterator;
 
+import de.uka.ilkd.key.gui.interactionlog.InteractionLogFacade;
 import org.key_project.util.collection.ImmutableMapEntry;
 
 import de.uka.ilkd.key.java.Services;

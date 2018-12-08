@@ -1,7 +1,6 @@
-package de.uka.ilkd.key.util.script;
+package de.uka.ilkd.key.gui.interactionlog.model;
 
 import java.beans.Transient;
-import java.util.Date;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;

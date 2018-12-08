@@ -7,9 +7,9 @@ import de.uka.ilkd.key.gui.Markdown;
 import de.uka.ilkd.key.gui.fonticons.FontAwesome;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.interactionlog.model.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.script.*;
 import sun.swing.DefaultLookup;
 
 import javax.swing.*;
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class InteractionLogView extends JPanel implements InteractionListeners {
+public class InteractionLogView extends JPanel implements InteractionRecorderListener {
     private static final float SMALL_ICON_SIZE = 16f;
     private final ExportProofScriptAction actionExportProofScript = new ExportProofScriptAction();
     private final SaveAction saveAction = new SaveAction();
@@ -40,7 +40,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
     private final ToggleFavouriteAction toggleFavouriteAction = new ToggleFavouriteAction();
     private final JumpIntoTreeAction jumpIntoTreeAction = new JumpIntoTreeAction();
     private final TryReapplyAction tryReapplyAction = new TryReapplyAction();
-
+    private final InteractionRecorder recoder = new InteractionRecorder();
 
     /**
      * the list of individual interactions (like impRight, auto, ...) in currently selected
@@ -55,7 +55,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
      * list of interactions, will be replaced on every change of the interactionLogSelection
      */
     private final DefaultListModel<Interaction> interactionListModel = new DefaultListModel<>();
-    //private final Box panelButtons = new Box(BoxLayout.X_AXIS);
+
     private final JToolBar panelButtons = new JToolBar();
 
     private final Services services;
@@ -105,11 +105,11 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         listInteraction.setComponentPopupMenu(popup);
 
 
-        ScriptRecorderFacade.addListener(this::onInteraction);
+        recoder.addListener(this::onInteraction);
 
-        interactionLogSelection.setModel(ScriptRecorderFacade.getLoadedInteractionLogs());
+        interactionLogSelection.setModel(recoder.getLoadedInteractionLogs());
         interactionLogSelection.addActionListener(this::handleSelectionChange);
-        interactionLogSelection.setModel(ScriptRecorderFacade.getLoadedInteractionLogs());
+        interactionLogSelection.setModel(recoder.getLoadedInteractionLogs());
 
         listInteraction.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
@@ -126,7 +126,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
 
 
         interactionLogSelection.setModel(
-                ScriptRecorderFacade.getLoadedInteractionLogs()
+                recoder.getLoadedInteractionLogs()
         );
 
         new DropTarget(listInteraction, 0, new DropTargetAdapter() {
@@ -151,7 +151,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         setLayout(new BorderLayout());
         add(panelButtons, BorderLayout.NORTH);
         add(new JScrollPane(listInteraction));
-        ScriptRecorderFacade.addListener(this);
+        recoder.addListener(this);
 
         setBorder(BorderFactory.createTitledBorder("Interactions"));
 
@@ -182,7 +182,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
     private void setCurrentProof(Proof proof) {
         if (proof == null) return;
         currentProof = proof;
-        ScriptRecorderFacade.get(currentProof);
+        recoder.get(currentProof);
         //rebuildList();
     }
 
@@ -191,7 +191,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         InteractionLog currentInteractionLog = getSelectedItem();
         System.out.println(currentInteractionLog.getMarkdownText());
         if (currentProof != null) {
-            InteractionLog state = ScriptRecorderFacade.get(currentProof);
+            InteractionLog state = recoder.get(currentProof);
             updateList(state);
         }
     }
@@ -211,6 +211,34 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         rebuildList();
     }
 
+    public ExportProofScriptAction getActionExportProofScript() {
+        return actionExportProofScript;
+    }
+
+    public SaveAction getSaveAction() {
+        return saveAction;
+    }
+
+    public LoadAction getLoadAction() {
+        return loadAction;
+    }
+
+    public AddUserNoteAction getAddUserNoteAction() {
+        return addUserNoteAction;
+    }
+
+    public JumpIntoTreeAction getJumpIntoTreeAction() {
+        return jumpIntoTreeAction;
+    }
+
+    public TryReapplyAction getTryReapplyAction() {
+        return tryReapplyAction;
+    }
+
+    public InteractionRecorder getRecoder() {
+        return recoder;
+    }
+
     private class InteractionLogModelItem extends DefaultComboBoxModel<InteractionLog> {
     }
 
@@ -224,7 +252,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
         @Override
         public void actionPerformed(ActionEvent e) {
             LogPrinter lp = new LogPrinter(services);
-            InteractionLog state = ScriptRecorderFacade.get(currentProof);
+            InteractionLog state = recoder.get(currentProof);
             String ps = lp.print(state);
             System.out.println(ps);
         }
@@ -248,7 +276,7 @@ public class InteractionLogView extends JPanel implements InteractionListeners {
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 try {
                     File file = fileChooser.getSelectedFile();
-                    ScriptRecorderFacade.readInteractionLog(file);
+                    recoder.readInteractionLog(file);
                     //addInteractionLog(importedLog);
                 } catch (IOException exception) {
                     JOptionPane.showMessageDialog(null,

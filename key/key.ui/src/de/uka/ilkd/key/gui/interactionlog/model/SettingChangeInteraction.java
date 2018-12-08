@@ -1,4 +1,6 @@
-package de.uka.ilkd.key.util.script;
+package de.uka.ilkd.key.gui.interactionlog.model;
+
+import de.uka.ilkd.key.control.InteractionListener;
 
 import java.awt.*;
 import java.io.IOException;
@@ -12,14 +14,14 @@ import java.util.Properties;
 public class SettingChangeInteraction extends Interaction {
     private String message;
     private Properties savedSettings;
-    private SettingType type;
+    private InteractionListener.SettingType type;
 
     public SettingChangeInteraction() {
         graphicalStyle.setBackgroundColor(Color.WHITE);
         graphicalStyle.setForegroundColor(Color.gray);
     }
 
-    public SettingChangeInteraction(Properties settings, SettingType t) {
+    public SettingChangeInteraction(Properties settings, InteractionListener.SettingType t) {
         this();
         savedSettings = settings;
         type = t;
@@ -68,9 +70,5 @@ public class SettingChangeInteraction extends Interaction {
                 .append("\n\n");
 
         return sb.toString();
-    }
-
-    enum SettingType {
-        SMT, CHOICE, STRATEGY
     }
 }

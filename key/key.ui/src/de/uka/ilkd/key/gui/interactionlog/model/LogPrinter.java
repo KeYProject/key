@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.util.script;
+package de.uka.ilkd.key.gui.interactionlog.model;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
