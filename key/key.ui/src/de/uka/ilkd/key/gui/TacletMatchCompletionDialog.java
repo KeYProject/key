@@ -32,6 +32,7 @@ import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultCellEditor;
@@ -57,9 +58,11 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.nodeviews.PosInSequentTransferable;
 import de.uka.ilkd.key.gui.utilities.BracketMatchingTextArea;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ModelChangeListener;
 import de.uka.ilkd.key.proof.ModelEvent;
@@ -609,30 +612,32 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 			    
 			    public void drop (DropTargetDropEvent event) {
 				Transferable transferable = event.getTransferable();
-				if(transferable.isDataFlavorSupported(PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER)) {
-			    	
-			    	
-					try {
-						event.acceptDrop(DnDConstants.ACTION_MOVE);
-				    	PosInSequent pis = (PosInSequent) transferable.getTransferData(PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
-						Term term = pis.getPosInOccurrence().subTerm();				    	
-				    	String droppedString = LogicPrinter.quickPrintTerm(term, mediator.getServices(), mediator.getNotationInfo().isPrettySyntax(), false);
-				    	
-						if(droppedString != null){
-								   
-							int pos=textarea.viewToModel
-								    (event.getLocation());
-								textarea.insert(droppedString, pos);
-						}
-						event.getDropTargetContext().dropComplete(true);
-					} catch (Exception e) {
-						event.rejectDrop();
-					} 
-			    	
-			    	
-			    	
-			    }
-				else 
+                    if(transferable.isDataFlavorSupported(PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER)) {
+
+
+                        try {
+                            event.acceptDrop(DnDConstants.ACTION_MOVE);
+                            PosInSequent pis = (PosInSequent) transferable.getTransferData(PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
+                            Term term = pis.getPosInOccurrence().subTerm();
+                            // Reactivate this when the parser is fully capable again.
+                            // String droppedString = LogicPrinter.quickPrintTerm(term, mediator.getServices(), mediator.getNotationInfo().isPrettySyntax(), false);
+                            String droppedString = printTerm(term);
+
+                            if(droppedString != null){
+
+                                int pos=textarea.viewToModel
+                                        (event.getLocation());
+                                textarea.insert(droppedString, pos);
+                            }
+                            event.getDropTargetContext().dropComplete(true);
+                        } catch (Exception e) {
+                            event.rejectDrop();
+                        }
+
+
+
+                    }
+                    else
 					if (transferable.isDataFlavorSupported 
 				    (DataFlavor.stringFlavor)){	  
 				    event.acceptDrop(DnDConstants.ACTION_MOVE);
@@ -657,7 +662,39 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 				}
 								
 			    }
-			    public void dropActionChanged(DropTargetDragEvent dtde) {}
+
+                private String printTerm(Term term) {
+                    final NotationInfo ni = new NotationInfo();
+
+                    Services services = mediator.getServices();
+                    LogicPrinter p = new LogicPrinter(new ProgramPrinter(), ni, services);
+                    boolean pretty = mediator.getNotationInfo().isPrettySyntax();
+                    ni.refresh(services, pretty, false);
+                    Map<Object, Notation> tbl = ni.getNotationTable();
+
+                    if(pretty) {
+                        // While the parser is not fully capable, deactivate a few things.
+                        final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+                        tbl.remove(setLDT.getUnion());
+                        tbl.remove(setLDT.getIntersect());
+                        tbl.remove(setLDT.getSetMinus());
+                        tbl.remove(setLDT.getElementOf());
+                        tbl.remove(setLDT.getSubset());
+                        tbl.remove(setLDT.getEmpty());
+                        tbl.remove(setLDT.getAllFields());
+                        tbl.remove(IObserverFunction.class);
+                        tbl.remove(IProgramMethod.class);
+                    }
+
+                    try {
+                        p.printTerm(term);
+                    } catch (IOException ioe) {
+                        return term.toString();
+                    }
+                    return p.result().toString();
+                }
+
+				public void dropActionChanged(DropTargetDragEvent dtde) {}
 			});        
 		ta.setDropTarget(aDropTarget);
 	    }
