@@ -154,4 +154,25 @@ public final class Immutables {
         return result.reverse();
     }
 
+    public static <T> ImmutableList<T> listOf(T... elements) {
+        ImmutableList<T> result = ImmutableSLList.<T>nil();
+        for (T t : elements) {
+            result = result.prepend(t);
+        }
+        return result.reverse();
+    }
+
+    public static <T> ImmutableList<T> listOf(T element) {
+        ImmutableList<T> result = ImmutableSLList.<T>nil();
+        result = result.prepend(element);
+        return result.reverse();
+    }
+
+    public static <T> ImmutableSet<T> setOf(T... elements) {
+        return DefaultImmutableSet.fromImmutableList(listOf(elements));
+    }
+
+    public static <T> ImmutableSet<T> setOf(T element) {
+        return DefaultImmutableSet.fromImmutableList(listOf(element));
+    }
 }

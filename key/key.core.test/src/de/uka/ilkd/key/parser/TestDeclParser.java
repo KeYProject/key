@@ -16,6 +16,8 @@ package de.uka.ilkd.key.parser;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.sort.*;
 import junit.framework.TestCase;
 
 import org.antlr.runtime.RecognitionException;
@@ -31,11 +33,10 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.ProxySort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.ParametricSort;
+import static de.uka.ilkd.key.logic.sort.ParametricSort.Variance.*;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import org.key_project.util.collection.Immutables;
 
 
 public class TestDeclParser extends TestCase {
@@ -88,12 +89,88 @@ public class TestDeclParser extends TestCase {
     }
 
     public void testSortDecl() {
+
+
 	parseDecls("\\sorts { elem; list; }");
 	assertEquals("find sort elem", new Name("elem"),
 		     nss.sorts().lookup(new Name("elem")).name()); 
 	assertEquals("find sort list", new Name("list"),
 		     nss.sorts().lookup(new Name("list")).name());
     }
+
+	public void testSortDeclFail() {
+		try {
+			String s = "\\sorts { X; X; }";
+			KeYParserF p = stringParser(s);
+			p.decls();
+			fail("Parsing " + s + " should have failed");
+		} catch (Exception ex) {
+			assertTrue(ex.getMessage().contains("already declared"));
+		}
+
+	}
+
+	public void testParametericSortDecl() {
+		parseDecls("\\sorts { \\generic E, F, G; " +
+				"coll<[E]>; list<[+E]> \\extends coll<[E]>;" +
+				"var<[-E, +F, G]>; }");
+
+		Sort e = nss.sorts().lookup("E");
+		ParametricSort list = (ParametricSort) nss.sorts().lookup("list");
+		ParametricSort coll = (ParametricSort) nss.sorts().lookup("coll");
+		ParametricSort var = (ParametricSort) nss.sorts().lookup("var");
+
+		assertTrue(e instanceof GenericSort);
+		assertTrue(coll instanceof ParametricSort);
+		assertTrue(list instanceof ParametricSort);
+
+		assertEquals(
+				Immutables.listOf(CONTRAVARIANT, COVARIANT, INVARIANT),
+				var.getCovariances());
+
+		assertEquals("{coll<[E]>}", list.extendsSorts().toString());
+
+		assertEquals("{any}", coll.extendsSorts().toString());
+	}
+
+	public void testParametericSortDeclFails() {
+    	try {
+			String s = "\\sorts { parametric<[E]>; }";
+			KeYParserF p = stringParser(s);
+			p.decls();
+			fail("Parsing " + s + " should have failed");
+		} catch (Exception ex) {
+			assertTrue(ex.getMessage().contains("Formal type parameters must be (already declared) generic sorts"));
+		}
+
+		try {
+			String s = "\\sorts { \\generic E; doubled<[E,E]>; }";
+			KeYParserF p = stringParser(s);
+			p.decls();
+			fail("Parsing " + s + " should have failed");
+		} catch (Exception ex) {
+			assertTrue(ex.getMessage().contains("unique"));
+		}
+
+
+		try {
+			String s = "\\sorts { parametric<[int]>; }";
+			KeYParserF p = stringParser(s);
+			p.decls();
+			fail("Parsing " + s + " should have failed");
+		} catch (Exception ex) {
+			assertTrue(ex.getMessage().contains("Formal type parameters must be (already declared) generic sorts"));
+		}
+
+		try {
+			String s = "\\sorts { \\generic E; int<[E]>; }";
+			KeYParserF p = stringParser(s);
+			p.decls();
+			fail("Parsing " + s + " should have failed");
+		} catch (Exception ex) {
+			assertTrue(ex.getMessage().contains("already declared"));
+		}
+	}
 
 
     protected GenericSort checkGenericSort ( Named            p_n,
@@ -293,6 +370,28 @@ public class TestDeclParser extends TestCase {
   	assertTrue("Cloneable should extend Object ", 
 		   cloneableSort.extendsSorts().contains(objectSort));
     }
+
+    public void testFunctionPolymorphicDecl() {
+		parseDecls("\\sorts { \\generic elem; list<[+elem]>; }\n" +
+				"\\functions {\n" +
+				"  elem elem::head(list<[elem]>);\n" +
+				"  list<[elem]> elem::tail(list<[elem]>);\n" +
+				"  list<[elem]> elem::nil;\n" +
+				"  list<[elem]> elem::cons(elem, list<[elem]>);\n" +
+				"}\n");
+
+
+        SortDependingFunction head = (SortDependingFunction) nss.functions().lookup("any::head");
+        SortDependingFunction inthead = head.getInstanceFor(nss.sorts().lookup("int"), serv);
+        assertEquals("int", inthead.sort().toString());
+        assertEquals("[list<[int]>]", inthead.argSorts().toString());
+
+        SortDependingFunction cons = (SortDependingFunction) nss.functions().lookup("any::cons");
+        SortDependingFunction intcons = cons.getInstanceFor(nss.sorts().lookup("int"), serv);
+        assertEquals("list<[int]>", intcons.sort().toString());
+        assertEquals("[int,list<[int]>]", intcons.argSorts().toString());
+
+	}
   
     public void testFunctionDecl() {
 	parseDecls("\\sorts { elem; list; }\n" +

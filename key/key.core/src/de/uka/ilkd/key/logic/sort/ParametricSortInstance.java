@@ -6,6 +6,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.function.Function;
 
@@ -23,6 +24,7 @@ public class ParametricSortInstance extends AbstractSort {
         if (cached != null) {
             return cached;
         } else {
+            CACHE.put(sort, sort);
             return sort;
         }
     }
@@ -50,11 +52,11 @@ public class ParametricSortInstance extends AbstractSort {
 
         // 2. extensions by variances
         ImmutableList<ParametricSort.Variance> cov = base.getCovariances();
-        for (int i = 0; !cov.isEmpty(); i++) {
+        for (int i = 0; !cov.isEmpty(); i++, cov = cov.tail()) {
             switch(cov.head()) {
                 case COVARIANT:
                     // take all bases of that arg and add the modified sort as ext class
-                    for (Sort s : parameters) {
+                    for (Sort s : parameters.get(i).extendsSorts()) {
                         ImmutableList<Sort> newArgs = parameters.replace(i, s);
                         result = result.add(ParametricSortInstance.get(base, newArgs));
                     }
@@ -89,5 +91,19 @@ public class ParametricSortInstance extends AbstractSort {
         ImmutableList<Sort> newParameters = parameters.map(f);
         // The cache ensures that no unnecessary duplicates are kept.
         return get(base, newParameters);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ParametricSortInstance that = (ParametricSortInstance) o;
+        return Objects.equals(parameters, that.parameters) &&
+                base == that.base;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(parameters, base);
     }
 }

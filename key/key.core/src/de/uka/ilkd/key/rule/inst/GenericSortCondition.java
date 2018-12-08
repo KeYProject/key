@@ -14,11 +14,12 @@
 package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.util.collection.*;
 
 
 /**
@@ -40,7 +41,7 @@ public abstract class GenericSortCondition {
      * (no generic sorts) or never compatible (non generic sorts that
      * don't match)
      */
-    public static GenericSortCondition createCondition(SchemaVariable sv,
+    public static ImmutableSet<GenericSortCondition> createCondition(SchemaVariable sv,
 													   InstantiationEntry<?> p_entry) {
 
         if (!( p_entry instanceof TermInstantiation)) {
@@ -52,24 +53,6 @@ public abstract class GenericSortCondition {
         return createCondition ( sv.sort (),
                                  ti.getInstantiation ().sort (),
                                  !subSortsAllowed ( sv ) );
-    }
-
-    /**
-     * Create a condition ensuring that the two given symbols become
-     * identical; "p0" may be of generic sort, "p1" not
-     * @return the resulting condition; null if the symbols are either
-     * incompatible or equal
-     */
-    public static GenericSortCondition createCondition
-	( SortDependingFunction p0,
-	  SortDependingFunction p1 ) {
-
-	if ( !p0.isSimilar ( p1 ) )
-	    return null;
-
-	return createCondition ( p0.getSortDependingOn (),
-				 p1.getSortDependingOn (),
-				 true );
     }
 
     /**
@@ -93,8 +76,7 @@ public abstract class GenericSortCondition {
      * sorts) or never compatible (e.g. non generic sorts that don't
      * match)
      */
-    protected static GenericSortCondition createCondition
-	( Sort s0, Sort s1, boolean p_identity ) {
+    private static ImmutableSet<GenericSortCondition> createCondition(Sort s0, Sort s1, boolean p_identity) {
 	while ( s0 instanceof ArraySort ) {
 	    // Currently the sort hierarchy is not inherited by
 	    // collection sorts; therefore identity has to be ensured
@@ -107,17 +89,40 @@ public abstract class GenericSortCondition {
 	    s1 = ((ArraySort)s1).elementSort ();
 	}
 
+        if ( s0 instanceof ParametricSortInstance ) {
+            if ( !(s1 instanceof ParametricSortInstance) ) {
+                return null;
+            }
+            ParametricSortInstance ps0 = (ParametricSortInstance) s0;
+            ParametricSortInstance ps1 = (ParametricSortInstance) s1;
+
+            if(ps0.getBase() != ps1.getBase()) {
+                return null;
+            }
+
+            ImmutableSet<GenericSortCondition> result = DefaultImmutableSet.nil();
+            ImmutableList<Sort> pa0 = ps0.getParameters();
+            ImmutableList<Sort> pa1 = ps1.getParameters();
+            while(!pa0.isEmpty()) {
+                result = result.union(createCondition(pa0.head(), pa1.head(), p_identity));
+                pa0 = pa0.tail();
+                pa1 = pa1.tail();
+            }
+
+            return result;
+        }
+
+
 	if ( !( s0 instanceof GenericSort ) 
-	       || s1 == Sort.FORMULA 
-	       || s1 == Sort.UPDATE)
+                || s1 == Sort.FORMULA || s1 == Sort.UPDATE)
 	    return null;
 
 	final GenericSort gs = (GenericSort) s0;
     
 	if ( p_identity ) {
-            return createIdentityCondition ( gs, s1 );
+            return Immutables.setOf(createIdentityCondition ( gs, s1 ));
         } else {
-            return createSupersortCondition ( gs, s1 );
+            return Immutables.setOf(createSupersortCondition ( gs, s1 ));
         }
     }
 

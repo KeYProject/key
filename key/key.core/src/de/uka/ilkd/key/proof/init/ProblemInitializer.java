@@ -338,17 +338,22 @@ public final class ProblemInitializer {
         Namespace<QuantifiableVariable> newVarNS = new Namespace<>();
         Namespace<Sort> newSortNS = new Namespace<>();
         Namespace<Function> newFuncNS = new Namespace<>();
+
+        // FIXME. This is a temporary fix --
+        // https://git.key-project.org/key/key/issues/720
+        // It does not really work like this.
+        
         for(Sort n : initConfig.sortNS().allElements()) {
-            if(!(n instanceof GenericSort)) {
+         //   if(!(n instanceof GenericSort)) {
                 newSortNS.addSafely(n);
-            }
+         //   }
         }
         for(Function n : initConfig.funcNS().allElements()) {
-            if(!(n instanceof SortDependingFunction
+        /*    if(!(n instanceof SortDependingFunction
                     && ((SortDependingFunction)n).getSortDependingOn()
-                    instanceof GenericSort)) {
+                    instanceof GenericSort)) {*/
                 newFuncNS.addSafely(n);
-            }
+        //    }
         }
         //System.out.println(initConfig.funcNS().hashCode() + " ---> " + newFuncNS.hashCode());
         initConfig.getServices().getNamespaces().setVariables(newVarNS);

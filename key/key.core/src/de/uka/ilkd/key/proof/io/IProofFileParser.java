@@ -15,6 +15,7 @@ package de.uka.ilkd.key.proof.io;
 
 import java.util.List;
 
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.KeYParser;
 
 /**

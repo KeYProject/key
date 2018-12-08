@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.logic.sort.ParametricSort;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.Name;
@@ -22,6 +23,9 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 
 /**
@@ -68,9 +72,10 @@ public final class SortDependingFunction extends Function {
     private static Sort instantiateResultSort(
             SortDependingFunctionTemplate template,
             Sort sortDependingOn) {
-        return template.sort == template.sortDependingOn
-                ? sortDependingOn
-                        : template.sort;
+        Map<GenericSort, Sort> map = new IdentityHashMap<>();
+        map.put(template.sortDependingOn, sortDependingOn);
+        ParametricSort.SortInstantiator inst = new ParametricSort.SortInstantiator(map);
+        return inst.apply(template.sort);
     }
 
 
@@ -78,12 +83,14 @@ public final class SortDependingFunction extends Function {
             SortDependingFunctionTemplate template,
             Sort sortDependingOn) {
         Sort[] result = new Sort[template.argSorts.size()];
+        Map<GenericSort, Sort> map = new IdentityHashMap<>();
+        map.put(template.sortDependingOn, sortDependingOn);
+        ParametricSort.SortInstantiator inst = new ParametricSort.SortInstantiator(map);
+
         for(int i = 0; i < result.length; i++) {
-            result[i]
-                    = (template.argSorts.get(i) == template.sortDependingOn
-                    ? sortDependingOn
-                            : template.argSorts.get(i));
+            result[i] = inst.apply(template.argSorts.get(i));
         }
+
         return new ImmutableArray<Sort>(result);
     }
 
@@ -122,7 +129,7 @@ public final class SortDependingFunction extends Function {
      * returns the variant for the given sort
      * @param sort the {@link Sort} for which to retrieve the corresponding
      * variant of this function
-     * @param services the {@link Services}
+     * @param services the {@link de.uka.ilkd.key.java.Services}
      * @return the variant for the given sort
      */
     public synchronized SortDependingFunction getInstanceFor(Sort sort,

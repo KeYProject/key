@@ -62,9 +62,11 @@ options {
   import org.key_project.util.collection.ImmutableList;
   import org.key_project.util.collection.ImmutableSLList;
   import org.key_project.util.collection.ImmutableSet;
+  import org.key_project.util.collection.Immutables;
   import de.uka.ilkd.key.logic.*;
   import de.uka.ilkd.key.logic.op.*;
   import de.uka.ilkd.key.logic.sort.*;
+  import de.uka.ilkd.key.logic.sort.ParametricSort.Variance;
   import de.uka.ilkd.key.logic.label.*;
 
   import de.uka.ilkd.key.proof.init.*;
@@ -1710,7 +1712,9 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
     boolean isProxySort = false;
     sortExt=new Sort [0];
     sortOneOf=new Sort [0];
-    sortIds = ImmutableSLList.<String>nil(); 
+    sortIds = ImmutableSLList.<String>nil();
+    // every sort can have multiple parameters. Every parameter is a generic sort + its variance
+    ImmutableList<ImmutableList<Pair<GenericSort, Variance>>> sortParameters = ImmutableSLList.nil();
 } : 
         ( 
          GENERIC {isGenericSort=true;} sortIds = simple_ident_comma_list
@@ -1720,11 +1724,15 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
             ( EXTENDS sortExt = extends_sorts )?
         | (ABSTRACT {isAbstractSort = true;})?
           firstSort = simple_ident_dots { sortIds = sortIds.prepend(firstSort); }
+              parameters=formal_sort_parameters { sortParameters = sortParameters.prepend(parameters); }
           (
-              (EXTENDS sortExt = extends_sorts ) 
-            | ((COMMA) sortIds = simple_ident_comma_list { sortIds = sortIds.prepend(firstSort) ; } )
-          )?
-        ) SEMI {   
+              (EXTENDS sortExt = extends_sorts )
+              // TODO parametrised sorts cannot be comma-listed
+            | ((COMMA)
+                 id = simple_ident { sortIds = sortIds.prepend(id); }
+                 parameters=formal_sort_parameters { sortParameters = sortParameters.prepend(parameters); } )*
+          )
+        ) SEMI {
             if (!skip_sorts) {
                     Iterator<String> it = sortIds.iterator ();        
                     while ( it.hasNext () ) {
@@ -1758,11 +1766,14 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
                                     ext = ext.add ( sortExt[i] );
                                 }
 
-                                if(isProxySort) {
-                                    s = new ProxySort(sort_name, ext);
-                                } else {
-                                s = new SortImpl(sort_name, ext, isAbstractSort);
-                                }
+                                ImmutableList<Pair<GenericSort, Variance>> sortParams = sortParameters.head();
+			                    if(isProxySort) {
+			                        s = new ProxySort(sort_name, ext);
+			                    } else if(sortParams != null) {
+									s = new ParametricSort(sort_name, ext, isAbstractSort, sortParams);
+								} else {
+			                    	s = new SortImpl(sort_name, ext, isAbstractSort);
+			                    }
                             }
                             assert s != null;
                             sorts().add ( s ); 
@@ -1794,6 +1805,42 @@ extends_sorts returns [Sort[\] extendsSorts = null]
         {
             extendsSorts = (Sort[])args.toArray(AN_ARRAY_OF_SORTS);
         }
+    ;
+
+formal_sort_parameters returns [ImmutableList<Pair<GenericSort, Variance>> result = null]
+@init {
+   Variance variance = null;
+}
+    :
+    ( OPENTYPEPARAMS
+        ( PLUS  { variance=Variance.COVARIANT; }
+        | MINUS { variance = Variance.CONTRAVARIANT; }
+        |       { variance = Variance.INVARIANT; }
+        )
+        id=simple_ident
+        {if (!skip_sorts) {
+            Sort genSort = sorts().lookup(id);
+            if(genSort == null || !(genSort instanceof GenericSort)) {
+               semanticError("Formal type parameters must be (already declared) generic sorts");
+            }
+            result = Immutables.listOf(new Pair(genSort, variance));
+        }}
+        ( COMMA
+                ( PLUS  { variance=Variance.COVARIANT; }
+                | MINUS { variance = Variance.CONTRAVARIANT; }
+                |       { variance = Variance.INVARIANT; }
+                )
+                id=simple_ident
+                {if (!skip_sorts) {
+                    Sort genSort = sorts().lookup(id);
+                    if(genSort == null || !(genSort instanceof GenericSort)) {
+                        semanticError("Formal type parameters must be (already declared) generic sorts");
+                    }
+                    result = result.prepend(new Pair(genSort, variance));
+                }}
+         )*
+         CLOSETYPEPARAMS { if (!skip_sorts) result = result.reverse(); }
+    )?
     ;
 
 oneof_sorts returns [Sort[\] oneOfSorts = null] 
@@ -2365,7 +2412,14 @@ any_sortId_check [boolean checkSort] returns [Sort _any_sort_id_check = null]
         s = array_decls[p, checkSort]
     ;
     
-    
+// Generic and non-generic sorts, array sorts allowed
+// This is Id*s*: It allows one or more comma-separated sorts
+any_sortIds_check [boolean checkSort] returns [ImmutableList<Sort> result = ImmutableSLList.nil()]
+    :
+       s=any_sortId_check[checkSort] { result = result.prepend(s); }
+       ( COMMA s2=any_sortId_check[checkSort] { result = result.prepend(s2); } )*
+    ;
+
 // Non-generic sorts
 sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> _sort_id_check_help = null]
 @after{ _sort_id_check_help = result; }
@@ -2379,11 +2433,12 @@ sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> _sort_id_check_he
             	s = ((ArraySort)s).elementSort ();
             }
 
-            if ( s instanceof GenericSort ) {
+           // FIXME. This is a temporary fix --
+           /* if ( s instanceof GenericSort ) {
                 throw new GenericSortException ( "sort",
                     "Non-generic sort expected", s,
                     getSourceName (), getLine (), getColumn () );
-            }
+            }*/
         }
     ;
     
@@ -2392,7 +2447,7 @@ sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> _sort_id_check_he
 any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null]
     :
         name = simple_sort_name
-        ( OPENTYPEPARAMS parameter=any_sortId_check[checkSort] CLOSETYPEPARAMS )?
+        ( OPENTYPEPARAMS parameters=any_sortIds_check[checkSort] CLOSETYPEPARAMS )?
         {
             //Special handling for byte, char, short, long:
             //these are *not* sorts, but they are nevertheless valid
@@ -2427,13 +2482,18 @@ any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null
                 if(s == null) {
                   throw new NotDeclException(input, "sort", name);
                 }
+
+                if(parameters != null) {
+                    if (s instanceof ParametricSort) {
+                        ParametricSort ps = (ParametricSort) s;
+                        s = ParametricSortInstance.get(ps, parameters);
+                    } else {
+                        semanticError("Not a polymorphic sort: " + name);
+                    }
+                }
             }
 
-            if(parameter != null) {
-                s = ParametricSort.get(s, parameter);
-            }
-
-             System.out.println("Sort " + s);
+//            System.out.println("Sort " + s);
 
             result = new Pair<Sort,Type>(s, t);
         }

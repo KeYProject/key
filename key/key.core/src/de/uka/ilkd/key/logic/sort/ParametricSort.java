@@ -1,10 +1,12 @@
 package de.uka.ilkd.key.logic.sort;
 
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -48,12 +50,13 @@ import java.util.function.Function;
 
 public class ParametricSort extends AbstractSort {
 
+
+
     public enum Variance {
         COVARIANT,
         CONTRAVARIANT,
-        INVARIANT
+        INVARIANT;
     }
-
     private final ImmutableList<GenericSort> parameters;
 
     private final ImmutableList<Variance> covariances;
@@ -63,6 +66,11 @@ public class ParametricSort extends AbstractSort {
         super(name, ext, isAbstract);
         this.parameters = parameters;
         this.covariances = covariances;
+    }
+
+    public ParametricSort(Name name, ImmutableSet<Sort> ext, boolean isAbstract,
+                          ImmutableList<Pair<GenericSort, Variance>> sortParams) {
+        this(name, ext, isAbstract, sortParams.map(x->x.first), sortParams.map(x->x.second));
     }
 
     public Function<Sort, Sort> getInstantiation(ImmutableList<Sort> args) {
@@ -81,21 +89,30 @@ public class ParametricSort extends AbstractSort {
             args = args.tail();
         }
 
-        return new Function<Sort, Sort>() {
-            @Override
-            public Sort apply(Sort sort) {
-                Sort mapped = map.get(sort);
-                if(mapped != null) {
-                    return mapped;
-                }
-                if (sort instanceof ParametricSortInstance) {
-                    ParametricSortInstance psort = (ParametricSortInstance) sort;
-                    return psort.map(this::apply);
-                } else {
-                    return sort;
-                }
+        return new SortInstantiator(map);
+    }
+
+    public static class SortInstantiator implements Function<Sort, Sort> {
+
+        private final Map<GenericSort, Sort> map;
+
+        public SortInstantiator(Map<GenericSort, Sort> map) {
+            this.map = map;
+        }
+
+        @Override
+        public Sort apply(Sort sort) {
+            Sort mapped = map.get(sort);
+            if(mapped != null) {
+                return mapped;
             }
-        };
+            if (sort instanceof ParametricSortInstance) {
+                ParametricSortInstance psort = (ParametricSortInstance) sort;
+                return psort.map(this::apply);
+            } else {
+                return sort;
+            }
+        }
     }
 
     public ImmutableList<GenericSort> getParameters() {

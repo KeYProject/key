@@ -73,7 +73,7 @@ public final class GenericSortInstantiations {
 
 	ImmutableList<GenericSort>                          sorts      =
 	    ImmutableSLList.<GenericSort>nil();
-	GenericSortCondition                       c;
+        ImmutableSet<GenericSortCondition>                       cs;
 	
         final Iterator<GenericSortCondition>             it;
 
@@ -85,11 +85,12 @@ public final class GenericSortInstantiations {
 
 	while ( p_instantiations.hasNext () ) {
 	final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = p_instantiations.next ();
-        c = GenericSortCondition.createCondition
-		( entry.key(), entry.value () );
-	    if ( c != null ) {
-		p_conditions = p_conditions.prepend ( c );
-		sorts        = sorts       .prepend ( c.getGenericSort () );
+            cs = GenericSortCondition.createCondition( entry.key(), entry.value () );
+            if ( cs != null ) {
+                for (GenericSortCondition c : cs) {
+                    p_conditions = p_conditions.prepend(c);
+                    sorts = sorts.prepend(c.getGenericSort());
+                }
 	    }
 	}
 	return create ( sorts, p_conditions, services );
@@ -130,9 +131,23 @@ public final class GenericSortInstantiations {
 	        sv instanceof ProgramSV )
 	    return Boolean.TRUE;
 
-	final GenericSortCondition c =
+        final ImmutableSet<GenericSortCondition> cs =
 	    GenericSortCondition.createCondition ( sv, p_entry );
-	if ( c != null ) return checkCondition ( c );
+
+        if ( cs != null ) {
+            boolean oneNull = false;
+            for (GenericSortCondition c : cs) {
+                Boolean retCheck = checkCondition(c);
+                if(retCheck == Boolean.FALSE) {
+                    return retCheck;
+                }
+                if(retCheck == null) {
+                    oneNull = true;
+                }
+            }
+
+            return oneNull ? null : Boolean.TRUE;
+        }
 	
         final Term term = ( (TermInstantiation)p_entry ).getInstantiation ();
         

@@ -199,4 +199,9 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @throws IndexOutOfBoundsException if pos is not a valid index in the list.
      */
     ImmutableList<T> replace(int pos, T t);
+
+    // TODO DOC!
+    default T get(int pos) {
+        return take(pos).head();
+    }
 }
