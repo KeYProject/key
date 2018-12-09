@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.interactionlog.model.builtin;
 
+import de.uka.ilkd.key.gui.interactionlog.algo.InteractionVisitor;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
 
@@ -15,5 +16,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class UseDependencyContractBuiltInRuleInteraction extends BuiltInRuleInteraction {
     public UseDependencyContractBuiltInRuleInteraction(UseDependencyContractApp app, Node node) {
+    }
+
+    @Override
+    public <T> T accept(InteractionVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

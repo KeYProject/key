@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.interactionlog.model;
 
 import de.uka.ilkd.key.control.InteractionListener;
+import de.uka.ilkd.key.gui.interactionlog.algo.InteractionVisitor;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -60,26 +61,11 @@ public class SettingChangeInteraction extends Interaction {
     }
 
     @Override
-    public String getMarkdownText() {
-        StringBuilder sb = new StringBuilder();
+    public <T> T accept(InteractionVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 
-        StringWriter writer = new StringWriter();
-        try {
-            savedSettings.store(writer, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        sb
-                .append("------\n")
-                .append("## Change of the ")
-                .append(type.name())
-                .append(" settings")
-                .append("\n")
-                .append(message)
-                .append("\n\n").append("```\n").append(writer).append("\n```")
-                .append("\n\n");
-
-        return sb.toString();
+    public InteractionListener.SettingType getType() {
+        return type;
     }
 }

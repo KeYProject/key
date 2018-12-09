@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.interactionlog.model;
 
+import de.uka.ilkd.key.gui.interactionlog.algo.InteractionVisitor;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -33,6 +34,11 @@ public class AutoModeInteraction extends Interaction {
     }
 
     @Override
+    public <T> T accept(InteractionVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
+    @Override
     public String getProofScriptRepresentation(Services services) {
         StringBuilder sb = new StringBuilder("auto");
         /*initialNodeSerialNumbers.forEach(nr -> {
@@ -41,30 +47,6 @@ public class AutoModeInteraction extends Interaction {
         sb.append("\n\t" + info);
 
         sb.append(";");
-        return sb.toString();
-    }
-
-    @Override
-    public String getMarkdownText() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("## `auto`\n");
-
-        sb.append("\nStarted on:\n");
-        initialNodeIds.forEach(nr -> sb.append("- ").append(nr).append("\n"));
-        sb.append("\n");
-
-        if (openGoalNodeIds.isEmpty())
-            sb.append("**Closed all goals**");
-        else {
-            sb.append("\nFinished on:\n");
-            initialNodeIds.forEach(nr -> sb.append("- ").append(nr).append("\n"));
-        }
-
-
-        sb.append("---\n```\n");
-        sb.append(info);
-        sb.append("\n```\n");
-
         return sb.toString();
     }
 

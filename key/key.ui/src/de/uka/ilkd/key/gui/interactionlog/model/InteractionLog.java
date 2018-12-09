@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.*;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,7 +23,12 @@ public class InteractionLog implements Serializable {
     @XmlAttribute
     private String name;
 
+    @XmlAttribute
+    private Date created;
+
     private List<Interaction> interactions = new ArrayList<>();
+
+
 
     public InteractionLog() {
         this(RandomName.getRandomName());
@@ -52,14 +58,19 @@ public class InteractionLog implements Serializable {
         return name;
     }
 
-    public String getMarkdownText() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("# InteractionLog: ")
-                .append(name)
-                .append("\n");
+    public String getName() {
+        return name;
+    }
 
-        interactions.forEach(interaction -> sb.append(interaction.getMarkdownText()));
+    public void setName(String name) {
+        this.name = name;
+    }
 
-        return sb.toString();
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
     }
 }

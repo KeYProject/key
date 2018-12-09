@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.interactionlog.model;
 
+import de.uka.ilkd.key.gui.interactionlog.algo.InteractionVisitor;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 
@@ -18,6 +19,11 @@ public class PruneInteraction extends NodeInteraction {
     }
 
     @Override
+    public <T> T accept(InteractionVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
+    @Override
     public String getProofScriptRepresentation(Services services) {
         StringBuilder sb = new StringBuilder("prune");
 
@@ -30,21 +36,7 @@ public class PruneInteraction extends NodeInteraction {
 
     @Override
     public String toString() {
-        return "prune;";
+        return "prune";
     }
-
-    @Override
-    public String getMarkdownText() {
-        StringBuilder sb = new StringBuilder();
-
-        sb
-                .append("------\n")
-                .append("## PruneInteraction ")
-                .append(getNodeId())
-                .append("\n\n");
-
-        return sb.toString();
-    }
-
 
 }

@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui.interactionlog.model;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.gui.interactionlog.algo.InteractionVisitor;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
@@ -72,21 +73,8 @@ public final class MacroInteraction extends NodeInteraction {
     }
 
     @Override
-    public String getMarkdownText() {
-        StringBuilder sb = new StringBuilder();
-
-        sb
-            .append("------\n")
-            .append("## MacroInteraction ")
-            .append(macroName)
-            .append("\n")
-            .append(getSerialNr())
-            .append("\n")
-            .append("```\n")
-            .append(info)
-            .append("\n```");
-
-        return sb.toString();
+    public <T> T accept(InteractionVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
     public String getMacro() {

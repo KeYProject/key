@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.interactionlog.model;
 
+import de.uka.ilkd.key.gui.interactionlog.algo.InteractionVisitor;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -72,35 +73,8 @@ public final class RuleInteraction extends NodeInteraction {
     }
 
     @Override
-    public String getMarkdownText() {
-        StringBuilder sb = new StringBuilder();
-
-        sb
-                .append("------\n")
-                .append("## RuleInteraction ")
-                .append(ruleName)
-                .append("\n\n")
-                .append("### PosInOccurence\n")
-                .append("```\n")
-                .append(posInOccurence)
-                .append("\n```\n\n")
-                .append("### arguments:\n")
-
-                .append("| parameter | value |\n")
-                .append("| --- | --- |\n");
-
-        arguments.forEach((key, value) -> {
-            sb
-                    .append("| ")
-                    .append(key)
-                    .append(" | ")
-                    .append(value)
-                    .append(" |")
-                    .append("\n");
-        });
-
-
-        return sb.toString();
+    public <T> T accept(InteractionVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
     public OccurenceIdentifier getPosInOccurence() {

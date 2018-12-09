@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.interactionlog.model.builtin;
 
 import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.gui.interactionlog.algo.InteractionVisitor;
 import de.uka.ilkd.key.gui.interactionlog.model.NodeIdentifier;
 import de.uka.ilkd.key.gui.interactionlog.model.OccurenceIdentifier;
 import de.uka.ilkd.key.java.Services;
@@ -36,5 +37,10 @@ public class OSSBuiltInRuleInteraction extends BuiltInRuleInteraction {
         PosInOccurrence pio = occurenceIdentifier.rebuildOn(goal);
         OneStepSimplifierRuleApp app = oss.createApp(pio, services);
         goal.apply(app);
+    }
+
+    @Override
+    public <T> T accept(InteractionVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

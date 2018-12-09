@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.interactionlog.model;
 
 import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.gui.interactionlog.algo.InteractionVisitor;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -30,8 +31,6 @@ public abstract class Interaction implements Serializable {
         throw new UnsupportedOperationException();
     }
 
-    public abstract String getMarkdownText();
-
     public Date getCreated() {
         return created;
     }
@@ -55,6 +54,8 @@ public abstract class Interaction implements Serializable {
     public void reapply(Services services, ProofControl control, Goal goal) {
         throw new UnsupportedOperationException();
     }
+
+    public abstract <T> T accept(InteractionVisitor<T> visitor);
 
     public static class InteractionGraphicStyle {
         private Icon icon;

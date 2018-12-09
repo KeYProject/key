@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.gui.interactionlog.model;
 
+import de.uka.ilkd.key.gui.interactionlog.algo.InteractionVisitor;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -25,6 +27,10 @@ public class UserNoteInteraction extends Interaction {
         this.note = note;
     }
 
+    @Override
+    public <T> T accept(InteractionVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 
     public String getNote() {
         return note;
@@ -39,20 +45,4 @@ public class UserNoteInteraction extends Interaction {
         return note;
     }
 
-    @Override
-    public String getMarkdownText() {
-        StringBuilder sb = new StringBuilder();
-
-        sb
-                .append("------\n")
-                .append("## UserNoteInteraction ")
-                .append("\n")
-                .append("### Content:\n")
-                .append("```\n")
-                .append(note)
-                .append("\n```")
-                .append("\n\n");
-
-        return sb.toString();
-    }
 }

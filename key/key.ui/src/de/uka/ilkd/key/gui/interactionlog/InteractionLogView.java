@@ -8,6 +8,7 @@ import de.uka.ilkd.key.gui.Markdown;
 import de.uka.ilkd.key.gui.fonticons.FontAwesome;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.interactionlog.algo.MarkdownExport;
 import de.uka.ilkd.key.gui.interactionlog.model.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
@@ -103,7 +104,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
                 int index = l.locationToIndex(e.getPoint());
                 if (index > -1) {
                     Interaction inter = (Interaction) m.getElementAt(index);
-                    l.setToolTipText("<html>" + Markdown.html(inter.getMarkdownText()) + "</html>");
+                    l.setToolTipText("<html>" + MarkdownExport.getHtml(inter) + "</html>");
                 }
             }
         });
@@ -168,7 +169,6 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
     private void rebuildList() {
         InteractionLog currentInteractionLog = getSelectedItem();
-        System.out.println(currentInteractionLog.getMarkdownText());
         if (currentProof != null) {
             InteractionLog state = recorder.get(currentProof);
             updateList(state);
