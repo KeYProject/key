@@ -10,11 +10,9 @@ import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.interactionlog.algo.MUProofScriptExport;
 import de.uka.ilkd.key.gui.interactionlog.algo.MarkdownExport;
 import de.uka.ilkd.key.gui.interactionlog.algo.Reapplication;
-import de.uka.ilkd.key.gui.interactionlog.model.Interaction;
-import de.uka.ilkd.key.gui.interactionlog.model.InteractionLog;
-import de.uka.ilkd.key.gui.interactionlog.model.InteractionRecorderListener;
-import de.uka.ilkd.key.gui.interactionlog.model.UserNoteInteraction;
+import de.uka.ilkd.key.gui.interactionlog.model.*;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import sun.swing.DefaultLookup;
 
@@ -381,7 +379,15 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JOptionPane.showMessageDialog((Component) e.getSource(), "TODO");
+            try {
+                NodeInteraction current = (NodeInteraction) listInteraction.getSelectedValue();
+                if (current != null) {
+                    Node node = current.getNode(mediator.getSelectedProof());
+                    mediator.getSelectionModel().setSelectedNode(node);
+                }
+            } catch (ClassCastException ex) {
+
+            }
         }
     }
 
