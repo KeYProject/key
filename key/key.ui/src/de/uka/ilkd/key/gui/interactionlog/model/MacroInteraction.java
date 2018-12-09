@@ -1,22 +1,19 @@
 package de.uka.ilkd.key.gui.interactionlog.model;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import de.uka.ilkd.key.gui.interactionlog.algo.InteractionVisitor;
-import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import org.key_project.util.collection.ImmutableList;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author weigl
@@ -52,24 +49,9 @@ public final class MacroInteraction extends NodeInteraction {
         this.openGoalNodeIds = openGoals.stream().map(g -> NodeIdentifier.get(g.node())).collect(Collectors.toList());
     }
 
-
-
-
     @Override
     public String toString() {
         return macroName;
-    }
-
-    @Override
-    public String getProofScriptRepresentation(Services services) {
-        StringBuilder sb = new StringBuilder(macroName);
-
-        sb.append("\n\t" + getSerialNr());
-
-        sb.append("\n\t" + info);
-
-        sb.append(";");
-        return sb.toString();
     }
 
     @Override

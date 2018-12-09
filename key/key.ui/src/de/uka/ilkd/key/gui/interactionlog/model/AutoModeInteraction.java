@@ -38,18 +38,6 @@ public class AutoModeInteraction extends Interaction {
         return visitor.visit(this);
     }
 
-    @Override
-    public String getProofScriptRepresentation(Services services) {
-        StringBuilder sb = new StringBuilder("auto");
-        /*initialNodeSerialNumbers.forEach(nr -> {
-            sb.append("\n\t" + nr);
-        });*/
-        sb.append("\n\t" + info);
-
-        sb.append(";");
-        return sb.toString();
-    }
-
     public ApplyStrategyInfo getInfo() {
         return info;
     }

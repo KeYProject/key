@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui.interactionlog.algo;
 
 import de.uka.ilkd.key.gui.Markdown;
 import de.uka.ilkd.key.gui.interactionlog.model.*;
+import de.uka.ilkd.key.gui.interactionlog.model.builtin.OSSBuiltInRuleInteraction;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -11,30 +12,23 @@ import java.io.StringWriter;
  * @author Alexander Weigl
  * @version 1 (09.12.18)
  */
-public class MarkdownExport extends DefaultInteractionVisitor<Void> {
-    private final PrintWriter out;
+public class MarkdownExport extends StreamInteractionVisitor {
+    public MarkdownExport() {
+    }
 
     public MarkdownExport(PrintWriter writer) {
-        out = writer;
+        super(writer);
     }
 
     public static String getMarkdown(Interaction interaction) {
-        try (StringWriter sw = new StringWriter()) {
-            PrintWriter writer = new PrintWriter(sw);
-            MarkdownExport me = new MarkdownExport(writer);
-            interaction.accept(me);
-            return sw.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return StreamInteractionVisitor.translate(new MarkdownExport(), interaction);
     }
 
     public static void writeTo(InteractionLog logbook, PrintWriter writer) {
         MarkdownExport me = new MarkdownExport(writer);
         writer.format("# Log book *%s*%n%n", logbook.getName());
         writer.format("Created at *%s*%n%n", logbook.getCreated());
-        logbook.getInteractions().forEach(interaction -> interaction.accept(me));
+        StreamInteractionVisitor.translate(me, logbook);
     }
 
     public static String getHtml(Interaction inter) {
@@ -107,6 +101,15 @@ public class MarkdownExport extends DefaultInteractionVisitor<Void> {
 
         out.format("Setting changed: %s%n", interaction.getType().name());
         out.format("%n```%n%s%n````%n", writer);
+        return null;
+    }
+
+    @Override
+    public Void visit(OSSBuiltInRuleInteraction interaction) {
+        out.format("## One step simplification%n");
+        out.format("* applied on %n  * Term:%s%n  * Toplevel %s%n",
+                interaction.getOccurenceIdentifier().getTerm(),
+                interaction.getOccurenceIdentifier().getToplevelTerm());
         return null;
     }
 }

@@ -24,17 +24,6 @@ public class PruneInteraction extends NodeInteraction {
     }
 
     @Override
-    public String getProofScriptRepresentation(Services services) {
-        StringBuilder sb = new StringBuilder("prune");
-
-        sb.append("\n\t");
-        sb.append(getSerialNr());
-
-        sb.append(";");
-        return sb.toString();
-    }
-
-    @Override
     public String toString() {
         return "prune";
     }

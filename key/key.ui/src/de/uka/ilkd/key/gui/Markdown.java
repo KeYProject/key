@@ -27,5 +27,4 @@ public class Markdown {
         Node node = parser.parse(markdown);
         return renderer.render(node);
     }
-
 }

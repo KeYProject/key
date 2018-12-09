@@ -27,10 +27,6 @@ public abstract class Interaction implements Serializable {
     @XmlAttribute
     private boolean favoured = false;
 
-    public String getProofScriptRepresentation(Services services) {
-        throw new UnsupportedOperationException();
-    }
-
     public Date getCreated() {
         return created;
     }

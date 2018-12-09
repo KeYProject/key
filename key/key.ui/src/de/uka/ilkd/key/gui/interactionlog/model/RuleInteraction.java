@@ -68,11 +68,6 @@ public final class RuleInteraction extends NodeInteraction {
     }
 
     @Override
-    public String getProofScriptRepresentation(Services services) {
-        return ruleName + ";";
-    }
-
-    @Override
     public <T> T accept(InteractionVisitor<T> visitor) {
         return visitor.visit(this);
     }

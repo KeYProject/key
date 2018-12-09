@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.interactionlog.model;
 
+import de.uka.ilkd.key.gui.interactionlog.algo.LogPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -21,6 +22,9 @@ import java.util.stream.Collectors;
 public class NodeIdentifier implements Serializable {
     @XmlElement(required = true, name = "select")
     private List<Integer> list = new ArrayList<>();
+
+    @XmlAttribute
+    private String branchLabel;
 
     @XmlTransient
     private int serialNr;
@@ -45,7 +49,9 @@ public class NodeIdentifier implements Serializable {
             }
             node = parent;
         } while (node != null);
-        return new NodeIdentifier(list);
+        NodeIdentifier ni = new NodeIdentifier(list);
+        ni.setBranchLabel(LogPrinter.getBranchingLabel(node));
+        return ni;
     }
 
     @Override
@@ -85,5 +91,13 @@ public class NodeIdentifier implements Serializable {
 
     public void setSerialNr(int serialNr) {
         this.serialNr = serialNr;
+    }
+
+    public String getBranchLabel() {
+        return branchLabel;
+    }
+
+    public void setBranchLabel(String branchLabel) {
+        this.branchLabel = branchLabel;
     }
 }

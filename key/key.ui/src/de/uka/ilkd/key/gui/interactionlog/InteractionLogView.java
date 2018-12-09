@@ -4,12 +4,16 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.Markdown;
 import de.uka.ilkd.key.gui.fonticons.FontAwesome;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.interactionlog.algo.MUProofScriptExport;
 import de.uka.ilkd.key.gui.interactionlog.algo.MarkdownExport;
-import de.uka.ilkd.key.gui.interactionlog.model.*;
+import de.uka.ilkd.key.gui.interactionlog.algo.Reapplication;
+import de.uka.ilkd.key.gui.interactionlog.model.Interaction;
+import de.uka.ilkd.key.gui.interactionlog.model.InteractionLog;
+import de.uka.ilkd.key.gui.interactionlog.model.InteractionRecorderListener;
+import de.uka.ilkd.key.gui.interactionlog.model.UserNoteInteraction;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import sun.swing.DefaultLookup;
@@ -18,22 +22,22 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.datatransfer.*;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Optional;
 
 public class InteractionLogView extends JPanel implements InteractionRecorderListener {
     private static final float SMALL_ICON_SIZE = 16f;
-    private final ExportUlbrichScriptAction actionExportProofScript = new ExportUlbrichScriptAction();
+    private final ExportMUScriptAction actionExportProofScript = new ExportMUScriptAction();
     private final ExportKPSAction actionKPSExport = new ExportKPSAction();
     private final SaveAction actionSave = new SaveAction();
     private final LoadAction actionLoad = new LoadAction();
@@ -43,7 +47,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     private final TryReapplyAction actionTryReapply = new TryReapplyAction();
     private final ExportMarkdownAction actionExportMarkdown = new ExportMarkdownAction();
     private final ShowExtendedActionsAction actionShowExtended = new ShowExtendedActionsAction();
-
+    private final ExportMUScriptClipboardAction actionMUCopyClipboard = new ExportMUScriptClipboardAction();
     private final InteractionRecorder recorder = new InteractionRecorder();
 
 
@@ -51,14 +55,17 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     private final JComboBox<InteractionLog> interactionLogSelection = new JComboBox<>();
     private final DefaultListModel<Interaction> interactionListModel = new DefaultListModel<>();
     private final Services services;
+    private final KeYMediator mediator;
     private Proof currentProof;
-
+    private JFileChooser fileChooser;
 
     public InteractionLogView(MainWindow mainWindow, KeYMediator mediator) {
         // register the recorder in the proof control
         mainWindow.getUserInterface().getProofControl().addInteractionListener(recorder);
         mainWindow.getUserInterface().getProofControl().addAutoModeListener(recorder);
         services = mediator.getServices();
+
+        this.mediator = mediator;
 
         listInteraction.setModel(interactionListModel);
         listInteraction.setCellRenderer(new InteractionCellRenderer());
@@ -83,6 +90,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         panelButtons.add(actionShowExtended);
 
         JPopupMenu popup = new JPopupMenu();
+        popup.add(new JMenuItem(actionMUCopyClipboard));
+        popup.addSeparator();
         popup.add(new JMenuItem(actionToggleFavourite));
         popup.add(new JMenuItem(actionJumpIntoTree));
         popup.add(new JMenuItem(actionTryReapply));
@@ -158,14 +167,12 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         return (InteractionLog) interactionLogSelection.getSelectedItem();
     }
 
-
     private void setCurrentProof(Proof proof) {
         if (proof == null) return;
         currentProof = proof;
         recorder.get(currentProof);
         //rebuildList();
     }
-
 
     private void rebuildList() {
         InteractionLog currentInteractionLog = getSelectedItem();
@@ -180,12 +187,22 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         interactionLog.getInteractions().forEach(interactionListModel::addElement);
     }
 
+    private JFileChooser getFileChooser() {
+        if (fileChooser == null) {
+            fileChooser = new JFileChooser();
+            File file = currentProof.getProofFile();
+            if (file != null)
+                fileChooser.setCurrentDirectory(file.getParentFile());
+        }
+        return fileChooser;
+    }
+
     @Override
     public void onInteraction(Interaction interaction) {
         rebuildList();
     }
 
-    public ExportUlbrichScriptAction getActionExportProofScript() {
+    public ExportMUScriptAction getActionExportProofScript() {
         return actionExportProofScript;
     }
 
@@ -216,20 +233,38 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     private class InteractionLogModelItem extends DefaultComboBoxModel<InteractionLog> {
     }
 
-    private class ExportUlbrichScriptAction extends AbstractAction {
-        ExportUlbrichScriptAction() {
+    private class ExportMUScriptAction extends AbstractFileSaveAction {
+        ExportMUScriptAction() {
             putValue(Action.NAME, "Export as Proof Script");
             putValue(Action.SMALL_ICON,
                     IconFontSwing.buildIcon(FontAwesomeBold.FILE_EXPORT, SMALL_ICON_SIZE));
         }
 
         @Override
+        void save(File selectedFile) {
+            InteractionLog current = getSelectedItem();
+            String script = MUProofScriptExport.getScript(current);
+            try (FileWriter fw = new FileWriter(selectedFile)) {
+                fw.write(script);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class ExportMUScriptClipboardAction extends AbstractAction {
+        ExportMUScriptClipboardAction() {
+            putValue(Action.NAME, "Copy MUScript");
+            putValue(Action.SMALL_ICON,
+                    IconFontSwing.buildIcon(FontAwesomeBold.COPY, SMALL_ICON_SIZE));
+        }
+
+        @Override
         public void actionPerformed(ActionEvent e) {
-            JOptionPane.showMessageDialog((Component) e.getSource(), "TODO");
-            LogPrinter lp = new LogPrinter(services);
-            InteractionLog state = recorder.get(currentProof);
-            String ps = lp.print(state);
-            System.out.println(ps);
+            String text = MUProofScriptExport.getScriptRepresentation(listInteraction.getSelectedValue());
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            StringSelection contents = new StringSelection(text);
+            clipboard.setContents(contents, contents);
         }
     }
 
@@ -274,14 +309,13 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileFilter(new FileNameExtensionFilter(
-                    "InteractionLog", "xml"));
+            JFileChooser fileChooser = getFileChooser();
             int returnValue = fileChooser.showSaveDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 InteractionLog activeInteractionLog = getSelectedItem();
                 try {
-                    InteractionLogFacade.storeInteractionLog(activeInteractionLog, fileChooser.getSelectedFile());
+                    InteractionLogFacade.storeInteractionLog(activeInteractionLog,
+                            fileChooser.getSelectedFile());
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(null,
                             exception.getCause(),
@@ -359,34 +393,73 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JOptionPane.showMessageDialog(null, "Not Implemented",
-                    "A very expected error.", JOptionPane.ERROR_MESSAGE);
+            try {
+                Reapplication reapplication = new Reapplication(mediator.getSelectedGoal());
+                Interaction inter = listInteraction.getSelectedValue();
+                if (inter != null) inter.accept(reapplication);
+            } catch (UnsupportedOperationException ex) {
+                JOptionPane.showMessageDialog(null, "Not Implemented",
+                        "A very expected error.", JOptionPane.ERROR_MESSAGE);
+            } catch (IllegalStateException ex) {
+
+            }
         }
     }
 
-    private class ExportKPSAction extends AbstractAction {
+    private abstract class AbstractFileSaveAction extends AbstractAction {
+        public AbstractFileSaveAction() {
+            super();
+        }
+
+        public AbstractFileSaveAction(String name) {
+            super(name);
+        }
+
+        public AbstractFileSaveAction(String name, Icon icon) {
+            super(name, icon);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JFileChooser fc = getFileChooser();
+            int choice = fc.showSaveDialog((Component) e.getSource());
+            if (choice == JFileChooser.APPROVE_OPTION) {
+                save(fc.getSelectedFile());
+            }
+        }
+
+        abstract void save(File selectedFile);
+    }
+
+    private class ExportKPSAction extends AbstractFileSaveAction {
         public ExportKPSAction() {
             super("Export as KPS …");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into the KPS format.");
             putValue(Action.SMALL_ICON, IconFontSwing.buildIcon(FontAwesomeBold.CODE, SMALL_ICON_SIZE));
         }
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            JOptionPane.showMessageDialog((Component) e.getSource(), "TODO");
+        void save(File selectedFile) {
+            try (FileWriter fw = new FileWriter(selectedFile)) {
+                MarkdownExport.writeTo(getSelectedItem(), new PrintWriter(fw));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    private class ExportMarkdownAction extends AbstractAction {
+    private class ExportMarkdownAction extends AbstractFileSaveAction {
         public ExportMarkdownAction() {
             super("Export as markdown …");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into a markdown file.");
             putValue(Action.SMALL_ICON, IconFontSwing.buildIcon(FontAwesomeBold.MARKDOWN, SMALL_ICON_SIZE));
         }
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            JOptionPane.showMessageDialog((Component) e.getSource(), "TODO");
+        void save(File selectedFile) {
+            try (FileWriter fw = new FileWriter(selectedFile)) {
+                MarkdownExport.writeTo(getSelectedItem(), new PrintWriter(fw));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -410,7 +483,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             JComponent btn = (JComponent) e.getSource();
             JPopupMenu menu = createMenu();
             PointerInfo pi = MouseInfo.getPointerInfo();
-            menu.show(btn, 0,0);
+            menu.show(btn, 0, 0);
             //pi.getLocation().x, pi.getLocation().y);
         }
     }

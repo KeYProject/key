@@ -1,5 +1,7 @@
-package de.uka.ilkd.key.gui.interactionlog.model;
+package de.uka.ilkd.key.gui.interactionlog.algo;
 
+import de.uka.ilkd.key.gui.interactionlog.model.Interaction;
+import de.uka.ilkd.key.gui.interactionlog.model.InteractionLog;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 
@@ -18,13 +20,12 @@ public class LogPrinter {
     public static String RANGE_SEPARATOR = " -- ";
 
     public static String END_MARKER = "$$";
-
+    private final Services services;
     private StringWriter w;
     private PrintWriter out;
     private Function<Node, String> matchExpr = LogPrinter::getBranchingLabel;
     private int indent = 0;
     private InteractionLog state;
-    private final Services services;
 
     public LogPrinter(Services services) {
         this.services = services;

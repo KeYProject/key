@@ -18,12 +18,6 @@ public abstract class BuiltInRuleInteraction extends NodeInteraction {
     public BuiltInRuleInteraction() {
     }
 
-
-    @Override
-    public String getProofScriptRepresentation(Services services) {
-        return ruleName + ";";
-    }
-
     public String getRuleName() {
         return ruleName;
     }

@@ -43,4 +43,25 @@ public class OSSBuiltInRuleInteraction extends BuiltInRuleInteraction {
     public <T> T accept(InteractionVisitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    @Override
+    public String toString() {
+        return "one step simplification on" + occurenceIdentifier.getTerm();
+    }
+
+    public OccurenceIdentifier getOccurenceIdentifier() {
+        return occurenceIdentifier;
+    }
+
+    public void setOccurenceIdentifier(OccurenceIdentifier occurenceIdentifier) {
+        this.occurenceIdentifier = occurenceIdentifier;
+    }
+
+    public NodeIdentifier getNodeIdentifier() {
+        return nodeIdentifier;
+    }
+
+    public void setNodeIdentifier(NodeIdentifier nodeIdentifier) {
+        this.nodeIdentifier = nodeIdentifier;
+    }
 }
