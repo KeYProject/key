@@ -35,6 +35,9 @@ public class OccurenceIdentifier {
     }
 
     public static OccurenceIdentifier get(PosInOccurrence p) {
+        if (p == null)
+            return new OccurenceIdentifier();
+
         List<Integer> indices = new ArrayList<>();
         PIOPathIterator iter = p.iterator();
         while (iter.next() != -1) {
