@@ -24,7 +24,7 @@ public class InteractionLog implements Serializable {
     private String name;
 
     @XmlAttribute
-    private Date created;
+    private Date created = new Date();
 
     private List<Interaction> interactions = new ArrayList<>();
 
