@@ -92,6 +92,8 @@ public abstract class ApplyTacletDialog extends JDialog {
 		    ApplyTacletDialog.this.closeDlg();
 		}
 	    });
+
+        getRootPane().setDefaultButton(applyButton);
     }
     
     protected KeYMediator mediator() {
