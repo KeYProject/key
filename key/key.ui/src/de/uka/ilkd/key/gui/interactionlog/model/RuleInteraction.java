@@ -1,11 +1,5 @@
 package de.uka.ilkd.key.gui.interactionlog.model;
 
-import java.util.HashMap;
-import java.util.Iterator;
-
-import de.uka.ilkd.key.gui.interactionlog.InteractionLogFacade;
-import org.key_project.util.collection.ImmutableMapEntry;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -14,19 +8,19 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
+import org.key_project.util.collection.ImmutableMapEntry;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * @author weigl
  */
 @XmlRootElement
 public final class RuleInteraction extends NodeInteraction {
-
-    private String posInOccurence;
-    //private NodeIdentifier appliedOn;
     private String ruleName;
+    private OccurenceIdentifier posInOccurence;
     private HashMap<String, String> arguments = new HashMap<>();
 
     public RuleInteraction() {
@@ -37,8 +31,7 @@ public final class RuleInteraction extends NodeInteraction {
         super(node);
 
         this.ruleName = app.rule().displayName();
-        this.posInOccurence = InteractionLogFacade
-                .serializePosInOccurence(app.posInOccurrence());
+        this.posInOccurence = OccurenceIdentifier.get(app.posInOccurrence());
 
         if (app instanceof TacletApp) {
             TacletApp tapp = (TacletApp) app;
@@ -83,38 +76,38 @@ public final class RuleInteraction extends NodeInteraction {
         StringBuilder sb = new StringBuilder();
 
         sb
-            .append("------\n")
-            .append("## RuleInteraction ")
-            .append(ruleName)
-            .append("\n\n")
-            .append("### PosInOccurence\n")
-            .append("```\n")
-            .append(posInOccurence)
-            .append("\n```\n\n")
-            .append("### arguments:\n")
+                .append("------\n")
+                .append("## RuleInteraction ")
+                .append(ruleName)
+                .append("\n\n")
+                .append("### PosInOccurence\n")
+                .append("```\n")
+                .append(posInOccurence)
+                .append("\n```\n\n")
+                .append("### arguments:\n")
 
-            .append("| parameter | value |\n")
-            .append("| --- | --- |\n");
+                .append("| parameter | value |\n")
+                .append("| --- | --- |\n");
 
         arguments.forEach((key, value) -> {
             sb
-                .append("| ")
-                .append(key)
-                .append(" | ")
-                .append(value)
-                .append(" |")
-                .append("\n");
+                    .append("| ")
+                    .append(key)
+                    .append(" | ")
+                    .append(value)
+                    .append(" |")
+                    .append("\n");
         });
 
 
         return sb.toString();
     }
 
-    public String getPosInOccurence() {
+    public OccurenceIdentifier getPosInOccurence() {
         return posInOccurence;
     }
 
-    public void setPosInOccurence(String posInOccurence) {
+    public void setPosInOccurence(OccurenceIdentifier posInOccurence) {
         this.posInOccurence = posInOccurence;
     }
 

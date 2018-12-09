@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui.interactionlog;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.Markdown;
 import de.uka.ilkd.key.gui.fonticons.FontAwesome;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
@@ -27,89 +28,72 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class InteractionLogView extends JPanel implements InteractionRecorderListener {
     private static final float SMALL_ICON_SIZE = 16f;
-    private final ExportProofScriptAction actionExportProofScript = new ExportProofScriptAction();
-    private final SaveAction saveAction = new SaveAction();
-    private final LoadAction loadAction = new LoadAction();
-    private final AddUserNoteAction addUserNoteAction = new AddUserNoteAction();
-    private final ToggleFavouriteAction toggleFavouriteAction = new ToggleFavouriteAction();
-    private final JumpIntoTreeAction jumpIntoTreeAction = new JumpIntoTreeAction();
-    private final TryReapplyAction tryReapplyAction = new TryReapplyAction();
-    private final InteractionRecorder recoder = new InteractionRecorder();
+    private final ExportUlbrichScriptAction actionExportProofScript = new ExportUlbrichScriptAction();
+    private final ExportKPSAction actionKPSExport = new ExportKPSAction();
+    private final SaveAction actionSave = new SaveAction();
+    private final LoadAction actionLoad = new LoadAction();
+    private final AddUserNoteAction actionAddUserNote = new AddUserNoteAction();
+    private final ToggleFavouriteAction actionToggleFavourite = new ToggleFavouriteAction();
+    private final JumpIntoTreeAction actionJumpIntoTree = new JumpIntoTreeAction();
+    private final TryReapplyAction actionTryReapply = new TryReapplyAction();
+    private final ExportMarkdownAction actionExportMarkdown = new ExportMarkdownAction();
+    private final ShowExtendedActionsAction actionShowExtended = new ShowExtendedActionsAction();
 
-    /**
-     * the list of individual interactions (like impRight, auto, ...) in currently selected
-     * interactionLog
-     */
+    private final InteractionRecorder recorder = new InteractionRecorder();
+
+
     private final JList<Interaction> listInteraction = new JList<>();
-    /**
-     * ComboBox for selecting a active InteractionLog
-     */
     private final JComboBox<InteractionLog> interactionLogSelection = new JComboBox<>();
-    /**
-     * list of interactions, will be replaced on every change of the interactionLogSelection
-     */
     private final DefaultListModel<Interaction> interactionListModel = new DefaultListModel<>();
-
-    private final JToolBar panelButtons = new JToolBar();
-
     private final Services services;
-    /**
-     * contains a List of all opened InteractionLogs, which are selectable in the ComboBox
-     */
-    private final List<InteractionLog> loadedInteractionLogs = new ArrayList<InteractionLog>();
-    private final JButton btnExport;
-    private final JButton btnSave;
-    private final JButton btnAddNote;
-    private final JButton btnLoad;
     private Proof currentProof;
-    /**
-     * index of InteractionLog, that is written to in current proof.
-     */
-    private Optional<Integer> writingActionInteractionLog = Optional.empty();
 
-    /**
-     * currently displayed InteractionLog
-     */
-    private Optional<Integer> displayedInteractionLog = Optional.empty();
 
-    public InteractionLogView(KeYMediator mediator) {
+    public InteractionLogView(MainWindow mainWindow, KeYMediator mediator) {
+        // register the recorder in the proof control
+        mainWindow.getUserInterface().getProofControl().addInteractionListener(recorder);
+        mainWindow.getUserInterface().getProofControl().addAutoModeListener(recorder);
         services = mediator.getServices();
+
         listInteraction.setModel(interactionListModel);
         listInteraction.setCellRenderer(new InteractionCellRenderer());
 
+        JToolBar panelButtons = new JToolBar();
         panelButtons.add(interactionLogSelection);
-        panelButtons.add(btnLoad = new JButton(loadAction));
-        panelButtons.add(btnSave = new JButton(saveAction));
-        panelButtons.add(Box.createHorizontalGlue());
-
-        panelButtons.add(btnExport = new JButton(actionExportProofScript));
-        panelButtons.add(btnAddNote = new JButton(addUserNoteAction));
+        JButton btnLoad = new JButton(actionLoad);
+        JButton btnSave = new JButton(actionSave);
+        JButton btnExport = new JButton(actionExportProofScript);
+        JButton btnAddNote = new JButton(actionAddUserNote);
 
         btnExport.setHideActionText(true);
         btnSave.setHideActionText(true);
         btnAddNote.setHideActionText(true);
         btnLoad.setHideActionText(true);
 
+        panelButtons.add(btnLoad);
+        panelButtons.add(btnSave);
+        panelButtons.add(Box.createHorizontalGlue());
+        panelButtons.add(actionAddUserNote);
+        panelButtons.addSeparator();
+        panelButtons.add(actionShowExtended);
+
         JPopupMenu popup = new JPopupMenu();
-        popup.add(new JMenuItem(toggleFavouriteAction));
-        popup.add(new JMenuItem(jumpIntoTreeAction));
-        popup.add(new JMenuItem(tryReapplyAction));
+        popup.add(new JMenuItem(actionToggleFavourite));
+        popup.add(new JMenuItem(actionJumpIntoTree));
+        popup.add(new JMenuItem(actionTryReapply));
         popup.addSeparator();
-        popup.add(new JMenuItem(addUserNoteAction));
+        popup.add(new JMenuItem(actionAddUserNote));
         listInteraction.setComponentPopupMenu(popup);
 
+        recorder.addListener(this);
 
-        recoder.addListener(this::onInteraction);
-
-        interactionLogSelection.setModel(recoder.getLoadedInteractionLogs());
+        interactionLogSelection.setModel(recorder.getLoadedInteractionLogs());
         interactionLogSelection.addActionListener(this::handleSelectionChange);
-        interactionLogSelection.setModel(recoder.getLoadedInteractionLogs());
+        interactionLogSelection.setModel(recorder.getLoadedInteractionLogs());
 
         listInteraction.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
@@ -124,10 +108,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             }
         });
 
-
-        interactionLogSelection.setModel(
-                recoder.getLoadedInteractionLogs()
-        );
+        interactionLogSelection.setModel(recorder.getLoadedInteractionLogs());
 
         new DropTarget(listInteraction, 0, new DropTargetAdapter() {
             @Override
@@ -137,9 +118,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
                     Object textFlavour = tr.getTransferData(DataFlavor.stringFlavor);
                     dtde.acceptDrop(dtde.getDropAction());
                     dtde.dropComplete(true);
-                    SwingUtilities.invokeLater(() -> {
-                        addUserNoteAction.doAddNote(textFlavour.toString());
-                    });
+                    SwingUtilities.invokeLater(() -> actionAddUserNote.doAddNote(textFlavour.toString()));
                     return;
                 } catch (UnsupportedFlavorException | IOException e) {
                     e.printStackTrace();
@@ -151,7 +130,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         setLayout(new BorderLayout());
         add(panelButtons, BorderLayout.NORTH);
         add(new JScrollPane(listInteraction));
-        recoder.addListener(this);
+        recorder.addListener(this);
 
         setBorder(BorderFactory.createTitledBorder("Interactions"));
 
@@ -166,11 +145,11 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             }
         });
         setCurrentProof(mediator.getSelectedProof());
+
     }
 
     private void handleSelectionChange(ActionEvent actionEvent) {
         InteractionLog selectedLog = getSelectedItem();
-
         updateList(selectedLog);
     }
 
@@ -182,7 +161,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     private void setCurrentProof(Proof proof) {
         if (proof == null) return;
         currentProof = proof;
-        recoder.get(currentProof);
+        recorder.get(currentProof);
         //rebuildList();
     }
 
@@ -191,7 +170,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         InteractionLog currentInteractionLog = getSelectedItem();
         System.out.println(currentInteractionLog.getMarkdownText());
         if (currentProof != null) {
-            InteractionLog state = recoder.get(currentProof);
+            InteractionLog state = recorder.get(currentProof);
             updateList(state);
         }
     }
@@ -201,65 +180,61 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         interactionLog.getInteractions().forEach(interactionListModel::addElement);
     }
 
-    /**
-     * gets called on every change to the interaction
-     *
-     * @param interaction
-     */
     @Override
     public void onInteraction(Interaction interaction) {
         rebuildList();
     }
 
-    public ExportProofScriptAction getActionExportProofScript() {
+    public ExportUlbrichScriptAction getActionExportProofScript() {
         return actionExportProofScript;
     }
 
-    public SaveAction getSaveAction() {
-        return saveAction;
+    public SaveAction getActionSave() {
+        return actionSave;
     }
 
-    public LoadAction getLoadAction() {
-        return loadAction;
+    public LoadAction getActionLoad() {
+        return actionLoad;
     }
 
-    public AddUserNoteAction getAddUserNoteAction() {
-        return addUserNoteAction;
+    public AddUserNoteAction getActionAddUserNote() {
+        return actionAddUserNote;
     }
 
-    public JumpIntoTreeAction getJumpIntoTreeAction() {
-        return jumpIntoTreeAction;
+    public JumpIntoTreeAction getActionJumpIntoTree() {
+        return actionJumpIntoTree;
     }
 
-    public TryReapplyAction getTryReapplyAction() {
-        return tryReapplyAction;
+    public TryReapplyAction getActionTryReapply() {
+        return actionTryReapply;
     }
 
-    public InteractionRecorder getRecoder() {
-        return recoder;
+    public InteractionRecorder getRecorder() {
+        return recorder;
     }
 
     private class InteractionLogModelItem extends DefaultComboBoxModel<InteractionLog> {
     }
 
-    private class ExportProofScriptAction extends AbstractAction {
-        public ExportProofScriptAction() {
-            putValue(Action.NAME, "Export as KPS");
+    private class ExportUlbrichScriptAction extends AbstractAction {
+        ExportUlbrichScriptAction() {
+            putValue(Action.NAME, "Export as Proof Script");
             putValue(Action.SMALL_ICON,
                     IconFontSwing.buildIcon(FontAwesomeBold.FILE_EXPORT, SMALL_ICON_SIZE));
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            JOptionPane.showMessageDialog((Component) e.getSource(), "TODO");
             LogPrinter lp = new LogPrinter(services);
-            InteractionLog state = recoder.get(currentProof);
+            InteractionLog state = recorder.get(currentProof);
             String ps = lp.print(state);
             System.out.println(ps);
         }
     }
 
     private class LoadAction extends AbstractAction {
-        public LoadAction() {
+        LoadAction() {
             putValue(Action.NAME, "Load");
             putValue(Action.SHORT_DESCRIPTION, "Load Interaction Log");
             putValue(Action.SMALL_ICON,
@@ -276,9 +251,9 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 try {
                     File file = fileChooser.getSelectedFile();
-                    recoder.readInteractionLog(file);
+                    recorder.readInteractionLog(file);
                     //addInteractionLog(importedLog);
-                } catch (IOException exception) {
+                } catch (Exception exception) {
                     JOptionPane.showMessageDialog(null,
                             exception.getCause(),
                             "IOException",
@@ -290,7 +265,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class SaveAction extends AbstractAction {
-        public SaveAction() {
+        SaveAction() {
             putValue(Action.NAME, "Save");
             putValue(Action.SMALL_ICON,
                     IconFontSwing.buildIcon(FontAwesome.SAVE, SMALL_ICON_SIZE));
@@ -307,7 +282,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
                 InteractionLog activeInteractionLog = getSelectedItem();
                 try {
                     InteractionLogFacade.storeInteractionLog(activeInteractionLog, fileChooser.getSelectedFile());
-                } catch (IOException exception) {
+                } catch (Exception exception) {
                     JOptionPane.showMessageDialog(null,
                             exception.getCause(),
                             "IOException",
@@ -319,7 +294,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class AddUserNoteAction extends AbstractAction {
-        public AddUserNoteAction() {
+        AddUserNoteAction() {
             super("Add Note");
             putValue(Action.SMALL_ICON,
                     IconFontSwing.buildIcon(FontAwesome.STICKY_NOTE, SMALL_ICON_SIZE));
@@ -332,7 +307,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             doAddNote("");
         }
 
-        public void doAddNote(String prefilled) {
+        void doAddNote(String prefilled) {
             Optional<String> note = new MultiLineInputPrompt(InteractionLogView.this, prefilled).show();
             if (note.isPresent()) {
                 UserNoteInteraction interaction = new UserNoteInteraction(note.get());
@@ -343,12 +318,10 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             }
 
         }
-
-
     }
 
     private class ToggleFavouriteAction extends AbstractAction {
-        public ToggleFavouriteAction() {
+        ToggleFavouriteAction() {
             super("Toggle Fav");
             setName("Toggle Fav");
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_F);
@@ -367,19 +340,19 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class JumpIntoTreeAction extends AbstractAction {
-        public JumpIntoTreeAction() {
+        JumpIntoTreeAction() {
             super("Jump into tree");
             putValue(SMALL_ICON, IconFontSwing.buildIcon(FontAwesome.CODE, SMALL_ICON_SIZE));
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            JOptionPane.showMessageDialog((Component) e.getSource(), "TODO");
         }
     }
 
     private class TryReapplyAction extends AbstractAction {
-        public TryReapplyAction() {
+        TryReapplyAction() {
             putValue(NAME, "Re-apply action");
             putValue(SMALL_ICON, IconFontSwing.buildIcon(FontAwesome.APPER, SMALL_ICON_SIZE));
         }
@@ -388,6 +361,57 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         public void actionPerformed(ActionEvent e) {
             JOptionPane.showMessageDialog(null, "Not Implemented",
                     "A very expected error.", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private class ExportKPSAction extends AbstractAction {
+        public ExportKPSAction() {
+            super("Export as KPS …");
+            putValue(Action.SHORT_DESCRIPTION, "Export the current log into the KPS format.");
+            putValue(Action.SMALL_ICON, IconFontSwing.buildIcon(FontAwesomeBold.CODE, SMALL_ICON_SIZE));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JOptionPane.showMessageDialog((Component) e.getSource(), "TODO");
+        }
+    }
+
+    private class ExportMarkdownAction extends AbstractAction {
+        public ExportMarkdownAction() {
+            super("Export as markdown …");
+            putValue(Action.SHORT_DESCRIPTION, "Export the current log into a markdown file.");
+            putValue(Action.SMALL_ICON, IconFontSwing.buildIcon(FontAwesomeBold.MARKDOWN, SMALL_ICON_SIZE));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JOptionPane.showMessageDialog((Component) e.getSource(), "TODO");
+        }
+    }
+
+    private class ShowExtendedActionsAction extends AbstractAction {
+        public ShowExtendedActionsAction() {
+            super("More …");
+            putValue(Action.SHORT_DESCRIPTION, "Shows further options");
+            putValue(Action.SMALL_ICON, IconFontSwing.buildIcon(FontAwesomeBold.WRENCH, SMALL_ICON_SIZE));
+        }
+
+        public JPopupMenu createMenu() {
+            JPopupMenu menu = new JPopupMenu(getName());
+            menu.add(actionExportMarkdown);
+            menu.add(actionExportProofScript);
+            menu.add(actionKPSExport);
+            return menu;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JComponent btn = (JComponent) e.getSource();
+            JPopupMenu menu = createMenu();
+            PointerInfo pi = MouseInfo.getPointerInfo();
+            menu.show(btn, 0,0);
+            //pi.getLocation().x, pi.getLocation().y);
         }
     }
 }

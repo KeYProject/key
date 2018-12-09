@@ -1,35 +1,43 @@
 package de.uka.ilkd.key.gui.interactionlog.model;
 
-import java.io.Serializable;
-import java.util.*;
-
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
+import javax.xml.bind.annotation.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
  * @version 1 (06.12.18)
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class NodeIdentifier implements Serializable {
-    List<Integer> list = new ArrayList<>();
+    @XmlElement(required = true, name = "select")
+    private List<Integer> list = new ArrayList<>();
+
+    @XmlTransient
+    private int serialNr;
 
     public NodeIdentifier() {
     }
 
     public NodeIdentifier(List<Integer> seq) {
-        this.list.addAll(list);
+        this.list.addAll(seq);
     }
 
-    public void setList(List<Integer> list) {
-        this.list = list;
-    }
-
-    public List<Integer> getList() {
-        return list;
+    public static NodeIdentifier get(Goal g) {
+        return get(g.node());
     }
 
     public static NodeIdentifier get(Node node) {
-        final LinkedList<Integer> list = new LinkedList<>();
+        LinkedList<Integer> list = new LinkedList<>();
         do {
             Node parent = node.parent();
             if (parent != null) {
@@ -38,6 +46,22 @@ public class NodeIdentifier implements Serializable {
             node = parent;
         } while (node != null);
         return new NodeIdentifier(list);
+    }
+
+    @Override
+    public String toString() {
+        return list.stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(".")) + " => " + serialNr;
+    }
+
+
+    public List<Integer> getList() {
+        return list;
+    }
+
+    public void setList(List<Integer> list) {
+        this.list = list;
     }
 
     public Optional<Node> findNode(Proof proof) {
@@ -53,5 +77,13 @@ public class NodeIdentifier implements Serializable {
             }
         }
         return Optional.of(node);
+    }
+
+    public int getSerialNr() {
+        return serialNr;
+    }
+
+    public void setSerialNr(int serialNr) {
+        this.serialNr = serialNr;
     }
 }

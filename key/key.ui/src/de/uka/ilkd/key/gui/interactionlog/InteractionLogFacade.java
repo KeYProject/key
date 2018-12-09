@@ -1,19 +1,13 @@
 package de.uka.ilkd.key.gui.interactionlog;
 
-import de.uka.ilkd.key.gui.interactionlog.model.Interaction;
-import de.uka.ilkd.key.gui.interactionlog.model.InteractionLog;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.gui.interactionlog.model.*;
+import de.uka.ilkd.key.gui.interactionlog.model.builtin.BuiltInRuleInteraction;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -21,10 +15,27 @@ import java.util.stream.Collectors;
  */
 public final class InteractionLogFacade {
     public static JAXBContext createContext() throws JAXBException {
-        JAXBContext ctx = JAXBContext.newInstance(Interaction.class);
+        JAXBContext ctx = JAXBContext.newInstance(
+                InteractionLog.class,
+                AutoModeInteraction.class,
+                NodeInteraction.class,
+                MacroInteraction.class,
+                SettingChangeInteraction.class,
+                UserNoteInteraction.class,
+                BuiltInRuleInteraction.class,
+                PruneInteraction.class,
+                RuleInteraction.class,
+                NodeIdentifier.class,
+                Interaction.class);
         return ctx;
     }
 
+    /**
+     *
+     * @param inputFile
+     * @return
+     * @throws JAXBException
+     */
     public static InteractionLog readInteractionLog(File inputFile)
             throws JAXBException {
         JAXBContext ctx = createContext();
@@ -32,24 +43,17 @@ public final class InteractionLogFacade {
         return (InteractionLog) unmarshaller.unmarshal(inputFile);
     }
 
+    /**
+     *
+     * @param log
+     * @param output
+     * @throws JAXBException
+     */
     public static void storeInteractionLog(InteractionLog log, File output)
             throws JAXBException {
         JAXBContext ctx = createContext();
         Marshaller marshaller = ctx.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         marshaller.marshal(log, output);
-    }
-
-    public static String serializePosInOccurence(PosInOccurrence p) {
-        List<Integer> indices = new ArrayList<>();
-        PosInOccurrence current = p;
-
-        while (current != null && !current.isTopLevel()) {
-            indices.add(p.getIndex());
-            current = current.up();
-        }
-
-        Collections.reverse(indices);
-        return indices.stream().map(Objects::toString)
-                .collect(Collectors.joining("."));
     }
 }

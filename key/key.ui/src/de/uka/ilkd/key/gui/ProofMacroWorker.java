@@ -12,6 +12,7 @@
 //
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.control.InteractionListener;
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -44,7 +45,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
     /**
      *
      */
-    private final List<ProofFinishedListener> proofFinishedListeners = new LinkedList<>();
+    protected final List<InteractionListener> interactionListeners = new LinkedList<>();
     /**
      * The {@link Node} to start macro at.
      */
@@ -88,7 +89,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
     }
 
     @Override
-    protected ProofMacroFinishedInfo doInBackground() throws Exception {
+    protected ProofMacroFinishedInfo doInBackground() {
         final ProverTaskListener ptl = mediator.getUI();
         Proof selectedProof = node.proof();
         info = ProofMacroFinishedInfo.getDefaultInfo(macro, selectedProof);
@@ -138,10 +139,18 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
     }
 
     protected void emitProofMacroFinished(Node node, ProofMacro macro, PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
-        proofFinishedListeners.forEach((l) -> l.macroFinished(node, macro, posInOcc, info));
+        interactionListeners.forEach((l) -> l.runMacro(node, macro, posInOcc, info));
     }
 
-    /*
+    public void addInteractionListener(InteractionListener listener) {
+        interactionListeners.add(listener);
+    }
+
+    public void removeInteractionListener(InteractionListener listener) {
+        interactionListeners.remove(listener);
+    }
+
+    /**
      * Select a goal below the currently selected node.
      * Does not do anything if that is not available.
      * Only enabled goals are considered.
@@ -158,9 +167,5 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
                 n = n.parent();
             }
         }
-    }
-
-    public interface ProofFinishedListener {
-        void macroFinished(Node node, ProofMacro macro, PosInOccurrence posInOcc, ProofMacroFinishedInfo info);
     }
 }

@@ -82,7 +82,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
                 "Documentation on taclets and symbols");
 
         // interaction log
-        interactionLogView = new InteractionLogView(mediator);
+        interactionLogView = new InteractionLogView(mainWindow, mediator);
         addTab("Interaction Log", INTERACTION_LOG_ICON, interactionLogView);
 
         setSelectedIndex(0);

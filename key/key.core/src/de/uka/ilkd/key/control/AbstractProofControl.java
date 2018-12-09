@@ -25,26 +25,22 @@ import java.util.List;
  */
 public abstract class AbstractProofControl implements ProofControl {
     /**
+     *
+     */
+    protected final List<InteractionListener> interactionListeners = new LinkedList<>();
+    /**
      * Optionally, the {@link RuleCompletionHandler} to use.
      */
     private final RuleCompletionHandler ruleCompletionHandler;
-
     /**
      * The default {@link ProverTaskListener} which will be added to all started {@link ApplyStrategy} instances.
      */
     private final ProverTaskListener defaultProverTaskListener;
-
     /**
      * Contains all available {@link AutoModeListener}.
      */
     private final List<AutoModeListener> autoModeListener = new LinkedList<AutoModeListener>();
-
     private boolean minimizeInteraction; // minimize user interaction
-
-    /**
-     *
-     */
-    protected final List<InteractionListener> interactionListeners = new LinkedList<>();
 
     /**
      * Constructor.
@@ -92,6 +88,14 @@ public abstract class AbstractProofControl implements ProofControl {
     @Override
     public void setMinimizeInteraction(boolean minimizeInteraction) {
         this.minimizeInteraction = minimizeInteraction;
+    }
+
+    public void addInteractionListener(InteractionListener listener) {
+        interactionListeners.add(listener);
+    }
+
+    public void removeInteractionListener(InteractionListener listener) {
+        interactionListeners.remove(listener);
     }
 
     @Override
@@ -589,6 +593,33 @@ public abstract class AbstractProofControl implements ProofControl {
         }
 
         startAutoMode(goal.proof(), ImmutableSLList.<Goal>nil().prepend(goal), new FocussedAutoModeTaskListener(goal.proof()));
+    }
+
+    /**
+     * Prunes a proof to the given node.
+     *
+     * @param node
+     * @see {@link Proof#pruneProof(Node)}
+     */
+    public void pruneTo(Node node) {
+        node.proof().pruneProof(node);
+        emitInteractivePrune(node);
+    }
+
+    protected void emitInteractivePrune(Node node) {
+        interactionListeners.forEach((l) -> l.runPrune(node));
+    }
+
+    /**
+     * Undo the last rule application on the given goal.
+     *
+     * @param goal a non-null goal
+     * @see {@link Proof#pruneProof(Goal)}
+     */
+    public void pruneTo(Goal goal) {
+        if (goal.node().parent() != null) {
+            pruneTo(goal.node().parent());
+        }
     }
 
     private final class FocussedAutoModeTaskListener implements ProverTaskListener {

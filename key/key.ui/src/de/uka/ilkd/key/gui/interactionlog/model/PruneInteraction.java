@@ -10,6 +10,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement()
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PruneInteraction extends NodeInteraction {
+    public PruneInteraction() {
+    }
 
     public PruneInteraction(Node node) {
         super(node);
@@ -36,10 +38,10 @@ public class PruneInteraction extends NodeInteraction {
         StringBuilder sb = new StringBuilder();
 
         sb
-            .append("------\n")
-            .append("## PruneInteraction ")
-            .append(getNodeId())
-            .append("\n\n");
+                .append("------\n")
+                .append("## PruneInteraction ")
+                .append(getNodeId())
+                .append("\n\n");
 
         return sb.toString();
     }

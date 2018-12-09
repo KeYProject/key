@@ -1,7 +1,10 @@
 package de.uka.ilkd.key.gui.interactionlog;
 
+import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.InteractionListener;
 import de.uka.ilkd.key.gui.interactionlog.model.*;
+import de.uka.ilkd.key.gui.interactionlog.model.builtin.BuiltInRuleInteraction;
+import de.uka.ilkd.key.gui.interactionlog.model.builtin.BuiltInRuleInteractionFactory;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -9,6 +12,7 @@ import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -17,14 +21,14 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.Settings;
 
 import javax.swing.*;
+import javax.xml.bind.JAXBException;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 /**
  * @author Alexander Weigl <weigl@kit.edu>
  */
-public class InteractionRecorder implements InteractionListener {
+public class InteractionRecorder implements InteractionListener, AutoModeListener {
     private List<InteractionRecorderListener> listeners = new ArrayList<>();
     private Map<Proof, InteractionLog> instances = new HashMap<>();
     private DefaultComboBoxModel<InteractionLog> loadedInteractionLogs = new DefaultComboBoxModel<>();
@@ -71,7 +75,7 @@ public class InteractionRecorder implements InteractionListener {
         return loadedInteractionLogs;
     }
 
-    public InteractionLog readInteractionLog(File file) throws IOException {
+    public InteractionLog readInteractionLog(File file) throws JAXBException {
         InteractionLog log = InteractionLogFacade.readInteractionLog(file);
         loadedInteractionLogs.addElement(log);
         return log;
@@ -128,7 +132,7 @@ public class InteractionRecorder implements InteractionListener {
     public void runBuiltInRule(Goal goal, IBuiltInRuleApp app, BuiltInRule rule,
                                PosInOccurrence pos, boolean forced) {
         InteractionLog state = get(goal.proof());
-        NodeInteraction interaction = new BuiltInRuleInteraction(goal.node(), app, rule, pos);
+        BuiltInRuleInteraction interaction = BuiltInRuleInteractionFactory.create(goal.node(), app);
         state.getInteractions().add(interaction);
         emit(interaction);
     }
@@ -160,5 +164,15 @@ public class InteractionRecorder implements InteractionListener {
                 goal.node(), app));
         state.getInteractions().add(interaction);
         emit(interaction);
+    }
+
+    @Override
+    public void autoModeStarted(ProofEvent e) {
+
+    }
+
+    @Override
+    public void autoModeStopped(ProofEvent e) {
+
     }
 }

@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.gui.interactionlog.model;
 
+import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.Goal;
 
 import javax.swing.*;
 import javax.xml.bind.annotation.*;
@@ -48,6 +50,10 @@ public abstract class Interaction implements Serializable {
 
     public InteractionGraphicStyle getGraphicalStyle() {
         return graphicalStyle;
+    }
+
+    public void reapply(Services services, ProofControl control, Goal goal) {
+        throw new UnsupportedOperationException();
     }
 
     public static class InteractionGraphicStyle {

@@ -15,6 +15,7 @@ import de.uka.ilkd.key.proof.Node;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * @author weigl
@@ -24,8 +25,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 public final class MacroInteraction extends NodeInteraction {
     private String macroName;
 
+    @XmlTransient
     private ProofMacro macro;
+    @XmlTransient
     private PosInOccurrence pos;
+
     private String info;
 
     private List<Integer> openGoalSerialNumbers;
