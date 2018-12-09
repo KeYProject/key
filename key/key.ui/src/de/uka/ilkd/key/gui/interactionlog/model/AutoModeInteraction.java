@@ -6,10 +6,15 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import org.key_project.util.collection.ImmutableList;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@XmlRootElement()
+@XmlAccessorType(XmlAccessType.FIELD)
 public class AutoModeInteraction extends Interaction {
 
     private ApplyStrategyInfo info;

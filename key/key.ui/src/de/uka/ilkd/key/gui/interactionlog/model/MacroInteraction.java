@@ -12,9 +12,15 @@ import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * @author weigl
  */
+@XmlRootElement()
+@XmlAccessorType(XmlAccessType.FIELD)
 public final class MacroInteraction extends NodeInteraction {
     private String macroName;
 

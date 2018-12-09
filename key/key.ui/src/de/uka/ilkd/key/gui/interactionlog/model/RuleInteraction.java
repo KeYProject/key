@@ -15,9 +15,13 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * @author weigl
  */
+@XmlRootElement
 public final class RuleInteraction extends NodeInteraction {
 
     private String posInOccurence;

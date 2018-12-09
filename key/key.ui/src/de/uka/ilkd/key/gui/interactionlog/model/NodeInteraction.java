@@ -5,9 +5,14 @@ import java.beans.Transient;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
+
 public abstract class NodeInteraction extends Interaction {
+    @XmlTransient
     private transient int serialNr;
 
+    @XmlAttribute
     private NodeIdentifier nodeId;
 
     public NodeInteraction() { }

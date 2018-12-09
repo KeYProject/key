@@ -1,21 +1,25 @@
 package de.uka.ilkd.key.gui.interactionlog.model;
 
+import de.uka.ilkd.key.proof.Proof;
+import org.key_project.util.RandomName;
+
+import javax.xml.bind.annotation.*;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.key_project.util.RandomName;
-
-import de.uka.ilkd.key.proof.Proof;
-
 /**
  * @author Alexander Weigl
  * @version 1 (06.12.18)
  */
+@XmlRootElement(name = "interaction-log")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class InteractionLog implements Serializable {
+    @XmlTransient
     private WeakReference<Proof> proof;
 
+    @XmlAttribute
     private String name;
 
     private List<Interaction> interactions = new ArrayList<>();
@@ -51,8 +55,8 @@ public class InteractionLog implements Serializable {
     public String getMarkdownText() {
         StringBuilder sb = new StringBuilder();
         sb.append("# InteractionLog: ")
-            .append(name)
-            .append("\n");
+                .append(name)
+                .append("\n");
 
         interactions.forEach(interaction -> sb.append(interaction.getMarkdownText()));
 

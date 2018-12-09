@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui.interactionlog.model;
 import de.uka.ilkd.key.java.Services;
 
 import javax.swing.*;
+import javax.xml.bind.annotation.*;
 import java.awt.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -10,9 +11,17 @@ import java.util.Date;
 /**
  * @author weigl
  */
+
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class Interaction implements Serializable {
+    @XmlTransient
     protected InteractionGraphicStyle graphicalStyle = new InteractionGraphicStyle();
+
+    @XmlAttribute
     private Date created = new Date();
+
+    @XmlAttribute
     private boolean favoured = false;
 
     public String getProofScriptRepresentation(Services services) {

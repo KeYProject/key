@@ -6,6 +6,12 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement()
+@XmlAccessorType(XmlAccessType.FIELD)
 public class BuiltInRuleInteraction extends NodeInteraction {
     public BuiltInRule rule;
     public PosInOccurrence pos;

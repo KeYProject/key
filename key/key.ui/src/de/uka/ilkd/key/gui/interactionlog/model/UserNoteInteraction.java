@@ -1,11 +1,17 @@
 package de.uka.ilkd.key.gui.interactionlog.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.awt.*;
 
 /**
  * @author Alexander Weigl
  * @version 1 (07.12.18)
  */
+
+@XmlRootElement()
+@XmlAccessorType(XmlAccessType.FIELD)
 public class UserNoteInteraction extends Interaction {
     private String note;
 
