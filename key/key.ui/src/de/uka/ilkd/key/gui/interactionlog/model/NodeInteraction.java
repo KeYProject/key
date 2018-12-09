@@ -1,13 +1,12 @@
 package de.uka.ilkd.key.gui.interactionlog.model;
 
-import de.uka.ilkd.key.control.ProofControl;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
 import java.beans.Transient;
 
+@XmlTransient
 public abstract class NodeInteraction extends Interaction {
     private transient int serialNr;
 

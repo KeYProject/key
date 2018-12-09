@@ -16,6 +16,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MergeRuleBuiltInRuleInteraction extends BuiltInRuleInteraction {
+    public MergeRuleBuiltInRuleInteraction() {
+    }
+
     public MergeRuleBuiltInRuleInteraction(MergeRuleBuiltInRuleApp app, Node node) {
     }
 

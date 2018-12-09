@@ -15,7 +15,7 @@ import java.util.Date;
  * @author weigl
  */
 
-@XmlRootElement
+@XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class Interaction implements Serializable {
     @XmlTransient
@@ -45,10 +45,6 @@ public abstract class Interaction implements Serializable {
 
     public InteractionGraphicStyle getGraphicalStyle() {
         return graphicalStyle;
-    }
-
-    public void reapply(Services services, ProofControl control, Goal goal) {
-        throw new UnsupportedOperationException();
     }
 
     public abstract <T> T accept(InteractionVisitor<T> visitor);

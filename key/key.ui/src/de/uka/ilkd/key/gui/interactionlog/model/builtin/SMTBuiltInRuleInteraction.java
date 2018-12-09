@@ -15,6 +15,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SMTBuiltInRuleInteraction extends BuiltInRuleInteraction {
+    public SMTBuiltInRuleInteraction() {
+    }
+
     public SMTBuiltInRuleInteraction(RuleAppSMT app, Node node) {
     }
 

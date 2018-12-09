@@ -15,6 +15,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ContractBuiltInRuleInteraction extends BuiltInRuleInteraction {
+    public ContractBuiltInRuleInteraction() {
+    }
+
     public ContractBuiltInRuleInteraction(ContractRuleApp app, Node node) {
     }
 

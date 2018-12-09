@@ -188,9 +188,11 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     private JFileChooser getFileChooser() {
         if (fileChooser == null) {
             fileChooser = new JFileChooser();
-            File file = currentProof.getProofFile();
-            if (file != null)
-                fileChooser.setCurrentDirectory(file.getParentFile());
+            if (currentProof != null) {
+                File file = currentProof.getProofFile();
+                if (file != null)
+                    fileChooser.setCurrentDirectory(file.getParentFile());
+            }
         }
         return fileChooser;
     }

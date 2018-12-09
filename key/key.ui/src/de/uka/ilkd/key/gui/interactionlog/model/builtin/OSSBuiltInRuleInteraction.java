@@ -1,14 +1,9 @@
 package de.uka.ilkd.key.gui.interactionlog.model.builtin;
 
-import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.interactionlog.algo.InteractionVisitor;
 import de.uka.ilkd.key.gui.interactionlog.model.NodeIdentifier;
 import de.uka.ilkd.key.gui.interactionlog.model.OccurenceIdentifier;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -26,17 +21,12 @@ public class OSSBuiltInRuleInteraction extends BuiltInRuleInteraction {
     private OccurenceIdentifier occurenceIdentifier;
     private NodeIdentifier nodeIdentifier;
 
+    public OSSBuiltInRuleInteraction() {
+    }
+
     public OSSBuiltInRuleInteraction(OneStepSimplifierRuleApp app, Node node) {
         nodeIdentifier = NodeIdentifier.get(node);
         occurenceIdentifier = OccurenceIdentifier.get(app.posInOccurrence());
-    }
-
-    @Override
-    public void reapply(Services services, ProofControl control, Goal goal) {
-        OneStepSimplifier oss = new OneStepSimplifier();
-        PosInOccurrence pio = occurenceIdentifier.rebuildOn(goal);
-        OneStepSimplifierRuleApp app = oss.createApp(pio, services);
-        goal.apply(app);
     }
 
     @Override

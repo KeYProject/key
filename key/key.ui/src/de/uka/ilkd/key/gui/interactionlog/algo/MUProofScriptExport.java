@@ -39,14 +39,35 @@ public class MUProofScriptExport extends StreamInteractionVisitor {
 
     @Override
     protected Void defaultVisit(Interaction interaction) {
-        out.format("// Unsupported interaction: " + interaction.getClass());
+        out.format("// Unsupported interaction: " + interaction.getClass() + "\n");
         return null;
     }
 
     @Override
     public Void visit(RuleInteraction interaction) {
-        out.format("rule %s;%n", interaction.getRuleName());
+        writeSelector(interaction.getNodeId());
+        out.format("rule %s%n", interaction.getRuleName());
+        out.format("\t     on = \"%s\"%n\tformula = \"%s\"%n",
+                interaction.getPosInOccurence().getTerm(),
+                interaction.getPosInOccurence().getToplevelTerm()
+        );
+
+        interaction.getArguments().forEach((k, v) ->
+                out.format("     inst_%s = \"%s\"%n", firstWord(k), v.trim()));
+        out.format(";%n");
         return null;
+    }
+
+    private String firstWord(String k) {
+        k = k.trim();
+        int p = k.indexOf(' ');
+        if(p<=0) return k;
+        else return k.substring(0, p);
+    }
+
+    private void writeSelector(NodeIdentifier nodeId) {
+        if (nodeId != null)
+            out.format("select %s;%n", nodeId.getBranchLabel());
     }
 
     @Override
@@ -62,6 +83,7 @@ public class MUProofScriptExport extends StreamInteractionVisitor {
 
     @Override
     public Void visit(MacroInteraction interaction) {
+        writeSelector(interaction.getNodeId());
         out.format("macro %s;%n", interaction.getMacro());
         return null;
     }
@@ -73,11 +95,19 @@ public class MUProofScriptExport extends StreamInteractionVisitor {
 
     @Override
     public Void visit(OSSBuiltInRuleInteraction interaction) {
-        return super.visit(interaction);
+        writeSelector(interaction.getNodeId());
+        out.format("one_step_simplify %n" +
+                        "\t     on = \"%s\"%n" +
+                        "\tformula = \"%s\"%n;%n",
+                interaction.getOccurenceIdentifier().getTerm(),
+                interaction.getOccurenceIdentifier().getToplevelTerm()
+        );
+        return null;
     }
 
     @Override
     public Void visit(SMTBuiltInRuleInteraction interaction) {
+        writeSelector(interaction.getNodeId());
         return super.visit(interaction);
     }
 

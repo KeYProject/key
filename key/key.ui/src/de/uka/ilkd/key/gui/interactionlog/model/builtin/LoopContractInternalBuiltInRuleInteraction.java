@@ -15,6 +15,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class LoopContractInternalBuiltInRuleInteraction extends BuiltInRuleInteraction{
+    public LoopContractInternalBuiltInRuleInteraction() {
+    }
+
     public LoopContractInternalBuiltInRuleInteraction(LoopContractInternalBuiltInRuleApp app, Node node) {
     }
 

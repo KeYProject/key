@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.gui.interactionlog;
 
 import de.uka.ilkd.key.gui.interactionlog.model.*;
-import de.uka.ilkd.key.gui.interactionlog.model.builtin.BuiltInRuleInteraction;
+import de.uka.ilkd.key.gui.interactionlog.model.builtin.*;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -23,6 +23,12 @@ public final class InteractionLogFacade {
                 SettingChangeInteraction.class,
                 UserNoteInteraction.class,
                 BuiltInRuleInteraction.class,
+                ContractBuiltInRuleInteraction.class,
+                LoopContractInternalBuiltInRuleInteraction.class,
+                MergeRuleBuiltInRuleInteraction.class,
+                OSSBuiltInRuleInteraction.class,
+                SMTBuiltInRuleInteraction.class,
+                UseDependencyContractBuiltInRuleInteraction.class,
                 PruneInteraction.class,
                 RuleInteraction.class,
                 NodeIdentifier.class,
@@ -31,7 +37,6 @@ public final class InteractionLogFacade {
     }
 
     /**
-     *
      * @param inputFile
      * @return
      * @throws JAXBException
@@ -44,7 +49,6 @@ public final class InteractionLogFacade {
     }
 
     /**
-     *
      * @param log
      * @param output
      * @throws JAXBException

@@ -33,6 +33,9 @@ public class InteractionRecorder implements InteractionListener, AutoModeListene
     private Map<Proof, InteractionLog> instances = new HashMap<>();
     private DefaultComboBoxModel<InteractionLog> loadedInteractionLogs = new DefaultComboBoxModel<>();
 
+    private boolean disableAll = false;
+    private boolean disableSettingsChanges = false;
+
     public InteractionLog get(Proof proof) {
         if (!instances.containsKey(proof)) {
             InteractionLog il = new InteractionLog(proof);
@@ -103,17 +106,34 @@ public class InteractionRecorder implements InteractionListener, AutoModeListene
 
     @Override
     public void settingChanged(Proof proof, Settings settings, SettingType type, String message) {
+        if (disableSettingsChanges) return;
+        if (disableAll) return;
+
         Properties p = new Properties();
         settings.writeSettings(p, p);
         SettingChangeInteraction sci = new SettingChangeInteraction(p, type);
         if (message != null) sci.setMessage(message);
         InteractionLog log = get(proof);
+
+        try {
+            //Remove the last interaction if it was a change setting with the same type
+            Interaction last = log.getInteractions().get(log.getInteractions().size() - 1);
+            if (last instanceof SettingChangeInteraction) {
+                SettingChangeInteraction change = (SettingChangeInteraction) last;
+                if (change.getType() == type) {
+                    log.getInteractions().remove(log.getInteractions().size() - 1);
+                }
+            }
+
+        } catch (IndexOutOfBoundsException | NullPointerException ex) {
+        }
         log.getInteractions().add(sci);
         emit(sci);
     }
 
     @Override
     public void runPrune(Node node) {
+        if (disableAll) return;
         InteractionLog state = get(node.proof());
         PruneInteraction interaction = new PruneInteraction(node);
         state.getInteractions().add(interaction);
@@ -122,6 +142,7 @@ public class InteractionRecorder implements InteractionListener, AutoModeListene
 
     @Override
     public void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
+        if (disableAll) return;
         InteractionLog state = get(node.proof());
         MacroInteraction interaction = new MacroInteraction(node, macro, posInOcc, info);
         state.getInteractions().add(interaction);
@@ -131,6 +152,7 @@ public class InteractionRecorder implements InteractionListener, AutoModeListene
     @Override
     public void runBuiltInRule(Goal goal, IBuiltInRuleApp app, BuiltInRule rule,
                                PosInOccurrence pos, boolean forced) {
+        if (disableAll) return;
         InteractionLog state = get(goal.proof());
         BuiltInRuleInteraction interaction = BuiltInRuleInteractionFactory.create(goal.node(), app);
         state.getInteractions().add(interaction);
@@ -151,6 +173,7 @@ public class InteractionRecorder implements InteractionListener, AutoModeListene
 
     @Override
     public void runAutoMode(List<Node> initialGoals, Proof proof, ApplyStrategyInfo info) {
+        if (disableAll) return;
         InteractionLog state = get(proof);
         AutoModeInteraction interaction = new AutoModeInteraction(initialGoals, info);
         state.getInteractions().add(interaction);
@@ -159,6 +182,7 @@ public class InteractionRecorder implements InteractionListener, AutoModeListene
 
     @Override
     public void runRule(Goal goal, RuleApp app) {
+        if (disableAll) return;
         InteractionLog state = get(goal.proof());
         RuleInteraction interaction = (new RuleInteraction(
                 goal.node(), app));
@@ -174,5 +198,13 @@ public class InteractionRecorder implements InteractionListener, AutoModeListene
     @Override
     public void autoModeStopped(ProofEvent e) {
 
+    }
+
+    public boolean isDisableAll() {
+        return disableAll;
+    }
+
+    public void setDisableAll(boolean disableAll) {
+        this.disableAll = disableAll;
     }
 }

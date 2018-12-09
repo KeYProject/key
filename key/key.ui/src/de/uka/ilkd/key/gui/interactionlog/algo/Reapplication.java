@@ -1,8 +1,18 @@
 package de.uka.ilkd.key.gui.interactionlog.algo;
 
+import de.uka.ilkd.key.api.ProofMacroApi;
+import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.gui.interactionlog.model.*;
 import de.uka.ilkd.key.gui.interactionlog.model.builtin.*;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
+import de.uka.ilkd.key.settings.ProofSettings;
+
+import java.util.Optional;
 
 /**
  * @author Alexander Weigl
@@ -10,6 +20,7 @@ import de.uka.ilkd.key.proof.Goal;
  */
 public class Reapplication extends DefaultInteractionVisitor<Void> {
     private final Goal goal;
+    private WindowUserInterfaceControl uic;
 
     public Reapplication(Goal goal) {
         this.goal = goal;
@@ -37,17 +48,35 @@ public class Reapplication extends DefaultInteractionVisitor<Void> {
 
     @Override
     public Void visit(MacroInteraction interaction) {
-        return super.visit(interaction);
+        ProofMacro macro = new ProofMacroApi().getMacro(interaction.getMacro());
+        PosInOccurrence pio = interaction.getPos();
+        if (macro != null) {
+            if (!macro.canApplyTo(goal.node(), pio)) {
+                throw new IllegalStateException("Macro not applicable");
+            }
+
+            try {
+                macro.applyTo(uic, goal.node(), pio, uic);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     @Override
     public Void visit(UserNoteInteraction interaction) {
-        return super.visit(interaction);
+        // weigl: maybe edit the change note feature here.
+        return null;
     }
 
     @Override
     public Void visit(OSSBuiltInRuleInteraction interaction) {
-        return super.visit(interaction);
+        OneStepSimplifier oss = new OneStepSimplifier();
+        PosInOccurrence pio = interaction.getOccurenceIdentifier().rebuildOn(goal);
+        OneStepSimplifierRuleApp app = oss.createApp(pio, goal.proof().getServices());
+        goal.apply(app);
+        return null;
     }
 
     @Override
@@ -57,7 +86,9 @@ public class Reapplication extends DefaultInteractionVisitor<Void> {
 
     @Override
     public Void visit(PruneInteraction interaction) {
-        return super.visit(interaction);
+        Optional<Node> node = interaction.getNodeId().findNode(goal.proof());
+        node.ifPresent(node1 -> goal.proof().pruneProof(node1));
+        return null;
     }
 
     @Override
@@ -77,7 +108,22 @@ public class Reapplication extends DefaultInteractionVisitor<Void> {
 
     @Override
     public Void visit(SettingChangeInteraction interaction) {
+        ProofSettings settings = goal.proof().getSettings();
+
+        switch (interaction.getType()) {
+            case SMT:
+                settings.getSMTSettings().readSettings(this, interaction.getSavedSettings());
+                break;
+            case CHOICE:
+                settings.getChoiceSettings().readSettings(this, interaction.getSavedSettings());
+                break;
+            case STRATEGY:
+                settings.getStrategySettings().readSettings(this, interaction.getSavedSettings());
+                break;
+        }
+
         return super.visit(interaction);
+
     }
 
     @Override
