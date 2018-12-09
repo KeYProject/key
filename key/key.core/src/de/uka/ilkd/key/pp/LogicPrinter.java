@@ -151,7 +151,7 @@ public class LogicPrinter {
 
     public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         final NotationInfo ni = new NotationInfo();
-        
+
         LogicPrinter p = new LogicPrinter(new ProgramPrinter(),
                                           ni,
                                           services);
