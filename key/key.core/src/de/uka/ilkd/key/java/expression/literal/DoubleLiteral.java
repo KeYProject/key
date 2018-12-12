@@ -87,10 +87,9 @@ public class DoubleLiteral extends Literal {
 		return ((DoubleLiteral)o).getValue().equals(getValue()); 
     }
     
-    public int hashCode(){
-    	int result = 17;
-    	result = 37 * result + getValue().hashCode();
-    	return result;
+    @Override
+    protected int computeHashCode(){
+    	return 37 * super.computeHashCode() + getValue().hashCode();
     }
     
     public boolean equals(Object o){

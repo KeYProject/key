@@ -14,13 +14,15 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.smt.SettingsDialog;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
@@ -43,24 +45,41 @@ public class ShowActiveSettingsAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent e) {
 
-	String message;
-
-	message = "Default Settings: \n"
-	        + ProofSettings.DEFAULT_SETTINGS.settingsToString()
-	        + "\n----------\n";
-	message += "Settings[CurrentProof]:\n"
-	        + ((getMediator().getSelectedProof() == null) ? "No proof loaded."
-	                : getMediator().getSelectedProof().getSettings()
-	                        .settingsToString());
-
-	final JTextArea settings = new JTextArea(message, 30, 80);
-	settings.setEditable(false);
-	settings.setLineWrap(true);
-
-	JScrollPane settingsPane = new JScrollPane(settings);
-
-	JOptionPane.showMessageDialog(mainWindow, settingsPane, "Settings used in the current proof",
-	        JOptionPane.INFORMATION_MESSAGE);
+	
+	
+	ProofSettings settings = (getMediator().getSelectedProof() == null) ?
+			                               ProofSettings.DEFAULT_SETTINGS :
+				                           getMediator().getSelectedProof().getSettings(); 
+	
+	SettingsTreeModel model = new SettingsTreeModel(settings, ProofIndependentSettings.DEFAULT_INSTANCE);
+	
+	SettingsDialog dialog = new SettingsDialog(model, model.getStartComponent(), new ActionListener() {
+        
+        @Override
+        public void actionPerformed(ActionEvent event) {
+                switch(event.getID()){
+                case SettingsDialog.APPLY_BUTTON:
+                	
+                        break;
+                        
+                case SettingsDialog.CANCEL_BUTTON:
+                        ((JDialog)event.getSource()).dispose();
+                        break;
+                        
+                case SettingsDialog.OKAY_BUTTON:
+                        
+                        
+                        ((JDialog)event.getSource()).dispose();
+                       
+                        break;
+                }
+                       
+        }
+    }, new JLabel(""),false);
+	dialog.setTitle("All Active Settings");
+    dialog.setLocationRelativeTo(null);
+    dialog.setVisible(true);
     }
+    
 
 }

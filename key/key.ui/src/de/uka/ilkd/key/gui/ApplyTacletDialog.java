@@ -61,7 +61,7 @@ public abstract class ApplyTacletDialog extends JDialog {
     protected JButton cancelButton;
     protected JButton applyButton;
    
-    private KeYMediator mediator;
+    protected KeYMediator mediator;
     protected boolean checkAfterEachInput=true;
 
     protected TacletInstantiationModel[] model; 
@@ -92,6 +92,8 @@ public abstract class ApplyTacletDialog extends JDialog {
 		    ApplyTacletDialog.this.closeDlg();
 		}
 	    });
+
+        getRootPane().setDefaultButton(applyButton);
     }
     
     protected KeYMediator mediator() {

@@ -116,11 +116,7 @@ public class MethodFrame extends JavaStatement implements
 
     }
 
-    @Override
-    public int hashCode() {
-        return 17*super.hashCode() + 13*execContext.hashCode() + body.hashCode();
-    }
-    
+   
     @Override
     public boolean hasNextPrefixElement() {
         return !body.isEmpty() && body.getStatementAt(0) instanceof ProgramPrefix;
