@@ -507,7 +507,7 @@ public class TermLabelManager {
                                   goal, hint, tacletTerm, newTerm.op(),
                                   newTerm.subs(), newTerm.boundVars(),
                                   newTerm.javaBlock(), newTerm.getLabels());
-        Term newlyLabeledTerm = services.getTermBuilder().label(newTerm, newLabels);
+        Term newlyLabeledTerm = services.getTermBuilder().addLabel(newTerm, newLabels);
         return refactorTerm(state, services, applicationPosInOccurrence,
                             newlyLabeledTerm, goal, hint, rule, tacletTerm);
     }
@@ -1036,9 +1036,6 @@ public class TermLabelManager {
         for (Term child : applicationTerm.subs()) {
             for (TermLabel label : child.getLabels()) {
                 ChildTermLabelPolicy policy = policies.get(label.name());
-                if (rule.name().toString().startsWith("applyEq")) {
-                    System.out.println("label=" + label + "\npolicy=" + policy + "\n\n");
-                }
                 if (policy != null
                         && policy.addLabel(services, applicationPosInOccurrence,
                                            applicationTerm, rule, goal, hint, tacletTerm,
@@ -1888,7 +1885,7 @@ public class TermLabelManager {
                         services.getTermBuilder().applyParallel(pair.first, newModality);
                 if (!applicationLabels.isEmpty()) {
                     newApplicationTerm =
-                            services.getTermBuilder().label(newApplicationTerm,
+                            services.getTermBuilder().addLabel(newApplicationTerm,
                                                             applicationLabels);
                 }
             }
