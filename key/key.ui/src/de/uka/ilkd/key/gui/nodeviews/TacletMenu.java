@@ -260,7 +260,10 @@ public class TacletMenu extends JMenu {
         addMacroMenu();
         
         addSeparator();
-        add(new ShowOriginAction(pos));
+
+        if (pos != null && !pos.isSequent()) {
+            add(new ShowOriginAction(pos));
+        }
 
         addClipboardItem(control);
 
