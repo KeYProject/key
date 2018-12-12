@@ -229,6 +229,11 @@ public class OriginTermLabel implements TermLabel {
         return CHILD_COUNT;
     }
 
+    @Override
+    public boolean isStrategyRelevant() {
+        return false;
+    }
+
     /**
      *
      * @return the term's origin.

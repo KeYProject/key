@@ -424,7 +424,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     if (heap == services.getTypeConverter().getHeapLDT().getSavedHeap()
                             && spec.getInternalModifies()
                                     .get(services.getTypeConverter().getHeapLDT().getHeap())
-                                    .equalsModTermLabels(tb.strictlyNothing())) {
+                                    .equalsModIrrelevantTermLabels(tb.strictlyNothing())) {
                         continue;
                     }
                     final Term m = spec.getModifies(heap, selfTerm, atPres, services);

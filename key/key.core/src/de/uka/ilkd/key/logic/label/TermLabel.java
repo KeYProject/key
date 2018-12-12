@@ -29,6 +29,8 @@ import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.feature.Feature;
 
 /**
  * <p>
@@ -165,12 +167,21 @@ public interface TermLabel extends Named {
      *         <tt>i</tt> is negative or greater-or-equal the number of
      *         parameters returned by {@link #getChildCount()}
      */
-    public Object getChild(int i);
+    Object getChild(int i);
 
     /**
      * Gets the number of parameters of this term label.
      *
      * @return the number of parameters (a non-negative number)
      */
-    public int getChildCount();
+    int getChildCount();
+
+    /**
+     *
+     * @return {@code true} iff this label should be observed by
+     *  {@link Feature}s and {@link Strategy}s.
+     */
+    default boolean isStrategyRelevant() {
+        return true;
+    }
 }

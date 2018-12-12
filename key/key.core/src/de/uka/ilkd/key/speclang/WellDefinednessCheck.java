@@ -433,7 +433,7 @@ public abstract class WellDefinednessCheck implements Contract {
         if (getAssignable() != null && showSig) {
             String printMods =
                     LogicPrinter
-                    .quickPrintTerm(getAssignable(null).equalsModTermLabels(TB.strictlyNothing())
+                    .quickPrintTerm(getAssignable(null).equalsModIrrelevantTermLabels(TB.strictlyNothing())
                             ? TB.empty()
                                     : this.getAssignable(null),
                                     services);
@@ -817,19 +817,19 @@ public abstract class WellDefinednessCheck implements Contract {
     final void setAssignable(Term ass, TermServices services) {
         this.assignable = ass;
         if (ass == null
-                || TB.strictlyNothing().equalsModTermLabels(ass)
-                || TB.FALSE().equalsModTermLabels(ass)) {
+                || TB.strictlyNothing().equalsModIrrelevantTermLabels(ass)
+                || TB.FALSE().equalsModIrrelevantTermLabels(ass)) {
             this.assignable = TB.strictlyNothing();
-        } else if (TB.tt().equalsModTermLabels(ass)
-                || TB.TRUE().equalsModTermLabels(ass)) {
+        } else if (TB.tt().equalsModIrrelevantTermLabels(ass)
+                || TB.TRUE().equalsModIrrelevantTermLabels(ass)) {
             this.assignable = TB.allLocs();
         }
     }
 
     final void combineAssignable(Term ass1, Term ass2, TermServices services) {
-        if (ass1 == null || TB.strictlyNothing().equalsModTermLabels(ass1)) {
+        if (ass1 == null || TB.strictlyNothing().equalsModIrrelevantTermLabels(ass1)) {
             setAssignable(ass2, services);
-        } else if(ass2 == null || TB.strictlyNothing().equalsModTermLabels(ass2)) {
+        } else if(ass2 == null || TB.strictlyNothing().equalsModIrrelevantTermLabels(ass2)) {
             setAssignable(ass1, services);
         } else {
             setAssignable(TB.union(ass1, ass2), services);
@@ -1081,8 +1081,8 @@ public abstract class WellDefinednessCheck implements Contract {
                                  ProgramVariable heapAtPre,
                                  Term anonHeap, TermServices services) {
         assert mod != null;
-        assert anonHeap != null || TB.strictlyNothing().equalsModTermLabels(mod);
-        final Term havocUpd = TB.strictlyNothing().equalsModTermLabels(mod) ?
+        assert anonHeap != null || TB.strictlyNothing().equalsModIrrelevantTermLabels(mod);
+        final Term havocUpd = TB.strictlyNothing().equalsModIrrelevantTermLabels(mod) ?
                 TB.skip()
                 : TB.elementary(heap, TB.anon(TB.var(heap), mod, anonHeap));
         final Term oldUpd = heapAtPre != heap ?

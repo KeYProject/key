@@ -108,7 +108,7 @@ public class OpReplacer {
         }
 
         for (SVSubstitute svs : map.keySet()) {
-            if (term.equalsModTermLabels(svs)) {
+            if (term.equalsModIrrelevantTermLabels(svs)) {
                 return (Term) map.get(svs);
             }
         }

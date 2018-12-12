@@ -182,11 +182,12 @@ public interface Term extends SVSubstitute, Sorted {
 
     /**
      * Checks if {@code o} is a term syntactically equal to this one,
-     * except for their labels.
+     * except for some irrelevant labels.
      *
      * @param o an object
      * @return {@code true} iff {@code o} is a term syntactically equal to this one,
      * except for their labels.
+     * @see TermLabel#isStrategyRelevant
      */
-    boolean equalsModTermLabels(Object o);
+    boolean equalsModIrrelevantTermLabels(Object o);
 }

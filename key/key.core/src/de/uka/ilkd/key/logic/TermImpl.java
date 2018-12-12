@@ -508,11 +508,10 @@ class TermImpl implements Term {
     }
 
     @Override
-    public boolean equalsModTermLabels(Object o) {
+    public boolean equalsModIrrelevantTermLabels(Object o) {
         if(o == this) {
             return true;
         }
-
 
         if(o == null || !(o instanceof TermImpl)) {
             return false;
@@ -520,10 +519,28 @@ class TermImpl implements Term {
 
         final TermImpl t = (TermImpl) o;
 
-        return op.equals(t.op)
+        if (!(op.equals(t.op)
                 && subs.equals(t.subs)
                 && boundVars.equals(t.boundVars)
-                && javaBlock.equals(t.javaBlock);
+                && javaBlock.equals(t.javaBlock))) {
+            return false;
+        }
+
+        Term other = (Term) o;
+
+        for (TermLabel label : getLabels()) {
+            if (label.isStrategyRelevant() && !other.getLabels().contains(label)) {
+                return false;
+            }
+        }
+
+        for (TermLabel label : other.getLabels()) {
+            if (label.isStrategyRelevant() && !getLabels().contains(label)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
