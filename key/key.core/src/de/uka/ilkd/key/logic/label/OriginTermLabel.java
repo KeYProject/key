@@ -110,6 +110,25 @@ public class OriginTermLabel implements TermLabel {
         this.subtermOrigins = new HashSet<>();
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((origin == null) ? 0 : origin.hashCode());
+        result = prime * result + ((subtermOrigins == null) ? 0 : subtermOrigins.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof OriginTermLabel) {
+            OriginTermLabel other = (OriginTermLabel) obj;
+            return other.origin.equals(origin) && other.subtermOrigins.equals(subtermOrigins);
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Creates a new {@link OriginTermLabel}.
      *
