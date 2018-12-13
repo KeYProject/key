@@ -433,7 +433,8 @@ public abstract class WellDefinednessCheck implements Contract {
         if (getAssignable() != null && showSig) {
             String printMods =
                     LogicPrinter
-                    .quickPrintTerm(getAssignable(null).equalsModIrrelevantTermLabels(TB.strictlyNothing())
+                    .quickPrintTerm(
+                        getAssignable(null).equalsModIrrelevantTermLabels(TB.strictlyNothing())
                             ? TB.empty()
                                     : this.getAssignable(null),
                                     services);

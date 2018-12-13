@@ -110,6 +110,19 @@ public class OriginTermLabel implements TermLabel {
         this.subtermOrigins = new HashSet<>();
     }
 
+    /**
+     * Creates a new {@link OriginTermLabel}.
+     *
+     * @param subtermOrigins the origins of the term's (former) subterms.
+     */
+    public OriginTermLabel(Set<Origin> subtermOrigins) {
+        this.origin = new Origin(SpecType.NONE, null, -1);
+        this.subtermOrigins = new HashSet<>();
+        this.subtermOrigins.addAll(subtermOrigins);
+        this.subtermOrigins = this.subtermOrigins.stream()
+                .filter(o -> o.specType != SpecType.NONE).collect(Collectors.toSet());
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -127,19 +140,6 @@ public class OriginTermLabel implements TermLabel {
         } else {
             return false;
         }
-    }
-
-    /**
-     * Creates a new {@link OriginTermLabel}.
-     *
-     * @param subtermOrigins the origins of the term's (former) subterms.
-     */
-    public OriginTermLabel(Set<Origin> subtermOrigins) {
-        this.origin = new Origin(SpecType.NONE, null, -1);
-        this.subtermOrigins = new HashSet<>();
-        this.subtermOrigins.addAll(subtermOrigins);
-        this.subtermOrigins = this.subtermOrigins.stream()
-                .filter(o -> o.specType != SpecType.NONE).collect(Collectors.toSet());
     }
 
     /**
