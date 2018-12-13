@@ -165,8 +165,8 @@ public class OriginTermLabel implements TermLabel {
      * <p> E.g., no labels should be added to terms whose operator is a heap variable as this leads
      * to various problems during proof search. </p>
      *
-     * @param term a term
-     * @param services services.
+     * @param op the specified operator.
+     * @param services the services object.
      * @return {@code true} iff an {@code OriginTermLabel} can be added to a term
      *  with the specified operator.
      */
