@@ -145,8 +145,10 @@ public final class OriginTermLabelWindow extends JFrame {
      */
     public OriginTermLabelWindow(PosInOccurrence pos, Node node, Services services) {
         // TermView can only print sequents or formulas, not terms.
-        while (!pos.subTerm().sort().equals(Sort.FORMULA)) {
-            pos = pos.up();
+        if (pos != null) {
+            while (!pos.subTerm().sort().equals(Sort.FORMULA)) {
+                pos = pos.up();
+            }
         }
 
         this.services = services;
