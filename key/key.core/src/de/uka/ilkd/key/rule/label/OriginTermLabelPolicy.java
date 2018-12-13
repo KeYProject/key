@@ -32,6 +32,10 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
             Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs,
             ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock,
             ImmutableArray<TermLabel> newTermOriginalLabels, TermLabel label) {
+        if (!OriginTermLabel.canAddLabel(newTermOp, services)) {
+            return null;
+        }
+
         if (rule instanceof BuiltInRule
                 && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
             return label;

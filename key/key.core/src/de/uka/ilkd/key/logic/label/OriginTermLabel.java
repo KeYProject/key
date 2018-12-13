@@ -13,6 +13,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 
 /**
@@ -143,6 +145,38 @@ public class OriginTermLabel implements TermLabel {
     }
 
     /**
+     * <p> Determines whether an {@code OriginTermLabel} can be added to the specified term. </p>
+     *
+     * <p> E.g., no labels should be added to terms whose operator is a heap variable as this leads
+     * to various problems during proof search. </p>
+     *
+     * @param term a term
+     * @param services services.
+     * @return {@code true} iff an {@code OriginTermLabel} can be added to the specified term.
+     */
+    public static boolean canAddLabel(Term term, Services services) {
+        return !services.getTypeConverter().getHeapLDT().getHeap().sort().equals(term.sort());
+    }
+
+    /**
+     * <p> Determines whether an {@code OriginTermLabel} can be added to a term with the specified
+     * operator. </p>
+     *
+     * <p> E.g., no labels should be added to terms whose operator is a heap variable as this leads
+     * to various problems during proof search. </p>
+     *
+     * @param term a term
+     * @param services services.
+     * @return {@code true} iff an {@code OriginTermLabel} can be added to a term
+     *  with the specified operator.
+     */
+    public static boolean canAddLabel(Operator op, Services services) {
+        return !(op instanceof ProgramVariable)
+                || !services.getTypeConverter().getHeapLDT().getHeap().sort().equals(
+                        op.sort(new ImmutableArray<>()));
+    }
+
+    /**
      * This method transforms a term in such a way that
      *
      * <ol>
@@ -158,7 +192,7 @@ public class OriginTermLabel implements TermLabel {
      * @return the transformed term.
      */
     public static Term collectSubtermOrigins(Term term, Services services) {
-        if (services.getTypeConverter().getHeapLDT().getHeap().sort().equals(term.sort())) {
+        if (!canAddLabel(term, services)) {
             return term;
         }
 

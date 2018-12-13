@@ -47,6 +47,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Term term,
             List<TermLabel> labels) {
+
         if (rule instanceof BuiltInRule
                 && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
             return;
@@ -76,7 +77,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             newLabel = new OriginTermLabel(subtermOrigins);
         }
 
-        if (!services.getTypeConverter().getHeapLDT().getHeap().sort().equals(term.sort())) {
+        if (OriginTermLabel.canAddLabel(term, services)) {
             labels.add(newLabel);
         }
     }

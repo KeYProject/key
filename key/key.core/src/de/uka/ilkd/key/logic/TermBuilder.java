@@ -34,6 +34,7 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -1657,7 +1658,8 @@ public class TermBuilder {
      */
     public Term addLabelToAllSubs(Term term, ImmutableArray<TermLabel> labels) {
         if (labels == null || labels.isEmpty()
-                || services.getTypeConverter().getHeapLDT().getHeap().sort().equals(term.sort())) {
+                || (!OriginTermLabel.canAddLabel(term, services)
+                        && labels.stream().anyMatch(l -> l instanceof OriginTermLabel))) {
             return term;
         }
 
