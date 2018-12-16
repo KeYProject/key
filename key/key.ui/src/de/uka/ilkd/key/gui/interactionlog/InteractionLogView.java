@@ -401,15 +401,21 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            Interaction inter = listInteraction.getSelectedValue();
             try {
+                //Reapplication should be ignored by the logging.
+                recorder.setDisableAll(true);
                 Reapplication reapplication = new Reapplication(mediator.getSelectedGoal());
-                Interaction inter = listInteraction.getSelectedValue();
                 if (inter != null) inter.accept(reapplication);
             } catch (UnsupportedOperationException ex) {
-                JOptionPane.showMessageDialog(null, "Not Implemented",
+                JOptionPane.showMessageDialog(null,
+                        String.format("<html>Reapplication of %s is not implemented<br>If you know how to do it, then override the corresponding method in %s.</html>",
+                                inter.getClass(), Reapplication.class),
                         "A very expected error.", JOptionPane.ERROR_MESSAGE);
             } catch (IllegalStateException ex) {
 
+            } finally {
+                recorder.setDisableAll(false);
             }
         }
     }

@@ -6,6 +6,8 @@ import de.uka.ilkd.key.gui.interactionlog.model.*;
 import de.uka.ilkd.key.gui.interactionlog.model.builtin.*;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.scripts.EngineState;
+import de.uka.ilkd.key.macros.scripts.RuleCommand;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
@@ -33,7 +35,16 @@ public class Reapplication extends DefaultInteractionVisitor<Void> {
 
     @Override
     public Void visit(RuleInteraction interaction) {
-        return super.visit(interaction);
+        RuleCommand ruleCommand = new RuleCommand();
+        EngineState state = new EngineState(goal.proof());
+        RuleCommand.Parameters parameter = null;
+        try {
+            parameter = ruleCommand.evaluateArguments(state, interaction.getArguments());
+            ruleCommand.execute(uic, parameter, state);
+        } catch (Exception e) {
+            throw new IllegalStateException("Rule application", e);
+        }
+        return null;
     }
 
     @Override
@@ -43,6 +54,7 @@ public class Reapplication extends DefaultInteractionVisitor<Void> {
 
     @Override
     public Void visit(AutoModeInteraction interaction) {
+        uic.getProofControl().startAutoMode(goal.proof(), goal.proof().openGoals(), uic);
         return super.visit(interaction);
     }
 
