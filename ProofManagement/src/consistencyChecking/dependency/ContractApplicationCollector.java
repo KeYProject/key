@@ -28,6 +28,8 @@ public class ContractApplicationCollector extends NodeIntermediateWalker {
         	AppNodeIntermediate appNode = (AppNodeIntermediate) node;
         	AppIntermediate appIntermediate = appNode.getIntermediateRuleApp();
         	String appName = appIntermediate.getRuleName();
+
+        	// TODO: do we have to check other contract uses here (e.g. Dependency Contracts, Block Contracts)?
         	if(appName.equals("Use Operation Contract")) {
         		BuiltInAppIntermediate biApp = (BuiltInAppIntermediate)appIntermediate;
         		String contract = biApp.getContract();

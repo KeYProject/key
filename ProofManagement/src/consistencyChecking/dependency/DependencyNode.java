@@ -57,11 +57,11 @@ public class DependencyNode {
 	@Override
 	public String toString() {
 		String result = "";
-		result = result + myContract.getBaseName() + " -> (";
+		result = result + myContract.getName() + " -> (";
 		boolean first = true;
 		for (FunctionalOperationContract currentDependency : myDependencies) {
 			if(!first) result = result + " ";
-			result = result + currentDependency.getBaseName();
+			result = result + currentDependency.getName();
 			first = false;
 		}
 		result = result + ")";
