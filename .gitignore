@@ -29,3 +29,4 @@ smt-solvers
 
 # *.orig files are created by git during merges
 *.orig
+/.metadata/
