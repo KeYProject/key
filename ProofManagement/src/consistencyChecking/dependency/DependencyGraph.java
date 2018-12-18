@@ -11,16 +11,11 @@ public class DependencyGraph {
 		myNodes = nodes;
 	}
 	public DependencyGraph() {
-		myNodes = new HashSet<>();
-		
+		this(new HashSet<>());		
 	}
 	
 	public void addNode(DependencyNode node) {
 		myNodes.add(node);
-	}
-	
-	public Set<DependencyNode> getNodes() {
-		return myNodes;
 	}
 	
 	public boolean isLegal() {

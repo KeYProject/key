@@ -9,7 +9,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import consistencyChecking.dependency.DependencyGraph;
-import consistencyChecking.dependency.DependencyGraphFactory;
+import consistencyChecking.dependency.DependencyGraphBuilder;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
@@ -46,12 +46,9 @@ public class DependencyChecker implements Checker {
                 Pair<String, BranchNodeIntermediate> currentContractAndProof = loadProof(proofPath);
                 contractProofPairs = contractProofPairs.prepend(currentContractAndProof);
             }
-
             // construct dependency graph from proofs
-            DependencyGraphFactory dependencyGraphFactory = new DependencyGraphFactory(specRepo, contractProofPairs);
-        	dependencyGraphFactory.start();
-        	DependencyGraph dependencyGraph =  dependencyGraphFactory.getResult();
-
+            // WARNING: the analysis as is currently implemented asserts there is exactly one proof for each contract!!!
+        	DependencyGraph dependencyGraph = DependencyGraphBuilder.buildGraph(specRepo, contractProofPairs);
             // check if graph contains illegal structures,
             //			e.g. cycles, unproven dependencies, ...
             if(!dependencyGraph.isLegal()) {
