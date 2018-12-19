@@ -123,7 +123,7 @@ final class PrefixSumRec {
       @            a[k+leftMost(left,right)] == (\sum int i; k-f(k)+1 <= i && i < k+1; \old(a[i+leftMost(left,right)])));
       @   //ensures a[right] == (\sum int i; leftMost(left,right) <= i && i < right+1; \old(a[i])); // the simple side-condition
       @   measured_by right - left + a.length + 3;
-      @   assignable \infinite_union(int k; leftMost(left,right) <= k 
+      @   assignable (\infinite_union int k; leftMost(left,right) <= k
       @              && k <= right && !even(k); \singleton(a[k]));
       @*/
 public void upsweep(int left, int right) {
@@ -151,7 +151,7 @@ public void upsweep(int left, int right) {
       @// ensures (\forall int k; leftMost(left,right) <= k && k <= right;
       @//             a[k] == (\sum int i; 0 <= i && i < binWeight(k-leftMost(left,right)); \old(a[i+leftMost+xxx])) + \old(a[right]));
       @   measured_by right - left + a.length + 3;
-      @   assignable \infinite_union(int k; leftMost(left,right) <= k
+      @   assignable (\infinite_union int k; leftMost(left,right) <= k
       @                              && k <= right; \singleton(a[k]));
       @*/
     public void downsweep(int left, int right) {

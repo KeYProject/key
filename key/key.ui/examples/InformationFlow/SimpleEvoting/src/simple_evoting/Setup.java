@@ -17,7 +17,7 @@ public final class Setup {
       @ invariant (\forall int i; 0 <= i && i < voters.length; \invariant_for(voters[i]));
       @ accessible \inv: numberOfVoters, numberOfCandidates,
       @                  server, server.rep, voters, voters.*,
-      @                  \infinite_union(int i; (0 <= i && i < voters.length) ? voters[i].* : \empty);
+      @                  (\infinite_union int i; (0 <= i && i < voters.length) ? voters[i].* : \empty);
       @*/
 
     /*@ normal_behavior
