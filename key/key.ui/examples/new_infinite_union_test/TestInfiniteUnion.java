@@ -1,4 +1,4 @@
-class TestInifiniteUnion {
+class TestInfiniteUnion {
     /*@
      @ requires true;
      @ ensures true;
