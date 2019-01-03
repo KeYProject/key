@@ -35,6 +35,7 @@ import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.Continue;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.java.statement.Try;
@@ -577,6 +578,8 @@ public final class BlockContractBuilders {
                 protected void doDefaultAction(SourceElement node) {
                     if (node instanceof StatementBlock) {
                         blocks = blocks.add((StatementBlock) node);
+                    } else if (node instanceof LoopStatement) {
+                        blocks = blocks.add(new StatementBlock((LoopStatement) node));
                     }
                 }
 

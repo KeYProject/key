@@ -45,6 +45,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
@@ -1319,6 +1320,41 @@ public class JMLSpecFactory {
      * @throws SLTranslationException a translation exception
      */
     public ImmutableSet<LoopContract> createJMLLoopContracts(final IProgramMethod method,
+            final List<Label> labels, final LoopStatement loop,
+            final TextualJMLSpecCase specificationCase) throws SLTranslationException {
+        if (!specificationCase.isLoopContract()) {
+            return DefaultImmutableSet.nil();
+        }
+
+        final Behavior behavior = specificationCase.getBehavior();
+        final LoopContract.Variables variables
+                = LoopContract.Variables.create(loop, labels, method, services);
+        final ProgramVariableCollection programVariables
+                = createProgramVariables(method, loop, variables);
+        final ContractClauses clauses
+                = translateJMLClauses(method, specificationCase, programVariables, behavior);
+        return new SimpleLoopContract.Creator("JML " + behavior + "loop contract", loop, labels,
+                method, behavior, variables, clauses.requires, clauses.measuredBy, clauses.ensures,
+                clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
+                clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
+                clauses.hasMod, clauses.decreases, services).create();
+    }
+
+    /**
+     * Creates a set of loop contracts for a block from a textual specification case.
+     *
+     * @param method
+     *            the method containing the block.
+     * @param labels
+     *            all labels belonging to the block.
+     * @param block
+     *            the block which the loop contracts belong to.
+     * @param specificationCase
+     *            the textual specification case.
+     * @return a set of loop contracts for a block from a textual specification case.
+     * @throws SLTranslationException a translation exception
+     */
+    public ImmutableSet<LoopContract> createJMLLoopContracts(final IProgramMethod method,
             final List<Label> labels, final StatementBlock block,
             final TextualJMLSpecCase specificationCase) throws SLTranslationException {
         if (!specificationCase.isLoopContract()) {
@@ -1353,7 +1389,7 @@ public class JMLSpecFactory {
      * @return
      */
     private ProgramVariableCollection createProgramVariables(final IProgramMethod method,
-            final StatementBlock block, final BlockContract.Variables variables) {
+            final JavaStatement block, final BlockContract.Variables variables) {
         final Map<LocationVariable, LocationVariable> remembranceVariables
                 = variables.combineRemembranceVariables();
         final Map<LocationVariable, LocationVariable> outerRemembranceVariables

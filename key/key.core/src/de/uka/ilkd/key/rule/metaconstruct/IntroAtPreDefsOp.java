@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -109,9 +110,34 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         // update merge contracts
         updateMergeContracts(mpss, atPres, services);
         // update block contracts
-        updateBlockAndLoopContracts(blocks, atPreVars, atPreHeapVars, services);
+        updateBlockAndLoopContracts(blocks, loops, atPreVars, atPreHeapVars, services);
 
         return tb.apply(atPreUpdate, target, null);
+    }
+
+    /**
+     * Replace the placeholder variables
+     * (see {@link BlockSpecificationElement#getPlaceholderVariables()})
+     * of all block contracts for blocks in {@code blocks} by
+     * {@code atPreVars} and {@code atPreHeapVars}
+     *
+     * @param blocks the blocks whose contracts to update.
+     * @param loops the loops whose contracts to update.
+     * @param atPreVars all remembrance variables.
+     * @param atPreHeapVars all remembrance heaps.
+     * @param services services.
+     */
+    public void updateBlockAndLoopContracts(
+            final ImmutableSet<StatementBlock> blocks,
+            final ImmutableSet<LoopStatement> loops,
+            Map<LocationVariable, LocationVariable> atPreVars,
+            Map<LocationVariable, LocationVariable> atPreHeapVars, Services services) {
+        updateBlockAndLoopContracts(
+                blocks.union(DefaultImmutableSet.fromSet(
+                        loops.stream().map(
+                                loop -> new StatementBlock(loop))
+                        .collect(Collectors.toSet()))),
+                atPreVars, atPreHeapVars, services);
     }
 
     /**
@@ -125,7 +151,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
      * @param atPreHeapVars all remembrance heaps.
      * @param services services.
      */
-    public void updateBlockAndLoopContracts(final ImmutableSet<StatementBlock> blocks,
+    public void updateBlockAndLoopContracts(
+            final ImmutableSet<StatementBlock> blocks,
             Map<LocationVariable, LocationVariable> atPreVars,
             Map<LocationVariable, LocationVariable> atPreHeapVars, Services services) {
         for (StatementBlock block : blocks) {

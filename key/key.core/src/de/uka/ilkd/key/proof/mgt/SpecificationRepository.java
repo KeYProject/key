@@ -70,6 +70,7 @@ import de.uka.ilkd.key.speclang.ContractAxiom;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalBlockContract;
+import de.uka.ilkd.key.speclang.FunctionalLoopContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
@@ -568,7 +569,7 @@ public final class SpecificationRepository {
     /**
      * Adds initially clause as post-condition to contracts of constructors.
      * Creates a new contract if there is none yet.
-     * 
+     *
      * @param inv
      *            initially clause
      * @param kjt
@@ -614,7 +615,7 @@ public final class SpecificationRepository {
 
     /**
      * Remove well-definedness checks from a given set of contracts
-     * 
+     *
      * @param contracts
      *            A set of contracts
      * @return contracts without well-definedness checks
@@ -637,7 +638,7 @@ public final class SpecificationRepository {
      * Registers a well-definedness check. It does not take care of its
      * visibility in the proof management dialog (this is done in
      * {@link #registerContract(Contract, Pair)}).
-     * 
+     *
      * @param check
      *            The well-definedness check to be registered
      */
@@ -651,7 +652,7 @@ public final class SpecificationRepository {
     /**
      * Unregisters a well-definedness check. It does not take care of its
      * visibility in the proof management dialog.
-     * 
+     *
      * @param check
      *            The well-definedness check to be unregistered
      */
@@ -949,6 +950,7 @@ public final class SpecificationRepository {
                 .toArray(new FunctionalOperationContract[toCombine.size()]);
         Arrays.sort(contractsArray,
                 new Comparator<FunctionalOperationContract>() {
+                    @Override
                     public int compare(FunctionalOperationContract c1,
                             FunctionalOperationContract c2) {
                         return c1.getName().compareTo(c2.getName());
@@ -1051,7 +1053,7 @@ public final class SpecificationRepository {
     /**
      * Adds postconditions raising from initially clauses to all constructors.
      * <b>Warning</b>: To be called after all contracts have been registered.
-     * 
+     *
      * @throws SLTranslationException
      *             may be thrown during contract extraction
      */
@@ -1078,7 +1080,7 @@ public final class SpecificationRepository {
      * clauses, the method <code>createContractsFromInitiallyClauses</code> adds
      * them to the contracts of respective constructors (or adds a contract if
      * there is none yet).
-     * 
+     *
      * @param ini
      *            initially clause
      */
@@ -1440,7 +1442,7 @@ public final class SpecificationRepository {
     /**
      * Returns the {@link ProofOblInput} from which the given {@link Proof} was
      * created.
-     * 
+     *
      * @param proof
      *            The {@link Proof}.
      * @return The {@link ProofOblInput} of the given {@link Proof} or
@@ -1512,7 +1514,7 @@ public final class SpecificationRepository {
      * loop does not possess an invariant, none is set to the target. A possibly
      * existing old registration will be overwritten, a registration for the
      * original loop remains untouched.
-     * 
+     *
      * @param from
      *            the loop with the original contract
      * @param loop
@@ -1706,7 +1708,7 @@ public final class SpecificationRepository {
     /**
      * Deletes the {@link MergeContract}s for a given
      * {@link MergePointStatement}.
-     * 
+     *
      * @param mps
      *            The {@link MergePointStatement} to delete the registered
      *            contracts for.
@@ -1795,7 +1797,7 @@ public final class SpecificationRepository {
     /**
      * Represent terms belong to model fields, so the well-definedness check
      * considers both of them together.
-     * 
+     *
      * @param kjt
      *            The relevant KeYJavaType
      */
@@ -1836,7 +1838,7 @@ public final class SpecificationRepository {
     /**
      * Registers a well-definedness check for a jml statement. It does not take
      * care of its visibility in the proof management dialog.
-     * 
+     *
      * @param swd
      *            The well-definedness check
      */

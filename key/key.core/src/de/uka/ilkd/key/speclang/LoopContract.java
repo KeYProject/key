@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -114,6 +115,12 @@ public interface LoopContract extends BlockSpecificationElement {
     public List<Label> getLoopLabels();
 
     /**
+     * @return {@code true} if this contract belongs to a block,
+     *  {@code false} if it belongs to a loop.
+     */
+    public boolean isOnBlock();
+
+    /**
      *
      * @param newBlock the new block.
      * @param newPreconditions the new preconditions.
@@ -148,4 +155,11 @@ public interface LoopContract extends BlockSpecificationElement {
      */
     @Override
     public LoopContract setBlock(StatementBlock newBlock);
+
+    /**
+     * @param newBlock
+     *            the new loop.
+     * @return a new loop contract equal to this one except that it belongs to a different loop.
+     */
+    public LoopContract setLoop(LoopStatement newLoop);
 }

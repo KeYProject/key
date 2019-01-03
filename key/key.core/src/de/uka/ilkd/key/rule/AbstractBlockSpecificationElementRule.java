@@ -6,11 +6,13 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -373,6 +375,15 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
                     element = element.getFirstElement();
                 }
             }
+
+            if (element instanceof LoopStatement) {
+                StatementBlock block = new StatementBlock((Statement) element);
+
+                if (hasApplicableContracts(services, block, modality, goal)) {
+                    return block;
+                }
+            }
+
             return null;
         }
 
