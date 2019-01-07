@@ -636,6 +636,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
         if (nextNonLabeled instanceof StatementBlock) {
             return createLoopContracts(method, labels,
                     (StatementBlock) nextNonLabeled, labeled.getComments());
+        } else if (nextNonLabeled instanceof LoopStatement) {
+            return createLoopContracts(method, labels,
+                    (LoopStatement) nextNonLabeled, labeled.getComments());
         } else {
             return DefaultImmutableSet.nil();
         }

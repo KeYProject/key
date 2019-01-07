@@ -1306,7 +1306,7 @@ public class JMLSpecFactory {
     }
 
     /**
-     * Creates a set of loop contracts for a block from a textual specification case.
+     * Creates a set of loop contracts for a loop from a textual specification case.
      *
      * @param method
      *            the method containing the block.

@@ -226,7 +226,8 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
             final Term decreases, ImmutableSet<FunctionalLoopContract> functionalContracts,
             Services services) {
-        super(baseName, new StatementBlock(loop), new ArrayList<>(0), method, modality, preconditions, measuredBy, postconditions,
+        super(baseName, new StatementBlock(loop), new ArrayList<>(0), method, modality,
+                preconditions, measuredBy, postconditions,
                 modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod);
 
         onBlock = false;

@@ -280,6 +280,22 @@ public final class SLEnvInput extends AbstractEnvInput {
         }
     }
 
+    private void addLabeledLoopContracts(SpecExtractor specExtractor,
+                                          final SpecificationRepository specRepos,
+                                          final IProgramMethod pm)
+                                      throws ProofInputException {
+        final JavaASTCollector labeledCollector =
+                new JavaASTCollector(pm.getBody(), LabeledStatement.class);
+        labeledCollector.start();
+        for (ProgramElement labeled : labeledCollector.getNodes()) {
+            final ImmutableSet<LoopContract> loopContracts =
+                    specExtractor.extractLoopContracts(pm, (LabeledStatement) labeled);
+            for (LoopContract specification : loopContracts) {
+                specRepos.addLoopContract(specification, true);
+            }
+        }
+    }
+
     private ImmutableSet<PositionedString> createSpecs(SpecExtractor specExtractor)
             throws ProofInputException {
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
@@ -331,6 +347,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 addBlockAndLoopContracts(specExtractor, specRepos, pm);
                 addMergePointStatements(specExtractor, specRepos, pm, methodSpecs);
                 addLabeledBlockContracts(specExtractor, specRepos, pm);
+                addLabeledLoopContracts(specExtractor, specRepos, pm);
             }
 
             //constructor contracts
