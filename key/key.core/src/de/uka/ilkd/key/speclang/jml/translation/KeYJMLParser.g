@@ -1873,9 +1873,9 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
                                       javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
         }
     |   UNIONINF LPAREN {
-            System.err.println("!!! Deprecation Warnung: You used \\infinite_union in the functional syntax."
-            + "\n\tThis is deprecated and won't be valid after adopting OpenJML."
-            + "\n\tPlease use \\infinite_union as a binder: (\\infinite_union var type; expr).");
+            System.err.println("!!! Deprecation Warnung: You used \\infinite_union in the functional syntax \\infinite_union(...)."
+            + "\n\tThis is deprecated and won't be valid in future versions of KeY."
+            + "\n\tPlease use \\infinite_union as a binder instead: (\\infinite_union var type; guard; store-ref-expr).");
           }
         (nullable=boundvarmodifiers)?
         declVars=quantifiedvardecls
