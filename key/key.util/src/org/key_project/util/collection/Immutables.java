@@ -125,7 +125,7 @@ public final class Immutables {
 
     }
 
-    public static <T> ImmutableList<T> concatDuplicateFreeLists(ImmutableList<T> l1, ImmutableList<T> l2) {
+    public static <T> ImmutableList<T> concatDuplicateFreeLists(ImmutableList<T> l1, ImmutableList<? extends T> l2) {
 
         Set<T> lookup = new HashSet<>();
         for (T element : l1) {

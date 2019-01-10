@@ -34,6 +34,7 @@ import de.uka.ilkd.key.java.statement.Break;
 import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.Continue;
 import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -570,22 +571,20 @@ public final class BlockContractBuilders {
                 ProgramElement pe,
                 Map<LocationVariable, LocationVariable> outerRemembranceHeaps,
                 Map<LocationVariable, LocationVariable> outerRemembranceVariables) {
-            ImmutableSet<StatementBlock> innerBlocks =
+            ImmutableSet<JavaStatement> innerBlocksAndLoops =
                     new JavaASTVisitor(pe, services) {
-                private ImmutableSet<StatementBlock> blocks = DefaultImmutableSet.nil();
+                private ImmutableSet<JavaStatement> statements = DefaultImmutableSet.nil();
 
                 @Override
                 protected void doDefaultAction(SourceElement node) {
-                    if (node instanceof StatementBlock) {
-                        blocks = blocks.add((StatementBlock) node);
-                    } else if (node instanceof LoopStatement) {
-                        blocks = blocks.add(new StatementBlock((LoopStatement) node));
+                    if (node instanceof StatementBlock || node instanceof LoopStatement) {
+                        statements = statements.add((JavaStatement) node);
                     }
                 }
 
-                public ImmutableSet<StatementBlock> run() {
+                public ImmutableSet<JavaStatement> run() {
                     walk(root());
-                    return blocks;
+                    return statements;
                 }
             }.run();
 
@@ -596,7 +595,7 @@ public final class BlockContractBuilders {
             atPreVars.putAll(outerRemembranceHeaps);
             atPreVars.putAll(outerRemembranceVariables);
             transformer.updateBlockAndLoopContracts(
-                    innerBlocks, atPreVars, outerRemembranceHeaps, services);
+                    innerBlocksAndLoops, atPreVars, outerRemembranceHeaps, services);
         }
     }
 
@@ -1729,7 +1728,7 @@ public final class BlockContractBuilders {
 
         private Term buildUsageFormula(Goal goal) {
             return services.getTermBuilder().prog(instantiation.modality,
-                    replaceBlock(instantiation.formula.javaBlock(), instantiation.block,
+                    replaceBlock(instantiation.formula.javaBlock(), instantiation.statement,
                             constructAbruptTerminationIfCascade()),
                     instantiation.formula.sub(0),
                     TermLabelManager.instantiateLabels(termLabelState, services, occurrence,
@@ -1739,7 +1738,7 @@ public final class BlockContractBuilders {
                             instantiation.formula.javaBlock(), instantiation.formula.getLabels()));
         }
 
-        private JavaBlock replaceBlock(final JavaBlock java, final StatementBlock oldBlock,
+        private JavaBlock replaceBlock(final JavaBlock java, final JavaStatement oldBlock,
                 final StatementBlock newBlock) {
             Statement newProgram = (Statement) new ProgramElementReplacer(java.program(), services)
                     .replace(oldBlock, newBlock);
@@ -1770,8 +1769,18 @@ public final class BlockContractBuilders {
         }
 
         private JavaBlock getJavaBlock(final ProgramVariable exceptionParameter) {
-            final StatementBlock block = new ValidityProgramConstructor(labels, instantiation.block,
-                    variables, exceptionParameter, services).construct();
+            final StatementBlock block;
+
+            if (instantiation.statement instanceof StatementBlock) {
+                block = new ValidityProgramConstructor(labels,
+                        (StatementBlock) instantiation.statement,
+                        variables, exceptionParameter, services).construct();
+            } else {
+                block = new ValidityProgramConstructor(labels,
+                        new StatementBlock(instantiation.statement),
+                        variables, exceptionParameter, services).construct();
+            }
+
             Statement wrappedBlock = wrapInMethodFrameIfContextIsAvailable(block);
             StatementBlock finishedBlock = finishTransactionIfModalityIsTransactional(wrappedBlock);
             return JavaBlock.createJavaBlock(finishedBlock);

@@ -246,6 +246,11 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         // do nothing
     }
 
+    protected void performActionOnLoopContract(final LoopStatement oldLoop,
+            final LoopStatement newLoop) {
+        // do nothing
+    }
+
     @Override
     public void performActionOnMergePointStatement(MergePointStatement x) {
         DefaultAction def = new DefaultAction(x) {
@@ -286,14 +291,14 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
             While newX = new While(guard, body, pos);
             performActionOnLoopInvariant(x, newX);
-            performActionOnLoopContract(new StatementBlock(x), new StatementBlock(newX));
+            performActionOnLoopContract(x, newX);
             addChild(newX);
 
             changed();
         } else {
             doDefaultAction(x);
             performActionOnLoopInvariant(x, x);
-            performActionOnLoopContract(new StatementBlock(x), new StatementBlock(x));
+            performActionOnLoopContract(x, x);
         }
     }
 
@@ -582,7 +587,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             ProgramElement createNewElement(ExtList changeList) {
                 For newFor = new For(changeList);
                 performActionOnLoopInvariant((For) pe, newFor);
-                performActionOnLoopContract(new StatementBlock(x), new StatementBlock(newFor));
+                performActionOnLoopContract(x, newFor);
                 return newFor;
             }
         };

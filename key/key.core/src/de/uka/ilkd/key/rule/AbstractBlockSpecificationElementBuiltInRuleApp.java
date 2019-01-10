@@ -5,8 +5,8 @@ import java.util.List;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -21,9 +21,9 @@ public abstract class AbstractBlockSpecificationElementBuiltInRuleApp
         extends AbstractBuiltInRuleApp {
 
     /**
-     * @see #getBlock()
+     * @see #getStatement()
      */
-    protected StatementBlock block;
+    protected JavaStatement statement;
 
     /**
      * @see #getHeapContext()
@@ -56,10 +56,10 @@ public abstract class AbstractBlockSpecificationElementBuiltInRuleApp
 
     /**
      *
-     * @return the block which the applied contract belongs to.
+     * @return the statement (block or loop) which the applied contract belongs to.
      */
-    public StatementBlock getBlock() {
-        return block;
+    public JavaStatement getStatement() {
+        return statement;
     }
 
     /**
@@ -91,7 +91,7 @@ public abstract class AbstractBlockSpecificationElementBuiltInRuleApp
 
     @Override
     public boolean complete() {
-        return pio != null && block != null && getContract() != null && heaps != null;
+        return pio != null && statement != null && getContract() != null && heaps != null;
     }
 
     @Override

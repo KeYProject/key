@@ -343,13 +343,15 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
                 = instantiate(application.posInOccurrence().subTerm(), goal, services);
         final LoopContract contract = application.getContract();
         contract.setInstantiationSelf(instantiation.self);
-        assert contract.getBlock().equals(instantiation.block);
+
+        assert contract.isOnBlock() && contract.getBlock().equals(instantiation.statement)
+            || !contract.isOnBlock() && contract.getLoop().equals(instantiation.statement);
 
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables
-                = MiscTools.getLocalIns(instantiation.block, services);
+                = MiscTools.getLocalIns(instantiation.statement, services);
         final ImmutableSet<ProgramVariable> localOutVariables
-                = MiscTools.getLocalOuts(instantiation.block, services);
+                = MiscTools.getLocalOuts(instantiation.statement, services);
         final Map<LocationVariable, Function> anonOutHeaps
                 = createAndRegisterAnonymisationVariables(heaps, contract, services);
         final LoopContract.Variables[] vars

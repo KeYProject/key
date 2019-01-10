@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -74,7 +75,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         if (instantiation == null) {
             return DefaultImmutableSet.nil();
         }
-        return getApplicableContracts(services.getSpecificationRepository(), instantiation.block,
+        return getApplicableContracts(services.getSpecificationRepository(), instantiation.statement,
                 instantiation.modality, goal);
     }
 
@@ -82,7 +83,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
      *
      * @param specifications
      *            a specification repository.
-     * @param block
+     * @param statement
      *            a block.
      * @param modality
      *            the current goal's modality.
@@ -91,18 +92,24 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
      * @return all applicable block contracts for the block from the repository.
      */
     public static ImmutableSet<BlockContract> getApplicableContracts(
-            final SpecificationRepository specifications, final StatementBlock block,
+            final SpecificationRepository specifications, final JavaStatement statement,
             final Modality modality, final Goal goal) {
-        ImmutableSet<BlockContract> collectedContracts
+        if (statement instanceof StatementBlock) {
+            StatementBlock block = (StatementBlock) statement;
+
+            ImmutableSet<BlockContract> collectedContracts
                 = specifications.getBlockContracts(block, modality);
-        if (modality == Modality.BOX) {
-            collectedContracts = collectedContracts
-                    .union(specifications.getBlockContracts(block, Modality.DIA));
-        } else if (modality == Modality.BOX_TRANSACTION) {
-            collectedContracts = collectedContracts
-                    .union(specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
+            if (modality == Modality.BOX) {
+                collectedContracts = collectedContracts
+                        .union(specifications.getBlockContracts(block, Modality.DIA));
+            } else if (modality == Modality.BOX_TRANSACTION) {
+                collectedContracts = collectedContracts
+                        .union(specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
+            }
+            return filterAppliedContracts(collectedContracts, goal);
+        } else {
+            return null;
         }
-        return filterAppliedContracts(collectedContracts, goal);
     }
 
     /**
@@ -140,7 +147,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
             if (app instanceof BlockContractInternalBuiltInRuleApp) {
                 BlockContractInternalBuiltInRuleApp blockRuleApp
                         = (BlockContractInternalBuiltInRuleApp) app;
-                if (blockRuleApp.getBlock().equals(contract.getBlock())
+                if (blockRuleApp.getStatement().equals(contract.getBlock())
                         && selfOrParentNode.getChildNr(previousNode) == 0) {
                     // prevent application of contract in its own check validity branch
                     // but not in other branches, e.g., do-while
@@ -507,9 +514,12 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
 
         @Override
         protected boolean hasApplicableContracts(final Services services,
-                final StatementBlock block, final Modality modality, Goal goal) {
-            return !getApplicableContracts(services.getSpecificationRepository(), block, modality,
-                    goal).isEmpty();
+                final JavaStatement statement, final Modality modality, Goal goal) {
+            ImmutableSet<BlockContract> contracts = getApplicableContracts(
+                    services.getSpecificationRepository(),
+                    statement, modality, goal);
+
+            return contracts != null && !contracts.isEmpty();
         }
     }
 

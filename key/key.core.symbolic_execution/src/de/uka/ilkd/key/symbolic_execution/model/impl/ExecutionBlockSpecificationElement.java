@@ -52,7 +52,7 @@ public class ExecutionBlockSpecificationElement extends AbstractExecutionNode<So
     * @param settings The {@link ITreeSettings} to use.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public ExecutionBlockSpecificationElement(ITreeSettings settings, 
+   public ExecutionBlockSpecificationElement(ITreeSettings settings,
                                  Node proofNode) {
       super(settings, proofNode);
    }
@@ -114,30 +114,30 @@ public class ExecutionBlockSpecificationElement extends AbstractExecutionNode<So
       Term result = null;
       if (variables.returnFlag != null) {
          returnFlag = declaredVariableAsTerm(sb, statementIndex);
-         statementIndex++; // Skip return flag 
+         statementIndex++; // Skip return flag
          if (variables.result != null) {
             result = declaredVariableAsTerm(sb, statementIndex);
-            statementIndex++; // Result variable 
+            statementIndex++; // Result variable
          }
       }
       Term exception = null;
       if (variables.exception != null) {
          exception = declaredVariableAsTerm(sb, statementIndex);
       }
-      BlockSpecificationElement.Terms terms = new BlockSpecificationElement.Terms(self, 
-                              null, // breakFlags are not used by getPlainText() 
-                              null, // continueFlags are not used by getPlainText() 
-                              returnFlag, // returnFlag are not used by getPlainText() 
-                              result, 
-                              exception, 
-                              remembranceHeaps, 
+      BlockSpecificationElement.Terms terms = new BlockSpecificationElement.Terms(self,
+                              null, // breakFlags are not used by getPlainText()
+                              null, // continueFlags are not used by getPlainText()
+                              returnFlag, // returnFlag are not used by getPlainText()
+                              result,
+                              exception,
+                              remembranceHeaps,
                               remembranceLocalVariables, // remembranceLocalVariables are not used by getPlainText()
                               null, null); // outerRemembranceVariables are not used by getPlainText()
-                              
+
       // Compute text
       return getContract().getPlainText(getServices(), terms);
    }
-   
+
    /**
     * Returns the variable declared by the statement at the given index as {@link Term}.
     * @param sb The {@link StatementBlock} which contains all variable declarations.
@@ -146,7 +146,7 @@ public class ExecutionBlockSpecificationElement extends AbstractExecutionNode<So
     */
    protected Term declaredVariableAsTerm(StatementBlock sb, int statementIndex) {
       Statement resultInitStatement = sb.getStatementAt(statementIndex);
-      assert resultInitStatement instanceof LocalVariableDeclaration : "Block Contract Rule has changed.";      
+      assert resultInitStatement instanceof LocalVariableDeclaration : "Block Contract Rule has changed.";
       Named var =  ((LocalVariableDeclaration) resultInitStatement).getVariables().get(0).getProgramVariable();
       assert var != null : "Block Contract Rule has changed.";
       return getServices().getTermBuilder().var((ProgramVariable) var);
@@ -200,6 +200,8 @@ public class ExecutionBlockSpecificationElement extends AbstractExecutionNode<So
     */
    @Override
    public StatementBlock getBlock() {
-      return ((AbstractBlockSpecificationElementBuiltInRuleApp)getProofNode().getAppliedRuleApp()).getBlock();
+      return (StatementBlock)
+              ((AbstractBlockSpecificationElementBuiltInRuleApp)getProofNode()
+                      .getAppliedRuleApp()).getStatement();
    }
 }

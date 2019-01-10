@@ -139,6 +139,24 @@ public interface LoopContract extends BlockSpecificationElement {
             Term newDecreases);
 
     /**
+    *
+    * @param newLoop the new loop.
+    * @param newPreconditions the new preconditions.
+    * @param newPostconditions the new postconditions.
+    * @param newModifiesClauses the new modifies clauses.
+    * @param newinfFlowSpecs the new information flow specifications.
+    * @param newVariables the new variables.
+    * @param newMeasuredBy the new measured-by clause.
+    * @param newDecreases the new decreases clause.
+    * @return a new loop contract with the specified attributes.
+    */
+    LoopContract update(LoopStatement newLoop, Map<LocationVariable, Term> newPreconditions,
+            Map<LocationVariable, Term> newPostconditions,
+            Map<LocationVariable, Term> newModifiesClauses,
+            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, Term newMeasuredBy,
+            Term newDecreases);
+
+    /**
      * @param newKJT
      *            the type containing the new target method.
      * @param newPM

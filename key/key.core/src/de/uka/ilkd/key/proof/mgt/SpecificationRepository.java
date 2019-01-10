@@ -138,6 +138,9 @@ public final class SpecificationRepository {
     private final Map<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>>
         loopContracts =
             new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>>();
+    private final Map<Pair<LoopStatement, Integer>, ImmutableSet<LoopContract>>
+        loopContractsOnLoops =
+            new LinkedHashMap<Pair<LoopStatement, Integer>, ImmutableSet<LoopContract>>();
     private Map<MergePointStatement, ImmutableSet<MergeContract>>
         mergeContracts =
             new LinkedHashMap<MergePointStatement, ImmutableSet<MergeContract>>();
@@ -1566,6 +1569,17 @@ public final class SpecificationRepository {
         }
     }
 
+    public ImmutableSet<LoopContract> getLoopContracts(LoopStatement loop) {
+        final Pair<LoopStatement, Integer> b = new Pair<LoopStatement, Integer>(
+                loop, loop.getStartPosition().getLine());
+        final ImmutableSet<LoopContract> contracts = loopContractsOnLoops.get(b);
+        if (contracts == null) {
+            return DefaultImmutableSet.<LoopContract> nil();
+        } else {
+            return contracts;
+        }
+    }
+
     public ImmutableSet<MergeContract> getMergeContracts(
             MergePointStatement mps) {
         final ImmutableSet<MergeContract> contracts = mergeContracts.get(mps);
@@ -1594,6 +1608,21 @@ public final class SpecificationRepository {
     public ImmutableSet<LoopContract> getLoopContracts(
             final StatementBlock block, final Modality modality) {
         ImmutableSet<LoopContract> result = getLoopContracts(block);
+        final Modality matchModality = getMatchModality(modality);
+        for (LoopContract contract : result) {
+            if (!contract.getModality().equals(matchModality)
+                    || (modality.transaction()
+                            && !contract.isTransactionApplicable()
+                            && !contract.isReadOnly(services))) {
+                result = result.remove(contract);
+            }
+        }
+        return result;
+    }
+
+    public ImmutableSet<LoopContract> getLoopContracts(
+            final LoopStatement loop, final Modality modality) {
+        ImmutableSet<LoopContract> result = getLoopContracts(loop);
         final Modality matchModality = getMatchModality(modality);
         for (LoopContract contract : result) {
             if (!contract.getModality().equals(matchModality)
@@ -1668,10 +1697,17 @@ public final class SpecificationRepository {
      *  based on {@code contract}.
      */
     public void addLoopContract(final LoopContract contract, boolean addFunctionalContract) {
-        final StatementBlock block = contract.getBlock();
-        final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
-                block, block.getStartPosition().getLine());
-        loopContracts.put(b, getLoopContracts(block).add(contract));
+        if (contract.isOnBlock()) {
+            final StatementBlock block = contract.getBlock();
+            final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
+                    block, block.getStartPosition().getLine());
+            loopContracts.put(b, getLoopContracts(block).add(contract));
+        } else {
+            final LoopStatement loop = contract.getLoop();
+            final Pair<LoopStatement, Integer> b = new Pair<LoopStatement, Integer>(
+                    loop, loop.getStartPosition().getLine());
+            loopContractsOnLoops.put(b, getLoopContracts(loop).add(contract));
+        }
 
         if (addFunctionalContract) {
             addContract(cf.funcLoop(contract));
@@ -1686,12 +1722,21 @@ public final class SpecificationRepository {
      * @param contract the {@code LoopContract} to remove.
      */
     public void removeLoopContract(final LoopContract contract) {
-        final StatementBlock block = contract.getBlock();
-        final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
-                block, block.getStartPosition().getLine());
+        if (contract.isOnBlock()) {
+            final StatementBlock block = contract.getBlock();
+            final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
+                    block, block.getStartPosition().getLine());
 
-        ImmutableSet<LoopContract> set = loopContracts.get(b);
-        loopContracts.put(b, set.remove(contract));
+            ImmutableSet<LoopContract> set = loopContracts.get(b);
+            loopContracts.put(b, set.remove(contract));
+        } else {
+            final LoopStatement loop = contract.getLoop();
+            final Pair<LoopStatement, Integer> b = new Pair<LoopStatement, Integer>(
+                    loop, loop.getStartPosition().getLine());
+
+            ImmutableSet<LoopContract> set = loopContractsOnLoops.get(b);
+            loopContractsOnLoops.put(b, set.remove(contract));
+        }
     }
 
     /**

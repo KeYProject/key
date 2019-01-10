@@ -226,7 +226,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
             final Term decreases, ImmutableSet<FunctionalLoopContract> functionalContracts,
             Services services) {
-        super(baseName, new StatementBlock(loop), new ArrayList<>(0), method, modality,
+        super(baseName, new StatementBlock(loop), labels, method, modality,
                 preconditions, measuredBy, postconditions,
                 modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod);
 
@@ -466,18 +466,24 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             final Map<LocationVariable, Term> newModifiesClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             final Term newMeasuredBy, final Term newDecreases) {
-        if (onBlock) {
-            return new SimpleLoopContract(baseName, newBlock, labels, method, modality,
-                    newPreconditions, newMeasuredBy, newPostconditions, newModifiesClauses,
-                    newinfFlowSpecs, newVariables, transactionApplicable, hasMod, newDecreases,
-                    functionalContracts, services);
-        } else {
-            return new SimpleLoopContract(baseName, (LoopStatement) newBlock.getChildAt(0),
-                    labels, method, modality,
-                    newPreconditions, newMeasuredBy, newPostconditions, newModifiesClauses,
-                    newinfFlowSpecs, newVariables, transactionApplicable, hasMod, newDecreases,
-                    functionalContracts, services);
-        }
+        return new SimpleLoopContract(baseName, newBlock, labels, method, modality,
+                newPreconditions, newMeasuredBy, newPostconditions, newModifiesClauses,
+                newinfFlowSpecs, newVariables, transactionApplicable, hasMod, newDecreases,
+                functionalContracts, services);
+    }
+
+    @Override
+    public LoopContract update(final LoopStatement newLoop,
+            final Map<LocationVariable, Term> newPreconditions,
+            final Map<LocationVariable, Term> newPostconditions,
+            final Map<LocationVariable, Term> newModifiesClauses,
+            final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
+            final Term newMeasuredBy, final Term newDecreases) {
+        return new SimpleLoopContract(baseName, newLoop,
+                labels, method, modality,
+                newPreconditions, newMeasuredBy, newPostconditions, newModifiesClauses,
+                newinfFlowSpecs, newVariables, transactionApplicable, hasMod, newDecreases,
+                functionalContracts, services);
     }
 
     @Override

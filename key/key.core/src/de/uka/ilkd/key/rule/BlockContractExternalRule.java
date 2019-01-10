@@ -214,13 +214,13 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
                 = instantiate(application.posInOccurrence().subTerm(), goal, services);
         final BlockContract contract = application.getContract();
         contract.setInstantiationSelf(instantiation.self);
-        assert contract.getBlock().equals(instantiation.block);
+        assert contract.getBlock().equals(instantiation.statement);
 
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables
-                = MiscTools.getLocalIns(instantiation.block, services);
+                = MiscTools.getLocalIns(instantiation.statement, services);
         final ImmutableSet<ProgramVariable> localOutVariables
-                = MiscTools.getLocalOuts(instantiation.block, services);
+                = MiscTools.getLocalOuts(instantiation.statement, services);
         final Map<LocationVariable, Function> anonymisationHeaps
                 = createAndRegisterAnonymisationVariables(heaps, contract, services);
         final BlockContract.Variables variables

@@ -77,27 +77,14 @@ public class LoopContractApplyHeadRule implements BuiltInRule {
         Term target = instantiation.formula;
 
         JavaBlock newJavaBlock;
+        newJavaBlock = JavaBlock.createJavaBlock(
+                (StatementBlock) new ProgramElementReplacer(
+                        target.javaBlock().program(), services)
+                .replace(instantiation.statement, headAndBlock));
 
-        if (someContract.isOnBlock()) {
-            newJavaBlock = JavaBlock.createJavaBlock(
-                    (StatementBlock) new ProgramElementReplacer(
-                            target.javaBlock().program(), services)
-                    .replace(instantiation.block, headAndBlock));
-
-            for (LoopContract c : contracts) {
-                services.getSpecificationRepository().removeLoopContract(c);
-                services.getSpecificationRepository().addLoopContract(c.setBlock(block), false);
-            }
-        } else {
-            newJavaBlock = JavaBlock.createJavaBlock(
-                    (StatementBlock) new ProgramElementReplacer(
-                            target.javaBlock().program(), services)
-                    .replace(instantiation.block.getChildAt(0), headAndBlock));
-
-            for (LoopContract c : contracts) {
-                services.getSpecificationRepository().removeLoopContract(c);
-                services.getSpecificationRepository().addLoopContract(c.setBlock(block), false);
-            }
+        for (LoopContract c : contracts) {
+            services.getSpecificationRepository().removeLoopContract(c);
+            services.getSpecificationRepository().addLoopContract(c.setBlock(block), false);
         }
 
         Goal result = goal.split(1).head();

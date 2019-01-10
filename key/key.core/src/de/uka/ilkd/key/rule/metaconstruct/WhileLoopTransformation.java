@@ -209,6 +209,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * last time
      * @param node respective node as program element
      */
+    @Override
     protected void doAction(ProgramElement node) {
         if (runMode == CHECK) {
             // in check mode we look only for unlabeled breaks and continues
@@ -224,6 +225,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
 
     /** starts the walker*/
+    @Override
     public void start() {
         replaceBreakWithNoLabel = -1;
         stack.push(new ExtList());
@@ -244,6 +246,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     /** walks through the AST. While keeping track of the current node
      * @param node the JavaProgramElement the walker is at
      */
+    @Override
     protected void walk(ProgramElement node) {
         stack.push(new ExtList());
         if ((node instanceof LoopStatement) ||
@@ -271,6 +274,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         }
     }
 
+    @Override
     public String toString() {
         return stack.peek().toString();
     }
@@ -279,10 +283,12 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * and if it has children all its children too are left unchanged
      * @param x source element
      */
+    @Override
     protected void doDefaultAction(SourceElement x) {
         addChild(x);
     }
 
+    @Override
     public void performActionOnSchemaVariable(SchemaVariable sv) {
         Object buffer = instantiations.getInstantiation(sv);
         if (buffer == null) {
@@ -321,9 +327,11 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
     }
 
+    @Override
     public void performActionOnLocalVariableDeclaration(
             LocalVariableDeclaration x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(ExtList changeList) {
                 return KeYJavaASTFactory.declare(changeList);
             }
@@ -331,8 +339,10 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnStatementBlock(final StatementBlock x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(ExtList changeList) {
                 StatementBlock newBlock = KeYJavaASTFactory.block(changeList);
                 ImmutableSet<BlockContract> bcs =
@@ -367,6 +377,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         return labelList.contains(x.getProgramElementName());
     }
 
+    @Override
     public void performActionOnBreak(Break x) {
         if (replaceJumpStatement(x)) {
             if (runMode == CHECK) {
@@ -381,6 +392,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         }
     }
 
+    @Override
     public void performActionOnContinue(Continue x) {
         if (replaceJumpStatement(x)) {
             if (runMode == CHECK) {
@@ -563,6 +575,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     *
     * @param x For loop statement
     */
+    @Override
     public void performActionOnFor(For x) {
         ExtList changeList = stack.peek();
         if (replaceBreakWithNoLabel == 0) {
@@ -634,6 +647,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * @param x EnhancedFor loop statement
      * @author mulbrich
      */
+    @Override
     public void performActionOnEnhancedFor(EnhancedFor x) {
         ExtList changeList = stack.peek();
         if (replaceBreakWithNoLabel == 0) {
@@ -665,6 +679,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * <code> Label1:if(c) l':{l'':{p#} while(c){b}}</code>
      * Check if this is ok when labeled continue statements are involved.
      */
+    @Override
     public void performActionOnWhile(While x) {
         ExtList changeList = stack.peek();
         if (replaceBreakWithNoLabel == 0) {
@@ -722,6 +737,16 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 While newLoop = KeYJavaASTFactory.whileLoop(guard, body,
                                                             x.getPositionInfo());
                 services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+
+                ImmutableSet<LoopContract> lcs =
+                    services.getSpecificationRepository().getLoopContracts(x);
+                if (lcs != null) {
+                    for (LoopContract lc : lcs) {
+                        lc = lc.setLoop(newLoop);
+                        services.getSpecificationRepository().addLoopContract(lc);
+                    }
+                }
+
                 addChild(newLoop);
                 changed();
             } else {
@@ -730,6 +755,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         }
     }
 
+    @Override
     public void performActionOnDo(Do x) {
         ExtList changeList = stack.peek();
         if (replaceBreakWithNoLabel == 0) {
@@ -784,8 +810,10 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         }
     }
 
+    @Override
     public void performActionOnIf(If x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(ExtList changeList) {
                 return KeYJavaASTFactory.ifStatement(changeList);
             }
@@ -793,8 +821,10 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnSwitch(Switch x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(ExtList changeList) {
                 return KeYJavaASTFactory.switchBlock(changeList);
             }
@@ -802,8 +832,10 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnTry(Try x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(ExtList changeList) {
                 return KeYJavaASTFactory.tryBlock(changeList);
             }
@@ -811,6 +843,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnLabeledStatement(LabeledStatement x) {
         Label l = null;
         ExtList changeList = stack.peek();
@@ -827,6 +860,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         }
     }
 
+    @Override
     public void performActionOnMethodFrame(MethodFrame x) {
         ExtList changeList = stack.peek();
         if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
@@ -853,8 +887,10 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
 
 
+    @Override
     public void performActionOnSynchronizedBlock(SynchronizedBlock x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(ExtList changeList) {
                 return KeYJavaASTFactory.synchronizedBlock(changeList);
             }
@@ -863,8 +899,10 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
 
 
+    @Override
     public void performActionOnCopyAssignment(CopyAssignment x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(ExtList changeList) {
                 return KeYJavaASTFactory.assign(changeList);
             }
@@ -872,8 +910,10 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
     public void performActionOnThen(Then x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(ExtList changeList) {
                 return KeYJavaASTFactory.thenBlock(changeList);
             }
@@ -882,8 +922,10 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
 
 
+    @Override
     public void performActionOnElse(Else x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(ExtList changeList) {
                 return KeYJavaASTFactory.elseBlock(changeList);
             }
@@ -892,6 +934,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
 
 
+    @Override
     public void performActionOnCase(Case x) {
         Expression e = null;
         ExtList changeList = stack.peek();
@@ -909,8 +952,10 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
 
 
+    @Override
     public void performActionOnCatch(Catch x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(ExtList changeList) {
                 return KeYJavaASTFactory.catchClause(changeList);
             }
@@ -919,8 +964,10 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
 
 
+    @Override
     public void performActionOnDefault(Default x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(ExtList changeList) {
                 return KeYJavaASTFactory.defaultBlock(changeList);
             }
@@ -929,8 +976,10 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
 
 
+    @Override
     public void performActionOnFinally(Finally x) {
         DefaultAction def = new DefaultAction() {
+            @Override
             ProgramElement createNewElement(ExtList changeList) {
                 return KeYJavaASTFactory.finallyBlock(changeList);
             }

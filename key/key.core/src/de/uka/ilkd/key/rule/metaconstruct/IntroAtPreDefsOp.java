@@ -19,7 +19,6 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -32,6 +31,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -133,10 +133,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             Map<LocationVariable, LocationVariable> atPreVars,
             Map<LocationVariable, LocationVariable> atPreHeapVars, Services services) {
         updateBlockAndLoopContracts(
-                blocks.union(DefaultImmutableSet.fromSet(
-                        loops.stream().map(
-                                loop -> new StatementBlock(loop))
-                        .collect(Collectors.toSet()))),
+                DefaultImmutableSet.<JavaStatement>nil().union(blocks).union(loops),
                 atPreVars, atPreHeapVars, services);
     }
 
@@ -146,23 +143,34 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
      * of all block contracts for blocks in {@code blocks} by
      * {@code atPreVars} and {@code atPreHeapVars}
      *
-     * @param blocks the blocks whose contracts to update.
+     * @param statements the blocks and loops whose contracts to update.
      * @param atPreVars all remembrance variables.
      * @param atPreHeapVars all remembrance heaps.
      * @param services services.
      */
     public void updateBlockAndLoopContracts(
-            final ImmutableSet<StatementBlock> blocks,
+            final ImmutableSet<? extends JavaStatement> statements,
             Map<LocationVariable, LocationVariable> atPreVars,
             Map<LocationVariable, LocationVariable> atPreHeapVars, Services services) {
-        for (StatementBlock block : blocks) {
+        for (JavaStatement statement : statements) {
             ImmutableSet<BlockSpecificationElement> contracts = DefaultImmutableSet.nil();
 
-            for (BlockContract c : services.getSpecificationRepository().getBlockContracts(block)) {
-                contracts = contracts.add(c);
-            }
-            for (LoopContract c : services.getSpecificationRepository().getLoopContracts(block)) {
-                contracts = contracts.add(c);
+            if (statement instanceof StatementBlock) {
+                StatementBlock block = (StatementBlock) statement;
+
+                for (BlockContract c : services.getSpecificationRepository().getBlockContracts(block)) {
+                    contracts = contracts.add(c);
+                }
+
+                for (LoopContract c : services.getSpecificationRepository().getLoopContracts(block)) {
+                    contracts = contracts.add(c);
+                }
+            } else {
+                LoopStatement loop = (LoopStatement) statement;
+
+                for (LoopContract c : services.getSpecificationRepository().getLoopContracts(loop)) {
+                    contracts = contracts.add(c);
+                }
             }
 
             for (BlockSpecificationElement contract : contracts) {
@@ -199,7 +207,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     newModifiesClauses.put(heap,
                             contract.getModifiesClause(heap, newVariables.self, services));
                 }
-                updateBlockOrLoopContract(block, contract, newVariables, newPreconditions,
+                updateBlockOrLoopContract(statement, contract, newVariables, newPreconditions,
                         newPostconditions, newModifiesClauses, services);
             }
         }
@@ -512,7 +520,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         }
     }
 
-    private static void updateBlockOrLoopContract(StatementBlock block,
+    private static void updateBlockOrLoopContract(JavaStatement statement,
             BlockSpecificationElement contract,
             final BlockSpecificationElement.Variables newVariables,
             final Map<LocationVariable, Term> newPreconditions,
@@ -520,18 +528,31 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             final Map<LocationVariable, Term> newModifiesClauses, Services services) {
         if (contract instanceof BlockContract) {
             final BlockContract newBlockContract
-                    = ((BlockContract) contract).update(block, newPreconditions, newPostconditions,
+                    = ((BlockContract) contract).update((StatementBlock) statement,
+                            newPreconditions, newPostconditions,
                             newModifiesClauses, contract.getInfFlowSpecs(), newVariables,
                             contract.getMby(newVariables, services));
 
             services.getSpecificationRepository().removeBlockContract((BlockContract) contract);
             services.getSpecificationRepository().addBlockContract(newBlockContract, false);
         } else if (contract instanceof LoopContract) {
-            final LoopContract newLoopContract
-                    = ((LoopContract) contract).update(block, newPreconditions, newPostconditions,
-                            newModifiesClauses, contract.getInfFlowSpecs(), newVariables,
-                            contract.getMby(newVariables, services),
-                            ((LoopContract) contract).getDecreases(newVariables, services));
+            final LoopContract newLoopContract;
+
+            if (statement instanceof StatementBlock) {
+                newLoopContract
+                        = ((LoopContract) contract).update((StatementBlock) statement,
+                                newPreconditions, newPostconditions,
+                                newModifiesClauses, contract.getInfFlowSpecs(), newVariables,
+                                contract.getMby(newVariables, services),
+                                ((LoopContract) contract).getDecreases(newVariables, services));
+            } else {
+                newLoopContract
+                        = ((LoopContract) contract).update((LoopStatement) statement,
+                                newPreconditions, newPostconditions,
+                                newModifiesClauses, contract.getInfFlowSpecs(), newVariables,
+                                contract.getMby(newVariables, services),
+                                ((LoopContract) contract).getDecreases(newVariables, services));
+            }
 
             services.getSpecificationRepository().removeLoopContract((LoopContract) contract);
             services.getSpecificationRepository().addLoopContract(newLoopContract, false);

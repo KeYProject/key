@@ -7,7 +7,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -65,10 +65,10 @@ public abstract class AbstractBlockContractBuiltInRuleApp
                 .instantiate(posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<BlockContract> contracts = AbstractBlockContractRule
                 .getApplicableContracts(instantiation, goal, services);
-        block = instantiation.block;
+        statement = instantiation.statement;
         ImmutableSet<BlockContract> cons = DefaultImmutableSet.<BlockContract> nil();
         for (BlockContract cont : contracts) {
-            if (cont.getBlock().getStartPosition().getLine() == block.getStartPosition()
+            if (cont.getBlock().getStartPosition().getLine() == statement.getStartPosition()
                     .getLine()) {
                 cons = cons.add(cont);
             }
@@ -80,16 +80,16 @@ public abstract class AbstractBlockContractBuiltInRuleApp
 
     /**
      *
-     * @param block
-     *            the new block.
+     * @param statement
+     *            the new statement.
      * @param contract
      *            the new contract.
      * @param heaps
      *            the new heap context.
      */
-    public void update(final StatementBlock block, final BlockContract contract,
+    public void update(final JavaStatement statement, final BlockContract contract,
             final List<LocationVariable> heaps) {
-        this.block = block;
+        this.statement = statement;
         this.contract = contract;
         this.heaps = heaps;
     }
