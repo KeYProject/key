@@ -12,7 +12,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -106,7 +105,7 @@ public interface LoopContract extends BlockSpecificationElement {
     /**
      * @return a loop of the form <code> while(&lt;getGuard()&gt;) { &lt;getBody()&gt; } </code>
      */
-    public While getLoop();
+    public LoopStatement getLoop();
 
     /**
      * @return all labels that belong to the loop, or an empty list if the loop is not a labeled

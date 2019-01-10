@@ -80,7 +80,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     /**
      * @see LoopContract#getLoop()
      */
-    private final While loop;
+    private final LoopStatement loop;
 
     /**
      * Services.
@@ -234,6 +234,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
         this.decreases = decreases;
         this.functionalContracts = functionalContracts;
         this.services = services;
+        this.loop = loop;
 
         loopLabels = labels;
         Label outerLabel = new ProgramElementName("breakLoop");
@@ -243,12 +244,6 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
         head = getHeadStatement(loop, block);
         guard = loop.getGuardExpression();
         body = getBodyStatement(loop, block, outerLabel, innerLabel, loopLabels, services);
-
-        if (loop instanceof While) {
-            this.loop = (While) loop;
-        } else {
-            this.loop = new While(guard, body);
-        }
 
         tail = new StatementBlock();
     }
@@ -386,7 +381,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     }
 
     @Override
-    public While getLoop() {
+    public LoopStatement getLoop() {
         return loop;
     }
 
