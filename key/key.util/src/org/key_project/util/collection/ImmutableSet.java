@@ -28,18 +28,18 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
     ImmutableSet<T> add(T element);
 
     /** @return union of this set with set */
-    ImmutableSet<T> union(ImmutableSet<T> set);
+    ImmutableSet<T> union(ImmutableSet<? extends T> set);
 
     /** @return intersection of this set with set */
-    ImmutableSet<T> intersect(ImmutableSet<T> set);
+    ImmutableSet<T> intersect(ImmutableSet<? extends T> set);
 
     /** @return Iterator<T> of the set */
     @Override
     Iterator<T> iterator();
-    
+
     /** @return Stream<T> of the set */
     Stream<T> stream();
-    
+
     /**
      * return true if predicate is fullfilled for at least one element
      * @param predicate the predicate
@@ -66,7 +66,7 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
      */
     @Override
     public boolean equals(Object o);
-    
+
     @Override
     public int hashCode();
 
