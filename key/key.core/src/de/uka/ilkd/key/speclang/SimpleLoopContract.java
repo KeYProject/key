@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -34,6 +35,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.metaconstruct.EnhancedForElimination;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
@@ -81,6 +83,16 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
      * @see LoopContract#getLoop()
      */
     private final LoopStatement loop;
+
+    /**
+     * @see LoopContract#getIndexVariable()
+     */
+    private final ProgramVariable index;
+
+    /**
+     * @see LoopContract#getValuesVariable()
+     */
+    private final ProgramVariable values;
 
     /**
      * Services.
@@ -162,19 +174,34 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             first = s.getBody();
         }
 
+        EnhancedForElimination enhancedForElim = null;
+
         final LoopStatement loop;
-        if (first != null && first instanceof While) {
+        if (first instanceof While) {
             loop = (While) first;
-        } else if (first != null && first instanceof For) {
+        } else if (first instanceof For) {
             loop = (For) first;
+        } else if (first instanceof EnhancedFor) {
+            enhancedForElim = new EnhancedForElimination((EnhancedFor) first);
+            enhancedForElim.transform((EnhancedFor) first, services, null);
+            loop = enhancedForElim.getLoop();
         } else {
-            loop = null;
             throw new IllegalArgumentException("Only blocks that begin with a while or a for "
                     + "loop may have a loop contract! \n" + "This block begins with "
                     + block.getFirstElement());
         }
 
-        head = getHeadStatement(loop, block);
+        if (enhancedForElim == null) {
+            index = null;
+            values = null;
+        } else {
+            index = enhancedForElim.getIndexVariable();
+            values = enhancedForElim.getValuesVariable();
+
+            addEnhancedForLoopVars(enhancedForElim);
+        }
+
+        head = getHeadStatement(loop, block, enhancedForElim);
         guard = loop.getGuardExpression();
         body = getBodyStatement(loop, block, outerLabel, innerLabel, loopLabels, services);
         this.loop = new While(guard, body);
@@ -241,9 +268,28 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
         Label innerLabel = new ProgramElementName("continueLoop");
         loopLabels.add(outerLabel);
 
-        head = getHeadStatement(loop, block);
-        guard = loop.getGuardExpression();
-        body = getBodyStatement(loop, block, outerLabel, innerLabel, loopLabels, services);
+        EnhancedForElimination enhancedForElim = null;
+        LoopStatement nonEnhancedLoop = loop;
+        if (loop instanceof EnhancedFor) {
+            enhancedForElim = new EnhancedForElimination((EnhancedFor) loop);
+            enhancedForElim.transform(loop, services, null);
+            nonEnhancedLoop = enhancedForElim.getLoop();
+        }
+
+        if (enhancedForElim == null) {
+            index = null;
+            values = null;
+        } else {
+            index = enhancedForElim.getIndexVariable();
+            values = enhancedForElim.getValuesVariable();
+
+            addEnhancedForLoopVars(enhancedForElim);
+        }
+
+        head = getHeadStatement(nonEnhancedLoop, block, enhancedForElim);
+        guard = nonEnhancedLoop.getGuardExpression();
+        body = getBodyStatement(
+                nonEnhancedLoop, block, outerLabel, innerLabel, loopLabels, services);
 
         tail = new StatementBlock();
     }
@@ -267,23 +313,40 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
      *            a loop.
      * @param block
      *            the block containing the loop.
+     * @param enhancedForElim
+     *            the transformation used to transform the loop, or {@code null}.
      * @return the initializers if the loop is a for-loop, {@code null} otherwise.
      */
-    private static StatementBlock getHeadStatement(LoopStatement loop, StatementBlock block) {
+    private static StatementBlock getHeadStatement(
+            LoopStatement loop,
+            StatementBlock block,
+            EnhancedForElimination enhancedForElim) {
         final StatementBlock sb;
-        if (loop != null && loop instanceof For) {
+
+        if (loop instanceof For) {
             ExtList headStatements = new ExtList();
+
+            if (enhancedForElim != null) {
+                headStatements.add(enhancedForElim.getHead());
+            }
+
             for (Statement statement : loop.getInitializers()) {
                 headStatements.add(statement);
             }
+
             sb = new StatementBlock(headStatements);
-        } else if (loop != null && loop instanceof While) {
-            sb = null;
+        } else if (loop instanceof While) {
+            if (enhancedForElim != null) {
+                sb = enhancedForElim.getHead();
+            } else {
+                sb = null;
+            }
         } else {
             throw new IllegalArgumentException("Only blocks that begin with a while or a for "
                     + "loop may have a loop contract! \n" + "This block begins with "
                     + block.getFirstElement());
         }
+
         return sb;
     }
 
@@ -307,13 +370,14 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     private static StatementBlock getBodyStatement(LoopStatement loop, StatementBlock block,
             Label outerLabel, Label innerLabel, List<Label> loopLabels, Services services) {
         final StatementBlock sb;
-        if (loop != null && loop instanceof While) {
+
+        if (loop instanceof While) {
             if (loop.getBody() instanceof StatementBlock) {
                 sb = (StatementBlock) loop.getBody();
             } else {
                 sb = new StatementBlock(loop.getBody());
             }
-        } else if (loop != null && loop instanceof For) {
+        } else if (loop instanceof For) {
             ExtList bodyStatements = new ExtList();
             bodyStatements.add(loop.getBody());
             StatementBlock innerBody = new InnerBreakAndContinueReplacer(
@@ -333,6 +397,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
                     + "loop may have a loop contract! \n" + "This block begins with "
                     + block.getFirstElement());
         }
+
         return sb;
     }
 
@@ -346,18 +411,59 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
      */
     private static StatementBlock getTailStatement(LoopStatement loop, StatementBlock block) {
         final StatementBlock sb;
-        if (loop != null && (loop instanceof For || loop instanceof While)) {
+
+        if (loop instanceof For || loop instanceof While) {
             ExtList tailStatements = new ExtList();
+
             for (int i = 1; i < block.getStatementCount(); ++i) {
                 tailStatements.add(block.getStatementAt(i));
             }
+
             sb = new StatementBlock(tailStatements);
         } else {
             throw new IllegalArgumentException("Only blocks that begin with a while or a for "
                     + "loop may have a loop contract! \n" + "This block begins with "
                     + block.getFirstElement());
         }
+
         return sb;
+    }
+
+    private void addEnhancedForLoopVars(EnhancedForElimination transformer) {
+        ProgramVariable idx = transformer.getIndexVariable();
+        ProgramVariable val = transformer.getValuesVariable();
+
+        if (idx != null) {
+            LocationVariable rem = new LocationVariable(
+                    services.getVariableNamer().getTemporaryNameProposal(
+                            idx.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
+                    idx.getKeYJavaType());
+
+            variables.remembranceLocalVariables.put((LocationVariable) idx, rem);
+
+            LocationVariable outerRem = new LocationVariable(
+                    services.getVariableNamer().getTemporaryNameProposal(
+                            idx.name() + VariablesCreator.OUTER_REMEMBRANCE_SUFFIX),
+                    idx.getKeYJavaType());
+
+            variables.outerRemembranceVariables.put((LocationVariable) idx, outerRem);
+        }
+
+        if (val != null) {
+            LocationVariable rem = new LocationVariable(
+                    services.getVariableNamer().getTemporaryNameProposal(
+                            val.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
+                    val.getKeYJavaType());
+
+            variables.remembranceLocalVariables.put((LocationVariable) val, rem);
+
+            LocationVariable outerRem = new LocationVariable(
+                    services.getVariableNamer().getTemporaryNameProposal(
+                            val.name() + VariablesCreator.OUTER_REMEMBRANCE_SUFFIX),
+                    val.getKeYJavaType());
+
+            variables.outerRemembranceVariables.put((LocationVariable) val, outerRem);
+        }
     }
 
     @Override
@@ -383,6 +489,16 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     @Override
     public LoopStatement getLoop() {
         return loop;
+    }
+
+    @Override
+    public ProgramVariable getIndexVariable() {
+        return index;
+    }
+
+    @Override
+    public ProgramVariable getValuesVariable() {
+        return values;
     }
 
     @Override

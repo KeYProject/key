@@ -806,21 +806,21 @@ public interface BlockSpecificationElement extends SpecificationElement {
          *
          * @see Variables#breakFlags
          */
-        private static final String BREAK_FLAG_BASE_NAME = "broke";
+        public static final String BREAK_FLAG_BASE_NAME = "broke";
 
         /**
          * Base name for all continue flags.
          *
          * @see Variables#continueFlags
          */
-        private static final String CONTINUE_FLAG_BASE_NAME = "continued";
+        public static final String CONTINUE_FLAG_BASE_NAME = "continued";
 
         /**
          * Name for the return flag.
          *
          * @see Variables#returnFlag
          */
-        private static final String RETURN_FLAG_NAME = "returned";
+        public static final String RETURN_FLAG_NAME = "returned";
 
         /**
          * Infix used between a flag's base name and the label name.
@@ -828,7 +828,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
          * @see Variables#breakFlags
          * @see Variables#continueFlags
          */
-        private static final String FLAG_INFIX = "To";
+        public static final String FLAG_INFIX = "To";
 
         /**
          * Suffix for all remembrance variables.
@@ -836,7 +836,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
          * @see Variables#remembranceHeaps
          * @see Variables#remembranceLocalVariables
          */
-        private static final String REMEMBRANCE_SUFFIX = "_Before_BLOCK";
+        public static final String REMEMBRANCE_SUFFIX = "_Before_BLOCK";
 
         /**
          * Suffix for all outer remembrance variables.
@@ -844,7 +844,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
          * @see Variables#outerRemembranceHeaps
          * @see Variables#outerRemembranceVariables
          */
-        private static final String OUTER_REMEMBRANCE_SUFFIX = "_Before_METHOD";
+        public static final String OUTER_REMEMBRANCE_SUFFIX = "_Before_METHOD";
 
         /**
          * @see BlockSpecificationElement#getBlock()

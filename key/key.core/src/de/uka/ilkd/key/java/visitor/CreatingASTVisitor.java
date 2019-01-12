@@ -601,6 +601,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             ProgramElement createNewElement(ExtList changeList) {
                 EnhancedFor enhancedFor = new EnhancedFor(changeList);
                 performActionOnLoopInvariant((EnhancedFor) pe, enhancedFor);
+                performActionOnLoopContract(x, enhancedFor);
                 return enhancedFor;
             }
         };

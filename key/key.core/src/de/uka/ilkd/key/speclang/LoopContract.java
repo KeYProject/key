@@ -15,6 +15,8 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.rule.metaconstruct.EnhancedForElimination;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
@@ -154,6 +156,22 @@ public interface LoopContract extends BlockSpecificationElement {
             Map<LocationVariable, Term> newModifiesClauses,
             ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, Term newMeasuredBy,
             Term newDecreases);
+
+    /**
+     *
+     * @return the index variable if {@link #getLoop()} is an enhanced for-loop,
+     *  {@code null} otherwise.
+     * @see EnhancedForElimination#getIndexVariable()
+     */
+    ProgramVariable getIndexVariable();
+
+    /**
+     *
+     * @return the values variable if {@link #getLoop()} is an enhanced for-loop,
+     *  {@code null} otherwise.
+     * @see EnhancedForElimination#getValuesVariable()
+     */
+    ProgramVariable getValuesVariable();
 
     /**
      * @param newKJT

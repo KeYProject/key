@@ -35,7 +35,6 @@ import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.statement.EnhancedFor;
-import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.IGuard;
 import de.uka.ilkd.key.java.statement.ILoopInit;
@@ -47,15 +46,15 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
- * 
+ *
  * This class defines a meta operator to resolve an enhanced for loop - by
  * transformation to a "normal" loop.
- * 
+ *
  * This class is used to transform an enh. for loop over an iterable object into
  * a while loop + surrounding statements.
- * 
+ *
  * @author mulbrich, bruns
- * 
+ *
  */
 
 public class EnhancedForElimination extends ProgramTransformer {
@@ -69,6 +68,12 @@ public class EnhancedForElimination extends ProgramTransformer {
     private static final String NEXT = "next";
     private static final String ITERATOR = "java.util.Iterator";
 
+    private ProgramVariable indexVariable;
+    private ProgramVariable valuesVariable;
+
+    private StatementBlock head;
+    private LoopStatement loop;
+
     public EnhancedForElimination(EnhancedFor forStatement) {
         super("enhancedfor-elim", forStatement);
     }
@@ -76,7 +81,7 @@ public class EnhancedForElimination extends ProgramTransformer {
     /**
      * An enhanced for loop is executed by transforming it into a "normal" for
      * loop.
-     * 
+     *
      * For an enhanced for "for(type var : exp) stm" the fields of LoopStatement
      * are used as follows:
      * <ul>
@@ -85,20 +90,20 @@ public class EnhancedForElimination extends ProgramTransformer {
      * <li>updates remains empty
      * <li>body: stm
      * </ul>
-     * 
+     *
      * <p>
      * Loops over arrays are treated by a taclet without use of this class.
-     * 
+     *
      * <p>
      * Loops over Iterable-objects are treated by this meta-construct.
-     * 
+     *
      * <p>
      * The rules which use this meta construct must ensure that exp is of type
      * Iterable.
-     * 
+     *
      * @see #makeIterableForLoop(LocalVariableDeclaration, Expression,
      *      Statement)
-     * 
+     *
      * @see de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer#transform(de.uka.ilkd.key.java.ProgramElement,
      *      de.uka.ilkd.key.java.Services,
      *      de.uka.ilkd.key.rule.inst.SVInstantiations)
@@ -119,8 +124,42 @@ public class EnhancedForElimination extends ProgramTransformer {
         } else {
             result = makeArrayForLoop(enhancedFor, services);
         }
-        
+
         return new ProgramElement[] { result };
+    }
+
+    /**
+     *
+     * @return the index variable that should replace {@code \index}.
+     */
+    public ProgramVariable getIndexVariable() {
+        return indexVariable;
+    }
+
+    /**
+    *
+    * @return the values variable that should replace {@code \values}.
+    */
+    public ProgramVariable getValuesVariable() {
+        return valuesVariable;
+    }
+
+    /**
+     *
+     * @return a block containing all statements to be executed before the transformed loop.
+     * @see #getLoop()
+     */
+    public StatementBlock getHead() {
+        return head;
+    }
+
+    /**
+     *
+     * @return the transformed loop.
+     * @see #getHead()
+     */
+    public LoopStatement getLoop() {
+        return loop;
     }
 
     /**
@@ -164,12 +203,14 @@ public class EnhancedForElimination extends ProgramTransformer {
                 ARR, arrayType);
         final Statement arrAssignment = KeYJavaASTFactory.declare(arrayVar, expression);
 
+        head = KeYJavaASTFactory.block(arrAssignment);
+
         // for(int i; i < arr.length; i++)
         final KeYJavaType intType = ji.getPrimitiveKeYJavaType("int");
-        final ProgramVariable itVar = KeYJavaASTFactory.localVariable(services, "i", intType);
-	final ILoopInit inits = KeYJavaASTFactory.loopInitZero(intType, itVar);
-        final IGuard guard = KeYJavaASTFactory.lessThanArrayLengthGuard(ji, itVar, arrayVar);
-        final IForUpdates updates = KeYJavaASTFactory.postIncrementForUpdates(itVar);
+        indexVariable = KeYJavaASTFactory.localVariable(services, "i", intType);
+	final ILoopInit inits = KeYJavaASTFactory.loopInitZero(intType, indexVariable);
+        final IGuard guard = KeYJavaASTFactory.lessThanArrayLengthGuard(ji, indexVariable, arrayVar);
+        final IForUpdates updates = KeYJavaASTFactory.postIncrementForUpdates(indexVariable);
 
         // there may be only one variable iterated over (see Language Specification Sect. 14.14.2)
         final LocalVariableDeclaration lvd = enhancedFor.getVariableDeclaration();
@@ -181,14 +222,14 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         // a = arr[i];
         // assign element of the current iteration to the enhanced for-loop iterator variable
-        final Statement getNextElement = KeYJavaASTFactory.assignArrayField(lvdVar, arrayVar, itVar);
-        final For forLoop = KeYJavaASTFactory.forLoop(inits, guard,
+        final Statement getNextElement = KeYJavaASTFactory.assignArrayField(lvdVar, arrayVar, indexVariable);
+        loop = KeYJavaASTFactory.forLoop(inits, guard,
                 updates, declArrayElemVar, getNextElement, body);
 
-        setInvariant(enhancedFor, forLoop, services);
+        setInvariant(enhancedFor, loop, services);
 
         // arr = exp; for(...) body
-        StatementBlock composition = KeYJavaASTFactory.block(arrAssignment, forLoop);
+        StatementBlock composition = KeYJavaASTFactory.block(arrAssignment, loop);
         return composition;
     }
 
@@ -206,12 +247,12 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         // local variable "values"
         final KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
-	final ProgramVariable valuesVar = KeYJavaASTFactory.localVariable(
+	valuesVariable = KeYJavaASTFactory.localVariable(
 		services, VALUES, seqType);
 
 	// ghost \seq values = \seq_empty
 	final Statement valuesInit = KeYJavaASTFactory.declare(new Ghost(),
-		valuesVar, EmptySeqLiteral.INSTANCE, seqType);
+		valuesVariable, EmptySeqLiteral.INSTANCE, seqType);
 
 	// Iterator itVar = expression.iterator();
 	final Statement itinit = KeYJavaASTFactory.declareMethodCall(
@@ -223,14 +264,16 @@ public class EnhancedForElimination extends ProgramTransformer {
 		.methodCall(itVar, HAS_NEXT);
 
         final LocalVariableDeclaration lvd = enhancedFor.getVariableDeclaration();
-        final StatementBlock block = makeBlock(itVar, valuesVar, lvd, enhancedFor.getBody());
+        final StatementBlock block = makeBlock(itVar, valuesVariable, lvd, enhancedFor.getBody());
 
         // while
-        final While whileGuard = new While(itGuard, block, null, new ExtList());
+        loop = new While(itGuard, block, null, new ExtList());
+
+        head = KeYJavaASTFactory.block(itinit, valuesInit);
 
         // block
-        final StatementBlock outerBlock = KeYJavaASTFactory.block(itinit, valuesInit, whileGuard);
-        setInvariant(enhancedFor, whileGuard, services);
+        final StatementBlock outerBlock = KeYJavaASTFactory.block(itinit, valuesInit, loop);
+        setInvariant(enhancedFor, loop, services);
         return outerBlock;
 
     }
@@ -255,7 +298,7 @@ public class EnhancedForElimination extends ProgramTransformer {
     }
 
     /*
-     * <values> = \seq_concat(<values>, \seq_singleton(<lvd>)); 
+     * <values> = \seq_concat(<values>, \seq_singleton(<lvd>));
      */
     private Statement makeValuesUpdate(ProgramVariable valuesVar, LocalVariableDeclaration lvd){
         final VariableSpecification var = lvd.getVariables().get(0);
