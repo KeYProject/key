@@ -94,11 +94,6 @@ public class StatementBlock extends JavaStatement
                         this.getStartPosition().getLine() == se.getStartPosition().getLine());
     }
 
-    @Override
-    public int hashCode() {
-        return 17*super.hashCode() + body.hashCode();
-    }
-
     /** computes the prefix elements for the given array of statment block */
     public static ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends Statement> b,
             ProgramPrefix current) {

@@ -2760,8 +2760,8 @@ term110 returns [Term _term110 = null]
 @after { _term110 = result; }
     :
         (
-            result = braces_term |
-            result = accessterm
+          result = braces_term
+        | { globalSelectNestingDepth=0; } result = accessterm
         )
         {
 	/*
@@ -3125,10 +3125,11 @@ array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = n
         }
 
 
-
+/*
+// This would require repeated { globalSelectNestingDepth=0; }
 accesstermlist returns [HashSet accessTerms = new LinkedHashSet()] :
      (t=accessterm {accessTerms.add(t);} ( COMMA t=accessterm {accessTerms.add(t);})* )? ;
-
+*/
 
 atom returns [Term _atom = null]
 @after { _atom = a; }

@@ -8,9 +8,15 @@
                   <statement name="int add = sub(x,y);" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false">
                      <operationContract name="result_0 = sub(x, y) catch(exc_0)
 pre: ((!x = null)&lt;&lt;impl&gt;&gt; &amp; (!y = null)&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
-post: result_0 = javaAddInt(x.value, y.value)
+post: result_0
+  = javaAddInt(int::select(heap,
+                           x,
+                           ConfigurationExtractorWithOperationContractsTest.IntWrapper::$value),
+               int::select(heap,
+                           y,
+                           ConfigurationExtractorWithOperationContractsTest.IntWrapper::$value))
 &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;
-mod: {}, creates no new objects
+mod: empty, creates no new objects
 termination: diamond" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x, y" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                         <statement name="return add_1;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false">
                            <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of ConfigurationExtractorWithOperationContractsTest.compute(x,y)&gt;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(not(equals(x,null)),not(equals(y,null)))">

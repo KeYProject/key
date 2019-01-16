@@ -1212,7 +1212,6 @@ public class TestApplyTaclet extends TestCase{
         goals=rApplist.head ().execute(goal, TacletForTests.services());
 
         assertTrue("Expected two goals.",goals.size()==2);
-        System.out.println(goals.head().sequent());
         assertTrue("Goal should be: ==> B, A, false", goals.head().sequent().antecedent().size() == 0);
         assertTrue("Goal should be: ==> B, A, false", goals.head().sequent().succedent().size() == 3);
         assertEquals("Goal should be:  ==> B, A, false", "B", goals.head().sequent().succedent().get(0).toString());

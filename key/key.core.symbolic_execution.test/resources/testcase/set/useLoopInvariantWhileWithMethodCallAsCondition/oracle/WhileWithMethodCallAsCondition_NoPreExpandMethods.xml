@@ -5,8 +5,10 @@
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <loopInvariant name="invariant: ((i &gt;= 0 &amp; i &lt;= array.length)&lt;&lt;SC&gt;&gt; &amp; result_1 = i)&lt;&lt;SC&gt;&gt;;
-variant: javaSubInt(array.length, i)
+            <loopInvariant name="invariant: (  (geq(i, Z(0(#)))
+ &amp; leq(i, length(array)))&lt;&lt;SC&gt;&gt;
+ &amp; result_1 = i)&lt;&lt;SC&gt;&gt;;
+variant: javaSubInt(length(array), i)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
                <methodCall name="&lt;call WhileWithMethodCallAsCondition.goOnNice(array_2,i_2)&gt;" pathCondition="true" pathConditionChanged="false">
