@@ -30,4 +30,10 @@ public class MemoryFileRepo extends AbstractFileRepo {
         // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    public Path getSaveName(Path path) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

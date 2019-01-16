@@ -33,4 +33,9 @@ public class TrivialFileRepo extends AbstractFileRepo {
     public InputStream getInputStream(Path p) throws FileNotFoundException {
         return new FileInputStream(p.toFile());
     }
+
+    @Override
+    public Path getSaveName(Path path) {
+        return baseDir.relativize(path);
+    }
 }

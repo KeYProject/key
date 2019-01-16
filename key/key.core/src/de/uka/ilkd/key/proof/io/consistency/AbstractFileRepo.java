@@ -63,6 +63,14 @@ public abstract class AbstractFileRepo implements FileRepo {
      * This flag indicates that the Repo and all data in it have been deleted.
      */
     protected boolean disposed = false;
+    
+    protected boolean isInJavaPath(Path path) {
+        return javaPath != null && path.startsWith(javaPath);
+    }
+    
+    protected boolean isInBootClassPath(Path path) {
+        return bootclasspath != null && path.startsWith(bootclasspath);
+    }
 
     @Override
     public void saveProof(Path savePath, Proof proof) throws IOException {
@@ -78,9 +86,11 @@ public abstract class AbstractFileRepo implements FileRepo {
         // write files to ZIP
         ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(savePath));
         Iterator<Path> it = files.iterator();
+        
         while (it.hasNext()) {
             Path p = it.next();
-            zos.putNextEntry(new ZipEntry(p.toString()));
+            // use the correct name for saving!
+            zos.putNextEntry(new ZipEntry(getSaveName(p).toString()));
 
             InputStream is;
             if (matcher.matches(p)) {

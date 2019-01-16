@@ -400,7 +400,7 @@ public class Recoder2KeY implements JavaReader {
     private List<recoder.java.CompilationUnit> recoderCompilationUnitsAsFiles(String[] cUnitStrings,
             FileRepo fileRepo) {
         List<recoder.java.CompilationUnit> cUnits = new ArrayList<recoder.java.CompilationUnit>();
-        parseSpecialClasses();
+        parseSpecialClasses(fileRepo);
         try {
             for (String filename : cUnitStrings) {
                 final CompilationUnit cu;

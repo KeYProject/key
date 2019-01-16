@@ -14,6 +14,7 @@ import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
+
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 
 /**
@@ -58,7 +59,8 @@ public class DiskFileRepo extends AbstractFileRepo {
     private Path tmpDir;
 
     /**
-     * Stores for each requested path the mapping to its concrete path in temp dir.
+     * Stores for each requested path the mapping to its concrete path in repo.
+     * Key and value paths are absolute, and even more, they are real paths.
      */
     private HashMap<Path, Path> map = new HashMap<Path, Path>();
 
@@ -79,7 +81,7 @@ public class DiskFileRepo extends AbstractFileRepo {
             return null;
         }
 
-        final Path norm = path.toAbsolutePath().normalize();
+        final Path norm = path.toRealPath(); //path.toAbsolutePath().normalize();
 
         // map lookup if the current path was already requested
         final Path p = map.get(norm);
@@ -115,10 +117,90 @@ public class DiskFileRepo extends AbstractFileRepo {
         return null;
     }
 
-    // TODO: move to IOUtil
-    private static void createDirsAndCopy(Path source, Path target) throws IOException {
-        Files.createDirectories(target.getParent());
-        Files.copy(source, target);
+    @Override
+    public OutputStream createOutputStream(Path path) throws IOException {
+        
+        // store the file inside the temporary directory (relative to tmp dir)
+        Path absTarget = tmpDir.resolve(path);
+    
+        try {
+            FileOutputStream fos = new FileOutputStream(absTarget.toFile());
+            
+            // store the path translation in map
+            // -> do not do this, since exists no copy of the file except in repo 
+            // Path translation = baseDir.resolve(path);
+            // map.put(translation, absTarget);
+            files.add(path);
+            return fos;
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public Path getSaveName(Path path) throws IOException {        
+        // the given path is already absolute or relative to the base dir
+        // assumption: a file with the given path has already been stored in the repo
+        //              (via getFile() or createOutputStream())
+        
+        Path abs = path;
+        if (!path.isAbsolute()) {
+            abs = baseDir.resolve(path);
+        }
+        
+        if (!Files.exists(abs)) {
+            // no map lookup possible -> use given name
+         // TODO: what if path is absolute here?
+            return path;
+        }
+        
+        // for lookup we need the real path
+        final Path real = abs.toRealPath(); // .toAbsolutePath().normalize();
+        Path repoPath = map.get(real);
+        
+        // as return value, we need the path relative to repo directory (tmpDir)
+        Path rel = tmpDir.relativize(repoPath);
+        
+        return rel;
+    }
+
+    @Override
+    public void dispose() {
+        if (disposed) {
+            return;
+        }
+    
+        try {
+            // delete the temporary directory with all contained files
+            Files.walk(tmpDir)
+                .sorted(Comparator.reverseOrder())
+                .map(Path::toFile)
+                .forEach(File::delete);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    
+        // set every hold reference to null
+        tmpDir = null;
+        map = null;
+        files = null;
+        super.dispose();
+    }
+
+    @Override
+    protected InputStream getInputStream(Path p) throws FileNotFoundException {
+        // convert given path to actual file path
+        Path concrete = tmpDir.resolve(p);
+        if (concrete == null) {
+            return null;
+        }
+    
+        // open new FileInputStream of the converted path
+        return new FileInputStream(concrete.toFile());
+    
     }
 
     // norm: absolute and normalized path of the requested file
@@ -126,7 +208,7 @@ public class DiskFileRepo extends AbstractFileRepo {
     // target: src, classpath, or bootclasspath in repo (relative to repo base dir)
     private Path resolveAndCopy(Path norm, Path containing, Path relTarget) throws IOException {
         // compute relative path from containing to norm
-        Path rel = containing.relativize(norm);
+        Path rel = containing.toRealPath().relativize(norm);
 
         // compute the absolute target path of the file in repo
         Path absTarget = tmpDir.resolve(relTarget).resolve(rel);
@@ -148,15 +230,18 @@ public class DiskFileRepo extends AbstractFileRepo {
         Path newFile = null;
 
         // where is the file located in (src, classpath, bootclasspath)
-        if (javaPath != null && javaFile.startsWith(javaPath)) {                  // src
+        if (isInJavaPath(javaFile)) {                                               // src
             newFile = resolveAndCopy(javaFile, javaPath, Paths.get("src"));
-        } else if (bootclasspath != null && javaFile.startsWith(bootclasspath)) { // bootclasspath
+        } else if (isInBootClassPath(javaFile)) {                                   // bootclasspath
             newFile = resolveAndCopy(javaFile, bootclasspath, Paths.get("bootclasspath"));
-        } else if (classpath != null) {                                           // classpath
+        } else if (classpath != null) {                                             // classpath
             // search for matching classpath in the list
             for (Path cp : classpath) {
                 // TODO: how to deal with zips/jars?
-                if (javaFile.startsWith(cp)) {            // only consider directories in classpath
+                
+                // convert to real path (else the check may be erroneous)
+                Path realCP = cp.toRealPath();
+                if (javaFile.startsWith(realCP)) {            // only consider directories in classpath
                     // we found the file location, so copy it
                     newFile = resolveAndCopy(javaFile, cp, Paths.get("classpath"));
                     break;
@@ -201,74 +286,28 @@ public class DiskFileRepo extends AbstractFileRepo {
         return null;
     }
 
-    private boolean isInternalFile(Path path) {
+    private boolean isInternalFile(Path path) throws IOException {
         return isBuiltInRuleFile(path);     // TODO: add check for internal java files and URLs
-    }
-
-    @Override
-    public OutputStream createOutputStream(Path path) {
-        // store the file inside the temporary directory
-        Path output = tmpDir.resolve(path);
-
-        try {
-            FileOutputStream fos = new FileOutputStream(output.toFile());
-            files.add(path);
-            return fos;
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
     }
 
     private static boolean isURLFile(Path path) {
         return path.startsWith("file:/");
     }
 
-    private static boolean isBuiltInRuleFile(Path file) {
+    private static boolean isBuiltInRuleFile(Path file) throws IOException {
         // TODO: check for URL
-        return file.normalize().startsWith(KEYPATH);
+        // has to be converted to real path here
+        return file.normalize().startsWith(KEYPATH.toRealPath());
     }
 
-    @Override
-    public void dispose() {
-        if (disposed) {
-            return;
-        }
-
-        try {
-            // delete the temporary directory with all contained files
-            Files.walk(tmpDir)
-                .sorted(Comparator.reverseOrder())
-                .map(Path::toFile)
-                .forEach(File::delete);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        // set every hold reference to null
-        tmpDir = null;
-        map = null;
-        files = null;
-        super.dispose();
-    }
-
-    @Override
-    protected InputStream getInputStream(Path p) throws FileNotFoundException {
-        // convert given path to actual file path
-        Path concrete = tmpDir.resolve(p);
-        if (concrete == null) {
-            return null;
-        }
-
-        // open new FileInputStream of the converted path
-        return new FileInputStream(concrete.toFile());
-
+    // TODO: move to IOUtil
+    private static void createDirsAndCopy(Path source, Path target) throws IOException {
+        Files.createDirectories(target.getParent());
+        Files.copy(source, target);
     }
 
     // shortcut for debug output
-    private void out(String s) {
+    private static void out(String s) {
         System.out.println(s);
     }
 }

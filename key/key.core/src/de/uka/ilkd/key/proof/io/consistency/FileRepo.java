@@ -31,8 +31,18 @@ public interface FileRepo {
      * @param path the path of the file to store (relative to the base directory of the proof)
      * @return an OutputStream to the file in the FileRepo
      * @throws FileNotFoundException if a file with the given path exists
+     * @throws IOException if the file with the given path does not exist
      */
-    public OutputStream createOutputStream(Path path) throws FileNotFoundException;
+    public OutputStream createOutputStream(Path path) throws FileNotFoundException, IOException;
+    
+    /**
+     * Return the save name for a given file.
+     * @param path the given file (absolute or relative to the proof base directory)
+     * @return the name (may include subdirectories) the file should have in proof package, that is
+     *      a path relative to the root of the package
+     * @throws IOException if the given path does not exist
+     */
+    public Path getSaveName(Path path) throws IOException;
 
     /**
      * Sets the bootclasspath (containing available classes from the Java Class Library).

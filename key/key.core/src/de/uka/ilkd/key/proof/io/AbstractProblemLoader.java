@@ -375,6 +375,7 @@ public abstract class AbstractProblemLoader {
             fileRepo.setBaseDir(tmpDir);
 
             // create new KeYUserProblemFile pointing to the (unzipped) proof file
+            // TODO: proof.proof is currently the only allowed filename
             Path unzippedProof = tmpDir.resolve(Paths.get("proof.proof"));
             return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof.toFile(),
                     fileRepo, control, profileOfNewProofs, false);
