@@ -22,7 +22,7 @@ public class System {
       @                  || destPos + length > ((int[])dest).length);
       @    assignable \nothing;
       @    signals_only ArrayIndexOutOfBoundsException;
-      @ also 
+      @ also
       @ public normal_behavior
       @   requires src instanceof int[] && dest instanceof int[];
       @   requires src != null && dest != null;
@@ -30,11 +30,11 @@ public class System {
       @   requires length >= 0;
       @   requires srcPos + length <= ((int[])src).length && destPos + length <= ((int[])dest).length;
       @   ensures (\forall int i; 0 <= i && i < length;
-      @             ((int[])dest)[destPos + i] == ((int[])src)[srcPos + i]);
+      @             ((int[])dest)[destPos + i] == \old(((int[])src)[srcPos + i]));
       @   assignable ((int[])dest)[destPos .. destPos + length - 1];
       @*/
-    public static native void arraycopy(java.lang.Object src,  int  srcPos,
-                                        java.lang.Object dest, int destPos,
+    public static native void arraycopy(/*@nullable*/ java.lang.Object src,  int  srcPos,
+                                        /*@nullable*/ java.lang.Object dest, int destPos,
                                         int length);
 
     // This implementation has been used to verify the above contracts
@@ -52,7 +52,7 @@ public class System {
         
     //     int[] tmp = new int[length];
 
-    //     if(srcPos < 0 || srcPos + length >= isrc.length) {
+    //     if(srcPos < 0 || srcPos + length > isrc.length) {
     //         throw new ArrayIndexOutOfBoundsException();
     //     }
 
@@ -66,7 +66,7 @@ public class System {
     //         tmp[i] = isrc[srcPos + i];
     //     }
 
-    //     if(destPos < 0 || destPos + length >= idest.length) {
+    //     if(destPos < 0 || destPos + length > idest.length) {
     //         throw new ArrayIndexOutOfBoundsException();
     //     }
 
