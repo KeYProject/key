@@ -33,9 +33,9 @@ public class System {
       @             ((int[])dest)[destPos + i] == ((int[])src)[srcPos + i]);
       @   assignable ((int[])dest)[destPos .. destPos + length - 1];
       @*/
-    public static native void arraycopy(Object src,  int  srcPos,
-                                        Object dest, int destPos,
-                                        int length)
+    public static native void arraycopy(java.lang.Object src,  int  srcPos,
+                                        java.lang.Object dest, int destPos,
+                                        int length);
 
     // This implementation has been used to verify the above contracts
     // {
