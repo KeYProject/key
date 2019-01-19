@@ -6,6 +6,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -67,7 +68,9 @@ public class LoopContractApplyHeadRule implements BuiltInRule {
         ImmutableSet<LoopContract> contracts = ruleApp.contracts;
         LoopContract someContract = contracts.iterator().next();
 
-        StatementBlock block = new StatementBlock(someContract.getLoop(), someContract.getTail());
+        StatementBlock block = new StatementBlock(
+                new While(someContract.getGuard(), someContract.getBody()),
+                someContract.getTail());
         StatementBlock headAndBlock = new StatementBlock(someContract.getHead(), block);
 
         TermBuilder tb = services.getTermBuilder();
@@ -83,8 +86,10 @@ public class LoopContractApplyHeadRule implements BuiltInRule {
                 .replace(instantiation.statement, headAndBlock));
 
         for (LoopContract c : contracts) {
+            LoopContract newContract = c.replaceEnhancedForVariables(block, services);
+
             services.getSpecificationRepository().removeLoopContract(c);
-            services.getSpecificationRepository().addLoopContract(c.setBlock(block), false);
+            services.getSpecificationRepository().addLoopContract(newContract, false);
         }
 
         Goal result = goal.split(1).head();

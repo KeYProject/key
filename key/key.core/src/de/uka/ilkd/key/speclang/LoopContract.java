@@ -197,4 +197,15 @@ public interface LoopContract extends BlockSpecificationElement {
      * @return a new loop contract equal to this one except that it belongs to a different loop.
      */
     public LoopContract setLoop(LoopStatement newLoop);
+
+    /**
+     * Replaces {@code \index} and {@code \values} with the proper variables in all terms of this
+     * contract.
+     *
+     * @param newBlock a new block.
+     * @param services services.
+     * @return a new loop contract equal to this one except that it belongs to the new block, and
+     *  {@code \index} and {@code \values} are replaced by proper variables in all terms.
+     */
+    public LoopContract replaceEnhancedForVariables(StatementBlock newBlock, Services services);
 }

@@ -61,6 +61,7 @@ public class EnhancedForElimination extends ProgramTransformer {
 
     private static final String IT = "it";
     private static final String ARR = "arr";
+    private static final String INDEX = "idx";
     private static final String VALUES = "values";
     private static final String ITERABLE_CLASS_NAME = "java.lang.Iterable";
     private static final String ITERATOR_METH = "iterator";
@@ -70,6 +71,7 @@ public class EnhancedForElimination extends ProgramTransformer {
 
     private ProgramVariable indexVariable;
     private ProgramVariable valuesVariable;
+    private ProgramVariable iteratorVariable;
 
     private StatementBlock head;
     private LoopStatement loop;
@@ -146,6 +148,14 @@ public class EnhancedForElimination extends ProgramTransformer {
 
     /**
      *
+     * @return the iterator variable.
+     */
+    public ProgramVariable getIteratorVariable() {
+        return iteratorVariable;
+    }
+
+    /**
+     *
      * @return a block containing all statements to be executed before the transformed loop.
      * @see #getLoop()
      */
@@ -207,7 +217,7 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         // for(int i; i < arr.length; i++)
         final KeYJavaType intType = ji.getPrimitiveKeYJavaType("int");
-        indexVariable = KeYJavaASTFactory.localVariable(services, "i", intType);
+        indexVariable = KeYJavaASTFactory.localVariable(services, INDEX, intType);
 	final ILoopInit inits = KeYJavaASTFactory.loopInitZero(intType, indexVariable);
         final IGuard guard = KeYJavaASTFactory.lessThanArrayLengthGuard(ji, indexVariable, arrayVar);
         final IForUpdates updates = KeYJavaASTFactory.postIncrementForUpdates(indexVariable);
@@ -242,13 +252,12 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         // local variable "it"
         final KeYJavaType iteratorType = services.getJavaInfo().getTypeByName(ITERATOR);
-	final ProgramVariable itVar = KeYJavaASTFactory.localVariable(services,
+	ProgramVariable iteratorVariable = KeYJavaASTFactory.localVariable(services,
 		IT, iteratorType);
 
         // local variable "values"
         final KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
-	valuesVariable = KeYJavaASTFactory.localVariable(
-		services, VALUES, seqType);
+	valuesVariable = KeYJavaASTFactory.localVariable(services, VALUES, seqType);
 
 	// ghost \seq values = \seq_empty
 	final Statement valuesInit = KeYJavaASTFactory.declare(new Ghost(),
@@ -256,15 +265,15 @@ public class EnhancedForElimination extends ProgramTransformer {
 
 	// Iterator itVar = expression.iterator();
 	final Statement itinit = KeYJavaASTFactory.declareMethodCall(
-                iteratorType, itVar, new ParenthesizedExpression(enhancedFor.getGuardExpression()),
+                iteratorType, iteratorVariable, new ParenthesizedExpression(enhancedFor.getGuardExpression()),
 		ITERATOR_METH);
 
 	// create the method call itVar.hasNext();
 	final Expression itGuard = KeYJavaASTFactory
-		.methodCall(itVar, HAS_NEXT);
+		.methodCall(iteratorVariable, HAS_NEXT);
 
         final LocalVariableDeclaration lvd = enhancedFor.getVariableDeclaration();
-        final StatementBlock block = makeBlock(itVar, valuesVariable, lvd, enhancedFor.getBody());
+        final StatementBlock block = makeBlock(iteratorVariable, valuesVariable, lvd, enhancedFor.getBody());
 
         // while
         loop = new While(itGuard, block, null, new ExtList());

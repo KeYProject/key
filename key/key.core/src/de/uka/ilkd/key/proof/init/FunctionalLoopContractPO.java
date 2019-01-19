@@ -35,6 +35,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalLoopContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopContract;
+import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -178,6 +179,8 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         final Services services = postInit();
         final TermBuilder tb = services.getTermBuilder();
         final IProgramMethod pm = getProgramMethod();
+
+        contract.replaceEnhancedForVariables(services);
 
         final ProgramVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
         register(selfVar, services);

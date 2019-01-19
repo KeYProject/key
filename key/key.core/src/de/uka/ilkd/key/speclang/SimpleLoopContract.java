@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.speclang;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.InnerBreakAndContinueReplacer;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -33,6 +35,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.metaconstruct.EnhancedForElimination;
@@ -177,11 +180,12 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
         EnhancedForElimination enhancedForElim = null;
 
         final LoopStatement loop;
-        if (first instanceof While) {
-            loop = (While) first;
-        } else if (first instanceof For) {
-            loop = (For) first;
+        if (first instanceof While || first instanceof For) {
+            this.loop = (LoopStatement) first;
+            loop = (LoopStatement) first;
         } else if (first instanceof EnhancedFor) {
+            this.loop = (LoopStatement) first;
+
             enhancedForElim = new EnhancedForElimination((EnhancedFor) first);
             enhancedForElim.transform((EnhancedFor) first, services, null);
             loop = enhancedForElim.getLoop();
@@ -197,14 +201,11 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
         } else {
             index = enhancedForElim.getIndexVariable();
             values = enhancedForElim.getValuesVariable();
-
-            addEnhancedForLoopVars(enhancedForElim);
         }
 
         head = getHeadStatement(loop, block, enhancedForElim);
         guard = loop.getGuardExpression();
         body = getBodyStatement(loop, block, outerLabel, innerLabel, loopLabels, services);
-        this.loop = new While(guard, body);
         tail = getTailStatement(loop, block);
     }
 
@@ -282,8 +283,6 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
         } else {
             index = enhancedForElim.getIndexVariable();
             values = enhancedForElim.getValuesVariable();
-
-            addEnhancedForLoopVars(enhancedForElim);
         }
 
         head = getHeadStatement(nonEnhancedLoop, block, enhancedForElim);
@@ -429,43 +428,6 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
         return sb;
     }
 
-    private void addEnhancedForLoopVars(EnhancedForElimination transformer) {
-        ProgramVariable idx = transformer.getIndexVariable();
-        ProgramVariable val = transformer.getValuesVariable();
-
-        if (idx != null) {
-            LocationVariable rem = new LocationVariable(
-                    services.getVariableNamer().getTemporaryNameProposal(
-                            idx.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
-                    idx.getKeYJavaType());
-
-            variables.remembranceLocalVariables.put((LocationVariable) idx, rem);
-
-            LocationVariable outerRem = new LocationVariable(
-                    services.getVariableNamer().getTemporaryNameProposal(
-                            idx.name() + VariablesCreator.OUTER_REMEMBRANCE_SUFFIX),
-                    idx.getKeYJavaType());
-
-            variables.outerRemembranceVariables.put((LocationVariable) idx, outerRem);
-        }
-
-        if (val != null) {
-            LocationVariable rem = new LocationVariable(
-                    services.getVariableNamer().getTemporaryNameProposal(
-                            val.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
-                    val.getKeYJavaType());
-
-            variables.remembranceLocalVariables.put((LocationVariable) val, rem);
-
-            LocationVariable outerRem = new LocationVariable(
-                    services.getVariableNamer().getTemporaryNameProposal(
-                            val.name() + VariablesCreator.OUTER_REMEMBRANCE_SUFFIX),
-                    val.getKeYJavaType());
-
-            variables.outerRemembranceVariables.put((LocationVariable) val, outerRem);
-        }
-    }
-
     @Override
     public StatementBlock getHead() {
         return head;
@@ -598,7 +560,95 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     }
 
     @Override
+    public LoopContract replaceEnhancedForVariables(StatementBlock newBlock, Services services) {
+        if (index == null && values == null) {
+            return setBlock(newBlock);
+        } else {
+            final Map<SVSubstitute, SVSubstitute> replacementMap = new HashMap<>();
+
+            if (index != null) {
+                replacementMap.put(
+                        services.getTermBuilder().index(),
+                        services.getTermBuilder().var(index));
+            }
+
+            if (values != null) {
+                replacementMap.put(
+                        services.getTermBuilder().values(),
+                        services.getTermBuilder().var(values));
+            }
+
+            final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
+
+
+            final Map<LocationVariable, Term> newPreconditions
+                = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> newPostconditions
+                = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> newModifiesClauses
+                = new LinkedHashMap<LocationVariable, Term>();
+
+            final Term newMeasuredBy = replacer.replace(getMby());
+            final Term newDecreases = replacer.replace(getDecreases());
+
+            for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
+                    .getAllHeaps()) {
+                if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
+                    continue;
+                }
+
+                newPreconditions.put(heap,
+                        replacer.replace(getPrecondition(heap, services)));
+                newPostconditions.put(heap,
+                        replacer.replace(getPostcondition(heap, services)));
+                newModifiesClauses.put(heap,
+                        replacer.replace(getModifiesClause(heap, services)));
+            }
+
+            SimpleLoopContract result = (SimpleLoopContract) update(
+                    newBlock,
+                    newPreconditions,
+                    newPostconditions,
+                    newModifiesClauses,
+                    getInfFlowSpecs(),
+                    getVariables(),
+                    newMeasuredBy,
+                    newDecreases);
+            result.addEnhancedForLoopVars();
+
+            return result;
+        }
+    }
+
+    private void addEnhancedForLoopVars() {
+        ProgramVariable idx = getIndexVariable();
+        ProgramVariable val = getValuesVariable();
+
+        if (idx != null) {
+            LocationVariable rem = new LocationVariable(
+                    services.getVariableNamer().getTemporaryNameProposal(
+                            idx.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
+                    idx.getKeYJavaType());
+
+            variables.remembranceLocalVariables.put((LocationVariable) idx, rem);
+        }
+
+        if (val != null) {
+            LocationVariable rem = new LocationVariable(
+                    services.getVariableNamer().getTemporaryNameProposal(
+                            val.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
+                    val.getKeYJavaType());
+
+            variables.remembranceLocalVariables.put((LocationVariable) val, rem);
+        }
+    }
+
+    @Override
     public LoopContract setBlock(StatementBlock newBlock) {
+        if (newBlock.equals(block)) {
+            return this;
+        }
+
         return new SimpleLoopContract(baseName, newBlock, labels, method, modality,
                 preconditions, measuredBy, postconditions, modifiesClauses,
                 infFlowSpecs, variables, transactionApplicable, hasMod, decreases,
@@ -607,6 +657,10 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
 
     @Override
     public LoopContract setLoop(LoopStatement newLoop) {
+        if (newLoop.equals(loop)) {
+            return this;
+        }
+
         return new SimpleLoopContract(baseName, newLoop, labels, method, modality,
                 preconditions, measuredBy, postconditions, modifiesClauses,
                 infFlowSpecs, variables, transactionApplicable, hasMod, decreases,
@@ -617,6 +671,11 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     public LoopContract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         assert newPM instanceof IProgramMethod;
         assert newKJT.equals(newPM.getContainerType());
+
+        if (newPM.equals(method)) {
+            return this;
+        }
+
         return new SimpleLoopContract(baseName, block, labels, (IProgramMethod) newPM, modality,
                 preconditions, measuredBy, postconditions, modifiesClauses, infFlowSpecs, variables,
                 transactionApplicable, hasMod, decreases, functionalContracts, services);

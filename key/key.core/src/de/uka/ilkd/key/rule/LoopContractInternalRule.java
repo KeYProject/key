@@ -341,7 +341,8 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
 
         final Instantiation instantiation
                 = instantiate(application.posInOccurrence().subTerm(), goal, services);
-        final LoopContract contract = application.getContract();
+        LoopContract contract = application.getContract();
+        contract = contract.replaceEnhancedForVariables(contract.getBlock(), services);
         contract.setInstantiationSelf(instantiation.self);
 
         assert contract.isOnBlock() && contract.getBlock().equals(instantiation.statement)

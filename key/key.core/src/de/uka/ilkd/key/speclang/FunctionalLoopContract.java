@@ -39,7 +39,7 @@ public class FunctionalLoopContract implements Contract {
     /**
      * @see #getLoopContract()
      */
-    private final LoopContract contract;
+    private LoopContract contract;
 
     /**
      * This contract's ID.
@@ -106,6 +106,15 @@ public class FunctionalLoopContract implements Contract {
                 .map(generator).reduce((acc, curr) -> acc
                         + SpecificationRepository.CONTRACT_COMBINATION_MARKER + curr)
                 .get();
+    }
+
+    /**
+     *
+     * @param services services.
+     * @see LoopContract#replaceEnhancedForVariables(StatementBlock, Services)
+     */
+    public void replaceEnhancedForVariables(Services services) {
+        contract = contract.replaceEnhancedForVariables(contract.getBlock(), services);
     }
 
     @Override
