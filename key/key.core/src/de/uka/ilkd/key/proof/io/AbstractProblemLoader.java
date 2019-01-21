@@ -513,8 +513,10 @@ public abstract class AbstractProblemLoader {
         		problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
 
         for (Proof p : proofList.getProofs()) {
-        	// register proof 
-        	initConfig.getServices().getSpecificationRepository().registerProof(poContainer.getProofOblInput(), p);
+            // register proof
+            initConfig.getServices().getSpecificationRepository()
+                                    .registerProof(poContainer.getProofOblInput(), p);
+            initConfig.getFileRepo().registerProof(p);
         }
 
         return proofList;

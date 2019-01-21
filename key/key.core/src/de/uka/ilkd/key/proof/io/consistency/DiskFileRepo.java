@@ -75,13 +75,13 @@ public class DiskFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    public InputStream getFile(Path path) throws IOException {
+    public InputStream getInputStream(Path path) throws IOException {
         // ignore URL files (those are internal files shipped with KeY)
         if (isURLFile(path)) {
-            return null;
+            return null; // TODO: do not return null here, but a useful InputStream
         }
 
-        final Path norm = path.toRealPath(); //path.toAbsolutePath().normalize();
+        final Path norm = path.toAbsolutePath().normalize();
 
         // map lookup if the current path was already requested
         final Path p = map.get(norm);
@@ -119,15 +119,15 @@ public class DiskFileRepo extends AbstractFileRepo {
 
     @Override
     public OutputStream createOutputStream(Path path) throws IOException {
-        
+
         // store the file inside the temporary directory (relative to tmp dir)
         Path absTarget = tmpDir.resolve(path);
-    
+
         try {
             FileOutputStream fos = new FileOutputStream(absTarget.toFile());
-            
+
             // store the path translation in map
-            // -> do not do this, since exists no copy of the file except in repo 
+            // -> do not do this, since exists no copy of the file except in repo
             // Path translation = baseDir.resolve(path);
             // map.put(translation, absTarget);
             files.add(path);
@@ -140,29 +140,31 @@ public class DiskFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    public Path getSaveName(Path path) throws IOException {        
-        // the given path is already absolute or relative to the base dir
+    public Path getSaveName(Path path) throws IOException {
+        // the given path is:
+        // 1. already absolute or
+        // 2. relative to the base dir
         // assumption: a file with the given path has already been stored in the repo
         //              (via getFile() or createOutputStream())
-        
+
         Path abs = path;
         if (!path.isAbsolute()) {
             abs = baseDir.resolve(path);
         }
-        
+
         if (!Files.exists(abs)) {
             // no map lookup possible -> use given name
          // TODO: what if path is absolute here?
             return path;
         }
-        
+
         // for lookup we need the real path
-        final Path real = abs.toRealPath(); // .toAbsolutePath().normalize();
+        final Path real = abs.toAbsolutePath().normalize(); // .toRealPath();
         Path repoPath = map.get(real);
-        
+
         // as return value, we need the path relative to repo directory (tmpDir)
         Path rel = tmpDir.relativize(repoPath);
-        
+
         return rel;
     }
 
@@ -171,7 +173,7 @@ public class DiskFileRepo extends AbstractFileRepo {
         if (disposed) {
             return;
         }
-    
+
         try {
             // delete the temporary directory with all contained files
             Files.walk(tmpDir)
@@ -182,7 +184,7 @@ public class DiskFileRepo extends AbstractFileRepo {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    
+
         // set every hold reference to null
         tmpDir = null;
         map = null;
@@ -191,16 +193,15 @@ public class DiskFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    protected InputStream getInputStream(Path p) throws FileNotFoundException {
+    protected InputStream getInputStreamInternal(Path p) throws FileNotFoundException {
         // convert given path to actual file path
         Path concrete = tmpDir.resolve(p);
         if (concrete == null) {
             return null;
         }
-    
+
         // open new FileInputStream of the converted path
         return new FileInputStream(concrete.toFile());
-    
     }
 
     // norm: absolute and normalized path of the requested file
@@ -208,7 +209,7 @@ public class DiskFileRepo extends AbstractFileRepo {
     // target: src, classpath, or bootclasspath in repo (relative to repo base dir)
     private Path resolveAndCopy(Path norm, Path containing, Path relTarget) throws IOException {
         // compute relative path from containing to norm
-        Path rel = containing.toRealPath().relativize(norm);
+        Path rel = containing.relativize(norm); //containing.toRealPath().relativize(norm);
 
         // compute the absolute target path of the file in repo
         Path absTarget = tmpDir.resolve(relTarget).resolve(rel);
@@ -238,10 +239,10 @@ public class DiskFileRepo extends AbstractFileRepo {
             // search for matching classpath in the list
             for (Path cp : classpath) {
                 // TODO: how to deal with zips/jars?
-                
+
                 // convert to real path (else the check may be erroneous)
-                Path realCP = cp.toRealPath();
-                if (javaFile.startsWith(realCP)) {            // only consider directories in classpath
+                Path realCP = cp; //.toRealPath();
+                if (javaFile.startsWith(realCP)) {         // only consider directories in classpath
                     // we found the file location, so copy it
                     newFile = resolveAndCopy(javaFile, cp, Paths.get("classpath"));
                     break;
@@ -296,8 +297,7 @@ public class DiskFileRepo extends AbstractFileRepo {
 
     private static boolean isBuiltInRuleFile(Path file) throws IOException {
         // TODO: check for URL
-        // has to be converted to real path here
-        return file.normalize().startsWith(KEYPATH.toRealPath());
+        return file.normalize().startsWith(KEYPATH);
     }
 
     // TODO: move to IOUtil

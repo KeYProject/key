@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
 /**
  * This interface provides access to files.
@@ -16,7 +17,7 @@ import de.uka.ilkd.key.proof.Proof;
  *
  * @author Wolfram Pfeifer
  */
-public interface FileRepo {
+public interface FileRepo extends ProofDisposedListener {
     /**
      * Provides access to a file on disk.
      * @param path the path of the file
@@ -24,7 +25,7 @@ public interface FileRepo {
      * @throws FileNotFoundException if the file does not exist
      * @throws IOException on IO errors, e.g. if the user has no permission to read the file
      */
-    public InputStream getFile(Path path) throws FileNotFoundException, IOException; // TODO: naming
+    public InputStream getInputStream(Path path) throws FileNotFoundException, IOException;
 
     /**
      * This method can be used to write a file to the FileRepo.
@@ -34,7 +35,7 @@ public interface FileRepo {
      * @throws IOException if the file with the given path does not exist
      */
     public OutputStream createOutputStream(Path path) throws FileNotFoundException, IOException;
-    
+
     /**
      * Return the save name for a given file.
      * @param path the given file (absolute or relative to the proof base directory)
@@ -95,4 +96,10 @@ public interface FileRepo {
      * Clears all data in the FileRepo and marks it as disposed.
      */
     public void dispose();
+
+    /**
+     * Register the proof in the FileRepo.
+     * @param proof the proof to register
+     */
+    public void registerProof(Proof proof);
 }

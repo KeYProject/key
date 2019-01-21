@@ -406,7 +406,7 @@ public class Recoder2KeY implements JavaReader {
                 final CompilationUnit cu;
                 Reader fr = null;
                 try {
-                    fr = new InputStreamReader(fileRepo.getFile(Paths.get(filename)),
+                    fr = new InputStreamReader(fileRepo.getInputStream(Paths.get(filename)),
                             StandardCharsets.UTF_8);
                     fr = new BufferedReader(fr);
                     cu = servConf.getProgramFactory().parseCompilationUnit(fr);
@@ -635,7 +635,7 @@ public class Recoder2KeY implements JavaReader {
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                             throws IOException {
                             if (!Files.isDirectory(file)) {
-                                fileRepo.getFile(file).close();
+                                fileRepo.getInputStream(file).close();
                             }
                             return FileVisitResult.CONTINUE;
                         }

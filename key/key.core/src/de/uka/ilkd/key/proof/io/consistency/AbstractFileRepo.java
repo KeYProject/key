@@ -23,6 +23,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 
 /**
  * Abstract repo implementation to perform tasks independent from the concrete way the files are
@@ -32,16 +33,17 @@ import de.uka.ilkd.key.proof.Proof;
  * @author Wolfram Pfeifer
  */
 public abstract class AbstractFileRepo implements FileRepo {
-    // TODO: paths are assumed to be absolute and normalized
-    /** The original java source path. */
+
+    /** The original java source path (absolute and normalized). */
     protected Path javaPath;
 
-    /** The original class path. */
+    /** The original class path (absolute and normalized). */
     protected List<Path> classpath;
 
     /**
      * The boot class path, that is, the path to the folder where stubs of library classes
      * (e.g. Object, List, ...) used in KeY are stored.
+     * The path stored here is absolute and normalized.
      */
     protected Path bootclasspath;
 
@@ -49,32 +51,38 @@ public abstract class AbstractFileRepo implements FileRepo {
      * The base directory of the loaded proof (needed to calculate relative paths).
      * If a .key/.proof file is loaded, this should be set to the path specified via "javaSource".
      * If a directory is loaded, baseDir should be set to the path of the directory.
+     * The path stored here is absolute and normalized.
      */
     protected Path baseDir;
 
     /**
      * Stores original paths of all files stored in the repo.
      * The paths stored here have to respect the repo structure with src folder,
-     * .key files top-level, ...
+     * *.key files at top-level, ...
      */
-    protected Set<Path> files = new HashSet<Path>();
+    protected Set<Path> files = new HashSet<>();
 
     /**
-     * This flag indicates that the Repo and all data in it have been deleted.
+     * This set stores all proofs that use this repo. When it gets empty, the repo is disposed.
+     */
+    protected Set<Proof> registeredProofs = new HashSet<>();
+
+    /**
+     * This flag indicates that the repo and all data in it have been deleted.
      */
     protected boolean disposed = false;
-    
+
     protected boolean isInJavaPath(Path path) {
         return javaPath != null && path.startsWith(javaPath);
     }
-    
+
     protected boolean isInBootClassPath(Path path) {
         return bootclasspath != null && path.startsWith(bootclasspath);
     }
 
     @Override
     public void saveProof(Path savePath, Proof proof) throws IOException {
-        // TODO: allow overwriting existing files (delete first?)
+        // TODO: allow overwriting of existing files (delete first?)
 
         // create actual ZIP file (plus its directory if not existent)
         Files.createDirectories(savePath.getParent());
@@ -86,7 +94,7 @@ public abstract class AbstractFileRepo implements FileRepo {
         // write files to ZIP
         ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(savePath));
         Iterator<Path> it = files.iterator();
-        
+
         while (it.hasNext()) {
             Path p = it.next();
             // use the correct name for saving!
@@ -98,10 +106,10 @@ public abstract class AbstractFileRepo implements FileRepo {
                 is = adaptFileRefs(p);
             } else {
                 // open InputStream to file without modification
-                is = getInputStream(p);
+                is = getInputStreamInternal(p);
             }
 
-            // we use a this method instead of IOUtil.copy() because zos must not be closed
+            // we use this method instead of IOUtil.copy() because zos must not be closed
             copy(is, zos);
             is.close();
 
@@ -111,13 +119,15 @@ public abstract class AbstractFileRepo implements FileRepo {
     }
 
     /**
-     * Can be used to get an InputStream (concrete implementation depends on concrete repo)
-     * of the resource.
-     * @param p the filename of the requested file
-     * @return an InputStream of the resource or null if it has not been stored in the repo before.
-     * @throws FileNotFoundException if the file exists, is a directory, or can not be opened
+     * Can be used to get a direct InputStream to a file stored in the FileRepo.
+     * The concrete implementation depends on the concrete FileRepo.
+     * @param p the original path (outside the FileRepo) of the requested file
+     * @return an InputStream of the resource or null if it has not been stored in the FileRepo
+     *      before.
+     * @throws FileNotFoundException if the does not file exist, is a directory,
+     *      or can not be opened
      */
-    protected abstract InputStream getInputStream(Path p) throws FileNotFoundException;
+    protected abstract InputStream getInputStreamInternal(Path p) throws FileNotFoundException;
 
     /**
      * Variation of the method IOUtil.copy():
@@ -150,9 +160,9 @@ public abstract class AbstractFileRepo implements FileRepo {
     protected InputStream adaptFileRefs(Path p) throws IOException {
 
         // get the concrete source from the repo
-        InputStream is = getInputStream(p);
+        InputStream is = getInputStreamInternal(p);
 
-        // TODO: adapt include/includeFile
+        // TODO: adapt include/includeFile (e.g. Taclets)
         try (Stream<String> lines = new BufferedReader(new InputStreamReader(is)).lines()) {
             // TODO: may produce multiple occurrences of same classpath statement
             // create an in-memory copy of the file, modify it, and return an InputStream
@@ -198,7 +208,8 @@ public abstract class AbstractFileRepo implements FileRepo {
 
     @Override
     public void setBaseDir(Path path) {
-        // path can be a file or a directory
+        /* Path can be a file or a directory. In case of a file the complete containing directory
+         * is read in. */
         if (Files.isDirectory(path)) {
             baseDir = path.toAbsolutePath().normalize();
         } else {
@@ -212,6 +223,13 @@ public abstract class AbstractFileRepo implements FileRepo {
     }
 
     @Override
+    public void registerProof(Proof proof) {
+        registeredProofs.add(proof);
+        // register the repo in the proof to listen to ProofDisposedEvents.
+        proof.addProofDisposedListener(this);
+    }
+
+    @Override
     public void dispose() {
         // delete all references
         javaPath = null;
@@ -219,6 +237,28 @@ public abstract class AbstractFileRepo implements FileRepo {
         bootclasspath = null;
         baseDir = null;
 
+        files.clear();
+        files = null;
+        registeredProofs = null;   // this set is already empty, else the repo must not be disposed
+
         disposed = true;
+    }
+
+    @Override
+    public void proofDisposing(ProofDisposedEvent e) {
+        // TODO nothing?
+    }
+
+    @Override
+    public void proofDisposed(ProofDisposedEvent e) {
+        Proof source = e.getSource();
+        source.removeProofDisposedListener(this);
+
+        // remove proof from registered proofs
+        registeredProofs.remove(source);
+        if (registeredProofs.isEmpty()) {
+            // empty repo -> clear all data in the repo (e.g. files, arrays)
+            dispose();
+        }
     }
 }

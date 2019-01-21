@@ -14,7 +14,7 @@ import java.nio.file.Path;
 public class MemoryFileRepo extends AbstractFileRepo {
 
     @Override
-    public InputStream getFile(Path path) throws FileNotFoundException, IOException {
+    public InputStream getInputStream(Path path) throws FileNotFoundException, IOException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -26,7 +26,7 @@ public class MemoryFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    public InputStream getInputStream(Path p) {
+    public InputStream getInputStreamInternal(Path p) {
         // TODO Auto-generated method stub
         return null;
     }

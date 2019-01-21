@@ -16,7 +16,7 @@ import java.nio.file.Path;
 public class TrivialFileRepo extends AbstractFileRepo {
 
     @Override
-    public InputStream getFile(Path path) throws FileNotFoundException, IOException {
+    public InputStream getInputStream(Path path) throws FileNotFoundException, IOException {
         files.add(path);
         return new FileInputStream(path.toFile());
     }
@@ -30,7 +30,7 @@ public class TrivialFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    public InputStream getInputStream(Path p) throws FileNotFoundException {
+    public InputStream getInputStreamInternal(Path p) throws FileNotFoundException {
         return new FileInputStream(p.toFile());
     }
 
