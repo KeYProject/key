@@ -72,10 +72,27 @@ public final class DiskFileRepo extends AbstractFileRepo {
      */
     public DiskFileRepo(String proofName) throws IOException {
         tmpDir = Files.createTempDirectory(proofName);
+
+        // hook for deleting tmpDir + content at program exit
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                try {
+                    // delete the temporary directory with all contained files
+                    Files.walk(tmpDir)
+                        .sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override
     public InputStream getInputStream(Path path) throws IOException {
+        out("input stream of " + path);
         // ignore URL files (those are internal files shipped with KeY)
         if (isURLFile(path)) {
             return null; // TODO: do not return null here, but a useful InputStream?
@@ -118,54 +135,41 @@ public final class DiskFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    public OutputStream createOutputStream(Path path) throws IOException {
+    public OutputStream createOutputStream(Path path) throws FileNotFoundException {
+
+        if (path.isAbsolute()) {
+            // programming error!
+            throw new IllegalArgumentException("The path is not absolute: " + path);
+        }
 
         // store the file inside the temporary directory (relative to tmp dir)
         Path absTarget = tmpDir.resolve(path);
 
-        try {
-            FileOutputStream fos = new FileOutputStream(absTarget.toFile());
+        // store the path translation in map
+        // -> do not do this, since exists no copy of the file except in repo
+        // Path translation = baseDir.resolve(path);
+        // map.put(translation, absTarget);
+        files.add(path);
 
-            // store the path translation in map
-            // -> do not do this, since exists no copy of the file except in repo
-            // Path translation = baseDir.resolve(path);
-            // map.put(translation, absTarget);
-            files.add(path);
-            return fos;
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
+        return new FileOutputStream(absTarget.toFile());
     }
 
     @Override
-    protected Path getSaveName(Path path) throws IOException {
-        // the given path is:
-        // 1. already absolute or
-        // 2. relative to the base dir
-        // assumption: a file with the given path has already been stored in the repo
-        //              (via getFile() or createOutputStream())
+    protected Path getSaveName(Path path) {
+        /* assumption: a file with the given path has already been stored in the repo
+         *              (via getInputStream() or createOutputStream()) */
 
-        Path abs = path;
-        if (!path.isAbsolute()) {
-            abs = baseDir.resolve(path);
-        }
+        /* the given path is:
+         * 1. absolute                      -> lookup translation in map, relativize to tmpDir
+         * 2. relative to the base dir      -> nothing to do */
 
-        if (!Files.exists(abs)) {
-            // no map lookup possible -> use given name
-         // TODO: what if path is absolute here?
+        if (path.isAbsolute()) {
+            // lookup translation in map, make relative to tmpDir
+            return tmpDir.relativize(map.get(path.normalize()));
+        } else {
+            // already relative to tmpDir
             return path;
         }
-
-        // for lookup we need the real path
-        final Path real = abs.toAbsolutePath().normalize();
-        Path repoPath = map.get(real);
-
-        // as return value, we need the path relative to repo directory (tmpDir)
-        Path rel = tmpDir.relativize(repoPath);
-
-        return rel;
     }
 
     @Override
@@ -193,8 +197,13 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
     @Override
     protected InputStream getInputStreamInternal(Path p) throws FileNotFoundException {
-        // convert given path to actual file path
-        Path concrete = tmpDir.resolve(p);
+        Path concrete;
+        if (p.isAbsolute()) {                   // p is absolute -> lookup in map
+            concrete = map.get(p.normalize());
+        } else {                                // p is relative -> interpret as relative to tmpDir
+            concrete = tmpDir.resolve(p.normalize());
+        }
+
         if (concrete == null) {
             return null;
         }
@@ -279,12 +288,13 @@ public final class DiskFileRepo extends AbstractFileRepo {
         return new FileInputStream(newFile.toFile());
     }
 
-    private InputStream getClassFileInputStream(Path classFile) {
-        // TODO:
-        return null;
+    private InputStream getClassFileInputStream(Path classFile) throws IOException {
+        // copy to classpath folder (*.class files may only occur in classpath)
+        Path newFile = resolveAndCopy(classFile, classFile.getParent(), Paths.get("classpath"));
+        return new FileInputStream(newFile.toFile());
     }
 
-    private boolean isInternalFile(Path path) throws IOException {
+    private static boolean isInternalFile(Path path) {
         return isBuiltInRuleFile(path);     // TODO: add check for internal java files and URLs
     }
 
@@ -292,12 +302,12 @@ public final class DiskFileRepo extends AbstractFileRepo {
         return path.startsWith("file:/");
     }
 
-    private static boolean isBuiltInRuleFile(Path file) throws IOException {
+    private static boolean isBuiltInRuleFile(Path file) {
         // TODO: check for URL
         return file.normalize().startsWith(KEYPATH);
     }
 
-    // TODO: move to IOUtil
+    // TODO: move to IOUtil?
     private static void createDirsAndCopy(Path source, Path target) throws IOException {
         Files.createDirectories(target.getParent());
         Files.copy(source, target);

@@ -28,19 +28,27 @@ public interface FileRepo extends ProofDisposedListener {
     public InputStream getInputStream(Path path) throws FileNotFoundException, IOException;
 
     /**
-     * This method can be used to write a file to the FileRepo.
-     * @param path the path of the file to store (relative to the base directory of the proof)
+     * This method can be used to write a file that has no counterpart outside to the FileRepo.
+     * @param path the path of the file to store. The path must be relative to the base directory
+     *      of the proof package.
      * @return an OutputStream to the file in the FileRepo
      * @throws FileNotFoundException if a file with the given path exists
-     * @throws IOException if the file with the given path does not exist
      */
-    public OutputStream createOutputStream(Path path) throws FileNotFoundException, IOException;
+    public OutputStream createOutputStream(Path path) throws FileNotFoundException;
 
     /**
      * Register the proof in the FileRepo.
      * @param proof the proof to register
      */
     public void registerProof(Proof proof);
+
+    /**
+     * Stores all files stored in the FileRepo in a consistent package as a ZIP archive at the given
+     * target path. If a file with the given path exists, it is deleted first.
+     * @param savePath the target path of the ZIP archive
+     * @throws IOException on IO errors, e.g. if the user has no permission to write at the path
+     */
+    public void saveProof(Path savePath) throws IOException;
 
     /**
      * Sets the bootclasspath (containing available classes from the Java Class Library).
@@ -61,15 +69,6 @@ public interface FileRepo extends ProofDisposedListener {
     public void setJavaPath(String javaPath);
 
     /**
-     * Stores the given proof and all files relevant for the proof in a consistent bundle as a ZIP
-     * archive at the given target path. If a file with the given path exists, it is deleted first.
-     * @param savePath the target path of the ZIP archive
-     * @param proof the given proof to save
-     * @throws IOException on IO errors, e.g. if the user has no permission to write at the path
-     */
-    public void saveProof(Path savePath, Proof proof) throws IOException;
-
-    /**
      * Sets the base directory of the proof, i.e. the main directory where the proof is loaded from.
      * When loading Java sources this is the directory the loaded file resides in.
      * When loading .key-Files this is the directory specified via "\\javaSource" or the directory
@@ -81,11 +80,4 @@ public interface FileRepo extends ProofDisposedListener {
      *             set as base path
      */
     public void setBaseDir(Path path);
-
-    /**
-     * Gets the base directory.
-     * See JavaDoc of {@link #setBaseDir(Path)} for further explanation.
-     * @return the path of the base directory
-     */
-    public Path getBaseDir();
 }

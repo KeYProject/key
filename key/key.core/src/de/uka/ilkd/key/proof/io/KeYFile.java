@@ -204,8 +204,7 @@ public class KeYFile implements EnvInput {
         if (!file.isAvailable()) {
             throw new FileNotFoundException("File/Resource " + file + " not found.");
         }
-        //input = file.getNewStream();
-        System.out.println("trying to get new stream of " + file.file());
+        // open a stream to the file (via FileRepo if possible)
         try {
             if (fileRepo != null) {
                 input = fileRepo.getInputStream(file.file().toPath());

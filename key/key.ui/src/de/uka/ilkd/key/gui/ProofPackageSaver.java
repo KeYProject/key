@@ -48,6 +48,6 @@ public class ProofPackageSaver extends ProofSaver {
         super.save(repo.createOutputStream(new File(proofFileName).toPath()));
 
         // save proof package with the help of the FileRepo
-        repo.saveProof(file.toPath(), proof);
+        repo.saveProof(file.toPath());
     }
 }

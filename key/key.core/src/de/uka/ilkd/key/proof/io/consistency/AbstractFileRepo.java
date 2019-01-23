@@ -56,9 +56,13 @@ public abstract class AbstractFileRepo implements FileRepo {
     protected Path baseDir;
 
     /**
-     * Stores original paths of all files stored in the repo.
-     * The paths stored here have to respect the repo structure with src folder,
-     * *.key files at top-level, ...
+     * Stores the source paths of all files that have been copied to the repo as absolute paths.
+     * In addition, all files (usually proofs) that are saved in the repo via the method
+     * {@link #createOutputStream(Path)} are stored here. These files are stored as relative paths
+     * respecting the repo structure, because they have no counterpart outside the repo.
+     *
+     * When the method {@link #saveProof(Path, Proof)} is called, all files registered here will
+     * be saved.
      */
     protected Set<Path> files = new HashSet<>();
 
@@ -91,7 +95,7 @@ public abstract class AbstractFileRepo implements FileRepo {
     }
 
     @Override
-    public void saveProof(Path savePath, Proof proof) throws IOException {
+    public void saveProof(Path savePath) throws IOException {
         // We overwrite an existing proof here in any case. Checks have to be done earlier.
         if (Files.exists(savePath)) {
             Files.delete(savePath);
@@ -136,9 +140,8 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @param path the given file (absolute or relative to the proof base directory)
      * @return the name (may include subdirectories) the file should have in proof package, that is
      *      a path relative to the root of the package
-     * @throws IOException if the given path does not exist
      */
-    protected abstract Path getSaveName(Path path) throws IOException;
+    protected abstract Path getSaveName(Path path);
 
     /**
      * Can be used to get a direct InputStream to a file stored in the FileRepo.
@@ -180,15 +183,14 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @throws IOException if an I/O error occurs
      */
     protected InputStream adaptFileRefs(Path p) throws IOException {
+        // TODO: adapt include/includeFile (e.g. for Taclets)
+        // TODO: may produce multiple occurrences of same classpath statement
 
-        // get the concrete source from the repo
-        InputStream is = getInputStreamInternal(p);
+        try (InputStream is = getInputStreamInternal(p);  // get concrete source from repo
+             Stream<String> lines = new BufferedReader(new InputStreamReader(is)).lines()) {
 
-        // TODO: adapt include/includeFile (e.g. Taclets)
-        try (Stream<String> lines = new BufferedReader(new InputStreamReader(is)).lines()) {
-            // TODO: may produce multiple occurrences of same classpath statement
             // create an in-memory copy of the file, modify it, and return an InputStream
-            String rep = lines                  // TODO: check regular expressions
+            String rep = lines
                 .map(l -> l.replaceAll("\\\\javaSource \\\".*\\\";",
                                        "\\\\javaSource \"src\";"))
                 .map(l -> l.replaceAll("\\\\classpath \\\".*\\\";",
@@ -196,10 +198,8 @@ public abstract class AbstractFileRepo implements FileRepo {
                 .map(l -> l.replaceAll("\\\\bootclasspath \\\".*\\\";",
                                        "\\\\bootclasspath \"bootclasspath\";"))
                 .collect(Collectors.joining(System.lineSeparator()));
-            is.close(); // TODO: ensure this is executed
 
-            ByteArrayInputStream bais = new ByteArrayInputStream(rep.getBytes("UTF-8"));
-            return bais;
+            return new ByteArrayInputStream(rep.getBytes("UTF-8"));
         }
     }
 
@@ -237,11 +237,6 @@ public abstract class AbstractFileRepo implements FileRepo {
         } else {
             baseDir = path.getParent().toAbsolutePath().normalize();
         }
-    }
-
-    @Override
-    public Path getBaseDir() {
-        return baseDir;
     }
 
     @Override
