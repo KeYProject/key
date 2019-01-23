@@ -22,7 +22,7 @@ import de.uka.ilkd.key.proof.io.RuleSourceFactory;
  *
  * @author Wolfram Pfeifer
  */
-public class DiskFileRepo extends AbstractFileRepo {
+public final class DiskFileRepo extends AbstractFileRepo {
     /**
      * The path where KeY's built-in rules are stored.
      * Needed to prevent built-in rules from getting cached.
@@ -78,7 +78,7 @@ public class DiskFileRepo extends AbstractFileRepo {
     public InputStream getInputStream(Path path) throws IOException {
         // ignore URL files (those are internal files shipped with KeY)
         if (isURLFile(path)) {
-            return null; // TODO: do not return null here, but a useful InputStream
+            return null; // TODO: do not return null here, but a useful InputStream?
         }
 
         final Path norm = path.toAbsolutePath().normalize();
@@ -140,7 +140,7 @@ public class DiskFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    public Path getSaveName(Path path) throws IOException {
+    protected Path getSaveName(Path path) throws IOException {
         // the given path is:
         // 1. already absolute or
         // 2. relative to the base dir
@@ -159,7 +159,7 @@ public class DiskFileRepo extends AbstractFileRepo {
         }
 
         // for lookup we need the real path
-        final Path real = abs.toAbsolutePath().normalize(); // .toRealPath();
+        final Path real = abs.toAbsolutePath().normalize();
         Path repoPath = map.get(real);
 
         // as return value, we need the path relative to repo directory (tmpDir)
@@ -169,7 +169,7 @@ public class DiskFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    public void dispose() {
+    protected void dispose() {
         if (disposed) {
             return;
         }
@@ -188,7 +188,6 @@ public class DiskFileRepo extends AbstractFileRepo {
         // set every hold reference to null
         tmpDir = null;
         map = null;
-        files = null;
         super.dispose();
     }
 
@@ -209,7 +208,7 @@ public class DiskFileRepo extends AbstractFileRepo {
     // target: src, classpath, or bootclasspath in repo (relative to repo base dir)
     private Path resolveAndCopy(Path norm, Path containing, Path relTarget) throws IOException {
         // compute relative path from containing to norm
-        Path rel = containing.relativize(norm); //containing.toRealPath().relativize(norm);
+        Path rel = containing.relativize(norm);
 
         // compute the absolute target path of the file in repo
         Path absTarget = tmpDir.resolve(relTarget).resolve(rel);
@@ -240,9 +239,7 @@ public class DiskFileRepo extends AbstractFileRepo {
             for (Path cp : classpath) {
                 // TODO: how to deal with zips/jars?
 
-                // convert to real path (else the check may be erroneous)
-                Path realCP = cp; //.toRealPath();
-                if (javaFile.startsWith(realCP)) {         // only consider directories in classpath
+                if (javaFile.startsWith(cp)) {         // only consider directories in classpath
                     // we found the file location, so copy it
                     newFile = resolveAndCopy(javaFile, cp, Paths.get("classpath"));
                     break;
@@ -307,7 +304,7 @@ public class DiskFileRepo extends AbstractFileRepo {
     }
 
     // shortcut for debug output
-    private static void out(String s) {
+    private static void out(String s) {     // TODO: delete
         System.out.println(s);
     }
 }

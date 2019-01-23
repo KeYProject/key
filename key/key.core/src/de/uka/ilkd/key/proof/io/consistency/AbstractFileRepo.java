@@ -72,17 +72,30 @@ public abstract class AbstractFileRepo implements FileRepo {
      */
     protected boolean disposed = false;
 
+    /**
+     * Checks if the given path is inside the Java path
+     * @param path the path to check
+     * @return true if the path is inside the Java path and false if not
+     */
     protected boolean isInJavaPath(Path path) {
         return javaPath != null && path.startsWith(javaPath);
     }
 
+    /**
+     * Checks if the given path is inside the boot class path
+     * @param path the path to check
+     * @return true if the path is inside the boot class path and false if not
+     */
     protected boolean isInBootClassPath(Path path) {
         return bootclasspath != null && path.startsWith(bootclasspath);
     }
 
     @Override
     public void saveProof(Path savePath, Proof proof) throws IOException {
-        // TODO: allow overwriting of existing files (delete first?)
+        // We overwrite an existing proof here in any case. Checks have to be done earlier.
+        if (Files.exists(savePath)) {
+            Files.delete(savePath);
+        }
 
         // create actual ZIP file (plus its directory if not existent)
         Files.createDirectories(savePath.getParent());
@@ -117,6 +130,15 @@ public abstract class AbstractFileRepo implements FileRepo {
         }
         zos.close();
     }
+
+    /**
+     * Return the save name for a given file.
+     * @param path the given file (absolute or relative to the proof base directory)
+     * @return the name (may include subdirectories) the file should have in proof package, that is
+     *      a path relative to the root of the package
+     * @throws IOException if the given path does not exist
+     */
+    protected abstract Path getSaveName(Path path) throws IOException;
 
     /**
      * Can be used to get a direct InputStream to a file stored in the FileRepo.
@@ -229,8 +251,10 @@ public abstract class AbstractFileRepo implements FileRepo {
         proof.addProofDisposedListener(this);
     }
 
-    @Override
-    public void dispose() {
+    /**
+     * Clears all data in the FileRepo and marks it as disposed.
+     */
+    protected void dispose() {
         // delete all references
         javaPath = null;
         classpath = null;
@@ -246,7 +270,7 @@ public abstract class AbstractFileRepo implements FileRepo {
 
     @Override
     public void proofDisposing(ProofDisposedEvent e) {
-        // TODO nothing?
+        // TODO not used?
     }
 
     @Override

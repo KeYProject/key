@@ -37,13 +37,10 @@ public interface FileRepo extends ProofDisposedListener {
     public OutputStream createOutputStream(Path path) throws FileNotFoundException, IOException;
 
     /**
-     * Return the save name for a given file.
-     * @param path the given file (absolute or relative to the proof base directory)
-     * @return the name (may include subdirectories) the file should have in proof package, that is
-     *      a path relative to the root of the package
-     * @throws IOException if the given path does not exist
+     * Register the proof in the FileRepo.
+     * @param proof the proof to register
      */
-    public Path getSaveName(Path path) throws IOException;
+    public void registerProof(Proof proof);
 
     /**
      * Sets the bootclasspath (containing available classes from the Java Class Library).
@@ -65,7 +62,7 @@ public interface FileRepo extends ProofDisposedListener {
 
     /**
      * Stores the given proof and all files relevant for the proof in a consistent bundle as a ZIP
-     * archive at the given target path.
+     * archive at the given target path. If a file with the given path exists, it is deleted first.
      * @param savePath the target path of the ZIP archive
      * @param proof the given proof to save
      * @throws IOException on IO errors, e.g. if the user has no permission to write at the path
@@ -91,15 +88,4 @@ public interface FileRepo extends ProofDisposedListener {
      * @return the path of the base directory
      */
     public Path getBaseDir();
-
-    /**
-     * Clears all data in the FileRepo and marks it as disposed.
-     */
-    public void dispose();
-
-    /**
-     * Register the proof in the FileRepo.
-     * @param proof the proof to register
-     */
-    public void registerProof(Proof proof);
 }
