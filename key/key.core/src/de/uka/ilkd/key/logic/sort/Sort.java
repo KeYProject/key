@@ -23,63 +23,63 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 
 public interface Sort extends Named {
-    
+
     /**
      * Formulas are represented as "terms" of this sort.
      */
-    final Sort FORMULA = new SortImpl(new Name("Formula"));
-    
+    public final Sort FORMULA = new SortImpl(new Name("Formula"));
+
     /**
      * Updates are represented as "terms" of this sort.
      */
-    final Sort UPDATE = new SortImpl(new Name("Update"));
+    public final Sort UPDATE = new SortImpl(new Name("Update"));
 
     /**
      * Term labels are represented as "terms" of this sort.
      */
-    final Sort TERMLABEL = new SortImpl(new Name("TermLabel"));
+    public final Sort TERMLABEL = new SortImpl(new Name("TermLabel"));
 
     /**
      * Any is a supersort of all sorts.
      */
-    final Sort ANY = new SortImpl(new Name("any"));    
-    
+    public final Sort ANY = new SortImpl(new Name("any"));
+
     public final Name CAST_NAME = new Name("cast");
     final Name INSTANCE_NAME = new Name("instance");
-    final Name EXACT_INSTANCE_NAME = new Name("exactInstance");    
-    
-    
+    final Name EXACT_INSTANCE_NAME = new Name("exactInstance");
+
+
     /**
      * Returns the direct supersorts of this sort. Not supported by NullSort.
      */
     ImmutableSet<Sort> extendsSorts();
-    
+
     /**
      * Returns the direct supersorts of this sort.
      */
-    ImmutableSet<Sort> extendsSorts(Services services); 
+    ImmutableSet<Sort> extendsSorts(Services services);
 
     /**
-     * Tells whether the given sort is a reflexive, transitive subsort of this 
+     * Tells whether the given sort is a reflexive, transitive subsort of this
      * sort.
      */
     boolean extendsTrans(Sort s);
-    
+
     /**
      * Tells whether this sort has no exact elements.
      */
     boolean isAbstract();
-    
+
     /**
      * returns the cast symbol of this Sort
      */
     SortDependingFunction getCastSymbol(TermServices services);
-    
+
     /**
      * returns the instanceof symbol of this Sort
      */
     SortDependingFunction getInstanceofSymbol(TermServices services);
-    
+
     /**
      * returns the exactinstanceof symbol of this Sort
      */

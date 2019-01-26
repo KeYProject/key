@@ -7,7 +7,6 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -59,14 +58,8 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
             result = oldLabel;
         }
 
-        //TODO This is probably not correct, but it prevents the origin being lost in some cases
-        // (like for OneStepSimplification).
-        if (result.getSubtermOrigins().size() == 1
-                && result.getOrigin().specType == SpecType.NONE) {
-            Origin origin = result.getSubtermOrigins().iterator().next();
-
-            result = new OriginTermLabel(origin.specType, origin.fileName, origin.line,
-                    result.getSubtermOrigins());
+        if (result.getOrigin().specType == SpecType.NONE && result.getSubtermOrigins().isEmpty()) {
+            result = null;
         }
 
         return result;

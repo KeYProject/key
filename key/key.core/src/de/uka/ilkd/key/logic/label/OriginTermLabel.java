@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 
 /**
@@ -155,7 +156,7 @@ public class OriginTermLabel implements TermLabel {
      * @return {@code true} iff an {@code OriginTermLabel} can be added to the specified term.
      */
     public static boolean canAddLabel(Term term, Services services) {
-        return !services.getTypeConverter().getHeapLDT().getHeap().sort().equals(term.sort());
+        return canAddLabel(term.op(), services);
     }
 
     /**
@@ -171,21 +172,21 @@ public class OriginTermLabel implements TermLabel {
      *  with the specified operator.
      */
     public static boolean canAddLabel(Operator op, Services services) {
-        return !(op instanceof ProgramVariable)
-                || !services.getTypeConverter().getHeapLDT().getHeap().sort().equals(
-                        op.sort(new ImmutableArray<>()));
+        if (op.arity() == 0) {
+            Sort sort = op.sort(new ImmutableArray<>());
+            Sort heapSort = services.getTypeConverter().getHeapLDT().getHeap().sort();
+
+            return sort.extendsTrans(Sort.FORMULA)
+                    || (op instanceof ProgramVariable && !sort.equals(heapSort));
+        } else {
+            return true;
+        }
     }
 
     /**
      * This method transforms a term in such a way that
-     *
-     * <ol>
-     *  <li> every sub-term of has a {@link OriginTermLabel}
-     *      (sub-terms that did not have one previously get a label with
-     *      SpecType {@link SpecType#NONE}). </li>
-     *  <li> every {@link OriginTermLabel} contains all of the correct
-     *      {@link #getSubtermOrigins()}. </li>
-     * </ol>
+     * every {@link OriginTermLabel} contains all of the correct
+     * {@link #getSubtermOrigins()}.
      *
      * @param term the term to transform.
      * @param services services.
@@ -216,12 +217,15 @@ public class OriginTermLabel implements TermLabel {
 
         if (oldLabel != null) {
             labels.remove(oldLabel);
-            labels.add(new OriginTermLabel(
-                    oldLabel.getOrigin().specType,
-                    oldLabel.getOrigin().fileName,
-                    oldLabel.getOrigin().line,
-                    origins));
-        } else {
+
+            if (!origins.isEmpty() || oldLabel.getOrigin().specType != SpecType.NONE) {
+                labels.add(new OriginTermLabel(
+                        oldLabel.getOrigin().specType,
+                        oldLabel.getOrigin().fileName,
+                        oldLabel.getOrigin().line,
+                        origins));
+            }
+        } else if (!origins.isEmpty()) {
             labels.add(new OriginTermLabel(
                     SpecType.NONE,
                     null,

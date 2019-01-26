@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
@@ -77,7 +78,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             newLabel = new OriginTermLabel(subtermOrigins);
         }
 
-        if (OriginTermLabel.canAddLabel(term, services)) {
+        if (OriginTermLabel.canAddLabel(term, services)
+                && (!subtermOrigins.isEmpty() || newLabel.getOrigin().specType != SpecType.NONE)) {
             labels.add(newLabel);
         }
     }
