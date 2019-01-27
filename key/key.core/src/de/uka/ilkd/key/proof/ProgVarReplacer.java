@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
-import java.util.Map;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -56,7 +55,7 @@ public final class ProgVarReplacer {
     /**
      * map specifying the replacements to be done
      */
-    private final Map<ProgramVariable, ProgramVariable> map;
+    private final ReplacementMap<ProgramVariable, ProgramVariable> map;
 
 
     /**
@@ -69,7 +68,8 @@ public final class ProgVarReplacer {
      * creates a ProgVarReplacer that replaces program variables as specified
      * by the map parameter
      */
-    public ProgVarReplacer(Map<ProgramVariable, ProgramVariable> map, Services services) {
+    public ProgVarReplacer(
+            ReplacementMap<ProgramVariable, ProgramVariable> map, Services services) {
         this.map = map;
         this.services = services;
     }

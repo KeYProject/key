@@ -46,6 +46,7 @@ import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.ReplacementMap;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 import de.uka.ilkd.key.speclang.LoopContract;
@@ -70,7 +71,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * stores the program variables to be replaced as keys and the new program
      * variables as values
      */
-    protected Map<ProgramVariable, ProgramVariable> replaceMap;
+    protected ReplacementMap<ProgramVariable, ProgramVariable> replaceMap;
 
     private ProgramElement result = null;
 
@@ -86,7 +87,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      *            the services instance
      */
     public ProgVarReplaceVisitor(ProgramElement st,
-            Map<ProgramVariable, ProgramVariable> map, Services services) {
+            ReplacementMap<ProgramVariable, ProgramVariable> map, Services services) {
         super(st, true, services);
         this.replaceMap = map;
         assert services != null;
@@ -106,7 +107,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      *            the services instance
      */
     public ProgVarReplaceVisitor(ProgramElement st,
-            Map<ProgramVariable, ProgramVariable> map, boolean replaceall,
+            ReplacementMap<ProgramVariable, ProgramVariable> map, boolean replaceall,
             Services services) {
         this(st, map, services);
         this.replaceallbynew = replaceall;
@@ -136,6 +137,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 pv.getKeYJavaType(), pv.isFinal());
     }
 
+    @Override
     protected void walk(ProgramElement node) {
         if (node instanceof LocalVariableDeclaration && replaceallbynew) {
             LocalVariableDeclaration vd = (LocalVariableDeclaration) node;
@@ -156,11 +158,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * the action that is performed just before leaving the node the last time
      * @param node the node described above
      */
+    @Override
     protected void doAction(ProgramElement node) {
         node.visit(this);
     }
 
     /** starts the walker */
+    @Override
     public void start() {
         stack.push(new ExtList());
         walk(root());
@@ -176,6 +180,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return result;
     }
 
+    @Override
     public void performActionOnProgramVariable(ProgramVariable pv) {
         ProgramElement newPV = replaceMap.get(pv);
         if (newPV != null) {
@@ -253,10 +258,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return changed ? res : terms;
     }
 
+    @Override
     public void performActionOnLocationVariable(LocationVariable x) {
         performActionOnProgramVariable(x);
     }
 
+    @Override
     public void performActionOnProgramConstant(ProgramConstant x) {
         performActionOnProgramVariable(x);
     }
@@ -532,6 +539,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return result;
     }
 
+    @Override
     public void performActionOnLoopInvariant(LoopStatement oldLoop,
             LoopStatement newLoop) {
         final TermBuilder tb = services.getTermBuilder();
