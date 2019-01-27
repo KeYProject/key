@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.control;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import org.key_project.util.collection.ImmutableList;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
@@ -24,7 +24,12 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
     /**
      * The names of all term labels that should not be printed by default.
      */
-    private static final Name[] HIDDEN_BY_DEFAULT = { OriginTermLabel.NAME };
+    private static final Name[] HIDDEN_BY_DEFAULT = { };
+
+    /**
+     * The names of all term labels that should never be printed.
+     */
+    private static final Name[] ALWAYS_HIDDEN = { OriginTermLabel.NAME };
 
     /**
      * A switch to choose whether labels are to be shown or not.
@@ -48,6 +53,11 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      */
     public TermLabelVisibilityManager() {
         for (Name name : HIDDEN_BY_DEFAULT) {
+            hiddenLabels.add(name);
+        }
+
+
+        for (Name name : ALWAYS_HIDDEN) {
             hiddenLabels.add(name);
         }
     }
@@ -184,17 +194,17 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      * @return The sorted list of supported term label names.
      */
     public static List<Name> getSortedTermLabelNames(TermLabelManager manager) {
-        ImmutableList<Name> labelNamesFromProfile = manager.getSupportedTermLabelNames();
-        List<Name> labelNames = new LinkedList<Name>();
-        for (Name labelName : labelNamesFromProfile) {
-            labelNames.add(labelName);
-        }
+        List<Name> labelNames = manager.getSupportedTermLabelNames().stream()
+                .filter(n -> !Arrays.stream(ALWAYS_HIDDEN).anyMatch(n::equals))
+                .collect(Collectors.toList());
+
         Collections.sort(labelNames, new Comparator<Name>() {
             @Override
             public int compare(Name t, Name t1) {
                 return String.CASE_INSENSITIVE_ORDER.compare(t.toString(), t1.toString());
             }
         });
+
         return labelNames;
     }
 }
