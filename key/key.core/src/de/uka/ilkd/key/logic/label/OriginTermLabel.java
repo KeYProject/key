@@ -184,6 +184,36 @@ public class OriginTermLabel implements TermLabel {
     }
 
     /**
+     * Removes all {@link OriginTermLabel} from the specified term and its sub-terms.
+     *
+     * @param term the term to transform.
+     * @param services services.
+     * @return the transformed term.
+     */
+    public static Term removeOriginLabels(Term term, Services services) {
+        List<TermLabel> labels = term.getLabels().toList();
+        TermLabel originTermLabel = term.getLabel(NAME);
+        TermBuilder tb = services.getTermBuilder();
+        ImmutableArray<Term> oldSubs = term.subs();
+        Term[] newSubs = new Term[oldSubs.size()];
+
+        if (originTermLabel != null) {
+            labels.remove(originTermLabel);
+        }
+
+        for (int i = 0; i < newSubs.length; ++i) {
+            newSubs[i] = removeOriginLabels(oldSubs.get(i), services);
+        }
+
+        return tb.tf().createTerm(
+                term.op(),
+                newSubs,
+                term.boundVars(),
+                term.javaBlock(),
+                new ImmutableArray<>(labels));
+    }
+
+    /**
      * This method transforms a term in such a way that
      * every {@link OriginTermLabel} contains all of the correct
      * {@link #getSubtermOrigins()}.

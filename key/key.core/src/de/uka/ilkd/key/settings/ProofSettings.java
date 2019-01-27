@@ -37,7 +37,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
  * // KeY-Configuration file
  * ActiveHeuristics=simplify_prog , simplify
  * MaximumNumberOfHeuristcsApplications=400
- * number  = IntegerLDT.class 
+ * number  = IntegerLDT.class
  * boolean = BooleanLDT.class
  * </code>
  */
@@ -78,6 +78,7 @@ public class ProofSettings {
     private final static int STRATEGY_SETTINGS = 0;
     private final static int CHOICE_SETTINGS = 1;
     private final static int SMT_SETTINGS = 2;
+    private final static int TERM_LABEL_SETTINGS = 3;
 
     /**
      * create a proof settings object. When you add a new settings object,
@@ -91,6 +92,7 @@ public class ProofSettings {
                 new ChoiceSettings(),
                 ProofDependentSMTSettings.getDefaultSettingsData(),
                 // new ViewSettings()
+                new TermLabelSettings(),
         };
 
         for (int i = 0; i < settings.length; i++) {
@@ -231,7 +233,7 @@ public class ProofSettings {
 
     /**
      * returns the StrategySettings object
-     * 
+     *
      * @return the StrategySettings object
      */
     public StrategySettings getStrategySettings() {
@@ -241,7 +243,7 @@ public class ProofSettings {
 
     /**
      * returns the ChoiceSettings object
-     * 
+     *
      * @return the ChoiceSettings object
      */
     public ChoiceSettings getChoiceSettings() {
@@ -256,12 +258,22 @@ public class ProofSettings {
 
     /**
      * returns the DecisionProcedureSettings object
-     * 
+     *
      * @return the DecisionProcedureSettings object
      */
     public ProofDependentSMTSettings getSMTSettings() {
         ensureInitialized();
         return (ProofDependentSMTSettings) settings[SMT_SETTINGS];
+    }
+
+    public TermLabelSettings getTermLabelSettings() {
+        ensureInitialized();
+        return (TermLabelSettings) settings[TERM_LABEL_SETTINGS];
+    }
+
+    public ProofSettings setTermLabelSettings(TermLabelSettings tls) {
+        settings[TERM_LABEL_SETTINGS] = tls;
+        return this;
     }
 
     //
@@ -284,10 +296,11 @@ public class ProofSettings {
         /**
          * called by the Settings object to inform the listener that its state
          * has changed
-         * 
+         *
          * @param e
          *            the Event sent to the listener
          */
+        @Override
         public void settingsChanged(EventObject e) {
             saveSettings();
         }
@@ -295,7 +308,7 @@ public class ProofSettings {
 
     /**
      * Checks if the choice settings are initialized.
-     * 
+     *
      * @return {@code true} settings are initialized, {@code false} settings are
      *         not initialized.
      */

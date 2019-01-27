@@ -258,9 +258,11 @@ public class TacletMenu extends JMenu {
         }
         createFocussedAutoModeMenu(control);
         addMacroMenu();
-        
-        addSeparator();
-        add(new ShowOriginAction(pos));
+
+        if (mediator.getSelectedProof().getSettings().getTermLabelSettings().getUseOriginLabels()) {
+            addSeparator();
+            add(new ShowOriginAction(pos));
+        }
 
         addClipboardItem(control);
 

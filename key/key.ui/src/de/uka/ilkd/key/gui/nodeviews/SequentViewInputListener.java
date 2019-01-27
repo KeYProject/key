@@ -21,6 +21,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -42,6 +44,9 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
     private static boolean refresh = true;
 
     protected void showTermInfo(Point p) {
+        MainWindow mainWindow = sequentView.getMainWindow();
+        KeYMediator mediator = mainWindow.getMediator();
+
         if (showTermInfo) {
             PosInSequent mousePos = sequentView.getPosInSequent(p);
             String info = null;
@@ -66,16 +71,18 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
                     Sequent seq = sequentView.getMainWindow().getMediator().getSelectedNode().sequent();
                     info += ProofSaver.posInOccurrence2Proof(seq, posInOcc);
 
-                    if (originLabel != null) {
+                    if (originLabel != null && mediator
+                            .getSelectedProof().getSettings()
+                            .getTermLabelSettings().getUseOriginLabels()) {
                         info += ", Origin: " + originLabel.getChild(0);
                     }
                 }
             }
 
             if (info == null) {
-                sequentView.getMainWindow().setStandardStatusLine();
+                mainWindow.setStandardStatusLine();
             } else {
-                sequentView.getMainWindow().setStatusLine(info);
+                mainWindow.setStatusLine(info);
             }
         }
     }
