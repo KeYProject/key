@@ -2,6 +2,8 @@ package de.uka.ilkd.key.gui;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
@@ -45,7 +47,7 @@ public class ProofPackageSaver extends ProofSaver {
         String proofFileName = MiscTools.toValidFileName(proof.name().toString() + ".proof");
 
         // save the proof file to the FileRepo (stream is closed by the save method!)
-        super.save(repo.createOutputStream(new File(proofFileName).toPath()));
+        super.save(repo.createOutputStream(Paths.get(proofFileName)));
 
         // save proof package with the help of the FileRepo
         repo.saveProof(file.toPath());

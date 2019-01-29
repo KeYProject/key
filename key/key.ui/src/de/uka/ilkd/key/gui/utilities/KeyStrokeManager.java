@@ -106,6 +106,8 @@ public final class KeyStrokeManager {
         mapping.put(IncreaseFontSizeAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, SHORTCUT_KEY_MASK));
         mapping.put(DecreaseFontSizeAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, SHORTCUT_KEY_MASK));
 
+        mapping.put(de.uka.ilkd.key.gui.actions.SavePackageAction.class,
+                KeyStroke.getKeyStroke(KeyEvent.VK_S, SHORTCUT_KEY_MASK | KeyEvent.ALT_DOWN_MASK));
         mapping.put(de.uka.ilkd.key.gui.actions.PruneProofAction.class,
                 KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
         mapping.put(de.uka.ilkd.key.gui.actions.GoalBackAction.class,
