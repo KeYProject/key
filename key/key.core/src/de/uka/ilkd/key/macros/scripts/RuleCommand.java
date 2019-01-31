@@ -1,8 +1,20 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.Varargs;
@@ -10,14 +22,11 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.*;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import de.uka.ilkd.key.rule.NoFindTaclet;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 
 /**
  * Command that applies a calculus rule
@@ -82,6 +91,20 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         theApp = assumesCandidates.head();
 
+        {
+            /*
+             * (DS, 2019-01-31): Try to instantiate first, otherwise, we cannot
+             * apply taclets with "\newPV", Skolem terms etc.
+             */
+            final TacletApp maybeInstApp = theApp
+                    .tryToInstantiate(proof.getServices().getOverlay(
+                            state.getFirstOpenGoal().getLocalNamespaces()));
+
+            if (maybeInstApp != null) {
+                theApp = maybeInstApp;
+            }
+        }
+
         for (SchemaVariable sv : theApp.uninstantiatedVars()) {
             if (theApp.isInstantiationRequired(sv)) {
                 Term inst = args.instantiations.get(sv.name().toString());
@@ -94,7 +117,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             }
         }
 
-        // instantiate remaining symbols
+        // try to instantiate remaining symbols
         theApp = theApp.tryToInstantiate(proof.getServices().getOverlay(state.getFirstOpenGoal().getLocalNamespaces()));
 
         if (theApp == null) {
