@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -133,11 +134,19 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             throws ScriptException {
 
         Proof proof = state.getProof();
-        Taclet taclet = proof.getEnv().getInitConfigForEnvironment().
-                lookupActiveTaclet(new Name(p.rulename));
+        Taclet taclet = proof.getEnv().getInitConfigForEnvironment()
+                .lookupActiveTaclet(new Name(p.rulename));
 
         if (taclet == null) {
-            throw new ScriptException("Taclet '" + p.rulename + "' not known.");
+            /*
+             * (DS, 2019-01-31): Might be a locally introduced taclet, e.g., by
+             * hide_left etc.
+             */
+            final Optional<TacletApp> maybeApp = Optional.ofNullable(state
+                    .getFirstOpenGoal().indexOfTaclets().lookup(p.rulename));
+
+            return maybeApp.orElseThrow(() -> new ScriptException(
+                    "Taclet '" + p.rulename + "' not known."));
         }
 
         if (taclet instanceof NoFindTaclet) {
