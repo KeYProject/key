@@ -19,7 +19,7 @@ public class SettingsCommand
         @Option(value = "oss", required = false) public Boolean oneStepSimplification;
         @Option(value = "steps", required = false) public Integer proofSteps;
 
-        @Varargs Map<String, String> others = new LinkedHashMap<>();
+        @Varargs public Map<String, String> others = new LinkedHashMap<>();
     }
 
     public SettingsCommand() {
