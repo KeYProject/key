@@ -15,10 +15,17 @@ import de.uka.ilkd.key.macros.scripts.meta.Varargs;
 public class SettingsCommand
         extends AbstractCommand<SettingsCommand.Parameters> {
 
+    /**
+     * The parameters of this command.
+     *
+     * @author Alexander Weigl, Dominic Steinhoefel
+     */
     public static class Parameters {
+        /** One Step Simplification parameter */
         @Option(value = "oss", required = false) public Boolean oneStepSimplification;
+        /** Maximum number of proof steps parameter */
         @Option(value = "steps", required = false) public Integer proofSteps;
-
+        /** Other parameters */
         @Varargs public Map<String, String> others = new LinkedHashMap<>();
     }
 
