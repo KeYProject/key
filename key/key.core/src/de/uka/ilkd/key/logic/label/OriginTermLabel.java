@@ -227,6 +227,9 @@ public class OriginTermLabel implements TermLabel {
             return term;
         }
 
+        final boolean addOriginLabels = services.getProof() != null
+                && services.getProof().getSettings().getTermLabelSettings().getUseOriginLabels();
+
         TermBuilder tb = services.getTermBuilder();
         ImmutableArray<Term> oldSubs = term.subs();
         Term[] newSubs = new Term[oldSubs.size()];
@@ -248,14 +251,15 @@ public class OriginTermLabel implements TermLabel {
         if (oldLabel != null) {
             labels.remove(oldLabel);
 
-            if (!origins.isEmpty() || oldLabel.getOrigin().specType != SpecType.NONE) {
+            if ((!origins.isEmpty() || oldLabel.getOrigin().specType != SpecType.NONE)
+                    && addOriginLabels) {
                 labels.add(new OriginTermLabel(
                         oldLabel.getOrigin().specType,
                         oldLabel.getOrigin().fileName,
                         oldLabel.getOrigin().line,
                         origins));
             }
-        } else if (!origins.isEmpty()) {
+        } else if (!origins.isEmpty() && addOriginLabels) {
             labels.add(new OriginTermLabel(
                     SpecType.NONE,
                     null,

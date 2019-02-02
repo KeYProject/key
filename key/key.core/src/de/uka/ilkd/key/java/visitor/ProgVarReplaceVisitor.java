@@ -136,6 +136,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 pv.getKeYJavaType(), pv.isFinal());
     }
 
+    @Override
     protected void walk(ProgramElement node) {
         if (node instanceof LocalVariableDeclaration && replaceallbynew) {
             LocalVariableDeclaration vd = (LocalVariableDeclaration) node;
@@ -156,11 +157,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * the action that is performed just before leaving the node the last time
      * @param node the node described above
      */
+    @Override
     protected void doAction(ProgramElement node) {
         node.visit(this);
     }
 
     /** starts the walker */
+    @Override
     public void start() {
         stack.push(new ExtList());
         walk(root());
@@ -176,6 +179,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return result;
     }
 
+    @Override
     public void performActionOnProgramVariable(ProgramVariable pv) {
         ProgramElement newPV = replaceMap.get(pv);
         if (newPV != null) {
@@ -253,10 +257,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return changed ? res : terms;
     }
 
+    @Override
     public void performActionOnLocationVariable(LocationVariable x) {
         performActionOnProgramVariable(x);
     }
 
+    @Override
     public void performActionOnProgramConstant(ProgramConstant x) {
         performActionOnProgramVariable(x);
     }
@@ -399,7 +405,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         final ImmutableList<InfFlowSpec> newInfFlowSpecs = replaceVariablesInTermListTriples(
                 oldContract.getInfFlowSpecs());
 
-        OpReplacer replacer = new OpReplacer(replaceMap, services.getTermFactory());
+        OpReplacer replacer = new OpReplacer(
+                replaceMap, services.getTermFactory(), services.getProof());
 
         return changed ? oldContract.update(newBlock, newPreconditions,
                 newPostconditions, newModifiesClauses, newInfFlowSpecs,
@@ -448,7 +455,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         final ImmutableList<InfFlowSpec> newInfFlowSpecs = replaceVariablesInTermListTriples(
                 oldContract.getInfFlowSpecs());
 
-        OpReplacer replacer = new OpReplacer(replaceMap, services.getTermFactory());
+        OpReplacer replacer = new OpReplacer(
+                replaceMap, services.getTermFactory(), services.getProof());
 
         return changed ? oldContract.update(newBlock, newPreconditions,
                 newPostconditions, newModifiesClauses, newInfFlowSpecs,
@@ -532,6 +540,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return result;
     }
 
+    @Override
     public void performActionOnLoopInvariant(LoopStatement oldLoop,
             LoopStatement newLoop) {
         final TermBuilder tb = services.getTermBuilder();
