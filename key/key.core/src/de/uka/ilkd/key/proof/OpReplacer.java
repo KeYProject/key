@@ -23,7 +23,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -33,8 +32,8 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 
 /**
- * Replaces operators in a term by other operators with the same signature,
- * or subterms of the term by other terms with the same sort. Does not
+ * Replaces operators in a term by other operators with the same signature, 
+ * or subterms of the term by other terms with the same sort. Does not 
  * replace in java blocks.
  */
 public class OpReplacer {
@@ -43,48 +42,46 @@ public class OpReplacer {
 
 
     /**
-     * @param map mapping from the operators/terms to be replaced to the ones to
+     * @param map mapping from the operators/terms to be replaced to the ones to 
      * replace them with
      * @param tf TODO
      * @param services TODO
      */
-    public OpReplacer(
-            ReplacementMap<? extends SVSubstitute, ? extends SVSubstitute> map,
-            TermFactory tf) {
-        assert map != null;
+    public OpReplacer(Map<? extends SVSubstitute, ? extends SVSubstitute> map, TermFactory tf) {
+	assert map != null;
         this.map = map;
         this.tf = tf;
     }
-
-
-    public static Term replace(Term toReplace, Term with, Term in, Services services) {
-        ReplacementMap<Term, Term> map = ReplacementMap.create(services);
-        map.put(toReplace, with);
-	    OpReplacer or = new OpReplacer(map, services.getTermFactory());
-	    return or.replace(in);
+    
+    
+    public static Term replace(Term toReplace, Term with, Term in, TermFactory tf) {
+	Map<Term,Term> map = new LinkedHashMap<Term,Term>();
+	map.put(toReplace, with);
+	OpReplacer or = new OpReplacer(map, tf);
+	return or.replace(in);
     }
-
-
-    public static ImmutableList<Term> replace(Term toReplace,
-	                                      Term with,
-	                                      ImmutableList<Term> in,
-	                                      Services services) {
-        ReplacementMap<Term, Term> map = ReplacementMap.create(services);
-        map.put(toReplace, with);
-        OpReplacer or = new OpReplacer(map, services.getTermFactory());
-        return or.replace(in);
-    }
-
-
-
-    public static Term replace(Operator toReplace, Operator with, Term in, Services services) {
-        ReplacementMap<Operator, Operator> map = ReplacementMap.create(services);
-        map.put(toReplace, with);
-        OpReplacer or = new OpReplacer(map, services.getTermFactory());
-        return or.replace(in);
-    }
-
-
+    
+    
+    public static ImmutableList<Term> replace(Term toReplace, 
+	                                      Term with, 
+	                                      ImmutableList<Term> in, 
+	                                      TermFactory tf) {
+	Map<Term,Term> map = new LinkedHashMap<Term,Term>();
+	map.put(toReplace, with);
+	OpReplacer or = new OpReplacer(map, tf);
+	return or.replace(in);
+    }    
+    
+    
+    
+    public static Term replace(Operator toReplace, Operator with, Term in, TermFactory tf) {
+	Map<Operator,Operator> map = new LinkedHashMap<Operator,Operator>();
+	map.put(toReplace, with);
+	OpReplacer or = new OpReplacer(map, tf);
+	return or.replace(in);
+    }    
+    
+    
     /**
      * Replaces in an operator.
      */
@@ -96,8 +93,8 @@ public class OpReplacer {
             return op;
         }
     }
-
-
+    
+    
     /**
      * Replaces in a term.
      */
@@ -105,29 +102,35 @@ public class OpReplacer {
         if(term == null) {
             return null;
         }
-        final Term newTerm = (Term) map.get(term);
+        final Term newTerm = (Term) map.get(term); 
         if(newTerm != null) {
             return newTerm;
         }
 
-        final Operator newOp = replace(term.op());
+        for (SVSubstitute svs : map.keySet()) {
+            if (term.equalsModIrrelevantTermLabels(svs)) {
+                return (Term) map.get(svs);
+            }
+        }
 
+        final Operator newOp = replace(term.op());
+        
         final int arity = term.arity();
-        final Term newSubTerms[] = new Term[arity];
+        final Term newSubTerms[] = new Term[arity];    
         boolean changedSubTerm = false;
         for(int i = 0; i < arity; i++) {
             Term subTerm = term.sub(i);
             newSubTerms[i] = replace(subTerm);
-
+    
             if(newSubTerms[i] != subTerm) {
                 changedSubTerm = true;
             }
-        }
-        final ImmutableArray<QuantifiableVariable> newBoundVars
+        }        
+        final ImmutableArray<QuantifiableVariable> newBoundVars 
         	= replace(term.boundVars());
-
+        
         final Term result;
-        if(newOp != term.op()
+        if(newOp != term.op()  
            || changedSubTerm
            || newBoundVars != term.boundVars()) {
             result = tf.createTerm(newOp,
@@ -138,10 +141,10 @@ public class OpReplacer {
         } else {
             result = term;
         }
-
+    
         return result;
-    }
-
+    }      
+    
     /**
      * Replaces in a list of terms.
      */
@@ -151,8 +154,8 @@ public class OpReplacer {
             result = result.append(replace(term));
         }
         return result;
-    }
-
+    }    
+    
     /**
      * Replaces in a list of triples of lists of terms.
      */
@@ -162,7 +165,7 @@ public class OpReplacer {
         if (terms == null) {
             return result;
         }
-
+        
         for(final InfFlowSpec infFlowSpec : terms) {
             final ImmutableList<Term> preExpressions = replace(infFlowSpec.preExpressions);
             final ImmutableList<Term> postExpressions = replace(infFlowSpec.postExpressions);
@@ -171,8 +174,8 @@ public class OpReplacer {
         }
         return result;
     }
-
-
+    
+    
     /**
      * Replaces in a set of terms.
      */
@@ -184,23 +187,23 @@ public class OpReplacer {
         return result;
     }
 
-
+    
     /**
      * Replaces in a map from Operator to Term.
      */
     public Map<Operator, Term> replace(/*in*/ Map<Operator, Term> myMap) {
-
+        
         Map<Operator,Term> result = new LinkedHashMap<Operator, Term>();
-
+        
         final Iterator<Map.Entry<Operator, Term>> it = myMap.entrySet().iterator();
         while(it.hasNext()) {
             final Map.Entry<Operator, Term> entry = it.next();
             result.put(replace(entry.getKey()), replace(entry.getValue()));
-        }
+        }        
         return result;
     }
-
-
+    
+   
     /**
      * Replaces in an ImmutableArray<QuantifiableVariable>.
      */
