@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 
 /**
@@ -167,7 +168,7 @@ public class OriginTermLabel implements TermLabel {
      * to various problems during proof search. </p>
      *
      * @param op the specified operator.
-     * @param services the services object.
+     * @param services services.
      * @return {@code true} iff an {@code OriginTermLabel} can be added to a term
      *  with the specified operator.
      */
@@ -176,8 +177,15 @@ public class OriginTermLabel implements TermLabel {
             Sort sort = op.sort(new ImmutableArray<>());
             Sort heapSort = services.getTypeConverter().getHeapLDT().getHeap().sort();
 
-            return sort.extendsTrans(Sort.FORMULA)
-                    || (op instanceof ProgramVariable && !sort.equals(heapSort));
+            if (sort.extendsTrans(Sort.FORMULA)) {
+                return true;
+            } else if (op instanceof ProgramVariable) {
+                return !sort.equals(heapSort)
+                        && !op.name().equals(services.getJavaInfo().getInv().name())
+                        && !op.name().toString().endsWith(SpecificationRepository.LIMIT_SUFFIX);
+            } else {
+                return false;
+            }
         } else {
             return true;
         }
