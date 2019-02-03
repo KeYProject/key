@@ -46,8 +46,8 @@ import de.uka.ilkd.key.util.Pair;
  * A class axiom corresponding to a JML* represents clause.
  */
 public final class RepresentsAxiom extends ClassAxiom {
-    
-    
+
+
     private final String name;
     private final IObserverFunction target;
     private final KeYJavaType kjt;
@@ -58,7 +58,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     private final Map<LocationVariable,ProgramVariable> atPreVars;
     private final ImmutableList<ProgramVariable> originalParamVars;
 
-    
+
     public RepresentsAxiom(String name,
 			   IObserverFunction target,
 	                   KeYJavaType kjt,
@@ -70,8 +70,8 @@ public final class RepresentsAxiom extends ClassAxiom {
 	                   Map<LocationVariable,ProgramVariable> atPreVars) {
     	      this(name,null,target,kjt,visibility,pre,rep,selfVar, paramVars,atPreVars);
    }
-    
-    
+
+
     public RepresentsAxiom(String name,
                            String displayName,
                            IObserverFunction target,
@@ -98,12 +98,12 @@ public final class RepresentsAxiom extends ClassAxiom {
         this.atPreVars = atPreVars;
         this.displayName = displayName;
     }
-    
-    
+
+
     @Override
     public boolean equals(Object o) {
        if (o == null || o.getClass() != getClass()) {
-          return false;        
+          return false;
        }
        RepresentsAxiom other = (RepresentsAxiom) o;
        if (!name.equals(other.name)) return false;
@@ -112,20 +112,20 @@ public final class RepresentsAxiom extends ClassAxiom {
 
        return true;
     }
-    
+
     @Override
     public int hashCode() {
-       return name.hashCode() + 13 * target.hashCode(); 
+       return name.hashCode() + 13 * target.hashCode();
     }
-    
+
     private boolean isFunctional(Services services) {
 	return originalRep.op() instanceof Equality
 	       && originalRep.sub(0).op() == target
-	       && (target.isStatic() 
+	       && (target.isStatic()
 		   || originalRep.sub(0).sub(target.getStateCount()*target.getHeapCount(services))
 		           .op().equals(originalSelfVar));
     }
-    
+
     public Term getAxiom(ParsableVariable heapVar,
                          ParsableVariable selfVar,
                          Services services) {
@@ -133,34 +133,39 @@ public final class RepresentsAxiom extends ClassAxiom {
 	assert (selfVar == null) == target.isStatic();
 	final Map<ProgramVariable, ParsableVariable> map =
 	        new LinkedHashMap<ProgramVariable, ParsableVariable>();
-	map.put(services.getTypeConverter().getHeapLDT().getHeap(), heapVar);	
+	map.put(services.getTypeConverter().getHeapLDT().getHeap(), heapVar);
 	if(selfVar != null) {
 	    map.put(originalSelfVar, selfVar);
 	}
-	final OpReplacer or = new OpReplacer(map, services.getTermFactory());
+	final OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
 	return or.replace(originalRep);
     }
-    
-    
+
+
+    @Override
     public String getName() {
 	return name;
     }
-    
-    
+
+
+    @Override
     public IObserverFunction getTarget() {
 	return target;
-    }    
-    
+    }
 
+
+    @Override
     public KeYJavaType getKJT() {
 	return kjt;
     }
-    
-    
+
+
+    @Override
     public VisibilityModifier getVisibility() {
 	return visibility;
     }
 
+    @Override
     public ImmutableSet<Taclet> getTaclets(
           ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
           final Services services) {
@@ -215,8 +220,9 @@ public final class RepresentsAxiom extends ClassAxiom {
                 .add(tacletWithShowSatisfiability).add(tacletWithTreatAsAxiom);
        }
     }
-    
-    
+
+
+    @Override
     public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
 	    						Services services) {
 	if(!isFunctional(services)) {
@@ -224,9 +230,9 @@ public final class RepresentsAxiom extends ClassAxiom {
 	} else {
 	    return MiscTools.collectObservers(originalRep.sub(1));
 	}
-    }    
-    
-    
+    }
+
+
     @Override
     public String toString() {
 	return originalRep.toString();
@@ -239,8 +245,8 @@ public final class RepresentsAxiom extends ClassAxiom {
         return new RepresentsAxiom(newName, displayName, target, newKjt, visibility, originalPre,
                                    originalRep, originalSelfVar, originalParamVars, atPreVars);
     }
-    
-    /** Conjoins two represents clauses with minimum visibility. 
+
+    /** Conjoins two represents clauses with minimum visibility.
      *  An exception is thrown if the targets or types are different.
      *  <b>Known issue</b>: public clauses in subclasses are hidden by protected clauses in superclasses;
      *  this only applies to observers outside the package of the subclass (whenever package-privacy is implemented).

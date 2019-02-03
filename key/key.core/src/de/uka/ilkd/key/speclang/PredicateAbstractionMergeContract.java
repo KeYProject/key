@@ -93,7 +93,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
 
     /**
      * TODO
-     * 
+     *
      * @param atPres
      * @param services
      * @return
@@ -102,7 +102,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
             Map<LocationVariable, Term> atPres, Services services) {
         final Map<Term, Term> replaceMap = getReplaceMap(atPres, services);
         final OpReplacer or = new OpReplacer(replaceMap,
-                services.getTermFactory());
+                services.getTermFactory(), services.getProof());
 
         return abstractionPredicates.stream().map(pred -> {
             final Term newPred = or
@@ -133,7 +133,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
 
     /**
      * TODO
-     * 
+     *
      * @param atPres
      * @param services
      * @return

@@ -187,10 +187,11 @@ public final class DependencyContractImpl implements DependencyContract {
             }
         }
 
-        OpReplacer or = new OpReplacer(map, services.getTermFactory());
+        OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
         return or.replace(originalPres.get(heap));
     }
 
+    @Override
     public Term getPre(List<LocationVariable> heapContext,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
@@ -238,11 +239,12 @@ public final class DependencyContractImpl implements DependencyContract {
                 }
             }
         }
-        OpReplacer or = new OpReplacer(map, services.getTermFactory());
+        OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
         return or.replace(originalPres.get(heap));
     }
 
 
+    @Override
     public Term getPre(List<LocationVariable> heapContext,
             Map<LocationVariable,Term> heapTerms,
             Term selfTerm,
@@ -298,7 +300,7 @@ public final class DependencyContractImpl implements DependencyContract {
             map.put(originalParamVar, paramVars.head());
             paramVars = paramVars.tail();
         }
-        OpReplacer or = new OpReplacer(map, services.getTermFactory());
+        OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
         return or.replace(originalMby);
     }
 
@@ -334,7 +336,7 @@ public final class DependencyContractImpl implements DependencyContract {
                 }
             }
         }
-        OpReplacer or = new OpReplacer(map, services.getTermFactory());
+        OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
         return or.replace(originalMby);
     }
 
@@ -431,7 +433,7 @@ public final class DependencyContractImpl implements DependencyContract {
                 }
             }
         }
-        OpReplacer or = new OpReplacer(map, services.getTermFactory());
+        OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
         return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
     }
 
@@ -466,7 +468,7 @@ public final class DependencyContractImpl implements DependencyContract {
             }
         }
 
-        OpReplacer or = new OpReplacer(map, services.getTermFactory());
+        OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
         return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
     }
 
@@ -500,7 +502,7 @@ public final class DependencyContractImpl implements DependencyContract {
         return null;
     }
 
-    
+
     @Override
     public boolean transactionApplicableContract() {
         return false;
@@ -516,7 +518,7 @@ public final class DependencyContractImpl implements DependencyContract {
         }
     }
 
-    
+
     @Override
     public ProofOblInput createProofObl(InitConfig initConfig,
                                      Contract contract) {
@@ -530,7 +532,7 @@ public final class DependencyContractImpl implements DependencyContract {
         return (ContractPO)createProofObl(initConfig, this);
     }
 
-    
+
     @Override
     public ProofOblInput getProofObl(Services services) {
         return services.getSpecificationRepository().getPO(this);

@@ -948,7 +948,7 @@ public final class BlockContractBuilders {
             }
 
             Term oldDecreases = new OpReplacer(variables.combineRemembranceVariables(),
-                    services.getTermFactory()).replace(decreases);
+                    services.getTermFactory(), services.getProof()).replace(decreases);
 
             // The condition (decreases >= 0) is part of the precondition
             // and does not need to be repeated here.

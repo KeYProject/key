@@ -48,7 +48,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Term term,
             List<TermLabel> labels) {
-        if (!services.getProof().getSettings().getTermLabelSettings().getUseOriginLabels()) {
+        if (services.getProof() == null
+                || !services.getProof().getSettings().getTermLabelSettings().getUseOriginLabels()) {
             return;
         }
 

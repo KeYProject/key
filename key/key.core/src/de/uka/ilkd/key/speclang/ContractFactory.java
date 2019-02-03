@@ -51,7 +51,7 @@ public class ContractFactory {
             "Symbolic Execution";
     public static final String INFORMATION_FLOW_CONTRACT_BASENAME =
             "Non-interference contract";
-    
+
     private static final String INVALID_ID = "INVALID_ID";
     private static final String UNKNOWN_CONTRACT_IMPLEMENTATION = "unknown contract implementation";
     private static final String CONTRACT_COMBINATION_MARKER = "#";
@@ -78,7 +78,7 @@ public class ContractFactory {
                         Map<LocationVariable, LocationVariable> atPreVars) {
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
-        addedPost = replaceVariables(addedPost, selfVar, resultVar, excVar, paramVars, atPreVars, 
+        addedPost = replaceVariables(addedPost, selfVar, resultVar, excVar, paramVars, atPreVars,
                                      foci.originalSelfVar, foci.originalResultVar,
                                      foci.originalExcVar, foci.originalParamVars,
                                      foci.originalAtPreVars);
@@ -231,7 +231,7 @@ public class ContractFactory {
         	if(heap == targetHeap) {
               accessibles.put(heap, dep.second);
         	}else{
-              accessibles.put(heap, tb.allLocs());        		
+              accessibles.put(heap, tb.allLocs());
         	}
         }
         // TODO: insert static invariant??
@@ -505,7 +505,7 @@ public class ContractFactory {
                         mby = tb.ife(otherPre, otherMby, mby);
                     }
                 }
-                
+
                 // the modifies clause must be computed before the preconditions
                 if (hasMod.get(h) || t.hasModifiesClause(h) || other.hasModifiesClause(h)) {
                     hasMod.put(h, true);
@@ -532,7 +532,7 @@ public class ContractFactory {
                         mods.put(h, nm);
                     }
                 }
-                
+
                 if(otherPre != null) {
                     pres.put(h,pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
                 }
@@ -549,7 +549,7 @@ public class ContractFactory {
                     axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
                 }
 
-                
+
             }
 
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
@@ -643,7 +643,7 @@ public class ContractFactory {
             map.put(tb.var(h), tb.var(atPreVars.get(h)));
           }
         }
-        return new OpReplacer(map, services.getTermFactory()).replace(t);
+        return new OpReplacer(map, services.getTermFactory(), services.getProof()).replace(t);
     }
 
 
@@ -652,7 +652,7 @@ public class ContractFactory {
                                   ImmutableList<ProgramVariable> paramVars,
                                   Map<LocationVariable,LocationVariable> atPreVars,
                                   ProgramVariable originalSelfVar,
-                                  ImmutableList<ProgramVariable> originalParamVars, 
+                                  ImmutableList<ProgramVariable> originalParamVars,
                                   Map<LocationVariable,LocationVariable> originalAtPreVars) {
         return replaceVariables(original,
                                 selfVar, null, null, paramVars, atPreVars,
@@ -686,7 +686,7 @@ public class ContractFactory {
                 map.put(it1.next(), it2.next());
             }
         }
-        OpReplacer or = new OpReplacer(map, services.getTermFactory());
+        OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
         original = or.replace(original);
         return original;
     }

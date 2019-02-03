@@ -236,7 +236,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
                 map.put(origTerm, svTerm);
             }
         }
-        OpReplacer or = new OpReplacer(map, services.getTermFactory());
+        OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
         Term result = or.replace(term);
 
         return result;

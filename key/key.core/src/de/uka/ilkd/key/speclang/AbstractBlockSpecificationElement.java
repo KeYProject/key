@@ -20,11 +20,13 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
@@ -248,7 +250,8 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
     @Override
     public Term getMby(Variables variables, Services services) {
         Map<ProgramVariable, ProgramVariable> map = createReplacementMap(variables, services);
-        return new OpReplacer(map, services.getTermFactory()).replace(measuredBy);
+        return new OpReplacer(map, services.getTermFactory(), services.getProof())
+                .replace(measuredBy);
     }
 
     @Override
@@ -256,7 +259,8 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         final Map<ProgramVariable, ProgramVariable> replacementMap
                 = createReplacementMap(new Variables(selfVar, null, null, null, null, null, null,
                         null, null, null, services), services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
+        final OpReplacer replacer = new OpReplacer(
+                replacementMap, services.getTermFactory(), services.getProof());
         return replacer.replace(measuredBy);
     }
 
@@ -267,7 +271,8 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
                 Term> replacementMap = createReplacementMap(null,
                         new Terms(selfTerm, null, null, null, null, null, null, null, null, atPres),
                         services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
+        final OpReplacer replacer = new OpReplacer(
+                replacementMap, services.getTermFactory(), services.getProof());
         return replacer.replace(measuredBy);
     }
 
@@ -281,7 +286,8 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         final Map<ProgramVariable, ProgramVariable> replacementMap
                 = createReplacementMap(new Variables(self, null, null, null, null, null, null, null,
                         null, atPres, services), services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
+        final OpReplacer replacer = new OpReplacer(
+                replacementMap, services.getTermFactory(), services.getProof());
         return replacer.replace(preconditions.get(heap));
     }
 
@@ -295,7 +301,8 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         assert services != null;
         final Map<Term, Term> replacementMap = createReplacementMap(heap,
                 new Terms(self, null, null, null, null, null, null, null, null, atPres), services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
+        final OpReplacer replacer = new OpReplacer(
+                replacementMap, services.getTermFactory(), services.getProof());
         return replacer.replace(preconditions.get(heapVariable));
     }
 
@@ -311,7 +318,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         assert (variables.self == null) == (this.variables.self == null);
         assert services != null;
         final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services),
-                services.getTermFactory());
+                services.getTermFactory(), services.getProof());
         return replacer.replace(preconditions.get(heap));
     }
 
@@ -324,7 +331,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         assert (terms.self == null) == (variables.self == null);
         assert services != null;
         final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services),
-                services.getTermFactory());
+                services.getTermFactory(), services.getProof());
         return replacer.replace(preconditions.get(heapVariable));
     }
 
@@ -336,7 +343,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         assert (variables.self == null) == (this.variables.self == null);
         assert services != null;
         final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services),
-                services.getTermFactory());
+                services.getTermFactory(), services.getProof());
         return replacer.replace(postconditions.get(heap));
     }
 
@@ -349,7 +356,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         assert (terms.self == null) == (variables.self == null);
         assert services != null;
         final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services),
-                services.getTermFactory());
+                services.getTermFactory(), services.getProof());
         return replacer.replace(postconditions.get(heapVariable));
     }
 
@@ -367,7 +374,8 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         final Map<ProgramVariable, ProgramVariable> replacementMap = createReplacementMap(
                 new Variables(self, null, null, null, null, null, null, null, null, null, services),
                 services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
+        final OpReplacer replacer = new OpReplacer(
+                replacementMap, services.getTermFactory(), services.getProof());
         return replacer.replace(modifiesClauses.get(heap));
     }
 
@@ -380,7 +388,8 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         assert services != null;
         final Map<Term, Term> replacementMap = createReplacementMap(heap,
                 new Terms(self, null, null, null, null, null, null, null, null, null), services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
+        final OpReplacer replacer = new OpReplacer(
+                replacementMap, services.getTermFactory(), services.getProof());
         return replacer.replace(modifiesClauses.get(heapVariable));
     }
 
@@ -614,7 +623,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
      */
     protected Map<ProgramVariable, ProgramVariable>
             createReplacementMap(final Variables newVariables, final Services services) {
-        final VariableReplacementMap result = new VariableReplacementMap();
+        final VariableReplacementMap result = new VariableReplacementMap(services.getTermFactory());
         result.replaceSelf(variables.self, newVariables.self, services);
         result.replaceFlags(variables.breakFlags, newVariables.breakFlags, services);
         result.replaceFlags(variables.continueFlags, newVariables.continueFlags, services);
@@ -645,7 +654,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
      */
     protected Map<Term, Term> createReplacementMap(final Term newHeap, final Terms newTerms,
             final Services services) {
-        final TermReplacementMap result = new TermReplacementMap();
+        final TermReplacementMap result = new TermReplacementMap(services.getTermFactory());
         result.replaceHeap(newHeap, services);
         result.replaceSelf(variables.self, newTerms.self, services);
         result.replaceFlags(variables.breakFlags, newTerms.breakFlags, services);
@@ -828,12 +837,12 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
      * @param <S>
      *            the key and value type.
      */
-    private abstract static class ReplacementMap<S extends Sorted> extends LinkedHashMap<S, S> {
+    private abstract static class ReplacementMap<S extends Sorted & SVSubstitute>
+    extends de.uka.ilkd.key.proof.ReplacementMap.NoIrrelevantLabelsReplacementMap<S, S> {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = -2339350643000987576L;
+        public ReplacementMap(TermFactory tf) {
+            super(tf);
+        }
 
         /**
          * Adds a mapping for the self variable.
@@ -969,7 +978,9 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
      */
     private static class VariableReplacementMap extends ReplacementMap<ProgramVariable> {
 
-        private static final long serialVersionUID = 8964634070766482218L;
+        public VariableReplacementMap(TermFactory tf) {
+            super(tf);
+        }
 
         @Override
         protected ProgramVariable convert(ProgramVariable variable, TermServices services) {
@@ -983,7 +994,9 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
      */
     private static class TermReplacementMap extends ReplacementMap<Term> {
 
-        private static final long serialVersionUID = 5465241780257247301L;
+        public TermReplacementMap(TermFactory tf) {
+            super(tf);
+        }
 
         public void replaceHeap(final Term newHeap, final Services services) {
             assert newHeap != null;
@@ -1223,7 +1236,8 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
                                     var(remembranceVariable.getValue()));
                         }
                     }
-                    mbyTerm = measuredBy(new OpReplacer(replacementMap, services.getTermFactory())
+                    mbyTerm = measuredBy(new OpReplacer(
+                            replacementMap, services.getTermFactory(), services.getProof())
                             .replace(measuredBy));
                 } else {
                     mbyTerm = measuredByEmpty();
@@ -1771,7 +1785,9 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
                                 var(remembranceVariable.getValue()));
                     }
                 }
-                return new OpReplacer(replacementMap, services.getTermFactory()).replace(formula);
+                return new OpReplacer(
+                        replacementMap, services.getTermFactory(), services.getProof())
+                        .replace(formula);
             }
         }
 

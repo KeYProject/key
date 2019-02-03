@@ -178,7 +178,8 @@ abstract class ReplaceAndRegisterMethod {
         for (QuantifiableVariable qv: qvs) {
             replaceMap.put(qv, new LogicVariable(qv.name(), qv.sort()));
         }
-        final OpReplacer op = new OpReplacer(replaceMap, services.getTermFactory());
+        final OpReplacer op = new OpReplacer(
+                replaceMap, services.getTermFactory(), services.getProof());
         return op.replace(term);
     }
 
