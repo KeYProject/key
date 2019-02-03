@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.macros.scripts.meta.Option;
-import de.uka.ilkd.key.macros.scripts.meta.Varargs;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import de.uka.ilkd.key.macros.scripts.meta.Option;
+import de.uka.ilkd.key.macros.scripts.meta.Varargs;
 
 /**
  * This command is used to set variables in the proof environment.
@@ -15,10 +15,18 @@ import java.util.Map;
 public class SettingsCommand
         extends AbstractCommand<SettingsCommand.Parameters> {
 
-    static class Parameters {
-        @Option(value = "oss", required = false) Boolean oneStepSimplification;
-
-        @Varargs Map<String, String> others = new LinkedHashMap<>();
+    /**
+     * The parameters of this command.
+     *
+     * @author Alexander Weigl, Dominic Steinhoefel
+     */
+    public static class Parameters {
+        /** One Step Simplification parameter */
+        @Option(value = "oss", required = false) public Boolean oneStepSimplification;
+        /** Maximum number of proof steps parameter */
+        @Option(value = "steps", required = false) public Integer proofSteps;
+        /** Other parameters */
+        @Varargs public Map<String, String> others = new LinkedHashMap<>();
     }
 
     public SettingsCommand() {
@@ -35,6 +43,10 @@ public class SettingsCommand
                     args.oneStepSimplification));
         }
 
+        if (args.proofSteps != null) {
+            proof.getSettings().getStrategySettings()
+                    .setMaxSteps(args.proofSteps);
+        }
     }
 
     @Override public String getName() {
