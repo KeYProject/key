@@ -1,5 +1,15 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.io.File;
+import java.io.StringReader;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Observer;
+
+import org.key_project.util.collection.ImmutableList;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -12,11 +22,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
-import org.key_project.util.collection.ImmutableList;
-
-import java.io.File;
-import java.io.StringReader;
-import java.util.*;
 
 /**
  * @author Alexander Weigl
@@ -59,6 +64,12 @@ public class EngineState {
     }
 
     public Goal getFirstOpenGoal() throws ScriptException {
+        if (goal != null && goal.node().isClosed()) {
+            System.err.println(
+                    "Inconsistent EngineState: Selected first open goal is closed. Resetting.");
+            goal = null;
+        }
+
         if (goal != null) {
             return goal;
         }

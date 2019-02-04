@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ServiceLoader;
+
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -7,10 +11,6 @@ import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ServiceLoader;
 
 public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     private static Map<String, ProofMacro> macroMap = loadMacroMap();
@@ -63,6 +63,8 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
             synchronized (macro) {
                 info = macro.applyTo(uiControl, g.node(), null, uiControl);
             }
+
+            state.setGoal((Goal) null);
         }
         catch (Exception e) {
             throw new ScriptException(
