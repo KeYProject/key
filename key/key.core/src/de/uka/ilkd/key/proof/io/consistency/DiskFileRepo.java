@@ -78,10 +78,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
             public void run() {
                 try {
                     // delete the temporary directory with all contained files
-                    Files.walk(tmpDir)
-                        .sorted(Comparator.reverseOrder())
-                        .map(Path::toFile)
-                        .forEach(File::delete);
+                    deleteDiskContent();
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -93,6 +90,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
     @Override
     public InputStream getInputStream(Path path) throws IOException {
         out("input stream of " + path);
+
         // ignore URL files (those are internal files shipped with KeY)
         if (isURLFile(path)) {
             return null; // TODO: do not return null here, but a useful InputStream?
@@ -180,10 +178,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
         try {
             // delete the temporary directory with all contained files
-            Files.walk(tmpDir)
-                .sorted(Comparator.reverseOrder())
-                .map(Path::toFile)
-                .forEach(File::delete);
+            deleteDiskContent();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -292,6 +287,19 @@ public final class DiskFileRepo extends AbstractFileRepo {
         // copy to classpath folder (*.class files may only occur in classpath)
         Path newFile = resolveAndCopy(classFile, classFile.getParent(), Paths.get("classpath"));
         return new FileInputStream(newFile.toFile());
+    }
+
+    /**
+     * Deletes the temporary directory with all contents (if not already done).
+     * @throws IOException if the directory or one of its files is not accessible
+     */
+    private void deleteDiskContent() throws IOException {
+        if (!disposed) {
+            Files.walk(tmpDir)
+            .sorted(Comparator.reverseOrder())
+            .map(Path::toFile)
+            .forEach(File::delete);
+        }
     }
 
     private static boolean isInternalFile(Path path) {
