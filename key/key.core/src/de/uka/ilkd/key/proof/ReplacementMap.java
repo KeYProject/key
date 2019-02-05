@@ -120,7 +120,7 @@ public interface ReplacementMap<S extends SVSubstitute, T extends SVSubstitute> 
                         old.javaBlock(),
                         new ImmutableArray<>(
                                 old.getLabels().stream()
-                                .filter(TermLabel::isStrategyRelevant).collect(Collectors.toList())));
+                                .filter(TermLabel::isProofRelevant).collect(Collectors.toList())));
 
                 return (R) result;
             } else {

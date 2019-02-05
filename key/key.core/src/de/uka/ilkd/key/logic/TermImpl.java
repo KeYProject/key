@@ -529,13 +529,13 @@ class TermImpl implements Term {
         Term other = (Term) o;
 
         for (TermLabel label : getLabels()) {
-            if (label.isStrategyRelevant() && !other.getLabels().contains(label)) {
+            if (label.isProofRelevant() && !other.getLabels().contains(label)) {
                 return false;
             }
         }
 
         for (TermLabel label : other.getLabels()) {
-            if (label.isStrategyRelevant() && !getLabels().contains(label)) {
+            if (label.isProofRelevant() && !getLabels().contains(label)) {
                 return false;
             }
         }

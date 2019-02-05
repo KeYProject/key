@@ -310,7 +310,7 @@ public class OriginTermLabel implements TermLabel {
     }
 
     @Override
-    public boolean isStrategyRelevant() {
+    public boolean isProofRelevant() {
         return false;
     }
 

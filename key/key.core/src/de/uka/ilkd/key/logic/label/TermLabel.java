@@ -29,8 +29,6 @@ import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
-import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.feature.Feature;
 
 /**
  * <p>
@@ -177,11 +175,14 @@ public interface TermLabel extends Named {
     int getChildCount();
 
     /**
+     * Returns {@code true} iff this label is used in any way during the proof.
      *
-     * @return {@code true} iff this label should be observed by
-     *  {@link Feature}s and {@link Strategy}s.
+     * E.g., {@link OriginTermLabel}s are not used during the proof;
+     * they only provide a convenience for the user.
+     *
+     * @return {@code true} iff this label is used in any way during the proof.
      */
-    default boolean isStrategyRelevant() {
+    default boolean isProofRelevant() {
         return true;
     }
 }
