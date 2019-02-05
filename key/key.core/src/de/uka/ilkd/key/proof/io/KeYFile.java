@@ -324,11 +324,12 @@ public class KeYFile implements EnvInput {
         File bootClassPathFile = new File(bootClassPath);
         
         if (!bootClassPathFile.isAbsolute()) {
+            // convert to absolute by resolving against the parent path of the parsed file
             String parentDirectory = file.file().getParent();
             bootClassPathFile = new File(parentDirectory, bootClassPath);            
         }
         
-        return bootClassPathFile.getCanonicalFile();         
+        return bootClassPathFile;
     }
     
 
@@ -374,15 +375,14 @@ public class KeYFile implements EnvInput {
             javaPath = problemParser.javaSource(); 
             
             if(javaPath != null) {
-                File cfile = new File(javaPath);
-                if (!cfile.isAbsolute()) { // test relative pathname
-                    //File parent = fileRepo.getOriginalFile(file.file()).getParentFile();
+                File absFile = new File(javaPath);
+                if (!absFile.isAbsolute()) {
+                    // convert to absolute by resolving against the parent path of the parsed file
                     File parent=file.file().getParentFile();
-                    cfile = new File(parent,javaPath).
-                    getCanonicalFile().getAbsoluteFile();
-                    javaPath = cfile.getAbsolutePath();
+                    absFile = new File(parent, javaPath);
+                    javaPath = absFile.getPath();
                 }
-                if (!cfile.exists()) {
+                if (!absFile.exists()) {
                     throw new ProofInputException("Declared Java source " 
                             + javaPath + " not found.");
                 }                      
