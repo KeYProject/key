@@ -18,8 +18,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -365,8 +367,7 @@ public abstract class AbstractProblemLoader {
                 return new SLEnvInput(file.getParentFile().getAbsolutePath(),
                                 classPath, bootClassPath, profileOfNewProofs, includes);
             }
-        } else if (filename.endsWith(".zproof")) {
-            // zipped proof package
+        } else if (filename.endsWith(".zproof")) {            // zipped proof package
             // unzip to a temporary directory
             Path tmpDir = Files.createTempDirectory("KeYunzip");
             IOUtil.extractZip(file.toPath(), tmpDir);
@@ -375,8 +376,15 @@ public abstract class AbstractProblemLoader {
             fileRepo.setBaseDir(tmpDir);
 
             // create new KeYUserProblemFile pointing to the (unzipped) proof file
-            // TODO: proof.proof is currently the only allowed filename
-            Path unzippedProof = tmpDir.resolve(Paths.get("proof.proof"));
+            PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.proof");
+
+            // TODO: replace by selection mechanism
+            // pick one of the proofs
+            Path unzippedProof = Files.list(tmpDir)
+                    .filter(matcher::matches)
+                    .findFirst()
+                    .get(); // TODO: message if the path is null, i.e. no proof is in package
+
             return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof.toFile(),
                     fileRepo, control, profileOfNewProofs, false);
         } else if (filename.endsWith(".key") || filename.endsWith(".proof")
