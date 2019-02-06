@@ -138,7 +138,7 @@ public final class MainWindow extends JFrame  {
     private SaveFileAction saveFileAction;
     
     /** action for saving a proof as a package */
-    private SavePackageAction savePackageAction;
+    private SaveBundleAction savePackageAction;
 
     private QuickSaveAction quickSaveAction;
     private QuickLoadAction quickLoadAction;
@@ -327,7 +327,7 @@ public final class MainWindow extends JFrame  {
         openMostRecentFileAction  = new OpenMostRecentFileAction(this);
         editMostRecentFileAction  = new EditMostRecentFileAction(this);
         saveFileAction            = new SaveFileAction(this);
-        savePackageAction         = new SavePackageAction(this);
+        savePackageAction         = new SaveBundleAction(this);
         quickSaveAction           = new QuickSaveAction(this);
         quickLoadAction           = new QuickLoadAction(this);
         proofManagementAction     = new ProofManagementAction(this);

@@ -11,10 +11,9 @@ import de.uka.ilkd.key.util.MiscTools;
 
 // TODO: What FileRepo implementations should this work with? all?
 //       How to create the correct Zip-Structure for TrivialFileRepo then?
-// TODO: additional gui-button save bundle
 /**
- * This class is responsible for saving (zipped) proof packages.
- * These packages contain all data needed for successfully reloading the proofs:
+ * This class is responsible for saving (zipped) proof bundles.
+ * These bundles contain all data needed for successfully reloading the proofs:
  * <ul>
  *  <li>.key files</li>
  *  <li>.proof files</li>
@@ -24,15 +23,15 @@ import de.uka.ilkd.key.util.MiscTools;
  *
  * @author Wolfram Pfeifer
  */
-public class ProofPackageSaver extends ProofSaver {
+public class ProofBundleSaver extends ProofSaver {
 
     /**
-     * Creates a new ProofPackageSaver.
+     * Creates a new ProofBundleSaver.
      * @param proof the proof to save
      * @param fileName the target filename
      * @param internalVersion the internal KeY version
      */
-    public ProofPackageSaver(Proof proof, String fileName, String internalVersion) {
+    public ProofBundleSaver(Proof proof, String fileName, String internalVersion) {
         super(proof, fileName, internalVersion);
     }
 
@@ -43,13 +42,13 @@ public class ProofPackageSaver extends ProofSaver {
 
         /* create a filename for the actual proof file in the FileRepo:
          * We always use the contract name here (preparation for proof bundle
-         * -> multiple proofs in one package). */
+         * -> saving multiple proofs). */
         String proofFileName = MiscTools.toValidFileName(proof.name().toString() + ".proof");
 
         // save the proof file to the FileRepo (stream is closed by the save method!)
         super.save(repo.createOutputStream(Paths.get(proofFileName)));
 
-        // save proof package with the help of the FileRepo
+        // save proof bundle with the help of the FileRepo
         repo.saveProof(file.toPath());
     }
 }
