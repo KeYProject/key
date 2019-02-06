@@ -303,16 +303,11 @@ public final class DiskFileRepo extends AbstractFileRepo {
     }
 
     private static boolean isInternalFile(Path path) {
-        return isBuiltInRuleFile(path);     // TODO: add check for internal java files and URLs
+        return path.normalize().startsWith(KEYPATH);
     }
 
     private static boolean isURLFile(Path path) {
         return path.startsWith("file:/");
-    }
-
-    private static boolean isBuiltInRuleFile(Path file) {
-        // TODO: check for URL
-        return file.normalize().startsWith(KEYPATH);
     }
 
     // TODO: move to IOUtil?
