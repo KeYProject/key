@@ -43,19 +43,20 @@ public class FindTacletAppContainer extends TacletAppContainer {
     private final FormulaTag      positionTag;
     private final PosInOccurrence applicationPosition;
 
-    FindTacletAppContainer ( NoPosTacletApp         p_app,
-			     PosInOccurrence p_pio,
-			     RuleAppCost     p_cost,
-			     Goal            p_goal,
-                             long            p_age ) {
-	super ( p_app, p_cost, p_age );
-    	applicationPosition = p_pio;
-    	positionTag         =
-    	    p_goal.getFormulaTagManager().getTagForPos(p_pio.topLevel());
+    FindTacletAppContainer (
+            NoPosTacletApp p_app,
+            PosInOccurrence p_pio,
+            RuleAppCost p_cost,
+            Goal p_goal,
+            long p_age) {
+        super (p_app, p_cost, p_age);
+        applicationPosition = p_pio;
+        positionTag         =
+                p_goal.getFormulaTagManager().getTagForPos(p_pio.topLevel());
 
-        if ( positionTag == null ) {            
+        if (positionTag == null) {
             // faster than <code>assertFalse</code>
-            Debug.fail ( "Formula " + p_pio + " does not exist" );
+            Debug.fail ("Formula " + p_pio + " does not exist");
         }
     }
 
@@ -77,55 +78,58 @@ public class FindTacletAppContainer extends TacletAppContainer {
 
     /**
      * @return true iff a subformula that contains the find position stored by
-     * this object has been altered since the creation of this object or if a 
+     * this object has been altered since the creation of this object or if a
      * preceding update has changed
      */
-    private boolean subformulaOrPreceedingUpdateHasChanged ( Goal p_goal ) {
-    	ImmutableList<FormulaChangeInfo> infoList =
-    	    p_goal.getFormulaTagManager().getModifications(positionTag);
+    private boolean subformulaOrPreceedingUpdateHasChanged (Goal p_goal) {
+        ImmutableList<FormulaChangeInfo> infoList =
+                p_goal.getFormulaTagManager().getModifications(positionTag);
 
-	while ( !infoList.isEmpty () ) {
-	    final FormulaChangeInfo info = infoList.head ();
-	    infoList = infoList.tail ();
-	    
-	    final SequentFormula newFormula = info.getNewFormula();
-        if ( newFormula == applicationPosition.sequentFormula() )
-            // then there were no relevant modifications since the creation
-            // of the rule app object
-            return false;
+        while (!infoList.isEmpty ()) {
+            final FormulaChangeInfo info = infoList.head ();
+            infoList = infoList.tail ();
 
-	    if ( !independentSubformulas ( info.getPositionOfModification(),
-	                                   newFormula ) )
-	        return true;
-	}
-	
-	return false;
+            final SequentFormula newFormula = info.getNewFormula();
+            if (newFormula == applicationPosition.sequentFormula()) {
+                // then there were no relevant modifications since the creation
+                // of the rule app object
+                return false;
+            }
+            if (!independentSubformulas (info.getPositionOfModification(),
+                    newFormula)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
     /**
      * checks if the modification path and the position where this taclet application
-     * has been matched again denote independent subformulas. The modification affects 
-     * a formula <code>F</code> if <code>F</code> is a subformula of the modified one 
-     * or the modification took part inside an update which may occur in the update 
-     * prefix instantiation of the taclet application    
+     * has been matched again denote independent subformulas. The modification affects
+     * a formula <code>F</code> if <code>F</code> is a subformula of the modified one
+     * or the modification took part inside an update which may occur in the update
+     * prefix instantiation of the taclet application
      * @return true iff <code>applicationPosition</code> is in the scope of
      * the position <code>p_pos</code> (the formulas are not compared, only the
-     * positions within the formulas) and no indirect relationship exists which 
-     * is established by a modification that occurred inside an update 
+     * positions within the formulas) and no indirect relationship exists which
+     * is established by a modification that occurred inside an update
      */
     private boolean independentSubformulas(PosInOccurrence changePos,
-                                           SequentFormula newFormula) {
+            SequentFormula newFormula) {
         final PIOPathIterator changePIO = changePos.iterator ();
         final PIOPathIterator appPIO = applicationPosition.iterator ();
 
-        while ( true ) {
+        while (true) {
             final int changeIndex = changePIO.next ();
             final int appIndex = appPIO.next ();
 
-            if ( appIndex == -1 ) return false;
-            
-            if ( changeIndex == -1 ) {
+            if (appIndex == -1) {
+                return false;
+            }
+
+            if (changeIndex == -1) {
                 final Term beforeChangeTerm = changePIO.getSubTerm ();
                 final Operator beforeChangeOp = beforeChangeTerm.op ();
 
@@ -136,25 +140,25 @@ public class FindTacletAppContainer extends TacletAppContainer {
                 // <code>TermTacletAppIndex.updateCompleteRebuild</code>
                 if ( beforeChangeOp instanceof Modality ) {
                     final PosInOccurrence afterChangePos =
-                        changePos.replaceConstrainedFormula ( newFormula );
+                            changePos.replaceConstrainedFormula (newFormula);
                     final Term afterChangeTerm = afterChangePos.subTerm ();
                     return beforeChangeOp == afterChangeTerm.op ()
-                           && beforeChangeTerm.sub ( 0 )
-                              .equals ( afterChangeTerm.sub ( 0 ) );
+                            && beforeChangeTerm.sub (0)
+                            .equalsModIrrelevantTermLabels(afterChangeTerm.sub (0));
                 }
-                
+
                 return false;
             }
 
-            if ( changeIndex != appIndex ) {
+            if (changeIndex != appIndex) {
                 // in case a change within an update occurred, also (some)
                 // taclets within the update target expression have to be
                 // invalidated
                 final Operator modOp = changePIO.getSubTerm ().op ();
 
-                return !( modOp instanceof UpdateApplication
-                          && appIndex == UpdateApplication.targetPos ()
-                          && updateContextIsRecorded () );
+                return !(modOp instanceof UpdateApplication
+                        && appIndex == UpdateApplication.targetPos ()
+                        && updateContextIsRecorded ());
             }
         }
     }

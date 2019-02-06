@@ -54,27 +54,28 @@ public class RootsGenerator implements TermGenerator {
     public static TermGenerator create(ProjectionToTerm powerRelation, TermServices services) {
         return new RootsGenerator ( powerRelation, services.getTermBuilder() );
     }
-    
+
     private RootsGenerator(ProjectionToTerm powerRelation, TermBuilder tb) {
         this.powerRelation = powerRelation;
         this.tb = tb;
     }
 
+    @Override
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Services services = goal.proof ().getServices ();
         final IntegerLDT numbers = services.getTypeConverter ().getIntegerLDT ();
-        
+
         final Term powerRel = powerRelation.toTerm ( app, pos, goal );
-        
+
         final Operator op = powerRel.op ();
-        
+
         assert op.arity () == 2;
-        
+
         final BigInteger lit =
             new BigInteger ( AbstractTermTransformer
                              .convertToDecimalString ( powerRel.sub ( 1 ),
                                                        services ) );
-        
+
         final Monomial mon = Monomial.create ( powerRel.sub ( 0 ), services );
         final int pow = mon.getParts ().size ();
         if ( pow <= 1 || !mon.getCoefficient ().equals ( one ) )
@@ -83,7 +84,7 @@ public class RootsGenerator implements TermGenerator {
         final Term var = mon.getParts ().head ();
         if ( !mon.getParts ().removeAll ( var ).isEmpty () )
             return emptyIterator ();
-        
+
         if ( op == numbers.getLessOrEquals () ) {
             return toIterator ( breakDownLeq ( var, lit, pow, services ) );
         } else if ( op == numbers.getGreaterOrEquals() ) {
@@ -91,8 +92,8 @@ public class RootsGenerator implements TermGenerator {
         } else if (op == Equality.EQUALS) {
             return toIterator ( breakDownEq ( var, lit, pow, services ) );
         }
-        
-        return emptyIterator ();        
+
+        return emptyIterator ();
     }
 
     private Iterator<Term> emptyIterator() {
@@ -100,8 +101,10 @@ public class RootsGenerator implements TermGenerator {
     }
 
     private Iterator<Term> toIterator(Term res) {
-        if ( res.equals ( tb.ff () ) ) return emptyIterator ();
-        return ImmutableSLList.<Term>nil().prepend ( res ).iterator ();
+        if (res.equalsModIrrelevantTermLabels (tb.ff ())) {
+            return emptyIterator ();
+        }
+        return ImmutableSLList.<Term>nil().prepend (res).iterator ();
     }
 
     private Term breakDownEq(Term var, BigInteger lit, int pow,
@@ -110,7 +113,7 @@ public class RootsGenerator implements TermGenerator {
 
         if ( ( pow % 2 == 0 ) ) {
             // the even case
-         
+
             switch ( lit.signum () ) {
             case -1:
                 // no solutions
@@ -135,7 +138,7 @@ public class RootsGenerator implements TermGenerator {
             }
         } else {
             // the odd case
-            
+
             final BigInteger r = root ( lit, pow );
             if ( power ( r, pow ).equals ( lit ) ) {
                 // one solution
@@ -154,7 +157,7 @@ public class RootsGenerator implements TermGenerator {
     private Term breakDownGeq(Term var, BigInteger lit, int pow, TermServices services) {
         if ( ( pow % 2 == 0 ) ) {
             // the even case
-            
+
             switch ( lit.signum () ) {
             case -1:
             case 0:
@@ -173,7 +176,7 @@ public class RootsGenerator implements TermGenerator {
             return tb.geq ( var,
                             tb.zTerm ( rootRoundingUpwards ( lit, pow ).toString () ) );
         }
-        
+
         assert false; // unreachable
         return null;
     }
@@ -181,7 +184,7 @@ public class RootsGenerator implements TermGenerator {
     private Term breakDownLeq(Term var, BigInteger lit, int pow, TermServices services) {
         if ( ( pow % 2 == 0 ) ) {
             // the even case
-            
+
             switch ( lit.signum () ) {
             case -1:
                 // no solutions
@@ -242,7 +245,7 @@ public class RootsGenerator implements TermGenerator {
         assert prod.signum () >= 0;
 
         // binary search for finding the root
-        
+
         BigInteger lb = BigInteger.ZERO;
         BigInteger ub = prod;
         while ( !power ( lb, exp ).equals ( prod )
@@ -256,12 +259,12 @@ public class RootsGenerator implements TermGenerator {
         }
         return lb;
     }
-    
+
     private BigInteger power (BigInteger base, int exp) {
         assert exp >= 0;
-        
+
         // shift-multiplier
-        
+
         BigInteger res = BigInteger.ONE;
         while (true) {
             if ( exp % 2 != 0 ) res = res.multiply ( base );
