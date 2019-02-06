@@ -16,9 +16,11 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.Taclet;
 
 /**
  * Refactoring for {@link OriginTermLabel}s.
@@ -39,7 +41,12 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm,
             Rule rule, Goal goal, Object hint, Term tacletTerm) {
-        return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE;
+        if (rule instanceof BuiltInRule
+                && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
+            return RefactoringScope.NONE;
+        } else {
+            return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE;
+        }
     }
 
     @Override
@@ -48,6 +55,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Term term,
             List<TermLabel> labels) {
+
         if (services.getProof() == null
                 || !services.getProof().getSettings().getTermLabelSettings().getUseOriginLabels()) {
             return;
@@ -55,6 +63,10 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
         if (rule instanceof BuiltInRule
                 && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
+            return;
+        }
+
+        if (rule instanceof Taclet && !shouldRefactorOnTaclet((Taclet) rule)) {
             return;
         }
 
@@ -95,6 +107,20 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
         }
 
         return result;
+    }
+
+    /**
+     * Determines whether any refatorings should be applied on an application of the given taclet.
+     * For some taclets, performing refactorings causes {@link FormulaTag}s to go missing.
+     *
+     * @param taclet a taclet rule.
+     * @return whether any refactorings should be applied on an application of the given rule.
+     *
+     * @see TermLabelRefactoring#shouldRefactorOnBuiltInRule(Rule, Goal, Object)
+     */
+    private boolean shouldRefactorOnTaclet(Taclet taclet) {
+        return !taclet.name().toString().startsWith("arrayLength")
+                && taclet.goalTemplates().size() <= 1;
     }
 
     @SuppressWarnings("unchecked")

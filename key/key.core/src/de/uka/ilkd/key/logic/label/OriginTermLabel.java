@@ -9,10 +9,13 @@ import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -173,21 +176,24 @@ public class OriginTermLabel implements TermLabel {
      *  with the specified operator.
      */
     public static boolean canAddLabel(Operator op, Services services) {
+        final TypeConverter tc = services.getTypeConverter();
+        final JavaInfo ji = services.getJavaInfo();
+
         if (op.arity() == 0) {
             Sort sort = op.sort(new ImmutableArray<>());
-            Sort heapSort = services.getTypeConverter().getHeapLDT().getHeap().sort();
 
             if (sort.extendsTrans(Sort.FORMULA)) {
                 return true;
             } else if (op instanceof ProgramVariable) {
-                return !sort.equals(heapSort)
-                        && !op.name().equals(services.getJavaInfo().getInv().name())
+                return !sort.extendsTrans(tc.getHeapLDT().targetSort())
+                        && !sort.extendsTrans(tc.getLocSetLDT().targetSort())
+                        && !op.name().equals(ji.getInv().name())
                         && !op.name().toString().endsWith(SpecificationRepository.LIMIT_SUFFIX);
             } else {
                 return false;
             }
         } else {
-            return true;
+            return !(op instanceof Function);
         }
     }
 
@@ -235,9 +241,6 @@ public class OriginTermLabel implements TermLabel {
             return term;
         }
 
-        final boolean addOriginLabels = services.getProof() != null
-                && services.getProof().getSettings().getTermLabelSettings().getUseOriginLabels();
-
         TermBuilder tb = services.getTermBuilder();
         ImmutableArray<Term> oldSubs = term.subs();
         Term[] newSubs = new Term[oldSubs.size()];
@@ -259,15 +262,14 @@ public class OriginTermLabel implements TermLabel {
         if (oldLabel != null) {
             labels.remove(oldLabel);
 
-            if ((!origins.isEmpty() || oldLabel.getOrigin().specType != SpecType.NONE)
-                    && addOriginLabels) {
+            if ((!origins.isEmpty() || oldLabel.getOrigin().specType != SpecType.NONE)) {
                 labels.add(new OriginTermLabel(
                         oldLabel.getOrigin().specType,
                         oldLabel.getOrigin().fileName,
                         oldLabel.getOrigin().line,
                         origins));
             }
-        } else if (!origins.isEmpty() && addOriginLabels) {
+        } else if (!origins.isEmpty()) {
             labels.add(new OriginTermLabel(
                     SpecType.NONE,
                     null,
