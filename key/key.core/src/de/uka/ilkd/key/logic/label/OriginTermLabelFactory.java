@@ -69,6 +69,10 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
      */
     private Origin parseOrigin(String str) throws TermLabelException {
         try {
+            if (str.equals("<none>")) {
+                return new Origin(SpecType.NONE, "", -1);
+            }
+
             StringTokenizer tokenizer = new StringTokenizer(str, " ");
 
             SpecType specType = parseSpecType(tokenizer.nextToken());
