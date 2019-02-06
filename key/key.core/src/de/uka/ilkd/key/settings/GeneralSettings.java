@@ -30,6 +30,12 @@ public class GeneralSettings implements Settings, Cloneable {
     public static boolean noPruningClosed = true;
 
     /**
+     * If this option is set, the (Disk)FileRepo does not delete its temporary directories
+     * (can be used for debugging).
+     */
+    public static boolean keepFileRepos = false;
+
+    /**
      * if true then JML specifications are globally disabled
      * in this run of KeY, regardless of the regular settings
      */

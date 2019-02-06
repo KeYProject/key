@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
+import de.uka.ilkd.key.settings.GeneralSettings;
 
 /**
  * This class uses a temporary directory as a store for the proof-relevant files.
@@ -294,7 +295,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
      * @throws IOException if the directory or one of its files is not accessible
      */
     private void deleteDiskContent() throws IOException {
-        if (!disposed) {
+        if (!disposed && !GeneralSettings.keepFileRepos) {
             Files.walk(tmpDir)
             .sorted(Comparator.reverseOrder())
             .map(Path::toFile)
