@@ -38,7 +38,14 @@ import de.uka.ilkd.key.util.InfFlowSpec;
  */
 public class OpReplacer {
 
+    /**
+     * Term factory.
+     */
     private TermFactory tf;
+
+    /**
+     * The replacement map.
+     */
     private final ReplacementMap<? extends SVSubstitute, ? extends SVSubstitute> map;
 
     /**
@@ -68,10 +75,6 @@ public class OpReplacer {
     public OpReplacer(
             Map<? extends SVSubstitute, ? extends SVSubstitute> map, TermFactory tf, Proof proof) {
         assert map != null;
-
-        if (proof == null && !(new Throwable()).getStackTrace()[1].getFileName().startsWith("OpReplacer")) {
-            System.out.print("");
-        }
 
         this.map = map instanceof ReplacementMap
                 ? (ReplacementMap<? extends SVSubstitute, ? extends SVSubstitute>) map
@@ -112,10 +115,8 @@ public class OpReplacer {
      * @param tf a term factory.
      * @return the terms with all occurences of the sub-term replaced.
      */
-    public static ImmutableList<Term> replace(Term toReplace,
-	                                      Term with,
-	                                      ImmutableList<Term> in,
-	                                      TermFactory tf) {
+    public static ImmutableList<Term> replace(
+            Term toReplace, Term with, ImmutableList<Term> in, TermFactory tf) {
         return replace(toReplace, with, in, tf, null);
     }
 
@@ -129,7 +130,7 @@ public class OpReplacer {
      *
      * @param toReplace the operator to replace.
      * @param with the replacement operator.
-     * @param the term in which to perform the replacement.
+     * @param in the term in which to perform the replacement.
      * @param tf a term factory.
      * @return a term with all occurences of the operator replaced.
      */
@@ -148,7 +149,7 @@ public class OpReplacer {
      * @return a term with all occurences of the sub-term replaced.
      */
     public static Term replace(Term toReplace, Term with, Term in, TermFactory tf, Proof proof) {
-        Map<Term,Term> map = new LinkedHashMap<Term,Term>();
+        Map<Term, Term> map = new LinkedHashMap<Term, Term>();
         map.put(toReplace, with);
         OpReplacer or = new OpReplacer(map, tf, proof);
         return or.replace(in);
@@ -169,7 +170,7 @@ public class OpReplacer {
                                           ImmutableList<Term> in,
                                           TermFactory tf,
                                           Proof proof) {
-    Map<Term,Term> map = new LinkedHashMap<Term,Term>();
+        Map<Term, Term> map = new LinkedHashMap<Term, Term>();
         map.put(toReplace, with);
         OpReplacer or = new OpReplacer(map, tf, proof);
         return or.replace(in);
@@ -180,14 +181,14 @@ public class OpReplacer {
      *
      * @param toReplace the operator to replace.
      * @param with the replacement operator.
-     * @param the term in which to perform the replacement.
+     * @param in the term in which to perform the replacement.
      * @param tf a term factory.
      * @param proof the currently loaded proof.
      * @return a term with all occurences of the operator replaced.
      */
     public static Term replace(
             Operator toReplace, Operator with, Term in, TermFactory tf, Proof proof) {
-        Map<Operator,Operator> map = new LinkedHashMap<Operator,Operator>();
+        Map<Operator, Operator> map = new LinkedHashMap<Operator, Operator>();
         map.put(toReplace, with);
         OpReplacer or = new OpReplacer(map, tf, proof);
         return or.replace(in);
@@ -198,10 +199,11 @@ public class OpReplacer {
      * Replaces in an operator.
      *
      * @param op the operator in which to perform the replacement.
+     * @return the replaced operator.
      */
     public Operator replace(Operator op) {
         Operator newOp = (Operator) map.get(op);
-        if(newOp != null) {
+        if (newOp != null) {
             return newOp;
         } else {
             return op;
@@ -213,13 +215,14 @@ public class OpReplacer {
      * Replaces in a term.
      *
      * @param term the term in which to perform the replacement.
+     * @return the transformed term.
      */
     public Term replace(Term term) {
         if(term == null) {
             return null;
         }
         final Term newTerm = (Term) map.get(term);
-        if(newTerm != null) {
+        if (newTerm != null) {
             return newTerm;
         }
 
@@ -258,7 +261,8 @@ public class OpReplacer {
     /**
      * Replaces in a list of terms.
      *
-     * @param temrs the terms in which to perform the replacement.
+     * @param terms the terms in which to perform the replacement.
+     * @return the list of transformed terms.
      */
     public ImmutableList<Term> replace(ImmutableList<Term> terms) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
@@ -272,6 +276,7 @@ public class OpReplacer {
      * Replaces in a list of triples of lists of terms.
      *
      * @param terms the terms in which to perform the replacement.
+     * @return the list of transformed terms.
      */
     public ImmutableList<InfFlowSpec> replaceInfFlowSpec(ImmutableList<InfFlowSpec> terms) {
         ImmutableList<InfFlowSpec>
@@ -294,6 +299,7 @@ public class OpReplacer {
      * Replaces in a set of terms.
      *
      * @param terms the terms in which to perform the replacement.
+     * @return the set of transformed terms.
      */
     public ImmutableSet<Term> replace(ImmutableSet<Term> terms) {
         ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
@@ -308,6 +314,7 @@ public class OpReplacer {
      * Replaces in a map from Operator to Term.
      *
      * @param myMap the map in which to perform the replacement.
+     * @return the transformed map.
      */
     public Map<Operator, Term> replace(Map<Operator, Term> myMap) {
 
@@ -326,6 +333,7 @@ public class OpReplacer {
      * Replaces in an ImmutableArray<QuantifiableVariable>.
      *
      * @param vars the array in which to perform the replacement.
+     * @return the list of transformed variables.
      */
     public ImmutableArray<QuantifiableVariable> replace(
 	    			ImmutableArray<QuantifiableVariable> vars) {

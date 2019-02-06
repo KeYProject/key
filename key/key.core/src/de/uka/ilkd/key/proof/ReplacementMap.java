@@ -21,20 +21,22 @@ import de.uka.ilkd.key.util.LinkedHashMap;
  *
  * @author lanzinger
  *
- * @param <S> the type of the operators to replace.
+ * @param <S> the type of the elements to replace.
  * @param <T> the type of the replacements.
  */
-public interface ReplacementMap<S extends SVSubstitute, T extends SVSubstitute> extends Map<S, T> {
+public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
 
     /**
      * Creates a new replacement map.
      *
+     * @param <S> the type of the elements to replace.
+     * @param <T> the type of the replacements.
      * @param tf a term factory.
      * @param proof the currently loaded proof, or {@code null} if no proof is loaded.
      * @return a new replacement map.
      */
-    public static <S extends SVSubstitute, T extends SVSubstitute>
-    ReplacementMap<S, T> create(TermFactory tf, Proof proof) {
+    public static <S extends SVSubstitute, T>
+        ReplacementMap<S, T> create(TermFactory tf, Proof proof) {
         if (proof != null && proof.getSettings().getTermLabelSettings().getUseOriginLabels()) {
             return new NoIrrelevantLabelsReplacementMap<S, T>(tf);
         } else {
@@ -45,13 +47,15 @@ public interface ReplacementMap<S extends SVSubstitute, T extends SVSubstitute> 
     /**
      * Creates a new replacement map.
      *
+     * @param <S> the type of the elements to replace.
+     * @param <T> the type of the replacements.
      * @param tf a term factory.
      * @param proof the currently loaded proof, or {@code null} if no proof is loaded.
      * @param initialMappings a map whose mapping should be added to the new replacement map.
      * @return a new replacement map.
      */
-    public static <S extends SVSubstitute, T extends SVSubstitute>
-    ReplacementMap<S, T> create(TermFactory tf, Proof proof, Map<S, T> initialMappings) {
+    public static <S extends SVSubstitute, T>
+        ReplacementMap<S, T> create(TermFactory tf, Proof proof, Map<S, T> initialMappings) {
         ReplacementMap<S, T> result = create(tf, proof);
         result.putAll(initialMappings);
         return result;
@@ -59,7 +63,8 @@ public interface ReplacementMap<S extends SVSubstitute, T extends SVSubstitute> 
 
     /**
      * <p>
-     * The replacement map type to use if {@link TermLabelSettings#getUseOriginLabels()} is false. </p>
+     * The replacement map type to use if {@link TermLabelSettings#getUseOriginLabels()} is false.
+     * </p>
      *
      * This is just a normal {@link LinkedHashMap}.
      *
@@ -68,13 +73,14 @@ public interface ReplacementMap<S extends SVSubstitute, T extends SVSubstitute> 
      * @param <S> the type of the operators to replace.
      * @param <T> the type of the replacements.
      */
-    public static class DefaultReplacementMap<S extends SVSubstitute, T extends SVSubstitute>
-    extends LinkedHashMap<S, T>
-    implements ReplacementMap<S, T> { }
+    public static class DefaultReplacementMap<S extends SVSubstitute, T>
+        extends LinkedHashMap<S, T>
+        implements ReplacementMap<S, T> { }
 
     /**
      * <p>
-     * The replacement map type to use if {@link TermLabelSettings#getUseOriginLabels()} is true. </p>
+     * The replacement map type to use if {@link TermLabelSettings#getUseOriginLabels()} is true.
+     * </p>
      *
      * <p> This map considers otherwise equal terms with different origins as equal. </p>
      *
@@ -86,7 +92,7 @@ public interface ReplacementMap<S extends SVSubstitute, T extends SVSubstitute> 
      * @see OriginTermLabel
      */
     public static class NoIrrelevantLabelsReplacementMap
-    <S extends SVSubstitute, T extends SVSubstitute> implements ReplacementMap<S, T> {
+        <S extends SVSubstitute, T> implements ReplacementMap<S, T> {
 
         /**
          * The map wrapped by this one.
