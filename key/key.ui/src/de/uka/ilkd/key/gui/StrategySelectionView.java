@@ -45,6 +45,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import de.uka.ilkd.key.gui.ext.KeYPane;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -86,10 +87,10 @@ import de.uka.ilkd.key.util.Triple;
  * {@link StrategyProperties}. For more information have a look at:
  * {@code http://i12www.ira.uka.de/~klebanov/mantis/view.php?id=1359}
  * </p>
- * 
+ *
  * @author Martin Hentschel
  */
-public final class StrategySelectionView extends JPanel {
+public final class StrategySelectionView extends JPanel implements KeYPane  {
     /**
      * Generated UID.
      */
@@ -136,15 +137,16 @@ public final class StrategySelectionView extends JPanel {
      * {@link #DEFINITION}.
      */
     private StrategySelectionComponents components;
-    
+
     /**
      * Stores whether a chosen predef setting has been changed;
      * in this case, the default button should be activated again.
      */
     private boolean predefChanged = true;
+    private JButton btnGo;
 
-    public StrategySelectionView(AutoModeAction autoModeAction) {
-        layoutPane(autoModeAction);
+    public StrategySelectionView() {
+        layoutPane();
         refresh(mediator == null ? null : mediator.getSelectedProof());
         setVisible(true);
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -155,7 +157,7 @@ public final class StrategySelectionView extends JPanel {
     }
 
     /** Build everything */
-    private void layoutPane(AutoModeAction autoModeAction) {
+    private void layoutPane() {
         assert components == null : "Content can not be created a second time!";
         components = new StrategySelectionComponents();
 
@@ -178,7 +180,7 @@ public final class StrategySelectionView extends JPanel {
 
         // //////////////////////////////////////////////////////////////////////
 
-        JButton go = new JButton(autoModeAction);
+        this.btnGo = new JButton();
 
         JPanel timeout = createDefaultPanel(components);
 
@@ -196,8 +198,8 @@ public final class StrategySelectionView extends JPanel {
         gbcpanel5.weighty = 0;
         gbcpanel5.anchor = GridBagConstraints.WEST;
         gbcpanel5.insets = new Insets(4, 4, 4, 4);
-        goLayout.setConstraints(go, gbcpanel5);
-        goPanel.add(go);
+        goLayout.setConstraints(btnGo, gbcpanel5);
+        goPanel.add(btnGo);
 
         gbcpanel5.gridx = 2;
         gbcpanel5.gridy = 0;
@@ -587,7 +589,7 @@ public final class StrategySelectionView extends JPanel {
 
     /**
      * enables or disables all components
-     * 
+     *
      * @param enable
      *            boolean saying whether to activate or deactivate the
      *            components
@@ -666,15 +668,32 @@ public final class StrategySelectionView extends JPanel {
                 .setActiveStrategyProperties(p);
 
         proof.setActiveStrategy(strategy);
-        
+
         refresh(proof);
     }
+
+    @Override
+    public void init(MainWindow window, KeYMediator mediator) {
+        setMediator(mediator);
+        btnGo.setAction(window.getAutoModeAction());
+    }
+
+    @Override
+    public String getTitle() {
+        return "Proof Search Strategy";
+    }
+
+    @Override
+    public JComponent getComponent() {
+        return this;
+    }
+
 
     /**
      * Provided via
      * {@link StrategySelectionView#getStrategySelectionComponents()} for direct
      * access to created user interface components.
-     * 
+     *
      * @author Martin Hentschel
      */
     private static class StrategySelectionComponents {
@@ -710,7 +729,7 @@ public final class StrategySelectionView extends JPanel {
         /**
          * Returns the {@link MaxRuleAppSlider} in which the maximal number of
          * steps is edited.
-         * 
+         *
          * @return The {@link MaxRuleAppSlider} in which the maximal number of
          *         steps is edited.
          */
@@ -721,7 +740,7 @@ public final class StrategySelectionView extends JPanel {
         /**
          * Sets the {@link MaxRuleAppSlider} in which the maximal number of
          * steps is edited.
-         * 
+         *
          * @param maxRuleAppSlider
          *            The {@link MaxRuleAppSlider} in which the maximal number
          *            of steps is edited.
@@ -732,7 +751,7 @@ public final class StrategySelectionView extends JPanel {
 
         /**
          * Registers the given {@link JRadioButton} for the given key.
-         * 
+         *
          * @param button
          *            The {@link JRadioButton}.
          * @param key
@@ -750,7 +769,7 @@ public final class StrategySelectionView extends JPanel {
         /**
          * Returns the mapping of property keys to the {@link JRadioButton}s
          * which defines the values.
-         * 
+         *
          * @return The mapping of property keys to the {@link JRadioButton}s
          *         which defines the values.
          */
@@ -760,7 +779,7 @@ public final class StrategySelectionView extends JPanel {
 
         /**
          * Returns the {@link JButton} which restores default values.
-         * 
+         *
          * @return The {@link JButton} which restores default values.
          */
         public JButton getDefaultButton() {
@@ -776,7 +795,7 @@ public final class StrategySelectionView extends JPanel {
 
         /**
          * Sets the {@link JButton} which restores default values.
-         * 
+         *
          * @param defaultButton
          *            The {@link JButton} which restores default values.
          */
@@ -786,7 +805,7 @@ public final class StrategySelectionView extends JPanel {
 
         /**
          * Sets the {@link JComboBox} for choosing a predefined value set.
-         * 
+         *
          * @param strategyPredefSettingsCmb
          *            The {@link JComboBox} for choosing a predefined value set.
          */
@@ -797,7 +816,7 @@ public final class StrategySelectionView extends JPanel {
 
         /**
          * Returns the {@link Map} of properties to {@link ButtonGroup}s.
-         * 
+         *
          * @return The {@link Map} of properties to {@link ButtonGroup}s.
          */
         public Map<String, ButtonGroup> getPropertyGroups() {
@@ -806,7 +825,7 @@ public final class StrategySelectionView extends JPanel {
 
         /**
          * Adds the property group.
-         * 
+         *
          * @param property
          *            The property.
          * @param group

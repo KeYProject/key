@@ -1581,4 +1581,9 @@ public final class MainWindow extends JFrame  {
    public void setShowTacletInfo(boolean show) {
       mainWindowTabbedPane.getProofTreeView().tacletInfoToggle.setSelected(show);
    }
+
+
+    public AutoModeAction getAutoModeAction() {
+        return autoModeAction;
+    }
 }

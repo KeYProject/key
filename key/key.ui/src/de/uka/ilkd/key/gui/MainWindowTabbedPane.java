@@ -1,26 +1,23 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
-
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.KeyStroke;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
+import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.ext.KeYPane;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.util.List;
 
 /**
  * {@link JTabbedPane} displayed in {@link MainWindow}, to the left of
  * {@link de.uka.ilkd.key.gui.nodeviews.SequentView}.
- * 
+ *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class MainWindowTabbedPane extends JTabbedPane {
-
     /**
      *
      */
@@ -31,14 +28,10 @@ public class MainWindowTabbedPane extends JTabbedPane {
      */
     private final ProofTreeView proofTreeView;
 
-    public ProofTreeView getProofTreeView() {
-        return proofTreeView;
-    }
-
     /**
      * the list of current open goals
      */
-    private final JScrollPane openGoalsView;
+    private final GoalList openGoalsView;
 
     /**
      * the strategy selection view
@@ -54,7 +47,20 @@ public class MainWindowTabbedPane extends JTabbedPane {
         assert mediator != null;
         assert mainWindow != null;
 
+        proofTreeView = KeYGuiExtensionFacade.getPanel(ProofTreeView.class);
+        infoView = KeYGuiExtensionFacade.getPanel(InfoView.class);
+        strategySelectionView = KeYGuiExtensionFacade.getPanel(StrategySelectionView.class);
+        openGoalsView = KeYGuiExtensionFacade.getPanel(GoalList.class);
+        List<KeYPane> panels = KeYGuiExtensionFacade.getAllPanels();
+        panels.forEach(p -> p.init(mainWindow, mediator));
+        panels.forEach(p ->
+                addTab(p.getTitle(),p.getIcon(), p.getComponent())
+        );
+
+
+
         // set proofTreeView
+        /*
         proofTreeView = new ProofTreeView(mediator);
         proofTreeView.setSize(proofTreeView.getPreferredSize());
         proofTreeView.setVisible(true);
@@ -84,12 +90,13 @@ public class MainWindowTabbedPane extends JTabbedPane {
 
         setSelectedIndex(0);
         setPreferredSize(new java.awt.Dimension(250, 440));
+         */
 
         // change some key mappings which collide with font settings.
         getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .getParent().remove(
-                        KeyStroke.getKeyStroke(KeyEvent.VK_UP, Toolkit
-                                .getDefaultToolkit().getMenuShortcutKeyMask()));
+                KeyStroke.getKeyStroke(KeyEvent.VK_UP, Toolkit
+                        .getDefaultToolkit().getMenuShortcutKeyMask()));
         getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(
                 KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit
                         .getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -103,4 +110,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
         infoView.setEnabled(b);
     }
 
+    public ProofTreeView getProofTreeView() {
+        return proofTreeView;
+    }
 }
