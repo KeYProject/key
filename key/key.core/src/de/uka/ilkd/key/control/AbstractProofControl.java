@@ -596,6 +596,9 @@ public abstract class AbstractProofControl implements ProofControl {
         startAutoMode(goal.proof(), ImmutableSLList.<Goal>nil().prepend(goal), new FocussedAutoModeTaskListener(goal.proof()));
     }
 
+    /**
+     * TODO
+     */
     public static final class FocussedAutoModeTaskListener implements ProverTaskListener {
         private final Proof proof;
 
