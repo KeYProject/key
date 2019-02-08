@@ -178,7 +178,8 @@ public abstract class ProofTreeViewFilter {
 		@Override
 		public boolean countChild(GUIProofTreeNode node, TreeNode parent, int pos) {
 			final boolean interactive = node.getNode().getNodeInfo().getInteractiveRuleApplication();
-			if (interactive) return true;
+			final boolean scripting = node.getNode().getNodeInfo().getScriptRuleApplication();
+			if (interactive || scripting) return true;
 
 			if (pos == parent.getChildCount() - 1) {
 				return true;

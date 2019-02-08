@@ -1,9 +1,5 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.Proof;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,6 +9,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Observer;
 import java.util.ServiceLoader;
+
+import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
 /**
  * @author Mattias Ulbrich
@@ -106,7 +107,9 @@ public class ProofScriptEngine {
                 //write("/tmp/weiglProofScripts_%d.txt", cnt, proof);
 
                 Object o = command.evaluateArguments(stateMap, argMap);
+                final Node firstNode = stateMap.getFirstOpenGoal().node();
                 command.execute(uiControl, o, stateMap);
+                firstNode.getNodeInfo() .setScriptRuleApplication(true);
             } catch (InterruptedException ie) {
                 throw ie;
             } catch (Exception e) {
