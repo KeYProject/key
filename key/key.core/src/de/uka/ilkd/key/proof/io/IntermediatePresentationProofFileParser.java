@@ -309,6 +309,13 @@ public class IntermediatePresentationProofFileParser implements
             }
             break;
 
+        case PROOF_SCRIPT: // proof script node
+            if (currNode != null) {
+                ((AppNodeIntermediate) currNode)
+                        .setScriptRuleApplication(true);
+            }
+            break;
+
         case RULE: // rule (taclet)
             ((AppNodeIntermediate) currNode)
                     .setIntermediateRuleApp(constructTacletApp());
