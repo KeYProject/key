@@ -67,15 +67,13 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
                     try {
                         macro.setParameter(macroParam.getKey(),
                                 macroParam.getValue());
-                    }
-                    catch (IllegalArgumentException e) {
+                    } catch (IllegalArgumentException e) {
                         throw new ScriptException(String.format(
                                 "Wrong format for parameter %s of macro %s: %s.\nMessage: %s",
                                 macroParam.getKey(), args.macroName,
                                 macroParam.getValue(), e.getMessage()));
                     }
-                }
-                else {
+                } else {
                     throw new ScriptException(
                             String.format("Unknown parameter %s for macro %s",
                                     macroParam.getKey(), args.macroName));
@@ -102,12 +100,10 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
             }
 
             state.setGoal((Goal) null);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ScriptException("Macro '" + args.macroName
                     + "' raised an exception: " + e.getMessage(), e);
-        }
-        finally {
+        } finally {
             uiControl.taskFinished(info);
             macro.resetParams();
         }
@@ -115,10 +111,13 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     }
 
     public static class Parameters {
+        /** Macro name parameter */
         @Option("#2")
         public String macroName;
+        /** Run on formula number "occ" parameter */
         @Option(value = "occ", required = false)
         public Integer occ = -1;
+        /** Variable macro parameters */
         @Varargs(as = String.class, prefix = "arg_")
         public Map<String, String> instantiations = new HashMap<>();
     }

@@ -105,8 +105,10 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     }
 
     public class Parameters {
+        /** A formula defining the goal to select */
         @Option(value = "formula", required = false)
         public Term formula;
+        /** The number of the goal to select, starts with 0 */
         @Option(value = "number", required = false)
         public Integer number;
     }
