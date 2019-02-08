@@ -12,6 +12,7 @@ public class AppNodeIntermediate extends NodeIntermediate {
 
     private AppIntermediate ruleApp = null;
     private boolean interactiveRuleApplication = false;
+    /** Signals that this app has been triggered by a proof script. */
     private boolean scriptRuleApplication = false;
 
     public AppIntermediate getIntermediateRuleApp() {

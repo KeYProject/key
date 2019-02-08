@@ -774,8 +774,8 @@ public class IntermediateProofReplayer {
                                 .programVariables().lookup(ph.second);
 
                         assert pv != null && pv instanceof ProgramVariable
-                                && ((ProgramVariable) pv).sort().equals(
-                                    ph.first) : "Program variable involved in join is not known to the system";
+                                && ((ProgramVariable) pv).sort().equals(ph.first) :
+                                    "Program variable involved in join is not known to the system";
 
                         userChoices.put((ProgramVariable) pv, elem);
                     }
