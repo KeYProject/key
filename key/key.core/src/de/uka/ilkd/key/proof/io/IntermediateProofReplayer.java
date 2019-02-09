@@ -494,8 +494,13 @@ public class IntermediateProofReplayer {
                     new IfFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
         }
         for (String ifFormulaStr : currInterm.getIfDirectFormulaList()) {
+            // MU 2019: #1487. We have to use the right namespaces to not
+            // ignore branch-local functions
+            NamespaceSet nss = currGoal.getLocalNamespaces();
+            Term term = parseTerm(ifFormulaStr, proof, nss.variables(),
+                    nss.programVariables(), nss.functions());
             ifFormulaList = ifFormulaList.append(new IfFormulaInstDirect(
-                    new SequentFormula(parseTerm(ifFormulaStr, proof))));
+                    new SequentFormula(term)));
         }
 
         // TODO: In certain cases, the below method call returns null and
