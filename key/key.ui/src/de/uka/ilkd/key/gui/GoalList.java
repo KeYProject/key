@@ -18,7 +18,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.ext.KeYPane;
+import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
 import de.uka.ilkd.key.gui.prooftree.DisableGoal;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -42,7 +42,7 @@ import java.util.EventObject;
 import java.util.List;
 import java.util.WeakHashMap;
 
-public class GoalList extends JList<Goal> implements KeYPane {
+public class GoalList extends JList<Goal> implements KeYPaneExtension {
 
     /**
      *

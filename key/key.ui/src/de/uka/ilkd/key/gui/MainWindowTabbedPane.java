@@ -3,7 +3,7 @@ package de.uka.ilkd.key.gui;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
-import de.uka.ilkd.key.gui.ext.KeYPane;
+import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 
 import javax.swing.*;
@@ -51,7 +51,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
         infoView = KeYGuiExtensionFacade.getPanel(InfoView.class).orElse(null);
         strategySelectionView = KeYGuiExtensionFacade.getPanel(StrategySelectionView.class).orElse(null);
         openGoalsView = KeYGuiExtensionFacade.getPanel(GoalList.class).orElse(null);
-        List<KeYPane> panels = KeYGuiExtensionFacade.getAllPanels();
+        List<KeYPaneExtension> panels = KeYGuiExtensionFacade.getAllPanels();
         panels.forEach(p -> p.init(mainWindow, mediator));
         panels.forEach(p ->
                 addTab(p.getTitle(),p.getIcon(), p.getComponent())

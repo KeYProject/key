@@ -25,7 +25,7 @@ import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
-import de.uka.ilkd.key.gui.ext.KeYPane;
+import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
 import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.*;
@@ -46,7 +46,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-public class ProofTreeView extends JPanel implements KeYPane {
+public class ProofTreeView extends JPanel implements KeYPaneExtension {
 
     public static final Color GRAY_COLOR = Color.DARK_GRAY;
     public static final Color BISQUE_COLOR = new Color(240, 228, 196);

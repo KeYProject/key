@@ -16,7 +16,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.KeYSelectionModel;
-import de.uka.ilkd.key.gui.ext.KeYPane;
+import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
@@ -35,7 +35,7 @@ import java.awt.event.ComponentListener;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class InfoView extends JSplitPane implements KeYPane {
+public class InfoView extends JSplitPane implements KeYPaneExtension {
 
     /**
      *

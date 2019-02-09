@@ -4,7 +4,7 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.ext.KeYMainMenu;
+import de.uka.ilkd.key.gui.ext.KeYExtConst;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
@@ -17,7 +17,7 @@ public class HeatmapToggleAction extends MainWindowAction {
     public HeatmapToggleAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Toggle heatmap");
-        putValue(KeYMainMenu.PATH, "Heatmap");
+        putValue(KeYExtConst.PATH, "Heatmap");
         setEnabled(getMediator().getSelectedProof() != null);
         putValue(Action.LONG_DESCRIPTION, "Enable or disable age heatmaps in the sequent view.");
         setIcon(IconFactory.heatmapIcon(MainWindow.TOOLBAR_ICON_SIZE));

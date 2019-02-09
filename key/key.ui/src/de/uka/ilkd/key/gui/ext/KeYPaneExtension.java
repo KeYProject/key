@@ -12,13 +12,13 @@ import javax.swing.*;
  * You can add various panels to the UI by implementing this
  * interface and announcing it via the {@link java.util.ServiceLoader}.
  *
- * Before mounting on the UI, the {@link KeYPane#init(MainWindow, KeYMediator)}
+ * Before mounting on the UI, the {@link KeYPaneExtension#init(MainWindow, KeYMediator)}
  * is called for injecting the dependencies.
  *
  * @author Alexander Weigl
  * @version 1 (07.02.19)
  */
-public interface KeYPane {
+public interface KeYPaneExtension {
     /**
      * @param window
      * @param mediator

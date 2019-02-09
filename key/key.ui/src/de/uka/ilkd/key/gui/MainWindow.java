@@ -13,24 +13,6 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.util.Collection;
-import java.util.EventObject;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import javax.swing.event.MouseInputAdapter;
-
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -39,7 +21,7 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
-import de.uka.ilkd.key.gui.ext.KeYMainMenu;
+import de.uka.ilkd.key.gui.ext.KeYMainMenuExtension;
 import de.uka.ilkd.key.gui.nodeviews.*;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
@@ -63,6 +45,16 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
+
+import javax.swing.*;
+import javax.swing.event.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.util.List;
+import java.util.*;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 public final class MainWindow extends JFrame {
 
@@ -403,6 +395,8 @@ public final class MainWindow extends JFrame {
         toolBarPanel.add(controlToolBar);
         toolBarPanel.add(fileOpToolBar);
 
+        KeYGuiExtensionFacade.createToolbars(this).forEach(toolBarPanel::add);
+
         getContentPane().add(toolBarPanel, BorderLayout.PAGE_START);
 
         proofListView.setPreferredSize(new java.awt.Dimension(350, 100));
@@ -474,8 +468,8 @@ public final class MainWindow extends JFrame {
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this));
         toolBar.addSeparator();
-        toolBar.add(createHeatmapToggle());
-        toolBar.add(createHeatmapMenuOpener());
+        //toolBar.add(createHeatmapToggle());
+        //toolBar.add(createHeatmapMenuOpener());
 
         return toolBar;
     }
@@ -639,9 +633,9 @@ public final class MainWindow extends JFrame {
     }
 
     private void createExtensionMenu(JMenuBar menuBar) {
-        List<KeYMainMenu> menus = KeYGuiExtensionFacade.getMainMenuExtensions();
+        List<KeYMainMenuExtension> menus = KeYGuiExtensionFacade.getMainMenuExtensions();
         if (!menus.isEmpty()) {
-            JMenu menu = KeYGuiExtensionFacade.getExtensionMenu(this);
+            JMenu menu = KeYGuiExtensionFacade.createExtensionMenu(this);
             menuBar.add(menu);
         }
     }
