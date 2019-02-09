@@ -47,10 +47,10 @@ public class MainWindowTabbedPane extends JTabbedPane {
         assert mediator != null;
         assert mainWindow != null;
 
-        proofTreeView = KeYGuiExtensionFacade.getPanel(ProofTreeView.class);
-        infoView = KeYGuiExtensionFacade.getPanel(InfoView.class);
-        strategySelectionView = KeYGuiExtensionFacade.getPanel(StrategySelectionView.class);
-        openGoalsView = KeYGuiExtensionFacade.getPanel(GoalList.class);
+        proofTreeView = KeYGuiExtensionFacade.getPanel(ProofTreeView.class).orElse(null);
+        infoView = KeYGuiExtensionFacade.getPanel(InfoView.class).orElse(null);
+        strategySelectionView = KeYGuiExtensionFacade.getPanel(StrategySelectionView.class).orElse(null);
+        openGoalsView = KeYGuiExtensionFacade.getPanel(GoalList.class).orElse(null);
         List<KeYPane> panels = KeYGuiExtensionFacade.getAllPanels();
         panels.forEach(p -> p.init(mainWindow, mediator));
         panels.forEach(p ->

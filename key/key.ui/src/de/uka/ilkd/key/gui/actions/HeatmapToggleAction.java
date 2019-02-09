@@ -1,34 +1,30 @@
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.HeatmapOptionsDialog;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ext.KeYMainMenu;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
+import de.uka.ilkd.key.settings.ViewSettings;
 
-/**
- * Action for invoking the heatmap options dialog.
- *
- * @author jschiffl
- */
-public class HeatmapSettingsAction extends MainWindowAction {
-    private HeatmapOptionsDialog dialog;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
-    /**
-     * constructor
-     *
-     * @param mainWindow the main window of the options dialog
-     */
-    public HeatmapSettingsAction(MainWindow mainWindow) {
+public class HeatmapToggleAction extends MainWindowAction {
+    public HeatmapToggleAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName("Heatmap Options");
+        setName("Toggle heatmap");
         putValue(KeYMainMenu.PATH, "Heatmap");
         setEnabled(getMediator().getSelectedProof() != null);
-        setIcon(IconFactory.selectDecProcArrow(MainWindow.TOOLBAR_ICON_SIZE));
+        putValue(Action.LONG_DESCRIPTION, "Enable or disable age heatmaps in the sequent view.");
+        setIcon(IconFactory.heatmapIcon(MainWindow.TOOLBAR_ICON_SIZE));
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        setSelected(vs.isShowHeatmap());
+        final SettingsListener setListener = e -> setSelected(vs.isShowHeatmap());
+        vs.addSettingsListener(setListener);
 
         final KeYSelectionListener selListener = new KeYSelectionListener() {
             @Override
@@ -47,13 +43,8 @@ public class HeatmapSettingsAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        getDialog().setVisible(true);
-    }
-
-    private HeatmapOptionsDialog getDialog() {
-        if (dialog == null) {
-            dialog = new HeatmapOptionsDialog();
-        }
-        return dialog;
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        vs.setHeatmapOptions(!vs.isShowHeatmap(), vs.isHeatmapSF(),
+                vs.isHeatmapNewest(), vs.getMaxAgeForHeatmap());
     }
 }
