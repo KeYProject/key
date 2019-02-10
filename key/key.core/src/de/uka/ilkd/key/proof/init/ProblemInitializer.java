@@ -297,10 +297,12 @@ public final class ProblemInitializer {
 
         final Includes includes = envInput.readIncludes();
 
-        // set the paths in the FileRepo (all three methods can deal with null parameters)
-        fileRepo.setJavaPath(javaPath);
-        fileRepo.setClassPath(classPath);
-        fileRepo.setBootClassPath(bootClassPath);
+        if (fileRepo != null) {
+            // set the paths in the FileRepo (all three methods can deal with null parameters)
+            fileRepo.setJavaPath(javaPath);
+            fileRepo.setClassPath(classPath);
+            fileRepo.setBootClassPath(bootClassPath);
+        }
 
         //create Recoder2KeY, set classpath
         final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(),

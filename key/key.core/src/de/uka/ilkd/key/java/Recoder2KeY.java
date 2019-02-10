@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -399,8 +400,13 @@ public class Recoder2KeY implements JavaReader {
                 final CompilationUnit cu;
                 Reader fr = null;
                 try {
-                    fr = new InputStreamReader(fileRepo.getInputStream(Paths.get(filename)),
-                            StandardCharsets.UTF_8);
+                    if (fileRepo != null) {
+                        fr = new InputStreamReader(fileRepo.getInputStream(Paths.get(filename)),
+                                StandardCharsets.UTF_8);
+                    } else {
+                        // fallback if no repo present (e.g. in tests)
+                        fr = new FileReader(filename);
+                    }
                     fr = new BufferedReader(fr);
                     cu = servConf.getProgramFactory().parseCompilationUnit(fr);
                 } catch (Exception e) {
