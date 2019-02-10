@@ -52,21 +52,24 @@ public interface FileRepo extends ProofDisposedListener {
 
     /**
      * Sets the bootclasspath (containing available classes from the Java Class Library).
-     * @param path the bootclasspath to set
+     * @param path the bootclasspath to set (the method does nothing if null is given)
+     * @throws IllegalStateException if the java path is already set
      */
-    public void setBootClassPath(File path);
+    public void setBootClassPath(File path) throws IllegalStateException;
 
     /**
      * Sets the classpath.
-     * @param classPath the classpath to set
+     * @param classPath the classpath to set (the method does nothing if null is given)
+     * @throws IllegalStateException if the java path is already set
      */
-    public void setClassPath(List<File> classPath);
+    public void setClassPath(List<File> classPath) throws IllegalStateException;
 
     /**
      * Sets the java path (where the source files are located).
-     * @param javaPath the java path to set
+     * @param javaPath the java path to set (the method does nothing if null is given)
+     * @throws IllegalStateException if the java path is already set
      */
-    public void setJavaPath(String javaPath);
+    public void setJavaPath(String javaPath) throws IllegalStateException;
 
     /**
      * Sets the base directory of the proof, i.e. the main directory where the proof is loaded from.
@@ -77,7 +80,7 @@ public interface FileRepo extends ProofDisposedListener {
      * This is needed by the FileRepo for resolving pathnames.
      *
      * @param path The path of the base directory. If a file is given, then its parent directory is
-     *             set as base path
+     *             set as base path.
      */
     public void setBaseDir(Path path);
 }

@@ -35,17 +35,17 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 public abstract class AbstractFileRepo implements FileRepo {
 
     /** The original java source path (absolute and normalized). */
-    protected Path javaPath;
+    private Path javaPath;
 
     /** The original class path (absolute and normalized). */
-    protected List<Path> classpath;
+    private List<Path> classpath;
 
     /**
      * The boot class path, that is, the path to the folder where stubs of library classes
      * (e.g. Object, List, ...) used in KeY are stored.
      * The path stored here is absolute and normalized.
      */
-    protected Path bootclasspath;
+    private Path bootclasspath;
 
     /**
      * The base directory of the loaded proof (needed to calculate relative paths).
@@ -53,7 +53,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * If a directory is loaded, baseDir should be set to the path of the directory.
      * The path stored here is absolute and normalized.
      */
-    protected Path baseDir;
+    private Path baseDir;
 
     /**
      * Stores the source paths of all files that have been copied to the repo as absolute paths.
@@ -64,17 +64,49 @@ public abstract class AbstractFileRepo implements FileRepo {
      * When the method {@link #saveProof(Path, Proof)} is called, all files registered here will
      * be saved.
      */
-    protected Set<Path> files = new HashSet<>();
+    private Set<Path> files = new HashSet<>();
 
     /**
      * This set stores all proofs that use this repo. When it gets empty, the repo is disposed.
      */
-    protected Set<Proof> registeredProofs = new HashSet<>();
+    private Set<Proof> registeredProofs = new HashSet<>();
 
     /**
      * This flag indicates that the repo and all data in it have been deleted.
      */
-    protected boolean disposed = false;
+    private boolean disposed = false;
+
+    protected Path getJavaPath() {
+        return javaPath;
+    }
+
+    protected boolean isDisposed() {
+        return disposed;
+    }
+
+    protected List<Path> getClasspath() {
+        return classpath;
+    }
+
+    protected Path getBootclasspath() {
+        return bootclasspath;
+    }
+
+    protected Path getBaseDir() {
+        return baseDir;
+    }
+
+    /**
+     * Adds the given file to the list of files to save.
+     * @param p the path of the file to add
+     */
+    protected void addFile(Path p) {
+        files.add(p);
+    }
+
+    protected Set<Proof> getRegisteredProofs() {
+        return registeredProofs;
+    }
 
     /**
      * Checks if the given path is inside the Java path
@@ -204,14 +236,20 @@ public abstract class AbstractFileRepo implements FileRepo {
     }
 
     @Override
-    public void setBootClassPath(File path) {
+    public void setBootClassPath(File path) throws IllegalStateException {
+        if (bootclasspath != null) {
+            throw new IllegalStateException("Bootclasspath is already set!");
+        }
         if (path != null) {
             bootclasspath = path.toPath().toAbsolutePath().normalize();
         }
     }
 
     @Override
-    public void setClassPath(List<File> paths) {
+    public void setClassPath(List<File> paths)  throws IllegalStateException {
+        if (classpath != null) {
+            throw new IllegalStateException("Classpath is already set!");
+        }
         if (paths != null) {
             classpath = paths.stream()
                     .filter(p -> p != null)             // to be sure it contains no null elements
@@ -222,7 +260,10 @@ public abstract class AbstractFileRepo implements FileRepo {
     }
 
     @Override
-    public void setJavaPath(String path) {
+    public void setJavaPath(String path) throws IllegalStateException {
+        if (javaPath != null) {
+            throw new IllegalStateException("JavaPath is already set!");
+        }
         if (path != null) {
             javaPath = Paths.get(path).toAbsolutePath().normalize();
         }

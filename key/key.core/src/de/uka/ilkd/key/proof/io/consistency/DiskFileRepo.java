@@ -148,7 +148,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
         // -> do not do this, since exists no copy of the file except in repo
         // Path translation = baseDir.resolve(path);
         // map.put(translation, absTarget);
-        files.add(path);
+        addFile(path);
 
         return new FileOutputStream(absTarget.toFile());
     }
@@ -173,7 +173,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
     @Override
     protected void dispose() {
-        if (disposed) {
+        if (isDisposed()) {
             return;
         }
 
@@ -223,7 +223,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
         // register in map and list (for lookup and saving)
         map.put(norm, absTarget);
-        files.add(norm);
+        addFile(norm);
 
         // return the path of the copied file
         return absTarget;
@@ -235,13 +235,13 @@ public final class DiskFileRepo extends AbstractFileRepo {
         Path newFile = null;
 
         // where is the file located in (src, classpath, bootclasspath)
-        if (isInJavaPath(javaFile)) {                                               // src
-            newFile = resolveAndCopy(javaFile, javaPath, Paths.get("src"));
-        } else if (isInBootClassPath(javaFile)) {                                   // bootclasspath
-            newFile = resolveAndCopy(javaFile, bootclasspath, Paths.get("bootclasspath"));
-        } else if (classpath != null) {                                             // classpath
+        if (isInJavaPath(javaFile)) {                                              // src
+            newFile = resolveAndCopy(javaFile, getJavaPath(), Paths.get("src"));
+        } else if (isInBootClassPath(javaFile)) {                                  // bootclasspath
+            newFile = resolveAndCopy(javaFile, getBootclasspath(), Paths.get("bootclasspath"));
+        } else if (getClasspath() != null) {                                       // classpath
             // search for matching classpath in the list
-            for (Path cp : classpath) {
+            for (Path cp : getClasspath()) {
                 // TODO: how to deal with zips/jars?
 
                 if (javaFile.startsWith(cp)) {         // only consider directories in classpath
@@ -271,7 +271,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
         // register in map and list (for lookup and saving)
         map.put(keyFile, absTarget);
-        files.add(keyFile);
+        addFile(keyFile);
 
         // return a FileInputStream to the copied file
         return new FileInputStream(absTarget.toFile());
@@ -295,11 +295,11 @@ public final class DiskFileRepo extends AbstractFileRepo {
      * @throws IOException if the directory or one of its files is not accessible
      */
     private void deleteDiskContent() throws IOException {
-        if (!disposed && !GeneralSettings.keepFileRepos) {
+        if (!isDisposed() && !GeneralSettings.keepFileRepos) {
             Files.walk(tmpDir)
-            .sorted(Comparator.reverseOrder())
-            .map(Path::toFile)
-            .forEach(File::delete);
+                 .sorted(Comparator.reverseOrder())
+                 .map(Path::toFile)
+                 .forEach(File::delete);
         }
     }
 
@@ -322,3 +322,4 @@ public final class DiskFileRepo extends AbstractFileRepo {
         System.out.println(s);
     }
 }
+

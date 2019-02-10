@@ -16,16 +16,13 @@ package de.uka.ilkd.key.java;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,8 +34,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
-
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -187,8 +182,6 @@ public class Recoder2KeY implements JavaReader {
     private Collection<? extends CompilationUnit> dynamicallyCreatedCompilationUnits;
     
     private final Services services;
-
-    //private FileRepository fileRepository = new TrivialFileRepository();      // TODO
 
     /**
      * create a new Recoder2KeY transformation object.
@@ -565,7 +558,6 @@ public class Recoder2KeY implements JavaReader {
             walker = bootCollection.createWalker(".java");
         } else {
             bootCollection = new DirectoryFileCollection(bootClassPath);
-            //bootCollection = fileRepository.createBootClassCollection(bootClassPath);     // TODO:
             walker = bootCollection.createWalker(new String[] {".java", ".jml"} );
         }
         
@@ -626,15 +618,15 @@ public class Recoder2KeY implements JavaReader {
 
         if(classPath != null) {
             for(File cp : classPath) {
-                // register file in fileRepo if the repo is set
+                // register file (or directory recursively) in fileRepo if the repo is set
                 if (fileRepo != null) {
-                    // TODO: should this be a separate method in FileRepo?
                     // iterate to make sure that only files are requested to repo
                     Files.walkFileTree(cp.toPath(), new SimpleFileVisitor<Path>() {
                         @Override
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                             throws IOException {
                             if (!Files.isDirectory(file)) {
+                                // hack to register the file to the repo
                                 fileRepo.getInputStream(file).close();
                             }
                             return FileVisitResult.CONTINUE;
@@ -658,7 +650,6 @@ public class Recoder2KeY implements JavaReader {
         	Reader f = null;
         	try {
                     currentDataLocation = walker.getCurrentDataLocation();
-                    //is = fileRepository.openJavaSource(currentDataLocation);  // TODO
                     InputStream is = walker.openCurrent();
                     f = new BufferedReader(new InputStreamReader(is));
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
@@ -1376,9 +1367,5 @@ public class Recoder2KeY implements JavaReader {
 
         throw rte;
     }
-
-//    public void setFileRepository(FileRepository fileRepository) {
-//        this.fileRepository  = fileRepository;
-//    }
 
 }

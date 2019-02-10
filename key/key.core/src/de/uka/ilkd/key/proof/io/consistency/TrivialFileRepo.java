@@ -17,14 +17,14 @@ public class TrivialFileRepo extends AbstractFileRepo {
 
     @Override
     public InputStream getInputStream(Path path) throws FileNotFoundException, IOException {
-        files.add(path);
+        addFile(path);
         return new FileInputStream(path.toFile());
     }
 
     @Override
     public OutputStream createOutputStream(Path path) throws FileNotFoundException {
         // TODO: create correct zip structure here, or other solution for saving zip
-        files.add(path);
+        addFile(path);
 
         return new FileOutputStream(path.toFile());
     }
@@ -36,6 +36,6 @@ public class TrivialFileRepo extends AbstractFileRepo {
 
     @Override
     public Path getSaveName(Path path) {
-        return baseDir.relativize(path);
+        return getBaseDir().relativize(path);
     }
 }
