@@ -73,8 +73,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
                     initialLocation);
             engine.setCommandMonitor(observer);
             engine.execute(mediator.getUI(), mediator.getSelectedProof());
-        }
-        catch (InterruptedException ex) {
+        } catch (InterruptedException ex) {
             Debug.out("Proof macro has been interrupted:");
             Debug.out(ex);
         }
@@ -119,11 +118,16 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
     protected void process(List<Object> chunks) {
         Document doc = logArea.getDocument();
         for (Object chunk : chunks) {
+            assert chunk instanceof String;
+
             try {
-                doc.insertString(doc.getLength(), "\n---\nExecuting: " + chunk,
-                        null);
-            }
-            catch (BadLocationException e) {
+                if (!((String) chunk).startsWith("'")) {
+                    doc.insertString(doc.getLength(), "\n---\n" + chunk, null);
+                } else if (!((String) chunk).startsWith("'echo ")) {
+                    doc.insertString(doc.getLength(),
+                            "\n---\nExecuting: " + chunk, null);
+                }
+            } catch (BadLocationException e) {
                 e.printStackTrace();
             }
         }
@@ -151,12 +155,10 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
 
         try {
             get();
-        }
-        catch (CancellationException ex) {
+        } catch (CancellationException ex) {
             System.err.println("Scripting was cancelled.");
             Debug.printStackTrace(ex);
-        }
-        catch (Throwable ex) {
+        } catch (Throwable ex) {
             ExceptionDialog.showDialog(MainWindow.getInstance(), ex);
         }
 
@@ -176,8 +178,8 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
         executor.shutdown();
         try {
             future.get(1000, TimeUnit.MILLISECONDS);
-        }
-        catch (InterruptedException | ExecutionException | TimeoutException e) {
+        } catch (InterruptedException | ExecutionException
+                | TimeoutException e) {
             /*
              * NOTE (DS, 2019-02-08): There are some problems in starting the
              * automode... We will just don't do anything here and hope that
