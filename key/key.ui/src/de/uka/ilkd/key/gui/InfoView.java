@@ -136,6 +136,7 @@ public class InfoView extends JSplitPane implements KeYPaneExtension {
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
+        setMainWindow(window);
         setMediator(mediator);
     }
 

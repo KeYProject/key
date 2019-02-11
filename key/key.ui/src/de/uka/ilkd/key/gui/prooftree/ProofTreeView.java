@@ -478,7 +478,7 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
-        this.mediator = mediator;
+        setMediator(mediator);
     }
 
     @Override
