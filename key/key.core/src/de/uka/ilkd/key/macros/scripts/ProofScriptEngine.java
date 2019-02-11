@@ -109,7 +109,7 @@ public class ProofScriptEngine {
                 Object o = command.evaluateArguments(stateMap, argMap);
                 final Node firstNode = stateMap.getFirstOpenGoal().node();
                 command.execute(uiControl, o, stateMap);
-                firstNode.getNodeInfo() .setScriptRuleApplication(true);
+                firstNode.getNodeInfo().setScriptRuleApplication(true);
             } catch (InterruptedException ie) {
                 throw ie;
             } catch (Exception e) {
