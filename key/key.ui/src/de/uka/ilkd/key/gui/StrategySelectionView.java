@@ -809,4 +809,9 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
             propertyGroups.put(property, group);
         }
     }
+
+    @Override
+    public int priority() {
+        return 750;
+    }
 }

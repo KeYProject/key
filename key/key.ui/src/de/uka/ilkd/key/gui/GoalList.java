@@ -887,4 +887,9 @@ public class GoalList extends JList<Goal> implements KeYPaneExtension {
             return sup;
         }
     }
+
+    @Override
+    public int priority() {
+        return 250;
+    }
 }

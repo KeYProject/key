@@ -203,4 +203,9 @@ public class InfoView extends JSplitPane implements KeYPaneExtension {
         }
 
     }
+
+    @Override
+    public int priority() {
+        return 1000;
+    }
 }

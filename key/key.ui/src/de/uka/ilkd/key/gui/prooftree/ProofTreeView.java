@@ -1333,4 +1333,6 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
         }
 
     }
+
+
 }

@@ -40,7 +40,9 @@ public class HeatmapExt implements KeYMainMenuExtension, KeYToolbarExtension {
     public JToolBar getToolbar(MainWindow mainWindow) {
         getActions(mainWindow);//initialize
         JToolBar tb = new JToolBar("Heatmap");
-        tb.add(new JToggleButton(toggleAction));
+        JToggleButton comp = new JToggleButton(toggleAction);
+        comp.setHideActionText(true);
+        tb.add(comp);
         tb.add(settingsAction);
         return tb;
     }
