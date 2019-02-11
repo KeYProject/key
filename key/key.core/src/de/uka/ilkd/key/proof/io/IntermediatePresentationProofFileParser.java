@@ -443,7 +443,7 @@ public class IntermediatePresentationProofFileParser
         protected ImmutableList<Name> currNewNames = null;
 
         public RuleInformation(String ruleName) {
-            this.currRuleName = ruleName;
+            this.currRuleName = ruleName.trim();
         }
 
         public boolean isBuiltinInfo() {

@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.proof.io;
 
-import static de.uka.ilkd.key.proof.io.IProofFileParser.ProofElementID;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -54,6 +52,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.IProofFileParser.ProofElementID;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -558,7 +557,7 @@ public class OutputStreamProofSaver {
         output.append(prefix);
         output.append(" (builtin \"");
         output.append(appliedRuleApp.rule().name().toString());
-        output.append(" \"");
+        output.append("\"");
         output.append(posInOccurrence2Proof(node.sequent(),
             appliedRuleApp.posInOccurrence()));
 
