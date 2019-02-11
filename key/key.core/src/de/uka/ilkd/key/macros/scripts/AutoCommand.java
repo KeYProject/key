@@ -81,7 +81,6 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             for (Goal goal : goals) {
                 applyStrategy.start(state.getProof(),
                         ImmutableSLList.<Goal>nil().prepend(goal));
-                state.setGoal((Goal) null);
 
                 // only now reraise the interruption exception
                 if (applyStrategy.hasBeenInterrupted()) {

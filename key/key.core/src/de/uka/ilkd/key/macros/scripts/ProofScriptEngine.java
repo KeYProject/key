@@ -113,13 +113,15 @@ public class ProofScriptEngine {
             } catch (InterruptedException ie) {
                 throw ie;
             } catch (Exception e) {
-                System.out.println("GOALS:" + proof.getSubtreeGoals(proof.root()).size());
-                proof.getSubtreeGoals(stateMap.getProof().root()).forEach(g -> {
-                            System.out.println("====");
-                            System.out.println(g.sequent());
-                            System.out.println("====");
-                        }
-                );
+                //@formatter:off
+                //System.out.println("GOALS:" + proof.getSubtreeGoals(proof.root()).size());
+                //proof.getSubtreeGoals(stateMap.getProof().root()).forEach(g -> {
+                //            System.out.println("====");
+                //            System.out.println(g.sequent());
+                //            System.out.println("====");
+                //        }
+                //);
+                //@formatter:on
 
                 throw new ScriptException(
                         "Error while executing script: " + e.getMessage()

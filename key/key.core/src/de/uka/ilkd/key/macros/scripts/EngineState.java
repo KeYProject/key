@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Observer;
+import java.util.Optional;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -39,6 +40,7 @@ public class EngineState {
     private File baseFileName = new File(".");
     private ValueInjector valueInjector = ValueInjector.createDefault();
     private Goal goal;
+    private Node lastSetGoalNode;
 
     public EngineState(Proof proof) {
         this.proof = proof;
@@ -57,6 +59,7 @@ public class EngineState {
 
     public void setGoal(Goal g) {
         goal = g;
+        lastSetGoalNode = Optional.ofNullable(g).map(Goal::node).orElse(null);
     }
 
     public Proof getProof() {
@@ -64,70 +67,90 @@ public class EngineState {
     }
 
     public Goal getFirstOpenGoal() throws ScriptException {
+        if (proof.closed()) {
+            throw new ScriptException("The proof is closed already");
+        }
+
+        Node rootNodeForSearch = proof.root();
         if (goal != null && goal.node().isClosed()) {
-            System.err.println(
-                    "Inconsistent EngineState: Selected first open goal is closed. Resetting.");
-            goal = null;
+            assert rootNodeForSearch != null;
+            /*
+             * The first subtree of the previous goal is closed. Try with other
+             * subtrees.
+             */
+            rootNodeForSearch = lastSetGoalNode;
+            setGoal((Goal) null);
         }
 
         if (goal != null) {
             return goal;
         }
 
-        Node node = proof.root();
-
-        if (node.isClosed()) {
-            throw new ScriptException("The proof is closed already");
+        setGoal(findGoalFromRoot(rootNodeForSearch));
+        if (goal == null && !rootNodeForSearch.equals(proof.root())) {
+            // Try again from root
+            setGoal(findGoalFromRoot(proof.root()));
         }
 
-        Goal g;
-        Deque<Node> choices = new LinkedList<Node>();
+        assert goal != null : "There must be an open goal at this point";
 
-        while (node != null) {
-            assert !node.isClosed();
+        return goal;
+    }
+
+    private Goal findGoalFromRoot(final Node rootNode) {
+        final Deque<Node> choices = new LinkedList<Node>();
+
+        Goal result = null;
+        Node node = rootNode;
+
+        loop: while (node != null) {
+            if (node.isClosed()) {
+                return null;
+            }
+
             int childCount = node.childrenCount();
 
             switch (childCount) {
-                case 0:
-                    g = getGoal(proof.openGoals(), node);
-                    if (g.isAutomatic()) {
-                        return g;
-                    }
-                    node = choices.pollLast();
-                    break;
+            case 0:
+                result = getGoal(proof.openGoals(), node);
+                if (result.isAutomatic()) {
+                    // We found our goal
+                    break loop;
+                }
+                node = choices.pollLast();
+                break;
 
-                case 1:
-                    node = node.child(0);
-                    break;
+            case 1:
+                node = node.child(0);
+                break;
 
-                default:
-                    Node next = null;
-                    for (int i = 0; i < childCount; i++) {
-                        Node child = node.child(i);
-                        if (!child.isClosed()) {
-                            if (next == null) {
-                                next = child;
-                            } else {
-                                choices.add(child);
-                            }
+            default:
+                Node next = null;
+                for (int i = 0; i < childCount; i++) {
+                    Node child = node.child(i);
+                    if (!child.isClosed()) {
+                        if (next == null) {
+                            next = child;
+                        } else {
+                            choices.add(child);
                         }
                     }
-                    assert next != null;
-                    node = next;
-                    break;
+                }
+                assert next != null;
+                node = next;
+                break;
             }
         }
-        assert false : "There must be an open goal at this point";
-        return null;
+
+        return result;
     }
 
     public Term toTerm(String string, Sort sort)
             throws ParserException, ScriptException {
         StringReader reader = new StringReader(string);
         Services services = proof.getServices();
-        Term formula = PARSER
-                .parse(reader, sort, services, getFirstOpenGoal().getLocalNamespaces(),
-                        abbrevMap);
+        Term formula = PARSER.parse(reader, sort, services,
+                getFirstOpenGoal().getLocalNamespaces(), abbrevMap);
         return formula;
     }
 
@@ -135,8 +158,8 @@ public class EngineState {
             throws ParserException, ScriptException {
         return (getFirstOpenGoal() == null
                 ? getProof().getServices().getNamespaces()
-                : getFirstOpenGoal().getLocalNamespaces())
-                .sorts().lookup(sortName);
+                : getFirstOpenGoal().getLocalNamespaces()).sorts()
+                        .lookup(sortName);
     }
 
     public Sequent toSequent(String sequent)

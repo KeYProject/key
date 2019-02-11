@@ -5,12 +5,15 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.Varargs;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
@@ -51,6 +54,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Parameters args,
             EngineState state) throws ScriptException, InterruptedException {
+        final Services services = state.getProof().getServices();
         // look up macro name
         ProofMacro macro = macroMap.get(args.macroName);
         if (macro == null) {
@@ -87,19 +91,45 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
         try {
             uiControl.taskStarted(new DefaultTaskStartedInfo(
                     TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
+            final Sequent sequent = g.node().sequent();
             PosInOccurrence pio = null;
+
             if (args.occ > -1) {
-                pio = new PosInOccurrence(
-                        g.node().sequent().getFormulabyNr(args.occ + 1),
+                pio = new PosInOccurrence(sequent.getFormulabyNr(args.occ + 1),
                         PosInTerm.getTopLevel(),
-                        args.occ + 1 <= g.node().sequent().antecedent().size());
+                        args.occ + 1 <= sequent.antecedent().size());
+            }
+
+            if (args.matches != null) {
+                boolean matched = false;
+
+                for (int i = 1; i < sequent.size() + 1; i++) {
+                    final boolean matchesRegex = formatTermString(LogicPrinter
+                            .quickPrintTerm(sequent.getFormulabyNr(i).formula(),
+                                    services)).matches(
+                                            ".*" + args.matches + ".*");
+                    if (matchesRegex) {
+                        if (matched) {
+                            throw new ScriptException(
+                                    "More than one occurrence of a matching term.");
+                        }
+                        matched = true;
+                        pio = new PosInOccurrence(sequent.getFormulabyNr(i),
+                                PosInTerm.getTopLevel(),
+                                i <= sequent.antecedent().size());
+                    }
+                }
+
+                if (!matched) {
+                    throw new ScriptException(String.format(
+                            "Did not find a formula matching regex %s",
+                            args.matches));
+                }
             }
 
             synchronized (macro) {
                 info = macro.applyTo(uiControl, g.node(), pio, uiControl);
             }
-
-            state.setGoal((Goal) null);
         } catch (Exception e) {
             throw new ScriptException("Macro '" + args.macroName
                     + "' raised an exception: " + e.getMessage(), e);
@@ -107,7 +137,19 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
             uiControl.taskFinished(info);
             macro.resetParams();
         }
+    }
 
+    /**
+     * Removes spaces and line breaks from the string representation of a term.
+     *
+     * @param str
+     *            The string to "clean up".
+     * @return The original without spaces and line breaks.
+     */
+    private static String formatTermString(String str) {
+        return str //
+                .replace("\n", " ") //
+                .replace(" +", " ");
     }
 
     public static class Parameters {
@@ -117,6 +159,9 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
         /** Run on formula number "occ" parameter */
         @Option(value = "occ", required = false)
         public Integer occ = -1;
+        /** Run on formula matching the given regex */
+        @Option(value = "matches", required = false)
+        public String matches = null;
         /** Variable macro parameters */
         @Varargs(as = String.class, prefix = "arg_")
         public Map<String, String> instantiations = new HashMap<>();
