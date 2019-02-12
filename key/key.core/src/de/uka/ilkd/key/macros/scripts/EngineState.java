@@ -72,29 +72,40 @@ public class EngineState {
         }
 
         Node rootNodeForSearch = proof.root();
-        if (goal != null && goal.node().isClosed()) {
+        Goal newGoal = goal;
+        if (newGoal != null && newGoal.node().isClosed()) {
             assert rootNodeForSearch != null;
             /*
              * The first subtree of the previous goal is closed. Try with other
              * subtrees.
              */
-            rootNodeForSearch = lastSetGoalNode;
-            setGoal((Goal) null);
+            rootNodeForSearch = goUpUntilOpen(lastSetGoalNode);
+            newGoal = null;
         }
 
-        if (goal != null) {
-            return goal;
+        if (newGoal != null) {
+            return newGoal;
         }
 
-        setGoal(findGoalFromRoot(rootNodeForSearch));
-        if (goal == null && !rootNodeForSearch.equals(proof.root())) {
-            // Try again from root
-            setGoal(findGoalFromRoot(proof.root()));
+        newGoal = findGoalFromRoot(rootNodeForSearch);
+        lastSetGoalNode = newGoal.node();
+
+        assert newGoal != null : "There must be an open goal at this point";
+        return newGoal;
+    }
+
+    private static Node goUpUntilOpen(final Node start) {
+        Node currNode = start;
+
+        while (currNode.isClosed()) {
+            /*
+             * There should always be a non-closed parent since we check whether
+             * the proof is closed at the beginning.
+             */
+            currNode = currNode.parent();
         }
 
-        assert goal != null : "There must be an open goal at this point";
-
-        return goal;
+        return currNode;
     }
 
     private Goal findGoalFromRoot(final Node rootNode) {
