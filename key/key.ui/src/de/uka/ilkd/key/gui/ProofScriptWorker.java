@@ -108,7 +108,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
         panel.add(cancel);
         cp.add(panel, BorderLayout.SOUTH);
 
-        dlg.setSize(400, 400);
+        dlg.setSize(750, 400);
         dlg.setLocationRelativeTo(MainWindow.getInstance());
 
         this.monitor = dlg;
