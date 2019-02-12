@@ -13,9 +13,26 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
+import de.uka.ilkd.key.control.AutoModeListener;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
+import de.uka.ilkd.key.gui.prooftree.DisableGoal;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.ImmutableList;
+
+import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -25,41 +42,10 @@ import java.util.EventObject;
 import java.util.List;
 import java.util.WeakHashMap;
 
-import javax.swing.AbstractListModel;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JList;
-import javax.swing.JPopupMenu;
-import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
-import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.control.AutoModeListener;
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.prooftree.DisableGoal;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.util.Debug;
-
-public class GoalList extends JList<Goal> {
+public class GoalList extends JList<Goal> implements KeYPaneExtension {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1632264315383703798L;
     private final static ImageIcon keyIcon = IconFactory.keyHole(20, 20);
@@ -67,165 +53,42 @@ public class GoalList extends JList<Goal> {
             .keyHoleInteractive(20, 20);
     private final static Icon linkedGoalIcon = IconFactory
             .keyHoleLinked(20, 20);
-
-    private KeYMediator mediator;
-
-    /** the model used by this view */
+    private final static int MAX_DISPLAYED_SEQUENT_LENGTH = 100;
+    /**
+     * the model used by this view
+     */
     private final SelectingGoalListModel selectingListModel;
     private final GoalListModel goalListModel;
-
-    /** interactive prover listener */
+    // clear this cache whenever some display settings are changed?
+    private final WeakHashMap<Sequent, String> seqToString =
+            new WeakHashMap<Sequent, String>();
+    private KeYMediator mediator;
+    /**
+     * interactive prover listener
+     */
     private GoalListInteractiveListener interactiveListener;
-
-    /** KeYSelection-Listener */
+    /**
+     * KeYSelection-Listener
+     */
     private GoalListSelectionListener selectionListener;
-
-    /** listens to gui events */
+    /**
+     * listens to gui events
+     */
     private GoalListGUIListener guiListener;
 
-    /**
-     * This action enables or disables a selected goal.
-     * 
-     * @author Richard Bubel
-     *
-     */
-    private final class DisableSingleGoal extends DisableGoal {
-
-        /**
-         * 
-         */
-        private static final long serialVersionUID = -2035187175105625072L;
-
-        DisableSingleGoal() {
-            if (getSelectedValue() instanceof Goal) {
-                final Goal g = (Goal) getSelectedValue();
-                putValue(NAME, g.isAutomatic() ? "Interactive Goal"
-                        : "Automatic Goal");
-                putValue(
-                        SHORT_DESCRIPTION,
-                        g.isAutomatic() ? "No automatic rules "
-                                + "will be applied when goal is set to interactive."
-                                : "Re-enable automatic rule application for this goal.");
-                putValue(SMALL_ICON,
-                        g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU
-                                : KEY_HOLE_PULL_DOWN_MENU);
-                enableGoals = !g.isAutomatic();
-                setEnabled(true);
-            }
-            else {
-                setEnabled(false);
-            }
-        }
-
-        /*
-         * return singleton list if selectedObject is a goal, an empty list
-         * otherwise.
-         */
-        @Override
-        public Iterable<Goal> getGoalList() {
-            final Object selectedObject = getSelectedValue();
-            final ArrayList<Goal> selectedGoals = new ArrayList<Goal>();
-
-            if (selectedObject instanceof Goal) {
-                selectedGoals.add((Goal) selectedObject);
-            }
-
-            return selectedGoals;
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            super.actionPerformed(e);
-            updateUI();
-        }
-
-    }
-
-    /**
-     * This action dis-/enables all goals except the chosen one.
-     * 
-     * @author Richard Bubel
-     */
-    private final class DisableOtherGoals extends DisableGoal {
-
-        /**
-         * 
-         */
-        private static final long serialVersionUID = 4077876260098617901L;
-
-        DisableOtherGoals() {
-            if (getSelectedValue() instanceof Goal) {
-                final Goal g = (Goal) getSelectedValue();
-                putValue(NAME, g.isAutomatic() ? "Set Other Goals Interactive"
-                        : "Set Other Goals Automatic");
-                putValue(
-                        SHORT_DESCRIPTION,
-                        g.isAutomatic() ? "No automatic rules "
-                                + "will be applied on all other goals."
-                                : "Re-enable automatic rule application for other goals.");
-                putValue(SMALL_ICON,
-                        g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU
-                                : KEY_HOLE_PULL_DOWN_MENU);
-                enableGoals = !g.isAutomatic();
-
-                setEnabled(getModel().getSize() > 1);
-            }
-            else {
-                setEnabled(false);
-            }
-        }
-
-        /*
-         * return all goals that are not the current goal (=selected value)
-         */
-        @Override
-        public Iterable<Goal> getGoalList() {
-            final Object selectedObject = getSelectedValue();
-            final List<Goal> selectedGoals = new ArrayList<Goal>();
-
-            for (int i = 0, sz = getModel().getSize(); i < sz; i++) {
-                final Object o = getModel().getElementAt(i);
-                if (o instanceof Goal && o != selectedObject) {
-                    selectedGoals.add((Goal) o);
-                }
-            }
-            return selectedGoals;
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            super.actionPerformed(e);
-            updateUI();
-        }
-    }
-
-    /**
-     * 
-     * choose goal as soon as selected
-     *
-     */
-    public class GoalListSelectionListern implements ListSelectionListener {
-
-        public void valueChanged(ListSelectionEvent e) {
-            final int firstIndex = e.getFirstIndex();
-            if (firstIndex >= 0
-                    && firstIndex < GoalList.this.getModel().getSize()) {
-                if (mediator.getSelectedGoal() != GoalList.this
-                        .getSelectedValue()) {
-                    goalChosen();
-                }
-            }
-        }
-    }
-
     public GoalList(KeYMediator mediator) {
+        this();
+        setMediator(mediator);
+    }
+
+    public GoalList() {
         interactiveListener = new GoalListInteractiveListener();
         selectionListener = new GoalListSelectionListener();
         guiListener = new GoalListGUIListener();
 
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        setMediator(mediator);
         goalListModel = new GoalListModel();
         selectingListModel = new SelectingGoalListModel(goalListModel);
-        selectingListModel.setProof(mediator.getSelectedProof());
         setModel(selectingListModel);
         setCellRenderer(new IconCellRenderer());
         addListSelectionListener(new GoalListSelectionListern());
@@ -248,6 +111,26 @@ public class GoalList extends JList<Goal> {
         updateUI();
     }
 
+    @Override
+    public void init(MainWindow window, KeYMediator mediator) {
+        setMediator(mediator);
+    }
+
+    @Override
+    public String getTitle() {
+        return "Goals";
+    }
+
+    @Override
+    public Icon getIcon() {
+        return null;
+    }
+
+    @Override
+    public JComponent getComponent() {
+        return new JScrollPane(this);
+    }
+
     private JPopupMenu popupMenu() {
         JPopupMenu menu = new JPopupMenu();
 
@@ -257,13 +140,16 @@ public class GoalList extends JList<Goal> {
         return menu;
     }
 
-    /** set the KeYMediator */
+    /**
+     * set the KeYMediator
+     */
     private void setMediator(KeYMediator m) {
         if (mediator != null) {
             unregister();
         }
         mediator = m;
         register();
+        selectingListModel.setProof(mediator.getSelectedProof());
     }
 
     public void updateUI() {
@@ -271,8 +157,7 @@ public class GoalList extends JList<Goal> {
         Font myFont = UIManager.getFont(Config.KEY_FONT_GOAL_LIST_VIEW);
         if (myFont != null) {
             setFont(myFont);
-        }
-        else {
+        } else {
             Debug.out(
                     "goallist: Warning: Use standard font. Could not find font:",
                     Config.KEY_FONT_GOAL_LIST_VIEW);
@@ -309,7 +194,7 @@ public class GoalList extends JList<Goal> {
     }
 
     private void goalChosen() {
-        Goal goal = (Goal) getSelectedValue();
+        Goal goal = getSelectedValue();
         if (goal != null) {
             mediator().goalChosen(goal);
         }
@@ -333,8 +218,7 @@ public class GoalList extends JList<Goal> {
                 final Goal selGoal = mediator().getSelectedGoal();
                 if (selGoal != null)
                     setSelectedValue(selGoal, true);
-            }
-            catch (IllegalStateException e) {
+            } catch (IllegalStateException e) {
                 // this exception occurs if no proof is loaded
                 // do nothing
                 Debug.out("GoalList: No proof loaded.");
@@ -344,87 +228,45 @@ public class GoalList extends JList<Goal> {
         validate();
     }
 
-    private class GoalListGUIListener implements GUIListener,
-            java.io.Serializable {
-        /**
-         * 
-         */
-        private static final long serialVersionUID = -1826501525753975124L;
+    private String seqToString(Sequent seq) {
+        String res = seqToString.get(seq);
+        if (res == null) {
+            LogicPrinter sp =
+                    new LogicPrinter(new ProgramPrinter(null), mediator()
+                            .getNotationInfo(), mediator().getServices(), true);
+            sp.printSequent(seq);
+            res = sp.toString().replace('\n', ' ');
+            res =
+                    res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH,
+                            res.length()));
 
-        /** invoked if a frame that wants modal access is opened */
-        public void modalDialogOpened(EventObject e) {
-            setEnabled(false);
+            seqToString.put(seq, res);
         }
-
-        /** invoked if a frame that wants modal access is closed */
-        public void modalDialogClosed(EventObject e) {
-            setEnabled(true);
-        }
-
-        public void shutDown(EventObject e) {
-        }
-
-    }
-
-    private class GoalListSelectionListener implements KeYSelectionListener {
-
-        /** focused node has changed */
-        public void selectedNodeChanged(KeYSelectionEvent e) {
-            selectSelectedGoal();
-        }
-
-        /**
-         * the selected proof has changed (e.g. a new proof has been loaded)
-         */
-        public void selectedProofChanged(KeYSelectionEvent e) {
-            Debug.out("GoalList: initialize with new proof");
-            selectingListModel.setProof(e.getSource().getSelectedProof());
-            validate();
-        }
-    }
-
-    private class GoalListInteractiveListener implements AutoModeListener {
-
-        /**
-         * invoked if automatic execution of heuristics has started
-         */
-        public void autoModeStarted(ProofEvent e) {
-            if (goalListModel.isAttentive()) {
-                mediator().removeKeYSelectionListener(selectionListener);
-            }
-            goalListModel.setAttentive(false);
-        }
-
-        /**
-         * invoked if automatic execution of heuristics has stopped
-         */
-        public void autoModeStopped(ProofEvent e) {
-            if (!goalListModel.isAttentive()) {
-                mediator().addKeYSelectionListener(selectionListener);
-            }
-            goalListModel.setAttentive(true);
-        }
-
+        return res;
     }
 
     private static class GoalListModel extends AbstractListModel<Goal> {
         private static final long serialVersionUID = 3754243473284250930L;
-        
-        /** the proof the model belongs to */
-        private Proof proof;
-        
-        /** */
-        private List<Goal> goals;
-        
-        /** is used to indicate if the model has to be updated */
-        private boolean attentive;
-        
-        /** listens to the proof */
+        /**
+         * listens to the proof
+         */
         private final ProofTreeListener proofTreeListener =
                 new GoalListProofTreeListener();
+        /**
+         * the proof the model belongs to
+         */
+        private Proof proof;
+        /**
+         *
+         */
+        private List<Goal> goals;
+        /**
+         * is used to indicate if the model has to be updated
+         */
+        private boolean attentive;
 
         GoalListModel() {
-            goals = new ArrayList<Goal>(10);
+            goals = new ArrayList<>(10);
         }
 
         /**
@@ -444,6 +286,13 @@ public class GoalList extends JList<Goal> {
         }
 
         /**
+         * returns true if the model respond to changes in the proof immediately
+         */
+        public boolean isAttentive() {
+            return attentive;
+        }
+
+        /**
          * Sets whether this object should respond to changes in the the proof
          * immediately.
          */
@@ -453,19 +302,11 @@ public class GoalList extends JList<Goal> {
                     proof.addProofTreeListener(proofTreeListener);
                     clear();
                     add(proof.openGoals());
-                }
-                else {
+                } else {
                     proof.removeProofTreeListener(proofTreeListener);
                 }
             }
             attentive = b;
-        }
-
-        /**
-         * returns true if the model respond to changes in the proof immediately
-         */
-        public boolean isAttentive() {
-            return attentive;
         }
 
         public void add(ImmutableList<Goal> g) {
@@ -504,14 +345,14 @@ public class GoalList extends JList<Goal> {
 
         class GoalListProofTreeListener implements ProofTreeListener,
                 java.io.Serializable {
-            
+
             private static final long serialVersionUID = 3090011700136463120L;
-            
+
             private boolean pruningInProcess;
 
             /*
              * (non-Javadoc)
-             * 
+             *
              * @see
              * de.uka.ilkd.key.proof.ProofTreeListener#proofExpanded(de.uka.
              * ilkd.key.proof.ProofTreeEvent)
@@ -554,14 +395,18 @@ public class GoalList extends JList<Goal> {
                 remove(e.getGoal());
             }
 
-            /** invoked if the current goal of the proof changed */
+            /**
+             * invoked if the current goal of the proof changed
+             */
             public void proofGoalsAdded(ProofTreeEvent e) {
                 if (pruningInProcess)
                     return;
                 add(e.getGoals());
             }
 
-            /** invoked if the current goal of the proof changed */
+            /**
+             * invoked if the current goal of the proof changed
+             */
             public void proofGoalsChanged(ProofTreeEvent e) {
                 if (pruningInProcess)
                     return;
@@ -586,6 +431,203 @@ public class GoalList extends JList<Goal> {
     }
 
     /**
+     * This action enables or disables a selected goal.
+     *
+     * @author Richard Bubel
+     */
+    private final class DisableSingleGoal extends DisableGoal {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = -2035187175105625072L;
+
+        DisableSingleGoal() {
+            if (getSelectedValue() != null) {
+                final Goal g = getSelectedValue();
+                putValue(NAME, g.isAutomatic() ? "Interactive Goal"
+                        : "Automatic Goal");
+                putValue(
+                        SHORT_DESCRIPTION,
+                        g.isAutomatic() ? "No automatic rules "
+                                + "will be applied when goal is set to interactive."
+                                : "Re-enable automatic rule application for this goal.");
+                putValue(SMALL_ICON,
+                        g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU
+                                : KEY_HOLE_PULL_DOWN_MENU);
+                enableGoals = !g.isAutomatic();
+                setEnabled(true);
+            } else {
+                setEnabled(false);
+            }
+        }
+
+        /*
+         * return singleton list if selectedObject is a goal, an empty list
+         * otherwise.
+         */
+        @Override
+        public Iterable<Goal> getGoalList() {
+            final Goal selectedObject = getSelectedValue();
+            final ArrayList<Goal> selectedGoals = new ArrayList<Goal>();
+
+            if (selectedObject != null) {
+                selectedGoals.add(selectedObject);
+            }
+
+            return selectedGoals;
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            super.actionPerformed(e);
+            updateUI();
+        }
+
+    }
+
+    /**
+     * This action dis-/enables all goals except the chosen one.
+     *
+     * @author Richard Bubel
+     */
+    private final class DisableOtherGoals extends DisableGoal {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = 4077876260098617901L;
+
+        DisableOtherGoals() {
+            if (getSelectedValue() != null) {
+                final Goal g = getSelectedValue();
+                putValue(NAME, g.isAutomatic() ? "Set Other Goals Interactive"
+                        : "Set Other Goals Automatic");
+                putValue(
+                        SHORT_DESCRIPTION,
+                        g.isAutomatic() ? "No automatic rules "
+                                + "will be applied on all other goals."
+                                : "Re-enable automatic rule application for other goals.");
+                putValue(SMALL_ICON,
+                        g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU
+                                : KEY_HOLE_PULL_DOWN_MENU);
+                enableGoals = !g.isAutomatic();
+
+                setEnabled(getModel().getSize() > 1);
+            } else {
+                setEnabled(false);
+            }
+        }
+
+        /*
+         * return all goals that are not the current goal (=selected value)
+         */
+        @Override
+        public Iterable<Goal> getGoalList() {
+            final Object selectedObject = getSelectedValue();
+            final List<Goal> selectedGoals = new ArrayList<>();
+
+            for (int i = 0, sz = getModel().getSize(); i < sz; i++) {
+                final Object o = getModel().getElementAt(i);
+                if (o != null && o != selectedObject) {
+                    selectedGoals.add((Goal) o);
+                }
+            }
+            return selectedGoals;
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            super.actionPerformed(e);
+            updateUI();
+        }
+    }
+
+    /**
+     * choose goal as soon as selected
+     */
+    public class GoalListSelectionListern implements ListSelectionListener {
+
+        public void valueChanged(ListSelectionEvent e) {
+            final int firstIndex = e.getFirstIndex();
+            if (firstIndex >= 0
+                    && firstIndex < GoalList.this.getModel().getSize()) {
+                if (mediator.getSelectedGoal() != GoalList.this
+                        .getSelectedValue()) {
+                    goalChosen();
+                }
+            }
+        }
+    }
+
+    private class GoalListGUIListener implements GUIListener,
+            java.io.Serializable {
+        /**
+         *
+         */
+        private static final long serialVersionUID = -1826501525753975124L;
+
+        /**
+         * invoked if a frame that wants modal access is opened
+         */
+        public void modalDialogOpened(EventObject e) {
+            setEnabled(false);
+        }
+
+        /**
+         * invoked if a frame that wants modal access is closed
+         */
+        public void modalDialogClosed(EventObject e) {
+            setEnabled(true);
+        }
+
+        public void shutDown(EventObject e) {
+        }
+
+    }
+
+    private class GoalListSelectionListener implements KeYSelectionListener {
+
+        /**
+         * focused node has changed
+         */
+        public void selectedNodeChanged(KeYSelectionEvent e) {
+            selectSelectedGoal();
+        }
+
+        /**
+         * the selected proof has changed (e.g. a new proof has been loaded)
+         */
+        public void selectedProofChanged(KeYSelectionEvent e) {
+            Debug.out("GoalList: initialize with new proof");
+            selectingListModel.setProof(e.getSource().getSelectedProof());
+            validate();
+        }
+    }
+
+    private class GoalListInteractiveListener implements AutoModeListener {
+
+        /**
+         * invoked if automatic execution of heuristics has started
+         */
+        public void autoModeStarted(ProofEvent e) {
+            if (goalListModel.isAttentive()) {
+                mediator().removeKeYSelectionListener(selectionListener);
+            }
+            goalListModel.setAttentive(false);
+        }
+
+        /**
+         * invoked if automatic execution of heuristics has stopped
+         */
+        public void autoModeStopped(ProofEvent e) {
+            if (!goalListModel.isAttentive()) {
+                mediator().addKeYSelectionListener(selectionListener);
+            }
+            goalListModel.setAttentive(true);
+        }
+
+    }
+
+    /**
      * Decorate <code>GoalListModel</code> with a filter that hides certain
      * goals. This is currently used to prevent the display of goals that appear
      * closed for the present user constraint.
@@ -593,26 +635,24 @@ public class GoalList extends JList<Goal> {
     private class SelectingGoalListModel extends AbstractListModel<Goal> {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 7395134147866131926L;
         private final GoalListModel delegate;
-        /**
-         * The last known size of the delegate model. This is used to recognise
-         * addition or removal of rows
-         */
-        private int delegateSize;
-
-        private Proof proof = null;
-
         /**
          * List of <code>Integer</code> objects that determine the (strictly
          * monotonic) mapping of the row indexes of this model to the rows of
          * the delegate model
          */
-        private final ArrayList<Integer> entries = new ArrayList<Integer>(10);
+        private final ArrayList<Integer> entries = new ArrayList<>(10);
         private final DelegateListener delegateListener =
                 new DelegateListener();
+        /**
+         * The last known size of the delegate model. This is used to recognise
+         * addition or removal of rows
+         */
+        private int delegateSize;
+        private Proof proof = null;
 
         public SelectingGoalListModel(GoalListModel delegate) {
             this.delegate = delegate;
@@ -629,7 +669,7 @@ public class GoalList extends JList<Goal> {
         }
 
         private int getDelegateIndex(int i) {
-            return (entries.get(i)).intValue();
+            return entries.get(i);
         }
 
         /**
@@ -649,9 +689,9 @@ public class GoalList extends JList<Goal> {
 
         private boolean isHiddenGoal(final Goal goal) {
             return proof != null && /*
-                                     * that afterwards should always be false as
-                                     * goals exist only for open nodes
-                                     */goal.node().isClosed();
+             * that afterwards should always be false as
+             * goals exist only for open nodes
+             */goal.node().isClosed();
         }
 
         private void setup() {
@@ -660,14 +700,14 @@ public class GoalList extends JList<Goal> {
             updateDelegateSize();
             fireContentsChanged(this, 0, getSize() - 1);
             selectSelectedGoal(); // this should rather be done by modifying the
-                                  // SelectionModel
+            // SelectionModel
         }
 
         /**
          * Determine the visible goals of a certain interval [delegateBegin,
          * delegateEnd) of the delegate model and create the respective entries
          * of the selection mapping
-         * 
+         *
          * @return the first position of the mapping after the added parts
          */
         private int selectFromInterval(int delegateBegin, int delegateEnd) {
@@ -679,7 +719,7 @@ public class GoalList extends JList<Goal> {
             for (int i = delegateBegin; i < delegateEnd; ++i) {
                 final Goal goal = delegate.getElementAt(i);
                 if (!isHiddenGoal(goal))
-                    entries.add(ind++, Integer.valueOf(i));
+                    entries.add(ind++, i);
             }
 
             return ind;
@@ -688,7 +728,7 @@ public class GoalList extends JList<Goal> {
         /**
          * Remove the parts of the entry mapping for a certain interval
          * [delegateBegin, delegateEnd) of the delegate model
-         * 
+         *
          * @return the first position of the mapping after the removed parts
          */
         private int removeInterval(int delegateBegin, int delegateEnd) {
@@ -719,7 +759,7 @@ public class GoalList extends JList<Goal> {
         private void shiftTail(int begin, int amount) {
             for (; begin != entries.size(); ++begin)
                 entries.set(begin,
-                        Integer.valueOf(getDelegateIndex(begin) + amount));
+                        getDelegateIndex(begin) + amount);
         }
 
         private int delegateSizeChange() {
@@ -737,7 +777,7 @@ public class GoalList extends JList<Goal> {
 
             private int delegateEnd(ListDataEvent e) {
                 return e.getIndex1() + 1; // we are calculating with right-open
-                                          // intervals
+                // intervals
             }
 
             public void contentsChanged(ListDataEvent e) {
@@ -793,34 +833,11 @@ public class GoalList extends JList<Goal> {
 
     }
 
-    private final static int MAX_DISPLAYED_SEQUENT_LENGTH = 100;
-
-    // clear this cache whenever some display settings are changed?
-    private final WeakHashMap<Sequent, String> seqToString =
-            new WeakHashMap<Sequent, String>();
-
-    private String seqToString(Sequent seq) {
-        String res = seqToString.get(seq);
-        if (res == null) {
-            LogicPrinter sp =
-                    new LogicPrinter(new ProgramPrinter(null), mediator()
-                            .getNotationInfo(), mediator().getServices(), true);
-            sp.printSequent(seq);
-            res = sp.toString().replace('\n', ' ');
-            res =
-                    res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH,
-                            res.length()));
-
-            seqToString.put(seq, res);
-        }
-        return res;
-    }
-
     private class IconCellRenderer extends DefaultListCellRenderer implements
             java.io.Serializable {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = -8178991338906184819L;
 
@@ -829,11 +846,11 @@ public class GoalList extends JList<Goal> {
         }
 
         public Component getListCellRendererComponent(JList<?> list, Object value, // value
-                                                                                   // to
-                                                                                   // display
-                int index, // cell index
-                boolean isSelected, // is the cell selected
-                boolean cellHasFocus) // the list and the cell have the focus
+                                                      // to
+                                                      // display
+                                                      int index, // cell index
+                                                      boolean isSelected, // is the cell selected
+                                                      boolean cellHasFocus) // the list and the cell have the focus
         {
             String valueStr;
             Color col = Color.black;
@@ -845,15 +862,14 @@ public class GoalList extends JList<Goal> {
                 // (DS) Also add the serial of the corresponding node to the
                 // printed String for better transparency and quicker
                 // access to features like visual node diff.
-                valueStr = "(#" + ((Goal)value).node().serialNr() + ") "
+                valueStr = "(#" + ((Goal) value).node().serialNr() + ") "
                         + seqToString(seq);
 
                 statusIcon =
                         ((Goal) value).isLinked() ? linkedGoalIcon
                                 : ((Goal) value).isAutomatic() ? keyIcon
-                                        : disabledGoalIcon;
-            }
-            else {
+                                : disabledGoalIcon;
+            } else {
                 valueStr = "" + value;
                 statusIcon = keyIcon;
             }
@@ -870,5 +886,10 @@ public class GoalList extends JList<Goal> {
 
             return sup;
         }
+    }
+
+    @Override
+    public int priority() {
+        return 250;
     }
 }
