@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.Map;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
@@ -7,11 +12,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.Map;
 
 /**
  * The AutoCommand invokes the automatic strategy "Auto"

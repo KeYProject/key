@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Map;
+
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -8,10 +12,6 @@ import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Map;
 
 public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public SelectCommand() {
@@ -25,7 +25,15 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
     @Override public void execute(Parameters args)
             throws ScriptException, InterruptedException {
-        Goal g = findGoalWith(args.formula, state.getProof());
+        Goal g;
+        if (args.number != null && args.formula == null) {
+            g = state.getProof().openEnabledGoals().take(args.number).head();
+        } else if (args.formula != null && args.number == null) {
+            g = findGoalWith(args.formula, state.getProof());
+        } else {
+            throw new ScriptException("Exactly one of 'formula' or 'number' are required");
+        }
+
         state.setGoal(g);
     }
 
@@ -97,8 +105,12 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     }
 
     public class Parameters {
-        @Option("formula")
+        /** A formula defining the goal to select */
+        @Option(value = "formula", required = false)
         public Term formula;
+        /** The number of the goal to select, starts with 0 */
+        @Option(value = "number", required = false)
+        public Integer number;
     }
 
 }
