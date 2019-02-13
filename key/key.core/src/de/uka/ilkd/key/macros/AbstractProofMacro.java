@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
@@ -56,6 +56,23 @@ public abstract class AbstractProofMacro implements ProofMacro {
     @Override
     public String getScriptCommandName() {
         return null;
+    }
+
+    @Override
+    public boolean hasParameter(String paramName) {
+        return false;
+    }
+
+    @Override
+    public void setParameter(String paramName, String paramValue)
+            throws IllegalArgumentException {
+        throw new IllegalArgumentException(
+                String.format("There is no parameter of name %s in macro %s",
+                        paramName, this.getClass().getSimpleName()));
+    }
+
+    @Override
+    public void resetParams() {
     }
 
     @Override

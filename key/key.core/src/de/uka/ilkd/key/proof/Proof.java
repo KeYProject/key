@@ -52,9 +52,9 @@ import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -78,7 +78,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
  * of the proof.
  */
 public class Proof implements Named {
-
+   
     /**
      * The time when the {@link Proof} instance was created.
      */
@@ -117,7 +117,7 @@ public class Proof implements Named {
     private AbbrevMap abbreviations = new AbbrevMap();
 
     /** the logic configuration for this proof, i.e., logic signature, rules etc.*/
-    private InitConfig initConfig;
+    private InitConfig initConfig;    
 
     /** the environment of the proof with specs and java model*/
     private ProofCorrectnessMgt localMgt;
@@ -159,8 +159,8 @@ public class Proof implements Named {
      */
     private File proofFile;
 
-    /**
-     * constructs a new empty proof with name
+    /** 
+     * constructs a new empty proof with name 
      */
     private Proof(Name name, InitConfig initConfig) {
         this.name = name;
@@ -223,16 +223,14 @@ public class Proof implements Named {
 
         this ( new Name ( name ), initConfig );
 
-        localMgt = new ProofCorrectnessMgt(this);
-
         Node rootNode = new Node(this, problem);
-        setRoot(rootNode);
 
         Goal firstGoal = new Goal(rootNode,
                         new RuleAppIndex(new TacletAppIndex(rules, getServices()),
                                         new BuiltInRuleAppIndex(builtInRules), getServices())
                         );
         openGoals = openGoals.prepend(firstGoal);
+        setRoot(rootNode);
 
         if (closed())
             fireProofClosed();
@@ -242,8 +240,8 @@ public class Proof implements Named {
         this ( name, Sequent.createSuccSequent
                         (Semisequent.EMPTY_SEMISEQUENT.insert(0,
                                         new SequentFormula(problem)).semisequent()),
-                                        initConfig.createTacletIndex(),
-                                        initConfig.createBuiltInRuleIndex(),
+                                        initConfig.createTacletIndex(), 
+                                        initConfig.createBuiltInRuleIndex(), 
                                         initConfig );
         problemHeader = header;
     }
@@ -277,7 +275,7 @@ public class Proof implements Named {
         // remove setting listener from settings
         initConfig.getSettings().getStrategySettings().removeSettingsListener(settingsListener);
         // set every reference (except the name) to null
-        root = null;
+        root = null;        
         env = null;
         openGoals = null;
         closedGoals = null;
@@ -389,7 +387,7 @@ public class Proof implements Named {
         getSettings().getStrategySettings().
         setStrategy(activeStrategy.name());
         updateStrategyOnGoals();
-
+        
         // This could be seen as a hack; it's however important that OSS is
         // refreshed after strategy has been set, otherwise nothing's gonna
         // happen.
@@ -431,9 +429,6 @@ public class Proof implements Named {
         } else {
             this.root = root;
             fireProofStructureChanged();
-
-            if (closed())
-                fireProofClosed();
         }
     }
 
@@ -444,7 +439,6 @@ public class Proof implements Named {
     public ProofIndependentSettings getProofIndependentSettings(){
         return pis;
     }
-
 
     /**
      * returns the list of open goals
@@ -529,11 +523,11 @@ public class Proof implements Named {
             // in order to detect branch closing.
             fireProofGoalsAdded ( ImmutableSLList.<Goal>nil() );
     }
-
+    
     /**
      * Opens a previously closed node (the one corresponding to p_goal)
      * and all its closed parents.<p>
-     *
+     * 
      * This is, for instance, needed for the {@link MergeRule}: In
      * a situation where a merge node and its associated partners
      * have been closed and the merge node is then pruned away,
@@ -1056,7 +1050,7 @@ public class Proof implements Named {
      * @param node the Node where to start from
      * @return the list of goals of the subtree starting with node
      */
-
+    
     public ImmutableList<Goal> getSubtreeGoals(Node node) {
         ImmutableList<Goal> result = ImmutableSLList.<Goal>nil();
         List<Node> leaves = node.getLeaves();
@@ -1255,34 +1249,17 @@ public class Proof implements Named {
     public void setProofFile(File proofFile) {
        this.proofFile = proofFile;
     }
-
+    
     public void saveToFile(File file) throws IOException{
        ProofSaver saver = new ProofSaver(this, file);
        saver.save();
     }
-
-   /**
-    * Extracts java source directory from {@link #header()}, if it exists.
-    */
-   public File getJavaSourceLocation() {
-      String header = header();
-      int i = header.indexOf("\\javaSource");
-      if (i >= 0) {
-         int begin = header.indexOf('\"', i);
-         int end = header.indexOf('\"', begin + 1);
-         String sourceLocation = header.substring(begin + 1, end);
-         if (sourceLocation.length() > 0) {
-            return new File(sourceLocation);
-         }
-      }
-      return null;
-   }
 
    public StrategyFactory getActiveStrategyFactory() {
       Name activeStrategyName = getActiveStrategy() != null ? getActiveStrategy().name() : null;
       return activeStrategyName != null ?
              getServices().getProfile().getStrategyFactory(activeStrategyName) :
              getServices().getProfile().getDefaultStrategyFactory();
-
+      
    }
 }

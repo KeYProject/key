@@ -20,9 +20,9 @@ import java.util.EventObject;
 import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProverTaskListener;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
-import de.uka.ilkd.key.proof.TaskStartedInfo;
+import de.uka.ilkd.key.prover.ProverTaskListener;
+import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.util.Debug;

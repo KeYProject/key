@@ -31,7 +31,6 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.Rule;
@@ -63,7 +62,6 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
                             Term modalityTerm,
                             Rule rule,
                             RuleApp ruleApp,
-                            Goal goal,
                             Object hint,
                             Term tacletTerm,
                             Operator newTermOp,

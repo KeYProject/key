@@ -110,7 +110,7 @@ public SMTOptionsAction(MainWindow mainWindow) {
                         }
                                
                 }
-            },bottomComponent);
+            },bottomComponent,true);
             dialog.setTitle("Settings for Decision Procedures");
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);

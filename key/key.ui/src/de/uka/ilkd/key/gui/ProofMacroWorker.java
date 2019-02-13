@@ -42,34 +42,34 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
      */
     private static final boolean SELECT_GOAL_AFTER_MACRO =
             Boolean.parseBoolean(System.getProperty("key.macro.selectGoalAfter", "true"));
-    /**
-     *
-     */
-    protected final List<InteractionListener> interactionListeners = new LinkedList<>();
+
     /**
      * The {@link Node} to start macro at.
      */
     private final Node node;
+    
     /**
      * The macro which is to be executed
      */
     private final ProofMacro macro;
+    
+    /**
+     * The resulting information of the task or null if the task was cancelled an exception was thrown
+     */
+    private TaskFinishedInfo info;
+
+    /** The thrown exception leading to cancellation of the task */
+    private Exception exception;
+    
     /**
      * The mediator of the environment
      */
     private final KeYMediator mediator;
+
     /**
      * This position may be null if no subterm selected
      */
     private final PosInOccurrence posInOcc;
-    /**
-     * The resulting information of the task or null if the task was cancelled an exception was thrown
-     */
-    private ProofMacroFinishedInfo info;
-    /**
-     * The thrown exception leading to cancellation of the task
-     */
-    private Exception exception;
 
     /**
      * Instantiates a new proof macro worker.

@@ -430,8 +430,4 @@ public abstract class LoopStatement extends JavaStatement
                         this.getStartPosition().getLine() == cmp.getStartPosition().getLine());
     }
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
 }

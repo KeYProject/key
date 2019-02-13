@@ -14,6 +14,7 @@
 package org.key_project.util.collection;
 
 import java.util.Iterator;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -40,9 +41,19 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
     ImmutableList<T> prepend(ImmutableList<T> list);
 
     /**
-     * prepends an iterable collection
+     * prepends an immutable list in reverse order, i.e.,
+     * [4,5,6].prepend([1,2,3]) will be [3,2,1,4,5,6]
+     * (more efficient than {@link ImmutableList#prepend(ImmutableList)})
+     * @return reverse(collection)++this
      */
-    ImmutableList<T> prepend(Iterable<T> collection);
+    ImmutableList<T> prependReverse(ImmutableList<T> collection);
+    
+    /**
+     * prepends an iterable collection in reverse order, i.e.,
+     * [4,5,6].prepend([1,2,3]) will be [3,2,1,4,5,6]
+     * @return reverse(collection)++this
+     */
+    ImmutableList<T> prependReverse(Iterable<T> collection);
 
     /**
      * prepends array (O(n))
@@ -85,7 +96,14 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @return <T> the first element in list
      */
     T head();
-
+    
+    /**
+     * return true if predicate is fullfilled for at least one element
+     * @param predicate the predicate
+     * @return true if predicate is fullfilled for at least one element
+     */
+    boolean exists(Predicate<T> predicate);
+    
     /**
      * @return IList<T> tail of list
      */
@@ -157,4 +175,5 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
     default Stream<T> stream() {
         return StreamSupport.stream(this.spliterator(), false);
     }
+
 }

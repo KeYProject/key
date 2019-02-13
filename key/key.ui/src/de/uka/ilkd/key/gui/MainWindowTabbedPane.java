@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 /**
  * {@link JTabbedPane} displayed in {@link MainWindow}, to the left of
@@ -39,11 +40,13 @@ public class MainWindowTabbedPane extends JTabbedPane {
     /**
      * the list of current open goals
      */
-    private final JScrollPane openGoalsView;
+    private final GoalList openGoalsView;
+
     /**
      * the strategy selection view
      */
     private final StrategySelectionView strategySelectionView;
+
     /**
      * the rule view
      */
@@ -53,7 +56,20 @@ public class MainWindowTabbedPane extends JTabbedPane {
         assert mediator != null;
         assert mainWindow != null;
 
+        proofTreeView = KeYGuiExtensionFacade.getPanel(ProofTreeView.class).orElse(null);
+        infoView = KeYGuiExtensionFacade.getPanel(InfoView.class).orElse(null);
+        strategySelectionView = KeYGuiExtensionFacade.getPanel(StrategySelectionView.class).orElse(null);
+        openGoalsView = KeYGuiExtensionFacade.getPanel(GoalList.class).orElse(null);
+        List<KeYPaneExtension> panels = KeYGuiExtensionFacade.getAllPanels();
+        panels.forEach(p -> p.init(mainWindow, mediator));
+        panels.forEach(p ->
+                addTab(p.getTitle(),p.getIcon(), p.getComponent())
+        );
+
+
+
         // set proofTreeView
+        /*
         proofTreeView = new ProofTreeView(mediator);
         proofTreeView.setSize(proofTreeView.getPreferredSize());
         proofTreeView.setVisible(true);
@@ -82,6 +98,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
                 "Documentation on taclets and symbols");
 
         // interaction log
+	//TODO remove
         interactionLogView = new InteractionLogView(mainWindow, mediator);
         addTab("Interaction Log", INTERACTION_LOG_ICON, interactionLogView);
 
@@ -111,4 +128,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
         interactionLogView.setEnabled(b);
     }
 
+    public ProofTreeView getProofTreeView() {
+        return proofTreeView;
+    }
 }

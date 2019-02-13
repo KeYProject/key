@@ -108,13 +108,6 @@ public class Try extends BranchStatement
         innerMostMethodFrame = info.getInnerMostMethodFrame();
 
     }
-    
-    
-    @Override
-    public int hashCode() {
-        return 17*super.hashCode() + 13*body.hashCode() + branches.hashCode();
-    }
-
 
     @Override
     public boolean hasNextPrefixElement() {

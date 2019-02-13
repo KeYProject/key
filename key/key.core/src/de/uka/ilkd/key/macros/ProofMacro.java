@@ -17,14 +17,14 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProverTaskListener;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
-import de.uka.ilkd.key.proof.TaskStartedInfo;
-import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
+import de.uka.ilkd.key.prover.ProverTaskListener;
+import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
+import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 /**
  * The interface ProofMacro is the entry point to a general strategy extension
@@ -111,6 +111,38 @@ public interface ProofMacro {
      * @return a non-<code>null</code> constant string
      */
     public String getDescription();
+
+    /**
+     * Checks whether this {@link ProofMacro} has a parameter named
+     * <code>paramName</code>. For use in proof scripts.
+     *
+     * @param paramName
+     *            The name to check.
+     * @return true iff this {@link ProofMacro} has a parameter named
+     *         <code>paramName</code>.
+     */
+    public boolean hasParameter(String paramName);
+
+    /**
+     * Sets the parameter named <code>paramName</code> to the given String
+     * representation in <code>paramValue</code>. For use in proof scripts.
+     *
+     * @param paramName
+     *            The name of the parameter.
+     * @param paramValue
+     *            The value of the parameter.
+     * @throws IllegalArgumentException
+     *             if there is no parameter of that name or the value is
+     *             incorrectly formatted (e.g., cannot be converted to a
+     *             number).
+     */
+    public void setParameter(String paramName, String paramValue)
+            throws IllegalArgumentException;
+
+    /**
+     * Resets the macro parameters to their defaults.
+     */
+    public void resetParams();
 
     /**
      * Can this macro be applied on the given goals?

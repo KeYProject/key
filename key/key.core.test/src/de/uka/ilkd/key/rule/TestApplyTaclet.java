@@ -98,7 +98,11 @@ public class TestApplyTaclet extends TestCase{
                    "",
                    "\\<{try{while (1==1) {if (1==2) {break;}} return 1==3; int i=17; } catch (Exception e) { return null;}}\\>\\forall int i; i>0",
                    "",
-                   "\\<{try{ {} while (1==1) {if (1==2) {break;}} return 1==3; int i=17; } catch (Exception e) { return null;}}\\>\\forall int i; i>0"
+                   "\\<{try{ {} while (1==1) {if (1==2) {break;}} return 1==3; int i=17; } catch (Exception e) { return null;}}\\>\\forall int i; i>0",
+           "","A",
+           "A","",
+           "","B | A",
+           "B & A",""
     };
     Proof[] proof;
 
@@ -694,6 +698,7 @@ public class TestApplyTaclet extends TestCase{
 		   it.next().formula().equals(TacletForTests.parseTerm("B")));
     }
 
+    
 
     public void testModalityLevel0 () {
 	Services services = TacletForTests.services();
@@ -1042,5 +1047,293 @@ public class TestApplyTaclet extends TestCase{
         ProgramElement is = goals.head().sequent().getFormulabyNr(1).formula().javaBlock().program();
         assertTrue("Expected:"+expected+"\n but was:"+is, expected.equalsModRenaming(is, new NameAbstractionTable()));
     }
+
+    public void testAddExistingFormulaSucc() {
+        NoPosTacletApp app = TacletForTests.getRules ().lookup ( "TestApplyTaclet_cut_direct" );
+
+        TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
+        tacletIndex.add ( app );
+        Goal goal = createGoal ( proof[24].root(), tacletIndex );
+        PosInOccurrence pos
+            = new PosInOccurrence(goal.sequent().succedent().getFirst(),
+                                  PosInTerm.getTopLevel(),
+                                  false);
+
+        ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
+            getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
+
+        assertTrue("Expected one rule application.",rApplist.size()==1);
+        assertTrue("Rule App should be complete", rApplist.head().complete());
+        
+        ImmutableList<Goal> goals=rApplist.head ().execute(goal, TacletForTests.services());
+
+        assertTrue("Expected two goals.",goals.size()==2);
+
+        assertTrue("Goal should be: ==> false, A", goals.head().sequent().antecedent().size() == 0);
+        assertTrue("Goal should be: ==> false, A", goals.head().sequent().succedent().size() == 2);
+        assertEquals("Goal should be: ==> A, false", "A", goals.head().sequent().succedent().get(0).toString());
+        assertEquals("Goal should be: ==> A, false", "false", goals.head().sequent().succedent().get(1).toString());
+
+        
+        assertTrue("Goal should be: A ==> true", goals.tail().head().sequent().antecedent().size() == 1);
+        assertTrue("Goal should be: A ==> true", goals.tail().head().sequent().succedent().size() == 1);
+        assertEquals("Goal should be: A ==> true", "A", goals.tail().head().sequent().antecedent().getFirst().toString());
+        assertEquals("Goal should be: A ==> true", "true", goals.tail().head().sequent().succedent().getFirst().toString());
+
+    }
+    
+    public void testAddExistingFormulaAntec() {
+        NoPosTacletApp app = TacletForTests.getRules ().lookup ( "TestApplyTaclet_cut_direct" );
+
+        TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
+        tacletIndex.add ( app );
+        Goal goal = createGoal ( proof[25].root(), tacletIndex );
+        PosInOccurrence pos
+            = new PosInOccurrence(goal.sequent().antecedent().getFirst(),
+                                  PosInTerm.getTopLevel(),
+                                  true);
+
+        ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
+            getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
+
+        assertTrue("Expected one rule application.",rApplist.size()==1);
+        assertTrue("Rule App should be complete", rApplist.head().complete());
+        
+        ImmutableList<Goal> goals=rApplist.head ().execute(goal, TacletForTests.services());
+
+        assertTrue("Expected two goals.",goals.size()==2);
+        
+        assertTrue("Goal should be: true, A ==> ", goals.tail().head().sequent().antecedent().size() == 2);
+        assertTrue("Goal should be: true, A ==> ", goals.tail().head().sequent().succedent().size() == 0);
+        assertEquals("Goal should be: true, A ==> ", "A", goals.tail().head().sequent().antecedent().get(0).toString());
+        assertEquals("Goal should be: true, A ==> ", "true", goals.tail().head().sequent().antecedent().get(1).toString());
+
+        assertTrue("Goal should be: false ==> A", goals.head().sequent().antecedent().size() == 1);
+        assertTrue("Goal should be: false ==> A", goals.head().sequent().succedent().size() == 1);
+        assertEquals("Goal should be: false ==> A", "false", goals.head().sequent().antecedent().get(0).toString());
+        assertEquals("Goal should be: false ==> A", "A", goals.head().sequent().succedent().get(0).toString());
+    }
+    /*
+    "","A",
+    "A","",
+    "","B,A",
+    "B,A",""
+    */
+    
+    public void testAddExistingFormulaTwoInSucc() {
+        
+        // setup
+        NoPosTacletApp orRight = TacletForTests.getRules ().lookup ( "or_right" );
+        NoPosTacletApp app = TacletForTests.getRules ().lookup ( "TestApplyTaclet_cut_direct" );
+        TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
+        tacletIndex.add ( app );
+        tacletIndex.add ( orRight );
+        
+        Goal goal = createGoal ( proof[26].root(), tacletIndex );
+        PosInOccurrence pos
+            = new PosInOccurrence(goal.sequent().succedent().getFirst(),
+                                  PosInTerm.getTopLevel(),
+                                  false);
+
+        ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
+            getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
+
+        ImmutableList<Goal> goals=rApplist.head ().execute(goal, TacletForTests.services());
+        goal = goals.head();
+        
+        // end of setup
+        
+
+        pos
+        = new PosInOccurrence(goal.sequent().succedent().getFirst(),
+                              PosInTerm.getTopLevel(),
+                              false);
+
+        rApplist=goal.ruleAppIndex().
+        getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
+    
+        assertTrue("Expected one rule application.",rApplist.size()==1);
+        assertTrue("Rule App should be complete", rApplist.head().complete());
+        
+        goals=rApplist.head ().execute(goal, TacletForTests.services());
+
+        assertTrue("Expected two goals.",goals.size()==2);
+        
+        assertTrue("Goal should be: ==> B, false, A", goals.head().sequent().antecedent().size() == 0);
+        assertTrue("Goal should be: ==> B, false, A", goals.head().sequent().succedent().size() == 3);
+        assertEquals("Goal should be:  ==> B, false, A", "B", goals.head().sequent().succedent().get(0).toString());
+        assertEquals("Goal should be:  ==> B, false, A", "false", goals.head().sequent().succedent().get(1).toString());
+        assertEquals("Goal should be:  ==> B, false, A", "A", goals.head().sequent().succedent().get(2).toString());
+
+        
+        assertTrue("Goal should be: B ==> true, A", goals.tail().head().sequent().antecedent().size() == 1);
+        assertTrue("Goal should be: B ==> true, A", goals.tail().head().sequent().succedent().size() == 2);
+        assertEquals("Goal should be:B  ==> true, A", "B", goals.tail().head().sequent().antecedent().get(0).toString());
+        assertEquals("Goal should be:B  ==> true, A", "true", goals.tail().head().sequent().succedent().get(0).toString());
+        assertEquals("Goal should be:B  ==> true, A", "A", goals.tail().head().sequent().succedent().get(1).toString());
+
+    }
+
+    public void testAddExistingFormulaTwoInSucc2() {
+
+        // setup
+        NoPosTacletApp orRight = TacletForTests.getRules ().lookup ( "or_right" );
+        NoPosTacletApp app = TacletForTests.getRules ().lookup ( "TestApplyTaclet_cut_direct" );
+        TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
+        tacletIndex.add ( app );
+        tacletIndex.add ( orRight );
+
+        Goal goal = createGoal ( proof[26].root(), tacletIndex );
+        PosInOccurrence pos
+        = new PosInOccurrence(goal.sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel(),
+                false);
+
+        ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
+                getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
+
+        ImmutableList<Goal> goals=rApplist.head ().execute(goal, TacletForTests.services());
+        goal = goals.head();
+
+        // end of setup
+
+
+        pos
+        = new PosInOccurrence(goal.sequent().succedent().get(1),
+                PosInTerm.getTopLevel(),
+                false);
+
+        rApplist=goal.ruleAppIndex().
+                getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
+
+        assertTrue("Expected one rule application.",rApplist.size()==1);
+        assertTrue("Rule App should be complete", rApplist.head().complete());
+
+        goals=rApplist.head ().execute(goal, TacletForTests.services());
+
+        assertTrue("Expected two goals.",goals.size()==2);
+        assertTrue("Goal should be: ==> B, A, false", goals.head().sequent().antecedent().size() == 0);
+        assertTrue("Goal should be: ==> B, A, false", goals.head().sequent().succedent().size() == 3);
+        assertEquals("Goal should be:  ==> B, A, false", "B", goals.head().sequent().succedent().get(0).toString());
+        assertEquals("Goal should be:  ==> B, A, false", "A", goals.head().sequent().succedent().get(1).toString());
+        assertEquals("Goal should be:  ==> B, A, false", "false", goals.head().sequent().succedent().get(2).toString());
+
+
+        assertTrue("Goal should be: A ==> B, true", goals.tail().head().sequent().antecedent().size() == 1);
+        assertTrue("Goal should be: A ==> B, true", goals.tail().head().sequent().succedent().size() == 2);
+        assertEquals("Goal should be:A ==> B, true", "A", goals.tail().head().sequent().antecedent().get(0).toString());
+        assertEquals("Goal should be:A ==> B, true", "B", goals.tail().head().sequent().succedent().get(0).toString());
+        assertEquals("Goal should be:A ==> B, true", "true", goals.tail().head().sequent().succedent().get(1).toString());
+
+    }
+
+    public void testAddExistingFormulaTwoInAntec() {
+
+        // setup
+        NoPosTacletApp andLeft = TacletForTests.getRules ().lookup ( "and_left" );
+        NoPosTacletApp app = TacletForTests.getRules ().lookup ( "TestApplyTaclet_cut_direct" );
+        TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
+        tacletIndex.add ( app );
+        tacletIndex.add ( andLeft );
+
+        Goal goal = createGoal ( proof[27].root(), tacletIndex );
+        PosInOccurrence pos
+        = new PosInOccurrence(goal.sequent().antecedent().getFirst(),
+                PosInTerm.getTopLevel(),
+                true);
+
+        ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
+                getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
+
+        ImmutableList<Goal> goals=rApplist.head ().execute(goal, TacletForTests.services());
+        goal = goals.head();
+
+        // end of setup
+
+
+        pos
+        = new PosInOccurrence(goal.sequent().antecedent().get(0),
+                PosInTerm.getTopLevel(),
+                true);
+
+        rApplist=goal.ruleAppIndex().
+                getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
+
+        assertTrue("Expected one rule application.",rApplist.size()==1);
+        assertTrue("Rule App should be complete", rApplist.head().complete());
+
+        goals=rApplist.head ().execute(goal, TacletForTests.services());
+
+        assertTrue("Expected two goals.",goals.size()==2);
+
+        assertTrue("Goal should be: false, A ==> B ", goals.head().sequent().antecedent().size() == 2);
+        assertTrue("Goal should be: false, A ==> B", goals.head().sequent().succedent().size() == 1);
+        assertEquals("Goal should be:  false, A ==> B", "false", goals.head().sequent().antecedent().get(0).toString());
+        assertEquals("Goal should be:  false, A ==> B", "A", goals.head().sequent().antecedent().get(1).toString());
+        assertEquals("Goal should be:  false, A ==> B", "B", goals.head().sequent().succedent().get(0).toString());
+
+
+        assertTrue("Goal should be: B, true, A ==>", goals.tail().head().sequent().antecedent().size() == 3);
+        assertTrue("Goal should be:  B, true, A ==>", goals.tail().head().sequent().succedent().size() == 0);
+        assertEquals("Goal should be: B, true, A ==>", "B", goals.tail().head().sequent().antecedent().get(0).toString());
+        assertEquals("Goal should be: B, true, A ==>", "true", goals.tail().head().sequent().antecedent().get(1).toString());
+        assertEquals("Goal should be: B, true, A ==>", "A", goals.tail().head().sequent().antecedent().get(2).toString());
+
+    }
+
+    public void testAddExistingFormulaTwoInAntec2() {
+
+        // setup
+        NoPosTacletApp andLeft = TacletForTests.getRules ().lookup ( "and_left" );
+        NoPosTacletApp app = TacletForTests.getRules ().lookup ( "TestApplyTaclet_cut_direct" );
+        TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
+        tacletIndex.add ( app );
+        tacletIndex.add ( andLeft );
+
+        Goal goal = createGoal ( proof[27].root(), tacletIndex );
+        PosInOccurrence pos
+        = new PosInOccurrence(goal.sequent().antecedent().getFirst(),
+                PosInTerm.getTopLevel(),
+                true);
+
+        ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
+                getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
+
+        ImmutableList<Goal> goals=rApplist.head ().execute(goal, TacletForTests.services());
+        goal = goals.head();
+
+        // end of setup
+
+
+        pos
+        = new PosInOccurrence(goal.sequent().antecedent().get(1),
+                PosInTerm.getTopLevel(),
+                true);
+
+        rApplist=goal.ruleAppIndex().
+                getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
+
+        assertTrue("Expected one rule application.",rApplist.size()==1);
+        assertTrue("Rule App should be complete", rApplist.head().complete());
+
+        goals=rApplist.head ().execute(goal, TacletForTests.services());
+
+        assertTrue("Expected two goals.",goals.size()==2);
+
+        assertTrue("Goal should be: B, false ==> A ", goals.head().sequent().antecedent().size() == 2);
+        assertTrue("Goal should be: B, false  ==> A", goals.head().sequent().succedent().size() == 1);
+        assertEquals("Goal should be:  B, false  ==> A", "B", goals.head().sequent().antecedent().get(0).toString());
+        assertEquals("Goal should be:  B, false  ==> A", "false", goals.head().sequent().antecedent().get(1).toString());
+        assertEquals("Goal should be:  B, false  ==> A", "A", goals.head().sequent().succedent().get(0).toString());
+
+
+        assertTrue("Goal should be: B, A, true  ==> ", goals.tail().head().sequent().antecedent().size() == 3);
+        assertTrue("Goal should be:   B, A, true  ==> ", goals.tail().head().sequent().succedent().size() == 0);
+        assertEquals("Goal should be:  B, A, true  ==> ", "B", goals.tail().head().sequent().antecedent().get(0).toString());
+        assertEquals("Goal should be:  B, A, true  ==> ", "A", goals.tail().head().sequent().antecedent().get(1).toString());
+        assertEquals("Goal should be:  B, A, true  ==> ", "true", goals.tail().head().sequent().antecedent().get(2).toString());
+
+    }
+
 
 }

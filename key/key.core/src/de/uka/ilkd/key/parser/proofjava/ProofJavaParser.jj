@@ -4242,7 +4242,7 @@ Do DoStatement() :
     setPostfixInfo(result);
     return result;
   }
-}
+} 
 
 LoopStatement ForStatement() :
 {
@@ -4252,6 +4252,7 @@ LoopStatement ForStatement() :
     ASTList<Expression> update = null;
     Statement body;
 }
+
 {
   "for"
 //  {
