@@ -2,11 +2,12 @@ package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
+import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.interactionlog.InteractionLogView;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,37 +21,30 @@ import java.util.List;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class MainWindowTabbedPane extends JTabbedPane {
+    public static final float TAB_ICON_SIZE = 16f;
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 334677113533050832L;
-    private static final float TAB_ICON_SIZE = 16f;
-    private static final Icon PROOF_ICON = IconFontSwing.buildIcon(FontAwesomeBold.TREE, TAB_ICON_SIZE);
-    private static final Icon INTERACTION_LOG_ICON =
-            IconFontSwing.buildIcon(FontAwesomeBold.BOOK, TAB_ICON_SIZE);
-    private static final Icon PROOF_SEARCH_STRATEGY_ICON = IconFontSwing.buildIcon(FontAwesomeBold.COGS, TAB_ICON_SIZE);
-    private static final Icon INFO_ICON = IconFontSwing.buildIcon(FontAwesomeBold.INFO_CIRCLE, TAB_ICON_SIZE);
+
 
     /**
      * the current proof tree
      */
-    private final ProofTreeView proofTreeView;
-    private final InteractionLogView interactionLogView;
+    private ProofTreeView proofTreeView;
+    private InteractionLogView interactionLogView;
     /**
      * the list of current open goals
      */
-    private final GoalList openGoalsView;
+    private GoalList openGoalsView;
 
     /**
      * the strategy selection view
      */
-    private final StrategySelectionView strategySelectionView;
+    private StrategySelectionView strategySelectionView;
 
     /**
      * the rule view
      */
-    private final InfoView infoView;
+    private InfoView infoView;
 
     MainWindowTabbedPane(MainWindow mainWindow, KeYMediator mediator, AutoModeAction autoModeAction) {
         assert mediator != null;
@@ -62,10 +56,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
         openGoalsView = KeYGuiExtensionFacade.getPanel(GoalList.class).orElse(null);
         List<KeYPaneExtension> panels = KeYGuiExtensionFacade.getAllPanels();
         panels.forEach(p -> p.init(mainWindow, mediator));
-        panels.forEach(p ->
-                addTab(p.getTitle(),p.getIcon(), p.getComponent())
-        );
-
+        panels.forEach(p -> addTab(p.getTitle(), p.getIcon(), p.getComponent()));
 
 
         // set proofTreeView
@@ -97,13 +88,9 @@ public class MainWindowTabbedPane extends JTabbedPane {
         addTab("Info", INFO_ICON, infoView,
                 "Documentation on taclets and symbols");
 
-        // interaction log
-	//TODO remove
-        interactionLogView = new InteractionLogView(mainWindow, mediator);
-        addTab("Interaction Log", INTERACTION_LOG_ICON, interactionLogView);
-
         setSelectedIndex(0);
         setPreferredSize(new java.awt.Dimension(250, 440));
+           */
 
         // change some key mappings which collide with font settings.
         getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
@@ -116,16 +103,11 @@ public class MainWindowTabbedPane extends JTabbedPane {
         setName("leftTabbed");
     }
 
-    public ProofTreeView getProofTreeView() {
-        return proofTreeView;
-    }
-
     protected void setEnabledForAllTabs(boolean b) {
         proofTreeView.setEnabled(b);
         openGoalsView.setEnabled(b);
         strategySelectionView.setEnabled(b);
         infoView.setEnabled(b);
-        interactionLogView.setEnabled(b);
     }
 
     public ProofTreeView getProofTreeView() {

@@ -1,10 +1,9 @@
 package de.uka.ilkd.key.gui.interactionlog.model;
 
 import de.uka.ilkd.key.gui.interactionlog.algo.InteractionVisitor;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import org.key_project.util.collection.ImmutableList;
 
 import javax.xml.bind.annotation.XmlAccessType;

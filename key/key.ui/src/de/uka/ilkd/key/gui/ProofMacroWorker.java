@@ -18,12 +18,16 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.ProverTaskListener;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.util.Debug;
 
 import javax.swing.*;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,29 +51,28 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
      * The {@link Node} to start macro at.
      */
     private final Node node;
-    
+
     /**
      * The macro which is to be executed
      */
     private final ProofMacro macro;
-    
-    /**
-     * The resulting information of the task or null if the task was cancelled an exception was thrown
-     */
-    private TaskFinishedInfo info;
-
-    /** The thrown exception leading to cancellation of the task */
-    private Exception exception;
-    
     /**
      * The mediator of the environment
      */
     private final KeYMediator mediator;
-
     /**
      * This position may be null if no subterm selected
      */
     private final PosInOccurrence posInOcc;
+    /**
+     * The resulting information of the task or null if the task was cancelled an exception was thrown
+     */
+    private ProofMacroFinishedInfo info;
+    /**
+     * The thrown exception leading to cancellation of the task
+     */
+    private Exception exception;
+    private List<InteractionListener> interactionListeners = new ArrayList<>();
 
     /**
      * Instantiates a new proof macro worker.
@@ -93,7 +96,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
         final ProverTaskListener ptl = mediator.getUI();
         Proof selectedProof = node.proof();
         info = ProofMacroFinishedInfo.getDefaultInfo(macro, selectedProof);
-        ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
+        ptl.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
         try {
             synchronized (macro) {
                 info = macro.applyTo(mediator.getUI(), node, posInOcc, ptl);
@@ -138,7 +141,8 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
         }
     }
 
-    protected void emitProofMacroFinished(Node node, ProofMacro macro, PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
+    protected void emitProofMacroFinished(Node node, ProofMacro macro,
+                                          PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
         interactionListeners.forEach((l) -> l.runMacro(node, macro, posInOcc, info));
     }
 

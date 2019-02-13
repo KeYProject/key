@@ -17,6 +17,8 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
+import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -65,11 +67,12 @@ import java.util.Map.Entry;
  * @author Martin Hentschel
  */
 public final class StrategySelectionView extends JPanel implements KeYPaneExtension {
+    public static final Icon PROOF_SEARCH_STRATEGY_ICON =
+            IconFontSwing.buildIcon(FontAwesomeBold.COGS, MainWindowTabbedPane.TAB_ICON_SIZE);
     /**
      * Generated UID.
      */
     private static final long serialVersionUID = -267867794853527874L;
-
     /**
      * The always used {@link StrategyFactory}.
      */
@@ -87,7 +90,20 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
      */
     private static final String JAVACARDDL_STRATEGY_NAME = FACTORY.name()
             .toString();
-
+    /**
+     * The {@link KeYMediator} which provides the active proof.
+     */
+    private KeYMediator mediator;
+    /**
+     * Allows access to shown UI controls generated according to
+     * {@link #DEFINITION}.
+     */
+    private StrategySelectionComponents components;
+    /**
+     * Stores whether a chosen predef setting has been changed;
+     * in this case, the default button should be activated again.
+     */
+    private boolean predefChanged = true;
     /**
      * Observe changes on {@link #mediator}.
      */
@@ -100,23 +116,6 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
                     refresh(e.getSource().getSelectedProof());
                 }
             };
-
-    /**
-     * The {@link KeYMediator} which provides the active proof.
-     */
-    private KeYMediator mediator;
-
-    /**
-     * Allows access to shown UI controls generated according to
-     * {@link #DEFINITION}.
-     */
-    private StrategySelectionComponents components;
-
-    /**
-     * Stores whether a chosen predef setting has been changed;
-     * in this case, the default button should be activated again.
-     */
-    private boolean predefChanged = true;
     private JButton btnGo;
 
     public StrategySelectionView() {
@@ -130,7 +129,9 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
         });
     }
 
-    /** Build everything */
+    /**
+     * Build everything
+     */
     private void layoutPane() {
         assert components == null : "Content can not be created a second time!";
         components = new StrategySelectionComponents();
@@ -252,9 +253,9 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
     }
 
     protected int createStrategyProperty(StrategySelectionComponents data,
-            StrategyFactory factory, JPanel javaDLOptionsPanel,
-            GridBagLayout javaDLOptionsLayout, int yCoord, boolean topLevel,
-            AbstractStrategyPropertyDefinition definition) {
+                                         StrategyFactory factory, JPanel javaDLOptionsPanel,
+                                         GridBagLayout javaDLOptionsLayout, int yCoord, boolean topLevel,
+                                         AbstractStrategyPropertyDefinition definition) {
 
         // Individual options
         if (definition instanceof OneOfStrategyPropertyDefinition) {
@@ -304,8 +305,7 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
                         ++yCoord;
                     }
                 }
-            }
-            else {
+            } else {
                 if (oneOfDefinition.getValues().get(0).getSwingGridx() >= 0) {
                     addJavaDLOption(javaDLOptionsPanel, label,
                             javaDLOptionsLayout, 2, yCoord, 1);
@@ -341,8 +341,7 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
                             ++yCoord;
                         }
                     }
-                }
-                else {
+                } else {
                     JPanel queryAxiomPanel = new JPanel();
                     queryAxiomPanel.add(label);
                     for (StrategyPropertyValueDefinition valueDefinition : oneOfDefinition
@@ -369,8 +368,7 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
 
             addJavaDLOptionSpace(javaDLOptionsPanel, javaDLOptionsLayout,
                     yCoord);
-        }
-        else {
+        } else {
             throw new RuntimeException("Unsupported property definition \""
                     + definition + "\".");
         }
@@ -385,8 +383,8 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
     }
 
     private JRadioButton newButton(String text, final String key,
-            final String command, boolean selected, boolean enabled,
-            final StrategyFactory factory) {
+                                   final String command, boolean selected, boolean enabled,
+                                   final StrategyFactory factory) {
         JRadioButton result = new JRadioButton(text);
         result.addActionListener(new ActionListener() {
             @Override
@@ -403,7 +401,7 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
     }
 
     private void addJavaDLOptionSpace(JPanel javaDLOptionsPanel,
-            GridBagLayout javaDLOptionsLayout, int yCoord) {
+                                      GridBagLayout javaDLOptionsLayout, int yCoord) {
         final GridBagConstraints con = new GridBagConstraints();
         con.gridx = 0;
         con.gridy = yCoord;
@@ -425,7 +423,7 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
     }
 
     private void addJavaDLOption(JPanel javaDLOptionsPanel, Component widget,
-            GridBagLayout javaDLOptionsLayout, int gridx, int gridy, int width) {
+                                 GridBagLayout javaDLOptionsLayout, int gridx, int gridy, int width) {
         final GridBagConstraints con = new GridBagConstraints();
         con.gridx = gridx;
         con.gridy = gridy;
@@ -479,8 +477,7 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
                     newProps =
                             DEFINITION.getDefaultPropertiesFactory()
                                     .createDefaultStrategyProperties();
-                }
-                else {
+                } else {
                     Triple<String, Integer, IDefaultStrategyPropertiesFactory> chosenDefault =
                             DEFINITION.getFurtherDefaults().get(selIndex - 1);
                     newMaxSteps = chosenDefault.second;
@@ -525,12 +522,13 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
         }
     }
 
-    /** performs a refresh of all elements in this tab */
+    /**
+     * performs a refresh of all elements in this tab
+     */
     public void refresh(Proof proof) {
         if (proof == null) {
             enableAll(false);
-        }
-        else {
+        } else {
             if (components.getMaxRuleAppSlider() != null) {
                 components.getMaxRuleAppSlider().refresh();
             }
@@ -554,8 +552,7 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
     private void refreshDefaultButton() {
         if (mediator.getSelectedProof() != null) {
             components.getDefaultButton().setEnabled(predefChanged);
-        }
-        else {
+        } else {
             components.getDefaultButton().setEnabled(false);
             components.getStrategyPredefSettingsCmb().setEnabled(false);
         }
@@ -564,9 +561,8 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
     /**
      * enables or disables all components
      *
-     * @param enable
-     *            boolean saying whether to activate or deactivate the
-     *            components
+     * @param enable boolean saying whether to activate or deactivate the
+     *               components
      */
     private void enableAll(boolean enable) {
         if (components.getMaxRuleAppSlider() != null) {
@@ -583,7 +579,7 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
     }
 
     public Strategy getStrategy(String strategyName, Proof proof,
-            StrategyProperties properties) {
+                                StrategyProperties properties) {
         if (mediator != null) {
             Iterator<StrategyFactory> supportedStrategies =
                     mediator.getProfile().supportedStrategies().iterator();
@@ -614,8 +610,7 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
             ButtonModel selected = entry.getValue().getSelection();
             if (selected != null) {
                 p.setProperty(entry.getKey(), selected.getActionCommand());
-            }
-            else {
+            } else {
                 p.setProperty(
                         entry.getKey(),
                         DEFINITION.getDefaultPropertiesFactory()
@@ -628,7 +623,7 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
     }
 
     private void updateStrategySettings(String strategyName,
-            StrategyProperties p) {
+                                        StrategyProperties p) {
         final Proof proof = mediator.getSelectedProof();
         final Strategy strategy = getStrategy(strategyName, proof, p);
 
@@ -662,6 +657,15 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
         return this;
     }
 
+    @Override
+    public int priority() {
+        return 750;
+    }
+
+    @Override
+    public Icon getIcon() {
+        return PROOF_SEARCH_STRATEGY_ICON;
+    }
 
     /**
      * Provided via
@@ -672,24 +676,21 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
      */
     private static class StrategySelectionComponents {
         /**
-         * The {@link MaxRuleAppSlider} in which the maximal number of steps is
-         * edited.
-         */
-        private MaxRuleAppSlider maxRuleAppSlider;
-
-        /**
          * Maps a property key to the {@link JRadioButton}s which defines the
          * values.
          */
         private final Map<String, List<JRadioButton>> propertyButtons =
                 new HashMap<String, List<JRadioButton>>();
-
         /**
          * Maps a property to the used {@link ButtonGroup}.
          */
         private final Map<String, ButtonGroup> propertyGroups =
                 new HashMap<String, ButtonGroup>();
-
+        /**
+         * The {@link MaxRuleAppSlider} in which the maximal number of steps is
+         * edited.
+         */
+        private MaxRuleAppSlider maxRuleAppSlider;
         /**
          * The {@link JButton} which restores default values.
          */
@@ -705,7 +706,7 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
          * steps is edited.
          *
          * @return The {@link MaxRuleAppSlider} in which the maximal number of
-         *         steps is edited.
+         * steps is edited.
          */
         public MaxRuleAppSlider getMaxRuleAppSlider() {
             return maxRuleAppSlider;
@@ -715,9 +716,8 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
          * Sets the {@link MaxRuleAppSlider} in which the maximal number of
          * steps is edited.
          *
-         * @param maxRuleAppSlider
-         *            The {@link MaxRuleAppSlider} in which the maximal number
-         *            of steps is edited.
+         * @param maxRuleAppSlider The {@link MaxRuleAppSlider} in which the maximal number
+         *                         of steps is edited.
          */
         public void setMaxRuleAppSlider(MaxRuleAppSlider maxRuleAppSlider) {
             this.maxRuleAppSlider = maxRuleAppSlider;
@@ -726,10 +726,8 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
         /**
          * Registers the given {@link JRadioButton} for the given key.
          *
-         * @param button
-         *            The {@link JRadioButton}.
-         * @param key
-         *            The key.
+         * @param button The {@link JRadioButton}.
+         * @param key    The key.
          */
         public void addPropertyButton(JRadioButton button, String key) {
             List<JRadioButton> buttons = propertyButtons.get(key);
@@ -745,7 +743,7 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
          * which defines the values.
          *
          * @return The mapping of property keys to the {@link JRadioButton}s
-         *         which defines the values.
+         * which defines the values.
          */
         public Map<String, List<JRadioButton>> getPropertyButtons() {
             return propertyButtons;
@@ -761,6 +759,15 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
         }
 
         /**
+         * Sets the {@link JButton} which restores default values.
+         *
+         * @param defaultButton The {@link JButton} which restores default values.
+         */
+        public void setDefaultButton(JButton defaultButton) {
+            this.defaultButton = defaultButton;
+        }
+
+        /**
          * @return The {@link JComboBox} for choosing a predefined value set.
          */
         public JComboBox<String> getStrategyPredefSettingsCmb() {
@@ -768,20 +775,9 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
         }
 
         /**
-         * Sets the {@link JButton} which restores default values.
-         *
-         * @param defaultButton
-         *            The {@link JButton} which restores default values.
-         */
-        public void setDefaultButton(JButton defaultButton) {
-            this.defaultButton = defaultButton;
-        }
-
-        /**
          * Sets the {@link JComboBox} for choosing a predefined value set.
          *
-         * @param strategyPredefSettingsCmb
-         *            The {@link JComboBox} for choosing a predefined value set.
+         * @param strategyPredefSettingsCmb The {@link JComboBox} for choosing a predefined value set.
          */
         public void setPredefsChoiceCmb(
                 JComboBox<String> strategyPredefSettingsCmb) {
@@ -800,18 +796,11 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
         /**
          * Adds the property group.
          *
-         * @param property
-         *            The property.
-         * @param group
-         *            The {@link ButtonGroup}.
+         * @param property The property.
+         * @param group    The {@link ButtonGroup}.
          */
         public void addPropertyGroup(String property, ButtonGroup group) {
             propertyGroups.put(property, group);
         }
-    }
-
-    @Override
-    public int priority() {
-        return 750;
     }
 }

@@ -1,10 +1,14 @@
 package de.uka.ilkd.key.control;
 
+import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
+import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
