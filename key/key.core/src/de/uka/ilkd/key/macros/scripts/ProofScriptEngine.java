@@ -106,7 +106,8 @@ public class ProofScriptEngine {
                     throw new ScriptException("Unknown command " + name);
                 }
 
-                if (stateMap.isEchoOn()) {
+                if (!name.startsWith(SYSTEM_COMMAND_PREFIX)
+                        && stateMap.isEchoOn()) {
                     System.out.format("%5d: %s%n", ++cnt, cmd);
                 }
                 // write("/tmp/weiglProofScripts_%d.txt", cnt, proof);
@@ -130,7 +131,7 @@ public class ProofScriptEngine {
 
                 throw new ScriptException(
                         "Error while executing script: " + e.getMessage()
-                                + "\n\nCommand:"
+                                + "\n\nCommand: "
                                 + argMap.get(ScriptLineParser.LITERAL_KEY),
                         initialLocation.getFilename(), mlp.getLine(),
                         mlp.getColumn(), e);
