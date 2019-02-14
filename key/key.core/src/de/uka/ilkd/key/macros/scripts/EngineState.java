@@ -42,6 +42,12 @@ public class EngineState {
     private Goal goal;
     private Node lastSetGoalNode;
 
+    /**
+     * If set to true, outputs all commands to observers and console. Otherwise,
+     * only shows explicit echo messages.
+     */
+    private boolean echoOn = true;
+
     public EngineState(Proof proof) {
         this.proof = proof;
         valueInjector.addConverter(Term.class, (String s) -> toTerm(s, null));
@@ -225,6 +231,14 @@ public class EngineState {
 
     public void setGoal(Node node) {
         setGoal(getGoal(proof.openGoals(), node));
+    }
+
+    public boolean isEchoOn() {
+        return echoOn;
+    }
+
+    public void setEchoOn(boolean echoOn) {
+        this.echoOn = echoOn;
     }
 
 }
