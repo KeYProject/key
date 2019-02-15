@@ -30,6 +30,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
+import de.uka.ilkd.key.strategy.DelegationBasedAutomatedRuleApplicationManager;
+import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.util.Debug;
 
@@ -616,19 +618,20 @@ public abstract class AbstractProofControl implements ProofControl {
 
         @Override
         public void taskFinished(TaskFinishedInfo info) {
-           for (final Goal goal : proof.openGoals()) {
-              // remove any filtering rule app managers that are left in the proof
-              // goals
-              if (goal.getRuleAppManager() instanceof FocussedRuleApplicationManager) {
-                  final FocussedRuleApplicationManager focusManager
-                          = (FocussedRuleApplicationManager) goal.getRuleAppManager();
-                  goal.setRuleAppManager(null);
-                  final AutomatedRuleApplicationManager realManager
-                          = focusManager.getDelegate();
-                  realManager.clearCache();
-                  goal.setRuleAppManager(realManager);
-              }
-          }
+            for (final Goal goal : proof.openGoals()) {
+                // remove any filtering rule app managers that are left in the
+                // proof goals
+                if (goal.getRuleAppManager() instanceof FocussedRuleApplicationManager
+                        || goal.getRuleAppManager() instanceof FocussedBreakpointRuleApplicationManager) {
+                    final DelegationBasedAutomatedRuleApplicationManager focusManager = //
+                            (DelegationBasedAutomatedRuleApplicationManager) goal.getRuleAppManager();
+                    goal.setRuleAppManager(null);
+                    final AutomatedRuleApplicationManager realManager = focusManager
+                            .getDelegate();
+                    realManager.clearCache();
+                    goal.setRuleAppManager(realManager);
+                }
+            }
         }
     }
 }
