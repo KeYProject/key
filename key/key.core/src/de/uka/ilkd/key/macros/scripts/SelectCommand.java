@@ -75,7 +75,6 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
             }
         }
 
-        assert false; // shouldn't be reached
         return null;
     }
 

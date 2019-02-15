@@ -621,10 +621,11 @@ public abstract class AbstractProofControl implements ProofControl {
             for (final Goal goal : proof.openGoals()) {
                 // remove any filtering rule app managers that are left in the
                 // proof goals
-                if (goal.getRuleAppManager() instanceof FocussedRuleApplicationManager
-                        || goal.getRuleAppManager() instanceof FocussedBreakpointRuleApplicationManager) {
+                final AutomatedRuleApplicationManager ruleAppManager = goal.getRuleAppManager();
+                if (ruleAppManager instanceof FocussedRuleApplicationManager
+                        || ruleAppManager instanceof FocussedBreakpointRuleApplicationManager) {
                     final DelegationBasedAutomatedRuleApplicationManager focusManager = //
-                            (DelegationBasedAutomatedRuleApplicationManager) goal.getRuleAppManager();
+                            (DelegationBasedAutomatedRuleApplicationManager) ruleAppManager;
                     goal.setRuleAppManager(null);
                     final AutomatedRuleApplicationManager realManager = focusManager
                             .getDelegate();
