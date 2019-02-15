@@ -3,6 +3,7 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import de.uka.ilkd.key.logic.Semisequent;
@@ -50,7 +51,8 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     private Goal findGoalWith(String branchTitle, Proof proof)
             throws ScriptException {
         return findGoalWith(
-                node -> node.getNodeInfo().getBranchLabel().equals(branchTitle),
+                node -> Optional.ofNullable(node.getNodeInfo().getBranchLabel())
+                        .orElse("").equals(branchTitle),
                 node -> getFirstSubtreeGoal(node, proof), proof);
     }
 
@@ -79,28 +81,30 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
     private Goal findGoalWith(Term formula, Proof proof)
             throws ScriptException {
-        return findGoalWith(node -> contains(node.sequent(), formula),
+        return findGoalWith(
+                node -> node.leaf() && contains(node.sequent(), formula),
                 node -> EngineState.getGoal(proof.openGoals(), node), proof);
     }
 
     private Goal findGoalWith(Function<Node, Boolean> filter,
             Function<Node, Goal> goalRetriever, Proof proof)
             throws ScriptException {
-        Goal g;
         Deque<Node> choices = new LinkedList<Node>();
         Node node = proof.root();
+
         while (node != null) {
             assert !node.isClosed();
             int childCount = node.childrenCount();
 
+            if (filter.apply(node)) {
+                final Goal g = goalRetriever.apply(node);
+                if (g.isAutomatic()) {
+                    return g;
+                }
+            }
+
             switch (childCount) {
             case 0:
-                if (filter.apply(node)) {
-                    g = goalRetriever.apply(node);
-                    if (g.isAutomatic()) {
-                        return g;
-                    }
-                }
                 node = choices.pollLast();
                 break;
 
