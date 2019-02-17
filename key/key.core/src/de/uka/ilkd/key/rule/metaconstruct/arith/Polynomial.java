@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 
@@ -39,22 +40,23 @@ public class Polynomial {
         this.parts = parts;
         this.constantPart = constantPart;
     }
-    
+
     private static final BigInteger MINUS_ONE = BigInteger.valueOf ( -1 );
 
     public final static Polynomial ZERO =
-        new Polynomial ( ImmutableSLList.<Monomial>nil(), BigInteger.ZERO );    
+        new Polynomial ( ImmutableSLList.<Monomial>nil(), BigInteger.ZERO );
     public final static Polynomial ONE =
-        new Polynomial ( ImmutableSLList.<Monomial>nil(), BigInteger.ONE );    
+        new Polynomial ( ImmutableSLList.<Monomial>nil(), BigInteger.ONE );
 
     public static Polynomial create(Term polyTerm, Services services) {
        final LRUCache<Term, Polynomial> cache = services.getCaches().getPolynomialCache();
-       
+       polyTerm = TermLabel.removeIrrelevantLabels(polyTerm, services);
+
        Polynomial res;
        synchronized (cache) {
            res = cache.get ( polyTerm );
        }
-       
+
        if ( res == null ) {
             res = createHelp ( polyTerm, services );
             synchronized (cache) {
@@ -82,14 +84,14 @@ public class Polynomial {
     public Polynomial multiply(Monomial m) {
         if ( m.getCoefficient ().signum () == 0 )
             return new Polynomial ( ImmutableSLList.<Monomial>nil(), BigInteger.ZERO );
-        
+
         ImmutableList<Monomial> newParts = ImmutableSLList.<Monomial>nil();
         for (Monomial part : parts) newParts = newParts.prepend(part.multiply(m));
 
         if ( m.getParts ().isEmpty () )
             return new Polynomial ( newParts,
                                     constantPart.multiply ( m.getCoefficient () ) );
-        
+
         newParts = addPart ( newParts, m.multiply ( constantPart ) );
         return new Polynomial ( newParts, BigInteger.ZERO );
     }
@@ -97,7 +99,7 @@ public class Polynomial {
     public Polynomial add(BigInteger c) {
         return new Polynomial ( parts, constantPart.add ( c ) );
     }
-    
+
     public Polynomial sub(Polynomial p) {
         final BigInteger newConst =
             getConstantTerm ().subtract ( p.getConstantTerm () );
@@ -105,7 +107,7 @@ public class Polynomial {
         for (Monomial monomial : p.getParts()) newParts = addPart(newParts, monomial.multiply(MINUS_ONE));
         return new Polynomial ( newParts, newConst );
     }
-    
+
     public Polynomial add(Monomial m) {
         if ( m.getParts ().isEmpty () )
             return new Polynomial ( parts,
@@ -113,7 +115,7 @@ public class Polynomial {
 
         return new Polynomial ( addPart ( parts, m ), constantPart );
     }
-    
+
     public Polynomial add(Polynomial p) {
         final BigInteger newConst =
             getConstantTerm ().add ( p.getConstantTerm () );
@@ -121,7 +123,7 @@ public class Polynomial {
         for (Monomial monomial : p.getParts()) newParts = addPart(newParts, monomial);
         return new Polynomial ( newParts, newConst );
     }
-    
+
     /**
      * @return the greatest common divisor of the coefficients of the monomials
      *         of this polynomial. The constant part of the polynomial is not
@@ -133,7 +135,7 @@ public class Polynomial {
         for (Monomial part : parts) res = res.gcd(part.getCoefficient());
         return res;
     }
-    
+
     /**
      * @return <code>true</code> if the value of <code>this</code> will
      *         always be less than the value of <code>p</code>
@@ -193,12 +195,12 @@ public class Polynomial {
         if ( parts.size () != p.parts.size () ) return false;
         return difference ( parts, p.parts ).isEmpty ();
     }
-    
+
     public Term toTerm (Services services) {
-        final Operator add = 
+        final Operator add =
             services.getTypeConverter().getIntegerLDT().getAdd();
         Term res = null;
-        
+
         final Iterator<Monomial> it = parts.iterator ();
         if ( it.hasNext () ) {
             res = it.next ().toTerm ( services );
@@ -206,33 +208,34 @@ public class Polynomial {
                 res = services.getTermFactory().createTerm
                               ( add, res, it.next ().toTerm ( services ) );
         }
-        
+
         final Term cTerm = services.getTermBuilder().zTerm(constantPart.toString());
-        
+
         if ( res == null )
             res = cTerm;
         else if ( !BigInteger.ZERO.equals ( constantPart ) )
             res = services.getTermFactory().createTerm ( add, cTerm, res );
-        
-        return res;        
+
+        return res;
     }
-    
+
+    @Override
     public String toString() {
         final StringBuffer res = new StringBuffer ();
         res.append ( constantPart );
 
         for (Monomial part : parts) res.append(" + ").append(part);
 
-        return res.toString ();        
+        return res.toString ();
     }
-    
+
     private static class Analyser {
         public BigInteger constantPart = BigInteger.ZERO;
         public ImmutableList<Monomial> parts = ImmutableSLList.<Monomial>nil();
         private final Services services;
         private final TypeConverter tc;
         private final Operator numbers, add;
-            
+
         public Analyser(final Services services) {
             this.services = services;
             this.tc = services.getTypeConverter ();
@@ -240,7 +243,7 @@ public class Polynomial {
             numbers = intLDT.getNumberSymbol ();
             add = intLDT.getAdd();
         }
-        
+
         public void analyse(Term polynomial) {
             final Operator op = polynomial.op ();
             if ( op == add ) {
@@ -291,8 +294,8 @@ public class Polynomial {
         final ImmutableList<Monomial> res = addPartHelp ( tail, m );
         if ( res == null ) return null;
         return res.prepend ( head );
-    }    
-    
+    }
+
     public BigInteger getConstantTerm() {
         return constantPart;
     }

@@ -3,9 +3,6 @@ package de.uka.ilkd.key.proof;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -116,19 +113,7 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
         @SuppressWarnings("unchecked")
         private <R> R wrap(R obj) {
             if (obj instanceof Term) {
-                Term old = (Term) obj;
-
-                Term result = tf.createTerm(
-                        old.op(),
-                        new ImmutableArray<>(
-                                old.subs().stream().map(this::wrap).collect(Collectors.toList())),
-                        old.boundVars(),
-                        old.javaBlock(),
-                        new ImmutableArray<>(
-                                old.getLabels().stream()
-                                .filter(TermLabel::isProofRelevant).collect(Collectors.toList())));
-
-                return (R) result;
+                return (R) TermLabel.removeIrrelevantLabels((Term) obj, tf);
             } else {
                 return obj;
             }

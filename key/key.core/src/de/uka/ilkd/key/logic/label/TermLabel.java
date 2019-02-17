@@ -13,11 +13,17 @@
 
 package de.uka.ilkd.key.logic.label;
 
+import java.util.stream.Collectors;
+
+import org.key_project.util.collection.ImmutableArray;
+
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -150,6 +156,45 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
  * @see TermLabelManager
  */
 public interface TermLabel extends Named {
+
+    /**
+     * Remove all irrelevant labels from a term.
+     *
+     * @param term the term to transform.
+     * @param services services.
+     * @return the transformed term.
+     * @see #isProofRelevant()
+     */
+    static Term removeIrrelevantLabels(Term term, Services services) {
+        if (services.getProof() != null
+                && !services.getProof().getSettings().getTermLabelSettings().getUseOriginLabels()) {
+            return term;
+        } else {
+            return removeIrrelevantLabels(term, services.getTermFactory());
+        }
+    }
+
+    /**
+     * Remove all irrelevant labels from a term.
+     *
+     * @param term the term to transform.
+     * @param tf a term factory.
+     * @return the transformed term.
+     * @see #isProofRelevant()
+     */
+    static Term removeIrrelevantLabels(Term term, TermFactory tf) {
+        return tf.createTerm(
+                term.op(),
+                new ImmutableArray<>(
+                        term.subs().stream()
+                        .map(t -> removeIrrelevantLabels(t, tf))
+                        .collect(Collectors.toList())),
+                term.boundVars(),
+                term.javaBlock(),
+                new ImmutableArray<>(
+                        term.getLabels().stream()
+                        .filter(TermLabel::isProofRelevant).collect(Collectors.toList())));
+    }
 
     /**
      * Retrieves the i-th parameter object of this term label.
