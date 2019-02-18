@@ -1644,7 +1644,9 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
       { if (excVar==null) raiseError("\\exception may only appear in determines clauses");
           else result = new SLExpression(tb.var(excVar), excVar.getKeYJavaType()); }
     |
-    (LPAREN quantifier) => result=specquantifiedexpression
+      (LPAREN UNIONINF) => result=infinite_union_expr
+    |
+      (LPAREN quantifier) => result=specquantifiedexpression
     |
         (LPAREN BSUM) => result=bsumterm
     |
@@ -1870,8 +1872,11 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
             result = new SLExpression(tb.allObjects(t.sub(1)),
                                       javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
         }
-    |   UNIONINF
-        LPAREN
+    |   UNIONINF LPAREN {
+            System.err.println("!!! Deprecation Warnung: You used \\infinite_union in the functional syntax \\infinite_union(...)."
+            + "\n\tThis is deprecated and won't be valid in future versions of KeY."
+            + "\n\tPlease use \\infinite_union as a binder instead: (\\infinite_union var type; guard; store-ref-expr).");
+          }
         (nullable=boundvarmodifiers)?
         declVars=quantifiedvardecls
         SEMI
@@ -1990,8 +1995,27 @@ quantifier returns [Token token = null] :
   | PRODUCT
   | SUM
   )
-    { token = input.LT(-1); }
+    { token = input.LT(-1); } //weigl: This is a terrible grammar style!
   ;
+
+infinite_union_expr returns [SLExpression result = null] throws SLTranslationException
+  :
+    LPAREN
+    UNIONINF
+    (nullable=boundvarmodifiers)?
+    declVars=quantifiedvardecls SEMI
+    {
+      resolverManager.pushLocalVariablesNamespace();
+      resolverManager.putIntoTopLocalVariablesNamespace(declVars.second, declVars.first);
+    }
+    ((predicate SEMI) => t2=predicate SEMI | SEMI )?
+    t=storeref
+    {
+      resolverManager.popLocalVariablesNamespace();
+      result = translator.translate(JMLTranslator.JMLKeyWord.UNIONINF, nullable, declVars, t, t2, services);
+    }
+    RPAREN
+    ;
 
 specquantifiedexpression returns [SLExpression result = null] throws SLTranslationException
 @init {
@@ -1999,21 +2023,25 @@ specquantifiedexpression returns [SLExpression result = null] throws SLTranslati
 }
 :
     LPAREN
-    q=quantifier
-    (nullable=boundvarmodifiers)?
-    declVars=quantifiedvardecls SEMI
-    {
-        resolverManager.pushLocalVariablesNamespace();
-        resolverManager.putIntoTopLocalVariablesNamespace(declVars.second, declVars.first);
-    }
-    ((predicate SEMI) => p=predicate SEMI | SEMI)?
-    expr=expression
-    {
-        resolverManager.popLocalVariablesNamespace();
+    (
+      q=quantifier
+      (nullable=boundvarmodifiers)?
+      declVars=quantifiedvardecls SEMI
+      {
+          resolverManager.pushLocalVariablesNamespace();
+          resolverManager.putIntoTopLocalVariablesNamespace(declVars.second, declVars.first);
+      }
+      ((predicate SEMI) => p=predicate SEMI | SEMI)?
+      expr=expression
+      {
+          resolverManager.popLocalVariablesNamespace();
 
-        p = tb.convertToFormula(p);
-        result = translator.translate(q.getText(), SLExpression.class, p, expr.getTerm(), declVars.first, declVars.second, nullable, expr.getType(), services);
-    }
+          p = tb.convertToFormula(p);
+          result = translator.translate(q.getText(), SLExpression.class, p, expr.getTerm(),
+                                        declVars.first, declVars.second,
+                                        nullable, expr.getType(), services);
+      }
+    )
     RPAREN
 ;
 

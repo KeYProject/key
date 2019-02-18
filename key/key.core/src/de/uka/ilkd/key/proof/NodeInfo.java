@@ -70,6 +70,9 @@ public class NodeInfo {
     /** has the rule app of the node been applied interactively? */
     private boolean interactiveApplication = false;
 
+    /** has the rule app of the node been applied by a proof script? */
+    private boolean scriptingApplication = false;
+
     /** User-provided plain-text annotations to the node. */
     private String notes;
 
@@ -340,12 +343,30 @@ public class NodeInfo {
     }
 
     /**
+     * parameter indicated if the rule has been applied by a proof script or not
+     * @param b a boolean indicating scripting application
+     */
+    public void setScriptRuleApplication(boolean b) {
+        scriptingApplication = b;
+    }
+
+    /**
      * returns true if the rule applied on this node has been performed
      * manually by the user
      * @return boolean for interactive rule application as described above
      */
     public boolean getInteractiveRuleApplication() {
         return interactiveApplication;
+    }
+
+    /**
+     * returns true if the rule applied on this node has been performed
+     * by a proof script command. For rule, macro commands etc., the first
+     * node is marked.
+     * @return boolean for proof script rule application as described above
+     */
+    public boolean getScriptRuleApplication() {
+        return scriptingApplication;
     }
 
     /** Add user-provided plain-text annotations.
