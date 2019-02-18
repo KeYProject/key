@@ -46,6 +46,8 @@ public class GeneralSettings implements Settings, Cloneable {
     private static final String USE_JML_KEY = "[General]UseJML";
     private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
     private static final String AUTO_SAVE = "[General]AutoSavePeriod";
+
+    /** The key for storing the allowBundleSaving flag in settings */
     private static final String ALLOW_BUNDLE_SAVING = "[General]AllowBundleSaving";
 
     /** minimize interaction is on by default */
@@ -69,7 +71,7 @@ public class GeneralSettings implements Settings, Cloneable {
      * If disabled, proofs can not be saved as bundle.
      * Toggles saving of copies of loaded files via a FileRepo.
      */
-    private static boolean allowBundleSaving = false;
+    private boolean allowBundleSaving = false;
 
     private LinkedList<SettingsListener> listenerList = 
         new LinkedList<SettingsListener>();
@@ -137,6 +139,11 @@ public class GeneralSettings implements Settings, Cloneable {
         fireSettingsChanged();
     }
 
+    /**
+     * Sets the allowBundleSaving flag. This enables/disables the possibility to store proofs as
+     * bundles.
+     * @param b the new truth value of the flag
+     */
     public void setAllowBundleSaving(boolean b) {
         if (allowBundleSaving != b) {
             allowBundleSaving = b;

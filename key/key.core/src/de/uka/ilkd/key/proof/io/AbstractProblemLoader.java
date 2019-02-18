@@ -44,6 +44,7 @@ import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -51,6 +52,8 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -243,8 +246,18 @@ public abstract class AbstractProblemLoader {
      */
     public void load() throws ProofInputException, IOException, ProblemLoaderException {
         control.loadingStarted(this);
+
+        // create a FileRepo depending on the setting
+        boolean bundle = ProofIndependentSettings.DEFAULT_INSTANCE
+                                                 .getGeneralSettings()
+                                                 .isAllowBundleSaving();
+        if (bundle) {
+            fileRepo = new DiskFileRepo("KeYTmpFileRepo");
+        } else {
+            fileRepo = new TrivialFileRepo();
+        }
+
         // Read environment
-        fileRepo = new DiskFileRepo("KeYTmpFileRepo");
         envInput = createEnvInput(fileRepo);
         problemInitializer = createProblemInitializer(fileRepo);
         initConfig = createInitConfig();
