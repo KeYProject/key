@@ -21,6 +21,13 @@ public class TrivialFileRepo extends AbstractFileRepo {
             return null; // TODO: do not return null here, but a useful InputStream?
         }
 
+        // TODO: handle gz files here
+        // TODO: same problem should be in DiskFileRepo
+        if (path.toString().endsWith(".proof.gz")) {
+            // ignore *.proof.gz files to force old behavior
+            return null;
+        }
+
         addFile(path);
         return new FileInputStream(path.toFile());
     }
