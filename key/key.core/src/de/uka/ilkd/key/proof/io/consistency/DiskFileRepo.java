@@ -306,10 +306,6 @@ public final class DiskFileRepo extends AbstractFileRepo {
         return path.normalize().startsWith(KEYPATH);
     }
 
-    private static boolean isURLFile(Path path) {
-        return path.startsWith("file:/");
-    }
-
     // TODO: move to IOUtil?
     private static void createDirsAndCopy(Path source, Path target) throws IOException {
         Files.createDirectories(target.getParent());

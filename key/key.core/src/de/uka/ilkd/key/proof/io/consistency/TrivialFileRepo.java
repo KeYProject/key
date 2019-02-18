@@ -14,9 +14,13 @@ import java.nio.file.Path;
  * @author Wolfram Pfeifer
  */
 public class TrivialFileRepo extends AbstractFileRepo {
-
     @Override
     public InputStream getInputStream(Path path) throws FileNotFoundException, IOException {
+        // ignore URL files (those are internal files shipped with KeY)
+        if (isURLFile(path)) {
+            return null; // TODO: do not return null here, but a useful InputStream?
+        }
+
         addFile(path);
         return new FileInputStream(path.toFile());
     }

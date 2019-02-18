@@ -97,6 +97,15 @@ public abstract class AbstractFileRepo implements FileRepo {
     }
 
     /**
+     * Checks if the given path contains a file URL.
+     * @param path the Path to check
+     * @return true iff the path contains a file URL.
+     */
+    protected static boolean isURLFile(Path path) {
+        return path.startsWith("file:/");
+    }
+
+    /**
      * Adds the given file to the list of files to save.
      * @param p the path of the file to add
      */
