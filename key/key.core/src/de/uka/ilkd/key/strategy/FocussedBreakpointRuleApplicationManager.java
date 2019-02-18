@@ -124,7 +124,7 @@ public class FocussedBreakpointRuleApplicationManager
             final String currStmtString = activeStmt.toString();
 
             if (currStmtString != null && //
-                    currStmtString.equals(breakpoint.orElseThrow())) {
+                    currStmtString.equals(breakpoint.get())) {
                 return false;
             }
         }
