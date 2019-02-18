@@ -77,9 +77,8 @@ public class PredictCostProver {
         }
     }
 
-    private ImmutableSet<ImmutableSet<Term>> createClause(ImmutableSet<Term> set)  {
-        final ImmutableSet<ImmutableSet<Term>> nil =
-                DefaultImmutableSet.<ImmutableSet<Term>>nil();
+    private ImmutableSet<ImmutableSet<Term>> createClause(ImmutableSet<Term> set) {
+        final ImmutableSet<ImmutableSet<Term>> nil = DefaultImmutableSet.<ImmutableSet<Term>>nil();
         ImmutableSet<ImmutableSet<Term>> res = nil.add(DefaultImmutableSet.<Term>nil());
         for (Term t : set) {
             ImmutableSet<ImmutableSet<Term>> tmp = nil;
@@ -102,9 +101,8 @@ public class PredictCostProver {
 
     // (2)self-proved rule
     /**
-     * If the given <code>problem</code>'s operation is equal,or mathmetic
-     * operation(=,>=, <=), this method will try to prove it by finding the
-     * relation between its two subterms.
+     * If the given <code>problem</code>'s operation is equal,or mathmetic operation(=,>=, <=), this
+     * method will try to prove it by finding the relation between its two subterms.
      */
     private Term provedBySelf(Term problem) {
         boolean negated = false;
@@ -123,14 +121,14 @@ public class PredictCostProver {
         if (TriggerUtils.isTrueOrFalse(arithRes)) {
             return negated ? tb.not(arithRes) : arithRes;
         } else {
-                return problem;
-            }
+            return problem;
+        }
     }
 
     // (3)equal rule
     /***
-     * @return trueT if problem is equal axiom, false if problem's negation is
-     *         equal axiom. Otherwise retrun problem.
+     * @return trueT if problem is equal axiom, false if problem's negation is equal axiom.
+     *         Otherwise retrun problem.
      */
     private Term directConsequenceOrContradictionOfAxiom(Term problem, Term axiom) {
         boolean negated = false;
@@ -154,8 +152,8 @@ public class PredictCostProver {
     /**
      * @param problem
      * @param axiom
-     * @return if axiom conduct problem then return trueT. If axiom conduct
-     *         negation of problem return fastT. Otherwise, return problem
+     * @return if axiom conduct problem then return trueT. If axiom conduct negation of problem
+     *         return fastT. Otherwise, return problem
      */
     private Term provedByAnother(Term problem, Term axiom) {
         Term res = directConsequenceOrContradictionOfAxiom(problem, axiom);
@@ -169,19 +167,16 @@ public class PredictCostProver {
     /**
      * try to prove <code>problem</code> by know <code>assertLits</code>
      *
-     * @param problem
-     *            a literal to be proved
-     * @param assertLits
-     *            a set of term assertLiterals in which all literals are true
-     * @return return <code>trueT</code> if if formu is proved to true,
-     *         <code> falseT</code> if false, and <code>atom</code> if it cann't
-     *         be proved.
+     * @param problem    a literal to be proved
+     * @param assertLits a set of term assertLiterals in which all literals are true
+     * @return return <code>trueT</code> if if formu is proved to true, <code> falseT</code> if
+     *         false, and <code>atom</code> if it cann't be proved.
      */
     private Term proveLiteral(Term problem, Iterable<? extends Term> assertLits) {
         Term res;
         /*
-         * res = provedFromCache(problem, cache); if (res.equals(trueT) ||
-         * res.equals(falseT)) { return res; }
+         * res = provedFromCache(problem, cache); if (res.equals(trueT) || res.equals(falseT)) {
+         * return res; }
          */
         res = provedBySelf(problem);
         if (TriggerUtils.isTrueOrFalse(res)) {
@@ -207,12 +202,11 @@ public class PredictCostProver {
     }
 
     /**
-     * refine every clause, by assume assertList are true and if a clause's cost
-     * is 0 which means it is refined to false, then cost 0 returned. If every
-     * clause's cost is -1 which means every clause is refined to true, cost -1
-     * returned. Otherwise, multiply of every cost is return. Beside, if a
-     * clause is refined to a situation that only one literal is left, the
-     * literal will be add to assertLiterals.
+     * refine every clause, by assume assertList are true and if a clause's cost is 0 which means it
+     * is refined to false, then cost 0 returned. If every clause's cost is -1 which means every
+     * clause is refined to true, cost -1 returned. Otherwise, multiply of every cost is return.
+     * Beside, if a clause is refined to a situation that only one literal is left, the literal will
+     * be add to assertLiterals.
      */
     private long firstRefine() {
         long cost = 1;
@@ -249,24 +243,22 @@ public class PredictCostProver {
 
     /** A sat() procedure with back searching */
     /*
-     * private long secondRefineX(SetOf<Term> assertLits, Map cache, Object[]
-     * cls, int index) { long cost = 1; for ( int i = index; i < cls.length; i++
-     * ) { Clause c = (Clause)cls[i]; final SetOf<Term> ls = c.refine (
-     * assertLits, cache ); if ( ls.contains ( falseT ) ) return 0; if (
-     * ls.contains ( trueT ) ) return secondRefine ( assertLits, cache, cls, i +
-     * 1 ); final Iterator<Term> it = ls.iterator (); while ( it.hasNext () ) {
-     * SetOf<Term> nextLits = SetAsListOf.<Term>nil().union ( assertLits );
-     * nextLits = nextLits.add ( it.next () ); final Map nextCache = new HashMap
-     * (); nextCache.putAll ( cache ); long nextCost = secondRefine ( nextLits,
-     * nextCache, cls, i + 1 ); cost = cost + nextCost;
+     * private long secondRefineX(SetOf<Term> assertLits, Map cache, Object[] cls, int index) { long
+     * cost = 1; for ( int i = index; i < cls.length; i++ ) { Clause c = (Clause)cls[i]; final
+     * SetOf<Term> ls = c.refine ( assertLits, cache ); if ( ls.contains ( falseT ) ) return 0; if (
+     * ls.contains ( trueT ) ) return secondRefine ( assertLits, cache, cls, i + 1 ); final
+     * Iterator<Term> it = ls.iterator (); while ( it.hasNext () ) { SetOf<Term> nextLits =
+     * SetAsListOf.<Term>nil().union ( assertLits ); nextLits = nextLits.add ( it.next () ); final
+     * Map nextCache = new HashMap (); nextCache.putAll ( cache ); long nextCost = secondRefine (
+     * nextLits, nextCache, cls, i + 1 ); cost = cost + nextCost;
      *
      * } } return cost; }
      */
 
-    private class Clause implements Iterable<Term>{
+    private class Clause implements Iterable<Term> {
 
         /** all literals contains in this clause */
-        public ImmutableSet<Term> literals = DefaultImmutableSet.<Term> nil();
+        private ImmutableSet<Term> literals = DefaultImmutableSet.<Term>nil();
 
         public Clause(ImmutableSet<Term> lits) {
             literals = lits;
@@ -295,8 +287,8 @@ public class PredictCostProver {
         }
 
         /**
-         * @return 0 if this clause is refine to false. 1 if true.
-         *         Otherwise,return the number of literals it left.
+         * @return 0 if this clause is refine to false. 1 if true. Otherwise,return the number of
+         *         literals it left.
          */
         public long cost() {
             if (literals.size() == 1 && literals.contains(falseT)) {
@@ -309,9 +301,8 @@ public class PredictCostProver {
         }
 
         /**
-         * Refine this clause in two process, first try to refined by itself, @see
-         * selfRefine. Second refine this clause by assuming assertLiteras are
-         * true
+         * Refine this clause in two process, first try to refined by itself, @see selfRefine.
+         * Second refine this clause by assuming assertLiteras are true
          */
         public void firstRefine() {
             // if (selfRefine(literals)) {
@@ -322,15 +313,15 @@ public class PredictCostProver {
         }
 
         /**
-         * Refine literals in this clause, but it does not change literlas, only
-         * return literals that can't be removed by refining
+         * Refine literals in this clause, but it does not change literlas, only return literals
+         * that can't be removed by refining
          */
         public ImmutableSet<Term> refine(Iterable<? extends Term> assertLits) {
-            ImmutableSet<Term> res = DefaultImmutableSet.<Term> nil();
+            ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
             for (final Term lit : this) {
                 final Operator op = proveLiteral(lit, assertLits).op();
                 if (op == Junctor.TRUE) {
-                    res = DefaultImmutableSet.<Term> nil().add(trueT);
+                    res = DefaultImmutableSet.<Term>nil().add(trueT);
                     break;
                 }
                 if (op == Junctor.FALSE) {
@@ -345,12 +336,11 @@ public class PredictCostProver {
         }
 
         /**
-         * This method is used for detect where a clause can be simply refined
-         * to to true. And it is implemented like this. Assume that the clause
-         * contains two literals Li and Lj. If (!Li->Lj) which is acturally
-         * (Li|Lj), is true, and the clasue is true. provedByAnthoer(Lj,!Li) is
-         * used to proved (!Li->Lj). Some examples are (!a|a) which is (!!a->a)
-         * and (a>=1|a<=0) which is !a>=1->a<=0
+         * This method is used for detect where a clause can be simply refined to to true. And it is
+         * implemented like this. Assume that the clause contains two literals Li and Lj. If
+         * (!Li->Lj) which is acturally (Li|Lj), is true, and the clasue is true.
+         * provedByAnthoer(Lj,!Li) is used to proved (!Li->Lj). Some examples are (!a|a) which is
+         * (!!a->a) and (a>=1|a<=0) which is !a>=1->a<=0
          */
         public boolean selfRefine(ImmutableSet<Term> lits) {
             if (lits.size() <= 1) {

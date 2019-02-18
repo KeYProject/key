@@ -98,6 +98,10 @@ public final class SpecificationRepository {
 
     public static final String CONTRACT_COMBINATION_MARKER = "#";
 
+    /**
+     * @see #limitObs(IObserverFunction)
+     * @see #unlimitObs(IObserverFunction)
+     */
     public static final String LIMIT_SUFFIX = "$lmtd";
 
     private final ContractFactory cf;
@@ -412,8 +416,9 @@ public final class SpecificationRepository {
     }
 
     private RepresentsAxiom getRepresentsAxiom(KeYJavaType kjt, ClassAxiom ax) {
-        if (!(ax instanceof RepresentsAxiom) || axioms.get(kjt) == null)
+        if (!(ax instanceof RepresentsAxiom) || axioms.get(kjt) == null) {
             return null;
+        }
         RepresentsAxiom result = null;
         for (ClassAxiom ca : axioms.get(kjt)) {
             if (ca instanceof RepresentsAxiom
@@ -581,8 +586,9 @@ public final class SpecificationRepository {
      */
     private void createContractsFromInitiallyClause(InitiallyClause inv,
             KeYJavaType kjt) throws SLTranslationException {
-        if (!kjt.equals(inv.getKJT()))
+        if (!kjt.equals(inv.getKJT())) {
             inv = inv.setKJT(kjt);
+        }
         for (IProgramMethod pm : services.getJavaInfo().getConstructors(kjt)) {
             if (!JMLInfoExtractor.isHelper(pm)) {
                 final ImmutableSet<Contract> oldContracts = getContracts(kjt,
@@ -590,9 +596,10 @@ public final class SpecificationRepository {
                 ImmutableSet<FunctionalOperationContract> oldFuncContracts = DefaultImmutableSet
                         .nil();
                 for (Contract old : oldContracts) {
-                    if (old instanceof FunctionalOperationContract)
+                    if (old instanceof FunctionalOperationContract) {
                         oldFuncContracts = oldFuncContracts
                                 .add((FunctionalOperationContract) old);
+                    }
                 }
                 if (oldFuncContracts.isEmpty()) {
                     final FunctionalOperationContract iniContr = cf.func(pm,
@@ -1013,8 +1020,9 @@ public final class SpecificationRepository {
         // in any case, create axiom with non-static target
         addClassAxiom(new PartialInvAxiom(inv, false, services));
         // for a static invariant, create also an axiom with a static target
-        if (inv.isStatic())
+        if (inv.isStatic()) {
             addClassAxiom(new PartialInvAxiom(inv, true, services));
+        }
         // inherit non-private, non-static invariants
         if (!inv.isStatic()
                 && VisibilityModifier.allowsInheritance(inv.getVisibility())) {
@@ -1089,8 +1097,9 @@ public final class SpecificationRepository {
     public void addInitiallyClause(InitiallyClause ini) {
         ImmutableSet<InitiallyClause> oldClauses = initiallyClauses
                 .get(ini.getKJT());
-        if (oldClauses == null)
+        if (oldClauses == null) {
             oldClauses = DefaultImmutableSet.<InitiallyClause> nil();
+        }
         initiallyClauses.put(ini.getKJT(), oldClauses.add(ini));
     }
 
@@ -1125,10 +1134,12 @@ public final class SpecificationRepository {
             // add invariant axiom for own class and other final classes
             for (KeYJavaType kjt : services.getJavaInfo()
                     .getAllKeYJavaTypes()) {
-                if (kjt != selfKjt && !ji.isFinal(kjt))
+                if (kjt != selfKjt && !ji.isFinal(kjt)) {
                     continue; // only final classes
-                if (kjt != selfKjt && JavaInfo.isPrivate(kjt))
+                }
+                if (kjt != selfKjt && JavaInfo.isPrivate(kjt)) {
                     continue; // only non-private classes
+                }
                 final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(
                         kjt);
                 final ProgramVariable selfVar = tb.selfVar(kjt, false);
@@ -1226,8 +1237,9 @@ public final class SpecificationRepository {
                                 tb.resultVar(pm, false), atPreVars, services);
                         Term preContract = fop.getPre(heaps, selfVar, paramVars,
                                 atPreVars, services);
-                        if (preContract == null)
+                        if (preContract == null) {
                             preContract = tb.tt();
+                        }
                         if (representsFromContract != null) {
                             // TODO Wojtek: I do not understand the visibility
                             // issues of model fields/methods.
@@ -1247,8 +1259,9 @@ public final class SpecificationRepository {
                     }
                     for (FunctionalOperationContract fop : getOperationContracts(
                             kjt, pm)) {
-                        if (!fop.getSpecifiedIn().equals(kjt))
+                        if (!fop.getSpecifiedIn().equals(kjt)) {
                             continue;
+                        }
                         Term preFromContract = fop.getPre(heaps, selfVar,
                                 paramVars, atPreVars, services);
                         Term postFromContract = fop.getPost(heaps, selfVar,
@@ -1304,9 +1317,9 @@ public final class SpecificationRepository {
                         currentAxioms = DefaultImmutableSet.<ClassAxiom> nil();
                     }
                     oldRep = getRepresentsAxiom(sub, subAx);
-                    if (oldRep == null)
+                    if (oldRep == null) {
                         axioms.put(sub, currentAxioms.add(subAx));
-                    else {
+                    } else {
                         final RepresentsAxiom newSubRep = oldRep.conjoin(subAx,
                                 tb);
                         axioms.put(sub,

@@ -838,7 +838,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
      *            the key and value type.
      */
     private abstract static class ReplacementMap<S extends Sorted & SVSubstitute>
-    extends de.uka.ilkd.key.proof.ReplacementMap.NoIrrelevantLabelsReplacementMap<S, S> {
+        extends de.uka.ilkd.key.proof.ReplacementMap.NoIrrelevantLabelsReplacementMap<S, S> {
 
         public ReplacementMap(TermFactory tf) {
             super(tf);

@@ -44,44 +44,60 @@ public interface Sort extends Named {
      */
     public final Sort ANY = new SortImpl(new Name("any"));
 
+    /**
+     * Name of {@link #getCastSymbol(TermServices)}.
+     */
     public final Name CAST_NAME = new Name("cast");
+
+    /**
+     * Name of {@link #getInstanceofSymbol(TermServices)}.
+     */
     final Name INSTANCE_NAME = new Name("instance");
+
+    /**
+     * Name of {@link #getExactInstanceofSymbol(TermServices)}.
+     */
     final Name EXACT_INSTANCE_NAME = new Name("exactInstance");
 
 
     /**
-     * Returns the direct supersorts of this sort. Not supported by NullSort.
+     * @return the direct supersorts of this sort. Not supported by {@code NullSort}.
      */
     ImmutableSet<Sort> extendsSorts();
 
     /**
-     * Returns the direct supersorts of this sort.
+     * @param services services.
+     * @return the direct supersorts of this sort.
      */
     ImmutableSet<Sort> extendsSorts(Services services);
 
     /**
-     * Tells whether the given sort is a reflexive, transitive subsort of this
+     * @param s some sort.
+     * @return whether the given sort is a reflexive, transitive subsort of this
      * sort.
      */
     boolean extendsTrans(Sort s);
 
     /**
-     * Tells whether this sort has no exact elements.
+     * @return whether this sort has no exact elements.
      */
     boolean isAbstract();
 
     /**
-     * returns the cast symbol of this Sort
+     * @param services services.
+     * @return the cast symbol of this sort.
      */
     SortDependingFunction getCastSymbol(TermServices services);
 
     /**
-     * returns the instanceof symbol of this Sort
+     * @param services services.
+     * @return the {@code instanceof} symbol of this sort.
      */
     SortDependingFunction getInstanceofSymbol(TermServices services);
 
     /**
-     * returns the exactinstanceof symbol of this Sort
+     * @param services services.
+     * @return the {@code exactinstanceof} symbol of this sort.
      */
     SortDependingFunction getExactInstanceofSymbol(TermServices services);
 

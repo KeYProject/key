@@ -44,19 +44,19 @@ public class FindTacletAppContainer extends TacletAppContainer {
     private final PosInOccurrence applicationPosition;
 
     FindTacletAppContainer (
-            NoPosTacletApp p_app,
-            PosInOccurrence p_pio,
-            RuleAppCost p_cost,
-            Goal p_goal,
-            long p_age) {
-        super (p_app, p_cost, p_age);
-        applicationPosition = p_pio;
+            NoPosTacletApp app,
+            PosInOccurrence pio,
+            RuleAppCost cost,
+            Goal goal,
+            long age) {
+        super (app, cost, age);
+        applicationPosition = pio;
         positionTag         =
-                p_goal.getFormulaTagManager().getTagForPos(p_pio.topLevel());
+                goal.getFormulaTagManager().getTagForPos(pio.topLevel());
 
         if (positionTag == null) {
             // faster than <code>assertFalse</code>
-            Debug.fail ("Formula " + p_pio + " does not exist");
+            Debug.fail ("Formula " + pio + " does not exist");
         }
     }
 
@@ -81,9 +81,9 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * this object has been altered since the creation of this object or if a
      * preceding update has changed
      */
-    private boolean subformulaOrPreceedingUpdateHasChanged (Goal p_goal) {
+    private boolean subformulaOrPreceedingUpdateHasChanged (Goal goal) {
         ImmutableList<FormulaChangeInfo> infoList =
-                p_goal.getFormulaTagManager().getModifications(positionTag);
+                goal.getFormulaTagManager().getModifications(positionTag);
 
         while (!infoList.isEmpty ()) {
             final FormulaChangeInfo info = infoList.head ();

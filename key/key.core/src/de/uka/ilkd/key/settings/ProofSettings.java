@@ -46,6 +46,11 @@ public class ProofSettings {
     public static final URL PROVER_CONFIG_FILE_TEMPLATE;
     public static final ProofSettings DEFAULT_SETTINGS;
 
+    private final static int STRATEGY_SETTINGS = 0;
+    private final static int CHOICE_SETTINGS = 1;
+    private final static int SMT_SETTINGS = 2;
+    private final static int TERM_LABEL_SETTINGS = 3;
+
     static {
         PROVER_CONFIG_FILE = new File(PathConfig.getKeyConfigDir()
                 + File.separator + "proof-settings.props");
@@ -63,23 +68,6 @@ public class ProofSettings {
     /** the default listener to settings */
     private ProofSettingsListener listener = new ProofSettingsListener();
 
-    // NOTE: This was commented out in commit
-    // 4932e4d1210356455c04a1e9fb7f2fa1f21b3e9d, 2012/11/08, in the process of
-    // separating proof independent from proof dependent settings.
-    // Is not in ProofIndependentSettings. I dont't know why these code
-    // corpses have been left here as comments, therefore I don't removed them.
-    // (DS, 2017-05-11)
-
-    // private final static int STRATEGY_SETTINGS = 0;
-    // private final static int GENERAL_SETTINGS = 1;
-    // private final static int CHOICE_SETTINGS = 2;
-    // private final static int SMT_SETTINGS = 3;
-    // private final static int VIEW_SETTINGS = 4;
-    private final static int STRATEGY_SETTINGS = 0;
-    private final static int CHOICE_SETTINGS = 1;
-    private final static int SMT_SETTINGS = 2;
-    private final static int TERM_LABEL_SETTINGS = 3;
-
     /**
      * create a proof settings object. When you add a new settings object,
      * PLEASE UPDATE THE LIST ABOVE AND USE THOSE CONSTANTS INSTEAD OF USING
@@ -88,11 +76,9 @@ public class ProofSettings {
 
     private ProofSettings() {
         settings = new Settings[] { new StrategySettings(),
-                // new GeneralSettings(),
-                new ChoiceSettings(),
-                ProofDependentSMTSettings.getDefaultSettingsData(),
-                // new ViewSettings()
-                new TermLabelSettings(),
+            new ChoiceSettings(),
+            ProofDependentSMTSettings.getDefaultSettingsData(),
+            new TermLabelSettings(),
         };
 
         for (int i = 0; i < settings.length; i++) {
@@ -176,10 +162,10 @@ public class ProofSettings {
     public void loadSettingsFromStream(Reader in) {
         Properties defaultProps = new Properties();
 
-        if (PROVER_CONFIG_FILE_TEMPLATE == null)
+        if (PROVER_CONFIG_FILE_TEMPLATE == null) {
             System.err.println(
                     "Warning: default proof-settings file could not be found.");
-        else {
+        } else {
             try {
                 defaultProps.load(PROVER_CONFIG_FILE_TEMPLATE.openStream());
             } catch (IOException e) {
@@ -225,8 +211,9 @@ public class ProofSettings {
 
     /** Used to load Settings from a .key file */
     public void loadSettingsFromString(String s) {
-        if (s == null)
+        if (s == null) {
             return;
+        }
         StringReader reader = new StringReader(s);
         loadSettingsFromStream(reader);
     }
