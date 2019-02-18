@@ -32,7 +32,6 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.MenuElement;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -241,10 +240,7 @@ public class TacletMenu extends JMenu {
 
         //        addPopFrameItem(control);
 
-        MenuElement[] ms = KeYGuiExtensionFacade.createTermMenu(sequentView.getMainWindow()).getSubElements();
-        for (MenuElement me : ms) {
-            add(me.getComponent());
-        }
+        add(KeYGuiExtensionFacade.createTermMenu(sequentView.getMainWindow()));
 
         addClipboardItem(control);
 

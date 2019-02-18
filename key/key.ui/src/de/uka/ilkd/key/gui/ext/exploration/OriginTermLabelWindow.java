@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui.proofExploration;
+package de.uka.ilkd.key.gui.ext.exploration;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -113,7 +113,7 @@ public final class OriginTermLabelWindow extends JFrame {
      *
      * @see #ORIGIN_INFO_TITLE
      */
-    public static final String SUBTERM_ORIGINS_TITLE = "Origins of (former) subformula and subterms";
+    public static final String SUBTERM_ORIGINS_TITLE = "Origins of (former) subformulas and subterms";
 
     /**
      * The gap between a term and its origin in the tree view.
@@ -351,10 +351,18 @@ public final class OriginTermLabelWindow extends JFrame {
         view.removeHighlight(view.getColorHighlight(HIGHLIGHT_COLOR));
         view.printSequent();
 
-        Range range = view.posTable.rangeForPath(path);
-        range = new Range(range.start() + 1, range.end() + 1);
+        try {
+            Range range = view.posTable.rangeForPath(path);
+            range = new Range(range.start() + 1, range.end() + 1);
 
-        view.paintHighlight(range, view.getColorHighlight(HIGHLIGHT_COLOR));
+            view.paintHighlight(range, view.getColorHighlight(HIGHLIGHT_COLOR));
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // The path does not point to a valid sub-term.
+            // E.g., this can happen if pretty-printing is activated and the user selects
+            // the subterm "#" of some number
+            // (which only exists in the view when pretty-printing is deactivated.)
+            // We simply ignore this error and do not paint any highlights.
+        }
     }
 
     private void updateJLabels(PosInOccurrence pos) {

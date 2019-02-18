@@ -1,10 +1,10 @@
-package de.uka.ilkd.key.gui.actions.exploration;
+package de.uka.ilkd.key.gui.ext.exploration;
 
 import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.proofExploration.OriginTermLabelWindow;
+import de.uka.ilkd.key.gui.ext.KeYExtConst;
 import de.uka.ilkd.key.pp.PosInSequent;
 
 /**
@@ -20,12 +20,13 @@ public class ShowOriginAction extends MainWindowAction {
 
     /**
      * Creates a new {@link ShowOriginAction}.
-     * 
+     *
      * @param pos the position of the term whose origin shall be shown.
      */
     public ShowOriginAction(PosInSequent pos) {
         super(MainWindow.getInstance());
         this.pos = pos;
+        putValue(KeYExtConst.PATH, "Origin");
         setName("Show origin");
     }
 
