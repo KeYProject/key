@@ -46,6 +46,7 @@ public class GeneralSettings implements Settings, Cloneable {
     private static final String USE_JML_KEY = "[General]UseJML";
     private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
     private static final String AUTO_SAVE = "[General]AutoSavePeriod";
+    private static final String ALLOW_BUNDLE_SAVING = "[General]AllowBundleSaving";
 
     /** minimize interaction is on by default */
     private boolean tacletFilter = true;
@@ -63,6 +64,12 @@ public class GeneralSettings implements Settings, Cloneable {
      * Positive values indicate save period.
      */
     private int autoSave = 0;
+
+    /**
+     * If disabled, proofs can not be saved as bundle.
+     * Toggles saving of copies of loaded files via a FileRepo.
+     */
+    private static boolean allowBundleSaving = false;
 
     private LinkedList<SettingsListener> listenerList = 
         new LinkedList<SettingsListener>();
@@ -90,6 +97,10 @@ public class GeneralSettings implements Settings, Cloneable {
 
     public int autoSavePeriod() {
         return autoSave;
+    }
+
+    public boolean isAllowBundleSaving() {
+        return allowBundleSaving;
     }
 
     // setter
@@ -126,6 +137,13 @@ public class GeneralSettings implements Settings, Cloneable {
         fireSettingsChanged();
     }
 
+    public void setAllowBundleSaving(boolean b) {
+        if (allowBundleSaving != b) {
+            allowBundleSaving = b;
+            fireSettingsChanged();
+        }
+    }
+
     /** gets a Properties object and has to perform the necessary
      * steps in order to change this object in a way that it
      * represents the stored settings
@@ -160,6 +178,11 @@ public class GeneralSettings implements Settings, Cloneable {
                 autoSave = 0;
             }
         }
+
+        val = props.getProperty(ALLOW_BUNDLE_SAVING);
+        if (val != null) {
+            allowBundleSaving = Boolean.valueOf(val).booleanValue();
+        }
     }
 
     /** implements the method required by the Settings interface. The
@@ -173,6 +196,7 @@ public class GeneralSettings implements Settings, Cloneable {
         props.setProperty(RIGHT_CLICK_MACROS_KEY, "" + rightClickMacros);
         props.setProperty(USE_JML_KEY, "" + useJML);
         props.setProperty(AUTO_SAVE, ""+ autoSave);
+        props.setProperty(ALLOW_BUNDLE_SAVING, "" + allowBundleSaving);
     }
 
     /** sends the message that the state of this setting has been

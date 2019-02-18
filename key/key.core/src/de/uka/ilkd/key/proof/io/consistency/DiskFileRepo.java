@@ -90,7 +90,6 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
     @Override
     public InputStream getInputStream(Path path) throws IOException {
-        out("input stream of " + path);
 
         // ignore URL files (those are internal files shipped with KeY)
         if (isURLFile(path)) {
@@ -185,7 +184,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
             e.printStackTrace();
         }
 
-        // set every hold reference to null
+        // set every held reference to null
         tmpDir = null;
         map = null;
         super.dispose();

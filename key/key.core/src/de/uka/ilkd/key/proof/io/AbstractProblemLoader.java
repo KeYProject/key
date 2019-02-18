@@ -377,7 +377,12 @@ public abstract class AbstractProblemLoader {
             // create new KeYUserProblemFile pointing to the (unzipped) proof file
             PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.proof");
 
-            // TODO: replace by selection mechanism
+            /* TODO: Currently it is not possible to load proof bundles with multiple proofs.
+             *  This feature is still pending, since the functionality to save multiple proofs in
+             *  one (consistent!) package is not yet implemented (see ProofManagement tool from
+             *  1st HacKeYthon).
+             *  So the current implementation just picks one of the proofs and loads it.
+             */
             // pick one of the proofs
             Path unzippedProof = Files.list(tmpDir)
                     .filter(matcher::matches)
