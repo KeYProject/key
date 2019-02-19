@@ -174,10 +174,12 @@ public final class OriginTermLabelWindow extends JFrame {
             tree.addTreeSelectionListener(e -> {
                 TreeNode source = (TreeNode) tree.getLastSelectedPathComponent();
 
-                ImmutableList<Integer> path = getPosTablePath(source.pos);
+                if (source != null) {
+                    ImmutableList<Integer> path = getPosTablePath(source.pos);
 
-                highlightInView(path);
-                updateJLabels(source.pos);
+                    highlightInView(path);
+                    updateJLabels(source.pos);
+                }
 
                 revalidate();
                 repaint();
@@ -565,7 +567,7 @@ public final class OriginTermLabelWindow extends JFrame {
 
         private static final long serialVersionUID = 2048113301808983374L;
 
-        private InitialPositionTable posTable;
+        private InitialPositionTable posTable = new InitialPositionTable();
         private Node node;
 
         TermView(PosInOccurrence pos, Node node, MainWindow mainWindow) {

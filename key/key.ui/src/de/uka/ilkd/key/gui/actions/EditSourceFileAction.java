@@ -36,6 +36,8 @@ import de.uka.ilkd.key.util.ExceptionTools;
  */
 public class EditSourceFileAction extends AbstractAction {
 
+   private static final long serialVersionUID = 1970488880435921205L;
+
    /**
     * Moves the caret in a {@link JTextArea} to the specified position. Assumes
     * the first position in the textarea is in line 1 column 1.
@@ -105,6 +107,8 @@ public class EditSourceFileAction extends AbstractAction {
                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
          final JTextArea textArea = new JTextArea(30, columnNumber) {
+            private static final long serialVersionUID = 1L;
+
             @Override
             public void addNotify() {
                super.addNotify();
