@@ -907,8 +907,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
         for (LocationVariable h : heapLDT.getAllHeaps()) {
-            final Term clauseTerm = originalClause.get(h);
+            Term clauseTerm = originalClause.get(h);
             if (clauseTerm != null && !clauseTerm.equals(tb.tt())) {
+                clauseTerm = includeHtmlMarkup ? tb.unlabelRecursive(clauseTerm) : clauseTerm;
                 clause =  printClauseText(text, includeHtmlMarkup, services,
                                           usePrettyPrinting, useUnicodeSymbols,
                                           clause, h, clauseTerm);
@@ -923,7 +924,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                boolean usePrettyPrinting,
                                                boolean useUnicodeSymbols) {
         String globalUpdates = "";
+        final TermBuilder tb = services.getTermBuilder();
         if (globalDefs != null) {
+            globalDefs = includeHtmlMarkup ? tb.unlabelRecursive(globalDefs) : globalDefs;
             final String printUpdates =
                     LogicPrinter.quickPrintTerm(globalDefs, services,
                                                 usePrettyPrinting,
