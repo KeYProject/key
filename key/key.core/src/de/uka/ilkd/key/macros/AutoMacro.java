@@ -163,7 +163,7 @@ public class AutoMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
-        return new FilterSymbexStrategy(proof.getActiveStrategy(), breakpoint,
+        return new AutoMacroFilterStrategy(proof.getActiveStrategy(), breakpoint,
                 allowSplits, whitelist, symbexOnly, onlyHumanReadable);
     }
 
@@ -176,10 +176,10 @@ public class AutoMacro extends StrategyProofMacro {
      * The Class FilterAppManager is a special strategy assigning to any rule
      * infinite costs if the goal has no modality
      */
-    private static class FilterSymbexStrategy extends FilterStrategy {
+    private static class AutoMacroFilterStrategy extends FilterStrategy {
         /** Name of that strategy */
         private static final Name NAME = new Name(
-                FilterSymbexStrategy.class.getSimpleName());
+                AutoMacroFilterStrategy.class.getSimpleName());
         /** See in outer class. */
         private final Optional<String> breakpoint;
         /** See in outer class. */
@@ -194,7 +194,7 @@ public class AutoMacro extends StrategyProofMacro {
         /** Signals that we already reached the breakpoint(s) */
         private boolean breakpointReached = false;
 
-        public FilterSymbexStrategy(Strategy delegate,
+        public AutoMacroFilterStrategy(Strategy delegate,
                 Optional<String> breakpoint, boolean allowSplits,
                 List<String> whitelist, boolean symbexOnly,
                 boolean onlyHumanReadable) {
@@ -219,7 +219,7 @@ public class AutoMacro extends StrategyProofMacro {
                 return true;
             }
 
-            if (breakpointReached) {
+            if (breakpointReached && isJavaPIO(pio)) {
                 return false;
             }
 
@@ -237,14 +237,13 @@ public class AutoMacro extends StrategyProofMacro {
                 return false;
             }
 
-            if (pio != null
-                    && pio.subTerm().javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
+            if (isJavaPIO(pio)) {
                 final SourceElement activeStmt = //
                         JavaTools.getActiveStatement(pio.subTerm().javaBlock());
                 final String currStmtString = activeStmt.toString();
 
                 if (currStmtString != null && //
-                        breakpoint.map(str -> str.equals(currStmtString))
+                        breakpoint.map(currStmtString::equals)
                                 .orElse(false)) {
                     breakpointReached = true;
                     return false;
@@ -252,6 +251,11 @@ public class AutoMacro extends StrategyProofMacro {
             }
 
             return super.isApprovedApp(app, pio, goal);
+        }
+
+        private boolean isJavaPIO(PosInOccurrence pio) {
+            return pio != null
+                    && pio.subTerm().javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
         }
 
         @Override
