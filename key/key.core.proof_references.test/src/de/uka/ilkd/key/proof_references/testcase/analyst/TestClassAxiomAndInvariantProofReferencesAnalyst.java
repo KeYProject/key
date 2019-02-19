@@ -40,7 +40,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                                  return IProofReference.USE_INVARIANT.equals(element.getKind());
                               }
                             },
-                            new ExpectedProofReferences(IProofReference.USE_INVARIANT, "and(geq(int::select(heap,self,Child::$x),Z(0(#))),leq(int::select(heap,self,Child::$x),Z(0(1(#)))))"));
+                            new ExpectedProofReferences(IProofReference.USE_INVARIANT, "and(geq(int::select(heap,self,Child::$x),Z(0(#))),leq(int::select(heap,self,Child::$x),Z(0(1(#)))))<<SC>>"));
    }
    
    /**
