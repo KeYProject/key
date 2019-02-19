@@ -10,6 +10,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -94,6 +96,7 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
 
     private static Term buildFormulaFromGoal(Goal symbExecGoal) {
         final TermBuilder tb = symbExecGoal.proof().getServices().getTermBuilder();
+        final TermFactory tf = symbExecGoal.proof().getServices().getTermFactory();
         Term result = tb.tt();
         for (final SequentFormula f : symbExecGoal.sequent().antecedent()) {
             result = tb.and(result, f.formula());
@@ -101,6 +104,7 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         for (final SequentFormula f : symbExecGoal.sequent().succedent()) {
             result = tb.and(result, tb.not(f.formula()));
         }
+        result = TermLabel.removeIrrelevantLabels(result, tf);
         return result;
     }
 

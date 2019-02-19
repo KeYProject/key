@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.Visitor;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -180,6 +181,7 @@ abstract class ReplaceAndRegisterMethod {
         }
         final OpReplacer op = new OpReplacer(
                 replaceMap, services.getTermFactory(), services.getProof());
+        term = TermLabel.removeIrrelevantLabels(term, services.getTermFactory());
         return op.replace(term);
     }
 
