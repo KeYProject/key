@@ -44,14 +44,29 @@ public final class LoopSpecImpl implements LoopSpecification {
     private final LoopStatement loop;
     private final IProgramMethod pm;
     private final KeYJavaType kjt;
+    /**
+     * The original invariant terms for each heap.
+     */
     private final Map<LocationVariable, Term> originalInvariants;
+    /**
+     * The original free invariant terms for each heap.
+     */
     private final Map<LocationVariable, Term> originalFreeInvariants;
+    /**
+     * The original modifies terms for each heap.
+     */
     private final Map<LocationVariable, Term> originalModifies;
+    /**
+     * The original information flow specification element lists for each heap.
+     */
     private final Map<LocationVariable, ImmutableList<InfFlowSpec>> originalInfFlowSpecs;
     private final Term originalVariant;
     private final Term originalSelfTerm;
     private final ImmutableList<Term> localIns;
     private final ImmutableList<Term> localOuts;
+    /**
+     * The mapping of the pre-heaps.
+     */
     private final Map<LocationVariable, Term> originalAtPres;
 
     // -------------------------------------------------------------------------
@@ -449,8 +464,16 @@ public final class LoopSpecImpl implements LoopSpecification {
                 + localOuts;
     }
 
-    public String getPlainText(Services services, boolean usePrettyPrinting,
-            boolean useUnicodeSymbols) {
+    /**
+     * Return a plain text representation of this loop specification.
+     * @param services the services object
+     * @param usePrettyPrinting determines whether we get pretty or raw text
+     * @param useUnicodeSymbols determines whether unicode will be used
+     * @return the plain text representation as a string
+     */
+    public String getPlainText(Services services,
+                               boolean usePrettyPrinting,
+                               boolean useUnicodeSymbols) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         return getPlainText(services, heapLDT.getAllHeaps(), usePrettyPrinting, useUnicodeSymbols);
     }

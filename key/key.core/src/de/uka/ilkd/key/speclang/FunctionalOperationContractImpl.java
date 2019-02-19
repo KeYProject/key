@@ -75,18 +75,39 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     final IProgramMethod pm;
     final KeYJavaType specifiedIn;
     final Modality modality;
+    /**
+     * The original precondition terms.
+     */
     final Map<LocationVariable, Term> originalPres;
+    /**
+     * The original free/unchecked precondition terms.
+     */
     final Map<LocationVariable, Term> originalFreePres;
     final Term originalMby;
+    /**
+     * The original postcondition terms.
+     */
     final Map<LocationVariable, Term> originalPosts;
+    /**
+     * The original free/unchecked postcondition terms.
+     */
     final Map<LocationVariable, Term> originalFreePosts;
+    /**
+     * The original axiom terms.
+     */
     final Map<LocationVariable, Term> originalAxioms;
+    /**
+     * The original assignable clause terms.
+     */
     final Map<LocationVariable, Term> originalMods;
     final Map<ProgramVariable, Term> originalDeps;
     final ProgramVariable originalSelfVar;
     final ImmutableList<ProgramVariable> originalParamVars;
     final ProgramVariable originalResultVar;
     final ProgramVariable originalExcVar;
+    /**
+     * The mapping of the pre-heap variables.
+     */
     final Map<LocationVariable, LocationVariable> originalAtPreVars;
     final Term globalDefs;
     final int id;
@@ -100,7 +121,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      */
     final Map<LocationVariable, Boolean> hasRealModifiesClause;
 
+    /**
+     * The term builder.
+     */
     private final TermBuilder tb;
+    /**
+     * The services object.
+     */
     private final TermServices services;
 
     // -------------------------------------------------------------------------
@@ -112,19 +139,30 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * future. Please use the factory methods in {@link de.uka.ilkd.key.speclang.ContractFactory}.
      *
      * @param baseName     base name of the contract (does not have to be unique)
+     * @param name         name of the contract (should be unique)
+     * @param kjt          the KeYJavaType of the method's Java class
      * @param pm           the IProgramMethod to which the contract belongs
+     * @param specifiedIn  TODO
      * @param modality     the modality of the contract
+     * @param pres         the precondition of the contract
+     * @param freePres     the free/unchecked precondition of the contract
      * @param mby          the measured_by clause of the contract
+     * @param posts        the postcondition of the contract
+     * @param freePosts    the free/unchecked postcondition of the contract
+     * @param axioms       the class axioms of the method
+     * @param mods         the modifies clause of the contract
+     * @param accessibles  the dependency clause of the contract
+     * @param hasRealMod   TODO
      * @param selfVar      the variable used for the receiver object
      * @param paramVars    the variables used for the operation parameters
      * @param resultVar    the variables used for the operation result
      * @param excVar       the variable used for the thrown exception
+     * @param atPreVars    the variable used for the pre-heap
      * @param globalDefs   definitions for the whole contract
+     * @param id           id of the contract (should be unique or INVALID_ID)
+     * @param toBeSaved    TODO
+     * @param transaction  TODO
      * @param services     TODO
-     * @param pre          the precondition of the contract
-     * @param post         the postcondition of the contract
-     * @param mod          the modifies clause of the contract
-     * @param heapAtPreVar the variable used for the pre-heap
      */
     FunctionalOperationContractImpl(String baseName,
             String name,
@@ -207,12 +245,23 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     // internal methods
     // -------------------------------------------------------------------------
 
-    protected Map<ProgramVariable, ProgramVariable> getReplaceMap(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            ProgramVariable resultVar,
-            ProgramVariable excVar,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
-            Services services) {
+    /**
+     * Get the according replace map for the given variables.
+     * @param selfVar the self variable
+     * @param paramVars the parameter variables
+     * @param resultVar the result variable
+     * @param excVar the exception variable
+     * @param atPreVars a map of pre-heaps to their variables
+     * @param services the services object
+     * @return the replacement map
+     */
+    protected Map<ProgramVariable, ProgramVariable>
+                    getReplaceMap(ProgramVariable selfVar,
+                                  ImmutableList<ProgramVariable> paramVars,
+                                  ProgramVariable resultVar,
+                                  ProgramVariable excVar,
+                                  Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+                                  Services services) {
         final Map<ProgramVariable, ProgramVariable> result =
                 new LinkedHashMap<ProgramVariable, ProgramVariable>();
 
@@ -280,17 +329,27 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 services);
     }
 
+    /**
+     * Get the according replace map for the given variable terms.
+     * @param heapTerms the heap terms
+     * @param selfTerm the self term
+     * @param paramTerms the parameter terms
+     * @param resultTerm the result term
+     * @param excTerm the exception variable term
+     * @param atPres a map of pre-heaps to their variable terms
+     * @param services the services object
+     * @return the replacement map
+     */
     protected Map<Term, Term> getReplaceMap(Map<LocationVariable, Term> heapTerms,
-            Term selfTerm,
-            ImmutableList<Term> paramTerms,
-            Term resultTerm,
-            Term excTerm,
-            Map<LocationVariable, Term> atPres,
-            Services services) {
+                                            Term selfTerm,
+                                            ImmutableList<Term> paramTerms,
+                                            Term resultTerm,
+                                            Term excTerm,
+                                            Map<LocationVariable, Term> atPres,
+                                            Services services) {
         final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
 
         // heaps
-
         for (LocationVariable heap : heapTerms.keySet()) {
             final Term heapTerm = heapTerms.get(heap);
             assert heapTerm == null || heapTerm.sort().equals(services.getTypeConverter()
@@ -770,30 +829,15 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 useUnicodeSymbols);
     }
 
-    private static String getText(IProgramMethod pm,
-            Operator originalResultVar,
-            Operator originalSelfVar,
-            ImmutableList<? extends SVSubstitute> originalParamVars,
-            ProgramVariable originalExcVar,
-            boolean hasMby,
-            Term originalMby,
-            Map<LocationVariable, Term> originalMods,
-            Map<LocationVariable, Boolean> hasRealModifiesClause,
-            Term globalDefs,
-            Map<LocationVariable, Term> originalPres,
-            Map<LocationVariable, Term> originalFreePres,
-            Map<LocationVariable, Term> originalPosts,
-            Map<LocationVariable, Term> originalFreePosts,
-            Map<LocationVariable, Term> originalAxioms,
-            Modality modality,
-            boolean transaction,
-            boolean includeHtmlMarkup,
-            Services services,
-            boolean usePrettyPrinting,
-            boolean useUnicodeSymbols) {
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final TermBuilder tb = services.getTermBuilder();
-        final LocationVariable baseHeap = heapLDT.getHeap();
+
+    private static String getSignatureText(IProgramMethod pm,
+                                           Operator originalResultVar,
+                                           Operator originalSelfVar,
+                                           ImmutableList<? extends SVSubstitute> originalParamVars,
+                                           ProgramVariable originalExcVar,
+                                           Services services,
+                                           boolean usePrettyPrinting,
+                                           boolean useUnicodeSymbols) {
         final StringBuffer sig = new StringBuffer();
         if (originalResultVar != null) {
             sig.append(originalResultVar);
@@ -828,24 +872,83 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             sig.append(originalExcVar);
             sig.append(")");
         }
+        return sig.toString();
+    }
 
-        final String mby = hasMby
-                ? LogicPrinter.quickPrintTerm(originalMby, services, usePrettyPrinting,
-                        useUnicodeSymbols)
-                : null;
 
-        String mods = "";
+    private static String printClauseText(final String text,
+                                          boolean includeHtmlMarkup,
+                                          Services services, boolean usePrettyPrinting,
+                                          boolean useUnicodeSymbols, String clause,
+                                          LocationVariable h, final Term clauseTerm) {
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final LocationVariable baseHeap = heapLDT.getHeap();
+
+        String printClause =
+                LogicPrinter.quickPrintTerm(clauseTerm, services,
+                                            usePrettyPrinting,
+                                            useUnicodeSymbols);
+        clause = clause
+                + (includeHtmlMarkup ? "<br><b>" : "\n")
+                + text
+                + (h == baseHeap ? "" : "[" + h + "]")
+                + (includeHtmlMarkup ? "</b> " : ": ")
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printClause, false)
+                        : printClause.trim());
+        return clause;
+    }
+
+    private static String getClauseText(final String text,
+                                           Map<LocationVariable, Term> originalClause,
+                                           boolean includeHtmlMarkup, Services services,
+                                           boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+        String clause = "";
+        final TermBuilder tb = services.getTermBuilder();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+
         for (LocationVariable h : heapLDT.getAllHeaps()) {
-            if (originalMods.get(h) != null) {
-                String printMods = LogicPrinter.quickPrintTerm(originalMods.get(h), services,
-                        usePrettyPrinting, useUnicodeSymbols);
-                mods = mods
-                        + (includeHtmlMarkup ? "<br><b>" : "\n")
-                        + "mod"
-                        + (h == baseHeap ? "" : "[" + h + "]")
-                        + (includeHtmlMarkup ? "</b> " : ": ")
-                        + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printMods, false)
-                                : printMods.trim());
+            final Term clauseTerm = originalClause.get(h);
+            if (clauseTerm != null && !clauseTerm.equals(tb.tt())) {
+                clause =  printClauseText(text, includeHtmlMarkup, services,
+                                          usePrettyPrinting, useUnicodeSymbols,
+                                          clause, h, clauseTerm);
+            }
+        }
+        return clause;
+    }
+
+    private static String getGlobalUpdatesText(Term globalDefs,
+                                               boolean includeHtmlMarkup,
+                                               Services services,
+                                               boolean usePrettyPrinting,
+                                               boolean useUnicodeSymbols) {
+        String globalUpdates = "";
+        if (globalDefs != null) {
+            final String printUpdates =
+                    LogicPrinter.quickPrintTerm(globalDefs, services,
+                                                usePrettyPrinting,
+                                                useUnicodeSymbols);
+            globalUpdates = (includeHtmlMarkup ? "<br><b>" : "\n")
+                    + "defs" + (includeHtmlMarkup ? "</b> " : ": ")
+                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printUpdates, false)
+                            : printUpdates.trim());
+        }
+        return globalUpdates;
+    }
+
+    private static String getModifiesText(Map<LocationVariable, Term> originalMods,
+                                          Map<LocationVariable, Boolean> hasRealModifiesClause,
+                                          boolean includeHtmlMarkup, Services services,
+                                          boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+        String mods = "";
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+
+        for (LocationVariable h : heapLDT.getAllHeaps()) {
+            final Term modTerm = originalMods.get(h);
+            if (modTerm != null) {
+                mods = printClauseText("mod", includeHtmlMarkup, services,
+                                       usePrettyPrinting, useUnicodeSymbols,
+                                       mods, h, modTerm);
                 if (!hasRealModifiesClause.get(h)) {
                     mods = mods +
                             (includeHtmlMarkup ? "<b>" : "") +
@@ -854,127 +957,94 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 }
             }
         }
+        return mods;
+    }
 
-        String globalUpdates = "";
-        if (globalDefs != null) {
-            final String printUpdates = LogicPrinter.quickPrintTerm(globalDefs, services,
-                    usePrettyPrinting, useUnicodeSymbols);
-            globalUpdates = (includeHtmlMarkup ? "<br><b>" : "\n")
-                    + "defs" + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printUpdates, false)
-                            : printUpdates.trim());
-        }
-
-        String pres = "";
-        for (LocationVariable h : heapLDT.getAllHeaps()) {
-            if (originalPres.get(h) != null) {
-                String printPres = LogicPrinter.quickPrintTerm(originalPres.get(h), services,
-                        usePrettyPrinting, useUnicodeSymbols);
-                pres = pres
-                        + (includeHtmlMarkup ? "<br><b>" : "\n")
-                        + "pre"
-                        + (h == baseHeap ? "" : "[" + h + "]")
-                        + (includeHtmlMarkup ? "</b> " : ": ")
-                        + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPres, false)
-                                : printPres.trim());
-            }
-        }
-
-        String freePres = "";
-        for (LocationVariable h : heapLDT.getAllHeaps()) {
-            Term freePre = originalFreePres.get(h);
-            if (freePre != null && !freePre.equals(tb.tt())) {
-                String printFreePres = LogicPrinter.quickPrintTerm(freePre, services,
-                        usePrettyPrinting, useUnicodeSymbols);
-                freePres = freePres
-                        + (includeHtmlMarkup ? "<br><b>" : "\n")
-                        + "free pre"
-                        + (h == baseHeap ? "" : "[" + h + "]")
-                        + (includeHtmlMarkup ? "</b> " : ": ")
-                        + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printFreePres, false)
-                                : printFreePres.trim());
-            }
-        }
-
-        String posts = "";
-        for (LocationVariable h : heapLDT.getAllHeaps()) {
-            if (originalPosts.get(h) != null) {
-                String printPosts = LogicPrinter.quickPrintTerm(originalPosts.get(h), services,
-                        usePrettyPrinting, useUnicodeSymbols);
-                posts = posts
-                        + (includeHtmlMarkup ? "<br><b>" : "\n")
-                        + "post"
-                        + (h == baseHeap ? "" : "[" + h + "]")
-                        + (includeHtmlMarkup ? "</b> " : ": ")
-                        + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPosts, false)
-                                : printPosts.trim());
-            }
-        }
-
-        String freePosts = "";
-        for (LocationVariable h : heapLDT.getAllHeaps()) {
-            Term freePost = originalFreePosts.get(h);
-            if (freePost != null && !freePost.equals(tb.tt())) {
-                String printFreePosts = LogicPrinter.quickPrintTerm(freePost, services,
-                        usePrettyPrinting, useUnicodeSymbols);
-                freePosts = freePosts
-                        + (includeHtmlMarkup ? "<br><b>" : "\n")
-                        + "free post"
-                        + (h == baseHeap ? "" : "[" + h + "]")
-                        + (includeHtmlMarkup ? "</b> " : ": ")
-                        + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printFreePosts, false)
-                                : printFreePosts.trim());
-            }
-        }
-
-        String axioms = "";
+    private static String getPostText(Map<LocationVariable, Term> originalPosts,
+                                      Map<LocationVariable, Term> originalAxioms,
+                                      boolean includeHtmlMarkup,
+                                      Services services,
+                                      boolean usePrettyPrinting,
+                                      boolean useUnicodeSymbols) {
+        String posts = getClauseText("post", originalPosts, includeHtmlMarkup, services,
+                                     usePrettyPrinting, useUnicodeSymbols);
         if (originalAxioms != null) {
-            for (LocationVariable h : heapLDT.getAllHeaps()) {
-                if (originalAxioms.get(h) != null) {
-                    String printAxioms = LogicPrinter.quickPrintTerm(originalAxioms.get(h),
-                            services, usePrettyPrinting, useUnicodeSymbols);
-                    posts = posts
-                            + (includeHtmlMarkup ? "<br><b>" : "\n")
-                            + "axiom"
-                            + (h == baseHeap ? "" : "[" + h + "]")
-                            + (includeHtmlMarkup ? "</b> " : ": ")
-                            + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printAxioms, false)
-                                    : printAxioms.trim());
-                }
-            }
+            posts = posts + getClauseText("axiom", originalAxioms, includeHtmlMarkup,
+                                          services, usePrettyPrinting, useUnicodeSymbols);
         }
+        return posts;
+    }
 
+    private static String getText(IProgramMethod pm,
+                                  Operator originalResultVar,
+                                  Operator originalSelfVar,
+                                  ImmutableList<? extends SVSubstitute> originalParamVars,
+                                  ProgramVariable originalExcVar,
+                                  boolean hasMby,
+                                  Term originalMby,
+                                  Map<LocationVariable, Term> originalMods,
+                                  Map<LocationVariable, Boolean> hasRealModifiesClause,
+                                  Term globalDefs,
+                                  Map<LocationVariable, Term> originalPres,
+                                  Map<LocationVariable, Term> originalFreePres,
+                                  Map<LocationVariable, Term> originalPosts,
+                                  Map<LocationVariable, Term> originalFreePosts,
+                                  Map<LocationVariable, Term> originalAxioms,
+                                  Modality modality,
+                                  boolean transaction,
+                                  boolean includeHtmlMarkup,
+                                  Services services,
+                                  boolean usePrettyPrinting,
+                                  boolean useUnicodeSymbols) {
+        final String sig =
+                getSignatureText(pm, originalResultVar, originalSelfVar, originalParamVars,
+                                 originalExcVar, services, usePrettyPrinting, useUnicodeSymbols);
+
+        final String mby = hasMby
+                ? LogicPrinter.quickPrintTerm(originalMby, services, usePrettyPrinting,
+                        useUnicodeSymbols)
+                : null;
+
+        final String mods =
+                getModifiesText(originalMods, hasRealModifiesClause,
+                                includeHtmlMarkup, services, usePrettyPrinting,
+                                useUnicodeSymbols);
+
+        final String globalUpdates =
+                getGlobalUpdatesText(globalDefs, includeHtmlMarkup, services,
+                                     usePrettyPrinting, useUnicodeSymbols);
+
+        final String pres =
+                getClauseText("pre", originalPres, includeHtmlMarkup,
+                              services, usePrettyPrinting, useUnicodeSymbols);
+
+        final String freePres =
+                getClauseText("free pre", originalFreePres, includeHtmlMarkup,
+                              services, usePrettyPrinting, useUnicodeSymbols);
+
+        final String freePosts =
+                getClauseText("free post", originalFreePosts, includeHtmlMarkup,
+                                 services, usePrettyPrinting, useUnicodeSymbols);
+
+        final String posts = getPostText(originalAxioms, originalAxioms, includeHtmlMarkup,
+                                         services, usePrettyPrinting, useUnicodeSymbols);
+
+        final String clauses = globalUpdates + pres + freePres + posts + freePosts + mods;
         if (includeHtmlMarkup) {
             return "<html>"
                     + "<i>"
-                    + LogicPrinter.escapeHTML(sig.toString(), false)
-                    + "</i>"
-                    + globalUpdates
-                    + pres
-                    + freePres
-                    + posts
-                    + freePosts
-                    + axioms
-                    + mods
+                    + LogicPrinter.escapeHTML(sig, false)
+                    + "</i>" + clauses
                     + (hasMby ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, false)
                             : "")
-                    + "<br><b>termination</b> "
-                    + modality
+                    + "<br><b>termination</b> " + modality
                     + (transaction ? "<br><b>transaction applicable</b>" : "") +
                     "</html>";
 
         } else {
-            return sig.toString()
-                    + globalUpdates
-                    + pres
-                    + freePres
-                    + posts
-                    + freePosts
-                    + axioms
-                    + mods
+            return sig + clauses
                     + (hasMby ? "\nmeasured-by: " + mby : "")
-                    + "\ntermination: "
-                    + modality
+                    + "\ntermination: " + modality
                     + (transaction ? "\ntransaction applicable:" : "");
         }
     }

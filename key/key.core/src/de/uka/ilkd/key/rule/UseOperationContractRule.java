@@ -94,6 +94,9 @@ public final class UseOperationContractRule implements BuiltInRule {
      */
     public static final String FINAL_PRE_TERM_HINT = "finalPreTerm";
 
+    /**
+     * A static instance of the (built-in) operation contract rule application.
+     */
     public static final UseOperationContractRule INSTANCE = new UseOperationContractRule();
 
     private static final Name NAME = new Name("Use Operation Contract");
@@ -255,27 +258,36 @@ public final class UseOperationContractRule implements BuiltInRule {
         return result;
     }
 
-    public static ImmutableSet<FunctionalOperationContract> getApplicableContracts(
-            Instantiation inst, Services services) {
-
+    /**
+     * Returns the operation contracts which are applicable for the passed instantiation.
+     * @param inst the operation contract rule instantiation
+     * @param services the services object
+     * @return all applicable contracts
+     */
+    public static ImmutableSet<FunctionalOperationContract>
+                    getApplicableContracts(Instantiation inst, Services services) {
         if (inst == null) {
             return DefaultImmutableSet.<FunctionalOperationContract>nil();
         }
 
         // there must be applicable contracts for the operation
         return getApplicableContracts(services, inst.pm, inst.staticType, inst.mod);
-
     }
 
     /**
      * Returns the operation contracts which are applicable for the passed operation and the passed
-     * modality
+     * modality.
+     * @param services the services object
+     * @param pm the program method
+     * @param kjt the KeYJavaType of the class
+     * @param modality the modality
+     * @return all applicable contracts
      */
-    private static ImmutableSet<FunctionalOperationContract> getApplicableContracts(
-            Services services,
-            IProgramMethod pm,
-            KeYJavaType kjt,
-            Modality modality) {
+    private static ImmutableSet<FunctionalOperationContract>
+                        getApplicableContracts(Services services,
+                                               IProgramMethod pm,
+                                               KeYJavaType kjt,
+                                               Modality modality) {
         ImmutableSet<FunctionalOperationContract> result = services.getSpecificationRepository()
                 .getOperationContracts(kjt, pm, modality);
 
@@ -972,27 +984,70 @@ public final class UseOperationContractRule implements BuiltInRule {
     // -------------------------------------------------------------------------
 
     public static final class Instantiation {
+        /**
+         * The enclosing update term.
+         */
         public final Term u;
+        /**
+         * The program post condition term.
+         */
         public final Term progPost;
+        /**
+         * The modality.
+         */
         public final Modality mod;
+        /**
+         * The actual result expression.
+         */
         public final Expression actualResult;
+        /**
+         * The actual self term.
+         */
         public final Term actualSelf;
+        /**
+         * The static KeYJavaType.
+         */
         public final KeYJavaType staticType;
+        /**
+         * TODO
+         */
         public final MethodOrConstructorReference mr;
+        /**
+         * The program method.
+         */
         public final IProgramMethod pm;
+        /**
+         * The actual parameter terms.
+         */
         public final ImmutableList<Term> actualParams;
+        /**
+         * TODO
+         */
         public final boolean transaction;
 
+        /**
+         * Creates a new instantiation for the contract rule and the given variables.
+         * @param u the enclosing update term
+         * @param progPost the post condition of the program method
+         * @param mod the modality
+         * @param actualResult the result expression
+         * @param actualSelf the self term
+         * @param staticType the static type
+         * @param mr TODO
+         * @param pm the program method
+         * @param actualParams the actual parameter terms
+         * @param transaction TODO
+         */
         public Instantiation(Term u,
-                Term progPost,
-                Modality mod,
-                Expression actualResult,
-                Term actualSelf,
-                KeYJavaType staticType,
-                MethodOrConstructorReference mr,
-                IProgramMethod pm,
-                ImmutableList<Term> actualParams,
-                boolean transaction) {
+                             Term progPost,
+                             Modality mod,
+                             Expression actualResult,
+                             Term actualSelf,
+                             KeYJavaType staticType,
+                             MethodOrConstructorReference mr,
+                             IProgramMethod pm,
+                             ImmutableList<Term> actualParams,
+                             boolean transaction) {
             assert u != null;
             assert u.sort() == Sort.UPDATE;
             assert progPost != null;
@@ -1023,31 +1078,65 @@ public final class UseOperationContractRule implements BuiltInRule {
         return new ContractRuleApp(this, pos);
     }
 
-    public static Map<LocationVariable, LocationVariable> computeAtPreVars(
-            List<LocationVariable> heapContext,
-            TermServices services,
-            Instantiation inst) {
-        return HeapContext.getBeforeAtPreVars(heapContext, services, "Before_" + inst.pm.getName());
+    /**
+     * Returns the correct pre-heap variables.
+     * @param heapContext the heap variables
+     * @param services the services object
+     * @param inst the instantiation for the operation contract rule
+     * @return a list of the resulting pre-heap variables
+     */
+    public static Map<LocationVariable, LocationVariable>
+                computeAtPreVars(List<LocationVariable> heapContext,
+                                 TermServices services,
+                                 Instantiation inst) {
+        return HeapContext.getBeforeAtPreVars(heapContext, services,
+                                              "Before_" + inst.pm.getName());
     }
 
+    /**
+     * Returns the correct self term.
+     * @param baseHeapTerm the heap term
+     * @param atPres the pre-heap variables as terms
+     * @param baseHeap the heap variable
+     * @param inst the instantiation for the operation contract rule
+     * @param resultTerm the term of the result variable
+     * @param tf the term factory
+     * @return the resulting self term
+     */
     public static Term computeSelf(Term baseHeapTerm,
-            Map<LocationVariable, Term> atPres,
-            LocationVariable baseHeap,
-            Instantiation inst,
-            Term resultTerm, TermFactory tf) {
+                                   Map<LocationVariable, Term> atPres,
+                                   LocationVariable baseHeap,
+                                   Instantiation inst,
+                                   Term resultTerm,
+                                   TermFactory tf) {
         return OpReplacer.replace(baseHeapTerm,
                 atPres.get(baseHeap),
                 inst.pm.isConstructor() ? resultTerm : inst.actualSelf, tf);
     }
 
+    /**
+     * Returns the correct parameter terms.
+     * @param baseHeapTerm the heap term
+     * @param atPres the pre-heap variables as terms
+     * @param baseHeap the heap variable
+     * @param inst the instantiation for the operation contract rule
+     * @param tf the term factory
+     * @return a list of the resulting parameter terms
+     */
     public static ImmutableList<Term> computeParams(Term baseHeapTerm,
-            Map<LocationVariable, Term> atPres,
-            LocationVariable baseHeap,
-            Instantiation inst,
-            TermFactory tf) {
+                                                    Map<LocationVariable, Term> atPres,
+                                                    LocationVariable baseHeap,
+                                                    Instantiation inst,
+                                                    TermFactory tf) {
         return OpReplacer.replace(baseHeapTerm, atPres.get(baseHeap), inst.actualParams, tf);
     }
 
+    /**
+     * Computes the result variable for this instantiation.
+     * @param inst the instantiation for the operation contract rule
+     * @param services the services object
+     * @return the result variable
+     */
     public static ProgramVariable computeResultVar(Instantiation inst, TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
         return inst.pm.isConstructor() ? tb.selfVar(inst.staticType, true)
@@ -1055,10 +1144,25 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
     private static class AnonUpdateData {
+        /**
+         * The assumption term.
+         */
         public final Term assumption;
+        /**
+         * The anonymization update term.
+         */
         public final Term anonUpdate;
+        /**
+         * The heap term.
+         */
         public final Term methodHeap;
+        /**
+         * The pre-heap term.
+         */
         public final Term methodHeapAtPre;
+        /**
+         * The anonymization heap term.
+         */
         public final Term anonHeap;
 
         public AnonUpdateData(Term assumption,

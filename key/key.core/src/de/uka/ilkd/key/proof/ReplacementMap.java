@@ -71,8 +71,9 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
      * @param <T> the type of the replacements.
      */
     public static class DefaultReplacementMap<S extends SVSubstitute, T>
-        extends LinkedHashMap<S, T>
-        implements ReplacementMap<S, T> { }
+        extends LinkedHashMap<S, T> implements ReplacementMap<S, T> {
+        private static final long serialVersionUID = 6223486569442129676L;
+    }
 
     /**
      * <p>

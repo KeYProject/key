@@ -48,7 +48,13 @@ import de.uka.ilkd.key.util.Triple;
  */
 public class ContractFactory {
 
+    /**
+     * The base name for symbolic execution contracts.
+     */
     public static final String SYMB_EXEC_CONTRACT_BASENAME = "Symbolic Execution";
+    /**
+     * The base name for information flow contracts.
+     */
     public static final String INFORMATION_FLOW_CONTRACT_BASENAME = "Non-interference contract";
 
     private static final String INVALID_ID = "INVALID_ID";
@@ -57,6 +63,10 @@ public class ContractFactory {
     private final Services services;
     private final TermBuilder tb;
 
+    /**
+     * Creates a new contract factory.
+     * @param services the services object
+     */
     public ContractFactory(Services services) {
         assert services != null;
         this.services = services;
@@ -68,12 +78,22 @@ public class ContractFactory {
     /**
      * Returns another contract like this one, except that the passed term has been added as a
      * postcondition (regardless of termination case).
+     * @param old the old contract
+     * @param addedPost the post condition to be added
+     * @param selfVar the used self variable
+     * @param resultVar the used result variable
+     * @param excVar the used exception variable
+     * @param paramVars the used program variables
+     * @param atPreVars the used pre-heap variables
+     * @return the resulting contract
      */
-    public FunctionalOperationContract addPost(FunctionalOperationContract old, Term addedPost,
-            ProgramVariable selfVar,
-            ProgramVariable resultVar, ProgramVariable excVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars) {
+    public FunctionalOperationContract addPost(FunctionalOperationContract old,
+                                               Term addedPost,
+                                               ProgramVariable selfVar,
+                                               ProgramVariable resultVar,
+                                               ProgramVariable excVar,
+                                               ImmutableList<ProgramVariable> paramVars,
+                                               Map<LocationVariable, LocationVariable> atPreVars) {
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
         addedPost = replaceVariables(addedPost, selfVar, resultVar, excVar, paramVars, atPreVars,
@@ -117,9 +137,13 @@ public class ContractFactory {
                 foci.transaction, services);
     }
 
-    /** Add the specification contained in InitiallyClause as a postcondition. */
+    /** Add the specification contained in InitiallyClause as a postcondition.
+     * @param old the old contract
+     * @param ini the initially clause to be added
+     * @return the resulting contract
+     */
     public FunctionalOperationContract addPost(FunctionalOperationContract old,
-            InitiallyClause ini) {
+                                               InitiallyClause ini) {
         final ProgramVariable selfVar = tb.selfVar(ini.getKJT(), true);
         return addPost(old, ini.getClause(selfVar, services), null, null, null, null, null);
     }
@@ -127,12 +151,18 @@ public class ContractFactory {
     /**
      * Returns another contract like this one, except that the passed term has been added as a
      * precondition.
+     * @param old the old contract
+     * @param addedPre precondition to be added
+     * @param selfVar used self variable
+     * @param paramVars used program variables
+     * @param atPreVars used pre-heap variables
+     * @return the resulting contract
      */
     public FunctionalOperationContract addPre(FunctionalOperationContract old,
-            Term addedPre,
-            ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars) {
+                                              Term addedPre,
+                                              ProgramVariable selfVar,
+                                              ImmutableList<ProgramVariable> paramVars,
+                                              Map<LocationVariable, LocationVariable> atPreVars) {
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
         addedPre = replaceVariables(addedPre, selfVar, paramVars, atPreVars,
@@ -179,9 +209,12 @@ public class ContractFactory {
 
     /**
      * Add global variable definitions (aka. old clause) to the contract.
+     * @param opc the functional method contract
+     * @param globalDefs the global variable definitions
+     * @return the resulting method contract
      */
     public FunctionalOperationContract addGlobalDefs(FunctionalOperationContract opc,
-            Term globalDefs) {
+                                                     Term globalDefs) {
         assert opc instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) opc;
         return new FunctionalOperationContractImpl(foci.baseName, foci.name, foci.kjt, foci.pm,
@@ -307,30 +340,62 @@ public class ContractFactory {
         return new FunctionalLoopContract(loopContract);
     }
 
-    public FunctionalOperationContract func(IProgramMethod pm, InitiallyClause ini)
-            throws SLTranslationException {
+    /**
+     * Create a new {@link FunctionalOperationContract} from an existing {@link IProgramMethod}
+     * and {@link InitiallyClause}.
+     *
+     * @param pm the {@link IProgramMethod}.
+     * @param ini the {@link InitiallyClause}.
+     * @return a new {@link FunctionalOperationContract}.
+     * @throws SLTranslationException in case translating the initially clause fails.
+     */
+    public FunctionalOperationContract
+                func(IProgramMethod pm, InitiallyClause ini) throws SLTranslationException {
         return new JMLSpecFactory(services).initiallyClauseToContract(ini, pm);
     }
 
+    /**
+     * Creates a new functional operation contract.
+     * @param baseName     base name of the contract (does not have to be unique)
+     * @param kjt          the KeYJavaType of the class
+     * @param pm           the IProgramMethod to which the contract belongs
+     * @param modality     the modality of the contract
+     * @param pres         the precondition of the contract
+     * @param freePres     the free/unchecked precondition of the contract
+     * @param mby          the measured_by clause of the contract
+     * @param posts        the postcondition of the contract
+     * @param freePosts    the free/unchecked postcondition of the contract
+     * @param axioms       the class axioms of the method
+     * @param mods         the modifies clause of the contract
+     * @param accs         the dependency clause of the contract
+     * @param hasMod       whether the contract has a modifies set
+     * @param selfVar      the self variable
+     * @param paramVars    the parameter variables
+     * @param resultVar    the exception variable
+     * @param excVar       the result variable
+     * @param atPreVars    a map of all pre-heap variables
+     * @param toBeSaved    TODO
+     * @return the resulting functional operation contract
+     */
     public FunctionalOperationContract func(String baseName,
-            KeYJavaType kjt,
-            IProgramMethod pm,
-            Modality modality,
-            Map<LocationVariable, Term> pres,
-            Map<LocationVariable, Term> freePres,
-            Term mby,
-            Map<LocationVariable, Term> posts,
-            Map<LocationVariable, Term> freePosts,
-            Map<LocationVariable, Term> axioms,
-            Map<LocationVariable, Term> mods,
-            Map<ProgramVariable, Term> accs,
-            Map<LocationVariable, Boolean> hasMod,
-            ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            ProgramVariable resultVar,
-            ProgramVariable excVar,
-            Map<LocationVariable, LocationVariable> atPreVars,
-            boolean toBeSaved) {
+                                            KeYJavaType kjt,
+                                            IProgramMethod pm,
+                                            Modality modality,
+                                            Map<LocationVariable, Term> pres,
+                                            Map<LocationVariable, Term> freePres,
+                                            Term mby,
+                                            Map<LocationVariable, Term> posts,
+                                            Map<LocationVariable, Term> freePosts,
+                                            Map<LocationVariable, Term> axioms,
+                                            Map<LocationVariable, Term> mods,
+                                            Map<ProgramVariable, Term> accs,
+                                            Map<LocationVariable, Boolean> hasMod,
+                                            ProgramVariable selfVar,
+                                            ImmutableList<ProgramVariable> paramVars,
+                                            ProgramVariable resultVar,
+                                            ProgramVariable excVar,
+                                            Map<LocationVariable, LocationVariable> atPreVars,
+                                            boolean toBeSaved) {
         return new FunctionalOperationContractImpl(baseName, null, kjt, pm, pm.getContainerType(),
                 modality, pres, freePres, mby, posts, freePosts,
                 axioms, mods, accs, hasMod, selfVar, paramVars,
@@ -341,39 +406,75 @@ public class ContractFactory {
                 services);
     }
 
+    /**
+     * Creates a new functional operation contract.
+     * @param baseName     base name of the contract (does not have to be unique)
+     * @param pm           the IProgramMethod to which the contract belongs
+     * @param terminates   a boolean determining whether we also prove termination
+     * @param pres         the precondition of the contract
+     * @param freePres     the free/unchecked precondition of the contract
+     * @param mby          the measured_by clause of the contract
+     * @param posts        the postcondition of the contract
+     * @param freePosts    the free/unchecked postcondition of the contract
+     * @param axioms       the class axioms of the method
+     * @param mods         the modifies clause of the contract
+     * @param accessibles  the dependency clause of the contract
+     * @param hasMod       whether the contract has a modifies set
+     * @param pv           a collection of the program variables
+     * @return the resulting functional operation contract
+     */
     public FunctionalOperationContract func(String baseName,
-            IProgramMethod pm,
-            boolean terminates,
-            Map<LocationVariable, Term> pres,
-            Map<LocationVariable, Term> freePres,
-            Term mby,
-            Map<LocationVariable, Term> posts,
-            Map<LocationVariable, Term> freePosts,
-            Map<LocationVariable, Term> axioms,
-            Map<LocationVariable, Term> mods,
-            Map<ProgramVariable, Term> accessibles,
-            Map<LocationVariable, Boolean> hasMod,
-            ProgramVariableCollection pv) {
+                                            IProgramMethod pm,
+                                            boolean terminates,
+                                            Map<LocationVariable, Term> pres,
+                                            Map<LocationVariable, Term> freePres,
+                                            Term mby,
+                                            Map<LocationVariable, Term> posts,
+                                            Map<LocationVariable, Term> freePosts,
+                                            Map<LocationVariable, Term> axioms,
+                                            Map<LocationVariable, Term> mods,
+                                            Map<ProgramVariable, Term> accessibles,
+                                            Map<LocationVariable, Boolean> hasMod,
+                                            ProgramVariableCollection pv) {
         return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres,
                 freePres, mby, posts, freePosts, axioms,
                 mods, accessibles, hasMod, pv, false, mods.get(
                         services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
 
+    /**
+     * Creates a new functional operation contract.
+     * @param baseName     base name of the contract (does not have to be unique)
+     * @param pm           the IProgramMethod to which the contract belongs
+     * @param modality     the modality of the contract
+     * @param pres         the precondition of the contract
+     * @param freePres     the free/unchecked precondition of the contract
+     * @param mby          the measured_by clause of the contract
+     * @param posts        the postcondition of the contract
+     * @param freePosts    the free/unchecked postcondition of the contract
+     * @param axioms       the class axioms of the method
+     * @param mods         the modifies clause of the contract
+     * @param accessibles  the dependency clause of the contract
+     * @param hasMod       whether the contract has a modifies set
+     * @param progVars     the program variables
+     * @param toBeSaved    TODO
+     * @param transaction  TODO
+     * @return the resulting functional operation contract
+     */
     public FunctionalOperationContract func(String baseName,
-            IProgramMethod pm,
-            Modality modality,
-            Map<LocationVariable, Term> pres,
-            Map<LocationVariable, Term> freePres,
-            Term mby,
-            Map<LocationVariable, Term> posts,
-            Map<LocationVariable, Term> freePosts,
-            Map<LocationVariable, Term> axioms,
-            Map<LocationVariable, Term> mods,
-            Map<ProgramVariable, Term> accessibles,
-            Map<LocationVariable, Boolean> hasMod,
-            ProgramVariableCollection progVars,
-            boolean toBeSaved, boolean transaction) {
+                                            IProgramMethod pm,
+                                            Modality modality,
+                                            Map<LocationVariable, Term> pres,
+                                            Map<LocationVariable, Term> freePres,
+                                            Term mby,
+                                            Map<LocationVariable, Term> posts,
+                                            Map<LocationVariable, Term> freePosts,
+                                            Map<LocationVariable, Term> axioms,
+                                            Map<LocationVariable, Term> mods,
+                                            Map<ProgramVariable, Term> accessibles,
+                                            Map<LocationVariable, Boolean> hasMod,
+                                            ProgramVariableCollection progVars,
+                                            boolean toBeSaved, boolean transaction) {
         return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm,
                 pm.getContainerType(), modality, pres, freePres,
                 mby, posts, freePosts,
@@ -384,35 +485,211 @@ public class ContractFactory {
                 Contract.INVALID_ID, toBeSaved, transaction, services);
     }
 
+    private static Modality combineModalities(Modality moda,
+                                              Modality otherModality) {
+        if (moda != otherModality) {
+            // TODO are there other modalities to appear in contracts?
+            // I know that this is extremely ugly, but I don't know how to combine other kinds
+            // of modalities.
+            if (moda == Modality.BOX) {
+                assert otherModality == Modality.DIA : "unknown modality " + otherModality
+                        + " in contract";
+                // do nothing
+            } else {
+                assert moda == Modality.DIA : "unknown modality " + moda + " in contract";
+                moda = Modality.BOX;
+            }
+        }
+        return moda;
+    }
+
+    private static Term combineMeasuredBy(Term mby, Term otherMby, LocationVariable h,
+                                          Term otherPre, Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        if (h == services.getTypeConverter().getHeapLDT().getHeap()) {
+            // bugfix (MU)
+            // if the first or the other contract do not have a
+            // measured-by-clause, assume no clause at all
+            if (mby == null || otherMby == null) {
+                mby = null;
+            } else {
+                mby = tb.ife(otherPre, otherMby, mby);
+            }
+        }
+        return mby;
+    }
+
+    private static void combineModifies(FunctionalOperationContractImpl t,
+                                        Map<LocationVariable, Term> pres,
+                                        Map<LocationVariable, Boolean> hasMod,
+                                        Map<LocationVariable, Term> mods,
+                                        FunctionalOperationContract other,
+                                        LocationVariable h, Term otherPre,
+                                        Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        if (hasMod.get(h) || t.hasModifiesClause(h) || other.hasModifiesClause(h)) {
+            hasMod.put(h, true);
+            Term m1 = mods.get(h);
+            Term m2 = other.getMod(h, t.originalSelfVar,
+                                   t.originalParamVars,
+                                   services);
+            Function emptyMod = services.getTypeConverter().getLocSetLDT().getEmpty();
+            if (m1 != null || m2 != null) {
+                Term nm;
+                if (m1 == null) {
+                    nm = m2;
+                } else if (m2 == null) {
+                    nm = m1;
+                } else if (m1.op().equals(emptyMod) && m2.op().equals(emptyMod)) {
+                    // special case for both contracts being (weakly) pure
+                    // fixes bug #1557
+                    nm = m1;
+                } else {
+                    Term ownPre = pres.get(h) != null ? pres.get(h) : tb.tt();
+                    nm = tb.intersect(tb.ife(ownPre, m1, tb.allLocs()),
+                            tb.ife(otherPre, m2, tb.allLocs()));
+                }
+                mods.put(h, nm);
+            }
+        }
+    }
+
+    private static Map<ProgramVariable, Term>
+               joinDependencies(FunctionalOperationContractImpl t,
+                                Map<ProgramVariable, Term> deps,
+                                FunctionalOperationContract other,
+                                Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            Term a1 = deps.get(h);
+            Term a2 = other.getDep(h, false,
+                    t.originalSelfVar,
+                    t.originalParamVars,
+                    t.originalAtPreVars,
+                    services);
+            if (a1 != null || a2 != null) {
+                Term na = null;
+                if (a1 == null) {
+                    na = a2;
+                } else if (a2 == null) {
+                    na = a1;
+                } else {
+                    na = tb.union(a1, a2);
+                }
+                deps.put(h, na);
+            }
+            boolean preHeap = t.originalAtPreVars.get(h) != null;
+            if (preHeap) {
+                LocationVariable hPre = t.originalAtPreVars.get(h);
+                Term a1Pre = deps.get(hPre);
+                Term a2Pre = other.getDep(hPre, true,
+                        t.originalSelfVar,
+                        t.originalParamVars,
+                        t.originalAtPreVars,
+                        services);
+                if (a1Pre != null || a2Pre != null) {
+                    Term naPre = null;
+                    if (a1Pre == null) {
+                        naPre = a2Pre;
+                    } else if (a2Pre == null) {
+                        naPre = a1Pre;
+                    } else {
+                        naPre = tb.union(a1Pre, a2Pre);
+                    }
+                    deps.put(hPre, naPre);
+                }
+            }
+        }
+        return deps;
+    }
+
+    private FunctionalOperationContract
+                joinWithOtherContracts(final String name,
+                                       FunctionalOperationContractImpl t,
+                                       FunctionalOperationContract[] others,
+                                       Map<LocationVariable, Term> pres,
+                                       Term mby,
+                                       Map<LocationVariable, Boolean> hasMod,
+                                       Map<LocationVariable, Term> posts,
+                                       Map<LocationVariable, Term> freePosts,
+                                       Map<LocationVariable, Term> axioms,
+                                       Map<LocationVariable, Term> mods,
+                                       Map<ProgramVariable, Term> deps,
+                                       Modality moda) {
+        for (FunctionalOperationContract other : others) {
+            moda = combineModalities(moda, other.getModality());
+            Term otherMby = other.hasMby()
+                    ? other.getMby(t.originalSelfVar, t.originalParamVars, services)
+                    : null;
+            for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                Term otherPre = other.getPre(h, t.originalSelfVar, t.originalParamVars,
+                                             t.originalAtPreVars, services);
+                Term otherPost = other.getPost(h, t.originalSelfVar, t.originalParamVars,
+                                               t.originalResultVar, t.originalExcVar,
+                                               t.originalAtPreVars, services);
+                Term otherFreePost = other.getFreePost(h, t.originalSelfVar, t.originalParamVars,
+                                                       t.originalResultVar, t.originalExcVar,
+                                                       t.originalAtPreVars, services);
+                Term otherAxiom =
+                        other.getRepresentsAxiom(h, t.originalSelfVar, t.originalParamVars,
+                                                 t.originalResultVar, t.originalAtPreVars,
+                                                 services);
+                mby = combineMeasuredBy(mby, otherMby, h, otherPre, services);
+
+                // the modifies clause must be computed before the preconditions
+                combineModifies(t, pres, hasMod, mods, other, h, otherPre, services);
+
+                if (otherPre != null) {
+                    pres.put(h, pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
+                }
+                if (otherPost != null) {
+                    final Term oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
+                    posts.put(h, posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost));
+                }
+                if (otherFreePost != null) {
+                    final Term oFreePost =
+                            tb.imp(atPreify(otherPre, t.originalAtPreVars), otherFreePost);
+                    freePosts.put(h, freePosts.get(h) == null
+                                        ? oFreePost : tb.and(freePosts.get(h), oFreePost));
+                }
+                if (otherAxiom != null) {
+                    final Term oAxiom =
+                            tb.imp(atPreify(otherPre, t.originalAtPreVars), otherAxiom);
+                    axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
+                }
+            }
+            deps = joinDependencies(t, deps, other, services);
+        }
+
+        /*
+         * (*) free preconditions are not joined because no sensible joining operator suggests
+         * itself. This is no problem, however, since combined contracts are only used for contract
+         * application and free preconditions are not used there. 2015, mu
+         */
+        return new FunctionalOperationContractImpl(
+                INVALID_ID, name, t.kjt, t.pm, t.specifiedIn,
+                moda, pres,
+                new LinkedHashMap<LocationVariable, Term>(), // (*)
+                mby, posts, freePosts, axioms, mods, deps, hasMod,
+                t.originalSelfVar, t.originalParamVars,
+                t.originalResultVar, t.originalExcVar,
+                t.originalAtPreVars, t.globalDefs,
+                Contract.INVALID_ID, t.toBeSaved,
+                t.transaction, services);
+    }
+
     /**
      * Returns the union of the passed contracts. Probably you want to use
      * SpecificationRepository.combineContracts() instead, which additionally takes care that the
      * combined contract can be loaded later. The resulting contract has id "INVALID_ID".
+     * @param name name of the contract union
+     * @param t the first contract
+     * @param others the other contracts
+     * @return the joined contract
      */
-    public FunctionalOperationContract union(FunctionalOperationContract... contracts) {
-        if (contracts.length == 0) {
-            return null;
-        }
-        if (contracts.length == 1) {
-            return contracts[0];
-        }
-        assert contracts[0] instanceof FunctionalOperationContractImpl :
-            UNKNOWN_CONTRACT_IMPLEMENTATION;
-
-        FunctionalOperationContractImpl t = (FunctionalOperationContractImpl) contracts[0];
-        FunctionalOperationContract[] others = Arrays.copyOfRange(contracts, 1, contracts.length);
-        assert others != null;
-
-        // determine names
-        StringBuffer nameSB = new StringBuffer(t.getName());
-        for (FunctionalOperationContract other : others) {
-            nameSB.append(CONTRACT_COMBINATION_MARKER).append(other.getName());
-        }
-
-        for (FunctionalOperationContract contract : others) {
-            assert contract.getTarget().equals(t.pm);
-        }
-
+    public FunctionalOperationContract union(final String name,
+                                             FunctionalOperationContractImpl t,
+                                             FunctionalOperationContract[] others) {
         // collect information
         Map<LocationVariable, Term> pres = new LinkedHashMap<LocationVariable, Term>(
                 t.originalPres.size());
@@ -453,179 +730,42 @@ public class ContractFactory {
         Map<LocationVariable, Term> mods = t.originalMods;
         Map<ProgramVariable, Term> deps = t.originalDeps;
         Modality moda = t.modality;
+        return joinWithOtherContracts(name, t, others, pres, mby, hasMod, posts,
+                                      freePosts, axioms, mods, deps, moda);
+    }
+
+    /**
+     * Returns the union of the passed contracts. Probably you want to use
+     * SpecificationRepository.combineContracts() instead, which additionally takes care that the
+     * combined contract can be loaded later. The resulting contract has id "INVALID_ID".
+     * @param contracts the passed contracts
+     * @return the union contract
+     */
+    public FunctionalOperationContract union(FunctionalOperationContract... contracts) {
+        if (contracts.length == 0) {
+            return null;
+        }
+        if (contracts.length == 1) {
+            return contracts[0];
+        }
+        assert contracts[0] instanceof FunctionalOperationContractImpl :
+            UNKNOWN_CONTRACT_IMPLEMENTATION;
+
+        FunctionalOperationContractImpl t = (FunctionalOperationContractImpl) contracts[0];
+        FunctionalOperationContract[] others = Arrays.copyOfRange(contracts, 1, contracts.length);
+        assert others != null;
+
+        // determine names
+        StringBuffer nameSB = new StringBuffer(t.getName());
         for (FunctionalOperationContract other : others) {
-            Modality otherModality = other.getModality();
-            if (moda != otherModality) {
-                // TODO are there other modalities to appear in contracts?
-                // I know that this is extremely ugly, but I don't know how to combine other kinds
-                // of modalities.
-                if (moda == Modality.BOX) {
-                    assert otherModality == Modality.DIA : "unknown modality " + otherModality
-                            + " in contract";
-                    // do nothing
-                } else {
-                    assert moda == Modality.DIA : "unknown modality " + moda + " in contract";
-                    moda = Modality.BOX;
-                }
-            }
-            Term otherMby = other.hasMby()
-                    ? other.getMby(t.originalSelfVar,
-                            t.originalParamVars,
-                            services)
-                    : null;
-            for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                Term otherPre = other.getPre(h, t.originalSelfVar,
-                        t.originalParamVars,
-                        t.originalAtPreVars,
-                        services);
-                Term otherPost = other.getPost(h, t.originalSelfVar,
-                        t.originalParamVars,
-                        t.originalResultVar,
-                        t.originalExcVar,
-                        t.originalAtPreVars,
-                        services);
-                Term otherFreePost = other.getFreePost(h, t.originalSelfVar,
-                        t.originalParamVars,
-                        t.originalResultVar,
-                        t.originalExcVar,
-                        t.originalAtPreVars,
-                        services);
-                Term otherAxiom = other.getRepresentsAxiom(h, t.originalSelfVar,
-                        t.originalParamVars,
-                        t.originalResultVar,
-                        t.originalAtPreVars,
-                        services);
-
-                if (h == services.getTypeConverter().getHeapLDT().getHeap()) {
-                    // bugfix (MU)
-                    // if the first or the other contract do not have a
-                    // measured-by-clause, assume no clause at all
-                    if (mby == null || otherMby == null) {
-                        mby = null;
-                    } else {
-                        mby = tb.ife(otherPre, otherMby, mby);
-                    }
-                }
-
-                // the modifies clause must be computed before the preconditions
-                if (hasMod.get(h) || t.hasModifiesClause(h) || other.hasModifiesClause(h)) {
-                    hasMod.put(h, true);
-                    Term m1 = mods.get(h);
-                    Term m2 = other.getMod(h, t.originalSelfVar,
-                            t.originalParamVars,
-                            services);
-                    Function emptyMod = services.getTypeConverter().getLocSetLDT().getEmpty();
-                    if (m1 != null || m2 != null) {
-                        Term nm;
-                        if (m1 == null) {
-                            nm = m2;
-                        } else if (m2 == null) {
-                            nm = m1;
-                        } else if (m1.op().equals(emptyMod) && m2.op().equals(emptyMod)) {
-                            // special case for both contracts being (weakly) pure
-                            // fixes bug #1557
-                            nm = m1;
-                        } else {
-                            Term ownPre = pres.get(h) != null ? pres.get(h) : tb.tt();
-                            nm = tb.intersect(tb.ife(ownPre, m1, tb.allLocs()),
-                                    tb.ife(otherPre, m2, tb.allLocs()));
-                        }
-                        mods.put(h, nm);
-                    }
-                }
-
-                if (otherPre != null) {
-                    pres.put(h, pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
-                }
-                if (otherPost != null) {
-                    final Term oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
-                    posts.put(h, posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost));
-                }
-                if (otherFreePost != null) {
-                    final Term oFreePost = tb.imp(atPreify(otherPre, t.originalAtPreVars),
-                            otherFreePost);
-                    freePosts.put(h, freePosts.get(h) == null ? oFreePost
-                            : tb.and(freePosts.get(h), oFreePost));
-                }
-                if (otherAxiom != null) {
-                    final Term oAxiom = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherAxiom);
-                    axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
-                }
-
-            }
-
-            for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                Term a1 = deps.get(h);
-                Term a2 = other.getDep(h, false,
-                        t.originalSelfVar,
-                        t.originalParamVars,
-                        t.originalAtPreVars,
-                        services);
-                if (a1 != null || a2 != null) {
-                    Term na = null;
-                    if (a1 == null) {
-                        na = a2;
-                    } else if (a2 == null) {
-                        na = a1;
-                    } else {
-                        na = tb.union(a1, a2);
-                    }
-                    deps.put(h, na);
-                }
-                boolean preHeap = t.originalAtPreVars.get(h) != null;
-                if (preHeap) {
-                    LocationVariable hPre = t.originalAtPreVars.get(h);
-                    Term a1Pre = deps.get(hPre);
-                    Term a2Pre = other.getDep(hPre, true,
-                            t.originalSelfVar,
-                            t.originalParamVars,
-                            t.originalAtPreVars,
-                            services);
-                    if (a1Pre != null || a2Pre != null) {
-                        Term naPre = null;
-                        if (a1Pre == null) {
-                            naPre = a2Pre;
-                        } else if (a2Pre == null) {
-                            naPre = a1Pre;
-                        } else {
-                            naPre = tb.union(a1Pre, a2Pre);
-                        }
-                        deps.put(hPre, naPre);
-                    }
-                }
-            }
+            nameSB.append(CONTRACT_COMBINATION_MARKER).append(other.getName());
         }
 
-        /*
-         * (*) free preconditions are not joined because no sensible joining operator suggests
-         * itself. This is no problem, however, since combined contracts are only used for contract
-         * application and free preconditions are not used there. 2015, mu
-         */
+        for (FunctionalOperationContract contract : others) {
+            assert contract.getTarget().equals(t.pm);
+        }
 
-        return new FunctionalOperationContractImpl(INVALID_ID,
-                nameSB.toString(),
-                t.kjt,
-                t.pm,
-                t.specifiedIn,
-                moda,
-                pres,
-                new LinkedHashMap<LocationVariable, Term>(), // (*)
-                mby,
-                posts,
-                freePosts,
-                axioms,
-                mods,
-                deps,
-                hasMod,
-                t.originalSelfVar,
-                t.originalParamVars,
-                t.originalResultVar,
-                t.originalExcVar,
-                t.originalAtPreVars,
-                t.globalDefs,
-                Contract.INVALID_ID,
-                t.toBeSaved,
-                t.transaction, services);
+        return union(nameSB.toString(), t, others);
     }
 
     // PRIVATE METHODS

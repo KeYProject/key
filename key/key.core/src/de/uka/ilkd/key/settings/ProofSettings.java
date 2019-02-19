@@ -46,9 +46,21 @@ public class ProofSettings {
     public static final URL PROVER_CONFIG_FILE_TEMPLATE;
     public static final ProofSettings DEFAULT_SETTINGS;
 
+    /**
+     * Array index for the strategy settings.
+     */
     private final static int STRATEGY_SETTINGS = 0;
+    /**
+     * Array index for the choice settings.
+     */
     private final static int CHOICE_SETTINGS = 1;
+    /**
+     * Array index for the smt settings.
+     */
     private final static int SMT_SETTINGS = 2;
+    /**
+     * Array index for the term label settings.
+     */
     private final static int TERM_LABEL_SETTINGS = 3;
 
     static {
@@ -253,11 +265,20 @@ public class ProofSettings {
         return (ProofDependentSMTSettings) settings[SMT_SETTINGS];
     }
 
+    /**
+     * Returns the term label settings from the proof settings.
+     * @return the term label settings
+     */
     public TermLabelSettings getTermLabelSettings() {
         ensureInitialized();
         return (TermLabelSettings) settings[TERM_LABEL_SETTINGS];
     }
 
+    /**
+     * Set the passed term label settings in the proof settings and return the proof settings.
+     * @param tls the term label settings
+     * @return the proof settings
+     */
     public ProofSettings setTermLabelSettings(TermLabelSettings tls) {
         settings[TERM_LABEL_SETTINGS] = tls;
         return this;

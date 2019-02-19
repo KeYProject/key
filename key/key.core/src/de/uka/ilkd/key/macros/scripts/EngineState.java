@@ -30,7 +30,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
  */
 public class EngineState {
     private final static DefaultTermParser PARSER = new DefaultTermParser();
-    private final Map<String, Object> arbitraryVariables = new HashMap<>();
+    //private final Map<String, Object> arbitraryVariables = new HashMap<>();
     private final Proof proof;
     private AbbrevMap abbrevMap = new AbbrevMap();
     /**

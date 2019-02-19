@@ -11,7 +11,8 @@ import java.net.UnknownHostException;
 public final class NetworkUtils {
 
     private static final URL KEY_URL = getURL("http://key-project.org/");
-    private static final URL LATEST_VERSION_URL = getURL("http://key-project.org/download/latest");
+    // private static final URL LATEST_VERSION_URL =
+    //         getURL("http://key-project.org/download/latest");
 
     /**
      * Tests whether the KeY Project home page is

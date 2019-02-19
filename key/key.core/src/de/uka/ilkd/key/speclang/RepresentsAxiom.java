@@ -53,6 +53,9 @@ public final class RepresentsAxiom extends ClassAxiom {
     private final Term originalPre;
     private final Term originalRep;
     private final ProgramVariable originalSelfVar;
+    /**
+     * The mapping of the pre-heaps.
+     */
     private final Map<LocationVariable, ProgramVariable> atPreVars;
     private final ImmutableList<ProgramVariable> originalParamVars;
 

@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
@@ -133,13 +132,13 @@ public class ProofScriptEngine {
         }
     }
 
-    private void write(String s, int cnt, Proof proof) {
-        try (FileWriter fw = new FileWriter(String.format(s, cnt))) {
-            fw.write(proof.toString());
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
-    }
+//    private void write(String s, int cnt, Proof proof) {
+//        try (FileWriter fw = new FileWriter(String.format(s, cnt))) {
+//            fw.write(proof.toString());
+//        } catch (IOException e) {
+//            System.err.println(e.getMessage());
+//        }
+//    }
 
     /**
      * Set the routine that is executed before every successfully executed

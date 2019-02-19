@@ -33,11 +33,20 @@ import de.uka.ilkd.key.logic.op.Operator;
  */
 public class Polynomial {
 
-    public final static Polynomial ZERO = new Polynomial(ImmutableSLList.<Monomial>nil(),
-            BigInteger.ZERO);
-    public final static Polynomial ONE = new Polynomial(ImmutableSLList.<Monomial>nil(),
-            BigInteger.ONE);
+    /**
+     * The polynomial expression of the BigInteger constant '0'.
+     */
+    public final static Polynomial ZERO =
+            new Polynomial(ImmutableSLList.<Monomial>nil(), BigInteger.ZERO);
+    /**
+     * The polynomial expression of the BigInteger constant '1'.
+     */
+    public final static Polynomial ONE =
+            new Polynomial(ImmutableSLList.<Monomial>nil(), BigInteger.ONE);
 
+    /**
+     * The BigInteger constant for the value '-1'.
+     */
     private static final BigInteger MINUS_ONE = BigInteger.valueOf(-1);
 
     private final BigInteger constantPart;
@@ -224,6 +233,11 @@ public class Polynomial {
         return difference(parts, p.parts).isEmpty();
     }
 
+    /**
+     * Creates a term from this polynomial expression.
+     * @param services the services object
+     * @return the resulting term
+     */
     public Term toTerm(Services services) {
         final Operator add = services.getTypeConverter().getIntegerLDT().getAdd();
         Term res = null;

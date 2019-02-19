@@ -49,6 +49,9 @@ public class QueryExpandCost implements Feature {
      *  and produces big literals.*/
     public static final int ConsideredAsBigLiteral = 7;
 
+    /**
+     * The base cost for this rule.
+     */
     private final int baseCost;
     private final int maxRepetitionsOnSameTerm;
     private final int termAgeFactor;
@@ -183,6 +186,10 @@ public class QueryExpandCost implements Feature {
     /** The method checks if the same rule has been applied earlier on this branch
      *  at the same position in the sequent. This method detects repetitive rule
      *  applications and is used to prevent loops in the proof tree.
+     * @param app The rule application.
+     * @param pos The occurrence position.
+     * @param goal The goal.
+     * @return The number of repetitive rule applications.
      */
     protected int queryExpandAlreadyAppliedAtPos(RuleApp app, PosInOccurrence pos, Goal goal) {
         int count = 0;
@@ -208,6 +215,14 @@ public class QueryExpandCost implements Feature {
         return count;
     }
 
+    /**
+     * This method determines whether the given goal belongs to a subtree of a
+     * step case or body preserves case. The search is done recursively for all
+     * parent nodes until either there are no more parent nodes or we have found
+     * an according (or opposing) branch label.
+     * @param goal the current proof goal
+     * @return a boolean saying whether the goal belongs to a step case
+     */
     protected static boolean isStepCaseBranch(Goal goal) {
         Node node = goal.node();
         while (node != null) {
