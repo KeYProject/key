@@ -29,9 +29,9 @@ public class OriginTermLabelsExt implements KeYTermMenuExtension, KeYMainMenuExt
     }
 
     @Override
-    public List<Action> getTermMenuActions(MainWindow mainWindow) {
+    public List<Action> getTermMenuActions(MainWindow mainWindow, PosInSequent pos) {
         List<Action> result = new LinkedList<>();
-        result.add(new ShowOriginAction(PosInSequent.createSequentPos()));
+        result.add(new ShowOriginAction(pos));
         return result;
     }
 

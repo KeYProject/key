@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -240,7 +241,13 @@ public class TacletMenu extends JMenu {
 
         //        addPopFrameItem(control);
 
-        add(KeYGuiExtensionFacade.createTermMenu(sequentView.getMainWindow()));
+        addSeparator();
+        JMenu extensionMenu =
+                KeYGuiExtensionFacade.createTermMenu(sequentView.getMainWindow(), pos);
+
+        for (Component el : extensionMenu.getMenuComponents()) {
+            add(el);
+        }
 
         addClipboardItem(control);
 

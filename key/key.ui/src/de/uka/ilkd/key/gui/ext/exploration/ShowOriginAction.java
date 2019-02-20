@@ -6,6 +6,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.ext.KeYExtConst;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.settings.TermLabelSettings;
 
 /**
  * Opens a {@link OriginTermLabelWindow} for the selected term.
@@ -25,9 +27,19 @@ public class ShowOriginAction extends MainWindowAction {
      */
     public ShowOriginAction(PosInSequent pos) {
         super(MainWindow.getInstance());
-        this.pos = pos;
-        putValue(KeYExtConst.PATH, "Origin");
+        this.pos = pos == null ? PosInSequent.createSequentPos() : pos;
+
+        final TermLabelSettings settings;
+        if (getMediator().getSelectedProof() != null) {
+            settings = getMediator().getSelectedProof().getSettings().getTermLabelSettings();
+        } else {
+            settings = ProofSettings.DEFAULT_SETTINGS.getTermLabelSettings();
+        }
+
         setName("Show origin");
+        setEnabled(settings.getUseOriginLabels());
+        settings.addSettingsListener(event -> setEnabled(settings.getUseOriginLabels()));
+        putValue(KeYExtConst.PATH, ".");
     }
 
     @Override
