@@ -270,10 +270,36 @@ public class OriginTermLabel implements TermLabel {
                         origins));
             }
         } else if (!origins.isEmpty()) {
+            SpecType commonSpecType = null;
+            String commonFileName = null;
+            int commonLine = -1;
+
+            for (Origin origin : origins) {
+                if (commonSpecType == null) {
+                    commonSpecType = origin.specType;
+                } else if (commonSpecType != origin.specType) {
+                    commonSpecType = SpecType.NONE;
+                    commonFileName = null;
+                    commonLine = -1;
+                    break;
+                }
+
+                if (commonFileName == null) {
+                    commonFileName = origin.fileName;
+                } else if (!commonFileName.equals(origin.fileName)) {
+                    commonFileName = Origin.MULTIPLE_FILES;
+                    commonLine = Origin.MULTIPLE_LINES;
+                }
+
+                if (commonLine == -1) {
+                    commonLine = origin.line;
+                } else if (commonLine != origin.line) {
+                    commonLine = Origin.MULTIPLE_LINES;
+                }
+            }
+
             labels.add(new OriginTermLabel(
-                    SpecType.NONE,
-                    null,
-                    -1,
+                    new Origin(commonSpecType, commonFileName, commonLine),
                     origins));
         }
 
@@ -346,6 +372,26 @@ public class OriginTermLabel implements TermLabel {
     public static class Origin implements Comparable<Origin> {
 
         /**
+         * Placeholder file name used for implicit specifications.
+         */
+        public static final String IMPLICIT_FILE_NAME = "\\implicit//";
+
+        /**
+         * Placeholder line number used for implicit specifications.
+         */
+        public static final int IMPLICIT_LINE = -1;
+
+        /**
+         * Placeholder line number used for specifications across multiple lines.
+         */
+        public static final String MULTIPLE_FILES = "\\multiple//";
+
+        /**
+         * Placeholder line number used for specifications across multiple lines.
+         */
+        public static final int MULTIPLE_LINES = -2;
+
+        /**
          * The JML spec type the term originates from.
          */
         public final SpecType specType;
@@ -377,13 +423,16 @@ public class OriginTermLabel implements TermLabel {
         public String toString() {
             StringBuilder sb = new StringBuilder(specType.toString());
 
-            if (fileName != null) {
+            if (fileName == null || fileName.equals(IMPLICIT_FILE_NAME)) {
+                sb.append(" (implicit)");
+            } else if (!fileName.equals(MULTIPLE_FILES)) {
                 sb.append(" @ ");
                 sb.append(fileName);
-                sb.append(" @ line ");
-                sb.append(line);
-            } else if (specType != SpecType.NONE) {
-                sb.append(" (implicit)");
+
+                if (line != MULTIPLE_LINES) {
+                    sb.append(" @ line ");
+                    sb.append(line);
+                }
             }
 
             return sb.toString();

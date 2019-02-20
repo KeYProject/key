@@ -97,7 +97,37 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
                     oldLabel.getOrigin().line,
                     subtermOrigins);
         } else {
-            newLabel = new OriginTermLabel(subtermOrigins);
+            SpecType commonSpecType = null;
+            String commonFileName = null;
+            int commonLine = -1;
+
+            for (Origin origin : subtermOrigins) {
+                if (commonSpecType == null) {
+                    commonSpecType = origin.specType;
+                } else if (commonSpecType != origin.specType) {
+                    commonSpecType = SpecType.NONE;
+                    commonFileName = null;
+                    commonLine = -1;
+                    break;
+                }
+
+                if (commonFileName == null) {
+                    commonFileName = origin.fileName;
+                } else if (!commonFileName.equals(origin.fileName)) {
+                    commonFileName = Origin.MULTIPLE_FILES;
+                    commonLine = Origin.MULTIPLE_LINES;
+                }
+
+                if (commonLine == -1) {
+                    commonLine = origin.line;
+                } else if (commonLine != origin.line) {
+                    commonLine = Origin.MULTIPLE_LINES;
+                }
+            }
+
+            newLabel = new OriginTermLabel(
+                    new Origin(commonSpecType, commonFileName, commonLine),
+                    subtermOrigins);
         }
 
         if (OriginTermLabel.canAddLabel(term, services)
@@ -116,7 +146,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     }
 
     /**
-     * Determines whether any refatorings should be applied on an application of the given taclet.
+     * Determines whether any refactorings should be applied on an application of the given taclet.
      * For some taclets, performing refactorings causes {@link FormulaTag}s to go missing.
      *
      * @param taclet a taclet rule.

@@ -82,14 +82,21 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
             if (token.equals("(implicit)")) {
                 matchEnd(tokenizer, str);
 
-                return new Origin(specType, null, -1);
+                return new Origin(specType, Origin.IMPLICIT_FILE_NAME, Origin.IMPLICIT_LINE);
             } else {
-                matchChar(token, str, "@");
+                String filename = Origin.MULTIPLE_FILES;
+                if (tokenizer.hasMoreTokens()) {
+                    matchChar(token, str, "@");
+                    filename = tokenizer.nextToken();
+                }
 
-                String filename = tokenizer.nextToken();
-                matchChar(tokenizer.nextToken(), str, "@");
-                matchId(tokenizer.nextToken(), str, "line");
-                int line = Integer.parseInt(tokenizer.nextToken());
+                int line = Origin.MULTIPLE_LINES;
+                if (tokenizer.hasMoreTokens()) {
+                    matchChar(tokenizer.nextToken(), str, "@");
+                    matchId(tokenizer.nextToken(), str, "line");
+                    line = Integer.parseInt(tokenizer.nextToken());
+                }
+
                 matchEnd(tokenizer, str);
 
                 return new Origin(specType, filename, line);
@@ -97,6 +104,8 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
         } catch (NoSuchElementException | IllegalArgumentException e) {
             throw new TermLabelException("Malformed origin string: \"" + str + "\"\n"
                     + "(Well-formed origins look like this: \"spec_type @ filename @ line xx\")\n"
+                    + "(                      or like this: \"spec_type @ filename\")\n"
+                    + "(                      or like this: \"spec_type\")\n"
                     + "(                      or like this: \"spec_type (implicit)\")\n");
         }
     }

@@ -44,6 +44,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
@@ -385,12 +386,44 @@ public final class OriginTermLabelWindow extends JFrame {
         StringBuilder subtermOriginsText = new StringBuilder("<html>");
 
         if (label != null) {
-            originText.append(label.getOrigin());
-            originJLabel.setOpaque(true);
+            // The term has an origin label. Show the term's origin.
+
+            if (label.getOrigin().specType != SpecType.NONE) {
+                originText.append(label.getOrigin());
+                originJLabel.setOpaque(true);
+            }
 
             for (Origin origin : label.getSubtermOrigins()) {
                 subtermOriginsText.append(origin);
                 subtermOriginsText.append("<br>");
+                subtermOriginsJLabel.setOpaque(true);
+            }
+
+            if (label.getSubtermOrigins().isEmpty() && pos.subTerm().subs().size() != 0
+                    && label.getOrigin().specType != SpecType.NONE) {
+                subtermOriginsText.append(label.getOrigin());
+                subtermOriginsJLabel.setOpaque(true);
+            }
+        } else {
+            // The term has no origin label.
+            // Iterate over its parent terms until we find one with an origin label,
+            // then show that term's origin.
+
+            final PosInOccurrence oldPos = pos;
+
+            while (label == null && !pos.isTopLevel()) {
+                pos = pos.up();
+                label = (OriginTermLabel) pos.subTerm().getLabel(OriginTermLabel.NAME);
+            }
+
+            if (label != null && label.getOrigin().specType != SpecType.NONE) {
+                originText.append(label.getOrigin());
+                originJLabel.setOpaque(true);
+            }
+
+            if (label != null && oldPos.subTerm().subs().size() != 0
+                    && label.getOrigin().specType != SpecType.NONE) {
+                subtermOriginsText.append(label.getOrigin());
                 subtermOriginsJLabel.setOpaque(true);
             }
         }
