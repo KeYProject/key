@@ -207,11 +207,12 @@ public class KeYFile implements EnvInput {
         // open a stream to the file (via FileRepo if possible)
         try {
             if (fileRepo != null) {
-                input = fileRepo.getInputStream(file.file().toPath());
-                if (input == null) {
-                    // fileRepo could not provide a file (internal rule file?)
-                    input = file.getNewStream();
-                }
+//                input = fileRepo.getInputStream(file.file().toPath());
+//                if (input == null) {
+//                    // fileRepo could not provide a file (internal rule file?)
+//                    input = file.getNewStream();
+//                }
+                input = fileRepo.getInputStream(file);
             } else {
                 input = file.getNewStream();
             }

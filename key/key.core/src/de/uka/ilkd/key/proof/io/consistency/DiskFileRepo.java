@@ -7,6 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,7 +17,7 @@ import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
-
+import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
@@ -91,10 +94,69 @@ public final class DiskFileRepo extends AbstractFileRepo {
     @Override
     public InputStream getInputStream(Path path) throws IOException {
 
-        // ignore URL files (those are internal files shipped with KeY)
-        if (isURLFile(path)) {
-            return null; // TODO: do not return null here, but a useful InputStream?
+        // wrap path into URL for uniform treatment
+        return getInputStream(path.toUri().toURL());
+
+//        // ignore URL files (those are internal files shipped with KeY)
+//        if (isURLFile(path)) {
+//            return null; // TODO: do not return null here, but a useful InputStream?
+//        }
+//
+//        return copyAndOpenInputStream(path);
+    }
+
+    @Override
+    public InputStream getInputStream(RuleSource ruleSource) throws IOException {
+        // wrap file of RuleSource into an URL
+        out("getting InputStream of RuleSource file: " + ruleSource.file());
+
+        // TODO: this fails if the file is a zip file: in this case, file starts with "file:/"
+        //URL url = file.toURI().toURL();
+
+        return getInputStream(ruleSource.url());
+    }
+
+    @Override
+    public InputStream getInputStream(URL url) throws IOException {
+        String protocol = url.getProtocol();
+        out("---- getting InputStream of URL: " + url.toString());
+
+        // currently, we support only two protocols: file and zip/jar
+        if (protocol.equals("file")) {
+            // url.getPath() may contain escaped characters -> we have to decode it
+            String path = URLDecoder.decode(url.getPath(), "UTF-8");
+            out("-------- getting InputStream of URL path: " + path);
+
+            return copyAndOpenInputStream(Paths.get(path));
+        } else if (protocol.equals("jar")) {        // TODO: zip?
+            JarURLConnection juc = (JarURLConnection) url.openConnection();
+            Path jarPath = Paths.get(juc.getJarFile().getName());
+
+            // TODO: wrong number of slashes somewhere
+
+            // copy the actual file, but return an InputStream to the concrete entry:
+            // - copy file of URL to repo
+            // - add file to repo map
+            getInputStream(jarPath).close();  // TODO: add private method registerPath or similar
+
+            // - return an InputStream to the copy
+            Path jarCopy = map.get(jarPath);
+            out("-------- path of copied jar is " + jarPath);
+
+            // we have to create the URL as string:
+            String entryStr = "jar:file:///" + jarCopy.toString() + "!/" + juc.getEntryName();
+            URL entryURL = new URL(entryStr);
+
+            // URL entryURL = new URL(jarCopy.toUri().toURL(), juc.getEntryName());
+            out("-------- the URL of the entry in the copied jar is " + entryURL);
+            return entryURL.openStream();
+        } else {
+            throw new IllegalArgumentException("This type of RuleSource is not supported!");
         }
+    }
+
+    private InputStream copyAndOpenInputStream(Path path) throws IOException {
+        // this method assumes that the path exists and is a valid (w/o protocol part as in URL!)
 
         final Path norm = path.toAbsolutePath().normalize();
 

@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import recoder.io.DataFileLocation;
 import recoder.io.DataLocation;
 
@@ -153,6 +154,15 @@ public class DirectoryFileCollection implements FileCollection {
             else
                 return new FileInputStream(currentFile);
 
+        }
+
+        @Override
+        public InputStream openCurrent(FileRepo fileRepo) throws IOException {
+            if(fileRepo != null) {
+                return fileRepo.getInputStream(currentFile.toPath());
+            } else {
+                return openCurrent();   // fallback without FileRepo
+            }
         }
 
         public boolean step() {

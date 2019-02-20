@@ -620,25 +620,26 @@ public class Recoder2KeY implements JavaReader {
         List<recoder.java.CompilationUnit> rcuList = new LinkedList<recoder.java.CompilationUnit>();
         List<FileCollection> sources = new ArrayList<FileCollection>();
 
+        // TODO: WP: load via FileRepo?
         parseInternalClasses(pf, rcuList);
 
         if(classPath != null) {
             for(File cp : classPath) {
-                // register file (or directory recursively) in fileRepo if the repo is set
-                if (fileRepo != null) {
-                    // iterate to make sure that only files are requested to repo
-                    Files.walkFileTree(cp.toPath(), new SimpleFileVisitor<Path>() {
-                        @Override
-                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                            throws IOException {
-                            if (!Files.isDirectory(file)) {
-                                // hack to register the file to the repo
-                                fileRepo.getInputStream(file).close();
-                            }
-                            return FileVisitResult.CONTINUE;
-                        }
-                    });
-                }
+//                // register file (or directory recursively) in fileRepo if the repo is set
+//                if (fileRepo != null) {
+//                    // iterate to make sure that only files are requested to repo
+//                    Files.walkFileTree(cp.toPath(), new SimpleFileVisitor<Path>() {
+//                        @Override
+//                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+//                            throws IOException {
+//                            if (!Files.isDirectory(file)) {
+//                                // hack to register the file to the repo
+//                                fileRepo.getInputStream(file).close();
+//                            }
+//                            return FileVisitResult.CONTINUE;
+//                        }
+//                    });
+//                }
                 if(cp.isDirectory()) {
                     sources.add(new DirectoryFileCollection(cp));
                 } else {
@@ -656,7 +657,7 @@ public class Recoder2KeY implements JavaReader {
         	Reader f = null;
         	try {
                     currentDataLocation = walker.getCurrentDataLocation();
-                    InputStream is = walker.openCurrent();
+                    InputStream is = walker.openCurrent(fileRepo);
                     f = new BufferedReader(new InputStreamReader(is));
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
                     rcu.setDataLocation(currentDataLocation);
@@ -679,7 +680,7 @@ public class Recoder2KeY implements JavaReader {
         	Reader f = null;
         	try {
                     currentDataLocation = walker.getCurrentDataLocation();
-                    InputStream is = walker.openCurrent();
+                    InputStream is = walker.openCurrent(fileRepo);
                     f = new BufferedReader(new InputStreamReader(is));
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
                     rcu.setDataLocation(currentDataLocation);
@@ -704,7 +705,7 @@ public class Recoder2KeY implements JavaReader {
         	InputStream is = null;
         	try {
                     currentDataLocation = walker.getCurrentDataLocation();
-                    is = new BufferedInputStream(walker.openCurrent());
+                    is = new BufferedInputStream(walker.openCurrent(fileRepo));
                     ClassFile cf;
                     try {
                         cf = parser.parseClassFile(is);

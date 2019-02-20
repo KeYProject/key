@@ -5,11 +5,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.proof.io.RuleSource;
 
 /**
  * This interface provides access to files.
@@ -26,6 +28,24 @@ public interface FileRepo extends ProofDisposedListener {
      * @throws IOException on IO errors, e.g. if the user has no permission to read the file
      */
     public InputStream getInputStream(Path path) throws FileNotFoundException, IOException;
+
+    /**
+     * Provides access to the InputStream of a RuleSource. The file the RuleSource is read from
+     * is copied to the FileRepo.
+     * @param ruleSource the RuleSource
+     * @return an InputStream of the RuleSource
+     * @throws IOException on IO errors
+     */
+    public InputStream getInputStream(RuleSource ruleSource) throws IOException;
+
+    /**
+     * Provides access to the InputStream of a file identified by an URL. The file is copied to the
+     * FileRepo.
+     * @param url the URL of the file
+     * @return an InputStream to the file identified by the URL
+     * @throws IOException on IO errors
+     */
+    public InputStream getInputStream(URL url) throws IOException;
 
     /**
      * This method can be used to write a file that has no counterpart outside to the FileRepo.

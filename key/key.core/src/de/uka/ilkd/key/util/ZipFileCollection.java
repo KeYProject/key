@@ -24,6 +24,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import recoder.io.DataLocation;
 
 
@@ -87,6 +88,15 @@ public class ZipFileCollection implements FileCollection {
                 throw new NoSuchElementException();
             else
                 return zipFile.getInputStream(currentEntry);
+        }
+
+        @Override
+        public InputStream openCurrent(FileRepo fileRepo) throws IOException {
+            if (fileRepo != null) {
+                return fileRepo.getInputStream(file.toPath());
+            } else {
+                return openCurrent();       // fallback without FileRepo
+            }
         }
 
         public boolean step() {

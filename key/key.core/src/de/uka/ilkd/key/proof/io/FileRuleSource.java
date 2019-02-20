@@ -3,8 +3,10 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URL;
 
 public class FileRuleSource extends RuleSource {
 
@@ -34,6 +36,11 @@ public class FileRuleSource extends RuleSource {
             throw new NullPointerException();
         }
         return ruleFile;
+    }
+
+    @Override
+    public URL url() throws IOException {
+        return file().toURI().toURL();
     }
 
     @Override

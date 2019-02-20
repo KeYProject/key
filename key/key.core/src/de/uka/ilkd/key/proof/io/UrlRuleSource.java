@@ -43,6 +43,11 @@ public class UrlRuleSource
     }
 
     @Override
+    public URL url() {
+        return url;
+    }
+
+    @Override
     public String getExternalForm() {
         return url.toExternalForm();
     }
