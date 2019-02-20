@@ -106,6 +106,8 @@ public class IconFactory {
 
     private static Image heatmapImage = getImage("images/toolbar/heatmap.png");
 
+    private static Image originImage = getImage("images/toolbar/origin.png");
+
     public static Image getImage(String s) {
 	ImageIcon ii=createImageIcon(IconFactory.class, s);
 	return ii.getImage();
@@ -371,6 +373,10 @@ public class IconFactory {
 
     public static Icon heatmapIcon(int size) {
         return scaleIcon(heatmapImage, size, size);
+    }
+
+    public static Icon originIcon(int size) {
+        return scaleIcon(originImage, size, size);
     }
 
     public static class KeYFolderIcon extends FolderIcon16 {

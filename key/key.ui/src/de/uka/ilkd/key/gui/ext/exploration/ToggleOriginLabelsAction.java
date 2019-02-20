@@ -2,10 +2,17 @@ package de.uka.ilkd.key.gui.ext.exploration;
 
 import java.awt.event.ActionEvent;
 
+import javax.swing.Action;
+import javax.swing.JOptionPane;
+
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.ext.KeYExtConst;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
 
 /**
@@ -22,17 +29,58 @@ public class ToggleOriginLabelsAction extends MainWindowAction {
      */
     public ToggleOriginLabelsAction(MainWindow mainWindow) {
         super(mainWindow);
-        putValue(KeYExtConst.PATH, "Origin Term Labels");
+
+        final TermLabelSettings settings;
+        if (getMediator().getSelectedProof() != null) {
+            settings = getMediator().getSelectedProof().getSettings().getTermLabelSettings();
+        } else {
+            settings = ProofSettings.DEFAULT_SETTINGS.getTermLabelSettings();
+        }
+
         setName("Toggle Origin Labels");
+        setIcon(IconFactory.originIcon(MainWindow.TOOLBAR_ICON_SIZE));
+        setEnabled(getMediator().getSelectedProof() != null);
+        setSelected(settings.getUseOriginLabels());
+
+        settings.addSettingsListener(event -> setSelected(settings.getUseOriginLabels()));
+        getMediator().addKeYSelectionListener(new KeYSelectionListener() {
+
+            @Override
+            public void selectedProofChanged(KeYSelectionEvent e) {
+                setEnabled(getMediator().getSelectedProof() != null);
+            }
+
+            @Override
+            public void selectedNodeChanged(KeYSelectionEvent e) {
+                setEnabled(getMediator().getSelectedProof() != null);
+            }
+        });
+
+        putValue(KeYExtConst.PATH, "Origin Term Labels");
+        putValue(Action.LONG_DESCRIPTION, "Toggle origin labels.");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Proof proof = mainWindow.getMediator().getSelectedProof();
+        final Proof proof = mainWindow.getMediator().getSelectedProof();
 
         if (proof != null) {
             TermLabelSettings settings = proof.getSettings().getTermLabelSettings();
             settings.setUseOriginLabels(!settings.getUseOriginLabels());
+
+            if (settings.getUseOriginLabels()) {
+                JOptionPane.showMessageDialog(
+                        mainWindow,
+                        "This setting will only take effect when the proof is reloaded.",
+                        "Origin",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(
+                        mainWindow,
+                        "This setting will be in effect for all following proof steps.",
+                        "Origin",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
         }
     }
 }

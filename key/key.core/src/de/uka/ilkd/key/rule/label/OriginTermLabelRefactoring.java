@@ -55,9 +55,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Term term,
             List<TermLabel> labels) {
-
-        if (services.getProof() == null
-                || !services.getProof().getSettings().getTermLabelSettings().getUseOriginLabels()) {
+        if (services.getProof() == null) {
             return;
         }
 
@@ -71,9 +69,6 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
         }
 
         OriginTermLabel oldLabel = null;
-        OriginTermLabel newLabel;
-
-        Set<Origin> subtermOrigins = collectSubtermOrigins(term.subs(), new HashSet<>());
 
         for (TermLabel label : labels) {
             if (label instanceof OriginTermLabel) {
@@ -81,6 +76,17 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
                 break;
             }
         }
+
+        if (!services.getProof().getSettings().getTermLabelSettings().getUseOriginLabels()) {
+            if (oldLabel != null) {
+                labels.remove(oldLabel);
+            }
+            return;
+        }
+
+        OriginTermLabel newLabel;
+
+        Set<Origin> subtermOrigins = collectSubtermOrigins(term.subs(), new HashSet<>());
 
         if (oldLabel != null) {
             labels.remove(oldLabel);
