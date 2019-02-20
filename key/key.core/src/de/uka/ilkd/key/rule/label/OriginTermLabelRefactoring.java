@@ -125,6 +125,10 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
                 }
             }
 
+            if (commonSpecType == null) {
+                commonSpecType = SpecType.NONE;
+            }
+
             newLabel = new OriginTermLabel(
                     new Origin(commonSpecType, commonFileName, commonLine),
                     subtermOrigins);

@@ -298,6 +298,10 @@ public class OriginTermLabel implements TermLabel {
                 }
             }
 
+            if (commonSpecType == null) {
+                commonSpecType = SpecType.NONE;
+            }
+
             labels.add(new OriginTermLabel(
                     new Origin(commonSpecType, commonFileName, commonLine),
                     origins));
