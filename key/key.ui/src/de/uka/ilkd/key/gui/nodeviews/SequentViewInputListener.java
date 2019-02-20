@@ -20,13 +20,14 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.StringJoiner;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
@@ -65,17 +66,14 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
                     // equal string representation are still different.
                     info = operator + ", Sort: " + t.sort() + ", Hash:" + t.hashCode();
 
-                    OriginTermLabel originLabel =
-                            (OriginTermLabel) t.getLabel(OriginTermLabel.NAME);
-
                     Sequent seq = sequentView.getMainWindow().getMediator().getSelectedNode().sequent();
                     info += ProofSaver.posInOccurrence2Proof(seq, posInOcc);
 
-                    if (originLabel != null && mediator
-                            .getSelectedProof().getSettings()
-                            .getTermLabelSettings().getUseOriginLabels()) {
-                        info += ", Origin: " + originLabel.getChild(0);
-                    }
+                    StringJoiner extensionStr = new StringJoiner(", ", ", ", "");
+                    extensionStr.setEmptyValue("");
+                    KeYGuiExtensionFacade.getTermInfoStrings(sequentView.getMainWindow(), mousePos)
+                        .forEach(extensionStr::add);
+                    info += extensionStr;
                 }
             }
 

@@ -163,9 +163,9 @@ public final class KeYGuiExtensionFacade {
     //region Term menu
 
     /**
-     * Retrieves all known implementation of the {@link KeYMainMenuExtension}
+     * Retrieves all known implementations of the {@link KeYMainMenuExtension}.
      *
-     * @return a list
+     * @return all known implementations of the {@link KeYMainMenuExtension}.
      */
     public static List<KeYTermMenuExtension> getTermMenuExtensions() {
         return getExtension(KeYTermMenuExtension.class);
@@ -181,6 +181,31 @@ public final class KeYGuiExtensionFacade {
         JMenu menu = new JMenu("Extensions");
         getTermMenuActions(window, pos).forEach(it -> sortActionIntoMenu(it, menu));
         return menu;
+    }
+    //endregion
+
+    //region Term info
+
+    /**
+     * Retrieves all known implementations of the {@link KeYTermInfoExtension}.
+     *
+     * @return all known implementations of the {@link KeYTermInfoExtension}.
+     */
+    public static List<KeYTermInfoExtension> getTermInfoExtensions() {
+        return getExtension(
+                KeYTermInfoExtension.class,
+                Comparator.comparingInt(KeYTermInfoExtension::getPriority));
+    }
+
+    /**
+     *
+     * @param window the main window.
+     * @param pos the position the user selected.
+     * @return every term info string from every loaded extension.
+     */
+    public static List<String> getTermInfoStrings(MainWindow window, PosInSequent pos) {
+        return getTermInfoExtensions().stream().flatMap(
+                it -> it.getTermInfoStrings(window, pos).stream()).collect(Collectors.toList());
     }
     //endregion
 
