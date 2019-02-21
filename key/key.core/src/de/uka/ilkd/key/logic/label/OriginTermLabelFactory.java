@@ -83,29 +83,37 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
                 matchEnd(tokenizer, str);
 
                 return new Origin(specType, Origin.IMPLICIT_FILE_NAME, Origin.IMPLICIT_LINE);
-            } else {
-                String filename = Origin.MULTIPLE_FILES;
-                if (tokenizer.hasMoreTokens()) {
-                    matchChar(token, str, "@");
-                    filename = tokenizer.nextToken();
-                }
-
-                int line = Origin.MULTIPLE_LINES;
-                if (tokenizer.hasMoreTokens()) {
-                    matchChar(tokenizer.nextToken(), str, "@");
-                    matchId(tokenizer.nextToken(), str, "line");
-                    line = Integer.parseInt(tokenizer.nextToken());
-                }
-
+            } else if (token.contentEquals("(multiple")) {
+                matchId(tokenizer.nextToken(), str, "files)");
                 matchEnd(tokenizer, str);
 
-                return new Origin(specType, filename, line);
+                return new Origin(specType, Origin.MULTIPLE_FILES, Origin.MULTIPLE_LINES);
+            } else {
+                matchChar(token, str, "@");
+                String filename = tokenizer.nextToken();
+
+                token = tokenizer.nextToken();
+
+                if (token.equals("(multiple")) {
+                    matchId(tokenizer.nextToken(), str, "lines)");
+                    matchEnd(tokenizer, str);
+
+                    return new Origin(specType, filename, Origin.MULTIPLE_LINES);
+                } else {
+                    matchChar(token, str, "@");
+                    matchId(tokenizer.nextToken(), str, "line");
+                    int line = Integer.parseInt(tokenizer.nextToken());
+                    matchEnd(tokenizer, str);
+
+
+                    return new Origin(specType, filename, line);
+                }
             }
         } catch (NoSuchElementException | IllegalArgumentException e) {
             throw new TermLabelException("Malformed origin string: \"" + str + "\"\n"
                     + "(Well-formed origins look like this: \"spec_type @ filename @ line xx\")\n"
-                    + "(                      or like this: \"spec_type @ filename\")\n"
-                    + "(                      or like this: \"spec_type\")\n"
+                    + "(                      or like this: \"spec_type @ filename (multiple lines)\")\n"
+                    + "(                      or like this: \"spec_type (multiple files)\")\n"
                     + "(                      or like this: \"spec_type (implicit)\")\n");
         }
     }

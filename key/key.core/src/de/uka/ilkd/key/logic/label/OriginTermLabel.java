@@ -378,7 +378,7 @@ public class OriginTermLabel implements TermLabel {
         /**
          * Placeholder file name used for implicit specifications.
          */
-        public static final String IMPLICIT_FILE_NAME = "\\implicit//";
+        public static final String IMPLICIT_FILE_NAME = "<implicit>";
 
         /**
          * Placeholder line number used for implicit specifications.
@@ -388,7 +388,7 @@ public class OriginTermLabel implements TermLabel {
         /**
          * Placeholder line number used for specifications across multiple lines.
          */
-        public static final String MULTIPLE_FILES = "\\multiple//";
+        public static final String MULTIPLE_FILES = "<multiple>";
 
         /**
          * Placeholder line number used for specifications across multiple lines.
@@ -419,7 +419,7 @@ public class OriginTermLabel implements TermLabel {
          */
         public Origin(SpecType specType, String fileName, int line) {
             this.specType = specType;
-            this.fileName = fileName;
+            this.fileName = fileName == null ? IMPLICIT_FILE_NAME : fileName;
             this.line = line;
         }
 
@@ -427,13 +427,17 @@ public class OriginTermLabel implements TermLabel {
         public String toString() {
             StringBuilder sb = new StringBuilder(specType.toString());
 
-            if (fileName == null || fileName.equals(IMPLICIT_FILE_NAME)) {
+            if (fileName.equals(IMPLICIT_FILE_NAME)) {
                 sb.append(" (implicit)");
-            } else if (!fileName.equals(MULTIPLE_FILES)) {
+            } else if (fileName.equals(MULTIPLE_FILES)) {
+                sb.append(" (multiple files)");
+            } else {
                 sb.append(" @ ");
                 sb.append(fileName);
 
-                if (line != MULTIPLE_LINES) {
+                if (line == MULTIPLE_LINES) {
+                    sb.append(" (multiple lines)");
+                } else {
                     sb.append(" @ line ");
                     sb.append(line);
                 }
