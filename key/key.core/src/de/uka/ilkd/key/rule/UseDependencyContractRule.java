@@ -106,7 +106,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
     private ImmutableSet<Term> addEqualDefs(ImmutableSet<Term> terms, Goal g) {
 	ImmutableList<Term> result = ImmutableSLList.nil();
-	
+
 	for(SequentFormula cf : g.sequent().antecedent()) {
 	    final Term formula = cf.formula();
 	    if(formula.op() instanceof Equality
@@ -252,7 +252,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    return false;
 	}
 	for(int i = 1, n = candidate.arity(); i < n; i++) {
-	    if(!(candidate.sub(i).equals(focus.sub(i))
+	    if(!(candidate.sub(i).equalsModIrrelevantTermLabels(focus.sub(i))
 		 || candidate.sub(i).op() instanceof LogicVariable)) {
 		return false;
 	    }
@@ -411,7 +411,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	boolean hasRawSteps = false;
 	for(int i = 0; i<target.getHeapCount(services) * target.getStateCount(); i++) {
 	  if(hasRawSteps(focus.sub(i), goal.sequent(), services)) {
-        hasRawSteps = true;		  
+        hasRawSteps = true;
 	    break;
 	  }
 	}
@@ -453,7 +453,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final IObserverFunction target = (IObserverFunction) focus.op();
         final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
         final TermBuilder TB = services.getTermBuilder();
-        
+
         final Term selfTerm;
         if (target.isStatic()) {
             selfTerm = null;
@@ -494,7 +494,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
            	 ? contract.getMby(heapTerms, selfTerm, paramTerms, atPres, services) : null;
 
         assert !step.subTerm().equals(focus);
-        
+
         Term freePre = !target.isStatic() ? TB.not(TB.equals(selfTerm, TB.NULL())) : null;
         Term disjoint = null;
         Term pre = null;
@@ -516,7 +516,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
                         services);
 
             assert changedLocs != null;
-            //store insts 
+            //store insts
             ifInsts = ifInsts.append(changedLocs.second.prepend(step));
             if(!target.isStatic()) {
                 final Term cr = TB.created(subStep, selfTerm);
@@ -586,7 +586,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         cjust.add(ruleApp, just);
 
         if(!useful) {
-        	return goal.split(1);        	
+        	return goal.split(1);
         }
 
         //prepare cut formula
@@ -636,7 +636,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     public UseDependencyContractApp createApp(PosInOccurrence pos) {
        return createApp(pos, null);
     }
-    
+
     @Override
     public UseDependencyContractApp createApp(PosInOccurrence pos, TermServices services) {
 		return new UseDependencyContractApp(this, pos);

@@ -15,7 +15,6 @@ import de.uka.ilkd.key.gui.ext.KeYToolbarExtension;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.pp.PosInSequent;
 
 /**
@@ -76,15 +75,8 @@ public class OriginTermLabelsExt
             // If the term has no origin label,
             // iterate over its parent terms until we find one with an origin label,
             // then show that term's origin.
-            while (originLabel == null && !pio.isTopLevel()) {
-                pio = pio.up();
-                term = pio.subTerm();
 
-                originLabel =
-                        (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
-            }
-
-            if (originLabel != null && originLabel.getOrigin().specType != SpecType.NONE) {
+            if (originLabel != null) {
                 result.add("Origin: " + originLabel.getChild(0));
             }
 
