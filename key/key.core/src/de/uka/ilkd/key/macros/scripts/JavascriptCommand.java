@@ -71,7 +71,7 @@ public class JavascriptCommand
         }
 
         public Sequent getSelectedGoal() throws ScriptException {
-            return state.getFirstOpenGoal().sequent();
+            return state.getFirstOpenAutomaticGoal().sequent();
         }
 
         public void setVar(String var, Term term) throws ScriptException {

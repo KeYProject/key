@@ -85,7 +85,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
             }
         }
 
-        Goal g = state.getFirstOpenGoal();
+        Goal g = state.getFirstOpenAutomaticGoal();
         ProofMacroFinishedInfo info = ProofMacroFinishedInfo
                 .getDefaultInfo(macro, state.getProof());
         try {

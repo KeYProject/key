@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -8,8 +10,6 @@ import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-
-import java.util.Map;
 
 /**
  * The command object CutCommand has as scriptcommand name "cut"
@@ -43,7 +43,6 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
     @Override public void execute(AbstractUserInterfaceControl uiControl,
             Parameters args, EngineState state)
             throws ScriptException, InterruptedException {
-
         Taclet cut = state.getProof().getEnv().getInitConfigForEnvironment()
                 .lookupActiveTaclet(CUT_TACLET_NAME);
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
@@ -51,7 +50,7 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
 
         app = app.addCheckedInstantiation(sv, args.formula,
                 state.getProof().getServices(), true);
-        state.getFirstOpenGoal().apply(app);
+        state.getFirstOpenAutomaticGoal().apply(app);
     }
 
     public static class Parameters {

@@ -71,7 +71,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         final RuleApp theApp = makeRuleApp(args, state);
         assert theApp != null;
 
-        Goal g = state.getFirstOpenGoal();
+        Goal g = state.getFirstOpenAutomaticGoal();
         g.apply(theApp);
     }
 
@@ -94,7 +94,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
              * hide_left etc.
              */
             final Optional<TacletApp> maybeApp = Optional.ofNullable(state
-                    .getFirstOpenGoal().indexOfTaclets().lookup(p.rulename));
+                    .getFirstOpenAutomaticGoal().indexOfTaclets().lookup(p.rulename));
 
             return maybeApp.orElseThrow(() -> new ScriptException(
                     "Taclet '" + p.rulename + "' not known."));
@@ -114,7 +114,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                     builtInRuleApp(p, state, maybeBuiltInRule.get());
             if (builtInRuleApp.isSufficientlyComplete()) {
                 builtInRuleApp = builtInRuleApp
-                        .forceInstantiate(state.getFirstOpenGoal());
+                        .forceInstantiate(state.getFirstOpenAutomaticGoal());
             }
             return builtInRuleApp;
         }
@@ -126,7 +126,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         TacletApp result = theApp;
 
         final ImmutableList<TacletApp> assumesCandidates = theApp
-                .findIfFormulaInstantiations(state.getFirstOpenGoal().sequent(),
+                .findIfFormulaInstantiations(state.getFirstOpenAutomaticGoal().sequent(),
                         proof.getServices());
 
         if (assumesCandidates.size() != 1) {
@@ -142,7 +142,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
              */
             final TacletApp maybeInstApp = result
                     .tryToInstantiate(proof.getServices().getOverlay(
-                            state.getFirstOpenGoal().getLocalNamespaces()));
+                            state.getFirstOpenAutomaticGoal().getLocalNamespaces()));
 
             if (maybeInstApp != null) {
                 result = maybeInstApp;
@@ -164,7 +164,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         // try to instantiate remaining symbols
         result = result.tryToInstantiate(proof.getServices()
-                .getOverlay(state.getFirstOpenGoal().getLocalNamespaces()));
+                .getOverlay(state.getFirstOpenAutomaticGoal().getLocalNamespaces()));
 
         if (result == null) {
             throw new ScriptException("Cannot instantiate this rule");
@@ -238,7 +238,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         final Services services = state.getProof().getServices();
         assert services != null;
 
-        final Goal g = state.getFirstOpenGoal();
+        final Goal g = state.getFirstOpenAutomaticGoal();
         final BuiltInRuleAppIndex index = g.ruleAppIndex()
                 .builtInRuleAppIndex();
 
@@ -269,7 +269,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         Services services = state.getProof().getServices();
         assert services != null;
         TacletFilter filter = new TacletNameFilter(p.rulename);
-        Goal g = state.getFirstOpenGoal();
+        Goal g = state.getFirstOpenAutomaticGoal();
         RuleAppIndex index = g.ruleAppIndex();
         index.autoModeStopped();
 

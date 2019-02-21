@@ -62,7 +62,7 @@ public class SaveNewNameCommand
         }
 
         try {
-            final Goal goal = stateMap.getFirstOpenGoal();
+            final Goal goal = stateMap.getFirstOpenAutomaticGoal();
             final Node node = goal.node().parent();
             final List<String> matches = node.getNameRecorder().getProposals()
                     .stream().map(Name::toString)
