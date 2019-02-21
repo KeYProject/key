@@ -110,11 +110,18 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
                 }
             }
         } catch (NoSuchElementException | IllegalArgumentException e) {
-            throw new TermLabelException("Malformed origin string: \"" + str + "\"\n"
-                    + "(Well-formed origins look like this: \"spec_type @ filename @ line xx\")\n"
-                    + "(                      or like this: \"spec_type @ filename (multiple lines)\")\n"
-                    + "(                      or like this: \"spec_type (multiple files)\")\n"
-                    + "(                      or like this: \"spec_type (implicit)\")\n");
+            throw new TermLabelException(
+                      "Malformed origin string: \""
+                    + str + "\"\n"
+                    + "(Well-formed origins have either this format: \""
+                    + "spec_type @ filename @ line xx\")\n"
+                    + "(                                    or this: \""
+                    + "spec_type @ filename (multiple lines)\")\n"
+                    + "(                                    or this: \""
+                    + "spec_type (multiple files)\")\n"
+                    + "(                                    or this: \""
+                    + "spec_type (implicit)\")\n"
+            );
         }
     }
 
