@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -206,9 +207,9 @@ public class OriginTermLabel implements TermLabel {
      */
     public static Term removeOriginLabels(Term term, Services services) {
         List<TermLabel> labels = term.getLabels().toList();
-        TermLabel originTermLabel = term.getLabel(NAME);
-        TermBuilder tb = services.getTermBuilder();
-        ImmutableArray<Term> oldSubs = term.subs();
+        final TermLabel originTermLabel = term.getLabel(NAME);
+        final TermFactory tf = services.getTermFactory();
+        final ImmutableArray<Term> oldSubs = term.subs();
         Term[] newSubs = new Term[oldSubs.size()];
 
         if (originTermLabel != null) {
@@ -219,12 +220,53 @@ public class OriginTermLabel implements TermLabel {
             newSubs[i] = removeOriginLabels(oldSubs.get(i), services);
         }
 
-        return tb.tf().createTerm(
-                term.op(),
-                newSubs,
-                term.boundVars(),
-                term.javaBlock(),
-                new ImmutableArray<>(labels));
+        return tf.createTerm(term.op(),
+                             newSubs,
+                             term.boundVars(),
+                             term.javaBlock(),
+                             new ImmutableArray<>(labels));
+    }
+
+
+    /**
+     * Compute the common origin from all origins in the passed origins set.
+     * @param origins the passed origins set
+     * @return the computed common origin
+     */
+    public static Origin computeCommonOrigin(final Set<Origin> origins) {
+        SpecType commonSpecType = null;
+        String commonFileName = null;
+        int commonLine = -1;
+
+        for (Origin origin : origins) {
+            if (commonSpecType == null) {
+                commonSpecType = origin.specType;
+            } else if (commonSpecType != origin.specType) {
+                commonSpecType = SpecType.NONE;
+                commonFileName = null;
+                commonLine = -1;
+                break;
+            }
+
+            if (commonFileName == null) {
+                commonFileName = origin.fileName;
+            } else if (!commonFileName.equals(origin.fileName)) {
+                commonFileName = Origin.MULTIPLE_FILES;
+                commonLine = Origin.MULTIPLE_LINES;
+            }
+
+            if (commonLine == -1) {
+                commonLine = origin.line;
+            } else if (commonLine != origin.line) {
+                commonLine = Origin.MULTIPLE_LINES;
+            }
+        }
+
+        if (commonSpecType == null) {
+            commonSpecType = SpecType.NONE;
+        }
+
+        return new Origin(commonSpecType, commonFileName, commonLine);
     }
 
     /**
@@ -241,78 +283,15 @@ public class OriginTermLabel implements TermLabel {
             return term;
         }
 
-        TermBuilder tb = services.getTermBuilder();
-        ImmutableArray<Term> oldSubs = term.subs();
-        Term[] newSubs = new Term[oldSubs.size()];
-        Set<Origin> origins = new HashSet<>();
+        SubTermOriginData newSubs = getSubTermOriginData(term.subs(), services);
+        final ImmutableArray<TermLabel> labels =
+                computeOriginLabelsFromSubTermOrigins(term, newSubs.origins);
 
-        for (int i = 0; i < newSubs.length; ++i) {
-            newSubs[i] = collectSubtermOrigins(oldSubs.get(i), services);
-            OriginTermLabel subLabel = (OriginTermLabel) newSubs[i].getLabel(NAME);
-
-            if (subLabel != null) {
-                origins.add(subLabel.getOrigin());
-                origins.addAll(subLabel.getSubtermOrigins());
-            }
-        }
-
-        List<TermLabel> labels = term.getLabels().toList();
-        OriginTermLabel oldLabel = (OriginTermLabel) term.getLabel(NAME);
-
-        if (oldLabel != null) {
-            labels.remove(oldLabel);
-
-            if ((!origins.isEmpty() || oldLabel.getOrigin().specType != SpecType.NONE)) {
-                labels.add(new OriginTermLabel(
-                        oldLabel.getOrigin().specType,
-                        oldLabel.getOrigin().fileName,
-                        oldLabel.getOrigin().line,
-                        origins));
-            }
-        } else if (!origins.isEmpty()) {
-            SpecType commonSpecType = null;
-            String commonFileName = null;
-            int commonLine = -1;
-
-            for (Origin origin : origins) {
-                if (commonSpecType == null) {
-                    commonSpecType = origin.specType;
-                } else if (commonSpecType != origin.specType) {
-                    commonSpecType = SpecType.NONE;
-                    commonFileName = null;
-                    commonLine = -1;
-                    break;
-                }
-
-                if (commonFileName == null) {
-                    commonFileName = origin.fileName;
-                } else if (!commonFileName.equals(origin.fileName)) {
-                    commonFileName = Origin.MULTIPLE_FILES;
-                    commonLine = Origin.MULTIPLE_LINES;
-                }
-
-                if (commonLine == -1) {
-                    commonLine = origin.line;
-                } else if (commonLine != origin.line) {
-                    commonLine = Origin.MULTIPLE_LINES;
-                }
-            }
-
-            if (commonSpecType == null) {
-                commonSpecType = SpecType.NONE;
-            }
-
-            labels.add(new OriginTermLabel(
-                    new Origin(commonSpecType, commonFileName, commonLine),
-                    origins));
-        }
-
-        return tb.tf().createTerm(
-                term.op(),
-                newSubs,
-                term.boundVars(),
-                term.javaBlock(),
-                new ImmutableArray<>(labels));
+        return services.getTermFactory().createTerm(term.op(),
+                                                    newSubs.terms,
+                                                    term.boundVars(),
+                                                    term.javaBlock(),
+                                                    labels);
     }
 
     @Override
@@ -365,6 +344,84 @@ public class OriginTermLabel implements TermLabel {
      */
     public Set<Origin> getSubtermOrigins() {
         return Collections.unmodifiableSet(subtermOrigins);
+    }
+
+
+    private static ImmutableArray<TermLabel>
+                            computeOriginLabelsFromSubTermOrigins(final Term term,
+                                                                  final Set<Origin> origins) {
+        List<TermLabel> labels = term.getLabels().toList();
+        final OriginTermLabel oldLabel = (OriginTermLabel) term.getLabel(NAME);
+
+        if (oldLabel != null) {
+            labels.remove(oldLabel);
+
+            if ((!origins.isEmpty() || oldLabel.getOrigin().specType != SpecType.NONE)) {
+                labels.add(new OriginTermLabel(
+                        oldLabel.getOrigin().specType,
+                        oldLabel.getOrigin().fileName,
+                        oldLabel.getOrigin().line,
+                        origins));
+            }
+        } else if (!origins.isEmpty()) {
+            final OriginTermLabel newLabel =
+                    new OriginTermLabel(computeCommonOrigin(origins), origins);
+
+            labels.add(newLabel);
+        }
+        return new ImmutableArray<>(labels);
+    }
+
+    /**
+     * @param subs the sub-terms to be searched
+     * @param services a services object used for getting type information
+     *                 and creating the new sub-term
+     * @return origin information about the searched sub-terms stored in a
+     *                {@link SubTermOriginData} object.
+     */
+    private static SubTermOriginData getSubTermOriginData(final ImmutableArray<Term> subs,
+                                                          final Services services) {
+        Term[] newSubs = new Term[subs.size()];
+        Set<Origin> origins = new HashSet<>();
+
+        for (int i = 0; i < newSubs.length; ++i) {
+            newSubs[i] = collectSubtermOrigins(subs.get(i), services);
+            final OriginTermLabel subLabel = (OriginTermLabel) newSubs[i].getLabel(NAME);
+
+            if (subLabel != null) {
+                origins.add(subLabel.getOrigin());
+                origins.addAll(subLabel.getSubtermOrigins());
+            }
+        }
+        return new SubTermOriginData(newSubs, origins);
+    }
+
+    /**
+     * This class stores an array of sub-terms and a set of all their origins.
+     * It is used when recursively collecting all origins from a term's sub-terms
+     * for setting its respective origin labels. The information of the sub-terms
+     * are used for propagating their origin label information upwards to their
+     * enclosing term.
+     *
+     * @author Michael Kirsten
+     *
+     */
+    private static class SubTermOriginData {
+        /**  All collected sub-terms */
+        public final Term[] terms;
+        /** All collected origins */
+        public final Set<Origin> origins;
+
+        /**
+         * This method constructs an object of type {@link SubTermOriginData}.
+         * @param subterms the collected sub-terms
+         * @param subtermOrigins the origin information collected from these sub-terms
+         */
+        public SubTermOriginData(Term[] subterms,
+                                 Set<Origin> subtermOrigins) {
+            this.terms = subterms;
+            this.origins = subtermOrigins;
+        }
     }
 
     /**

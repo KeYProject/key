@@ -2,8 +2,9 @@ package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.parser.Location;
 
-@SuppressWarnings("serial")
 public class ScriptException extends Exception {
+
+    private static final long serialVersionUID = -1200219771837971833L;
 
     private final Location location;
 

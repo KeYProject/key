@@ -15,6 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
@@ -152,10 +153,10 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     * @return The {@link String} representation of the given {@link Term}.
     */
    protected String formatTerm(Term term, Services services) {
-      return SymbolicExecutionUtil.formatTerm(term, 
-                                              services, 
-                                              settings.isUseUnicode(),
-                                              settings.isUsePrettyPrinting());
+       return SymbolicExecutionUtil.formatTerm(term,
+                                               services,
+                                               settings.isUseUnicode(),
+                                               settings.isUsePrettyPrinting());
    }
 
    /**

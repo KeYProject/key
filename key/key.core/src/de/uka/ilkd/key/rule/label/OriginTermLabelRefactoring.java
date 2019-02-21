@@ -50,11 +50,11 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     }
 
     @Override
-    public void refactorLabels(
-            TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Term term,
-            List<TermLabel> labels) {
+    public void refactorLabels(TermLabelState state, Services services,
+                               PosInOccurrence applicationPosInOccurrence,
+                               Term applicationTerm, Rule rule, Goal goal,
+                               Object hint, Term tacletTerm, Term term,
+                               List<TermLabel> labels) {
         if (services.getProof() == null) {
             return;
         }
@@ -84,58 +84,24 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             return;
         }
 
-        OriginTermLabel newLabel;
-
         Set<Origin> subtermOrigins = collectSubtermOrigins(term.subs(), new HashSet<>());
 
+        final OriginTermLabel newLabel;
         if (oldLabel != null) {
             labels.remove(oldLabel);
-
-            newLabel = new OriginTermLabel(
-                    oldLabel.getOrigin().specType,
-                    oldLabel.getOrigin().fileName,
-                    oldLabel.getOrigin().line,
-                    subtermOrigins);
+            final Origin oldOrigin = oldLabel.getOrigin();
+            newLabel = new OriginTermLabel(oldOrigin.specType,
+                                           oldOrigin.fileName,
+                                           oldOrigin.line,
+                                           subtermOrigins);
         } else {
-            SpecType commonSpecType = null;
-            String commonFileName = null;
-            int commonLine = -1;
-
-            for (Origin origin : subtermOrigins) {
-                if (commonSpecType == null) {
-                    commonSpecType = origin.specType;
-                } else if (commonSpecType != origin.specType) {
-                    commonSpecType = SpecType.NONE;
-                    commonFileName = null;
-                    commonLine = -1;
-                    break;
-                }
-
-                if (commonFileName == null) {
-                    commonFileName = origin.fileName;
-                } else if (!commonFileName.equals(origin.fileName)) {
-                    commonFileName = Origin.MULTIPLE_FILES;
-                    commonLine = Origin.MULTIPLE_LINES;
-                }
-
-                if (commonLine == -1) {
-                    commonLine = origin.line;
-                } else if (commonLine != origin.line) {
-                    commonLine = Origin.MULTIPLE_LINES;
-                }
-            }
-
-            if (commonSpecType == null) {
-                commonSpecType = SpecType.NONE;
-            }
-
-            newLabel = new OriginTermLabel(
-                    new Origin(commonSpecType, commonFileName, commonLine),
-                    subtermOrigins);
+            final Origin commonOrigin = OriginTermLabel.computeCommonOrigin(subtermOrigins);
+            newLabel = new OriginTermLabel(commonOrigin, subtermOrigins);
         }
 
         if (OriginTermLabel.canAddLabel(term, services)
-                && (!subtermOrigins.isEmpty() || newLabel.getOrigin().specType != SpecType.NONE)) {
+                && (!subtermOrigins.isEmpty()
+                        || newLabel.getOrigin().specType != SpecType.NONE)) {
             labels.add(newLabel);
         }
     }

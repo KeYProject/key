@@ -3753,8 +3753,8 @@ public final class SymbolicExecutionUtil {
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     * @return The {@link String} representation of the given {@link Term}.
     */
-   public static String formatTerm(Term term, 
-                                   Services services, 
+   public static String formatTerm(Term term,
+                                   Services services,
                                    boolean useUnicode,
                                    boolean usePrettyPrinting) {
       if ((useUnicode || usePrettyPrinting) && services != null) {
@@ -3773,7 +3773,9 @@ public final class SymbolicExecutionUtil {
          return result.toString();
       }
       else {
-         return term != null ? term.toString() : null;
+         return term != null ?
+                 TermLabel.removeIrrelevantLabels(term, services).toString()
+                 : null;
       }
    }
    
