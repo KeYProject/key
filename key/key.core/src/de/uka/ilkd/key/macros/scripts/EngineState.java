@@ -72,14 +72,30 @@ public class EngineState {
         return proof;
     }
 
-    public Goal getFirstOpenGoal() throws ScriptException {
+    /**
+     * Returns the first open goal, which has to be automatic iff checkAutomatic
+     * is true.
+     *
+     * @param checkAutomatic
+     *            Set to true if the returned {@link Goal} should be automatic.
+     * @return the first open goal, which has to be automatic iff checkAutomatic
+     *         is true.
+     *
+     * @throws ScriptException
+     *             If there is no such {@link Goal}, or something else goes
+     *             wrong.
+     */
+    @SuppressWarnings("unused")
+    public Goal getFirstOpenGoal(boolean checkAutomatic)
+            throws ScriptException {
         if (proof.closed()) {
             throw new ScriptException("The proof is closed already");
         }
 
         Node rootNodeForSearch = proof.root();
         Goal newGoal = goal;
-        if (newGoal != null && newGoal.node().isClosed()) {
+        if (newGoal != null && ((checkAutomatic && !newGoal.isAutomatic())
+                || newGoal.node().isClosed())) {
             assert rootNodeForSearch != null;
             /*
              * The first subtree of the previous goal is closed. Try with other
@@ -93,11 +109,25 @@ public class EngineState {
             return newGoal;
         }
 
-        newGoal = findGoalFromRoot(rootNodeForSearch);
+        newGoal = findGoalFromRoot(rootNodeForSearch, checkAutomatic);
         lastSetGoalNode = newGoal.node();
 
-        assert newGoal != null : "There must be an open goal at this point";
+        if (newGoal == null) {
+            throw new ScriptException(
+                    "There must be an open goal at this point");
+        }
+
         return newGoal;
+    }
+
+    /**
+     * @return The first open and automatic {@link Goal}.
+     *
+     * @throws ScriptException
+     *             If there is no such {@link Goal}.
+     */
+    public Goal getFirstOpenAutomaticGoal() throws ScriptException {
+        return getFirstOpenGoal(true);
     }
 
     private static Node goUpUntilOpen(final Node start) {
@@ -114,7 +144,7 @@ public class EngineState {
         return currNode;
     }
 
-    private Goal findGoalFromRoot(final Node rootNode) {
+    private Goal findGoalFromRoot(final Node rootNode, boolean checkAutomatic) {
         final Deque<Node> choices = new LinkedList<Node>();
 
         Goal result = null;
@@ -130,7 +160,7 @@ public class EngineState {
             switch (childCount) {
             case 0:
                 result = getGoal(proof.openGoals(), node);
-                if (result.isAutomatic()) {
+                if (!checkAutomatic || result.isAutomatic()) {
                     // We found our goal
                     break loop;
                 }
@@ -167,15 +197,15 @@ public class EngineState {
         StringReader reader = new StringReader(string);
         Services services = proof.getServices();
         Term formula = PARSER.parse(reader, sort, services,
-                getFirstOpenGoal().getLocalNamespaces(), abbrevMap);
+                getFirstOpenAutomaticGoal().getLocalNamespaces(), abbrevMap);
         return formula;
     }
 
     public Sort toSort(String sortName)
             throws ParserException, ScriptException {
-        return (getFirstOpenGoal() == null
+        return (getFirstOpenAutomaticGoal() == null
                 ? getProof().getServices().getNamespaces()
-                : getFirstOpenGoal().getLocalNamespaces()).sorts()
+                : getFirstOpenAutomaticGoal().getLocalNamespaces()).sorts()
                         .lookup(sortName);
     }
 
@@ -185,7 +215,8 @@ public class EngineState {
         Services services = proof.getServices();
 
         Sequent seq = PARSER.parseSeq(reader, services,
-                getFirstOpenGoal().getLocalNamespaces(), getAbbreviations());
+                getFirstOpenAutomaticGoal().getLocalNamespaces(),
+                getAbbreviations());
         return seq;
     }
 

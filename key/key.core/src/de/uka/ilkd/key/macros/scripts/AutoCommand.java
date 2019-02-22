@@ -64,7 +64,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         if (arguments.isOnAllOpenGoals()) {
             goals = state.getProof().openGoals();
         } else {
-            final Goal goal = state.getFirstOpenGoal();
+            final Goal goal = state.getFirstOpenAutomaticGoal();
             goals = ImmutableSLList.<Goal> nil().prepend(goal);
 
             final Optional<String> matchesRegEx = Optional

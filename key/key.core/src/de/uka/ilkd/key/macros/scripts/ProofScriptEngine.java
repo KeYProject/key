@@ -113,7 +113,7 @@ public class ProofScriptEngine {
                 // write("/tmp/weiglProofScripts_%d.txt", cnt, proof);
 
                 Object o = command.evaluateArguments(stateMap, argMap);
-                final Node firstNode = stateMap.getFirstOpenGoal().node();
+                final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
                 command.execute(uiControl, o, stateMap);
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
             } catch (InterruptedException ie) {

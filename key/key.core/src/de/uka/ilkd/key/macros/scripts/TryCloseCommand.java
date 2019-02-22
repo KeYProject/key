@@ -38,7 +38,7 @@ public class TryCloseCommand
         boolean branch = "branch".equals(args.branch);
         Node target;
         if (branch) {
-            target = state.getFirstOpenGoal().node();
+            target = state.getFirstOpenAutomaticGoal().node();
         }
         else {
             target = state.getProof().root();

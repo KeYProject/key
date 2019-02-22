@@ -96,7 +96,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
                                                        EngineState state) throws ScriptException {
         Services services = state.getProof().getServices();
         TacletFilter filter = TacletFilter.TRUE;
-        Goal g = state.getFirstOpenGoal();
+        Goal g = state.getFirstOpenAutomaticGoal();
         RuleAppIndex index = g.ruleAppIndex();
         index.autoModeStopped();
 
@@ -151,7 +151,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
                         }
 
                         try { //Term not already successfully replaced
-                            Goal goalold = state.getFirstOpenGoal();
+                            Goal goalold = state.getFirstOpenAutomaticGoal();
 
                             RewriteTaclet rw = (RewriteTaclet) pta.taclet();
                             if (pta.complete()) {
