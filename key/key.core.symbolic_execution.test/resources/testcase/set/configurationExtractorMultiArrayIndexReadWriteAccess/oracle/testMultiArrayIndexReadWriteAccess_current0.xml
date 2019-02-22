@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
+   <equivalenceClass representativeTerm="array">
+      <term term="array"/>
+      <term term="array"/>
+   </equivalenceClass>
    <state name="return array[0][0];">
       <value name="exc" programVariable="exc" isArrayIndex="false" value="null" type="Null" condition="true"/>
       <association name="array" programVariable="array" isArrayIndex="false" target="o1" condition="true"/>

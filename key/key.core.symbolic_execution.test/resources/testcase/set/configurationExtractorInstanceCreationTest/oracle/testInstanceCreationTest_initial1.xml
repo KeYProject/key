@@ -2,6 +2,7 @@
 <model>
    <equivalenceClass representativeTerm="self">
       <term term="self"/>
+      <term term="self"/>
       <term term="InstanceCreationTest::select(heap,self,InstanceCreationTest::$next)"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return InstanceCreationTest.classWrapper.value+this.instanceWrapper.value+this.next.instanceWrapper.value+localWrapper.value;">
@@ -9,6 +10,8 @@
       <association name="self" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="self" type="InstanceCreationTest">
-      <association name="next" programVariable="next" isArrayIndex="false" target="o1" condition="true"/>
+   </object>
+   <object xml:id="o2" name="self" type="InstanceCreationTest">
+      <association name="next" programVariable="next" isArrayIndex="false" target="o2" condition="true"/>
    </object>
 </model>

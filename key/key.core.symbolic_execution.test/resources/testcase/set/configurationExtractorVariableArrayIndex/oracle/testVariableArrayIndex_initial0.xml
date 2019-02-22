@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
+   <equivalenceClass representativeTerm="self">
+      <term term="self"/>
+      <term term="self"/>
+   </equivalenceClass>
    <state name="One Step Simplification resulting in {}">
       <value name="exc" programVariable="exc" isArrayIndex="false" value="exc" type="java.lang.Throwable" condition="true"/>
       <association name="self" programVariable="self" isArrayIndex="false" target="o2" condition="true"/>
@@ -9,6 +13,8 @@
       <value name="[int::select(heap,self,VariableArrayIndex::$index)]" isArrayIndex="true" arrayIndex="int::select(heap,self,VariableArrayIndex::$index)" value="int::select(heap,int[]::select(heap,self,VariableArrayIndex::$array),arr(int::select(heap,self,VariableArrayIndex::$index)))" type="int" condition="true"/>
    </object>
    <object xml:id="o2" name="self" type="VariableArrayIndex">
+   </object>
+   <object xml:id="o3" name="self" type="VariableArrayIndex">
       <value name="index" programVariable="index" isArrayIndex="false" value="int::select(heap,self,VariableArrayIndex::$index)" type="int" condition="true"/>
       <association name="array" programVariable="array" isArrayIndex="false" target="o1" condition="true"/>
    </object>

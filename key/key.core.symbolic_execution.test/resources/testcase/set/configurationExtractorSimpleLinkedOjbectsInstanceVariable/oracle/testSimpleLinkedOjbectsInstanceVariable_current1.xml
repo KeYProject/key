@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
+   <equivalenceClass representativeTerm="self">
+      <term term="self"/>
+      <term term="self"/>
+   </equivalenceClass>
    <equivalenceClass representativeTerm="SimpleLinkedOjbectsInstanceVariable::select(heap,self,SimpleLinkedOjbectsInstanceVariable::$next)">
       <term term="SimpleLinkedOjbectsInstanceVariable::select(heap,self,SimpleLinkedOjbectsInstanceVariable::$next)"/>
       <term term="SimpleLinkedOjbectsInstanceVariable::select(heap,SimpleLinkedOjbectsInstanceVariable::select(heap,self,SimpleLinkedOjbectsInstanceVariable::$next),SimpleLinkedOjbectsInstanceVariable::$next)"/>

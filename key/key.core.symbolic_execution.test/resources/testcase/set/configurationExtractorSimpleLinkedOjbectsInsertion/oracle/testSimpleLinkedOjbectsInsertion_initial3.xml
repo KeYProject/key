@@ -2,6 +2,7 @@
 <model>
    <equivalenceClass representativeTerm="x">
       <term term="x"/>
+      <term term="x"/>
       <term term="SimpleLinkedOjbectsInsertion::select(heap,x,SimpleLinkedOjbectsInsertion::$next)"/>
       <term term="SimpleLinkedOjbectsInsertion::select(heap,SimpleLinkedOjbectsInsertion::select(heap,x,SimpleLinkedOjbectsInsertion::$next),SimpleLinkedOjbectsInsertion::$next)"/>
    </equivalenceClass>
@@ -10,6 +11,8 @@
       <association name="x" programVariable="x" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="x" type="SimpleLinkedOjbectsInsertion">
-      <association name="next" programVariable="next" isArrayIndex="false" target="o1" condition="true"/>
+   </object>
+   <object xml:id="o2" name="x" type="SimpleLinkedOjbectsInsertion">
+      <association name="next" programVariable="next" isArrayIndex="false" target="o2" condition="true"/>
    </object>
 </model>

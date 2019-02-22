@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
+   <equivalenceClass representativeTerm="self">
+      <term term="self"/>
+      <term term="self"/>
+   </equivalenceClass>
+   <equivalenceClass representativeTerm="summand">
+      <term term="summand"/>
+      <term term="summand"/>
+   </equivalenceClass>
    <state name="{}">
       <value name="exc" programVariable="exc" isArrayIndex="false" value="null" type="Null" condition="true"/>
       <association name="summand" programVariable="summand" isArrayIndex="false" target="o1" condition="true"/>

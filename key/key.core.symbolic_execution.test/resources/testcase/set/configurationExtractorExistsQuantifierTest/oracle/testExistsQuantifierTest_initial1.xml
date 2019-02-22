@@ -3,6 +3,7 @@
    <equivalenceClass representativeTerm="self">
       <term term="p_0"/>
       <term term="self"/>
+      <term term="self"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in {}">
       <value name="exc" programVariable="exc" isArrayIndex="false" value="exc" type="java.lang.Throwable" condition="true"/>

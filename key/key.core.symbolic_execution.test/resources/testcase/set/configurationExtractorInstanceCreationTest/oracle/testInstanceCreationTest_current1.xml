@@ -2,6 +2,7 @@
 <model>
    <equivalenceClass representativeTerm="self">
       <term term="self"/>
+      <term term="self"/>
       <term term="InstanceCreationTest::select(heap,self,InstanceCreationTest::$next)"/>
    </equivalenceClass>
    <state name="return InstanceCreationTest.classWrapper.value+this.instanceWrapper.value+this.next.instanceWrapper.value+localWrapper.value;">

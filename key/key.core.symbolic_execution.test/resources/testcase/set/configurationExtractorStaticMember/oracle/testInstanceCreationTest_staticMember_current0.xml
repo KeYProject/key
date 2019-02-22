@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
+   <equivalenceClass representativeTerm="self">
+      <term term="self"/>
+      <term term="self"/>
+   </equivalenceClass>
    <equivalenceClass representativeTerm="null">
       <term term="NextLevel::select(heap,Refer::select(heap,null,StaticMember::$r),Refer::$nl)"/>
       <term term="null"/>

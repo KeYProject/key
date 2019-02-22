@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <equivalenceClass representativeTerm="null">
+   <equivalenceClass representativeTerm="obj">
       <term term="obj"/>
-      <term term="null"/>
+      <term term="obj"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return obj.x;">
-      <value name="obj" programVariable="obj" isArrayIndex="false" value="null" type="Null" condition="true"/>
       <value name="exc" programVariable="exc" isArrayIndex="false" value="exc" type="java.lang.Throwable" condition="true"/>
+      <association name="obj" programVariable="obj" isArrayIndex="false" target="o1" condition="true"/>
    </state>
+   <object xml:id="o1" name="obj" type="EmptyPathConditionAndNoUpdates">
+   </object>
 </model>

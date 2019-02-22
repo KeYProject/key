@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
+   <equivalenceClass representativeTerm="x">
+      <term term="x"/>
+      <term term="x"/>
+   </equivalenceClass>
    <equivalenceClass representativeTerm="SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next)">
       <term term="SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next)"/>
+      <term term="SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next)"/>
+      <term term="SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next)"/>
       <term term="SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next)"/>
    </equivalenceClass>
    <state name="return x.value+x.next.value+x.next.next.value;">

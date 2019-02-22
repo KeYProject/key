@@ -2,6 +2,7 @@
 <model>
    <equivalenceClass representativeTerm="x">
       <term term="x"/>
+      <term term="x"/>
       <term term="SimpleLinkedOjbectsInsertion::select(heap,SimpleLinkedOjbectsInsertion::select(heap,x,SimpleLinkedOjbectsInsertion::$next),SimpleLinkedOjbectsInsertion::$next)"/>
    </equivalenceClass>
    <state name="return x.value+x.next.value+x.next.next.value+x.next.next.next.value;">

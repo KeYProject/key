@@ -44,9 +44,7 @@
                </variable>
                <callStackEntry path="/0"/>
                <operationContract name="result_0 = magic() catch(exc_0)
-pre: true
-post: result_0 = Z(2(4(#))) &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;
-mod: empty
+mod: {}
 termination: diamond" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                   <variable name="x" isArrayIndex="false">
                      <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
@@ -122,8 +120,8 @@ termination: diamond" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged
                </value>
             </variable>
             <callStackEntry path="/0"/>
-            <loopInvariant name="invariant: leq(x, Z(neglit(1(#))));
-variant: javaSubInt(Z(0(#)), x)
+            <loopInvariant name="invariant: x &lt;= -1;
+variant: javaSubInt(0, x)
 mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initiallyValid="true">
                <variable name="x" isArrayIndex="false">
                   <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">

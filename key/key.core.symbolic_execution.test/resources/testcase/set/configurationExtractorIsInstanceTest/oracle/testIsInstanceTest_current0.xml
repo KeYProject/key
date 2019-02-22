@@ -2,6 +2,7 @@
 <model>
    <equivalenceClass representativeTerm="null">
       <term term="obj"/>
+      <term term="obj"/>
       <term term="IsInstanceTest::select(heap,null,IsInstanceTest::$A)"/>
       <term term="null"/>
    </equivalenceClass>
