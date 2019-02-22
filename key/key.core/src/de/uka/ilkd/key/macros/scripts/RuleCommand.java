@@ -28,6 +28,7 @@ import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
@@ -93,8 +94,9 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
              * (DS, 2019-01-31): Might be a locally introduced taclet, e.g., by
              * hide_left etc.
              */
-            final Optional<TacletApp> maybeApp = Optional.ofNullable(state
-                    .getFirstOpenAutomaticGoal().indexOfTaclets().lookup(p.rulename));
+            final Optional<TacletApp> maybeApp = Optional
+                    .ofNullable(state.getFirstOpenAutomaticGoal()
+                            .indexOfTaclets().lookup(p.rulename));
 
             return maybeApp.orElseThrow(() -> new ScriptException(
                     "Taclet '" + p.rulename + "' not known."));
@@ -125,9 +127,10 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             throws ScriptException {
         TacletApp result = theApp;
 
+        final Services services = proof.getServices();
         final ImmutableList<TacletApp> assumesCandidates = theApp
-                .findIfFormulaInstantiations(state.getFirstOpenAutomaticGoal().sequent(),
-                        proof.getServices());
+                .findIfFormulaInstantiations(
+                        state.getFirstOpenAutomaticGoal().sequent(), services);
 
         if (assumesCandidates.size() != 1) {
             throw new ScriptException("Not a unique \\assumes instantiation");
@@ -135,19 +138,34 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         result = assumesCandidates.head();
 
+        /*
+         * NOTE (DS, 2019-02-22): If we change something by instantiating the
+         * app as much as possible, it might happen that the match conditions
+         * (those which are not really conditions, but which change the
+         * instantiations based on others that are yet to be added) have to be
+         * evaluated again, since the second call to tryToInstantiate won't do
+         * this if everything already has been instantiated. That's a little sad
+         * and a border case, but I had that problem.
+         */
+        boolean recheckMatchConditions;
         {
             /*
              * (DS, 2019-01-31): Try to instantiate first, otherwise, we cannot
              * apply taclets with "\newPV", Skolem terms etc.
              */
             final TacletApp maybeInstApp = result
-                    .tryToInstantiate(proof.getServices().getOverlay(
-                            state.getFirstOpenAutomaticGoal().getLocalNamespaces()));
+                    .tryToInstantiateAsMuchAsPossible(services.getOverlay(state
+                            .getFirstOpenAutomaticGoal().getLocalNamespaces()));
 
             if (maybeInstApp != null) {
                 result = maybeInstApp;
+                recheckMatchConditions = true;
+            } else {
+                recheckMatchConditions = false;
             }
         }
+
+        recheckMatchConditions &= !result.uninstantiatedVars().isEmpty();
 
         for (SchemaVariable sv : result.uninstantiatedVars()) {
             if (result.isInstantiationRequired(sv)) {
@@ -157,17 +175,26 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                             "missing instantiation for " + sv);
                 }
 
-                result = result.addInstantiation(sv, inst, true,
-                        proof.getServices());
+                result = result.addInstantiation(sv, inst, true, services);
             }
         }
 
         // try to instantiate remaining symbols
-        result = result.tryToInstantiate(proof.getServices()
-                .getOverlay(state.getFirstOpenAutomaticGoal().getLocalNamespaces()));
+        result = result.tryToInstantiate(services.getOverlay(
+                state.getFirstOpenAutomaticGoal().getLocalNamespaces()));
 
         if (result == null) {
             throw new ScriptException("Cannot instantiate this rule");
+        }
+
+        if (recheckMatchConditions) {
+            final MatchConditions appMC = result.taclet().getMatcher()
+                    .checkConditions(result.matchConditions(), services);
+            if (appMC == null) {
+                return null;
+            } else {
+                result = result.setMatchConditions(appMC, services);
+            }
         }
 
         return result;
