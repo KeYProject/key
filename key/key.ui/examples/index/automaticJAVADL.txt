@@ -217,6 +217,7 @@ group javaCard {
 
 # Other tests:
    provable ./heap/coincidence_count/project.key
+   provable ./heap/verifyThis11_1_Maximum/project.key
    provable ./heap/fm12_01_LRS/lcp.key
    provable ./heap/SemanticSlicing/project.key
    provable ./heap/information_flow/ArrayList_contains.key
