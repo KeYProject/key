@@ -3,9 +3,25 @@
    <methodCall name="&lt;call QueryInPrecondition.main(x,y)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicValue = magic(x,y);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = magic(x, y) catch(exc_0)
-pre: (QueryInPrecondition.xPre(x) = TRUE &amp; y &lt; 0)&lt;&lt;SC&gt;&gt;
-| !((QueryInPrecondition.xPre(x) = TRUE &amp; y &lt; 0)&lt;&lt;SC&gt;&gt;)
-mod: {}
+pre: (  QueryInPrecondition::xPre(heap, x) = TRUE
+   &amp; lt(y, Z(0(#))))&lt;&lt;SC&gt;&gt;
+| !((  QueryInPrecondition::xPre(heap, x) = TRUE
+     &amp; lt(y, Z(0(#))))&lt;&lt;SC&gt;&gt;)
+post: (   (    QueryInPrecondition::xPre(heapBefore_magic,
+                                     x)
+         = TRUE
+       &amp; lt(y, Z(0(#))))&lt;&lt;SC&gt;&gt;
+   -&gt;     result_0
+        = QueryInPrecondition::subFirst(heap, x, y)
+      &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;)
+&amp; (   !((    QueryInPrecondition::xPre(heapBefore_magic,
+                                       x)
+           = TRUE
+         &amp; lt(y, Z(0(#))))&lt;&lt;SC&gt;&gt;)
+   -&gt;     result_0
+        = QueryInPrecondition::subSecond(heap, x, y)
+      &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;)
+mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x, y" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
                <methodReturn name="&lt;return of main&gt;" signature="&lt;return of QueryInPrecondition.main(x,y)&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 

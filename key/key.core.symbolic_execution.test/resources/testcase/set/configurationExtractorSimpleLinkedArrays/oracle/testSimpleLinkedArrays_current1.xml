@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <equivalenceClass representativeTerm="x">
-      <term term="x"/>
-      <term term="x"/>
-   </equivalenceClass>
    <equivalenceClass representativeTerm="SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next),arr(Z(0(#))))">
       <term term="SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next),arr(Z(0(#))))"/>
       <term term="SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next),arr(Z(0(#)))),SimpleLinkedArrays::$next),arr(Z(0(#))))"/>

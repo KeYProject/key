@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <equivalenceClass representativeTerm="x">
-      <term term="x"/>
-      <term term="x"/>
-   </equivalenceClass>
    <state name="return x.value+x.next.value;">
       <value name="exc" programVariable="exc" isArrayIndex="false" value="null" type="Null" condition="true"/>
       <association name="x" programVariable="x" isArrayIndex="false" target="o1" condition="true"/>

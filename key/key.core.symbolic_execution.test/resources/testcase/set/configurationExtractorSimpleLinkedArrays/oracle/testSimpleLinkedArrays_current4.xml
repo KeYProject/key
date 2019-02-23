@@ -2,7 +2,6 @@
 <model>
    <equivalenceClass representativeTerm="x">
       <term term="x"/>
-      <term term="x"/>
       <term term="SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next),arr(Z(0(#))))"/>
       <term term="SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next),arr(Z(0(#)))),SimpleLinkedArrays::$next),arr(Z(0(#))))"/>
    </equivalenceClass>

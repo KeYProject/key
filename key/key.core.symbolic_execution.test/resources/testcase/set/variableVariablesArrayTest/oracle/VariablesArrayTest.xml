@@ -151,6 +151,10 @@
                         </termination>
                         <callStateVariable name="a" isArrayIndex="false">
                            <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
                            </value>
                         </callStateVariable>
                         <callStateVariable name="exc" isArrayIndex="false">
@@ -234,6 +238,10 @@
                      </termination>
                      <callStateVariable name="a" isArrayIndex="false">
                         <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
                         </value>
                      </callStateVariable>
                      <callStateVariable name="exc" isArrayIndex="false">
@@ -364,6 +372,10 @@
                </termination>
                <callStateVariable name="a" isArrayIndex="false">
                   <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="length" isArrayIndex="false">
+                        <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
                   </value>
                </callStateVariable>
                <callStateVariable name="exc" isArrayIndex="false">

@@ -2,7 +2,6 @@
 <model>
    <equivalenceClass representativeTerm="x">
       <term term="x"/>
-      <term term="x"/>
       <term term="SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next)"/>
       <term term="SimpleLinkedOjbectsDeletion::select(heap,SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),SimpleLinkedOjbectsDeletion::$next)"/>
    </equivalenceClass>
@@ -11,8 +10,6 @@
       <association name="x" programVariable="x" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="x" type="SimpleLinkedOjbectsDeletion">
-   </object>
-   <object xml:id="o2" name="x" type="SimpleLinkedOjbectsDeletion">
-      <association name="next" programVariable="next" isArrayIndex="false" target="o2" condition="true"/>
+      <association name="next" programVariable="next" isArrayIndex="false" target="o1" condition="true"/>
    </object>
 </model>

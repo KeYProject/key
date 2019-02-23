@@ -2,7 +2,6 @@
 <model>
    <equivalenceClass representativeTerm="x">
       <term term="x"/>
-      <term term="x"/>
       <term term="SimpleLinkedOjbectsDeletion::select(heap,SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),SimpleLinkedOjbectsDeletion::$next)"/>
    </equivalenceClass>
    <state name="return x.value+x.next.value;">

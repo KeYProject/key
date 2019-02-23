@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <equivalenceClass representativeTerm="self">
-      <term term="self"/>
-      <term term="self"/>
-   </equivalenceClass>
    <state name="{}">
       <value name="k" programVariable="k" isArrayIndex="false" value="k" type="int" condition="true"/>
       <value name="NextLevel::m" programVariable="NextLevel::m" isArrayIndex="false" value="Z(1(#))" type="int" condition="true"/>

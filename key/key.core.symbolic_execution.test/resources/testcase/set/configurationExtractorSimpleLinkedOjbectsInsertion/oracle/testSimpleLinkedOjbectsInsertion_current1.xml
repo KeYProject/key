@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <equivalenceClass representativeTerm="x">
-      <term term="x"/>
-      <term term="x"/>
-   </equivalenceClass>
    <equivalenceClass representativeTerm="SimpleLinkedOjbectsInsertion::select(heap,x,SimpleLinkedOjbectsInsertion::$next)">
       <term term="SimpleLinkedOjbectsInsertion::select(heap,x,SimpleLinkedOjbectsInsertion::$next)"/>
       <term term="SimpleLinkedOjbectsInsertion::select(heap,SimpleLinkedOjbectsInsertion::select(heap,x,SimpleLinkedOjbectsInsertion::$next),SimpleLinkedOjbectsInsertion::$next)"/>

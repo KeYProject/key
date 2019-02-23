@@ -3,33 +3,54 @@
    <methodCall name="&lt;call UseOperationContractNormalAndExceptionalBranchTest.main(value)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicNumber = magic(value);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = magic(value) catch(exc_0)
-pre: (value &lt; 0 &amp; value &gt;= -10)&lt;&lt;SC&gt;&gt;
-| value &lt; -10
-| (value &gt;= 0
-&amp; value &lt; 10)&lt;&lt;SC&gt;&gt;
-| value &gt;= 10
-mod: \if (  (value &lt; 0 &amp; value &gt;= -10)&lt;&lt;SC&gt;&gt;
-          | value &lt; -10
-          | (value &gt;= 0
-          &amp; value &lt; 10)&lt;&lt;SC&gt;&gt;)
-         \then (     \if (  (value &lt; 0 &amp; value &gt;= -10)&lt;&lt;SC&gt;&gt;
-                          | value &lt; -10)
-                         \then (     \if ((  value &lt; 0
-                                           &amp;    value
-                                             &gt;= -10)&lt;&lt;SC&gt;&gt;)
-                                         \then (allLocs)
-                                         \else (allLocs)
-                                \cap \if (value &lt; -10)
-                                         \then (allLocs)
-                                         \else (allLocs))
-                         \else (allLocs)
-                \cap \if ((value &gt;= 0 &amp; value &lt; 10)&lt;&lt;SC&gt;&gt;)
-                         \then (allLocs)
-                         \else (allLocs))
-         \else (allLocs)
-\cap \if (value &gt;= 10)
-         \then (allLocs)
-         \else (allLocs)
+pre: (lt(value, Z(0(#))) &amp; geq(value, Z(neglit(0(1(#))))))&lt;&lt;SC&gt;&gt;
+| lt(value, Z(neglit(0(1(#)))))
+| (geq(value, Z(0(#)))
+&amp; lt(value, Z(0(1(#)))))&lt;&lt;SC&gt;&gt;
+| geq(value, Z(0(1(#))))
+post: (   (  lt(value, Z(0(#)))
+       &amp; geq(value, Z(neglit(0(1(#))))))&lt;&lt;SC&gt;&gt;
+   -&gt;   !(exc_0 = null)&lt;&lt;impl&gt;&gt;
+      &amp; java.lang.Exception::instance(exc_0) = TRUE)
+&amp; (   lt(value, Z(neglit(0(1(#)))))
+   -&gt;   !(exc_0 = null)&lt;&lt;impl&gt;&gt;
+      &amp; java.lang.Exception::instance(exc_0) = TRUE)
+&amp; (   (geq(value, Z(0(#))) &amp; lt(value, Z(0(1(#)))))&lt;&lt;SC&gt;&gt;
+   -&gt; result_0 = Z(2(4(#))) &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;)
+&amp; (   geq(value, Z(0(1(#))))
+   -&gt; result_0 = Z(4(8(#))) &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;)
+mod: intersect(\if (  (  lt(value, Z(0(#)))
+                  &amp; geq(value, Z(neglit(0(1(#))))))&lt;&lt;SC&gt;&gt;
+               | lt(value, Z(neglit(0(1(#)))))
+               | (geq(value, Z(0(#)))
+               &amp; lt(value, Z(0(1(#)))))&lt;&lt;SC&gt;&gt;)
+              \then (intersect(\if (  (  lt(value,
+                                            Z(0(#)))
+                                       &amp; geq(value,
+                                             Z(neglit(0(1(#))))))&lt;&lt;SC&gt;&gt;
+                                    | lt(value,
+                                         Z(neglit(0(1(#))))))
+                                   \then (intersect(\if ((  lt(value,
+                                                               Z(0(#)))
+                                                          &amp; geq(value,
+                                                                Z(neglit(0(1(#))))))&lt;&lt;SC&gt;&gt;)
+                                                        \then (allLocs)
+                                                        \else (allLocs),
+                                                    \if (lt(value,
+                                                            Z(neglit(0(1(#))))))
+                                                        \then (allLocs)
+                                                        \else (allLocs)))
+                                   \else (allLocs),
+                               \if ((  geq(value,
+                                           Z(0(#)))
+                                     &amp; lt(value,
+                                          Z(0(1(#)))))&lt;&lt;SC&gt;&gt;)
+                                   \then (allLocs)
+                                   \else (allLocs)))
+              \else (allLocs),
+          \if (geq(value, Z(0(1(#)))))
+              \then (allLocs)
+              \else (allLocs))
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="value" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))" pathCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))" pathConditionChanged="true" branchCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                <statement name="int magicNumberCopy = magicNumber;" pathCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))" pathConditionChanged="false">

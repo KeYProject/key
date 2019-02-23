@@ -2,8 +2,6 @@
 <model>
    <equivalenceClass representativeTerm="self">
       <term term="self"/>
-      <term term="self"/>
-      <term term="summand"/>
       <term term="summand"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in {}">

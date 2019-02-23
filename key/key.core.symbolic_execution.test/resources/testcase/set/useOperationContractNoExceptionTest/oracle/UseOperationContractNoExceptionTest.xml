@@ -2,10 +2,20 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call UseOperationContractNoExceptionTest.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicNumber = magic(123);" pathCondition="true" pathConditionChanged="false">
-         <operationContract name="result_0 = magic(123) catch(exc_0)
-pre: 123 &gt;= 0 | 123 &lt; 0
-mod: \if (123 &gt;= 0)  \then (allLocs)  \else (allLocs)
-\cap \if (123 &lt; 0)  \then (allLocs)  \else (allLocs)
+         <operationContract name="result_0 = magic(Z(3(2(1(#))))) catch(exc_0)
+pre: geq(Z(3(2(1(#)))), Z(0(#)))
+| lt(Z(3(2(1(#)))), Z(0(#)))
+post: (   geq(Z(3(2(1(#)))), Z(0(#)))
+   -&gt; result_0 = Z(2(4(#))) &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;)
+&amp; (   lt(Z(3(2(1(#)))), Z(0(#)))
+   -&gt;   result_0 = Z(neglit(1(#)))
+      &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;)
+mod: intersect(\if (geq(Z(3(2(1(#)))), Z(0(#))))
+              \then (allLocs)
+              \else (allLocs),
+          \if (lt(Z(3(2(1(#)))), Z(0(#))))
+              \then (allLocs)
+              \else (allLocs))
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="Z(3(2(1(#))))" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="int magicNumberCopy = magicNumber;" pathCondition="true" pathConditionChanged="false">
                <statement name="return magicNumber+magicNumberCopy;" pathCondition="true" pathConditionChanged="false">

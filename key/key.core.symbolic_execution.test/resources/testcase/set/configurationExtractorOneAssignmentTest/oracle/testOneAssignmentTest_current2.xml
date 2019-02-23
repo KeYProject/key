@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <equivalenceClass representativeTerm="x">
-      <term term="x"/>
-      <term term="x"/>
-   </equivalenceClass>
-   <equivalenceClass representativeTerm="self">
-      <term term="self"/>
-      <term term="self"/>
-   </equivalenceClass>
    <equivalenceClass representativeTerm="null">
       <term term="OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y)"/>
       <term term="null"/>

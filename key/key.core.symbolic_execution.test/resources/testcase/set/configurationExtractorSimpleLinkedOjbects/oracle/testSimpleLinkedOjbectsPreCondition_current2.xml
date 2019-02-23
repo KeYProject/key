@@ -2,13 +2,7 @@
 <model>
    <equivalenceClass representativeTerm="x">
       <term term="x"/>
-      <term term="x"/>
       <term term="SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next)"/>
-      <term term="SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next)"/>
-   </equivalenceClass>
-   <equivalenceClass representativeTerm="SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next)">
-      <term term="SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next)"/>
-      <term term="SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next)"/>
    </equivalenceClass>
    <state name="return x.value+x.next.value+x.next.next.value;">
       <value name="exc" programVariable="exc" isArrayIndex="false" value="null" type="Null" condition="true"/>

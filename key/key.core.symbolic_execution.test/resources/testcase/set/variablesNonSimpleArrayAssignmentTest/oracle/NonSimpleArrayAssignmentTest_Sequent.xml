@@ -15,6 +15,10 @@
    <methodCall name="&lt;call NonSimpleArrayAssignmentTest.main(array)&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="array" isArrayIndex="false">
          <value name="array {true}" typeString="NonSimpleArrayAssignmentTest[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+            <variable name="length" isArrayIndex="false">
+               <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
          </value>
       </variable>
       <variable name="exc" isArrayIndex="false">
@@ -24,6 +28,10 @@
       <statement name="array[0].value=100;" pathCondition="true" pathConditionChanged="false">
          <variable name="array" isArrayIndex="false">
             <value name="array {true}" typeString="NonSimpleArrayAssignmentTest[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+               <variable name="length" isArrayIndex="false">
+                  <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
             </value>
          </variable>
          <variable name="exc" isArrayIndex="false">
@@ -35,6 +43,10 @@
                <value name="array {true}" typeString="NonSimpleArrayAssignmentTest[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
                      <value name="[Z(0(#))] {true}" typeString="NonSimpleArrayAssignmentTest" valueString="NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="length" isArrayIndex="false">
+                     <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
@@ -56,6 +68,10 @@
                               <value name="value {true}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
+                        </value>
+                     </variable>
+                     <variable name="length" isArrayIndex="false">
+                        <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
@@ -89,6 +105,10 @@
                            <value name="[Z(1(#))] {or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null))">
                            </value>
                            <value name="[Z(1(#))] {or(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null))))}" typeString="NonSimpleArrayAssignmentTest" valueString="NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))" isValueAnObject="true" isValueUnknown="false" conditionString="or(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null))))">
+                           </value>
+                        </variable>
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {or(or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_3),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_3)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_3))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_3)))}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_3),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_3)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_3))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_3)))">
                            </value>
                         </variable>
                      </value>
@@ -146,6 +166,10 @@
                            </variable>
                            <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
                               <value name="[Z(1(#))] {or(or(or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))),and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_2),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_2)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_2)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))))}" typeString="NonSimpleArrayAssignmentTest" valueString="NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))" isValueAnObject="true" isValueUnknown="false" conditionString="or(or(or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))),and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_2),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_2)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_2)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))))">
+                              </value>
+                           </variable>
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {or(or(or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))),and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_2),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_2)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_2)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))))}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))),and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_2),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_2)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_2)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))))">
                               </value>
                            </variable>
                         </value>
@@ -207,6 +231,10 @@
                                        <value name="value {and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))}" typeString="int" valueString="int::select(heap,NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))">
                                        </value>
                                     </variable>
+                                 </value>
+                              </variable>
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))">
                                  </value>
                               </variable>
                            </value>
@@ -274,6 +302,10 @@
                                  </variable>
                                  <variable name="[Z(3(#))]" arrayIndex="Z(3(#))" isArrayIndex="true">
                                     <value name="[Z(3(#))] {or(or(or(or(or(or(or(or(or(or(or(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))),and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5)),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5)),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5)),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5)),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))))}" typeString="NonSimpleArrayAssignmentTest" valueString="NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#))))" isValueAnObject="true" isValueUnknown="false" conditionString="or(or(or(or(or(or(or(or(or(or(or(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))),and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5)),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5)),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5)),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5)),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))))">
+                                    </value>
+                                 </variable>
+                                 <variable name="length" isArrayIndex="false">
+                                    <value name="length {or(or(or(or(or(or(or(or(or(or(or(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))),and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5)),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5)),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5)),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5)),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))))}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(or(or(or(or(or(or(or(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))),and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5)),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5)),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5)),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5)),equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),n_5)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),n_5))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))))">
                                     </value>
                                  </variable>
                               </value>
@@ -367,6 +399,10 @@
                                           </variable>
                                        </value>
                                     </variable>
+                                    <variable name="length" isArrayIndex="false">
+                                       <value name="length {or(or(or(or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))))}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))))">
+                                       </value>
+                                    </variable>
                                  </value>
                               </variable>
                               <variable name="exc" isArrayIndex="false">
@@ -444,6 +480,10 @@
                                                 <value name="value {and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))">
                                                 </value>
                                              </variable>
+                                          </value>
+                                       </variable>
+                                       <variable name="length" isArrayIndex="false">
+                                          <value name="length {or(or(or(or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))))}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))))">
                                           </value>
                                        </variable>
                                     </value>
@@ -525,6 +565,10 @@
                                                 </variable>
                                              </value>
                                           </variable>
+                                          <variable name="length" isArrayIndex="false">
+                                             <value name="length {or(or(or(or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))))}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(or(or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))),and(and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))))">
+                                             </value>
+                                          </variable>
                                        </value>
                                     </variable>
                                     <variable name="exc" isArrayIndex="false">
@@ -534,6 +578,26 @@
                                  </termination>
                                  <callStateVariable name="array" isArrayIndex="false">
                                     <value name="array {true}" typeString="NonSimpleArrayAssignmentTest[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                       <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                                          <value name="[Z(0(#))] {true}" typeString="NonSimpleArrayAssignmentTest" valueString="NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                          </value>
+                                       </variable>
+                                       <variable name="[Z(2(#))]" arrayIndex="Z(2(#))" isArrayIndex="true">
+                                          <value name="[Z(2(#))] {true}" typeString="NonSimpleArrayAssignmentTest" valueString="NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#))))" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                          </value>
+                                       </variable>
+                                       <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
+                                          <value name="[Z(1(#))] {true}" typeString="NonSimpleArrayAssignmentTest" valueString="NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                          </value>
+                                       </variable>
+                                       <variable name="[Z(3(#))]" arrayIndex="Z(3(#))" isArrayIndex="true">
+                                          <value name="[Z(3(#))] {true}" typeString="NonSimpleArrayAssignmentTest" valueString="NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(3(#))))" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                          </value>
+                                       </variable>
+                                       <variable name="length" isArrayIndex="false">
+                                          <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                          </value>
+                                       </variable>
                                     </value>
                                  </callStateVariable>
                                  <callStateVariable name="exc" isArrayIndex="false">
@@ -588,6 +652,10 @@
                                  </variable>
                                  <variable name="[Z(3(#))]" arrayIndex="Z(3(#))" isArrayIndex="true">
                                     <value name="[Z(3(#))] {or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))">
+                                    </value>
+                                 </variable>
+                                 <variable name="length" isArrayIndex="false">
+                                    <value name="length {or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))">
                                     </value>
                                  </variable>
                               </value>
@@ -651,6 +719,10 @@
                                     </variable>
                                     <variable name="[Z(3(#))]" arrayIndex="Z(3(#))" isArrayIndex="true">
                                        <value name="[Z(3(#))] {or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))">
+                                       </value>
+                                    </variable>
+                                    <variable name="length" isArrayIndex="false">
+                                       <value name="length {or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))">
                                        </value>
                                     </variable>
                                  </value>
@@ -718,6 +790,10 @@
                                           <value name="[Z(3(#))] {or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))">
                                           </value>
                                        </variable>
+                                       <variable name="length" isArrayIndex="false">
+                                          <value name="length {or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="or(or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))">
+                                          </value>
+                                       </variable>
                                     </value>
                                  </variable>
                                  <variable name="exc" isArrayIndex="false">
@@ -735,6 +811,26 @@
                               </termination>
                               <callStateVariable name="array" isArrayIndex="false">
                                  <value name="array {true}" typeString="NonSimpleArrayAssignmentTest[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                    <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                                       <value name="[Z(0(#))] {true}" typeString="NonSimpleArrayAssignmentTest" valueString="NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                    <variable name="[Z(2(#))]" arrayIndex="Z(2(#))" isArrayIndex="true">
+                                       <value name="[Z(2(#))] {true}" typeString="NonSimpleArrayAssignmentTest" valueString="NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#))))" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                    <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
+                                       <value name="[Z(1(#))] {true}" typeString="NonSimpleArrayAssignmentTest" valueString="NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                    <variable name="[Z(3(#))]" arrayIndex="Z(3(#))" isArrayIndex="true">
+                                       <value name="[Z(3(#))] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                    <variable name="length" isArrayIndex="false">
+                                       <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
                                  </value>
                               </callStateVariable>
                               <callStateVariable name="exc" isArrayIndex="false">
@@ -772,6 +868,10 @@
                            </variable>
                            <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
                               <value name="[Z(1(#))] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
@@ -817,6 +917,10 @@
                               </variable>
                               <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
                                  <value name="[Z(1(#))] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
@@ -866,6 +970,10 @@
                                     <value name="[Z(1(#))] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
+                                 <variable name="length" isArrayIndex="false">
+                                    <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
                               </value>
                            </variable>
                            <variable name="exc" isArrayIndex="false">
@@ -883,6 +991,22 @@
                         </termination>
                         <callStateVariable name="array" isArrayIndex="false">
                            <value name="array {true}" typeString="NonSimpleArrayAssignmentTest[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                                 <value name="[Z(0(#))] {true}" typeString="NonSimpleArrayAssignmentTest" valueString="NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[Z(2(#))]" arrayIndex="Z(2(#))" isArrayIndex="true">
+                                 <value name="[Z(2(#))] {true}" typeString="NonSimpleArrayAssignmentTest" valueString="NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#))))" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
+                                 <value name="[Z(1(#))] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
                            </value>
                         </callStateVariable>
                         <callStateVariable name="exc" isArrayIndex="false">
@@ -911,6 +1035,10 @@
                            <value name="[Z(1(#))] {equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)">
                            </value>
                            <value name="[Z(1(#))] {and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)))}" typeString="NonSimpleArrayAssignmentTest" valueString="NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)))">
+                           </value>
+                        </variable>
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
@@ -948,6 +1076,10 @@
                               <value name="[Z(1(#))] {equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)">
                               </value>
                               <value name="[Z(1(#))] {and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)))}" typeString="NonSimpleArrayAssignmentTest" valueString="NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)))">
+                              </value>
+                           </variable>
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
@@ -995,6 +1127,10 @@
                                  <value name="[Z(1(#))] {and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)))}" typeString="NonSimpleArrayAssignmentTest" valueString="NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#))))" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))),null)))">
                                  </value>
                               </variable>
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
                            </value>
                         </variable>
                         <variable name="exc" isArrayIndex="false">
@@ -1012,6 +1148,18 @@
                      </termination>
                      <callStateVariable name="array" isArrayIndex="false">
                         <value name="array {true}" typeString="NonSimpleArrayAssignmentTest[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                              <value name="[Z(0(#))] {true}" typeString="NonSimpleArrayAssignmentTest" valueString="NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="[Z(2(#))]" arrayIndex="Z(2(#))" isArrayIndex="true">
+                              <value name="[Z(2(#))] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
                         </value>
                      </callStateVariable>
                      <callStateVariable name="exc" isArrayIndex="false">
@@ -1029,6 +1177,10 @@
                      <value name="[Z(0(#))] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
+                  <variable name="length" isArrayIndex="false">
+                     <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
                </value>
             </variable>
             <variable name="n" isArrayIndex="false">
@@ -1044,6 +1196,10 @@
                   <value name="array {true}" typeString="NonSimpleArrayAssignmentTest[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
                         <value name="[Z(0(#))] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="length" isArrayIndex="false">
+                        <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
@@ -1071,6 +1227,10 @@
                            <value name="[Z(0(#))] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
                      </value>
                   </variable>
                   <variable name="exc" isArrayIndex="false">
@@ -1088,6 +1248,14 @@
                </termination>
                <callStateVariable name="array" isArrayIndex="false">
                   <value name="array {true}" typeString="NonSimpleArrayAssignmentTest[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
+                        <value name="[Z(0(#))] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="length" isArrayIndex="false">
+                        <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
                   </value>
                </callStateVariable>
                <callStateVariable name="exc" isArrayIndex="false">

@@ -113,6 +113,10 @@
                   </termination>
                   <callStateVariable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="next" isArrayIndex="false">
+                           <value name="next {true}" typeString="VariablesConditionalCycle" valueString="VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
                      </value>
                   </callStateVariable>
                   <callStateVariable name="exc" isArrayIndex="false">
@@ -188,6 +192,10 @@
                </termination>
                <callStateVariable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="next" isArrayIndex="false">
+                        <value name="next {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
                   </value>
                </callStateVariable>
                <callStateVariable name="exc" isArrayIndex="false">

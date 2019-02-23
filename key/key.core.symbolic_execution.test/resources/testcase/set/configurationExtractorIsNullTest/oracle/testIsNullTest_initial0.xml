@@ -2,7 +2,6 @@
 <model>
    <equivalenceClass representativeTerm="null">
       <term term="obj"/>
-      <term term="obj"/>
       <term term="null"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return 1;">

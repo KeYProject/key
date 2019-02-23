@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <equivalenceClass representativeTerm="x">
-      <term term="x"/>
-      <term term="x"/>
-   </equivalenceClass>
-   <equivalenceClass representativeTerm="y">
-      <term term="y"/>
-      <term term="y"/>
-   </equivalenceClass>
    <state name="return add_1;">
       <value name="exc_0" programVariable="exc_0" isArrayIndex="false" value="null" type="Null" condition="true"/>
       <value name="result_0" programVariable="result_0" isArrayIndex="false" value="Z(5(#))" type="int" condition="true"/>

@@ -2,7 +2,6 @@
 <model>
    <equivalenceClass representativeTerm="x">
       <term term="x"/>
-      <term term="x"/>
       <term term="SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next)"/>
       <term term="SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next)"/>
    </equivalenceClass>

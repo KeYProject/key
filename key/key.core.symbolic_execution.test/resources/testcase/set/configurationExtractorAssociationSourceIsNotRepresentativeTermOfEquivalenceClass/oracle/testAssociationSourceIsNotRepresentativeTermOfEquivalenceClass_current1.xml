@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <equivalenceClass representativeTerm="self">
-      <term term="self"/>
-      <term term="self"/>
-   </equivalenceClass>
-   <equivalenceClass representativeTerm="current">
-      <term term="current"/>
-      <term term="current"/>
-   </equivalenceClass>
    <equivalenceClass representativeTerm="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right)">
       <term term="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right)"/>
       <term term="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right),algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$left)"/>
