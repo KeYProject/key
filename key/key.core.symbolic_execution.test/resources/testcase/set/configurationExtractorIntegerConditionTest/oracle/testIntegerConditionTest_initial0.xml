@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
+   <equivalenceClass representativeTerm="self">
+      <term term="self"/>
+      <term term="self"/>
+   </equivalenceClass>
    <state name="One Step Simplification resulting in return 42;">
       <value name="a" programVariable="a" isArrayIndex="false" value="Z(1(#))" type="int" condition="true"/>
       <value name="IntegerConditionTest::y" programVariable="IntegerConditionTest::y" isArrayIndex="false" value="Z(3(#))" type="int" condition="true"/>
@@ -7,6 +11,8 @@
       <association name="self" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="self" type="IntegerConditionTest">
+   </object>
+   <object xml:id="o2" name="self" type="IntegerConditionTest">
       <value name="x" programVariable="x" isArrayIndex="false" value="Z(1(#))" type="int" condition="true"/>
    </object>
 </model>

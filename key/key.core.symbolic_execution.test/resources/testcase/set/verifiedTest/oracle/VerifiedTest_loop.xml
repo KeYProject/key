@@ -4,7 +4,7 @@
       <branchStatement name="if (_x&lt;0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="_x=-_x;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
-               <loopInvariant name="invariant: geq(_x, Z(0(#)));
+               <loopInvariant name="invariant: _x &gt;= 0;
 variant: _x
 mod: allLocs" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initiallyValid="true">
                   <branchCondition name="gt(_x_0,Z(0(#)))" pathCondition="and(geq(_x_0,Z(1(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="gt(_x_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
@@ -28,7 +28,7 @@ mod: allLocs" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initial
             </statement>
          </branchCondition>
          <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <loopInvariant name="invariant: geq(_x, Z(0(#)));
+            <loopInvariant name="invariant: _x &gt;= 0;
 variant: _x
 mod: allLocs" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" initiallyValid="true">
                <branchCondition name="gt(_x_0,Z(0(#)))" pathCondition="and(geq(_x_0,Z(1(#))),geq(x,Z(0(#))))" pathConditionChanged="true" branchCondition="gt(_x_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">

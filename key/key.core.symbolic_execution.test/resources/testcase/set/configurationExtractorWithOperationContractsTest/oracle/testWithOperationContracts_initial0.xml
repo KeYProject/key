@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
+   <equivalenceClass representativeTerm="x">
+      <term term="x"/>
+      <term term="x"/>
+   </equivalenceClass>
+   <equivalenceClass representativeTerm="y">
+      <term term="y"/>
+      <term term="y"/>
+   </equivalenceClass>
    <state name="One Step Simplification resulting in return add_1;">
       <value name="exc_0" programVariable="exc_0" isArrayIndex="false" value="null" type="Null" condition="true"/>
       <value name="result_0" programVariable="result_0" isArrayIndex="false" value="add(Z(3(#)),ConfigurationExtractorWithOperationContractsTest_IntWrapper_value_1&lt;&lt;selectSK&gt;&gt;)" type="int" condition="true"/>
