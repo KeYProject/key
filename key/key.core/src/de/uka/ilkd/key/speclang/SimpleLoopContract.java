@@ -552,8 +552,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             final Map<LocationVariable, Term> newModifiesClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             final Term newMeasuredBy, final Term newDecreases) {
-        return new SimpleLoopContract(baseName, newLoop,
-                labels, method, modality,
+        return new SimpleLoopContract(baseName, newLoop, labels, method, modality,
                 newPreconditions, newMeasuredBy, newPostconditions, newModifiesClauses,
                 newinfFlowSpecs, newVariables, transactionApplicable, hasMod, newDecreases,
                 functionalContracts, services);
@@ -614,32 +613,26 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
                     getVariables(),
                     newMeasuredBy,
                     newDecreases);
-            result.addEnhancedForLoopVars();
+
+            if (index != null) {
+                LocationVariable rem = new LocationVariable(
+                        services.getVariableNamer().getTemporaryNameProposal(
+                                index.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
+                        index.getKeYJavaType());
+
+                result.variables.remembranceLocalVariables.put((LocationVariable) index, rem);
+            }
+
+            if (values != null) {
+                LocationVariable rem = new LocationVariable(
+                        services.getVariableNamer().getTemporaryNameProposal(
+                                values.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
+                        values.getKeYJavaType());
+
+                result.variables.remembranceLocalVariables.put((LocationVariable) values, rem);
+            }
 
             return result;
-        }
-    }
-
-    private void addEnhancedForLoopVars() {
-        ProgramVariable idx = getIndexVariable();
-        ProgramVariable val = getValuesVariable();
-
-        if (idx != null) {
-            LocationVariable rem = new LocationVariable(
-                    services.getVariableNamer().getTemporaryNameProposal(
-                            idx.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
-                    idx.getKeYJavaType());
-
-            variables.remembranceLocalVariables.put((LocationVariable) idx, rem);
-        }
-
-        if (val != null) {
-            LocationVariable rem = new LocationVariable(
-                    services.getVariableNamer().getTemporaryNameProposal(
-                            val.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
-                    val.getKeYJavaType());
-
-            variables.remembranceLocalVariables.put((LocationVariable) val, rem);
         }
     }
 
