@@ -13,17 +13,16 @@
 
 package org.key_project.util.collection;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-
 /**
- * implementation of a persistent set using the SLListOf<T> implementation
- * with all its implications (means e.g. O(n) for adding an
- * element and so on.
+ * implementation of a persistent set using the SLListOf<T> implementation with all its implications
+ * (means e.g. O(n) for adding an element and so on.
  */
 public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
@@ -42,30 +41,32 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     /** the empty set */
     @SuppressWarnings("unchecked")
-   public static final <T> DefaultImmutableSet<T> nil() {
-	return (DefaultImmutableSet<T>) NILSet.NIL;
+    public static final <T> DefaultImmutableSet<T> nil() {
+        return (DefaultImmutableSet<T>) NILSet.NIL;
     }
-
 
     protected DefaultImmutableSet() {
-	elementList = ImmutableSLList.<T>nil();
+        elementList = ImmutableSLList.<T>nil();
     }
 
-    /** creates new set with one element
+    /**
+     * creates new set with one element
+     *
      * @param element of type <T> the new Set contains
      */
     protected DefaultImmutableSet(T element) {
-	elementList = (ImmutableSLList.<T>nil()).prepend(element);
+        elementList = (ImmutableSLList.<T>nil()).prepend(element);
     }
 
-    /** creates new set containg all elements from the elementList
-     * PRECONDITION: elementList has no duplicates
+    /**
+     * creates new set containg all elements from the elementList PRECONDITION: elementList has no
+     * duplicates
+     *
      * @param elementList IList<T> contains all elements of the new Set
      */
     private DefaultImmutableSet(ImmutableList<T> elementList) {
-	this.elementList=elementList;
+        this.elementList = elementList;
     }
-
 
 //    private static HashSet<String> previousComplains = new HashSet<>();
     private void complainAboutSize() {
@@ -86,61 +87,64 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 //        }
     }
 
-    /** adds an element
+    /**
+     * adds an element
+     *
      * @param element of type <T> that has to be added to this set
      */
     @Override
     public ImmutableSet<T> add(T element) {
         complainAboutSize();
-	if (elementList.contains(element)) {
-	    return this;
-	}
-	return new DefaultImmutableSet<T>(elementList.prepend(element));
+        if (elementList.contains(element)) {
+            return this;
+        }
+        return new DefaultImmutableSet<T>(elementList.prepend(element));
     }
 
-    /** adds an element, barfs if the element is already present
+    /**
+     * adds an element, barfs if the element is already present
+     *
      * @param element of type <T> that has to be added to this set
      * @throws org.key_project.utils.collection.NotUniqueException if the element is already present
      */
     @Override
     public ImmutableSet<T> addUnique(T element) throws NotUniqueException {
         complainAboutSize();
-	if (elementList.contains(element)) {
-	    throw new NotUniqueException(element);
-	} else {
-	    return new DefaultImmutableSet<T>(elementList.prepend(element));
-	}
+        if (elementList.contains(element)) {
+            throw new NotUniqueException(element);
+        } else {
+            return new DefaultImmutableSet<T>(elementList.prepend(element));
+        }
     }
 
     /** @return union of this set with set */
     @Override
     public ImmutableSet<T> union(ImmutableSet<? extends T> set) {
-	if(set instanceof DefaultImmutableSet && size() * set.size() > UNION_OPTIMIZATION_SIZE) {
-	    return newUnion((DefaultImmutableSet<? extends T>) set);
-	}
+        if (set instanceof DefaultImmutableSet && size() * set.size() > UNION_OPTIMIZATION_SIZE) {
+            return newUnion((DefaultImmutableSet<? extends T>) set);
+        }
 
-	return originalUnion(set);
+        return originalUnion(set);
     }
-
 
     private DefaultImmutableSet<T> newUnion(DefaultImmutableSet<? extends T> set) {
         ImmutableList<? extends T> otherList = set.elementList;
         ImmutableList<T> clean = Immutables.concatDuplicateFreeLists(this.elementList, otherList);
-	    return new DefaultImmutableSet<T>(clean);
+        return new DefaultImmutableSet<T>(clean);
     }
 
     private DefaultImmutableSet<T> originalUnion(ImmutableSet<? extends T> set) {
-	if (set.isEmpty()) {
-	    return this;
-	}
+        if (set.isEmpty()) {
+            return this;
+        }
 
-	ImmutableList<T> unionElements = this.elementList;
-	for (T otherEl : set) {
-	    if (!contains(otherEl)) {
-		unionElements = unionElements.prepend(otherEl);
-	    }
-	}
-	return new DefaultImmutableSet<T>(unionElements);
+        ImmutableList<T> unionElements = this.elementList;
+        for (T otherEl : set) {
+            if (!contains(otherEl)) {
+                unionElements = unionElements.prepend(otherEl);
+            }
+        }
+        return new DefaultImmutableSet<T>(unionElements);
     }
 
     /** @return intersection of this set with set */
@@ -148,29 +152,29 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     @Override
     public ImmutableSet<T> intersect(ImmutableSet<? extends T> set) {
         complainAboutSize();
-	if (set.isEmpty()) {
-	    // This cast is safe due to the set's immutability.
-	    return (ImmutableSet<T>) set;
-	}
+        if (set.isEmpty()) {
+            // This cast is safe due to the set's immutability.
+            return (ImmutableSet<T>) set;
+        }
 
-    ImmutableList<T> intersectElements = ImmutableSLList.<T>nil();
-	for (T el : set) {
-	    if (contains(el)) {
-	    intersectElements = intersectElements.prepend(el);
-	    }
-	}
+        ImmutableList<T> intersectElements = ImmutableSLList.<T>nil();
+        for (T el : set) {
+            if (contains(el)) {
+                intersectElements = intersectElements.prepend(el);
+            }
+        }
 
-	if(intersectElements.isEmpty()) {
-	    return DefaultImmutableSet.<T>nil();
-	} else {
-	return new DefaultImmutableSet<T>(intersectElements);
-    }
+        if (intersectElements.isEmpty()) {
+            return DefaultImmutableSet.<T>nil();
+        } else {
+            return new DefaultImmutableSet<T>(intersectElements);
+        }
     }
 
     /** @return Iterator<T> of the set */
     @Override
     public Iterator<T> iterator() {
-	return elementList.iterator();
+        return elementList.iterator();
     }
 
     @Override
@@ -182,26 +186,27 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     @Override
     public boolean contains(T obj) {
         complainAboutSize();
-	return elementList.contains(obj);
+        return elementList.contains(obj);
     }
 
     /** @return true iff this set is subset of set s */
     @Override
     public boolean subset(ImmutableSet<T> s) {
-	if (size() > s.size()) {
-	    return false;
-	} else {
-	    for (T el: this) {
-		if (!s.contains(el)) {
-		    return false;
-		}
-	    }
-	}
-	return true;
+        if (size() > s.size()) {
+            return false;
+        } else {
+            for (T el : this) {
+                if (!s.contains(el)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
      * return true if predicate is fullfilled for at least one element
+     *
      * @param predicate the predicate
      * @return true if predicate is fullfilled for at least one element
      */
@@ -213,35 +218,35 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     /** @return int the cardinality of the set */
     @Override
     public int size() {
-	return elementList.size();
+        return elementList.size();
     }
 
     /** @return true iff the set is empty */
     @Override
     public boolean isEmpty() {
-	return false;
+        return false;
     }
 
     @Override
     public ImmutableSet<T> remove(T element) {
-	final ImmutableList<T> list = elementList.removeFirst(element);
-	return list.isEmpty() ? DefaultImmutableSet.<T>nil() : new DefaultImmutableSet<T>(list);
+        final ImmutableList<T> list = elementList.removeFirst(element);
+        return list.isEmpty() ? DefaultImmutableSet.<T>nil() : new DefaultImmutableSet<T>(list);
     }
 
-
-    /** @return true iff the this set is subset of o and vice versa.
+    /**
+     * @return true iff the this set is subset of o and vice versa.
      */
     @Override
     public boolean equals(Object obj) {
-	if (obj==this) {
-	    return true;
-	}
-	if (!(obj instanceof ImmutableSet)) {
-	    return false;
-	}
-	@SuppressWarnings("unchecked")
-   ImmutableSet<T> o=(ImmutableSet<T>) obj;
-	return (o.subset(this) && this.subset(o));
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof ImmutableSet)) {
+            return false;
+        }
+        @SuppressWarnings("unchecked")
+        ImmutableSet<T> o = (ImmutableSet<T>) obj;
+        return (o.subset(this) && this.subset(o));
     }
 
     /**
@@ -249,7 +254,14 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      */
     @Override
     public <S> S[] toArray(S[] array) {
-	return elementList.toArray(array);
+        return elementList.toArray(array);
+    }
+
+    @Override
+    public Set<T> toSet() {
+        Set<T> result = new HashSet<>();
+        elementList.forEach(el -> result.add(el));
+        return result;
     }
 
     @Override
@@ -277,12 +289,11 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     /**
      * Create an immutable set from an immutable list.
      *
-     * @param list
-     *            a non-null immutable list
+     * @param list a non-null immutable list
      * @return a fresh immutable set with the same iteration order.
      */
-    public static<T> ImmutableSet<T> fromImmutableList(ImmutableList<T> list) {
-        if(list.isEmpty()) {
+    public static <T> ImmutableSet<T> fromImmutableList(ImmutableList<T> list) {
+        if (list.isEmpty()) {
             return nil();
         } else {
             return new DefaultImmutableSet<T>(Immutables.removeDuplicates(list));
@@ -292,12 +303,11 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     /**
      * Create an immutable set from a mutable set
      *
-     * @param set
-     *            a non-null mutable set
+     * @param set a non-null mutable set
      * @return a fresh immutable set with all the elements in set
      */
-    public static<T> ImmutableSet<T> fromSet(Set<T> set) {
-        if(set.isEmpty()) {
+    public static <T> ImmutableSet<T> fromSet(Set<T> set) {
+        if (set.isEmpty()) {
             return nil();
         } else {
             ImmutableList<T> backerList = ImmutableSLList.nil();
@@ -310,115 +320,116 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     @Override
     public String toString() {
-	Iterator<T> it=this.iterator();
-	StringBuffer str=new StringBuffer("{");
-	while (it.hasNext()) {
-	    str.append(it.next());
-	    if (it.hasNext()) {
-		str.append(",");
-	    }
-	}
-	str.append("}");
-	return str.toString();
+        Iterator<T> it = this.iterator();
+        StringBuffer str = new StringBuffer("{");
+        while (it.hasNext()) {
+            str.append(it.next());
+            if (it.hasNext()) {
+                str.append(",");
+            }
+        }
+        str.append("}");
+        return str.toString();
     }
 
     /** represents the empty set for elements of type <T> */
     private static class NILSet<T> extends DefaultImmutableSet<T> {
 
-	/**
+        /**
          *
          */
         private static final long serialVersionUID = -8055357307337694419L;
         static final NILSet<?> NIL = new NILSet<>();
 
-	private NILSet() {}
+        private NILSet() {
+        }
 
-	/** the NIL list is a singleton. Deserialization builds
-	 * a new NIL object that has to be replaced by the singleton.
-	 */
-	private Object readResolve()
-	throws java.io.ObjectStreamException {
-	    return NIL;
-	}
+        /**
+         * the NIL list is a singleton. Deserialization builds a new NIL object that has to be
+         * replaced by the singleton.
+         */
+        private Object readResolve()
+                throws java.io.ObjectStreamException {
+            return NIL;
+        }
 
+        /** adds an element */
+        @Override
+        public ImmutableSet<T> add(T element) {
+            return new DefaultImmutableSet<T>(element);
+        }
 
-	/** adds an element */
-	@Override
-    public ImmutableSet<T> add(T element) {
-	    return new DefaultImmutableSet<T>(element);
-	}
+        /** adds an element (which is unique, since the set was empty) */
+        @Override
+        public ImmutableSet<T> addUnique(T element) {
+            return new DefaultImmutableSet<T>(element);
+        }
 
-	/** adds an element (which is unique, since the set was empty) */
-	@Override
-    public ImmutableSet<T> addUnique(T element) {
-	    return new DefaultImmutableSet<T>(element);
-	}
+        /** @return union of this set with set */
+        @SuppressWarnings("unchecked")
+        @Override
+        public ImmutableSet<T> union(ImmutableSet<? extends T> set) {
+            // This cast is safe due to the set's immutability.
+            return (ImmutableSet<T>) set;
+        }
 
-	/** @return union of this set with set */
-	@SuppressWarnings("unchecked")
-    @Override
-    public ImmutableSet<T> union(ImmutableSet<? extends T> set) {
-	    // This cast is safe due to the set's immutability.
-	    return (ImmutableSet<T>) set;
-	}
+        /** @return true iff obj in set */
+        @Override
+        public boolean contains(T obj) {
+            return false;
+        }
 
-	/** @return true iff obj in set */
-	@Override
-    public boolean contains(T obj) {
-	    return false;
-	}
+        /** @return Iterator<T> of the set */
+        @Override
+        public Iterator<T> iterator() {
+            return ImmutableSLList.<T>nil().iterator();
+        }
 
-	/** @return Iterator<T> of the set */
-	@Override
-    public Iterator<T> iterator() {
-	    return ImmutableSLList.<T>nil().iterator();
-	}
+        /** @return true iff this set is subset of set s */
+        @Override
+        public boolean subset(ImmutableSet<T> s) {
+            return true;
+        }
 
-	/** @return true iff this set is subset of set s */
-	@Override
-    public boolean subset(ImmutableSet<T> s) {
-	    return true;
-	}
+        /** @return int the cardinality of the set */
+        @Override
+        public int size() {
+            return 0;
+        }
 
-	/** @return int the cardinality of the set */
-	@Override
-    public int size() {
-	    return 0;
-	}
+        /** @return true iff the set is empty */
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
 
-	/** @return true iff the set is empty */
-	@Override
-    public boolean isEmpty() {
-	    return true;
-	}
+        /**
+         * @return true iff the this set is subset of o and vice versa.
+         */
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof NILSet<?>;
+        }
 
-	/** @return true iff the this set is subset of o and vice versa.
-	 */
-	@Override
-    public boolean equals(Object o) {
-	    return o instanceof NILSet<?>;
-	}
+        @Override
+        public int hashCode() {
+            return 23456;
+        }
 
-	@Override
-    public int hashCode() {
-	    return 23456;
-	}
+        @Override
+        public String toString() {
+            return "{}";
+        }
 
-	@Override
-    public String toString() {
-	    return "{}";
-	}
+        @Override
+        public ImmutableSet<T> remove(T element) {
+            return this;
+        }
 
-	@Override
-    public ImmutableSet<T> remove(T element) {
-	    return this;
-	}
-
-	@Override
-    public <S> S[] toArray(S[] array) {
-	    return array;
-	}
-
+        @Override
+        public <S> S[] toArray(S[] array) {
+            return array;
+        }
 
     }
 
