@@ -113,6 +113,38 @@ public interface ProofMacro {
     public String getDescription();
 
     /**
+     * Checks whether this {@link ProofMacro} has a parameter named
+     * <code>paramName</code>. For use in proof scripts.
+     *
+     * @param paramName
+     *            The name to check.
+     * @return true iff this {@link ProofMacro} has a parameter named
+     *         <code>paramName</code>.
+     */
+    public boolean hasParameter(String paramName);
+
+    /**
+     * Sets the parameter named <code>paramName</code> to the given String
+     * representation in <code>paramValue</code>. For use in proof scripts.
+     *
+     * @param paramName
+     *            The name of the parameter.
+     * @param paramValue
+     *            The value of the parameter.
+     * @throws IllegalArgumentException
+     *             if there is no parameter of that name or the value is
+     *             incorrectly formatted (e.g., cannot be converted to a
+     *             number).
+     */
+    public void setParameter(String paramName, String paramValue)
+            throws IllegalArgumentException;
+
+    /**
+     * Resets the macro parameters to their defaults.
+     */
+    public void resetParams();
+
+    /**
      * Can this macro be applied on the given goals?
      *
      * This method should not make any changes but check if the macro can be

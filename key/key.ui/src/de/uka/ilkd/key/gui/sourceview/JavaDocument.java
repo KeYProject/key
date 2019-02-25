@@ -314,6 +314,9 @@ public class JavaDocument extends DefaultStyledDocument {
             // tokenStart should be already set here
             token = token + '*';
             state = CommentState.MAYBEEND;
+        } else {                                        // multiplication
+            token = token + '*';
+            state = CommentState.NO;
         }
     }
 
