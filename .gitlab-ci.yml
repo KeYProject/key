@@ -23,6 +23,15 @@ compile:openjdk8:
     - javac -version
     - ant -f key/scripts/build.xml compileAll
 
+compile:openjdk8gradle:
+  stage: primary
+  image: key-dev-openjdk8
+  script:
+    - javac -version
+    - cd key
+    - gradle classes
+    - gradle testClasses
+
 compile:openjdk11:
   stage: primary
   image: key-dev-openjdk11
