@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.JavaStatement;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -94,22 +95,25 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
     public static ImmutableSet<BlockContract> getApplicableContracts(
             final SpecificationRepository specifications, final JavaStatement statement,
             final Modality modality, final Goal goal) {
+        StatementBlock block;
         if (statement instanceof StatementBlock) {
-            StatementBlock block = (StatementBlock) statement;
-
-            ImmutableSet<BlockContract> collectedContracts
-                = specifications.getBlockContracts(block, modality);
-            if (modality == Modality.BOX) {
-                collectedContracts = collectedContracts
-                        .union(specifications.getBlockContracts(block, Modality.DIA));
-            } else if (modality == Modality.BOX_TRANSACTION) {
-                collectedContracts = collectedContracts
-                        .union(specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
-            }
-            return filterAppliedContracts(collectedContracts, goal);
+            block = (StatementBlock) statement;
+        } else if (statement instanceof LoopStatement) {
+            block = new StatementBlock(statement);
         } else {
             return null;
         }
+
+        ImmutableSet<BlockContract> collectedContracts
+        = specifications.getBlockContracts(block, modality);
+        if (modality == Modality.BOX) {
+            collectedContracts = collectedContracts
+                    .union(specifications.getBlockContracts(block, Modality.DIA));
+        } else if (modality == Modality.BOX_TRANSACTION) {
+            collectedContracts = collectedContracts
+                    .union(specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
+        }
+        return filterAppliedContracts(collectedContracts, goal);
     }
 
     /**

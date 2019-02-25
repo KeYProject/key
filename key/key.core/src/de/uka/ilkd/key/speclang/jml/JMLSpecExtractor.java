@@ -248,7 +248,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
                         .getJavaType();
             }
             return tc.isReferenceType(type) ? d : d - 1;
-        } else return 0;
+        } else {
+            return 0;
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -282,11 +284,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 }
                 // check for spec_* modifiers (bug #1280)
                 if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) member,
-                        "spec_public"))
+                        "spec_public")) {
                     visibility = new Public();
-                else if (JMLInfoExtractor.hasJMLModifier(
-                        (FieldDeclaration) member, "spec_protected"))
+                } else if (JMLInfoExtractor.hasJMLModifier(
+                        (FieldDeclaration) member, "spec_protected")) {
                     visibility = new Protected();
+                }
 
                 for (FieldSpecification field : ((FieldDeclaration) member)
                         .getFieldSpecifications()) {
@@ -601,10 +604,22 @@ public final class JMLSpecExtractor implements SpecExtractor {
         if (nextNonLabeled instanceof StatementBlock) {
             return createBlockContracts(method, labels,
                     (StatementBlock) nextNonLabeled, labeled.getComments());
+        } else if (nextNonLabeled instanceof LoopStatement) {
+            return createBlockContracts(method, labels,
+                    (LoopStatement) nextNonLabeled, labeled.getComments());
         } else {
             return DefaultImmutableSet.nil();
         }
     }
+
+    @Override
+    public ImmutableSet<BlockContract> extractBlockContracts(
+            final IProgramMethod method, final LoopStatement loop)
+            throws SLTranslationException {
+        return createBlockContracts(method, new LinkedList<Label>(), loop,
+                loop.getComments());
+    }
+
     @Override
     public ImmutableSet<LoopContract> extractLoopContracts(
             final IProgramMethod method, final LoopStatement loop)
@@ -679,6 +694,28 @@ public final class JMLSpecExtractor implements SpecExtractor {
             try {
                 result = result.union(jsf.createJMLBlockContracts(method,
                         labels, block, specificationCase));
+            } catch (final SLWarningException exception) {
+                warnings = warnings.add(exception.getWarning());
+            }
+        }
+        return result;
+    }
+
+    private ImmutableSet<BlockContract> createBlockContracts(
+            final IProgramMethod method, final List<Label> labels,
+            final LoopStatement loop, final Comment[] comments)
+            throws SLTranslationException {
+        ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
+        // For some odd reason every comment block appears twice; thus we remove
+        // duplicates.
+        final TextualJMLConstruct[] constructs = parseMethodLevelComments(
+                removeDuplicates(comments), getFileName(method));
+        for (int i = constructs.length - 1; i >= 0
+                && constructs[i] instanceof TextualJMLSpecCase; i--) {
+            final TextualJMLSpecCase specificationCase = (TextualJMLSpecCase) constructs[i];
+            try {
+                result = result.union(jsf.createJMLBlockContracts(method,
+                        labels, loop, specificationCase));
             } catch (final SLWarningException exception) {
                 warnings = warnings.add(exception.getWarning());
             }
