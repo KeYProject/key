@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -30,17 +31,20 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.metaconstruct.EnhancedForElimination;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Default implementation for {@link LoopContract}.
@@ -121,6 +125,11 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
      * @see LoopContract#toBlockContract()
      */
     private BlockContract blockContract;
+
+    /**
+     * @see LoopContract#replaceEnhancedForVariables(StatementBlock, Services)
+     */
+    private SimpleLoopContract replacedEnhancedForVars;
 
     /**
      * Construct a loop contract for a block that starts with a loop.
@@ -483,12 +492,31 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
 
     @Override
     public BlockContract toBlockContract() {
+        StatementBlock block = new StatementBlock(
+                new While(getGuard(), getBody()),
+                getTail());
+        StatementBlock headAndBlock = head == null
+                ? new StatementBlock(block)
+                : new StatementBlock(head, block);
         SimpleLoopContract r = (SimpleLoopContract) replaceEnhancedForVariables(block, services);
+
+        Map<LocationVariable, Term> weakenedPre;
+        if (head == null) {
+            weakenedPre = r.preconditions;
+        } else {
+            weakenedPre = new HashMap<>();
+
+            for (LocationVariable heap : r.preconditions.keySet()) {
+                weakenedPre.put(heap, weakenFormula(
+                        r.preconditions.get(heap), MiscTools.getLocalOutsAndDeclared(head, services)));
+            }
+        }
 
         if (blockContract == null) {
             blockContract = new SimpleBlockContract(
-                    r.baseName, r.block, r.labels, r.method, r.modality,
-                r.preconditions, r.measuredBy, r.postconditions, r.modifiesClauses,
+                    r.baseName, headAndBlock, r.labels, r.method, r.modality,
+                    weakenedPre,
+                r.measuredBy, r.postconditions, r.modifiesClauses,
                 r.infFlowSpecs, r.variables, r.transactionApplicable, r.hasMod,
                 DefaultImmutableSet.nil());
             ((SimpleBlockContract) blockContract).setLoopContract(r);
@@ -600,8 +628,12 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
 
     @Override
     public LoopContract replaceEnhancedForVariables(StatementBlock newBlock, Services services) {
+        if (replacedEnhancedForVars != null) {
+            return replacedEnhancedForVars;
+        }
+
         if (index == null && values == null) {
-            return setBlock(newBlock);
+            replacedEnhancedForVars = (SimpleLoopContract) setBlock(newBlock);
         } else {
             final Map<SVSubstitute, SVSubstitute> replacementMap = new HashMap<>();
 
@@ -644,7 +676,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
                         replacer.replace(getModifiesClause(heap, services)));
             }
 
-            SimpleLoopContract result = (SimpleLoopContract) update(
+            replacedEnhancedForVars = (SimpleLoopContract) update(
                     newBlock,
                     newPreconditions,
                     newPostconditions,
@@ -660,7 +692,8 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
                                 index.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
                         index.getKeYJavaType());
 
-                result.variables.remembranceLocalVariables.put((LocationVariable) index, rem);
+                replacedEnhancedForVars
+                    .variables.remembranceLocalVariables.put((LocationVariable) index, rem);
             }
 
             if (values != null) {
@@ -669,11 +702,12 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
                                 values.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
                         values.getKeYJavaType());
 
-                result.variables.remembranceLocalVariables.put((LocationVariable) values, rem);
+                replacedEnhancedForVars
+                    .variables.remembranceLocalVariables.put((LocationVariable) values, rem);
             }
-
-            return result;
         }
+
+        return replacedEnhancedForVars;
     }
 
     @Override
@@ -731,6 +765,61 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
                 + ", modifiesClauses=" + modifiesClauses + ", infFlowSpecs=" + infFlowSpecs
                 + ", variables=" + variables + ", transactionApplicable=" + transactionApplicable
                 + ", hasMod=" + hasMod + "]";
+    }
+
+    /**
+     * <p> Weakens a formula by setting all atomic sub-formulas that contain a variable
+     * from a specified set to {@code true}. </p>
+     *
+     * @param term the formula to weaken.
+     * @param vars the variables to remove from the formula.
+     * @return the weakened formula.
+     * @see #toBlockContract()
+     */
+    private Term weakenFormula(Term term, ImmutableSet<ProgramVariable> vars) {
+        if (term == null) {
+            return null;
+        }
+
+        final TermFactory tf = services.getTermFactory();
+
+        if (term.sort() == Sort.FORMULA) {
+            List<Term> subs = new ArrayList<>();
+            for (Term sub : term.subs()) {
+                Term newSub = weakenFormula(sub, vars);
+                if (newSub == null) {
+                    return services.getTermBuilder().tt();
+                } else {
+                    subs.add(newSub);
+                }
+            }
+
+            return tf.createTerm(
+                    term.op(),
+                    new ImmutableArray<Term>(subs),
+                    term.boundVars(),
+                    term.javaBlock());
+        } else if (term.op() instanceof ProgramVariable
+                && vars.contains((ProgramVariable) term.op())) {
+            return null;
+        } else {
+            List<Term> subs = new ArrayList<>();
+
+            for (Term sub : term.subs()) {
+                Term newSub = weakenFormula(sub, vars);
+                if (newSub == null) {
+                    return null;
+                } else {
+                    subs.add(newSub);
+                }
+            }
+
+            return tf.createTerm(
+                    term.op(),
+                    new ImmutableArray<Term>(subs),
+                    term.boundVars(),
+                    term.javaBlock());
+        }
     }
 
     /**

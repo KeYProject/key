@@ -245,7 +245,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             loopBlockApplyHeadFeature = loopContractApplyHead(longConst(Long.MIN_VALUE));
         } else if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT_EXTERNAL)) {
             blockFeature = blockContractExternalFeature(longConst(Long.MIN_VALUE));
-            loopBlockFeature = loopContractExternalFeature(longConst(Long.MIN_VALUE));
+            loopBlockFeature = SumFeature.createSum(
+                    loopContractExternalFeature(longConst(Long.MIN_VALUE)),
+                    loopContractInternalFeature(longConst(42)));
             loopBlockApplyHeadFeature = loopContractApplyHead(longConst(Long.MIN_VALUE));
         } else {
             blockFeature = blockContractInternalFeature(inftyConst());
@@ -973,15 +975,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private boolean classAxiomDelayedApplication() {
         String classAxiomSetting =
-                (String) strategyProperties
-                        .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
+                strategyProperties
+                .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
         return StrategyProperties.CLASS_AXIOM_DELAYED.equals(classAxiomSetting);
     }
 
     private boolean classAxiomApplicationEnabled() {
         String classAxiomSetting =
-                (String) strategyProperties
-                        .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
+                strategyProperties
+                .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
         return !StrategyProperties.CLASS_AXIOM_OFF.equals(classAxiomSetting);
     }
 
@@ -2641,7 +2643,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                 .create(heapLDT),
                                                 not(ff.ifThenElse)))),
                         not(ContainsTermFeature.create(instOf("s"), instOf("t1")))));
-        
+
         // Without EqNonDuplicateAppFeature.INSTANCE
         // rule 'applyEq' might be applied on the same term
         // without changing the sequent for a really long time. This is tested by
@@ -2768,6 +2770,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupInEqSimpInstantiationWithoutRetry(d);
     }
 
+    @Override
     public Name name() {
         return new Name(JAVA_CARD_DL_STRATEGY);
     }
@@ -2782,6 +2785,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule
      *         shall not be applied at all (it is discarded by the strategy).
      */
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
             Goal goal) {
         return costComputationF.computeCost(app, pio, goal);
@@ -2795,11 +2799,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      * @param goal the goal
      * @return true iff the rule should be applied, false otherwise
      */
+    @Override
     public final boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
             Goal goal) {
         return !(approvalF.computeCost(app, pio, goal) instanceof TopRuleAppCost);
     }
 
+    @Override
     protected RuleAppCost instantiateApp(RuleApp app,
             PosInOccurrence pio, Goal goal) {
         return instantiationF.computeCost(app, pio, goal);

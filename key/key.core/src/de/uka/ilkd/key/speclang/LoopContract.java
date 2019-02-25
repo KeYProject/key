@@ -217,8 +217,13 @@ public interface LoopContract extends BlockSpecificationElement {
     public boolean isInternalOnly();
 
     /**
+     * Returns a {@code BlockContract} for {@link #getBlock()}.
      *
-     * @return a {@code BlockContract} equivalent to this {@code LoopContract}.
+     * This is used to apply for-loop and for-each-loops: The block containing the loop is applied
+     * using a block contract; inside that block contract's validity branch, the while-loop
+     * obtained by transforming the for-loop is applied using a loop contract.
+     *
+     * @return a valid {@code BlockContract} for {@link #getBlock()}.
      */
     public BlockContract toBlockContract();
 }
