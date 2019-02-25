@@ -113,6 +113,11 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     private ImmutableSet<FunctionalLoopContract> functionalContracts;
 
     /**
+     * @see LoopContract#isInternalOnly()
+     */
+    private boolean internalOnly;
+
+    /**
      * Construct a loop contract for a block that starts with a loop.
      *
      * @param baseName
@@ -207,6 +212,8 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
         guard = loop.getGuardExpression();
         body = getBodyStatement(loop, block, outerLabel, innerLabel, loopLabels, services);
         tail = getTailStatement(loop, block);
+
+        internalOnly = loop instanceof EnhancedFor || loop instanceof For;
     }
 
     /**
@@ -289,8 +296,9 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
         guard = nonEnhancedLoop.getGuardExpression();
         body = getBodyStatement(
                 nonEnhancedLoop, block, outerLabel, innerLabel, loopLabels, services);
-
         tail = new StatementBlock();
+
+        internalOnly = loop instanceof EnhancedFor || loop instanceof For;
     }
 
     /**
@@ -469,6 +477,11 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     }
 
     @Override
+    public boolean isInternalOnly() {
+        return internalOnly;
+    }
+
+    @Override
     public List<Label> getLoopLabels() {
         return loopLabels;
     }
@@ -539,10 +552,13 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             final Map<LocationVariable, Term> newModifiesClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             final Term newMeasuredBy, final Term newDecreases) {
-        return new SimpleLoopContract(baseName, newBlock, labels, method, modality,
+        SimpleLoopContract result = new SimpleLoopContract(
+                baseName, newBlock, labels, method, modality,
                 newPreconditions, newMeasuredBy, newPostconditions, newModifiesClauses,
                 newinfFlowSpecs, newVariables, transactionApplicable, hasMod, newDecreases,
                 functionalContracts, services);
+        result.internalOnly = internalOnly;
+        return result;
     }
 
     @Override
@@ -552,10 +568,13 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             final Map<LocationVariable, Term> newModifiesClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             final Term newMeasuredBy, final Term newDecreases) {
-        return new SimpleLoopContract(baseName, newLoop, labels, method, modality,
+        SimpleLoopContract result = new SimpleLoopContract(
+                baseName, newLoop, labels, method, modality,
                 newPreconditions, newMeasuredBy, newPostconditions, newModifiesClauses,
                 newinfFlowSpecs, newVariables, transactionApplicable, hasMod, newDecreases,
                 functionalContracts, services);
+        result.internalOnly = internalOnly;
+        return result;
     }
 
     @Override
@@ -642,10 +661,13 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             return this;
         }
 
-        return new SimpleLoopContract(baseName, newBlock, labels, method, modality,
+        SimpleLoopContract result = new SimpleLoopContract(
+                baseName, newBlock, labels, method, modality,
                 preconditions, measuredBy, postconditions, modifiesClauses,
                 infFlowSpecs, variables, transactionApplicable, hasMod, decreases,
                 functionalContracts, services);
+        result.internalOnly = internalOnly;
+        return result;
     }
 
     @Override
@@ -654,10 +676,13 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             return this;
         }
 
-        return new SimpleLoopContract(baseName, newLoop, labels, method, modality,
+        SimpleLoopContract result = new SimpleLoopContract(
+                baseName, newLoop, labels, method, modality,
                 preconditions, measuredBy, postconditions, modifiesClauses,
                 infFlowSpecs, variables, transactionApplicable, hasMod, decreases,
                 functionalContracts, services);
+        result.internalOnly = internalOnly;
+        return result;
     }
 
     @Override
@@ -669,9 +694,12 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             return this;
         }
 
-        return new SimpleLoopContract(baseName, block, labels, (IProgramMethod) newPM, modality,
+        SimpleLoopContract result = new SimpleLoopContract(
+                baseName, block, labels, (IProgramMethod) newPM, modality,
                 preconditions, measuredBy, postconditions, modifiesClauses, infFlowSpecs, variables,
                 transactionApplicable, hasMod, decreases, functionalContracts, services);
+        result.internalOnly = internalOnly;
+        return result;
     }
 
     @Override

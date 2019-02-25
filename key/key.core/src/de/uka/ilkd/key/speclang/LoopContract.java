@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.metaconstruct.EnhancedForElimination;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
@@ -208,4 +209,10 @@ public interface LoopContract extends BlockSpecificationElement {
      *  {@code \index} and {@code \values} are replaced by proper variables in all terms.
      */
     public LoopContract replaceEnhancedForVariables(StatementBlock newBlock, Services services);
+
+    /**
+     * @return {@code true} iff this contract should only be applied using
+     *  {@link LoopContractInternalRule}.
+     */
+    public boolean isInternalOnly();
 }

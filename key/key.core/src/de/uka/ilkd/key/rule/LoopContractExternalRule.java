@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.FunctionalLoopContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -192,7 +193,30 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
 
     @Override
     public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
-        return !InfFlowCheckInfo.isInfFlow(goal) && super.isApplicable(goal, occurrence);
+        if (InfFlowCheckInfo.isInfFlow(goal)) {
+            return false;
+        } else if (occursNotAtTopLevelInSuccedent(occurrence)) {
+            return false;
+        } else if (Transformer.inTransformer(occurrence)) {
+            return false;
+        } else {
+            final Instantiation instantiation
+                    = instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
+
+            if (instantiation == null) {
+                return false;
+            }
+
+            final ImmutableSet<LoopContract> contracts
+                    = getApplicableContracts(instantiation, goal, goal.proof().getServices());
+
+            for (LoopContract contract : contracts) {
+                if (contract.getHead() == null && !contract.isInternalOnly()) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     @Override
