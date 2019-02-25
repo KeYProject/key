@@ -2,16 +2,27 @@
 <projectDescription>
 	<name>key.util</name>
 	<comment></comment>
-	<projects>
-	</projects>
-	<buildSpec>
-		<buildCommand>
-			<name>org.eclipse.jdt.core.javabuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-	</buildSpec>
+	<projects/>
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments/>
+		</buildCommand>
+	</buildSpec>
+	<linkedResources>
+		<link>
+			<name>key.util.test-src</name>
+			<type>2</type>
+			<location>/home/weigl/work/key/key/key.util.test/src</location>
+		</link>
+		<link>
+			<name>key.util.test-resources</name>
+			<type>2</type>
+			<location>/home/weigl/work/key/key/key.util.test/resources</location>
+		</link>
+	</linkedResources>
+	<filteredResources/>
 </projectDescription>
