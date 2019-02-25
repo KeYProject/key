@@ -1,270 +1,172 @@
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-
 plugins {
-    id "ca.coglinc.javacc" version "2.4.0"
+    id("ca.coglinc.javacc") version("2.4.0") apply false
 }
 
-apply plugin: "java"
-apply plugin: "idea"
-apply plugin: "java-library"
-apply plugin: 'antlr'
-apply plugin: 'maven-publish'
+subprojects {
+    apply plugin: "java"
+    apply plugin: "idea"
+    apply plugin: "eclipse"
+    apply plugin: "java-library"
+    apply plugin: "maven-publish"
 
-repositories {
-    flatDir { dirs 'lib', "key.core/lib" }
-    mavenCentral()
-}
-
-def replaceDotWithUpperCase(String text) {
-    Pattern p = Pattern.compile("[._](.)")
-    Matcher m = p.matcher(text)
-    StringBuffer sb = new StringBuffer()
-    while (m.find()) {
-        m.appendReplacement(sb, m.group(1).toUpperCase())
+    group = "org.key_project"
+    version = "2.8.0-SNAPSHOT"
+    repositories {
+        mavenCentral()
+        flatDir { dirs "lib", "$rootDir/key.core/lib" }
     }
-    m.appendTail(sb)
-    println(sb)
-    return sb.toString()
-}
-
-def addKeySourceSets(String folder) {
-    def name = replaceDotWithUpperCase(folder)
-    def s = sourceSets.create(name)
-    s.java {
-        srcDirs "key.$folder/src",
-                //if (new File("key.$folder/genSrc").exists()) {
-                "key.$folder/genSrc"
-        //}
-    }
-    s.resources { srcDirs "key.$folder/resources" }
-    sourceSets.add(s)
-
-    def testFolder = new File("key.${folder}.test/")
-
-    if (testFolder.exists()) {
-        def t = sourceSets.create("${name}Test")
-        t.java {
-            srcDirs "${testFolder}/src",
-                    //if (new File(testFolder, "genSrc").exists()) {
-                    new File(testFolder, "genSrc")
-            //}
-        }
-        t.resources { srcDirs "key.${folder}.test/resources" }
-        sourceSets.add(s)
-        dependencies.add(t.name + "Compile", s.output)
-    }
-
-    def exampleFolder = new File("key.${folder}.examples")
-
-    if (exampleFolder.exists()) {
-        def t = sourceSets.create("${name}Examples")
-        t.java { srcDirs "${exampleFolder}/src" }
-        t.resources { srcDirs "key.${folder}.test/resources" }
-        sourceSets.add(s)
-    }
-}
-
-addKeySourceSets("core")
-addKeySourceSets("util")
-addKeySourceSets("ui")
-addKeySourceSets("core.example")
-addKeySourceSets("core.symbolic_execution")
-addKeySourceSets("core.testgen")
-addKeySourceSets("removegenerics")
-addKeySourceSets("core.proof_references")
-
-def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
-sourceSets.main.java.srcDirs += javaCCOutputDir
-sourceSets.main.antlr.srcDirs = [file("src")]
-
-dependencies {
-    coreCompile sourceSets.util.output
-    coreTestCompile sourceSets.core.output
-    coreExampleCompile sourceSets.core.output
-    uiCompile sourceSets.core.output
-
-    coreSymbolicExecutionCompile sourceSets.core.output
-    coreTestgenCompile sourceSets.core.output
-    removegenericsCompile sourceSets.core.output
-    coreProofReferencesCompile sourceSets.core.output
-
-
-
-    antlr name: 'antlr'
-    //    javacc 'net.java.dev.javacc:javacc:[version]'
-    // Jars
-    coreCompile name: 'antlr'
-    coreCompile name: 'javacc'
-    coreCompile name: 'recoderKey'
-
-    utilTestCompile group: 'junit', name: 'junit', version: '4.12'
-    coreTestCompile sourceSets.utilTest.output
-}
-
-
-def callGit(args) {
-    return "git %s".execute().text.trim()
-}
-
-task gitInfo() {
-    doLast {
-        callGit("rev-parse --short HEAD")
-        callGit("rev-parse --abbrev-ref HEAD")
-    }
-}
-
-generateGrammarSource {
-    source = fileTree("src/") {
-        include "de/uka/ilkd/key/parser/KeYLexer.g",
-                "de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.g",
-                "de/uka/ilkd/key/speclang/jml/translation/KeYJMLLexer.g",
-                "de/uka/ilkd/key/parser/KeYParser.g",
-                "de/uka/ilkd/key/speclang/jml/translation/KeYJMLParser.g",
-                "de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.g"
-    }
-
-    outputDirectory = file("${projectDir}/build/generated-src/antlr/main")
-    arguments += ["-visitor"]
-}
-
-compileJavacc {
-    outputDirectory = javaCCOutputDir
-    inputDirectory = file('src/')
-
-    doLast {
-        copy {
-            from("src/de/uka/ilkd/key/parser/schemajava/Token.java.source") {
-                rename 'Token.java.source', 'Token.java'
-            }
-            into file("${buildDir}/generated-src/javacc/de/uka/ilkd/key/parser/schemajava/")
-        }
-        copy {
-            from("src/de/uka/ilkd/key/parser/proofjava/Token.java.source") {
-                rename 'Token.java.source', 'Token.java'
-            }
-            into file("${buildDir}/generated-src/javacc/de/uka/ilkd/key/parser/proofjava/")
-        }
-    }
-    /*
-    "/de/uka/ilkd/key/parser/proofjava/ProofJavaParser.jj"
-    outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/proofjava"
-    javacchome="${ext.dir}"
-    -->*/
-}
-
-/*
-generateGrammarSource.enabled = false
-generateTestGrammarSource.enabled = false
-
-task generateKeyGrammar(type: AntlrTask) {
-    arguments += ["-visitor", "-long-messages",
-                  "-package", "de.uka.ilkd.key.parser"]
-    source "src/de/uka/ilkd/key/parser/KeY*.g"
-}
-
-task generatePreJMLGrammar(type: AntlrTask) {
-    arguments += ["-visitor", "-long-messages",
-                  "-package", "de.uka.ilkd.key.speclang.jml.pretranslation"]
-    include "src/de/uka/ilkd/key/speclang/jml/pretranslation/*.g"
-}
-
-task generateJMLGrammar(type: AntlrTask) {
-    arguments += ["-visitor", "-long-messages",
-                  "-package", "de.uka.ilkd.key.speclang.jml.translation"]
-    include "src/de/uka/ilkd/key/speclang/jml/translation"
-}
-
-compileJava.dependsOn += [generateJMLGrammar, generateKeyGrammar,
-                          generatePreJMLGrammar]
-*dependencies {
 
     dependencies {
-    testCompile project(":key.core.proof_references")
-    testCompile project(":key.util.test")
-    testCompile project(":key.core.test")
-
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-}dependencies {
-    compile project(':key.core')
-}dependencies {
-    compile project(':key.core.symbolic_execution')
-}sourceSets {
-    main {
-        java { srcDirs = [] }
-        resources { srcDirs = [] }
+        testCompile("junit:junit:4.12")
     }
-    test {
-        java { srcDirs = ['src'] }
-        resources { srcDirs = ['resources'] }
+
+    sourceSets {
+        main {
+            java { srcDirs(file("src/")) }
+            resources { srcDirs(file("resources/")) }
+        }
+
+        test {
+            java { srcDirs(file("../${project.name}.test/src/")) }
+            resources { srcDirs(file("../${project.name}.test/resources/")) }
+        }
+    }
+
+    /*val buildInfo by tasks.registering(BuildInfo::class) {
+        version = project.version.toString()
+        outputFile = file("$buildDir/generated-resources/build-info.properties")
+    }*/
+}
+
+project(":key.util") {}
+
+project(":key.core.example") {
+    dependencies {
+        compile project(":key.core")
+    }
+}
+project(":key.core") {
+    apply plugin: "ca.coglinc.javacc"
+    apply plugin: "antlr"
+
+    dependencies {
+        compile project(":key.util")
+        compile name: 'recoderKey'
+        compile name: 'javacc'
+        compile name: 'antlr'
+
+        antlr name: 'antlr'
+        javacc name: 'javacc' //'net.java.dev.javacc:javacc:[version]'
+        //antlr("org.antlr:antlr:3.5.2")   // use ANTLR version 3
+    }
+
+    def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
+
+    sourceSets.main.antlr.srcDirs = [file("src")]
+    sourceSets.test.antlr.srcDirs = [file("$rootDir/key.core.test/src/")]
+    sourceSets.main.java.srcDirs(javaCCOutputDir)
+
+    generateGrammarSource {
+        source = fileTree("src/") {
+            include("de/uka/ilkd/key/parser/KeYLexer.g",
+                    "de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.g",
+                    "de/uka/ilkd/key/speclang/jml/translation/KeYJMLLexer.g",
+                    "de/uka/ilkd/key/parser/KeYParser.g",
+                    "de/uka/ilkd/key/speclang/jml/translation/KeYJMLParser.g",
+                    "de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.g")
+        }
+
+        outputDirectory = file("${projectDir}/build/generated-src/antlr/main")
+        arguments.add("-visitor")
+    }
+
+    generateTestGrammarSource {
+        source = fileTree("$rootDir/key.core.test/src/") {
+            include("de/uka/ilkd/key/proof/runallproofs/proofcollection/ProofCollection.g")
+        }
+        outputDirectory = file("${projectDir}/build/generated-src/antlr/test")
+        arguments.add("-visitor")
+    }
+
+    compileJavacc {
+        outputDirectory = javaCCOutputDir
+        inputDirectory = file("src/")
+        doLast {
+            copy {
+                from("src/de/uka/ilkd/key/parser/schemajava/Token.java.source") {
+                    rename "Token.java.source", "Token.java"
+                }
+                into file("${buildDir}/generated-src/javacc/de/uka/ilkd/key/parser/schemajava/")
+            }
+            copy {
+                from("src/de/uka/ilkd/key/parser/proofjava/Token.java.source") {
+                    rename "Token.java.source", "Token.java"
+                }
+                into file("${buildDir}/generated-src/javacc/de/uka/ilkd/key/parser/proofjava/")
+            }
+        }
+        /*
+        "/de/uka/ilkd/key/parser/proofjava/ProofJavaParser.jj"
+        outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/proofjava"
+        javacchome="${ext.dir}"
+        -->*/
     }
 }
 
-dependencies {
-    testCompile project(':key.core.symbolic_execution')
-    testCompile project(':key.core.test')
-}sourceSets {
-    main {
-        java { srcDirs = [] }
-        resources { srcDirs = [] }
-    }
-    test {
-        java { srcDirs = ['src'] }
-        resources { srcDirs = ['resources'] }
+
+project(":key.core.proof_references") {
+    dependencies {
+        compile project(":key.core")
     }
 }
 
-dependencies {
-    testCompile project(':key.core')
-    testCompile project(':key.util.test')
-}dependencies {
-    compile project(':key.core')
-}sourceSets {
-    main {
-        java { srcDirs = [] }
-        resources { srcDirs = [] }
-    }
-    test {
-        java { srcDirs = ['src'] }
-        resources { srcDirs = ['resources'] }
-    }
-}
-dependencies {
-    testCompile project(':key.core.testgen')
-    testCompile project(':key.core.test')
-}dependencies {
-    compile project(":key.core")
-}sourceSets {
-    main {
-        java { srcDirs = [] }
-        resources { srcDirs = [] }
-    }
-    test {
-        java { srcDirs = ['src'] }
-        resources { srcDirs = ['resources'] }
+project(":key.core.symbolic_execution") {
+    dependencies {
+        compile project(":key.core")
     }
 }
 
-dependencies {
-    testCompile project(":key.removegenerics")
-    testCompile project(":key.util.test")
-}apply plugin: 'application'
 
-dependencies {
-    compile project(':key.core')
-    compile project(':key.core.testgen')
-    compile project(':key.core.symbolic_execution')
-/*    compile name: 'antlr'
-    compile name: 'javacc'
-    compile name: 'recoderKey'*
-}sourceSets {
-    main {
-        java { srcDirs = [] }
-        resources { srcDirs = [] }
-    }
-    test {
-        java { srcDirs = ['src'] }
-        resources { srcDirs = ['resources'] }
+project(":key.core.testgen") {
+    dependencies {
+        compile project(":key.core")
     }
 }
-*/
+
+
+project(":key.removegenerics") {
+    dependencies {
+        compile project(":key.core")
+    }
+}
+
+project(":key.ui") {
+    apply plugin: "application"
+    dependencies {
+        compile(project(":key.core"))
+        compile(project(":key.core.proof_references"))
+        compile(project(":key.core.symbolic_execution"))
+        compile(project(":key.core.testgen"))
+        compile(project(":key.removegenerics"))
+    }
+
+    task createExamplesZip(type: Zip) {
+        destinationDirectory = file("$projectDir/resources")
+        archiveFileName = "examples.zip"
+        from 'examples'
+        include '*'
+        include '*/*' //to include contents of a folder present inside Reports directory
+    }
+
+    processResources.dependsOn(createExamplesZip)
+
+    application {
+        //dependsOn(createExamplesZip)
+        mainClassName = "de.uka.ilkd.key.core.Main"
+    }
+
+    run {
+        systemProperties["key.examples.dir"] = "$projectDir/examples"
+    }
+}
+

@@ -75,6 +75,11 @@ public final class ExampleChooser extends JDialog {
     private static final String PROOF_FILE_NAME = "project.proof";
 
     /**
+     * Java property name to specify a custom key example folder.
+     */
+    public static final String KEY_EXAMPLE_DIR = "key.examples.dir";
+
+    /**
      * This class is a singleton class and this its only instance.
      */
     private static ExampleChooser instance;
@@ -370,6 +375,11 @@ public final class ExampleChooser extends JDialog {
     //-------------------------------------------------------------------------
 
     public static File lookForExamples() {
+        //weigl: using java properties: -Dkey.examples.dir="..."
+        if(System.getProperty(KEY_EXAMPLE_DIR)!=null){
+            return new File(System.getProperty(KEY_EXAMPLE_DIR));
+        }
+
         // greatly simplified version without parent path lookup.
         File folder = new File(IOUtil.getProjectRoot(ExampleChooser.class), EXAMPLES_PATH);
         if (!folder.exists()) {
