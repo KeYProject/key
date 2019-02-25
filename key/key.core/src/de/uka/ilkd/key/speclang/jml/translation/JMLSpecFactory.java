@@ -44,7 +44,6 @@ import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.BranchStatement;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
@@ -1288,12 +1287,8 @@ public class JMLSpecFactory {
     public ImmutableSet<BlockContract> createJMLBlockContracts(final IProgramMethod method,
             final List<Label> labels, final StatementBlock block,
             final TextualJMLSpecCase specificationCase) throws SLTranslationException {
-        // For for-loops, we create a block contract around the loop contract
-        // to be able to consider the for-loop's head
-        if (specificationCase.isLoopContract() && !block.isEmpty()
-                && !(block.getChildAt(0) instanceof For
-                        || block.getChildAt(0) instanceof EnhancedFor)) {
-                return DefaultImmutableSet.nil();
+        if (specificationCase.isLoopContract()) {
+            return DefaultImmutableSet.nil();
         }
 
         final Behavior behavior = specificationCase.getBehavior();
@@ -1304,47 +1299,6 @@ public class JMLSpecFactory {
         final ContractClauses clauses
                 = translateJMLClauses(method, specificationCase, programVariables, behavior);
         return new SimpleBlockContract.Creator("JML " + behavior + "block contract", block, labels,
-                method, behavior, variables, clauses.requires, clauses.measuredBy, clauses.ensures,
-                clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
-                clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
-                clauses.hasMod, services).create();
-    }
-
-    /**
-     * Creates a set of block contracts for a loop from a textual specification case.
-     *
-     * @param method
-     *            the method containing the block.
-     * @param labels
-     *            all labels belonging to the block.
-     * @param block
-     *            the block which the block contracts belong to.
-     * @param specificationCase
-     *            the textual specification case.
-     * @return a set of block contracts for a block from a textual specification case.
-     * @throws SLTranslationException
-     *            translation exception
-     */
-    public ImmutableSet<BlockContract> createJMLBlockContracts(final IProgramMethod method,
-            final List<Label> labels, final LoopStatement loop,
-            final TextualJMLSpecCase specificationCase) throws SLTranslationException {
-        // For for-loops, we create a block contract around the loop contract
-        // to be able to consider the for-loop's head
-        if (specificationCase.isLoopContract()
-                && !(loop instanceof For
-                        || loop instanceof EnhancedFor)) {
-                return DefaultImmutableSet.nil();
-        }
-
-        final Behavior behavior = specificationCase.getBehavior();
-        final BlockContract.Variables variables
-                = BlockContract.Variables.create(loop, labels, method, services);
-        final ProgramVariableCollection programVariables
-                = createProgramVariables(method, loop, variables);
-        final ContractClauses clauses
-                = translateJMLClauses(method, specificationCase, programVariables, behavior);
-        return new SimpleBlockContract.Creator(
-                "JML " + behavior + "block contract", new StatementBlock(loop), labels,
                 method, behavior, variables, clauses.requires, clauses.measuredBy, clauses.ensures,
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
                 clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,

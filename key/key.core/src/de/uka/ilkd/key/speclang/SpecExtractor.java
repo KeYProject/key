@@ -74,17 +74,6 @@ public interface SpecExtractor {
             throws SLTranslationException;
 
     /**
-     * Returns the block contracts for the passed loop.
-     * @param method the program method containing the loop.
-     * @param loop the loop.
-     * @return the block contracts
-     * @throws SLTranslationException a translation exception
-     */
-    ImmutableSet<BlockContract> extractBlockContracts(
-            IProgramMethod method, LoopStatement loop)
-            throws SLTranslationException;
-
-    /**
      * Returns the loop contracts for the passed loop.
      * @param method the program method containing the loop.
      * @param loop the loop.
