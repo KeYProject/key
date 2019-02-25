@@ -92,4 +92,11 @@ public interface BlockContract extends BlockSpecificationElement {
      */
     @Override
     public BlockContract setBlock(StatementBlock newBlock);
+
+    /**
+     *
+     * @return the {@code LoopContract} from which this contract was generated, or {@code null}.
+     * @see LoopContract#toBlockContract()
+     */
+    public LoopContract toLoopContract();
 }

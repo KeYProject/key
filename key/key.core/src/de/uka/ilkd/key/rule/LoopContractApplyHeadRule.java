@@ -90,6 +90,8 @@ public class LoopContractApplyHeadRule implements BuiltInRule {
 
             services.getSpecificationRepository().removeLoopContract(c);
             services.getSpecificationRepository().addLoopContract(newContract, false);
+            services.getSpecificationRepository().addBlockContract(
+                    newContract.toBlockContract().setBlock(headAndBlock));
         }
 
         Goal result = goal.split(1).head();

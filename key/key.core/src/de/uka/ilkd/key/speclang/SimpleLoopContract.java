@@ -118,6 +118,11 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     private boolean internalOnly;
 
     /**
+     * @see LoopContract#toBlockContract()
+     */
+    private BlockContract blockContract;
+
+    /**
      * Construct a loop contract for a block that starts with a loop.
      *
      * @param baseName
@@ -474,6 +479,22 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     @Override
     public boolean isOnBlock() {
         return onBlock;
+    }
+
+    @Override
+    public BlockContract toBlockContract() {
+        SimpleLoopContract r = (SimpleLoopContract) replaceEnhancedForVariables(block, services);
+
+        if (blockContract == null) {
+            blockContract = new SimpleBlockContract(
+                    r.baseName, r.block, r.labels, r.method, r.modality,
+                r.preconditions, r.measuredBy, r.postconditions, r.modifiesClauses,
+                r.infFlowSpecs, r.variables, r.transactionApplicable, r.hasMod,
+                DefaultImmutableSet.nil());
+            ((SimpleBlockContract) blockContract).setLoopContract(r);
+        }
+
+        return blockContract;
     }
 
     @Override

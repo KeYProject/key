@@ -50,6 +50,8 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
      */
     private ImmutableSet<FunctionalBlockContract> functionalContracts;
 
+    private LoopContract loopContract = null;
+
     /**
      *
      * @param baseName
@@ -108,6 +110,19 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
                 .combine();
     }
 
+    void setLoopContract(LoopContract loopContract) {
+        if (this.loopContract != null) {
+            throw new IllegalStateException();
+        }
+
+        this.loopContract = loopContract;
+    }
+
+    @Override
+    public LoopContract toLoopContract() {
+        return loopContract;
+    }
+
     @Override
     public ImmutableSet<FunctionalBlockContract> getFunctionalContracts() {
         return functionalContracts;
@@ -154,9 +169,12 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
             final Map<LocationVariable, Term> newModifiesClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             Term newMeasuredBy) {
-        return new SimpleBlockContract(baseName, newBlock, labels, method, modality,
+        SimpleBlockContract result = new SimpleBlockContract(
+                baseName, newBlock, labels, method, modality,
                 newPreconditions, newMeasuredBy, newPostconditions, newModifiesClauses,
                 newinfFlowSpecs, newVariables, transactionApplicable, hasMod, functionalContracts);
+        result.setLoopContract(loopContract);
+        return result;
     }
 
     @Override
@@ -169,9 +187,12 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
     public BlockContract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         assert newPM instanceof IProgramMethod;
         assert newKJT.equals(newPM.getContainerType());
-        return new SimpleBlockContract(baseName, block, labels, (IProgramMethod) newPM, modality,
+        SimpleBlockContract result = new SimpleBlockContract(
+                baseName, block, labels, (IProgramMethod) newPM, modality,
                 preconditions, measuredBy, postconditions, modifiesClauses, infFlowSpecs, variables,
                 transactionApplicable, hasMod, functionalContracts);
+        result.setLoopContract(loopContract);
+        return result;
     }
 
     @Override

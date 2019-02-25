@@ -1720,8 +1720,12 @@ public final class SpecificationRepository {
             loopContractsOnLoops.put(b, getLoopContracts(loop).add(contract));
         }
 
-        if (addFunctionalContract && !contract.isInternalOnly()) {
-            addContract(cf.funcLoop(contract));
+        if (addFunctionalContract) {
+            if (contract.isInternalOnly()) {
+                addContract(cf.funcBlock(contract.toBlockContract()));
+            } else {
+                addContract(cf.funcLoop(contract));
+            }
         }
     }
 

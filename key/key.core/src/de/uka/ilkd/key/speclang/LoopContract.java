@@ -215,4 +215,10 @@ public interface LoopContract extends BlockSpecificationElement {
      *  {@link LoopContractInternalRule}.
      */
     public boolean isInternalOnly();
+
+    /**
+     *
+     * @return a {@code BlockContract} equivalent to this {@code LoopContract}.
+     */
+    public BlockContract toBlockContract();
 }
