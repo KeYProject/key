@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -9,46 +15,95 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Map;
-
 public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public SelectCommand() {
         super(Parameters.class);
     }
 
-    @Override public Parameters evaluateArguments(EngineState state,
+    @Override
+    public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
+        return state.getValueInjector().inject(this, new Parameters(),
+                arguments);
     }
 
-    @Override public void execute(Parameters args)
+    @Override
+    public void execute(Parameters args)
             throws ScriptException, InterruptedException {
-        Goal g = findGoalWith(args.formula, state.getProof());
+        Goal g;
+        if (args.number != null && args.formula == null
+                && args.branch == null) {
+            g = state.getProof().openEnabledGoals().take(args.number).head();
+        } else if (args.formula != null && args.number == null
+                && args.branch == null) {
+            g = findGoalWith(args.formula, state.getProof());
+        } else if (args.branch != null && args.formula == null
+                && args.number == null) {
+            g = findGoalWith(args.branch, state.getProof());
+        } else {
+            throw new ScriptException(
+                    "Exactly one of 'formula', 'branch' or 'number' are required");
+        }
+
         state.setGoal(g);
+    }
+
+    private Goal findGoalWith(String branchTitle, Proof proof)
+            throws ScriptException {
+        return findGoalWith(
+                node -> Optional.ofNullable(node.getNodeInfo().getBranchLabel())
+                        .orElse("").equals(branchTitle),
+                node -> getFirstSubtreeGoal(node, proof), proof);
+    }
+
+    private static Goal getFirstSubtreeGoal(Node node, Proof proof) {
+        Goal goal;
+        if (node.leaf() && //
+                (goal = EngineState.getGoal(proof.openGoals(), node)) != null) {
+            return goal;
+        }
+
+        if (node.childrenCount() == 0) {
+            return null;
+        }
+
+        final Iterable<Node> children = (() -> node.childrenIterator());
+        for (Node child : children) {
+            goal = getFirstSubtreeGoal(child, proof);
+            if (goal != null) {
+                return goal;
+            }
+        }
+
+        return null;
     }
 
     private Goal findGoalWith(Term formula, Proof proof)
             throws ScriptException {
+        return findGoalWith(
+                node -> node.leaf() && contains(node.sequent(), formula),
+                node -> EngineState.getGoal(proof.openGoals(), node), proof);
+    }
 
-        Goal g;
+    private Goal findGoalWith(Function<Node, Boolean> filter,
+            Function<Node, Goal> goalRetriever, Proof proof)
+            throws ScriptException {
         Deque<Node> choices = new LinkedList<Node>();
         Node node = proof.root();
+
         while (node != null) {
             assert !node.isClosed();
             int childCount = node.childrenCount();
 
-            Sequent seq;
+            if (filter.apply(node)) {
+                final Goal g = goalRetriever.apply(node);
+                if (g.isAutomatic()) {
+                    return g;
+                }
+            }
+
             switch (childCount) {
             case 0:
-                seq = node.sequent();
-                if (contains(seq, formula)) {
-                    g = EngineState.getGoal(proof.openGoals(), node);
-                    if (g.isAutomatic()) {
-                        return g;
-                    }
-                }
                 node = choices.pollLast();
                 break;
 
@@ -63,8 +118,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
                     if (!child.isClosed()) {
                         if (next == null) {
                             next = child;
-                        }
-                        else {
+                        } else {
                             choices.add(child);
                         }
                     }
@@ -79,8 +133,8 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     }
 
     private boolean contains(Sequent seq, Term formula) {
-        return contains(seq.antecedent(), formula) || contains(seq.succedent(),
-                formula);
+        return contains(seq.antecedent(), formula)
+                || contains(seq.succedent(), formula);
     }
 
     private boolean contains(Semisequent semiseq, Term formula) {
@@ -92,13 +146,21 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         return false;
     }
 
-    @Override public String getName() {
+    @Override
+    public String getName() {
         return "select";
     }
 
     public class Parameters {
-        @Option("formula")
+        /** A formula defining the goal to select */
+        @Option(value = "formula", required = false)
         public Term formula;
+        /** The number of the goal to select, starts with 0 */
+        @Option(value = "number", required = false)
+        public Integer number;
+        /** The name of the branch to select */
+        @Option(value = "branch", required = false)
+        public String branch;
     }
 
 }

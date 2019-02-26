@@ -47,13 +47,13 @@ public final class PosInOccurrence {
     /**
      * The subterm this object points to, or <code>null</code>
      */
-    private Term subTermCache = null;
+    private volatile Term subTermCache = null;
 
     public PosInOccurrence(SequentFormula sequentFormula,
                            PosInTerm posInTerm,
                            boolean inAntec) {
         assert posInTerm != null;
-    assert sequentFormula != null;
+        assert sequentFormula != null;
 	this.inAntec = inAntec;
 	this.sequentFormula = sequentFormula;	
 	this.posInTerm = posInTerm;	
@@ -192,35 +192,22 @@ public final class PosInOccurrence {
      */
     public PosInOccurrence replaceConstrainedFormula (SequentFormula p_newFormula) {
         assert p_newFormula != null;
-        final PIOPathIterator it = iterator ();
-        Term newTerm = p_newFormula.formula ();
-        PosInTerm newPosInTerm = PosInTerm.getTopLevel();
-
-        while ( true ) {
-            final int subNr = it.next ();
-            
-            if ( subNr == -1 ) break;
-
-            newPosInTerm = newPosInTerm.down( subNr );
-            newTerm = newTerm.sub ( subNr );
+        if (p_newFormula == sequentFormula) {
+            return this;
         }
-
         return new PosInOccurrence ( p_newFormula,
-                                     newPosInTerm,
+                                     posInTerm,
                                      inAntec);
     }
-
-       
-    
 
     /**
      * returns the subterm this object points to
      */
-    public Term subTerm () {
-	if ( subTermCache == null ) {
-	    subTermCache = posInTerm.getSubTerm(sequentFormula.formula());
-	}
-	return subTermCache;
+    public Term subTerm () {        
+        if ( subTermCache == null ) {
+            subTermCache = posInTerm.getSubTerm(sequentFormula.formula());
+        }
+        return subTermCache;
     }
 
     /**

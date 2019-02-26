@@ -3,9 +3,11 @@
    <methodCall name="&lt;call self.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = self.magic(x) catch(exc_0)
-pre: self.&lt;inv&gt;
-post: result_0 = self.subMagic(x) &amp; self.&lt;inv&gt; &amp; exc_0 = null
-mod: {}
+pre: java.lang.Object::&lt;inv&gt;(heap, self)&lt;&lt;impl&gt;&gt;
+post: (result_0 = QueryWithFields::subMagic(heap, self, x)
+&amp; java.lang.Object::&lt;inv&gt;(heap, self)&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
+&amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;
+mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" selfTerm="self" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
                <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(x)&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 

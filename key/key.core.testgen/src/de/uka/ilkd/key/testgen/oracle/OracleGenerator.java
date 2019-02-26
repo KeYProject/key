@@ -121,7 +121,6 @@ public class OracleGenerator {
 	}
 	
 	public OracleMethod generateOracleMethod(Term term){
-		
 		constants = getConstants(term);
 		methodArgs = getMethodArgs(term);
 		OracleTerm body = generateOracle(term, false);

@@ -18,8 +18,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -28,58 +28,71 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 /**
  * Matching triggers within another quantifier expression. Problems with the
  * current implementation:
- * 
+ *
  * * the usage of EqualityConstraint for unification implies that a variable is
  * never instantiated with non-rigid terms
- * 
+ *
  * * it is unclear whether certain instantiations are lost due to too strict type
  * checks in EqualityConstraint
  */
 class TwoSidedMatching {
-	    
+
     private final UniTrigger trigger;
     private final Term triggerWithMVs;
     private final Substitution targetSubstWithMVs;
     private final Substitution triggerSubstWithMVs;
     private final Term targetWithMVs;
-    
-    TwoSidedMatching(UniTrigger trigger, Term targetTerm, TermServices services) {
+
+    /**
+     * creates an instance of a two sided matching
+     * @param trigger the UniTrigger
+     * @param targetTerm the term to match
+     * @param services the Services
+     */
+    TwoSidedMatching(UniTrigger trigger, Term targetTerm, Services services) {
         this.trigger = trigger;
         this.targetSubstWithMVs =
-            ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars ( targetTerm, services );
+                ReplacerOfQuanVariablesWithMetavariables.
+                    createSubstitutionForVars ( targetTerm, services );
         this.triggerSubstWithMVs =
-            trigger.getTriggerSetThisBelongsTo().getReplacementWithMVs ();
-        
+                trigger.getTriggerSetThisBelongsTo().getReplacementWithMVs ();
+
         if (targetSubstWithMVs.isGround()) {
             this.targetWithMVs =
-            targetSubstWithMVs.apply ( TriggerUtils.discardQuantifiers ( targetTerm ), services );
+                    targetSubstWithMVs.apply(TriggerUtils.discardQuantifiers(targetTerm), 
+                            services);
         } else {
-            this.targetWithMVs = null;            
+            this.targetWithMVs = null;
         }
         if (triggerSubstWithMVs.isGround()) {
             this.triggerWithMVs =
-            triggerSubstWithMVs.apply ( trigger.getTriggerTerm (), services );
+                    triggerSubstWithMVs.apply ( trigger.getTriggerTerm (), services );
         } else {
-            this.triggerWithMVs = null;            
+            this.triggerWithMVs = null;
         }
     }
-    
-    ImmutableSet<Substitution> getSubstitutions(TermServices services) {
+
+    /**
+     * returns the found matchings
+     * @param services the Services
+     * @return the found matchings
+     */
+    ImmutableSet<Substitution> getSubstitutions(Services services) {
         if (triggerWithMVs == null || targetWithMVs == null) {
             // non ground subs not supported yet
             return DefaultImmutableSet.<Substitution>nil();
         }
-	return getAllSubstitutions ( targetWithMVs, services );
+        return getAllSubstitutions ( targetWithMVs, services );
     }
-    
-    private ImmutableSet<Substitution> getAllSubstitutions(Term target, TermServices services) {
+
+    private ImmutableSet<Substitution> getAllSubstitutions(Term target, Services services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
         Substitution sub = match ( triggerWithMVs, target, services );
-        if ( sub != null
-             && ( trigger.isElementOfMultitrigger() || sub.isTotalOn ( trigger.getUniVariables() )
-             // sub.containFreevar(trigger.ts.allTerm.
-             // varsBoundHere(0).getQuantifiableVariable(0))
-             ) ) {
+        if (sub != null
+                && (trigger.isElementOfMultitrigger() || sub.isTotalOn (trigger.getUniVariables())
+                        // sub.containFreevar(trigger.ts.allTerm.
+                        // varsBoundHere(0).getQuantifiableVariable(0))
+                        )) {
             allsubs = allsubs.add ( sub );
         }
         final Operator op = target.op ();
@@ -90,32 +103,36 @@ class TwoSidedMatching {
         }
         return allsubs;
     }
-    
+
     /** find a substitution in a allterm by using unification */
-    private Substitution match(Term triggerTerm, Term targetTerm, 
-            TermServices services) {
+    private Substitution match(Term triggerTerm, Term targetTerm,
+            Services services) {
         final Constraint c =
-            Constraint.BOTTOM.unify ( targetTerm, triggerTerm,
-                                      services );
+                Constraint.BOTTOM.unify ( targetTerm, triggerTerm,
+                        services );
         if ( c.isSatisfiable () ) {
             ImmutableMap<QuantifiableVariable,Term> sub =
-                DefaultImmutableMap.<QuantifiableVariable,Term>nilMap();
+                    DefaultImmutableMap.<QuantifiableVariable,Term>nilMap();
             for (QuantifiableVariable quantifiableVariable : trigger.getUniVariables()) {
                 QuantifiableVariable q = quantifiableVariable;
                 Term mv = triggerSubstWithMVs.getSubstitutedTerm(q);
                 Term t = c.getInstantiation((Metavariable) (mv.op()), services);
-                if (t == null || t.op() instanceof Metavariable)
+                if (t == null || t.op() instanceof Metavariable) {
                     return null;
-                if (isGround(t))
+                }
+                if (isGround(t)) {
                     sub = sub.put(q, t);
+                }
             }
-            if ( sub.size () > 0 ) return new Substitution ( sub );
+            if ( sub.size () > 0 ) {
+                return new Substitution ( sub );
+            }
         }
         return null;
     }
 
     private boolean isGround(Term t) {
         return !triggerSubstWithMVs.termContainsValue ( t )
-               && !targetSubstWithMVs.termContainsValue ( t );
-    } 
+                && !targetSubstWithMVs.termContainsValue ( t );
+    }
 }

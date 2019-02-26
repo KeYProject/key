@@ -176,7 +176,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
         for (SequentFormula sf : semi) {
             replacements = replacements.append
-                    (instantiateReplacement(termLabelState, sf, services, matchCond, applicationPosInOccurrence, labelHint, goal, tacletApp));           
+                    (instantiateReplacement(termLabelState, sf, services, matchCond,
+                            applicationPosInOccurrence, labelHint, goal, tacletApp));
         }
 
         return replacements;

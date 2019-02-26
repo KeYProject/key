@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package banking_example;
 
 
@@ -29,7 +25,7 @@ public class UserAccount {
       @ public invariant 0 <= incorrectLogins && incorrectLogins <= 3;
       @
       @ accessible \inv : this.*, password[*], bankAccounts[*],
-      @                   \infinite_union(int i;
+      @                   (\infinite_union int i;
       @                                   (0 <= i && i < bankAccounts.length) ?
       @                                   bankAccounts[i].* : \empty);
       @*/

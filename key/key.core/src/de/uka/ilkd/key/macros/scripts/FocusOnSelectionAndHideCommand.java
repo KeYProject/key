@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * Hide all formulas that are not selected
  * Parameter:
- * * The sequent with those formuals that should not be hidden
+ * * The sequent with those formulas that should not be hidden
  * Created by sarah on 1/12/17.
  */
 public class FocusOnSelectionAndHideCommand
@@ -58,7 +58,7 @@ public class FocusOnSelectionAndHideCommand
         Object fixedGoal = stateMap.get(GOAL_KEY);
         if (fixedGoal instanceof Node) {
             Node fixed = (Node) fixedGoal;
-            //case node is already modified by focus, the child has to be returend
+            //case node is already modified by focus, the child has to be returned
             if (!fixed.leaf()) {
                 assert fixed.childrenCount() == 1;
                 fixed = fixed.child(0);
@@ -81,7 +81,7 @@ public class FocusOnSelectionAndHideCommand
             throws ParserException, ScriptException {
         while (true) {
             //get current goal
-            Goal g = state.getFirstOpenGoal();
+            Goal g = state.getFirstOpenAutomaticGoal();
             //find formulas that should be hidden in sequent of current goal
 
             //hide
@@ -211,12 +211,12 @@ public class FocusOnSelectionAndHideCommand
     }
 
     /**
-     * Make tacletApp for one sequentformula to hide on the seuqent
+     * Make tacletApp for one sequent formula to hide on the sequent
      *
      * @param g      the goal on which this hide rule should be applied to
-     * @param toHide the sequentformula to hide
+     * @param toHide the sequent formula to hide
      * @param tac    the taclet top apply (either hide_left or hide_right)
-     * @param antec  whether teh formula is in the antecedent
+     * @param antec  whether the formula is in the antecedent
      * @throws ScriptException
      */
     private void makeTacletApp(Goal g, SequentFormula toHide, Taclet tac,
@@ -229,7 +229,7 @@ public class FocusOnSelectionAndHideCommand
 
         Set<SchemaVariable> svs = tac.collectSchemaVars();
         assert svs.size() == 1;
-        Iterator iter = svs.iterator();
+        Iterator<SchemaVariable> iter = svs.iterator();
         SchemaVariable sv = (SchemaVariable) iter.next();
 
         SVInstantiations inst = SVInstantiations.EMPTY_SVINSTANTIATIONS;

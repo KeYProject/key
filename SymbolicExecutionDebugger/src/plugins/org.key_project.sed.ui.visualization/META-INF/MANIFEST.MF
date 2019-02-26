@@ -19,8 +19,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.sed.core;bundle-version="1.0.0",
  org.key_project.sed.ui;bundle-version="1.0.0",
  org.key_project.sed.ui.visualization.model;bundle-version="1.0.0",
- org.eclipse.graphiti;bundle-version="[0.11.0,0.15.0)",
- org.eclipse.graphiti.ui;bundle-version="[0.11.0,0.15.0)"
+ org.eclipse.graphiti,
+ org.eclipse.graphiti.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8, JavaSE-10, JavaSE-9
 Bundle-Vendor: KeY Project

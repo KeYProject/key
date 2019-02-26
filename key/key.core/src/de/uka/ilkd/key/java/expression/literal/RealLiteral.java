@@ -87,14 +87,9 @@ public class RealLiteral extends Literal {
 		return ((RealLiteral)o).getValue().equals(getValue());
     }
 
-    public int hashCode(){
-    	int result = 59;
-    	result = 69 * result + getValue().hashCode();
-    	return result;
-    }
-
-    public boolean equals(Object o){
-    	return super.equals(o);
+    @Override
+    public int computeHashCode(){
+    	return 17*super.computeHashCode() + getValue().hashCode();
     }
 
     /**

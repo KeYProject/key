@@ -5,10 +5,15 @@
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <loopInvariant name="invariant: i &gt;= 0
-&amp; i &lt;= array.length
-&amp; result_1 = javaCastInt(bsum{int j;}(0, i, array[j]));
-variant: javaSubInt(array.length, i)
+            <loopInvariant name="invariant: (  (geq(i, Z(0(#)))
+ &amp; leq(i, length(array)))&lt;&lt;SC&gt;&gt;
+ &amp;   result_1
+   = javaCastInt(bsum{int j;}(Z(0(#)),
+                              i,
+                              int::select(heap,
+                                          array,
+                                          arr(j)))))&lt;&lt;SC&gt;&gt;;
+variant: javaSubInt(length(array), i)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
                <branchStatement name="if (array==null)" pathCondition="true" pathConditionChanged="false" blockOpened="true">

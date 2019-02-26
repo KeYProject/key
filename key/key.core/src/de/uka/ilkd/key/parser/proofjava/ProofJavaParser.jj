@@ -1504,7 +1504,7 @@ VariableSpecification VariableDeclarator(boolean isForField) :
     } else {
         result = factory.createVariableSpecification(id, dim, init);
     }
-    //    setPrefixInfo(result); // only after "=" !!!!!!!!!!!!!!!
+    setPrefixInfo(result); // only after "=" !!!!!!!!!!!!!!!        // TODO: WP:
     checkConstruction(result);
     setPostfixInfo(result);
     return result;
@@ -2000,7 +2000,7 @@ TypeReference PrimitiveType() :
     result = factory.createTypeReference(id);
     checkConstruction(result);
     setPostfixInfo(result);
-    //    setPrefixInfo(result);
+    setPrefixInfo(result);      // TODO: WP:
     return result;
   }
 }
@@ -3939,7 +3939,7 @@ LocalVariableDeclaration LocalVariableDeclaration() :
 {
   {
     result = factory.createLocalVariableDeclaration();
-    setPrefixInfo(result);
+    //setPrefixInfo(result);            // TODO: WP:
   }
   (annot = AnnotationUse() { declSpecs.add(annot); })*
   [ "final"
@@ -3964,6 +3964,7 @@ LocalVariableDeclaration LocalVariableDeclaration() :
       result.setTypeReference(tr);
       result.setVariableSpecifications(vl);
       checkConstruction(result);
+      setPrefixInfo(result);            // TODO: WP: moved from the top of the method
       setPostfixInfo(result);
       return result;
   }
@@ -4241,7 +4242,7 @@ Do DoStatement() :
     setPostfixInfo(result);
     return result;
   }
-}
+} 
 
 LoopStatement ForStatement() :
 {
@@ -4251,6 +4252,7 @@ LoopStatement ForStatement() :
     ASTList<Expression> update = null;
     Statement body;
 }
+
 {
   "for"
 //  {

@@ -287,16 +287,17 @@ public class SendFeedbackAction extends AbstractAction {
         public JavaSourceItem() {
             super("Send Java Source");
         }
+
         @Override
         boolean isEnabled() {
-           try {
-              File javaSourceLocation = MainWindow.getInstance().getMediator()
-                    .getSelectedProof().getJavaSourceLocation();
-              return javaSourceLocation == null ? false : true;
-           }
-           catch (Exception e) {
-              return false;
-           }
+            try {
+                Proof proof = MainWindow.getInstance().getMediator()
+                        .getSelectedProof();
+                File javaSourceLocation = OutputStreamProofSaver.getJavaSourceLocation(proof);
+                return javaSourceLocation == null ? false : true;
+            } catch (Exception e) {
+                return false;
+            }
         }
 
         private void getJavaFilesRecursively(File directory, List<File> list) {
@@ -313,8 +314,9 @@ public class SendFeedbackAction extends AbstractAction {
         @Override
         void appendDataToZipOutputStream(ZipOutputStream stream)
               throws IOException {
-           File javaSourceLocation = MainWindow.getInstance().getMediator()
-                 .getSelectedProof().getJavaSourceLocation();
+           Proof proof = MainWindow.getInstance().getMediator()
+                         .getSelectedProof();
+           File javaSourceLocation = OutputStreamProofSaver.getJavaSourceLocation(proof);
            List<File> javaFiles = new LinkedList<>();
            getJavaFilesRecursively(javaSourceLocation, javaFiles);
            for (File f : javaFiles) {

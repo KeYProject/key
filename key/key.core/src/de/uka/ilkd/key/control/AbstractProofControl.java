@@ -12,15 +12,15 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
-import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
+import de.uka.ilkd.key.prover.ProverTaskListener;
+import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
@@ -30,6 +30,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
+import de.uka.ilkd.key.strategy.DelegationBasedAutomatedRuleApplicationManager;
+import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.util.Debug;
 
@@ -47,14 +49,14 @@ public abstract class AbstractProofControl implements ProofControl {
     * The default {@link ProverTaskListener} which will be added to all started {@link ApplyStrategy} instances.
     */
    private final ProverTaskListener defaultProverTaskListener;
-   
+
    /**
     * Contains all available {@link AutoModeListener}.
     */
    private final List<AutoModeListener> autoModeListener = new LinkedList<AutoModeListener>();
-   
+
    private boolean minimizeInteraction; // minimize user interaction
-   
+
    /**
     * Constructor.
     * @param defaultProverTaskListener The default {@link ProverTaskListener} which will be added to all started {@link ApplyStrategy} instances.
@@ -73,7 +75,7 @@ public abstract class AbstractProofControl implements ProofControl {
       this.ruleCompletionHandler = ruleCompletionHandler;
       this.defaultProverTaskListener = defaultProverTaskListener;
    }
-   
+
    /**
     * {@inheritDoc}
     */
@@ -91,7 +93,7 @@ public abstract class AbstractProofControl implements ProofControl {
    public void setMinimizeInteraction(boolean minimizeInteraction) {
       this.minimizeInteraction = minimizeInteraction;
    }
-   
+
    @Override
    public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos) {
         ImmutableList<BuiltInRule> rules = ImmutableSLList.<BuiltInRule>nil();
@@ -104,7 +106,7 @@ public abstract class AbstractProofControl implements ProofControl {
         }
         return rules;
     }
-    
+
 
 
     @Override
@@ -178,7 +180,7 @@ public abstract class AbstractProofControl implements ProofControl {
         }
         return result;
     }
-    
+
     @Override
     public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos) {
    final Services services = goal.proof().getServices();
@@ -235,7 +237,7 @@ public abstract class AbstractProofControl implements ProofControl {
         }
         return true;
     }
-    
+
 
     @Override
     public void applyInteractive(RuleApp app, Goal goal) {
@@ -300,18 +302,18 @@ public abstract class AbstractProofControl implements ProofControl {
 //if (result.size()==0) System.err.println("Available was "+fittingApps);
         return result;
     }
-    
+
     public TacletInstantiationModel[] completeAndApplyApp(java.util.List<TacletApp> apps, Goal goal) {
         TacletInstantiationModel[] origInstModels = new TacletInstantiationModel[apps.size()];
         LinkedList<TacletInstantiationModel> recentInstModels = new LinkedList<TacletInstantiationModel>();
 
         int appCounter = 0;
-        for (final TacletApp tA : apps) {            
+        for (final TacletApp tA : apps) {
             origInstModels[appCounter] = createModel(tA, goal);
 
             if (InstantiationFileHandler.hasInstantiationListsFor(tA
                     .taclet())) {
-                for (final List<String> instantiations : 
+                for (final List<String> instantiations :
                     InstantiationFileHandler.getInstantiationListsFor(tA.taclet())) {
                     int start = tA.instantiations().size();
 
@@ -345,14 +347,14 @@ public abstract class AbstractProofControl implements ProofControl {
 
     public TacletInstantiationModel createModel(TacletApp app, Goal goal) {
        final Proof proof = goal.proof();
-       
+
        return new TacletInstantiationModel(
             app, goal.sequent(),
                goal.getLocalNamespaces(),
               proof.abbreviations(),
        goal);
     }
-    
+
     @Override
     public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced) {
       assert goal != null;
@@ -438,9 +440,9 @@ public abstract class AbstractProofControl implements ProofControl {
 
         return result;
     }
-    
 
-    
+
+
     /**
      * {@inheritDoc}
      */
@@ -472,7 +474,7 @@ public abstract class AbstractProofControl implements ProofControl {
           }
        }
     }
-    
+
     /**
      * Default implementation of {@link RuleCompletionHandler#completeBuiltInRuleApp(IBuiltInRuleApp, Goal, boolean)}.
      */
@@ -489,7 +491,7 @@ public abstract class AbstractProofControl implements ProofControl {
     public boolean isAutoModeSupported(Proof proof) {
        return proof != null && !proof.isDisposed(); // All not disposed proofs are supported.
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -529,7 +531,7 @@ public abstract class AbstractProofControl implements ProofControl {
           aListenerList.autoModeStopped(e);
        }
     }
-        
+
     /**
      * {@inheritDoc}
      */
@@ -564,7 +566,7 @@ public abstract class AbstractProofControl implements ProofControl {
        stopAutoMode();
        waitWhileAutoMode();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -581,6 +583,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * <code>focus!=null</code>) to a particular subterm or subformula of that
      * goal
      */
+    @Override
     public void startFocussedAutoMode(PosInOccurrence focus, Goal goal) {
         if (focus != null) {
             // exchange the rule app manager of that goal to filter rule apps
@@ -595,9 +598,12 @@ public abstract class AbstractProofControl implements ProofControl {
         startAutoMode(goal.proof(), ImmutableSLList.<Goal>nil().prepend(goal), new FocussedAutoModeTaskListener(goal.proof()));
     }
 
-    private final class FocussedAutoModeTaskListener implements ProverTaskListener {
+    /**
+     * TODO
+     */
+    public static final class FocussedAutoModeTaskListener implements ProverTaskListener {
         private final Proof proof;
-        
+
         public FocussedAutoModeTaskListener(Proof proof) {
            this.proof = proof;
         }
@@ -612,19 +618,21 @@ public abstract class AbstractProofControl implements ProofControl {
 
         @Override
         public void taskFinished(TaskFinishedInfo info) {
-           for (final Goal goal : proof.openGoals()) {
-              // remove any filtering rule app managers that are left in the proof
-              // goals
-              if (goal.getRuleAppManager() instanceof FocussedRuleApplicationManager) {
-                  final FocussedRuleApplicationManager focusManager
-                          = (FocussedRuleApplicationManager) goal.getRuleAppManager();
-                  goal.setRuleAppManager(null);
-                  final AutomatedRuleApplicationManager realManager
-                          = focusManager.getDelegate();
-                  realManager.clearCache();
-                  goal.setRuleAppManager(realManager);
-              }
-          }
+            for (final Goal goal : proof.openGoals()) {
+                // remove any filtering rule app managers that are left in the
+                // proof goals
+                final AutomatedRuleApplicationManager ruleAppManager = goal.getRuleAppManager();
+                if (ruleAppManager instanceof FocussedRuleApplicationManager
+                        || ruleAppManager instanceof FocussedBreakpointRuleApplicationManager) {
+                    final DelegationBasedAutomatedRuleApplicationManager focusManager = //
+                            (DelegationBasedAutomatedRuleApplicationManager) ruleAppManager;
+                    goal.setRuleAppManager(null);
+                    final AutomatedRuleApplicationManager realManager = focusManager
+                            .getDelegate();
+                    realManager.clearCache();
+                    goal.setRuleAppManager(realManager);
+                }
+            }
         }
     }
 }

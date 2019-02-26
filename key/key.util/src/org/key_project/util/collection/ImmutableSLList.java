@@ -15,6 +15,7 @@ package org.key_project.util.collection;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
+import java.util.function.Predicate;
 
 /**
  * Simple implementation of a non-destructive (unmodifiable) list. The list implementation
@@ -75,13 +76,12 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	    result = array;
 	}
 	ImmutableList<T> rest = this;
-	for (int i = 0; i<size(); i++) {
+	for (int i = 0, sz = size(); i<sz; i++) {
 	    result[i] = (S) rest.head();
 	    rest = rest.tail();
 	}
 	return result;
     }
-
 
     /**
      * Convert the list to a Java array (O(n))
@@ -90,7 +90,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
     public <S> S[] toArray(Class<S> type) {
         S[] result = (S[]) Array.newInstance(type, size());
         ImmutableList<T> rest = this;
-        for (int i = 0; i<size(); i++) {
+        for (int i = 0, sz = size(); i<sz; i++) {
             result[i] = (S) rest.head();
             rest = rest.tail();
         }
@@ -115,9 +115,10 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
      * @return IList<T> the new list
      */
     protected ImmutableList<T> prepend(T[] array, int n) {
-	ImmutableList<T> res = this;
-	while ( n-- != 0 )
-	    res = new Cons<T>(array[n], (ImmutableSLList<T>)res);
+	ImmutableSLList<T> res = this;
+	while ( n-- != 0 ) {
+	    res = new Cons<T>(array[n], res);
+	}
 	return res;
     }
 
@@ -132,14 +133,15 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
     }
 
     @Override
-    public ImmutableList<T> prepend(Iterable<T> collection) {
-        ImmutableList<T> tmp = this;
-        for (T elem: collection){
-            tmp = tmp.prepend(elem);
+    public ImmutableList<T> prependReverse(Iterable<T> collection) {
+        ImmutableSLList<T> tmp = this;        
+        for (T elem : collection){
+            tmp = new Cons<T>(elem, tmp);
         }
         return tmp;
     }
     
+
     /**
      * first <code>n</code> elements of the list are truncated
      * @param n an int specifying the number of elements to be truncated
@@ -203,23 +205,67 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	    return new Cons<S>(e, this);
 	}
 
-	/** prepends list (O(n))
+	/** prepends list (O(n)+O(m))
 	 * @param list the IList<T> to be prepended
 	 * @return IList<T> the new list
 	 */
         @Override
-	public ImmutableList<S> prepend(ImmutableList<S> list) {
-	    if (list.isEmpty()) {
-		return this;
-	    }
-	    ImmutableList<S> result = this;
-	    for (S el : list.reverse()) {
-		result = result.prepend(el);
-	    }
-	    return result;
-	}
+        public ImmutableList<S> prepend(ImmutableList<S> list) {
+            if (list.isEmpty()) {
+                return this;
+            } else { 
+                final int sz = list.size();
+                if (sz == 1) {
+                    return new Cons<>(list.head(), this);
+                }
+                Cons<S> result = this;
+                final Object[] listElements = list.toArray(new Object[sz]);
+                for (int i = sz - 1; i>=0; i--) {
+                    result = new Cons<>((S)listElements[i], result);
+                }
+                return result;
+            }
+        }
+        
+        /** 
+         * prepends list (O(n)+O(m)) in reversed order
+         * @param list the IList<T> to be prepended
+         * @return IList<T> the new list
+         */
+        @Override
+        public ImmutableList<S> prependReverse(ImmutableList<S> list) {
+            if (list.isEmpty()) {
+                return this;
+            } else {           
+                Cons<S> result = this;
+                for (int sz = list.size(); sz > 0; sz--) {
+                    result = new Cons<>(list.head(), result);
+                    list = list.tail();
+                }
+                return result;
+            }
+        }
+        
+        /**
+         * return true if predicate is fullfilled for at least one element
+         * @param predicate the predicate
+         * @return true if predicate is fullfilled for at least one element
+         */    
+        @Override
+        public boolean exists(Predicate<S> predicate) {
+            ImmutableList<S> list = this;
+            while (!list.isEmpty()) {
+                if (predicate.test(list.head())) {
+                    return true;
+                }
+                list = list.tail();
+            }
+            return false;
+        }
 
-	/** appends element at end (non-destructive) (O(n))
+
+	/** 
+	 * appends element at end (non-destructive) (O(n))
 	 * @param e the <T> to be prepended
 	 * @return IList<T> the new list
 	 */
@@ -331,7 +377,6 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 		}
 	    }
 	    return this;
-
 	}
 
 
@@ -413,7 +458,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	/** @return next element in list */
         @Override
 	public T next() {
-	    T element = list.head();
+	    final T element = list.head();
 	    list = list.tail();
 	    return element;
 	}
@@ -486,6 +531,11 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	}
         
         @Override
+        public ImmutableList<S> prependReverse(ImmutableList<S> list) {
+            return list.reverse();
+        }
+        
+        @Override
 	public ImmutableList<S> append(S element) {
 	    return new Cons<S>(element);
 	}
@@ -504,6 +554,16 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	public boolean contains(S obj) {
 	    return false;
 	}
+        
+        /**
+         * return true if predicate is fullfilled for at least one element
+         * @param predicate the predicate
+         * @return true if predicate is fullfilled for at least one element
+         */    
+        @Override
+        public boolean exists(Predicate<S> predicate) {
+            return false;
+        }
 
         @Override
 	public boolean isEmpty() {

@@ -47,10 +47,7 @@ import de.uka.ilkd.key.util.Debug;
 
 public class VariableSpecification extends JavaNonTerminalProgramElement
     implements NamedProgramElement, ExpressionContainer, Variable//,Declaration
- {
-
-     private int hashcode=0; // just cache, does not break immutability
-       
+ {       
      /**
       *	Initializer.
       */     
@@ -148,6 +145,11 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         throw new ArrayIndexOutOfBoundsException();
     }
 
+    @Override
+    protected int computeHashCode(){
+        return 37*super.computeHashCode() + 31 * ((type==null) ? 0 : type.hashCode()) + dimensions;
+    }
+     
     /**
      *      Get the number of expressions in this container.
      *      @return the number of expressions.
@@ -296,18 +298,6 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
 	    }
 	}
 	return true;	
-    }
-     
-    public int hashCode(){
-	if (hashcode!=0) return hashcode;
-    	int result = 17;
-    	result = 37 * result + dimensions;
-    	result = 37 * result + ((type==null) ? 0 : type.hashCode());
-    	result = 37 * result + getChildCount();
-    	for (int i = 0, cc = getChildCount(); i<cc; i++) {
-    		result = 37 * result + getChildAt(i).hashCode();
-    	}
-    	return hashcode=result;
     }
      
     public boolean equals (Object o){

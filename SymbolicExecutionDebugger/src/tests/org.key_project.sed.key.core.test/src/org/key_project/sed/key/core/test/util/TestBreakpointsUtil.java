@@ -40,7 +40,7 @@ import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
+import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.FieldWatchpoint;
@@ -141,11 +141,11 @@ public final class TestBreakpointsUtil {
       TestUtilsUtil.menuClick(bot, "Run", "Toggle Breakpoint");
    }
    
-   public static Set<de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint> getBreakpointStopConditions(IStopCondition stopCondition) {
+   public static Set<de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint> getBreakpointStopConditions(StopCondition stopCondition) {
       Set<de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint>lineBreakpoints = new LinkedHashSet<de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint>();
       if(stopCondition instanceof CompoundStopCondition){
          CompoundStopCondition compoundStopCondition = (CompoundStopCondition) stopCondition;
-         for(IStopCondition child : compoundStopCondition.getChildren()){
+         for(StopCondition child : compoundStopCondition.getChildren()){
             lineBreakpoints.addAll(getBreakpointStopConditions(child));
          }
       }else if(stopCondition instanceof SymbolicExecutionBreakpointStopCondition){

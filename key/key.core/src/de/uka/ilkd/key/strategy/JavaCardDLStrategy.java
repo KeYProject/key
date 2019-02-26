@@ -1172,32 +1172,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                                       numbers)),
                                                       TermSmallerThanFeature
                                                           .create(right, left)))))))),
-                    longConst(-4000),
-                    EqNonDuplicateAppFeature.INSTANCE })); // Without
-        // EqNonDuplicateAppFeature.INSTANCE
-        // rule
-        // 'applyEq'
-        // might
-        // be
-        // applied
-        // on
-        // the
-        // same
-        // term
-        // without
-        // changing
-        // the
-        // sequent
-        // for
-        // a
-        // really
-        // long
-        // time.
-        // This
-        // is
-        // tested
-        // by
-        // TestSymbolicExecutionTreeBuilder#testInstanceOfNotInEndlessLoop()
+                    longConst(-4000)}));
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -1638,8 +1613,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 add(eqMonomialFeature, longConst(2)));
 
         //
-        bindRuleSet(d, "defOps_expandModulo", add(longConst(-600),
-                ifZero(isBelow(ff.ifThenElse), inftyConst(), IsInRangeProvable.INSTANCE)));
+        bindRuleSet(d, "defOps_expandModulo", add(NonDuplicateAppModPositionFeature.INSTANCE,
+                longConst(-600)));
 
         // category "saturate"
 
@@ -2666,6 +2641,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                 .create(heapLDT),
                                                 not(ff.ifThenElse)))),
                         not(ContainsTermFeature.create(instOf("s"), instOf("t1")))));
+        
+        // Without EqNonDuplicateAppFeature.INSTANCE
+        // rule 'applyEq' might be applied on the same term
+        // without changing the sequent for a really long time. This is tested by
+        // TestSymbolicExecutionTreeBuilder#testInstanceOfNotInEndlessLoop()
+        bindRuleSet(d, "apply_equations", EqNonDuplicateAppFeature.INSTANCE);
 
         return d;
     }

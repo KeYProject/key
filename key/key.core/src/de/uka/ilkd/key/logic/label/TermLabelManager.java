@@ -657,11 +657,11 @@ public class TermLabelManager {
       }
       // Allow rule specific updater to remove and add labels
       if (currentRuleSpecificUpdates != null) {
-         performUpdater(state, services, applicationPosInOccurrence, applicationTerm, modalityTerm, rule, ruleApp, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, currentRuleSpecificUpdates, newLabels);
+         performUpdater(state, services, applicationPosInOccurrence, applicationTerm, modalityTerm, rule, ruleApp, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, currentRuleSpecificUpdates, newLabels);
       }
       // Allow all rule updater to remove and add labels
       if (!allRulesUpdates.isEmpty()) {
-         performUpdater(state, services, applicationPosInOccurrence, applicationTerm, modalityTerm, rule, ruleApp, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, allRulesUpdates, newLabels);
+         performUpdater(state, services, applicationPosInOccurrence, applicationTerm, modalityTerm, rule, ruleApp, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, allRulesUpdates, newLabels);
       }
       // Return result
       return new ImmutableArray<TermLabel>(newLabels.toArray(new TermLabel[newLabels.size()]));
@@ -954,21 +954,20 @@ public class TermLabelManager {
     *     Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)}.
     * </p>
     * @param state The {@link TermLabelState} of the current rule application.
-    * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
-    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
-    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
-    * @param modalityTerm The optional modality {@link Term}.
-    * @param rule The {@link Rule} which is applied.
-    * @param ruleApp The {@link RuleApp} which is currently performed.
-    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
-    * @param hint An optional hint passed from the active rule to describe the term which should be created.
-    * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-    * @param newTermOp The new {@link Operator} of the {@link Term} to create.
-    * @param newTermSubs The optional children of the {@link Term} to create.
-    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
-    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
-    * @param updater The {@link TermLabelUpdate} instances to perform.
-    * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
+ * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
+ * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+ * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+ * @param modalityTerm The optional modality {@link Term}.
+ * @param rule The {@link Rule} which is applied.
+ * @param ruleApp The {@link RuleApp} which is currently performed.
+ * @param hint An optional hint passed from the active rule to describe the term which should be created.
+ * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
+ * @param newTermOp The new {@link Operator} of the {@link Term} to create.
+ * @param newTermSubs The optional children of the {@link Term} to create.
+ * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
+ * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+ * @param updater The {@link TermLabelUpdate} instances to perform.
+ * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
     */
    protected void performUpdater(TermLabelState state,
                                  Services services,
@@ -977,7 +976,6 @@ public class TermLabelManager {
                                  Term modalityTerm,
                                  Rule rule,
                                  RuleApp ruleApp,
-                                 Goal goal,
                                  Object hint,
                                  Term tacletTerm,
                                  Operator newTermOp,
@@ -987,7 +985,7 @@ public class TermLabelManager {
                                  ImmutableList<TermLabelUpdate> updater,
                                  Set<TermLabel> newLabels) {
       for (TermLabelUpdate update : updater) {
-         update.updateLabels(state, services, applicationPosInOccurrence, applicationTerm, modalityTerm, rule, ruleApp, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, newLabels);
+         update.updateLabels(state, services, applicationPosInOccurrence, applicationTerm, modalityTerm, rule, ruleApp, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, newLabels);
       }
    }
    

@@ -56,7 +56,7 @@ public final class DescriptionFacade {
      * @return a non-null string
      * @see ProofScriptCommand#getDocumentation()
      */
-    public static String getDocumentation(ProofScriptCommand cmd) {
+    public static String getDocumentation(ProofScriptCommand<?> cmd) {
         return getString(cmd.getName());
     }
 
@@ -68,7 +68,7 @@ public final class DescriptionFacade {
      * @return a string or null, if {@code arg} is null or {@code arg.getCommand} returns null
      * @see ProofScriptArgument#getDocumentation()
      */
-    public static String getDocumentation(ProofScriptArgument arg) {
+    public static String getDocumentation(ProofScriptArgument<?> arg) {
         if(arg==null || arg.getCommand() == null) {
             return null;
         }

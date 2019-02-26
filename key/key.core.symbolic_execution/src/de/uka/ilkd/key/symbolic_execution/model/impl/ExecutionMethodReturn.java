@@ -31,12 +31,12 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
@@ -263,7 +263,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                                                                                                                  methodReturnNode,
                                                                                                                  getProofNode(),
                                                                                                                  resultVar);
-               ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(getProof(), 
+               ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(getProof(), 
                                                                                    sideProofEnv,
                                                                                    input.getSequentToProve(), 
                                                                                    StrategyProperties.METHOD_NONE,

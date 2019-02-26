@@ -89,19 +89,21 @@ class TermImpl implements Term {
     //------------------------------------------------------------------------- 
     
    
-   private void determineFreeVars() {
-	freeVars = DefaultImmutableSet.<QuantifiableVariable>nil();
+   private ImmutableSet<QuantifiableVariable> determineFreeVars() {
+       ImmutableSet<QuantifiableVariable> localFreeVars = 
+               DefaultImmutableSet.<QuantifiableVariable>nil();
         
         if(op instanceof QuantifiableVariable) {
-            freeVars = freeVars.add((QuantifiableVariable) op);
+            localFreeVars = localFreeVars.add((QuantifiableVariable) op);
         } 
         for(int i = 0, ar = arity(); i < ar; i++) {
 	    ImmutableSet<QuantifiableVariable> subFreeVars = sub(i).freeVars();
 	    for(int j = 0, sz = varsBoundHere(i).size(); j < sz; j++) {
 		subFreeVars = subFreeVars.remove(varsBoundHere(i).get(j));
 	    }
-	    freeVars = freeVars.union(subFreeVars);	   
+	    localFreeVars = localFreeVars.union(subFreeVars);	   
 	}
+        return localFreeVars;
     }
 
 
@@ -186,13 +188,15 @@ class TermImpl implements Term {
     @Override
     public int depth() {
 	if(depth == -1) {
+	    int localDepth = -1;
             for (int i = 0, n = arity(); i < n; i++) {
                 final int subTermDepth = sub(i).depth();
                 if(subTermDepth > depth) {
-                    depth = subTermDepth;   
+                    localDepth = subTermDepth;   
                 }
             }
-            depth++;
+            ++localDepth;
+            depth = localDepth;
 	}
         return depth;
     }
@@ -204,13 +208,14 @@ class TermImpl implements Term {
             if(!op.isRigid()) {
         	rigid = ThreeValuedTruth.FALSE;
             } else {
-        	rigid = ThreeValuedTruth.TRUE;
+                ThreeValuedTruth localIsRigid = ThreeValuedTruth.TRUE;
         	for(int i = 0, n = arity(); i < n; i++) {
             	    if(!sub(i).isRigid()) {
-            		rigid = ThreeValuedTruth.FALSE;
+            	    localIsRigid = ThreeValuedTruth.FALSE;
             		break;
             	    }
         	}
+        	rigid = localIsRigid;
             }
         }
             
@@ -221,7 +226,7 @@ class TermImpl implements Term {
     @Override
     public ImmutableSet<QuantifiableVariable> freeVars() {
         if(freeVars == null) {
-            determineFreeVars();
+            freeVars = determineFreeVars();
         }
         return freeVars;
     }
@@ -458,7 +463,6 @@ class TermImpl implements Term {
        if(o == this) {
           return true;
        }
-       
 
        if(o == null || o.getClass() != getClass()
              || hashCode() != o.hashCode()) {
@@ -486,7 +490,7 @@ class TermImpl implements Term {
 
 
     /** 
-     * performs teh actual computation of the hashcode and can be overwritten by subclasses if necessary 
+     * performs the actual computation of the hashcode and can be overwritten by subclasses if necessary 
      */
     protected int computeHashCode() {
         int hashcode = 5;

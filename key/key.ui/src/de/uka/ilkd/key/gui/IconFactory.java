@@ -49,8 +49,8 @@ public class IconFactory {
     private static Icon provedFolderIcon     = KeYFolderIcon.getKeYFolderIconClosed();
     private static Icon linkedFolderIcon     = KeYFolderIcon.getKeYFolderIconLinked();
     private static Icon closableFolderIcon   = KeYFolderIcon.getKeYFolderIconClosable();
-    
-    private static Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png"); 
+
+    private static Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
 
     private static Icon expandedIcon   = KeYControlIcon.getKeYExpandedIcon();
     private static Icon collapsedIcon  = KeYControlIcon.getKeYCollapsedIcon();
@@ -61,21 +61,21 @@ public class IconFactory {
         getImage("images/toolbar/autoModeStart.png");
     private static Image autoModeStop =
         getImage("images/toolbar/autoModeStop.png");
-    private static Image decisionProcedureConfigArrow = 
+    private static Image decisionProcedureConfigArrow =
 	    getImage("images/toolbar/decProcArrow.png");
 
     private static Image junit = getImage("images/toolbar/junit_logo.png");
     private static Image jml   = getImage("images/toolbar/jml.png");
     private static Image uml   = getImage("images/toolbar/uml.png");
 
-    private static Image openKeYFile = 
+    private static Image openKeYFile =
         getImage("images/toolbar/open.png");
-    private static Image openMostRecentKeYFile = 
+    private static Image openMostRecentKeYFile =
         getImage("images/toolbar/openMostRecent.png");
-    private static Image saveFile = 
+    private static Image saveFile =
         getImage("images/toolbar/saveFile.png");
-    private static Image editFile = 
-        getImage("images/toolbar/edit.png");    
+    private static Image editFile =
+        getImage("images/toolbar/edit.png");
     private static Image abandonProof = getImage("images/toolbar/abandon.png");
     private static Image configure = getImage("images/toolbar/config.png");
     private static Image help = getImage("images/toolbar/help.png");
@@ -96,11 +96,15 @@ public class IconFactory {
     private static Image previous = getImage("images/toolbar/go-previous.png");
     private static Image stop = getImage("images/toolbar/stop.png");
 
-    private static Image interactiveAppLogo = 
+    private static Image interactiveAppLogo =
         getImage("images/interactiveAppLogo.png");
-    
+    private static Image scriptAppLogo =
+        getImage("images/scriptAppLogo.png");
+
     private static Image counterexampleImage = getImage("images/toolbar/ce.png");
     private static Image testgenerationImage = getImage("images/toolbar/tg.png");
+
+    private static Image heatmapImage = getImage("images/toolbar/heatmap.png");
 
     public static Image getImage(String s) {
 	ImageIcon ii=createImageIcon(IconFactory.class, s);
@@ -141,9 +145,9 @@ public class IconFactory {
        // error message Resource not found
        System.out.println("No image resource "+ filename + " found");
        return null;
-   } else { 
+   } else {
        Debug.out("Done.");
-       return new ImageIcon(iconURL); 
+       return new ImageIcon(iconURL);
    }
     }
 
@@ -227,7 +231,7 @@ public class IconFactory {
     public static ImageIcon keyHole(int x, int y) {
 	return scaleIcon(keyHole,x,y);
     }
-    
+
     public static ImageIcon keyHoleClosed(int x, int y) {
 	return scaleIcon(keyHoleClosed,x,y);
     }
@@ -235,19 +239,19 @@ public class IconFactory {
     public static ImageIcon keyHoleAlmostClosed(int x, int y) {
 	return scaleIcon(keyHoleAlmostClosed,x,y);
     }
-    
+
     public static ImageIcon keyHoleInteractive(int x, int y) {
         return scaleIcon(keyHoleInteractive,x,y);
     }
-    
+
     public static ImageIcon keyHoleLinked(int x, int y) {
         return scaleIcon(keyHoleLinked,x,y);
     }
-    
+
     public static ImageIcon keyLogo(int x, int y) {
 	return  scaleIcon(keyLogo,x,y);
     }
- 
+
     public static ImageIcon key22Logo(int x, int y) {
 	return  scaleIcon(keyLogo22,x,y);
     }
@@ -279,19 +283,19 @@ public class IconFactory {
     public static ImageIcon selectStrategyArrow(int size) {
         return null;
     }
-    
+
     public static ImageIcon selectDecProcArrow(int size) {
         return scaleIcon(decisionProcedureConfigArrow, size / 2, size);
     }
-    
+
     public static Icon oneStepSimplifier(int size) {
         return scaleIcon(oneStepSimplifier, size, size);
     }
-    
+
     public static Icon testGeneration(int size){
     	return scaleIcon(testgenerationImage, size, size);
     }
-    
+
     public static Icon counterExample(int size){
     	return scaleIcon(counterexampleImage, size, size);
     }
@@ -299,15 +303,15 @@ public class IconFactory {
     public static ImageIcon junitLogo(int size) {
 	return scaleIcon(junit, size, size);
     }
-    
+
     public static ImageIcon jmlLogo(int size) {
         return scaleIcon(jml, size, size);
     }
-    
+
     public static ImageIcon umlLogo(int size) {
         return scaleIcon(uml, size, size);
     }
-    
+
     public static ImageIcon pruneLogo(int size) {
     	return scaleIcon(prune, size, size);
     }
@@ -323,7 +327,7 @@ public class IconFactory {
     public static Icon linkedFolderIcon() {
    return linkedFolderIcon;
     }
-    
+
     public static Icon closableFolderIcon() {
 	return closableFolderIcon;
     }
@@ -332,7 +336,7 @@ public class IconFactory {
     public static Icon expandedIcon() {
 	return expandedIcon;
     }
-    
+
     public static Icon collapsedIcon() {
 	return collapsedIcon;
     }
@@ -341,26 +345,33 @@ public class IconFactory {
 	return keyLogoSmall;
     }
 
-    public static Icon openMostRecent(int size) {       
+    public static Icon openMostRecent(int size) {
         return scaleIcon(openMostRecentKeYFile, size, size);
     }
 
-    public static Icon openKeYFile(int size) {       
+    public static Icon openKeYFile(int size) {
         return scaleIcon(openKeYFile, size, size);
     }
 
-    public static Icon saveFile(int size) {       
+    public static Icon saveFile(int size) {
         return scaleIcon(saveFile, size, size);
     }
-    
-    public static Icon editFile(int size) {       
-        return scaleIcon(editFile, size, size);
-    }    
 
-    public static Icon interactiveAppLogo(int size) {       
+    public static Icon editFile(int size) {
+        return scaleIcon(editFile, size, size);
+    }
+
+    public static Icon interactiveAppLogo(int size) {
        return scaleIcon(interactiveAppLogo, size, size);
     }
 
+    public static Icon scriptAppLogo(int size) {
+       return scaleIcon(scriptAppLogo, size, size);
+    }
+
+    public static Icon heatmapIcon(int size) {
+        return scaleIcon(heatmapImage, size, size);
+    }
 
     public static class KeYFolderIcon extends FolderIcon16 {
 
@@ -388,11 +399,12 @@ public class IconFactory {
             frontColor = p_frontColor;
         }
 
+        @Override
         public void paintIcon(Component c, Graphics g, int x, int y) {
             GraphicsConfiguration gc = c != null ? c.getGraphicsConfiguration() : null;
             Image image;
             if (gc != null) {
-                image = gc.createCompatibleImage(getIconWidth(), 
+                image = gc.createCompatibleImage(getIconWidth(),
                         getIconHeight(),
                         Transparency.BITMASK);
             } else {
@@ -400,7 +412,7 @@ public class IconFactory {
                         getIconHeight(),
                         BufferedImage.TYPE_INT_ARGB);
             }
-            Graphics imageG = image.getGraphics();      
+            Graphics imageG = image.getGraphics();
             paintMe(c,imageG);
             imageG.dispose();
 
@@ -444,10 +456,14 @@ public class IconFactory {
 
         }
 
+        @Override
         public int getShift() { return -1; }
+        @Override
         public int getAdditionalHeight() { return 2; }
 
+        @Override
         public int getIconWidth() { return folderIcon16Size.width; }
+        @Override
         public int getIconHeight() { return folderIcon16Size.height + getAdditionalHeight(); }
     }
 
@@ -473,11 +489,12 @@ public class IconFactory {
 
         }
 
+        @Override
         public void paintIcon(Component c, Graphics g, int x, int y) {
             GraphicsConfiguration gc = c.getGraphicsConfiguration();
             Image image;
             if (gc != null) {
-                image = gc.createCompatibleImage(getIconWidth(), 
+                image = gc.createCompatibleImage(getIconWidth(),
                         getIconHeight(),
                         Transparency.BITMASK);
             } else {
@@ -485,7 +502,7 @@ public class IconFactory {
                         getIconHeight(),
                         BufferedImage.TYPE_INT_ARGB);
             }
-            Graphics imageG = image.getGraphics();      
+            Graphics imageG = image.getGraphics();
             paintMe(c,imageG);
             imageG.dispose();
 
@@ -500,7 +517,7 @@ public class IconFactory {
             int midx = getIconWidth() / 2;
             int midy = getIconHeight() / 2;
 
-            int min = getIconWidth() < getIconHeight() ? 
+            int min = getIconWidth() < getIconHeight() ?
                     getIconWidth() : getIconHeight();
 
 
@@ -511,7 +528,7 @@ public class IconFactory {
                             midx+(min/4 - 2), midy);
                     if (collapsed) {
                         g.drawLine(midx, midy -(min/4 - 2),
-                                midx, midy +(min/4 - 2));        
+                                midx, midy +(min/4 - 2));
                     }
         }
     }

@@ -55,6 +55,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeRule;
+import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
@@ -98,6 +99,13 @@ public class Proof implements Named {
 
     /** list with the open goals of the proof */
     private ImmutableList<Goal> openGoals = ImmutableSLList.<Goal>nil();
+
+    /**
+     * list with the closed goals of the proof, needed to make pruning in closed branches
+     * possible. If the list needs too much memory, pruning can be disabled via the
+     * command line option "--no-pruning-closed". In this case the list will not be filled.
+     */
+    private ImmutableList<Goal> closedGoals = ImmutableSLList.<Goal>nil();
 
     /** declarations &c, read from a problem file or otherwise */
     private String problemHeader = "";
@@ -215,16 +223,14 @@ public class Proof implements Named {
 
         this ( new Name ( name ), initConfig );
 
-        localMgt = new ProofCorrectnessMgt(this);
-
         Node rootNode = new Node(this, problem);
-        setRoot(rootNode);
 
         Goal firstGoal = new Goal(rootNode,
                         new RuleAppIndex(new TacletAppIndex(rules, getServices()),
                                         new BuiltInRuleAppIndex(builtInRules), getServices())
                         );
         openGoals = openGoals.prepend(firstGoal);
+        setRoot(rootNode);
 
         if (closed())
             fireProofClosed();
@@ -272,6 +278,7 @@ public class Proof implements Named {
         root = null;        
         env = null;
         openGoals = null;
+        closedGoals = null;
         problemHeader = null;
         abbreviations = null;
         initConfig = null;
@@ -422,9 +429,6 @@ public class Proof implements Named {
         } else {
             this.root = root;
             fireProofStructureChanged();
-
-            if (closed())
-                fireProofClosed();
         }
     }
 
@@ -436,9 +440,6 @@ public class Proof implements Named {
         return pis;
     }
 
-    
-    
-    
     /**
      * returns the list of open goals
      * @return list with the open goals
@@ -446,7 +447,6 @@ public class Proof implements Named {
     public ImmutableList<Goal> openGoals() {
         return openGoals;
     }
-
 
     /**
      * return the list of open and enabled goals
@@ -511,6 +511,9 @@ public class Proof implements Named {
             goal = getGoal ( it.next () );
             if ( goal != null ) {
                 b = true;
+                if (!GeneralSettings.noPruningClosed) {
+                    closedGoals = closedGoals.prepend(goal);
+                }
                 remove ( goal );
             }
         }
@@ -535,6 +538,8 @@ public class Proof implements Named {
      */
     public void reOpenGoal(Goal p_goal) {
         p_goal.node().reopen();
+        closedGoals = closedGoals.removeAll(p_goal);
+        fireProofStructureChanged();
     }
 
     /** removes the given goal from the list of open goals. Take care
@@ -621,14 +626,15 @@ public class Proof implements Named {
             breadthFirstSearch(cuttingPoint, new ProofVisitor() {
                 @Override
                 public void visit(Proof proof, Node visitedNode) {
-                    if (visitedNode.leaf() && !visitedNode.isClosed()) {
-                        if (firstLeaf == null) {
-                            firstLeaf = visitedNode;
+                    if (visitedNode.leaf()) {
+                        // pruning in closed branches (can be disabled via "--no-pruning-closed")
+                        if (!visitedNode.isClosed() || !GeneralSettings.noPruningClosed) {
+                            if (firstLeaf == null) {
+                                firstLeaf = visitedNode;
+                            } else {
+                                residualLeaves.add(visitedNode);
+                            }
                         }
-                        else {
-                            residualLeaves.add(visitedNode);
-                        }
-
                     }
 
                     if (initConfig != null && visitedNode.parent() != null) {
@@ -666,13 +672,19 @@ public class Proof implements Named {
                             });
                         }
                     }
-
                 }
             });
 
-            final Goal firstGoal = getGoal(firstLeaf);
+            // first leaf is closed -> add as goal and reopen
+            final Goal firstGoal = firstLeaf.isClosed() ? getClosedGoal(firstLeaf)
+                                                        : getGoal(firstLeaf);
             assert firstGoal != null;
-            
+            if (firstLeaf.isClosed()) {
+                add(firstGoal);
+                reOpenGoal(firstGoal);
+            }
+
+            // TODO: WP: test interplay with merge rules
             // Cutting a linked goal (linked by a "defocusing" merge
             // operation, see {@link MergeRule}) unlinks this goal again.
             if (firstGoal.isLinked()) {
@@ -710,6 +722,8 @@ public class Proof implements Named {
 
             //remove the goals of the residual leaves.
             removeOpenGoals(residualLeaves);
+            removeClosedGoals(residualLeaves);
+
             return subtrees;
 
         }
@@ -738,6 +752,22 @@ public class Proof implements Named {
             openGoals = newGoalList;
         }
 
+        /**
+         * Removes the given collection of Nodes from the closedGoals.
+         * Nodes in the given collection which are not member of closedGoals are ignored.
+         * This method does not reopen the goals! This has to be done via the method
+         * reOpenGoal() if desired.
+         * @param toBeRemoved the goals to remove
+         */
+        private void removeClosedGoals(Collection<Node> toBeRemoved) {
+            ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
+            for(Goal closedGoal : closedGoals) {
+                if(!toBeRemoved.contains(closedGoal.node())) {
+                    newGoalList = newGoalList.prepend(closedGoal);
+                }
+            }
+            closedGoals = newGoalList;
+        }
 
         private ImmutableList<Node> cut(Node node) {
             ImmutableList<Node> children = ImmutableSLList.nil();
@@ -755,8 +785,13 @@ public class Proof implements Named {
 
     }
 
+    /**
+     * Performs an undo operation on the given goal. This is equivalent to a pruning of the
+     * parent node of the goal (if this parent node exists).
+     * @param goal the Goal where the last rule application gets undone
+     */
     public synchronized void pruneProof(Goal goal) {
-        if(goal.node().parent()!= null){
+        if(goal.node().parent() != null) {
             pruneProof(goal.node().parent());
         }
     }
@@ -774,7 +809,11 @@ public class Proof implements Named {
 
     public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint, boolean fireChanges) {
         assert cuttingPoint.proof() == this;
-        if(getGoal(cuttingPoint) != null || cuttingPoint.isClosed()){
+        if(getGoal(cuttingPoint) != null) {
+            return null;
+        }
+        // abort pruning if the node is closed and pruning in closed branches is disabled
+        if (cuttingPoint.isClosed() && GeneralSettings.noPruningClosed) {
             return null;
         }
 
@@ -913,7 +952,6 @@ public class Proof implements Named {
         }
     }
 
-
     /**
      * Fires the event {@link ProofTreeListener#notesChanged(ProofTreeEvent)} to all listener.
      * @param node The changed {@link Node}.
@@ -983,6 +1021,29 @@ public class Proof implements Named {
         return null;
     }
 
+    /**
+     * @param node the Node which is checked for a corresponding closed goal
+     * @return true if the goal that belongs to the given node is closed
+     * and false if not or if there is no such goal.
+     */
+    public boolean isClosedGoal(Node node) {
+        return getClosedGoal(node) != null;
+    }
+
+    /**
+     * Get the closed goal belonging to the given node if it exists.
+     * @param node the Node where a corresponding closed goal is searched
+     * @return the closed goal that belongs to the given node or null if the
+     * node is an inner one or an open goal
+     */
+    public Goal getClosedGoal(Node node) {
+        for (final Goal result : closedGoals) {
+            if (result.node() == node) {
+                return result;
+            }
+        }
+        return null;
+    }
 
     /** returns the list of goals of the subtree starting with node.
      *
@@ -997,6 +1058,23 @@ public class Proof implements Named {
         	if (leaves.remove(goal.node())) { //if list contains node, remove it to make the list faster later
         		result = result.prepend(goal);
         	}
+        }
+        return result;
+    }
+
+    /**
+     * Returns a list of all (closed) goals of the closed subtree pending from this node.
+     * @param node the root of the subtree
+     * @return the closed goals in the subtree
+     */
+    public ImmutableList<Goal> getClosedSubtreeGoals(Node node) {
+        ImmutableList<Goal> result = ImmutableSLList.<Goal>nil();
+        List<Node> leaves = node.getLeaves();
+        for (final Goal goal : closedGoals) {
+            //if list contains node, remove it to make the list faster later
+            if (leaves.remove(goal.node())) {
+                result = result.prepend(goal);
+            }
         }
         return result;
     }
@@ -1176,23 +1254,6 @@ public class Proof implements Named {
        ProofSaver saver = new ProofSaver(this, file);
        saver.save();
     }
-    
-   /**
-    * Extracts java source directory from {@link #header()}, if it exists.
-    */
-   public File getJavaSourceLocation() {
-      String header = header();
-      int i = header.indexOf("\\javaSource");
-      if (i >= 0) {
-         int begin = header.indexOf('\"', i);
-         int end = header.indexOf('\"', begin + 1);
-         String sourceLocation = header.substring(begin + 1, end);
-         if (sourceLocation.length() > 0) {
-            return new File(sourceLocation);
-         }
-      }
-      return null;
-   }
 
    public StrategyFactory getActiveStrategyFactory() {
       Name activeStrategyName = getActiveStrategy() != null ? getActiveStrategy().name() : null;

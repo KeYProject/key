@@ -99,10 +99,10 @@ public class VMTacletMatcher implements TacletMatcher {
     
 
     /** (non-Javadoc)
-     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(java.util.Iterator, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
+     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(ImmutableList, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
      */
     @Override
-    public final IfMatchResult matchIf (   Iterable<IfFormulaInstantiation> p_toMatch,
+    public final IfMatchResult matchIf (   ImmutableList<IfFormulaInstantiation> p_toMatch,
             Term                             p_template,
             MatchConditions                  p_matchCond,
             Services                         p_services ) {
@@ -121,8 +121,13 @@ public class VMTacletMatcher implements TacletMatcher {
             context = p_matchCond.getInstantiations().getUpdateContext();   
         }
         
-        for (IfFormulaInstantiation cf: p_toMatch) {
-            Term formula = cf.getConstrainedFormula().formula();
+        ImmutableList<IfFormulaInstantiation> workingList = p_toMatch;
+        while (!workingList.isEmpty()) {
+        	final IfFormulaInstantiation cf = workingList.head();
+        	workingList = workingList.tail();
+            
+        	Term formula = cf.getConstrainedFormula().formula();
+
             if (updateContextPresent) {                 
                 formula = matchUpdateContext(context, formula);
             }

@@ -1,182 +1,288 @@
 <?xml version="1.0"?>
 <project name="key" default="compileAll" basedir=".">
-	<property name="key.dir" value="${basedir}/../"/>
-	<property name="rep.dir" value="${basedir}/../../"/>
-	<property name="javadoc.dir" value="${key.dir}/deployment/api/"/>
-	<property environment="env"/>
+    <property name="key.dir" value="${basedir}/../"/>
+    <property name="rep.dir" value="${basedir}/../../"/>
+    <property name="javadoc.dir" value="${key.dir}/deployment/api/"/>
+    <property environment="env"/>
 
-	<condition property="key.version" value="${env.KEY_VERSION}" else="2.7">
-		<isset property="env.KEY_VERSION"/>
-	</condition>
+    <condition property="key.version" value="${env.KEY_VERSION}" else="2.7">
+        <isset property="env.KEY_VERSION"/>
+    </condition>
 
-	<condition property="taclet.match" value="${taclet.match}" else="vm">
-		<isset property="taclet.match"/>
-	</condition>
+    <condition property="taclet.match" value="${taclet.match}" else="vm">
+        <isset property="taclet.match"/>
+    </condition>
 
-		<condition property="tacletindex.threading.enabled" value="${tacletindex.threading.enabled}" else="false">
-		<isset property="tacletindex.threading.enabled"/>
-	</condition>
+    <condition property="tacletindex.threading.enabled" value="${tacletindex.threading.enabled}" else="false">
+        <isset property="tacletindex.threading.enabled"/>
+    </condition>
 
-	 <!-- The following tasks are for KeY -->
-	<target name="start" depends="compileAll" description="Starts KeY (after recompilation if necessary).">
-		<ant antfile="${key.dir}/key.ui/build.xml" target="start" dir="${key.dir}/key.ui" inheritall="false"/>
-	</target>
+    <!-- The following tasks are for KeY -->
+    <target name="start" depends="compileAll" description="Starts KeY (after recompilation if necessary).">
+        <ant antfile="${key.dir}/key.ui/build.xml" target="start" dir="${key.dir}/key.ui" inheritall="false"/>
+    </target>
 
-	<target name="compileAll" description="Build all subprojects needed for KeY. (Calls 'ant compile' on production subprojects.)">
-		<ant antfile="${key.dir}/key.util/build.xml" target="compile" dir="${key.dir}/key.util" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core/build.xml" target="compile" dir="${key.dir}/key.core" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.testgen/build.xml" target="compile" dir="${key.dir}/key.core.testgen" inheritall="false"/>
-		<ant antfile="${key.dir}/key.ui/build.xml" target="compile" dir="${key.dir}/key.ui" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.symbolic_execution/build.xml" target="compile" dir="${key.dir}/key.core.symbolic_execution" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.proof_references/build.xml" target="compile" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.example/build.xml" target="compile" dir="${key.dir}/key.core.example" inheritall="false"/>
-		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="compile" dir="${key.dir}/key.removegenerics" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="compile" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
-	</target>
+    <target name="compileAll"
+            description="Build all subprojects needed for KeY. (Calls 'ant compile' on production subprojects.)">
+        <ant antfile="${key.dir}/key.util/build.xml" target="compile" dir="${key.dir}/key.util" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core/build.xml" target="compile" dir="${key.dir}/key.core" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.testgen/build.xml" target="compile" dir="${key.dir}/key.core.testgen"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.ui/build.xml" target="compile" dir="${key.dir}/key.ui" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.symbolic_execution/build.xml" target="compile"
+             dir="${key.dir}/key.core.symbolic_execution" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.proof_references/build.xml" target="compile"
+             dir="${key.dir}/key.core.proof_references" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.example/build.xml" target="compile" dir="${key.dir}/key.core.example"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.removegenerics/build.xml" target="compile" dir="${key.dir}/key.removegenerics"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="compile"
+             dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
+    </target>
 
-	<target name="deployAll" description="Prepare KeY for shipping. Find results in directory 'deployment'. (Calls 'ant deploy' on production subprojects.)">
-		<!-- Update GIT revision s-->
-		<exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
-			<arg value="rev-parse"/>
-			<arg value="HEAD"/>
-		</exec>	
-		<!-- Zip source code -->
-		<zip destfile="${key.dir}/deployment/key-src-${key.version}_${git.revision}.zip"
-		     basedir="${rep.dir}/"
-		     excludes="*-src-*,*.jnlp,**/deployment/**,**/bin/**,*~,**/oldStuff/**"
-		 />
-		<!-- Create Jar archives -->
-		<ant antfile="${key.dir}/key.util/build.xml" target="deploy" dir="${key.dir}/key.util" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core/build.xml" target="deploy" dir="${key.dir}/key.core" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.testgen/build.xml" target="deploy" dir="${key.dir}/key.core.testgen" inheritall="false"/>
-		<ant antfile="${key.dir}/key.ui/build.xml" target="deploy" dir="${key.dir}/key.ui" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.symbolic_execution/build.xml" target="deploy" dir="${key.dir}/key.core.symbolic_execution" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.proof_references/build.xml" target="deploy" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.example/build.xml" target="deploy" dir="${key.dir}/key.core.example" inheritall="false"/>
-		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="deploy" dir="${key.dir}/key.removegenerics" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="deploy" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
-		<!-- Deploy license -->
-		<copy todir="${key.dir}/deployment">
-			<fileset file="${key.dir}/LICENSE.TXT"/>
-		</copy>
-		<!-- Deploy KeY.jar -->
-		<copy todir="${basedir}/KeY.jar" file="${key.dir}/key.ui/resources/de/uka/ilkd/key/gui/images/key-color.gif" />
-		<jar destfile="${key.dir}/deployment/KeY.jar" basedir="${basedir}/KeY.jar" manifest="${basedir}/KeY.jar/META-INF/MANIFEST.MF" />	
-		<delete file="${basedir}/KeY.jar/key-color.gif" />
-		<!-- Zip binary release -->
-		<zip destfile="${key.dir}/deployment/key-${key.version}_${git.revision}.zip"
-		     basedir="${key.dir}/deployment"
-		     excludes="*-src-*,**/key*-*.zip,*.jnlp"
-		 />
-	</target>
+    <target name="jarAll" description="Create jar files for each submodule">
+        <!-- Create Jar archives -->
+        <ant antfile="${key.dir}/key.util/build.xml" target="deploy" dir="${key.dir}/key.util" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core/build.xml" target="deploy" dir="${key.dir}/key.core" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.testgen/build.xml" target="deploy" dir="${key.dir}/key.core.testgen"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.ui/build.xml" target="deploy" dir="${key.dir}/key.ui" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.symbolic_execution/build.xml" target="deploy"
+             dir="${key.dir}/key.core.symbolic_execution" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.proof_references/build.xml" target="deploy"
+             dir="${key.dir}/key.core.proof_references" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.example/build.xml" target="deploy" dir="${key.dir}/key.core.example"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.removegenerics/build.xml" target="deploy" dir="${key.dir}/key.removegenerics"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="deploy"
+             dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
+    </target>
 
-	<target name="cleanAll" description="Remove all generated files. (Clears deployment files and calls 'ant clean' on production subprojects.)">
-		<!-- Clean components -->
-		<ant antfile="${key.dir}/key.util/build.xml" target="clean" dir="${key.dir}/key.util" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core/build.xml" target="clean" dir="${key.dir}/key.core" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.testgen/build.xml" target="clean" dir="${key.dir}/key.core.testgen" inheritall="false"/>
-		<ant antfile="${key.dir}/key.ui/build.xml" target="clean" dir="${key.dir}/key.ui" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.symbolic_execution/build.xml" target="clean" dir="${key.dir}/key.core.symbolic_execution" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.proof_references/build.xml" target="clean" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.example/build.xml" target="clean" dir="${key.dir}/key.core.example" inheritall="false"/>
-		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="clean" dir="${key.dir}/key.removegenerics" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="clean" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
-		<!-- Delete deployed files -->
-		<delete file="${key.dir}/deployment/LICENSE.TXT" failonerror="false" />
-		<delete file="${key.dir}/deployment/KeY.jar" failonerror="false" />
-		<delete file="${key.dir}/deployment/LICENSE.TXT" failonerror="false" />
-	</target>
+    <target name="deployAll"
+            description="Prepare KeY for shipping. Find results in directory 'deployment'. (Calls 'ant deploy' on production subprojects.)"
+            depends="jarAll">
+        <!-- Update GIT revision s-->
+        <exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
+            <arg value="rev-parse"/>
+            <arg value="HEAD"/>
+        </exec>
+        <!-- Zip source code -->
+        <zip destfile="${key.dir}/deployment/key-src-${key.version}_${git.revision}.zip"
+             basedir="${rep.dir}/"
+             excludes="*-src-*,*.jnlp,**/deployment/**,**/bin/**,*~,**/oldStuff/**"
+        />
 
-	<!-- The following tasks are for KeY's Tests -->
-	<!-- The target "runAllTests" runs the tests on the compiled
-	     class-files as found in the bin/ directories;
-	     the target "test-deploy-all" runs the test on the packaged jar-files
-	     Rule of thumb: use "runAllTests" when developing and use
-	     "test-deploy-all" when deploying (jenkins/hudson use test-deploy-all)	     
-	-->
-
-	<target name="runAllTests" depends="compileAllTests" description="Run test of all subprojects. (Calls 'ant runTests' on test subprojects.)">
-		<ant antfile="${key.dir}/key.util.test/build.xml" target="runTests" dir="${key.dir}/key.util.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.test/build.xml" target="runTests" dir="${key.dir}/key.core.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="runTests" dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.proof_references.test/build.xml" target="runTests" dir="${key.dir}/key.core.proof_references.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.symbolic_execution.test/build.xml" target="runTests" dir="${key.dir}/key.core.symbolic_execution.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.removegenerics.test/build.xml" target="runTests" dir="${key.dir}/key.removegenerics.test" inheritall="false"/>
-	</target>
-
-	<target name="test-deploy-all" depends="deployAll, compileAllTests" description="Builds all projects, their tests and deploys the result.">
-		<ant antfile="${key.dir}/key.util.test/build.xml" target="test-deploy" dir="${key.dir}/key.util.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.test/build.xml" target="test-deploy" dir="${key.dir}/key.core.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="test-deploy" dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.proof_references.test/build.xml" target="test-deploy" dir="${key.dir}/key.core.proof_references.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.symbolic_execution.test/build.xml" target="test-deploy" dir="${key.dir}/key.core.symbolic_execution.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.removegenerics.test/build.xml" target="test-deploy" dir="${key.dir}/key.removegenerics.test" inheritall="false"/>
-	</target>
-
-	<target name="compileAllTests" depends="compileAll" description="Build testcases in all subprojects needed for KeY. (Calls 'ant compile' on test subprojects.)">
-		<ant antfile="${key.dir}/key.util.test/build.xml" target="compile" dir="${key.dir}/key.util.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.test/build.xml" target="compile" dir="${key.dir}/key.core.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="compile" dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.proof_references.test/build.xml" target="compile" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.symbolic_execution.test/build.xml" target="compile" dir="${key.dir}/key.core.symbolic_execution.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.removegenerics.test/build.xml" target="compile" dir="${key.dir}/key.removegenerics.test" inheritall="false"/>
-	</target>
-
-	<target name="cleanAllTests" description="Clean all generated files in the test packages. (Calls 'ant clean' on test subprojects.)">
-		<ant antfile="${key.dir}/key.util.test/build.xml" target="clean" dir="${key.dir}/key.util.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.test/build.xml" target="clean" dir="${key.dir}/key.core.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="clean" dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.proof_references/build.xml" target="clean" dir="${key.dir}/key.core.proof_references" inheritall="false"/>
-		<ant antfile="${key.dir}/key.core.symbolic_execution.test/build.xml" target="clean" dir="${key.dir}/key.core.symbolic_execution.test" inheritall="false"/>
-		<ant antfile="${key.dir}/key.removegenerics.test/build.xml" target="clean" dir="${key.dir}/key.removegenerics.test" inheritall="false"/>
-	</target>
+        <!-- Deploy license -->
+        <copy todir="${key.dir}/deployment">
+            <fileset file="${key.dir}/LICENSE.TXT"/>
+        </copy>
+        <!-- Deploy KeY.jar -->
+        <copy todir="${basedir}/KeY.jar" file="${key.dir}/key.ui/resources/de/uka/ilkd/key/gui/images/key-color.gif"/>
+        <jar destfile="${key.dir}/deployment/KeY.jar" basedir="${basedir}/KeY.jar"
+             manifest="${basedir}/KeY.jar/META-INF/MANIFEST.MF"/>
+        <delete file="${basedir}/KeY.jar/key-color.gif"/>
+        <!-- Zip binary release -->
+        <zip destfile="${key.dir}/deployment/key-${key.version}_${git.revision}.zip"
+             basedir="${key.dir}/deployment"
+             excludes="*-src-*,**/key*-*.zip,*.jnlp"
+        />
+    </target>
 
 
-	<target name="generateDoc" depends="compileAll" description="Build javadoc.">
-   	  <mkdir dir="${javadoc.dir}"/>
-  	  <!-- Update GIT revision s-->
-	  <exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
-	    <arg value="rev-parse"/>
-	    <arg value="HEAD"/>
-	  </exec>	
+    <target name="fatJar" description="Builds a fat jar with all dependencies"
+            depends="jarAll">
 
-	  <javadoc destdir="${javadoc.dir}" windowtitle="KeY API Documentation" doctitle="KeY API Documentation ${key.version}_${git.revision}"
-		   header="KeY ${key.version}_${git.revision}" access="private">
-	    <fileset dir="${key.dir}/key.util/src/">
-	      <include name="**/*.java"/>
-	    </fileset>
-	    <fileset dir="${key.dir}/key.core/src/">
-	      <include name="**/*.java"/>
-	    </fileset>
-	    <fileset dir="${key.dir}/key.core/genSrc/">
-	      <include name="**/*.java"/>
-	    </fileset>
-	    <fileset dir="${key.dir}/key.core.testgen/src/">
-	      <include name="**/*.java"/>
-	    </fileset>
-	    <fileset dir="${key.dir}/key.ui/src/">
-	      <include name="**/*.java"/>
-	    </fileset>
-	    <fileset dir="${key.dir}/key.core.symbolic_execution/src/">
-	      <include name="**/*.java"/>
-	    </fileset>
-	    <fileset dir="${key.dir}/key.core.proof_references/src/">
-	      <include name="**/*.java"/>
-	    </fileset>
-	    <classpath>
-	      <pathelement location="${key.dir}/key.core/lib/antlr.jar"/>
-	      <pathelement location="${key.dir}/key.core/lib/recoderKey.jar"/>
-	    </classpath>  
+        <exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
+            <arg value="rev-parse"/>
+            <arg value="HEAD"/>
+        </exec>
+
+        <jar jarfile="${key.dir}/deployment/key-${key.version}_${git.revision}-exe.jar"
+             basedir="${basedir}/KeY.jar">
+
+            <manifest>
+                <attribute name="Manifest-Version" value="1.0"/>
+                <attribute name="Permissions" value="all-permissions"/>
+                <attribute name="Codebase" value="formal.iti.kit.edu"/>
+                <attribute name="Application-Name" value="KeY"/>
+                <attribute name="Class-Path"
+                           value="./components/key.util.jar ./libs/antlr.jar ./libs/recoderKey.jar ./components/key.core.jar ./components/key.core.testgen.jar ./components/key.core.symbolic_execution.jar ./components/key.ui.jar"/>
+                <attribute name="Main-Class" value="de.uka.ilkd.key.core.Main"/>
+               <!-- <attribute name="SplashScreen-Image" value="splash.gif/key-color.gif"/>-->
+            </manifest>
+
+            <!-- Splash image -->
+            <fileset dir="${key.dir}/scripts/KeY.jar/">
+                <include name="key-color.gif"/>
+            </fileset>
+
+            <fileset dir="${key.dir}/key.util/bin/">
+                <include name="LaunchFatJar*"/>
+                <include name="JarClassLoader*"/>
+            </fileset>
+
+            <fileset dir="${key.dir}/deployment/components">
+                <include name="**/*.jar"/>
+            </fileset>
+
+            <fileset dir="${key.dir}/deployment/libs">
+                <include name="**/*.jar"/>
+            </fileset>
+
+            <fileset dir="${key.dir}/deployment/">
+                <include name="**/*.txt"/>
+            </fileset>
+
+            <fileset file="${key.dir}/LICENSE.TXT"/>
+        </jar>
+    </target>
 
 
-	    <link href="http://recoder.sourceforge.net/doc/api/" />
-	    <link href="http://docs.oracle.com/javase/7/docs/api/" />
-	    <link href="http://www.antlr2.org/javadoc/" />
-	    <link href="http://www.antlr3.org/api/Java/" />
-	  </javadoc>
-	  <!-- zip KeY-API documentation-->
-	  <zip destfile="${key.dir}/deployment/key-api-doc-${key.version}_${git.revision}.zip"
-		     basedir="${key.dir}/deployment/api"
-	  />
-	</target>
+    <target name="cleanAll"
+            description="Remove all generated files. (Clears deployment files and calls 'ant clean' on production subprojects.)">
+        <!-- Clean components -->
+        <ant antfile="${key.dir}/key.util/build.xml" target="clean" dir="${key.dir}/key.util" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core/build.xml" target="clean" dir="${key.dir}/key.core" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.testgen/build.xml" target="clean" dir="${key.dir}/key.core.testgen"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.ui/build.xml" target="clean" dir="${key.dir}/key.ui" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.symbolic_execution/build.xml" target="clean"
+             dir="${key.dir}/key.core.symbolic_execution" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.proof_references/build.xml" target="clean"
+             dir="${key.dir}/key.core.proof_references" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.example/build.xml" target="clean" dir="${key.dir}/key.core.example"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.removegenerics/build.xml" target="clean" dir="${key.dir}/key.removegenerics"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="clean"
+             dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
+        <!-- Delete deployed files -->
+        <delete file="${key.dir}/deployment/LICENSE.TXT" failonerror="false"/>
+        <delete file="${key.dir}/deployment/KeY.jar" failonerror="false"/>
+        <delete file="${key.dir}/deployment/LICENSE.TXT" failonerror="false"/>
+    </target>
+
+    <!-- The following tasks are for KeY's Tests -->
+    <!-- The target "runAllTests" runs the tests on the compiled
+         class-files as found in the bin/ directories;
+         the target "test-deploy-all" runs the test on the packaged jar-files
+         Rule of thumb: use "runAllTests" when developing and use
+         "test-deploy-all" when deploying (jenkins/hudson use test-deploy-all)
+    -->
+
+    <target name="runAllTests" depends="compileAllTests"
+            description="Run test of all subprojects. (Calls 'ant runTests' on test subprojects.)">
+        <ant antfile="${key.dir}/key.util.test/build.xml" target="runTests" dir="${key.dir}/key.util.test"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.test/build.xml" target="runTests" dir="${key.dir}/key.core.test"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="runTests"
+             dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.proof_references.test/build.xml" target="runTests"
+             dir="${key.dir}/key.core.proof_references.test" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.symbolic_execution.test/build.xml" target="runTests"
+             dir="${key.dir}/key.core.symbolic_execution.test" inheritall="false"/>
+        <ant antfile="${key.dir}/key.removegenerics.test/build.xml" target="runTests"
+             dir="${key.dir}/key.removegenerics.test" inheritall="false"/>
+    </target>
+
+    <target name="test-deploy-all" depends="deployAll, compileAllTests"
+            description="Builds all projects, their tests and deploys the result.">
+        <ant antfile="${key.dir}/key.util.test/build.xml" target="test-deploy" dir="${key.dir}/key.util.test"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.test/build.xml" target="test-deploy" dir="${key.dir}/key.core.test"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="test-deploy"
+             dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.proof_references.test/build.xml" target="test-deploy"
+             dir="${key.dir}/key.core.proof_references.test" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.symbolic_execution.test/build.xml" target="test-deploy"
+             dir="${key.dir}/key.core.symbolic_execution.test" inheritall="false"/>
+        <ant antfile="${key.dir}/key.removegenerics.test/build.xml" target="test-deploy"
+             dir="${key.dir}/key.removegenerics.test" inheritall="false"/>
+    </target>
+
+    <target name="compileAllTests" depends="compileAll"
+            description="Build testcases in all subprojects needed for KeY. (Calls 'ant compile' on test subprojects.)">
+        <ant antfile="${key.dir}/key.util.test/build.xml" target="compile" dir="${key.dir}/key.util.test"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.test/build.xml" target="compile" dir="${key.dir}/key.core.test"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="compile"
+             dir="${key.dir}/key.core.testgen.test" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.proof_references.test/build.xml" target="compile"
+             dir="${key.dir}/key.core.proof_references" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.symbolic_execution.test/build.xml" target="compile"
+             dir="${key.dir}/key.core.symbolic_execution.test" inheritall="false"/>
+        <ant antfile="${key.dir}/key.removegenerics.test/build.xml" target="compile"
+             dir="${key.dir}/key.removegenerics.test" inheritall="false"/>
+    </target>
+
+    <target name="cleanAllTests"
+            description="Clean all generated files in the test packages. (Calls 'ant clean' on test subprojects.)">
+        <ant antfile="${key.dir}/key.util.test/build.xml" target="clean" dir="${key.dir}/key.util.test"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.test/build.xml" target="clean" dir="${key.dir}/key.core.test"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.testgen.test/build.xml" target="clean" dir="${key.dir}/key.core.testgen.test"
+             inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.proof_references/build.xml" target="clean"
+             dir="${key.dir}/key.core.proof_references" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.symbolic_execution.test/build.xml" target="clean"
+             dir="${key.dir}/key.core.symbolic_execution.test" inheritall="false"/>
+        <ant antfile="${key.dir}/key.removegenerics.test/build.xml" target="clean"
+             dir="${key.dir}/key.removegenerics.test" inheritall="false"/>
+    </target>
+
+
+    <target name="generateDoc" depends="compileAll" description="Build javadoc.">
+        <mkdir dir="${javadoc.dir}"/>
+        <!-- Update GIT revision s-->
+        <exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
+            <arg value="rev-parse"/>
+            <arg value="HEAD"/>
+        </exec>
+
+        <javadoc destdir="${javadoc.dir}" windowtitle="KeY API Documentation"
+                 doctitle="KeY API Documentation ${key.version}_${git.revision}"
+                 header="KeY ${key.version}_${git.revision}" access="private">
+            <fileset dir="${key.dir}/key.util/src/">
+                <include name="**/*.java"/>
+            </fileset>
+            <fileset dir="${key.dir}/key.core/src/">
+                <include name="**/*.java"/>
+            </fileset>
+            <fileset dir="${key.dir}/key.core/genSrc/">
+                <include name="**/*.java"/>
+            </fileset>
+            <fileset dir="${key.dir}/key.core.testgen/src/">
+                <include name="**/*.java"/>
+            </fileset>
+            <fileset dir="${key.dir}/key.ui/src/">
+                <include name="**/*.java"/>
+            </fileset>
+            <fileset dir="${key.dir}/key.core.symbolic_execution/src/">
+                <include name="**/*.java"/>
+            </fileset>
+            <fileset dir="${key.dir}/key.core.proof_references/src/">
+                <include name="**/*.java"/>
+            </fileset>
+            <classpath>
+                <pathelement location="${key.dir}/key.core/lib/antlr.jar"/>
+                <pathelement location="${key.dir}/key.core/lib/recoderKey.jar"/>
+            </classpath>
+
+
+            <link href="http://recoder.sourceforge.net/doc/api/"/>
+            <link href="http://docs.oracle.com/javase/7/docs/api/"/>
+            <link href="http://www.antlr2.org/javadoc/"/>
+            <link href="http://www.antlr3.org/api/Java/"/>
+        </javadoc>
+        <!-- zip KeY-API documentation-->
+        <zip destfile="${key.dir}/deployment/key-api-doc-${key.version}_${git.revision}.zip"
+             basedir="${key.dir}/deployment/api"
+        />
+    </target>
 </project>

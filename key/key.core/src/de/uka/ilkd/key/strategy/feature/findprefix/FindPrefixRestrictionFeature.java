@@ -13,10 +13,7 @@
 
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
-import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
@@ -51,19 +48,8 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
             this.checker = checker;
         }
 
-        public void initPrefixCheck(PosInOccurrence p_pos) {
-            checker.initPrefixCheck(p_pos);
-        }
-
-
-        public void checkOperator(Operator op,
-                                  PIOPathIterator it) {
-            checker.checkOperator(op, it);
-        }
-
-
-        public boolean getResult() {
-            return checker.getResult();
+        public final boolean check(PosInOccurrence pio) {
+            return checker.check(pio);
         }
     }
 
@@ -89,7 +75,6 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
 
     private final PrefixChecker[] prefixCheckers;
     private final PositionModifier[] positionModifiers;
-
 
 
     /**
@@ -143,7 +128,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
         // apply the position modifiers
         PosInOccurrence newPos = pos;
         for (PositionModifier positionModifier : positionModifiers) {
-            newPos = positionModifier.modifyPosistion(pos);
+            newPos = positionModifier.modifyPosistion(newPos);
         }
 
         // apply the prefix checkers
@@ -158,32 +143,12 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
      * @return true, if all PrefixCheckers return true
      */
     private boolean checkPrefix(PosInOccurrence pos) {
-        // init prefix checkers
-        for (PrefixChecker prefixChecker : prefixCheckers) {
-            prefixChecker.initPrefixCheck(pos);
-        }
-
         // iterate through the prefix and let the prefix checkers do their work
-        if (pos.posInTerm() != null) {
-            PIOPathIterator it = pos.iterator();
-            Operator op;
-
-            while (it.next() != -1) {
-                final Term t = it.getSubTerm();
-                op = t.op();
-
-                for (PrefixChecker prefixChecker : prefixCheckers) {
-                    prefixChecker.checkOperator(op, it);
-                }
-
+        for (PrefixChecker prefixChecker : prefixCheckers) {
+            if (!prefixChecker.check(pos)) {
+                return false;
             }
         }
-
-        // return the result
-        boolean result = true;
-        for (PrefixChecker prefixChecker : prefixCheckers) {
-            result &= prefixChecker.getResult();
-        }
-        return result;
+        return true;
     }
 }

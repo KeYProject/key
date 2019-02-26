@@ -42,12 +42,15 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
+import de.uka.ilkd.key.prover.ProverCore;
+import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
@@ -147,15 +150,16 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public void taskFinished(TaskFinishedInfo info) {
         super.taskFinished(info);
-        if (info.getSource() instanceof ApplyStrategy) {
+        if (info != null && info.getSource() instanceof ProverCore) {
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
             }
-            ApplyStrategy.ApplyStrategyInfo result =
+            ApplyStrategyInfo result =
                     (ApplyStrategyInfo) info.getResult();
 
             Proof proof = info.getProof();
-            if (proof != null && !proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
+            if (proof != null && !proof.closed()
+                    && mainWindow.getMediator().getSelectedProof() == proof) {
                 Goal g = result.nonCloseableGoal();
                 if (g == null) {
                     g = proof.openGoals().head();
@@ -171,12 +175,13 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 }
             }
             mainWindow.displayResults(info.toString());
-        } else if (info.getSource() instanceof ProofMacro) {
+        } else if (info != null && info.getSource() instanceof ProofMacro) {
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
                 assert info instanceof ProofMacroFinishedInfo;
                 Proof proof = info.getProof();
-                if (proof != null && !proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
+                if (proof != null && !proof.closed()
+                        && mainWindow.getMediator().getSelectedProof() == proof) {
                     Goal g = proof.openGoals().head();
                     mainWindow.getMediator().goalChosen(g);
                     if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
@@ -189,7 +194,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                     }
                 }
             }
-        } else if (info.getSource() instanceof ProblemLoader) {
+        } else if (info != null && info.getSource() instanceof ProblemLoader) {
             resetStatus(this);
             Throwable result = (Throwable) info.getResult();
             if (info.getResult() != null) {
@@ -204,8 +209,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                     Pair<String, Location> scriptAndLoc;
                     try {
                         scriptAndLoc = problemLoader.readProofScript();
-                        ProofScriptWorker psw = new ProofScriptWorker(mainWindow.getMediator(),
-                                scriptAndLoc.first, scriptAndLoc.second);
+                        ProofScriptWorker psw =
+                                new ProofScriptWorker(mainWindow.getMediator(),
+                                                      scriptAndLoc.first,
+                                                      scriptAndLoc.second);
                         psw.init();
                         psw.execute();
                     } catch (ProofInputException e) {
@@ -218,7 +225,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             }
         } else {
             resetStatus(this);
-            if (!info.toString().isEmpty()) {
+            if (info != null && !info.toString().isEmpty()) {
                 mainWindow.displayResults(info.toString());
             }
         }

@@ -4,9 +4,10 @@
       <statement name="_obj.value=1;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="not(equals(obj,null))" pathCondition="not(equals(obj,null))" pathConditionChanged="true" branchCondition="not(equals(obj,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="_obj.value=doubleValue(1);" pathCondition="not(equals(obj,null))" pathConditionChanged="false">
-               <operationContract name="result_0 = doubleValue(1) catch(exc_0)
-pre: 1 &gt;= 0
-post: result_0 = javaAddInt(1, 1) &amp; exc_0 = null
+               <operationContract name="result_0 = doubleValue(Z(1(#))) catch(exc_0)
+pre: geq(Z(1(#)), Z(0(#)))
+post: result_0 = javaAddInt(Z(1(#)), Z(1(#)))
+&amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;
 mod: allLocs
 termination: diamond" pathCondition="not(equals(obj,null))" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="Z(1(#))" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                   <branchCondition name="equals(exc_0,null)" pathCondition="and(equals(exc_0,null),not(equals(obj,null)))" pathConditionChanged="true" branchCondition="equals(exc_0,null)" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (doubleValue)">
@@ -14,8 +15,8 @@ termination: diamond" pathCondition="not(equals(obj,null))" pathConditionChanged
                         <statement name="int result = 0;" pathCondition="and(equals(exc_0,null),not(equals(obj,null)))" pathConditionChanged="false">
                            <loopStatement name="for ( int i = 0; i==0; i++ )" pathCondition="and(equals(exc_0,null),not(equals(obj,null)))" pathConditionChanged="false" blockOpened="true">
                               <statement name="int i = 0;" pathCondition="and(equals(exc_0,null),not(equals(obj,null)))" pathConditionChanged="false">
-                                 <loopInvariant name="invariant: i &gt;= 0 &amp; i &lt;= 1;
-variant: javaSubInt(2, i)
+                                 <loopInvariant name="invariant: (geq(i, Z(0(#))) &amp; leq(i, Z(1(#))))&lt;&lt;SC&gt;&gt;;
+variant: javaSubInt(Z(2(#)), i)
 mod: false" pathCondition="and(equals(exc_0,null),not(equals(obj,null)))" pathConditionChanged="false" initiallyValid="true">
                                     <branchCondition name="equals(i_0,Z(0(#)))" pathCondition="and(and(equals(exc_0,null),not(equals(obj,null))),equals(i_0,Z(0(#))))" pathConditionChanged="true" branchCondition="equals(i_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                                        <loopCondition name="i==0" pathCondition="and(and(equals(exc_0,null),not(equals(obj,null))),equals(i_0,Z(0(#))))" pathConditionChanged="false" blockOpened="true">

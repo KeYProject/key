@@ -259,10 +259,10 @@ public final class Goal  {
 	if ( node ().sequent () != p_node.sequent () ) {
 	    node = p_node;
 	    resetTagManager();
-	} else
+	} else {
 	    node = p_node;
+	}
 	ruleAppIndex.setup ( this );
-
     }
 
     /**
@@ -662,8 +662,9 @@ public final class Goal  {
 
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
 
-        if ( goalList != null )
-            proof.fireRuleApplied( new ProofEvent ( proof, ruleAppInfo ) );
+        if (goalList != null) {
+            proof.fireRuleApplied(new ProofEvent(proof, ruleAppInfo, goalList));
+        }
         return goalList;
     }
 

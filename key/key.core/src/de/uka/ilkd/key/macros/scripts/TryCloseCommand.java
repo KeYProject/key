@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Node;
-
-import java.util.Map;
 
 /**
  * The script command tryclose" has two optional arguments:
@@ -38,7 +38,7 @@ public class TryCloseCommand
         boolean branch = "branch".equals(args.branch);
         Node target;
         if (branch) {
-            target = state.getFirstOpenGoal().node();
+            target = state.getFirstOpenAutomaticGoal().node();
         }
         else {
             target = state.getProof().root();
@@ -46,6 +46,10 @@ public class TryCloseCommand
 
         try {
             macro.applyTo(uiControl, target, null, uiControl);
+            if (args.assertClosed && !target.isClosed()) {
+                throw new ScriptException(
+                        "Could not close subtree of node " + target.serialNr());
+            }
         }
         catch (Exception e) {
             throw new ScriptException(
@@ -63,5 +67,7 @@ public class TryCloseCommand
         public Integer steps;
         @Option(value = "#2", required = false)
         public String branch;
+        @Option(value = "assertClosed", required = false)
+        public Boolean assertClosed = false;
     }
 }
