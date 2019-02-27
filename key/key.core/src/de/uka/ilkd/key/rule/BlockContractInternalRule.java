@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
@@ -299,6 +300,29 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
                 assumptions, frameCondition, updates, configurator, conditionsAndClausesBuilder,
                 services);
         return result;
+    }
+
+    @Override
+    public boolean isApplicable(Goal goal, PosInOccurrence occurrence) {
+        if (occursNotAtTopLevelInSuccedent(occurrence)) {
+            return false;
+        }
+        // abort if inside of transformer
+        if (Transformer.inTransformer(occurrence)) {
+            return false;
+        }
+        final Instantiation instantiation
+                = instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
+        if (instantiation == null) {
+            return false;
+        }
+        final ImmutableSet<BlockContract> contracts
+                = getApplicableContracts(instantiation, goal, goal.proof().getServices());
+
+        // If we are using internal rules, we can apply the respective loop contract directly,
+        // without first applying this block contract.
+        return !contracts.isEmpty()
+                && contracts.stream().allMatch(c -> c.toLoopContract() == null);
     }
 
     /**
