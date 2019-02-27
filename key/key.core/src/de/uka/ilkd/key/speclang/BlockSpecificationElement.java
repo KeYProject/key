@@ -50,6 +50,22 @@ public interface BlockSpecificationElement extends SpecificationElement {
 
     /**
      *
+     * @return all {@link FunctionalAuxiliaryContract}s with a valid id that correspond to this
+     *         {@code BlockSpecificationElement}.
+     *         Unless this contract is a combination of other contracts, the resulting set will
+     *         only contain one element.
+     */
+    public ImmutableSet<FunctionalAuxiliaryContract<?>> getFunctionalContracts();
+
+    /**
+     *
+     * @param contract the new functional contract.
+     * @see #getFunctionalContracts()
+     */
+    public void setFunctionalContract(FunctionalAuxiliaryContract<?> contract);
+
+    /**
+     *
      * @return the block this contract belongs to.
      */
     public StatementBlock getBlock();

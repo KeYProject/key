@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;
@@ -33,22 +32,6 @@ import de.uka.ilkd.key.util.InfFlowSpec;
  * @author lanzinger
  */
 public interface LoopContract extends BlockSpecificationElement {
-
-    /**
-     *
-     * @return all {@link FunctionalLoopContract}s with a valid id that correspond to this
-     *         {@code LoopContract}. Unless this contract is a combination of other contracts (see
-     *         {@link SimpleLoopContract#combine(ImmutableSet, Services)}, the resulting set will
-     *         only contain one element.
-     */
-    public ImmutableSet<FunctionalLoopContract> getFunctionalContracts();
-
-    /**
-     *
-     * @param contract the new functional contract.
-     * @see #getFunctionalContracts()
-     */
-    public void setFunctionalLoopContract(FunctionalLoopContract contract);
 
     /**
      *

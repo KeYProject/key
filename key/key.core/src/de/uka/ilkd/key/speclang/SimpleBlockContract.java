@@ -45,11 +45,6 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 public final class SimpleBlockContract extends AbstractBlockSpecificationElement
         implements BlockContract {
 
-    /**
-     * @see BlockContract#getFunctionalContracts()
-     */
-    private ImmutableSet<FunctionalBlockContract> functionalContracts;
-
     private LoopContract loopContract = null;
 
     /**
@@ -90,11 +85,9 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
             final Map<LocationVariable, Term> modifiesClauses,
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
-            ImmutableSet<FunctionalBlockContract> functionalContracts) {
+            ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts) {
         super(baseName, block, labels, method, modality, preconditions, measuredBy, postconditions,
-                modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod);
-
-        this.functionalContracts = functionalContracts;
+                modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod, functionalContracts);
     }
 
     /**
@@ -124,16 +117,12 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
     }
 
     @Override
-    public ImmutableSet<FunctionalBlockContract> getFunctionalContracts() {
-        return functionalContracts;
-    }
+    public void setFunctionalContract(FunctionalAuxiliaryContract<?> contract) {
+        super.setFunctionalContract(contract);
 
-    @Override
-    public void setFunctionalBlockContract(FunctionalBlockContract contract) {
-        assert contract.id() != Contract.INVALID_ID;
-        assert contract.getBlockContract().equals(this);
-
-        functionalContracts = DefaultImmutableSet.<FunctionalBlockContract> nil().add(contract);
+        if (loopContract != null) {
+            loopContract.setFunctionalContract(contract);
+        }
     }
 
     @Override
@@ -149,12 +138,13 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
 
     @Override
     public String getUniqueName() {
-        if (getTarget() != null)
+        if (getTarget() != null) {
             return "Block Contract " + getBlock().getStartPosition().getLine() + " "
                     + getTarget().getUniqueName();
-        else
+        } else {
             return "Block Contract " + getBlock().getStartPosition().getLine() + " "
                     + Math.abs(getBlock().hashCode());
+        }
     }
 
     @Override
@@ -319,7 +309,8 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
             placeholderVariables = head.getPlaceholderVariables();
             remembranceVariables = placeholderVariables.combineRemembranceVariables();
 
-            ImmutableSet<FunctionalBlockContract> functionalContracts = DefaultImmutableSet.nil();
+            ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts =
+                    DefaultImmutableSet.nil();
 
             for (BlockContract contract : contracts) {
                 addConditionsFrom(contract);

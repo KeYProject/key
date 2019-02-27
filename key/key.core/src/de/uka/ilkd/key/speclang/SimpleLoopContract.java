@@ -117,11 +117,6 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     private final List<Label> loopLabels;
 
     /**
-     * @see LoopContract#getFunctionalContracts()
-     */
-    private ImmutableSet<FunctionalLoopContract> functionalContracts;
-
-    /**
      * @see LoopContract#isInternalOnly()
      */
     private boolean internalOnly;
@@ -179,14 +174,14 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             final Map<LocationVariable, Term> modifiesClauses,
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
-            final Term decreases, ImmutableSet<FunctionalLoopContract> functionalContracts,
+            final Term decreases, ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
             Services services) {
         super(baseName, block, labels, method, modality, preconditions, measuredBy, postconditions,
-                modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod);
+                modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod,
+                functionalContracts);
 
         onBlock = true;
         this.decreases = decreases;
-        this.functionalContracts = functionalContracts;
         this.services = services;
 
         loopLabels = new ArrayList<Label>();
@@ -278,15 +273,15 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             final Map<LocationVariable, Term> modifiesClauses,
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
-            final Term decreases, ImmutableSet<FunctionalLoopContract> functionalContracts,
+            final Term decreases, ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
             Services services) {
         super(baseName, new StatementBlock(loop), labels, method, modality,
                 preconditions, measuredBy, postconditions,
-                modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod);
+                modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod,
+                functionalContracts);
 
         onBlock = false;
         this.decreases = decreases;
-        this.functionalContracts = functionalContracts;
         this.services = services;
         this.loop = loop;
 
@@ -561,11 +556,20 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
                     r.baseName, headAndBlock, r.labels, r.method, r.modality,
                     pre, r.measuredBy, post, r.modifiesClauses,
                 r.infFlowSpecs, r.variables, r.transactionApplicable, r.hasMod,
-                DefaultImmutableSet.nil());
-            ((SimpleBlockContract) blockContract).setLoopContract(r);
+                functionalContracts);
+            ((SimpleBlockContract) blockContract).setLoopContract(this);
         }
 
         return blockContract;
+    }
+
+    @Override
+    public void setFunctionalContract(FunctionalAuxiliaryContract<?> contract) {
+        super.setFunctionalContract(contract);
+
+        if (internalOnly && !toBlockContract().getFunctionalContracts().contains(contract)) {
+            toBlockContract().setFunctionalContract(contract);
+        }
     }
 
     @Override
@@ -595,19 +599,6 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     public Term getDecreases(Variables variables, Services services) {
         Map<ProgramVariable, ProgramVariable> map = createReplacementMap(variables, services);
         return new OpReplacer(map, services.getTermFactory()).replace(decreases);
-    }
-
-    @Override
-    public ImmutableSet<FunctionalLoopContract> getFunctionalContracts() {
-        return functionalContracts;
-    }
-
-    @Override
-    public void setFunctionalLoopContract(FunctionalLoopContract contract) {
-        assert contract.id() != Contract.INVALID_ID;
-        assert contract.getLoopContract().equals(this);
-
-        functionalContracts = DefaultImmutableSet.<FunctionalLoopContract> nil().add(contract);
     }
 
     @Override
@@ -1091,7 +1082,8 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             placeholderVariables = head.getPlaceholderVariables();
             remembranceVariables = placeholderVariables.combineRemembranceVariables();
 
-            ImmutableSet<FunctionalLoopContract> functionalContracts = DefaultImmutableSet.nil();
+            ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts =
+                    DefaultImmutableSet.nil();
 
             for (LoopContract contract : contracts) {
                 addConditionsFrom(contract);

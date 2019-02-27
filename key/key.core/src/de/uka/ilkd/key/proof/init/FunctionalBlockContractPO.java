@@ -34,6 +34,7 @@ import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalBlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -411,7 +412,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                 variables.exception.getKeYJavaType());
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder
-                = new ConditionsAndClausesBuilder(contract.getBlockContract(), heaps, variables,
+                = new ConditionsAndClausesBuilder(contract.getAuxiliaryContract(), heaps, variables,
                         selfTerm, services);
 
         final Term[] assumptions = createAssumptions(pm, selfVar, heaps, localInVariables,
@@ -428,7 +429,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
         final Term validity = setUpValidityTerm(heaps, anonHeaps, anonOutHeaps, localInVariables,
                 localOutVariables, exceptionParameter, assumptions, postconditions, updates,
-                contract.getBlockContract(), conditionsAndClausesBuilder, configurator, services,
+                contract.getAuxiliaryContract(), conditionsAndClausesBuilder, configurator, services,
                 tb);
         assignPOTerms(validity);
 
@@ -516,7 +517,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         final Instantiation inst = new Instantiation(tb.skip(), tb.tt(), contract.getModality(),
                 selfTerm, block, ec);
         return new GoalsConfigurator(null, new TermLabelState(), inst,
-                contract.getBlockContract().getLabels(), variables, null, services, null);
+                contract.getAuxiliaryContract().getLabels(), variables, null, services, null);
     }
 
     /**

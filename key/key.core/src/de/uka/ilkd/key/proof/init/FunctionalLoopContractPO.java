@@ -198,7 +198,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
                         .createAndRegisterCopies("_NEXT");
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder
-                = new ConditionsAndClausesBuilder(contract.getLoopContract(), heaps, variables,
+                = new ConditionsAndClausesBuilder(contract.getAuxiliaryContract(), heaps, variables,
                         selfTerm, services);
 
         final Term wellFormedHeapsCondition
@@ -298,9 +298,9 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     private Term[] createPostconditionsNext(final Term selfTerm, final List<LocationVariable> heaps,
             final LoopContract.Variables nextVariables,
             final Map<LocationVariable, Term> modifiesClauses, final Services services) {
-        final Term nextPostcondition = new ConditionsAndClausesBuilder(contract.getLoopContract(),
+        final Term nextPostcondition = new ConditionsAndClausesBuilder(contract.getAuxiliaryContract(),
                 heaps, nextVariables, selfTerm, services).buildPostcondition();
-        final Term nextFrameCondition = new ConditionsAndClausesBuilder(contract.getLoopContract(),
+        final Term nextFrameCondition = new ConditionsAndClausesBuilder(contract.getAuxiliaryContract(),
                 heaps, nextVariables, selfTerm, services).buildFrameCondition(modifiesClauses);
         return new Term[] { nextPostcondition, nextFrameCondition };
     }
@@ -415,7 +415,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
                 selfTerm, getBlock(), ec);
 
         return new GoalsConfigurator(null, termLabelState, inst,
-                contract.getLoopContract().getLabels(), variables, null, services, null);
+                contract.getAuxiliaryContract().getLabels(), variables, null, services, null);
     }
 
     /**
@@ -475,7 +475,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         final Term anonInUpdate = updatesBuilder.buildAnonInUpdate(anonInHeaps);
         final Term context = tb.sequential(outerRemembranceUpdate, anonInUpdate);
 
-        Term validity = configurator.setUpLoopValidityGoal(null, contract.getLoopContract(),
+        Term validity = configurator.setUpLoopValidityGoal(null, contract.getAuxiliaryContract(),
                 context, remembranceUpdate, nextRemembranceUpdate, anonOutHeaps, modifiesClauses,
                 assumptions, decreasesCheck, postconditions, postconditionsNext, exceptionParameter,
                 variables.termify(selfTerm), nextVariables);

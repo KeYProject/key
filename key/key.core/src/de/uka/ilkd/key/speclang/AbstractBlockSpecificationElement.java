@@ -109,6 +109,11 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
     protected final String baseName;
 
     /**
+     * @see BlockSpecificationElement#getFunctionalContracts()
+     */
+    protected ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts;
+
+    /**
      *
      * @param baseName
      *            the base name.
@@ -143,7 +148,8 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
             final Map<LocationVariable, Term> postconditions,
             final Map<LocationVariable, Term> modifiesClauses,
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
-            final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod) {
+            final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
+            ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts) {
         assert block != null;
         assert labels != null;
         assert method != null;
@@ -169,6 +175,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         this.variables = variables;
         this.transactionApplicable = transactionApplicable;
         this.hasMod = hasMod;
+        this.functionalContracts = functionalContracts;
     }
 
     @Override
@@ -601,6 +608,18 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         result = prime * result + (transactionApplicable ? 1231 : 1237);
         result = prime * result + ((variables == null) ? 0 : variables.hashCode());
         return result;
+    }
+
+    @Override
+    public ImmutableSet<FunctionalAuxiliaryContract<?>> getFunctionalContracts() {
+        return functionalContracts;
+    }
+
+    @Override
+    public void setFunctionalContract(FunctionalAuxiliaryContract<?> contract) {
+        assert contract.id() != Contract.INVALID_ID;
+        functionalContracts = DefaultImmutableSet.<FunctionalAuxiliaryContract<?>>nil()
+                .add(contract);
     }
 
     /**
