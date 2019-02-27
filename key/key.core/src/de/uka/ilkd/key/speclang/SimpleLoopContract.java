@@ -21,6 +21,9 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
 import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
@@ -31,6 +34,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -501,23 +505,61 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
                 : new StatementBlock(head, block);
         SimpleLoopContract r = (SimpleLoopContract) replaceEnhancedForVariables(block, services);
 
-        Map<LocationVariable, Term> weakenedPre;
+        TermBuilder tb = services.getTermBuilder();
+
+        Map<LocationVariable, Term> pre;
+        Map<LocationVariable, Term> post;
         if (head == null) {
-            weakenedPre = r.preconditions;
+            pre = r.preconditions;
+            post = r.postconditions;
         } else {
-            weakenedPre = new HashMap<>();
+            Map<Term, Term> preReplacementMap = new HashMap<>();
+            Map<Term, Term> postReplacementMap = new HashMap<>();
+            for (int i = 0; i < head.getStatementCount(); ++i) {
+                Statement stmt = head.getStatementAt(i);
+                if (stmt instanceof LocalVariableDeclaration) {
+                    LocalVariableDeclaration decl = (LocalVariableDeclaration) stmt;
+                    ProgramVariable var = (ProgramVariable)
+                            decl.getVariables().get(0).getProgramVariable();
+                    Expression init = decl.getVariables().get(0).getInitializer();
+
+                    if (init instanceof ProgramVariable) {
+                        preReplacementMap.put(tb.var(var), tb.var((ProgramVariable) init));
+                        postReplacementMap.put(
+                                tb.var(r.variables.remembranceLocalVariables.get(var)),
+                                tb.var((ProgramVariable) init));
+                    } else if (init instanceof AbstractIntegerLiteral) {
+                        preReplacementMap.put(tb.var(var),
+                                services.getTypeConverter().getIntegerLDT()
+                                .translateLiteral((Literal) init, services));
+                        postReplacementMap.put(
+                                tb.var(r.variables.remembranceLocalVariables.get(var)),
+                                services.getTypeConverter().getIntegerLDT()
+                                .translateLiteral((Literal) init, services));
+                    }
+                }
+            }
+
+            OpReplacer preReplacer = new OpReplacer(preReplacementMap, services.getTermFactory());
+            OpReplacer postReplacer = new OpReplacer(postReplacementMap, services.getTermFactory());
+            pre = new HashMap<>();
+            post = new HashMap<>();
 
             for (LocationVariable heap : r.preconditions.keySet()) {
-                weakenedPre.put(heap, weakenFormula(
-                        r.preconditions.get(heap), MiscTools.getLocalOutsAndDeclared(head, services)));
+                pre.put(heap, weakenFormula(
+                        preReplacer.replace(r.preconditions.get(heap)),
+                        MiscTools.getLocalOutsAndDeclared(head, services)));
+            }
+
+            for (LocationVariable heap : r.postconditions.keySet()) {
+                post.put(heap, postReplacer.replace(r.postconditions.get(heap)));
             }
         }
 
         if (blockContract == null) {
             blockContract = new SimpleBlockContract(
                     r.baseName, headAndBlock, r.labels, r.method, r.modality,
-                    weakenedPre,
-                r.measuredBy, r.postconditions, r.modifiesClauses,
+                    pre, r.measuredBy, post, r.modifiesClauses,
                 r.infFlowSpecs, r.variables, r.transactionApplicable, r.hasMod,
                 DefaultImmutableSet.nil());
             ((SimpleBlockContract) blockContract).setLoopContract(r);

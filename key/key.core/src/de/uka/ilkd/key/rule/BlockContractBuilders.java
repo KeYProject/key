@@ -1611,7 +1611,7 @@ public final class BlockContractBuilders {
             Map<LocationVariable, Function> anonOutHeaps2 = new HashMap<>();
             for (LocationVariable heap : anonOutHeaps.keySet()) {
                 final String anonymisationName
-                        = tb.newName("init_" + heap.name());
+                        = tb.newName("init_" + ANON_OUT_PREFIX + heap.name());
                 final Function anonymisationFunction
                         = new Function(new Name(anonymisationName), heap.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
