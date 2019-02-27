@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -777,18 +778,30 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
      * @see #toBlockContract()
      */
     private Term weakenFormula(Term term, ImmutableSet<ProgramVariable> vars) {
+        return weakenFormula(term, vars, false);
+    }
+
+    private Term weakenFormula(Term term, ImmutableSet<ProgramVariable> vars, boolean propagate) {
         if (term == null) {
             return null;
         }
 
         final TermFactory tf = services.getTermFactory();
 
+        if (!propagate && term.op() != Junctor.AND) {
+            propagate = true;
+        }
+
         if (term.sort() == Sort.FORMULA) {
             List<Term> subs = new ArrayList<>();
             for (Term sub : term.subs()) {
                 Term newSub = weakenFormula(sub, vars);
                 if (newSub == null) {
-                    return services.getTermBuilder().tt();
+                    if (propagate) {
+                        return null;
+                    } else {
+                        subs.add(services.getTermBuilder().tt());
+                    }
                 } else {
                     subs.add(newSub);
                 }
