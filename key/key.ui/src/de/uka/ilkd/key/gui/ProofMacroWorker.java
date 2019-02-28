@@ -9,11 +9,10 @@
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 package de.uka.ilkd.key.gui;
 
-import javax.swing.SwingWorker;
-
+import de.uka.ilkd.key.control.InteractionListener;
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -23,19 +22,22 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.util.Debug;
+
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The Class ProofMacroWorker is a swing worker for the application of proof
  * macros.
- *
+ * <p>
  * It decouples proof macros from the GUI event thread. It registers with the
  * mediator to receive Stop-Button events
  */
-public class ProofMacroWorker extends SwingWorker<Void, Void> implements InterruptListener {
+public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> implements InterruptListener {
 
     /**
      * This flag decides whether after a macro an open is selected or not.
@@ -49,35 +51,34 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
      * The {@link Node} to start macro at.
      */
     private final Node node;
-    
+
     /**
      * The macro which is to be executed
      */
     private final ProofMacro macro;
-    
-    /**
-     * The resulting information of the task or null if the task was cancelled an exception was thrown
-     */
-    private TaskFinishedInfo info;
-
-    /** The thrown exception leading to cancellation of the task */
-    private Exception exception;
-    
     /**
      * The mediator of the environment
      */
     private final KeYMediator mediator;
-
     /**
      * This position may be null if no subterm selected
      */
     private final PosInOccurrence posInOcc;
+    /**
+     * The resulting information of the task or null if the task was cancelled an exception was thrown
+     */
+    private ProofMacroFinishedInfo info;
+    /**
+     * The thrown exception leading to cancellation of the task
+     */
+    private Exception exception;
+    private List<InteractionListener> interactionListeners = new ArrayList<>();
 
     /**
      * Instantiates a new proof macro worker.
      *
-     * @param node the {@link Node} to start macro at.
-     * @param macro the macro, not null
+     * @param node     the {@link Node} to start macro at.
+     * @param macro    the macro, not null
      * @param mediator the mediator, not null
      * @param posInOcc the position, possibly null
      */
@@ -91,24 +92,26 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
     }
 
     @Override
-    protected Void doInBackground() throws Exception {
+    protected ProofMacroFinishedInfo doInBackground() {
         final ProverTaskListener ptl = mediator.getUI();
         Proof selectedProof = node.proof();
         info = ProofMacroFinishedInfo.getDefaultInfo(macro, selectedProof);
-        ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
+        ptl.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
         try {
-            synchronized(macro) {
+            synchronized (macro) {
                 info = macro.applyTo(mediator.getUI(), node, posInOcc, ptl);
             }
         } catch (final InterruptedException exception) {
             Debug.out("Proof macro has been interrupted:");
             Debug.out(exception);
+            info = new ProofMacroFinishedInfo(macro, selectedProof, true);
             this.exception = exception;
         } catch (final Exception exception) {
             // This should actually never happen.
             this.exception = exception;
-        } 
-        return null;
+        }
+
+        return info;
     }
 
     @Override
@@ -118,25 +121,40 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
 
     @Override
     protected void done() {
-        synchronized(macro) {
+        synchronized (macro) {
             mediator.removeInterruptedListener(this);
-            if ( ! isCancelled() && exception != null ) { // user cancelled task is fine, we do not report this
+            if (!isCancelled() && exception != null) { // user cancelled task is fine, we do not report this
                 // This should actually never happen.
                 ExceptionDialog.showDialog(MainWindow.getInstance(), exception);
-            }                        
-            
+            }
+
             mediator.getUI().taskFinished(info);
 
-            if(SELECT_GOAL_AFTER_MACRO) {
+            if (SELECT_GOAL_AFTER_MACRO) {
                 selectOpenGoalBelow();
             }
-                        
+
             mediator.setInteractive(true);
             mediator.startInterface(true);
+
+            emitProofMacroFinished(node, macro, posInOcc, info);
         }
     }
 
-    /*
+    protected void emitProofMacroFinished(Node node, ProofMacro macro,
+                                          PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
+        interactionListeners.forEach((l) -> l.runMacro(node, macro, posInOcc, info));
+    }
+
+    public void addInteractionListener(InteractionListener listener) {
+        interactionListeners.add(listener);
+    }
+
+    public void removeInteractionListener(InteractionListener listener) {
+        interactionListeners.remove(listener);
+    }
+
+    /**
      * Select a goal below the currently selected node.
      * Does not do anything if that is not available.
      * Only enabled goals are considered.
@@ -145,8 +163,8 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
         Node selectedNode = mediator.getSelectedNode();
         for (Goal g : selectedNode.proof().openEnabledGoals()) {
             Node n = g.node();
-            while(n != null) {
-                if(n == selectedNode) {
+            while (n != null) {
+                if (n == selectedNode) {
                     mediator.getSelectionModel().setSelectedGoal(g);
                     return;
                 }

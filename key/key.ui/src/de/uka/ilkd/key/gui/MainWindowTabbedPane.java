@@ -4,6 +4,9 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
+import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.interactionlog.InteractionLogView;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 
 import javax.swing.*;
@@ -18,30 +21,30 @@ import java.util.List;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class MainWindowTabbedPane extends JTabbedPane {
-    /**
-     *
-     */
+    public static final float TAB_ICON_SIZE = 16f;
+
     private static final long serialVersionUID = 334677113533050832L;
+
 
     /**
      * the current proof tree
      */
-    private final ProofTreeView proofTreeView;
-
+    private ProofTreeView proofTreeView;
+    private InteractionLogView interactionLogView;
     /**
      * the list of current open goals
      */
-    private final GoalList openGoalsView;
+    private GoalList openGoalsView;
 
     /**
      * the strategy selection view
      */
-    private final StrategySelectionView strategySelectionView;
+    private StrategySelectionView strategySelectionView;
 
     /**
      * the rule view
      */
-    private final InfoView infoView;
+    private InfoView infoView;
 
     MainWindowTabbedPane(MainWindow mainWindow, KeYMediator mediator, AutoModeAction autoModeAction) {
         assert mediator != null;
@@ -53,10 +56,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
         openGoalsView = KeYGuiExtensionFacade.getPanel(GoalList.class).orElse(null);
         List<KeYPaneExtension> panels = KeYGuiExtensionFacade.getAllPanels();
         panels.forEach(p -> p.init(mainWindow, mediator));
-        panels.forEach(p ->
-                addTab(p.getTitle(),p.getIcon(), p.getComponent())
-        );
-
+        panels.forEach(p -> addTab(p.getTitle(), p.getIcon(), p.getComponent()));
 
 
         // set proofTreeView
@@ -64,7 +64,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
         proofTreeView = new ProofTreeView(mediator);
         proofTreeView.setSize(proofTreeView.getPreferredSize());
         proofTreeView.setVisible(true);
-        addTab("Proof", null, proofTreeView,
+        addTab("Proof", PROOF_ICON, proofTreeView,
                 "The current state of the proof as tree");
 
         // set openGoalsView
@@ -80,17 +80,17 @@ public class MainWindowTabbedPane extends JTabbedPane {
         // set strategySelectionView
         strategySelectionView = new StrategySelectionView(autoModeAction);
         strategySelectionView.setMediator(mediator);
-        addTab("Proof Search Strategy", null, strategySelectionView,
+        addTab("Proof Search Strategy", PROOF_SEARCH_STRATEGY_ICON, strategySelectionView,
                 "Select strategy for automated proof search");
 
         // set ruleView
         infoView = new InfoView(mediator, mainWindow);
-        addTab("Info", null, infoView,
+        addTab("Info", INFO_ICON, infoView,
                 "Documentation on taclets and symbols");
 
         setSelectedIndex(0);
         setPreferredSize(new java.awt.Dimension(250, 440));
-         */
+           */
 
         // change some key mappings which collide with font settings.
         getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)

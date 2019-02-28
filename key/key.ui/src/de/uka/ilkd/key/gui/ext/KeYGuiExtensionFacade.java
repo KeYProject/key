@@ -107,8 +107,9 @@ public final class KeYGuiExtensionFacade {
             String cur = mpath.next();
             Component[] children = menu.getMenuComponents();
             for (int i = 0; i < children.length; i++) {
-                if (children[i].getName().equals(cur)) {
-                    return (JMenu) children[i];
+                if (Objects.equals(children[i].getName(), cur)) {
+                    JMenu sub = (JMenu) children[i];
+                    return findMenu(sub, mpath);
                 }
             }
             JMenu m = new JMenu(cur);
