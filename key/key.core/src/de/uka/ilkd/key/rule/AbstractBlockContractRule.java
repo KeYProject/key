@@ -45,8 +45,8 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -75,7 +75,9 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         if (instantiation == null) {
             return DefaultImmutableSet.nil();
         }
-        return getApplicableContracts(services.getSpecificationRepository(), instantiation.statement,
+        return getApplicableContracts(
+                services.getSpecificationRepository(),
+                instantiation.statement,
                 instantiation.modality, goal);
     }
 

@@ -158,7 +158,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
      * @param decreases
      *            the contract's decreases clause.
      * @param functionalContracts
-     *            the functional loop contracts corresponding to this contract.
+     *            the functional contracts corresponding to this contract.
      * @param services
      *            services.
      */
@@ -257,7 +257,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
      * @param decreases
      *            the contract's decreases clause.
      * @param functionalContracts
-     *            the functional loop contracts corresponding to this contract.
+     *            the functional contracts corresponding to this contract.
      * @param services
      *            services.
      */

@@ -211,8 +211,8 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
          *            the modality.
          * @param self
          *            the self variable.
-         * @param block
-         *            the block the contract belongs to.
+         * @param statement
+         *            the statement the contract belongs to.
          * @param context
          *            the execution context in which the block occurs.
          */

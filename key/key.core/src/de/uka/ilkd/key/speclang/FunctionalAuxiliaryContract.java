@@ -28,6 +28,8 @@ import de.uka.ilkd.key.rule.BlockContractBuilders;
  * This class is only used to generate a proof obligation for an {@link AuxiliaryContract}.
  *
  * @author lanzinger
+ *
+ * @param <T> the type of {@link AuxiliaryContract} for which this class generated POs.
  */
 public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> implements Contract {
 
@@ -35,7 +37,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     /**
      * @see #getAuxiliaryContract()
      */
-    protected T contract;
+    private T contract;
 
     /**
      * This contract's ID.
@@ -330,6 +332,10 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      */
     public boolean hasModifiesClause(LocationVariable heap) {
         return contract.hasModifiesClause(heap);
+    }
+
+    protected void setAuxiliaryContract(T contract) {
+        this.contract = contract;
     }
 
     /**

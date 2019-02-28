@@ -115,50 +115,6 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     protected ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts;
 
     /**
-     * Replaces variables in a map of terms
-     *
-     * @param term a term.
-     * @param variables replacements for {@link #getVariables()}
-     * @param services services.
-     * @return the term with every occurrence of a variable from {@link #getVariables()} replaced.
-     */
-    public Term getTerm(
-            final Term term,
-            final Variables variables,
-            final Services services) {
-        assert variables != null;
-        assert (variables.self == null) == (this.variables.self == null);
-        assert services != null;
-
-        final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services),
-                services.getTermFactory());
-        return replacer.replace(term);
-    }
-
-    /**
-     * Replaces variables in a map of terms
-     *
-     * @param term a term.
-     * @param the replacement heap
-     * @param terms replacements for {@link #getVariables()}
-     * @param services services.
-     * @return the term with every occurrence of a variable from {@link #getVariables()} replaced.
-     */
-    public Term getTerm(
-            final Term term,
-            final Term heap,
-            final Terms terms,
-            final Services services) {
-        assert terms != null;
-        assert (terms.self == null) == (this.variables.self == null);
-        assert services != null;
-
-        final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services),
-                services.getTermFactory());
-        return replacer.replace(term);
-    }
-
-    /**
      *
      * @param baseName
      *            the base name.
@@ -186,6 +142,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      *            whether or not this contract is applicable for transactions.
      * @param hasMod
      *            a map specifying on which heaps this contract has a modified clause.
+     * @param functionalContracts
+     *            the functional contracts corresponding to this contract.
      */
     public AbstractAuxiliaryContractImpl(final String baseName, final StatementBlock block,
             final List<Label> labels, final IProgramMethod method, final Modality modality,
@@ -290,6 +248,50 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 = (this.variables.self != null ? services.getTermBuilder().var(this.variables.self)
                         : null);
         return variables.termify(selfTerm);
+    }
+
+    /**
+     * Replaces variables in a map of terms
+     *
+     * @param term a term.
+     * @param variables replacements for {@link #getVariables()}
+     * @param services services.
+     * @return the term with every occurrence of a variable from {@link #getVariables()} replaced.
+     */
+    public Term getTerm(
+            final Term term,
+            final Variables variables,
+            final Services services) {
+        assert variables != null;
+        assert (variables.self == null) == (this.variables.self == null);
+        assert services != null;
+
+        final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services),
+                services.getTermFactory());
+        return replacer.replace(term);
+    }
+
+    /**
+     * Replaces variables in a map of terms
+     *
+     * @param term a term.
+     * @param heap the replacement heap
+     * @param terms replacements for {@link #getVariables()}
+     * @param services services.
+     * @return the term with every occurrence of a variable from {@link #getVariables()} replaced.
+     */
+    public Term getTerm(
+            final Term term,
+            final Term heap,
+            final Terms terms,
+            final Services services) {
+        assert terms != null;
+        assert (terms.self == null) == (this.variables.self == null);
+        assert services != null;
+
+        final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services),
+                services.getTermFactory());
+        return replacer.replace(term);
     }
 
     @Override

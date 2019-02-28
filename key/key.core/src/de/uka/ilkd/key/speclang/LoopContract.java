@@ -176,7 +176,7 @@ public interface LoopContract extends AuxiliaryContract {
     public LoopContract setBlock(StatementBlock newBlock);
 
     /**
-     * @param newBlock
+     * @param newLoop
      *            the new loop.
      * @return a new loop contract equal to this one except that it belongs to a different loop.
      */

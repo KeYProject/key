@@ -80,6 +80,11 @@ public final class MiscTools {
     /**
      * Returns the receiver term of the passed method frame, or null if the frame belongs to a
      * static method.
+     *
+     * @param mf a method frame.
+     * @param services services.
+     * @return the receiver term of the passed method frame, or null if the frame belongs to a
+     * static method.
      */
     public static Term getSelfTerm(MethodFrame mf, Services services) {
         ExecutionContext ec = (ExecutionContext) mf.getExecutionContext();
@@ -91,6 +96,14 @@ public final class MiscTools {
         }
     }
 
+    /**
+     * All variables read in the specified program element, excluding newly declared variables.
+     *
+     * @param pe a program element.
+     * @param services services.
+     * @return all variables read in the specified program element,
+     *  excluding newly declared variables.
+     */
     public static ImmutableSet<ProgramVariable> getLocalIns(ProgramElement pe,
             Services services) {
         final ReadPVCollector rpvc = new ReadPVCollector(pe, services);
@@ -98,6 +111,14 @@ public final class MiscTools {
         return rpvc.result();
     }
 
+    /**
+     * All variables changed in the specified program element, excluding newly declared variables.
+     *
+     * @param pe a program element.
+     * @param services services.
+     * @return all variables changed in the specified program element,
+     *  excluding newly declared variables.
+     */
     public static ImmutableSet<ProgramVariable> getLocalOuts(
             ProgramElement pe,
             Services services) {
@@ -106,6 +127,14 @@ public final class MiscTools {
         return wpvc.getWrittenPVs();
     }
 
+    /**
+     * All variables changed in the specified program element, including newly declared variables.
+     *
+     * @param pe a program element.
+     * @param services services.
+     * @return all variables changed in the specified program element,
+     *  including newly declared variables.
+     */
     public static ImmutableSet<ProgramVariable> getLocalOutsAndDeclared(
             ProgramElement pe,
             Services services) {
@@ -114,6 +143,13 @@ public final class MiscTools {
         return wpvc.getWrittenPVs().union(wpvc.getDeclaredPVs());
     }
 
+    /**
+     * All variables newly declared in the specified program element.
+     *
+     * @param pe a program element.
+     * @param services services.
+     * @return all variables newly declared in the specified program element.
+     */
     public static ImmutableSet<ProgramVariable> getLocallyDeclaredVars(
             ProgramElement pe,
             Services services) {
@@ -137,9 +173,15 @@ public final class MiscTools {
         return result;
     }
 
+
     /**
-     * True if both are <code>null</code> or <code>a.equals(b)</code> with <code>equals</code> from
-     * type T.
+     * {@code true} iff both are <code>null</code> or <code>a.equals(b)</code>
+     * with <code>equals</code> from type T.
+     *
+     * @param a an object.
+     * @param b another object.
+     * @return {@code true} iff both are <code>null</code> or <code>a.equals(b)</code>
+     *  with <code>equals</code> from type T.
      */
     public static <T> boolean equalsOrNull(T a, Object b) {
         if (a == null) {
@@ -149,6 +191,15 @@ public final class MiscTools {
         }
     }
 
+    /**
+     * {@code true} iff all are <code>null</code> or <code>a.equals(b)</code>
+     * with <code>equals</code> from type T for every {@code b}.
+     *
+     * @param a an object.
+     * @param bs other object.
+     * @return {@code true} iff all are <code>null</code> or <code>a.equals(b)</code>
+     *  with <code>equals</code> from type T for every {@code b}.
+     */
     public static <T> boolean equalsOrNull(T a, Object... bs) {
         boolean result = true;
         for (Object b : bs) {
@@ -162,8 +213,11 @@ public final class MiscTools {
     // =======================================================
 
     /**
-     * Concatenates two arrays. The second array may have an entry type that is a subtype of the
-     * first one.
+     * Concatenates two arrays.
+     *
+     * @param s1 an array.
+     * @param s2 another array.
+     * @return the concatenation of both arrays.
      */
     public static <S, T extends S> S[] concat(S[] s1, T[] s2) {
         S[] res = Arrays.copyOf(s1, s1.length + s2.length);
@@ -181,6 +235,10 @@ public final class MiscTools {
      * Combine two maps by function application. Values of <code>m0</code> which are not keys of
      * <code>m1</code> are dropped. This implementation tries to use the same implementation of
      * {@link java.util.Map} (provided in Java SE) as <code>m0</code>.
+     *
+     * @param m0 a map.
+     * @param m1 another map.
+     * @return the combination of both maps.
      */
     public static <S, T, U> Map<S, U> apply(Map<S, ? extends T> m0, Map<T, U> m1) {
         Map<S, U> res = null;
@@ -218,6 +276,9 @@ public final class MiscTools {
      * "/home//daniel/./key/" yields {"","home","daniel","key"}. Tries to automatically detect UNIX
      * or Windows directory delimiters. There is no check whether all other characters are valid for
      * filenames.
+     *
+     * @param filename a file name.
+     * @return all directory entries in the file name.
      */
     static List<String> disectFilename(String filename) {
         final char sep = File.separatorChar;
@@ -261,10 +322,14 @@ public final class MiscTools {
 
     /**
      * Returns a filename relative to another one. The second parameter needs to be absolute and is
-     * expected to refer to directory This method only operates on Strings, not on real files! Note
+     * expected to refer to a directory. This method only operates on Strings, not on real files! Note
      * that it treats Strings case-sensitive. The resulting filename always uses UNIX directory
      * delimiters. Raises a RuntimeException if no relative path could be found (may happen on
      * Windows systems).
+     *
+     * @param origFilename a filename.
+     * @param toFilename the name of a parent directory of {@code origFilename}.
+     * @return {@code origFilename} relative to {@code toFilename}
      */
     public static String makeFilenameRelative(String origFilename, String toFilename) {
         final List<String> origFileNameSections = disectFilename(origFilename);

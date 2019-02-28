@@ -65,7 +65,17 @@ public class FunctionalLoopContract extends FunctionalAuxiliaryContract<LoopCont
         return new FunctionalLoopContract(getAuxiliaryContract().setTarget(newKJT, newPM), id());
     }
 
+    /**
+     * Replaces {@code \index} and {@code \values} with the proper variables in all terms of this
+     * contract.
+     *
+     * @param services services.
+     *
+     * @see LoopContract#replaceEnhancedForVariables(de.uka.ilkd.key.java.StatementBlock, Services)
+     */
     public void replaceEnhancedForVariables(Services services) {
-        contract = contract.replaceEnhancedForVariables(contract.getBlock(), services);
+        setAuxiliaryContract(
+                getAuxiliaryContract().replaceEnhancedForVariables(
+                        getAuxiliaryContract().getBlock(), services));
     }
 }

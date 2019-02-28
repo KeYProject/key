@@ -1099,7 +1099,8 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @see Variables#outerRemembranceVariables
          */
         private Map<LocationVariable, LocationVariable> createOuterRemembranceLocalVariables() {
-            ImmutableSet<ProgramVariable> localInVariables = MiscTools.getLocalIns(statement, services);
+            ImmutableSet<ProgramVariable> localInVariables =
+                    MiscTools.getLocalIns(statement, services);
 
             SourceElement first;
 
@@ -1119,7 +1120,8 @@ public interface AuxiliaryContract extends SpecificationElement {
 
                     for (LocationVariable var : collector.result()) {
                         if (!var.getKeYJavaType().equals(
-                                services.getTypeConverter().getHeapLDT().getHeap().getKeYJavaType())) {
+                                services.getTypeConverter().getHeapLDT()
+                                    .getHeap().getKeYJavaType())) {
                             localInVariables = localInVariables.add(var);
                         }
                     }

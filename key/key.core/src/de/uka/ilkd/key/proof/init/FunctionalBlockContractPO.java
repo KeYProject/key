@@ -29,8 +29,8 @@ import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.BlockContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.VariablesCreatorAndRegistrar;
-import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalBlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -438,7 +438,8 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
         final Term validity = setUpValidityTerm(heaps, anonHeaps, anonOutHeaps, localInVariables,
                 localOutVariables, exceptionParameter, assumptions, postconditions, updates,
-                contract.getAuxiliaryContract(), conditionsAndClausesBuilder, configurator, services,
+                contract.getAuxiliaryContract(),
+                conditionsAndClausesBuilder, configurator, services,
                 tb);
         assignPOTerms(validity);
 

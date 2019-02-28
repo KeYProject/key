@@ -43,8 +43,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
@@ -158,17 +158,20 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             if (statement instanceof StatementBlock) {
                 StatementBlock block = (StatementBlock) statement;
 
-                for (BlockContract c : services.getSpecificationRepository().getBlockContracts(block)) {
+                for (BlockContract c
+                        : services.getSpecificationRepository().getBlockContracts(block)) {
                     contracts = contracts.add(c);
                 }
 
-                for (LoopContract c : services.getSpecificationRepository().getLoopContracts(block)) {
+                for (LoopContract c
+                        : services.getSpecificationRepository().getLoopContracts(block)) {
                     contracts = contracts.add(c);
                 }
             } else {
                 LoopStatement loop = (LoopStatement) statement;
 
-                for (LoopContract c : services.getSpecificationRepository().getLoopContracts(loop)) {
+                for (LoopContract c
+                        : services.getSpecificationRepository().getLoopContracts(loop)) {
                     contracts = contracts.add(c);
                 }
             }

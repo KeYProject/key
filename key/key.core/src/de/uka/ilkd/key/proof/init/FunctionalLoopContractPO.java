@@ -29,8 +29,8 @@ import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.BlockContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.VariablesCreatorAndRegistrar;
-import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalLoopContract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -298,9 +298,11 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     private Term[] createPostconditionsNext(final Term selfTerm, final List<LocationVariable> heaps,
             final LoopContract.Variables nextVariables,
             final Map<LocationVariable, Term> modifiesClauses, final Services services) {
-        final Term nextPostcondition = new ConditionsAndClausesBuilder(contract.getAuxiliaryContract(),
+        final Term nextPostcondition =
+                new ConditionsAndClausesBuilder(contract.getAuxiliaryContract(),
                 heaps, nextVariables, selfTerm, services).buildPostcondition();
-        final Term nextFrameCondition = new ConditionsAndClausesBuilder(contract.getAuxiliaryContract(),
+        final Term nextFrameCondition =
+                new ConditionsAndClausesBuilder(contract.getAuxiliaryContract(),
                 heaps, nextVariables, selfTerm, services).buildFrameCondition(modifiesClauses);
         return new Term[] { nextPostcondition, nextFrameCondition };
     }

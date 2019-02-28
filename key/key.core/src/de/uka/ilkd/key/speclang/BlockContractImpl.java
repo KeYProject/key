@@ -45,6 +45,9 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
         implements BlockContract {
 
+    /**
+     * @see #toLoopContract()
+     */
     private LoopContract loopContract = null;
 
     /**
@@ -76,7 +79,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
      * @param hasMod
      *            a map specifying on which heaps this contract has a modified clause.
      * @param functionalContracts
-     *            the functional loop contracts corresponding to this contract.
+     *            the functional contracts corresponding to this contract.
      */
     public BlockContractImpl(final String baseName, final StatementBlock block,
             final List<Label> labels, final IProgramMethod method, final Modality modality,
@@ -87,7 +90,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
             ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts) {
         super(baseName, block, labels, method, modality, preconditions, measuredBy, postconditions,
-                modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod, functionalContracts);
+                modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod,
+                functionalContracts);
     }
 
     /**
@@ -103,6 +107,11 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 .combine();
     }
 
+    /**
+     *
+     * @param loopContract the loop contract from which this block contract was created.
+     * @see #toLoopContract()
+     */
     void setLoopContract(LoopContract loopContract) {
         if (this.loopContract != null) {
             throw new IllegalStateException();
