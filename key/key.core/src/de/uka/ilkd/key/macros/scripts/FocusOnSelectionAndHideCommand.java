@@ -81,7 +81,7 @@ public class FocusOnSelectionAndHideCommand
             throws ParserException, ScriptException {
         while (true) {
             //get current goal
-            Goal g = state.getFirstOpenGoal();
+            Goal g = state.getFirstOpenAutomaticGoal();
             //find formulas that should be hidden in sequent of current goal
 
             //hide

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -20,13 +21,18 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.Varargs;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -63,91 +69,169 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Parameters args,
             EngineState state) throws ScriptException, InterruptedException {
-        Proof proof = state.getProof();
-        TacletApp theApp = makeTacletApp(args, state);
+        final RuleApp theApp = makeRuleApp(args, state);
         assert theApp != null;
 
-        ImmutableList<TacletApp> assumesCandidates = theApp
-                .findIfFormulaInstantiations(state.getFirstOpenGoal().sequent(),
-                        proof.getServices());
-
-        if (assumesCandidates.size() != 1) {
-            throw new ScriptException("Not a unique \\assumes instantiation");
-        }
-
-        theApp = assumesCandidates.head();
-
-        {
-            /*
-             * (DS, 2019-01-31): Try to instantiate first, otherwise, we cannot
-             * apply taclets with "\newPV", Skolem terms etc.
-             */
-            final TacletApp maybeInstApp = theApp
-                    .tryToInstantiate(proof.getServices().getOverlay(
-                            state.getFirstOpenGoal().getLocalNamespaces()));
-
-            if (maybeInstApp != null) {
-                theApp = maybeInstApp;
-            }
-        }
-
-        for (SchemaVariable sv : theApp.uninstantiatedVars()) {
-            if (theApp.isInstantiationRequired(sv)) {
-                Term inst = args.instantiations.get(sv.name().toString());
-                if (inst == null) {
-                    throw new ScriptException(
-                            "missing instantiation for " + sv);
-                }
-                theApp = theApp.addInstantiation(sv, inst, true,
-                        proof.getServices());
-            }
-        }
-
-        // try to instantiate remaining symbols
-        theApp = theApp.tryToInstantiate(proof.getServices()
-                .getOverlay(state.getFirstOpenGoal().getLocalNamespaces()));
-
-        if (theApp == null) {
-            throw new ScriptException("Cannot instantiate this rule");
-        }
-
-        Goal g = state.getFirstOpenGoal();
+        Goal g = state.getFirstOpenAutomaticGoal();
         g.apply(theApp);
     }
 
-    private TacletApp makeTacletApp(Parameters p, EngineState state)
+    private RuleApp makeRuleApp(Parameters p, EngineState state)
             throws ScriptException {
 
-        Proof proof = state.getProof();
-        Taclet taclet = proof.getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(new Name(p.rulename));
+        final Proof proof = state.getProof();
+        final Optional<BuiltInRule> maybeBuiltInRule = proof.getInitConfig()
+                .getProfile().getStandardRules().getStandardBuiltInRules()
+                .stream().filter(r -> r.name().toString().equals(p.rulename))
+                .findAny();
 
-        if (taclet == null) {
+        final Optional<Taclet> maybeTaclet = Optional
+                .ofNullable(proof.getEnv().getInitConfigForEnvironment()
+                        .lookupActiveTaclet(new Name(p.rulename)));
+
+        if (!maybeBuiltInRule.isPresent() && !maybeTaclet.isPresent()) {
             /*
              * (DS, 2019-01-31): Might be a locally introduced taclet, e.g., by
              * hide_left etc.
              */
-            final Optional<TacletApp> maybeApp = Optional.ofNullable(state
-                    .getFirstOpenGoal().indexOfTaclets().lookup(p.rulename));
+            final Optional<TacletApp> maybeApp = Optional
+                    .ofNullable(state.getFirstOpenAutomaticGoal()
+                            .indexOfTaclets().lookup(p.rulename));
 
             return maybeApp.orElseThrow(() -> new ScriptException(
                     "Taclet '" + p.rulename + "' not known."));
         }
 
-        if (taclet instanceof NoFindTaclet) {
-            return makeNoFindTacletApp(taclet);
-        } else {
-            return findTacletApp(p, state);
-        }
+        if (maybeTaclet.isPresent()) {
+            TacletApp theApp;
+            if (maybeTaclet.get() instanceof NoFindTaclet) {
+                theApp = makeNoFindTacletApp(maybeTaclet.get());
+            } else {
+                theApp = findTacletApp(p, state);
+            }
 
+            return instantiateTacletApp(p, state, proof, theApp);
+        } else {
+            IBuiltInRuleApp builtInRuleApp = //
+                    builtInRuleApp(p, state, maybeBuiltInRule.get());
+            if (builtInRuleApp.isSufficientlyComplete()) {
+                builtInRuleApp = builtInRuleApp
+                        .forceInstantiate(state.getFirstOpenAutomaticGoal());
+            }
+            return builtInRuleApp;
+        }
     }
 
-    private TacletApp makeNoFindTacletApp(
-            Taclet taclet/*
-                          * , Parameters p, EngineState state
-                          */) {
+    private TacletApp instantiateTacletApp(final Parameters p,
+            final EngineState state, final Proof proof, final TacletApp theApp)
+            throws ScriptException {
+        TacletApp result = theApp;
+
+        final Services services = proof.getServices();
+        final ImmutableList<TacletApp> assumesCandidates = theApp
+                .findIfFormulaInstantiations(
+                        state.getFirstOpenAutomaticGoal().sequent(), services);
+
+        if (assumesCandidates.size() != 1) {
+            throw new ScriptException("Not a unique \\assumes instantiation");
+        }
+
+        result = assumesCandidates.head();
+
+        /*
+         * NOTE (DS, 2019-02-22): If we change something by instantiating the
+         * app as much as possible, it might happen that the match conditions
+         * (those which are not really conditions, but which change the
+         * instantiations based on others that are yet to be added) have to be
+         * evaluated again, since the second call to tryToInstantiate won't do
+         * this if everything already has been instantiated. That's a little sad
+         * and a border case, but I had that problem.
+         */
+        boolean recheckMatchConditions;
+        {
+            /*
+             * (DS, 2019-01-31): Try to instantiate first, otherwise, we cannot
+             * apply taclets with "\newPV", Skolem terms etc.
+             */
+            final TacletApp maybeInstApp = result
+                    .tryToInstantiateAsMuchAsPossible(services.getOverlay(state
+                            .getFirstOpenAutomaticGoal().getLocalNamespaces()));
+
+            if (maybeInstApp != null) {
+                result = maybeInstApp;
+                recheckMatchConditions = true;
+            } else {
+                recheckMatchConditions = false;
+            }
+        }
+
+        recheckMatchConditions &= !result.uninstantiatedVars().isEmpty();
+
+        for (SchemaVariable sv : result.uninstantiatedVars()) {
+            if (result.isInstantiationRequired(sv)) {
+                Term inst = p.instantiations.get(sv.name().toString());
+                if (inst == null) {
+                    throw new ScriptException(
+                            "missing instantiation for " + sv);
+                }
+
+                result = result.addInstantiation(sv, inst, true, services);
+            }
+        }
+
+        // try to instantiate remaining symbols
+        result = result.tryToInstantiate(services.getOverlay(
+                state.getFirstOpenAutomaticGoal().getLocalNamespaces()));
+
+        if (result == null) {
+            throw new ScriptException("Cannot instantiate this rule");
+        }
+
+        if (recheckMatchConditions) {
+            final MatchConditions appMC = result.taclet().getMatcher()
+                    .checkConditions(result.matchConditions(), services);
+            if (appMC == null) {
+                return null;
+            } else {
+                result = result.setMatchConditions(appMC, services);
+            }
+        }
+
+        return result;
+    }
+
+    private TacletApp makeNoFindTacletApp(Taclet taclet) {
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(taclet);
         return app;
+    }
+
+    private IBuiltInRuleApp builtInRuleApp(Parameters p, EngineState state,
+            BuiltInRule rule) throws ScriptException {
+        final List<IBuiltInRuleApp> matchingApps = //
+                findBuiltInRuleApps(p, state).stream()
+                        .filter(r -> r.rule().name().equals(rule.name()))
+                        .collect(Collectors.toList());
+
+        if (matchingApps.isEmpty()) {
+            throw new ScriptException("No matching applications.");
+        }
+
+        if (p.occ < 0) {
+            if (matchingApps.size() > 1) {
+                throw new ScriptException(
+                        "More than one applicable occurrence");
+            }
+
+            return matchingApps.get(0);
+        } else {
+            if (p.occ >= matchingApps.size()) {
+                throw new ScriptException("Occurence " + p.occ
+                        + " has been specified, but there are only "
+                        + matchingApps.size() + " hits.");
+            }
+
+            return matchingApps.get(p.occ);
+        }
     }
 
     private TacletApp findTacletApp(Parameters p, EngineState state)
@@ -176,12 +260,43 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         }
     }
 
+    private ImmutableList<IBuiltInRuleApp> findBuiltInRuleApps(Parameters p,
+            EngineState state) throws ScriptException {
+        final Services services = state.getProof().getServices();
+        assert services != null;
+
+        final Goal g = state.getFirstOpenAutomaticGoal();
+        final BuiltInRuleAppIndex index = g.ruleAppIndex()
+                .builtInRuleAppIndex();
+
+        ImmutableList<IBuiltInRuleApp> allApps = ImmutableSLList.nil();
+        for (SequentFormula sf : g.node().sequent().antecedent()) {
+            if (!isFormulaSearchedFor(p, sf, services)) {
+                continue;
+            }
+
+            allApps = allApps.append(index.getBuiltInRule(g,
+                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)));
+        }
+
+        for (SequentFormula sf : g.node().sequent().succedent()) {
+            if (!isFormulaSearchedFor(p, sf, services)) {
+                continue;
+            }
+
+            allApps = allApps.append(index.getBuiltInRule(g,
+                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
+        }
+
+        return allApps;
+    }
+
     private ImmutableList<TacletApp> findAllTacletApps(Parameters p,
             EngineState state) throws ScriptException {
         Services services = state.getProof().getServices();
         assert services != null;
         TacletFilter filter = new TacletNameFilter(p.rulename);
-        Goal g = state.getFirstOpenGoal();
+        Goal g = state.getFirstOpenAutomaticGoal();
         RuleAppIndex index = g.ruleAppIndex();
         index.autoModeStopped();
 

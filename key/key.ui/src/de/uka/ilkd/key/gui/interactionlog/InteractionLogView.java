@@ -14,7 +14,6 @@ import de.uka.ilkd.key.gui.interactionlog.algo.Reapplication;
 import de.uka.ilkd.key.gui.interactionlog.model.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import sun.swing.DefaultLookup;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -703,10 +702,10 @@ class InteractionCellRenderer extends JPanel implements ListCellRenderer<Interac
         Border border = null;
         if (cellHasFocus) {
             if (isSelected) {
-                border = DefaultLookup.getBorder(this, ui, "List.focusSelectedCellHighlightBorder");
+                border = UIManager.getDefaults().getBorder("List.focusSelectedCellHighlightBorder");
             }
             if (border == null) {
-                border = DefaultLookup.getBorder(this, ui, "List.focusCellHighlightBorder");
+                border = UIManager.getDefaults().getBorder("List.focusCellHighlightBorder");
             }
         } else {
         }

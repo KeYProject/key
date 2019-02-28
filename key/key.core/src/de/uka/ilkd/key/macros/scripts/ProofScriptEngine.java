@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Observer;
+import java.util.Optional;
 import java.util.ServiceLoader;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
@@ -20,6 +21,7 @@ import de.uka.ilkd.key.proof.Proof;
  * @author Alexander Weigl
  */
 public class ProofScriptEngine {
+    private static final String SYSTEM_COMMAND_PREFIX = "@";
     private static final int MAX_CHARS_PER_COMMAND = 80;
     private static final Map<String, ProofScriptCommand> COMMANDS = loadCommands();
 
@@ -51,8 +53,7 @@ public class ProofScriptEngine {
     }
 
     @SuppressWarnings("unchecked")
-    public void execute(
-            AbstractUserInterfaceControl uiControl, Proof proof)
+    public void execute(AbstractUserInterfaceControl uiControl, Proof proof)
             throws IOException, InterruptedException, ScriptException {
 
         ScriptLineParser mlp = new ScriptLineParser(new StringReader(script));
@@ -88,7 +89,9 @@ public class ProofScriptEngine {
                 cmd = cmd.substring(0, MAX_CHARS_PER_COMMAND) + " ...'";
             }
 
-            if (commandMonitor != null) {
+            if (commandMonitor != null && stateMap.isEchoOn() && !Optional
+                    .ofNullable(argMap.get(ScriptLineParser.COMMAND_KEY))
+                    .orElse("").startsWith(SYSTEM_COMMAND_PREFIX)) {
                 commandMonitor.update(null, cmd);
             }
 
@@ -103,11 +106,14 @@ public class ProofScriptEngine {
                     throw new ScriptException("Unknown command " + name);
                 }
 
-                System.out.format("%5d: %s%n", ++cnt, cmd);
-                //write("/tmp/weiglProofScripts_%d.txt", cnt, proof);
+                if (!name.startsWith(SYSTEM_COMMAND_PREFIX)
+                        && stateMap.isEchoOn()) {
+                    System.out.format("%5d: %s%n", ++cnt, cmd);
+                }
+                // write("/tmp/weiglProofScripts_%d.txt", cnt, proof);
 
                 Object o = command.evaluateArguments(stateMap, argMap);
-                final Node firstNode = stateMap.getFirstOpenGoal().node();
+                final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
                 command.execute(uiControl, o, stateMap);
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
             } catch (InterruptedException ie) {
@@ -125,8 +131,8 @@ public class ProofScriptEngine {
 
                 throw new ScriptException(
                         "Error while executing script: " + e.getMessage()
-                                + "\n\nCommand:" + argMap
-                                .get(ScriptLineParser.LITERAL_KEY),
+                                + "\n\nCommand: "
+                                + argMap.get(ScriptLineParser.LITERAL_KEY),
                         initialLocation.getFilename(), mlp.getLine(),
                         mlp.getColumn(), e);
             }
@@ -145,11 +151,10 @@ public class ProofScriptEngine {
      * Set the routine that is executed before every successfully executed
      * command.
      *
-     * @param monitor the monitor to set
+     * @param monitor
+     *            the monitor to set
      */
     public void setCommandMonitor(Observer monitor) {
         this.commandMonitor = monitor;
     }
 }
-
-
