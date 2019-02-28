@@ -279,6 +279,18 @@ public interface BlockSpecificationElement extends SpecificationElement {
      *
      * @param heap
      *            the heap to use.
+     * @param variables
+     *            the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *            services.
+     * @return this contract's modifies clause on the specified heap.
+     */
+    Term getModifiesClause(LocationVariable heap, Variables variables, Services services);
+
+    /**
+     *
+     * @param heap
+     *            the heap to use.
      * @param services
      *            services.
      * @return this contract's modifies clause on the specified heap.
@@ -1020,7 +1032,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
             final Map<LocationVariable, LocationVariable> result
                     = new LinkedHashMap<LocationVariable, LocationVariable>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                result.put(heap, heapAtPreVar(heap + suffix, heap.sort(), false));
+                result.put(heap, heapAtPreVar(heap + suffix, heap.sort(), true));
             }
             return result;
         }

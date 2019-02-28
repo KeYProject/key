@@ -114,6 +114,50 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
     protected ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts;
 
     /**
+     * Replaces variables in a map of terms
+     *
+     * @param term a term.
+     * @param variables replacements for {@link #getVariables()}
+     * @param services services.
+     * @return the term with every occurrence of a variable from {@link #getVariables()} replaced.
+     */
+    public Term getTerm(
+            final Term term,
+            final Variables variables,
+            final Services services) {
+        assert variables != null;
+        assert (variables.self == null) == (this.variables.self == null);
+        assert services != null;
+
+        final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services),
+                services.getTermFactory());
+        return replacer.replace(term);
+    }
+
+    /**
+     * Replaces variables in a map of terms
+     *
+     * @param term a term.
+     * @param the replacement heap
+     * @param terms replacements for {@link #getVariables()}
+     * @param services services.
+     * @return the term with every occurrence of a variable from {@link #getVariables()} replaced.
+     */
+    public Term getTerm(
+            final Term term,
+            final Term heap,
+            final Terms terms,
+            final Services services) {
+        assert terms != null;
+        assert (terms.self == null) == (this.variables.self == null);
+        assert services != null;
+
+        final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services),
+                services.getTermFactory());
+        return replacer.replace(term);
+    }
+
+    /**
      *
      * @param baseName
      *            the base name.
@@ -254,56 +298,46 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
 
     @Override
     public Term getMby(Variables variables, Services services) {
-        Map<ProgramVariable, ProgramVariable> map = createReplacementMap(variables, services);
-        return new OpReplacer(map, services.getTermFactory()).replace(measuredBy);
+        return getTerm(measuredBy, variables, services);
     }
 
     @Override
     public Term getMby(ProgramVariable selfVar, Services services) {
-        final Map<ProgramVariable, ProgramVariable> replacementMap
-                = createReplacementMap(new Variables(selfVar, null, null, null, null, null, null,
-                        null, null, null, services), services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
-        return replacer.replace(measuredBy);
+        return getTerm(
+                measuredBy,
+                new Variables(selfVar, null, null, null, null, null, null,
+                        null, null, null, services),
+                services);
     }
 
     @Override
     public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
             Map<LocationVariable, Term> atPres, Services services) {
-        final Map<Term,
-                Term> replacementMap = createReplacementMap(null,
-                        new Terms(selfTerm, null, null, null, null, null, null, null, null, atPres),
-                        services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
-        return replacer.replace(measuredBy);
+        return getTerm(
+                measuredBy,
+                null,
+                new Terms(selfTerm, null, null, null, null, null, null, null, null, atPres),
+                services);
     }
 
     @Override
     public Term getPrecondition(final LocationVariable heap, final ProgramVariable self,
             final Map<LocationVariable, LocationVariable> atPres, final Services services) {
-        assert heap != null;
-        assert (self == null) == (variables.self == null);
-        assert atPres != null;
-        assert services != null;
-        final Map<ProgramVariable, ProgramVariable> replacementMap
-                = createReplacementMap(new Variables(self, null, null, null, null, null, null, null,
-                        null, atPres, services), services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
-        return replacer.replace(preconditions.get(heap));
+        return getTerm(
+                preconditions.get(heap),
+                new Variables(
+                        self, null, null, null, null, null, null, null, null, atPres, services),
+                services);
     }
 
     @Override
     public Term getPrecondition(final LocationVariable heapVariable, final Term heap,
             final Term self, final Map<LocationVariable, Term> atPres, final Services services) {
-        assert heapVariable != null;
-        assert heap != null;
-        assert (self == null) == (variables.self == null);
-        assert atPres != null;
-        assert services != null;
-        final Map<Term, Term> replacementMap = createReplacementMap(heap,
-                new Terms(self, null, null, null, null, null, null, null, null, atPres), services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
-        return replacer.replace(preconditions.get(heapVariable));
+        return getTerm(
+                preconditions.get(heapVariable),
+                heap,
+                new Terms(self, null, null, null, null, null, null, null, null, atPres),
+                services);
     }
 
     @Override
@@ -313,51 +347,25 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
 
     @Override
     public Term getPrecondition(LocationVariable heap, Variables variables, Services services) {
-        assert heap != null;
-        assert variables != null;
-        assert (variables.self == null) == (this.variables.self == null);
-        assert services != null;
-        final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services),
-                services.getTermFactory());
-        return replacer.replace(preconditions.get(heap));
+        return getTerm(preconditions.get(heap), variables, services);
     }
 
     @Override
     public Term getPrecondition(LocationVariable heapVariable, Term heap, Terms terms,
             Services services) {
-        assert heapVariable != null;
-        assert heap != null;
-        assert terms != null;
-        assert (terms.self == null) == (variables.self == null);
-        assert services != null;
-        final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services),
-                services.getTermFactory());
-        return replacer.replace(preconditions.get(heapVariable));
+        return getTerm(preconditions.get(heapVariable), heap, terms, services);
     }
 
     @Override
     public Term getPostcondition(final LocationVariable heap, final Variables variables,
             final Services services) {
-        assert heap != null;
-        assert variables != null;
-        assert (variables.self == null) == (this.variables.self == null);
-        assert services != null;
-        final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services),
-                services.getTermFactory());
-        return replacer.replace(postconditions.get(heap));
+        return getTerm(postconditions.get(heap), variables, services);
     }
 
     @Override
     public Term getPostcondition(final LocationVariable heapVariable, final Term heap,
             final Terms terms, final Services services) {
-        assert heapVariable != null;
-        assert heap != null;
-        assert terms != null;
-        assert (terms.self == null) == (variables.self == null);
-        assert services != null;
-        final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services),
-                services.getTermFactory());
-        return replacer.replace(postconditions.get(heapVariable));
+        return getTerm(postconditions.get(heapVariable), heap, terms, services);
     }
 
     @Override
@@ -368,27 +376,26 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
     @Override
     public Term getModifiesClause(final LocationVariable heap, final ProgramVariable self,
             final Services services) {
-        assert heap != null;
-        assert (self == null) == (variables.self == null);
-        assert services != null;
-        final Map<ProgramVariable, ProgramVariable> replacementMap = createReplacementMap(
+        return getTerm(
+                modifiesClauses.get(heap),
                 new Variables(self, null, null, null, null, null, null, null, null, null, services),
                 services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
-        return replacer.replace(modifiesClauses.get(heap));
     }
 
     @Override
     public Term getModifiesClause(final LocationVariable heapVariable, final Term heap,
             final Term self, final Services services) {
-        assert heapVariable != null;
-        assert heap != null;
-        assert (self == null) == (variables.self == null);
-        assert services != null;
-        final Map<Term, Term> replacementMap = createReplacementMap(heap,
-                new Terms(self, null, null, null, null, null, null, null, null, null), services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
-        return replacer.replace(modifiesClauses.get(heapVariable));
+        return getTerm(
+                modifiesClauses.get(heapVariable),
+                heap,
+                new Terms(self, null, null, null, null, null, null, null, null, null),
+                services);
+    }
+
+    @Override
+    public Term getModifiesClause(
+            final LocationVariable heap, final Variables variables, final Services services) {
+        return getTerm(modifiesClauses.get(heap), variables, services);
     }
 
     @Override

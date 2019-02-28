@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -35,21 +34,17 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.metaconstruct.EnhancedForElimination;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
-import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Default implementation for {@link LoopContract}.
@@ -504,9 +499,11 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
 
         Map<LocationVariable, Term> pre;
         Map<LocationVariable, Term> post;
+        Map<LocationVariable, Term> modifies;
         if (head == null) {
             pre = r.preconditions;
             post = r.postconditions;
+            modifies = r.modifiesClauses;
         } else {
             Map<Term, Term> preReplacementMap = new HashMap<>();
             Map<Term, Term> postReplacementMap = new HashMap<>();
@@ -539,22 +536,25 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             OpReplacer postReplacer = new OpReplacer(postReplacementMap, services.getTermFactory());
             pre = new HashMap<>();
             post = new HashMap<>();
+            modifies = new HashMap<>();
 
             for (LocationVariable heap : r.preconditions.keySet()) {
-                pre.put(heap, weakenFormula(
-                        preReplacer.replace(r.preconditions.get(heap)),
-                        MiscTools.getLocalOutsAndDeclared(head, services)));
+                pre.put(heap, preReplacer.replace(r.preconditions.get(heap)));
             }
 
             for (LocationVariable heap : r.postconditions.keySet()) {
                 post.put(heap, postReplacer.replace(r.postconditions.get(heap)));
+            }
+
+            for (LocationVariable heap : r.modifiesClauses.keySet()) {
+                modifies.put(heap, preReplacer.replace(r.modifiesClauses.get(heap)));
             }
         }
 
         if (blockContract == null) {
             blockContract = new SimpleBlockContract(
                     r.baseName, headAndBlock, r.labels, r.method, r.modality,
-                    pre, r.measuredBy, post, r.modifiesClauses,
+                    pre, r.measuredBy, post, modifies,
                 r.infFlowSpecs, r.variables, r.transactionApplicable, r.hasMod,
                 functionalContracts);
             ((SimpleBlockContract) blockContract).setLoopContract(this);
@@ -667,7 +667,15 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
         }
 
         if (index == null && values == null) {
-            replacedEnhancedForVars = (SimpleLoopContract) setBlock(newBlock);
+            replacedEnhancedForVars = (SimpleLoopContract) update(
+                    newBlock,
+                    preconditions,
+                    postconditions,
+                    modifiesClauses,
+                    infFlowSpecs,
+                    variables,
+                    measuredBy,
+                    decreases);
         } else {
             final Map<SVSubstitute, SVSubstitute> replacementMap = new HashMap<>();
 
@@ -693,8 +701,8 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             final Map<LocationVariable, Term> newModifiesClauses
                 = new LinkedHashMap<LocationVariable, Term>();
 
-            final Term newMeasuredBy = replacer.replace(getMby());
-            final Term newDecreases = replacer.replace(getDecreases());
+            final Term newMeasuredBy = replacer.replace(measuredBy);
+            final Term newDecreases = replacer.replace(decreases);
 
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                     .getAllHeaps()) {
@@ -715,8 +723,8 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
                     newPreconditions,
                     newPostconditions,
                     newModifiesClauses,
-                    getInfFlowSpecs(),
-                    getVariables(),
+                    infFlowSpecs,
+                    variables,
                     newMeasuredBy,
                     newDecreases);
 
@@ -799,73 +807,6 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
                 + ", modifiesClauses=" + modifiesClauses + ", infFlowSpecs=" + infFlowSpecs
                 + ", variables=" + variables + ", transactionApplicable=" + transactionApplicable
                 + ", hasMod=" + hasMod + "]";
-    }
-
-    /**
-     * <p> Weakens a formula by setting all atomic sub-formulas that contain a variable
-     * from a specified set to {@code true}. </p>
-     *
-     * @param term the formula to weaken.
-     * @param vars the variables to remove from the formula.
-     * @return the weakened formula.
-     * @see #toBlockContract()
-     */
-    private Term weakenFormula(Term term, ImmutableSet<ProgramVariable> vars) {
-        return weakenFormula(term, vars, false);
-    }
-
-    private Term weakenFormula(Term term, ImmutableSet<ProgramVariable> vars, boolean propagate) {
-        if (term == null) {
-            return null;
-        }
-
-        final TermFactory tf = services.getTermFactory();
-
-        if (!propagate && term.op() != Junctor.AND) {
-            propagate = true;
-        }
-
-        if (term.sort() == Sort.FORMULA) {
-            List<Term> subs = new ArrayList<>();
-            for (Term sub : term.subs()) {
-                Term newSub = weakenFormula(sub, vars);
-                if (newSub == null) {
-                    if (propagate) {
-                        return null;
-                    } else {
-                        subs.add(services.getTermBuilder().tt());
-                    }
-                } else {
-                    subs.add(newSub);
-                }
-            }
-
-            return tf.createTerm(
-                    term.op(),
-                    new ImmutableArray<Term>(subs),
-                    term.boundVars(),
-                    term.javaBlock());
-        } else if (term.op() instanceof ProgramVariable
-                && vars.contains((ProgramVariable) term.op())) {
-            return null;
-        } else {
-            List<Term> subs = new ArrayList<>();
-
-            for (Term sub : term.subs()) {
-                Term newSub = weakenFormula(sub, vars);
-                if (newSub == null) {
-                    return null;
-                } else {
-                    subs.add(newSub);
-                }
-            }
-
-            return tf.createTerm(
-                    term.op(),
-                    new ImmutableArray<Term>(subs),
-                    term.boundVars(),
-                    term.javaBlock());
-        }
     }
 
     /**

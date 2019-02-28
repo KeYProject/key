@@ -34,6 +34,7 @@ import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalBlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
@@ -395,6 +396,14 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         final ProgramVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
         register(selfVar, services);
         final Term selfTerm = selfVar == null ? null : tb.var(selfVar);
+
+        LoopContract innerLoopContract = contract.getAuxiliaryContract().toLoopContract();
+        if (innerLoopContract != null) {
+            services.getSpecificationRepository().addLoopContract(
+                    innerLoopContract.replaceEnhancedForVariables(
+                            innerLoopContract.getBlock(), services),
+                    false);
+        }
 
         final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
         final ImmutableSet<ProgramVariable> localInVariables
