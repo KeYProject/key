@@ -92,6 +92,7 @@ public final class KeyStrokeManager {
             mapping.put(de.uka.ilkd.key.macros.HeapSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_H,MULTI_KEY_MASK));
             mapping.put(de.uka.ilkd.key.macros.UpdateSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_L,MULTI_KEY_MASK));
             mapping.put(de.uka.ilkd.key.macros.IntegerSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_I,MULTI_KEY_MASK));
+            mapping.put(de.uka.ilkd.key.macros.SMTPreparationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_Y,MULTI_KEY_MASK));
 
             mapping.put(de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_F1,0));
             mapping.put(de.uka.ilkd.key.gui.actions.QuickSaveAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_F5,0));
