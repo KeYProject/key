@@ -38,11 +38,11 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 /**
  * Default implementation of {@link BlockContract}.
  *
- * @see SimpleBlockContract.Creator
+ * @see BlockContractImpl.Creator
  *
  * @author wacker, lanzinger
  */
-public final class SimpleBlockContract extends AbstractBlockSpecificationElement
+public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
         implements BlockContract {
 
     private LoopContract loopContract = null;
@@ -78,7 +78,7 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
      * @param functionalContracts
      *            the functional loop contracts corresponding to this contract.
      */
-    public SimpleBlockContract(final String baseName, final StatementBlock block,
+    public BlockContractImpl(final String baseName, final StatementBlock block,
             final List<Label> labels, final IProgramMethod method, final Modality modality,
             final Map<LocationVariable, Term> preconditions, final Term measuredBy,
             final Map<LocationVariable, Term> postconditions,
@@ -159,7 +159,7 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
             final Map<LocationVariable, Term> newModifiesClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             Term newMeasuredBy) {
-        SimpleBlockContract result = new SimpleBlockContract(
+        BlockContractImpl result = new BlockContractImpl(
                 baseName, newBlock, labels, method, modality,
                 newPreconditions, newMeasuredBy, newPostconditions, newModifiesClauses,
                 newinfFlowSpecs, newVariables, transactionApplicable, hasMod, functionalContracts);
@@ -177,7 +177,7 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
     public BlockContract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         assert newPM instanceof IProgramMethod;
         assert newKJT.equals(newPM.getContainerType());
-        SimpleBlockContract result = new SimpleBlockContract(
+        BlockContractImpl result = new BlockContractImpl(
                 baseName, block, labels, (IProgramMethod) newPM, modality,
                 preconditions, measuredBy, postconditions, modifiesClauses, infFlowSpecs, variables,
                 transactionApplicable, hasMod, functionalContracts);
@@ -196,11 +196,11 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
     }
 
     /**
-     * This class is used to build {@link SimpleBlockContract}s.
+     * This class is used to build {@link BlockContractImpl}s.
      *
      * @see Creator#create()
      */
-    public static class Creator extends AbstractBlockSpecificationElement.Creator<BlockContract> {
+    public static class Creator extends AbstractAuxiliaryContractImpl.Creator<BlockContract> {
 
         /**
          *
@@ -265,7 +265,7 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
                 Map<LocationVariable, Term> modifiesClauses,
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
                 boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod) {
-            return new SimpleBlockContract(baseName, block, labels, method, modality, preconditions,
+            return new BlockContractImpl(baseName, block, labels, method, modality, preconditions,
                     measuredBy, postconditions, modifiesClauses, infFlowSpecs, variables,
                     transactionApplicable, hasMod, null);
         }
@@ -276,7 +276,7 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
      * simultaneously.
      */
     protected static class Combinator
-            extends AbstractBlockSpecificationElement.Combinator<BlockContract> {
+            extends AbstractAuxiliaryContractImpl.Combinator<BlockContract> {
 
         /**
          *
@@ -327,7 +327,7 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
                 hasMod.put(heap, hm);
             }
 
-            SimpleBlockContract result = new SimpleBlockContract(baseName, head.getBlock(),
+            BlockContractImpl result = new BlockContractImpl(baseName, head.getBlock(),
                     head.getLabels(), head.getMethod(), head.getModality(), preconditions,
                     contracts[0].getMby(), postconditions, modifiesClauses, head.getInfFlowSpecs(),
                     placeholderVariables, head.isTransactionApplicable(), hasMod,

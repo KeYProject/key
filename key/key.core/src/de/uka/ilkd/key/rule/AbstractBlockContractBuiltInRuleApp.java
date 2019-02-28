@@ -13,7 +13,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.SimpleBlockContract;
+import de.uka.ilkd.key.speclang.BlockContractImpl;
 
 /**
  * Application of {@link AbstractBlockContractRule}.
@@ -21,7 +21,7 @@ import de.uka.ilkd.key.speclang.SimpleBlockContract;
  * @author wacker, lanzinger
  */
 public abstract class AbstractBlockContractBuiltInRuleApp
-        extends AbstractBlockSpecificationElementBuiltInRuleApp {
+        extends AbstractAuxiliaryContractBuiltInRuleApp {
 
     /**
      * @see #getContract()
@@ -73,7 +73,7 @@ public abstract class AbstractBlockContractBuiltInRuleApp
                 cons = cons.add(cont);
             }
         }
-        contract = SimpleBlockContract.combine(cons, services);
+        contract = BlockContractImpl.combine(cons, services);
         heaps = HeapContext.getModHeaps(services, instantiation.isTransactional());
         return this;
     }

@@ -71,11 +71,11 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.rule.AbstractBlockContractRule.BlockContractHint;
-import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule.Instantiation;
+import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule.Instantiation;
 import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement.Variables;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
+import de.uka.ilkd.key.speclang.AuxiliaryContract.Variables;
 import de.uka.ilkd.key.speclang.BlockWellDefinedness;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.LinkedHashMap;
@@ -110,17 +110,17 @@ public final class BlockContractBuilders {
     public static final class ValidityProgramConstructor {
 
         /**
-         * @see BlockSpecificationElement#getLabels()
+         * @see AuxiliaryContract#getLabels()
          */
         private final Iterable<Label> labels;
 
         /**
-         * @see BlockSpecificationElement#getBlock()
+         * @see AuxiliaryContract#getBlock()
          */
         private final StatementBlock block;
 
         /**
-         * @see BlockSpecificationElement#getVariables()
+         * @see AuxiliaryContract#getVariables()
          */
         private final BlockContract.Variables variables;
 
@@ -352,7 +352,7 @@ public final class BlockContractBuilders {
         private final Goal goal;
 
         /**
-         * @see BlockSpecificationElement#getPlaceholderVariables()
+         * @see AuxiliaryContract#getPlaceholderVariables()
          */
         private final BlockContract.Variables placeholderVariables;
 
@@ -606,7 +606,7 @@ public final class BlockContractBuilders {
     public static final class UpdatesBuilder extends TermBuilder {
 
         /**
-         * @see BlockSpecificationElement#getVariables()
+         * @see AuxiliaryContract#getVariables()
          */
         private final BlockContract.Variables variables;
 
@@ -821,15 +821,15 @@ public final class BlockContractBuilders {
     public static final class ConditionsAndClausesBuilder extends TermBuilder {
 
         /**
-         * @see BlockSpecificationElement#getVariables()
-         * @see BlockSpecificationElement.Variables#termify(Term)
+         * @see AuxiliaryContract#getVariables()
+         * @see AuxiliaryContract.Variables#termify(Term)
          */
         protected final BlockContract.Terms terms;
 
         /**
          * The contract being applied
          */
-        private final BlockSpecificationElement contract;
+        private final AuxiliaryContract contract;
 
         /**
          * The heaps.
@@ -837,7 +837,7 @@ public final class BlockContractBuilders {
         private final List<LocationVariable> heaps;
 
         /**
-         * @see BlockSpecificationElement#getVariables()
+         * @see AuxiliaryContract#getVariables()
          */
         private final BlockContract.Variables variables;
 
@@ -854,7 +854,7 @@ public final class BlockContractBuilders {
          * @param services
          *            services.
          */
-        public ConditionsAndClausesBuilder(final BlockSpecificationElement contract,
+        public ConditionsAndClausesBuilder(final AuxiliaryContract contract,
                 final List<LocationVariable> heaps, final BlockContract.Variables variables,
                 final Term self, final Services services) {
             super(services.getTermFactory(), services);
@@ -868,7 +868,7 @@ public final class BlockContractBuilders {
          *
          * @return the termified variables.
          */
-        public BlockSpecificationElement.Terms getTerms() {
+        public AuxiliaryContract.Terms getTerms() {
             return terms;
         }
 
@@ -1164,7 +1164,7 @@ public final class BlockContractBuilders {
         /**
          * The rule application.
          */
-        private final AbstractBlockSpecificationElementBuiltInRuleApp application;
+        private final AbstractAuxiliaryContractBuiltInRuleApp application;
 
         /**
          * The term label state.
@@ -1177,14 +1177,14 @@ public final class BlockContractBuilders {
         private final Instantiation instantiation;
 
         /**
-         * @see BlockSpecificationElement#getLabels()
+         * @see AuxiliaryContract#getLabels()
          */
         private final List<Label> labels;
 
         /**
-         * @see BlockSpecificationElement#getVariables()
+         * @see AuxiliaryContract#getVariables()
          */
-        private final BlockSpecificationElement.Variables variables;
+        private final AuxiliaryContract.Variables variables;
 
         /**
          * The position at which the rule is applied.
@@ -1199,7 +1199,7 @@ public final class BlockContractBuilders {
         /**
          * The rule being applied.
          */
-        private final AbstractBlockSpecificationElementRule rule;
+        private final AbstractAuxiliaryContractRule rule;
 
         /**
          *
@@ -1220,11 +1220,11 @@ public final class BlockContractBuilders {
          * @param rule
          *            the rule being applied.
          */
-        public GoalsConfigurator(final AbstractBlockSpecificationElementBuiltInRuleApp application,
+        public GoalsConfigurator(final AbstractAuxiliaryContractBuiltInRuleApp application,
                 final TermLabelState termLabelState, final Instantiation instantiation,
-                final List<Label> labels, final BlockSpecificationElement.Variables variables,
+                final List<Label> labels, final AuxiliaryContract.Variables variables,
                 final PosInOccurrence occurrence, final Services services,
-                final AbstractBlockSpecificationElementRule rule) {
+                final AbstractAuxiliaryContractRule rule) {
             this.application = application;
             this.termLabelState = termLabelState;
             this.instantiation = instantiation;
@@ -1263,15 +1263,15 @@ public final class BlockContractBuilders {
          */
         private static ProgramVariable[] createLoopVariables(final Services services) {
             ProgramVariable conditionVariable
-                    = AbstractBlockSpecificationElementRule.createLocalVariable("cond",
+                    = AbstractAuxiliaryContractRule.createLocalVariable("cond",
                             services.getJavaInfo().getKeYJavaType("boolean"), services);
 
             ProgramVariable brokeLoopVariable
-                    = AbstractBlockSpecificationElementRule.createLocalVariable("brokeLoop",
+                    = AbstractAuxiliaryContractRule.createLocalVariable("brokeLoop",
                             services.getJavaInfo().getKeYJavaType("boolean"), services);
 
             ProgramVariable continuedLoopVariable
-                    = AbstractBlockSpecificationElementRule.createLocalVariable("continuedLoop",
+                    = AbstractAuxiliaryContractRule.createLocalVariable("continuedLoop",
                             services.getJavaInfo().getKeYJavaType("boolean"), services);
             final ProgramVariable[] loopVariables = new ProgramVariable[] { conditionVariable,
                 brokeLoopVariable, continuedLoopVariable };
@@ -1421,7 +1421,7 @@ public final class BlockContractBuilders {
             return postBody;
         }
 
-        private static Term createAbruptTerms(final BlockSpecificationElement.Terms terms,
+        private static Term createAbruptTerms(final AuxiliaryContract.Terms terms,
                 Term exceptionNeqNull, final TermBuilder tb) {
             Set<Term> abruptTerms = new LinkedHashSet<>();
             abruptTerms.add(exceptionNeqNull);
@@ -1496,7 +1496,7 @@ public final class BlockContractBuilders {
         public Term setUpValidityGoal(final Goal goal, final Term[] updates,
                 final Term[] assumptions, final Term[] postconditions,
                 final ProgramVariable exceptionParameter,
-                final BlockSpecificationElement.Terms terms) {
+                final AuxiliaryContract.Terms terms) {
             final TermBuilder tb = services.getTermBuilder();
             JavaBlock newJavaBlock = getJavaBlock(exceptionParameter);
             Term newPost = tb.and(postconditions);
@@ -1508,7 +1508,7 @@ public final class BlockContractBuilders {
                 goal.setBranchLabel("Validity");
             }
             newPost = TermLabelManager.refactorTerm(termLabelState, services, null, newPost, rule,
-                    goal, AbstractBlockSpecificationElementRule.NEW_POSTCONDITION_TERM_HINT, null);
+                    goal, AbstractAuxiliaryContractRule.NEW_POSTCONDITION_TERM_HINT, null);
 
             Term term;
             if (goal != null) {
@@ -1577,8 +1577,8 @@ public final class BlockContractBuilders {
                 final Map<LocationVariable, Term> modifiesClauses, final Term[] assumptions,
                 final Term decreasesCheck, final Term[] postconditions,
                 final Term[] postconditionsNext, final ProgramVariable exceptionParameter,
-                final BlockSpecificationElement.Terms terms,
-                final BlockSpecificationElement.Variables nextVars) {
+                final AuxiliaryContract.Terms terms,
+                final AuxiliaryContract.Variables nextVars) {
             final TermBuilder tb = services.getTermBuilder();
             final Modality modality = instantiation.modality;
 
@@ -1728,7 +1728,7 @@ public final class BlockContractBuilders {
         private JavaBlock[] createJavaBlocks(final LoopContract contract,
                 ProgramVariable conditionVariable, final ProgramVariable exceptionParameter,
                 Map<Label, ProgramVariable> breakFlags, Map<Label, ProgramVariable> continueFlags) {
-            BlockSpecificationElement.Variables bodyVariables
+            AuxiliaryContract.Variables bodyVariables
                     = new Variables(variables.self, breakFlags, continueFlags, variables.returnFlag,
                             variables.result, variables.exception, variables.remembranceHeaps,
                             variables.remembranceLocalVariables, variables.outerRemembranceHeaps,
@@ -1844,7 +1844,7 @@ public final class BlockContractBuilders {
         }
 
         private Term[] createPosts(final Goal goal, final Term[] postconditions,
-                final Term[] postconditionsNext, final BlockSpecificationElement.Terms terms,
+                final Term[] postconditionsNext, final AuxiliaryContract.Terms terms,
                 final TermBuilder tb) {
             Term post = tb.and(postconditions);
             post = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services, post,
@@ -1852,7 +1852,7 @@ public final class BlockContractBuilders {
                             .prependReverse(terms.remembranceLocalVariables.keySet()),
                     terms.exception);
             post = TermLabelManager.refactorTerm(termLabelState, services, null, post, rule, goal,
-                    AbstractBlockSpecificationElementRule.NEW_POSTCONDITION_TERM_HINT, null);
+                    AbstractAuxiliaryContractRule.NEW_POSTCONDITION_TERM_HINT, null);
 
             Term postNext = tb.and(postconditionsNext);
             postNext = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services,
@@ -1860,7 +1860,7 @@ public final class BlockContractBuilders {
                             .prependReverse(terms.remembranceLocalVariables.keySet()),
                     terms.exception);
             postNext = TermLabelManager.refactorTerm(termLabelState, services, null, postNext, rule,
-                    goal, AbstractBlockSpecificationElementRule.NEW_POSTCONDITION_TERM_HINT, null);
+                    goal, AbstractAuxiliaryContractRule.NEW_POSTCONDITION_TERM_HINT, null);
             final Term[] posts = new Term[] { post, postNext };
             return posts;
         }

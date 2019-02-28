@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.ForToWhileTransformation;
 import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.SimpleLoopContract;
+import de.uka.ilkd.key.speclang.LoopContractImpl;
 
 /**
  * <p>
@@ -41,29 +41,29 @@ import de.uka.ilkd.key.speclang.SimpleLoopContract;
  *
  * <p>
  * Note that the actual transformation is performed in the constructor of
- * {@link SimpleLoopContract}.
+ * {@link LoopContractImpl}.
  * </p>
  *
  * @author lanzinger
  */
-public class LoopContractApplyHeadRule implements BuiltInRule {
+public class LoopApplyHeadRule implements BuiltInRule {
 
     /**
      * The only instance of this class.
      */
-    public static final LoopContractApplyHeadRule INSTANCE = new LoopContractApplyHeadRule();
+    public static final LoopApplyHeadRule INSTANCE = new LoopApplyHeadRule();
 
     /**
      * The rule name.
      */
-    public static final Name NAME = new Name("Loop Contract Apply Head");
+    public static final Name NAME = new Name("Loop Apply Head");
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp application)
             throws RuleAbortException {
-        assert application instanceof LoopContractApplyHeadBuiltInRuleApp;
-        LoopContractApplyHeadBuiltInRuleApp ruleApp
-                = (LoopContractApplyHeadBuiltInRuleApp) application;
+        assert application instanceof LoopApplyHeadBuiltInRuleApp;
+        LoopApplyHeadBuiltInRuleApp ruleApp
+                = (LoopApplyHeadBuiltInRuleApp) application;
 
         ImmutableSet<LoopContract> contracts = ruleApp.contracts;
         LoopContract someContract = contracts.iterator().next();
@@ -119,7 +119,7 @@ public class LoopContractApplyHeadRule implements BuiltInRule {
 
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-        return new LoopContractApplyHeadBuiltInRuleApp(this, pos);
+        return new LoopApplyHeadBuiltInRuleApp(this, pos);
     }
 
     @Override

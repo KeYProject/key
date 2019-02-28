@@ -10,14 +10,14 @@ import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 
 /**
- * Application for {@link AbstractBlockSpecificationElementRule}.
+ * Application for {@link AbstractAuxiliaryContractRule}.
  *
  * @author wacker, lanzinger
  */
-public abstract class AbstractBlockSpecificationElementBuiltInRuleApp
+public abstract class AbstractAuxiliaryContractBuiltInRuleApp
         extends AbstractBuiltInRuleApp {
 
     /**
@@ -49,7 +49,7 @@ public abstract class AbstractBlockSpecificationElementBuiltInRuleApp
      * @param ifInstantiations
      *            if instantiations.
      */
-    public AbstractBlockSpecificationElementBuiltInRuleApp(BuiltInRule rule,
+    public AbstractAuxiliaryContractBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence occurrence, ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
     }
@@ -66,7 +66,7 @@ public abstract class AbstractBlockSpecificationElementBuiltInRuleApp
      *
      * @return the contract being applied.
      */
-    public abstract BlockSpecificationElement getContract();
+    public abstract AuxiliaryContract getContract();
 
     /**
      *

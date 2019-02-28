@@ -44,7 +44,7 @@ import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
@@ -117,7 +117,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
     /**
      * Replace the placeholder variables
-     * (see {@link BlockSpecificationElement#getPlaceholderVariables()})
+     * (see {@link AuxiliaryContract#getPlaceholderVariables()})
      * of all block contracts for blocks in {@code blocks} by
      * {@code atPreVars} and {@code atPreHeapVars}
      *
@@ -139,7 +139,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
     /**
      * Replace the placeholder variables
-     * (see {@link BlockSpecificationElement#getPlaceholderVariables()})
+     * (see {@link AuxiliaryContract#getPlaceholderVariables()})
      * of all block contracts for blocks in {@code blocks} by
      * {@code atPreVars} and {@code atPreHeapVars}
      *
@@ -153,7 +153,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             Map<LocationVariable, LocationVariable> atPreVars,
             Map<LocationVariable, LocationVariable> atPreHeapVars, Services services) {
         for (JavaStatement statement : statements) {
-            ImmutableSet<BlockSpecificationElement> contracts = DefaultImmutableSet.nil();
+            ImmutableSet<AuxiliaryContract> contracts = DefaultImmutableSet.nil();
 
             if (statement instanceof StatementBlock) {
                 StatementBlock block = (StatementBlock) statement;
@@ -173,16 +173,16 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 }
             }
 
-            for (BlockSpecificationElement contract : contracts) {
+            for (AuxiliaryContract contract : contracts) {
                 Map<LocationVariable, LocationVariable> nonHeapVars = new LinkedHashMap<>();
                 nonHeapVars.putAll(atPreVars);
                 atPreHeapVars.forEach((key, val) -> nonHeapVars.remove(key));
                 atPreHeapVars.remove(services.getTypeConverter().getHeapLDT().getSavedHeap());
 
-                final BlockSpecificationElement.Variables variables
+                final AuxiliaryContract.Variables variables
                         = contract.getPlaceholderVariables();
-                final BlockSpecificationElement.Variables newVariables
-                        = new BlockSpecificationElement.Variables(variables.self,
+                final AuxiliaryContract.Variables newVariables
+                        = new AuxiliaryContract.Variables(variables.self,
                                 variables.breakFlags, variables.continueFlags, variables.returnFlag,
                                 variables.result, variables.exception, variables.remembranceHeaps,
                                 variables.remembranceLocalVariables, atPreHeapVars, nonHeapVars,
@@ -327,7 +327,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             Map<LocationVariable, LocationVariable> atPreHeapVars, Term atPreUpdate,
             Services services, final TermBuilder tb) {
         for (StatementBlock block : blocks) {
-            ImmutableSet<BlockSpecificationElement> contracts = DefaultImmutableSet.nil();
+            ImmutableSet<AuxiliaryContract> contracts = DefaultImmutableSet.nil();
 
             for (BlockContract c : services.getSpecificationRepository().getBlockContracts(block)) {
                 contracts = contracts.add(c);
@@ -336,7 +336,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 contracts = contracts.add(c);
             }
 
-            for (BlockSpecificationElement contract : contracts) {
+            for (AuxiliaryContract contract : contracts) {
                 List<LocationVariable> keys = new ArrayList<LocationVariable>(
                         contract.getPlaceholderVariables().outerRemembranceVariables.keySet());
 
@@ -521,8 +521,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
     }
 
     private static void updateBlockOrLoopContract(JavaStatement statement,
-            BlockSpecificationElement contract,
-            final BlockSpecificationElement.Variables newVariables,
+            AuxiliaryContract contract,
+            final AuxiliaryContract.Variables newVariables,
             final Map<LocationVariable, Term> newPreconditions,
             final Map<LocationVariable, Term> newPostconditions,
             final Map<LocationVariable, Term> newModifiesClauses, Services services) {

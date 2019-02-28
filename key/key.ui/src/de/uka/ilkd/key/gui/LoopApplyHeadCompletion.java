@@ -2,21 +2,21 @@ package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.LoopContractApplyHeadBuiltInRuleApp;
+import de.uka.ilkd.key.rule.LoopApplyHeadBuiltInRuleApp;
 
 /**
- * Interactive completion for {@link LoopContractApplyHeadBuiltInRuleApp}.
+ * Interactive completion for {@link LoopApplyHeadBuiltInRuleApp}.
  */
-public class LoopContractApplyHeadCompletion
+public class LoopApplyHeadCompletion
         implements InteractiveRuleApplicationCompletion {
     
-    LoopContractApplyHeadCompletion(MainWindow mainWindow){ }
+    LoopApplyHeadCompletion(MainWindow mainWindow){ }
 
     @Override
     public IBuiltInRuleApp complete(final IBuiltInRuleApp application,
             final Goal goal, final boolean force) {
-        LoopContractApplyHeadBuiltInRuleApp result =
-                (LoopContractApplyHeadBuiltInRuleApp) application;
+        LoopApplyHeadBuiltInRuleApp result =
+                (LoopApplyHeadBuiltInRuleApp) application;
         if (!result.complete() && result.cannotComplete(goal)) {
             return result;
         }
@@ -27,6 +27,6 @@ public class LoopContractApplyHeadCompletion
 
     @Override
     public boolean canComplete(final IBuiltInRuleApp app) {
-        return app instanceof LoopContractApplyHeadBuiltInRuleApp;
+        return app instanceof LoopApplyHeadBuiltInRuleApp;
     }
 }

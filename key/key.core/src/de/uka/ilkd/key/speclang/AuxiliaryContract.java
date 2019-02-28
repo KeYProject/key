@@ -46,7 +46,7 @@ import de.uka.ilkd.key.util.MiscTools;
  *
  * @author wacker, lanzinger
  */
-public interface BlockSpecificationElement extends SpecificationElement {
+public interface AuxiliaryContract extends SpecificationElement {
 
     /**
      *
@@ -471,7 +471,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
      * @return a contract equal to this one except that it belongs to a different target.
      */
 
-    public BlockSpecificationElement setTarget(KeYJavaType newKJT, IObserverFunction newPM);
+    public AuxiliaryContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
 
     /**
      *
@@ -479,7 +479,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
      *            the new block.
      * @return a contract equal to this one except that it belongs to a different block.
      */
-    public BlockSpecificationElement setBlock(StatementBlock newBlock);
+    public AuxiliaryContract setBlock(StatementBlock newBlock);
 
     /**
      * @param services services.
@@ -496,7 +496,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
 
     /**
      * This class contains all new variables that are introduced during a
-     * {@link BlockSpecificationElement}'s instantiation.
+     * {@link AuxiliaryContract}'s instantiation.
      */
     public static class Variables {
 
@@ -875,18 +875,18 @@ public interface BlockSpecificationElement extends SpecificationElement {
         public static final String OUTER_REMEMBRANCE_SUFFIX = "_Before_METHOD";
 
         /**
-         * @see BlockSpecificationElement#getBlock()
+         * @see AuxiliaryContract#getBlock()
          * @see LoopContract#getLoop()
          */
         private final JavaStatement statement;
 
         /**
-         * @see BlockSpecificationElement#getLabels()
+         * @see AuxiliaryContract#getLabels()
          */
         private final List<Label> labels;
 
         /**
-         * @see BlockSpecificationElement#getMethod()
+         * @see AuxiliaryContract#getMethod()
          */
         private final IProgramMethod method;
 

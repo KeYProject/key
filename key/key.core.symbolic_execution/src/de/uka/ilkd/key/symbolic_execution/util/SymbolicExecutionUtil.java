@@ -118,7 +118,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.AbstractBlockContractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementBuiltInRuleApp;
+import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractExternalBuiltInRuleApp;
@@ -1166,7 +1166,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} represent node as block contract, {@code false} represent node as something else. 
     */
    public static boolean isBlockSpecificationElement(Node node, RuleApp ruleApp) {
-      return ruleApp instanceof AbstractBlockSpecificationElementBuiltInRuleApp;
+      return ruleApp instanceof AbstractAuxiliaryContractBuiltInRuleApp;
    }
 
    /**

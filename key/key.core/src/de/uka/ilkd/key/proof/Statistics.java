@@ -7,7 +7,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.SideProofStatistics;
-import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementBuiltInRuleApp;
+import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
@@ -271,7 +271,7 @@ public class Statistics {
                     dep++;
                 } else if (ruleApp instanceof ContractRuleApp) {
                     contr++;
-                } else if (ruleApp instanceof AbstractBlockSpecificationElementBuiltInRuleApp) {
+                } else if (ruleApp instanceof AbstractAuxiliaryContractBuiltInRuleApp) {
                     block++;
                 } else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
                     inv++;

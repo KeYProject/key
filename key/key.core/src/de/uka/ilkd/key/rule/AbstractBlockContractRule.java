@@ -46,7 +46,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -58,7 +58,7 @@ import de.uka.ilkd.key.util.MiscTools;
  *
  * @author wacker, lanzinger
  */
-public abstract class AbstractBlockContractRule extends AbstractBlockSpecificationElementRule {
+public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContractRule {
 
     /**
      *
@@ -325,7 +325,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
     }
 
     private static ProofObligationVars generateProofObligationVariables(
-            final BlockSpecificationElement.Variables variables,
+            final AuxiliaryContract.Variables variables,
             final ProgramVariable exceptionParameter, final LocationVariable baseHeap,
             final ImmutableList<Term> localVarsAtPre, final ImmutableList<Term> localVarsAtPost,
             final Services services, final TermBuilder tb) {
@@ -425,7 +425,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
 
     protected InfFlowValidityData setUpInfFlowValidityGoal(final Goal infFlowGoal,
             final BlockContract contract, final Map<LocationVariable, Function> anonymisationHeaps,
-            final Services services, final BlockSpecificationElement.Variables variables,
+            final Services services, final AuxiliaryContract.Variables variables,
             final ProgramVariable exceptionParameter, final List<LocationVariable> heaps,
             final ImmutableSet<ProgramVariable> localInVariables,
             final ImmutableSet<ProgramVariable> localOutVariables,
@@ -497,7 +497,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
      * A builder for {@link Instantiation}s.
      */
     protected static final class Instantiator
-            extends AbstractBlockSpecificationElementRule.Instantiator {
+            extends AbstractAuxiliaryContractRule.Instantiator {
 
         /**
          *

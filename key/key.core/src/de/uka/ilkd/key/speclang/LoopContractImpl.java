@@ -49,11 +49,11 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 /**
  * Default implementation for {@link LoopContract}.
  *
- * @see SimpleLoopContract.Creator
+ * @see LoopContractImpl.Creator
  *
  * @author lanzinger
  */
-public final class SimpleLoopContract extends AbstractBlockSpecificationElement
+public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         implements LoopContract {
 
     /**
@@ -124,7 +124,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     /**
      * @see LoopContract#replaceEnhancedForVariables(StatementBlock, Services)
      */
-    private SimpleLoopContract replacedEnhancedForVars;
+    private LoopContractImpl replacedEnhancedForVars;
 
     /**
      * Construct a loop contract for a block that starts with a loop.
@@ -162,7 +162,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
      * @param services
      *            services.
      */
-    public SimpleLoopContract(final String baseName, final StatementBlock block,
+    public LoopContractImpl(final String baseName, final StatementBlock block,
             final List<Label> labels, final IProgramMethod method, final Modality modality,
             final Map<LocationVariable, Term> preconditions, final Term measuredBy,
             final Map<LocationVariable, Term> postconditions,
@@ -261,7 +261,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
      * @param services
      *            services.
      */
-    public SimpleLoopContract(final String baseName, final LoopStatement loop,
+    public LoopContractImpl(final String baseName, final LoopStatement loop,
             final List<Label> labels, final IProgramMethod method, final Modality modality,
             final Map<LocationVariable, Term> preconditions, final Term measuredBy,
             final Map<LocationVariable, Term> postconditions,
@@ -493,7 +493,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
         StatementBlock headAndBlock = head == null
                 ? new StatementBlock(block)
                 : new StatementBlock(head, block);
-        SimpleLoopContract r = (SimpleLoopContract) replaceEnhancedForVariables(block, services);
+        LoopContractImpl r = (LoopContractImpl) replaceEnhancedForVariables(block, services);
 
         TermBuilder tb = services.getTermBuilder();
 
@@ -552,12 +552,12 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
         }
 
         if (blockContract == null) {
-            blockContract = new SimpleBlockContract(
+            blockContract = new BlockContractImpl(
                     r.baseName, headAndBlock, r.labels, r.method, r.modality,
                     pre, r.measuredBy, post, modifies,
                 r.infFlowSpecs, r.variables, r.transactionApplicable, r.hasMod,
                 functionalContracts);
-            ((SimpleBlockContract) blockContract).setLoopContract(this);
+            ((BlockContractImpl) blockContract).setLoopContract(this);
         }
 
         return blockContract;
@@ -635,7 +635,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             final Map<LocationVariable, Term> newModifiesClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             final Term newMeasuredBy, final Term newDecreases) {
-        SimpleLoopContract result = new SimpleLoopContract(
+        LoopContractImpl result = new LoopContractImpl(
                 baseName, newBlock, labels, method, modality,
                 newPreconditions, newMeasuredBy, newPostconditions, newModifiesClauses,
                 newinfFlowSpecs, newVariables, transactionApplicable, hasMod, newDecreases,
@@ -651,7 +651,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             final Map<LocationVariable, Term> newModifiesClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             final Term newMeasuredBy, final Term newDecreases) {
-        SimpleLoopContract result = new SimpleLoopContract(
+        LoopContractImpl result = new LoopContractImpl(
                 baseName, newLoop, labels, method, modality,
                 newPreconditions, newMeasuredBy, newPostconditions, newModifiesClauses,
                 newinfFlowSpecs, newVariables, transactionApplicable, hasMod, newDecreases,
@@ -667,7 +667,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
         }
 
         if (index == null && values == null) {
-            replacedEnhancedForVars = (SimpleLoopContract) update(
+            replacedEnhancedForVars = (LoopContractImpl) update(
                     newBlock,
                     preconditions,
                     postconditions,
@@ -718,7 +718,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
                         replacer.replace(getModifiesClause(heap, services)));
             }
 
-            replacedEnhancedForVars = (SimpleLoopContract) update(
+            replacedEnhancedForVars = (LoopContractImpl) update(
                     newBlock,
                     newPreconditions,
                     newPostconditions,
@@ -758,7 +758,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             return this;
         }
 
-        SimpleLoopContract result = new SimpleLoopContract(
+        LoopContractImpl result = new LoopContractImpl(
                 baseName, newBlock, labels, method, modality,
                 preconditions, measuredBy, postconditions, modifiesClauses,
                 infFlowSpecs, variables, transactionApplicable, hasMod, decreases,
@@ -773,7 +773,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             return this;
         }
 
-        SimpleLoopContract result = new SimpleLoopContract(
+        LoopContractImpl result = new LoopContractImpl(
                 baseName, newLoop, labels, method, modality,
                 preconditions, measuredBy, postconditions, modifiesClauses,
                 infFlowSpecs, variables, transactionApplicable, hasMod, decreases,
@@ -791,7 +791,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             return this;
         }
 
-        SimpleLoopContract result = new SimpleLoopContract(
+        LoopContractImpl result = new LoopContractImpl(
                 baseName, block, labels, (IProgramMethod) newPM, modality,
                 preconditions, measuredBy, postconditions, modifiesClauses, infFlowSpecs, variables,
                 transactionApplicable, hasMod, decreases, functionalContracts, services);
@@ -810,11 +810,11 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     }
 
     /**
-     * This class is used to build {@link SimpleLoopContract}s.
+     * This class is used to build {@link LoopContractImpl}s.
      *
      * @see Creator#create()
      */
-    public static class Creator extends AbstractBlockSpecificationElement.Creator<LoopContract> {
+    public static class Creator extends AbstractAuxiliaryContractImpl.Creator<LoopContract> {
 
         /**
          * @see LoopContract#getDecreases()
@@ -958,13 +958,13 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
                 boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod) {
             if (block != null) {
-                return new SimpleLoopContract(
+                return new LoopContractImpl(
                         baseName, block, labels, method, modality, preconditions,
                         measuredBy, postconditions, modifiesClauses, infFlowSpecs, variables,
                         transactionApplicable, hasMod, decreases, null, services);
             } else {
                 assert loop != null;
-                return new SimpleLoopContract(
+                return new LoopContractImpl(
                         baseName, loop, labels, method, modality, preconditions,
                         measuredBy, postconditions, modifiesClauses, infFlowSpecs, variables,
                         transactionApplicable, hasMod, decreases, null, services);
@@ -990,7 +990,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
      * simultaneously.
      */
     protected static class Combinator
-            extends AbstractBlockSpecificationElement.Combinator<LoopContract> {
+            extends AbstractAuxiliaryContractImpl.Combinator<LoopContract> {
 
         /**
          *
@@ -1041,7 +1041,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
                 hasMod.put(heap, hm);
             }
 
-            SimpleLoopContract result = new SimpleLoopContract(baseName, head.getBlock(),
+            LoopContractImpl result = new LoopContractImpl(baseName, head.getBlock(),
                     head.getLabels(), head.getMethod(), head.getModality(), preconditions,
                     contracts[0].getMby(), postconditions, modifiesClauses, head.getInfFlowSpecs(),
                     placeholderVariables, head.isTransactionApplicable(), hasMod,

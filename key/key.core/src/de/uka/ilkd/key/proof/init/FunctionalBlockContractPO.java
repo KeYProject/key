@@ -23,14 +23,14 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule.Instantiation;
+import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule.Instantiation;
 import de.uka.ilkd.key.rule.BlockContractBuilders;
 import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.BlockContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.VariablesCreatorAndRegistrar;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalBlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -449,7 +449,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     /**
      *
      * @return the contract's block.
-     * @see BlockSpecificationElement#getBlock()
+     * @see AuxiliaryContract#getBlock()
      */
     public StatementBlock getBlock() {
         return contract.getBlock();
@@ -467,7 +467,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     /**
      *
      * @return the method containing this contract.
-     * @see BlockSpecificationElement#getMethod()
+     * @see AuxiliaryContract#getMethod()
      */
     public IProgramMethod getProgramMethod() {
         return contract.getMethod();

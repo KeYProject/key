@@ -36,7 +36,7 @@ import de.uka.ilkd.key.speclang.LoopContract;
  *
  * @author lanzinger
  */
-public abstract class AbstractLoopContractRule extends AbstractBlockSpecificationElementRule {
+public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContractRule {
 
     /**
      *
@@ -250,7 +250,7 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
      * A builder for {@link Instantiation}s.
      */
     protected static final class Instantiator
-            extends AbstractBlockSpecificationElementRule.Instantiator {
+            extends AbstractAuxiliaryContractRule.Instantiator {
 
         /**
          *

@@ -29,19 +29,19 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * <p>
- * Rule for the application of {@link BlockSpecificationElement}s.
+ * Rule for the application of {@link AuxiliaryContract}s.
  * </p>
  *
- * @see AbstractBlockSpecificationElementBuiltInRuleApp
+ * @see AbstractAuxiliaryContractBuiltInRuleApp
  *
  * @author wacker, lanzinger
  */
-public abstract class AbstractBlockSpecificationElementRule implements BuiltInRule {
+public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
 
     /**
      *
@@ -167,7 +167,7 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
     /**
      * This encapsulates all information from the rule application that is needed to apply the rule.
      *
-     * @see AbstractBlockSpecificationElementBuiltInRuleApp
+     * @see AbstractAuxiliaryContractBuiltInRuleApp
      */
     public static final class Instantiation {
 

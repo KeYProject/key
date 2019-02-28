@@ -30,26 +30,26 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 
 /**
- * A window to contain a {@link BlockSpecificationElementSelectionPanel}.
+ * A window to contain a {@link AuxiliaryContractSelectionPanel}.
  *
  * @param <T>
  */
-public class BlockSpecificationElementConfigurator<T extends BlockSpecificationElement>
+public class AuxiliaryContractConfigurator<T extends AuxiliaryContract>
         extends JDialog {
 
     private static final long serialVersionUID = 4882043118399402599L;
 
-    private BlockSpecificationElementSelectionPanel<T> contractPanel;
+    private AuxiliaryContractSelectionPanel<T> contractPanel;
     private JButton okButton;
     private JButton cancelButton;
 
     private boolean successful = false;
 
-    public BlockSpecificationElementConfigurator(final String name,
-                                     final BlockSpecificationElementSelectionPanel<T> contractPanel,
+    public AuxiliaryContractConfigurator(final String name,
+                                     final AuxiliaryContractSelectionPanel<T> contractPanel,
                                      final JDialog owner,
                                      final Services services,
                                      final T[] contracts,
@@ -58,8 +58,8 @@ public class BlockSpecificationElementConfigurator<T extends BlockSpecificationE
         init(services, contractPanel, contracts, title);
     }
 
-    public BlockSpecificationElementConfigurator(final String name,
-                                     final BlockSpecificationElementSelectionPanel<T> contractPanel,
+    public AuxiliaryContractConfigurator(final String name,
+                                     final AuxiliaryContractSelectionPanel<T> contractPanel,
                                      final Frame owner,
                                      final Services services,
                                      final T[] contracts,
@@ -69,7 +69,7 @@ public class BlockSpecificationElementConfigurator<T extends BlockSpecificationE
     }
 
     private void init(final Services services,
-            final BlockSpecificationElementSelectionPanel<T> contractPanel,
+            final AuxiliaryContractSelectionPanel<T> contractPanel,
                       final T[] contracts,
                       final String title) {
         initContractPanel(services, contractPanel, contracts, title);
@@ -81,7 +81,7 @@ public class BlockSpecificationElementConfigurator<T extends BlockSpecificationE
     }
 
     private void initContractPanel(final Services services,
-                                   final BlockSpecificationElementSelectionPanel<T> contractPanel,
+                                   final AuxiliaryContractSelectionPanel<T> contractPanel,
                                    final T[] contracts,
                                    final String title) {
         this.contractPanel = contractPanel;

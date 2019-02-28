@@ -78,7 +78,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBlockSpecificationElement;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionAuxiliaryContract;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionExceptionalMethodReturn;
@@ -1130,7 +1130,7 @@ public class SymbolicExecutionTreeBuilder {
          }
          else if (SymbolicExecutionUtil.isBlockSpecificationElement(node, node.getAppliedRuleApp())) {
             if (isNotInImplicitMethod(node)) {
-               result = new ExecutionBlockSpecificationElement(settings, node);
+               result = new ExecutionAuxiliaryContract(settings, node);
                // Initialize new call stack of the validity branch
                initNewValidiityMethodCallStack(node);
             }

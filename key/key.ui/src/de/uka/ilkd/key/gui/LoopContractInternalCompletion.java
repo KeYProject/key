@@ -7,7 +7,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule.Instantiation;
+import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule.Instantiation;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopContractInternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopContractInternalRule;
@@ -45,8 +45,8 @@ public class LoopContractInternalCompletion implements InteractiveRuleApplicatio
                 .instantiate(application.posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<LoopContract> contracts =
                 LoopContractInternalRule.getApplicableContracts(instantiation, goal, services);
-        final BlockSpecificationElementConfigurator<LoopContract> configurator
-            = new BlockSpecificationElementConfigurator<>("Loop Contract Configurator",
+        final AuxiliaryContractConfigurator<LoopContract> configurator
+            = new AuxiliaryContractConfigurator<>("Loop Contract Configurator",
                     new LoopContractSelectionPanel(services, true),
                     mainWindow, services, contracts.toArray(new LoopContract[contracts.size()]),
                     "Contracts for Block: " + instantiation.statement);

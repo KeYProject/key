@@ -48,7 +48,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
@@ -486,9 +486,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
     }
 
-    private BlockSpecificationElement.Variables replaceBlockContractVariables(
-            final BlockSpecificationElement.Variables variables) {
-        return new BlockSpecificationElement.Variables(replaceVariable(variables.self),
+    private AuxiliaryContract.Variables replaceBlockContractVariables(
+            final AuxiliaryContract.Variables variables) {
+        return new AuxiliaryContract.Variables(replaceVariable(variables.self),
                 replaceFlags(variables.breakFlags),
                 replaceFlags(variables.continueFlags),
                 replaceVariable(variables.returnFlag),

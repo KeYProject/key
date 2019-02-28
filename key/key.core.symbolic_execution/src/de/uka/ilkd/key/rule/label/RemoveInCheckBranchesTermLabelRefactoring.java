@@ -26,7 +26,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule;
+import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.LoopContractExternalRule;
@@ -39,7 +39,7 @@ import de.uka.ilkd.key.rule.WhileInvariantRule;
  * This {@link TermLabelRefactoring} removes the supported {@link TermLabel}
  * in check branches. These are:
  * <ul>
- *    <li>{@link AbstractBlockSpecificationElementRule}: Pre</li>
+ *    <li>{@link AbstractAuxiliaryContractRule}: Pre</li>
  *    <li>{@link UseOperationContractRule}: Pre</li>
  *    <li>{@link UseOperationContractRule}: Null reference</li>
  *    <li>{@link WhileInvariantRule}: Invariant Initially Valid</li>
@@ -96,7 +96,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
                   goal.node().getNodeInfo().getBranchLabel().startsWith("Invariant Initially Valid")) {
             return RefactoringScope.SEQUENT;
          }
-         else if (rule instanceof AbstractBlockSpecificationElementRule &&
+         else if (rule instanceof AbstractAuxiliaryContractRule &&
                   goal.node().getNodeInfo().getBranchLabel().startsWith("Precondition")) {
               return RefactoringScope.SEQUENT;
            }

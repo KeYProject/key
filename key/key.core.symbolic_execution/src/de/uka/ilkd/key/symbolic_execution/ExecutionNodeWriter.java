@@ -26,7 +26,7 @@ import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockSpecificationElement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionAuxiliaryContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
@@ -293,7 +293,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String TAG_OPERATION_CONTRACT = "operationContract";
 
    /**
-    * Tag name to store {@link IExecutionBlockSpecificationElement}s.
+    * Tag name to store {@link IExecutionAuxiliaryContract}s.
     */
    public static final String TAG_BLOCK_CONTRACT = "blockContract";
 
@@ -488,8 +488,8 @@ public class ExecutionNodeWriter extends AbstractWriter {
       else if (node instanceof IExecutionLoopInvariant) {
          appendExecutionLoopInvariant(level, (IExecutionLoopInvariant)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
-      else if (node instanceof IExecutionBlockSpecificationElement) {
-         appendExecutionBlockContract(level, (IExecutionBlockSpecificationElement)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      else if (node instanceof IExecutionAuxiliaryContract) {
+         appendExecutionBlockContract(level, (IExecutionAuxiliaryContract)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
       else if (node instanceof IExecutionJoin) {
          appendExecutionJoin(level, (IExecutionJoin)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
@@ -962,7 +962,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
    }
 
    /**
-    * Converts the given {@link IExecutionBlockSpecificationElement} into XML and appends it to the {@link StringBuffer}.
+    * Converts the given {@link IExecutionAuxiliaryContract} into XML and appends it to the {@link StringBuffer}.
     * @param level The current child level.
     * @param node The {@link IExecutionLoopInvariant} to convert.
     * @param saveVariables Save variables? 
@@ -973,7 +973,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @throws ProofInputException Occurred Exception.
     */
    protected void appendExecutionBlockContract(int level, 
-                                               IExecutionBlockSpecificationElement node, 
+                                               IExecutionAuxiliaryContract node, 
                                                boolean saveVariables, 
                                                boolean saveCallStack, 
                                                boolean saveReturnValues,

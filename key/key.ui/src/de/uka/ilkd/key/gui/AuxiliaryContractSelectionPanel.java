@@ -21,22 +21,22 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
-import de.uka.ilkd.key.speclang.SimpleBlockContract;
-import de.uka.ilkd.key.speclang.SimpleLoopContract;
+import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
+import de.uka.ilkd.key.speclang.BlockContractImpl;
+import de.uka.ilkd.key.speclang.LoopContractImpl;
 
 /**
  * This panel used to select which {@code T}(s) to use for a
- * {@link AbstractBlockSpecificationElementRule}.
+ * {@link AbstractAuxiliaryContractRule}.
  *
  * @param <T>
  * 
- * @see BlockSpecificationElementConfigurator
- * @see SimpleBlockContract#combine(org.key_project.util.collection.ImmutableSet, Services)
- * @see SimpleLoopContract#combine(org.key_project.util.collection.ImmutableSet, Services)
+ * @see AuxiliaryContractConfigurator
+ * @see BlockContractImpl#combine(org.key_project.util.collection.ImmutableSet, Services)
+ * @see LoopContractImpl#combine(org.key_project.util.collection.ImmutableSet, Services)
  */
-public abstract class BlockSpecificationElementSelectionPanel<T extends BlockSpecificationElement>
+public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContract>
         extends JPanel {
     
     private static final long serialVersionUID = 129743953718747490L;
@@ -45,7 +45,7 @@ public abstract class BlockSpecificationElementSelectionPanel<T extends BlockSpe
     protected final JList<T> contractList;
     private final TitledBorder border;
 
-    public BlockSpecificationElementSelectionPanel(
+    public AuxiliaryContractSelectionPanel(
             final Services services, final boolean multipleSelection) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.services = services;

@@ -31,7 +31,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
  *
  * @author lanzinger
  */
-public interface LoopContract extends BlockSpecificationElement {
+public interface LoopContract extends AuxiliaryContract {
 
     /**
      *

@@ -34,25 +34,25 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementBuiltInRuleApp;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockSpecificationElement;
+import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionAuxiliaryContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * The default implementation of {@link IExecutionBlockSpecificationElement}.
+ * The default implementation of {@link IExecutionAuxiliaryContract}.
  * @author Martin Hentschel
  */
-public class ExecutionBlockSpecificationElement extends AbstractExecutionNode<SourceElement> implements IExecutionBlockSpecificationElement {
+public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElement> implements IExecutionAuxiliaryContract {
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public ExecutionBlockSpecificationElement(ITreeSettings settings,
+   public ExecutionAuxiliaryContract(ITreeSettings settings,
                                  Node proofNode) {
       super(settings, proofNode);
    }
@@ -108,7 +108,7 @@ public class ExecutionBlockSpecificationElement extends AbstractExecutionNode<So
       Term validitiyModalityTerm = TermBuilder.goBelowUpdates(SymbolicExecutionUtil.posInOccurrenceInOtherNode(getProofNode(), getModalityPIO(), validitiyNode));
       MethodFrame mf = JavaTools.getInnermostMethodFrame(validitiyModalityTerm.javaBlock(), getServices());
       StatementBlock sb = mf != null ? mf.getBody() : (StatementBlock) validitiyModalityTerm.javaBlock().program();
-      BlockSpecificationElement.Variables variables = getContract().getVariables();
+      AuxiliaryContract.Variables variables = getContract().getVariables();
       int statementIndex = variables.breakFlags.size() + variables.continueFlags.size(); // Skip break and continues
       Term returnFlag = null;
       Term result = null;
@@ -124,7 +124,7 @@ public class ExecutionBlockSpecificationElement extends AbstractExecutionNode<So
       if (variables.exception != null) {
          exception = declaredVariableAsTerm(sb, statementIndex);
       }
-      BlockSpecificationElement.Terms terms = new BlockSpecificationElement.Terms(self,
+      AuxiliaryContract.Terms terms = new AuxiliaryContract.Terms(self,
                               null, // breakFlags are not used by getPlainText()
                               null, // continueFlags are not used by getPlainText()
                               returnFlag, // returnFlag are not used by getPlainText()
@@ -191,8 +191,8 @@ public class ExecutionBlockSpecificationElement extends AbstractExecutionNode<So
     * {@inheritDoc}
     */
    @Override
-   public BlockSpecificationElement getContract() {
-      return ((AbstractBlockSpecificationElementBuiltInRuleApp)getProofNode().getAppliedRuleApp()).getContract();
+   public AuxiliaryContract getContract() {
+      return ((AbstractAuxiliaryContractBuiltInRuleApp)getProofNode().getAppliedRuleApp()).getContract();
    }
 
    /**
@@ -201,7 +201,7 @@ public class ExecutionBlockSpecificationElement extends AbstractExecutionNode<So
    @Override
    public StatementBlock getBlock() {
       return (StatementBlock)
-              ((AbstractBlockSpecificationElementBuiltInRuleApp)getProofNode()
+              ((AbstractAuxiliaryContractBuiltInRuleApp)getProofNode()
                       .getAppliedRuleApp()).getStatement();
    }
 }

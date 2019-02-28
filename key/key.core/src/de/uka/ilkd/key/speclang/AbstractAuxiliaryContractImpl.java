@@ -32,11 +32,12 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
- * Abstract base class for all default implementations of {@link BlockSpecificationElement}.
+ * Abstract base class for all default implementations of the sub-interfaces of
+ * {@link AuxiliaryContract}.
  *
  * @author wacker, lanzinger
  */
-public abstract class AbstractBlockSpecificationElement implements BlockSpecificationElement {
+public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract {
 
     /**
      * @see #getBlock()
@@ -109,7 +110,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
     protected final String baseName;
 
     /**
-     * @see BlockSpecificationElement#getFunctionalContracts()
+     * @see AuxiliaryContract#getFunctionalContracts()
      */
     protected ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts;
 
@@ -186,7 +187,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
      * @param hasMod
      *            a map specifying on which heaps this contract has a modified clause.
      */
-    public AbstractBlockSpecificationElement(final String baseName, final StatementBlock block,
+    public AbstractAuxiliaryContractImpl(final String baseName, final StatementBlock block,
             final List<Label> labels, final IProgramMethod method, final Modality modality,
             final Map<LocationVariable, Term> preconditions, final Term measuredBy,
             final Map<LocationVariable, Term> postconditions,
@@ -557,7 +558,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         } else if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        AbstractBlockSpecificationElement other = (AbstractBlockSpecificationElement) obj;
+        AbstractAuxiliaryContractImpl other = (AbstractAuxiliaryContractImpl) obj;
         if ((block == null && other.block != null)
                 || (block != null && !block.equals(other.block))) {
             return false;
@@ -1025,32 +1026,32 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
     }
 
     /**
-     * This class contains a builder method for {@link AbstractBlockSpecificationElement}s
+     * This class contains a builder method for {@link AbstractAuxiliaryContractImpl}s
      * ({@link Creator#create()}). It should be overridden in every subclass.
      *
      * @param <T>
      *            the type of the subclass.
      */
-    protected static abstract class Creator<T extends BlockSpecificationElement>
+    protected static abstract class Creator<T extends AuxiliaryContract>
             extends TermBuilder {
 
         /**
-         * @see BlockSpecificationElement#getBaseName()
+         * @see AuxiliaryContract#getBaseName()
          */
         private final String baseName;
 
         /**
-         * @see BlockSpecificationElement#getBlock()
+         * @see AuxiliaryContract#getBlock()
          */
         private final StatementBlock block;
 
         /**
-         * @see BlockSpecificationElement#getLabels()
+         * @see AuxiliaryContract#getLabels()
          */
         private final List<Label> labels;
 
         /**
-         * @see BlockSpecificationElement#getMethod()
+         * @see AuxiliaryContract#getMethod()
          */
         private final IProgramMethod method;
 
@@ -1060,17 +1061,17 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         private final Behavior behavior;
 
         /**
-         * @see BlockSpecificationElement#getVariables()
+         * @see AuxiliaryContract#getVariables()
          */
         private final Variables variables;
 
         /**
-         * @see BlockSpecificationElement#getMby()
+         * @see AuxiliaryContract#getMby()
          */
         private final Term measuredBy;
 
         /**
-         * @see BlockSpecificationElement#getRequires(LocationVariable)
+         * @see AuxiliaryContract#getRequires(LocationVariable)
          */
         private final Map<LocationVariable, Term> requires;
 
@@ -1080,7 +1081,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         private final Map<LocationVariable, Term> ensures;
 
         /**
-         * @see BlockSpecificationElement#getInfFlowSpecs()
+         * @see AuxiliaryContract#getInfFlowSpecs()
          */
         private final ImmutableList<InfFlowSpec> infFlowSpecs;
 
@@ -1589,7 +1590,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
      * @param <T>
      *            the type of the subclass.
      */
-    protected static abstract class Combinator<T extends BlockSpecificationElement>
+    protected static abstract class Combinator<T extends AuxiliaryContract>
             extends TermBuilder {
 
         /**
@@ -1598,7 +1599,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         protected final T[] contracts;
 
         /**
-         * @see BlockSpecificationElement#getPlaceholderVariables()
+         * @see AuxiliaryContract#getPlaceholderVariables()
          */
         protected Variables placeholderVariables;
 
@@ -1608,17 +1609,17 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         protected Map<LocationVariable, LocationVariable> remembranceVariables;
 
         /**
-         * @see BlockSpecificationElement#getPrecondition(LocationVariable, Services)
+         * @see AuxiliaryContract#getPrecondition(LocationVariable, Services)
          */
         protected final Map<LocationVariable, Term> preconditions;
 
         /**
-         * @see BlockSpecificationElement#getPostcondition(LocationVariable, Services)
+         * @see AuxiliaryContract#getPostcondition(LocationVariable, Services)
          */
         protected final Map<LocationVariable, Term> postconditions;
 
         /**
-         * @see BlockSpecificationElement#getModifiesClause(LocationVariable, Services)
+         * @see AuxiliaryContract#getModifiesClause(LocationVariable, Services)
          */
         protected final Map<LocationVariable, Term> modifiesClauses;
 

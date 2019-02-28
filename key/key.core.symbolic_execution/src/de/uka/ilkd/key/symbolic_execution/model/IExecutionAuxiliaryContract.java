@@ -16,28 +16,28 @@ package de.uka.ilkd.key.symbolic_execution.model;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBlockSpecificationElement;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionAuxiliaryContract;
 
 /**
  * <p>
  * A node in the symbolic execution tree which represents a use block/loop contract application.
  * </p>
  * <p>
- * The default implementation is {@link ExecutionBlockSpecificationElement} which
+ * The default implementation is {@link ExecutionAuxiliaryContract} which
  * is instantiated via a {@link SymbolicExecutionTreeBuilder} instance.
  * </p>
  * @author Martin Hentschel
  * @see SymbolicExecutionTreeBuilder
- * @see ExecutionBlockSpecificationElement
+ * @see ExecutionAuxiliaryContract
  */
-public interface IExecutionBlockSpecificationElement extends IExecutionNode<SourceElement> {
+public interface IExecutionAuxiliaryContract extends IExecutionNode<SourceElement> {
    /**
-    * Returns the applied {@link BlockSpecificationElement}.
-    * @return The applied {@link BlockSpecificationElement}.
+    * Returns the applied {@link AuxiliaryContract}.
+    * @return The applied {@link AuxiliaryContract}.
     */
-   public BlockSpecificationElement getContract();
+   public AuxiliaryContract getContract();
    
    /**
     * Returns the {@link StatementBlock} at which the {@link BlockContract} is applied.

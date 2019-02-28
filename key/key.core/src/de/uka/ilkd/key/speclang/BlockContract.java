@@ -37,7 +37,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
  *
  * @author wacker, lanzinger
  */
-public interface BlockContract extends BlockSpecificationElement {
+public interface BlockContract extends AuxiliaryContract {
 
     /**
     *

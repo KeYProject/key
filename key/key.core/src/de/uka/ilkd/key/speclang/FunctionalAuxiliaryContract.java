@@ -25,11 +25,11 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.BlockContractBuilders;
 
 /**
- * This class is only used to generate a proof obligation for an {@link BlockSpecificationElement}.
+ * This class is only used to generate a proof obligation for an {@link AuxiliaryContract}.
  *
  * @author lanzinger
  */
-public abstract class FunctionalAuxiliaryContract<T extends BlockSpecificationElement> implements Contract {
+public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> implements Contract {
 
 
     /**
@@ -326,7 +326,7 @@ public abstract class FunctionalAuxiliaryContract<T extends BlockSpecificationEl
      * @param heap
      *            the heap to use.
      * @return <code>true</code> iff this contract is strictly pure.
-     * @see BlockSpecificationElement#hasModifiesClause(LocationVariable)
+     * @see AuxiliaryContract#hasModifiesClause(LocationVariable)
      */
     public boolean hasModifiesClause(LocationVariable heap) {
         return contract.hasModifiesClause(heap);
@@ -334,7 +334,7 @@ public abstract class FunctionalAuxiliaryContract<T extends BlockSpecificationEl
 
     /**
      *
-     * @return the corresponding {@link BlockSpecificationElement}.
+     * @return the corresponding {@link AuxiliaryContract}.
      */
     public T getAuxiliaryContract() {
         return contract;
@@ -343,7 +343,7 @@ public abstract class FunctionalAuxiliaryContract<T extends BlockSpecificationEl
     /**
      *
      * @return the block this contract belongs to.
-     * @see BlockSpecificationElement#getBlock()
+     * @see AuxiliaryContract#getBlock()
      */
     public StatementBlock getBlock() {
         return contract.getBlock();
@@ -352,7 +352,7 @@ public abstract class FunctionalAuxiliaryContract<T extends BlockSpecificationEl
     /**
      *
      * @return the method containing {@link #getBlock()}
-     * @see BlockSpecificationElement#getMethod()
+     * @see AuxiliaryContract#getMethod()
      */
     public IProgramMethod getMethod() {
         return contract.getMethod();
@@ -364,16 +364,16 @@ public abstract class FunctionalAuxiliaryContract<T extends BlockSpecificationEl
      *
      * @return the placeholder variables used created during this contracts instantiation.
      * @see BlockContractBuilders.VariablesCreatorAndRegistrar
-     * @see BlockSpecificationElement#getPlaceholderVariables()
+     * @see AuxiliaryContract#getPlaceholderVariables()
      */
-    public BlockSpecificationElement.Variables getPlaceholderVariables() {
+    public AuxiliaryContract.Variables getPlaceholderVariables() {
         return contract.getPlaceholderVariables();
     }
 
     /**
      *
      * @return this contract's modality.
-     * @see BlockSpecificationElement#getModality()
+     * @see AuxiliaryContract#getModality()
      */
     public Modality getModality() {
         return contract.getModality();

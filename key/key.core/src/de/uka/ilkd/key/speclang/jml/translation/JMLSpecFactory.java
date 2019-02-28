@@ -65,7 +65,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.ParametricMergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.UnparametricMergeProcedure;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassAxiomImpl;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -84,8 +84,8 @@ import de.uka.ilkd.key.speclang.MergeContract;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
-import de.uka.ilkd.key.speclang.SimpleBlockContract;
-import de.uka.ilkd.key.speclang.SimpleLoopContract;
+import de.uka.ilkd.key.speclang.BlockContractImpl;
+import de.uka.ilkd.key.speclang.LoopContractImpl;
 import de.uka.ilkd.key.speclang.UnparameterizedMergeContract;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
@@ -1298,7 +1298,7 @@ public class JMLSpecFactory {
                 = createProgramVariables(method, block, variables);
         final ContractClauses clauses
                 = translateJMLClauses(method, specificationCase, programVariables, behavior);
-        return new SimpleBlockContract.Creator("JML " + behavior + "block contract", block, labels,
+        return new BlockContractImpl.Creator("JML " + behavior + "block contract", block, labels,
                 method, behavior, variables, clauses.requires, clauses.measuredBy, clauses.ensures,
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
                 clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
@@ -1333,7 +1333,7 @@ public class JMLSpecFactory {
                 = createProgramVariables(method, loop, variables);
         final ContractClauses clauses
                 = translateJMLClauses(method, specificationCase, programVariables, behavior);
-        return new SimpleLoopContract.Creator("JML " + behavior + "loop contract", loop, labels,
+        return new LoopContractImpl.Creator("JML " + behavior + "loop contract", loop, labels,
                 method, behavior, variables, clauses.requires, clauses.measuredBy, clauses.ensures,
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
                 clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
@@ -1368,7 +1368,7 @@ public class JMLSpecFactory {
                 = createProgramVariables(method, block, variables);
         final ContractClauses clauses
                 = translateJMLClauses(method, specificationCase, programVariables, behavior);
-        return new SimpleLoopContract.Creator("JML " + behavior + "loop contract", block, labels,
+        return new LoopContractImpl.Creator("JML " + behavior + "loop contract", block, labels,
                 method, behavior, variables, clauses.requires, clauses.measuredBy, clauses.ensures,
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
                 clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
@@ -1385,7 +1385,7 @@ public class JMLSpecFactory {
      * @param block
      *            the block.
      * @param variables
-     *            an instance of {@link BlockSpecificationElement.Variables} for the block.
+     *            an instance of {@link AuxiliaryContract.Variables} for the block.
      * @return
      */
     private ProgramVariableCollection createProgramVariables(final IProgramMethod method,
