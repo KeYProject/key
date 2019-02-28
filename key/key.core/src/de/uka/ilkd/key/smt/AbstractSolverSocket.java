@@ -48,6 +48,9 @@ public abstract class AbstractSolverSocket implements PipeListener<SolverCommuni
 		else if(type == SolverType.Z3_CE_SOLVER){
 			return new Z3CESocket(name, query);
 		}
+		else if(type == SolverType.Z3_NEW_TL_SOLVER){
+			return new Z3Socket(name, query);
+		}
 		else if(type == SolverType.SIMPLIFY_SOLVER){
 			return new SimplifySocket(name, query);
 		}
