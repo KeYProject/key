@@ -61,7 +61,8 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
         public int     maxGenericSorts               = 2;
         public long    maxInteger                   =2147483645;
         public long    minInteger                   =-2147483645;
-        public boolean useLegacyTranslation = false;
+//        TODO js: could be used once the new translation is working
+//        public boolean useLegacyTranslation = false;
 
 
 
@@ -87,8 +88,6 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
                 this.maxInteger                    = data.maxInteger;
                 this.minInteger                    = data.minInteger;
                 this.invariantForall               = data.invariantForall;
-                this.useLegacyTranslation          = data.useLegacyTranslation;
-
         }
 
 
@@ -128,8 +127,6 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
 
                 supportedTaclets.selectTaclets(SettingsConverter.read(props, TACLET_SELECTION,
                                 supportedTaclets.getNamesOfSelectedTaclets()));
-
-                useLegacyTranslation = SettingsConverter.read(props, LEGACY_TRANSLATION, useLegacyTranslation);
         }
 
         @Override
@@ -144,7 +141,6 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
                 SettingsConverter.store(props,INTEGERS_MAXIMUM,maxInteger);
                 SettingsConverter.store(props,INTEGERS_MINIMUM,minInteger);
                 SettingsConverter.store(props, INVARIANT_FORALL, invariantForall);
-                SettingsConverter.store(props, LEGACY_TRANSLATION, useLegacyTranslation);
         }
 
 

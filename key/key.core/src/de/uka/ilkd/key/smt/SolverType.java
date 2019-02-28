@@ -185,12 +185,8 @@ public interface SolverType  {
 
             @Override
             public SMTTranslator createTranslator(Services services) {
-                if (services.getProof().getSettings().getSMTSettings().useLegacyTranslation) {
-                    return new SmtLib2Translator(services,
+				return new SmtLib2Translator(services,
                                     new Configuration(false,false));
-                } else {
-                    return new ModularSMTLib2Translator();
-                }
             }
 
 
@@ -216,6 +212,86 @@ public interface SolverType  {
 
 
     };
+
+	/**
+	 * Z3 with new modular translator
+	 */
+	static public final SolverType Z3_NEW_TL_SOLVER = new AbstractSolverType() {
+
+
+		@Override
+		public String getDefaultSolverCommand() {
+			return "z3";
+		}
+
+		@Override
+		public String getDefaultSolverParameters() {
+			return "-in -smt2";
+		}
+
+		@Override
+		public SMTSolver createSolver(SMTProblem problem,
+									  SolverListener listener, Services services) {
+			return new SMTSolverImplementation(problem, listener,
+					services, this);
+		}
+
+		@Override
+		public String getName() {
+			return "Z3_NEW_TL";
+		}
+
+		@Override
+		public String getVersionParameter() {
+			return "-version";
+		}
+
+		@Override
+		public String getRawVersion() {
+			final String tmp = super.getRawVersion();
+			if (tmp == null) {
+				return null;
+			}
+			return tmp.substring(tmp.indexOf("version"));
+		}
+
+		@Override
+		public String[] getSupportedVersions() {
+			return new String[]{"version 3.2", "version 4.1", "version 4.3.0", "version 4.3.1"};
+		}
+
+		@Override
+		public String[] getDelimiters() {
+			return new String[]{"\n", "\r"};
+		}
+
+		@Override
+		public boolean supportsIfThenElse() {
+			return true;
+		}
+
+		@Override
+		public SMTTranslator createTranslator(Services services) {
+			return new ModularSMTLib2Translator();
+		}
+
+
+		@Override
+		public String getInfo() {
+			return "";
+//                    return "Z3 does not use quantifier elimination by default. This means for example that"
+//                                    + " the following problem cannot be solved automatically by default:\n\n"
+//                                    + "\\functions{\n"
+//                                    + "\tint n;\n"
+//                                    + "}\n\n"
+//                                    + "\\problem{\n"
+//                                    + "\t((\\forall int x;(x<=0 | x >= n+1)) & n >= 1)->false\n"
+//                                    + "}"
+//                                    + "\n\n"
+//                                    + "You can activate quantifier elimination by appending QUANT_FM=true to"
+//                                    + " the execution command.";
+		}
+	};
 
 	/**
 	 * Class for the Z3 solver. It makes use of the SMT2-format.

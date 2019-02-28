@@ -13,13 +13,7 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -486,7 +480,19 @@ public class SMTObjTranslator implements SMTTranslator {
 		return new StringBuffer(s);
 	}
 
-	public ModelExtractor getQuery() {
+    /**
+     * Js: Architecturally, translation of taclets should be moved here at some point.
+     * @param services The current proof services
+     * @param settings The current SMT settings
+     * @return
+     * @throws IllegalFormulaException
+     */
+    @Override
+    public ArrayList<StringBuffer> translateTaclets(Services services, SMTSettings settings) throws IllegalFormulaException {
+        return null;
+    }
+
+    public ModelExtractor getQuery() {
 		for (String str : functions.keySet()) {
 			SMTFunction f = functions.get(str);
 			query.addFunction(f);

@@ -677,7 +677,6 @@ class TranslationOptions extends TablePanel{
 	private JCheckBox useBuiltInUniqueness;
 	private JCheckBox useUIMultiplication;
 	private JCheckBox useConstantsForIntegers;
-	private JCheckBox useLegacyTranslation;
 	private JTextField minField;
 	private JTextField maxField;
 	private final int minWidthOfTitle;
@@ -752,7 +751,6 @@ class TranslationOptions extends TablePanel{
 		createNullInstantiation();
 		createBuiltInUniqueness();
 		createUIMultiplication();
-		createLegacyTranslation();
 		createConstantsForIntegers();
 	}
 
@@ -885,20 +883,4 @@ class TranslationOptions extends TablePanel{
 		}
 		return useConstantsForIntegers;
 	}
-
-	public JCheckBox createLegacyTranslation() {
-
-        if(useLegacyTranslation == null){
-            useLegacyTranslation = addCheckBox( "Use legacy SMT Translation.",
-                    ""
-                    ,settings.useLegacyTranslation
-                    , new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    settings.useLegacyTranslation = useLegacyTranslation.isSelected();
-                }
-            });
-        }
-        return useLegacyTranslation;
-    }
 }
