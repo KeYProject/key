@@ -290,7 +290,7 @@ public class SolverListener implements SolverLauncherListener {
 
                 if (problemContainsUpdOrDL) {
                     progressDialog.addInformation("One or more proof goals contain heap updates, method calls," +
-                            " and/or JavaDL. The SMT translation of these will be incomplete," +
+                            " and/or modalities. The SMT translation of these will be incomplete," +
                                     " and the result will likely be unhelpful.",
                             new Color(200,150,0), null);
                 }
