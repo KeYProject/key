@@ -29,8 +29,8 @@ compile:openjdk8gradle:
   script:
     - javac -version
     - cd key
-    - gradle classes
-    - gradle testClasses
+    - ./gradle classes
+    - ./gradle testClasses
 
 compile:openjdk11:
   stage: primary
