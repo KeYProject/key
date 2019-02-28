@@ -525,8 +525,7 @@ class ProgressTable extends JTable{
                     width = Math.max(width, comp.getPreferredSize().width);
                 }
 
-
-                width += 2*margin;
+                width += 10*margin;
 
                 col.setPreferredWidth(width);
             }
