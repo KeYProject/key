@@ -18,14 +18,13 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.gui.GUIListener;
-import de.uka.ilkd.key.gui.IconFactory;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.ProofMacroMenu;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
+import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.*;
@@ -63,6 +62,7 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
             java.awt.event.InputEvent.CTRL_DOWN_MASK
                     | java.awt.event.InputEvent.SHIFT_DOWN_MASK
                     | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+    public static final Icon PROOF_ICON = IconFontSwing.buildIcon(FontAwesomeBold.TREE, MainWindowTabbedPane.TAB_ICON_SIZE);
     private static final long serialVersionUID = 3732875161168302809L;
     // Taclet info can be shown for inner nodes.
     public final TacletInfoToggle tacletInfoToggle = new TacletInfoToggle();
@@ -108,7 +108,6 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
      * the search dialog
      */
     private ProofTreeSearchBar proofTreeSearchPanel;
-
 
     /**
      * creates a new proof tree
@@ -234,7 +233,6 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
         delegateView.setVisible(true);
     }
 
-
     /**
      * returns the mediator to communicate with the model
      *
@@ -357,7 +355,6 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
         treeSelectionListener.ignoreChange = false;
     }
 
-
     protected void makeNodeExpanded(Node n) {
         GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n);
         if (node == null) return;
@@ -365,7 +362,6 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
         TreePath tp = new TreePath(obs);
         delegateView.makeVisible(tp);
     }
-
 
     /**
      * Collapse all subtrees that are closed
@@ -394,7 +390,6 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
                 collapseClosedNodesHelp(path.pathByAddingChild(child));
         }
     }
-
 
     /**
      * Collapse all branches which are not below <tt>path</tt>
@@ -488,7 +483,7 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
 
     @Override
     public Icon getIcon() {
-        return null;
+        return PROOF_ICON;
     }
 
     @Override
