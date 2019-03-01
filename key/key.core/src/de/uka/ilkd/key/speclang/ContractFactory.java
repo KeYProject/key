@@ -453,6 +453,11 @@ public class ContractFactory {
         }
         Map<LocationVariable,Term> mods = t.originalMods;
         Map<ProgramVariable,Term> deps = t.originalDeps;
+        // MU: Bugfix #1489
+        // Do not modify the data stores in t but make new copies
+        mods = new LinkedHashMap<>(mods);
+        deps = new LinkedHashMap<>(deps);
+
         Modality moda = t.modality;
         for(FunctionalOperationContract other : others) {
             Modality otherModality = other.getModality();
