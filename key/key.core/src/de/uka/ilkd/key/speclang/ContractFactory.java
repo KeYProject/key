@@ -414,6 +414,13 @@ public class ContractFactory {
             assert contract.getTarget().equals(t.pm);
         }
 
+        Map<LocationVariable,Term> mods = t.originalMods;
+        Map<ProgramVariable,Term> deps = t.originalDeps;
+        // MU: Bugfix #1489
+        // Do not modify the data stores in t but make new copies
+        mods = new LinkedHashMap<>(mods);
+        deps = new LinkedHashMap<>(deps);
+
         //collect information
         Map<LocationVariable,Term> pres =
                 new LinkedHashMap<LocationVariable, Term>(t.originalPres.size());
@@ -438,7 +445,12 @@ public class ContractFactory {
            if(oriFreePost != null) {
                freePosts.put(h, tb.imp(atPreify(t.originalFreePres.get(h), t.originalAtPreVars),
                                        oriFreePost));
-            }
+           }
+
+           Term oriMod = t.originalMods.get(h);
+           if(oriMod != null) {
+               mods.put(h, tb.ife(t.originalPres.get(h), oriMod, tb.allLocs()));
+           }
         }
 
         Map<LocationVariable,Term> axioms = new LinkedHashMap<LocationVariable,Term>();
@@ -451,12 +463,6 @@ public class ContractFactory {
                 }
             }
         }
-        Map<LocationVariable,Term> mods = t.originalMods;
-        Map<ProgramVariable,Term> deps = t.originalDeps;
-        // MU: Bugfix #1489
-        // Do not modify the data stores in t but make new copies
-        mods = new LinkedHashMap<>(mods);
-        deps = new LinkedHashMap<>(deps);
 
         Modality moda = t.modality;
         for(FunctionalOperationContract other : others) {
@@ -531,7 +537,7 @@ public class ContractFactory {
                         	nm = m1;
                         } else {
                             Term ownPre = pres.get(h) != null ? pres.get(h) : tb.tt();
-                            nm = tb.intersect(tb.ife(ownPre, m1, tb.allLocs()),
+                            nm = tb.intersect(m1,
                                     tb.ife(otherPre, m2, tb.allLocs()));
                         }
                         mods.put(h, nm);
