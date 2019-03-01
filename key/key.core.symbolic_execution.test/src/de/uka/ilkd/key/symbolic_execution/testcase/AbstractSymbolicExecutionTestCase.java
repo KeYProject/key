@@ -111,7 +111,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    /**
     * <p>
     * If this constant is {@code true} a temporary directory is created with
-    * new oracle files. The developer has than to copy the new required files
+    * new oracle files. The developer has then to copy the new required files
     * into the plug-in so that they are used during next test execution.
     * </p>
     * <p>
@@ -123,7 +123,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * has changed so that they are outdated.
     * </p>
     */
-   public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = true;
+   public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = false;
 
    /**
     * If the fast mode is enabled the step wise creation of models is disabled.
