@@ -178,6 +178,7 @@ public class InnerNodeView extends SequentView {
         }
 
         updateHidingProperty();
+        updateHeatMapHighlights();
     }
 
 }
