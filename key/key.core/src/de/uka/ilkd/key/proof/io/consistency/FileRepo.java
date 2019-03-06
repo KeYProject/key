@@ -63,14 +63,6 @@ public interface FileRepo extends ProofDisposedListener {
     public void registerProof(Proof proof);
 
     /**
-     * Stores all files stored in the FileRepo in a consistent package as a ZIP archive at the given
-     * target path. If a file with the given path exists, it is deleted first.
-     * @param savePath the target path of the ZIP archive
-     * @throws IOException on IO errors, e.g. if the user has no permission to write at the path
-     */
-    public void saveProof(Path savePath) throws IOException;
-
-    /**
      * Sets the bootclasspath (containing available classes from the Java Class Library).
      * @param path the bootclasspath to set (the method does nothing if null is given)
      * @throws IllegalStateException if the java path is already set

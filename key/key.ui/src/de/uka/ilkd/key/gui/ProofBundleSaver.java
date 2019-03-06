@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.proof.io.consistency.AbstractFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -40,6 +41,12 @@ public class ProofBundleSaver extends ProofSaver {
         // get the FileRepo from the InitConfig of the Proof
         FileRepo repo = proof.getInitConfig().getFileRepo();
 
+        // this ProofSaver can not be used with TrivialFileRepo
+        if (!(repo instanceof AbstractFileRepo)) {
+            throw new UnsupportedOperationException("Error! This FileRepo does not support"
+                    + "bundle saving!");
+        }
+
         /* create a filename for the actual proof file in the FileRepo:
          * We always use the contract name here (preparation for proof bundle
          * -> saving multiple proofs). */
@@ -49,6 +56,6 @@ public class ProofBundleSaver extends ProofSaver {
         super.save(repo.createOutputStream(Paths.get(proofFileName)));
 
         // save proof bundle with the help of the FileRepo
-        repo.saveProof(file.toPath());
+        ((AbstractFileRepo)repo).saveProof(file.toPath());
     }
 }

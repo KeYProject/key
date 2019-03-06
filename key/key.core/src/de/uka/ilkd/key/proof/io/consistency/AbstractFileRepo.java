@@ -135,7 +135,12 @@ public abstract class AbstractFileRepo implements FileRepo {
         return bootclasspath != null && path.startsWith(bootclasspath);
     }
 
-    @Override
+    /**
+     * Stores all files stored in the FileRepo in a consistent package as a ZIP archive at the given
+     * target path. If a file with the given path exists, it is deleted first.
+     * @param savePath the target path of the ZIP archive
+     * @throws IOException on IO errors, e.g. if the user has no permission to write at the path
+     */
     public void saveProof(Path savePath) throws IOException {
         // We overwrite an existing proof here in any case. Checks have to be done earlier.
         if (Files.exists(savePath)) {
@@ -203,7 +208,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @return true if copy was performed and false if not performed
      * @throws IOException if an I/O error occurs
      */
-    public static boolean copy(InputStream source, OutputStream target) throws IOException {
+    private static boolean copy(InputStream source, OutputStream target) throws IOException {
         if (source != null && target != null) {
             byte[] buffer = new byte[1024];
             int read;
@@ -225,23 +230,65 @@ public abstract class AbstractFileRepo implements FileRepo {
      */
     protected InputStream adaptFileRefs(Path p) throws IOException {
         // TODO: adapt include/includeFile (e.g. for Taclets)
-        // TODO: may produce multiple occurrences of same classpath statement
+        // TODO: may replace/filter too much (e.g. in comments)
 
         try (InputStream is = getInputStreamInternal(p);  // get concrete source from repo
              Stream<String> lines = new BufferedReader(new InputStreamReader(is)).lines()) {
 
-            // create an in-memory copy of the file, modify it, and return an InputStream
-            String rep = lines
-                .map(l -> l.replaceAll("\\\\javaSource \\\".*\\\";",
-                                       "\\\\javaSource \"src\";"))
-                .map(l -> l.replaceAll("\\\\classpath \\\".*\\\";",
-                                       "\\\\classpath \"classpath\";"))
-                .map(l -> l.replaceAll("\\\\bootclasspath \\\".*\\\";",
-                                       "\\\\bootclasspath \"bootclasspath\";"))
-                .collect(Collectors.joining(System.lineSeparator()));
+            // create an in-memory copy of the file, modify it, prepend the classpath,
+            // and return an InputStream
+            String rep = lines                       // remove all classpath declarations
+                              .filter(l -> !l.matches(".*\\\\classpath \\\".*\\\";.*"))
+                              .map(l -> l.replaceAll("\\\\javaSource \\\".*\\\";",
+                                                     "\\\\javaSource \"src\";"))
+                              .map(l -> l.replaceAll("\\\\bootclasspath \\\".*\\\";",
+                                                     "\\\\bootclasspath \"bootclasspath\";"))
+                              .collect(Collectors.joining(System.lineSeparator()));
+
+            // add classpath (has to be prior to javaSource)
+            rep = addClasspath(rep);
 
             return new ByteArrayInputStream(rep.getBytes("UTF-8"));
         }
+    }
+
+    /**
+     * Adds the classpath String for all paths in classpath to the given String representing
+     * the content of a .key/.proof file. The classpath Strings are inserted at the correct
+     * position: Directly in front of "\javaSource ...", if existing, or else in front of
+     * other "\classpath ..." declarations.
+     * @param keyFileContent a String containing the content of a .key/.proof file.
+     * @return the modified content of the file with inserted "\classpath ..." declarations.
+     */
+    private String addClasspath(String keyFileContent) {
+        if (classpath.isEmpty()) {
+            return keyFileContent;
+        }
+
+        // build a String with all classpaths
+        StringBuilder sb = new StringBuilder();
+        for (Path t : classpath) {
+            sb.append("\\classpath \"");
+            sb.append(getSaveName(t));
+            sb.append("\";");
+            sb.append(System.lineSeparator());
+        }
+
+        // either javaSource or classpath must be specified -> find it
+        int index = keyFileContent.indexOf("\\javaSource");
+        if (index == -1) {          // classpath must be present
+            index = keyFileContent.indexOf("\\classpath");
+        }
+
+        // fallback: insert at beginning of String
+        if (index == -1) {
+            index = 0;
+        }
+
+        return keyFileContent.substring(0, index)
+                + System.lineSeparator()
+                + sb.toString()
+                + keyFileContent.substring(index);
     }
 
     @Override
@@ -300,6 +347,10 @@ public abstract class AbstractFileRepo implements FileRepo {
      * Clears all data in the FileRepo and marks it as disposed.
      */
     protected void dispose() {
+        if (disposed) {
+            return;
+        }
+
         // delete all references
         javaPath = null;
         classpath = null;
@@ -315,7 +366,6 @@ public abstract class AbstractFileRepo implements FileRepo {
 
     @Override
     public void proofDisposing(ProofDisposedEvent e) {
-        // TODO not used?
     }
 
     @Override

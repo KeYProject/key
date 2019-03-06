@@ -553,9 +553,10 @@ public class Recoder2KeY implements JavaReader {
      * as a directory (not a JAR file at the moment) and all files in this
      * directory are read in. This is done using a
      * {@link DirectoryFileCollection}.
+     * @param fileRepo the FileRepo that provides the InputStream to resources
      */
-    private void parseInternalClasses(ProgramFactory pf, List<recoder.java.CompilationUnit> rcuList) 
-                    throws IOException, ParseException, ParserException {
+    private void parseInternalClasses(ProgramFactory pf, List<recoder.java.CompilationUnit> rcuList,
+            FileRepo fileRepo) throws IOException, ParseException, ParserException {
         
         FileCollection bootCollection;
         FileCollection.Walker walker = null;
@@ -570,7 +571,7 @@ public class Recoder2KeY implements JavaReader {
         
         while(walker.step()) {
             DataLocation loc = walker.getCurrentDataLocation();
-            InputStream is = walker.openCurrent();
+            InputStream is = walker.openCurrent(fileRepo);
             Reader f = new BufferedReader(new InputStreamReader(is));
             
             try {
@@ -609,6 +610,7 @@ public class Recoder2KeY implements JavaReader {
      * </ol>
      *
      * @author mulbrich
+     * @param fileRepo the FileRepo for obtaining InputStreams
      * @throws ParserException
      * @throws IOException
      * @throws ParseException
@@ -620,26 +622,10 @@ public class Recoder2KeY implements JavaReader {
         List<recoder.java.CompilationUnit> rcuList = new LinkedList<recoder.java.CompilationUnit>();
         List<FileCollection> sources = new ArrayList<FileCollection>();
 
-        // TODO: WP: load via FileRepo?
-        parseInternalClasses(pf, rcuList);
+        parseInternalClasses(pf, rcuList, fileRepo);
 
         if(classPath != null) {
             for(File cp : classPath) {
-//                // register file (or directory recursively) in fileRepo if the repo is set
-//                if (fileRepo != null) {
-//                    // iterate to make sure that only files are requested to repo
-//                    Files.walkFileTree(cp.toPath(), new SimpleFileVisitor<Path>() {
-//                        @Override
-//                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-//                            throws IOException {
-//                            if (!Files.isDirectory(file)) {
-//                                // hack to register the file to the repo
-//                                fileRepo.getInputStream(file).close();
-//                            }
-//                            return FileVisitResult.CONTINUE;
-//                        }
-//                    });
-//                }
                 if(cp.isDirectory()) {
                     sources.add(new DirectoryFileCollection(cp));
                 } else {
@@ -648,6 +634,8 @@ public class Recoder2KeY implements JavaReader {
             }
         }
 
+        /* While the resources are read (and possibly copied) via the FileRepo, the data location
+         * is left as it is. This leaves the line information intact. */
         DataLocation currentDataLocation = null;
 
         // -- read jml files --

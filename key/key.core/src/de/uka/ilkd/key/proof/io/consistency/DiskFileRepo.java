@@ -18,7 +18,6 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
 import de.uka.ilkd.key.proof.io.RuleSource;
-import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
 /**
@@ -31,7 +30,8 @@ public final class DiskFileRepo extends AbstractFileRepo {
      * The path where KeY's built-in rules are stored.
      * Needed to prevent built-in rules from getting cached.
      */
-    protected static final Path KEYPATH = RuleSourceFactory.fromDefaultLocation("").file().toPath();
+    //protected static final Path KEYPATH = RuleSourceFactory.fromDefaultLocation("").file().toPath();
+    protected static final Path KEYPATH = Paths.get("..").toAbsolutePath().normalize();
 
     /**
      * This matcher matches *.java files.
@@ -93,25 +93,14 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
     @Override
     public InputStream getInputStream(Path path) throws IOException {
-
         // wrap path into URL for uniform treatment
         return getInputStream(path.toUri().toURL());
-
-//        // ignore URL files (those are internal files shipped with KeY)
-//        if (isURLFile(path)) {
-//            return null; // TODO: do not return null here, but a useful InputStream?
-//        }
-//
-//        return copyAndOpenInputStream(path);
     }
 
     @Override
     public InputStream getInputStream(RuleSource ruleSource) throws IOException {
         // wrap file of RuleSource into an URL
         out("getting InputStream of RuleSource file: " + ruleSource.file());
-
-        // TODO: this fails if the file is a zip file: in this case, file starts with "file:/"
-        //URL url = file.toURI().toURL();
 
         return getInputStream(ruleSource.url());
     }
@@ -132,7 +121,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
             JarURLConnection juc = (JarURLConnection) url.openConnection();
             Path jarPath = Paths.get(juc.getJarFile().getName());
 
-            // TODO: wrong number of slashes somewhere
+            // TODO: wrong number of slashes somewhere?
 
             // copy the actual file, but return an InputStream to the concrete entry:
             // - copy file of URL to repo
@@ -295,7 +284,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
         Path newFile = null;
 
-        // where is the file located in (src, classpath, bootclasspath)
+        // Where is the file located (src, classpath, bootclasspath)?
         if (isInJavaPath(javaFile)) {                                              // src
             newFile = resolveAndCopy(javaFile, getJavaPath(), Paths.get("src"));
         } else if (isInBootClassPath(javaFile)) {                                  // bootclasspath
@@ -303,11 +292,13 @@ public final class DiskFileRepo extends AbstractFileRepo {
         } else if (getClasspath() != null) {                                       // classpath
             // search for matching classpath in the list
             for (Path cp : getClasspath()) {
-                // TODO: how to deal with zips/jars?
-
                 if (javaFile.startsWith(cp)) {         // only consider directories in classpath
+                    // cp is always a directory
+                    // -> we put the file into the corresponding subdir in our classpath folder
+                    Path parent = cp.getParent();
+
                     // we found the file location, so copy it
-                    newFile = resolveAndCopy(javaFile, cp, Paths.get("classpath"));
+                    newFile = resolveAndCopy(javaFile, parent, Paths.get("classpath"));
                     break;
                 }
             }
@@ -347,8 +338,28 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
     private InputStream getClassFileInputStream(Path classFile) throws IOException {
         // copy to classpath folder (*.class files may only occur in classpath)
-        Path newFile = resolveAndCopy(classFile, classFile.getParent(), Paths.get("classpath"));
-        return new FileInputStream(newFile.toFile());
+
+        Path newFile = null;
+
+        // class file may be in subdirectories
+        // search for matching classpath in the list
+        for (Path cp : getClasspath()) {
+            if (classFile.startsWith(cp)) {         // only consider directories in classpath
+                // cp is always a directory
+                // -> we put the file into the corresponding subdir in our classpath folder
+                Path parent = cp.getParent();
+
+                // we found the file location, so copy it
+                newFile = resolveAndCopy(classFile, parent, Paths.get("classpath"));
+                break;
+            }
+        }
+
+        if (newFile != null) {
+            //newFile = resolveAndCopy(classFile, classFile.getParent(), Paths.get("classpath"));
+            return new FileInputStream(newFile.toFile());
+        }
+        return null;
     }
 
     /**
