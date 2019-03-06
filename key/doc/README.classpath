@@ -15,9 +15,10 @@ do not contain a model of any contained code.
 0. Changes
 ----------
 
+Mar 6, 19   Wolfram Pfeifer
+    corrected wrong example, updated list of internal classes
 Sep 4, 09   mulbrich
 	dropping \noDefaultClasses, adding \bootclasspath
-	
 
 
 1. Syntax
@@ -28,9 +29,8 @@ The \classpath directive may be placed directly in front of the
 \javaSource directive or instead of it. There may be an arbitrary
 number of \classpath annotations, but at most one \bootclasspath.
 
-The \bootclasspath directive is optional. It it appears, however, it
-has to be placed directly in front of all \classpath directives
-directives.
+The \bootclasspath directive is optional. If it appears, however, it
+has to be placed directly in front of all \classpath directives.
 
 \classpath must be followed by a string describing either a directory
 or a zip file. Any jar file is a zip file. The path may either be
@@ -42,8 +42,8 @@ are not supported here at the moment.
 
 Example: A .key-file might begin with
 
-\classpath "/tmp/classes.jar";
 \bootclasspath "../systemDir/";
+\classpath "/tmp/classes.jar";
 \classpath "../classDir/";
 \classpath "someLibrary.jar";
 \javaSource "../sources";
@@ -53,7 +53,7 @@ Example: A .key-file might begin with
 2. Meaning
 ----------
 
-In KeY there are three kind of resources read in when loading sources.
+In KeY there are three kinds of resources read in when loading sources.
 
 2.1. Boot Classes / System Classes / Default Classes
 
@@ -149,7 +149,7 @@ of the default classes.
 If you forget to include classes, it may to lead to unexpected and 
 mysterious errors at runtime of KeY.
 
-[1] system/resources/de/uka/ilkd/key/java/JavaRedux
+[1] key.core/resources/de/uka/ilkd/key/java/JavaRedux
 
 4. Known issues
 ---------------
@@ -182,12 +182,17 @@ always contains fully qualified names.
 
 A. List of internally stored classes:
 -------------------------------------
+(see key.core/resources/de/uka/ilkd/key/java/JavaRedux/JAVALANG.TXT)
 
 java.lang.Object
 
+java.lang.annotation.Annotation
 java.lang.ArithmeticException
 java.lang.ArrayIndexOutOfBoundsException
 java.lang.ArrayStoreException
+java.lang.AssertionError
+java.lang.Character
+java.lang.Class
 java.lang.ClassCastException
 java.lang.CloneNotSupportedException
 java.lang.Cloneable
@@ -196,24 +201,37 @@ java.lang.Enum
 java.lang.Error
 java.lang.Exception
 java.lang.ExceptionInInitializerError
+java.lang.IllegalArgumentException
 java.lang.IndexOutOfBoundsException
+java.lang.Integer
 java.lang.InterruptedException
 java.lang.Iterable (*)
 java.lang.LinkageError
 java.lang.NegativeArraySizeException
 java.lang.NoClassDefFoundError
 java.lang.NullPointerException
+java.lang.Number
 java.lang.NumberFormatException (*)
+java.lang.OutOfMemoryError
+java.lang.Runnable
 java.lang.RuntimeException
 java.lang.String
+java.lang.StringBuffer
+java.lang.System
+java.lang.Thread
 java.lang.Throwable
+java.lang.VirtualMachineError
 java.util.Collection (*)
 java.util.Iterator (*)
 java.util.List (*)
 java.util.ListIterator (*)
 java.util.Map (*)
 java.util.Set (*)
+java.io.FilterOutputStream
+java.io.InputStream
 java.io.IOException (*)
+java.io.OutputStream
+java.io.PrintStream
 java.io.Serializable
 
 (*) If you want to overwrite the internal classes, these may be
