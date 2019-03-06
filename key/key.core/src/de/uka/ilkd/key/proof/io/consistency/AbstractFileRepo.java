@@ -269,7 +269,17 @@ public abstract class AbstractFileRepo implements FileRepo {
         StringBuilder sb = new StringBuilder();
         for (Path t : classpath) {
             sb.append("\\classpath \"");
-            sb.append(getSaveName(t));
+
+            Path cp;
+            if (Files.isRegularFile(t)) {
+                // t denotes a zip/jar file -> request savename (depends on subclass)
+                cp = getSaveName(t);
+            } else {
+                // t denotes a directory in classpath -> add "classpath/dir_name"
+                cp = Paths.get("classpath").resolve(t.getFileName());
+            }
+
+            sb.append(cp);
             sb.append("\";");
             sb.append(System.lineSeparator());
         }
