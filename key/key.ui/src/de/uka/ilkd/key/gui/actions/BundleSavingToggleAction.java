@@ -2,6 +2,8 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 
+import javax.swing.JOptionPane;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
@@ -28,6 +30,12 @@ public class BundleSavingToggleAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        // changes become effective for the next proof
+        if (mainWindow.getMediator().ensureProofLoaded()) {
+            JOptionPane.showMessageDialog(mainWindow,
+                    "Your changes will become effective when the next problem is loaded.\n",
+                    "Allow Proof Bundle Saving", JOptionPane.INFORMATION_MESSAGE);
+        }
         boolean selected = isSelected();
         ProofIndependentSettings.DEFAULT_INSTANCE
                                 .getGeneralSettings()
