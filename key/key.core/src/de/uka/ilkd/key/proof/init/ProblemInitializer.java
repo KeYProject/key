@@ -332,7 +332,7 @@ public final class ProblemInitializer {
      * depending symbols for a generic sort out of the namespaces.
      * Helper for readEnvInput().
      *
-     * See bug report #1185, #1189
+     * See bug report #1185, #1189 (in Mantis)
      */
     private void cleanupNamespaces(InitConfig initConfig) {
         Namespace<QuantifiableVariable> newVarNS = new Namespace<>();

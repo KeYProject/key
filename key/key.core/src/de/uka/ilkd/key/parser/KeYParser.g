@@ -1166,6 +1166,7 @@ options {
         }
         
         // not found
+
         if (args==null) {
             throw new NotDeclException
                 (input, "(program) variable or constant", varfunc_name);
@@ -4520,6 +4521,35 @@ one_invariant[ParsableVariable selfVar]
      } RBRACE SEMI
 ;
 
+/*
+ * Read over a sequence of tokens that form a block in braces.
+ * Braces can be nested like
+ *    {  a ; ; b { c } }
+ *
+ * This can be done to overread entire blocks.
+ */
+skipBracedBlock
+    :
+    LBRACE
+    {
+       int nestingLevel = 1;
+       recLoop: while(true) {
+         switch (input.LA(1)) {
+         case LBRACE:
+           nestingLevel++;
+           break;
+
+         case RBRACE:
+           nestingLevel--;
+           if (nestingLevel == 0)  break recLoop;
+           break;
+         }
+         input.consume();
+       }
+    }
+    RBRACE
+    ;
+
 problem returns [ Term _problem = null ]
 @init {
     boolean axiomMode = false;
@@ -4559,8 +4589,17 @@ problem returns [ Term _problem = null ]
         (  ( RULES { axiomMode = false;} 
            | AXIOMS { axiomMode = true;}
            )
-        ( choices = option_list[choices] )?
-	    LBRACE
+
+           ( choices = option_list[choices] )?
+           (
+              // #MT-1185: KeY parses the same file several times.
+              // During problem parsing, some aspects of taclets
+              // can not be reparsed. Hence, in the problem walkthrough
+              // crudely overread the taclet setcion altogether.
+              { skip_taclets }? =>
+              skipBracedBlock
+           |
+            LBRACE
             { 
                 switchToSchemaMode(); 
             }
@@ -4582,6 +4621,7 @@ problem returns [ Term _problem = null ]
                 }
             )*
             RBRACE {choices=DefaultImmutableSet.<Choice>nil();}
+           )
         ) *
 
         { if(input.index() == 0) {
