@@ -1,16 +1,26 @@
 plugins {
     id("ca.coglinc.javacc") version("2.4.0") apply false
+    id("idea")
+    id("eclipse")
+}
+
+idea{
+    module {
+        //if you love browsing Javadoc
+        downloadJavadoc = false
+        //and hate reading sources :)
+        downloadSources = true
+    }
 }
 
 subprojects {
     apply plugin: "java"
-    apply plugin: "idea"
-    apply plugin: "eclipse"
     apply plugin: "java-library"
     apply plugin: "maven-publish"
 
     group = "org.key_project"
     version = "2.8.0-SNAPSHOT"
+    
     repositories {
         mavenCentral()
         flatDir { dirs "lib", "$rootDir/key.core/lib" }
@@ -31,11 +41,6 @@ subprojects {
             resources { srcDirs(file("../${project.name}.test/resources/")) }
         }
     }
-
-    /*val buildInfo by tasks.registering(BuildInfo::class) {
-        version = project.version.toString()
-        outputFile = file("$buildDir/generated-resources/build-info.properties")
-    }*/
 }
 
 project(":key.util") {}
@@ -45,6 +50,7 @@ project(":key.core.example") {
         compile project(":key.core")
     }
 }
+
 project(":key.core") {
     apply plugin: "ca.coglinc.javacc"
     apply plugin: "antlr"
@@ -113,7 +119,6 @@ project(":key.core") {
     }
 }
 
-
 project(":key.core.proof_references") {
     dependencies {
         compile project(":key.core")
@@ -126,13 +131,11 @@ project(":key.core.symbolic_execution") {
     }
 }
 
-
 project(":key.core.testgen") {
     dependencies {
         compile project(":key.core")
     }
 }
-
 
 project(":key.removegenerics") {
     dependencies {
