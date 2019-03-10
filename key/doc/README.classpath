@@ -1,4 +1,3 @@
-
 Using the \classpath directives in KeY
 ======================================
 
@@ -182,57 +181,11 @@ always contains fully qualified names.
 
 A. List of internally stored classes:
 -------------------------------------
-(see key.core/resources/de/uka/ilkd/key/java/JavaRedux/JAVALANG.TXT)
 
-java.lang.Object
+See key.core/resources/de/uka/ilkd/key/java/JavaRedux/JAVALANG.TXT
+for a comprehensive and uptodate list of the classes currently comprised
+in the bootclasspath in KeY.
 
-java.lang.annotation.Annotation
-java.lang.ArithmeticException
-java.lang.ArrayIndexOutOfBoundsException
-java.lang.ArrayStoreException
-java.lang.AssertionError
-java.lang.Character
-java.lang.Class
-java.lang.ClassCastException
-java.lang.CloneNotSupportedException
-java.lang.Cloneable
-java.lang.Comparable
-java.lang.Enum
-java.lang.Error
-java.lang.Exception
-java.lang.ExceptionInInitializerError
-java.lang.IllegalArgumentException
-java.lang.IndexOutOfBoundsException
-java.lang.Integer
-java.lang.InterruptedException
-java.lang.Iterable (*)
-java.lang.LinkageError
-java.lang.NegativeArraySizeException
-java.lang.NoClassDefFoundError
-java.lang.NullPointerException
-java.lang.Number
-java.lang.NumberFormatException (*)
-java.lang.OutOfMemoryError
-java.lang.Runnable
-java.lang.RuntimeException
-java.lang.String
-java.lang.StringBuffer
-java.lang.System
-java.lang.Thread
-java.lang.Throwable
-java.lang.VirtualMachineError
-java.util.Collection (*)
-java.util.Iterator (*)
-java.util.List (*)
-java.util.ListIterator (*)
-java.util.Map (*)
-java.util.Set (*)
-java.io.FilterOutputStream
-java.io.InputStream
-java.io.IOException (*)
-java.io.OutputStream
-java.io.PrintStream
-java.io.Serializable
-
-(*) If you want to overwrite the internal classes, these may be
-omitted, all the others must be present
+If you intend to override the bootclasspath, not all classes of these
+classes are required in your bootclasspath. However, ommiting essential
+classes may result in strange exceptions at runtime.
