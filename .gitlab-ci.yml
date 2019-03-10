@@ -32,6 +32,15 @@ compile:openjdk8gradle:
     - ./gradle classes
     - ./gradle testClasses
 
+compile:openjdk8gradlecheck:
+  stage: secondary
+  image: key-dev-openjdk8
+  script:
+    - javac -version
+    - cd key
+    - ./gradle check
+
+
 compile:openjdk11:
   stage: primary
   image: key-dev-openjdk11
