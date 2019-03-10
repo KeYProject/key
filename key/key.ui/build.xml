@@ -44,6 +44,7 @@
     <target name="compile" depends="copy" description="Compile all source files into the build directory.">
         <mkdir dir="${build.dir}"/>
         <javac srcdir="${src.dir}"
+               encoding="utf-8"
                destdir="${build.dir}"
                includeantruntime="false"
                source="1.8"

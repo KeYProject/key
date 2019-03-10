@@ -22,7 +22,12 @@ subprojects {
 
     group = "org.key_project"
     version = "2.8.0-SNAPSHOT"
-    
+
+
+    tasks.withType(Compile) {
+        options.encoding = "UTF-8"
+    }
+
     repositories {
         mavenCentral()
         flatDir { dirs "lib", "$rootDir/key.core/lib" }
