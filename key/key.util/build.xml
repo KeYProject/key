@@ -13,7 +13,8 @@
 	<target name="compile" description="Compile all source files into the build directory.">
 		<mkdir dir="${build.dir}"/>
 		<javac srcdir= "${src.dir}" 
-		       destdir="${build.dir}" 
+		       destdir="${build.dir}"
+                       encoding="utf-8"
 		       includeantruntime="false" 
 		       source="1.8" 
 		       target="1.8"
