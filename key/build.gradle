@@ -154,7 +154,12 @@ project(":key.ui") {
         compile(project(":key.core.symbolic_execution"))
         compile(project(":key.core.testgen"))
         compile(project(":key.removegenerics"))
-    }
+
+
+        compile group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.12.1'
+compile group: 'com.atlassian.commonmark', name: 'commonmark-ext-gfm-tables', version: '0.12.1'
+
+        }
 
     task createExamplesZip(type: Zip) {
         destinationDirectory = file("$projectDir/resources")
