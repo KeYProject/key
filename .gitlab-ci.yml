@@ -24,7 +24,7 @@ compile:openjdk8:
     - javac -version
     - ant -f key/scripts/build.xml compileAll
 
-compile:openjdk8gradle:
+compile:classes:
   stage: primary
   image: key-dev-openjdk8
   script:
@@ -32,7 +32,7 @@ compile:openjdk8gradle:
     - cd key
     - ./gradlew --parallel classes
 
-compile:openjdk8gradle:
+compile:testClasses:
   stage: secondary
   image: key-dev-openjdk8
   script:
@@ -40,8 +40,7 @@ compile:openjdk8gradle:
     - cd key
     - ./gradlew --parallel testClasses
 
-
-compile:openjdk8gradlecheck:
+compile:check:
   stage: ternary
   image: key-dev-openjdk8
   script:
