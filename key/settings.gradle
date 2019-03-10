@@ -1,0 +1,8 @@
+include("key.util",
+        "key.core", "key.ui",
+        "key.core.example",
+        "key.core.symbolic_execution",
+        "key.core.testgen",
+        "key.removegenerics",
+        "key.core.proof_references"
+)

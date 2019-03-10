@@ -499,3 +499,4 @@ examples/standard_key/strings/substring5.key.proof
 examples/standard_key/types/disjoint.key.proof
 examples/standard_key/unicode_test.key.proof
 .gitignore
+/build/

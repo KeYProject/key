@@ -17,6 +17,8 @@ subprojects {
     apply plugin: "java"
     apply plugin: "java-library"
     apply plugin: "maven-publish"
+    apply plugin: "idea"
+    apply plugin: "eclipse"
 
     group = "org.key_project"
     version = "2.8.0-SNAPSHOT"
@@ -143,6 +145,7 @@ project(":key.removegenerics") {
     }
 }
 
+
 project(":key.ui") {
     apply plugin: "application"
     dependencies {
@@ -158,7 +161,7 @@ project(":key.ui") {
         archiveFileName = "examples.zip"
         from 'examples'
         include '*'
-        include '*/*' //to include contents of a folder present inside Reports directory
+        include '*/*' //*/
     }
 
     processResources.dependsOn(createExamplesZip)
@@ -173,3 +176,6 @@ project(":key.ui") {
     }
 }
 
+task start {
+    dependsOn project(":key.ui").run
+}
