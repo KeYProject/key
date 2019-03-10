@@ -1027,7 +1027,13 @@ public class Recoder2KeY implements JavaReader {
             }
 
             if (var.getKeYJavaType() == null) {
-                throw new IllegalArgumentException("Variable " + var + " has no type");
+                /// The program variable "variant" introduced to prove loop termination has sort
+                /// "any" and, hence, no type. Parsing modalities fails on branches on which the
+                /// variable exists. Therefore, it seems better to silently ignore such program
+                /// variables (not making themaccessible) rather than to throw an exception.
+                /// MU 01.2019
+                // throw new IllegalArgumentException("Variable " + var + " has no type");
+                continue l;
             }
 
             String typeName = "";
