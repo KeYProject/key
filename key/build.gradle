@@ -159,7 +159,11 @@ project(":key.ui") {
         compile group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.12.1'
 compile group: 'com.atlassian.commonmark', name: 'commonmark-ext-gfm-tables', version: '0.12.1'
 
-        }
+
+        //Java 11
+        compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
+
+    }
 
     task createExamplesZip(type: Zip) {
         destinationDirectory = file("$projectDir/resources")
