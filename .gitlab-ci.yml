@@ -8,6 +8,7 @@
 stages:
     - primary
     - secondary
+    - ternary
 
 compile:oraclejdk8:
   stage: primary
@@ -30,10 +31,18 @@ compile:openjdk8gradle:
     - javac -version
     - cd key
     - ./gradlew --parallel classes
+
+compile:openjdk8gradle:
+  stage: secondary
+  image: key-dev-openjdk8
+  script:
+    - javac -version
+    - cd key
     - ./gradlew --parallel testClasses
 
+
 compile:openjdk8gradlecheck:
-  stage: secondary
+  stage: ternary
   image: key-dev-openjdk8
   script:
     - javac -version
