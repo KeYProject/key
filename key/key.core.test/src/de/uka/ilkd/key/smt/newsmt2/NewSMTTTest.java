@@ -124,7 +124,15 @@ public class NewSMTTTest {
 
     @Test
     public void numberConstants() {
-
+        Term t1 = tb.zTerm(42);
+        String expected1 = "42";
+        Assert.assertEquals(expected1, mh.translate(t1).toString());
+        Term t2 = tb.zTerm(-42);
+        String expected2 = "-42";
+        Assert.assertEquals(expected2, mh.translate(t2).toString());
+        Term t3 = tb.zTerm(-0);
+        String expected3 = "0";
+        Assert.assertEquals(expected3, mh.translate(t3).toString());
     }
 
     @Test
