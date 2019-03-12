@@ -7,7 +7,7 @@ import org.key_project.util.java.IOUtil;
 
 public class HelperClassForUtilityTests {
    public static final String RESOURCE_DIRECTORY;
-   
+
    static {
       File projectRoot = IOUtil.getProjectRoot(HelperClassForUtilityTests.class);
       // Update path in Eclipse Plug-ins executed as JUnit Test.
@@ -20,7 +20,11 @@ public class HelperClassForUtilityTests {
          projectRoot = projectRoot.getParentFile().getParentFile().getParentFile();
          projectRoot = new File(projectRoot, "key" + File.separator + "key.util.test");
       }
-      RESOURCE_DIRECTORY = projectRoot + File.separator + "resources";
+      if(System.getProperty("test-resources") != null) {
+          RESOURCE_DIRECTORY = new File(System.getProperty("test-resources")).getAbsolutePath();
+      }else{
+          RESOURCE_DIRECTORY = projectRoot + File.separator + "resources";
+      }
    }
 
    /**
@@ -35,7 +39,7 @@ public class HelperClassForUtilityTests {
        TestCase.assertTrue(folder.isDirectory());*/
        return folder;
    }
-   
+
    /**
     * Creates a file
     * @param file The file to create.

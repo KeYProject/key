@@ -52,7 +52,11 @@ subprojects {
     }
 }
 
-project(":key.util") {}
+project(":key.util") {
+    test{
+        systemProperty "test-resources", "../${project.name}.test/resources"
+    }
+}
 
 project(":key.core.example") {
     dependencies {
@@ -127,6 +131,10 @@ project(":key.core") {
         javacchome="${ext.dir}"
         -->*/
     }
+
+    test{
+        systemProperty "testcases", "../${project.name}.test/resources/testcase"
+    }
 }
 
 project(":key.core.proof_references") {
@@ -145,6 +153,10 @@ project(":key.core.testgen") {
     dependencies {
         compile project(":key.core")
     }
+
+    test{
+        systemProperty "testcases", "../${project.name}.test/resources/testcase"
+    }
 }
 
 project(":key.removegenerics") {
@@ -152,7 +164,6 @@ project(":key.removegenerics") {
         compile project(":key.core")
     }
 }
-
 
 project(":key.ui") {
     apply plugin: "application"
@@ -165,8 +176,7 @@ project(":key.ui") {
 
 
         compile group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.12.1'
-compile group: 'com.atlassian.commonmark', name: 'commonmark-ext-gfm-tables', version: '0.12.1'
-
+        compile group: 'com.atlassian.commonmark', name: 'commonmark-ext-gfm-tables', version: '0.12.1'
 
         //Java 11
         compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'

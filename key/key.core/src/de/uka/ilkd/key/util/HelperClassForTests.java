@@ -73,8 +73,13 @@ public class HelperClassForTests {
          projectRoot = projectRoot.getParentFile().getParentFile().getParentFile();
          projectRoot = new File(projectRoot, "key" + File.separator + "key.core.test");
       }
-      TESTCASE_DIRECTORY = projectRoot + File.separator + "resources"+ File.separator + "testcase";
-      DUMMY_KEY_FILE = new File(TESTCASE_DIRECTORY + File.separator + "dummyTrue.key");
+       if(System.getProperty("testcases") != null) {
+           TESTCASE_DIRECTORY = new File(System.getProperty("testcases")).getAbsolutePath();
+           DUMMY_KEY_FILE = new File(TESTCASE_DIRECTORY , "dummyTrue.key");
+       }else{
+           TESTCASE_DIRECTORY = projectRoot + File.separator + "resources"+ File.separator + "testcase";
+           DUMMY_KEY_FILE = new File(TESTCASE_DIRECTORY + File.separator + "dummyTrue.key");
+       }
    }
 
     

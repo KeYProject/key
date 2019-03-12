@@ -46,7 +46,7 @@ compile:check:
   script:
     - javac -version
     - cd key
-    - ./gradlew --parallel check
+    - ./gradlew --parallel --continue check
 
 
 compile:openjdk11:
