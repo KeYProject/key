@@ -224,6 +224,24 @@ public class NewSMTTTest {
                 mh.translate(iot, SExpr.Type.BOOL).toString());
     }
 
+    @Test
+    public void updAppTest() throws IllegalFormulaException, IOException {
+        LocationVariable xVar = new LocationVariable(new ProgramElementName("x"), intSort);
+        LocationVariable yVar = new LocationVariable(new ProgramElementName("y"), intSort);
+        LocationVariable zVar = new LocationVariable(new ProgramElementName("z"), intSort);
+        Term x = tb.var(xVar);
+        Term y = tb.var(yVar);
+        Term z = tb.var(zVar);
+        Term add = tb.add(x, y);
+        Term elemUpd = tb.elementary(x, z);
+        Term updApp = tb.apply(elemUpd, add);
+        String ts = trans.translateProblem(updApp, services, null).toString();
+        File updAppTestFile = new File(TEST_DIR + "UpdAppTest.smt2");
+        writeToTestFile(updAppTestFile, ts);
+        String expected = "(apply-update (elementary-update x_Var z_Var) (+ x_Var z_Var))";
+        Assert.assertEquals(expected, mh.translate(updApp, SExpr.Type.BOOL).toString());
+    }
+
     /**
      * This method runs the Z3 solver on the specified file. It can be used to quickly test whether
      * a translation works as expected.
