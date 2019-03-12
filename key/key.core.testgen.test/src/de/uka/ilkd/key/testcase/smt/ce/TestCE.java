@@ -12,7 +12,6 @@ import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SolverType;
-import de.uka.ilkd.key.smt.test.TestCommons;
 import de.uka.ilkd.key.suite.util.HelperClassForTestgenTests;
 
 public class TestCE extends TestCommons {

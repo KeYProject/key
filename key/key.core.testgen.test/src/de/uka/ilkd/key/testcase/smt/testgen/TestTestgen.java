@@ -2,6 +2,7 @@ package de.uka.ilkd.key.testcase.smt.testgen;
 
 import java.io.File;
 
+import de.uka.ilkd.key.testcase.smt.ce.TestCommons;
 import org.junit.Test;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -9,10 +10,9 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.TestGenMacro;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SolverType;
-import de.uka.ilkd.key.smt.test.TestCommons;
 import de.uka.ilkd.key.suite.util.HelperClassForTestgenTests;
 
-public class TestTestgen extends TestCommons{
+public class TestTestgen extends TestCommons {
 	public static final String testFile = HelperClassForTestgenTests.TESTCASE_DIRECTORY
 	        + File.separator + "smt" + File.separator + "tg" + File.separator;
 	private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";

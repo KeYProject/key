@@ -35,6 +35,8 @@ subprojects {
 
     dependencies {
         testCompile("junit:junit:4.12")
+        testCompile project(":key.util")
+
     }
 
     sourceSets {
@@ -67,6 +69,7 @@ project(":key.core") {
         compile name: 'recoderKey'
         compile name: 'javacc'
         compile name: 'antlr'
+
 
         antlr name: 'antlr'
         javacc name: 'javacc' //'net.java.dev.javacc:javacc:[version]'
