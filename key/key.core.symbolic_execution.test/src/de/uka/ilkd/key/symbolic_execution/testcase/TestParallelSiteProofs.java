@@ -37,7 +37,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
  */
 // TODO: Add test case class to test suite "TestKey" after fixing exceptions
 public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
-   private static final int NUMBER_OF_THREADS = 54;
+   private static final int NUMBER_OF_THREADS = 21;
 
 /**
     * Tests parallel site proofs on a new instantiate proof after applying "resume" on it.
