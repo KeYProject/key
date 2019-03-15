@@ -2,11 +2,9 @@ package de.uka.ilkd.key.gui.interactionlog;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.MainWindowTabbedPane;
 import de.uka.ilkd.key.gui.ext.KeYMainMenuExtension;
 import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.fonticons.KeYIcons;
 
 import javax.swing.*;
 import java.util.Arrays;
@@ -17,8 +15,8 @@ import java.util.List;
  * @version 1 (13.02.19)
  */
 public class InteractionLogExt implements KeYPaneExtension, KeYMainMenuExtension {
-    private static final Icon INTERACTION_LOG_ICON = IconFontSwing.buildIcon(FontAwesomeBold.BOOK,
-            MainWindowTabbedPane.TAB_ICON_SIZE);
+    private static final Icon INTERACTION_LOG_ICON =
+            KeYIcons.INTERLOG_ICON.getIcon();
 
     private InteractionLogView interactionLogView = new InteractionLogView();
 

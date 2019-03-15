@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.fonticons;
 
-import java.io.InputStream;
+import java.awt.*;
+import java.io.IOException;
 
 /**
  * Copyright (c) 2016 jIconFont <BR>
@@ -23,8 +24,7 @@ import java.io.InputStream;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-public enum Entypo implements IconCode {
-
+public enum Entypo implements IconFont {
     ADDRESS('\uE723'),
     ADJUST('\u25D1'),
     AIR('\uE753'),
@@ -254,22 +254,8 @@ public enum Entypo implements IconCode {
         return character;
     }
 
-    @Override
-    public String getFontFamily() {
-        return "Entypo";
-    }
-
-    public static IconFont getIconFont() {
-        return new IconFont() {
-            @Override
-            public String getFontFamily() {
-                return "Entypo";
-            }
-
-            @Override
-            public InputStream getFontInputStream() {
-                return Entypo.class.getResourceAsStream("/fonts/entypo.ttf");
-            }
-        };
+    public Font getFont() throws IOException, FontFormatException {
+        return Font.createFont(Font.TRUETYPE_FONT,
+                Entypo.class.getResourceAsStream("/fonts/entypo.ttf"));
     }
 }

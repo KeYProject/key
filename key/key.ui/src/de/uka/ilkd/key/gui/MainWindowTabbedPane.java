@@ -4,9 +4,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
-import de.uka.ilkd.key.gui.interactionlog.InteractionLogView;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 
 import javax.swing.*;
