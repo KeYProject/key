@@ -21,6 +21,10 @@ import static de.uka.ilkd.key.gui.ext.KeYExtConst.PRIORITY;
  * @version 1 (07.02.19)
  */
 public final class KeYGuiExtensionFacade {
+    private static final Set<String> forbiddenPlugins = new HashSet<>();
+    public void forbidClass(String clazz) {forbiddenPlugins.add(clazz); }
+    public void allowClass(String clazz){ forbiddenPlugins.remove(clazz);}
+
     //region panel extension
     @SuppressWarnings("todo")
     public static List<KeYPaneExtension> getAllPanels() {
@@ -170,6 +174,8 @@ public final class KeYGuiExtensionFacade {
     }
     //endregion
 
+    private static Map<Class<?>, List<Object>> extensionCache = new HashMap<>();
+
     /**
      * Retrieves extensions via {@link ServiceLoader}.
      *
@@ -177,17 +183,33 @@ public final class KeYGuiExtensionFacade {
      * @param <T> the interface of the service
      * @return a list of all found service implementations
      */
-
-    private static Map<Class<?>, List<Object>> extensionCache = new HashMap<>();
     @SuppressWarnings("unchecked")
     private static <T> List<T> getExtension(Class<T> c) {
         return (List<T>) extensionCache.computeIfAbsent(c, (k) -> {
             Spliterator<T> iter = ServiceLoader.load(c).spliterator();
             return StreamSupport.stream(iter, false)
+                    .filter(KeYGuiExtensionFacade::isNotForbidden)
                     .collect(Collectors.toList());
         });
     }
 
+    /**
+     * Determines if a given plugin is disabled by the user.
+     *
+     * A plugin can either disabled by adding its fqn to the {@see #forbiddenPlugins} list
+     * or setting <code>-P[fqn]=false</code> add the command line.
+     *
+     * @param a an instance of a plugin, non-null
+     * @return
+     */
+    private static boolean isNotForbidden(Object a) {
+        if(forbiddenPlugins.contains(a.getClass().getName()))
+            return false;
+        String sys = System.getProperty(a.getClass().getName());
+        if(sys!=null && sys.equalsIgnoreCase("false"))
+            return false;
+        return true;
+    }
 
     /**
      * Retrieves extensions via {@link ServiceLoader}, includes a sorting via <code>comp</code>.
