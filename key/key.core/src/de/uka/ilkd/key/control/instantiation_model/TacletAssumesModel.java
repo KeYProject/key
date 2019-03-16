@@ -149,7 +149,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
         } catch (RecognitionException e) {
             throw new SVInstantiationParserException(manualInput, pos, e.charPositionInLine,
                     "Problem occured parsing a manual input"
-                    + " of an '\\assumes'-sequent.\n" + e.getMessage(), true);
+                    + " of an '\\assumes'-sequent.\n" + e.getMessage(), true).initCause(e);
         }
     }
 

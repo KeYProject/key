@@ -29,6 +29,7 @@ import de.uka.ilkd.key.rule.metaconstruct.EnumConstantValue;
 import de.uka.ilkd.key.rule.metaconstruct.ExpandQueriesMetaConstruct;
 import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
 import de.uka.ilkd.key.rule.metaconstruct.MemberPVToField;
+import de.uka.ilkd.key.rule.metaconstruct.ObserverEqualityMetaConstruct;
 import de.uka.ilkd.key.rule.metaconstruct.arith.DivideLCRMonomials;
 import de.uka.ilkd.key.rule.metaconstruct.arith.DivideMonomials;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaAdd;
@@ -72,9 +73,6 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 
     public static final AbstractTermTransformer META_XOR = new MetaBinaryXOr();
 
-    
-    
-    
     public static final AbstractTermTransformer META_ADD = new MetaAdd();
 
     public static final AbstractTermTransformer META_SUB = new MetaSub();
@@ -113,6 +111,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 
     public static final AbstractTermTransformer EXPAND_QUERIES = new ExpandQueriesMetaConstruct();
         
+    public static final AbstractTermTransformer OBSERVER_EQUALITY = new ObserverEqualityMetaConstruct();
     
     private static Sort[] createMetaSortArray(int arity) {
 	Sort[] result = new Sort[arity];

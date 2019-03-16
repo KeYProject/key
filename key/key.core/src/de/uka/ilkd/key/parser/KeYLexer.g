@@ -225,6 +225,7 @@ lexer grammar KeYLexer;
 	PROGRAMVARIABLES : '\\programVariables';
 
         // Keywords for varcond and related stuff
+	SAME_OBSERVER : '\\sameObserver';
 	VARCOND : '\\varcond';
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
         DEPENDINGON : '\\dependingOn';
