@@ -3,6 +3,7 @@ package org.key_project.util.helper;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.*;
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +29,7 @@ final class FindResources {
      * @author Greg Briggs
      */
     public static <T> List<Path> getResources(String path, Class<T> clazz) throws URISyntaxException, IOException {
-        var dirURL = clazz.getClassLoader().getResource(path);
+        URL dirURL = clazz.getClassLoader().getResource(path);
         if (dirURL != null && dirURL.getProtocol().equals("file")) {
             /* A file path: easy enough */
             File[] files = new File(dirURL.toURI()).listFiles();
@@ -63,7 +64,7 @@ final class FindResources {
     }
 
     public static <T> Path getResource(String path, Class<T> clazz) throws URISyntaxException, IOException {
-        var dirURL = clazz.getClassLoader().getResource(path);
+        URL dirURL = clazz.getClassLoader().getResource(path);
         if (dirURL != null && dirURL.getProtocol().equals("file")) {
             return new File(dirURL.toURI()).toPath();
         }
