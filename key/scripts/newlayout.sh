@@ -1,31 +1,72 @@
 #!/bin/sh
 
+require_clean_work_tree () {
+    # Update the index
+    git update-index -q --ignore-submodules --refresh
+    err=0
+
+    # Disallow unstaged changes in the working tree
+    if ! git diff-files --quiet --ignore-submodules --
+    then
+        echo >&2 "cannot $1: you have unstaged changes."
+        git diff-files --name-status -r --ignore-submodules -- >&2
+        err=1
+    fi
+
+    # Disallow uncommitted changes in the index
+    if ! git diff-index --cached --quiet HEAD --ignore-submodules --
+    then
+        echo >&2 "cannot $1: your index contains uncommitted changes."
+        git diff-index --cached --name-status -r --ignore-submodules HEAD -- >&2
+        err=1
+    fi
+
+    if [ $err = 1 ]
+    then
+        echo >&2 "Please commit or stash them."
+        exit 1
+    fi
+}
+
+
+echo -e <<EOF
+Welcome to the KeY newlayout script
+!!! This script will change the directory of your current checkout copy.
+!!! Ensure that \e[4myour working copy is comitted!\e[0m
+EOF
+
+require_clean_work_tree
+
 echo "Create src/*/*/* folders"
+GITMV="git mv -k -v"
+MKDIR="mkdir -pv"
 
 for i in key.{core,ui,util,removegenerics,core.testgen,core.symbolic_execution,core.proof_references}/
 do
-    git mv -k $i/src $i/tmp
+    #intermediate storage of src
+    $GITMV $i/src $i/tmp
 
-    echo "Create new java source folder: $i/src/main/"
-    mkdir -p $i/src/main/
-
-    git mv -k $i/tmp $i/src/main/java
-    git mv -k $i/resources $i/src/main/
-    git mv -k $i/META-INF $i/src/main/resources
+    $MKDIR $i/src/main/
+    $GITMV $i/tmp $i/src/main/java
+    $GITMV $i/resources $i/src/main/
+    $GITMV $i/META-INF $i/src/main/resources
 done
 
 function merge_test() {
-    mkdir $1/src/test/
-    echo "Move $1.test to $1"
-    git mv -kf $1.test/src/      $1/src/test/java
-    git mv -kf $1.test/resources $1/src/test/resources
- #   git mv $1.test/META-INF  $1/src/test/resources/
+    $MKDIR $1/src/test/
+    echo "Move $1.test/src to $1/src/test/java"
+    $GITMV -f $1.test/src/      $1/src/test/java
+
+    echo "Move $1.test/resources to $1/src/test/resources"
+    $GITMV -f $1.test/resources $1/src/test/resources
+    $GITMV -f $1.test/META-INF  $1/src/test/resources/
 }
 
-echo
-echo "!!! HINT: Sometimes the git command failes due to empty folder. (removegenerics.test, ui.test)"
-echo "!!! DO NOT WOORY! It is fine."
-echo
+echo -e <<EOF
+!!! \e[31mHINT:
+!!! \tSometimes the git command failes due to empty folder.
+!!! \e[32mDO NOT WOORY! It is fine.\e[0m
+EOF
 
 merge_test key.core.testgen
 merge_test key.core.symbolic_execution
@@ -36,7 +77,7 @@ merge_test key.core
 
 
 echo "Special treatment for tacletProofs"
-git mv -k key.core{.test,}/tacletProofs
+$GITMV key.core{.test,}/tacletProofs
 
 
 echo "Remove *.test projects"
@@ -63,8 +104,8 @@ function extract_antlr() {
     find java -iname '*.g' | while read f; do
         a=$(dirname $f)
         dest=antlr/${a##java/}
-        mkdir -p $dest
-        git mv -k $f $dest
+        $MKDIR $dest
+        $GITMV $f $dest
     done
     cd $owd
 }
@@ -77,14 +118,14 @@ owd=$(pwd)
 cd key.core/src/main
 mkdir -p javacc/de/uka/ilkd/key/parser/{proof,schema}java/
 
-git mv ./java/de/uka/ilkd/key/parser/proofjava/ProofJavaParser.jj \
+$GITMV ./java/de/uka/ilkd/key/parser/proofjava/ProofJavaParser.jj \
     javacc/de/uka/ilkd/key/parser/proofjava/
 
-git mv ./java/de/uka/ilkd/key/parser/proofjava/Token.java.source \
+$GITMV ./java/de/uka/ilkd/key/parser/proofjava/Token.java.source \
     javacc/de/uka/ilkd/key/parser/proofjava/Token.java
 
-git mv ./java/de/uka/ilkd/key/parser/schemajava/SchemaJavaParser.jj \
+GITMV ./java/de/uka/ilkd/key/parser/schemajava/SchemaJavaParser.jj \
     javacc/de/uka/ilkd/key/parser/schemajava/
 
-git mv ./java/de/uka/ilkd/key/parser/schemajava/Token.java.source \
+GITMV  ./java/de/uka/ilkd/key/parser/schemajava/Token.java.source \
     javacc/de/uka/ilkd/key/parser/schemajava/Token.java
