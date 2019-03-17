@@ -42,7 +42,7 @@ subprojects {
 
 project(":key.util") {
     test {
-        systemProperty "test-resources", "../${project.name}.test/resources"
+        systemProperty "test-resources", "src/test/resources"
     }
 }
 
