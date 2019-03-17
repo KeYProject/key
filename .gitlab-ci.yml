@@ -40,6 +40,15 @@ compile:testClasses:
     - cd key
     - ./gradlew --parallel testClasses
 
+compile:testClassesJava11:
+  stage: primary
+  image: key-dev-openjdk11
+  allow_failure: true
+  script:
+    - javac -version
+    - cd key
+    - ./gradlew --parallel classes testClasses
+
 compile:check:
   stage: ternary
   image: key-dev-openjdk8
@@ -48,25 +57,24 @@ compile:check:
     - cd key
     - ./gradlew --parallel --continue check
 
+# compile:openjdk11:
+#   stage: primary
+#   image: key-dev-openjdk11
+#   allow_failure: true
+#   script:
+#     - javac -version
+#     - ant -f key/scripts/build.xml compileAll
 
-compile:openjdk11:
-  stage: primary
-  image: key-dev-openjdk11
-  allow_failure: true
-  script:
-    - javac -version
-    - ant -f key/scripts/build.xml compileAll
-
-fatJar:oraclejdk8:
-  stage: secondary
-  image: key-dev-jdk8
-  script:
-    - javac -version
-    - ant -f key/scripts/build.xml fatJar
-  artifacts:
-    paths:
-      - key/deployment/*.jar
-    expire_in: 1 week
+# fatJar:oraclejdk8:
+#   stage: secondary
+#   image: key-dev-jdk8
+#   script:
+#     - javac -version
+#     - ant -f key/scripts/build.xml fatJar
+#   artifacts:
+#     paths:
+#       - key/deployment/*.jar
+#     expire_in: 1 week
 
 checkstyle:
   stage: primary
