@@ -47,6 +47,7 @@
                encoding="utf-8"
                destdir="${build.dir}"
                includeantruntime="false"
+               encoding="utf-8"
                source="1.8"
                target="1.8"
                deprecation="off"

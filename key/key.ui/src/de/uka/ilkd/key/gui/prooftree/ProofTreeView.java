@@ -141,16 +141,16 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
                 }
             }
         };
-
         delegateView.setUI(new CacheLessMetalTreeUI());
 
-        delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_MASK));
-        delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_MASK));
-
+        delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent()
+                .remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_MASK));
+        delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent()
+                .remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_MASK));
 
         delegateView.setInvokesStopCellEditing(true);
-        delegateView.getSelectionModel().setSelectionMode(
-                TreeSelectionModel.SINGLE_TREE_SELECTION);
+        delegateView.getSelectionModel()
+                .setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         treeSelectionListener = new GUITreeSelectionListener();
         delegateView.addTreeSelectionListener(treeSelectionListener);
         delegateView.setScrollsOnExpand(true);
@@ -183,8 +183,6 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
 
         setProofTreeFont();
         delegateView.setLargeModel(true);
-
-        updateUI();
 
         setLayout(new BorderLayout());
 
@@ -1323,11 +1321,6 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
                 // trigger repainting the tree after the completion of this event.
                 delegateView.repaint();
             }
-
-
         }
-
     }
-
-
 }
