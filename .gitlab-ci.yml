@@ -91,7 +91,8 @@ compile:testCheck:
     reports:
       junit:
         - "build/test-results/test/TEST-*.xml"
-        - "**/build/test-results/test/TEST-*.xml"
+        - "**/**/build/test-results/test/TEST-*.xml"
+        - "key/key.util/build/test-results/test/TEST-*.xml"
 
 
 compile:check:
