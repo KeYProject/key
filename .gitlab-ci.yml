@@ -10,19 +10,19 @@ stages:
     - secondary
     - ternary
 
-compile:oraclejdk8:
-  stage: primary
-  image: key-dev-jdk8
-  script:
-    - javac -version
-    - ant -f key/scripts/build.xml compileAll
+# compile:oraclejdk8:
+#   stage: primary
+#   image: key-dev-jdk8
+#   script:
+#     - javac -version
+#     - ant -f key/scripts/build.xml compileAll
     
-compile:openjdk8:
-  stage: primary
-  image: key-dev-openjdk8
-  script:
-    - javac -version
-    - ant -f key/scripts/build.xml compileAll
+# compile:openjdk8:
+#   stage: primary
+#   image: key-dev-openjdk8
+#   script:
+#     - javac -version
+#     - ant -f key/scripts/build.xml compileAll
 
 compile:classes:
   stage: primary
@@ -40,8 +40,16 @@ compile:testClasses:
     - cd key
     - ./gradlew --parallel testClasses
 
+compile:testClassesOracle8:
+  stage: secondary
+  image: key-dev-jdk8
+  script:
+    - javac -version
+    - ./gradlew --parallel classes testClasses
+
+
 compile:testClassesJava11:
-  stage: primary
+  stage: secondary
   image: key-dev-openjdk11
   allow_failure: true
   script:
