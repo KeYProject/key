@@ -4,7 +4,7 @@ plugins {
     id("eclipse")
 }
 
-idea{
+idea {
     module {
         //if you love browsing Javadoc
         downloadJavadoc = false
@@ -38,22 +38,10 @@ subprojects {
         testCompile project(":key.util")
 
     }
-
-    sourceSets {
-        main {
-            java { srcDirs(file("src/")) }
-            resources { srcDirs(file("resources/")) }
-        }
-
-        test {
-            java { srcDirs(file("../${project.name}.test/src/")) }
-            resources { srcDirs(file("../${project.name}.test/resources/")) }
-        }
-    }
 }
 
 project(":key.util") {
-    test{
+    test {
         systemProperty "test-resources", "../${project.name}.test/resources"
     }
 }
@@ -71,58 +59,43 @@ project(":key.core") {
     dependencies {
         compile project(":key.util")
         compile name: 'recoderKey'
-        compile name: 'javacc'
-        compile name: 'antlr'
+        //compile name: 'javacc'
+        //compile name: 'antlr'
+        compile 'net.java.dev.javacc:javacc:4.0'
+        compile "org.antlr:antlr-runtime:3.5.2"
+        compile group: 'antlr', name: 'antlr', version: '2.7.7'
 
-
-        antlr name: 'antlr'
-        javacc name: 'javacc' //'net.java.dev.javacc:javacc:[version]'
-        //antlr("org.antlr:antlr:3.5.2")   // use ANTLR version 3
+        //antlr name: 'antlr'
+        //javacc name: 'javacc'
+        javacc 'net.java.dev.javacc:javacc:4.0'
+        antlr "org.antlr:antlr:3.5.2"   // use ANTLR version 3
     }
 
     def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
-
-    sourceSets.main.antlr.srcDirs = [file("src")]
-    sourceSets.test.antlr.srcDirs = [file("$rootDir/key.core.test/src/")]
-    sourceSets.main.java.srcDirs(javaCCOutputDir)
+    def javaCCOutputDirMain = file("$javaCCOutputDir/main")
+    sourceSets.main.java.srcDirs(javaCCOutputDirMain)
 
     generateGrammarSource {
-        source = fileTree("src/") {
-            include("de/uka/ilkd/key/parser/KeYLexer.g",
-                    "de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.g",
-                    "de/uka/ilkd/key/speclang/jml/translation/KeYJMLLexer.g",
-                    "de/uka/ilkd/key/parser/KeYParser.g",
-                    "de/uka/ilkd/key/speclang/jml/translation/KeYJMLParser.g",
-                    "de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.g")
-        }
-
-        outputDirectory = file("${projectDir}/build/generated-src/antlr/main")
-        arguments.add("-visitor")
+        maxHeapSize = "64m"
+        arguments += ["-visitor", "-listener", "-long-messages"]
     }
 
     generateTestGrammarSource {
-        source = fileTree("$rootDir/key.core.test/src/") {
-            include("de/uka/ilkd/key/proof/runallproofs/proofcollection/ProofCollection.g")
-        }
-        outputDirectory = file("${projectDir}/build/generated-src/antlr/test")
-        arguments.add("-visitor")
+        maxHeapSize = "64m"
+        arguments += ["-visitor", "-listener", "-long-messages"]
     }
 
     compileJavacc {
-        outputDirectory = javaCCOutputDir
-        inputDirectory = file("src/")
+        outputDirectory = javaCCOutputDirMain
+        inputDirectory  = file("src/main/javacc")
         doLast {
             copy {
-                from("src/de/uka/ilkd/key/parser/schemajava/Token.java.source") {
-                    rename "Token.java.source", "Token.java"
-                }
-                into file("${buildDir}/generated-src/javacc/de/uka/ilkd/key/parser/schemajava/")
+                from("src/main/javacc/de/uka/ilkd/key/parser/schemajava/Token.java")
+                into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/schemajava/"
             }
             copy {
-                from("src/de/uka/ilkd/key/parser/proofjava/Token.java.source") {
-                    rename "Token.java.source", "Token.java"
-                }
-                into file("${buildDir}/generated-src/javacc/de/uka/ilkd/key/parser/proofjava/")
+                from("src/main/javacc/de/uka/ilkd/key/parser/proofjava/Token.java")
+                into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/proofjava/"
             }
         }
         /*
@@ -132,7 +105,7 @@ project(":key.core") {
         -->*/
     }
 
-    test{
+    test {
         systemProperty "testcases", "../${project.name}.test/resources/testcase"
     }
 }
@@ -154,7 +127,7 @@ project(":key.core.testgen") {
         compile project(":key.core")
     }
 
-    test{
+    test {
         systemProperty "testcases", "../${project.name}.test/resources/testcase"
     }
 }

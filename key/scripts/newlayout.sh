@@ -1,5 +1,22 @@
 #!/bin/sh
 
+cat <<EOF
+Welcome to the KeY newlayout script
+
+!!! This script will change the directory of your current checkout.
+
+!!! Ensure that your working copy is comitted!
+
+!!! No waranty for data lost.
+
+EOF
+
+if [ ! -d key.core ]; then
+    echo -e "\e[31mTHIS SCRIPT SHOULD BE RUN INSIDE key/key DIRECTORY!\e[0m. ABORT"
+    exit 1
+fi
+
+
 require_clean_work_tree () {
     # Update the index
     git update-index -q --ignore-submodules --refresh
@@ -23,17 +40,11 @@ require_clean_work_tree () {
 
     if [ $err = 1 ]
     then
-        echo >&2 "Please commit or stash them."
+        echo -e "You have uncomitted changes."
+        echo -e "\e[33mPlease commit or stash them.\e[0m"
         exit 1
     fi
 }
-
-
-echo -e <<EOF
-Welcome to the KeY newlayout script
-!!! This script will change the directory of your current checkout copy.
-!!! Ensure that \e[4myour working copy is comitted!\e[0m
-EOF
 
 require_clean_work_tree
 
@@ -50,6 +61,8 @@ do
     $GITMV $i/tmp $i/src/main/java
     $GITMV $i/resources $i/src/main/
     $GITMV $i/META-INF $i/src/main/resources
+
+    read
 done
 
 function merge_test() {
@@ -84,7 +97,7 @@ echo "Remove *.test projects"
 function remove_project() {
     echo "Safe deletion of $1"
     #known files safe to delete!
-    rm -rf $1/build.{gradle,xml} $1/testresults $1/runallproofs_tmp $1/bin $1/.* $1/lib
+    rm -rf $1/build.{gradle,xml} $1/testresults $1/runallproofs_tmp $1/bin $1/.??* $1/lib
     rm -ri $1
 }
 
@@ -115,17 +128,25 @@ extract_antlr key.core/src/test
 
 echo "Extract JavaCC"
 owd=$(pwd)
-cd key.core/src/main
-mkdir -p javacc/de/uka/ilkd/key/parser/{proof,schema}java/
+(cd key.core/src/main;
+ mkdir -p javacc/de/uka/ilkd/key/parser/{proof,schema}java/
+ $GITMV ./java/de/uka/ilkd/key/parser/proofjava/ProofJavaParser.jj \
+        javacc/de/uka/ilkd/key/parser/proofjava/;
+ $GITMV ./java/de/uka/ilkd/key/parser/proofjava/Token.java.source \
+        javacc/de/uka/ilkd/key/parser/proofjava/Token.java;
+ $GITMV ./java/de/uka/ilkd/key/parser/schemajava/SchemaJavaParser.jj \
+        javacc/de/uka/ilkd/key/parser/schemajava/;
+ $GITMV  ./java/de/uka/ilkd/key/parser/schemajava/Token.java.source \
+         javacc/de/uka/ilkd/key/parser/schemajava/Token.java;
+)
 
-$GITMV ./java/de/uka/ilkd/key/parser/proofjava/ProofJavaParser.jj \
-    javacc/de/uka/ilkd/key/parser/proofjava/
+for i in key.{core,ui,util,removegenerics,core.testgen,core.symbolic_execution,core.proof_references}
+do
+    git add -v $i/src
+done
 
-$GITMV ./java/de/uka/ilkd/key/parser/proofjava/Token.java.source \
-    javacc/de/uka/ilkd/key/parser/proofjava/Token.java
+git add key.core/tacletProofs/
 
-GITMV ./java/de/uka/ilkd/key/parser/schemajava/SchemaJavaParser.jj \
-    javacc/de/uka/ilkd/key/parser/schemajava/
 
-GITMV  ./java/de/uka/ilkd/key/parser/schemajava/Token.java.source \
-    javacc/de/uka/ilkd/key/parser/schemajava/Token.java
+echo -e "\e[33mYou sould make a commit now.\e[0m"
+echo -e "\t git commit -a "
