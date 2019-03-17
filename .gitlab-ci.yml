@@ -45,6 +45,7 @@ compile:testClassesOracle8:
   image: key-dev-jdk8
   script:
     - javac -version
+    - cd key
     - ./gradlew --parallel classes testClasses
 
 
