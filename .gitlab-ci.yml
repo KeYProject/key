@@ -79,6 +79,21 @@ compile:testClassesJava11:
     - cd key
     - ./gradlew --parallel classes testClasses
 
+compile:testCheck:
+  stage: primary
+  image: key-dev-openjdk8
+  script:
+    - javac -version
+    - cd key
+    - ./gradlew --parallel --continue :key.util:test
+    - find -iname "*.xml"
+  artifacts:
+    reports:
+      junit:
+        - "build/test-results/test/TEST-*.xml"
+        - "**/build/test-results/test/TEST-*.xml"
+
+
 compile:check:
   stage: ternary
   image: key-dev-openjdk8
@@ -86,6 +101,7 @@ compile:check:
     - javac -version
     - cd key
     - ./gradlew --parallel --continue check
+    - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
