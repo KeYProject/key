@@ -106,7 +106,12 @@ project(":key.core") {
     }
 
     test {
-        systemProperty "testcases", "../${project.name}.test/resources/testcase"
+        systemProperty "testcases", "src/test/resources/testcase"
+
+        // set JVM arguments for the test JVM(s)
+        jvmArgs '-XX:MaxPermSize=1G'
+
+        // "../${project.name}/resources/testcase"
     }
 }
 

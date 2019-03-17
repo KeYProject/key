@@ -13,12 +13,15 @@
 
 package de.uka.ilkd.key.rule.loop;
 
+import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.Test;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleTests;
 import junit.framework.TestCase;
+
+import java.io.File;
 
 /**
  * Test cases for the {@link LoopScopeInvariantRule}. Should shine a light on
@@ -31,15 +34,14 @@ import junit.framework.TestCase;
  */
 public class LoopScopeInvRuleTests extends TestCase {
 
-    private static final String TEST_RESOURCES_DIR_PREFIX = "resources/testcase/loopScopeInvRule/";
+    private static final File TEST_RESOURCES_DIR_PREFIX = new File(HelperClassForTests.TESTCASE_DIRECTORY, "loopScopeInvRule/");
 
     /**
      * Automatic proof of a benchmark with labeled breaks and continues.
      */
     @Test
     public void testDoAutomaticProofOfBenchmarkWithLabeledBreaksAndContinues() {
-        final Proof proof = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX,
-                "Test.key");
+        final Proof proof = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX, "Test.key");
         MergeRuleTests.startAutomaticStrategy(proof);
 
         assertTrue(proof.closed());

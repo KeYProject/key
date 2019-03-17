@@ -57,27 +57,33 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 public class HelperClassForTests {
-   public static final String TESTCASE_DIRECTORY;
-   
-   public static final File DUMMY_KEY_FILE;
+
+    @Deprecated
+    public static final File TESTCASE_DIRECTORY;
+
+    @Deprecated
+    public static final File DUMMY_KEY_FILE;
    
    static {
       File projectRoot = IOUtil.getProjectRoot(HelperClassForTests.class);
       // Update path in Eclipse Plug-ins executed as JUnit Test.
-      if ("org.key_project.core.test".equals(projectRoot.getName())) {
-         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile().getParentFile();
-         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.test");
+       if ("org.key_project.core.test".equals(projectRoot.getName())) {
+          projectRoot = projectRoot.getParentFile().getParentFile().getParentFile().getParentFile();
       }
       // Update path in Eclipse Plug-ins executed as JUnit Plug-in Test.
       else if ("tests".equals(projectRoot.getName())) {
          projectRoot = projectRoot.getParentFile().getParentFile().getParentFile();
-         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.test");
-      }
+       }
+       // Test for Intellij
+       else if (projectRoot.getAbsolutePath().contains("production")) {
+           projectRoot = projectRoot.getParentFile().getParentFile();
+       }
+
        if(System.getProperty("testcases") != null) {
-           TESTCASE_DIRECTORY = new File(System.getProperty("testcases")).getAbsolutePath();
+           TESTCASE_DIRECTORY = new File(System.getProperty("testcases")).getAbsoluteFile();
            DUMMY_KEY_FILE = new File(TESTCASE_DIRECTORY , "dummyTrue.key");
        }else{
-           TESTCASE_DIRECTORY = projectRoot + File.separator + "resources"+ File.separator + "testcase";
+           TESTCASE_DIRECTORY = new File(projectRoot, "src/test/resources/testcase");
            DUMMY_KEY_FILE = new File(TESTCASE_DIRECTORY + File.separator + "dummyTrue.key");
        }
    }

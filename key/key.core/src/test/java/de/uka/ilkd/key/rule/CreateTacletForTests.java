@@ -45,14 +45,14 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
+import static org.junit.Assert.*;
 
 
 /** 
  * create Taclet for test cases.
  */
-public class CreateTacletForTests extends TestCase {
-
-    Sort nat;
+public class CreateTacletForTests {
+	private Sort nat;
 
     public static AntecTaclet impleft;
     public static SuccTaclet impright;
@@ -94,8 +94,7 @@ public class CreateTacletForTests extends TestCase {
 
     public Services services;
 
-    public CreateTacletForTests(String name) {
-	super(name);
+    public CreateTacletForTests() {
 	services = new Services(AbstractProfile.getDefaultProfile());
 	tf = services.getTermFactory();
     }

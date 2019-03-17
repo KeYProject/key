@@ -16,6 +16,7 @@ package de.uka.ilkd.key.rule.merge;
 import java.io.File;
 import java.util.Iterator;
 
+import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.Test;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -42,7 +43,7 @@ import junit.framework.TestCase;
  */
 public class MergeRuleTests extends TestCase {
 
-    private static final String TEST_RESOURCES_DIR_PREFIX = "resources/testcase/merge/";
+    private static final File TEST_RESOURCES_DIR_PREFIX = new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/");
 
     /**
      * Simple regression test case loading an existing closed proof (standard
@@ -325,6 +326,10 @@ public class MergeRuleTests extends TestCase {
         }
     }
 
+    public static Proof loadProof(String directory, String proofFileName) {
+        return loadProof(new File(directory), proofFileName);
+    }
+
     /**
      * Loads the given proof file. Checks if the proof file exists and the proof
      * is not null, and fails if the proof could not be loaded.
@@ -334,9 +339,10 @@ public class MergeRuleTests extends TestCase {
      *
      * @return The loaded proof.
      */
-    public static Proof loadProof(Object directory, String proofFileName) {
-        File proofFile = new File(directory + proofFileName);
-        assertTrue(proofFile.exists());
+    public static Proof loadProof(File directory, String proofFileName) {
+        File proofFile = new File(directory , proofFileName);
+        assertTrue("Proof file: " + proofFile.getAbsolutePath() + " could not be found!",
+                proofFile.exists());
 
         try {
             KeYEnvironment<?> environment = KeYEnvironment.load(

@@ -8,6 +8,9 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * This class provides tests for parsing int, long, and char literals.
@@ -125,13 +128,6 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
         "020_0000_0000_0000_0000_0000L"                                               // 2^64
     };
 
-    /**
-     * Creates a new test object for literal parsing tests.
-     */
-    public TestIntLiteralParsing() {
-        super(TestIntLiteralParsing.class.getSimpleName());
-    }
-
     @Override
     public Term parseTerm(String s) throws RecognitionException {
         PositionedString p = new PositionedString(s);
@@ -150,6 +146,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
      * Tests if the Strings in INTSTRINGS are parsed and converted correctly.
      * @throws RecognitionException if a parsing error occurs
      */
+    @Test
     public void testCharLiteralParsing() throws RecognitionException {
         Term t;
         String input;
@@ -167,12 +164,11 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
         }
     }
 
-
-
     /**
      * Tests if the Strings in INTSTRINGS are parsed and converted correctly.
      * @throws RecognitionException if a parsing error occurs
      */
+    @Test
     public void testIntLiteralParsing() throws RecognitionException {
         Term t;
         String input;
@@ -190,11 +186,11 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
         }
     }
 
-
     /**
      * Tests if the Strings in LONGSTRINGS are parsed and converted correctly.
      * @throws RecognitionException if a parsing error occurs
      */
+    @Test
     public void testLongLiteralParsing() throws RecognitionException {
         Term t;
         String input;
@@ -217,6 +213,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
      * which are just outside the range of int.
      * @throws RecognitionException if a parsing error occurs
      */
+    @Test
     public void testIntRange() throws RecognitionException {
         for (String s : INTRANGESTRINGS) {
             try {
@@ -233,6 +230,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
      * literals which are just outside the range of long.
      * @throws RecognitionException if a parsing error occurs
      */
+    @Test
     public void testLongRange() throws RecognitionException {
         for (String s : LONGRANGESTRINGS) {
             try {

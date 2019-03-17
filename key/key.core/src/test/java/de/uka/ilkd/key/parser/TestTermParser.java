@@ -14,6 +14,9 @@
 package de.uka.ilkd.key.parser;
 
 import org.antlr.runtime.RecognitionException;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -30,6 +33,7 @@ import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.TacletForTests;
+import static org.junit.Assert.*;
 
 public class TestTermParser extends AbstractTestTermParser {
 
@@ -44,8 +48,7 @@ public class TestTermParser extends AbstractTestTermParser {
     
     private final Recoder2KeY r2k;
 
-    public TestTermParser(String name) {
-	super(name);
+    public TestTermParser() {
         r2k = new Recoder2KeY(services, nss);
         r2k.parseSpecialClasses();
     }
@@ -55,7 +58,7 @@ public class TestTermParser extends AbstractTestTermParser {
         return TacletForTests.services();
     }
 
-    @Override
+    @Before
     public void setUp() throws RecognitionException {	
         
         /*
@@ -137,20 +140,24 @@ public class TestTermParser extends AbstractTestTermParser {
                 new AbbrevMap());
     }
 
+    @Test
     public void test1() throws Exception {
 	assertEquals("parse x",t_x,parseTerm("x"));
     }
 
+    @Test
     public void test1a() {
 	boolean parsed = false;
 	try { parseTerm("x()"); parsed = true;} catch (Exception e) {}
 	assertFalse("parse x() should fail", parsed);
     }
 
+    @Test
     public void test2() throws Exception {
 	assertEquals("parse head(xs)",t_headxs,parseTerm("head(xs)"));
     }
 
+    @Test
     public void test3() throws Exception {
 	Term t = tf.createTerm(cons,t_headxs,t_tailys);
 	
@@ -158,6 +165,7 @@ public class TestTermParser extends AbstractTestTermParser {
 		     t,parseTerm("cons(head(xs),tail(ys))"));
     }
 
+    @Test
     public void test5() {
 	Term t = tf.createTerm(Equality.EQUALS,
 	    tf.createTerm
@@ -173,6 +181,7 @@ public class TestTermParser extends AbstractTestTermParser {
 		     t,parseFormula("head(cons(x,xs))=head(cons(x,nil()))"));
     }
 
+    @Test
     public void testNotEqual() {
 	Term t = tf.createTerm(Junctor.NOT,
 	    tf.createTerm(Equality.EQUALS,
@@ -187,7 +196,7 @@ public class TestTermParser extends AbstractTestTermParser {
 		     t,parseFormula("head(cons(x,xs))!=head(cons(x,nil))"));
     }
 
-
+	@Test
     public void test6() {
 	Term t = tf.createTerm
 	    (Equality.EQV,
@@ -206,6 +215,7 @@ public class TestTermParser extends AbstractTestTermParser {
 		     t,parseFormula("x=x|y=y->z=z&xs=xs<->!ys=ys"));
     }
 
+	@Test
     public void test7() {
 	/** Bound variables are newly created by the parser,
 	 * so we have to parse first, then extract the used variables,
@@ -232,6 +242,7 @@ public class TestTermParser extends AbstractTestTermParser {
 	
     }
 
+    @Test
     public void test8() throws Exception {
 	/** A bit like test7, but for a substitution term */
 
@@ -257,6 +268,7 @@ public class TestTermParser extends AbstractTestTermParser {
 	}
     }
 
+	@Test
     public void test9() {
 	/* Try something with a prediate */
 	
@@ -276,6 +288,7 @@ public class TestTermParser extends AbstractTestTermParser {
 	
     }
 
+	@Test
     public void test10() throws Exception {
 	// Unquoted, this is
 	// <{ int x = 2; {String x = "\"}";} }> true
@@ -293,14 +306,16 @@ public class TestTermParser extends AbstractTestTermParser {
 	t = parseTerm(s);
 	//System.out.println(t);
     }
-   
 
 
+
+	@Test
     public void test12() throws Exception {
 	    String s="\\<{int i; i=0;}\\> \\<{ while (i>0) ;}\\>true";
 	    Term t = parseTerm(s);
     }
 
+	@Test
     public void test13() throws Exception{
        Term t1 = parseTerm("\\exists elem x; \\forall list ys; \\forall list xs; ( xs ="
 		                    			+" cons(x,ys))");
@@ -321,6 +336,7 @@ public class TestTermParser extends AbstractTestTermParser {
         assertTrue("Terms should be equalModRenaming", t3.equalsModRenaming(t4));
      }
 
+	@Test
     public void test14() throws Exception {
 	String s="\\<{int[] i;i=new int[5];}\\>true";
 	Term t=parseTerm(s);
@@ -328,13 +344,15 @@ public class TestTermParser extends AbstractTestTermParser {
 	t=parseTerm(s);
     }
 
-    public void xtestBindingUpdateTermOldBindingAlternative() throws Exception {
+	@Test@Ignore
+	public void xtestBindingUpdateTermOldBindingAlternative() throws Exception {
 	String s="\\<{int i,j;}\\> {i:=j} i = j";
 	Term t = parseTerm(s);
 	assertTrue("expected {i:=j}(i=j) but is ({i:=j}i)=j)", 
 		t.sub(0).op() instanceof UpdateApplication);
     }
 
+	@Test
     public void testBindingUpdateTerm() throws Exception {
 	String s="\\forall int j; {globalIntPV:=j} globalIntPV = j";
 	Term t = parseTerm(s);
@@ -342,24 +360,28 @@ public class TestTermParser extends AbstractTestTermParser {
 		t.sub(0).op() instanceof UpdateApplication);
     }
 
+	@Test
     public void testParsingArray() throws Exception {
 	String s="\\forall int[][] i; \\forall int j; i[j][j] = j";
 	Term t = parseTerm(s);
     }
 
 
+	@Test@Ignore
     public void xtestParsingArrayWithSpaces() throws Exception {
 	String s="\\<{int[][] i; int j;}\\> i[ j ][ j ] = j";
 	Term t = parseTerm(s);
     }
 
+    @Test
     public void testParsingArrayCombination() throws Exception {
 	String s="\\forall int[][] i; \\forall int j; i [i[i[j][j]][i[j][j]]][i[j][i[j][j]]] = j";
 	Term t = parseTerm(s);
     }
 
-    
-    public void testAmbigiousFuncVarPred() {
+
+	@Test
+	public void testAmbigiousFuncVarPred() {
 	// tests bug id 216
 	String s = "\\functions {} \\predicates{mypred(int, int);}"+
 	    "\n\\problem {\\forall int x; mypred(x, 0)}\n \\proof {\n"+
@@ -375,7 +397,8 @@ public class TestTermParser extends AbstractTestTermParser {
 	}
     }
 
-    public void testParseQueriesAndAttributes() throws Exception {
+	@Test
+	public void testParseQueriesAndAttributes() throws Exception {
 	TacletForTests.getJavaInfo().readJavaBlock("{}");
 	r2k.readCompilationUnit("public class T extends "
 				+"java.lang.Object{ "
@@ -395,7 +418,8 @@ public class TestTermParser extends AbstractTestTermParser {
 	parseTerm(s);
     }
 
-    public void testProgramVariables() {
+	@Test
+	public void testProgramVariables() {
 	TacletForTests.getJavaInfo().readJavaBlock("{}");
 	r2k.readCompilationUnit("public class T0 extends "
 				+"java.lang.Object{} ");
@@ -408,8 +432,8 @@ public class TestTermParser extends AbstractTestTermParser {
 	assertFalse("Program variables should not have arguments", parsed);
     }
 
-
-    public void testNegativeLiteralParsing() {
+	@Test
+	public void testNegativeLiteralParsing() {
 	String s1 = "-1234";
 	Term t = null;
 	try {
@@ -438,7 +462,8 @@ public class TestTermParser extends AbstractTestTermParser {
 	
     }
 
-    public void testIfThenElse () throws Exception {
+	@Test
+	public void testIfThenElse () throws Exception {
         Term t=null, t2=null;
         
         String s1 = "\\if (3=4) \\then (1) \\else (2)";
@@ -478,29 +503,33 @@ public class TestTermParser extends AbstractTestTermParser {
                      && t.sub ( 2 ).equals ( parseTerm ( "2=3" ) ) );
 
     }
-   
 
-    public void testInfix1() throws Exception {
+	@Test
+	public void testInfix1() throws Exception {
 	assertEquals("infix1",parseTerm("aa + bb"),
 	                      parseTerm("add(aa,bb)"));
     }
 
-    public void testInfix2() throws Exception {
+	@Test
+	public void testInfix2() throws Exception {
 	assertEquals("infix2",parseTerm("aa + bb*cc"),
 	                      parseTerm("add(aa,mul(bb,cc))"));
     }
 
-    public void testInfix3() throws Exception {
+	@Test
+	public void testInfix3() throws Exception {
 	assertEquals("infix3",parseTerm("aa + bb*cc < 123 + -90"),
 	                      parseTerm("lt(add(aa,mul(bb,cc)),add(123,-90))"));
     }
 
-    public void testInfix4() throws Exception {
+	@Test
+	public void testInfix4() throws Exception {
 	assertEquals("infix4",parseTerm("aa%bb*cc < -123"),
 	                      parseTerm("lt(mul(mod(aa,bb),cc),-123)"));
     }
-    
-    public void testCast() throws Exception {
+
+	@Test
+	public void testCast() throws Exception {
         assertEquals("cast stronger than plus", parseTerm("(int)3+2"), 
                 parseTerm("((int)3)+2"));
      }

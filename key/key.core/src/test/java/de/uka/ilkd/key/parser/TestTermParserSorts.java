@@ -3,19 +3,17 @@ package de.uka.ilkd.key.parser;
 import org.antlr.runtime.RecognitionException;
 
 import de.uka.ilkd.key.logic.Term;
+import org.junit.Before;
+import org.junit.Test;
 
+import static org.junit.Assert.*;
 /**
  * Testing pretty-printing and parsing of seqGet terms in this class.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class TestTermParserSorts extends AbstractTestTermParser {
-
-    public TestTermParserSorts() {
-        super(TestTermParserSorts.class.getSimpleName());
-    }
-
-    @Override
+    @Before
     public void setUp() throws RecognitionException {
         parseDecls("\\programVariables {Seq s;}");
         parseDecls("\\programVariables {int i;}");
@@ -32,6 +30,7 @@ public class TestTermParserSorts extends AbstractTestTermParser {
     /*
      * Test whether pretty syntax of sequences is parsed correctly.
      */
+    @Test
     public void testParseSequencePrettySyntax() throws Exception {
         /*
          * Test any::seqGet(s,i)

@@ -5,6 +5,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * Test behaviour of {@link KeYJMLParser} for inputs in which braces are
@@ -13,10 +16,6 @@ import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class TestJMLParserAssociativity extends AbstractTestTermParser {
-
-    public TestJMLParserAssociativity() {
-        super(TestJMLParserAssociativity.class.getSimpleName());
-    }
 
     @Override
     public Term parseTerm(String s) throws Exception {
@@ -41,6 +40,7 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
      * Left-associative parsing: (((1 + 2) - 3) + 4) = 4
      * Right-associative parsing: (1 + (2 - (3 + 4))) = -4
      */
+    @Test
     public void testLeftAssociativity() throws Exception {
 
         // test */%

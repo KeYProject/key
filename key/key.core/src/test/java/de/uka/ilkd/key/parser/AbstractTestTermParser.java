@@ -1,22 +1,8 @@
 package de.uka.ilkd.key.parser;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import junit.framework.TestCase;
-
-import org.antlr.runtime.RecognitionException;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -26,21 +12,29 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.antlr.runtime.RecognitionException;
+import org.key_project.util.collection.ImmutableSLList;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Class providing methods for parser tests.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class AbstractTestTermParser extends TestCase {
+public class AbstractTestTermParser {
 
     protected final TermFactory tf;
     protected final TermBuilder tb;
     protected final NamespaceSet nss;
     protected final Services services;
 
-    AbstractTestTermParser(String name) {
-        super(name);
+    AbstractTestTermParser() {
         services = getServices();
         tb = services.getTermBuilder();
         tf = tb.tf();
@@ -48,11 +42,11 @@ public class AbstractTestTermParser extends TestCase {
     }
 
     Sort lookup_sort(String name) {
-        return (Sort) nss.sorts().lookup(new Name(name));
+        return nss.sorts().lookup(new Name(name));
     }
 
     Function lookup_func(String name) {
-        return (Function) nss.functions().lookup(new Name(name));
+        return nss.functions().lookup(new Name(name));
     }
 
     LogicVariable declareVar(String name, Sort sort) {

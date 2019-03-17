@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -33,10 +34,6 @@ import de.uka.ilkd.key.util.ExceptionTools;
  */
 @RunWith(Parameterized.class)
 public class ParserMessageTest {
-
-   private static final File KEY_CORE_TEST = IOUtil
-         .getProjectRoot(ParserMessageTest.class);
-
    private final String docFile = "key/doc/README.parserMessageTest";
 
    private final List<String> lines;
@@ -50,8 +47,7 @@ public class ParserMessageTest {
     */
    @Parameters(name = "{0}")
    public static Collection<Object[]> data() {
-      File testDataDir = new File(KEY_CORE_TEST, "resources" + File.separator
-            + "testcase" + File.separator + "parserMessageTest");
+      File testDataDir = new File(HelperClassForTests.TESTCASE_DIRECTORY, "parserMessageTest");
       Collection<Object[]> data = new LinkedList<>();
       for (File file : testDataDir.listFiles()) {
          if (file.isDirectory()) {

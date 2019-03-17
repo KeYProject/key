@@ -49,7 +49,7 @@ public class TestParallelParsing extends TestCase {
     * @param locations The locations to load.
     * @throws Exception Occurred Exception.
     */
-   protected void doParallelTest(String baseDir, 
+   protected void doParallelTest(File baseDir,
                                  int numOfThreadsPerLocation,
                                  String... locations) throws Exception {
       boolean originalOneStepSimplification = HelperClassForTests.isOneStepSimplificationEnabled(null);

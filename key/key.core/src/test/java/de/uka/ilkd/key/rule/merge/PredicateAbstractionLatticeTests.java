@@ -13,9 +13,11 @@
 
 package de.uka.ilkd.key.rule.merge;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import de.uka.ilkd.key.util.HelperClassForTests;
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -40,7 +42,7 @@ import de.uka.ilkd.key.proof.Proof;
  */
 public class PredicateAbstractionLatticeTests extends TestCase {
 
-    private static final String TEST_RESOURCES_DIR_PREFIX = "resources/testcase/merge/";
+    private static final File TEST_RESOURCES_DIR_PREFIX = new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/");
 
     @Test
     public void testCreateSignLatticeWithPredicates() {
