@@ -79,22 +79,6 @@ compile:testClassesJava11:
     - cd key
     - ./gradlew --parallel classes testClasses
 
-compile:testCheck:
-  stage: primary
-  image: key-dev-openjdk8
-  script:
-    - javac -version
-    - cd key
-    - ./gradlew --parallel --continue :key.util:test
-    - find -iname "*.xml"
-  artifacts:
-    reports:
-      junit:
-        - "build/test-results/test/TEST-*.xml"
-        - "**/**/build/test-results/test/TEST-*.xml"
-        - "key/key.util/build/test-results/test/TEST-*.xml"
-
-
 compile:check:
   stage: ternary
   image: key-dev-openjdk8
@@ -112,8 +96,7 @@ compile:check:
   artifacts:
     reports:
       junit:
-        - "build/test-results/test/TEST-*.xml"
-        - "*/build/test-results/test/TEST-*.xml"
+        - "**/**/build/test-results/test/TEST-*.xml"
 
 # compile:openjdk11:
 #   stage: primary
