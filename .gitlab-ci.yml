@@ -6,6 +6,7 @@
 #
 
 cache:
+  policy: pull-push
   paths:
     - .gradle/wrapper
     - .gradle/caches
@@ -32,12 +33,6 @@ stages:
 #     - javac -version
 #     - ant -f key/scripts/build.xml compileAll
     
-# compile:openjdk8:
-#   stage: primary
-#   image: key-dev-openjdk8
-#   script:
-#     - javac -version
-#     - ant -f key/scripts/build.xml compileAll
 
 compile:classes:
   stage: primary
@@ -69,7 +64,7 @@ compile:testClasses:
 
 compile:testClassesOracle8:
   stage: secondary
-  image: key-dev-jdk11
+  image: key-dev-jdk8
   script:
     - javac -version
     - cd key
