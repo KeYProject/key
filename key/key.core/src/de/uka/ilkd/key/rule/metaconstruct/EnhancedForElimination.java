@@ -42,6 +42,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
@@ -176,7 +177,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         Expression expression = enhancedFor.getGuardExpression();
 
         ProgramElement result;
-        if (isIterable(expression, services)) {
+        if (!isArrayType(expression, services)) {
             result = makeIterableForLoop(enhancedFor, services);
         } else {
             result = makeArrayForLoop(enhancedFor, services);
@@ -228,19 +229,17 @@ public class EnhancedForElimination extends ProgramTransformer {
     }
 
     /**
-     * Checks if an expression is an {@code Iterable}.
+     * Checks if an expression has an array type.
      *
      * @param expression the expression to check
      * @param services   the services for lookups
      * @return true, if expression's type is a subtype of Iterable
      */
-    private boolean isIterable(Expression expression, Services services) {
+    private boolean isArrayType(Expression expression, Services services) {
         JavaInfo ji = services.getJavaInfo();
         // TODO: how to get a more appropriate execution context?
         final ExecutionContext ec = ji.getDefaultExecutionContext();
-        boolean iterable = ji.isSubtype(expression.getKeYJavaType(services, ec),
-                ji.getTypeByName(ITERABLE_CLASS_NAME));
-        return iterable;
+        return expression.getKeYJavaType(services, ec).getSort() instanceof ArraySort;
     }
 
     /*
