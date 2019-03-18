@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.suite;
 
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -28,5 +29,6 @@ import de.uka.ilkd.key.testcase.smt.testgen.TestTestgen;
     TestCE.class,
     TestTestgen.class
 })
+@Ignore
 public class AllTestGenTests {
 }

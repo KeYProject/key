@@ -12,7 +12,8 @@ import org.junit.Test;
 import java.io.File;
 
 public class TestTestgen extends TestCommons {
-    public static final File testFile = new File(HelperClassForTestgenTests.TESTCASE_DIRECTORY, "smt/gt");
+    public static final File testFile = new File(
+            HelperClassForTestgenTests.TESTCASE_DIRECTORY, "smt/tg");
     private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
     private static boolean isInstalled = false;
     private static boolean installChecked = false;
@@ -56,7 +57,7 @@ public class TestTestgen extends TestCommons {
     @Test
     public void testMiddle() throws Exception {
         File file = new File(testFile, "middle.key");
-        assertTrue(file.exists());
+        assertTrue("File " + file + " does not exists!", file.exists());
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file, null, null, null);
         try {
             Proof proof = env.getLoadedProof();

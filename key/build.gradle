@@ -139,7 +139,7 @@ project(":key.core.testgen") {
     }
 
     test {
-        systemProperty "testcases", "../${project.name}.test/resources/testcase"
+        systemProperty "testcases", "src/test/resources/testcase"
     }
 }
 
