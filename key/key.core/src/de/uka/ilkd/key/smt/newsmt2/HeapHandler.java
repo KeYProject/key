@@ -72,7 +72,7 @@ public class HeapHandler implements SMTHandler {
         }
 
         if (supportedFunctions.containsKey(op)) {
-            trans.handleAsFunctionCall(supportedFunctions.get(op), term);
+            return trans.handleAsFunctionCall(supportedFunctions.get(op), term);
         }
 
         if (services.getTypeConverter().getHeapLDT().isSelectOp(op)) {

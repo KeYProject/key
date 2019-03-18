@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
+import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import java.util.Map;
 
@@ -63,7 +64,7 @@ public class FieldConstantHandler implements SMTHandler {
             state.put(CONSTANT_COUNTER_PROPERTY, curVal - 1);
             trans.addKnownSymbol(smtName);
         }
-        return new SExpr(smtName);
+        return new SExpr(smtName, Type.UNIVERSE);
     }
 
 }
