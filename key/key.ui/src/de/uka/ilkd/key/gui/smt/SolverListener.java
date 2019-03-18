@@ -120,7 +120,7 @@ public class SolverListener implements SolverLauncherListener {
                                 
 
                         }
-                        addInformation("Translation", solver.getTranslation());
+                        addInformation("Translation", solver.getPrettyTranslation());
                         if (solver.getTacletTranslation() != null) {
                                 addInformation("Taclets", solver
                                                 .getTacletTranslation()

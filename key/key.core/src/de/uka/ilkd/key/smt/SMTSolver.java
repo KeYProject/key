@@ -61,6 +61,15 @@ public interface SMTSolver {
     public String getTranslation();
 
     /**
+     * Returns an indented and more readable version of the translation
+     * for display
+     *
+     * @return Pretty-printed String representation of the corresponding problem, if the solver
+     *         process is not running, otherwise null.
+     */
+    String getPrettyTranslation();
+
+    /**
      * Returns the taclet translation that is used as assumptions. If the solver
      * process is still running the method returns <code>null</code> in order to
      * maintain thread safety.

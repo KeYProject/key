@@ -47,6 +47,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         private AbstractSolverSocket socket;
 
         private ModelExtractor query;
+        private String prettyProblemString;
 
 
         public ModelExtractor getQuery() {
@@ -315,32 +316,33 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         }
 
 
-
         private static String indent(String string) {
 
-            StringBuilder sb = new StringBuilder();
-            int indention = 0;
+                StringBuilder sb = new StringBuilder();
+                int open = 0;
 
-            for (int i = 0; i < string.length(); i++) {
-                char c = string.charAt(i);
-                switch (c) {
-                case '(':
-                    sb.append("\n");
-                    for (int j = 0; j < indention; j++) {
-                        sb.append(" ");
-                    }
-                    sb.append("(");
-                    indention++;
-                    break;
-                case ')':
-                    indention--;
-                    // fall through
-                default:
-                    sb.append(c);
+                for (int i = 0; i < string.length(); i++) {
+                        char c = string.charAt(i);
+                        switch (c) {
+                                case '(':
+                                        open++;
+                                        if (open > 0 && open % 3 == 0) {
+                                                sb.append("\n");
+                                                for (int j = 0; j <= open; j++) {
+                                                        sb.append(" ");
+                                                }
+                                        }
+                                        sb.append("(");
+                                        break;
+                                case ')':
+                                        open--;
+                                        // fall through
+                                default:
+                                        sb.append(c);
+                        }
                 }
-            }
 
-            return sb.toString();
+                return sb.toString();
         }
 
 
@@ -381,7 +383,8 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         	else{
         		SMTTranslator trans = getType().createTranslator(services);
             	//instantiateTaclets(trans);
-            	problemString = indent(trans.translateProblem(term, services, smtSettings).toString());
+            	problemString = trans.translateProblem(term, services, smtSettings).toString();
+            	prettyProblemString = indent(problemString);
             	exceptionsForTacletTranslation.addAll(trans.getExceptionsOfTacletTranslation());
         	}
 
@@ -423,6 +426,11 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         @Override
         public String getTranslation() {
                 return isRunning() ? null : problemString;
+        }
+
+        @Override
+        public String getPrettyTranslation() {
+                return isRunning() ? null : prettyProblemString;
         }
 
         @Override
