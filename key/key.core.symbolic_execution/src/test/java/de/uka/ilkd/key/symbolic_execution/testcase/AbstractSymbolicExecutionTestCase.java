@@ -167,7 +167,11 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          projectRoot = projectRoot.getParentFile().getParentFile().getParentFile();
          projectRoot = new File(projectRoot, "key" + File.separator + "key.core.symbolic_execution.test");
       }
-      testCaseDirectory = new File(projectRoot + File.separator + "resources"+ File.separator + "testcase");
+      if(System.getProperty("testcases") != null) {
+         testCaseDirectory = new File(System.getProperty("testcases")).getAbsoluteFile();
+      }else{
+         testCaseDirectory = new File(projectRoot, "src/test/resources/testcase");
+      }
    }
 
    /**

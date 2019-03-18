@@ -62,7 +62,11 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
          projectRoot = projectRoot.getParentFile().getParentFile().getParentFile();
          projectRoot = new File(projectRoot, "key" + File.separator + "key.core.proof_references.test");
       }
-      TESTCASE_DIRECTORY = projectRoot + File.separator + "resources"+  File.separator + "testcase";
+      if(System.getProperty("testcases") != null) {
+         TESTCASE_DIRECTORY = new File(System.getProperty("testcases")).getAbsolutePath();
+      }else{
+         TESTCASE_DIRECTORY = projectRoot + "src/test/resources/testcase";
+      }
    }
    
    /**

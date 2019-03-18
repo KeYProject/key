@@ -58,10 +58,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 public class HelperClassForTests {
 
-    @Deprecated
     public static final File TESTCASE_DIRECTORY;
-
-    @Deprecated
     public static final File DUMMY_KEY_FILE;
    
    static {

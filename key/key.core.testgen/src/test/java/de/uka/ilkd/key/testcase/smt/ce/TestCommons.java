@@ -35,12 +35,10 @@ import java.util.LinkedList;
  * Use this class for testing SMT: It provides a mechanism to load proofs and
  * taclets. Do not modify this class directly but derive subclasses to implement
  * tests.
- * 
+ *
  */
 public abstract class TestCommons extends TestCase {
-	protected static String folder = HelperClassForTests.TESTCASE_DIRECTORY
-	        + File.separator + "smt" + File.separator + "tacletTranslation"
-	        + File.separator;
+	protected static File folder = new File(HelperClassForTests.TESTCASE_DIRECTORY, "smt/tacletTranslation");
 	/** The set of taclets */
 	private Collection<Taclet> taclets = new LinkedList<Taclet>();
 	InitConfig initConfig = null;
@@ -60,7 +58,7 @@ public abstract class TestCommons extends TestCase {
 
 	/**
 	 * returns the solver that should be tested.
-	 * 
+	 *
 	 * @return the solver to be tested.
 	 */
 	public abstract SolverType getSolverType();
@@ -76,7 +74,7 @@ public abstract class TestCommons extends TestCase {
 		// unknown is always allowed. But wrong answers are not allowed
 		return correctResult(isValid, result);
 	}
-	
+
 	protected boolean correctResult(Goal g, boolean isValid){
 		return correctResult(isValid, checkGoal(g));
 	}
@@ -92,11 +90,11 @@ public abstract class TestCommons extends TestCase {
 
 	/**
 	 * check a problem file
-	 * 
+	 *
 	 * @param filepath
 	 *            the path to the file
 	 * @return the resulttype of the external solver
-	 * @throws ProblemLoaderException 
+	 * @throws ProblemLoaderException
 	 */
 	protected SMTSolverResult checkFile(String filepath) throws IOException, ProblemLoaderException {
 	   KeYEnvironment<?> p = loadProof(filepath);
@@ -118,8 +116,8 @@ public abstract class TestCommons extends TestCase {
 		launcher.launch(problem, g.proof().getServices(), getSolverType());
 		return problem.getFinalResult();
     }
-	
-	
+
+
 
 	protected KeYEnvironment<?> loadProof(String filepath) throws ProblemLoaderException {
 	   return KeYEnvironment.load(new File(filepath), null, null, null);
@@ -128,7 +126,7 @@ public abstract class TestCommons extends TestCase {
 	/**
 	 * Returns a set of taclets that can be used for tests. REMARK: First you
 	 * have to call <code>parse</code> to instantiate the set of taclets.
-	 * 
+	 *
 	 * @return set of taclets.
 	 */
 	protected Collection<Taclet> getTaclets() {
@@ -142,7 +140,7 @@ public abstract class TestCommons extends TestCase {
 		}
 		return taclets;
 	}
-	
+
 	protected HashSet<String> getTacletNames() {
 		Collection<Taclet> set = getTaclets();
 		HashSet<String> names = new HashSet<String>();
@@ -156,7 +154,7 @@ public abstract class TestCommons extends TestCase {
 	 * Use this method if you only need taclets for testing.
 	 */
 	protected ProofAggregate parse() {
-		return parse(new File(folder + "dummyFile.key"));
+		return parse(new File(folder, "dummyFile.key"));
 	}
 
 	/**
@@ -169,7 +167,7 @@ public abstract class TestCommons extends TestCase {
 
 	/**
 	 * Parses a problem file and returns the corresponding ProofAggregate.
-	 * 
+	 *
 	 * @param file
 	 *            problem file.
 	 * @profile determines the profile that should be used.
