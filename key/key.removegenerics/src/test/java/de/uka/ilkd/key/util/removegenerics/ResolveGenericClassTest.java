@@ -16,11 +16,13 @@ package de.uka.ilkd.key.util.removegenerics;
 import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
+import org.junit.Ignore;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.ProgramFactory;
 import recoder.java.CompilationUnit;
 
+@Ignore("Common Class for utilities")
 public class ResolveGenericClassTest extends TestCase {
     
     protected CrossReferenceServiceConfiguration sc = new CrossReferenceServiceConfiguration();

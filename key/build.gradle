@@ -119,11 +119,17 @@ project(":key.core.proof_references") {
     dependencies {
         compile project(":key.core")
     }
+    test {
+        systemProperty "testcases", "src/test/resources/testcase"
+    }
 }
 
 project(":key.core.symbolic_execution") {
     dependencies {
         compile project(":key.core")
+    }
+    test {
+        systemProperty "testcases", "src/test/resources/testcase"
     }
 }
 
