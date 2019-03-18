@@ -1,10 +1,15 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
 
@@ -20,20 +25,34 @@ public class MasterHandler {
 
     private List<SMTHandler> handlers = new ArrayList<>();
 
-    private List<SExpr> declarations = new ArrayList<>();
+    private List<Writable> declarations = new ArrayList<>();
 
-    private List<SExpr> axioms = new ArrayList<>();
+    private List<Writable> axioms = new ArrayList<>();
 
     private Set<String> knownSymbols  = new HashSet<>();
 
+    private Properties snippets = new Properties();
+
     private HashSet<Sort> sorts = new HashSet<>();
 
-    public MasterHandler(Services services) {
+    private Map<String, Object> translationState = new HashMap<>();
+
+    public MasterHandler(Services services) throws IOException {
 
         for (SMTHandler smtHandler : ServiceLoader.load(SMTHandler.class)) {
             smtHandler.init(services);
+            URL snippetResources = smtHandler.getSnippetResource();
+            if(snippetResources != null) {
+                try {
+                    snippets.loadFromXML(snippetResources.openStream());
+                } catch (IOException e) {
+                    throw new IOException("Error while reading snippet resource " + snippetResources, e);
+                }
+            }
             handlers.add(smtHandler);
         }
+
+        snippets.loadFromXML(getClass().getResourceAsStream("CastHandler.preamble.xml"));
     }
 
     public SExpr translate(Term problem) {
@@ -46,7 +65,7 @@ public class MasterHandler {
             return handleAsUnknownValue(problem);
         } catch(Exception ex) {
             exceptions.add(ex);
-            return new SExpr("ERROR", Type.UNIVERSE);
+            return handleAsUnknownValue(problem);
         }
     }
 
@@ -55,7 +74,12 @@ public class MasterHandler {
             return coerce(translate(problem), type);
         }  catch(Exception ex) {
             exceptions.add(ex);
-            return new SExpr("ERROR", Type.UNIVERSE);
+            try {
+                return coerce(handleAsUnknownValue(problem), type);
+            } catch (SMTTranslationException e) {
+                // This can actually never happen since a universe element is translated
+                throw new Error(e);
+            }
         }
     }
 
@@ -66,6 +90,15 @@ public class MasterHandler {
             addDeclaration(new SExpr("declare-const", pr, "U"));
         }
         return new SExpr(pr, Type.UNIVERSE);
+    }
+
+    public SExpr handleAsFunctionCall(String functioName, Term term) {
+        addFromSnippets(functioName);
+        List<SExpr> children = new ArrayList<>();
+        for (int i = 0; i < term.arity(); i++) {
+            children.add(translate(term.sub(i), Type.UNIVERSE));
+        }
+        return new SExpr(functioName, Type.UNIVERSE, children);
     }
 
     public boolean isKnownSymbol(String pr) {
@@ -147,19 +180,19 @@ public class MasterHandler {
         return result;
     }
 
-    public List<SExpr> getDeclarations() {
+    public List<Writable> getDeclarations() {
         return declarations;
     }
 
-    public void addDeclaration(SExpr decl) {
+    public void addDeclaration(Writable decl) {
         declarations.add(decl);
     }
 
-    public void addAxiom(SExpr decl) {
+    public void addAxiom(Writable decl) {
         axioms.add(decl);
     }
 
-    public List<SExpr> getAxioms() {
+    public List<Writable> getAxioms() {
         return axioms;
     }
 
@@ -169,5 +202,31 @@ public class MasterHandler {
 
     public HashSet<Sort> getSorts() {
         return sorts;
+    }
+
+    public void addFromSnippets(String functionName) {
+        if (isKnownSymbol(functionName)) {
+            return;
+        }
+
+        if (snippets.containsKey(functionName + ".decls")) {
+            VerbatimSMT decl = new VerbatimSMT(snippets.getProperty(functionName + ".decls"));
+            addDeclaration(decl);
+        }
+
+        if (snippets.containsKey(functionName + ".axioms")) {
+            VerbatimSMT decl = new VerbatimSMT(snippets.getProperty(functionName + ".axioms"));
+        }
+
+        addKnownSymbol(functionName);
+
+        String[] deps = snippets.getProperty(functionName + ".deps", "").trim().split(", *");
+        for (String dep : deps) {
+            addFromSnippets(dep);
+        }
+    }
+
+    public Map<String, Object> getTranslationState() {
+        return translationState;
     }
 }

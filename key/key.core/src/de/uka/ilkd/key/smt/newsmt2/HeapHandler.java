@@ -1,35 +1,59 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+import java.io.IOException;
+import java.util.IdentityHashMap;
+import java.util.Map;
+
 public class HeapHandler implements SMTHandler {
 
-    public static final String HEAP = "heap";
     public static final String WELL_FORMED = "wellFormed";
     public static final String KEYSELECT = "keyselect";
+    public static final String KEYSTORE = "keystore";
+    public static final String KEYANON = "keyanon";
+    public static final String KEYMEMSET = "keymemset";
+    public static final String KEYCREATE = "keycreate";
+
     private Services services;
+    private Map<Function, String> supportedFunctions =
+            new IdentityHashMap<>();
+
 
     @Override
-    public void init(Services services) {
+    public void init(Services services) throws IOException {
         this.services = services;
+
+        supportedFunctions.clear();
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        supportedFunctions.put(heapLDT.getAnon(), KEYANON);
+        supportedFunctions.put(heapLDT.getWellFormed(), WELL_FORMED);
+        supportedFunctions.put(heapLDT.getCreate(), KEYCREATE);
+        supportedFunctions.put(heapLDT.getMemset(), KEYMEMSET);
+        supportedFunctions.put(heapLDT.getStore(), KEYSTORE);
     }
 
     @Override
     public boolean canHandle(Term term) {
-        return term.op().toString().contains(HEAP)
-            || term.toString().contains(WELL_FORMED)
-            || services.getTypeConverter().getHeapLDT().isSelectOp(term.op())
-            || term.op().toString().equals("store");
+        Operator op = term.op();
+        return supportedFunctions.containsKey(op)
+            || services.getTypeConverter().getHeapLDT().isSelectOp(op);
     }
+
+
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
 
+        /* REVIEW MU: We decided to remove special casing of heaps.
         if (term.op().toString().contains(HEAP)) {
             String s = term.toString();
             if (!trans.isKnownSymbol(s)) {
@@ -38,34 +62,35 @@ public class HeapHandler implements SMTHandler {
             }
             return new SExpr(s, Type.UNIVERSE);
         }
+        */
 
-        if (term.op().toString().equals(WELL_FORMED)) {
-            return new SExpr(WELL_FORMED, Type.BOOL, trans.translate(term.sub(0)));
+        Operator op = term.op();
+
+        if (services.getTypeConverter().getHeapLDT().getWellFormed() == op) {
+            trans.addFromSnippets(WELL_FORMED);
+            return new SExpr(WELL_FORMED, Type.BOOL, trans.translate(term.sub(0), Type.UNIVERSE));
         }
 
-        if (term.op().toString().equals("store")) {
-            SExpr st1 = trans.translate(term.sub(0));
-            SExpr st2 = trans.coerce(trans.translate(term.sub(1)), Type.UNIVERSE);
-            SExpr st3 = trans.coerce(trans.translate(term.sub(2)), Type.UNIVERSE);
-            SExpr st4 = trans.coerce(trans.translate(term.sub(3)), Type.UNIVERSE);
-            return new SExpr("keystore", Type.HEAP, st1, st2, st3, st4);
+        if (supportedFunctions.containsKey(op)) {
+            trans.handleAsFunctionCall(supportedFunctions.get(op), term);
         }
-
-        SortDependingFunction op = (SortDependingFunction) term.op();
-        Sort dep = op.getSortDependingOn();
 
         if (services.getTypeConverter().getHeapLDT().isSelectOp(op)) {
-            SExpr se1 = trans.translate(term.sub(0));
-            SExpr se2 = trans.translate(term.sub(1));
-            SExpr se3 = trans.translate(term.sub(2));
+            trans.addFromSnippets(KEYSELECT);
+
+            SExpr select = trans.handleAsFunctionCall(KEYSELECT, term);
+
+            SortDependingFunction sdf = (SortDependingFunction) op;
+            Sort dep = sdf.getSortDependingOn();
 
             if (dep == Sort.ANY) {
-                return new SExpr("select", SExpr.Type.UNIVERSE, se1, se2, se3);
+                return select;
+            } else {
+                return SExpr.castExpr(SExpr.sortExpr(dep), select);
             }
-
-            return SExpr.castExpr(SExpr.sortExpr(dep), new SExpr("select", Type.UNIVERSE, se1, se2, se3));
         }
 
-        return new SExpr("unreachable");
+        throw new SMTTranslationException("unreachable code");
     }
+
 }

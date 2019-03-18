@@ -50,13 +50,17 @@ public class MacroKeyBinding extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
+        System.out.println("MacroKeyBinding.actionPerformed");
         PosInSequent mousePos = sequentView.getLastPosInSequent();
-        if(mousePos == null) {
-            return;
+        System.out.println("mousePos = " + mousePos);
+        PosInOccurrence posInOcc;
+
+        if (mousePos == null) {
+            posInOcc = null;
+        } else {
+            posInOcc = mousePos.getPosInOccurrence();
         }
 
-        PosInOccurrence posInOcc = mousePos.getPosInOccurrence();
         if(macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
             mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, posInOcc);
         }

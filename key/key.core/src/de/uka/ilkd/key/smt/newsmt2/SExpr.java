@@ -28,7 +28,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * @author Mattias Ulbrich
  *
  */
-public class SExpr {
+public class SExpr implements Writable {
 
     public static final String DECLARE_CONST = "declare-const";
 
@@ -102,6 +102,8 @@ public class SExpr {
     }
 
     public static SExpr castExpr(SExpr sortExp, SExpr exp) {
+        // REVIEW MU: Should there perhaps be a coercion to Universe before the call?
+        // What if a "Int" is given. That would fail.
         return new SExpr("cast", Type.UNIVERSE, exp, sortExp);
     }
 
@@ -120,6 +122,7 @@ public class SExpr {
         }
     }
 
+    @Override
     public void appendTo(StringBuffer sb) {
         boolean noSpace = name.isEmpty();
         if(children.size() > 0 || noSpace) {

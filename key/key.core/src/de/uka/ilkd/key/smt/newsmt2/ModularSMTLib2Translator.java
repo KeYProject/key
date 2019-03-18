@@ -30,11 +30,19 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     private List<Throwable> tacletExceptions = Collections.emptyList();
 
+    // REVIEW MU: Eventually switch to StringBuilder which is faster
     @Override
     public StringBuffer translateProblem(Term problem, Services services, SMTSettings settings)
         throws IllegalFormulaException {
 
-        MasterHandler master = new MasterHandler(services);
+        MasterHandler master;
+        try {
+            master = new MasterHandler(services);
+        } catch (IOException ex) {
+            exceptions = Collections.singletonList(ex);
+            // Review MU: This should not be reported as exceptions only ...
+            return new StringBuffer("error while translationg");
+        }
 
         SExpr result = master.translate(problem, Type.BOOL);
         exceptions = master.getExceptions();
@@ -69,13 +77,13 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         createSortTypeHierarchy(problem, services, master, sb);
 
-        for(SExpr decl : master.getDeclarations()) {
+        for(Writable decl : master.getDeclarations()) {
             decl.appendTo(sb);
             sb.append("\n");
         }
 
         sb.append("; --- Axioms\n\n");
-        for (SExpr ax : master.getAxioms()) {
+        for (Writable ax : master.getAxioms()) {
             ax.appendTo(sb);
             sb.append("\n\n");
         }

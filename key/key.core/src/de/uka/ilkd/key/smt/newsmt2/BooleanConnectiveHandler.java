@@ -33,17 +33,19 @@ public class BooleanConnectiveHandler implements SMTHandler {
     public void init(Services services) {
         BooleanLDT ldt = services.getTypeConverter().getBooleanLDT();
 
-        if(logicFalse != null) {
-            supportedOperators.remove(logicFalse);
-        }
+        // Review MU: I believe the put below already removes the old value
+//        if(logicFalse != null) {
+//            supportedOperators.remove(logicFalse);
+//        }
         this.logicFalse = ldt.getFalseConst();
         supportedOperators.put(logicFalse, "false");
 
-        if(logicTrue != null) {
-            supportedOperators.remove(logicTrue);
-        }
+
+//        if(logicTrue != null) {
+//            supportedOperators.remove(logicTrue);
+//        }
         this.logicTrue = ldt.getTrueConst();
-        supportedOperators.put(logicFalse, "true");
+        supportedOperators.put(logicTrue, "true");
     }
 
     @Override

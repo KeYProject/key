@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<comment>These are the preamble snippets needed by class InstanceOfHandler in this package</comment>
+
+    <entry key="instance.decls">(declare-fun instanceof (U T) Bool)</entry>
+    <entry key="instance.axioms">(assert (forall ((u U) (t T)) (=> (instanceof u t) (subtype (typeof u) t))))</entry>
+
+
+    <entry key="exactinstanceof.decls">(declare-fun exactinstanceof (U T) Bool)</entry>
+    <entry key="exactinstanceof.axioms">(assert (forall ((u U) (t T)) (=> (exactinstanceof u t) (= (typeof u) t))))</entry>
+</properties>

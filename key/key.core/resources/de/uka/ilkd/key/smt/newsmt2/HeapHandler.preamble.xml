@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<comment>These are the preamble snippets needed by class HeapHandler in this package</comment>
+
+    <entry key="keyselect.decls">(declare-fun keyselect (U U U) U)</entry>
+    <entry key="keystore.decls">(declare-fun keystore (U U U U) U)</entry>
+    <entry key="keyanon.decls">(declare-fun keyanon (U U U) U)</entry>
+    <entry key="keymemset.decls">(declare-fun keyanon (U U U) U)</entry>
+    <entry key="keycreate.decls">(declare-fun keyanon (U U) U)</entry>
+    <entry key="wellformed.decls">(declare-fun wellFormed (U) Bool)</entry>
+    <entry key="field_java.lang.Object::$&lt;created&gt;.decls">(declare-fun |field_java.lang.Object::$&lt;created&gt;| U)</entry>
+
+    <entry key="keystore.axioms">
+        (assert (forall ((h U)(o U)(f U)(o2 U)(f2 U)(v U))
+            (=> (and (= o o2) (= f f2) (not (= f field_created)) (= (keyselect (keystore h o f v) o f) v)))))
+        (assert (forall ((h U)(o U)(f U)(o2 U)(f2 U)(v U))
+            (or (= o o2) (= (keyselect (keystore h o f v) o2 f2) (keyselect h o2 f2)))))
+        (assert (forall ((h U)(o U)(f U)(o2 U)(f2 U)(v U))
+            (or (= f f2) (= (keyselect (keystore h o f v) o2 f2) (keyselect h o2 f2)))))
+        (assert (forall ((h U)(o U)(f U)(o2 U)(f2 U)(v U))
+            (= (keyselect (keystore h o f_created v) o2 f2) (keyselect h o2 f2)))))
+    </entry>
+
+    <entry key="keyanon.axioms">
+        ; axioms for keyanon are still to be done!
+    </entry>
+
+    <entry key="field_java.lang.Object::$&lt;created&gt;.axioms">
+        (assert (fieldIdentifier |field_java.lang.Object::$&lt;created&gt;| -1)
+    </entry>
+
+    <entry key="keystore.deps">keyselect, field_java.lang.Object::$&lt;created&gt;</entry>
+    <entry key="keyanon.deps">keyselect</entry>
+    <entry key="keymemset.deps">keyselect</entry>
+    <entry key="keycreate.deps">keyselect</entry>
+    <entry key="field_java.lang.Object::$&lt;created&gt;">fieldIdentifier</entry>
+
+</properties>
