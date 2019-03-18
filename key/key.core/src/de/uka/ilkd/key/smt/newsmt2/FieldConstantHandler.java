@@ -1,17 +1,17 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
-import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import java.util.Map;
 
 public class FieldConstantHandler implements SMTHandler {
 
+    public static final String CONSTANT_COUNTER_PROPERTY = "fieldConstant.counter";
     private Services services;
 
     @Override
@@ -20,13 +20,14 @@ public class FieldConstantHandler implements SMTHandler {
     }
 
     @Override
-    // Review MU: I changed this to use any::cast since it would throw an exception
-    // if applied to "null" terms.
     public boolean canHandle(Term term) {
-        return term.sort() == services.getTypeConverter().getHeapLDT().getFieldSort()
-                && term.op() instanceof Function
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        Operator op = term.op();
+        return term.sort() == heapLDT.getFieldSort()
+                && op instanceof Function
                 && term.arity() == 0
-                && term.op().name().toString().contains("::$");
+                && op.name().toString().contains("::$")
+                || op == heapLDT.getArr();
     }
 
     @Override
@@ -34,14 +35,21 @@ public class FieldConstantHandler implements SMTHandler {
         String name = term.op().name().toString();
         String smtName = "field_" + name;
 
-        if(term.op() == services.getTypeConverter().getHeapLDT().getCreated()) {
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        Operator op = term.op();
+
+        if (op == heapLDT.getArr()) {
+            return trans.handleAsFunctionCall("arr", term);
+        }
+
+        if(op == heapLDT.getCreated()) {
             // java.lang.Object::$<created> is a special symbol handled already in Heap
             trans.addFromSnippets(smtName);
         }
 
         if (!trans.isKnownSymbol(smtName)) {
             Map<String, Object> state = trans.getTranslationState();
-            Integer curVal = (Integer) state.getOrDefault("fieldConstant.counter", -2);
+            Integer curVal = (Integer) state.getOrDefault(CONSTANT_COUNTER_PROPERTY, -2);
 
             trans.addFromSnippets("fieldIdentifier");
 
@@ -52,7 +60,7 @@ public class FieldConstantHandler implements SMTHandler {
                             new SExpr("fieldIdentifier", smtName),
                             new SExpr(curVal.toString()))));
 
-            state.put("fieldConstant.counter", curVal - 1);
+            state.put(CONSTANT_COUNTER_PROPERTY, curVal - 1);
             trans.addKnownSymbol(smtName);
         }
         return new SExpr(smtName);
