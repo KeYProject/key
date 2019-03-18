@@ -2,9 +2,7 @@ package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
@@ -199,6 +197,26 @@ public class NewSMTTTest {
     }
 
     @Test
+    public void heapTest() throws IllegalFormulaException, IOException {
+        LocationVariable xVar = new LocationVariable(new ProgramElementName("x"), intSort);
+        Term x = tb.var(xVar);
+        Term h = tb.var(new LocationVariable(new ProgramElementName("h"), heapSort));
+        Term o = tb.var(new LocationVariable(new ProgramElementName("o"), objectSort));
+        Term f = tb.var(new LocationVariable(new ProgramElementName("f"), fieldSort));
+        Term storeTerm = tb.store(h, o, f, x);
+        Term selectTerm = tb.select(intSort, storeTerm, o, f);
+        Term eqTerm = tb.equals(selectTerm, x);
+        String ts = trans.translateProblem(eqTerm, services, null).toString();
+        String testFP = TEST_DIR + "HeapTest.smt2";
+        File heapTestFile = new File(testFP);
+        writeToTestFile(heapTestFile, ts);
+        String exp = "(= (cast (select (keystore var_h var_o var_f var_x) " +
+                "var_o var_f) sort_int) var_x)";
+        Assert.assertEquals(exp, mh.translate(eqTerm, SExpr.Type.BOOL).toString());
+        Assert.assertTrue(solverReturnsUnsat(testFP));
+    }
+
+    @Test
     public void castTest() throws IllegalFormulaException, IOException {
         LogicVariable xVar = new LogicVariable(new ProgramElementName("x"), intSort);
         LogicVariable yVar = new LogicVariable(new ProgramElementName("y"), intSort);
@@ -219,7 +237,7 @@ public class NewSMTTTest {
         String pathname = TEST_DIR + "InstOfTest.smt2";
         File instofTestFile = new File(pathname);
         writeToTestFile(instofTestFile, ts);
-//        Assert.assertTrue(solverReturnsUnsat(pathname));
+        Assert.assertTrue(solverReturnsUnsat(pathname));
         Assert.assertEquals("(instanceof ui_x sort_int)",
                 mh.translate(iot, SExpr.Type.BOOL).toString());
     }
