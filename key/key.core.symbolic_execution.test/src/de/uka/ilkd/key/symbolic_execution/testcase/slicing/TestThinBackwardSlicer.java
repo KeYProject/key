@@ -338,9 +338,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testFigure2Instance_right() throws Exception {
       doSlicingTest("/slicing/figure2Instance/Figure2Instance.proof", 
-                    new RightAssignmentSelector(256),
+                    new RightAssignmentSelector(267),
                     true,
-                    218, 171, 169, 154, 150, 133, 99);
+                    229, 182, 180, 165, 161, 144, 99);
    }
 
    /**
