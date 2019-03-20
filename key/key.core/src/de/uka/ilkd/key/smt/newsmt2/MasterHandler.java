@@ -215,7 +215,8 @@ public class MasterHandler {
         }
 
         if (snippets.containsKey(functionName + ".axioms")) {
-            VerbatimSMT decl = new VerbatimSMT(snippets.getProperty(functionName + ".axioms"));
+            VerbatimSMT ax = new VerbatimSMT(snippets.getProperty(functionName + ".axioms"));
+            addAxiom(ax);
         }
 
         addKnownSymbol(functionName);

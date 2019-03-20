@@ -1,4 +1,4 @@
-(set-option :print-success true) 
+(set-option :print-success true)
 
 (set-option :produce-unsat-cores true)
 
@@ -28,9 +28,4 @@
 (assert (forall ((x U) (t T)) (! (subtype (typeof (cast x t)) t) :pattern (cast x t)))) 				
 (assert (forall ((x U) (t T)) (! (=> (subtype (typeof x) t) (= (cast x t) x)) :pattern (cast x t))))
 
-(declare-fun instanceof (U T) Bool)
-(assert (forall ((u U) (t T)) (=> (instanceof u t) (subtype (typeof u) t))))
-
-(declare-fun exactinstanceof (U T) Bool)
-(assert (forall ((u U) (t T)) (=> (exactinstanceof u t) (= (typeof u) t))))
 

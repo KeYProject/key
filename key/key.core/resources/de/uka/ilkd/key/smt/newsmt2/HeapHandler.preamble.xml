@@ -10,17 +10,17 @@
     <entry key="keymemset.decls">(declare-fun keyanon (U U U) U)</entry>
     <entry key="keycreate.decls">(declare-fun keyanon (U U) U)</entry>
     <entry key="wellFormed.decls">(declare-fun wellFormed (U) Bool)</entry>
-    <entry key="field_java.lang.Object::&lt;created&gt;.decls">(declare-fun |field_java.lang.Object::&lt;created&gt;| () U)</entry>
+    <entry key="field_java.lang.Object::&lt;created&gt;.decls">(declare-const |field_java.lang.Object::&lt;created&gt;| U)</entry>
 
     <entry key="keystore.axioms">
         (assert (forall ((h U)(o U)(f U)(o2 U)(f2 U)(v U))
-            (=> (and (= o o2) (= f f2) (not (= f field_created)) (= (keyselect (keystore h o f v) o f) v)))))
+            (=> (and (= o o2) (= f f2) (not (= f |field_java.lang.Object::&lt;created&gt;|))) (= (keyselect (keystore h o f v) o2 f2) v))))
         (assert (forall ((h U)(o U)(f U)(o2 U)(f2 U)(v U))
             (or (= o o2) (= (keyselect (keystore h o f v) o2 f2) (keyselect h o2 f2)))))
         (assert (forall ((h U)(o U)(f U)(o2 U)(f2 U)(v U))
             (or (= f f2) (= (keyselect (keystore h o f v) o2 f2) (keyselect h o2 f2)))))
         (assert (forall ((h U)(o U)(f U)(o2 U)(f2 U)(v U))
-            (= (keyselect (keystore h o f_created v) o2 f2) (keyselect h o2 f2)))))
+            (= (keyselect (keystore h o |field_java.lang.Object::&lt;created&gt;| v) o2 f2) (keyselect h o2 f2))))
     </entry>
 
     <entry key="keyanon.axioms">
@@ -28,7 +28,7 @@
     </entry>
 
     <entry key="field_java.lang.Object::&lt;created&gt;.axioms">
-        (assert (fieldIdentifier |field_java.lang.Object::&lt;created&gt;| -1)
+        (assert (= (fieldIdentifier |field_java.lang.Object::&lt;created&gt;|) -1))
     </entry>
 
     <entry key="keystore.deps">keyselect, field_java.lang.Object::&lt;created&gt;</entry>

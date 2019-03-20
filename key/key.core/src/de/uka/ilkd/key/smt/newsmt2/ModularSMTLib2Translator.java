@@ -77,6 +77,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         createSortTypeHierarchy(problem, services, master, sb);
 
+        sb.append("; --- Declarations\n\n");
         for(Writable decl : master.getDeclarations()) {
             decl.appendTo(sb);
             sb.append("\n");
@@ -92,7 +93,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         SExpr assertion = new SExpr("assert", Type.NONE, new SExpr("not", Type.NONE, result));
         assertion.appendTo(sb);
 
-        sb.append("(check-sat)");
+        sb.append("\n(check-sat)");
 
         return sb;
     }
@@ -102,10 +103,6 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         MasterHandler master, StringBuffer sb) {
 
         for (Sort s : master.getSorts()) {
-            if (s.toString().equals("Heap")) {
-                sb.append(readResource("heap-axioms.smt2"));
-                continue;
-            }
             if (s.toString().equals("Null")) {
                 sb.append(readResource("null-axioms.smt2"));
                 continue;

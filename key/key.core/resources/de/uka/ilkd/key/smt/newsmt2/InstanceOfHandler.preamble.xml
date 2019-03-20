@@ -4,8 +4,8 @@
 
 <comment>These are the preamble snippets needed by class InstanceOfHandler in this package</comment>
 
-    <entry key="instance.decls">(declare-fun instanceof (U T) Bool)</entry>
-    <entry key="instance.axioms">(assert (forall ((u U) (t T)) (=> (instanceof u t) (subtype (typeof u) t))))</entry>
+    <entry key="instanceof.decls">(declare-fun instanceof (U T) Bool)</entry>
+    <entry key="instanceof.axioms">(assert (forall ((u U) (t T)) (=> (instanceof u t) (subtype (typeof u) t))))</entry>
 
 
     <entry key="exactinstanceof.decls">(declare-fun exactinstanceof (U T) Bool)</entry>
