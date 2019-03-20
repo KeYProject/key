@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<comment>These are the preamble snippets needed for handling the integer sort</comment>
+
+    <entry key="int.axioms">
+(assert (forall ((i Int)) (= (u2i (i2u i)) i)))
+(assert (forall ((x U)) (=> (instanceof x sort_int)  (= (i2u (u2i x)) x))))
+(assert (forall ((i Int)) (= (typeof (i2u i)) sort_int)))
+    </entry>
+
+    <entry key="int.decls">
+(declare-fun u2i (U) Int)
+(declare-fun i2u (Int) U)
+(declare-const sort_int T)
+    </entry>
+
+</properties>

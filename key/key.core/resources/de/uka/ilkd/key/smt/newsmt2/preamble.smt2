@@ -8,14 +8,6 @@
 (declare-sort U 0)
 (declare-const sort_any T)
 
-(declare-fun u2i (U) Int)
-(declare-fun i2u (Int) U)
-(assert (forall ((i Int)) (= (u2i (i2u i)) i)))
-
-(declare-fun u2b (U) Bool)
-(declare-fun b2u (Bool) U)
-(assert (forall ((b Bool)) (= (u2b (b2u b)) b)))
-
 (declare-fun subtype (T T) Bool)
 
 (assert (forall ((t1 T)) (subtype t1 t1)))

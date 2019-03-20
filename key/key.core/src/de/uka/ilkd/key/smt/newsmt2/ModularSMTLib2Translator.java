@@ -3,13 +3,7 @@ package de.uka.ilkd.key.smt.newsmt2;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -33,7 +27,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     // REVIEW MU: Eventually switch to StringBuilder which is faster
     @Override
     public StringBuffer translateProblem(Term problem, Services services, SMTSettings settings)
-        throws IllegalFormulaException {
+            throws IllegalFormulaException {
 
         MasterHandler master;
         try {
@@ -43,6 +37,11 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             // Review MU: This should not be reported as exceptions only ...
             return new StringBuffer("error while translationg");
         }
+
+        //these are always needed (i think)
+        master.addFromSnippets("bool");
+        master.addFromSnippets("int");
+        master.addFromSnippets("instanceof");
 
         SExpr result = master.translate(problem, Type.BOOL);
         exceptions = master.getExceptions();
@@ -61,24 +60,22 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             addAllSorts(problem, master);
         }
 
-        StringBuffer distinctSortSB = new StringBuffer();
-        distinctSortSB.append("(assert (distinct ");
+        List<SExpr> sortExprs = new LinkedList<>();
         for (Sort s : master.getSorts()) {
             if (s != Sort.ANY) {
-                sb.append("(declare-const " + SExpr.sortExpr(s) + " T)\n");
+                master.addDeclaration(new SExpr("declare-const", SExpr.sortExpr(s).toString(), "T"));
             }
-            distinctSortSB.append(SExpr.sortExpr(s) + " ");
+            sortExprs.add(SExpr.sortExpr(s));
         }
-        distinctSortSB.append("))\n");
         if (master.getSorts().size() > 1) {
-            sb.append(distinctSortSB);
+            master.addDeclaration(new SExpr("assert", Type.BOOL,
+                    new SExpr("distinct", Type.BOOL, sortExprs)));
         }
         sb.append("\n");
 
         createSortTypeHierarchy(problem, services, master, sb);
 
-        sb.append("; --- Declarations\n\n");
-        for(Writable decl : master.getDeclarations()) {
+        for (Writable decl : master.getDeclarations()) {
             decl.appendTo(sb);
             sb.append("\n");
         }
@@ -100,7 +97,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
 
     private void createSortTypeHierarchy(Term problem, Services services,
-        MasterHandler master, StringBuffer sb) {
+                                         MasterHandler master, StringBuffer sb) {
 
         for (Sort s : master.getSorts()) {
             if (s.toString().equals("Null")) {
@@ -166,13 +163,13 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     private static String readResource(String s) {
         BufferedReader r = new BufferedReader(
-            new InputStreamReader(
-                ModularSMTLib2Translator.class.getResourceAsStream(s)));
+                new InputStreamReader(
+                        ModularSMTLib2Translator.class.getResourceAsStream(s)));
 
         try {
             String line;
             StringBuilder sb = new StringBuilder();
-            while((line = r.readLine()) != null) {
+            while ((line = r.readLine()) != null) {
                 sb.append(line).append("\n");
             }
 
@@ -186,7 +183,6 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     private void postProcess(SExpr result) {
         // TODO: remove (u2i (i2u x)) --->  x
     }
-
 
 
     @Override

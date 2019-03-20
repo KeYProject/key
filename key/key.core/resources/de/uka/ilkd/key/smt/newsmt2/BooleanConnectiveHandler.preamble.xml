@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<comment>These are the preamble snippets needed for handling the boolean sort</comment>
+
+    <entry key="bool.decls">
+(declare-fun u2b (U) Bool)
+(declare-fun b2u (Bool) U)
+(declare-const sort_boolean T)
+(declare-const TRUE U)
+(declare-const FALSE U)
+    </entry>
+
+    <entry key="bool.axioms">
+(assert (forall ((b Bool)) (= (u2b (b2u b)) b)))
+(assert (= (typeof TRUE) sort_boolean))
+(assert (= (typeof FALSE) sort_boolean))
+(assert (forall ((u U)) (=> (= (typeof u) sort_boolean) (or (= u TRUE) (= u FALSE)))))
+(assert (u2b TRUE))
+(assert (not (u2b FALSE)))
+    </entry>
+
+</properties>
