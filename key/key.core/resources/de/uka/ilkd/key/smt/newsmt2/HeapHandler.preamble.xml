@@ -9,8 +9,8 @@
     <entry key="keyanon.decls">(declare-fun keyanon (U U U) U)</entry>
     <entry key="keymemset.decls">(declare-fun keyanon (U U U) U)</entry>
     <entry key="keycreate.decls">(declare-fun keyanon (U U) U)</entry>
-    <entry key="wellformed.decls">(declare-fun wellFormed (U) Bool)</entry>
-    <entry key="field_java.lang.Object::$&lt;created&gt;.decls">(declare-fun |field_java.lang.Object::$&lt;created&gt;| U)</entry>
+    <entry key="wellFormed.decls">(declare-fun wellFormed (U) Bool)</entry>
+    <entry key="field_java.lang.Object::&lt;created&gt;.decls">(declare-fun |field_java.lang.Object::&lt;created&gt;| () U)</entry>
 
     <entry key="keystore.axioms">
         (assert (forall ((h U)(o U)(f U)(o2 U)(f2 U)(v U))
@@ -27,14 +27,14 @@
         ; axioms for keyanon are still to be done!
     </entry>
 
-    <entry key="field_java.lang.Object::$&lt;created&gt;.axioms">
-        (assert (fieldIdentifier |field_java.lang.Object::$&lt;created&gt;| -1)
+    <entry key="field_java.lang.Object::&lt;created&gt;.axioms">
+        (assert (fieldIdentifier |field_java.lang.Object::&lt;created&gt;| -1)
     </entry>
 
-    <entry key="keystore.deps">keyselect, field_java.lang.Object::$&lt;created&gt;</entry>
+    <entry key="keystore.deps">keyselect, field_java.lang.Object::&lt;created&gt;</entry>
     <entry key="keyanon.deps">keyselect</entry>
     <entry key="keymemset.deps">keyselect</entry>
     <entry key="keycreate.deps">keyselect</entry>
-    <entry key="field_java.lang.Object::$&lt;created&gt;">fieldIdentifier</entry>
+    <entry key="field_java.lang.Object::&lt;created&gt;">fieldIdentifier</entry>
 
 </properties>
