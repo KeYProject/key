@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.FileSystems;
@@ -17,8 +18,12 @@ import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
+
+import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
  * This class uses a temporary directory as a store for the proof-relevant files.
@@ -27,11 +32,16 @@ import de.uka.ilkd.key.settings.GeneralSettings;
  */
 public final class DiskFileRepo extends AbstractFileRepo {
     /**
-     * The path where KeY's built-in rules are stored.
-     * Needed to prevent built-in rules from getting cached.
+     * The URL to KeY's built-in rules (used to prevent built-in rules from getting copied).
      */
-    //protected static final Path KEYPATH = RuleSourceFactory.fromDefaultLocation("").file().toPath();
-    protected static final Path KEYPATH = Paths.get("..").toAbsolutePath().normalize();
+    protected static final URL RULES_URL =
+            KeYResourceManager.getManager().getResourceFile(Proof.class, "rules/");
+
+    /**
+     * The URL to KeY's built-in Java classes (used to prevent these classes from getting copied).
+     */
+    protected static final URL REDUX_URL =
+            KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, "JavaRedux/");
 
     /**
      * This matcher matches *.java files.
@@ -375,8 +385,15 @@ public final class DiskFileRepo extends AbstractFileRepo {
         }
     }
 
-    private static boolean isInternalFile(Path path) {
-        return path.normalize().startsWith(KEYPATH);
+    private static boolean isInternalFile(Path path) throws MalformedURLException {
+        // we explicitly check if path is in JavaRedux or in rule path
+        URL url = path.toUri().toURL();
+
+        // TODO: maybe we have to cut off the protocol part first?
+        String urlStr = url.toString();
+        String rulesURLStr = RULES_URL.toString();
+        String reduxURLStr = REDUX_URL.toString();
+        return urlStr.startsWith(rulesURLStr) || urlStr.startsWith(reduxURLStr);
     }
 
     // TODO: move to IOUtil?
