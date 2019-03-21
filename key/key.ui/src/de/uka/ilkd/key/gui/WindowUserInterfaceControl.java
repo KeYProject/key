@@ -389,8 +389,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
        final boolean saved = fileChooser.showSaveDialog(mainWindow, proof.getProofFile());
        if (saved) {
            Path path = fileChooser.getSaveFile();
-           ProofSaver saver = new ProofBundleSaver(proof, path.toString(),
-                   KeYConstants.INTERNAL_VERSION);
+           ProofSaver saver = new ProofBundleSaver(proof, path.toFile());
 
            String errorMsg;
            try {

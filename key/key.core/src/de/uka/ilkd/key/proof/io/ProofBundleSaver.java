@@ -9,8 +9,6 @@ import de.uka.ilkd.key.proof.io.consistency.AbstractFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.MiscTools;
 
-// TODO: What FileRepo implementations should this work with? all?
-//       How to create the correct Zip-Structure for TrivialFileRepo then?
 /**
  * This class is responsible for saving (zipped) proof bundles.
  * These bundles contain all data needed for successfully reloading the proofs:
@@ -28,11 +26,10 @@ public class ProofBundleSaver extends ProofSaver {
     /**
      * Creates a new ProofBundleSaver.
      * @param proof the proof to save
-     * @param fileName the target filename
-     * @param internalVersion the internal KeY version
+     * @param saveFile the target filename
      */
-    public ProofBundleSaver(Proof proof, String fileName, String internalVersion) {
-        super(proof, fileName, internalVersion);
+    public ProofBundleSaver(Proof proof, File saveFile) {
+        super(proof, saveFile);
     }
 
     @Override
@@ -52,7 +49,7 @@ public class ProofBundleSaver extends ProofSaver {
         String proofFileName = MiscTools.toValidFileName(proof.name().toString() + ".proof");
 
         // save the proof file to the FileRepo (stream is closed by the save method!)
-        super.save(repo.createOutputStream(Paths.get(proofFileName)));
+        save(repo.createOutputStream(Paths.get(proofFileName)));
 
         // save proof bundle with the help of the FileRepo
         ((AbstractFileRepo)repo).saveProof(file.toPath());
