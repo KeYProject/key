@@ -1,11 +1,10 @@
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.io.consistency.AbstractFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.MiscTools;
