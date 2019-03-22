@@ -41,7 +41,7 @@ public final class IntLinkedList implements IntList {
           @ decreases seq.length - \values.length;
           @ assignable \nothing;
           @*/
-        for (Integer i : this) {
+        for (MyInteger i : this) {
             result += i.intValue();
         }
         
@@ -59,7 +59,7 @@ public final class IntLinkedList implements IntList {
           @ decreases seq.length - \values.length;
           @ assignable \nothing;
           @*/
-        for (Integer i : this) {
+        for (MyInteger i : this) {
             result += i.intValue();
         }
         

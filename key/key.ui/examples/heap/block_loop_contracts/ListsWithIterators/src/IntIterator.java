@@ -8,24 +8,28 @@ public class IntIterator implements Iterator {
     //@ ghost \seq nodeseq;
     //@ ghost \seq seq;
     
-    //@ public instance invariant nodeseq == list.nodeseq[0 .. (nodeseq.length - 1)];
-    //@ public instance invariant seq == list.seq[0 .. (seq.length - 1)];
+    //@ public instance invariant nodeseq == list.nodeseq[0 .. nodeseq.length];
+    //@ public instance invariant seq == list.seq[0 .. seq.length];
 
     //@ public instance invariant nodeseq.length <= list.nodeseq.length;
     //@ public instance invariant seq.length <= list.seq.length;
     //@ public instance invariant seq.length == nodeseq.length;
 
-    //@ public instance invariant next != null ==> next == nodeseq[nodeseq.length - 1];
-    //@ public instance invariant next != null ==> next.data == seq[seq.length - 1];
+    //@ public instance invariant next != null ==> next == list.nodeseq[nodeseq.length];
+    //@ public instance invariant next != null ==> next.data == list.seq[seq.length];
     
     //@ public instance invariant seq.length == list.seq.length <==> next == null;
 
+    /*@ public normal_behavior
+      @ requires \invariant_for(list);
+      @ ensures this.list == list;
+      @ ensures this.next == list.first;
+      @ ensures seq.length == 0;
+      @ assignable \nothing;
+      @*/
     public IntIterator(IntLinkedList list) {
         this.list = list;
-        
         next = list.first;
-        //@ set nodeseq = \seq_concat(nodeseq, \seq_singleton(next));
-        //@ set seq = \seq_concat(seq, \seq_singleton(next.data));
     }
 
     /*@ public normal_behavior
@@ -38,17 +42,25 @@ public class IntIterator implements Iterator {
 
     /*@ public normal_behavior
       @ requires next != null;
+      @ ensures \result != null;
       @ ensures \result.intValue() == \old(next).data;
       @ ensures seq.length == \old(seq.length) + 1;
+      @ assignable next, nodeseq, seq;
+      @
+      @ also
+      @
+      @ public exceptional_behavior
+      @ requires next == null;
+      @ signals(NullPointerException) true;
       @ assignable \nothing;
       @*/
-    public Integer next() {
+    public MyInteger next() {
         int result = next.data;
-        
-        next = next.next;
+
         //@ set nodeseq = \seq_concat(nodeseq, \seq_singleton(next));
         //@ set seq = \seq_concat(seq, \seq_singleton(next.data));
+        next = next.next;
         
-        return Integer.valueOf(result);
+        return MyInteger.valueOf(result);
     }
 }
