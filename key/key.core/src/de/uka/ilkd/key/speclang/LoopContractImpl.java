@@ -2,10 +2,12 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -180,7 +182,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         this.decreases = decreases;
         this.services = services;
 
-        loopLabels = new ArrayList<Label>();
+        Set<Label> loopLabels = new HashSet<Label>();
         Label outerLabel = new ProgramElementName("breakLoop");
         Label innerLabel = new ProgramElementName("continueLoop");
         loopLabels.add(outerLabel);
@@ -218,9 +220,10 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             values = enhancedForElim.getValuesVariable();
         }
 
+        this.loopLabels = new ArrayList<>(loopLabels);
         head = getHeadStatement(loop, block, enhancedForElim);
         guard = loop.getGuardExpression();
-        body = getBodyStatement(loop, block, outerLabel, innerLabel, loopLabels, services);
+        body = getBodyStatement(loop, block, outerLabel, innerLabel, this.loopLabels, services);
         tail = getTailStatement(loop, block);
 
         internalOnly = loop instanceof EnhancedFor || loop instanceof For;
@@ -281,7 +284,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         this.services = services;
         this.loop = loop;
 
-        loopLabels = labels;
+        Set<Label> loopLabels = new HashSet<Label>();
         Label outerLabel = new ProgramElementName("breakLoop");
         Label innerLabel = new ProgramElementName("continueLoop");
         loopLabels.add(outerLabel);
@@ -302,10 +305,11 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             values = enhancedForElim.getValuesVariable();
         }
 
+        this.loopLabels = new ArrayList<>(loopLabels);
         head = getHeadStatement(nonEnhancedLoop, block, enhancedForElim);
         guard = nonEnhancedLoop.getGuardExpression();
         body = getBodyStatement(
-                nonEnhancedLoop, block, outerLabel, innerLabel, loopLabels, services);
+                nonEnhancedLoop, block, outerLabel, innerLabel, this.loopLabels, services);
         tail = new StatementBlock();
 
         internalOnly = loop instanceof EnhancedFor || loop instanceof For;
