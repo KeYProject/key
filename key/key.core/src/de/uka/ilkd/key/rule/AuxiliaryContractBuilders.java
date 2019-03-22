@@ -86,7 +86,7 @@ import de.uka.ilkd.key.util.MiscTools;
  *
  * @author wacker, lanzinger
  */
-public final class BlockContractBuilders {
+public final class AuxiliaryContractBuilders {
 
     /**
      * Prefix for all anonymization constants in {@link UpdatesBuilder#buildAnonInUpdate(Map)}.
@@ -99,7 +99,7 @@ public final class BlockContractBuilders {
      */
     public static final String ANON_OUT_PREFIX = "anonOut_";
 
-    private BlockContractBuilders() {
+    private AuxiliaryContractBuilders() {
     }
 
     /**

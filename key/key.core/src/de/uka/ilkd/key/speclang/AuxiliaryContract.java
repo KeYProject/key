@@ -36,7 +36,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.rule.BlockContractBuilders;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
@@ -93,7 +93,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      * are replaced by the real variables with the same names when the contract is applied.
      *
      * @return the placeholder variables used created during this contracts instantiation.
-     * @see BlockContractBuilders.VariablesCreatorAndRegistrar
+     * @see AuxiliaryContractBuilders.VariablesCreatorAndRegistrar
      */
     public Variables getPlaceholderVariables();
 

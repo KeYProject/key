@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
+import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
@@ -527,6 +528,14 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                         postReplacementMap.put(
                                 tb.var(r.variables.remembranceLocalVariables.get(var)),
                                 services.getTypeConverter().getIntegerLDT()
+                                .translateLiteral((Literal) init, services));
+                    } else if (init instanceof EmptySeqLiteral) {
+                        preReplacementMap.put(tb.var(var),
+                                services.getTypeConverter().getSeqLDT()
+                                .translateLiteral((Literal) init, services));
+                        postReplacementMap.put(
+                                tb.var(r.variables.remembranceLocalVariables.get(var)),
+                                services.getTypeConverter().getSeqLDT()
                                 .translateLiteral((Literal) init, services));
                     }
                 }

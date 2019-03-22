@@ -24,11 +24,11 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule.Instantiation;
-import de.uka.ilkd.key.rule.BlockContractBuilders;
-import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
-import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
-import de.uka.ilkd.key.rule.BlockContractBuilders.UpdatesBuilder;
-import de.uka.ilkd.key.rule.BlockContractBuilders.VariablesCreatorAndRegistrar;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistrar;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
@@ -355,7 +355,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
         for (LocationVariable heap : heaps) {
             final String anonymisationName
-                    = tb.newName(BlockContractBuilders.ANON_IN_PREFIX + heap.name());
+                    = tb.newName(AuxiliaryContractBuilders.ANON_IN_PREFIX + heap.name());
             final Function anonymisationFunction
                     = new Function(new Name(anonymisationName), heap.sort(), true);
             services.getNamespaces().functions().addSafely(anonymisationFunction);
@@ -381,7 +381,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         for (LocationVariable heap : heaps) {
             if (contract.hasModifiesClause(heap)) {
                 final String anonymisationName
-                        = tb.newName(BlockContractBuilders.ANON_OUT_PREFIX + heap.name());
+                        = tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + heap.name());
                 final Function anonymisationFunction
                         = new Function(new Name(anonymisationName), heap.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);

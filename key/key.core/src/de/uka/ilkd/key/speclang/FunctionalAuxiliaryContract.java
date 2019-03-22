@@ -22,7 +22,7 @@ import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.BlockContractBuilders;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 
 /**
  * This class is only used to generate a proof obligation for an {@link AuxiliaryContract}.
@@ -369,7 +369,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      * are replaced by the real variables with the same names when the contract is applied.
      *
      * @return the placeholder variables used created during this contracts instantiation.
-     * @see BlockContractBuilders.VariablesCreatorAndRegistrar
+     * @see AuxiliaryContractBuilders.VariablesCreatorAndRegistrar
      * @see AuxiliaryContract#getPlaceholderVariables()
      */
     public AuxiliaryContract.Variables getPlaceholderVariables() {

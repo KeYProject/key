@@ -16,10 +16,10 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
-import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
-import de.uka.ilkd.key.rule.BlockContractBuilders.UpdatesBuilder;
-import de.uka.ilkd.key.rule.BlockContractBuilders.VariablesCreatorAndRegistrar;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistrar;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.MiscTools;
 

@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.rule.BlockContractBuilders;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 
 
@@ -111,7 +111,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
                 (AuxiliaryContract.Variables) d.get(BasicSnippetData.Key.BLOCK_VARS);
         final StatementBlock block = (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
         final StatementBlock sb =
-                new BlockContractBuilders.ValidityProgramConstructor(labels, block,
+                new AuxiliaryContractBuilders.ValidityProgramConstructor(labels, block,
                                                                  variables,
                                                                  exceptionParameter,
                                                                  d.services).construct();
