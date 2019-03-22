@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,8 +24,10 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
  * Abstract repo implementation to perform tasks independent from the concrete way the files are
@@ -33,6 +37,41 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
  * @author Wolfram Pfeifer
  */
 public abstract class AbstractFileRepo implements FileRepo {
+    /**
+     * The URL to KeY's built-in rules (used to prevent built-in rules from getting copied).
+     */
+    protected static final URL RULES_URL =
+            KeYResourceManager.getManager().getResourceFile(Proof.class, "rules/");
+
+    /**
+     * The URL to KeY's built-in Java classes (used to prevent these classes from getting copied).
+     */
+    protected static final URL REDUX_URL =
+            KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, "JavaRedux/");
+
+    /**
+     * This matcher matches *.java files.
+     */
+    protected static final PathMatcher JAVA_MATCHER =
+            FileSystems.getDefault().getPathMatcher("glob:**.java");
+
+    /**
+     * A matcher matches *.key and *.proof files.
+     */
+    protected static final PathMatcher KEY_MATCHER =
+            FileSystems.getDefault().getPathMatcher("glob:**.{key,proof}");
+
+    /**
+     * This matcher matches *.zip and *.jar files.
+     */
+    protected static final PathMatcher ZIP_MATCHER =
+            FileSystems.getDefault().getPathMatcher("glob:**.{zip,jar}");
+
+    /**
+     * This matcher matches *.class files.
+     */
+    protected static final PathMatcher CLASS_MATCHER =
+            FileSystems.getDefault().getPathMatcher("glob:**.class");
 
     /** The original java source path (absolute and normalized). */
     private Path javaPath;
@@ -76,6 +115,44 @@ public abstract class AbstractFileRepo implements FileRepo {
      */
     private boolean disposed = false;
 
+    /**
+     * Variation of the method IOUtil.copy():
+     * Copies the content of InputStream to OutputStream <b>without closing any of them</b>.
+     * @param source the source of the copy operation
+     * @param target the target of the copy operation
+     * @return true if copy was performed and false if not performed
+     * @throws IOException if an I/O error occurs
+     */
+    private static boolean copy(InputStream source, OutputStream target) throws IOException {
+        if (source != null && target != null) {
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = source.read(buffer)) >= 1) {
+                target.write(buffer, 0, read);
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Tests if the given path references an internal file in KeY, i.e. if it is inside JavaRedux
+     * or rules folder.
+     * @param path the path to test
+     * @return true iff it is an internal file
+     * @throws MalformedURLException if the path can not be converted to an URL
+     */
+    protected static boolean isInternalFile(Path path) throws MalformedURLException {
+        URL url = path.toUri().toURL();
+
+        // TODO: maybe we better should cut off the protocol part first?
+        String urlStr = url.toString();
+        String rulesURLStr = RULES_URL.toString();
+        String reduxURLStr = REDUX_URL.toString();
+        return urlStr.startsWith(rulesURLStr) || urlStr.startsWith(reduxURLStr);
+    }
+
     protected Path getJavaPath() {
         return javaPath;
     }
@@ -94,15 +171,6 @@ public abstract class AbstractFileRepo implements FileRepo {
 
     protected Path getBaseDir() {
         return baseDir;
-    }
-
-    /**
-     * Checks if the given path contains a file URL.
-     * @param path the Path to check
-     * @return true iff the path contains a file URL.
-     */
-    protected static boolean isURLFile(Path path) {
-        return path.startsWith("file:/");
     }
 
     /**
@@ -151,9 +219,6 @@ public abstract class AbstractFileRepo implements FileRepo {
         Files.createDirectories(savePath.getParent());
         Files.createFile(savePath);
 
-        // filtering for *.key/*.proof files
-        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.{key,proof}");
-
         // write files to ZIP
         ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(savePath));
         Iterator<Path> it = files.iterator();
@@ -164,7 +229,8 @@ public abstract class AbstractFileRepo implements FileRepo {
             zos.putNextEntry(new ZipEntry(getSaveName(p).toString()));
 
             InputStream is;
-            if (matcher.matches(p)) {
+            // filtering for *.key/*.proof files
+            if (KEY_MATCHER.matches(p)) {
                 // adapt file references to point to the copied files
                 is = adaptFileRefs(p);
             } else {
@@ -199,27 +265,6 @@ public abstract class AbstractFileRepo implements FileRepo {
      *      or can not be opened
      */
     protected abstract InputStream getInputStreamInternal(Path p) throws FileNotFoundException;
-
-    /**
-     * Variation of the method IOUtil.copy():
-     * Copies the content of InputStream to OutputStream <b>without closing any of them</b>.
-     * @param source the source of the copy operation
-     * @param target the target of the copy operation
-     * @return true if copy was performed and false if not performed
-     * @throws IOException if an I/O error occurs
-     */
-    private static boolean copy(InputStream source, OutputStream target) throws IOException {
-        if (source != null && target != null) {
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = source.read(buffer)) >= 1) {
-                target.write(buffer, 0, read);
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     /**
      * Rewrites the file references inside of .key/.proof files such that the point correctly to
