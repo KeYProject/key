@@ -2,7 +2,8 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Wed Feb 04 11:29:17 CET 2015
+#Wed Mar 20 00:03:03 CET 2019
+[StrategyProperty]OSS_OPTIONS_KEY=OSS_ON
 [StrategyProperty]VBT_PHASE=VBT_SYM_EX
 [SMTSettings]useUninterpretedMultiplication=true
 [SMTSettings]SelectedTaclets=
@@ -24,7 +25,7 @@
 [Strategy]Timeout=-1
 [Strategy]MaximumNumberOfAutomaticApplications=1000
 [SMTSettings]integersMaximum=2147483645
-[Choice]DefaultChoices=Strings-Strings\\:on , reach-reach\\:on , JavaCard-JavaCard\\:off , assertions-assertions\\:on , bigint-bigint\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , modelFields-modelFields\\:showSatisfiability , initialisation-initialisation\\:disableStaticInitialisation , sequences-sequences\\:on , runtimeExceptions-runtimeExceptions\\:allow , integerSimplificationRules-integerSimplificationRules\\:full , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , moreSeqRules-moreSeqRules\\:off
+[Choice]DefaultChoices=assertions-assertions\\:on , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:allow , JavaCard-JavaCard\\:off , Strings-Strings\\:on , modelFields-modelFields\\:showSatisfiability , bigint-bigint\\:on , sequences-sequences\\:on , moreSeqRules-moreSeqRules\\:off , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , permissions-permissions\\:off , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off
 [SMTSettings]useConstantsForBigOrSmallIntegers=true
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
@@ -36,13 +37,14 @@
 [SMTSettings]explicitTypeHierarchy=false
 [Strategy]ActiveStrategy=Symbolic Execution Strategy
 [StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+[StrategyProperty]MPS_OPTIONS_KEY=MPS_MERGE
 "
 }
 
 \javaSource "";
 
 \proofObligation "#Proof Obligation Settings
-#Wed Feb 04 11:29:17 CET 2015
+#Wed Mar 20 00:03:03 CET 2019
 name=main(Figure2Param.A, Figure2Param.A, Figure2Param.B, Figure2Param.A, Figure2Param.B)
 addSymbolicExecutionLabel=true
 addUninterpretedPredicate=true
@@ -52,11 +54,12 @@ method=Figure2Param\\#main(Figure2Param.A, Figure2Param.A, Figure2Param.B, Figur
 
 \proof {
 (keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+(keyLog "1" (keyUser "wolfram" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "1000")
+(autoModeTime "2013")
 
 (branch "dummy ID"
-(builtin "One Step Simplification" (formula "1") (newnames "heapAtPre"))
+(builtin "One Step Simplification" (formula "1") (newnames "heapAtPre,SETAccumulate"))
 (rule "impRight" (formula "1"))
 (rule "andLeft" (formula "1"))
 (rule "andLeft" (formula "2"))
@@ -152,8 +155,8 @@ method=Figure2Param\\#main(Figure2Param.A, Figure2Param.A, Figure2Param.B, Figur
    (rule "dismissNonSelectedField" (formula "1") (term "0,0,1"))
    (rule "wellFormedStoreObject" (formula "1") (term "0"))
    (builtin "One Step Simplification" (formula "1"))
-   (rule "wellFormedCreate" (formula "1") (term "0,0"))
-   (rule "replace_known_left" (formula "1") (term "0,0") (ifseqformula "4"))
+   (rule "wellFormedCreate" (formula "1") (term "0"))
+   (rule "replace_known_left" (formula "1") (term "0") (ifseqformula "4"))
    (builtin "One Step Simplification" (formula "1"))
    (rule "notLeft" (formula "1"))
    (rule "pullOutSelect" (formula "11") (term "0") (inst "selectSK=java_lang_Object_created__0"))
@@ -162,8 +165,8 @@ method=Figure2Param\\#main(Figure2Param.A, Figure2Param.A, Figure2Param.B, Figur
    (rule "castDel" (formula "1") (term "1,0"))
    (rule "eqSymm" (formula "1") (term "0,0"))
    (rule "sortsDisjointModuloNull" (formula "1") (term "0,0"))
-   (rule "replace_known_right" (formula "1") (term "1,0,0") (ifseqformula "14"))
-   (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "13")))
+   (rule "replace_known_right" (formula "1") (term "0,0,0") (ifseqformula "13"))
+   (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "14")))
    (rule "applyEqReverse" (formula "12") (term "0") (ifseqformula "1"))
    (rule "hideAuxiliaryEq" (formula "1"))
    (rule "blockEmpty" (formula "16") (term "1"))
@@ -240,137 +243,137 @@ method=Figure2Param\\#main(Figure2Param.A, Figure2Param.A, Figure2Param.B, Figur
                (branch "CUT: w = null TRUE"
                   (builtin "One Step Simplification" (formula "10"))
                   (rule "true_left" (formula "10"))
-                  (rule "cut_direct" (formula "8") (term "0"))
-                  (branch "CUT: y = null TRUE"
-                     (builtin "One Step Simplification" (formula "9"))
-                     (rule "true_left" (formula "9"))
-                     (rule "cut_direct" (formula "7") (term "0"))
-                     (branch "CUT: z = null TRUE"
-                        (builtin "One Step Simplification" (formula "8"))
-                        (rule "true_left" (formula "8"))
-                        (rule "cut_direct" (formula "6") (term "0"))
-                        (branch "CUT: x = null TRUE"
-                           (builtin "One Step Simplification" (formula "7"))
-                           (rule "true_left" (formula "7"))
-                           (rule "cut_direct" (formula "10") (term "0"))
-                           (branch "CUT: v = null TRUE"
-                              (builtin "One Step Simplification" (formula "11"))
-                              (rule "true_left" (formula "11"))
+                  (rule "cut_direct" (formula "6") (term "0"))
+                  (branch "CUT: x = null TRUE"
+                     (builtin "One Step Simplification" (formula "7"))
+                     (rule "true_left" (formula "7"))
+                     (rule "cut_direct" (formula "10") (term "0"))
+                     (branch "CUT: v = null TRUE"
+                        (builtin "One Step Simplification" (formula "11"))
+                        (rule "true_left" (formula "11"))
+                        (rule "cut_direct" (formula "8") (term "0"))
+                        (branch "CUT: y = null TRUE"
+                           (builtin "One Step Simplification" (formula "9"))
+                           (rule "true_left" (formula "9"))
+                           (rule "cut_direct" (formula "7") (term "0"))
+                           (branch "CUT: z = null TRUE"
+                              (builtin "One Step Simplification" (formula "8"))
+                              (rule "true_left" (formula "8"))
                               (opengoal " ")
                            )
-                           (branch "CUT: v = null FALSE"
-                              (builtin "One Step Simplification" (formula "10"))
+                           (branch "CUT: z = null FALSE"
+                              (builtin "One Step Simplification" (formula "7"))
                               (opengoal " ")
                            )
                         )
-                        (branch "CUT: x = null FALSE"
-                           (builtin "One Step Simplification" (formula "6"))
-                           (rule "cut_direct" (formula "10") (term "0"))
-                           (branch "CUT: v = null TRUE"
-                              (builtin "One Step Simplification" (formula "11"))
-                              (rule "true_left" (formula "11"))
+                        (branch "CUT: y = null FALSE"
+                           (builtin "One Step Simplification" (formula "8"))
+                           (rule "cut_direct" (formula "7") (term "0"))
+                           (branch "CUT: z = null TRUE"
+                              (builtin "One Step Simplification" (formula "8"))
+                              (rule "true_left" (formula "8"))
                               (opengoal " ")
                            )
-                           (branch "CUT: v = null FALSE"
-                              (builtin "One Step Simplification" (formula "10"))
+                           (branch "CUT: z = null FALSE"
+                              (builtin "One Step Simplification" (formula "7"))
                               (opengoal " ")
                            )
                         )
                      )
-                     (branch "CUT: z = null FALSE"
-                        (builtin "One Step Simplification" (formula "7"))
-                        (rule "cut_direct" (formula "6") (term "0"))
-                        (branch "CUT: x = null TRUE"
-                           (builtin "One Step Simplification" (formula "7"))
-                           (rule "true_left" (formula "7"))
-                           (rule "cut_direct" (formula "10") (term "0"))
-                           (branch "CUT: v = null TRUE"
-                              (builtin "One Step Simplification" (formula "11"))
-                              (rule "true_left" (formula "11"))
+                     (branch "CUT: v = null FALSE"
+                        (builtin "One Step Simplification" (formula "10"))
+                        (rule "cut_direct" (formula "8") (term "0"))
+                        (branch "CUT: y = null TRUE"
+                           (builtin "One Step Simplification" (formula "9"))
+                           (rule "true_left" (formula "9"))
+                           (rule "cut_direct" (formula "7") (term "0"))
+                           (branch "CUT: z = null TRUE"
+                              (builtin "One Step Simplification" (formula "8"))
+                              (rule "true_left" (formula "8"))
                               (opengoal " ")
                            )
-                           (branch "CUT: v = null FALSE"
-                              (builtin "One Step Simplification" (formula "10"))
+                           (branch "CUT: z = null FALSE"
+                              (builtin "One Step Simplification" (formula "7"))
                               (opengoal " ")
                            )
                         )
-                        (branch "CUT: x = null FALSE"
-                           (builtin "One Step Simplification" (formula "6"))
-                           (rule "cut_direct" (formula "10") (term "0"))
-                           (branch "CUT: v = null TRUE"
-                              (builtin "One Step Simplification" (formula "11"))
-                              (rule "true_left" (formula "11"))
+                        (branch "CUT: y = null FALSE"
+                           (builtin "One Step Simplification" (formula "8"))
+                           (rule "cut_direct" (formula "7") (term "0"))
+                           (branch "CUT: z = null TRUE"
+                              (builtin "One Step Simplification" (formula "8"))
+                              (rule "true_left" (formula "8"))
                               (opengoal " ")
                            )
-                           (branch "CUT: v = null FALSE"
-                              (builtin "One Step Simplification" (formula "10"))
+                           (branch "CUT: z = null FALSE"
+                              (builtin "One Step Simplification" (formula "7"))
                               (opengoal " ")
                            )
                         )
                      )
                   )
-                  (branch "CUT: y = null FALSE"
-                     (builtin "One Step Simplification" (formula "8"))
-                     (rule "cut_direct" (formula "7") (term "0"))
-                     (branch "CUT: z = null TRUE"
-                        (builtin "One Step Simplification" (formula "8"))
-                        (rule "true_left" (formula "8"))
-                        (rule "cut_direct" (formula "6") (term "0"))
-                        (branch "CUT: x = null TRUE"
-                           (builtin "One Step Simplification" (formula "7"))
-                           (rule "true_left" (formula "7"))
-                           (rule "cut_direct" (formula "10") (term "0"))
-                           (branch "CUT: v = null TRUE"
-                              (builtin "One Step Simplification" (formula "11"))
-                              (rule "true_left" (formula "11"))
+                  (branch "CUT: x = null FALSE"
+                     (builtin "One Step Simplification" (formula "6"))
+                     (rule "cut_direct" (formula "10") (term "0"))
+                     (branch "CUT: v = null TRUE"
+                        (builtin "One Step Simplification" (formula "11"))
+                        (rule "true_left" (formula "11"))
+                        (rule "cut_direct" (formula "8") (term "0"))
+                        (branch "CUT: y = null TRUE"
+                           (builtin "One Step Simplification" (formula "9"))
+                           (rule "true_left" (formula "9"))
+                           (rule "cut_direct" (formula "7") (term "0"))
+                           (branch "CUT: z = null TRUE"
+                              (builtin "One Step Simplification" (formula "8"))
+                              (rule "true_left" (formula "8"))
                               (opengoal " ")
                            )
-                           (branch "CUT: v = null FALSE"
-                              (builtin "One Step Simplification" (formula "10"))
+                           (branch "CUT: z = null FALSE"
+                              (builtin "One Step Simplification" (formula "7"))
                               (opengoal " ")
                            )
                         )
-                        (branch "CUT: x = null FALSE"
-                           (builtin "One Step Simplification" (formula "6"))
-                           (rule "cut_direct" (formula "10") (term "0"))
-                           (branch "CUT: v = null TRUE"
-                              (builtin "One Step Simplification" (formula "11"))
-                              (rule "true_left" (formula "11"))
+                        (branch "CUT: y = null FALSE"
+                           (builtin "One Step Simplification" (formula "8"))
+                           (rule "cut_direct" (formula "7") (term "0"))
+                           (branch "CUT: z = null TRUE"
+                              (builtin "One Step Simplification" (formula "8"))
+                              (rule "true_left" (formula "8"))
                               (opengoal " ")
                            )
-                           (branch "CUT: v = null FALSE"
-                              (builtin "One Step Simplification" (formula "10"))
+                           (branch "CUT: z = null FALSE"
+                              (builtin "One Step Simplification" (formula "7"))
                               (opengoal " ")
                            )
                         )
                      )
-                     (branch "CUT: z = null FALSE"
-                        (builtin "One Step Simplification" (formula "7"))
-                        (rule "cut_direct" (formula "6") (term "0"))
-                        (branch "CUT: x = null TRUE"
-                           (builtin "One Step Simplification" (formula "7"))
-                           (rule "true_left" (formula "7"))
-                           (rule "cut_direct" (formula "10") (term "0"))
-                           (branch "CUT: v = null TRUE"
-                              (builtin "One Step Simplification" (formula "11"))
-                              (rule "true_left" (formula "11"))
+                     (branch "CUT: v = null FALSE"
+                        (builtin "One Step Simplification" (formula "10"))
+                        (rule "cut_direct" (formula "8") (term "0"))
+                        (branch "CUT: y = null TRUE"
+                           (builtin "One Step Simplification" (formula "9"))
+                           (rule "true_left" (formula "9"))
+                           (rule "cut_direct" (formula "7") (term "0"))
+                           (branch "CUT: z = null TRUE"
+                              (builtin "One Step Simplification" (formula "8"))
+                              (rule "true_left" (formula "8"))
                               (opengoal " ")
                            )
-                           (branch "CUT: v = null FALSE"
-                              (builtin "One Step Simplification" (formula "10"))
+                           (branch "CUT: z = null FALSE"
+                              (builtin "One Step Simplification" (formula "7"))
                               (opengoal " ")
                            )
                         )
-                        (branch "CUT: x = null FALSE"
-                           (builtin "One Step Simplification" (formula "6"))
-                           (rule "cut_direct" (formula "10") (term "0"))
-                           (branch "CUT: v = null TRUE"
-                              (builtin "One Step Simplification" (formula "11"))
-                              (rule "true_left" (formula "11"))
+                        (branch "CUT: y = null FALSE"
+                           (builtin "One Step Simplification" (formula "8"))
+                           (rule "cut_direct" (formula "7") (term "0"))
+                           (branch "CUT: z = null TRUE"
+                              (builtin "One Step Simplification" (formula "8"))
+                              (rule "true_left" (formula "8"))
                               (opengoal " ")
                            )
-                           (branch "CUT: v = null FALSE"
-                              (builtin "One Step Simplification" (formula "10"))
+                           (branch "CUT: z = null FALSE"
+                              (builtin "One Step Simplification" (formula "7"))
                               (opengoal " ")
                            )
                         )
@@ -379,137 +382,137 @@ method=Figure2Param\\#main(Figure2Param.A, Figure2Param.A, Figure2Param.B, Figur
                )
                (branch "CUT: w = null FALSE"
                   (builtin "One Step Simplification" (formula "9"))
-                  (rule "cut_direct" (formula "8") (term "0"))
-                  (branch "CUT: y = null TRUE"
-                     (builtin "One Step Simplification" (formula "9"))
-                     (rule "true_left" (formula "9"))
-                     (rule "cut_direct" (formula "7") (term "0"))
-                     (branch "CUT: z = null TRUE"
-                        (builtin "One Step Simplification" (formula "8"))
-                        (rule "true_left" (formula "8"))
-                        (rule "cut_direct" (formula "6") (term "0"))
-                        (branch "CUT: x = null TRUE"
-                           (builtin "One Step Simplification" (formula "7"))
-                           (rule "true_left" (formula "7"))
-                           (rule "cut_direct" (formula "10") (term "0"))
-                           (branch "CUT: v = null TRUE"
-                              (builtin "One Step Simplification" (formula "11"))
-                              (rule "true_left" (formula "11"))
+                  (rule "cut_direct" (formula "6") (term "0"))
+                  (branch "CUT: x = null TRUE"
+                     (builtin "One Step Simplification" (formula "7"))
+                     (rule "true_left" (formula "7"))
+                     (rule "cut_direct" (formula "10") (term "0"))
+                     (branch "CUT: v = null TRUE"
+                        (builtin "One Step Simplification" (formula "11"))
+                        (rule "true_left" (formula "11"))
+                        (rule "cut_direct" (formula "8") (term "0"))
+                        (branch "CUT: y = null TRUE"
+                           (builtin "One Step Simplification" (formula "9"))
+                           (rule "true_left" (formula "9"))
+                           (rule "cut_direct" (formula "7") (term "0"))
+                           (branch "CUT: z = null TRUE"
+                              (builtin "One Step Simplification" (formula "8"))
+                              (rule "true_left" (formula "8"))
                               (opengoal " ")
                            )
-                           (branch "CUT: v = null FALSE"
-                              (builtin "One Step Simplification" (formula "10"))
+                           (branch "CUT: z = null FALSE"
+                              (builtin "One Step Simplification" (formula "7"))
                               (opengoal " ")
                            )
                         )
-                        (branch "CUT: x = null FALSE"
-                           (builtin "One Step Simplification" (formula "6"))
-                           (rule "cut_direct" (formula "10") (term "0"))
-                           (branch "CUT: v = null TRUE"
-                              (builtin "One Step Simplification" (formula "11"))
-                              (rule "true_left" (formula "11"))
+                        (branch "CUT: y = null FALSE"
+                           (builtin "One Step Simplification" (formula "8"))
+                           (rule "cut_direct" (formula "7") (term "0"))
+                           (branch "CUT: z = null TRUE"
+                              (builtin "One Step Simplification" (formula "8"))
+                              (rule "true_left" (formula "8"))
                               (opengoal " ")
                            )
-                           (branch "CUT: v = null FALSE"
-                              (builtin "One Step Simplification" (formula "10"))
+                           (branch "CUT: z = null FALSE"
+                              (builtin "One Step Simplification" (formula "7"))
                               (opengoal " ")
                            )
                         )
                      )
-                     (branch "CUT: z = null FALSE"
-                        (builtin "One Step Simplification" (formula "7"))
-                        (rule "cut_direct" (formula "6") (term "0"))
-                        (branch "CUT: x = null TRUE"
-                           (builtin "One Step Simplification" (formula "7"))
-                           (rule "true_left" (formula "7"))
-                           (rule "cut_direct" (formula "10") (term "0"))
-                           (branch "CUT: v = null TRUE"
-                              (builtin "One Step Simplification" (formula "11"))
-                              (rule "true_left" (formula "11"))
+                     (branch "CUT: v = null FALSE"
+                        (builtin "One Step Simplification" (formula "10"))
+                        (rule "cut_direct" (formula "8") (term "0"))
+                        (branch "CUT: y = null TRUE"
+                           (builtin "One Step Simplification" (formula "9"))
+                           (rule "true_left" (formula "9"))
+                           (rule "cut_direct" (formula "7") (term "0"))
+                           (branch "CUT: z = null TRUE"
+                              (builtin "One Step Simplification" (formula "8"))
+                              (rule "true_left" (formula "8"))
                               (opengoal " ")
                            )
-                           (branch "CUT: v = null FALSE"
-                              (builtin "One Step Simplification" (formula "10"))
+                           (branch "CUT: z = null FALSE"
+                              (builtin "One Step Simplification" (formula "7"))
                               (opengoal " ")
                            )
                         )
-                        (branch "CUT: x = null FALSE"
-                           (builtin "One Step Simplification" (formula "6"))
-                           (rule "cut_direct" (formula "10") (term "0"))
-                           (branch "CUT: v = null TRUE"
-                              (builtin "One Step Simplification" (formula "11"))
-                              (rule "true_left" (formula "11"))
+                        (branch "CUT: y = null FALSE"
+                           (builtin "One Step Simplification" (formula "8"))
+                           (rule "cut_direct" (formula "7") (term "0"))
+                           (branch "CUT: z = null TRUE"
+                              (builtin "One Step Simplification" (formula "8"))
+                              (rule "true_left" (formula "8"))
                               (opengoal " ")
                            )
-                           (branch "CUT: v = null FALSE"
-                              (builtin "One Step Simplification" (formula "10"))
+                           (branch "CUT: z = null FALSE"
+                              (builtin "One Step Simplification" (formula "7"))
                               (opengoal " ")
                            )
                         )
                      )
                   )
-                  (branch "CUT: y = null FALSE"
-                     (builtin "One Step Simplification" (formula "8"))
-                     (rule "cut_direct" (formula "7") (term "0"))
-                     (branch "CUT: z = null TRUE"
-                        (builtin "One Step Simplification" (formula "8"))
-                        (rule "true_left" (formula "8"))
-                        (rule "cut_direct" (formula "6") (term "0"))
-                        (branch "CUT: x = null TRUE"
-                           (builtin "One Step Simplification" (formula "7"))
-                           (rule "true_left" (formula "7"))
-                           (rule "cut_direct" (formula "10") (term "0"))
-                           (branch "CUT: v = null TRUE"
-                              (builtin "One Step Simplification" (formula "11"))
-                              (rule "true_left" (formula "11"))
+                  (branch "CUT: x = null FALSE"
+                     (builtin "One Step Simplification" (formula "6"))
+                     (rule "cut_direct" (formula "10") (term "0"))
+                     (branch "CUT: v = null TRUE"
+                        (builtin "One Step Simplification" (formula "11"))
+                        (rule "true_left" (formula "11"))
+                        (rule "cut_direct" (formula "8") (term "0"))
+                        (branch "CUT: y = null TRUE"
+                           (builtin "One Step Simplification" (formula "9"))
+                           (rule "true_left" (formula "9"))
+                           (rule "cut_direct" (formula "7") (term "0"))
+                           (branch "CUT: z = null TRUE"
+                              (builtin "One Step Simplification" (formula "8"))
+                              (rule "true_left" (formula "8"))
                               (opengoal " ")
                            )
-                           (branch "CUT: v = null FALSE"
-                              (builtin "One Step Simplification" (formula "10"))
+                           (branch "CUT: z = null FALSE"
+                              (builtin "One Step Simplification" (formula "7"))
                               (opengoal " ")
                            )
                         )
-                        (branch "CUT: x = null FALSE"
-                           (builtin "One Step Simplification" (formula "6"))
-                           (rule "cut_direct" (formula "10") (term "0"))
-                           (branch "CUT: v = null TRUE"
-                              (builtin "One Step Simplification" (formula "11"))
-                              (rule "true_left" (formula "11"))
+                        (branch "CUT: y = null FALSE"
+                           (builtin "One Step Simplification" (formula "8"))
+                           (rule "cut_direct" (formula "7") (term "0"))
+                           (branch "CUT: z = null TRUE"
+                              (builtin "One Step Simplification" (formula "8"))
+                              (rule "true_left" (formula "8"))
                               (opengoal " ")
                            )
-                           (branch "CUT: v = null FALSE"
-                              (builtin "One Step Simplification" (formula "10"))
+                           (branch "CUT: z = null FALSE"
+                              (builtin "One Step Simplification" (formula "7"))
                               (opengoal " ")
                            )
                         )
                      )
-                     (branch "CUT: z = null FALSE"
-                        (builtin "One Step Simplification" (formula "7"))
-                        (rule "cut_direct" (formula "6") (term "0"))
-                        (branch "CUT: x = null TRUE"
-                           (builtin "One Step Simplification" (formula "7"))
-                           (rule "true_left" (formula "7"))
-                           (rule "cut_direct" (formula "10") (term "0"))
-                           (branch "CUT: v = null TRUE"
-                              (builtin "One Step Simplification" (formula "11"))
-                              (rule "true_left" (formula "11"))
+                     (branch "CUT: v = null FALSE"
+                        (builtin "One Step Simplification" (formula "10"))
+                        (rule "cut_direct" (formula "8") (term "0"))
+                        (branch "CUT: y = null TRUE"
+                           (builtin "One Step Simplification" (formula "9"))
+                           (rule "true_left" (formula "9"))
+                           (rule "cut_direct" (formula "7") (term "0"))
+                           (branch "CUT: z = null TRUE"
+                              (builtin "One Step Simplification" (formula "8"))
+                              (rule "true_left" (formula "8"))
                               (opengoal " ")
                            )
-                           (branch "CUT: v = null FALSE"
-                              (builtin "One Step Simplification" (formula "10"))
+                           (branch "CUT: z = null FALSE"
+                              (builtin "One Step Simplification" (formula "7"))
                               (opengoal " ")
                            )
                         )
-                        (branch "CUT: x = null FALSE"
-                           (builtin "One Step Simplification" (formula "6"))
-                           (rule "cut_direct" (formula "10") (term "0"))
-                           (branch "CUT: v = null TRUE"
-                              (builtin "One Step Simplification" (formula "11"))
-                              (rule "true_left" (formula "11"))
+                        (branch "CUT: y = null FALSE"
+                           (builtin "One Step Simplification" (formula "8"))
+                           (rule "cut_direct" (formula "7") (term "0"))
+                           (branch "CUT: z = null TRUE"
+                              (builtin "One Step Simplification" (formula "8"))
+                              (rule "true_left" (formula "8"))
                               (opengoal " ")
                            )
-                           (branch "CUT: v = null FALSE"
-                              (builtin "One Step Simplification" (formula "10"))
+                           (branch "CUT: z = null FALSE"
+                              (builtin "One Step Simplification" (formula "7"))
                               (opengoal " ")
                            )
                         )
@@ -542,5 +545,4 @@ method=Figure2Param\\#main(Figure2Param.A, Figure2Param.A, Figure2Param.B, Figur
    (rule "closeFalse" (formula "1"))
 )
 )
-
 }
