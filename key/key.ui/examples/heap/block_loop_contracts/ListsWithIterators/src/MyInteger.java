@@ -11,6 +11,7 @@ public final class MyInteger {
     }
 
     /*@ public normal_behavior
+      @ ensures \result != null;
       @ ensures \result.val == val;
       @ assignable \nothing;
       @*/

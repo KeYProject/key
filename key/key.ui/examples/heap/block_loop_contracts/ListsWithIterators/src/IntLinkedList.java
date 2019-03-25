@@ -12,7 +12,7 @@ public final class IntLinkedList implements IntList {
       @
       @ invariant (\forall int i; 0<=i && i<size; 
       @         ((IntNode)nodeseq[i]) != null  // this implies \typeof(nodeseq[i]) == \type(IntNode)
-      @      && ((IntNode)nodeseq[i]).data == seq[i] 
+      @      && ((IntNode)nodeseq[i]).data == (int)seq[i] 
       @      && (\forall int j; 0<=j && j<size; (IntNode)nodeseq[i] == (IntNode)nodeseq[j] ==> i == j)
       @      && ((IntNode)nodeseq[i]).next == (i==size-1 ? null : (IntNode)nodeseq[i+1]));
       @
@@ -36,6 +36,7 @@ public final class IntLinkedList implements IntList {
         /*@ loop_contract normal_behavior
           @ requires \invariant_for(this);
           @ ensures \invariant_for(this);
+          @ ensures \values.length <= seq.length;
           @ ensures \values == seq[0 .. (\values.length - 1)];
           @ ensures result == (\sum int i; 0 <= i && i < \values.length; (int)seq[i]);
           @ decreases seq.length - \values.length;

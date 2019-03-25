@@ -15,13 +15,14 @@ public class IntIterator implements Iterator {
     //@ public instance invariant seq.length <= list.seq.length;
     //@ public instance invariant seq.length == nodeseq.length;
 
-    //@ public instance invariant next != null ==> next == list.nodeseq[nodeseq.length];
-    //@ public instance invariant next != null ==> next.data == list.seq[seq.length];
+    //@ public instance invariant next != null ==> next == (IntNode)list.nodeseq[nodeseq.length];
+    //@ public instance invariant next != null ==> next.data == (int)list.seq[seq.length];
     
     //@ public instance invariant seq.length == list.seq.length <==> next == null;
 
     /*@ public normal_behavior
       @ requires \invariant_for(list);
+      @ ensures \invariant_for(list);
       @ ensures this.list == list;
       @ ensures this.next == list.first;
       @ ensures seq.length == 0;
@@ -42,6 +43,8 @@ public class IntIterator implements Iterator {
 
     /*@ public normal_behavior
       @ requires next != null;
+      @ requires \invariant_for(list);
+      @ ensures \invariant_for(list);
       @ ensures \result != null;
       @ ensures \result.intValue() == \old(next).data;
       @ ensures seq.length == \old(seq.length) + 1;
