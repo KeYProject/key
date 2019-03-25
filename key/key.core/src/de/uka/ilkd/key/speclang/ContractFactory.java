@@ -421,6 +421,10 @@ public class ContractFactory {
         mods = new LinkedHashMap<>(mods);
         deps = new LinkedHashMap<>(deps);
 
+        // keep this to check if every contract has the same mod
+        // then no if-then-else cascades are needed.
+        Map<LocationVariable, Term> uniformMod = new LinkedHashMap<>();
+
         //collect information
         Map<LocationVariable,Term> pres =
                 new LinkedHashMap<LocationVariable, Term>(t.originalPres.size());
@@ -451,6 +455,7 @@ public class ContractFactory {
             Term origMod = t.originalMods.get(h);
             if(origMod != null) {
                 mods.put(h, tb.ife(t.originalPres.get(h), origMod, tb.allLocs()));
+                uniformMod.put(h, origMod);
             }
         }
 
@@ -533,21 +538,20 @@ public class ContractFactory {
                     Term m2 = other.getMod(h, t.originalSelfVar,
                             t.originalParamVars,
                             services);
-                    Function emptyMod = services.getTypeConverter().getLocSetLDT().getEmpty();
                     if (m1 != null || m2 != null) {
                         Term nm;
                         if (m1 == null) {
                             nm = m2;
                         } else if (m2 == null) {
                             nm = m1;
-                        } else if (m1.op().equals(emptyMod) && m2.op().equals(emptyMod)) {
-                        	// special case for both contracts being (weakly) pure
-                        	// fixes bug #1557
-                        	nm = m1;
                         } else {
-                            Term ownPre = pres.get(h) != null ? pres.get(h) : tb.tt();
                             nm = tb.intersect(m1,
                                     tb.ife(otherPre, m2, tb.allLocs()));
+
+                            // check if the other mod is the same as the one in the uniform store.
+                            if(uniformMod.containsKey(h) && !uniformMod.get(h).equals(m2)) {
+                                uniformMod.remove(h);
+                            }
                         }
                         mods.put(h, nm);
                     }
@@ -612,6 +616,17 @@ public class ContractFactory {
                     }
                 }
              }
+        }
+
+        /*
+         * If there is a uniform mod clause (i.e., the same for all joined contracts),
+         * then use that istead of the disjunction of if-then-else expressions.
+         * (Related to an older fix by Daniel Grahl for MT-1557.)
+         */
+        for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            if (uniformMod.containsKey(h)) {
+                mods.put(h, uniformMod.get(h));
+            }
         }
 
         /* (*) free preconditions are not joined because no sensible joining operator

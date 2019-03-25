@@ -22,14 +22,12 @@ post: (   gt(x, Z(0(#)))
    -&gt;   java.lang.Error::instance(exc_0) = TRUE
       |   java.lang.RuntimeException::instance(exc_0)
         = TRUE)
-mod: intersect(\if (gt(x, Z(0(#))) | lt(x, Z(0(#))))
-              \then (intersect(\if (gt(x, Z(0(#))))
-                                   \then (allLocs)
-                                   \else (allLocs),
-                               \if (lt(x, Z(0(#))))
-                                   \then (allLocs)
-                                   \else (allLocs)))
-              \else (allLocs),
+mod: intersect(intersect(\if (gt(x, Z(0(#))))
+                        \then (allLocs)
+                        \else (allLocs),
+                    \if (lt(x, Z(0(#))))
+                        \then (allLocs)
+                        \else (allLocs)),
           \if (x = Z(0(#)))
               \then (allLocs)
               \else (allLocs))

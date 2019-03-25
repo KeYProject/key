@@ -27,27 +27,19 @@ post: (   (exc_0 = null)&lt;&lt;impl&gt;&gt;
          -&gt;   java.lang.Error::instance(exc_0) = TRUE
             |   java.lang.RuntimeException::instance(exc_0)
               = TRUE))
-mod: intersect(\if (true)
-              \then (intersect(\if (true)
-                                   \then (intersect(\if (true)
-                                                        \then (intersect(\if (true)
-                                                                             \then (allLocs)
-                                                                             \else (allLocs),
-                                                                         \if (  x
-                                                                              = Z(4(#)))
-                                                                             \then (allLocs)
-                                                                             \else (allLocs)))
-                                                        \else (allLocs),
-                                                    \if (geq(x,
-                                                             Z(0(1(#)))))
-                                                        \then (allLocs)
-                                                        \else (allLocs)))
-                                   \else (allLocs),
-                               \if (lt(x,
-                                       Z(neglit(2(2(#))))))
-                                   \then (allLocs)
-                                   \else (allLocs)))
-              \else (allLocs),
+mod: intersect(intersect(intersect(intersect(\if (true)
+                                            \then (allLocs)
+                                            \else (allLocs),
+                                        \if (  x
+                                             = Z(4(#)))
+                                            \then (allLocs)
+                                            \else (allLocs)),
+                              \if (geq(x, Z(0(1(#)))))
+                                  \then (allLocs)
+                                  \else (allLocs)),
+                    \if (lt(x, Z(neglit(2(2(#))))))
+                        \then (allLocs)
+                        \else (allLocs)),
           \if (x = Z(neglit(3(#))))
               \then (allLocs)
               \else (allLocs))
