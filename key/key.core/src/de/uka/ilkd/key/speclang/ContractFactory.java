@@ -414,8 +414,8 @@ public class ContractFactory {
             assert contract.getTarget().equals(t.pm);
         }
 
-        Map<LocationVariable,Term> mods = t.originalMods;
-        Map<ProgramVariable,Term> deps = t.originalDeps;
+        Map<LocationVariable, Term> mods = t.originalMods;
+        Map<ProgramVariable, Term> deps = t.originalDeps;
         // MU: Bugfix #1489
         // Do not modify the data stores in t but make new copies
         mods = new LinkedHashMap<>(mods);
@@ -434,24 +434,24 @@ public class ContractFactory {
         Map<LocationVariable,Term> freePosts =
                 new LinkedHashMap<LocationVariable, Term>(t.originalFreePosts.size());
         for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-           hasMod.put(h, false);
-           Term oriPost = t.originalPosts.get(h);
-           Term oriFreePost = t.originalFreePosts.get(h);
-           if(oriPost != null) {
-              posts.put(h,tb.imp(atPreify(t.originalPres.get(h),
+            hasMod.put(h, false);
+            Term oriPost = t.originalPosts.get(h);
+            Term oriFreePost = t.originalFreePosts.get(h);
+            if(oriPost != null) {
+                posts.put(h, tb.imp(atPreify(t.originalPres.get(h),
                         t.originalAtPreVars),
-                   oriPost));
-           }
+                        oriPost));
+            }
 
-           if(oriFreePost != null) {
+            if(oriFreePost != null) {
                freePosts.put(h, tb.imp(atPreify(t.originalFreePres.get(h), t.originalAtPreVars),
                                        oriFreePost));
-           }
+            }
 
-           Term oriMod = t.originalMods.get(h);
-           if(oriMod != null) {
-               mods.put(h, tb.ife(t.originalPres.get(h), oriMod, tb.allLocs()));
-           }
+            Term origMod = t.originalMods.get(h);
+            if(origMod != null) {
+                mods.put(h, tb.ife(t.originalPres.get(h), origMod, tb.allLocs()));
+            }
         }
 
         Map<LocationVariable,Term> axioms = new LinkedHashMap<LocationVariable,Term>();
