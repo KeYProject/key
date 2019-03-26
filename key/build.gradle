@@ -42,13 +42,12 @@ subprojects {
 
 project(":key.util") {
     test {
+        useJUnit()
         systemProperty "test-resources", "src/test/resources"
-    }
-}
-
-project(":key.core.example") {
-    dependencies {
-        compile project(":key.core")
+        filter {
+            //https://docs.gradle.org/current/userguide/java_testing.html#test_filtering
+            includeTestsMatching '*Tests' // only run the Test suites
+        }
     }
 }
 
@@ -87,7 +86,7 @@ project(":key.core") {
 
     compileJavacc {
         outputDirectory = javaCCOutputDirMain
-        inputDirectory  = file("src/main/javacc")
+        inputDirectory = file("src/main/javacc")
         doLast {
             copy {
                 from("src/main/javacc/de/uka/ilkd/key/parser/schemajava/Token.java")
@@ -98,11 +97,6 @@ project(":key.core") {
                 into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/proofjava/"
             }
         }
-        /*
-        "/de/uka/ilkd/key/parser/proofjava/ProofJavaParser.jj"
-        outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/proofjava"
-        javacchome="${ext.dir}"
-        -->*/
     }
 
     test {
@@ -111,9 +105,22 @@ project(":key.core") {
         // set JVM arguments for the test JVM(s)
         jvmArgs '-XX:MaxPermSize=1G'
 
-        // "../${project.name}/resources/testcase"
     }
 }
+
+project(":key.core.example") {
+    dependencies {
+        compile project(":key.core")
+    }
+}
+
+project(":key.core.symbolic_execution.example") {
+    dependencies {
+        compile project(":key.core")
+        compile project(":key.core.symbolic_execution")
+    }
+}
+
 
 project(":key.core.proof_references") {
     dependencies {
@@ -172,7 +179,7 @@ project(":key.ui") {
         archiveFileName = "examples.zip"
         from 'examples'
         include '*'
-        include '*/*' //*/
+        include '*/*'
     }
 
     processResources.dependsOn(createExamplesZip)
