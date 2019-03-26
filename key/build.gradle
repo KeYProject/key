@@ -15,6 +15,7 @@ idea {
 
 group = "org.key_project"
 version = "2.8.0-SNAPSHOT"
+ext.gitRevision = "git rev-parse HEAD".execute().in.readLines().get(0)
 
 configure(allprojects - project(':keyext') - rootProject) {
     apply plugin: "java"
@@ -25,7 +26,7 @@ configure(allprojects - project(':keyext') - rootProject) {
 
     group = rootProject.group
     version = rootProject.version
-
+    ext.gitRevision = rootProject.ext.gitRevision
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
@@ -227,6 +228,7 @@ project(":key.ui") {
     run {
         systemProperties["key.examples.dir"] = "$projectDir/examples"
     }
+
 }
 
 project(":keyext:interactionlog") {
@@ -254,7 +256,7 @@ task alldoc(type: Javadoc) {
         //showFromPrivate()
         addBooleanOption 'Xdoclint:none', true
         // overview = new File( projectDir, 'src/javadoc/package.html' )
-         //stylesheetFile = new File( projectDir, 'src/javadoc/stylesheet.css' )
+        //stylesheetFile = new File( projectDir, 'src/javadoc/stylesheet.css' )
         windowTitle = 'KeY API Documentation'
         docTitle = "KeY JavaDoc ($project.version)"
         bottom = "Copyright &copy; 2003-2019 <a href=\"http://key-project.org\">The KeY-Project</a>."
@@ -264,4 +266,28 @@ task alldoc(type: Javadoc) {
         links += "http://www.antlr3.org/api/Java/"
         links += "http://recoder.sourceforge.net/doc/api/"
     }
+}
+
+task fatJar(type: Jar) {
+    dependsOn project(":key.ui").jar
+    dependsOn project(":keyext:interactionlog").jar
+
+    def jarFiles = //[project(":key.ui").jar.archivePath] +
+            project(":key.ui").configurations.runtimeClasspath
+    def names = jarFiles.collect { "./${it.name}" }.join(", ")
+    println names
+
+    manifest {
+        attributes 'Main-Class': "de.uka.ilkd.key.core.Main",
+                "Manifest-Version": "1.0",
+                "Permissions": "all-permissions",
+                "Codebase": "formal.iti.kit.edu",
+                "Application-Name": "KeY",
+                "Class-Path": names
+    }
+
+    archiveName = "key-${project.version}-exec.jar"
+    destinationDir(buildDir)
+    from jarFiles
+    from "$rootDir/LICENSE.TXT"
 }
