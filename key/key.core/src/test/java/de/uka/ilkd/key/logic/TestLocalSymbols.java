@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
+import de.uka.ilkd.key.util.HelperClassForTests;
 import junit.framework.TestCase;
 
 import org.key_project.util.collection.ImmutableList;
@@ -33,9 +34,9 @@ import de.uka.ilkd.key.rule.TacletForTests;
  */
 
 public class TestLocalSymbols extends TestCase {
+    private static final File TEST_RESOURCES_DIR_PREFIX =
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "localSymbols/");
 
-    private static final String TEST_RESOURCES_DIR_PREFIX =
-            "resources/testcase/localSymbols/".replace('/', File.separatorChar);
 
     static class LocalMacro extends AbstractPropositionalExpansionMacro {
 
@@ -160,8 +161,8 @@ public class TestLocalSymbols extends TestCase {
      * @return The loaded proof.
      */
     private KeYEnvironment<?> loadProof(String proofFileName) {
-        File proofFile = new File(TEST_RESOURCES_DIR_PREFIX + proofFileName);
-        assertTrue(proofFile.exists());
+        File proofFile = new File(TEST_RESOURCES_DIR_PREFIX,  proofFileName);
+        assertTrue("Proof file does not exist"+ proofFile, proofFile.exists());
 
         try {
             KeYEnvironment<?> environment = KeYEnvironment.load(

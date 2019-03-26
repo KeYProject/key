@@ -99,10 +99,39 @@ project(":key.core") {
         }
     }
 
-    test {
+
+    tasks.withType(Test) {//Configure all tests
         systemProperty "testcases", "src/test/resources/testcase"
+        systemProperty "TACLET_PROOFS", "tacletProofs"
+        systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
     }
+
+    test {
+        filter {
+            includeTestsMatching "JavaTests"
+            includeTestsMatching "LogicModelTests"
+
+            includeTestsMatching "ParserTests"
+            includeTestsMatching "ProofConstructionTests"
+            includeTestsMatching "RuleTests"
+            includeTestsMatching "SmtTests"
+            includeTestsMatching "SpeclangTests"
+            includeTestsMatching "UtilityTests"
+        }
+    }
+
+    task testProofRules(type:Test) {
+        group "verification"
+        filter { includeTestsMatching "ProveRulesTest" }
+    }
+
+    task testRunAllProofs(type:Test) {
+        group "verification"
+        filter { includeTestsMatching "RunAllProofsTestSuite" }
+    }
+
+    //check.dependsOn << testProofRules << testRunAllProofs
 }
 
 project(":key.core.example") {

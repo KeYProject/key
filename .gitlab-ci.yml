@@ -85,7 +85,7 @@ compile:check:key.util:
   script:
     - javac -version
     - cd key
-    - ./gradlew --continue :key.util:check
+    - ./gradlew --build-cache --continue :key.util:check
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -104,7 +104,7 @@ compile:check:key.core:
   script:
     - javac -version
     - cd key
-    - ./gradlew --continue :key.core:check
+    - ./gradlew --build-cache --continue :key.core:check
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -123,7 +123,7 @@ compile:check:proofref:
   script:
     - javac -version
     - cd key
-    - ./gradlew --continue :key.core.proof_references:check
+    - ./gradlew --build-cache --continue :key.core.proof_references:check
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -142,7 +142,7 @@ compile:check:testgen:
   script:
     - javac -version
     - cd key
-    - ./gradlew --continue :key.core.testgen:check
+    - ./gradlew --build-cache --continue :key.core.testgen:check
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -161,7 +161,7 @@ compile:check:ui:
   script:
     - javac -version
     - cd key
-    - ./gradlew --continue :key.ui:check
+    - ./gradlew --build-cache --continue :key.ui:check
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -180,7 +180,7 @@ compile:check:removegenerics:
   script:
     - javac -version
     - cd key
-    - ./gradlew --continue :key.removegenerics:check
+    - ./gradlew --build-cache --continue :key.removegenerics:check
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"

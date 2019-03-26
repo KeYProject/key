@@ -4,12 +4,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,18 +43,30 @@ import de.uka.ilkd.key.util.Pair;
  */
 @RunWith(Parameterized.class)
 public class ProveRulesTest {
-
    /*
     * File object pointing to directory key/key.core.test
     */
-   private static final File KEY_CORE_TEST;
    private static final File PROOF_DIRECTORY;
 
+
    static {
-      KEY_CORE_TEST = IOUtil.getProjectRoot(ProveRulesTest.class);
-      PROOF_DIRECTORY = new File(KEY_CORE_TEST, "tacletProofs");
-      assert PROOF_DIRECTORY.exists() : "Directory containing taclet proofs cannot be found at location: "
-            + PROOF_DIRECTORY;
+       File file = null;
+       if(System.getProperty("TACLET_PROOFS") != null)
+           file = new File(System.getProperty("TACLET_PROOFS"));
+       else {
+           String[] candidates = new String[]{
+                   "./tacletProofs",
+                   "key.core/tacletProofs",
+                   "../key.core/tacletProofs",
+                   "../tacletProofs"};
+           for (String candidate: candidates) {
+               file = new File(candidate);
+               if(file.exists()) break;
+           }
+       }
+       assertTrue("Directory containing taclet proofs cannot be found at location: "
+               + file, file.exists());
+       PROOF_DIRECTORY = file;
    }
 
    private final String tacletName;
