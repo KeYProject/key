@@ -13,6 +13,9 @@ idea {
     }
 }
 
+group = "org.key_project"
+version = "2.8.0-SNAPSHOT"
+
 configure(allprojects - project(':keyext') - rootProject) {
     apply plugin: "java"
     apply plugin: "java-library"
@@ -20,12 +23,18 @@ configure(allprojects - project(':keyext') - rootProject) {
     apply plugin: "idea"
     apply plugin: "eclipse"
 
-    group = "org.key_project"
-    version = "2.8.0-SNAPSHOT"
+    group = rootProject.group
+    version = rootProject.version
 
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
+    }
+
+    tasks.withType(Javadoc) {
+        //failOnError=false
+        options.addBooleanOption 'Xdoclint:none', true
+        options.verbose()
     }
 
     repositories {
@@ -121,12 +130,12 @@ project(":key.core") {
         }
     }
 
-    task testProofRules(type:Test) {
+    task testProofRules(type: Test) {
         group "verification"
         filter { includeTestsMatching "ProveRulesTest" }
     }
 
-    task testRunAllProofs(type:Test) {
+    task testRunAllProofs(type: Test) {
         group "verification"
         filter { includeTestsMatching "RunAllProofsTestSuite" }
     }
@@ -231,4 +240,28 @@ project(":keyext:interactionlog") {
 
 task start {
     dependsOn project(":key.ui").run
+}
+
+task alldoc(type: Javadoc) {
+    group "documentation"
+    def projects = allprojects - project(':keyext') - rootProject
+    //key.ui javadoc is broken
+    source projects.collect { it.sourceSets.main.allJava }
+    classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
+    destinationDir = file("${buildDir}/docs/javadoc")
+
+    configure(options) {
+        //showFromPrivate()
+        addBooleanOption 'Xdoclint:none', true
+        // overview = new File( projectDir, 'src/javadoc/package.html' )
+         //stylesheetFile = new File( projectDir, 'src/javadoc/stylesheet.css' )
+        windowTitle = 'KeY API Documentation'
+        docTitle = "KeY JavaDoc ($project.version)"
+        bottom = "Copyright &copy; 2003-2019 <a href=\"http://key-project.org\">The KeY-Project</a>."
+        use = true
+        links += 'http://download.oracle.com/javase/8/docs/api/'
+        links += "http://www.antlr2.org/javadoc/"
+        links += "http://www.antlr3.org/api/Java/"
+        links += "http://recoder.sourceforge.net/doc/api/"
+    }
 }

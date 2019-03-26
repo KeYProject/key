@@ -34,8 +34,7 @@ import de.uka.ilkd.key.rule.PosTacletApp;
  * <li> it returns the selected taclet app and does not initiate any further
  * action as the original {@link de.uka.ilkd.key.gui.nodeviews.TacletMenu} </li>
  * <li> it does not display any additional menu entries like: 
- *    Apply strategies here, built-in rules, abbreviation etc.
- * </li>
+ *    Apply strategies here, built-in rules, abbreviation etc.</li>
  * </ul> 
  */
 public class SimpleTacletSelectionMenu extends JMenu {
@@ -48,7 +47,7 @@ public class SimpleTacletSelectionMenu extends JMenu {
     /**
      * creates an instance of this menu displaying the applications stored in
      * <tt>apps</tt>
-     * @param apps the {@link IList<PosTacletApp>} to be displayed
+     * @param apps the {@link ImmutableList<PosTacletApp>} to be displayed
      * @param info the NotationInfo used to pretty print the taclets in 
      * tooltips
      * @param listener the ActionListener which is registered at each 
@@ -63,7 +62,7 @@ public class SimpleTacletSelectionMenu extends JMenu {
 
     /**
      * adds the given applications to the menu
-     * @param apps the IList<PosTacletApp> to be displayed
+     * @param apps the IList to be displayed
      * @param info the NotationInfo used to pretty print the taclets in 
      * tooltips
      * @param listener the ActionListener which is registered at each 
