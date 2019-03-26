@@ -128,6 +128,7 @@ project(":key.core.proof_references") {
     }
     test {
         systemProperty "testcases", "src/test/resources/testcase"
+        filter { includeTestsMatching "AllProofReferencesTests" }
     }
 }
 
@@ -137,6 +138,10 @@ project(":key.core.symbolic_execution") {
     }
     test {
         systemProperty "testcases", "src/test/resources/testcase"
+
+        filter {
+            includeTestsMatching "AllSymbolicExecutionTests"
+        }
     }
 }
 
@@ -147,6 +152,7 @@ project(":key.core.testgen") {
 
     test {
         systemProperty "testcases", "src/test/resources/testcase"
+        filter { includeTestsMatching "AllTestGenTests" }
     }
 }
 
