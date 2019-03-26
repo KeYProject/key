@@ -5,13 +5,16 @@
     <property name="dist.dir" value="${basedir}/../deployment"/>
 
     <path id="key.ui.class.path">
+        <pathelement location="${basedir}/libs/commonmark-0.12.1.jar"/>
+        <pathelement location="${basedir}/libs/commonmark-ext-gfm-tables-0.12.1.jar"/>
+        <pathelement location="${basedir}/libs/jaxb-api-2.3.1.jar"/>
+        <pathelement location="${basedir}/libs/jaxb-impl-2.3.1.jar"/>
+        <pathelement location="${basedir}/libs/jaxb-core-2.3.0.1.jar"/>
         <pathelement path="${basedir}/../key.util/bin"/>
         <pathelement path="${basedir}/../key.core/bin"/>
         <pathelement path="${basedir}/../key.core.testgen/bin"/>
         <pathelement location="${basedir}/../key.core/lib/antlr.jar"/>
         <pathelement location="${basedir}/../key.core/lib/recoderKey.jar"/>
-        <pathelement location="${basedir}/libs/commonmark-0.12.1.jar"/>
-        <pathelement location="${basedir}/libs/commonmark-ext-gfm-tables-0.12.1.jar"/>
     </path>
 
     <path id="key.ui.run.class.path">
@@ -36,6 +39,17 @@
     <target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
         <mkdir dir="${dist.dir}"/>
         <mkdir dir="${dist.dir}/components"/>
+        <copy todir="${dist.dir}/libs/" verbose="true">
+          <fileset dir="${basedir}/libs/" includes="*.jar"/>
+
+          <path>
+            <pathelement path="${basedir}/libs/commonmark-0.12.1.jar"/>
+            <pathelement path="${basedir}/libs/commonmark-ext-gfm-tables-0.12.1.jar"/>
+            <pathelement location="${basedir}/libs/jaxb-api-2.3.1.jar"/>
+            <pathelement location="${basedir}/libs/jaxb-impl-2.3.1.jar"/>
+            <pathelement location="${basedir}/libs/jaxb-core-2.3.0.1.jar"/>
+          </path>
+        </copy>
         <zip destfile="${build.dir}/examples.zip" basedir="${basedir}/examples"/>
         <jar destfile="${dist.dir}/components/key.ui.jar" basedir="${build.dir}"
              manifest="${basedir}/META-INF/MANIFEST.MF"/>
