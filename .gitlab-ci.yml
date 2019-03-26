@@ -52,7 +52,7 @@ checkstyle:
     - key/scripts/tools/checkstyle/publishAudit.py report.txt
   artifacts:
     name: "checkstyle-report-$CI_JOB_ID"
-    expire_in: 1 week
+    expire_in: 1 year
     when: always
     paths:
     - report.txt
