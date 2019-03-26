@@ -79,13 +79,13 @@ compile:testClassesJava11:
     - cd key
     - ./gradlew --parallel classes testClasses
 
-compile:check:
+compile:check:key.util:
   stage: ternary
   image: key-dev-openjdk8
   script:
     - javac -version
     - cd key
-    - ./gradlew --parallel --continue check
+    - ./gradlew --continue :key.util:check
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -98,24 +98,100 @@ compile:check:
       junit:
         - "**/**/build/test-results/test/TEST-*.xml"
 
-# compile:openjdk11:
-#   stage: primary
-#   image: key-dev-openjdk11
-#   allow_failure: true
-#   script:
-#     - javac -version
-#     - ant -f key/scripts/build.xml compileAll
+compile:check:key.core:
+  stage: ternary
+  image: key-dev-openjdk8
+  script:
+    - javac -version
+    - cd key
+    - ./gradlew --continue :key.core:check
+    - ls
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/test/TEST-*.xml"
 
-# fatJar:oraclejdk8:
-#   stage: secondary
-#   image: key-dev-jdk8
-#   script:
-#     - javac -version
-#     - ant -f key/scripts/build.xml fatJar
-#   artifacts:
-#     paths:
-#       - key/deployment/*.jar
-#     expire_in: 1 week
+compile:check:proofref:
+  stage: ternary
+  image: key-dev-openjdk8
+  script:
+    - javac -version
+    - cd key
+    - ./gradlew --continue :key.core:proof_references:check
+    - ls
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/test/TEST-*.xml"
+
+compile:check:testgen:
+  stage: ternary
+  image: key-dev-openjdk8
+  script:
+    - javac -version
+    - cd key
+    - ./gradlew --continue :key.core.testgen:check
+    - ls
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/test/TEST-*.xml"
+
+compile:check:ui:
+  stage: ternary
+  image: key-dev-openjdk8
+  script:
+    - javac -version
+    - cd key
+    - ./gradlew --continue :key.ui:check
+    - ls
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/test/TEST-*.xml"
+
+compile:check:removegenerics:
+  stage: ternary
+  image: key-dev-openjdk8
+  script:
+    - javac -version
+    - cd key
+    - ./gradlew --continue :key.removegenerics:check
+    - ls
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/test/TEST-*.xml"
 
 checkstyle:
   stage: primary
