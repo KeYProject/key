@@ -338,9 +338,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testFigure2Instance_right() throws Exception {
       doSlicingTest("/slicing/figure2Instance/Figure2Instance.proof", 
-                    new RightAssignmentSelector(256),
+                    new RightAssignmentSelector(267),
                     true,
-                    218, 171, 169, 154, 150, 133, 99);
+                    229, 182, 180, 165, 161, 144, 99);
    }
 
    /**
@@ -470,9 +470,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testFigure2_right() throws Exception {
       doSlicingTest("/slicing/figure2/Figure2.proof", 
-                    new RightAssignmentSelector(258),
+                    new RightAssignmentSelector(269),
                     false,
-                    218, 168);
+                    229, 179);
    }
 
    /**
@@ -481,9 +481,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public void testFigure2_left() throws Exception {
       doSlicingTest("/slicing/figure2/Figure2.proof", 
-                    new LeftAssignmentSelector(258),
+                    new LeftAssignmentSelector(269),
                     false,
-                    258, 218, 168);
+                    269, 229, 179);
    }
 
    /**
