@@ -59,15 +59,7 @@ post: (   (  lt(i, Z(0(#)))
                \else (FALSE)
       &amp; java.lang.Object::&lt;inv&gt;(heap, x)&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
       &amp; (exc_2 = null)&lt;&lt;impl&gt;&gt;)
-mod: intersect(\if ((  lt(i, Z(0(#)))
-                &amp; java.lang.Object::&lt;inv&gt;(heap, x)&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-              \then (allLocs)
-              \else (allLocs),
-          \if ((  (!array = null
-                &amp; geq(i, Z(0(#))))&lt;&lt;SC&gt;&gt;
-                &amp; java.lang.Object::&lt;inv&gt;(heap, x)&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-              \then (allLocs)
-              \else (allLocs))
+mod: allLocs
 termination: diamond" pathCondition="not(or(or(or(or(not(equals(exc_0,null)),not(imp(equals(exc_0,null),or(or(equals(array,null),equals(x,null)),java.lang.Object::&lt;inv&gt;(heapBefore_goOnNice,x))))),not(imp(and(java.lang.Object::&lt;inv&gt;(heapBefore_goOnNice,x),equals(exc_0,null)),or(or(equals(array,null),equals(x,null)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
     b=x.goOnNice(array,i);
   }
@@ -173,15 +165,7 @@ post: (   (  lt(i, Z(0(#)))
                \else (FALSE)
       &amp; java.lang.Object::&lt;inv&gt;(heap, x)&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
       &amp; (exc_2 = null)&lt;&lt;impl&gt;&gt;)
-mod: intersect(\if ((  lt(i, Z(0(#)))
-                &amp; java.lang.Object::&lt;inv&gt;(heap, x)&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-              \then (allLocs)
-              \else (allLocs),
-          \if ((  (!array = null
-                &amp; geq(i, Z(0(#))))&lt;&lt;SC&gt;&gt;
-                &amp; java.lang.Object::&lt;inv&gt;(heap, x)&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-              \then (allLocs)
-              \else (allLocs))
+mod: allLocs
 termination: diamond" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
     b=x.goOnNice(array,i);
   }

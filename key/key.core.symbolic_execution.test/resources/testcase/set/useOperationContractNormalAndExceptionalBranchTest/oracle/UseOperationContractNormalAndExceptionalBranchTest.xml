@@ -19,23 +19,7 @@ post: (   (  lt(value, Z(0(#)))
    -&gt; result_0 = Z(2(4(#))) &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;)
 &amp; (   geq(value, Z(0(1(#))))
    -&gt; result_0 = Z(4(8(#))) &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;)
-mod: intersect(intersect(intersect(\if ((  lt(value,
-                                         Z(0(#)))
-                                    &amp; geq(value,
-                                          Z(neglit(0(1(#))))))&lt;&lt;SC&gt;&gt;)
-                                  \then (allLocs)
-                                  \else (allLocs),
-                              \if (lt(value,
-                                      Z(neglit(0(1(#))))))
-                                  \then (allLocs)
-                                  \else (allLocs)),
-                    \if ((  geq(value, Z(0(#)))
-                          &amp; lt(value, Z(0(1(#)))))&lt;&lt;SC&gt;&gt;)
-                        \then (allLocs)
-                        \else (allLocs)),
-          \if (geq(value, Z(0(1(#)))))
-              \then (allLocs)
-              \else (allLocs))
+mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="value" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))" pathCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))" pathConditionChanged="true" branchCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                <statement name="int magicNumberCopy = magicNumber;" pathCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))" pathConditionChanged="false">

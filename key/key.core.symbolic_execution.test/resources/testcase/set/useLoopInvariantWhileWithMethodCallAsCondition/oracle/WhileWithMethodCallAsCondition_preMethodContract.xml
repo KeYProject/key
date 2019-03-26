@@ -40,12 +40,7 @@ post: (   lt(i, Z(0(#)))
               \then (TRUE)
               \else (FALSE)
       &amp; (exc_2 = null)&lt;&lt;impl&gt;&gt;)
-mod: intersect(\if (lt(i, Z(0(#))))
-              \then (allLocs)
-              \else (allLocs),
-          \if ((!array = null &amp; geq(i, Z(0(#))))&lt;&lt;SC&gt;&gt;)
-              \then (allLocs)
-              \else (allLocs))
+mod: allLocs
 termination: diamond" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b=goOnNice(array,i);
   }
