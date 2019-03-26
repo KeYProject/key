@@ -1,4 +1,4 @@
-package example;
+package org.key_project.example;
 
 import java.io.File;
 import java.util.HashMap;
