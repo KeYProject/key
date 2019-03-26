@@ -15,7 +15,13 @@ idea {
 
 group = "org.key_project"
 version = "2.8.0-SNAPSHOT"
-ext.gitRevision = "git rev-parse HEAD".execute().in.readLines().get(0)
+		
+try{
+	ext.gitRevision = "git rev-parse HEAD".execute().in.readLines().get(0)
+}catch(Exception e){
+    println e.message
+	ext.gitRevision = ""	
+}
 
 configure(allprojects - project(':keyext') - rootProject) {
     apply plugin: "java"
