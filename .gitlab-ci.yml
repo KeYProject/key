@@ -40,7 +40,7 @@ compile:classes:
   script:
     - javac -version
     - cd key
-    - ./gradlew --parallel classes
+    - ./gradlew --build-cache classes
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
@@ -54,7 +54,7 @@ compile:testClasses:
   script:
     - javac -version
     - cd key
-    - ./gradlew --parallel testClasses
+    - ./gradlew --build-cache --parallel testClasses
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull-push
@@ -123,7 +123,7 @@ compile:check:proofref:
   script:
     - javac -version
     - cd key
-    - ./gradlew --continue :key.core:proof_references:check
+    - ./gradlew --continue :key.core.proof_references:check
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"

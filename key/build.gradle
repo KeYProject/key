@@ -101,10 +101,7 @@ project(":key.core") {
 
     test {
         systemProperty "testcases", "src/test/resources/testcase"
-
-        // set JVM arguments for the test JVM(s)
-        jvmArgs '-XX:MaxPermSize=1G'
-
+        maxHeapSize = "4g"
     }
 }
 
@@ -126,6 +123,7 @@ project(":key.core.proof_references") {
         compile project(":key.core")
     }
     test {
+        maxHeapSize = "4g"
         systemProperty "testcases", "src/test/resources/testcase"
         filter { includeTestsMatching "AllProofReferencesTests" }
     }
