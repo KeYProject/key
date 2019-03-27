@@ -2,25 +2,31 @@ plugins {
     id("ca.coglinc.javacc") version("2.4.0") apply false
     id("idea")
     id("eclipse")
+    id "com.jfrog.bintray" version "1.8.4" apply false
 }
 
 idea {
     module {
-        //if you love browsing Javadoc
         downloadJavadoc = false
-        //and hate reading sources :)
         downloadSources = true
     }
 }
 
 group = "org.key_project"
 version = "2.8.0-SNAPSHOT"
-		
-try{
-	ext.gitRevision = "git rev-parse HEAD".execute().in.readLines().get(0)
-}catch(Exception e){
+
+static def getDate() {
+    return new Date().format('yyyyMMdd')
+}
+
+
+ext.dateVersion = getDate()
+
+try {
+    ext.gitRevision = "git rev-parse HEAD".execute().in.readLines().get(0)
+} catch (Exception e) {
     println e.message
-	ext.gitRevision = ""	
+    ext.gitRevision = ""
 }
 
 configure(allprojects - project(':keyext') - rootProject) {
@@ -29,6 +35,7 @@ configure(allprojects - project(':keyext') - rootProject) {
     apply plugin: "maven-publish"
     apply plugin: "idea"
     apply plugin: "eclipse"
+    apply plugin: "com.jfrog.bintray"
 
     group = rootProject.group
     version = rootProject.version
@@ -52,9 +59,87 @@ configure(allprojects - project(':keyext') - rootProject) {
     dependencies {
         testCompile("junit:junit:4.12")
         testCompile project(":key.util")
+    }
 
+
+    task sourcesJar(type: Jar) {
+        from sourceSets.main.allJava
+        archiveClassifier = 'sources'
+    }
+
+    task javadocJar(type: Jar) {
+        from javadoc
+        archiveClassifier = 'javadoc'
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                artifact sourcesJar
+                artifact javadocJar
+                pom {
+                    name = projects.name
+                    description = project.description
+                    url = 'http://key-project.org/'
+
+                    licenses {
+                        license {
+                            name = "GNU General Public License (GPL), Version 2"
+                            url = "http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'key'
+                            name = 'KeY Developers'
+                            email = 'support@key-project.org'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:git://git.key-project.org/key/key.git'
+                        developerConnection = 'scm:git:git://git.key-project.org/key/key.git'
+                        url = 'https://git.key-project.org/'
+                    }
+                }
+            }
+        }
+        repositories {
+            maven {
+                name = "bintray-snapshots"
+                url = "https://dl.bintray.com/key/stable-snapshots"
+            }
+        }
+    }
+
+    bintray {
+        user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+        key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+        publications  = ['mavenJava']
+
+        dryRun = false //[Default: false] Whether to run this as dry-run, without deploying
+        publish = true //[Default: false] Whether version should be auto published after an upload
+        override = false //[Default: false] Whether to override version artifacts already published
+
+
+        pkg {
+            userOrg = "key"
+            repo = 'stable-snapshots'
+            name = "key"
+            licenses = ['GPL-2.0']
+            vcsUrl = 'https://git.key-project.org/key/key.git'
+        }
     }
 }
+
+allprojects {
+    tasks.withType(Javadoc) {
+        if (JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption('html5', true)
+        }
+    }
+}
+
 
 project(":key.util") {
     test {
@@ -114,7 +199,6 @@ project(":key.core") {
             }
         }
     }
-
 
     tasks.withType(Test) {//Configure all tests
         systemProperty "testcases", "src/test/resources/testcase"
