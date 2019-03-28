@@ -46,8 +46,7 @@ import de.uka.ilkd.key.util.Debug;
  */
 
 public class VariableSpecification extends JavaNonTerminalProgramElement
-    implements NamedProgramElement, ExpressionContainer, Variable//,Declaration
- {
+    implements NamedProgramElement, ExpressionContainer, Variable { //,Declaration
      /**
       *	Initializer.
       */     
