@@ -11,8 +11,11 @@ import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.ext.KeYExtConst;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
 
 /**
@@ -30,19 +33,10 @@ public class ToggleOriginLabelsAction extends MainWindowAction {
     public ToggleOriginLabelsAction(MainWindow mainWindow) {
         super(mainWindow);
 
-        final TermLabelSettings settings;
-        if (getMediator().getSelectedProof() != null) {
-            settings = getMediator().getSelectedProof().getSettings().getTermLabelSettings();
-        } else {
-            settings = ProofSettings.DEFAULT_SETTINGS.getTermLabelSettings();
-        }
-
         setName("Toggle Origin Labels");
         setIcon(IconFactory.originIcon(MainWindow.TOOLBAR_ICON_SIZE));
         setEnabled(getMediator().getSelectedProof() != null);
-        setSelected(settings.getUseOriginLabels());
 
-        settings.addSettingsListener(event -> setSelected(settings.getUseOriginLabels()));
         getMediator().addKeYSelectionListener(new KeYSelectionListener() {
 
             @Override
@@ -62,25 +56,35 @@ public class ToggleOriginLabelsAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        final Proof proof = mainWindow.getMediator().getSelectedProof();
+        Proof proof = mainWindow.getMediator().getSelectedProof();
 
         if (proof != null) {
+            Services services = proof.getServices();
             TermLabelSettings settings = proof.getSettings().getTermLabelSettings();
             settings.setUseOriginLabels(!settings.getUseOriginLabels());
 
             if (settings.getUseOriginLabels()) {
                 JOptionPane.showMessageDialog(
                         mainWindow,
-                        "This setting will only take effect when the proof is reloaded.",
+                        "Origin labels will be added when the proof is reloaded.",
                         "Origin",
                         JOptionPane.INFORMATION_MESSAGE);
             } else {
+                for (Goal goal : proof.openGoals()) {
+                    for (int i = 1; i <= goal.sequent().size(); ++i) {
+                        Term t = goal.sequent().getFormulabyNr(i).formula();
+                        OriginTermLabel.removeOriginLabels(t, services);
+                    }
+                }
+
                 JOptionPane.showMessageDialog(
                         mainWindow,
-                        "This setting will be in effect for all following proof steps.",
+                        "Origin labels have been removed from all open goals and all proof obligations.",
                         "Origin",
                         JOptionPane.INFORMATION_MESSAGE);
             }
+
+            mainWindow.getMediator().getSelectionModel().fireSelectedNodeChanged();
         }
     }
 }
