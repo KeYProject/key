@@ -20,4 +20,6 @@
 (assert (forall ((x U) (t T)) (! (subtype (typeof (cast x t)) t) :pattern (cast x t)))) 				
 (assert (forall ((x U) (t T)) (! (=> (subtype (typeof x) t) (= (cast x t) x)) :pattern (cast x t))))
 
-
+(declare-const null U)
+(declare-const sort_Null T)
+(assert (= (typeof null) sort_Null))

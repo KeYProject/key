@@ -38,7 +38,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             return new StringBuffer("error while translationg");
         }
 
-        //these are always needed (i think)
+        //these are always needed
         master.addFromSnippets("bool");
         master.addFromSnippets("int");
         master.addFromSnippets("instanceof");
@@ -62,7 +62,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         List<SExpr> sortExprs = new LinkedList<>();
         for (Sort s : master.getSorts()) {
-            if (s != Sort.ANY) {
+            if (s != Sort.ANY && !(MasterHandler.SPECIAL_SORTS.contains(s.toString()))) {
                 master.addDeclaration(new SExpr("declare-const", SExpr.sortExpr(s).toString(), "T"));
             }
             sortExprs.add(SExpr.sortExpr(s));
@@ -100,10 +100,6 @@ public class ModularSMTLib2Translator implements SMTTranslator {
                                          MasterHandler master, StringBuffer sb) {
 
         for (Sort s : master.getSorts()) {
-            if (s.toString().equals("Null")) {
-                sb.append(readResource("null-axioms.smt2"));
-                continue;
-            }
             Set<Sort> children = directChildSorts(s, master.getSorts());
             for (Sort child : children) {
                 master.addAxiom(new SExpr("assert", new SExpr("subtype", SExpr.sortExpr(child), SExpr.sortExpr(s))));

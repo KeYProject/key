@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -34,6 +36,9 @@ public class MasterHandler {
     private Properties snippets = new Properties();
 
     private HashSet<Sort> sorts = new HashSet<>();
+
+    public static final Set<String> SPECIAL_SORTS =
+            Stream.of("int", "boolean", "Null").collect(Collectors.toSet());
 
     private Map<String, Object> translationState = new HashMap<>();
 

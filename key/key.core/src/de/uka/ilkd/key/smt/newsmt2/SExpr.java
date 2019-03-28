@@ -115,6 +115,9 @@ public class SExpr implements Writable {
     }
 
     public String getEscapedName() {
+        if (name.length() > 0 && name.charAt(0) == '|' && name.charAt(name.length() - 1) == '|') {
+            return name; //already escaped
+        }
         if (EXTRACHAR_PATTERN.matcher(name).find() && type != Type.PATTERN) {
             return "|" + name + "|";
         } else {
