@@ -12,30 +12,15 @@
 //
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.Toolkit;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.KeyStroke;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 
-public abstract class MainWindowAction extends AbstractAction {
-
+public abstract class MainWindowAction extends KeyAction {
     /**
      *
      */
     private static final long serialVersionUID = -6611537258325987383L;
-
-    /**
-     * This constant holds the typical key to be used for shortcuts (usually
-     * {@link java.awt.Event#CTRL_MASK})
-     */
-    protected static final int SHORTCUT_KEY_MASK
-            = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
     protected final MainWindow mainWindow;
 
@@ -44,42 +29,8 @@ public abstract class MainWindowAction extends AbstractAction {
         this.mainWindow = mainWindow;
         putValue(ACCELERATOR_KEY, KeyStrokeManager.get(this));
     }
-    
+
     protected KeYMediator getMediator() {
         return mainWindow.getMediator();
-    }
-
-    protected void setName(String name) {
-        putValue(NAME, name);
-    }
-
-    protected String getName() {
-        return (String) getValue(NAME);
-    }
-
-    @Deprecated // add a line in gui.utils.KeyStrokeManager instead
-    protected void setAcceleratorLetter(int letter) {
-        setAcceleratorKey(KeyStroke.getKeyStroke(letter, SHORTCUT_KEY_MASK));
-    }
-
-    @Deprecated // add a line in gui.utils.KeyStrokeManager instead
-    protected void setAcceleratorKey(KeyStroke keyStroke) {
-        putValue(ACCELERATOR_KEY, keyStroke);
-    }
-
-    protected void setTooltip(String toolTip) {
-        putValue(Action.SHORT_DESCRIPTION, toolTip);
-    }
-
-    protected void setIcon(Icon icon) {
-        putValue(SMALL_ICON, icon);
-    }
-
-    protected void setSelected(Boolean b) {
-        putValue(SELECTED_KEY, b);
-    }
-
-    protected boolean isSelected() {
-        return getValue(SELECTED_KEY) == Boolean.TRUE;
     }
 }

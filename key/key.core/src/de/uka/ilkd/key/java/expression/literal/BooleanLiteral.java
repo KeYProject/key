@@ -119,18 +119,16 @@ public class BooleanLiteral extends Literal {
         }
         return ((BooleanLiteral)o).getValue() == getValue(); 
     }
-    
-    public int hashCode(){
-    	int result = 17;
-    	result = 37 * result + (getValue() ? 0 : 1);
-    	return result;
+
+    @Override
+    protected int computeHashCode(){
+    	return 37 * super.computeHashCode() + (getValue() ? 0 : 1);
     }
     
+    @Override
     public boolean equals(Object o){
     	return super.equals(o);
     }
-
-
 
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element

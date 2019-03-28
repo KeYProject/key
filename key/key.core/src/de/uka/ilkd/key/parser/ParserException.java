@@ -47,6 +47,11 @@ public final class ParserException extends Exception {
         return location;
     }
 
+    @Override
+    public synchronized ParserException initCause(Throwable cause) {
+        super.initCause(cause);
+        return this;
+    }
 
     /* --- fields --- */
 

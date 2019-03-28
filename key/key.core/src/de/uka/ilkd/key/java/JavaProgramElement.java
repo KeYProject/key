@@ -32,6 +32,7 @@ public abstract class JavaProgramElement extends JavaSourceElement
 
     private final Comment[] comments;
     
+    private int hashCode = -1;
 
     public JavaProgramElement() {
 	comments = NO_COMMENTS;
@@ -132,12 +133,26 @@ public abstract class JavaProgramElement extends JavaSourceElement
     	return (this.getClass() == se.getClass());
     }
     
-    
-    @Override    
-    public int hashCode(){
-    	int result = 17;
-    	result = 37 * result + this.getClass().hashCode();
-    	return result;
+    protected int computeHashCode() {
+        int result = 17 * this.getClass().hashCode();
+        return result;
+    }
+
+    /**
+     * if you need to customize the hashcode computation for a subclass
+     * please override method {@link #computeHashCode()}
+     */
+    @Override
+    public final int hashCode(){
+        if (hashCode == -1) {
+            int localHash = computeHashCode();
+            if (localHash == -1) {
+                localHash = 1;
+            }
+            this.hashCode = localHash;
+        }
+    	
+    	return hashCode;
     }
     
     

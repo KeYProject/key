@@ -2,12 +2,15 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call ArrayUtil.indexOf(array,toSearch)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
-         <loopInvariant name="invariant: (  (i &gt;= 0
- &amp; i &lt;= array.length)&lt;&lt;SC&gt;&gt;
+         <loopInvariant name="invariant: (  (geq(i, Z(0(#)))
+ &amp; leq(i, length(array)))&lt;&lt;SC&gt;&gt;
  &amp; \forall int j;
-     (   (j &gt;= 0 &amp; j &lt; i)&lt;&lt;SC&gt;&gt; &amp; inInt(j)
-      -&gt; !array[j] = toSearch))&lt;&lt;SC&gt;&gt;;
-variant: javaSubInt(array.length, i)
+     (   (geq(j, Z(0(#))) &amp; lt(j, i))&lt;&lt;SC&gt;&gt; &amp; inInt(j)
+      -&gt; !  java.lang.Object::select(heap,
+                                     array,
+                                     arr(j))
+          = toSearch))&lt;&lt;SC&gt;&gt;;
+variant: javaSubInt(length(array), i)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
             <branchCondition name="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
     boolean b = i&lt;array.length;

@@ -62,10 +62,14 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
         return "Continue automatic strategy application until no more modality is on the sequent.";
     }
 
-    /*
+    /**
      * find a modality term in a node
+     *
+     * @param node
+     *            TODO
+     * @return TODO
      */
-    private static boolean hasModality(Node node) {
+    static boolean hasModality(Node node) {
         Sequent sequent = node.sequent();
         for (SequentFormula sequentFormula : sequent) {
             if(hasModality(sequentFormula.formula())) {
@@ -98,10 +102,14 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
         return false;
     }
 
-    /*
+    /**
      * Checks if a rule is marked as not suited for interaction.
+     *
+     * @param rule
+     *            TODO
+     * @return TODO
      */
-    private static boolean isNonHumanInteractionTagged(Rule rule) {
+    static boolean isNonHumanInteractionTagged(Rule rule) {
         return isInRuleSet(rule, NON_HUMAN_INTERACTION_RULESET);
     }
 

@@ -23,6 +23,25 @@ public class JavaDocument extends DefaultStyledDocument {
 
     private static final long serialVersionUID = -1856296532743892931L;
 
+    // highlighting colors (same as in HTMLSyntaxHighlighter of SequentView for consistency)
+
+    /** highight color for Java keywords (dark red/violet) */
+    private static final Color JAVA_KEYWORD_COLOR = new Color(0x7f0055);
+
+    //private static final Color JAVA_STRING_COLOR = new Color(0x000000);
+
+    /** highight color for comments (dull green) */
+    private static final Color COMMENT_COLOR = new Color(0x3f7f5f);
+
+    /** highight color for JavaDoc (dull green) */
+    private static final Color JAVADOC_COLOR = new Color(0x3f7f5f);
+
+    /** highight color for JML (dark blue) */
+    private static final Color JML_COLOR = new Color(0x0000c0);
+
+    /** highight color for JML keywords (blue) */
+    private static final Color JML_KEYWORD_COLOR = new Color(0x0000f0);
+
     /**
      * Enum to indicate the current mode (environment) of the parser.
      * Examples are STRING ("..."), COMMENT (&#47;&#42; ... &#42;&#47;),
@@ -30,7 +49,7 @@ public class JavaDocument extends DefaultStyledDocument {
      */
     private enum Mode {
         /** parser is currently inside a String */
-        STRING,
+        //STRING,                                           // currently not in use
         /** parser is currently inside normal java code */
         NORMAL,
         /** parser is currently inside a keyword */
@@ -53,7 +72,7 @@ public class JavaDocument extends DefaultStyledDocument {
 
     /**
      * Enum to indicate the current comment state of the parser.
-     * It is used to store, which comment relevant chars were just recently encountered.
+     * It is used to store which comment relevant chars were just recently encountered.
      */
     private enum CommentState {
         /** no comment char encountered */
@@ -159,7 +178,7 @@ public class JavaDocument extends DefaultStyledDocument {
     private SimpleAttributeSet annotation = new SimpleAttributeSet();
 
     /** the style of strings */
-    private SimpleAttributeSet string = new SimpleAttributeSet();
+    //private SimpleAttributeSet string = new SimpleAttributeSet();
 
     /** default style */
     private SimpleAttributeSet normal = new SimpleAttributeSet();
@@ -215,14 +234,14 @@ public class JavaDocument extends DefaultStyledDocument {
      * (as in eclipse default settings).
      */
     public JavaDocument () {
-        // set the styles (as in eclipse default settings)
+        // set the styles
         StyleConstants.setBold(keyword, true);
-        StyleConstants.setForeground(keyword, new Color(127, 0, 85));
-        StyleConstants.setForeground(comment, new Color(63, 127, 95));
-        StyleConstants.setForeground(javadoc, new Color(63, 95, 191));
-        StyleConstants.setForeground(string, new Color(42, 0, 255));
-        StyleConstants.setForeground(jml, new Color(255, 102, 0));
-        StyleConstants.setForeground(jmlkeyword, new Color(255, 102, 0));
+        StyleConstants.setForeground(keyword, JAVA_KEYWORD_COLOR);
+        StyleConstants.setForeground(comment, COMMENT_COLOR);
+        StyleConstants.setForeground(javadoc, JAVADOC_COLOR);
+        //StyleConstants.setForeground(string, JAVA_STRING_COLOR);
+        StyleConstants.setForeground(jml, JML_COLOR);
+        StyleConstants.setForeground(jmlkeyword, JML_KEYWORD_COLOR);
         StyleConstants.setBold(jmlkeyword, true);
 
         // fill the keyword hash sets
@@ -295,6 +314,9 @@ public class JavaDocument extends DefaultStyledDocument {
             // tokenStart should be already set here
             token = token + '*';
             state = CommentState.MAYBEEND;
+        } else {                                        // multiplication
+            token = token + '*';
+            state = CommentState.NO;
         }
     }
 
