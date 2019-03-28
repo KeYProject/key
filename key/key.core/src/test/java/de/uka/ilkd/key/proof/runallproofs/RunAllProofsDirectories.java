@@ -1,10 +1,13 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
+import org.key_project.util.java.IOUtil;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.key_project.util.java.IOUtil;
+import static org.key_project.util.java.IOUtil.findFolder;
+
 
 /**
  * Initialising directories for runallproofs is a bit tricky since doing it
@@ -46,18 +49,6 @@ public class RunAllProofsDirectories implements Serializable {
                 "key.core/testresults/runallproofs");
     }
 
-    private static File findFolder(String propertyName, boolean exists, String... candidates) {
-        if (System.getProperty(propertyName) != null) {
-            File f = new File(System.getProperty(propertyName));
-            if (f.exists() || !exists) return f;
-        }
-
-        for (String c : candidates) {
-            File f = new File(c);
-            if (f.exists() || !exists) return f;
-        }
-        return null;
-    }
 
     public RunAllProofsDirectories(Date runStart) {
         RUNALLPROOFS_DIR.mkdirs();

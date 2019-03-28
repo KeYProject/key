@@ -35,7 +35,7 @@ static def getGitRevision() {
 ext.dateVersion = getDate()
 ext.gitRevision = getGitRevision()
 
-configure(allprojects - project(':keyext') - rootProject) {
+configure(allprojects -  rootProject) {
     apply plugin: "java"
     apply plugin: "java-library"
     apply plugin: "maven-publish"
@@ -301,6 +301,7 @@ project(":key.removegenerics") {
 project(":key.ui") {
     apply plugin: "application"
     apply plugin: 'com.github.johnrengelman.shadow'
+
     dependencies {
         compile(project(":key.core"))
         compile(project(":key.core.proof_references"))
@@ -308,7 +309,7 @@ project(":key.ui") {
         compile(project(":key.core.testgen"))
         compile(project(":key.removegenerics"))
 
-        runtimeOnly project(":keyext:interactionlog")
+        runtimeOnly project(":keyext.interactionlog")
     }
 
     task createExamplesZip(type: Zip) {
@@ -320,6 +321,10 @@ project(":key.ui") {
     }
 
     processResources.dependsOn << createExamplesZip
+
+    shadowJar {
+        minimize()
+    }
 
     application {
         //dependsOn(createExamplesZip)
@@ -333,7 +338,7 @@ project(":key.ui") {
 
 }
 
-project(":keyext:interactionlog") {
+project(":keyext.interactionlog") {
     dependencies {
         compile project(":key.ui")
         compile group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.12.1'
@@ -348,7 +353,7 @@ task start {
 
 task alldoc(type: Javadoc) {
     group "documentation"
-    def projects = allprojects - project(':keyext') - rootProject
+    def projects = subprojects
     //key.ui javadoc is broken
     source projects.collect { it.sourceSets.main.allJava }
     classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
@@ -372,7 +377,7 @@ task alldoc(type: Javadoc) {
 
 task fatJar(type: Jar) {
     dependsOn project(":key.ui").jar
-    dependsOn project(":keyext:interactionlog").jar
+    dependsOn project(":keyext.interactionlog").jar
 
     def jarFiles = //[project(":key.ui").jar.archivePath] +
             project(":key.ui").configurations.runtimeClasspath
