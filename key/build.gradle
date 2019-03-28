@@ -1,8 +1,14 @@
+//TODO copy examles.zip into distribution
+//TODO example.zip seems to build wrong
+//TODO figure out why javacc is always executed
+
 plugins {
-    id("ca.coglinc.javacc") version("2.4.0") apply false
     id("idea")
     id("eclipse")
+
+    id("ca.coglinc.javacc") version("2.4.0") apply false
     id "com.jfrog.bintray" version "1.8.4" apply false
+    id "com.github.johnrengelman.shadow" version "5.0.0"  apply false
 }
 
 idea {
@@ -16,18 +22,18 @@ group = "org.key_project"
 version = "2.8.0-SNAPSHOT"
 
 static def getDate() {
-    return new Date().format('yyyyMMdd')
+    return new java.util.Date().format('yyyyMMdd')
+}
+
+static def getGitRevision() {
+    def cmd = "git rev-parse HEAD"
+    def process = cmd.execute()
+    return process.text
 }
 
 
 ext.dateVersion = getDate()
-
-try {
-    ext.gitRevision = "git rev-parse HEAD".execute().in.readLines().get(0)
-} catch (Exception e) {
-    println e.message
-    ext.gitRevision = ""
-}
+ext.gitRevision = getGitRevision()
 
 configure(allprojects - project(':keyext') - rootProject) {
     apply plugin: "java"
@@ -290,6 +296,7 @@ project(":key.removegenerics") {
 
 project(":key.ui") {
     apply plugin: "application"
+    apply plugin: 'com.github.johnrengelman.shadow'
     dependencies {
         compile(project(":key.core"))
         compile(project(":key.core.proof_references"))
@@ -301,14 +308,14 @@ project(":key.ui") {
     }
 
     task createExamplesZip(type: Zip) {
-        destinationDirectory = file("$projectDir/resources")
+        destinationDirectory = file("$buildDir/resources/main/")
         archiveFileName = "examples.zip"
         from 'examples'
         include '*'
         include '*/*'
     }
 
-    processResources.dependsOn(createExamplesZip)
+    processResources.dependsOn<< createExamplesZip
 
     application {
         //dependsOn(createExamplesZip)
@@ -318,6 +325,7 @@ project(":key.ui") {
     run {
         systemProperties["key.examples.dir"] = "$projectDir/examples"
     }
+
 
 }
 
@@ -365,7 +373,6 @@ task fatJar(type: Jar) {
     def jarFiles = //[project(":key.ui").jar.archivePath] +
             project(":key.ui").configurations.runtimeClasspath
     def names = jarFiles.collect { "./${it.name}" }.join(", ")
-    println names
 
     manifest {
         attributes 'Main-Class': "de.uka.ilkd.key.core.Main",
@@ -379,5 +386,6 @@ task fatJar(type: Jar) {
     archiveName = "key-${project.version}-exec.jar"
     destinationDir(buildDir)
     from jarFiles
+    with project(":key.ui").jar
     from "$rootDir/LICENSE.TXT"
 }
