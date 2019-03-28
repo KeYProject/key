@@ -12,14 +12,14 @@ import org.key_project.util.java.IOUtil;
  * runallproofs. Subprocesses have to re-initialise static variables correctly,
  * which could be overlooked or implemented incorrectly. Even if implemented
  * correctly, the resulting code can be quite complicated.
- * 
+ * <p>
  * An alternative is to pass-through pointers non-statically to the places where
  * they are needed. This again results results in inconvenient clutter in the
  * code.
- * 
+ * <p>
  * I eventually decided to put all filesystem-related stuff from runallproofs to
  * a separate location.
- * 
+ *
  * @author kai
  */
 @SuppressWarnings("serial")
@@ -29,26 +29,34 @@ public class RunAllProofsDirectories implements Serializable {
      * The path to the KeY repository. Configurable via system property
      * {@code key.home}.
      */
-    public static final File KEY_HOME;
-
     public static final File EXAMPLE_DIR;
-
-    public static final File KEY_CORE_TEST;
-
     protected static final File RUNALLPROOFS_DIR;
 
-    
 
     /**
      * Initialise static variables which are identical for each RAP run.
      */
     static {
-        KEY_HOME = IOUtil.getProjectRoot(RunAllProofsTest.class)
-                .getParentFile();
-        EXAMPLE_DIR = new File(KEY_HOME, "key.ui" + File.separator + "examples");
-        KEY_CORE_TEST = new File(KEY_HOME, "key.core.test");
-        RUNALLPROOFS_DIR = new File(KEY_CORE_TEST, "testresults"
-                + File.separator + "runallproofs");
+        EXAMPLE_DIR = findFolder("EXAMPLES_DIR", true,
+                "examples", "../key.ui/examples", "key.ui/examples");
+        RUNALLPROOFS_DIR = findFolder("RUNALLPROOFS_DIR", false,
+                "testresults/runallproofs",
+                "../testresults/runallproofs",
+                "../key.core/testresults/runallproofs",
+                "key.core/testresults/runallproofs");
+    }
+
+    private static File findFolder(String propertyName, boolean exists, String... candidates) {
+        if (System.getProperty(propertyName) != null) {
+            File f = new File(System.getProperty(propertyName));
+            if (f.exists() || !exists) return f;
+        }
+
+        for (String c : candidates) {
+            File f = new File(c);
+            if (f.exists() || !exists) return f;
+        }
+        return null;
     }
 
     public RunAllProofsDirectories(Date runStart) {

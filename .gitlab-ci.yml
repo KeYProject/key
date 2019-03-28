@@ -193,6 +193,47 @@ compile:check:removegenerics:
       junit:
         - "**/**/build/test-results/test/TEST-*.xml"
 
+
+
+compile:check:testRunAllProofs:
+  stage: primary
+  image: key-dev-openjdk8
+  script:
+    - javac -version
+    - cd key
+    - ./gradlew --build-cache --continue :key.core:testRunAllProofs
+    - ls
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/test/TEST-*.xml"
+
+
+compile:check:testProofRules:
+  stage: primary
+  image: key-dev-openjdk8
+  script:
+    - javac -version
+    - cd key
+    - ./gradlew --build-cache --continue :key.core:testProofRules
+    - ls
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/test/TEST-*.xml"
+
 checkstyle:
   stage: primary
   image: key-dev-openjdk8

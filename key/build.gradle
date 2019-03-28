@@ -8,7 +8,7 @@ plugins {
 
     id("ca.coglinc.javacc") version("2.4.0") apply false
     id "com.jfrog.bintray" version "1.8.4" apply false
-    id "com.github.johnrengelman.shadow" version "5.0.0"  apply false
+    id "com.github.johnrengelman.shadow" version "5.0.0" apply false
 }
 
 idea {
@@ -121,7 +121,7 @@ configure(allprojects - project(':keyext') - rootProject) {
     bintray {
         user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
         key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
-        publications  = ['mavenJava']
+        publications = ['mavenJava']
 
         dryRun = false //[Default: false] Whether to run this as dry-run, without deploying
         publish = true //[Default: false] Whether version should be auto published after an upload
@@ -209,6 +209,10 @@ project(":key.core") {
     tasks.withType(Test) {//Configure all tests
         systemProperty "testcases", "src/test/resources/testcase"
         systemProperty "TACLET_PROOFS", "tacletProofs"
+        systemProperty "EXAMPLES_DIR", new File(project(":key.ui").projectDir, "examples")
+        systemProperty "RUNALLPROOFS_DIR", "$buildDir/report/runallproves"
+
+
         systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
     }
@@ -315,7 +319,7 @@ project(":key.ui") {
         include '*/*'
     }
 
-    processResources.dependsOn<< createExamplesZip
+    processResources.dependsOn << createExamplesZip
 
     application {
         //dependsOn(createExamplesZip)
