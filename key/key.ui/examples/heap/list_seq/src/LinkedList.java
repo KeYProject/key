@@ -8,7 +8,7 @@ final class LinkedList implements List {
     
     /*@
       @ private invariant footprint == \set_union(this.*,
-      @      \infinite_union(int i; 0<=i && i<size; ((Node)nodeseq[i]).*));
+      @      (\infinite_union int i; 0<=i && i<size; ((Node)nodeseq[i]).*));
       @
       @ private invariant (\forall int i; 0<=i && i<size; 
       @         ((Node)nodeseq[i]) != null  // this implies \typeof(nodeseq[i]) == \type(Node)

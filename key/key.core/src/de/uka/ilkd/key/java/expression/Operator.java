@@ -200,11 +200,6 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     public int getExpressionCount() {
         return (children != null) ? children.size() : 0;
     }
-
-    @Override
-    public int hashCode() {
-        return 17*super.hashCode()+13*(children == null ? 0 : children.hashCode());
-    }
     
     /*
       Return the expression at the specified index in this node's

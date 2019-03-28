@@ -38,12 +38,22 @@
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <loopInvariant name="invariant: i &gt;= 0
+         <loopInvariant name="invariant: geq(i, Z(0(#)))
 &amp; \forall int j_5;
-    (   (j_5 &lt; i &amp; 0 &lt;= j_5)&lt;&lt;SC&gt;&gt; &amp; inInt(j_5)
-     -&gt; self.passwords[j_5] &gt;= 0);
-variant: javaSubInt(self.passwords.length, i)
-mod: {}" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
+    (     (lt(j_5, i)
+        &amp; leq(Z(0(#)), j_5))&lt;&lt;SC&gt;&gt;
+        &amp; inInt(j_5)
+     -&gt; geq(int::select(heap,
+                        int[]::select(heap,
+                                      self,
+                                      EnoughInfoReturn::$passwords),
+                        arr(j_5)),
+            Z(0(#))));
+variant: javaSubInt(length(int[]::select(heap,
+                                self,
+                                EnoughInfoReturn::$passwords)),
+           i)
+mod: empty" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
             <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="EnoughInfoReturn" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="passwords" isArrayIndex="false">

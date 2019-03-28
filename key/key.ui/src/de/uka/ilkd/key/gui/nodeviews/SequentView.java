@@ -19,8 +19,7 @@ import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_CO
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Point;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 import javax.swing.JEditorPane;
 import javax.swing.UIManager;
@@ -34,15 +33,14 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
-import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
-import de.uka.ilkd.key.pp.VisibleTermLabels;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /*
  * Parent class of CurrentGoalView and InnerNodeView.
@@ -52,6 +50,8 @@ public abstract class SequentView extends JEditorPane {
 
     protected static final Color INACTIVE_BACKGROUND_COLOR
             = new Color(UIManager.getColor("Panel.background").getRGB());
+    // default starting color for heatmaps
+    private static final Color HEATMAP_DEFAULT_START_COLOR = new Color(.8f, .7f, .5f);
 
     private final MainWindow mainWindow;
 
@@ -449,6 +449,26 @@ public abstract class SequentView extends JEditorPane {
         }
     }
 
+    protected void updateHeatMapHighlights() {
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        int max_age = vs.getMaxAgeForHeatmap();
+        if (vs.isShowHeatmap()) {
+            if (vs.isHeatmapSF()) {
+                if (vs.isHeatmapNewest()) {
+                    updateHeatmapSFHighlights(max_age, true);
+                } else {
+                    updateHeatmapSFHighlights(max_age, false);
+                }
+            } else {
+                if (vs.isHeatmapNewest()) {
+                    updateHeatmapTermHighlights(max_age, true);
+                } else {
+                    updateHeatmapTermHighlights(max_age, false);
+                }
+            }
+        }
+    }
+
     public void highlight(Point p) {
         setCurrentHighlight(defaultHighlight);
         paintHighlights(p);
@@ -472,6 +492,223 @@ public abstract class SequentView extends JEditorPane {
             maxChars -= 1;
         }
         return maxChars;
+    }
+
+    /**
+     * Highlights sequent formulas according to their age (if newest is false),
+     * or the newest sequent formulas.
+     * @param max_age maximum age up to which sf's are highlighted, or number of recent sf's to highlight.
+     * @param newest Are newest sf's highlighted (true) or all up to max_age (false)?
+     */
+    protected void updateHeatmapSFHighlights(int max_age, boolean newest) {
+        if (getLogicPrinter() == null) {
+            return;
+        }
+
+        InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
+
+        int i = 0;
+
+        // 5 "youngest" sequent formulas are highlighted.
+        ImmutableList<SequentPrintFilterEntry> entryList = filter.getFilteredAntec().append(filter.getFilteredSucc());
+        if (newest) {
+            SequentPrintFilterEntry[] sortedArray = new SequentPrintFilterEntry[entryList.size()];
+            entryList.toArray(sortedArray);
+            Arrays.sort(sortedArray, new Comparator<SequentPrintFilterEntry>() {
+                @Override
+                public int compare(SequentPrintFilterEntry o1, SequentPrintFilterEntry o2) {
+                    int o1age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
+                            o1.getFilteredFormula(), 1000);
+                    int o2age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
+                            o2.getFilteredFormula(), 1000);
+                    return o1age - o2age;
+                }
+            });
+            for (SequentPrintFilterEntry entry : entryList) {
+                for (int j = 0; j < max_age && j < sortedArray.length; ++j) {
+                    if (sortedArray[j].equals(entry)) {
+                        Color color = computeColorForAge(max_age, j);
+                        ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil()
+                                .prepend(0).append(i);
+                        Range r = ipt.rangeForPath(list);
+                        Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
+                        Object tag = getColorHighlight(color);
+                        paintHighlight(newR, tag);
+                    }
+                }
+                ++i;
+            }
+        } else {    // all formulas below MAX_AGE_FOR_HEATMAP are highlighted.
+            for(SequentPrintFilterEntry entry : entryList) {
+                SequentFormula form = entry.getFilteredFormula();
+                int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form, max_age + 2);
+                if(age < max_age) {
+                    Color color = computeColorForAge(max_age, age);
+                    ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil().prepend(0).append(i);
+                    Range r = ipt.rangeForPath(list);
+                    Range newR = new Range(r.start()+1, r.end()+1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
+                    Object tag = getColorHighlight(color);
+                    paintHighlight(newR, tag);
+                }
+                ++i;
+            }
+        }
+    }
+
+    /**
+     * Highlights terms according to their age (if newest is false),
+     * or the newest terms.
+     * @param max_age maximum age up to which terms are highlighted, or number of recent terms to highlight.
+     * @param newest Are newest terms highlighted (true) or all up to max_age (false)?
+     */
+    protected void updateHeatmapTermHighlights(int max_age, boolean newest) {
+        LinkedList<Node> nodeList = new LinkedList<>();
+        Node node = getMainWindow().getMediator().getSelectedNode();
+        nodeList.add(node);
+        // some sort of limit might make sense here for big sequents, but since
+        // for the newest term heatmap duplicates will be removed,
+        // this list has to be longer than max_age_for_heatmap.
+        while (node.parent() != null) {
+            node = node.parent();
+            nodeList.addFirst(node);
+        }
+        ArrayList<PIO_age> pio_age_list = new ArrayList<>();
+        Iterator<Node> it = nodeList.iterator();
+        int age = nodeList.size() - 1;
+
+        // preparation of the list of terms
+        while (it.hasNext()) {
+            node = it.next();
+            if (node.getNodeInfo().getSequentChangeInfo() != null) {
+                ImmutableList<SequentFormula> added_ante = node.getNodeInfo().getSequentChangeInfo().addedFormulas(true);
+                ImmutableList<SequentFormula> added_succ = node.getNodeInfo().getSequentChangeInfo().addedFormulas(false);
+                for (SequentFormula sf : added_ante) {
+                    pio_age_list.add(new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), age));
+                }
+                for (SequentFormula sf : added_succ) {
+                    pio_age_list.add(new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), age));
+                }
+                ImmutableList<FormulaChangeInfo> modified = node.getNodeInfo().getSequentChangeInfo().modifiedFormulas();
+                for (FormulaChangeInfo fci : modified) {
+                    PosInOccurrence positionOfMod = fci.getPositionOfModification();
+                    pio_age_list.add(new PIO_age(positionOfMod, age));
+                    for (PIO_age pair : pio_age_list) {
+                        if (pair.get_pio().sequentFormula().equals(fci.getOriginalFormula())) {
+                            if(positionOfMod.posInTerm().isPrefixOf(pair.get_pio().posInTerm())) {
+                                pair.active = false;
+                            } else {
+                                pair.set_pio(new PosInOccurrence(fci.getNewFormula(), pair.get_pio().posInTerm(), pair.get_pio().isInAntec()));
+                            }
+                        }
+                    }
+                }
+                for (SequentFormula sf : node.getNodeInfo().getSequentChangeInfo().removedFormulas(true)) {
+                    for (PIO_age pair : pio_age_list) {
+                        if (pair.get_pio().sequentFormula().equals(sf) && pair.get_pio().isInAntec()) {
+                            pair.active = false;
+                        }
+                    }
+                }
+                for (SequentFormula sf : node.getNodeInfo().getSequentChangeInfo().removedFormulas(false)) {
+                    for (PIO_age pair : pio_age_list) {
+                        if (pair.get_pio().sequentFormula().equals(sf) && !pair.get_pio().isInAntec()) {
+                            pair.active = false;
+                        }
+                    }
+                }
+
+            }
+            --age;
+        }
+        InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
+
+        pio_age_list.sort(new Comparator<PIO_age>() {
+                @Override
+                public int compare(PIO_age o1, PIO_age o2) {
+                    return o1.age >= o2.age ? 1 : -1;
+                }
+        });
+
+        // actual highlighting
+        if (newest) {
+            for (int j = 0; j < pio_age_list.size() && j < max_age; ++j) {
+                PIO_age pair = pio_age_list.get(j);
+                if (!pair.active) {
+                    continue;
+                }
+
+                while (j+1 < pio_age_list.size() && pio_age_list.get(j+1).get_pio().equals(pair.get_pio())) {
+                    pair = pio_age_list.get(j+1);
+                    pio_age_list.remove(j);
+                }
+
+                Color color = computeColorForAge(max_age, j);
+                ImmutableList<Integer> pfp = ipt.pathForPosition(pair.get_pio(), filter);
+                if (pfp != null) {
+                    Range r = ipt.rangeForPath(pfp);
+                    Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
+                    Object tag = getColorHighlight(color);
+                    paintHighlight(newR, tag);
+                }
+            }
+        } else {
+            for (PIO_age pair : pio_age_list) {
+                if (!pair.active || pair.get_age() > max_age) {
+                    continue;
+                }
+                PosInOccurrence pio = pair.get_pio();
+                Color color = computeColorForAge(max_age, pair.get_age());
+                ImmutableList<Integer> pfp = ipt.pathForPosition(pio, filter);
+                if (pfp != null) {
+                    Range r = ipt.rangeForPath(pfp);
+                    Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
+                    Object tag = getColorHighlight(color);
+                    paintHighlight(newR, tag);
+                }
+            }
+        }
+    }
+
+    /**
+     * computes the appropriate color for a given age and maximum age.
+     * Implements linear interpolation between the starting colour and white.
+     * @param max_age the maximum age of a term / sf, specified in viewsettings
+     * @param age the age of the given term / sf
+     * @return the appropriate color
+     */
+    private Color computeColorForAge(int max_age, int age) {
+        float[] color = HEATMAP_DEFAULT_START_COLOR.getRGBColorComponents(null);
+        float redDiff = (1.f - color[0]);
+        float greenDiff = (1.f - color[1]);
+        float blueDiff = (1.f - color[2]);
+        // exponentieller abfall - unterschiede zwischen ersten zwei, drei formeln deutlicher, danach kaum noch unterschied
+        // float diff = (float) (1.f - Math.pow(.5f, age-1));
+
+        // linearer abfall
+        float diff = (float) age / max_age;
+        float red = color[0] + redDiff * diff;
+        float green = color[1] + greenDiff * diff;
+        float blue = color[2] + blueDiff * diff;
+        return new Color(red, green, blue);
+    }
+
+    /**
+     * computes the age of a given sequent formula, i.e.,
+     * its distance to the root of the proof tree. If the formula is older
+     * than max_age, we do not care, because this method is only used for
+     * heatmap highlighting, and older formulas are not considered anyway.
+     * @param node the current node
+     * @param form the given sf
+     * @param max_age the maximum age, specified in viewSettings
+     * @return the sf's age
+     */
+    private int computeSeqFormulaAge(Node node, SequentFormula form, int max_age) {
+        int age = -1;
+        while (age < max_age && node != null && node.sequent().contains(form)) {
+            age++;
+            node = node.parent();
+        }
+        return age;
     }
 
     public abstract void printSequent();
@@ -523,4 +760,44 @@ public abstract class SequentView extends JEditorPane {
         return orgSize != newSize;
     }
 
+    /**
+     * Utility class consisting of a pair of the PosInOccurrence of a term, and its age.
+     * Used for term heatmap highlighting.
+     * @author jschiffl
+     *
+     */
+    class PIO_age {
+        PosInOccurrence pio;
+        int age;
+        boolean active = true;
+        public PIO_age(PosInOccurrence pio, int age) {
+            this.pio = pio;
+            this.age = age;
+        }
+        public PosInOccurrence get_pio() {
+            return pio;
+        }
+        public int get_age() {
+            return age;
+        }
+        public void set_pio(PosInOccurrence pio) {
+            this.pio = pio;
+
+        }
+        @Override
+        public String toString() {
+            return "PIO_age [pio=" + pio + ", age=" + age + ", active=" + active + "]";
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof CurrentGoalView.PIO_age) {
+                CurrentGoalView.PIO_age c = (CurrentGoalView.PIO_age) o;
+                if (this.age == c.age && this.pio == c.pio) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
 }

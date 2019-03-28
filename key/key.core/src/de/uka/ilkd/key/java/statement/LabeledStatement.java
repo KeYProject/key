@@ -315,11 +315,6 @@ public class LabeledStatement extends JavaStatement
 	return super.equalsModRenaming(lSt, nat);
     }
     
-    @Override
-    public int hashCode(){
-    	return 17 * super.hashCode() + 13 * body.hashCode() + name.hashCode();
-    }
-        
     public PosInProgram getFirstActiveChildPos() {
         return firstActiveChildPos;
     }
