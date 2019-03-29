@@ -136,6 +136,20 @@ configure(allprojects -  rootProject) {
             vcsUrl = 'https://git.key-project.org/key/key.git'
         }
     }
+
+
+    eclipse {
+        classpath {
+            file {
+                whenMerged {
+                    def source = entries.find { it.path == 'src/main/java' }
+                    source.entryAttributes['ignore_optional_problems'] = 'true'
+
+                    entries.findAll { it.path.endsWith('/resources') }.each { it.excludes = ["**/*.java"] }
+                }
+            }
+        }
+    }
 }
 
 allprojects {
