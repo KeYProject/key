@@ -235,7 +235,6 @@ project(":key.core") {
         filter {
             includeTestsMatching "JavaTests"
             includeTestsMatching "LogicModelTests"
-
             includeTestsMatching "ParserTests"
             includeTestsMatching "ProofConstructionTests"
             includeTestsMatching "RuleTests"
@@ -279,8 +278,8 @@ project(":key.core.proof_references") {
         compile project(":key.core")
     }
     test {
-        maxHeapSize = "4g"
         systemProperty "testcases", "src/test/resources/testcase"
+        maxHeapSize = "4g"
         filter { includeTestsMatching "AllProofReferencesTests" }
     }
 }
@@ -291,10 +290,8 @@ project(":key.core.symbolic_execution") {
     }
     test {
         systemProperty "testcases", "src/test/resources/testcase"
-
-        filter {
-            includeTestsMatching "AllSymbolicExecutionTests"
-        }
+        maxHeapSize = "4g"
+        filter { includeTestsMatching "AllSymbolicExecutionTests" }
     }
 }
 
