@@ -239,6 +239,9 @@ project(":key.core") {
     task testRunAllProofs(type: Test) {
         group "verification"
         filter { includeTestsMatching "RunAllProofsTestSuite" }
+        afterTest { desc, result -> 
+            logger.quiet "Executing test ${desc.name} [${desc.className}] with result: ${result.resultType}"
+        }
     }
 
     //check.dependsOn << testProofRules << testRunAllProofs
