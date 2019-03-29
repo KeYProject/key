@@ -31,17 +31,20 @@ static def getGitRevision() {
     return process.text
 }
 
-
 ext.dateVersion = getDate()
 ext.gitRevision = getGitRevision()
 
-configure(allprojects -  rootProject) {
+configure(allprojects - rootProject) {
     apply plugin: "java"
     apply plugin: "java-library"
     apply plugin: "maven-publish"
     apply plugin: "idea"
     apply plugin: "eclipse"
     apply plugin: "com.jfrog.bintray"
+
+    apply plugin: 'checkstyle'
+    apply plugin: 'pmd'
+    apply plugin: 'findbugs'
 
     group = rootProject.group
     version = rootProject.version
@@ -57,6 +60,24 @@ configure(allprojects -  rootProject) {
         options.verbose()
     }
 
+    findbugs { findbugsTest.enabled = false; ignoreFailures = true }
+    pmd { pmdTest.enabled = false; ignoreFailures = true }
+    tasks.withType(Checkstyle) {
+        configFile file("$rootDir/scripts/tools/checkstyle/key_checks.xml")
+    }
+    tasks.withType(FindBugs) {
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
+    }
+    tasks.withType(Pmd) {
+        reports {
+            xml.enabled = true
+            html.enabled = true
+        }
+    }
+
     repositories {
         mavenCentral()
         flatDir { dirs "lib", "$rootDir/key.core/lib" }
@@ -66,7 +87,6 @@ configure(allprojects -  rootProject) {
         testCompile("junit:junit:4.12")
         testCompile project(":key.util")
     }
-
 
     task sourcesJar(type: Jar) {
         from sourceSets.main.allJava
@@ -252,7 +272,7 @@ project(":key.core") {
     task testRunAllProofs(type: Test) {
         group "verification"
         filter { includeTestsMatching "RunAllProofsTestSuite" }
-        afterTest { desc, result -> 
+        afterTest { desc, result ->
             logger.quiet "Executing test ${desc.name} [${desc.className}] with result: ${result.resultType}"
         }
     }
