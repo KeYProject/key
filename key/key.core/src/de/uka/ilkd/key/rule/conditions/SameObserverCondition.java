@@ -65,9 +65,15 @@ import java.util.Collections;
  */
 public final class SameObserverCondition implements VariableCondition {
 
+    /**
+     * The first argument provided to the condition in the rule.
+     */
     private final SchemaVariable schema1;
-    private final SchemaVariable schema2;
 
+    /**
+     * The second argument provided to the condition in the rule.
+     */
+    private final SchemaVariable schema2;
 
     /**
      * Create a new condition
@@ -132,7 +138,7 @@ public final class SameObserverCondition implements VariableCondition {
     }
 
     @Override
-        public String toString () {
-            return "\\sameObserver (" + schema1 + ", " + schema2 + ")";
-        }
+    public String toString () {
+        return "\\sameObserver (" + schema1 + ", " + schema2 + ")";
     }
+}

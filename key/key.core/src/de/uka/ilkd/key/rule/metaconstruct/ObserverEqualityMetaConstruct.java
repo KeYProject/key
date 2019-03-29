@@ -96,6 +96,7 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
      *                 null.
      * @param svInst   instantiations of schema variables, not used
      * @param services non-null {@link Services}
+     * @return a non-null Term of sort FORMULA
      * @throws IllegalArgumentException if the term argument is not as expected
      */
     public Term transform(Term term, SVInstantiations svInst, Services services) {
