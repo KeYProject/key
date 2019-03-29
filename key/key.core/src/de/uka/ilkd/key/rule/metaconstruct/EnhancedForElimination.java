@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -33,6 +34,7 @@ import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.IForUpdates;
@@ -40,8 +42,11 @@ import de.uka.ilkd.key.java.statement.IGuard;
 import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -87,11 +92,6 @@ public class EnhancedForElimination extends ProgramTransformer {
     private static final String VALUES = "values";
 
     /**
-     * {@code Iterable} class name.
-     */
-    private static final String ITERABLE_CLASS_NAME = "java.lang.Iterable";
-
-    /**
      * {@code iterator} method name.
      */
     private static final String ITERATOR_METHOD_NAME = "iterator";
@@ -104,12 +104,7 @@ public class EnhancedForElimination extends ProgramTransformer {
     /**
      * {@code next} method name.
      */
-    private static final String NEXT_MATHOD_NAME = "next";
-
-    /**
-     * {@code Iterator} class name.
-     */
-    private static final String ITERATOR = "java.util.Iterator";
+    private static final String NEXT_METHOD_NAME = "next";
 
     /**
      * @see #getIndexVariable()
@@ -136,8 +131,36 @@ public class EnhancedForElimination extends ProgramTransformer {
      */
     private LoopStatement loop;
 
-    public EnhancedForElimination(EnhancedFor forStatement) {
+    /**
+     * Execution context sv.
+     */
+    private IExecutionContext execContextSV;
+
+    /**
+     * Execution context.
+     */
+    private ExecutionContext execContext;
+
+    /**
+     * Creates a new enhaced for-loop elimination.
+     *
+     * @param execContextSV the execution context.
+     * @param forStatement the enhanced for loop to eliminate.
+     */
+    public EnhancedForElimination(ProgramSV execContextSV, EnhancedFor forStatement) {
         super("enhancedfor-elim", forStatement);
+        this.execContextSV = execContextSV;
+    }
+
+    /**
+     * Creates a new enhaced for-loop elimination.
+     *
+     * @param execContext the execution context.
+     * @param forStatement the enhanced for loop to eliminate.
+     */
+    public EnhancedForElimination(ExecutionContext execContext, EnhancedFor forStatement) {
+        super("enhancedfor-elim", forStatement);
+        this.execContext = execContext;
     }
 
     /**
@@ -169,12 +192,20 @@ public class EnhancedForElimination extends ProgramTransformer {
     @Override
     public ProgramElement[] transform(ProgramElement pe,
             Services services, SVInstantiations svInst) {
-
         assert pe instanceof EnhancedFor : "Only works on enhanced fors";
 
         EnhancedFor enhancedFor = (EnhancedFor) pe;
 
         Expression expression = enhancedFor.getGuardExpression();
+
+        if (execContext == null) {
+            if (execContextSV == null) {
+                execContext = svInst.getContextInstantiation().activeStatementContext();
+            } else {
+                execContext = (ExecutionContext) svInst
+                        .getInstantiation((SchemaVariable) execContextSV);
+            }
+        }
 
         ProgramElement result;
         if (!isArrayType(expression, services)) {
@@ -236,10 +267,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * @return true, if expression's type is a subtype of Iterable
      */
     private boolean isArrayType(Expression expression, Services services) {
-        JavaInfo ji = services.getJavaInfo();
-        // TODO: how to get a more appropriate execution context?
-        final ExecutionContext ec = ji.getDefaultExecutionContext();
-        return expression.getKeYJavaType(services, ec).getSort() instanceof ArraySort;
+        return expression.getKeYJavaType(services, execContext).getSort() instanceof ArraySort;
     }
 
     /*
@@ -247,7 +275,6 @@ public class EnhancedForElimination extends ProgramTransformer {
      * arr = exp; for(int i = 0; i < arr.length; i++) body;
      */
     private ProgramElement makeArrayForLoop(EnhancedFor enhancedFor, Services services) {
-
         Expression expression = enhancedFor.getGuardExpression();
         Statement body = enhancedFor.getBody();
 
@@ -256,9 +283,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         final JavaInfo ji = services.getJavaInfo();
 
         // T[] arr = exp;
-        // TODO: how to get a more appropriate execution context?
-        final ExecutionContext ec = ji.getDefaultExecutionContext();
-        final KeYJavaType arrayType = expression.getKeYJavaType(services, ec);
+        final KeYJavaType arrayType = expression.getKeYJavaType(services, execContext);
         final ProgramVariable arrayVar = KeYJavaASTFactory.localVariable(services,
                 ARR, arrayType);
         final Statement arrAssignment = KeYJavaASTFactory.declare(arrayVar, expression);
@@ -300,9 +325,14 @@ public class EnhancedForElimination extends ProgramTransformer {
      * "{ ; while(<itguard>) <block> } "
      */
     private ProgramElement makeIterableForLoop(EnhancedFor enhancedFor, Services services) {
+        final Expression iterableExpr = enhancedFor.getGuardExpression();
+        final KeYJavaType iterableType = iterableExpr.getKeYJavaType(services, execContext);
+        final IProgramMethod iteratorMethod = services.getJavaInfo().getProgramMethod(
+                iterableType, ITERATOR_METHOD_NAME,
+                ImmutableSLList.nil(), execContext.getTypeReference().getKeYJavaType());
 
         // local variable "it"
-        final KeYJavaType iteratorType = services.getJavaInfo().getTypeByName(ITERATOR);
+        final KeYJavaType iteratorType = iteratorMethod.getReturnType();
         ProgramVariable iteratorVariable = KeYJavaASTFactory.localVariable(services,
                 IT, iteratorType);
 
@@ -351,7 +381,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         final VariableSpecification varSpec = lvd.getVariableSpecifications()
                 .get(0);
         final LocalVariableDeclaration varDecl = KeYJavaASTFactory
-                .declareMethodCall(varSpec.getProgramVariable(), itVar, NEXT_MATHOD_NAME);
+                .declareMethodCall(varSpec.getProgramVariable(), itVar, NEXT_METHOD_NAME);
 
         // ATTENTION: in order for the invariant rule to work correctly,
         // the update to values needs to appear at the _second_ entry of the

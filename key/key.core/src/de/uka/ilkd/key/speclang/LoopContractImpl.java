@@ -15,6 +15,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
@@ -26,6 +27,7 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
@@ -203,7 +205,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         } else if (first instanceof EnhancedFor) {
             this.loop = (LoopStatement) first;
 
-            enhancedForElim = new EnhancedForElimination((EnhancedFor) first);
+            ExecutionContext ec = KeYJavaASTFactory.executionContext(
+                    method.getContainerType(), method, null);
+            enhancedForElim = new EnhancedForElimination(ec, (EnhancedFor) first);
             enhancedForElim.transform((EnhancedFor) first, services, null);
             loop = enhancedForElim.getLoop();
         } else {
@@ -292,7 +296,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         EnhancedForElimination enhancedForElim = null;
         LoopStatement nonEnhancedLoop = loop;
         if (loop instanceof EnhancedFor) {
-            enhancedForElim = new EnhancedForElimination((EnhancedFor) loop);
+            ExecutionContext ec = KeYJavaASTFactory.executionContext(
+                    method.getContainerType(), method, null);
+            enhancedForElim = new EnhancedForElimination(ec, (EnhancedFor) loop);
             enhancedForElim.transform(loop, services, null);
             nonEnhancedLoop = enhancedForElim.getLoop();
         }
