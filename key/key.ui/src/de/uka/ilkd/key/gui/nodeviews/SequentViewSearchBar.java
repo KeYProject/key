@@ -39,8 +39,8 @@ import de.uka.ilkd.key.util.Pair;
 public class SequentViewSearchBar extends SearchBar {
 
     private static final long serialVersionUID = 9102464983776181771L;
-    public static final Color SEARCH_HIGHLIGHT_COLOR_1 = new Color(255, 140, 0, 178);
-    public static final Color SEARCH_HIGHLIGHT_COLOR_2 = new Color(255, 140, 0, 100);
+    public static final Color SEARCH_HIGHLIGHT_COLOR_1 = new Color(0, 140, 255, 178);
+    public static final Color SEARCH_HIGHLIGHT_COLOR_2 = new Color(0, 140, 255, 100);
 
     public static enum SearchMode {
         HIGHLIGHT("Highlight"), HIDE("Hide"), REGROUP("Regroup");
