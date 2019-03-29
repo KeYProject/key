@@ -34,123 +34,180 @@ import java.util.Collections;
 
 
 /**
- * Uses the class <code>QueryExpand</code> in order to insert query expansions in the term that the
- * meta construct is applied on.
- * @author gladisch
+ * This meta contruct allows one to prove equality (equivalence) of two
+ * observer terms if they belong to the same observer function symbol.
+ * <p>
+ * It takes two arguments of any sort and the result is a formula.
+ * <p>
+ * This construct is asymmetric. The second argument is the call with the
+ * base heap, i.e., the one with fewer created objects.
+ * The first argument is the one with the larger heap, i.e., after
+ * modification and with potentially more created objects.
+ * <p>
+ * The construct implements the condition (9.10) in §9.4.4 in the new KeY book.
+ * <p>
+ * It is probably less efficient than {@link UseDependencyContractRule}, however
+ * it is more generally applicable. It mitigates the problem, that in
+ * interactive proving the above builtin rule is often not available if desired.
+ *
+ * <h3>Limitation</h3>
+ *
+ * Currently it works only for observable functions that depend on a single
+ * heap. If applied to more than one heap than the secondary heaps must be
+ * equal and are not treated using dependency contracts.
+ *
+ * @author Mattias Ulbrich 2019
+ * @see UseDependencyContractRule
  */
 public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
 
-	public static final String name = "#ObserverEquality";
+    /**
+     * The unique identifier name.
+     */
+    public static final String NAME = "#ObserverEquality";
 
-	public ObserverEqualityMetaConstruct() {
-		super(new Name(name), 2, Sort.FORMULA);
-	}
+    /**
+     * This constructor is probably only called from
+     * {@link AbstractTermTransformer}.
+     */
+    public ObserverEqualityMetaConstruct() {
+        super(new Name(NAME), 2, Sort.FORMULA);
+    }
 
-	/**
-	 * term.sub(0) is the term that possibly contains queries.
-	 * term.sub(1) is expected to be true or false. True indicates that the
-	 * meta construct appears in a positive context wrt. to logical negation, (e.g. in the succedent or negated in the antecedent)
-	 * False implies means that the meta construct appears in a negative context. (e.g. in the antecedent or negated in the succedent)
-	 */
-	public Term transform(Term term, SVInstantiations svInst, Services services) {
-		Term term1 = term.sub(0);
-		Term term2 = term.sub(1);
+    /**
+     * Given two terms termExt and termBase, produce a formula which implies
+     * equality of the two terms.
+     *
+     * <h3>Precondition</h3>
+     * The two terms must be belong to the same function symbol. That symbol
+     * must be an observer and must possess a dependency contract.
+     * <p>
+     * It is easy to write a taclet that violates this. The method should
+     * therefore been written defensively.  Since the method must not throw
+     * declared exceptions, {@link IllegalArgumentException}s are used.
+     *
+     * <h3>Postcondition</h3>
+     * It returns a formula that is a conjunction. It implies the equality of
+     * termExt and termBase.
+     *
+     * @param term     A term of the type {@code #ObserverEquality(t1, t2)}, not
+     *                 null.
+     * @param svInst   instantiations of schema variables, not used
+     * @param services non-null {@link Services}
+     */
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
+        Term termExt = term.sub(0);
+        Term termBase = term.sub(1);
 
-		assert term1.op() instanceof IObserverFunction : "\\sameObserver must be true";
-		assert term2.op() instanceof IObserverFunction : "\\sameObserver must be true";
+        if (!(termExt.op() instanceof IObserverFunction) ||
+            !(termBase.op() instanceof IObserverFunction)) {
+            throw new IllegalArgumentException(
+                    "\\sameObserver must be true for " + NAME);
+        }
+        IObserverFunction obs1 = (IObserverFunction) termExt.op();
+        IObserverFunction obs2 = (IObserverFunction) termBase.op();
 
-		IObserverFunction obs1 = (IObserverFunction) term1.op();
-		IObserverFunction obs2 = (IObserverFunction) term2.op();
-
-		assert obs1 == obs2 : "\\sameObserver must be true";
+        if (obs1 != obs2) {
+            throw new IllegalArgumentException("\\sameObserver must be true");
+        }
 
         KeYJavaType kjt = obs1.isStatic() ?
                 obs1.getContainerType() :
-                services.getTypeConverter().getKeYJavaType(term1.sub(1));
+                services.getTypeConverter().getKeYJavaType(termExt.sub(1));
 
-		ImmutableSet<Contract> contracts =
-				UseDependencyContractRule.getApplicableContracts(services, kjt, obs1);
+        ImmutableSet<Contract> contracts =
+                UseDependencyContractRule.getApplicableContracts(services, kjt, obs1);
 
-		DependencyContract contract = (DependencyContract) contracts.iterator().next();
+        DependencyContract contract = (DependencyContract) contracts.iterator().next();
 
-		Term result = services.getTermBuilder().and(
-				buildConditionMonotonicHeap(term1.sub(0), term2.sub(0), services),
-				buildConditionPrecondition(term2, contract, services),
-				buildConditionSameParams(term1, term2, services),
-				buildConditionDependency(term1, term2, contract, services)
-		);
+        Term result = services.getTermBuilder().and(
+                buildConditionMonotonicHeap(termExt.sub(0), termBase.sub(0), services),
+                buildConditionPrecondition(termBase, contract, services),
+                buildConditionSameParams(termExt, termBase, services),
+                buildConditionDependency(termExt, termBase, contract, services)
+        );
 
-		return result;
-	}
+        return result;
+    }
 
-	private Term buildConditionDependency(Term larger, Term smaller,
-										  DependencyContract contract, Services services) {
-		//  forall o,f. o,f in dep@heap1 ==> o.f@heap1 == o.f@heap2
+    /*
+     * For f(h, a1, ..., an) and f(h', a1', ..., an') build the term
+     *   forall o,f. o,f in dep@h' ==> o.f@h' == o.f@h
+     */
+    private Term buildConditionDependency(Term larger, Term smaller,
+                                          DependencyContract contract, Services services) {
 
-		TermBuilder tb = services.getTermBuilder();
-		LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
 
-//		VariableSV varObj = SchemaVariableFactory.createVariableSV(
-//				new Name("_ov"), services.getJavaInfo().getJavaLangObject().getSort());
-//		VariableSV varFld = SchemaVariableFactory.createVariableSV(
-//				new Name("_fv"), services.getTypeConverter().getHeapLDT().getFieldSort());
-		LogicVariable varObj = new LogicVariable(new Name("_ov"),
-				services.getJavaInfo().getJavaLangObject().getSort());
-		LogicVariable varFld = new LogicVariable(new Name("_fv"),
-				services.getTypeConverter().getHeapLDT().getFieldSort());
+        TermBuilder tb = services.getTermBuilder();
+        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
 
-		Term ov = tb.var(varObj);
-		Term fv = tb.var(varFld);
+        LogicVariable varObj = new LogicVariable(new Name("_ov"),
+                services.getJavaInfo().getJavaLangObject().getSort());
+        LogicVariable varFld = new LogicVariable(new Name("_fv"),
+                services.getTypeConverter().getHeapLDT().getFieldSort());
 
-		ImmutableList<Term> params = smaller.subs().toImmutableList().take(2);
+        Term ov = tb.var(varObj);
+        Term fv = tb.var(varFld);
 
-		Term mod = contract.getDep(baseHeap, false, smaller.sub(0),
-				smaller.sub(1), params, Collections.emptyMap(), services);
+        ImmutableList<Term> params = smaller.subs().toImmutableList().take(2);
 
-		Term result = tb.all(varObj, tb.all(varFld,
-				tb.imp(
-						tb.elementOf(ov, fv, mod),
-						tb.equals(
-								tb.select(Sort.ANY, smaller.sub(0), ov, fv),
-								tb.select(Sort.ANY, larger.sub(0), ov, fv)))));
+        Term mod = contract.getDep(baseHeap, false, smaller.sub(0),
+                smaller.sub(1), params, Collections.emptyMap(), services);
 
-		return result;
-	}
+        Term result = tb.all(varObj, tb.all(varFld,
+                tb.imp(
+                        tb.elementOf(ov, fv, mod),
+                        tb.equals(
+                                tb.select(Sort.ANY, smaller.sub(0), ov, fv),
+                                tb.select(Sort.ANY, larger.sub(0), ov, fv)))));
 
-	private Term buildConditionSameParams(Term term1, Term term2, Services services) {
-		TermBuilder tb = services.getTermBuilder();
-		Term result = tb.tt();
+        return result;
+    }
 
-		for (int i = 2; i < term1.arity(); i++) {
-			result = tb.and(result, tb.equals(term1.sub(i), term2.sub(i)));
-		}
+    /*
+     * For f(h, a1, ..., an) and f(h', a1', ..., an') build
+     *   a1=a1' /\ ... /\ an=an'
+     */
+    private Term buildConditionSameParams(Term term1, Term term2, Services services) {
+        TermBuilder tb = services.getTermBuilder();
+        Term result = tb.tt();
 
-		return result;
-	}
+        for (int i = 2; i < term1.arity(); i++) {
+            result = tb.and(result, tb.equals(term1.sub(i), term2.sub(i)));
+        }
 
-	private Term buildConditionPrecondition(Term app, DependencyContract contract, Services services) {
+        return result;
+    }
 
-		LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-		ImmutableList<Term> params = app.subs().toImmutableList().take(2);
+    /*
+     * For f(h, a1, ..., an) and f(h', a1', ..., an') build
+     *   depContract_f_pre(h, a1, ..., an)
+     * by instantiating that part of the contract.
+     */
+    private Term buildConditionPrecondition(Term app, DependencyContract contract, Services services) {
 
-		return contract.getPre(baseHeap, app.sub(0), app.sub(1), params, Collections.emptyMap(), services);
-	}
+        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        ImmutableList<Term> params = app.subs().toImmutableList().take(2);
 
-	private Term buildConditionMonotonicHeap(Term largerHeap, Term smallerHeap, Services services) {
-		//  forall o, o.created@smaller ==> o.created@larger
+        return contract.getPre(baseHeap, app.sub(0), app.sub(1), params, Collections.emptyMap(), services);
+    }
 
-		// VariableSV var = SchemaVariableFactory.createVariableSV(
-		//		new Name("_ov"), services.getJavaInfo().getJavaLangObject().getSort());
-		LogicVariable var = new LogicVariable(new Name("_ov"),
-				services.getJavaInfo().getJavaLangObject().getSort());
+    /*
+     * For f(h, a1, ..., an) and f(h', a1', ..., an') build
+     *   forall o, o.created@h' ==> o.created@h
+     */
+    private Term buildConditionMonotonicHeap(Term largerHeap, Term smallerHeap, Services services) {
 
-		TermBuilder tb = services.getTermBuilder();
+        LogicVariable var = new LogicVariable(new Name("_ov"),
+                services.getJavaInfo().getJavaLangObject().getSort());
 
-		Term ov = tb.var(var);
+        TermBuilder tb = services.getTermBuilder();
 
-		return tb.all(var,
-				tb.imp(
-						tb.created(smallerHeap, ov),
-						tb.created(largerHeap, ov)));
-	}
+        Term ov = tb.var(var);
+
+        return tb.all(var,
+                tb.imp(
+                        tb.created(smallerHeap, ov),
+                        tb.created(largerHeap, ov)));
+    }
 }
