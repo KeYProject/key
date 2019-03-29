@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.rule.conditions.SameObserverCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
@@ -58,6 +59,7 @@ import java.util.Collections;
  *
  * @author Mattias Ulbrich 2019
  * @see UseDependencyContractRule
+ * @see SameObserverCondition
  */
 public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
 
@@ -94,6 +96,7 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
      *                 null.
      * @param svInst   instantiations of schema variables, not used
      * @param services non-null {@link Services}
+     * @throws IllegalArgumentException if the term argument is not as expected
      */
     public Term transform(Term term, SVInstantiations svInst, Services services) {
         Term termExt = term.sub(0);

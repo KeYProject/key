@@ -59,7 +59,9 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 
     private static final Map<String, AbstractTermTransformer> name2metaop 
     	= new LinkedHashMap<String, AbstractTermTransformer>(70);
-    
+
+    // TODO: This seems to be better handled using a ServiceLoader
+
     //must be first
     public static final Sort METASORT = new SortImpl(new Name("Meta"));    
     
