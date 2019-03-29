@@ -1,5 +1,10 @@
 include "key.util"
 include "key.core"
+
+//include "key.core:informationflow"
+include "key.core:rifl"
+
+
 include "key.ui"
 include "key.core.symbolic_execution"
 include "key.core.testgen"

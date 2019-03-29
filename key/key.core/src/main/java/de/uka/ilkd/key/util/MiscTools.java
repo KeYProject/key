@@ -16,17 +16,12 @@ package de.uka.ilkd.key.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.Filenames;
+import org.key_project.util.Strings;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -132,13 +127,16 @@ public final class MiscTools {
 
     /**
      * True if both are <code>null</code> or <code>a.equals(b)</code> with <code>equals</code> from type T.
+     * You should use {@link Objects#equals(Object, Object)} directly.
      */
+    @Deprecated
     public static <T> boolean equalsOrNull(T a, Object b){
-        if (a == null) {
+        return Objects.equals(a, b);
+        /*if (a == null) {
             return b == null;
         } else {
             return a.equals(b);
-        }
+        }*/
     }
 
     public static <T> boolean equalsOrNull(T a, Object... bs){
@@ -153,17 +151,14 @@ public final class MiscTools {
     // =======================================================
     // Methods operating on Arrays
     // =======================================================
-    
+
     /**
      * Concatenates two arrays.
      * The second array may have an entry type that is a
      * subtype of the first one.
      */
     public static <S,T extends S> S[] concat(S[] s1, T[] s2) {
-        S[] res = Arrays.copyOf(s1, s1.length+s2.length);
-        for (int i= 0; i < s2.length; i++)
-            res[i+s1.length] = s2[i];
-        return res;
+        return KeYCollections.concat(s1,s2);
     }
 
 
@@ -178,25 +173,7 @@ public final class MiscTools {
      * (provided in Java SE) as <code>m0</code>.
      */
     public static <S,T,U> Map<S,U> apply(Map<S,? extends T> m0, Map<T,U> m1) {
-        Map<S,U> res = null;
-        final int size = m0.size() < m1.size()? m0.size(): m1.size();
-        // try to use more specific implementation
-        if (m0 instanceof java.util.TreeMap)
-            res = new java.util.TreeMap<S,U>();
-        else if (m0 instanceof java.util.concurrent.ConcurrentHashMap)
-            res = new java.util.concurrent.ConcurrentHashMap<S,U>(size);
-        else if (m0 instanceof java.util.IdentityHashMap)
-            res = new java.util.IdentityHashMap<S, U>(size);
-        else if (m0 instanceof java.util.WeakHashMap)
-            res = new java.util.WeakHashMap<S,U>(size);
-        else res = new HashMap<S,U>(size);
-
-        for (Entry<S, ? extends T> e: m0.entrySet()) {
-            final U value = m1.get(e.getValue());
-            if (value != null)
-                res.put(e.getKey(), value);
-        }
-        return res;
+        return KeYCollections.apply(m0, m1);
     }
 
 
@@ -214,39 +191,7 @@ public final class MiscTools {
      * There is no check whether all other characters are valid for filenames.
      */
     static List<String> disectFilename(String filename){
-        final char sep = File.separatorChar;
-        List<String> res = new ArrayList<String>();
-        // if filename contains slashes, take it as UNIX filename, otherwise Windows
-        if (filename.indexOf("/") != -1) assert sep == '/' : "\""+filename+"\" contains both / and \\";
-        else if (filename.indexOf("\\") != -1) assert sep == '\\': "\""+filename+"\" contains both / and \\";
-        else {
-            res.add(filename);
-            return res;
-        }
-        int i = 0;
-        while (i < filename.length()){
-            int j = filename.indexOf(sep,i);
-            if (j == -1){ // no slash anymore
-                final String s = filename.substring(i, filename.length());
-                if (!s.equals("."))
-                    res.add(s);
-                break;
-            }
-            if (i == j) {
-                // empty string between slashes
-                if (i == 0)
-                    // leading slash
-                    res.add("");
-            } else {
-                // contains "/./"
-                final String s = filename.substring(i, j);
-                if (!s.equals(".")) {
-                    res.add(s);
-                }
-            }
-            i = j+1;
-        }
-        return res;
+        return Filenames.disectFilename(filename);
     }
 
     /** Returns a filename relative to another one.
@@ -258,74 +203,7 @@ public final class MiscTools {
      * (may happen on Windows systems).
      */
     public static String makeFilenameRelative(String origFilename, String toFilename){
-        final List<String> origFileNameSections = disectFilename(origFilename);
-        String[] a = origFileNameSections.toArray(new String[origFileNameSections.size()]);
-        final List<String> destinationFilenameSections = disectFilename(toFilename);
-        String[] b = destinationFilenameSections.toArray(new String[destinationFilenameSections.size()]);
-
-        // check for Windows paths
-        if (File.separatorChar == '\\' &&
-                a[0].length() == 2 && a[0].charAt(1) == ':') {
-            char drive = Character.toUpperCase(a[0].charAt(0));
-            if (!(b[0].length() == 2 && Character.toUpperCase(b[0].charAt(0)) == drive && b[0].charAt(1) == ':'))
-                throw new RuntimeException("cannot make paths on different drives relative");
-            // remove drive letter
-            a[0] = ""; b[0] = "";
-        }
-        int i;
-        String s = "";
-        String t = "";
-
-        if (a[0].equals("")) { // not already relative
-        if (!b[0].equals(""))
-            throw new RuntimeException("\""+toFilename+ "\" is a relative path. Please use absolute paths to make others relative to them.");
-
-        // remove ".." from paths
-        a = removeDotDot(a);
-        b = removeDotDot(b);
-
-        // FIXME: there may be leading ..'s
-
-        i = 1; boolean diff= false;
-        while (i < b.length){
-            // shared until i
-            if (i >= a.length || !a[i].equals(b[i])) diff = true;
-            // add ".." for each remaining element in b
-            // and collect the remaining elements of a
-            if (diff) {
-                s = s + "../";
-                if (i < a.length)
-                    t = t + (a[i].equals("")? "" : "/")+ a[i];
-            }
-            i++;
-        }
-        } else { i = 0; }
-        while (i < a.length)
-            t = t +(a[i].equals("")? "" : "/")+ a[i++];
-        // strip leading slash
-        if (t.length()>0 && t.charAt(0) == '/')
-            t = t.substring(1);
-        // strip ending slash
-        t = s + t;
-        if (t.length() > 0 && t.charAt(t.length()-1) == '/')
-            t = t.substring(0,t.length()-1);
-        return t;
-    }
-
-
-    private static String[] removeDotDot(String[] a) {
-        String[] newa = new String[a.length];
-        int k = 0;
-        for (int j = 0; j < a.length-1; j++){
-            if (a[j].equals("..") || !a[j+1].equals("..")){
-                newa[k++] = a[j];
-            } else
-                j++;
-        }
-        if (!a[a.length-1].equals("..")){
-            newa[k++] = a[a.length-1];
-        }
-        return Arrays.copyOf(newa, k);
+        return Filenames.makeFilenameRelative(origFilename, toFilename);
     }
 
 
@@ -372,15 +250,7 @@ public final class MiscTools {
      *         delimiter
      */
     public static String join(Iterable<?> collection, String delimiter) {
-        StringBuilder sb = new StringBuilder();
-        for (Object obj : collection) {
-            if(sb.length() > 0) {
-                sb.append(delimiter);
-            }
-            sb.append(obj);
-        }
-
-        return sb.toString();
+        return KeYCollections.join(collection, delimiter);
     }
 
     /**
@@ -398,7 +268,7 @@ public final class MiscTools {
      *         delimiter
      */
     public static String join(Object[] collection, String delimiter) {
-        return join(Arrays.asList(collection), delimiter);
+        return KeYCollections.join(collection, delimiter);
     }
 
     /**
@@ -416,14 +286,7 @@ public final class MiscTools {
      * @author mattias ulbrich
      */
     public static /*@ non_null @*/ String filterAlphabetic(/*@ non_null @*/ String string) {
-        StringBuilder res = new StringBuilder();
-        for (int i = 0; i < string.length(); i++) {
-            char c = string.charAt(i);
-            if((c >= 'A' && c <= 'Z') || (c >= 'A' && c <= 'Z')) {
-                res.append(c);
-            }
-        }
-        return res.toString();
+        return KeYCollections.filterAlphabetic(string);
     }
 
     /** Checks whether a string contains another one as a whole word
@@ -432,19 +295,7 @@ public final class MiscTools {
      * @param word string to be searched for
      */
     public static boolean containsWholeWord(String s, String word){
-        if (s == null || word == null) return false;
-        int i = -1;
-        final int wl = word.length();
-        while (true) {
-            i = s.indexOf(word, i+1);
-            if (i < 0 || i >= s.length()) break;
-            if (i == 0 || Character.isWhitespace(s.charAt(i-1))) {
-                if (i+wl == s.length() || Character.isWhitespace(s.charAt(i+wl)) || s.charAt(i+wl) == ';') {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return Strings.containsWholeWord(s, word);
     }
 
 
@@ -454,14 +305,7 @@ public final class MiscTools {
      * @return
      */
     public static boolean isJMLComment(String comment) {
-        try {
-        return (comment.startsWith("/*@") || comment.startsWith("//@")
-                || comment.startsWith("/*+KeY@") || comment.startsWith("//+KeY@")
-                || (comment.startsWith("/*-")&& !comment.substring(3,6).equals("KeY") && comment.contains("@"))
-                || (comment.startsWith("//-") && !comment.substring(3,6).equals("KeY") && comment.contains("@")));
-        } catch (IndexOutOfBoundsException e){
-            return false;
-        }
+        return Strings.isJMLComment(comment);
     }
 
     /**
@@ -505,7 +349,7 @@ public final class MiscTools {
        }
        return name;
     }
-    
+
     /**
      * <p>
      * Returns the name of the applied rule in the given {@link Node} of
@@ -525,7 +369,7 @@ public final class MiscTools {
        }
        return name;
     }
-    
+
     /**
      * <p>
      * Returns the name of the {@link RuleApp}.
@@ -547,7 +391,7 @@ public final class MiscTools {
        }
        return name;
     }
-    
+
     /**
      * Returns the {@link OneStepSimplifier} used in the given {@link Proof}.
      * @param proof The {@link Proof} to get its used {@link OneStepSimplifier}.
@@ -562,7 +406,7 @@ public final class MiscTools {
           return null;
        }
     }
-    
+
     /**
      * Returns the {@link OneStepSimplifier} used in the given {@link Profile}.
      * @param profile The {@link Profile} to get its used {@link OneStepSimplifier}.
@@ -584,7 +428,7 @@ public final class MiscTools {
      */
     public static ProgramVariable findActualVariable(ProgramVariable originalVar, Node node) {
         ProgramVariable actualVar = originalVar;
-        if (node != null) {          
+        if (node != null) {
             outer:
                 do {
                     if (node.getRenamingTable() != null) {
@@ -689,7 +533,7 @@ public final class MiscTools {
         }
         return result;
     }
-    
+
     /**
      * read an input stream to its end into a string.
      *
@@ -740,10 +584,10 @@ public final class MiscTools {
        result.put("optimisedSelectRules", "optimisedSelectRules:on");
        result.put("wdChecks", "wdChecks:off");
        result.put("wdOperator", "wdOperator:L");
-       result.put("permissions", "permissions:off"); 
+       result.put("permissions", "permissions:off");
        return result;
     }
-    
+
     /**
      * Returns the path to the source file defined by the given {@link PositionInfo}.
      * @param posInfo The {@link PositionInfo} to extract source file from.
