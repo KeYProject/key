@@ -23,7 +23,7 @@ public class TermLabelSettings implements Settings, Cloneable {
     /**
      * @see {@link #getUseOriginLabels()}
      */
-    private boolean useOriginLabels = true;
+    private boolean useOriginLabels = false;
 
     /**
      * @see #addSettingsListener(SettingsListener)
@@ -41,9 +41,9 @@ public class TermLabelSettings implements Settings, Cloneable {
         } else {
             Debug.out(
                     "TermLabelSettings: Failure while reading the setting \"UseOriginLabels\".\n" +
-                    "Using the default value: true." +
+                    "Using the default value: false." +
                     "\nThe string read was: ", str);
-            useOriginLabels = true;
+            useOriginLabels = false;
         }
     }
 
