@@ -1,5 +1,10 @@
 pipeline {
   agent any
+
+  environment {
+      GRADLE_OPTS = '-Dorg.gradle.daemon=false'
+  }
+
   stages {
     stage('Compile') {
       steps {
@@ -31,6 +36,8 @@ cd key
             sh '''cd key
 ./gradlew --build-cache --continue :key.core:check
 '''
+            junit(testResults: '*/*/build/test-results/test/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
+
           }
         }
         stage('key.ui') {
@@ -38,6 +45,7 @@ cd key
             sh '''cd key
 ./gradlew --build-cache --continue :key.ui:check
 '''
+            junit(testResults: '*/*/build/test-results/test/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
           }
         }
         stage('Test: proof_references') {
@@ -45,13 +53,16 @@ cd key
             sh '''cd key
 ./gradlew --build-cache --continue :key.core.proof_references:check
 '''
+            junit(testResults: '*/*/build/test-results/test/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
+
           }
         }
         stage('Test: key.removegenerics') {
           steps {
             sh '''cd key
-./gradlew --build-cache --continue :key.removegenerics
+./gradlew --build-cache --continue :key.removegenerics:check
 '''
+            junit(testResults: '*/*/build/test-results/test/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
           }
         }
         stage('Test: key.core.testgen') {
@@ -59,6 +70,7 @@ cd key
             sh '''cd key
 ./gradlew --build-cache --continue :key.core.testgen:check
 '''
+            junit(testResults: '*/*/build/test-results/test/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
           }
         }
       }
@@ -72,6 +84,7 @@ cd key
 ./gradlew --build-cache --continue :key.core:testRunAllProofs
 ls'''
             junit '*/*/build/test-results/test/*.xml'
+            junit(testResults: '*/*/build/test-results/test/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
           }
         }
         stage('Test: ProofRules') {
@@ -80,7 +93,7 @@ ls'''
 ./gradlew --build-cache --continue :key.core:testProofRules
 
 ls -l*/*/build/test-results/test/*.xml'''
-            junit '*/*/build/test-results/test/*.xml'
+            junit(testResults: '*/*/build/test-results/test/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
           }
         }
       }
