@@ -91,8 +91,7 @@ ls'''
           steps {
             sh '''cd key
 ./gradlew --build-cache --continue :key.core:testProofRules
-
-ls -l*/*/build/test-results/test/*.xml'''
+'''
             junit(testResults: '*/*/build/test-results/test/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
           }
         }
