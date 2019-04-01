@@ -16,10 +16,10 @@ package de.uka.ilkd.key.speclang;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.MapUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -198,14 +198,14 @@ public final class LoopSpecImpl implements LoopSpecification {
     @Override
     public LoopSpecification map(UnaryOperator<Term> op, Services services) {
         Map<LocationVariable, Term> newInvariants = originalInvariants.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, Term> newFreeInvariants =
                 originalFreeInvariants.entrySet().stream().collect(
-                        Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+                        MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, Term> newModifies = originalModifies.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, ImmutableList<InfFlowSpec>> newInfFlowSpecs =
-                originalInfFlowSpecs.entrySet().stream().collect(Collectors.toMap(
+                originalInfFlowSpecs.entrySet().stream().collect(MapUtil.collector(
                         Map.Entry::getKey,
                         entry -> entry.getValue().stream().map(spec -> spec.map(op))
                         .collect(ImmutableList.collector())));
@@ -215,7 +215,7 @@ public final class LoopSpecImpl implements LoopSpecification {
         ImmutableList<Term> newLocalOuts =
                 localOuts.stream().map(op).collect(ImmutableList.collector());
         Map<LocationVariable, Term> newAtPres = originalAtPres.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
 
         return new LoopSpecImpl(
                 loop, pm, kjt,

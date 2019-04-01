@@ -37,10 +37,8 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
                 LinkedList<T>::new,
                 (list, el) -> list.add(el),
                 (list1, list2) -> {
-                    List<T> result = new LinkedList<>();
-                    result.addAll(list1);
-                    result.addAll(list2);
-                    return result; },
+                    list1.addAll(list2);
+                    return list1; },
                 ImmutableList::<T>fromList);
     }
 

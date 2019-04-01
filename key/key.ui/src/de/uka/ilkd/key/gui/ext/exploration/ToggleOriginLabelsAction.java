@@ -42,6 +42,8 @@ public class ToggleOriginLabelsAction extends MainWindowAction {
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
                 setEnabled(getMediator().getSelectedProof() != null);
+
+                handleAction();
             }
 
             @Override
@@ -54,10 +56,38 @@ public class ToggleOriginLabelsAction extends MainWindowAction {
         putValue(Action.LONG_DESCRIPTION, "Toggle origin labels.");
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
+    private void handleAction() {
         Proof proof = mainWindow.getMediator().getSelectedProof();
         Services services = proof.getServices();
+
+        if (proof != null) {
+            TermLabelSettings settings = proof.getSettings().getTermLabelSettings();
+            settings.setUseOriginLabels(!settings.getUseOriginLabels());
+
+            if (!settings.getUseOriginLabels()) {
+                for (Proof p : services.getSpecificationRepository().getAllProofs()) {
+                    for (Goal g : p.openGoals()) {
+                        for (int i = 1; i <= g.sequent().size(); ++i) {
+                            Term t = g.sequent().getFormulabyNr(i).formula();
+                            OriginTermLabel.removeOriginLabels(t, services);
+                        }
+                    }
+                }
+
+                services.getSpecificationRepository().map(
+                        term -> OriginTermLabel.removeOriginLabels(term, services),
+                        services);
+            }
+
+            mainWindow.getMediator().getSelectionModel().fireSelectedNodeChanged();
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        handleAction();
+
+        Proof proof = mainWindow.getMediator().getSelectedProof();
 
         if (proof != null) {
             TermLabelSettings settings = proof.getSettings().getTermLabelSettings();
@@ -70,23 +100,13 @@ public class ToggleOriginLabelsAction extends MainWindowAction {
                         "Origin",
                         JOptionPane.INFORMATION_MESSAGE);
             } else {
-                for (Proof p : services.getSpecificationRepository().getAllProofs()) {
-                    for (Goal g : p.openGoals()) {
-                        for (int i = 1; i <= g.sequent().size(); ++i) {
-                            Term t = g.sequent().getFormulabyNr(i).formula();
-                            OriginTermLabel.removeOriginLabels(t, services);
-                        }
-                    }
-                }
-
                 JOptionPane.showMessageDialog(
                         mainWindow,
-                        "Origin labels have been removed from all open goals and all proof obligations.",
+                        "Origin labels have been removed from "
+                                + "all open goals and all proof obligations.",
                         "Origin",
                         JOptionPane.INFORMATION_MESSAGE);
             }
-
-            mainWindow.getMediator().getSelectionModel().fireSelectedNodeChanged();
         }
     }
 }

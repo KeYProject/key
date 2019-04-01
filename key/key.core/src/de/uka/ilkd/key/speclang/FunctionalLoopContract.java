@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.MapUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -184,8 +184,8 @@ public class FunctionalLoopContract implements Contract {
                 = (Map<LocationVariable, ProgramVariable>) atPreVars;
         return contract.getPrecondition(heap, selfVar,
                 atPreVars0.entrySet().stream().collect(
-                        Collectors.<Map.Entry<LocationVariable, ProgramVariable>,
-                        LocationVariable, LocationVariable>toMap(Map.Entry::getKey,
+                        MapUtil.<Map.Entry<LocationVariable, ProgramVariable>,
+                        LocationVariable, LocationVariable>collector(Map.Entry::getKey,
                             entry -> (LocationVariable) entry.getValue())),
                 services);
     }

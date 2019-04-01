@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.MapUtil;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -246,20 +246,21 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     @Override
     public FunctionalOperationContract map(UnaryOperator<Term> op, Services services) {
         Map<LocationVariable, Term> newPres = originalPres.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, Term> newFreePres = originalFreePres.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newMby = op.apply(originalMby);
         Map<LocationVariable, Term> newPosts = originalPosts.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, Term> newFreePosts = originalFreePosts.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
-        Map<LocationVariable, Term> newAxioms = originalAxioms.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newAxioms = originalAxioms == null ? null :
+            originalAxioms.entrySet().stream().collect(
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, Term> newMods = originalMods.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<ProgramVariable, Term> newAccessibles = originalDeps.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newGlobalDefs = op.apply(globalDefs);
 
         return new FunctionalOperationContractImpl(

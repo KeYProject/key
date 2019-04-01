@@ -17,9 +17,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.MapUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -134,10 +134,10 @@ public final class DependencyContractImpl implements DependencyContract {
     @Override
     public DependencyContract map(UnaryOperator<Term> op, Services services) {
         Map<LocationVariable, Term> newPres = originalPres.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newMby = op.apply(originalMby);
         Map<ProgramVariable, Term> newDeps = originalDeps.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
 
         return new DependencyContractImpl(baseName, name, kjt, target, specifiedIn,
                 newPres, newMby, newDeps,

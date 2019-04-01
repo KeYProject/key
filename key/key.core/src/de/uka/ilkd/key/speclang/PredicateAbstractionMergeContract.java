@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
+import org.key_project.util.java.MapUtil;
+
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionLattice;
@@ -68,7 +70,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
         return new PredicateAbstractionMergeContract(
                 mps,
                 atPres.entrySet().stream().collect(
-                        Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue()))),
+                        MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue()))),
                 kjt, latticeTypeName, abstractionPredicates);
     }
 

@@ -206,6 +206,10 @@ public class OriginTermLabel implements TermLabel {
      * @return the transformed term.
      */
     public static Term removeOriginLabels(Term term, Services services) {
+        if (term == null) {
+            return null;
+        }
+
         List<TermLabel> labels = term.getLabels().toList();
         final TermLabel originTermLabel = term.getLabel(NAME);
         final TermFactory tf = services.getTermFactory();

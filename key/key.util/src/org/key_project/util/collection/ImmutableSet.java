@@ -38,10 +38,8 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
                 HashSet<T>::new,
                 (set, el) -> set.add(el),
                 (set1, set2) -> {
-                    Set<T> result = new HashSet<>();
-                    result.addAll(set1);
-                    result.addAll(set2);
-                    return result; },
+                    set1.addAll(set2);
+                    return set1; },
                 ImmutableSet::<T>fromSet,
                 Characteristics.UNORDERED);
     }

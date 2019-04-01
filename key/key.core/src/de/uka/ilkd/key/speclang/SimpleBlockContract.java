@@ -17,11 +17,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.MapUtil;
 
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -164,11 +164,11 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
     @Override
     public BlockContract map(UnaryOperator<Term> op, Services services) {
         Map<LocationVariable, Term> newPreconditions = preconditions.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, Term> newPostconditions = postconditions.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, Term> newModifiesClauses = modifiesClauses.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newMeasuredBy = op.apply(measuredBy);
 
         return update(
