@@ -57,9 +57,9 @@ public class ToggleOriginLabelsAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         Proof proof = mainWindow.getMediator().getSelectedProof();
+        Services services = proof.getServices();
 
         if (proof != null) {
-            Services services = proof.getServices();
             TermLabelSettings settings = proof.getSettings().getTermLabelSettings();
             settings.setUseOriginLabels(!settings.getUseOriginLabels());
 
@@ -70,10 +70,12 @@ public class ToggleOriginLabelsAction extends MainWindowAction {
                         "Origin",
                         JOptionPane.INFORMATION_MESSAGE);
             } else {
-                for (Goal goal : proof.openGoals()) {
-                    for (int i = 1; i <= goal.sequent().size(); ++i) {
-                        Term t = goal.sequent().getFormulabyNr(i).formula();
-                        OriginTermLabel.removeOriginLabels(t, services);
+                for (Proof p : services.getSpecificationRepository().getAllProofs()) {
+                    for (Goal g : p.openGoals()) {
+                        for (int i = 1; i <= g.sequent().size(); ++i) {
+                            Term t = g.sequent().getFormulabyNr(i).formula();
+                            OriginTermLabel.removeOriginLabels(t, services);
+                        }
                     }
                 }
 
