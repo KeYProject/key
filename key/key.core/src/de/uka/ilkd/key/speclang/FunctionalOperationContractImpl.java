@@ -23,6 +23,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -239,6 +241,35 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         this.id = id;
         this.transaction = transaction;
         this.toBeSaved = toBeSaved;
+    }
+
+    @Override
+    public FunctionalOperationContract map(UnaryOperator<Term> op, Services services) {
+        Map<LocationVariable, Term> newPres = originalPres.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newFreePres = originalFreePres.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Term newMby = op.apply(originalMby);
+        Map<LocationVariable, Term> newPosts = originalPosts.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newFreePosts = originalFreePosts.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newAxioms = originalAxioms.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newMods = originalMods.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<ProgramVariable, Term> newAccessibles = originalDeps.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Term newGlobalDefs = op.apply(globalDefs);
+
+        return new FunctionalOperationContractImpl(
+                baseName, name, kjt, pm, specifiedIn, modality,
+                newPres, newFreePres, newMby, newPosts, newFreePosts,
+                newAxioms, newMods, newAccessibles,
+                hasRealModifiesClause, originalSelfVar, originalParamVars,
+                originalResultVar, originalExcVar, originalAtPreVars,
+                newGlobalDefs,
+                id, toBeSaved, transaction, services);
     }
 
     // -------------------------------------------------------------------------

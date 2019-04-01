@@ -16,6 +16,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -28,11 +29,14 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 
 /**
- * A contract about an operation (i.e., a method or a constructor), consisting 
- * of a precondition, a postcondition, a modifies clause, a measured-by clause, 
+ * A contract about an operation (i.e., a method or a constructor), consisting
+ * of a precondition, a postcondition, a modifies clause, a measured-by clause,
  * and a modality.
  */
 public interface FunctionalOperationContract extends OperationContract {
+
+    @Override
+    public FunctionalOperationContract map(UnaryOperator<Term> op, Services services);
 
     /**
      * Returns the modality of the contract.
@@ -47,21 +51,21 @@ public interface FunctionalOperationContract extends OperationContract {
      * Returns the postcondition of the contract.
      */
     public Term getPost(LocationVariable heap,
-                        ProgramVariable selfVar, 
-	    	        ImmutableList<ProgramVariable> paramVars, 
-	    	        ProgramVariable resultVar, 
+                        ProgramVariable selfVar,
+	    	        ImmutableList<ProgramVariable> paramVars,
+	    	        ProgramVariable resultVar,
 	    	        ProgramVariable excVar,
 	    	        Map<LocationVariable,? extends ProgramVariable> atPreVars,
 	    	        Services services);
 
     public Term getPost(List<LocationVariable> heapContext,
-                        ProgramVariable selfVar, 
-	    	        ImmutableList<ProgramVariable> paramVars, 
-	    	        ProgramVariable resultVar, 
+                        ProgramVariable selfVar,
+	    	        ImmutableList<ProgramVariable> paramVars,
+	    	        ProgramVariable resultVar,
 	    	        ProgramVariable excVar,
 	    	        Map<LocationVariable,? extends ProgramVariable> atPreVars,
 	    	        Services services);
-    
+
     /**
      * Returns the postcondition of the contract.
      */
@@ -132,6 +136,7 @@ public interface FunctionalOperationContract extends OperationContract {
     public Term getPre();
     public Term getPost();
     public Term getMod();
+    @Override
     public Term getMby();
     public Term getSelf();
     public ImmutableList<Term> getParams();

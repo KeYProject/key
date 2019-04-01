@@ -5,6 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -388,6 +390,25 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
                 newPreconditions, newMeasuredBy, newPostconditions, newModifiesClauses,
                 newinfFlowSpecs, newVariables, transactionApplicable, hasMod, newDecreases,
                 functionalContracts, services);
+    }
+
+    @Override
+    public LoopContract map(UnaryOperator<Term> op, Services services) {
+        Map<LocationVariable, Term> newPreconditions = preconditions.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newPostconditions = postconditions.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newModifiesClauses = modifiesClauses.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Term newMeasuredBy = op.apply(measuredBy);
+        Term newDecreases = op.apply(decreases);
+
+        return update(
+                block,
+                newPreconditions, newPostconditions, newModifiesClauses,
+                infFlowSpecs.stream().map(spec -> spec.map(op)).collect(ImmutableList.collector()),
+                variables,
+                newMeasuredBy, newDecreases);
     }
 
     @Override

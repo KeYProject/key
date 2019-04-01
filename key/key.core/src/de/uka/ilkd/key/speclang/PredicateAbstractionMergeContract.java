@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
@@ -60,6 +61,15 @@ public class PredicateAbstractionMergeContract implements MergeContract {
         this.latticeType = latticeTypeFromString(latticeType);
         this.latticeTypeName = latticeType;
         this.abstractionPredicates = abstractionPredicates;
+    }
+
+    @Override
+    public PredicateAbstractionMergeContract map(UnaryOperator<Term> op, Services services) {
+        return new PredicateAbstractionMergeContract(
+                mps,
+                atPres.entrySet().stream().collect(
+                        Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue()))),
+                kjt, latticeTypeName, abstractionPredicates);
     }
 
     @Override

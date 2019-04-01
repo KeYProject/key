@@ -93,6 +93,11 @@ public class FunctionalBlockContract implements Contract {
                 .generateContractTypeName(str, getKJT(), getTarget(), getKJT()));
     }
 
+    @Override
+    public FunctionalBlockContract map(UnaryOperator<Term> op, Services services) {
+        return new FunctionalBlockContract(contract.map(op, services), id);
+    }
+
     /**
      *
      * @param baseName

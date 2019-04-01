@@ -15,6 +15,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -279,6 +280,9 @@ public interface Contract extends SpecificationElement {
      *         available.
      */
     public boolean hasSelfVar();
+
+    @Override
+    public Contract map(UnaryOperator<Term> op, Services services);
 
     /**
      * Class for storing the original variables without always distinguishing several different

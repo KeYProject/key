@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.speclang;
 
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -92,4 +93,7 @@ public interface BlockContract extends BlockSpecificationElement {
      */
     @Override
     public BlockContract setBlock(StatementBlock newBlock);
+
+    @Override
+    public BlockContract map(UnaryOperator<Term> op, Services services);
 }

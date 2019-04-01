@@ -93,6 +93,11 @@ public class FunctionalLoopContract implements Contract {
                 .generateContractTypeName(str, getKJT(), getTarget(), getKJT()));
     }
 
+    @Override
+    public FunctionalLoopContract map(UnaryOperator<Term> op, Services services) {
+        return new FunctionalLoopContract(contract.map(op, services), id);
+    }
+
     /**
      *
      * @param baseName

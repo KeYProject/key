@@ -16,6 +16,8 @@ package de.uka.ilkd.key.speclang;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -125,10 +127,23 @@ public final class DependencyContractImpl implements DependencyContract {
                 INVALID_ID);
     }
 
-
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
+
+    @Override
+    public DependencyContract map(UnaryOperator<Term> op, Services services) {
+        Map<LocationVariable, Term> newPres = originalPres.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Term newMby = op.apply(originalMby);
+        Map<ProgramVariable, Term> newDeps = originalDeps.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+
+        return new DependencyContractImpl(baseName, name, kjt, target, specifiedIn,
+                newPres, newMby, newDeps,
+                originalSelfVar, originalParamVars, originalAtPreVars,
+                globalDefs, id);
+    }
 
     @Override
     public String getName() {

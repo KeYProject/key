@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.util;
 
+import java.util.function.UnaryOperator;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -26,6 +28,13 @@ public class InfFlowSpec {
         this.preExpressions = preExpressions;
         this.postExpressions = postExpressions;
         this.newObjects = newObjects;
+    }
+
+    public InfFlowSpec map(UnaryOperator<Term> op) {
+        return new InfFlowSpec(
+                preExpressions.stream().map(op).collect(ImmutableList.collector()),
+                postExpressions.stream().map(op).collect(ImmutableList.collector()),
+                newObjects.stream().map(op).collect(ImmutableList.collector()));
     }
 
     private InfFlowSpec() {

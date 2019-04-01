@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -96,6 +97,13 @@ public final class RepresentsAxiom extends ClassAxiom {
         this.originalParamVars = paramVars;
         this.atPreVars = atPreVars;
         this.displayName = displayName;
+    }
+
+    @Override
+    public SpecificationElement map(UnaryOperator<Term> op, Services services) {
+        return new RepresentsAxiom(name, displayName, target, kjt, visibility,
+                op.apply(originalPre), op.apply(originalRep),
+                originalSelfVar, originalParamVars, atPreVars);
     }
 
     @Override

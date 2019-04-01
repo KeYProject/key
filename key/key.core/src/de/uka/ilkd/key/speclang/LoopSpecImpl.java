@@ -15,6 +15,8 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -192,6 +194,37 @@ public final class LoopSpecImpl implements LoopSpecification {
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
+
+    @Override
+    public LoopSpecification map(UnaryOperator<Term> op, Services services) {
+        Map<LocationVariable, Term> newInvariants = originalInvariants.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newFreeInvariants =
+                originalFreeInvariants.entrySet().stream().collect(
+                        Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newModifies = originalModifies.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, ImmutableList<InfFlowSpec>> newInfFlowSpecs =
+                originalInfFlowSpecs.entrySet().stream().collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().stream().map(spec -> spec.map(op))
+                        .collect(ImmutableList.collector())));
+        Term newVariant = op.apply(originalVariant);
+        Term newSelfTerm = op.apply(originalSelfTerm);
+        ImmutableList<Term> newLocalIns = localIns.stream().map(op).collect(ImmutableList.collector());
+        ImmutableList<Term> newLocalOuts =
+                localOuts.stream().map(op).collect(ImmutableList.collector());
+        Map<LocationVariable, Term> newAtPres = originalAtPres.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+
+        return new LoopSpecImpl(
+                loop, pm, kjt,
+                newInvariants, newFreeInvariants, newModifies,
+                newInfFlowSpecs,
+                newVariant, newSelfTerm,
+                newLocalIns, newLocalOuts,
+                newAtPres);
+    }
 
     @Override
     public LoopStatement getLoop() {
