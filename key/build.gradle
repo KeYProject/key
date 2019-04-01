@@ -3,12 +3,10 @@
 //TODO figure out why javacc is always executed
 
 plugins {
+    id("ca.coglinc.javacc") version("2.4.0") apply false
     id("idea")
     id("eclipse")
-
-    id("ca.coglinc.javacc") version("2.4.0") apply false
     id "com.jfrog.bintray" version "1.8.4" apply false
-    id "com.github.johnrengelman.shadow" version "5.0.0" apply false
 }
 
 idea {
@@ -22,7 +20,7 @@ group = "org.key_project"
 version = "2.8.0-SNAPSHOT"
 
 static def getDate() {
-    return new java.util.Date().format('yyyyMMdd')
+    return new Date().format('yyyyMMdd')
 }
 
 static def getGitRevision() {
@@ -34,7 +32,14 @@ static def getGitRevision() {
 ext.dateVersion = getDate()
 ext.gitRevision = getGitRevision()
 
-configure(allprojects - rootProject) {
+try {
+    ext.gitRevision = "git rev-parse HEAD".execute().in.readLines().get(0)
+} catch (Exception e) {
+    println e.message
+    ext.gitRevision = ""
+}
+
+subprojects {
     apply plugin: "java"
     apply plugin: "java-library"
     apply plugin: "maven-publish"
@@ -59,6 +64,18 @@ configure(allprojects - rootProject) {
         options.addBooleanOption 'Xdoclint:none', true
         options.verbose()
     }
+
+ tasks.withType(Test) {//Configure all tests
+        systemProperty "testcases", "src/test/resources/testcase"
+        systemProperty "TACLET_PROOFS", "tacletProofs"
+        systemProperty "EXAMPLES_DIR", new File(project(":key.ui").projectDir, "examples")
+        systemProperty "RUNALLPROOFS_DIR", "$buildDir/report/runallproves"
+
+
+        systemProperty "key.disregardSettings", "true"
+        maxHeapSize = "4g"
+    }
+
 
     findbugs { findbugsTest.enabled = false; ignoreFailures = true }
     pmd { pmdTest.enabled = false; ignoreFailures = true }
@@ -87,6 +104,7 @@ configure(allprojects - rootProject) {
         testCompile("junit:junit:4.12")
         testCompile project(":key.util")
     }
+
 
     task sourcesJar(type: Jar) {
         from sourceSets.main.allJava
@@ -255,6 +273,7 @@ project(":key.core") {
         filter {
             includeTestsMatching "JavaTests"
             includeTestsMatching "LogicModelTests"
+
             includeTestsMatching "ParserTests"
             includeTestsMatching "ProofConstructionTests"
             includeTestsMatching "RuleTests"
@@ -300,6 +319,7 @@ project(":key.core.proof_references") {
     test {
         systemProperty "testcases", "src/test/resources/testcase"
         maxHeapSize = "4g"
+        systemProperty "testcases", "src/test/resources/testcase"
         filter { includeTestsMatching "AllProofReferencesTests" }
     }
 }
@@ -346,6 +366,7 @@ project(":key.ui") {
         compile(project(":key.removegenerics"))
 
         runtimeOnly project(":keyext.interactionlog")
+        //runtimeOnly project(":keyext.script.ui")
     }
 
     task createExamplesZip(type: Zip) {
@@ -414,6 +435,7 @@ task alldoc(type: Javadoc) {
 task fatJar(type: Jar) {
     dependsOn project(":key.ui").jar
     dependsOn project(":keyext.interactionlog").jar
+    //dependsOn project(":keyext.script.ui").jar
 
     def jarFiles = //[project(":key.ui").jar.archivePath] +
             project(":key.ui").configurations.runtimeClasspath

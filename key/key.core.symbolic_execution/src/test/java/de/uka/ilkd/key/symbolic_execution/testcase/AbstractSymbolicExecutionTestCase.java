@@ -29,11 +29,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import junit.framework.TestCase;
 
+import org.junit.Assert;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
-import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 import org.xml.sax.SAXException;
 
@@ -153,25 +154,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    /**
     * The directory which contains the KeY repository.
     */
-   public static final File testCaseDirectory;
+   public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
 
    static {
-      File projectRoot = IOUtil.getProjectRoot(AbstractSymbolicExecutionTestCase.class);
-      // Update path in Eclipse Plug-ins executed as JUnit Test.
-      if ("org.key_project.core.symbolic_execution.test".equals(projectRoot.getName())) {
-         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile().getParentFile();
-         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.symbolic_execution.test");
-      }
-      // Update path in Eclipse Plug-ins executed as JUnit Plug-in Test.
-      else if ("tests".equals(projectRoot.getName())) {
-         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile();
-         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.symbolic_execution.test");
-      }
-      if(System.getProperty("testcases") != null) {
-         testCaseDirectory = new File(System.getProperty("testcases")).getAbsoluteFile();
-      }else{
-         testCaseDirectory = new File(projectRoot, "src/test/resources/testcase");
-      }
+      Assert.assertNotNull("Could not find test case directory", testCaseDirectory);
    }
 
    /**

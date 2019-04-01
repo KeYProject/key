@@ -20,12 +20,13 @@ import java.util.LinkedHashSet;
 
 import junit.framework.TestCase;
 
+import org.junit.Assert;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
-import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -48,29 +49,15 @@ import de.uka.ilkd.key.util.HelperClassForTests;
  * @author Martin Hentschel
  */
 public abstract class AbstractProofReferenceTestCase extends TestCase {
-   public static final String TESTCASE_DIRECTORY;
-   
-   static {
-      File projectRoot = IOUtil.getProjectRoot(AbstractProofReferenceTestCase.class);
-      // Update path in Eclipse Plug-ins executed as JUnit Test.
-      if ("org.key_project.core.proof_references.test".equals(projectRoot.getName())) {
-         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile().getParentFile();
-         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.proof_references.test");
-      }
-      // Update path in Eclipse Plug-ins executed as JUnit Plug-in Test.
-      else if ("tests".equals(projectRoot.getName())) {
-         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile();
-         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.proof_references.test");
-      }
-      if(System.getProperty("testcases") != null) {
-         TESTCASE_DIRECTORY = new File(System.getProperty("testcases")).getAbsolutePath();
-      }else{
-         TESTCASE_DIRECTORY = projectRoot + "src/test/resources/testcase";
-      }
+    public static final File TESTCASE_DIRECTORY = FindResources.getTestCasesDirectory();
+
+    static {
+        Assert.assertNotNull("Could not find test case directory",
+                TESTCASE_DIRECTORY);
    }
-   
+
    /**
-    * Executes the test steps of test methods. 
+    * Executes the test steps of test methods.
     * @param baseDir The base directory which contains test and oracle file.
     * @param javaPathInBaseDir The path to the java file inside the base directory.
     * @param containerTypeName The name of the type which contains the method.
@@ -80,18 +67,18 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
     * @param expectedReferences The expected proof references.
     * @throws Exception Occurred Exception.
     */
-   protected void doReferenceFunctionTest(String baseDir, 
-                                          String javaPathInBaseDir, 
-                                          String containerTypeName, 
+   protected void doReferenceFunctionTest(File baseDir,
+                                          String javaPathInBaseDir,
+                                          String containerTypeName,
                                           String targetName,
                                           boolean useContracts,
                                           IProofReferencesAnalyst analyst,
                                           ExpectedProofReferences... expectedReferences) throws Exception {
       doReferenceFunctionTest(baseDir, javaPathInBaseDir, containerTypeName, targetName, useContracts, analyst, null, expectedReferences);
    }
-   
+
    /**
-    * Executes the test steps of test methods. 
+    * Executes the test steps of test methods.
     * @param baseDir The base directory which contains test and oracle file.
     * @param javaPathInBaseDir The path to the java file inside the base directory.
     * @param containerTypeName The name of the type which contains the method.
@@ -102,9 +89,9 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
     * @param expectedReferences The expected proof references.
     * @throws Exception Occurred Exception.
     */
-   protected void doReferenceFunctionTest(String baseDir, 
-                                          String javaPathInBaseDir, 
-                                          String containerTypeName, 
+   protected void doReferenceFunctionTest(File baseDir,
+                                          String javaPathInBaseDir,
+                                          String containerTypeName,
                                           String targetName,
                                           boolean useContracts,
                                           IProofReferencesAnalyst analyst,
@@ -115,7 +102,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
    }
 
    /**
-    * Executes the test steps of test methods. 
+    * Executes the test steps of test methods.
     * @param baseDir The base directory which contains test and oracle file.
     * @param javaPathInBaseDir The path to the java file inside the base directory.
     * @param containerTypeName The name of the type which contains the method.
@@ -125,9 +112,9 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
     * @param expectedReferences The expected proof references.
     * @throws Exception Occurred Exception.
     */
-   protected void doReferenceMethodTest(String baseDir, 
-                                        String javaPathInBaseDir, 
-                                        String containerTypeName, 
+   protected void doReferenceMethodTest(File baseDir,
+                                        String javaPathInBaseDir,
+                                        String containerTypeName,
                                         String methodFullName,
                                         boolean useContracts,
                                         IProofReferencesAnalyst analyst,
@@ -136,7 +123,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
    }
 
    /**
-    * Executes the test steps of test methods. 
+    * Executes the test steps of test methods.
     * @param baseDir The base directory which contains test and oracle file.
     * @param javaPathInBaseDir The path to the java file inside the base directory.
     * @param containerTypeName The name of the type which contains the method.
@@ -147,9 +134,9 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
     * @param expectedReferences The expected proof references.
     * @throws Exception Occurred Exception.
     */
-   protected void doReferenceMethodTest(String baseDir, 
-                                        String javaPathInBaseDir, 
-                                        String containerTypeName, 
+   protected void doReferenceMethodTest(File baseDir,
+                                        String javaPathInBaseDir,
+                                        String containerTypeName,
                                         String methodFullName,
                                         boolean useContracts,
                                         IProofReferencesAnalyst analyst,
@@ -158,7 +145,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
       IProofTester tester = createReferenceMethodTester(analyst, currentReferenceFilter, expectedReferences);
       doProofMethodTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, useContracts, tester);
    }
-   
+
    /**
     * Creates the {@link IProofTester} used by {@link #doProofFunctionTest(File, String, String, String, boolean, IProofTester)}
     * and {@link #doProofMethodTest(File, String, String, String, boolean, IProofTester)}.
@@ -168,7 +155,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
     * @return The created {@link IProofTester}.
     */
    protected IProofTester createReferenceMethodTester(final IProofReferencesAnalyst analyst,
-                                                      final IFilter<IProofReference<?>> currentReferenceFilter, 
+                                                      final IFilter<IProofReference<?>> currentReferenceFilter,
                                                       final ExpectedProofReferences... expectedReferences) {
       return new IProofTester() {
          @Override
@@ -194,7 +181,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
          }
       };
    }
-   
+
    /**
     * Extracts all {@link IProofReference}s of the given once which are extracted from the given {@link Node}.
     * @param references The {@link IProofReference}s to search in.
@@ -261,7 +248,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
          i++;
       }
    }
-   
+
    /**
     * Defines the values of an expected proof reference.
     * @author Martin Hentschel
@@ -271,7 +258,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
        * The expected kind.
        */
       private String kind;
-      
+
       /**
        * The expected target.
        */
@@ -303,7 +290,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
          return target;
       }
    }
-   
+
    /**
     * Does some test steps with a {@link Proof}.
     * @param baseDir The base directory which contains test and oracle file.
@@ -314,9 +301,9 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
     * @param tester The {@link IProofTester} which executes the test steps.
     * @throws Exception Occurred Exception.
     */
-   protected void doProofFunctionTest(String baseDir, 
-                                      String javaPathInBaseDir, 
-                                      String containerTypeName, 
+   protected void doProofFunctionTest(File baseDir,
+                                      String javaPathInBaseDir,
+                                      String containerTypeName,
                                       final String targetName,
                                       boolean useContracts,
                                       IProofTester tester) throws Exception {
@@ -370,7 +357,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
          }
       }
    }
-   
+
    /**
     * Does some test steps with a {@link Proof}.
     * @param baseDir The base directory which contains test and oracle file.
@@ -381,9 +368,9 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
     * @param tester The {@link IProofTester} which executes the test steps.
     * @throws Exception Occurred Exception.
     */
-   protected void doProofMethodTest(String baseDir, 
-                                    String javaPathInBaseDir, 
-                                    String containerTypeName, 
+   protected void doProofMethodTest(File baseDir,
+                                    String javaPathInBaseDir,
+                                    String containerTypeName,
                                     String methodFullName,
                                     boolean useContracts,
                                     IProofTester tester) throws Exception {
@@ -427,7 +414,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
          }
       }
    }
-   
+
    /**
     * Does some test steps with a {@link Proof}.
     * @param environment The {@link KeYEnvironment} which provides the {@link Proof}.
@@ -453,9 +440,9 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
       // Do test
       tester.doTest(environment, proof);
    }
-   
+
    /**
-    * Executes some proof steps with on given {@link Proof}. 
+    * Executes some proof steps with on given {@link Proof}.
     * @author Martin Hentschel
     */
    protected static interface IProofTester {

@@ -1,28 +1,14 @@
 package de.uka.ilkd.key.suite.util;
 
+import org.junit.Assert;
+import org.key_project.util.helper.FindResources;
+
 import java.io.File;
 
-import org.key_project.util.java.IOUtil;
-
 public class HelperClassForTestgenTests {
-   public static final String TESTCASE_DIRECTORY;
-   
-   static {
-      File projectRoot = IOUtil.getProjectRoot(HelperClassForTestgenTests.class);
-      // Update path in Eclipse Plug-ins executed as JUnit Test.
-      if ("org.key_project.core.testgen.test".equals(projectRoot.getName())) {
-         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile().getParentFile();
-         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.testgen.test");
-      }
-      // Update path in Eclipse Plug-ins executed as JUnit Plug-in Test.
-      else if ("tests".equals(projectRoot.getName())) {
-         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile();
-         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.testgen.test");
-      }
-      if(System.getProperty("testcases") != null) {
-         TESTCASE_DIRECTORY = new File(System.getProperty("testcases")).getAbsolutePath();
-      }else{
-         TESTCASE_DIRECTORY = projectRoot + File.separator + "resources"+  File.separator + "testcase";
-      }
-   }
+    public static final File TESTCASE_DIRECTORY = FindResources.getTestCasesDirectory();
+
+    static {
+        Assert.assertNotNull("Could not find test case directory", TESTCASE_DIRECTORY);
+    }
 }

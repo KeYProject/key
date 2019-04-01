@@ -2,7 +2,6 @@ package de.uka.ilkd.key.proof.proverules;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.key_project.util.java.IOUtil.findFolder;
 
 import java.io.File;
 import java.util.*;
@@ -51,14 +50,9 @@ public class ProveRulesTest {
 
 
    static {
-       PROOF_DIRECTORY  = findFolder("TACLET_PROOFS",true,
-               "./tacletProofs",
-               "key.core/tacletProofs",
-               "../key.core/tacletProofs",
-               "../tacletProofs");
-
+       PROOF_DIRECTORY = FindResources.getTacletProofsDirectory();
        assertTrue("Directory containing taclet proofs cannot be found at location: "
-               + PROOF_DIRECTORY , PROOF_DIRECTORY  != null && PROOF_DIRECTORY .exists());
+               + PROOF_DIRECTORY, PROOF_DIRECTORY.exists());
    }
 
    private final String tacletName;

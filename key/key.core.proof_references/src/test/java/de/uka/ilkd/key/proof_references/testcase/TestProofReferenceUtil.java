@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof_references.testcase;
 
+import java.io.File;
 import java.util.LinkedHashSet;
 
 import org.key_project.util.collection.ImmutableList;
@@ -117,9 +118,9 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     * @param expectedReferences The expected proof references.
     * @throws Exception Occurred Exception.
     */
-   protected void doAPITest(String baseDir, 
-                            String javaPathInBaseDir, 
-                            String containerTypeName, 
+   protected void doAPITest(File baseDir,
+                            String javaPathInBaseDir,
+                            String containerTypeName,
                             String methodFullName,
                             boolean useContracts,
                             final ImmutableList<IProofReferencesAnalyst> analysts,
