@@ -3,7 +3,10 @@ pipeline {
   stages {
     stage('Compile') {
       steps {
-        sh '''cd key; ./gradlew classes'''
+        sh '''cd key
+pwd
+ls -l'''
+        sh 'cd key; ./gradlew classes'
       }
     }
   }
