@@ -48,9 +48,11 @@ subprojects {
     apply plugin: "eclipse"
     apply plugin: "com.jfrog.bintray"
 
+    /*
     apply plugin: 'checkstyle'
     apply plugin: 'pmd'
     apply plugin: 'findbugs'
+    */
 
     group = rootProject.group
     version = rootProject.version
@@ -78,7 +80,7 @@ subprojects {
     }
 
 
-    findbugs { findbugsTest.enabled = false; ignoreFailures = true }
+    /*findbugs { findbugsTest.enabled = false; ignoreFailures = true }
     pmd { pmdTest.enabled = false; ignoreFailures = true }
     tasks.withType(Checkstyle) {
         configFile file("$rootDir/scripts/tools/checkstyle/key_checks.xml")
@@ -94,7 +96,7 @@ subprojects {
             xml.enabled = true
             html.enabled = true
         }
-    }
+    }*/
 
     repositories {
         mavenCentral()
