@@ -327,6 +327,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                                                 sb.append(string.charAt(i));
                                                 i++;
                                         }
+                                        sb.append("\n");
                                         break;
                                 case '(':
                                         open++;
