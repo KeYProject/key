@@ -47,8 +47,6 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         private AbstractSolverSocket socket;
 
         private ModelExtractor query;
-        private String prettyProblemString;
-
 
         public ModelExtractor getQuery() {
 			return query;
@@ -324,6 +322,12 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 for (int i = 0; i < string.length(); i++) {
                         char c = string.charAt(i);
                         switch (c) {
+                                case ';':
+                                        while (i < string.length() && string.charAt(i) != '\n') {
+                                                sb.append(string.charAt(i));
+                                                i++;
+                                        }
+                                        break;
                                 case '(':
                                         open++;
                                         if (open > 0 && open % 3 == 0) {
@@ -383,8 +387,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         	else{
         		SMTTranslator trans = getType().createTranslator(services);
             	//instantiateTaclets(trans);
-            	problemString = trans.translateProblem(term, services, smtSettings).toString();
-            	prettyProblemString = indent(problemString);
+            	problemString = indent(trans.translateProblem(term, services, smtSettings).toString());
             	exceptionsForTacletTranslation.addAll(trans.getExceptionsOfTacletTranslation());
         	}
 
@@ -426,11 +429,6 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         @Override
         public String getTranslation() {
                 return isRunning() ? null : problemString;
-        }
-
-        @Override
-        public String getPrettyTranslation() {
-                return isRunning() ? null : prettyProblemString;
         }
 
         @Override
