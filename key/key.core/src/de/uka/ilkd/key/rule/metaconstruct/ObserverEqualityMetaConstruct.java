@@ -45,7 +45,7 @@ import java.util.Collections;
  * The first argument is the one with the larger heap, i.e., after
  * modification and with potentially more created objects.
  * <p>
- * The construct implements the condition (9.10) in §9.4.4 in the new KeY book.
+ * The construct implements the condition (9.10) in Sect. 9.4.4 in the new KeY book.
  * <p>
  * It is probably less efficient than {@link UseDependencyContractRule}, however
  * it is more generally applicable. It mitigates the problem, that in
