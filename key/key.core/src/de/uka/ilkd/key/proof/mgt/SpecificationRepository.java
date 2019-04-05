@@ -1131,12 +1131,10 @@ public final class SpecificationRepository {
             // add invariant axiom for own class and other final classes
             for (KeYJavaType kjt : services.getJavaInfo()
                     .getAllKeYJavaTypes()) {
-                if (kjt != selfKjt && !ji.isFinal(kjt))
-                 {
+                if (kjt != selfKjt && !ji.isFinal(kjt)) {
                     continue; // only final classes
                 }
-                if (kjt != selfKjt && JavaInfo.isPrivate(kjt))
-                 {
+                if (kjt != selfKjt && JavaInfo.isPrivate(kjt)) {
                     continue; // only non-private classes
                 }
                 final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(
@@ -1558,6 +1556,12 @@ public final class SpecificationRepository {
         }
     }
 
+    /**
+     * Returns all block contracts for the specified block.
+     *
+     * @param block a block.
+     * @return all block contracts for the specified block.
+     */
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
@@ -1569,6 +1573,12 @@ public final class SpecificationRepository {
         }
     }
 
+    /**
+     * Returns all loop contracts for the specified block.
+     *
+     * @param block a block.
+     * @return all loop contracts for the specified block.
+     */
     public ImmutableSet<LoopContract> getLoopContracts(StatementBlock block) {
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
@@ -1580,6 +1590,12 @@ public final class SpecificationRepository {
         }
     }
 
+    /**
+     * Returns all loop contracts for the specified loop.
+     *
+     * @param loop a loop.
+     * @return all loop contracts for the specified loop.
+     */
     public ImmutableSet<LoopContract> getLoopContracts(LoopStatement loop) {
         final Pair<LoopStatement, Integer> b = new Pair<LoopStatement, Integer>(
                 loop, loop.getStartPosition().getLine());

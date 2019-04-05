@@ -301,7 +301,8 @@ public class EnhancedForElimination extends ProgramTransformer {
         // there may be only one variable iterated over (see Language Specification Sect. 14.14.2)
         final LocalVariableDeclaration lvd = enhancedFor.getVariableDeclaration();
         final IProgramVariable programVariable = lvd.getVariables().get(0).getProgramVariable();
-        assert programVariable instanceof ProgramVariable : "Since this is a concrete program, the spec must not be schematic";
+        assert programVariable instanceof ProgramVariable :
+            "Since this is a concrete program, the spec must not be schematic";
         final ProgramVariable lvdVar = (ProgramVariable) programVariable;
         final Statement declArrayElemVar = KeYJavaASTFactory.declare(lvdVar);
 
@@ -396,7 +397,8 @@ public class EnhancedForElimination extends ProgramTransformer {
     private Statement makeValuesUpdate(ProgramVariable valuesVar, LocalVariableDeclaration lvd) {
         final VariableSpecification var = lvd.getVariables().get(0);
         final IProgramVariable element = var.getProgramVariable();
-        assert element instanceof ProgramVariable : "Since this is a concrete program, the spec must not be schematic";
+        assert element instanceof ProgramVariable :
+            "Since this is a concrete program, the spec must not be schematic";
         final Expression seqSingleton = new SeqSingleton((ProgramVariable) element);
         final Expression seqConcat = new SeqConcat(valuesVar, seqSingleton);
         final Statement assignment = new CopyAssignment(valuesVar, seqConcat);
