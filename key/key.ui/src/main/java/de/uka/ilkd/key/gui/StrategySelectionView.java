@@ -17,8 +17,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.fonticons.KeYIcons;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -67,8 +66,6 @@ import java.util.Map.Entry;
  * @author Martin Hentschel
  */
 public final class StrategySelectionView extends JPanel implements KeYPaneExtension {
-    public static final Icon PROOF_SEARCH_STRATEGY_ICON =
-            IconFontSwing.buildIcon(FontAwesomeBold.COGS, MainWindowTabbedPane.TAB_ICON_SIZE);
     /**
      * Generated UID.
      */
@@ -664,7 +661,7 @@ public final class StrategySelectionView extends JPanel implements KeYPaneExtens
 
     @Override
     public Icon getIcon() {
-        return PROOF_SEARCH_STRATEGY_ICON;
+        return KeYIcons.PROOF_SEARCH_STRATEGY_ICON.getIcon();
     }
 
     /**

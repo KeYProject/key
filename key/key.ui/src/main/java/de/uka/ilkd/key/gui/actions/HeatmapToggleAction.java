@@ -4,8 +4,8 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ext.KeYExtConst;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.fonticons.KeYIcons;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
@@ -16,8 +16,8 @@ import java.awt.event.ActionEvent;
 
 public class HeatmapToggleAction extends MainWindowAction {
 
-    public static final Icon ICON_SELECTED = IconFontSwing.buildIcon(FontAwesomeBold.FIRE_EXTINGUISHER, MainWindow.TOOLBAR_ICON_SIZE);
-    public static final Icon ICON_NOT_SELECTED = IconFontSwing.buildIcon(FontAwesomeBold.FIRE, MainWindow.TOOLBAR_ICON_SIZE);
+    public static final Icon ICON_SELECTED = KeYIcons.HEATMAP_DEACTIVATE.getIcon();
+    public static final Icon ICON_NOT_SELECTED = KeYIcons.HEATMAP_ACTIVATE.getIcon();
 
     public HeatmapToggleAction(MainWindow mainWindow) {
         super(mainWindow);
