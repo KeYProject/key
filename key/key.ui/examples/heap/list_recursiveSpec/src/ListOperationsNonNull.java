@@ -28,7 +28,7 @@ public void remove (ListNN o, int i){ //Here "o" denotes the beginning of the li
 /*@ public normal_behavior
  requires  (\forall ListNN u; u.next!=null);
  assignable \strictly_nothing;
- accessible \infinite_union(ListNN n; n.next); //over approximation
+ accessible (\infinite_union ListNN n; n.next); //over approximation
  ensures \result == (\forall int i;0<=i; 
             (\forall int j;0<=j ;((getNextContractNN(o,i)==getNextContractNN(o,j) ==> i==j ))));
 @*/
@@ -52,7 +52,7 @@ public void lem_gNNNexpand2(ListNN l, int k){ } //Use the contract of this metho
 /*@ public normal_behavior
  requires  n>=0 &&  (\forall ListNN l; l.next!=null);
  assignable getNextContractNN(o,n).value;
- accessible \infinite_union(ListNN n; n.next);
+ accessible (\infinite_union ListNN n; n.next);
  ensures  getNextContractNN(o,n).value==val;
  diverges true;
 @*/
@@ -97,7 +97,7 @@ public void lem_gNNNexpand2(ListNN l, int k){ } //Use the contract of this metho
 /*@ public normal_behavior
  requires  n>=0 && o!=null; 
  assignable \strictly_nothing;
- accessible \infinite_union(ListNN l; l.next);
+ accessible (\infinite_union ListNN l; l.next);
  ensures  (n==0 ==> \result == o) &&
           (n>0  ==> \result == getNextContractNN(o,n-1).next);
  measured_by n;
