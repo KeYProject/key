@@ -39,6 +39,10 @@ public class SettingsManager {
         settingsProviders.sort(Comparator.comparingInt(SettingsProvider::getPriorityOfSettings));
         SettingsDialog dialog = new SettingsDialog(mainWindow);
         dialog.setSettingsProvider(settingsProviders);
+        dialog.setLocationByPlatform(true);
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        dialog.setIconImage(IconFactory.keyLogo());
+        dialog.pack();
         dialog.setVisible(true);
     }
 

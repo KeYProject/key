@@ -8,7 +8,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.gui.smt.FileChooserPanel;
-import de.uka.ilkd.key.gui.smt.TablePanel;
+import de.uka.ilkd.key.gui.settings.TablePanel;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
 

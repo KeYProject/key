@@ -21,7 +21,6 @@ import javax.swing.JLabel;
 
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 

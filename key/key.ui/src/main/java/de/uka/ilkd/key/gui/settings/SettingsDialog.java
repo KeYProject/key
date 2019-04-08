@@ -2,8 +2,11 @@ package de.uka.ilkd.key.gui.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.smt.OptionContentNode;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;

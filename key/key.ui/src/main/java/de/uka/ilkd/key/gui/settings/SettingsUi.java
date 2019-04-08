@@ -1,12 +1,10 @@
 package de.uka.ilkd.key.gui.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.smt.OptionContentNode;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
+import javax.swing.tree.*;
 import java.awt.*;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -60,7 +58,7 @@ public class SettingsUi extends JPanel {
     }
 
     private JPanel createWestPanel() {
-        JPanel p = new JPanel(new BorderLayout());
+        JPanel p = new JPanel(new BorderLayout(5,5));
         Box boxNorth = new Box(BoxLayout.X_AXIS);
         JLabel lblSearch;
         boxNorth.add(lblSearch = new JLabel("Search"));

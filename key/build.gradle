@@ -368,6 +368,8 @@ project(":key.ui") {
         compile(project(":key.core.testgen"))
         compile(project(":key.removegenerics"))
 
+        compile 'com.miglayout:miglayout-swing:5.2'
+
         runtimeOnly project(":keyext.interactionlog")
         //runtimeOnly project(":keyext.script.ui")
     }
