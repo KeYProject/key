@@ -58,9 +58,9 @@ public class ToggleOriginLabelsAction extends MainWindowAction {
 
     private void handleAction() {
         Proof proof = mainWindow.getMediator().getSelectedProof();
-        Services services = proof.getServices();
 
         if (proof != null) {
+            Services services = proof.getServices();
             TermLabelSettings settings = proof.getSettings().getTermLabelSettings();
             settings.setUseOriginLabels(!settings.getUseOriginLabels());
 

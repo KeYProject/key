@@ -93,36 +93,29 @@ public class OriginTermLabelsExt
 
     @Override
     public List<String> getTermInfoStrings(MainWindow mainWindow, PosInSequent pos) {
-        if (pos.isSequent()
-                || !mainWindow.getMediator().getSelectedProof().getSettings()
-                    .getTermLabelSettings().getUseOriginLabels()) {
-            return new LinkedList<>();
-        } else {
-            PosInOccurrence pio = pos.getPosInOccurrence();
-            Term term = pio.subTerm();
+        PosInOccurrence pio = pos.getPosInOccurrence();
+        Term term = pio.subTerm();
 
-            OriginTermLabel originLabel =
+        OriginTermLabel originLabel =
+                (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
+
+        List<String> result = new LinkedList<>();
+
+        // If the term has no origin label,
+        // iterate over its parent terms until we find one with an origin label,
+        // then show that term's origin.
+        while (originLabel == null && !pio.isTopLevel()) {
+            pio = pio.up();
+            term = pio.subTerm();
+
+            originLabel =
                     (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
-
-            List<String> result = new LinkedList<>();
-
-            // If the term has no origin label,
-            // iterate over its parent terms until we find one with an origin label,
-            // then show that term's origin.
-            while (originLabel == null && !pio.isTopLevel()) {
-                pio = pio.up();
-                term = pio.subTerm();
-
-                originLabel =
-                        (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
-            }
-
-            if (originLabel != null && originLabel.getOrigin().specType != SpecType.NONE) {
-                result.add("Origin: " + originLabel.getChild(0));
-            }
-
-            return result;
         }
 
+        if (originLabel != null && originLabel.getOrigin().specType != SpecType.NONE) {
+            result.add("Origin: " + originLabel.getChild(0));
+        }
+
+        return result;
     }
 }
