@@ -12,7 +12,11 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.ext.KeYExtConst;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -62,15 +66,29 @@ public class ToggleOriginLabelsAction extends MainWindowAction {
         if (proof != null) {
             Services services = proof.getServices();
             TermLabelSettings settings = proof.getSettings().getTermLabelSettings();
-            settings.setUseOriginLabels(!settings.getUseOriginLabels());
 
             if (!settings.getUseOriginLabels()) {
                 for (Proof p : services.getSpecificationRepository().getAllProofs()) {
                     for (Goal g : p.openGoals()) {
-                        for (int i = 1; i <= g.sequent().size(); ++i) {
-                            Term t = g.sequent().getFormulabyNr(i).formula();
-                            OriginTermLabel.removeOriginLabels(t, services);
+                        Sequent seq = g.sequent();
+                        SequentChangeInfo changes = null;
+
+                        for (int i = 1; i <= seq.size(); ++i) {
+                            SequentFormula oldFormula = seq.getFormulabyNr(i);
+                            SequentFormula newFormula = new SequentFormula(
+                                    OriginTermLabel.removeOriginLabels(oldFormula.formula(), services));
+                            SequentChangeInfo change = seq.changeFormula(
+                                    newFormula,
+                                    PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel()));
+
+                            if (changes == null) {
+                                changes = change;
+                            } else {
+                                changes.combine(change);
+                            }
                         }
+
+                        g.setSequent(changes);
                     }
                 }
 
@@ -85,13 +103,12 @@ public class ToggleOriginLabelsAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        handleAction();
-
         Proof proof = mainWindow.getMediator().getSelectedProof();
 
         if (proof != null) {
             TermLabelSettings settings = proof.getSettings().getTermLabelSettings();
             settings.setUseOriginLabels(!settings.getUseOriginLabels());
+            handleAction();
 
             if (settings.getUseOriginLabels()) {
                 JOptionPane.showMessageDialog(
