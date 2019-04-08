@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui.ext;
+package de.uka.ilkd.key.gui.extension.api;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.util.Collections;
 import java.util.List;
 
-public interface KeYToolbarExtensionAdapter extends KeYToolbarExtension {
+public interface KeYToolbarExtensionAdapter extends KeYGuiExtension.Toolbar {
     /**
      * @param mainWindow
      * @return

@@ -2,8 +2,7 @@ package org.key_project.ui.interactionlog;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.ext.KeYMainMenuExtension;
-import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.KeYIcons;
 
 import javax.swing.*;
@@ -14,9 +13,10 @@ import java.util.List;
  * @author Alexander Weigl
  * @version 1 (13.02.19)
  */
-public class InteractionLogExt implements KeYPaneExtension, KeYMainMenuExtension {
-    private static final Icon INTERACTION_LOG_ICON =
-            KeYIcons.INTERLOG_ICON.getIcon();
+@KeYGuiExtension.Info(name = "Interaction Logging", optional = true, priority = 10000)
+public class InteractionLogExt implements KeYGuiExtension,
+        KeYGuiExtension.LeftPanel, KeYGuiExtension.MainMenu {
+    private static final Icon INTERACTION_LOG_ICON = KeYIcons.INTERLOG_ICON.getIcon();
 
     private InteractionLogView interactionLogView = new InteractionLogView();
 

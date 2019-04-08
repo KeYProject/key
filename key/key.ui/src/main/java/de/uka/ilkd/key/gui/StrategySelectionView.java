@@ -16,7 +16,7 @@ package de.uka.ilkd.key.gui;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.KeYIcons;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -65,7 +65,8 @@ import java.util.Map.Entry;
  *
  * @author Martin Hentschel
  */
-public final class StrategySelectionView extends JPanel implements KeYPaneExtension {
+public final class StrategySelectionView extends JPanel
+        implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
     /**
      * Generated UID.
      */

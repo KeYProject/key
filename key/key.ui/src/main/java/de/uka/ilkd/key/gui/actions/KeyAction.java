@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.ext.KeYExtConst;
+import de.uka.ilkd.key.gui.extension.api.KeYExtConstants;
 
 import javax.swing.*;
 import java.awt.*;
@@ -76,20 +76,20 @@ public abstract class KeyAction extends AbstractAction {
     }
 
     protected String getMenuPath() {
-        return (String) getValue(KeYExtConst.PATH);
+        return (String) getValue(KeYExtConstants.PATH);
     }
 
     protected void setMenuPath(String path) {
-        putValue(KeYExtConst.PATH, path);
+        putValue(KeYExtConstants.PATH, path);
     }
 
     protected int getPriority() {
-        Integer i = (Integer) getValue(KeYExtConst.PRIORITY);
+        Integer i = (Integer) getValue(KeYExtConstants.PRIORITY);
         return i == null ? 0 : i;
     }
 
     protected void setPriority(int priority) {
-        putValue(KeYExtConst.PRIORITY, priority);
+        putValue(KeYExtConstants.PRIORITY, priority);
     }
 
 }

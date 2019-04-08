@@ -10,7 +10,6 @@ import java.awt.*;
  * @version 1 (15.03.19)
  */
 public class KeYIconManagement {
-
     private static final float SMALL_ICON_SIZE = 12f;
 
     static {

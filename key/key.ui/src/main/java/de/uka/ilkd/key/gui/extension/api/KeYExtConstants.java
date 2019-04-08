@@ -1,4 +1,6 @@
-package de.uka.ilkd.key.gui.ext;
+package de.uka.ilkd.key.gui.extension.api;
+
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 
 import javax.swing.*;
 import java.util.Iterator;
@@ -8,7 +10,7 @@ import java.util.Iterator;
  *
  * @author Alexander Weigl <weigl@kit.edu>
  */
-public interface KeYExtConst {
+public interface KeYExtConstants {
     /**
      * Additional key for {@link javax.swing.Action}s. Describes the priority,
      * and therefor an order to arrange these actions.
@@ -25,5 +27,4 @@ public interface KeYExtConst {
      * @see KeYGuiExtensionFacade#findMenu(JMenu, Iterator)
      */
     String PATH = "PATH";
-
 }

@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.gui.fonticons;
 
-import sun.java2d.loops.FontInfo;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;

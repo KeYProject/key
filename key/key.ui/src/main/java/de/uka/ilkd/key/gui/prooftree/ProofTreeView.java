@@ -22,8 +22,7 @@ import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
-import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.KeYIcons;
 import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
@@ -45,7 +44,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-public class ProofTreeView extends JPanel implements KeYPaneExtension {
+public class ProofTreeView extends JPanel implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
 
     public static final Color GRAY_COLOR = Color.DARK_GRAY;
     public static final Color BISQUE_COLOR = new Color(240, 228, 196);

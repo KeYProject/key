@@ -1,8 +1,10 @@
-package de.uka.ilkd.key.gui.ext;
+package de.uka.ilkd.key.gui.extension.impl;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.HeatmapSettingsAction;
 import de.uka.ilkd.key.gui.actions.HeatmapToggleAction;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -13,7 +15,11 @@ import java.util.List;
  *
  * @author Alexander Weigl
  */
-public class HeatmapExt implements KeYMainMenuExtension, KeYToolbarExtension {
+@KeYGuiExtension.Info(name = "Heatmap")
+public class HeatmapExt implements KeYGuiExtension,
+        KeYGuiExtension.MainMenu,
+        KeYGuiExtension.Toolbar,
+        KeYGuiExtension.Settings {
     private List<Action> actions = new ArrayList<>(2);
     private HeatmapToggleAction toggleAction;
     private HeatmapSettingsAction settingsAction;
@@ -32,11 +38,6 @@ public class HeatmapExt implements KeYMainMenuExtension, KeYToolbarExtension {
     }
 
     @Override
-    public int getPriority() {
-        return 0;
-    }
-
-    @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         getActions(mainWindow);//initialize
         JToolBar tb = new JToolBar("Heatmap");
@@ -45,5 +46,26 @@ public class HeatmapExt implements KeYMainMenuExtension, KeYToolbarExtension {
         tb.add(comp);
         tb.add(settingsAction);
         return tb;
+    }
+
+    @Override
+    public SettingsProvider getSettings() {
+        return new HeatmapSettingsProvider();
+    }
+}
+
+class HeatmapSettingsProvider implements SettingsProvider {
+    @Override
+    public String getDescription() {
+        return "Heatmap";
+    }
+
+    @Override
+    public JComponent getPanel(MainWindow window) {
+        return new JLabel("TODO");
+    }
+
+    @Override
+    public void applySettings(MainWindow window) {
     }
 }

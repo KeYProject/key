@@ -1,15 +1,14 @@
-package de.uka.ilkd.key.gui.interactionlog;
+package org.key_project.ui.interactionlog;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeRegular;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.fonticons.KeYIcons;
-import de.uka.ilkd.key.gui.interactionlog.algo.MUProofScriptExport;
-import de.uka.ilkd.key.gui.interactionlog.algo.MarkdownExport;
-import de.uka.ilkd.key.gui.interactionlog.algo.Reapplication;
-import de.uka.ilkd.key.gui.interactionlog.model.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import org.key_project.ui.interactionlog.algo.MUProofScriptExport;
@@ -320,7 +319,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             putValue(Action.NAME, "Load");
             putValue(Action.SHORT_DESCRIPTION, "Load Interaction Log");
             putValue(Action.SMALL_ICON,
-                    IconFontSwing.buildIcon(FontAwesomeBold.TRUCK_LOADING, SMALL_ICON_SIZE));
+                    IconFontSwing.buildIcon(FontAwesomeSolid.TRUCK_LOADING, SMALL_ICON_SIZE));
             // new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/database_add.png")));
             setPriority(0);
             setMenuPath(MENU_ILOG);
@@ -382,7 +381,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         AddUserNoteAction() {
             setName("Add Note");
             putValue(Action.SMALL_ICON,
-                    IconFontSwing.buildIcon(FontAwesome.STICKY_NOTE, SMALL_ICON_SIZE));
+                    IconFontSwing.buildIcon(FontAwesomeRegular.STICKY_NOTE, SMALL_ICON_SIZE));
             //new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/book_add.png")));
             setMenuPath(MENU_ILOG);
         }
@@ -412,7 +411,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_F);
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_MASK));
             putValue(Action.SMALL_ICON,
-                    IconFontSwing.buildIcon(FontAwesomeBold.HEART, SMALL_ICON_SIZE, Color.red));
+                    IconFontSwing.buildIcon(FontAwesomeSolid.HEART, SMALL_ICON_SIZE, Color.red));
             //    new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/heart.png")));
             setMenuPath(MENU_ILOG);
         }
@@ -512,7 +511,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         public ExportMarkdownAction() {
             setName("Export as markdown …");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into a markdown file.");
-            putValue(Action.SMALL_ICON, IconFontSwing.buildIcon(FontAwesomeBold.MARKDOWN, SMALL_ICON_SIZE));
+            putValue(Action.SMALL_ICON, IconFontSwing.buildIcon(FontAwesomeSolid.MARKDOWN, SMALL_ICON_SIZE));
             setMenuPath(MENU_ILOG_EXPORT);
         }
 

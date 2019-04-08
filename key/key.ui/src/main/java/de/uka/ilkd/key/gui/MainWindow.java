@@ -20,14 +20,15 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
-import de.uka.ilkd.key.gui.ext.KeYMainMenuExtension;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.nodeviews.*;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
@@ -633,7 +634,7 @@ public final class MainWindow extends JFrame {
     }
 
     private void createExtensionMenu(JMenuBar menuBar) {
-        List<KeYMainMenuExtension> menus = KeYGuiExtensionFacade.getMainMenuExtensions();
+        List<KeYGuiExtension.MainMenu> menus = KeYGuiExtensionFacade.getMainMenuExtensions();
         if (!menus.isEmpty()) {
             JMenu menu = KeYGuiExtensionFacade.createExtensionMenu(this);
             menuBar.add(menu);
@@ -653,7 +654,6 @@ public final class MainWindow extends JFrame {
         fileMenu.add(quickLoadAction);
         fileMenu.addSeparator();
         fileMenu.add(proofManagementAction);
-
 
         fileMenu.add(loadUserDefinedTacletsAction);
         JMenu submenu = new JMenu("Prove");
@@ -763,6 +763,8 @@ public final class MainWindow extends JFrame {
     private JMenu createOptionsMenu() {
         JMenu options = new JMenu("Options");
         options.setMnemonic(KeyEvent.VK_O);
+
+        options.add(SettingsManager.getInstance().getActionShowSettings(this));
 
         options.add(new TacletOptionsAction(this));
         options.add(new SMTOptionsAction(this));
