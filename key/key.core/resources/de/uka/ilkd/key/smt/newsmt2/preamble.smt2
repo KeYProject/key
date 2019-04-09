@@ -4,6 +4,8 @@
 
 (set-option :produce-models true)
 
+(set-logic ALL)
+
 (declare-sort T 0)
 (declare-sort U 0)
 (declare-const sort_any T)
@@ -17,8 +19,8 @@
 (declare-fun typeof (U) T)
 
 (declare-fun cast (U T) U)
-(assert (forall ((x U) (t T)) (! (subtype (typeof (cast x t)) t) :pattern (cast x t)))) 				
-(assert (forall ((x U) (t T)) (! (=> (subtype (typeof x) t) (= (cast x t) x)) :pattern (cast x t))))
+(assert (forall ((x U) (t T)) (! (subtype (typeof (cast x t)) t) :pattern ((cast x t)))))
+(assert (forall ((x U) (t T)) (! (=> (subtype (typeof x) t) (= (cast x t) x)) :pattern ((cast x t)))))
 
 (declare-const null U)
 (declare-const sort_Null T)
