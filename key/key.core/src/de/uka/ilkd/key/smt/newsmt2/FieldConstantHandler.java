@@ -50,7 +50,7 @@ public class FieldConstantHandler implements SMTHandler {
 
         if (!trans.isKnownSymbol(smtName)) {
             Map<String, Object> state = trans.getTranslationState();
-            Integer curVal = (Integer) state.getOrDefault(CONSTANT_COUNTER_PROPERTY, -2);
+            Integer curVal = (Integer) state.getOrDefault(CONSTANT_COUNTER_PROPERTY, 2);
 
             trans.addFromSnippets("fieldIdentifier");
 
@@ -59,9 +59,9 @@ public class FieldConstantHandler implements SMTHandler {
             trans.addAxiom(new SExpr("assert",
                     new SExpr("=",
                             new SExpr("fieldIdentifier", smtName),
-                            new SExpr(curVal.toString()))));
+                            new SExpr("-", Type.INT, curVal.toString()))));
 
-            state.put(CONSTANT_COUNTER_PROPERTY, curVal - 1);
+            state.put(CONSTANT_COUNTER_PROPERTY, curVal + 1);
             trans.addKnownSymbol(smtName);
         }
         return new SExpr(smtName, Type.UNIVERSE);
