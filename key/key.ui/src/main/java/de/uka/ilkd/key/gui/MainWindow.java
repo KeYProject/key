@@ -22,6 +22,7 @@ import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.fonticons.KeYIconManagement;
 import de.uka.ilkd.key.gui.nodeviews.*;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
@@ -218,6 +219,7 @@ public final class MainWindow extends JFrame {
      * This class should only be instantiated once!
      */
     private MainWindow() {
+        KeYIconManagement.enableFontIcons();
         setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
         applyGnomeWorkaround();
         setLaF();

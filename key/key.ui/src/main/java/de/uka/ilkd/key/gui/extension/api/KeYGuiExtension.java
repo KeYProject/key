@@ -31,6 +31,8 @@ public interface KeYGuiExtension {
 
         boolean disabled() default false;
 
+        String description() default "";
+
         int priority() default 0;
     }
 

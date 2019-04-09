@@ -1,10 +1,13 @@
 package de.uka.ilkd.key.gui.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.smt.OptionContentNode;
+import de.uka.ilkd.key.gui.fonticons.KeYIcons;
 
 import javax.swing.*;
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -17,10 +20,15 @@ import java.util.stream.Collectors;
  * @version 1 (08.04.19)
  */
 public class SettingsUi extends JPanel {
+    private static final Icon ICON_TREE_NODE_RETRACTED = KeYIcons.TREE_NODE_EXPANDED.getIcon();
+    private static final Icon ICON_TREE_NODE_EXPANDED = KeYIcons.TREE_NODE_RETRACTED.getIcon();
+
+
+    private final JSplitPane root;
     private DefaultTreeModel treeModel = new DefaultTreeModel(null, false);
     private JTree treeSettingsPanels = new JTree(treeModel);
     private JTextField txtSearch = new JTextField();
-
+    private JScrollPane center;
 
     public SettingsUi(MainWindow mainWindow) {
         treeSettingsPanels.setCellRenderer(new DefaultTreeCellRenderer() {
@@ -34,44 +42,65 @@ public class SettingsUi extends JPanel {
                     JLabel lbl = (JLabel) super.getTreeCellRendererComponent(tree, panel.getDescription(), sel, expanded, leaf, row, hasFocus);
                     lbl.setIcon(panel.getIcon());
                     lbl.setFont(lbl.getFont().deriveFont(16f));
+
+                    if (!node.isLeaf()) {
+                        lbl.setIcon(expanded ? ICON_TREE_NODE_EXPANDED : ICON_TREE_NODE_RETRACTED);
+                    }
+                    lbl.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
                     return lbl;
                 }
             }
         });
 
-        JSplitPane root = new JSplitPane();
-
+        root = new JSplitPane();
+        root.setRightComponent(center = new JScrollPane());
         treeSettingsPanels.addTreeSelectionListener(e -> {
             SettingsTreeNode n = (SettingsTreeNode) e.getPath().getLastPathComponent();
             if (n.provider != null && n.provider.getPanel(mainWindow) != null) {
-                root.setRightComponent(n.provider.getPanel(mainWindow));
+                center.setViewportView(n.provider.getPanel(mainWindow));
             }
-
         });
 
         treeSettingsPanels.setRootVisible(false);
         setLayout(new BorderLayout(5, 5));
-        JScrollPane spCenter = new JScrollPane();
         root.setLeftComponent(createWestPanel());
-        root.setRightComponent(spCenter);
+        root.setDividerLocation(0.3d);
         add(root, BorderLayout.CENTER);
     }
 
     private JPanel createWestPanel() {
-        JPanel p = new JPanel(new BorderLayout(5,5));
+        JPanel p = new JPanel(new BorderLayout(5, 5));
         Box boxNorth = new Box(BoxLayout.X_AXIS);
         JLabel lblSearch;
-        boxNorth.add(lblSearch = new JLabel("Search"));
+        boxNorth.add(lblSearch = new JLabel("Search: "));
         boxNorth.add(txtSearch);
         lblSearch.setLabelFor(txtSearch);
         p.add(boxNorth, BorderLayout.NORTH);
         p.add(new JScrollPane(treeSettingsPanels));
+        p.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         return p;
     }
 
     public void setSettingsProvider(List<SettingsProvider> providers) {
-        treeModel = new DefaultTreeModel(new SettingsTreeNode(providers));
+        SettingsTreeNode root = new SettingsTreeNode(providers);
+        treeModel = new DefaultTreeModel(root);
         treeSettingsPanels.setModel(treeModel);
+        LinkedList<TreePath> list = new LinkedList<>();
+        getPaths(new TreePath(treeModel.getPathToRoot(root)), list);
+        list.forEach(it -> treeSettingsPanels.expandPath(it));
+    }
+
+    public void getPaths(TreePath parent, List<TreePath> list) {
+        list.add(parent);
+
+        TreeNode node = (TreeNode) parent.getLastPathComponent();
+        if (node.getChildCount() >= 0) {
+            for (Enumeration e = node.children(); e.hasMoreElements(); ) {
+                TreeNode n = (TreeNode) e.nextElement();
+                TreePath path = parent.pathByAddingChild(n);
+                getPaths(path, list);
+            }
+        }
     }
 
     public void selectPanel(SettingsProvider provider) {

@@ -50,15 +50,15 @@ class SolverOptions extends TablePanel implements SettingsProvider {
     private JButton toDefaultButton;
 
     public SolverOptions(SolverType solverType) {
+        this.setName(solverType.getName());
+        this.solverType = solverType;
+
         solverName = createSolverName();
         solverInstalled = createSolverInstalled();
         solverCommand = createSolverInstalled();
         solverParameters = createSolverParameters();
         solverSupported = createSolverSupported();
         toDefaultButton = createButtons();
-
-        this.setName(solverType.getName());
-        this.solverType = solverType;
     }
 
     protected void setSmtSettings() {

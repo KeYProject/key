@@ -7,7 +7,6 @@ import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 
 /**
  * @author Alexander Weigl
@@ -111,9 +110,8 @@ class TranslationOptions extends TablePanel implements SettingsProvider {
 
     public JCheckBox createNullInstantiation() {
         return addCheckBox("Instantiate hierarchy assumptions if possible (recommended).",
-                infoUseNullInstantiation,
-                settings.useNullInstantiation,
-                (ActionListener) e -> settings.useNullInstantiation = useNullInstantiation.isSelected());
+                infoUseNullInstantiation, false,
+                e -> settings.useNullInstantiation = useNullInstantiation.isSelected());
     }
 
     public JCheckBox createBuiltInUniqueness() {
@@ -125,12 +123,12 @@ class TranslationOptions extends TablePanel implements SettingsProvider {
     public JCheckBox createUIMultiplication() {
         return addCheckBox("Use uninterpreted multiplication if necessary.",
                 infoUseUIMultiplication,
-                settings.useUIMultiplication,
-                (ActionListener) e -> settings.useUIMultiplication = useUIMultiplication.isSelected());
+                false,
+                e -> settings.useUIMultiplication = useUIMultiplication.isSelected());
     }
 
     public JTextField createMaxField() {
-        return createTextField(Long.toString(settings.maxInteger), e -> {
+        return addTextField("Maximum", "", "", e -> {
             long result = settings.maxInteger;
             try {
                 result = Long.parseLong(maxField.getText());

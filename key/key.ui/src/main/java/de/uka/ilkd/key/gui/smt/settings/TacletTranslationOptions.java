@@ -15,15 +15,15 @@ package de.uka.ilkd.key.gui.smt.settings;
 
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.gui.smt.FileChooserPanel;
 import de.uka.ilkd.key.gui.settings.TablePanel;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 
 import javax.swing.*;
 
-
-class TacletTranslationOptions extends TablePanel implements SettingsProvider {
+public class TacletTranslationOptions extends TablePanel implements SettingsProvider {
     private static final long serialVersionUID = 1L;
     private static final String infoFileChooserPanel = "Activate this option to store the translations of taclets"
             + " that are handed over to the externals solvers:\n"
@@ -46,9 +46,10 @@ class TacletTranslationOptions extends TablePanel implements SettingsProvider {
                     + " use a certain amount of different generic sorts (see: taclet selection).\n\n"
                     + "Rule of thumb: Most of the taclets can be translated by using 2-3 different"
                     + " generic sorts.";
-    private final FileChooserPanel fileChooserPanel;
+    private final JTextField fileChooserPanel;
     private final JTextField maxNumberOfGenerics;
-    private SMTSettings settings;
+    private ProofDependentSMTSettings pdSettings;
+    private ProofIndependentSMTSettings piSettings;
 
 
     public TacletTranslationOptions() {
@@ -63,18 +64,17 @@ class TacletTranslationOptions extends TablePanel implements SettingsProvider {
                     try {
                         value = Integer.parseInt(maxNumberOfGenerics.getText());
                     } catch (NumberFormatException ex) {
-                        value = settings.getPdSettings().maxGenericSorts;
+                        value = pdSettings.maxGenericSorts;
                     }
-                    settings.getPdSettings().maxGenericSorts = value;
+                    pdSettings.maxGenericSorts = value;
                 });
     }
 
-    public FileChooserPanel createFileChooserPanel() {
+    public JTextField createFileChooserPanel() {
         return addFileChooserPanel("Store taclet translation to file:",
-                "", infoFileChooserPanel, true,
-                settings.storeTacletTranslationToFile(), e -> {
-                    settings.getPiSettings().pathForTacletTranslation = fileChooserPanel.getPath();
-                    settings.getPiSettings().storeTacletTranslationToFile = fileChooserPanel.isSelected();
+                "", infoFileChooserPanel, true, e -> {
+                    piSettings.pathForTacletTranslation = fileChooserPanel.getText();
+                    //TODO piSettings.storeTacletTranslationToFile = fileChooserPanel.isSelected();
                 });
     }
 
@@ -85,9 +85,11 @@ class TacletTranslationOptions extends TablePanel implements SettingsProvider {
 
     @Override
     public JComponent getPanel(MainWindow window) {
-        //TODO Settings
-        maxNumberOfGenerics.setText(Integer.toString(settings.getMaxNumberOfGenerics()));
-        fileChooserPanel.getFolderField().setText(settings.getPathForTacletTranslation());
+        pdSettings = SettingsManager.getSmtPdSettings(window);
+        piSettings = SettingsManager.getSmtPiSettings();
+        maxNumberOfGenerics.setText(Integer.toString(pdSettings.maxGenericSorts));
+        fileChooserPanel.setText(piSettings.pathForTacletTranslation);
+        fileChooserPanel.setEnabled(piSettings.storeTacletTranslationToFile);
         return this;
     }
 

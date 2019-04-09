@@ -2,14 +2,13 @@ package de.uka.ilkd.key.gui.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.smt.OptionContentNode;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -58,6 +57,29 @@ public class SettingsDialog extends JDialog {
         return ui;
     }
 
+    private List<Exception> apply() {
+        List<Exception> exc = new LinkedList<>();
+        for (SettingsProvider it : providers) {
+            try {
+                it.applySettings(mainWindow);
+            } catch (Exception e) {
+                exc.add(e);
+            }
+        }
+        return exc;
+    }
+
+    private boolean showErrors(List<Exception> apply) {
+        if (!apply.isEmpty()) {
+            String msg = apply.stream().map(Throwable::getMessage)
+                    .collect(Collectors.joining("<br>", "<html>", "</html>"));
+            JOptionPane.showMessageDialog(this, msg,
+                    "Error in Settings",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+        return apply.isEmpty();
+    }
+
     private class CancelAction extends KeyAction {
         public CancelAction() {
             setName("Cancel");
@@ -76,8 +98,7 @@ public class SettingsDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            actionApply.actionPerformed(e);
-            setVisible(false);
+            setVisible(!showErrors(apply()));
         }
     }
 
@@ -88,7 +109,7 @@ public class SettingsDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            providers.forEach(it -> it.applySettings(mainWindow));
+            showErrors(apply());
         }
     }
 }

@@ -64,6 +64,18 @@ public class KeYIconManagement {
                 IconFontSwing.buildIcon(FontAwesomeSolid.FIRE_EXTINGUISHER, MainWindow.TOOLBAR_ICON_SIZE));
         KeYIcons.HEATMAP_DEACTIVATE.setIcon(
                 IconFontSwing.buildIcon(FontAwesomeSolid.FIRE, MainWindow.TOOLBAR_ICON_SIZE));
+
+        KeYIcons.TREE_NODE_EXPANDED.setIcon(
+                IconFontSwing.buildIcon(FontAwesomeSolid.CARET_DOWN, 16));
+        KeYIcons.TREE_NODE_RETRACTED.setIcon(
+                IconFontSwing.buildIcon(FontAwesomeSolid.CARET_RIGHT, 16));
+
+
+        KeYIcons.WARNING_INCOMPLETE.setIcon(
+                IconFontSwing.buildIcon(FontAwesomeSolid.EXCLAMATION_TRIANGLE, 16, Color.ORANGE));
+        KeYIcons.WARNING_UNSOUND.setIcon(
+                IconFontSwing.buildIcon(FontAwesomeSolid.EXCLAMATION_TRIANGLE, 16, Color.RED));
+
     }
 }
 

@@ -37,7 +37,7 @@ public interface SettingsProvider {
     /**
      *
      */
-    void applySettings(MainWindow window);
+    void applySettings(MainWindow window) throws Exception;
 
     /**
      *

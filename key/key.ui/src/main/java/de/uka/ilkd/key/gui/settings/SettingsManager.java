@@ -5,6 +5,10 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.ExtensionManager;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider;
+import de.uka.ilkd.key.gui.testgen.TestGenOptionsPanel;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.*;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -17,6 +21,11 @@ import java.util.List;
  * @version 1 (08.04.19)
  */
 public class SettingsManager {
+    public static final TestGenOptionsPanel TEST_GEN_OPTIONS_PANEL = new TestGenOptionsPanel();
+    public static final ExtensionManager EXTENSION_MANAGER = new ExtensionManager();
+    public static final SettingsProvider SMT_SETTINGS = new SMTSettingsProvider();
+    public static final TacletOptionsSettings TACLET_OPTIONS_SETTINGS = new TacletOptionsSettings();
+
     private static SettingsManager INSTANCE;
     private List<SettingsProvider> settingsProviders = new LinkedList<>();
 
@@ -30,19 +39,49 @@ public class SettingsManager {
     public static SettingsManager getInstance() {
         if (INSTANCE == null) {
             INSTANCE = createWithExtensions();
-            INSTANCE.add(new ExtensionManager());
+            INSTANCE.add(SMT_SETTINGS);
+            INSTANCE.add(EXTENSION_MANAGER);
+            INSTANCE.add(TEST_GEN_OPTIONS_PANEL);
+            INSTANCE.add(TACLET_OPTIONS_SETTINGS);
         }
         return INSTANCE;
+    }
+
+    public static ProofDependentSMTSettings getSmtPdSettings(MainWindow window) {
+        Proof proof = window.getMediator().getSelectedProof();
+        ProofDependentSMTSettings pdSettings;
+        if (proof == null) {
+            return ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
+        } else {
+            return proof.getSettings().getSMTSettings();
+        }
+    }
+
+    public static ProofIndependentSMTSettings getSmtPiSettings() {
+        return ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings();
+    }
+
+    public static TestGenerationSettings getTestgenSettings() {
+        return ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
+    }
+
+    public static ChoiceSettings getChoiceSettings(MainWindow window) {
+        return ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+/*        if (null != window.getMediator().getSelectedProof()) {
+            return window.getMediator().getSelectedProof().getSettings().getChoiceSettings();
+        } else {
+            return ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+        }*/
     }
 
     public void showSettingsDialog(MainWindow mainWindow) {
         settingsProviders.sort(Comparator.comparingInt(SettingsProvider::getPriorityOfSettings));
         SettingsDialog dialog = new SettingsDialog(mainWindow);
         dialog.setSettingsProvider(settingsProviders);
-        dialog.setLocationByPlatform(true);
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         dialog.setIconImage(IconFactory.keyLogo());
-        dialog.pack();
+        dialog.setSize(800, 600);
+        dialog.setLocationByPlatform(true);
         dialog.setVisible(true);
     }
 

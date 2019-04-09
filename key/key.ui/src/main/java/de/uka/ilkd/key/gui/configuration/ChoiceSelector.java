@@ -72,7 +72,7 @@ public class ChoiceSelector extends JDialog {
     private JTextArea explanationArea;
     private static Properties explanationMap;
 
-    /** creates a new ChoiceSelector, using the <code>ChoiceSettings</code>
+    /** creates a new TacletOptionsSettings, using the <code>ChoiceSettings</code>
      * from <code>settings</code> */
     public ChoiceSelector(ChoiceSettings settings) {  
 	super(new JFrame(), "Taclet Base Configuration", true);
@@ -97,7 +97,7 @@ public class ChoiceSelector extends JDialog {
 	}
     }
 
-    /** creates a new ChoiceSelector */
+    /** creates a new TacletOptionsSettings */
     public ChoiceSelector(){
 	this(ProofSettings.DEFAULT_SETTINGS.getChoiceSettings());
     }

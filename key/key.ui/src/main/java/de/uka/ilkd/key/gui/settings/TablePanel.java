@@ -16,8 +16,9 @@ package de.uka.ilkd.key.gui.settings;
 
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
-import de.uka.ilkd.key.gui.smt.FileChooserPanel;
+import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
+import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -33,7 +34,25 @@ import java.awt.event.ActionListener;
  */
 public abstract class TablePanel extends JPanel {
     protected TablePanel() {
-        setLayout(new MigLayout());
+        setLayout(new MigLayout(
+                new LC().fillX().wrapAfter(3),
+                new AC().count(3).fill(1)
+                        .sizeGroup()
+                        .size("16px", 2)
+                        .grow(0f, 0)
+                        .grow(1000f, 1)
+                        .align("right", 0)));
+    }
+
+    public static JLabel createHelpLabel(String s) {
+        if (s == null || s.isEmpty())
+            s = "";
+        else
+            s = "<html>" + s.replaceAll("\n", "<br>");
+        JLabel infoButton = new JLabel(
+                IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
+        infoButton.setToolTipText(s);
+        return infoButton;
     }
 
     protected JTextArea createInfoArea(String info) {
@@ -51,19 +70,17 @@ public abstract class TablePanel extends JPanel {
             JComponent component = components[i];
             component.setAlignmentX(LEFT_ALIGNMENT);
             //last component, either line break or info
-            if (i == length - 1 && !hasInfo) {
-                add(component, new CC().wrap().span(2));
-            } else {
-                add(component);
-            }
+            add(component);
         }
 
+        JLabel infoButton;
         if (hasInfo) {
-            JLabel infoButton = new JLabel(
-                    IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
-            infoButton.setToolTipText(info);
-            add(infoButton, new CC().wrap());
+            infoButton = createHelpLabel(info);
+        } else {
+            infoButton = new JLabel();
         }
+        add(infoButton);
+
     }
 
     protected JCheckBox createCheckBox(String title, boolean value, ActionListener changeListener) {
@@ -75,34 +92,56 @@ public abstract class TablePanel extends JPanel {
     protected JCheckBox addCheckBox(String title, String info,
                                     boolean value, ActionListener changeListener) {
         JCheckBox checkBox = createCheckBox(title, value, changeListener);
-        addRowWithHelp(info, checkBox);
+        addRowWithHelp(info, new JLabel(), checkBox);
         return checkBox;
     }
 
 
-    protected FileChooserPanel addFileChooserPanel(String title, String file, String info,
-                                                   boolean selected, boolean enabled,
-                                                   ActionListener changeListener) {
-        FileChooserPanel fileChooserPanel = new FileChooserPanel(selected, enabled, title, file);
-        fileChooserPanel.addActionListener(changeListener);
-        setMaximumHeight(fileChooserPanel, fileChooserPanel.getPreferredSize().height);
-        addRowWithHelp(info, fileChooserPanel);
-        return fileChooserPanel;
+    protected JTextField addFileChooserPanel(String title, String file, String info,
+                                             boolean isSave, ActionListener changeListener) {
+        JTextField textField = new JTextField(file);
+        textField.addActionListener(changeListener);
+        JLabel lbl = new JLabel(title);
+        lbl.setLabelFor(textField);
+        add(lbl);
+        Box box = new Box(BoxLayout.X_AXIS);
+        JButton btnFileChooser = new JButton(IconFontSwing.buildIcon(FontAwesomeSolid.SEARCH, 12f));
+        btnFileChooser.setBorderPainted(false);
+        btnFileChooser.setFocusPainted(false);
+        btnFileChooser.setContentAreaFilled(false);
+
+        btnFileChooser.addActionListener(e -> {
+            JFileChooser f = new JFileChooser(textField.getText());
+            int c = 0;
+            if (isSave)
+                c = f.showSaveDialog((Component) e.getSource());
+            else
+                c = f.showOpenDialog((Component) e.getSource());
+            if (c == JFileChooser.APPROVE_OPTION) {
+                textField.setText(f.getSelectedFile().getAbsolutePath());
+            }
+        });
+        add(box);
+        box.add(textField);
+        box.add(btnFileChooser);
+        add(createHelpLabel(info), new CC().wrap());
+        return textField;
     }
 
     protected <T> JComboBox<T> addComboBox(String info, int selectionIndex,
                                            ActionListener changeListener, T... items) {
-        JComboBox<T> comboBox = new JComboBox<T>(items);
+        JComboBox<T> comboBox = new JComboBox<>(items);
         comboBox.setSelectedIndex(selectionIndex);
         comboBox.addActionListener(changeListener);
-        addRowWithHelp(info, comboBox);
+        if (info != null && !info.isEmpty()) {
+            add(new JLabel());
+            add(comboBox);
+            JLabel infoButton = createHelpLabel(info);
+            add(infoButton, new CC().wrap());
+        } else {
+            add(comboBox, new CC().span(2).wrap());
+        }
         return comboBox;
-    }
-
-    private void setMaximumHeight(JComponent component, int height) {
-        Dimension dim = component.getMaximumSize();
-        dim.height = height;
-        component.setMaximumSize(dim);
     }
 
     protected JTextField createTextField(String text, final ActionListener changeListener) {
@@ -140,7 +179,17 @@ public abstract class TablePanel extends JPanel {
     }
 
     protected void addSeparator(String titleText) {
-        add(new JLabel(titleText));
-        add(new JSeparator(), new CC().span(2).wrap());
+        JPanel pane = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        JSeparator sep = new JSeparator(JSeparator.HORIZONTAL);
+        pane.add(sep, gbc);
+
+        Box box = new Box(BoxLayout.X_AXIS);
+        box.add(new JLabel(titleText));
+        box.add(pane);
+        add(box, new CC().span().grow().alignX("left"));
     }
 }
