@@ -1,13 +1,11 @@
 package de.uka.ilkd.key.control;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
@@ -194,9 +192,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      * @return The sorted list of supported term label names.
      */
     public static List<Name> getSortedTermLabelNames(TermLabelManager manager) {
-        List<Name> labelNames = manager.getSupportedTermLabelNames().stream()
-                .filter(n -> !Arrays.stream(ALWAYS_HIDDEN).anyMatch(n::equals))
-                .collect(Collectors.toList());
+        List<Name> labelNames = manager.getSupportedTermLabelNames().toList();
 
         Collections.sort(labelNames, new Comparator<Name>() {
             @Override
