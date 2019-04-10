@@ -3,11 +3,13 @@ package de.uka.ilkd.key.gui.extension.impl;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import org.key_project.util.ServiceLoaderUtil;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -177,11 +179,9 @@ public final class KeYGuiExtensionFacade {
 
     @SuppressWarnings("unchecked")
     private static void loadExtensions() {
-        ServiceLoader<KeYGuiExtension> loader = ServiceLoader.load(KeYGuiExtension.class);
-        extensions = loader.stream()
-                .map(ServiceLoader.Provider::type)
+        extensions = ServiceLoaderUtil.stream(KeYGuiExtension.class)
                 .filter(KeYGuiExtensionFacade::isNotForbidden)
-                .map(it -> new Extension(it))
+                .map(Extension::new)
                 .filter(it -> !it.isDisabled())
                 .sorted()
                 .distinct()
