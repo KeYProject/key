@@ -650,7 +650,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                             r , services);
             break;
         default:
-        	throw new AssertionError();
+            throw new AssertionError();
         }
     }
 
