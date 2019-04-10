@@ -25,7 +25,7 @@ public class HelpFacade {
     /**
      * @see OpenHelpAction
      */
-    public static final Action ACTION_OPEN_HELP = new OpenHelpAction();
+    public static final KeyAction ACTION_OPEN_HELP = new OpenHelpAction();
 
     /**
      * The base url of the help system.

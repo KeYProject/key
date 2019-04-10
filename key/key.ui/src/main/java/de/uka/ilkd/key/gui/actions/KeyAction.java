@@ -17,7 +17,7 @@ public abstract class KeyAction extends AbstractAction {
     protected static final int SHORTCUT_KEY_MASK
             = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
-    protected String getName() {
+    public String getName() {
         return (String) getValue(NAME);
     }
 
@@ -25,14 +25,24 @@ public abstract class KeyAction extends AbstractAction {
         putValue(NAME, name);
     }
 
-    @Deprecated // add a line in gui.utils.KeyStrokeManager instead
     protected void setAcceleratorLetter(int letter) {
         setAcceleratorKey(KeyStroke.getKeyStroke(letter, SHORTCUT_KEY_MASK));
     }
 
-    @Deprecated // add a line in gui.utils.KeyStrokeManager instead
+    public int getMnemonic() {
+        return (int) getValue(MNEMONIC_KEY);
+    }
+
+    protected void setMnemonic(int c) {
+        putValue(MNEMONIC_KEY, c);
+    }
+
     protected void setAcceleratorKey(KeyStroke keyStroke) {
         putValue(ACCELERATOR_KEY, keyStroke);
+    }
+
+    public KeyStroke getAcceleratorKey() {
+        return (KeyStroke) getValue(ACCELERATOR_KEY);
     }
 
     protected String getTooltip() {
@@ -51,11 +61,11 @@ public abstract class KeyAction extends AbstractAction {
         putValue(LARGE_ICON_KEY, icon);
     }
 
-    protected Icon getIcon(Icon icon) {
+    public Icon getIcon(Icon icon) {
         return getSmallIcon();
     }
 
-    protected Icon getSmallIcon() {
+    public Icon getSmallIcon() {
         return (Icon) getValue(SMALL_ICON);
     }
 
@@ -67,7 +77,7 @@ public abstract class KeyAction extends AbstractAction {
         return (Icon) getValue(LARGE_ICON_KEY);
     }
 
-    protected boolean isSelected() {
+    public boolean isSelected() {
         return getValue(SELECTED_KEY) == Boolean.TRUE;
     }
 
@@ -75,7 +85,7 @@ public abstract class KeyAction extends AbstractAction {
         putValue(SELECTED_KEY, b);
     }
 
-    protected String getMenuPath() {
+    public String getMenuPath() {
         return (String) getValue(KeYExtConstants.PATH);
     }
 
@@ -83,7 +93,7 @@ public abstract class KeyAction extends AbstractAction {
         putValue(KeYExtConstants.PATH, path);
     }
 
-    protected int getPriority() {
+    public int getPriority() {
         Integer i = (Integer) getValue(KeYExtConstants.PRIORITY);
         return i == null ? 0 : i;
     }

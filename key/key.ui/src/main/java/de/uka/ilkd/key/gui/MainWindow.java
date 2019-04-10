@@ -23,6 +23,8 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.KeYIconManagement;
+import de.uka.ilkd.key.gui.help.HelpFacade;
+import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.gui.nodeviews.*;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
@@ -58,6 +60,7 @@ import java.util.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+@HelpInfo()
 public final class MainWindow extends JFrame {
 
     private static final long serialVersionUID = 5853419918923902636L;
@@ -220,6 +223,12 @@ public final class MainWindow extends JFrame {
      */
     private MainWindow() {
         KeYIconManagement.enableFontIcons();
+
+        getRootPane().getInputMap().put(HelpFacade.ACTION_OPEN_HELP.getAcceleratorKey(),
+                HelpFacade.ACTION_OPEN_HELP);
+        getRootPane().getActionMap().put(HelpFacade.ACTION_OPEN_HELP,
+                HelpFacade.ACTION_OPEN_HELP);
+
         setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
         applyGnomeWorkaround();
         setLaF();
