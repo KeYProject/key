@@ -24,7 +24,6 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -545,19 +544,22 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
     }
 
     private enum ReplaceTypes {
-    	
+
         /**
          * Program variable replace type.
          */
         PROGRAM_VARIABLE (ProgramVariable.class),
+
         /**
          * Abstract integer literal replace type.
          */
         ABSTRACT_INTEGER_LITERAL (AbstractIntegerLiteral.class),
+
         /**
          * Empty sequence literal replace type.
          */
         EMPTY_SEQ_LITERAL (EmptySeqLiteral.class);
+
         /**
          * The target class.
          */
@@ -572,7 +574,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                     return c;
                 }
             }
-            
+
             throw new AssertionError();
         }
     }
@@ -585,10 +587,10 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                                         Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        preReplacementMap.put(tb.var(var), tb.var((ProgramVariable) init));
+        preReplacementMap.put(tb.var(var), tb.var(init));
         postReplacementMap.put(
                     tb.var(r.variables.remembranceLocalVariables.get(var)),
-                    tb.var((ProgramVariable) init));
+                    tb.var(init));
     }
 
     private static void replaceVariable(ProgramVariable var,
@@ -601,11 +603,11 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
 
         preReplacementMap.put(tb.var(var),
                 services.getTypeConverter().getIntegerLDT()
-                .translateLiteral((Literal) init, services));
+                .translateLiteral(init, services));
         postReplacementMap.put(
                 tb.var(r.variables.remembranceLocalVariables.get(var)),
                 services.getTypeConverter().getIntegerLDT()
-                .translateLiteral((Literal) init, services));
+                .translateLiteral(init, services));
     }
 
     private static void replaceVariable(ProgramVariable var,
@@ -618,11 +620,11 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
 
         preReplacementMap.put(tb.var(var),
                 services.getTypeConverter().getSeqLDT()
-                .translateLiteral((Literal) init, services));
+                .translateLiteral(init, services));
         postReplacementMap.put(
                 tb.var(r.variables.remembranceLocalVariables.get(var)),
                 services.getTypeConverter().getSeqLDT()
-                .translateLiteral((Literal) init, services));
+                .translateLiteral(init, services));
     }
 
     private static void replaceVariable(ProgramVariable var,
@@ -654,8 +656,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
 
     @Override
     public BlockContract toBlockContract() {
-        StatementBlock block =
-                new StatementBlock(new While(getGuard(), getBody()),
+        StatementBlock block = new StatementBlock(new While(getGuard(), getBody()),
                                    getTail());
         StatementBlock headAndBlock =
                 (head == null) ? new StatementBlock(block) : new StatementBlock(head, block);
