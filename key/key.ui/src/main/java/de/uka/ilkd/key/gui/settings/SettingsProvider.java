@@ -1,10 +1,8 @@
 package de.uka.ilkd.key.gui.settings;
 
-import com.sun.tools.javac.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 
 import javax.swing.*;
-import javax.swing.tree.TreeNode;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,20 +12,20 @@ import java.util.List;
  */
 public interface SettingsProvider {
     /**
+     * A textual human readable description of the settings panel.
+     * Used at the overview tree at the left.
      *
-     * @return
+     * @return non-null non-empty string
      */
     String getDescription();
 
     /**
-     *
      * @param window
      * @return
      */
     JComponent getPanel(MainWindow window);
 
     /**
-     *
      * @return
      */
     default List<SettingsProvider> getChildren() {
@@ -40,15 +38,15 @@ public interface SettingsProvider {
     void applySettings(MainWindow window) throws Exception;
 
     /**
-     *
      * @return
+     * @deprecated unused currently
      */
+    @Deprecated
     default Icon getIcon() {
         return null;
     }
 
     /**
-     *
      * @param substring
      * @return
      */
@@ -57,7 +55,6 @@ public interface SettingsProvider {
     }
 
     /**
-     *
      * @return
      */
     default int getPriorityOfSettings() {
