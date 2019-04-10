@@ -545,10 +545,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
     }
 
     private enum ReplaceTypes {
-        /**
-         * Unknown replace type.
-         */
-        UNKNOWN (null),
+    	
         /**
          * Program variable replace type.
          */
@@ -570,12 +567,13 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             this.targetClass = targetClass;
         }
         public static LoopContractImpl.ReplaceTypes fromClass(Class<?> cls) {
-            for (ReplaceTypes c: values()) {
-                if (c.targetClass == cls) {
+            for (ReplaceTypes c : values()) {
+                if (c.targetClass.isAssignableFrom(cls)) {
                     return c;
                 }
             }
-            return UNKNOWN;
+            
+            throw new AssertionError();
         }
     }
 
@@ -585,7 +583,6 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                                         Map<Term, Term> postReplacementMap,
                                         LoopContractImpl r,
                                         Services services) {
-        assert init instanceof ProgramVariable;
         TermBuilder tb = services.getTermBuilder();
 
         preReplacementMap.put(tb.var(var), tb.var((ProgramVariable) init));
@@ -600,7 +597,6 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                                         Map<Term, Term> postReplacementMap,
                                         LoopContractImpl r,
                                         Services services) {
-        assert init instanceof AbstractIntegerLiteral;
         TermBuilder tb = services.getTermBuilder();
 
         preReplacementMap.put(tb.var(var),
@@ -618,7 +614,6 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                                         Map<Term, Term> postReplacementMap,
                                         LoopContractImpl r,
                                         Services services) {
-        assert init instanceof EmptySeqLiteral;
         TermBuilder tb = services.getTermBuilder();
 
         preReplacementMap.put(tb.var(var),
@@ -653,7 +648,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                             r , services);
             break;
         default:
-            break;
+        	throw new AssertionError();
         }
     }
 
