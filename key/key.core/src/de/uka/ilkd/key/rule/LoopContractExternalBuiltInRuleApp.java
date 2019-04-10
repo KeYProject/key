@@ -52,7 +52,7 @@ public class LoopContractExternalBuiltInRuleApp extends AbstractLoopContractBuil
         assert rule != null;
         assert rule instanceof LoopContractExternalRule;
         assert occurrence != null;
-        this.statement = statement;
+        setStatement(statement);
         this.contract = contract;
         this.heaps = heaps;
     }
@@ -60,7 +60,7 @@ public class LoopContractExternalBuiltInRuleApp extends AbstractLoopContractBuil
     @Override
     public LoopContractExternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
         return new LoopContractExternalBuiltInRuleApp(builtInRule, newOccurrence, ifInsts,
-                statement, contract, heaps);
+                getStatement(), contract, heaps);
     }
 
     @Override

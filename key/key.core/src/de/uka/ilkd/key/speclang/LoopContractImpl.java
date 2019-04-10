@@ -335,6 +335,54 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
     }
 
     /**
+     * Create replacement map for index and values variables.
+     * @param index the index program variable
+     * @param values the values program variable
+     * @param services the services object
+     * @return the new according op replacer
+     */
+    private static OpReplacer createOpReplacer(final ProgramVariable index,
+                                               final ProgramVariable values,
+                                               Services services) {
+        final Map<SVSubstitute, SVSubstitute> replacementMap = new HashMap<>();
+        if (index != null) {
+            replacementMap.put(
+                    services.getTermBuilder().index(),
+                    services.getTermBuilder().var(index));
+        }
+        if (values != null) {
+            replacementMap.put(
+                    services.getTermBuilder().values(),
+                    services.getTermBuilder().var(values));
+        }
+        return new OpReplacer(replacementMap, services.getTermFactory());
+    }
+
+    /**
+     * Replace the given variable in the given variable map
+     * @param vars the old variables
+     * @param variable the variable to be replaced
+     * @param services the services object
+     * @return the new variables
+     */
+    private static LoopContractImpl replaceVariable(LoopContractImpl vars,
+                                                    ProgramVariable variable,
+                                                    Services services) {
+        if (variable != null) {
+            LocationVariable rem =
+                    new LocationVariable(
+                            services.getVariableNamer().getTemporaryNameProposal(
+                                    variable.name()
+                                    + VariablesCreator.REMEMBRANCE_SUFFIX
+                            ),
+                            variable.getKeYJavaType()
+                    );
+            vars.variables.remembranceLocalVariables.put((LocationVariable) variable, rem);
+        }
+        return vars;
+    }
+
+    /**
      *
      * @param loop
      *            a loop.
@@ -496,26 +544,136 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         return onBlock;
     }
 
-    @Override
-    public BlockContract toBlockContract() {
-        StatementBlock block = new StatementBlock(
-                new While(getGuard(), getBody()),
-                getTail());
-        StatementBlock headAndBlock = head == null
-                ? new StatementBlock(block)
-                : new StatementBlock(head, block);
-        LoopContractImpl r = (LoopContractImpl) replaceEnhancedForVariables(block, services);
+    private enum ReplaceTypes {
+        /**
+         * Unknown replace type.
+         */
+        UNKNOWN (null),
+        /**
+         * Program variable replace type.
+         */
+        PROGRAM_VARIABLE (ProgramVariable.class),
+        /**
+         * Abstract integer literal replace type.
+         */
+        ABSTRACT_INTEGER_LITERAL (AbstractIntegerLiteral.class),
+        /**
+         * Empty sequence literal replace type.
+         */
+        EMPTY_SEQ_LITERAL (EmptySeqLiteral.class);
+        /**
+         * The target class.
+         */
+        private final Class<?> targetClass;
 
+        ReplaceTypes (Class<?> targetClass) {
+            this.targetClass = targetClass;
+        }
+        public static LoopContractImpl.ReplaceTypes fromClass(Class<?> cls) {
+            for (ReplaceTypes c: values()) {
+                if (c.targetClass == cls) {
+                    return c;
+                }
+            }
+            return UNKNOWN;
+        }
+    }
+
+    private static void replaceVariable(ProgramVariable var,
+                                        ProgramVariable init,
+                                        Map<Term, Term> preReplacementMap,
+                                        Map<Term, Term> postReplacementMap,
+                                        LoopContractImpl r,
+                                        Services services) {
+        assert init instanceof ProgramVariable;
         TermBuilder tb = services.getTermBuilder();
 
-        Map<LocationVariable, Term> pre;
-        Map<LocationVariable, Term> post;
-        Map<LocationVariable, Term> modifies;
-        if (head == null) {
-            pre = r.preconditions;
-            post = r.postconditions;
-            modifies = r.modifiesClauses;
-        } else {
+        preReplacementMap.put(tb.var(var), tb.var((ProgramVariable) init));
+        postReplacementMap.put(
+                    tb.var(r.variables.remembranceLocalVariables.get(var)),
+                    tb.var((ProgramVariable) init));
+    }
+
+    private static void replaceVariable(ProgramVariable var,
+                                        AbstractIntegerLiteral init,
+                                        Map<Term, Term> preReplacementMap,
+                                        Map<Term, Term> postReplacementMap,
+                                        LoopContractImpl r,
+                                        Services services) {
+        assert init instanceof AbstractIntegerLiteral;
+        TermBuilder tb = services.getTermBuilder();
+
+        preReplacementMap.put(tb.var(var),
+                services.getTypeConverter().getIntegerLDT()
+                .translateLiteral((Literal) init, services));
+        postReplacementMap.put(
+                tb.var(r.variables.remembranceLocalVariables.get(var)),
+                services.getTypeConverter().getIntegerLDT()
+                .translateLiteral((Literal) init, services));
+    }
+
+    private static void replaceVariable(ProgramVariable var,
+                                        EmptySeqLiteral init,
+                                        Map<Term, Term> preReplacementMap,
+                                        Map<Term, Term> postReplacementMap,
+                                        LoopContractImpl r,
+                                        Services services) {
+        assert init instanceof EmptySeqLiteral;
+        TermBuilder tb = services.getTermBuilder();
+
+        preReplacementMap.put(tb.var(var),
+                services.getTypeConverter().getSeqLDT()
+                .translateLiteral((Literal) init, services));
+        postReplacementMap.put(
+                tb.var(r.variables.remembranceLocalVariables.get(var)),
+                services.getTypeConverter().getSeqLDT()
+                .translateLiteral((Literal) init, services));
+    }
+
+    private static void replaceVariable(ProgramVariable var,
+                                        Expression init,
+                                        Map<Term, Term> preReplacementMap,
+                                        Map<Term, Term> postReplacementMap,
+                                        LoopContractImpl r,
+                                        Services services) {
+        switch (ReplaceTypes.fromClass(init.getClass())) {
+        case PROGRAM_VARIABLE:
+            replaceVariable(var, (ProgramVariable) init,
+                            preReplacementMap, postReplacementMap,
+                            r , services);
+            break;
+        case ABSTRACT_INTEGER_LITERAL:
+            replaceVariable(var, (AbstractIntegerLiteral) init,
+                            preReplacementMap, postReplacementMap,
+                            r , services);
+            break;
+        case EMPTY_SEQ_LITERAL:
+            replaceVariable(var, (EmptySeqLiteral) init,
+                            preReplacementMap, postReplacementMap,
+                            r , services);
+            break;
+        default:
+            break;
+        }
+    }
+
+    @Override
+    public BlockContract toBlockContract() {
+        StatementBlock block =
+                new StatementBlock(new While(getGuard(), getBody()),
+                                   getTail());
+        StatementBlock headAndBlock =
+                (head == null) ? new StatementBlock(block) : new StatementBlock(head, block);
+        LoopContractImpl r = (LoopContractImpl) replaceEnhancedForVariables(block, services);
+
+        Map<LocationVariable, Term> pre =
+                (head == null) ? r.preconditions : new HashMap<>();
+        Map<LocationVariable, Term> post =
+                (head == null) ? r.postconditions : new HashMap<>();
+        Map<LocationVariable, Term> modifies =
+                (head == null) ? r.modifiesClauses : new HashMap<>();
+
+        if (head != null) {
             Map<Term, Term> preReplacementMap = new HashMap<>();
             Map<Term, Term> postReplacementMap = new HashMap<>();
             for (int i = 0; i < head.getStatementCount(); ++i) {
@@ -525,46 +683,19 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                     ProgramVariable var = (ProgramVariable)
                             decl.getVariables().get(0).getProgramVariable();
                     Expression init = decl.getVariables().get(0).getInitializer();
-
-                    if (init instanceof ProgramVariable) {
-                        preReplacementMap.put(tb.var(var), tb.var((ProgramVariable) init));
-                        postReplacementMap.put(
-                                tb.var(r.variables.remembranceLocalVariables.get(var)),
-                                tb.var((ProgramVariable) init));
-                    } else if (init instanceof AbstractIntegerLiteral) {
-                        preReplacementMap.put(tb.var(var),
-                                services.getTypeConverter().getIntegerLDT()
-                                .translateLiteral((Literal) init, services));
-                        postReplacementMap.put(
-                                tb.var(r.variables.remembranceLocalVariables.get(var)),
-                                services.getTypeConverter().getIntegerLDT()
-                                .translateLiteral((Literal) init, services));
-                    } else if (init instanceof EmptySeqLiteral) {
-                        preReplacementMap.put(tb.var(var),
-                                services.getTypeConverter().getSeqLDT()
-                                .translateLiteral((Literal) init, services));
-                        postReplacementMap.put(
-                                tb.var(r.variables.remembranceLocalVariables.get(var)),
-                                services.getTypeConverter().getSeqLDT()
-                                .translateLiteral((Literal) init, services));
-                    }
+                    replaceVariable(var, init, preReplacementMap, postReplacementMap,
+                                    r, services);
                 }
             }
-
             OpReplacer preReplacer = new OpReplacer(preReplacementMap, services.getTermFactory());
             OpReplacer postReplacer = new OpReplacer(postReplacementMap, services.getTermFactory());
-            pre = new HashMap<>();
-            post = new HashMap<>();
-            modifies = new HashMap<>();
 
             for (LocationVariable heap : r.preconditions.keySet()) {
                 pre.put(heap, preReplacer.replace(r.preconditions.get(heap)));
             }
-
             for (LocationVariable heap : r.postconditions.keySet()) {
                 post.put(heap, postReplacer.replace(r.postconditions.get(heap)));
             }
-
             for (LocationVariable heap : r.modifiesClauses.keySet()) {
                 modifies.put(heap, preReplacer.replace(r.modifiesClauses.get(heap)));
             }
@@ -575,10 +706,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                     r.baseName, headAndBlock, r.labels, r.method, r.modality,
                     pre, r.measuredBy, post, modifies,
                 r.infFlowSpecs, r.variables, r.transactionApplicable, r.hasMod,
-                functionalContracts);
+                getFunctionalContracts());
             ((BlockContractImpl) blockContract).setLoopContract(this);
         }
-
         return blockContract;
     }
 
@@ -658,7 +788,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 baseName, newBlock, labels, method, modality,
                 newPreconditions, newMeasuredBy, newPostconditions, newModifiesClauses,
                 newinfFlowSpecs, newVariables, transactionApplicable, hasMod, newDecreases,
-                functionalContracts, services);
+                getFunctionalContracts(), services);
         result.internalOnly = internalOnly;
         return result;
     }
@@ -674,7 +804,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 baseName, newLoop, labels, method, modality,
                 newPreconditions, newMeasuredBy, newPostconditions, newModifiesClauses,
                 newinfFlowSpecs, newVariables, transactionApplicable, hasMod, newDecreases,
-                functionalContracts, services);
+                getFunctionalContracts(), services);
         result.internalOnly = internalOnly;
         return result;
     }
@@ -696,22 +826,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                     measuredBy,
                     decreases);
         } else {
-            final Map<SVSubstitute, SVSubstitute> replacementMap = new HashMap<>();
-
-            if (index != null) {
-                replacementMap.put(
-                        services.getTermBuilder().index(),
-                        services.getTermBuilder().var(index));
-            }
-
-            if (values != null) {
-                replacementMap.put(
-                        services.getTermBuilder().values(),
-                        services.getTermBuilder().var(values));
-            }
-
-            final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
-
+            final OpReplacer replacer = createOpReplacer(index, values, services);
 
             final Map<LocationVariable, Term> newPreconditions
                 = new LinkedHashMap<LocationVariable, Term>();
@@ -723,12 +838,11 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             final Term newMeasuredBy = replacer.replace(measuredBy);
             final Term newDecreases = replacer.replace(decreases);
 
-            for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
-                    .getAllHeaps()) {
+            for (LocationVariable heap
+                    : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
                     continue;
                 }
-
                 newPreconditions.put(heap,
                         replacer.replace(getPrecondition(heap, services)));
                 newPostconditions.put(heap,
@@ -736,36 +850,17 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 newModifiesClauses.put(heap,
                         replacer.replace(getModifiesClause(heap, services)));
             }
-
-            replacedEnhancedForVars = (LoopContractImpl) update(
-                    newBlock,
-                    newPreconditions,
-                    newPostconditions,
-                    newModifiesClauses,
-                    infFlowSpecs,
-                    variables,
-                    newMeasuredBy,
-                    newDecreases);
-
-            if (index != null) {
-                LocationVariable rem = new LocationVariable(
-                        services.getVariableNamer().getTemporaryNameProposal(
-                                index.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
-                        index.getKeYJavaType());
-
-                replacedEnhancedForVars
-                    .variables.remembranceLocalVariables.put((LocationVariable) index, rem);
-            }
-
-            if (values != null) {
-                LocationVariable rem = new LocationVariable(
-                        services.getVariableNamer().getTemporaryNameProposal(
-                                values.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
-                        values.getKeYJavaType());
-
-                replacedEnhancedForVars
-                    .variables.remembranceLocalVariables.put((LocationVariable) values, rem);
-            }
+            replacedEnhancedForVars =
+                    (LoopContractImpl) update(newBlock,
+                                              newPreconditions,
+                                              newPostconditions,
+                                              newModifiesClauses,
+                                              infFlowSpecs,
+                                              variables,
+                                              newMeasuredBy,
+                                              newDecreases);
+            replacedEnhancedForVars = replaceVariable(replacedEnhancedForVars, index, services);
+            replacedEnhancedForVars = replaceVariable(replacedEnhancedForVars, values, services);
         }
 
         return replacedEnhancedForVars;
@@ -781,7 +876,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 baseName, newBlock, labels, method, modality,
                 preconditions, measuredBy, postconditions, modifiesClauses,
                 infFlowSpecs, variables, transactionApplicable, hasMod, decreases,
-                functionalContracts, services);
+                getFunctionalContracts(), services);
         result.internalOnly = internalOnly;
         return result;
     }
@@ -796,7 +891,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 baseName, newLoop, labels, method, modality,
                 preconditions, measuredBy, postconditions, modifiesClauses,
                 infFlowSpecs, variables, transactionApplicable, hasMod, decreases,
-                functionalContracts, services);
+                getFunctionalContracts(), services);
         result.internalOnly = internalOnly;
         return result;
     }
@@ -813,7 +908,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         LoopContractImpl result = new LoopContractImpl(
                 baseName, block, labels, (IProgramMethod) newPM, modality,
                 preconditions, measuredBy, postconditions, modifiesClauses, infFlowSpecs, variables,
-                transactionApplicable, hasMod, decreases, functionalContracts, services);
+                transactionApplicable, hasMod, decreases, getFunctionalContracts(), services);
         result.internalOnly = internalOnly;
         return result;
     }

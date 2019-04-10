@@ -18,7 +18,7 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
     /**
      * The rule being applied.
      */
-    protected LoopApplyHeadRule rule;
+    private LoopApplyHeadRule rule;
 
     /**
      * The loop contracts on which the rule is applied.

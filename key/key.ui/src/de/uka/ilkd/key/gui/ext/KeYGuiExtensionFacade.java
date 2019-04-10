@@ -22,7 +22,6 @@ import static de.uka.ilkd.key.gui.ext.KeYExtConst.PRIORITY;
  */
 public final class KeYGuiExtensionFacade {
     //region panel extension
-    @SuppressWarnings("todo")
     public static List<KeYPaneExtension> getAllPanels() {
         return getExtension(KeYPaneExtension.class, Comparator.comparingInt(KeYPaneExtension::priority));
     }
@@ -34,7 +33,6 @@ public final class KeYGuiExtensionFacade {
      * @param <T>
      * @return
      */
-    @SuppressWarnings("cast")
     public static <T extends KeYPaneExtension> Optional<T> getPanel(Class<T> clazz) {
         Optional<KeYPaneExtension> v = getAllPanels().stream()
                 .filter(it -> it.getClass().isAssignableFrom(clazz))

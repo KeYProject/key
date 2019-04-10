@@ -168,10 +168,11 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, Term> newModifiesClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             Term newMeasuredBy) {
-        BlockContractImpl result = new BlockContractImpl(
-                baseName, newBlock, labels, method, modality,
-                newPreconditions, newMeasuredBy, newPostconditions, newModifiesClauses,
-                newinfFlowSpecs, newVariables, transactionApplicable, hasMod, functionalContracts);
+        BlockContractImpl result =
+                new BlockContractImpl(baseName, newBlock, labels, method, modality,
+                                      newPreconditions, newMeasuredBy, newPostconditions,
+                                      newModifiesClauses, newinfFlowSpecs, newVariables,
+                                      transactionApplicable, hasMod, getFunctionalContracts());
         result.setLoopContract(loopContract);
         return result;
     }
@@ -189,7 +190,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
         BlockContractImpl result = new BlockContractImpl(
                 baseName, block, labels, (IProgramMethod) newPM, modality,
                 preconditions, measuredBy, postconditions, modifiesClauses, infFlowSpecs, variables,
-                transactionApplicable, hasMod, functionalContracts);
+                transactionApplicable, hasMod, getFunctionalContracts());
         result.setLoopContract(loopContract);
         return result;
     }

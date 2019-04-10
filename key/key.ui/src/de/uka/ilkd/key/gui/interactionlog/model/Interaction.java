@@ -1,9 +1,6 @@
 package de.uka.ilkd.key.gui.interactionlog.model;
 
-import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.interactionlog.algo.InteractionVisitor;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.Goal;
 
 import javax.swing.*;
 import javax.xml.bind.annotation.*;
@@ -18,6 +15,8 @@ import java.util.Date;
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class Interaction implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @XmlTransient
     protected InteractionGraphicStyle graphicalStyle = new InteractionGraphicStyle();
 

@@ -138,6 +138,9 @@ public final class SpecificationRepository {
     private final Map<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>>
         loopContracts =
             new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>>();
+    /**
+     * A map which relates each loop statement its starting line number and set of loop contracts.
+     */
     private final Map<Pair<LoopStatement, Integer>, ImmutableSet<LoopContract>>
         loopContractsOnLoops =
             new LinkedHashMap<Pair<LoopStatement, Integer>, ImmutableSet<LoopContract>>();
@@ -1617,6 +1620,14 @@ public final class SpecificationRepository {
         }
     }
 
+    /**
+     * Returns block contracts for according block statement
+     * and modality.
+     *
+     * @param block     the given block.
+     * @param modality the given modality.
+     * @return
+     */
     public ImmutableSet<BlockContract> getBlockContracts(
             final StatementBlock block, final Modality modality) {
         ImmutableSet<BlockContract> result = getBlockContracts(block);
@@ -1647,6 +1658,14 @@ public final class SpecificationRepository {
         return result;
     }
 
+    /**
+     * Returns loop contracts for according loop statement
+     * and modality.
+     *
+     * @param loop     the given loop.
+     * @param modality the given modality.
+     * @return the set of resulting loop statements.
+     */
     public ImmutableSet<LoopContract> getLoopContracts(
             final LoopStatement loop, final Modality modality) {
         ImmutableSet<LoopContract> result = getLoopContracts(loop);

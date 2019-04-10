@@ -94,7 +94,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     /**
      * the type that is used for schema variables types.
      */
-    public static KeYJavaType typeSVType
+    private static KeYJavaType typeSVType
     	= new KeYJavaType(PrimitiveType.PROGRAM_SV, ProgramSVSort.TYPE);
 
     /**
@@ -142,10 +142,11 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             final ProgramSV[] labels = mc.getSV();
             return new ForToWhile(labels[0], labels[1],
                     list.get(Statement.class));
-        }  else if ("#enhancedfor-elim".equals(mcName)){
+        } else if ("#enhancedfor-elim".equals(mcName)) {
             EnhancedFor efor = list.get(EnhancedFor.class);
-            if(efor == null)
+            if (efor == null) {
                 throw new ConvertException("#enhancedfor-elim requires an enhanced for loop as argument");
+            }
             ProgramSV[] svw = mc.getSV();
             ProgramSV execSV = null;
             for (int i = 0; i < svw.length; i++) {
@@ -411,8 +412,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         if (varspec == null) {
             ExtList l = collectChildren(recoderVarspec);
             ProgramElement pv
-               = ProgramSVSort.VARIABLE.getSVWithSort(l,
-            					      ProgramElementName.class);
+                = ProgramSVSort.VARIABLE.getSVWithSort(l, ProgramElementName.class);
             if (pv instanceof ProgramElementName) { // sth. like #type i;
                 KeYJavaType kjt = new KeYJavaType(typeSVType);
                 pv = new LocationVariable((ProgramElementName) pv, kjt);

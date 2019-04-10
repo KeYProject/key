@@ -474,13 +474,15 @@ public final class MainWindow extends JFrame {
         return toolBar;
     }
 
-    private JToggleButton createHeatmapToggle() {
-        return new JToggleButton(new HeatmapToggleAction(this));
-    }
+    /*
+     * private JToggleButton createHeatmapToggle() { return new
+     * JToggleButton(new HeatmapToggleAction(this)); }
+     */
 
-    private JButton createHeatmapMenuOpener() {
-        return new JButton(new HeatmapSettingsAction(this));
-    }
+    /*
+     * private JButton createHeatmapMenuOpener() { return new JButton(new
+     * HeatmapSettingsAction(this)); }
+     */
 
     private ComplexButton createSMTComponent() {
         smtComponent = new ComplexButton(TOOLBAR_ICON_SIZE);

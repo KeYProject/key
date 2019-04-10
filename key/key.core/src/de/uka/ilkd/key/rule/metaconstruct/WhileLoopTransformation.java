@@ -669,7 +669,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         }
     }
 
-    /* Performs the unwinding of the loop
+    /** Performs the unwinding of the loop
      * Warning: The unwinding does not comply with the rule in the KeY book up to 100%
      * The difference is revealed by the following example:
      * <code> Label1:while(c){b}</code>
@@ -678,6 +678,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * This implementation creates however.
      * <code> Label1:if(c) l':{l'':{p#} while(c){b}}</code>
      * Check if this is ok when labeled continue statements are involved.
+     *
+     * @param x the while statement
      */
     @Override
     public void performActionOnWhile(While x) {
@@ -688,15 +690,12 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             if (changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
             }
-
             Expression guard = ((Guard) changeList.removeFirst()).getExpression();
             Statement body =
                 (Statement) (changeList.isEmpty() ?
                     null : changeList.removeFirst());
 
-            /*
-             * rename all occ. variables in the body (same name but different object)
-             */
+            // rename all occ. variables in the body (same name but different object)
             ProgVarReplaceVisitor replacer =
                 new ProgVarReplaceVisitor(body,
                                           new LinkedHashMap<ProgramVariable, ProgramVariable>(),
@@ -746,7 +745,6 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                         services.getSpecificationRepository().addLoopContract(lc);
                     }
                 }
-
                 addChild(newLoop);
                 changed();
             } else {

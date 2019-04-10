@@ -65,15 +65,15 @@ public abstract class AbstractLoopContractBuiltInRuleApp
                 .instantiate(posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<LoopContract> contracts = AbstractLoopContractRule
                 .getApplicableContracts(instantiation, goal, services);
-        statement = instantiation.statement;
+        setStatement(instantiation.statement);
         ImmutableSet<LoopContract> cons = DefaultImmutableSet.<LoopContract> nil();
         for (LoopContract cont : contracts) {
             if (cont.isOnBlock() &&
-                    cont.getBlock().getStartPosition().getLine() == statement.getStartPosition()
-                    .getLine()) {
+                    cont.getBlock().getStartPosition().getLine()
+                        == getStatement().getStartPosition().getLine()) {
                 cons = cons.add(cont);
             } else if (!cont.isOnBlock() &&
-                    cont.getLoop().getStartPosition().getLine() == statement.getStartPosition()
+                    cont.getLoop().getStartPosition().getLine() == getStatement().getStartPosition()
                     .getLine()) {
                 cons = cons.add(cont);
             }
@@ -94,7 +94,7 @@ public abstract class AbstractLoopContractBuiltInRuleApp
      */
     public void update(final JavaStatement statement, final LoopContract contract,
             final List<LocationVariable> heaps) {
-        this.statement = statement;
+        setStatement(statement);
         this.contract = contract;
         this.heaps = heaps;
     }

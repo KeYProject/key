@@ -158,6 +158,11 @@ public final class MiscTools {
         return wpvc.getDeclaredPVs();
     }
 
+    /**
+     * Recursively collect all observers for this term including all of its sub terms.
+     * @param t the term for which we want to collect the observer functions.
+     * @return the observers as a set of pairs with sorts and according observers
+     */
     public static ImmutableSet<Pair<Sort, IObserverFunction>> collectObservers(Term t) {
         ImmutableSet<Pair<Sort, IObserverFunction>> result = DefaultImmutableSet.nil();
         if (t.op() instanceof IObserverFunction) {
@@ -180,6 +185,7 @@ public final class MiscTools {
      *
      * @param a an object.
      * @param b another object.
+     * @param <T> type of {@code a} and result value.
      * @return {@code true} iff both are <code>null</code> or <code>a.equals(b)</code>
      *  with <code>equals</code> from type T.
      */
@@ -197,6 +203,7 @@ public final class MiscTools {
      *
      * @param a an object.
      * @param bs other object.
+     * @param <T> type of {@code a} and result value.
      * @return {@code true} iff all are <code>null</code> or <code>a.equals(b)</code>
      *  with <code>equals</code> from type T for every {@code b}.
      */
@@ -217,6 +224,8 @@ public final class MiscTools {
      *
      * @param s1 an array.
      * @param s2 another array.
+     * @param <S> type o array {@code s1} and of result array.
+     * @param <T> type of array {@code s2}.
      * @return the concatenation of both arrays.
      */
     public static <S, T extends S> S[] concat(S[] s1, T[] s2) {
@@ -238,6 +247,9 @@ public final class MiscTools {
      *
      * @param m0 a map.
      * @param m1 another map.
+     * @param <S> type of {@code m0}.
+     * @param <T> type of {@code m1}.
+     * @param <U> new type of result map indexes.
      * @return the combination of both maps.
      */
     public static <S, T, U> Map<S, U> apply(Map<S, ? extends T> m0, Map<T, U> m1) {
@@ -322,10 +334,10 @@ public final class MiscTools {
 
     /**
      * Returns a filename relative to another one. The second parameter needs to be absolute and is
-     * expected to refer to a directory. This method only operates on Strings, not on real files! Note
-     * that it treats Strings case-sensitive. The resulting filename always uses UNIX directory
-     * delimiters. Raises a RuntimeException if no relative path could be found (may happen on
-     * Windows systems).
+     * expected to refer to a directory. This method only operates on Strings, not on real files!
+     * Note that it treats Strings case-sensitive. The resulting filename always uses UNIX
+     * directory delimiters. Raises a RuntimeException if no relative path could be found (may
+     * happen on Windows systems).
      *
      * @param origFilename a filename.
      * @param toFilename the name of a parent directory of {@code origFilename}.
@@ -357,7 +369,8 @@ public final class MiscTools {
         if (a[0].equals("")) { // not already relative
             if (!b[0].equals("")) {
                 throw new RuntimeException("\"" + toFilename
-                        + "\" is a relative path. Please use absolute paths to make others relative to them.");
+                        + "\" is a relative path. "
+                        + "Please use absolute paths to make others relative to them.");
             }
 
             // remove ".." from paths
@@ -378,7 +391,7 @@ public final class MiscTools {
                 if (diff) {
                     s = s + "../";
                     if (i < a.length) {
-                        t = t + (a[i].equals("") ? "" : "/") + a[i];
+                        t += (a[i].equals("") ? "" : "/") + a[i];
                     }
                 }
                 i++;
@@ -387,7 +400,8 @@ public final class MiscTools {
             i = 0;
         }
         while (i < a.length) {
-            t = t + (a[i].equals("") ? "" : "/") + a[i++];
+            t += (a[i].equals("") ? "" : "/") + a[i];
+            i++;
         }
         // strip leading slash
         if (t.length() > 0 && t.charAt(0) == '/') {
@@ -406,13 +420,15 @@ public final class MiscTools {
         int k = 0;
         for (int j = 0; j < a.length - 1; j++) {
             if (a[j].equals("..") || !a[j + 1].equals("..")) {
-                newa[k++] = a[j];
+                newa[k] = a[j];
+                k++;
             } else {
                 j++;
             }
         }
         if (!a[a.length - 1].equals("..")) {
-            newa[k++] = a[a.length - 1];
+            newa[k] = a[a.length - 1];
+            k++;
         }
         return Arrays.copyOf(newa, k);
     }
@@ -491,7 +507,7 @@ public final class MiscTools {
      * @param string an arbitrary string
      * @return a string which is a sub-structure of the original character sequence
      *
-     * @author mattias ulbrich
+     * @author Mattias Ulbrich
      */
     public static /* @ non_null @ */ String filterAlphabetic(/* @ non_null @ */ String string) {
         StringBuilder res = new StringBuilder();
@@ -505,11 +521,12 @@ public final class MiscTools {
     }
 
     /**
-     * Checks whether a string contains another one as a whole word (i.e., separated by whitespaces
-     * or a semicolon at the end).
+     * Checks whether a string contains another one as a whole word (i.e., separated by
+     * white spaces or a semicolon at the end).
      *
      * @param s    string to search in
      * @param word string to be searched for
+     * @return the answer to the question specified above
      */
     public static boolean containsWholeWord(String s, String word) {
         if (s == null || word == null) {
@@ -700,8 +717,14 @@ public final class MiscTools {
     // -------------------------------------------------------------------------
 
     private static final class ReadPVCollector extends JavaASTVisitor {
+        /**
+         * The list of resulting (i.e., read) program variables.
+         */
         private ImmutableSet<ProgramVariable> result = DefaultImmutableSet.<ProgramVariable>nil();
 
+        /**
+         * The declared program variables.
+         */
         private ImmutableSet<ProgramVariable> declaredPVs = DefaultImmutableSet
                 .<ProgramVariable>nil();
 
@@ -733,11 +756,17 @@ public final class MiscTools {
     }
 
     private static class WrittenAndDeclaredPVCollector extends JavaASTVisitor {
-        protected ImmutableSet<ProgramVariable> writtenPVs
-            = DefaultImmutableSet.<ProgramVariable>nil();
+        /**
+         * The written program variables.
+         */
+        private ImmutableSet<ProgramVariable> writtenPVs =
+                DefaultImmutableSet.<ProgramVariable>nil();
 
-        protected ImmutableSet<ProgramVariable> declaredPVs = DefaultImmutableSet
-                .<ProgramVariable>nil();
+        /**
+         * The declared program variables.
+         */
+        private ImmutableSet<ProgramVariable> declaredPVs =
+                DefaultImmutableSet.<ProgramVariable>nil();
 
         public WrittenAndDeclaredPVCollector(ProgramElement root, Services services) {
             super(root, services);

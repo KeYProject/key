@@ -45,14 +45,17 @@ public class LoopContractInternalBuiltInRuleApp extends AbstractLoopContractBuil
      *            the heap context.
      */
     public LoopContractInternalBuiltInRuleApp(final BuiltInRule rule,
-            final PosInOccurrence occurrence, final ImmutableList<PosInOccurrence> ifInstantiations,
-            final JavaStatement statement, final LoopContract contract,
-            final List<LocationVariable> heaps) {
+                                              final PosInOccurrence occurrence,
+                                              final ImmutableList<PosInOccurrence>
+                                                           ifInstantiations,
+                                              final JavaStatement statement,
+                                              final LoopContract contract,
+                                              final List<LocationVariable> heaps) {
         super(rule, occurrence, ifInstantiations);
         assert rule != null;
         assert rule instanceof LoopContractInternalRule;
         assert occurrence != null;
-        this.statement = statement;
+        setStatement(statement);
         this.contract = contract;
         this.heaps = heaps;
     }
@@ -60,7 +63,7 @@ public class LoopContractInternalBuiltInRuleApp extends AbstractLoopContractBuil
     @Override
     public LoopContractInternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
         return new LoopContractInternalBuiltInRuleApp(builtInRule, newOccurrence, ifInsts,
-                statement, contract, heaps);
+                                                      getStatement(), contract, heaps);
     }
 
     @Override

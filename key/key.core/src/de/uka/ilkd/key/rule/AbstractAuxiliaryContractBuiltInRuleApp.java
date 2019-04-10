@@ -23,7 +23,7 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp
     /**
      * @see #getStatement()
      */
-    protected JavaStatement statement;
+    private JavaStatement statement;
 
     /**
      * @see #getHeapContext()
@@ -52,6 +52,14 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp
     public AbstractAuxiliaryContractBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence occurrence, ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
+    }
+
+    /**
+     *
+     * @param s the statement (block or loop) which the applied contract belongs to.
+     */
+    public void setStatement(JavaStatement s) {
+        this.statement = s;
     }
 
     /**

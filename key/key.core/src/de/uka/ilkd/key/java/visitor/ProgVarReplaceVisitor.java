@@ -270,7 +270,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     public void performActionOnBlockContract(final StatementBlock oldBlock,
-            final StatementBlock newBlock) {
+                                             final StatementBlock newBlock) {
         ImmutableSet<BlockContract> oldContracts = services
                 .getSpecificationRepository().getBlockContracts(oldBlock);
         for (BlockContract oldContract : oldContracts) {
@@ -282,7 +282,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     public void performActionOnLoopContract(final StatementBlock oldBlock,
-            final StatementBlock newBlock) {
+                                            final StatementBlock newBlock) {
         ImmutableSet<LoopContract> oldContracts = services
                 .getSpecificationRepository().getLoopContracts(oldBlock);
         for (LoopContract oldContract : oldContracts) {
@@ -294,7 +294,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     public void performActionOnLoopContract(final LoopStatement oldLoop,
-            final LoopStatement newLoop) {
+                                            final LoopStatement newLoop) {
         ImmutableSet<LoopContract> oldContracts = services
                 .getSpecificationRepository().getLoopContracts(oldLoop);
         for (LoopContract oldContract : oldContracts) {

@@ -65,10 +65,10 @@ public abstract class AbstractBlockContractBuiltInRuleApp
                 .instantiate(posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<BlockContract> contracts = AbstractBlockContractRule
                 .getApplicableContracts(instantiation, goal, services);
-        statement = instantiation.statement;
+        setStatement(instantiation.statement);
         ImmutableSet<BlockContract> cons = DefaultImmutableSet.<BlockContract> nil();
         for (BlockContract cont : contracts) {
-            if (cont.getBlock().getStartPosition().getLine() == statement.getStartPosition()
+            if (cont.getBlock().getStartPosition().getLine() == getStatement().getStartPosition()
                     .getLine()) {
                 cons = cons.add(cont);
             }
@@ -89,7 +89,7 @@ public abstract class AbstractBlockContractBuiltInRuleApp
      */
     public void update(final JavaStatement statement, final BlockContract contract,
             final List<LocationVariable> heaps) {
-        this.statement = statement;
+        setStatement(statement);
         this.contract = contract;
         this.heaps = heaps;
     }

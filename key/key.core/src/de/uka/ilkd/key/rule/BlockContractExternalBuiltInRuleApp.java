@@ -45,14 +45,17 @@ public class BlockContractExternalBuiltInRuleApp extends AbstractBlockContractBu
      *            the heap context.
      */
     public BlockContractExternalBuiltInRuleApp(final BuiltInRule rule,
-            final PosInOccurrence occurrence, final ImmutableList<PosInOccurrence> ifInstantiations,
-            final JavaStatement statement, final BlockContract contract,
-            final List<LocationVariable> heaps) {
+                                               final PosInOccurrence occurrence,
+                                               final ImmutableList<PosInOccurrence>
+                                                            ifInstantiations,
+                                               final JavaStatement statement,
+                                               final BlockContract contract,
+                                               final List<LocationVariable> heaps) {
         super(rule, occurrence, ifInstantiations);
         assert rule != null;
         assert rule instanceof BlockContractExternalRule;
         assert occurrence != null;
-        this.statement = statement;
+        setStatement(statement);
         this.contract = contract;
         this.heaps = heaps;
     }
@@ -60,7 +63,7 @@ public class BlockContractExternalBuiltInRuleApp extends AbstractBlockContractBu
     @Override
     public BlockContractExternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
         return new BlockContractExternalBuiltInRuleApp(builtInRule, newOccurrence, ifInsts,
-                statement, contract, heaps);
+                                                       getStatement(), contract, heaps);
     }
 
     @Override

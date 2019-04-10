@@ -65,7 +65,7 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
         assert rule != null;
         assert rule instanceof BlockContractInternalRule;
         assert occurrence != null;
-        this.statement = statement;
+        setStatement(statement);
         this.contract = contract;
         this.heaps = heaps;
     }
@@ -73,7 +73,7 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
     @Override
     public BlockContractInternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
         return new BlockContractInternalBuiltInRuleApp(builtInRule, newOccurrence, ifInsts,
-                statement, contract, heaps);
+                getStatement(), contract, heaps);
     }
 
     @Override
