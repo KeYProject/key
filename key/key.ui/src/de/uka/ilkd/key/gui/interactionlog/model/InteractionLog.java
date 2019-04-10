@@ -17,6 +17,8 @@ import java.util.List;
 @XmlRootElement(name = "interaction-log")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InteractionLog implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @XmlTransient
     private WeakReference<Proof> proof;
 

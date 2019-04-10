@@ -16,6 +16,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MergeRuleBuiltInRuleInteraction extends BuiltInRuleInteraction {
+    private static final long serialVersionUID = 1L;
+
     public MergeRuleBuiltInRuleInteraction() {
     }
 

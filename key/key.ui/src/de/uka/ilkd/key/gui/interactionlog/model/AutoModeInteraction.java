@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 @XmlRootElement()
 @XmlAccessorType(XmlAccessType.FIELD)
 public class AutoModeInteraction extends Interaction {
+    private static final long serialVersionUID = 3650173956594987169L;
+
     private ApplyStrategyInfo info;
 
     private List<NodeIdentifier> initialNodeIds;

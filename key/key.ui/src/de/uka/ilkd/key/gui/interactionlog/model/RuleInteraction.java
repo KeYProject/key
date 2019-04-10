@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.interactionlog.model;
 
 import de.uka.ilkd.key.gui.interactionlog.algo.InteractionVisitor;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -16,10 +15,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * @author weigl
+ * @author Alexander Weigl
  */
 @XmlRootElement
 public final class RuleInteraction extends NodeInteraction {
+    private static final long serialVersionUID = 1L;
+
     private String ruleName;
     private OccurenceIdentifier posInOccurence;
     private HashMap<String, String> arguments = new HashMap<>();

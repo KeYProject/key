@@ -14,8 +14,6 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import javax.swing.JCheckBox;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  * {@link JCheckBox} indicating whether taclet info is displayed for inner nodes
@@ -24,6 +22,8 @@ import javax.swing.event.ChangeListener;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class TacletInfoToggle extends JCheckBox {
+    private static final long serialVersionUID = 1L;
+
     private InnerNodeView innerNodeView = null;
 
     public TacletInfoToggle() {

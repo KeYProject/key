@@ -99,7 +99,7 @@ public final class TypeConverter {
     private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
     
     private HeapLDT heapLDT = null;
-    private IntegerLDT integerLDT = null;
+    //private IntegerLDT integerLDT = null;
     
     TypeConverter(Services s) {
         this.services = s;
@@ -119,7 +119,7 @@ public final class TypeConverter {
             }
         }
         heapLDT = getHeapLDT();
-        integerLDT = getIntegerLDT();
+        //integerLDT = getIntegerLDT();
     }
 
     public ImmutableList<LDT> getModels() {

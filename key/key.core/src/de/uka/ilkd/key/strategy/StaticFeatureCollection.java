@@ -8,7 +8,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
-import de.uka.ilkd.key.rule.LoopContractApplyHeadRule;
+import de.uka.ilkd.key.rule.LoopApplyHeadRule;
 import de.uka.ilkd.key.rule.LoopContractExternalRule;
 import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
@@ -116,11 +116,11 @@ public abstract class StaticFeatureCollection {
 
     /**
      * @param cost The specified cost.
-     * @return a feature for {@link LoopContractApplyHeadRule} with the specified cost.
+     * @return a feature for {@link LoopApplyHeadRule} with the specified cost.
      */
     protected static Feature loopContractApplyHead(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(LoopContractApplyHeadRule.INSTANCE);
+        filter.addRuleToSet(LoopApplyHeadRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
 

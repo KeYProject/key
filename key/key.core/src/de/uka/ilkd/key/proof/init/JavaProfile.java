@@ -145,7 +145,7 @@ public class JavaProfile extends AbstractProfile {
                                    .prepend(getOneStepSimpilifier())
                                    .prepend(QueryExpand.INSTANCE)
                                    .prepend(MergeRule.INSTANCE)
-                                   .prepend(LoopContractApplyHeadRule.INSTANCE);
+                                   .prepend(LoopApplyHeadRule.INSTANCE);
 
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact
         // that Contract insertion rule is the FIRST element of this list!
@@ -253,6 +253,6 @@ public class JavaProfile extends AbstractProfile {
     public boolean isSpecificationInvolvedInRuleApp(RuleApp app) {
         return app instanceof LoopInvariantBuiltInRuleApp ||
                 app instanceof AbstractContractRuleApp ||
-                app instanceof AbstractBlockSpecificationElementBuiltInRuleApp;
+                app instanceof AbstractAuxiliaryContractBuiltInRuleApp;
     }
 }

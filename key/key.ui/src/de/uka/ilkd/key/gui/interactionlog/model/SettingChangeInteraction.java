@@ -8,8 +8,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.awt.*;
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Properties;
 
 /**
@@ -20,6 +18,8 @@ import java.util.Properties;
 @XmlRootElement()
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SettingChangeInteraction extends Interaction {
+    private static final long serialVersionUID = 1L;
+
     @XmlAttribute
     private String message;
 

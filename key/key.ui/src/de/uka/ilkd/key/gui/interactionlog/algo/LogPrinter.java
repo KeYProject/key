@@ -2,7 +2,6 @@ package de.uka.ilkd.key.gui.interactionlog.algo;
 
 import de.uka.ilkd.key.gui.interactionlog.model.Interaction;
 import de.uka.ilkd.key.gui.interactionlog.model.InteractionLog;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 
 import java.io.PrintWriter;
@@ -12,7 +11,7 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * @author weigl
+ * @author Alexander Weigl
  */
 public class LogPrinter {
     public static String SEPARATOR = " // ";
@@ -20,15 +19,13 @@ public class LogPrinter {
     public static String RANGE_SEPARATOR = " -- ";
 
     public static String END_MARKER = "$$";
-    private final Services services;
     private StringWriter w;
     private PrintWriter out;
     private Function<Node, String> matchExpr = LogPrinter::getBranchingLabel;
     private int indent = 0;
     private InteractionLog state;
 
-    public LogPrinter(Services services) {
-        this.services = services;
+    public LogPrinter() {
     }
 
 
