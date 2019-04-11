@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.logic;
 
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -1708,10 +1707,8 @@ public class TermBuilder {
             return tf.createTerm(term.op(), term.subs(), term.boundVars(),
                     term.javaBlock(), labels);
         } else {
-            ArrayList<TermLabel> newLabelList = new ArrayList<TermLabel>();
-            for (TermLabel l : term.getLabels()) {
-                newLabelList.add(l);
-            }
+            List<TermLabel> newLabelList = term.getLabels().toList();
+
             for (TermLabel l : labels) {
                 if (!newLabelList.contains(l)) {
                     newLabelList.add(l);
@@ -1739,23 +1736,40 @@ public class TermBuilder {
     }
 
     /**
-     * Applies labels to a term, removing any existing labels.
+     * Applies labels to a term, removing any existing labels of the same type.
      *
      * @param term the term.
      * @param labels the labels to apply.
      * @return the modified term.
      */
     public Term label(Term term, ImmutableArray<TermLabel> labels) {
-        if ((labels == null || labels.isEmpty())) {
+    	if ((labels == null || labels.isEmpty()) && !term.hasLabels()) {
             return term;
-        } else {
+        } else if (!term.hasLabels()) {
             return tf.createTerm(term.op(), term.subs(), term.boundVars(),
                     term.javaBlock(), labels);
+        } else {
+            List<TermLabel> newLabelList = term.getLabels().toList();
+
+            for (TermLabel newLabel : labels) {
+            	for (TermLabel oldLabel : newLabelList) {
+            		if (oldLabel.getClass().equals(newLabel.getClass())) {
+            			newLabelList.remove(oldLabel);
+            			break;
+            		}
+            	}
+
+                newLabelList.add(newLabel);
+            }
+
+            return tf.createTerm(term.op(), term.subs(), term.boundVars(),
+                    term.javaBlock(),
+                    new ImmutableArray<TermLabel>(newLabelList));
         }
     }
 
     /**
-     * Applies a label to a term, removing any existing labels.
+     * Applies a label to a term, removing any existing labels of the same type.
      *
      * @param term the term.
      * @param label the label to apply.
