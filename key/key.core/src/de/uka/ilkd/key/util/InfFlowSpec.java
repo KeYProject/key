@@ -30,6 +30,12 @@ public class InfFlowSpec {
         this.newObjects = newObjects;
     }
 
+    /**
+     * Applies a unary operator to every list of terms in this InfFlow specification element.
+     *
+     * @param op the operator to apply.
+     * @return this InfFlow specification element with the operator applied.
+     */
     public InfFlowSpec map(UnaryOperator<Term> op) {
         return new InfFlowSpec(
                 preExpressions.stream().map(op).collect(ImmutableList.collector()),

@@ -43,18 +43,30 @@ public interface OperationContract extends Contract {
 
     /**
      * Returns the modifies clause of the contract.
+     *
+     * @param heapVar   the heap variable.
+     * @param selfVar   the self variable.
+     * @param paramVars the list of parameter variables.
+     * @param services  the services object.
+     * @return the modifies clause.
      */
     public Term getMod(LocationVariable heapVar, ProgramVariable selfVar,
-	    	       ImmutableList<ProgramVariable> paramVars,
+                       ImmutableList<ProgramVariable> paramVars,
                        Services services);
-
 
     /**
      * Returns the modifies clause of the contract.
+     *
+     * @param heapVar    the heap variable
+     * @param heapTerm   the heap variable term.
+     * @param selfTerm   the self variable term.
+     * @param paramTerms the list of parameter variable terms.
+     * @param services   the services object.
+     * @return the modifies clause.
      */
     public Term getMod(LocationVariable heapVar, Term heapTerm,
-	               Term selfTerm,
-	    	       ImmutableList<Term> paramTerms,
+                       Term selfTerm,
+                       ImmutableList<Term> paramTerms,
                        Services services);
 
     public Term getFreePre(LocationVariable heap,

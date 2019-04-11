@@ -207,11 +207,12 @@ public final class LoopSpecImpl implements LoopSpecification {
         Map<LocationVariable, ImmutableList<InfFlowSpec>> newInfFlowSpecs =
                 originalInfFlowSpecs.entrySet().stream().collect(MapUtil.collector(
                         Map.Entry::getKey,
-                        entry -> entry.getValue().stream().map(spec -> spec.map(op))
-                        .collect(ImmutableList.collector())));
+                    entry -> entry.getValue().stream().map(spec -> spec.map(op))
+                             .collect(ImmutableList.collector())));
         Term newVariant = op.apply(originalVariant);
         Term newSelfTerm = op.apply(originalSelfTerm);
-        ImmutableList<Term> newLocalIns = localIns.stream().map(op).collect(ImmutableList.collector());
+        ImmutableList<Term> newLocalIns =
+                localIns.stream().map(op).collect(ImmutableList.collector());
         ImmutableList<Term> newLocalOuts =
                 localOuts.stream().map(op).collect(ImmutableList.collector());
         Map<LocationVariable, Term> newAtPres = originalAtPres.entrySet().stream().collect(

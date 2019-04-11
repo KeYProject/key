@@ -45,8 +45,18 @@ import de.uka.ilkd.key.util.Pair;
  */
 public final class PartialInvAxiom extends ClassAxiom {
 
+    /**
+     * The partial invariant from which the axiom is derived.
+     */
     private final ClassInvariant inv;
+    /**
+     * The partial invariant function symbol.
+     */
     private final IObserverFunction target;
+    /**
+     * Whether the axiom matches static invariants (i.e., &lt;$inv&gt;)
+     * or instance invariants (i.e., &lt;inv&gt;).
+     */
     private final boolean isStatic;
 
     /** Creates a new class axiom.
@@ -56,15 +66,15 @@ public final class PartialInvAxiom extends ClassAxiom {
      * @param services
      */
     public PartialInvAxiom(ClassInvariant inv, boolean isStatic, Services services) {
-	assert inv != null;
-	this.inv = inv;
-	assert !isStatic || inv.isStatic();
-	this.isStatic = isStatic;
-	this.target = isStatic? services.getJavaInfo().getStaticInv(inv.getKJT())
-	            : services.getJavaInfo().getInv();
-
-
-	assert target != null;
+        assert inv != null;
+        this.inv = inv;
+        assert !isStatic || inv.isStatic();
+        this.isStatic = isStatic;
+        this.target =
+                isStatic ?
+                        services.getJavaInfo().getStaticInv(inv.getKJT())
+                        : services.getJavaInfo().getInv();
+        assert target != null;
     }
 
     public PartialInvAxiom(ClassInvariant inv, String displayName, Services services){
@@ -178,15 +188,14 @@ public final class PartialInvAxiom extends ClassAxiom {
     @Override
     public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
 	    						Services services) {
-	final ProgramVariable dummySelfVar
-		= services.getTermBuilder().selfVar(inv.getKJT(), false);
-	return MiscTools.collectObservers(inv.getInv(dummySelfVar, services));
+        final ProgramVariable dummySelfVar =
+                services.getTermBuilder().selfVar(inv.getKJT(), false);
+        return MiscTools.collectObservers(inv.getInv(dummySelfVar, services));
     }
-
 
     @Override
     public String toString() {
-	return inv.toString();
+        return inv.toString();
     }
 
     public ClassInvariant getInv() {

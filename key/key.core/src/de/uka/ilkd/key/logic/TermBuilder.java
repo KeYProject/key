@@ -1743,7 +1743,7 @@ public class TermBuilder {
      * @return the modified term.
      */
     public Term label(Term term, ImmutableArray<TermLabel> labels) {
-    	if ((labels == null || labels.isEmpty()) && !term.hasLabels()) {
+        if ((labels == null || labels.isEmpty()) && !term.hasLabels()) {
             return term;
         } else if (!term.hasLabels()) {
             return tf.createTerm(term.op(), term.subs(), term.boundVars(),
@@ -1752,16 +1752,14 @@ public class TermBuilder {
             List<TermLabel> newLabelList = term.getLabels().toList();
 
             for (TermLabel newLabel : labels) {
-            	for (TermLabel oldLabel : newLabelList) {
-            		if (oldLabel.getClass().equals(newLabel.getClass())) {
-            			newLabelList.remove(oldLabel);
-            			break;
-            		}
-            	}
-
+                for (TermLabel oldLabel : newLabelList) {
+                    if (oldLabel.getClass().equals(newLabel.getClass())) {
+                        newLabelList.remove(oldLabel);
+                        break;
+                    }
+                }
                 newLabelList.add(newLabel);
             }
-
             return tf.createTerm(term.op(), term.subs(), term.boundVars(),
                     term.javaBlock(),
                     new ImmutableArray<TermLabel>(newLabelList));

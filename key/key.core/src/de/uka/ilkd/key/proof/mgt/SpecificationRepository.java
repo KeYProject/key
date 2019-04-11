@@ -801,7 +801,7 @@ public final class SpecificationRepository {
             }
 
             map.put(key, (ImmutableSet<V>) oldSet.stream().map(
-                    contract -> contract.map(op, services)).collect(ImmutableSet.collector()));
+                contract -> contract.map(op, services)).collect(ImmutableSet.collector()));
         }
     }
 
@@ -843,7 +843,7 @@ public final class SpecificationRepository {
      *
      * @see SpecificationElement#map(java.util.function.UnaryOperator, Services)
      */
-    public void map(UnaryOperator<Term> op, Services servicess) {
+    public void map(UnaryOperator<Term> op, Services services) {
         mapValueSets(contracts, op, services);
         mapValueSets(operationContracts, op, services);
         mapValueSets(wdChecks, op, services);

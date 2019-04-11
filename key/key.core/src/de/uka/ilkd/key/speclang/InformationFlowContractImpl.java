@@ -165,12 +165,15 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     public InformationFlowContract map(UnaryOperator<Term> op, Services services) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
-                op.apply(origPre), op.apply(origMby), op.apply(origMod),
-                hasRealModifiesClause, origSelf,
-                origParams.stream().map(op).collect(ImmutableList.collector()),
-                op.apply(origResult), op.apply(origExc), op.apply(origAtPre), op.apply(origDep),
-                origInfFlowSpecs.stream().map(spec -> spec.map(op)).collect(ImmutableList.collector()),
-                toBeSaved, id);
+                                               op.apply(origPre), op.apply(origMby),
+                                               op.apply(origMod), hasRealModifiesClause, origSelf,
+                                               origParams.stream().map(op)
+                                               .collect(ImmutableList.collector()),
+                                               op.apply(origResult), op.apply(origExc),
+                                               op.apply(origAtPre), op.apply(origDep),
+                                               origInfFlowSpecs.stream().map(spec -> spec.map(op))
+                                               .collect(ImmutableList.collector()),
+                                               toBeSaved, id);
     }
 
     @Override

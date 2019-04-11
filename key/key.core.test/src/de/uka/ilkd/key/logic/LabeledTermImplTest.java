@@ -65,7 +65,7 @@ public class LabeledTermImplTest extends TestCase {
 	   Term oneLabel = services.getTermBuilder().label(unlabled, sedLabel);
 	   Term oneLabelChanged = services.getTermBuilder().label(oneLabel, ParameterlessTermLabel.ANON_HEAP_LABEL);
 	   Term twoLabels = services.getTermBuilder().label(unlabled, new ImmutableArray<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL, sedLabel));
-	   // Test unlabled
+	   // Test unlabeled
 	   assertFalse(unlabled.hasLabels());
 	   assertNotNull(unlabled.getLabels());
 	   assertEquals(0, unlabled.getLabels().size());
@@ -80,7 +80,7 @@ public class LabeledTermImplTest extends TestCase {
       assertTrue(oneLabel.containsLabel(sedLabel));
       assertFalse(oneLabel.containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL));
       assertFalse(oneLabel.containsLabel(anotherSedLabel));
-      // Test oneLabledAgain
+      // Test oneLabeledAgain
       assertTrue(oneLabelChanged.hasLabels());
       assertNotNull(oneLabelChanged.getLabels());
       assertEquals(1, oneLabelChanged.getLabels().size());

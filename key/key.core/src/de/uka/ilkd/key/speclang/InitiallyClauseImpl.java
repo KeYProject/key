@@ -34,12 +34,34 @@ import de.uka.ilkd.key.proof.OpReplacer;
  */
 public final class InitiallyClauseImpl implements InitiallyClause {
 
+    /**
+     * The unique internal name of the initially clause.
+     */
     private final String name;
+    /**
+     * The displayed name.
+     */
     private final String displayName;
+    /**
+     * The KeYJavaType representing the function to which the
+     * initially clause belongs.
+     */
     private final KeYJavaType kjt;
+    /**
+     * The visibility of the initially clause (null for default visibility).
+     */
     private final VisibilityModifier visibility;
+    /**
+     * The invariant from which the initially clause is derived.
+     */
     private final Term originalInv;
+    /**
+     * The original self variable of the receiver object.
+     */
     private final ParsableVariable originalSelfVar;
+    /**
+     * The original specification.
+     */
     private final PositionedString originalSpec;
 
 
@@ -65,11 +87,11 @@ public final class InitiallyClauseImpl implements InitiallyClause {
                               ParsableVariable selfVar, PositionedString originalSpec) {
         assert name != null && !name.equals("");
         assert displayName != null && !displayName.equals("");
-	assert kjt != null;
+        assert kjt != null;
         assert inv != null;
         this.name            = name;
         this.displayName     = displayName;
-	this.kjt             = kjt;
+        this.kjt             = kjt;
         this.visibility      = visibility;
         this.originalInv     = inv;
         this.originalSelfVar = selfVar;
@@ -77,7 +99,6 @@ public final class InitiallyClauseImpl implements InitiallyClause {
         originalInv.execPostOrder(oc);
         this.originalSpec = originalSpec;
     }
-
 
 
     //-------------------------------------------------------------------------
@@ -98,7 +119,6 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     }
 
 
-
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
@@ -116,7 +136,6 @@ public final class InitiallyClauseImpl implements InitiallyClause {
         return name;
     }
 
-
     @Override
     public String getDisplayName() {
         return displayName;
@@ -125,9 +144,8 @@ public final class InitiallyClauseImpl implements InitiallyClause {
 
     @Override
     public KeYJavaType getKJT() {
-	return kjt;
+        return kjt;
     }
-
 
     @Override
     public Term getClause(ParsableVariable selfVar, TermServices services) {
@@ -146,11 +164,8 @@ public final class InitiallyClauseImpl implements InitiallyClause {
 
     @Override
     public VisibilityModifier getVisibility() {
-	return visibility;
+        return visibility;
     }
-
-
-
 
     @Override
     public String toString() {
@@ -159,14 +174,13 @@ public final class InitiallyClauseImpl implements InitiallyClause {
 
     @Override
     public InitiallyClause setKJT(KeYJavaType newKjt) {
-	InitiallyClauseImpl res= new InitiallyClauseImpl(name,
-                                      displayName,
-                                      newKjt,
-                                      visibility,
-                                      originalInv,
-                                      originalSelfVar,originalSpec);
-	return res;
+        InitiallyClauseImpl res = new InitiallyClauseImpl(name,
+                                                          displayName,
+                                                          newKjt,
+                                                          visibility,
+                                                          originalInv,
+                                                          originalSelfVar,
+                                                          originalSpec);
+        return res;
     }
-
-
 }

@@ -49,25 +49,44 @@ public interface FunctionalOperationContract extends OperationContract {
 
     /**
      * Returns the postcondition of the contract.
+     *
+     * @param heap      the heap variable.
+     * @param selfVar   the self variable.
+     * @param paramVars the list of parameter variables.
+     * @param resultVar the result variable.
+     * @param excVar    the exception variable.
+     * @param atPreVars the map of old variables.
+     * @param services  the services object.
+     * @return the post condition.
      */
     public Term getPost(LocationVariable heap,
                         ProgramVariable selfVar,
-	    	        ImmutableList<ProgramVariable> paramVars,
-	    	        ProgramVariable resultVar,
-	    	        ProgramVariable excVar,
-	    	        Map<LocationVariable,? extends ProgramVariable> atPreVars,
-	    	        Services services);
+                        ImmutableList<ProgramVariable> paramVars,
+                        ProgramVariable resultVar,
+                        ProgramVariable excVar,
+                        Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+                        Services services);
 
     public Term getPost(List<LocationVariable> heapContext,
                         ProgramVariable selfVar,
-	    	        ImmutableList<ProgramVariable> paramVars,
-	    	        ProgramVariable resultVar,
-	    	        ProgramVariable excVar,
-	    	        Map<LocationVariable,? extends ProgramVariable> atPreVars,
-	    	        Services services);
+                        ImmutableList<ProgramVariable> paramVars,
+                        ProgramVariable resultVar,
+                        ProgramVariable excVar,
+                        Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+                        Services services);
 
     /**
      * Returns the postcondition of the contract.
+     *
+     * @param heap       the heap variable.
+     * @param heapTerm   the heap variable term.
+     * @param selfTerm   the self variable term.
+     * @param paramTerms the list of parameter variable terms.
+     * @param resultTerm the result variable term.
+     * @param excTerm    the exception variable term.
+     * @param atPres     the map of old variable terms.
+     * @param services   the services object.
+     * @return the postcondition.
      */
     public Term getPost(LocationVariable heap,
                         Term heapTerm,
@@ -75,24 +94,24 @@ public interface FunctionalOperationContract extends OperationContract {
                         ImmutableList<Term> paramTerms,
                         Term resultTerm,
                         Term excTerm,
-	    	        Map<LocationVariable,Term> atPres,
-	    	        Services services);
+                        Map<LocationVariable, Term> atPres,
+                        Services services);
 
     public Term getPost(List<LocationVariable> heapContext,
-                        Map<LocationVariable,Term> heapTerms,
+                        Map<LocationVariable, Term> heapTerms,
                         Term selfTerm,
                         ImmutableList<Term> paramTerms,
                         Term resultTerm,
-	    	        Term excTerm,
-	    	        Map<LocationVariable,Term> atPres,
-	    	        Services services);
+                        Term excTerm,
+                        Map<LocationVariable, Term> atPres,
+                        Services services);
 
     public Term getFreePost(LocationVariable heap,
                             ProgramVariable selfVar,
                             ImmutableList<ProgramVariable> paramVars,
                             ProgramVariable resultVar,
                             ProgramVariable excVar,
-                            Map<LocationVariable,? extends ProgramVariable> atPreVars,
+                            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
                             Services services);
 
     public Term getFreePost(LocationVariable heap,
@@ -101,16 +120,16 @@ public interface FunctionalOperationContract extends OperationContract {
                             ImmutableList<Term> paramTerms,
                             Term resultTerm,
                             Term excTerm,
-                            Map<LocationVariable,Term> atPres,
+                            Map<LocationVariable, Term> atPres,
                             Services services);
 
     public Term getFreePost(List<LocationVariable> heapContext,
-                            Map<LocationVariable,Term> heapTerms,
+                            Map<LocationVariable, Term> heapTerms,
                             Term selfTerm,
                             ImmutableList<Term> paramTerms,
                             Term resultTerm,
                             Term excTerm,
-                            Map<LocationVariable,Term> atPres,
+                            Map<LocationVariable, Term> atPres,
                             Services services);
 
     /**
@@ -129,7 +148,7 @@ public interface FunctionalOperationContract extends OperationContract {
                                    ImmutableList<Term> paramTerms,
                                    Term resultTerm,
                                    Term excTerm,
-                                   Map<LocationVariable,Term> atPres,
+                                   Map<LocationVariable, Term> atPres,
                                    Services services);
 
     public String getBaseName();

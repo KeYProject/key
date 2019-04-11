@@ -39,12 +39,35 @@ import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
  */
 public final class ClassInvariantImpl implements ClassInvariant {
 
+    /**
+     * The unique internal name of the class invariant.
+     */
     private final String name;
+    /**
+     * The displayed name.
+     */
     private final String displayName;
+    /**
+     * The KeYJavaType representing the function to which the
+     * class invariant belongs.
+     */
     private final KeYJavaType kjt;
+    /**
+     * The visibility of the class invariant (null for default visibility).
+     */
     private final VisibilityModifier visibility;
+    /**
+     * The original invariant from which the class invariant is derived.
+     */
     private final Term originalInv;
+    /**
+     * The original self variable of the receiver object.
+     */
     private final ParsableVariable originalSelfVar;
+    /**
+     * Whether the class invariant is a static (i.e., &lt;$inv&gt;)
+     * or an instance invariant (i.e., &lt;inv&gt;).
+     */
     private final boolean isStatic;
 
 
@@ -164,7 +187,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     @Override
     public ClassInvariant setKJT(KeYJavaType newKjt) {
         String newName = name.replaceFirst(kjt.getName(), newKjt.getName());
-	return new ClassInvariantImpl(newName,
+        return new ClassInvariantImpl(newName,
                                       displayName,
                                       newKjt,
                                       visibility,
