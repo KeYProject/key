@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import junit.framework.TestCase;
-
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -22,6 +20,7 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.rule.TacletForTests;
+import junit.framework.TestCase;
 
 public class LabeledTermImplTest extends TestCase {
 
@@ -34,21 +33,21 @@ public class LabeledTermImplTest extends TestCase {
             tf = services.getTermFactory();
 
         }
-    
+
 	public void testEqualsLabelOnTop() {
-                Term unlabeledTerm = 
-				tf.createTerm(Junctor.AND, 
-						tf.createTerm(Junctor.TRUE), 
+                Term unlabeledTerm =
+				tf.createTerm(Junctor.AND,
+						tf.createTerm(Junctor.TRUE),
 						tf.createTerm(Junctor.FALSE));
-		
+
 		ImmutableArray<TermLabel> labels = new ImmutableArray<TermLabel>(
 		      ParameterlessTermLabel.ANON_HEAP_LABEL);
-		
-		Term labeledTerm = 
-				tf.createTerm(Junctor.AND, 
-						tf.createTerm(Junctor.TRUE), 
+
+		Term labeledTerm =
+				tf.createTerm(Junctor.AND,
+						tf.createTerm(Junctor.TRUE),
 						tf.createTerm(Junctor.FALSE), labels);
-				
+
 		assertFalse("Labeled and unlabeled terms must not be equal", labeledTerm.equals(unlabeledTerm));
 		assertFalse("Labeled and unlabeled terms must not be equal", unlabeledTerm.equals(labeledTerm));
 	}
@@ -65,6 +64,8 @@ public class LabeledTermImplTest extends TestCase {
 	   Term oneLabel = services.getTermBuilder().label(unlabled, sedLabel);
 	   Term oneLabelChanged = services.getTermBuilder().label(oneLabel, ParameterlessTermLabel.ANON_HEAP_LABEL);
 	   Term twoLabels = services.getTermBuilder().label(unlabled, new ImmutableArray<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL, sedLabel));
+	   Term oneLabelAdded0 = services.getTermBuilder().addLabel(oneLabel, ParameterlessTermLabel.ANON_HEAP_LABEL);
+	   Term oneLabelAdded1 = services.getTermBuilder().addLabel(oneLabelAdded0, ParameterlessTermLabel.ANON_HEAP_LABEL);
 	   // Test unlabled
 	   assertFalse(unlabled.hasLabels());
 	   assertNotNull(unlabled.getLabels());
@@ -91,6 +92,8 @@ public class LabeledTermImplTest extends TestCase {
       // Test twoLabels
       assertTrue(twoLabels.hasLabels());
       assertNotNull(twoLabels.getLabels());
+      assertEquals(2, oneLabelAdded0.getLabels().size());
+      assertEquals(2, oneLabelAdded1.getLabels().size());
       assertEquals(2, twoLabels.getLabels().size());
       assertSame(ParameterlessTermLabel.ANON_HEAP_LABEL, twoLabels.getLabels().get(0));
       assertSame(sedLabel, twoLabels.getLabels().get(1));
