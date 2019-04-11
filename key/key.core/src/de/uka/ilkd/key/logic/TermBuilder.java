@@ -1694,55 +1694,13 @@ public class TermBuilder {
     }
 
     /**
-     * Adds labels to a term.
+     * Adds labels to a term, removing any existing labels of the same type.
      *
      * @param term the term.
      * @param labels the labels to add.
      * @return the term with the labels added.
      */
     public Term addLabel(Term term, ImmutableArray<TermLabel> labels) {
-        if ((labels == null || labels.isEmpty()) && !term.hasLabels()) {
-            return term;
-        } else if (!term.hasLabels()) {
-            return tf.createTerm(term.op(), term.subs(), term.boundVars(),
-                    term.javaBlock(), labels);
-        } else {
-            List<TermLabel> newLabelList = term.getLabels().toList();
-
-            for (TermLabel l : labels) {
-                if (!newLabelList.contains(l)) {
-                    newLabelList.add(l);
-                }
-            }
-            return tf.createTerm(term.op(), term.subs(), term.boundVars(),
-                    term.javaBlock(),
-                    new ImmutableArray<TermLabel>(newLabelList));
-        }
-    }
-
-    /**
-     * Adds a label to a term.
-     *
-     * @param term the term.
-     * @param label the label to add.
-     * @return the term with the label added.
-     */
-    public Term addLabel(Term term, TermLabel label) {
-        if (label == null && !term.hasLabels()) {
-            return term;
-        } else {
-            return addLabel(term, new ImmutableArray<TermLabel>(label));
-        }
-    }
-
-    /**
-     * Applies labels to a term, removing any existing labels of the same type.
-     *
-     * @param term the term.
-     * @param labels the labels to apply.
-     * @return the modified term.
-     */
-    public Term label(Term term, ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty()) && !term.hasLabels()) {
             return term;
         } else if (!term.hasLabels()) {
@@ -1760,6 +1718,7 @@ public class TermBuilder {
                 }
                 newLabelList.add(newLabel);
             }
+
             return tf.createTerm(term.op(), term.subs(), term.boundVars(),
                     term.javaBlock(),
                     new ImmutableArray<TermLabel>(newLabelList));
@@ -1767,7 +1726,38 @@ public class TermBuilder {
     }
 
     /**
-     * Applies a label to a term, removing any existing labels of the same type.
+     * Adds a label to a term, removing any existing labels of the same type.
+     *
+     * @param term the term.
+     * @param label the label to add.
+     * @return the term with the label added.
+     */
+    public Term addLabel(Term term, TermLabel label) {
+        if (label == null && !term.hasLabels()) {
+            return term;
+        } else {
+            return addLabel(term, new ImmutableArray<TermLabel>(label));
+        }
+    }
+
+    /**
+     * Applies labels to a term, removing any existing labels.
+     *
+     * @param term the term.
+     * @param labels the labels to apply.
+     * @return the modified term.
+     */
+    public Term label(Term term, ImmutableArray<TermLabel> labels) {
+        if ((labels == null || labels.isEmpty())) {
+            return term;
+        } else {
+            return tf.createTerm(term.op(), term.subs(), term.boundVars(),
+                                 term.javaBlock(), labels);
+        }
+    }
+
+    /**
+     * Applies a label to a term, removing any existing labels.
      *
      * @param term the term.
      * @param label the label to apply.
