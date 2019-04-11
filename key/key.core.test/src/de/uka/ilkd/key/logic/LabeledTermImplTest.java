@@ -59,19 +59,19 @@ public class LabeledTermImplTest extends TestCase {
 	 */
 	public void testGetHasAndContainsLabels() {
 	   // Create terms
-	   Term unlabled = services.getTermBuilder().tt();
+	   Term unlabeled = services.getTermBuilder().tt();
 	   SymbolicExecutionTermLabel sedLabel = new SymbolicExecutionTermLabel(1);
 	   SymbolicExecutionTermLabel anotherSedLabel = new SymbolicExecutionTermLabel(2);
-	   Term oneLabel = services.getTermBuilder().label(unlabled, sedLabel);
+	   Term oneLabel = services.getTermBuilder().label(unlabeled, sedLabel);
 	   Term oneLabelChanged = services.getTermBuilder().label(oneLabel, ParameterlessTermLabel.ANON_HEAP_LABEL);
-	   Term twoLabels = services.getTermBuilder().label(unlabled, new ImmutableArray<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL, sedLabel));
+	   Term twoLabels = services.getTermBuilder().label(unlabeled, new ImmutableArray<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL, sedLabel));
 	   // Test unlabeled
-	   assertFalse(unlabled.hasLabels());
-	   assertNotNull(unlabled.getLabels());
-	   assertEquals(0, unlabled.getLabels().size());
-	   assertFalse(unlabled.containsLabel(sedLabel));
-      assertFalse(unlabled.containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL));
-      assertFalse(unlabled.containsLabel(anotherSedLabel));
+	   assertFalse(unlabeled.hasLabels());
+	   assertNotNull(unlabeled.getLabels());
+	   assertEquals(0, unlabeled.getLabels().size());
+	   assertFalse(unlabeled.containsLabel(sedLabel));
+      assertFalse(unlabeled.containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL));
+      assertFalse(unlabeled.containsLabel(anotherSedLabel));
 		// Test oneLabel
       assertTrue(oneLabel.hasLabels());
       assertNotNull(oneLabel.getLabels());
