@@ -14,8 +14,10 @@
       <association name="next" programVariable="next" isArrayIndex="false" target="o3" condition="true"/>
    </object>
    <object xml:id="o3" name="SimpleLinkedOjbectsInsertion::select(heap,x,SimpleLinkedOjbectsInsertion::$next)" type="SimpleLinkedOjbectsInsertion">
-      <association name="next" programVariable="next" isArrayIndex="false" target="o4" condition="true"/>
    </object>
-   <object xml:id="o4" name="SimpleLinkedOjbectsInsertion::select(heap,SimpleLinkedOjbectsInsertion::select(heap,x,SimpleLinkedOjbectsInsertion::$next),SimpleLinkedOjbectsInsertion::$next)" type="SimpleLinkedOjbectsInsertion">
+   <object xml:id="o4" name="SimpleLinkedOjbectsInsertion::select(heap,x,SimpleLinkedOjbectsInsertion::$next)" type="SimpleLinkedOjbectsInsertion">
+      <association name="next" programVariable="next" isArrayIndex="false" target="o5" condition="true"/>
+   </object>
+   <object xml:id="o5" name="SimpleLinkedOjbectsInsertion::select(heap,SimpleLinkedOjbectsInsertion::select(heap,x,SimpleLinkedOjbectsInsertion::$next),SimpleLinkedOjbectsInsertion::$next)" type="SimpleLinkedOjbectsInsertion">
    </object>
 </model>

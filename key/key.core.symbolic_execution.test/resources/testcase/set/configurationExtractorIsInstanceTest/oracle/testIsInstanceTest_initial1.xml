@@ -2,6 +2,7 @@
 <model>
    <equivalenceClass representativeTerm="obj">
       <term term="obj"/>
+      <term term="obj"/>
       <term term="IsInstanceTest::select(heap,null,IsInstanceTest::$A)"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return 1;">

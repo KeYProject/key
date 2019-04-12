@@ -2,6 +2,7 @@
 <model>
    <equivalenceClass representativeTerm="null">
       <term term="obj"/>
+      <term term="obj"/>
       <term term="null"/>
    </equivalenceClass>
    <state name="return 1;">

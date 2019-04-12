@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
+   <equivalenceClass representativeTerm="obj">
+      <term term="obj"/>
+      <term term="obj"/>
+   </equivalenceClass>
    <state name="{}">
       <value name="n" programVariable="n" isArrayIndex="false" value="Z(0(#))" type="int" condition="true"/>
       <value name="exc" programVariable="exc" isArrayIndex="false" value="null" type="Null" condition="true"/>

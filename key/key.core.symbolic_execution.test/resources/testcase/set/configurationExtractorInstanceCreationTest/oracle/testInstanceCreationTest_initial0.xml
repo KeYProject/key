@@ -9,10 +9,8 @@
       <association name="self" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="self" type="InstanceCreationTest">
+      <association name="next" programVariable="next" isArrayIndex="false" target="o2" condition="true"/>
    </object>
-   <object xml:id="o2" name="self" type="InstanceCreationTest">
-      <association name="next" programVariable="next" isArrayIndex="false" target="o3" condition="true"/>
-   </object>
-   <object xml:id="o3" name="InstanceCreationTest::select(heap,self,InstanceCreationTest::$next)" type="InstanceCreationTest">
+   <object xml:id="o2" name="InstanceCreationTest::select(heap,self,InstanceCreationTest::$next)" type="InstanceCreationTest">
    </object>
 </model>

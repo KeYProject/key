@@ -15,7 +15,7 @@
    <state name="One Step Simplification resulting in return current;">
       <value name="exc" programVariable="exc" isArrayIndex="false" value="exc" type="java.lang.Throwable" condition="true"/>
       <association name="current" programVariable="current" isArrayIndex="false" target="o1" condition="true"/>
-      <association name="self" programVariable="self" isArrayIndex="false" target="o5" condition="true"/>
+      <association name="self" programVariable="self" isArrayIndex="false" target="o6" condition="true"/>
    </state>
    <object xml:id="o1" name="current" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
    </object>
@@ -24,10 +24,12 @@
       <association name="right" programVariable="right" isArrayIndex="false" target="o3" condition="true"/>
    </object>
    <object xml:id="o3" name="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right)" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
-      <association name="left" programVariable="left" isArrayIndex="false" target="o4" condition="true"/>
    </object>
-   <object xml:id="o4" name="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right),algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$left)" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
+   <object xml:id="o4" name="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right)" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
+      <association name="left" programVariable="left" isArrayIndex="false" target="o5" condition="true"/>
    </object>
-   <object xml:id="o5" name="self" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass">
+   <object xml:id="o5" name="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right),algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$left)" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
+   </object>
+   <object xml:id="o6" name="self" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass">
    </object>
 </model>

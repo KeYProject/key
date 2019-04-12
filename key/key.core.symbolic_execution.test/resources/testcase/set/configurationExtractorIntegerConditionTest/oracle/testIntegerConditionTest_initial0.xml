@@ -11,8 +11,6 @@
       <association name="self" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="self" type="IntegerConditionTest">
-   </object>
-   <object xml:id="o2" name="self" type="IntegerConditionTest">
       <value name="x" programVariable="x" isArrayIndex="false" value="Z(1(#))" type="int" condition="true"/>
    </object>
 </model>

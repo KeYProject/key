@@ -3,6 +3,8 @@
    <equivalenceClass representativeTerm="x">
       <term term="x"/>
       <term term="y"/>
+      <term term="x"/>
+      <term term="y"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return add_1;">
       <value name="exc_0" programVariable="exc_0" isArrayIndex="false" value="null" type="Null" condition="true"/>

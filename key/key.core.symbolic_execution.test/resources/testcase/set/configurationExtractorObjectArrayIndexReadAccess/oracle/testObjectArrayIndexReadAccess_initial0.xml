@@ -15,6 +15,8 @@
       <association name="[Z(0(#))]" isArrayIndex="true" arrayIndex="Z(0(#))" target="o3" condition="true"/>
    </object>
    <object xml:id="o3" name="IntWrapper::select(heap,array,arr(Z(0(#))))" type="IntWrapper">
+   </object>
+   <object xml:id="o4" name="IntWrapper::select(heap,array,arr(Z(0(#))))" type="IntWrapper">
       <value name="value" programVariable="value" isArrayIndex="false" value="Z(2(4(#)))" type="int" condition="true"/>
    </object>
 </model>
