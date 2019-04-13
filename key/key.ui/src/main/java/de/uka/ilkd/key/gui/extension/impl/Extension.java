@@ -68,4 +68,37 @@ public class Extension<T> implements Comparable<Extension> {
     public int hashCode() {
         return Objects.hash(clazz);
     }
+
+    public String getDescription() {
+        return info == null ? "" : info.description();
+    }
+
+    public boolean supports(Class<?> c) {
+        return c.isAssignableFrom(getType());
+    }
+
+    public boolean supportsSettings() {
+        return supports(KeYGuiExtension.Settings.class);
+    }
+
+    public boolean supportsLeftPanel() {
+        return supports(KeYGuiExtension.LeftPanel.class);
+    }
+
+    public boolean supportsContextMenu() {
+        return supports(KeYGuiExtension.ContextMenu.class);
+    }
+
+    public boolean supportsMainMenu() {
+        return supports(KeYGuiExtension.MainMenu.class);
+    }
+
+    public boolean supportsStatusLine() {
+        return supports(KeYGuiExtension.StatusLine.class);
+    }
+
+
+    public boolean supportsToolbar() {
+        return supports(KeYGuiExtension.Toolbar.class);
+    }
 }

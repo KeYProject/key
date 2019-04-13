@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.fonticons.KeYIconManagement;
 import de.uka.ilkd.key.gui.fonticons.KeYIcons;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -11,19 +12,21 @@ import net.miginfocom.swing.MigLayout;
 import org.key_project.util.java.ObjectUtil;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class TacletOptionsSettings extends JPanel implements SettingsProvider {
     private static final String EXPLANATIONS_RESOURCE = "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
     private static Properties explanationMap;
-    private ChoiceSettings settings;
     private HashMap<String, String> category2DefaultChoice;
     private HashMap<String, Set<String>> category2Choices;
-    private boolean changed = false;
+    private ChoiceSettings settings;
+    private boolean warnNoProof = false;
 
     public TacletOptionsSettings() {
         setLayout(new MigLayout(
@@ -158,6 +161,22 @@ public class TacletOptionsSettings extends JPanel implements SettingsProvider {
     }
 
     protected void layoutChoiceSelector() {
+        JLabel lblHead1 = new JLabel("Taclet Options");
+        lblHead1.setFont(lblHead1.getFont().deriveFont(16f));
+        add(lblHead1, new CC().newline());
+
+        if (warnNoProof) {
+            JLabel lblHead2 = new JLabel("No Proof loaded. Taclet options may not be parsed.");
+            lblHead2.setIcon(KeYIcons.WARNING_INCOMPLETE.getIcon());
+            lblHead2.setFont(lblHead2.getFont().deriveFont(14f));
+            add(lblHead2, new CC().newline());
+        }
+
+        JLabel lblHead2 = new JLabel("Taclet options will take effect only on new proofs.");
+        lblHead2.setIcon(KeYIcons.WARNING_INCOMPLETE.getIcon());
+        lblHead2.setFont(lblHead2.getFont().deriveFont(14f));
+        add(lblHead2, new CC().newline());
+
         category2DefaultChoice.keySet().stream().sorted().forEach(this::addCategory);
     }
 
@@ -234,7 +253,6 @@ public class TacletOptionsSettings extends JPanel implements SettingsProvider {
      */
     private void setDefaultChoice(String category, String choice) {
         category2DefaultChoice.put(category, choice);
-        changed = true;
     }
 
     @Override
@@ -244,6 +262,7 @@ public class TacletOptionsSettings extends JPanel implements SettingsProvider {
 
     @Override
     public JComponent getPanel(MainWindow window) {
+        warnNoProof = window.getMediator().getSelectedProof() != null;
         setChoiceSettings(SettingsManager.getChoiceSettings(window));
         return this;
     }
@@ -257,7 +276,7 @@ public class TacletOptionsSettings extends JPanel implements SettingsProvider {
     }
 
     @Override
-    public void applySettings(MainWindow window) throws Exception {
+    public void applySettings(MainWindow window) throws InvalidSettingsInputException {
         /*settings.setDefaultChoices(category2DefaultChoice);}*/
         System.out.println("TODO: TacletOptionsSettings.applySettings");
     }

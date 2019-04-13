@@ -22,10 +22,12 @@ import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionListener;
+import java.text.Format;
 
 /**
  * 2019-04-08, weigl: rewrite to mig layout
@@ -83,32 +85,46 @@ public abstract class TablePanel extends JPanel {
 
     }
 
-    protected JCheckBox createCheckBox(String title, boolean value, ActionListener changeListener) {
+    protected JCheckBox createCheckBox(String title, boolean value, final Validator<Boolean> validator) {
         JCheckBox checkBox = new JCheckBox(title, value);
-        checkBox.addActionListener(changeListener);
+        checkBox.addActionListener(e -> {
+            try {
+                validator.validate(checkBox.isSelected());
+                demarkComponentAsErrornous(checkBox);
+            } catch (Exception ex) {
+                markComponentAsErrornous(checkBox, ex.getMessage());
+            }
+        });
         return checkBox;
     }
 
     protected JCheckBox addCheckBox(String title, String info,
-                                    boolean value, ActionListener changeListener) {
-        JCheckBox checkBox = createCheckBox(title, value, changeListener);
+                                    boolean value, final Validator<Boolean> validator) {
+        JCheckBox checkBox = createCheckBox(title, value, validator);
         addRowWithHelp(info, new JLabel(), checkBox);
         return checkBox;
     }
 
 
     protected JTextField addFileChooserPanel(String title, String file, String info,
-                                             boolean isSave, ActionListener changeListener) {
+                                             boolean isSave, final Validator<String> validator) {
         JTextField textField = new JTextField(file);
-        textField.addActionListener(changeListener);
+        textField.addActionListener(e -> {
+            try {
+                validator.validate(textField.getText());
+                demarkComponentAsErrornous(textField);
+            } catch (Exception ex) {
+                markComponentAsErrornous(textField, ex.getMessage());
+            }
+        });
         JLabel lbl = new JLabel(title);
         lbl.setLabelFor(textField);
         add(lbl);
         Box box = new Box(BoxLayout.X_AXIS);
         JButton btnFileChooser = new JButton(IconFontSwing.buildIcon(FontAwesomeSolid.SEARCH, 12f));
-        btnFileChooser.setBorderPainted(false);
+        /*btnFileChooser.setBorderPainted(false);
         btnFileChooser.setFocusPainted(false);
-        btnFileChooser.setContentAreaFilled(false);
+        btnFileChooser.setContentAreaFilled(false);*/
 
         btnFileChooser.addActionListener(e -> {
             JFileChooser f = new JFileChooser(textField.getText());
@@ -129,10 +145,17 @@ public abstract class TablePanel extends JPanel {
     }
 
     protected <T> JComboBox<T> addComboBox(String info, int selectionIndex,
-                                           ActionListener changeListener, T... items) {
+                                           final Validator<T> validator, T... items) {
         JComboBox<T> comboBox = new JComboBox<>(items);
         comboBox.setSelectedIndex(selectionIndex);
-        comboBox.addActionListener(changeListener);
+        comboBox.addActionListener(e -> {
+            try {
+                validator.validate((T) comboBox.getSelectedItem());
+                demarkComponentAsErrornous(comboBox);
+            } catch (Exception ex) {
+                markComponentAsErrornous(comboBox, ex.getMessage());
+            }
+        });
         if (info != null && !info.isEmpty()) {
             add(new JLabel());
             add(comboBox);
@@ -144,25 +167,9 @@ public abstract class TablePanel extends JPanel {
         return comboBox;
     }
 
-    protected JTextField createTextField(String text, final ActionListener changeListener) {
+    protected JTextField createTextField(String text, final Validator<String> validator) {
         JTextField field = new JTextField(text);
-        field.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                if (changeListener != null) changeListener.actionPerformed(null);
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                if (changeListener != null) changeListener.actionPerformed(null);
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                if (changeListener != null) changeListener.actionPerformed(null);
-            }
-        });
+        field.getDocument().addDocumentListener(new DocumentValidatorAdapter(field, validator));
         return field;
     }
 
@@ -172,8 +179,33 @@ public abstract class TablePanel extends JPanel {
         addRowWithHelp(helpText, label, component);
     }
 
-    protected JTextField addTextField(String title, String text, String info, final ActionListener changeListener) {
-        JTextField field = createTextField(text, changeListener);
+    protected JTextField addTextField(String title, String text, String info, final Validator<String> validator) {
+        JTextField field = createTextField(text, validator);
+        addTitledComponent(title, field, info);
+        return field;
+    }
+
+
+    protected JFormattedTextField createNumberFormattedTextField(Format format, final Validator<String> validator) {
+        JFormattedTextField field = new JFormattedTextField(format);
+        field.getDocument().addDocumentListener(new DocumentValidatorAdapter(field, validator));
+        return field;
+    }
+
+    protected JSpinner createNumberTextField(int min, int max, int step, final Validator<Integer> validator) {
+        SpinnerModel spinnerModel = new SpinnerNumberModel(min, min, max, step);
+        return createNumberTextField(spinnerModel, validator);
+    }
+
+    protected <T> JSpinner createNumberTextField(SpinnerModel model, final Validator<T> validator) {
+        JSpinner field = new JSpinner(model);
+        field.addChangeListener(new ValidatorSpinnerAdapter<>(field, validator));
+        return field;
+    }
+
+    protected JSpinner addNumberField(String title, int min, int max, int step, String info,
+                                      final Validator<Integer> validator) {
+        JSpinner field = createNumberTextField(min, max, step, validator);
         addTitledComponent(title, field, info);
         return field;
     }
@@ -191,5 +223,70 @@ public abstract class TablePanel extends JPanel {
         box.add(new JLabel(titleText));
         box.add(pane);
         add(box, new CC().span().grow().alignX("left"));
+    }
+
+    @SuppressWarnings("unchecked")
+    private class ValidatorSpinnerAdapter<T> implements ChangeListener {
+        private final Validator<T> validator;
+        private final JSpinner model;
+
+        public ValidatorSpinnerAdapter(JSpinner model, Validator<T> validator) {
+            this.model = model;
+            this.validator = validator;
+        }
+
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            Object current = model.getValue();
+            try {
+                validator.validate((T) current);
+                demarkComponentAsErrornous(model);
+            } catch (Exception ex) {
+                markComponentAsErrornous(model, ex.getMessage());
+            }
+        }
+    }
+
+    protected void demarkComponentAsErrornous(JComponent component) {
+        component.setBackground(Color.white);//find color
+    }
+
+    protected void markComponentAsErrornous(JComponent component, String error) {
+        component.setBackground(Color.RED);
+        component.setToolTipText(error);
+    }
+
+    private class DocumentValidatorAdapter implements DocumentListener {
+        private final JTextField field;
+        private final Validator<String> validator;
+
+        private DocumentValidatorAdapter(JTextField field, Validator<String> validator) {
+            this.field = field;
+            this.validator = validator;
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            update();
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            update();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            update();
+        }
+
+        void update() {
+            try {
+                validator.validate(field.getText());
+                demarkComponentAsErrornous(field);
+            } catch (Exception ex) {
+                markComponentAsErrornous(field, ex.getMessage());
+            }
+        }
     }
 }

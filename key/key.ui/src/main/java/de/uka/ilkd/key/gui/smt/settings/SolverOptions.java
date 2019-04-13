@@ -13,7 +13,6 @@ import javax.swing.*;
  * @version 1 (08.04.19)
  */
 class SolverOptions extends TablePanel implements SettingsProvider {
-    private static final long serialVersionUID = 1L;
     private static final String infoSolverName =
             "There are two ways to make supported provers applicable for KeY:\n"
                     + "1. Specify the absolute path of the prover in the field 'Command'.\n"
@@ -72,7 +71,7 @@ class SolverOptions extends TablePanel implements SettingsProvider {
             settings.setParameters(solverType, solverParameters.getText());
 
         });
-        addRowWithHelp(null, toDefaultButton);
+        addRowWithHelp(null, new JLabel(), toDefaultButton);
         return toDefaultButton;
 //		checkForSupportButton = new JButton("Check for support.");
 //		checkForSupportButton.addActionListener(new ActionListener() {

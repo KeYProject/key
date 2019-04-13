@@ -68,8 +68,8 @@ class TranslationOptions extends TablePanel implements SettingsProvider {
     private final JCheckBox useBuiltInUniqueness;
     private final JCheckBox useUIMultiplication;
     private final JCheckBox useConstantsForIntegers;
-    private final JTextField minField;
-    private final JTextField maxField;
+    private final JSpinner minField;
+    private final JSpinner maxField;
     private ProofDependentSMTSettings settings;
 
 
@@ -95,8 +95,8 @@ class TranslationOptions extends TablePanel implements SettingsProvider {
             useNullInstantiation.setSelected(settings.useNullInstantiation);
             useBuiltInUniqueness.setSelected(settings.useBuiltInUniqueness);
             useConstantsForIntegers.setSelected(settings.useConstantsForIntegers);
-            minField.setText("" + settings.minInteger);
-            maxField.setText("" + settings.maxInteger);
+            minField.setValue(settings.minInteger);
+            maxField.setValue(settings.maxInteger);
         }
     }
 
@@ -127,35 +127,28 @@ class TranslationOptions extends TablePanel implements SettingsProvider {
                 e -> settings.useUIMultiplication = useUIMultiplication.isSelected());
     }
 
-    public JTextField createMaxField() {
-        return addTextField("Maximum", "", "", e -> {
+    public JSpinner createMaxField() {
+        JSpinner max = addNumberField("Maximum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, "", e -> {
             long result = settings.maxInteger;
             try {
-                result = Long.parseLong(maxField.getText());
+                result = (long) maxField.getValue();
                 maxField.setForeground(Color.BLACK);
             } catch (Throwable ex) {
                 maxField.setForeground(Color.RED);
             }
             settings.maxInteger = result;
         });
+        max.setValue(Integer.MAX_VALUE);
+        return max;
     }
 
-    public JTextField createMinField() {
-        return addTextField("Minimum", "", null, e -> {
-            long result = settings.minInteger;
-            try {
-                result = Long.parseLong(minField.getText());
-                minField.setForeground(Color.BLACK);
-            } catch (Throwable ex) {
-                minField.setForeground(Color.RED);
-            }
-            settings.minInteger = result;
-
-        });
+    public JSpinner createMinField() {
+        return addNumberField("Minimum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, null,
+                val -> settings.minInteger = val);
     }
 
     public JCheckBox createConstantsForIntegers() {
-        return addCheckBox("activated", infoUseConstantsForIntegers,
+        return addCheckBox("Active", infoUseConstantsForIntegers,
                 false,
                 e -> {
                     settings.useConstantsForIntegers = useConstantsForIntegers.isSelected();

@@ -12,11 +12,10 @@ import java.util.List;
  * @version 1 (08.04.19)
  */
 public class DefaultSettingsProvider implements SettingsProvider {
-
     private String description;
     private JComponent panel;
     private List<SettingsProvider> children;
-    private Collection<String> keywords = new ArrayList<>();
+    private String keywords = "";
     private int priority;
     private Icon icon;
 
@@ -66,7 +65,7 @@ public class DefaultSettingsProvider implements SettingsProvider {
 
     @Override
     public boolean contains(String substring) {
-        return keywords.stream().anyMatch(it -> it.contains(substring));
+        return keywords.contains(substring);
     }
 
     @Override

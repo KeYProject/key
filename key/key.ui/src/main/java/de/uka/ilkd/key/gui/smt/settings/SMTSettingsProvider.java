@@ -50,13 +50,13 @@ public class SMTSettingsProvider extends TablePanel implements SettingsProvider 
     private final JTextField saveToFilePanel;
 
     private final JComboBox<String> progressModeBox;
-    private final JTextField maxProcesses;
-    private final JTextField timeoutField;
-    private final JTextField intBoundField;
+    private final JSpinner maxProcesses;
+    private final JSpinner timeoutField;
+    private final JSpinner intBoundField;
     //private JTextField heapBoundField;
-    private final JTextField seqBoundField;
-    private final JTextField objectBoundField;
-    private final JTextField locsetBoundField;
+    private final JSpinner seqBoundField;
+    private final JSpinner objectBoundField;
+    private final JSpinner locsetBoundField;
     private final JCheckBox solverSupportCheck;
 
     private ProofIndependentSMTSettings settings;
@@ -111,12 +111,12 @@ public class SMTSettingsProvider extends TablePanel implements SettingsProvider 
         pi.fireSettingsChanged();
     }
 
-    private JTextField createLocSetBoundField() {
-        return addTextField("Locset Bound:", "", infoBound,
+    private JSpinner createLocSetBoundField() {
+        return addNumberField("Locset Bound:", 0, Integer.MAX_VALUE, 1, infoBound,
                 e -> {
                     long value;
                     try {
-                        value = Long.parseLong(locsetBoundField.getText());
+                        value = (long) locsetBoundField.getValue();
                     } catch (NumberFormatException ex) {
                         value = settings.locsetBound;
                     }
@@ -124,14 +124,14 @@ public class SMTSettingsProvider extends TablePanel implements SettingsProvider 
                 });
     }
 
-    public JTextField createMaxProcesses() {
-        return addTextField("Concurrent Processes:",
-                "",
+    public JSpinner createMaxProcesses() {
+        return addNumberField("Concurrent Processes:",
+                0, Integer.MAX_VALUE, 1,
                 infoMaxProcesses,
                 e -> {
                     int value;
                     try {
-                        value = Integer.parseInt(maxProcesses.getText());
+                        value = (int) maxProcesses.getValue();
                     } catch (NumberFormatException ex) {
                         value = settings.maxConcurrentProcesses;
                     }
@@ -139,12 +139,12 @@ public class SMTSettingsProvider extends TablePanel implements SettingsProvider 
                 });
     }
 
-    public JTextField createTimeoutField() {
-        return addTextField("Timeout:", "", infoTimeoutField,
+    public JSpinner createTimeoutField() {
+        return addNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, infoTimeoutField,
                 e -> {
                     long value;
                     try {
-                        value = (long) (Float.parseFloat(timeoutField.getText()) * 1000);
+                        value = (long) ((long) timeoutField.getValue() * 1000.0);
                     } catch (NumberFormatException ex) {
                         value = settings.timeout;
                     }
@@ -152,12 +152,12 @@ public class SMTSettingsProvider extends TablePanel implements SettingsProvider 
                 });
     }
 
-    public JTextField createIntBoundField() {
-        return addTextField("Integer Bound:", "", infoBound,
+    public JSpinner createIntBoundField() {
+        return addNumberField("Integer Bound:", 0, Integer.MAX_VALUE, 1, infoBound,
                 e -> {
                     long value;
                     try {
-                        value = Long.parseLong(intBoundField.getText());
+                        value = (long) intBoundField.getValue();
                     } catch (NumberFormatException ex) {
                         value = settings.intBound;
                     }
@@ -165,12 +165,12 @@ public class SMTSettingsProvider extends TablePanel implements SettingsProvider 
                 });
     }
 
-    public JTextField createSeqBoundField() {
-        return addTextField("Seq Bound:", "", infoBound,
+    public JSpinner createSeqBoundField() {
+        return addNumberField("Seq Bound:", 0, Integer.MAX_VALUE, 1, infoBound,
                 e -> {
                     long value;
                     try {
-                        value = Long.parseLong(seqBoundField.getText());
+                        value = (long) seqBoundField.getValue();
                     } catch (NumberFormatException ex) {
                         value = settings.seqBound;
                     }
@@ -178,12 +178,12 @@ public class SMTSettingsProvider extends TablePanel implements SettingsProvider 
                 });
     }
 
-    public JTextField createObjectBoundField() {
-        return addTextField("Object Bound:", "", infoBound,
+    public JSpinner createObjectBoundField() {
+        return addNumberField("Object Bound:", 0, Integer.MAX_VALUE, 1, infoBound,
                 e -> {
                     long value;
                     try {
-                        value = Long.parseLong(objectBoundField.getText());
+                        value = (long) objectBoundField.getValue();
                     } catch (NumberFormatException ex) {
                         value = settings.objectBound;
                     }
@@ -231,11 +231,11 @@ public class SMTSettingsProvider extends TablePanel implements SettingsProvider 
         saveToFilePanel.setText(this.settings.pathForSMTTranslation);
         solverSupportCheck.setSelected(this.settings.checkForSupport);
         progressModeBox.setSelectedIndex(this.settings.modeOfProgressDialog);
-        intBoundField.setText(Long.toString(this.settings.intBound));
-        locsetBoundField.setText(Long.toString(this.settings.locsetBound));
-        objectBoundField.setText(Long.toString(this.settings.objectBound));
-        seqBoundField.setText(Long.toString(this.settings.seqBound));
-        timeoutField.setText(Float.toString((float) this.settings.timeout / 1000));
-        maxProcesses.setText(Long.toString(this.settings.maxConcurrentProcesses));
+        intBoundField.setValue(this.settings.intBound);
+        locsetBoundField.setValue(this.settings.locsetBound);
+        objectBoundField.setValue(this.settings.objectBound);
+        seqBoundField.setValue(this.settings.seqBound);
+        timeoutField.setValue(((float) this.settings.timeout / 1000));
+        maxProcesses.setValue(this.settings.maxConcurrentProcesses);
     }
 }

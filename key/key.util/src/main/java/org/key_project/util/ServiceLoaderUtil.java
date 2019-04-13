@@ -29,18 +29,20 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Stream;
 
 public final class ServiceLoaderUtil {
     private static final String PREFIX = "META-INF/services/";
 
+    /**
+     * Backport of {@link ServiceLoader#stream()} for Java8.
+     * weigl: Should be replaced by if we upgrade.
+     */
+    @Deprecated
     public static <S> Stream<Class<S>> stream(Class<S> c) {
         ClassLoader cloader = c.getClassLoader();
-        List<String> classes = new LinkedList<>();
+        Set<String> classes = new HashSet<>();
         try {
             Iterator<URL> iter = cloader.getResources(PREFIX + c.getName()).asIterator();
             while (iter.hasNext()) {

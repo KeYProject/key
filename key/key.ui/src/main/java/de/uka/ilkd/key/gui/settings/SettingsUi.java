@@ -9,6 +9,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -36,19 +38,36 @@ public class SettingsUi extends JPanel {
             public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
                 SettingsTreeNode node = (SettingsTreeNode) value;
                 SettingsProvider panel = node.provider;
+                JLabel lbl = null;
                 if (panel == null) {
-                    return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+                    lbl = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
                 } else {
-                    JLabel lbl = (JLabel) super.getTreeCellRendererComponent(tree, panel.getDescription(), sel, expanded, leaf, row, hasFocus);
-                    lbl.setIcon(panel.getIcon());
+                    lbl = (JLabel) super.getTreeCellRendererComponent(tree, panel.getDescription(), sel, expanded, leaf, row, hasFocus);
                     lbl.setFont(lbl.getFont().deriveFont(16f));
 
                     if (!node.isLeaf()) {
                         lbl.setIcon(expanded ? ICON_TREE_NODE_EXPANDED : ICON_TREE_NODE_RETRACTED);
+                    } else {
+                        lbl.setIcon(panel.getIcon());
                     }
-                    lbl.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
-                    return lbl;
+                    lbl.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+                    if (!txtSearch.getText().isEmpty() && panel.contains(txtSearch.getText())) {
+                        lbl.setBackground(Color.black);
+                        lbl.setBorder(BorderFactory.createLineBorder(Color.BLUE, 2, true));
+                    } else {
+                        lbl.setBackground(Color.white);
+                        lbl.setBorder(null);
+                    }
                 }
+                return lbl;
+            }
+        });
+
+        txtSearch.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                treeSettingsPanels.invalidate();
+                treeSettingsPanels.repaint();
             }
         });
 
@@ -58,6 +77,7 @@ public class SettingsUi extends JPanel {
             SettingsTreeNode n = (SettingsTreeNode) e.getPath().getLastPathComponent();
             if (n.provider != null && n.provider.getPanel(mainWindow) != null) {
                 center.setViewportView(n.provider.getPanel(mainWindow));
+                center.getVerticalScrollBar().setValue(0);
             }
         });
 

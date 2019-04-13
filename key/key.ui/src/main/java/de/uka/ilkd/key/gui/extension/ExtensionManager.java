@@ -4,7 +4,11 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.impl.Extension;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.fonticons.KeYIcons;
+import de.uka.ilkd.key.gui.settings.DefaultSettingsProvider;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.gui.settings.TablePanel;
+import net.miginfocom.layout.CC;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,20 +18,58 @@ import java.awt.event.ActionEvent;
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
-public class ExtensionManager extends JPanel implements SettingsProvider {
-    private Box boxList = new Box(BoxLayout.Y_AXIS);
+public class ExtensionManager extends TablePanel implements SettingsProvider {
+    private String keywords = "";
 
     public ExtensionManager() {
-        setLayout(new BorderLayout());
-        add(new JLabel("Extension Settings"), BorderLayout.NORTH);
-        add(new JScrollPane(boxList));
+        refresh();
     }
 
     private void refresh() {
-        boxList.removeAll();
-        KeYGuiExtensionFacade.getExtensions().forEach(it ->
-                boxList.add(new JCheckBox(new ExtensionActivationAction(it)))
-        );
+        removeAll();
+        keywords = "";
+
+        JLabel lblHead = new JLabel("Extension Settings");
+        keywords += lblHead.getText();
+        lblHead.setFont(lblHead.getFont().deriveFont(16f));
+        add(lblHead, new CC().span().alignX("left"));
+
+        JLabel lblInfo = new JLabel("Settings will be applied on next restart");
+        keywords += lblInfo.getText();
+        lblInfo.setIcon(KeYIcons.WARNING_INCOMPLETE.getIcon());
+        lblInfo.setBackground(Color.orange.darker());
+        lblHead.setFont(lblHead.getFont().deriveFont(16f));
+        add(lblInfo, new CC().span().alignX("left"));
+
+
+        KeYGuiExtensionFacade.getExtensions().forEach(it -> {
+            JCheckBox box = new JCheckBox(new ExtensionActivationAction(it));
+            keywords += box.getText();
+            add(new JLabel(), new CC().newline());
+            add(box);
+
+            JLabel lblProvides = new JLabel(getSupportLabel(it));
+            keywords += lblProvides.getText();
+            lblProvides.setFont(lblProvides.getFont().deriveFont(Font.ITALIC));
+            add(new JLabel(), new CC().newline());
+            add(lblProvides);
+
+            if (!it.getDescription().isEmpty()) {
+                add(new JLabel(), new CC().newline());
+                add(createInfoArea(it.getDescription()));
+                keywords += it.getDescription();
+            }
+        });
+    }
+
+    private String getSupportLabel(Extension it) {
+        return "Provides: " +
+                (it.supportsContextMenu() ? "ContextMenu " : "") +
+                (it.supportsLeftPanel() ? "LeftPanel " : "") +
+                (it.supportsMainMenu() ? "MainMenu " : "") +
+                (it.supportsSettings() ? "Settings " : "") +
+                (it.supportsStatusLine() ? "StatusLine " : "") +
+                (it.supportsToolbar() ? "Toolbar " : "");
     }
 
     @Override
@@ -41,6 +83,10 @@ public class ExtensionManager extends JPanel implements SettingsProvider {
         return this;
     }
 
+    @Override
+    public boolean contains(String substring) {
+        return keywords.toLowerCase().contains(substring.toLowerCase());
+    }
 
     @Override
     public void applySettings(MainWindow window) {

@@ -6,13 +6,17 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * The settings dialog.
+ *
  * @author Alexander Weigl
  * @version 1 (08.04.19)
+ * @see SettingsUi
  */
 public class SettingsDialog extends JDialog {
     private final MainWindow mainWindow;
@@ -34,6 +38,11 @@ public class SettingsDialog extends JDialog {
         JPanel buttonBar = createButtonBar();
         root.add(buttonBar, BorderLayout.SOUTH);
         setContentPane(root);
+
+        getRootPane().registerKeyboardAction(e -> {
+            dispose();
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+
         setSize(600, 400);
     }
 
@@ -76,8 +85,9 @@ public class SettingsDialog extends JDialog {
             JOptionPane.showMessageDialog(this, msg,
                     "Error in Settings",
                     JOptionPane.ERROR_MESSAGE);
+            return false;
         }
-        return apply.isEmpty();
+        return true;
     }
 
     private class CancelAction extends KeyAction {

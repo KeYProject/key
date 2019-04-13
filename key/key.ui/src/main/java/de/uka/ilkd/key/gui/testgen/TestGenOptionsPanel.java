@@ -7,8 +7,6 @@ import de.uka.ilkd.key.gui.settings.TablePanel;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 @SuppressWarnings("serial")
 public class TestGenOptionsPanel extends TablePanel implements SettingsProvider {
@@ -28,8 +26,8 @@ public class TestGenOptionsPanel extends TablePanel implements SettingsProvider 
     private final JTextField saveToFilePanel;
     private final JTextField openJMLPanel;
     private final JTextField objenesisPanel;
-    private final JTextField maxProcesses;
-    private final JTextField maxUnwinds;
+    private final JSpinner maxProcesses;
+    private final JSpinner maxUnwinds;
     private final JCheckBox symbolicEx;
     private final JCheckBox useJUnit;
     private final JCheckBox invariantForAll;
@@ -55,30 +53,18 @@ public class TestGenOptionsPanel extends TablePanel implements SettingsProvider 
         checkboxRFL = getRFLSelectionPanel();
     }
 
-    private JTextField getMaxProcesses() {
-        return addTextField("Concurrent Processes:", Long.toString(settings.getNumberOfProcesses()), infoMaxProcesses,
-                e -> {
-                    int value;
-                    try {
-                        value = Integer.parseInt(maxProcesses.getText());
-                    } catch (NumberFormatException ex) {
-                        value = settings.getNumberOfProcesses();
-                    }
-                    settings.setConcurrentProcesses(value);
+    private JSpinner getMaxProcesses() {
+        return addNumberField("Concurrent Processes:", 0, Integer.MAX_VALUE, 1, infoMaxProcesses,
+                obj -> {
+                    settings.setConcurrentProcesses(obj);
                     settings.fireSettingsChanged();
                 });
     }
 
-    private JTextField getMaxUnwinds() {
-        return addTextField("Maximal Unwinds:", Long.toString(settings.getMaximalUnwinds()), infoMaxUnwinds,
+    private JSpinner getMaxUnwinds() {
+        return addNumberField("Maximal Unwinds:", 0, Integer.MAX_VALUE, 1, infoMaxUnwinds,
                 e -> {
-                    int value;
-                    try {
-                        value = Integer.parseInt(maxUnwinds.getText());
-                    } catch (NumberFormatException ex) {
-                        value = settings.getMaximalUnwinds();
-                    }
-                    settings.setMaxUnwinds(value);
+                    settings.setMaxUnwinds(e);
                     settings.fireSettingsChanged();
                 });
     }
@@ -112,60 +98,45 @@ public class TestGenOptionsPanel extends TablePanel implements SettingsProvider 
     }
 
     private JCheckBox getJUnitPanel() {
-        return addCheckBox("Generate JUnit and test oracle", infoUseJunit, settings.useJunit(), e -> {
-            settings.setUseJunit(useJUnit.isSelected());
+        return addCheckBox("Generate JUnit and test oracle", infoUseJunit, settings.useJunit(), val -> {
+            settings.setUseJunit(val);
             settings.fireSettingsChanged();
         });
     }
 
     private JCheckBox getRemoveDuplicatesPanel() {
-        return addCheckBox("Remove duplicates", infoRemoveDuplicates, settings.removeDuplicates(), new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                settings.setRemoveDuplicates(removeDuplicates.isSelected());
-                settings.fireSettingsChanged();
-            }
+        return addCheckBox("Remove duplicates", infoRemoveDuplicates, settings.removeDuplicates(), val -> {
+            settings.setRemoveDuplicates(val);
+            settings.fireSettingsChanged();
         });
     }
 
     private JCheckBox getRFLSelectionPanel() {
         return
-                addCheckBox("Use reflection framework", infoRFLSelection, settings.useRFL(), new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        settings.setRFL(checkboxRFL.isSelected());
-                        settings.fireSettingsChanged();
-                    }
+                addCheckBox("Use reflection framework", infoRFLSelection, settings.useRFL(), val -> {
+                    settings.setRFL(val);
+                    settings.fireSettingsChanged();
                 });
     }
 
     private JCheckBox getSymbolicEx() {
-        return addCheckBox("Apply symbolic execution", infoApplySymbolicEx, settings.getApplySymbolicExecution(), new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                settings.setApplySymbolicExecution(symbolicEx.isSelected());
-                settings.fireSettingsChanged();
-            }
+        return addCheckBox("Apply symbolic execution", infoApplySymbolicEx, settings.getApplySymbolicExecution(), val -> {
+            settings.setApplySymbolicExecution(val);
+            settings.fireSettingsChanged();
         });
     }
 
     private JCheckBox getInvariantForall() {
-        return addCheckBox("Require invariant for all objects", infoInvariantForAll, settings.invaraiantForAll(), new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                settings.setInvariantForAll(invariantForAll.isSelected());
-                settings.fireSettingsChanged();
-            }
+        return addCheckBox("Require invariant for all objects", infoInvariantForAll, settings.invaraiantForAll(), val -> {
+            settings.setInvariantForAll(val);
+            settings.fireSettingsChanged();
         });
     }
 
     private JCheckBox getIncludePostCondition() {
-        return addCheckBox("Include Post Condition", infoIncludePostcondition, settings.includePostCondition(), new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                settings.setIncludePostCondition(includePostCondition.isSelected());
-                settings.fireSettingsChanged();
-            }
+        return addCheckBox("Include Post Condition", infoIncludePostcondition, settings.includePostCondition(), val -> {
+            settings.setIncludePostCondition(val);
+            settings.fireSettingsChanged();
         });
     }
 

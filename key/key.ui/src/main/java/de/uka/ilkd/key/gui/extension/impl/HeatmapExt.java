@@ -5,17 +5,25 @@ import de.uka.ilkd.key.gui.actions.HeatmapSettingsAction;
 import de.uka.ilkd.key.gui.actions.HeatmapToggleAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.gui.settings.TablePanel;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
+import net.miginfocom.layout.CC;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Extension adapter for Heatmap
  *
  * @author Alexander Weigl
  */
-@KeYGuiExtension.Info(name = "Heatmap")
+@KeYGuiExtension.Info(name = "Heatmap", optional = true,
+        description = "Colorize the formulae on the sequence based on the most recent changes\n" +
+                "Developer: Jonas Schiffl <jonas.schiffl@kit.edu>")
 public class HeatmapExt implements KeYGuiExtension,
         KeYGuiExtension.MainMenu,
         KeYGuiExtension.Toolbar,
@@ -54,7 +62,120 @@ public class HeatmapExt implements KeYGuiExtension,
     }
 }
 
-class HeatmapSettingsProvider implements SettingsProvider {
+/**
+ * This Dialog contains options for highlighting sequent formulae or terms
+ * according to their age, i.e., when they were first introduced into the proof.
+ * It is possible to highlight all sf/terms up to a specified age, or to
+ * highlight the x newest sf/terms, x being specified by the user.
+ *
+ * @author weigl
+ * @author jschiffl
+ */
+class HeatmapSettingsProvider extends TablePanel implements SettingsProvider {
+    /**
+     * The view settings
+     */
+    private static final ViewSettings VS = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+
+    /**
+     * Minimal setting for number of highlighted terms
+     */
+    private static final int MIN_AGE = 1;
+
+    /**
+     * Maximal setting for number of highlighted terms
+     */
+    private static final int MAX_AGE = 1000;
+
+    /**
+     * Text for introductory heatmap explanation
+     */
+    private static final String INTRO_LABEL = "Heatmaps can be used to "
+            + "highlight the most recent changes in the sequent.";
+
+    /**
+     * Explanation for age textfield
+     */
+    private static final String TEXTFIELD_LABEL = "Maximum age of highlighted \n"
+            + "terms or formulae, or number of newest terms or formulae\n"
+            + "Please enter a number between " + MIN_AGE + " and " + MAX_AGE + ".";
+
+    private final JSpinner spinnerAge;
+
+    enum HeatmapMode {
+        DEFAULT("No Heatmaps",
+                "No Heatmaps are shown.",
+                false, false, false),
+        SF_AGE("Sequent formulae up to age",
+                "All sequent formulae that have been added or changed in the last k steps are highlighted. \n"
+                        + "More recent formulae will have a stronger highlight. It is possible that less \n"
+                        + "than k formulae are highlighted, e.g. if one formula has changed multiple times.\n",
+                true, true, false),
+        SF_NEWEST("Newest sequent formulae",
+                "All formulae in the sequent are sorted by how new they are, i.e., how recently they have\n"
+                        + " been added or changed. The first k formulae of the sorted list are highlighted\n"
+                        + "according to their position in the list,\n"
+                        + " with the most recent formula receiving the strongest highlight.\n",
+                true, true, true),
+        TERMS_AGE("Terms up to age", "All terms that have been added or changed in the last k steps are highlighted. \n"
+                + "More recent terms will have a stronger highlight. It is possible that less than \n"
+                + "k terms are highlighted, e.g. if one term has changed multiple times.", true, false, false),
+        TERMS_NEWEST("Newest terms",
+                "All terms in the sequent are sorted by how new they are, i.e., how recently they\n"
+                        + "have been added or changed. The first k terms of the sorted list are highlighted\n"
+                        + "according to their position in the list,\n"
+                        + " with the most recent term receiving the strongest highlight.",
+                true, false, true);
+
+        final String text;
+        final String desc;
+        boolean enableHeatmap, sequent, newest;
+
+
+        HeatmapMode(String shortText, String description, boolean enableHeatmap, boolean sequent, boolean newest) {
+            desc = description;
+            text = shortText;
+            this.enableHeatmap = enableHeatmap;
+            this.sequent = sequent;
+            this.newest = newest;
+        }
+
+        public String description() {
+            return desc;
+        }
+    }
+
+    private Map<HeatmapMode, JRadioButton> map = new HashMap<>();
+
+    HeatmapSettingsProvider() {
+        ButtonGroup group = new ButtonGroup();
+        for (HeatmapMode m : HeatmapMode.values()) {
+            JRadioButton radio = new JRadioButton(m.text);
+            radio.setActionCommand(m.name());
+            group.add(radio);
+            map.put(m, radio);
+        }
+        add(new JLabel(INTRO_LABEL), new CC().span().alignX("left"));
+
+        addSeparator("Disable Heatmaps");
+        addRadio(HeatmapMode.DEFAULT);
+        addSeparator("Highlight sequent formulae");
+        addRadio(HeatmapMode.SF_AGE);
+        addRadio(HeatmapMode.SF_NEWEST);
+        addSeparator("Highlight terms");
+        addRadio(HeatmapMode.TERMS_AGE);
+        addRadio(HeatmapMode.TERMS_NEWEST);
+
+        spinnerAge = addNumberField("Maximal age:", MIN_AGE, MAX_AGE, 1, TEXTFIELD_LABEL, e -> {
+            //LIVE UPDATE: VS.setHeatmapOptions(VS.isShowHeatmap(), VS.isHeatmapSF(), VS.isHeatmapNewest(), (int) valueSpinner.getValue()));
+        });
+    }
+
+    private void addRadio(HeatmapMode mode) {
+        JRadioButton radio = map.get(mode);
+        addRowWithHelp(mode.desc, new JLabel(), radio);
+    }
+
     @Override
     public String getDescription() {
         return "Heatmap";
@@ -62,10 +183,27 @@ class HeatmapSettingsProvider implements SettingsProvider {
 
     @Override
     public JComponent getPanel(MainWindow window) {
-        return new JLabel("TODO");
+        for (Map.Entry<HeatmapMode, JRadioButton> entry : map.entrySet()) {
+            HeatmapMode mode = entry.getKey();
+            if (mode.enableHeatmap == VS.isShowHeatmap() &&
+                    mode.sequent == VS.isHeatmapSF() &&
+                    mode.newest == VS.isHeatmapNewest()) {
+                entry.getValue().setSelected(true);
+                break;
+            }
+        }
+        spinnerAge.setValue(VS.getMaxAgeForHeatmap());
+        return this;
     }
 
     @Override
     public void applySettings(MainWindow window) {
+        for (Map.Entry<HeatmapMode, JRadioButton> entry : map.entrySet()) {
+            if (entry.getValue().isSelected()) {
+                HeatmapMode mode = entry.getKey();
+                VS.setHeatmapOptions(mode.enableHeatmap, mode.sequent, mode.newest, (int) spinnerAge.getValue());
+                break;
+            }
+        }
     }
 }

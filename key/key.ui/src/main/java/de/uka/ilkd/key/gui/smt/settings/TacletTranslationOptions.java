@@ -47,7 +47,7 @@ public class TacletTranslationOptions extends TablePanel implements SettingsProv
                     + "Rule of thumb: Most of the taclets can be translated by using 2-3 different"
                     + " generic sorts.";
     private final JTextField fileChooserPanel;
-    private final JTextField maxNumberOfGenerics;
+    private final JSpinner maxNumberOfGenerics;
     private ProofDependentSMTSettings pdSettings;
     private ProofIndependentSMTSettings piSettings;
 
@@ -57,12 +57,13 @@ public class TacletTranslationOptions extends TablePanel implements SettingsProv
         maxNumberOfGenerics = createMaxNumberOfGenerics();
     }
 
-    public JTextField createMaxNumberOfGenerics() {
-        return addTextField("Maximum number of generic sorts.", "",
-                infoMaxNumberOfGenerics, e -> {
+    public JSpinner createMaxNumberOfGenerics() {
+        return addNumberField("Maximum number of generic sorts.", 0,
+                Integer.MAX_VALUE, 1, infoMaxNumberOfGenerics,
+                e -> {
                     int value;
                     try {
-                        value = Integer.parseInt(maxNumberOfGenerics.getText());
+                        value = (Integer) maxNumberOfGenerics.getValue();
                     } catch (NumberFormatException ex) {
                         value = pdSettings.maxGenericSorts;
                     }
@@ -87,7 +88,7 @@ public class TacletTranslationOptions extends TablePanel implements SettingsProv
     public JComponent getPanel(MainWindow window) {
         pdSettings = SettingsManager.getSmtPdSettings(window);
         piSettings = SettingsManager.getSmtPiSettings();
-        maxNumberOfGenerics.setText(Integer.toString(pdSettings.maxGenericSorts));
+        maxNumberOfGenerics.setValue(pdSettings.maxGenericSorts);
         fileChooserPanel.setText(piSettings.pathForTacletTranslation);
         fileChooserPanel.setEnabled(piSettings.storeTacletTranslationToFile);
         return this;
