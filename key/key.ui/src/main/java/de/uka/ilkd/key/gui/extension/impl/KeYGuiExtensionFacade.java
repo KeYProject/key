@@ -182,7 +182,6 @@ public final class KeYGuiExtensionFacade {
         extensions = ServiceLoaderUtil.stream(KeYGuiExtension.class)
                 .filter(KeYGuiExtensionFacade::isNotForbidden)
                 .map(Extension::new)
-                .filter(it -> !it.isDisabled())
                 .sorted()
                 .distinct()
                 .collect(Collectors.toList());
@@ -191,11 +190,12 @@ public final class KeYGuiExtensionFacade {
     /**
      * @param clazz the interface class
      * @param <T>   the interface of the service
-     * @return a list of all found service implementations
+     * @return a list of all found and enabled service implementations
      */
     @SuppressWarnings("unchecked")
     private static <T> Stream<Extension<T>> getExtensionsStream(Class<T> clazz) {
         return getExtensions().stream()
+                .filter(it -> !it.isDisabled())
                 .filter(it -> clazz.isAssignableFrom(it.getType()))
                 .map(it -> (Extension<T>) it);
     }
@@ -206,7 +206,7 @@ public final class KeYGuiExtensionFacade {
     }
 
     /**
-     * Determines if a given plugin is disabled by the user.
+     * Determines if a given plugin is completely disabled.
      * <p>
      * A plugin can either disabled by adding its fqn to the {@see #forbiddenPlugins} list
      * or setting <code>-P[fqn]=false</code> add the command line.
@@ -254,7 +254,8 @@ public final class KeYGuiExtensionFacade {
      */
     public void forbidClass(String clazz) {
         forbiddenPlugins.add(clazz);
-        extensions = extensions.stream().filter(it -> !it.getType().getName().equals(clazz))
+        extensions = extensions.stream()
+                .filter(it -> !it.getType().getName().equals(clazz))
                 .collect(Collectors.toList());
     }
 

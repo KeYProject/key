@@ -4,5 +4,31 @@
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="key.key.core.example.main" target="12" />
+      <module name="key.key.core.example.test" target="12" />
+      <module name="key.key.core.main" target="12" />
+      <module name="key.key.core.proof_references.main" target="12" />
+      <module name="key.key.core.proof_references.test" target="12" />
+      <module name="key.key.core.rifl.main" target="12" />
+      <module name="key.key.core.rifl.test" target="12" />
+      <module name="key.key.core.symbolic_execution.example.main" target="12" />
+      <module name="key.key.core.symbolic_execution.example.test" target="12" />
+      <module name="key.key.core.symbolic_execution.main" target="12" />
+      <module name="key.key.core.symbolic_execution.test" target="12" />
+      <module name="key.key.core.test" target="12" />
+      <module name="key.key.core.testgen.main" target="12" />
+      <module name="key.key.core.testgen.test" target="12" />
+      <module name="key.key.removegenerics.main" target="12" />
+      <module name="key.key.removegenerics.test" target="12" />
+      <module name="key.key.ui.main" target="12" />
+      <module name="key.key.ui.test" target="12" />
+      <module name="key.key.util.main" target="12" />
+      <module name="key.key.util.test" target="12" />
+      <module name="key.keyext.tacletide.main" target="12" />
+      <module name="key.keyext.tacletide.test" target="12" />
+      <module name="org.key_project.key.keyext.interactionlog.main" target="12" />
+      <module name="org.key_project.key.keyext.interactionlog.test" target="12" />
+    </bytecodeTargetLevel>
   </component>
 </project>

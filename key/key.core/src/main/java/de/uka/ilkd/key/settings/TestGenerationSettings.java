@@ -123,7 +123,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	}
 
 	@Override
-	public void readSettings(Object sender, Properties props) {
+	public void readSettings(Properties props) {
 	    applySymbolicExecution =  SettingsConverter.read(props,
                 TestGenerationSettings.propApplySymbolicExecution,
                 TestGenerationSettings.DEFAULT_APPLYSYMBOLICEX);
@@ -229,7 +229,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 
 
 	@Override
-	public void writeSettings(Object sender, Properties props) {
+	public void writeSettings(Properties props) {
 		//System.out.println("Saving: "+maxUnwinds);
         SettingsConverter.store(props,
                 TestGenerationSettings.propApplySymbolicExecution,

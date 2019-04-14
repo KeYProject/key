@@ -110,7 +110,7 @@ public class InteractionRecorder implements InteractionListener, AutoModeListene
         if (disableAll) return;
 
         Properties p = new Properties();
-        settings.writeSettings(p, p);
+        settings.writeSettings(p);
         SettingChangeInteraction sci = new SettingChangeInteraction(p, type);
         if (message != null) sci.setMessage(message);
         InteractionLog log = get(proof);

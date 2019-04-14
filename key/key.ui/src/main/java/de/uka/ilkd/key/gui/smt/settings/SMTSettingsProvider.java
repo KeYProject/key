@@ -107,7 +107,7 @@ public class SMTSettingsProvider extends TablePanel implements SettingsProvider 
     @Override
     public void applySettings(MainWindow window) {
         ProofIndependentSMTSettings pi = SettingsManager.getSmtPiSettings();
-        pi.copy(settings);
+        //TODO pi.copy(settings);
         pi.fireSettingsChanged();
     }
 

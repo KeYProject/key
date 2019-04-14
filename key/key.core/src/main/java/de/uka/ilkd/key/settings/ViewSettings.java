@@ -233,7 +233,7 @@ public class ViewSettings implements Settings, Cloneable {
      * @param props the collection of properties
      */
     @Override
-    public void readSettings(Object sender, Properties props) {
+    public void readSettings(Properties props) {
 		String val1 = props.getProperty(MAX_TOOLTIP_LINES_KEY);
 		String val2 = props.getProperty(FONT_INDEX);
 		String val3 = props.getProperty(SHOW_WHOLE_TACLET);
@@ -302,12 +302,12 @@ public class ViewSettings implements Settings, Cloneable {
 	 * are written to the given Properties object. Only entries of the form
 	 * <key>=<value>(, <value>)* are allowed.
 	 *
-	 * @param props
-	 *           the Properties object where to write the settings as (key,
-	 *           value) pair
-	 */
+     * @param props
+     *           the Properties object where to write the settings as (key,
+     *           value) pair
+     */
     @Override
-    public void writeSettings(Object sender,Properties props) {
+    public void writeSettings(Properties props) {
     	props.setProperty(MAX_TOOLTIP_LINES_KEY, "" + maxTooltipLines);
     	props.setProperty(SHOW_WHOLE_TACLET, "" + showWholeTaclet);
     	props.setProperty(FONT_INDEX, "" + sizeIndex);

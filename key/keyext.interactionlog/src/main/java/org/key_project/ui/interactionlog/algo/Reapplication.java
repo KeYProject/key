@@ -124,13 +124,13 @@ public class Reapplication extends DefaultInteractionVisitor<Void> {
 
         switch (interaction.getType()) {
             case SMT:
-                settings.getSMTSettings().readSettings(this, interaction.getSavedSettings());
+                settings.getSMTSettings().readSettings(interaction.getSavedSettings());
                 break;
             case CHOICE:
-                settings.getChoiceSettings().readSettings(this, interaction.getSavedSettings());
+                settings.getChoiceSettings().readSettings(interaction.getSavedSettings());
                 break;
             case STRATEGY:
-                settings.getStrategySettings().readSettings(this, interaction.getSavedSettings());
+                settings.getStrategySettings().readSettings(interaction.getSavedSettings());
                 break;
         }
 

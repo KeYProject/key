@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.extension.impl;
 
+import de.uka.ilkd.key.gui.extension.ExtensionManager;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 
 import java.lang.reflect.InvocationTargetException;
@@ -43,7 +44,9 @@ public class Extension<T> implements Comparable<Extension> {
     }
 
     public boolean isDisabled() {
-        return info != null && info.disabled();
+        return (info != null && info.disabled()) ||
+                ExtensionManager.getExtensionSettings()
+                        .getForbiddenClasses().contains(getType().getName());
     }
 
     public Class<T> getType() {

@@ -105,7 +105,7 @@ public class StrategySettings implements Settings, Cloneable {
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.gui.Settings#readSettings(java.util.Properties)
      */
-    public void readSettings (Object sender, Properties props ) {
+    public void readSettings(Properties props) {
         String numString = props.getProperty(STEPS_KEY);
         String strategyString = props.getProperty(STRATEGY_KEY);
         String timeoutString = props.getProperty(TIMEOUT_KEY);
@@ -152,7 +152,7 @@ public class StrategySettings implements Settings, Cloneable {
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.gui.Settings#writeSettings(java.util.Properties)
      */
-    public void writeSettings (Object sender, Properties props ) {
+    public void writeSettings(Properties props) {
 	if (getStrategy()==null) {
 	    setStrategy(JavaCardDLStrategyFactory.NAME); // It would be bedder to return the name of the default factory defined by the profile used by the proof in which this strategysettings is used or just not to save the strategy because it is not defined.
 	}
