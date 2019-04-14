@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.smt.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.TablePanel;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
@@ -40,31 +41,27 @@ class SolverOptions extends TablePanel implements SettingsProvider {
     private static final int SOLVER_NOT_SUPPOTED = 1;
     private static final int SOLVER_SUPPORT_NOT_CHECKED = 2;
     private final SolverType solverType;
-    private final JTextField solverName;
     private final JTextField solverCommand;
     private final JTextField solverParameters;
-    private final JTextField solverInstalled;
-    private final JTextField solverSupported;
     private ProofIndependentSMTSettings settings;
-    private JButton toDefaultButton;
 
     public SolverOptions(SolverType solverType) {
         this.setName(solverType.getName());
         this.solverType = solverType;
 
-        solverName = createSolverName();
-        solverInstalled = createSolverInstalled();
+        JTextField solverName = createSolverName();
+        JTextField solverInstalled = createSolverInstalled();
         solverCommand = createSolverInstalled();
         solverParameters = createSolverParameters();
-        solverSupported = createSolverSupported();
-        toDefaultButton = createButtons();
+        JTextField solverSupported = createSolverSupported();
+        JButton toDefaultButton = createButtons();
     }
 
-    protected void setSmtSettings() {
+    /*protected void setSmtSettings() {
         createSolverInstalled().setText(Boolean.toString(solverType.isInstalled(true)));
-    }
+    }*/
 
-    public JButton createButtons() {
+    protected JButton createButtons() {
         JButton toDefaultButton = new JButton("Set parameters to default.");
         toDefaultButton.addActionListener(arg0 -> {
             createSolverParameters().setText(solverType.getDefaultSolverParameters());
@@ -108,7 +105,7 @@ class SolverOptions extends TablePanel implements SettingsProvider {
         }
     }
 
-    public JTextField createSolverSupported() {
+    protected JTextField createSolverSupported() {
         JTextField txt = addTextField("Support", getSolverSupportText(),
                 infoSolverSupport + createSupportedVersionText(), null);
         txt.setEditable(false);
@@ -116,7 +113,7 @@ class SolverOptions extends TablePanel implements SettingsProvider {
     }
 
 
-    public JTextField createSolverParameters() {
+    protected JTextField createSolverParameters() {
         return addTextField("Parameters", solverType.getSolverParameters(), infoSolverParameters,
                 e -> settings.setParameters(solverType, solverParameters.getText()));
     }
@@ -128,7 +125,7 @@ class SolverOptions extends TablePanel implements SettingsProvider {
     }
 
 
-    public JTextField createSolverInstalled() {
+    protected JTextField createSolverInstalled() {
         final boolean installed = solverType.isInstalled(true);
         String info = installed ? "yes" : "no";
         if (installed) {
@@ -141,7 +138,7 @@ class SolverOptions extends TablePanel implements SettingsProvider {
         return txt;
     }
 
-    public JTextField createSolverName() {
+    protected JTextField createSolverName() {
         JTextField txt = addTextField("Name", solverType.getName(), infoSolverName, null);
         txt.setBackground(this.getBackground());
         txt.setEditable(false);
@@ -155,7 +152,7 @@ class SolverOptions extends TablePanel implements SettingsProvider {
 
     @Override
     public JComponent getPanel(MainWindow window) {
-        //TODO update settings
+        settings = SettingsManager.getSmtPiSettings().clone();
         return this;
     }
 

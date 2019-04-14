@@ -74,7 +74,14 @@ public class SettingsManager {
         }*/
     }
 
+
+
     public void showSettingsDialog(MainWindow mainWindow) {
+        SettingsDialog dialog = createDialog(mainWindow);
+        dialog.setVisible(true);
+    }
+
+    private SettingsDialog createDialog(MainWindow mainWindow) {
         settingsProviders.sort(Comparator.comparingInt(SettingsProvider::getPriorityOfSettings));
         SettingsDialog dialog = new SettingsDialog(mainWindow);
         dialog.setSettingsProvider(settingsProviders);
@@ -82,13 +89,11 @@ public class SettingsManager {
         dialog.setIconImage(IconFactory.keyLogo());
         dialog.setSize(800, 600);
         dialog.setLocationByPlatform(true);
-        dialog.setVisible(true);
+        return dialog;
     }
 
     public void showSettingsDialog(MainWindow mainWindow, SettingsProvider selectedPanel) {
-        settingsProviders.sort(Comparator.comparingInt(SettingsProvider::getPriorityOfSettings));
-        SettingsDialog dialog = new SettingsDialog(mainWindow);
-        dialog.setSettingsProvider(settingsProviders);
+        SettingsDialog dialog = createDialog(mainWindow);
         dialog.getUi().selectPanel(selectedPanel);
         dialog.setVisible(true);
     }

@@ -114,7 +114,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		return outputPath;
 	}
 
-	public boolean invaraiantForAll() {
+	public boolean invariantForAll() {
 		return invariantForAll;
 	}
 	
@@ -200,8 +200,6 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	public void setUseJunit(boolean useJunit) {
 		this.useJunit = useJunit;
 	}
-	
-	
 
 	public String getObjenesisPath() {
 		return objenesisPath;
@@ -258,5 +256,11 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		        objenesisPath);
 		SettingsConverter.store(props, TestGenerationSettings.propIncludePostCondition,
 				includePostCondition);
+	}
+
+	public void set(TestGenerationSettings settings) {
+		Properties p = new Properties();
+		settings.writeSettings(p);
+		readSettings(p);
 	}
 }

@@ -807,7 +807,6 @@ public final class MainWindow extends JFrame {
      * Remove those, that are not installed anymore, add those, that got installed.
      */
     public void updateSMTSelectMenu() {
-
         Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE.
                 getSMTSettings().getUsableSolverUnions();
 

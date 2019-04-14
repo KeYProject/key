@@ -72,7 +72,7 @@ public class TestGenOptionsPanel extends TablePanel implements SettingsProvider 
 
     private JTextField getSaveToFilePanel() {
         return addFileChooserPanel("Store test cases to folder:",
-                settings.getOutputFolderPath(), infoSaveTo,
+                "", infoSaveTo,
                 true, e -> {
                     settings.setOutputPath(saveToFilePanel.getText());
                     settings.fireSettingsChanged();
@@ -81,7 +81,7 @@ public class TestGenOptionsPanel extends TablePanel implements SettingsProvider 
 
     private JTextField getOpenJMLPanel() {
         return addFileChooserPanel("Location of openjml:",
-                settings.getOpenjmlPath(), infoOpenJMLPath,
+                "", infoOpenJMLPath,
                 true, e -> {
                     settings.setOpenjmlPath(openJMLPanel.getText());
                     settings.fireSettingsChanged();
@@ -90,7 +90,7 @@ public class TestGenOptionsPanel extends TablePanel implements SettingsProvider 
 
     private JTextField getObjenesisPanel() {
         return addFileChooserPanel("Location of objenesis:",
-                settings.getObjenesisPath(), infoObjenesisPath,
+                "", infoObjenesisPath,
                 true, e -> {
                     settings.setObjenesisPath(objenesisPanel.getText());
                     settings.fireSettingsChanged();
@@ -98,14 +98,14 @@ public class TestGenOptionsPanel extends TablePanel implements SettingsProvider 
     }
 
     private JCheckBox getJUnitPanel() {
-        return addCheckBox("Generate JUnit and test oracle", infoUseJunit, settings.useJunit(), val -> {
+        return addCheckBox("Generate JUnit and test oracle", infoUseJunit, false, val -> {
             settings.setUseJunit(val);
             settings.fireSettingsChanged();
         });
     }
 
     private JCheckBox getRemoveDuplicatesPanel() {
-        return addCheckBox("Remove duplicates", infoRemoveDuplicates, settings.removeDuplicates(), val -> {
+        return addCheckBox("Remove duplicates", infoRemoveDuplicates, false, val -> {
             settings.setRemoveDuplicates(val);
             settings.fireSettingsChanged();
         });
@@ -113,28 +113,28 @@ public class TestGenOptionsPanel extends TablePanel implements SettingsProvider 
 
     private JCheckBox getRFLSelectionPanel() {
         return
-                addCheckBox("Use reflection framework", infoRFLSelection, settings.useRFL(), val -> {
+                addCheckBox("Use reflection framework", infoRFLSelection, false, val -> {
                     settings.setRFL(val);
                     settings.fireSettingsChanged();
                 });
     }
 
     private JCheckBox getSymbolicEx() {
-        return addCheckBox("Apply symbolic execution", infoApplySymbolicEx, settings.getApplySymbolicExecution(), val -> {
+        return addCheckBox("Apply symbolic execution", infoApplySymbolicEx, false, val -> {
             settings.setApplySymbolicExecution(val);
             settings.fireSettingsChanged();
         });
     }
 
     private JCheckBox getInvariantForall() {
-        return addCheckBox("Require invariant for all objects", infoInvariantForAll, settings.invaraiantForAll(), val -> {
+        return addCheckBox("Require invariant for all objects", infoInvariantForAll, false, val -> {
             settings.setInvariantForAll(val);
             settings.fireSettingsChanged();
         });
     }
 
     private JCheckBox getIncludePostCondition() {
-        return addCheckBox("Include Post Condition", infoIncludePostcondition, settings.includePostCondition(), val -> {
+        return addCheckBox("Include Post Condition", infoIncludePostcondition, false, val -> {
             settings.setIncludePostCondition(val);
             settings.fireSettingsChanged();
         });
@@ -147,12 +147,23 @@ public class TestGenOptionsPanel extends TablePanel implements SettingsProvider 
 
     @Override
     public JComponent getPanel(MainWindow window) {
+        settings = new TestGenerationSettings(SettingsManager.getTestgenSettings());
+        includePostCondition.setSelected(settings.includePostCondition());
+        invariantForAll.setSelected(settings.invariantForAll());
+        useJUnit.setSelected(settings.useJunit());
+        symbolicEx.setSelected(settings.getApplySymbolicExecution());
+        removeDuplicates.setSelected(settings.removeDuplicates());
+        checkboxRFL.setSelected(settings.useRFL());
+        objenesisPanel.setText(settings.getObjenesisPath());
+        openJMLPanel.setText(settings.getOpenjmlPath());
+        saveToFilePanel.setText(settings.getOutputFolderPath());
         return this;
     }
 
     @Override
     public void applySettings(MainWindow window) {
         TestGenerationSettings globalSettings = SettingsManager.getTestgenSettings();
-        //TODO copy from settings to globalSettings
+        globalSettings.set(settings);
+        globalSettings.fireSettingsChanged();
     }
 }

@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.fonticons.KeYIconManagement;
 import de.uka.ilkd.key.gui.fonticons.KeYIcons;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -12,7 +11,8 @@ import net.miginfocom.swing.MigLayout;
 import org.key_project.util.java.ObjectUtil;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,10 +23,10 @@ import java.util.stream.Collectors;
 public class TacletOptionsSettings extends JPanel implements SettingsProvider {
     private static final String EXPLANATIONS_RESOURCE = "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
     private static Properties explanationMap;
-    private HashMap<String, String> category2DefaultChoice;
+    private HashMap<String, String> category2Choice;
     private HashMap<String, Set<String>> category2Choices;
     private ChoiceSettings settings;
-    private boolean warnNoProof = false;
+    private boolean warnNoProof = true;
 
     public TacletOptionsSettings() {
         setLayout(new MigLayout(
@@ -177,12 +177,12 @@ public class TacletOptionsSettings extends JPanel implements SettingsProvider {
         lblHead2.setFont(lblHead2.getFont().deriveFont(14f));
         add(lblHead2, new CC().newline());
 
-        category2DefaultChoice.keySet().stream().sorted().forEach(this::addCategory);
+        category2Choice.keySet().stream().sorted().forEach(this::addCategory);
     }
 
     protected void addCategory(String cat) {
         List<ChoiceEntry> choices = createChoiceEntries(category2Choices.get(cat));
-        ChoiceEntry selectedChoice = findChoice(choices, category2DefaultChoice.get(cat));
+        ChoiceEntry selectedChoice = findChoice(choices, category2Choice.get(cat));
         String explanation = getExplanation(cat);
 
         addTitleRow(cat);
@@ -192,6 +192,7 @@ public class TacletOptionsSettings extends JPanel implements SettingsProvider {
             if (c.equals(selectedChoice)) {
                 btn.setSelected(true);
             }
+            btn.addActionListener(new ChoiceSettingsSetter(cat, c.choice));
         }
         addExplanation(explanation);
         /*choiceList.addListSelectionListener(new ListSelectionListener() {
@@ -247,14 +248,6 @@ public class TacletOptionsSettings extends JPanel implements SettingsProvider {
         add(lbl, new CC().span().newline());
     }
 
-    /**
-     * is called to set the selected choice in
-     * <code>category2DefaultChoice</code>
-     */
-    private void setDefaultChoice(String category, String choice) {
-        category2DefaultChoice.put(category, choice);
-    }
-
     @Override
     public String getDescription() {
         return "Taclet Options";
@@ -262,23 +255,22 @@ public class TacletOptionsSettings extends JPanel implements SettingsProvider {
 
     @Override
     public JComponent getPanel(MainWindow window) {
-        warnNoProof = window.getMediator().getSelectedProof() != null;
+        warnNoProof = window.getMediator().getSelectedProof() == null;
         setChoiceSettings(SettingsManager.getChoiceSettings(window));
         return this;
     }
 
     private void setChoiceSettings(ChoiceSettings choiceSettings) {
         this.settings = choiceSettings;
-        category2DefaultChoice = settings.getDefaultChoices();
+        category2Choice = settings.getDefaultChoices();
         category2Choices = settings.getChoices();
         removeAll();
         layoutChoiceSelector();
     }
 
     @Override
-    public void applySettings(MainWindow window) throws InvalidSettingsInputException {
-        /*settings.setDefaultChoices(category2DefaultChoice);}*/
-        System.out.println("TODO: TacletOptionsSettings.applySettings");
+    public void applySettings(MainWindow window) {
+        settings.setDefaultChoices(category2Choice);
     }
 
     /**
@@ -430,6 +422,21 @@ public class TacletOptionsSettings extends JPanel implements SettingsProvider {
                     return choice;
                 }
             }
+        }
+    }
+
+    private class ChoiceSettingsSetter implements ActionListener {
+        private final String category;
+        private final String options;
+
+        public ChoiceSettingsSetter(String cat, String choice) {
+            category = cat;
+            options = choice;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            category2Choice.put(category, options);
         }
     }
 }

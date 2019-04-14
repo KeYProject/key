@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.smt.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.TablePanel;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
@@ -101,33 +102,33 @@ class TranslationOptions extends TablePanel implements SettingsProvider {
     }
 
 
-    public JCheckBox createUseExplicitTypeHierachy() {
+    protected JCheckBox createUseExplicitTypeHierachy() {
         return addCheckBox("Use a explicit type hierarchy.",
                 infoUseExplicitTypeHierarchy,
                 false,
                 e -> settings.useExplicitTypeHierarchy = useExplicitTypeHierachy.isSelected());
     }
 
-    public JCheckBox createNullInstantiation() {
+    protected JCheckBox createNullInstantiation() {
         return addCheckBox("Instantiate hierarchy assumptions if possible (recommended).",
                 infoUseNullInstantiation, false,
                 e -> settings.useNullInstantiation = useNullInstantiation.isSelected());
     }
 
-    public JCheckBox createBuiltInUniqueness() {
+    protected JCheckBox createBuiltInUniqueness() {
         return addCheckBox("Use built-in mechanism for uniqueness if possible.",
                 infoUseBuiltInUniqueness, false,
                 e -> settings.useBuiltInUniqueness = useBuiltInUniqueness.isSelected());
     }
 
-    public JCheckBox createUIMultiplication() {
+    protected JCheckBox createUIMultiplication() {
         return addCheckBox("Use uninterpreted multiplication if necessary.",
                 infoUseUIMultiplication,
                 false,
                 e -> settings.useUIMultiplication = useUIMultiplication.isSelected());
     }
 
-    public JSpinner createMaxField() {
+    protected JSpinner createMaxField() {
         JSpinner max = addNumberField("Maximum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, "", e -> {
             long result = settings.maxInteger;
             try {
@@ -142,12 +143,12 @@ class TranslationOptions extends TablePanel implements SettingsProvider {
         return max;
     }
 
-    public JSpinner createMinField() {
+    protected JSpinner createMinField() {
         return addNumberField("Minimum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, null,
                 val -> settings.minInteger = val);
     }
 
-    public JCheckBox createConstantsForIntegers() {
+    protected JCheckBox createConstantsForIntegers() {
         return addCheckBox("Active", infoUseConstantsForIntegers,
                 false,
                 e -> {
@@ -164,11 +165,14 @@ class TranslationOptions extends TablePanel implements SettingsProvider {
 
     @Override
     public JComponent getPanel(MainWindow window) {
-        //TODO setSmtSettings();
+        setSmtSettings(SettingsManager.getSmtPdSettings(window).clone());
         return this;
     }
 
     @Override
     public void applySettings(MainWindow window) {
+        ProofDependentSMTSettings current = SettingsManager.getSmtPdSettings(window);
+        current.copy(settings);//transfer settings
+        current.fireSettingsChanged();
     }
 }

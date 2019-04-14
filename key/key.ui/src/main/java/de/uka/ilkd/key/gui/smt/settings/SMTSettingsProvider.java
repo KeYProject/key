@@ -107,7 +107,7 @@ public class SMTSettingsProvider extends TablePanel implements SettingsProvider 
     @Override
     public void applySettings(MainWindow window) {
         ProofIndependentSMTSettings pi = SettingsManager.getSmtPiSettings();
-        //TODO pi.copy(settings);
+        pi.copy(settings);
         pi.fireSettingsChanged();
     }
 
@@ -124,7 +124,7 @@ public class SMTSettingsProvider extends TablePanel implements SettingsProvider 
                 });
     }
 
-    public JSpinner createMaxProcesses() {
+    private JSpinner createMaxProcesses() {
         return addNumberField("Concurrent Processes:",
                 0, Integer.MAX_VALUE, 1,
                 infoMaxProcesses,
@@ -139,7 +139,7 @@ public class SMTSettingsProvider extends TablePanel implements SettingsProvider 
                 });
     }
 
-    public JSpinner createTimeoutField() {
+    private JSpinner createTimeoutField() {
         return addNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, infoTimeoutField,
                 e -> {
                     long value;
@@ -152,7 +152,7 @@ public class SMTSettingsProvider extends TablePanel implements SettingsProvider 
                 });
     }
 
-    public JSpinner createIntBoundField() {
+    private JSpinner createIntBoundField() {
         return addNumberField("Integer Bound:", 0, Integer.MAX_VALUE, 1, infoBound,
                 e -> {
                     long value;
@@ -165,7 +165,7 @@ public class SMTSettingsProvider extends TablePanel implements SettingsProvider 
                 });
     }
 
-    public JSpinner createSeqBoundField() {
+    private JSpinner createSeqBoundField() {
         return addNumberField("Seq Bound:", 0, Integer.MAX_VALUE, 1, infoBound,
                 e -> {
                     long value;
@@ -178,7 +178,7 @@ public class SMTSettingsProvider extends TablePanel implements SettingsProvider 
                 });
     }
 
-    public JSpinner createObjectBoundField() {
+    private JSpinner createObjectBoundField() {
         return addNumberField("Object Bound:", 0, Integer.MAX_VALUE, 1, infoBound,
                 e -> {
                     long value;
@@ -191,14 +191,14 @@ public class SMTSettingsProvider extends TablePanel implements SettingsProvider 
                 });
     }
 
-    public JComboBox<String> getProgressModeBox() {
+    private JComboBox<String> getProgressModeBox() {
         return addComboBox(infoProgressModeBox, 0,
                 e -> settings.modeOfProgressDialog = progressModeBox.getSelectedIndex(),
                 getProgressMode(ProofIndependentSMTSettings.PROGRESS_MODE_USER),
                 getProgressMode(ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE));
     }
 
-    public JCheckBox createSolverSupportCheck() {
+    private JCheckBox createSolverSupportCheck() {
         return addCheckBox("Check for support when a solver is started.",
                 infoCheckForSupport,
                 false,
@@ -214,7 +214,7 @@ public class SMTSettingsProvider extends TablePanel implements SettingsProvider 
                 });
     }
 
-    String getProgressMode(int index) {
+    private String getProgressMode(int index) {
         switch (index) {
             case ProofIndependentSMTSettings.PROGRESS_MODE_USER:
                 return PROGRESS_MODE_USER;
