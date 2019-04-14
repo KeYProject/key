@@ -42,11 +42,6 @@ public class InteractionLogExt implements KeYGuiExtension,
     }
 
     @Override
-    public int priority() {
-        return 1500;
-    }
-
-    @Override
     public List<Action> getMainMenuActions(MainWindow mainWindow) {
         return Arrays.asList(
                 interactionLogView.getActionAddUserNote(),

@@ -656,11 +656,6 @@ public final class StrategySelectionView extends JPanel
     }
 
     @Override
-    public int priority() {
-        return 750;
-    }
-
-    @Override
     public Icon getIcon() {
         return KeYIcons.PROOF_SEARCH_STRATEGY_ICON.getIcon();
     }

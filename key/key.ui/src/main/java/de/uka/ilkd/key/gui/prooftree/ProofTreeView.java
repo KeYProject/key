@@ -487,12 +487,6 @@ public class ProofTreeView extends JPanel implements KeYGuiExtension, KeYGuiExte
     public JComponent getComponent() {
         return this;
     }
-
-    @Override
-    public int priority() {
-        return 0;
-    }
-
     // INNER CLASSES
 
     // to prevent memory leaks

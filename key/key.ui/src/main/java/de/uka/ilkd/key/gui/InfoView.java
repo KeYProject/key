@@ -207,10 +207,4 @@ public class InfoView extends JSplitPane implements KeYGuiExtension, KeYGuiExten
         }
 
     }
-
-    @Override
-    public int priority() {
-        return 1000;
-    }
-
 }

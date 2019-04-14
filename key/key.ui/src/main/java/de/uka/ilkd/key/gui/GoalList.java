@@ -245,11 +245,6 @@ public class GoalList extends JList<Goal>
         return res;
     }
 
-    @Override
-    public int priority() {
-        return 250;
-    }
-
     private static class GoalListModel extends AbstractListModel<Goal> {
         private static final long serialVersionUID = 3754243473284250930L;
         /**

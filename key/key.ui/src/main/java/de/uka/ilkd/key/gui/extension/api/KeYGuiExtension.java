@@ -25,31 +25,59 @@ import java.util.List;
 public interface KeYGuiExtension {
     @Retention(RetentionPolicy.RUNTIME)
     @interface Info {
+        /**
+         * Simple name of this extension, else the fqdn of the class is used
+         *
+         * @return non-null string
+         */
         String name() default "";
 
+        /**
+         * Optional extension can be disabled by the user.
+         *
+         * @return a boolean
+         */
         boolean optional() default false;
 
+        /**
+         * Disabled extension are not instantiated
+         *
+         * @return a boolean
+         */
         boolean disabled() default false;
 
+        /**
+         * Long description of this extension.
+         * <p>
+         * what does it? who develops it?
+         *
+         * @return a string, default empty
+         */
         String description() default "";
 
+        /**
+         * Loading priority of this extension. Baseline is zero
+         *
+         * @return
+         */
         int priority() default 0;
     }
 
+    /**
+     * Main Menu extension provides entry to the extension {@link JMenu} in the main frame.
+     */
     interface MainMenu {
         /**
-         * @param mainWindow
-         * @return
+         * A list of actions which should be added to the main menu.
+         * <p>
+         * Actions should use the {@link KeYExtConstants#PATH} and {@link KeYExtConstants#PRIORITY} to control their
+         * position in the menu.
+         *
+         * @param mainWindow the window of the main menu
+         * @return non-null, emptiable list of actions.
+         * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
         List<Action> getMainMenuActions(MainWindow mainWindow);
-
-
-        /**
-         * @return
-         */
-        default int getPriority() {
-            return 0;
-        }
     }
 
     /**
@@ -67,60 +95,100 @@ public interface KeYGuiExtension {
      */
     interface LeftPanel {
         /**
-         * @param window
-         * @param mediator
+         * Initialization of the subcomponents.
+         * <p>
+         * Called before any other method; can be used to construct the UI.
+         *
+         * @param window   parent of this extension
+         * @param mediator the current mediator
          */
-        public void init(MainWindow window, KeYMediator mediator);
+        void init(MainWindow window, KeYMediator mediator);
 
         /**
          * The title of the tab pane for the user.
          *
          * @return non-null and non-empty string
          */
-        public String getTitle();
+        String getTitle();
 
         /**
-         * A nice icon for viewing aside to the tab title.
+         * An icon for viewing aside to the tab title.
          *
-         * @return
+         * @return nullable icon
+         * @see de.uka.ilkd.key.gui.fonticons.KeYIcons
          */
-        public default Icon getIcon() {
+        default Icon getIcon() {
             return null;
         }
 
         /**
          * The content of the tab pane
          *
-         * @return
+         * @return non-null
          */
-        public JComponent getComponent();
-
-
-        /**
-         * @return
-         */
-        public default int priority() {
-            return 0;
-        }
+        JComponent getComponent();
     }
 
+    /**
+     * This interface describes the UI extension for adding various context menus.
+     *
+     * @author Alexander Weigl
+     * @version 1 (07.02.19)
+     */
     interface ContextMenu {
         /**
-         * @param mainWindow non-null
-         * @return a list of actions
+         * A list of actions which should be added to the main menu.
+         * <p>
+         * Actions should use the {@link KeYExtConstants#PATH} and {@link KeYExtConstants#PRIORITY} to control their
+         * position in the menu.
+         *
+         * @param mainWindow       the window of the main menu
+         * @param kind             the type of context menu
+         * @param underlyingObject the object for which the context menu is requested
+         * @return non-null, emptiable list of actions.
+         * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
         List<Action> getContextActions(MainWindow mainWindow, ContextMenuKind kind, Object underlyingObject);
     }
 
+    /**
+     * This interface describes the UI extension to add a {@link Toolbar} into the main window.
+     *
+     * @author Alexander Weigl
+     */
     interface Toolbar {
+        /**
+         * A toolbar which will be embedded into the main window.s
+         *
+         * @param mainWindow the parent of the toolbar
+         * @return non-null
+         */
         JToolBar getToolbar(MainWindow mainWindow);
     }
 
+    /**
+     * This interface describes the UI extension to add a components
+     * into the status line (right side) of the main window.
+     *
+     * @author Alexander Weigl
+     */
     interface StatusLine {
+        /**
+         * @return non-null, emptiable list of components
+         */
         List<JComponent> getStatusLineComponents();
     }
 
-    public interface Settings {
+    /**
+     * This interface describes the UI extension to add a {@link SettingsProvider}
+     * into the default settings dialog.
+     *
+     * @author Alexander Weigl
+     */
+    interface Settings {
+        /**
+         * @return non-null settings provider
+         */
         SettingsProvider getSettings();
     }
 }
