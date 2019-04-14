@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * @version 1 (13.02.19)
  */
 @SuppressWarnings("Duplicates")
-final class FindResources {
+public final class FindResources {
     /**
      * List directory contents for a resource folder. Not recursive.
      * This is basically a brute-force implementation.
@@ -93,5 +93,64 @@ final class FindResources {
 
     public static <T> Path getResource(String path) throws URISyntaxException, IOException {
         return getResource(path, FindResources.class);
+    }
+
+    /**
+     * @param property
+     * @param candidates
+     * @return
+     */
+    public static File findFolder(String property, String... candidates) {
+        return findFolder(true, property, candidates);
+    }
+
+    /**
+     * Search for a folder.
+     * <p>
+     * The folder is searched by a value given via java system properties or by a list of candidates.
+     * <p>
+     * You can specify whether the folder should exists or not. If the should exists the method could return null.
+     *
+     * @param property a key for {@link System#getProperty(String)}
+     * @param exists       flag whether the folder should exists
+     * @param candidates   a list of candidates, used if <code>propertyName</code> is not set by the user
+     * @return
+     */
+    public static File findFolder(boolean exists, String property, String... candidates) {
+        if (System.getProperty(property) != null) {
+            File f = new File(System.getProperty(property));
+            if (f.exists() || !exists) {
+                return f;
+            }
+        }
+        for (String c : candidates) {
+            File f = new File(c);
+            if (f.exists() || !exists) {
+                return f;
+            }
+        }
+        return null;
+    }
+
+    public static File getExampleDirectory() {
+        return findFolder("KEY_EXAMPLES_DIR", "key.ui/examples", "../key.ui/examples", "examples");
+    }
+
+    public static File getTestResultForRunAllProofs() {
+        return findFolder(false, "KEY_TESTRESULT_RUNALLPROOFS",
+                "build/reports/runallproofs");
+    }
+
+    public static File getTestCasesDirectory() {
+        return findFolder("TEST_CASES", "src/test/resources/testcase");
+    }
+
+    public static File getTestResourcesDirectory() {
+        return findFolder("TEST_RESOURCES", "src/test/resources/");
+    }
+
+    public static File getTacletProofsDirectory() {
+        return findFolder("TACLET_PROOFS", "key.core/tacletProofs",
+                "../key.core/tacletProofs", "tacletProofs");
     }
 }

@@ -3,29 +3,9 @@ package org.key_project.util.helper;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import org.key_project.util.java.IOUtil;
 
 public class HelperClassForUtilityTests {
-   public static final File RESOURCE_DIRECTORY;
-
-   static {
-      File projectRoot = IOUtil.getProjectRoot(HelperClassForUtilityTests.class);
-      // Update path in Eclipse Plug-ins executed as JUnit Test.
-      if ("org.key_project.util.test".equals(projectRoot.getName())) {
-         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile().getParentFile();
-      }
-      // Update path in Eclipse Plug-ins executed as JUnit Plug-in Test.
-      else if ("tests".equals(projectRoot.getName())) {
-         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile();
-      } else if( projectRoot.getAbsolutePath().contains("production")) {
-          projectRoot = projectRoot.getParentFile().getParentFile().getParentFile();
-      }
-      if(System.getProperty("test-resources") != null) {
-          RESOURCE_DIRECTORY = new File(System.getProperty("test-resources"));
-      }else{
-          RESOURCE_DIRECTORY = new File(projectRoot, "src/test/resources");
-      }
-   }
+    public static final File RESOURCE_DIRECTORY = FindResources.getTestResourcesDirectory();
 
    /**
     * Creates a folder.

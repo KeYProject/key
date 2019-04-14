@@ -828,30 +828,4 @@ public final class IOUtil {
             return name;
         }
     }
-
-
-    /**
-     * Search for a folder.
-     * <p>
-     * The folder is searched by a value given via java system properties or by a list of candidates.
-     * <p>
-     * You can specify whether the folder should exists or not. If the should exists the method could return null.
-     *
-     * @param propertyName a key for {@link System#getProperty(String)}
-     * @param exists       flag whether the folder should exists
-     * @param candidates   a list of candidates, used if <code>propertyName</code> is not set by the user
-     * @return
-     */
-    public static File findFolder(String propertyName, boolean exists, String... candidates) {
-        if (System.getProperty(propertyName) != null) {
-            File f = new File(System.getProperty(propertyName));
-            if (f.exists() || !exists) return f;
-        }
-
-        for (String c : candidates) {
-            File f = new File(c);
-            if (f.exists() || !exists) return f;
-        }
-        return null;
-    }
 }

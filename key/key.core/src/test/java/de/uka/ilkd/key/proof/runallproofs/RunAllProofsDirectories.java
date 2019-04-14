@@ -1,13 +1,10 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
-import org.key_project.util.java.IOUtil;
+import org.key_project.util.helper.FindResources;
 
 import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
-
-import static org.key_project.util.java.IOUtil.findFolder;
-
 
 /**
  * Initialising directories for runallproofs is a bit tricky since doing it
@@ -27,29 +24,8 @@ import static org.key_project.util.java.IOUtil.findFolder;
  */
 @SuppressWarnings("serial")
 public class RunAllProofsDirectories implements Serializable {
-
-    /**
-     * The path to the KeY repository. Configurable via system property
-     * {@code key.home}.
-     */
-    public static final File EXAMPLE_DIR;
-    protected static final File RUNALLPROOFS_DIR;
-
-
-    /**
-     * Initialise static variables which are identical for each RAP run.
-     */
-    static {
-        EXAMPLE_DIR = findFolder("EXAMPLES_DIR", true,
-                "examples", "../key.ui/examples", "key.ui/examples");
-        RUNALLPROOFS_DIR = findFolder("RUNALLPROOFS_DIR", false,
-                "testresults/runallproofs",
-                "../testresults/runallproofs",
-                "../key.core/testresults/runallproofs",
-                "key.core/testresults/runallproofs");
-    }
-
-
+    public static final File EXAMPLE_DIR = FindResources.getExampleDirectory();
+    public static final File RUNALLPROOFS_DIR = FindResources.getTestResultForRunAllProofs();
     public RunAllProofsDirectories(Date runStart) {
         RUNALLPROOFS_DIR.mkdirs();
     }

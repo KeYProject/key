@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.key_project.util.collection.KeYCollections;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -131,8 +132,8 @@ class RIFLHandler extends DefaultHandler {
     public SpecificationContainer getSpecification() {
         // drop categories, merge sources and sinks
         final Map<SpecificationEntity, String> tmp = new LinkedHashMap<SpecificationEntity, String>();
-        tmp.putAll(apply(sources2categories, categories2domains));
-        tmp.putAll(apply(sinks2categories, categories2domains));
+        tmp.putAll(KeYCollections.apply(sources2categories, categories2domains));
+        tmp.putAll(KeYCollections.apply(sinks2categories, categories2domains));
         return new DefaultSpecificationContainer(tmp, flow);
     }
 

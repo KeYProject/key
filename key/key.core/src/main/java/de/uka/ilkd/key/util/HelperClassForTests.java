@@ -25,9 +25,9 @@ import java.util.Map.Entry;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
-import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -58,32 +58,8 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 public class HelperClassForTests {
 
-    public static final File TESTCASE_DIRECTORY;
-    public static final File DUMMY_KEY_FILE;
-   
-   static {
-      File projectRoot = IOUtil.getProjectRoot(HelperClassForTests.class);
-      // Update path in Eclipse Plug-ins executed as JUnit Test.
-       if ("org.key_project.core.test".equals(projectRoot.getName())) {
-          projectRoot = projectRoot.getParentFile().getParentFile().getParentFile().getParentFile();
-      }
-      // Update path in Eclipse Plug-ins executed as JUnit Plug-in Test.
-      else if ("tests".equals(projectRoot.getName())) {
-         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile();
-       }
-       // Test for Intellij
-       else if (projectRoot.getAbsolutePath().contains("production")) {
-           projectRoot = projectRoot.getParentFile().getParentFile();
-       }
-
-       if(System.getProperty("testcases") != null) {
-           TESTCASE_DIRECTORY = new File(System.getProperty("testcases")).getAbsoluteFile();
-           DUMMY_KEY_FILE = new File(TESTCASE_DIRECTORY , "dummyTrue.key");
-       }else{
-           TESTCASE_DIRECTORY = new File(projectRoot, "src/test/resources/testcase");
-           DUMMY_KEY_FILE = new File(TESTCASE_DIRECTORY + File.separator + "dummyTrue.key");
-       }
-   }
+    public static final File TESTCASE_DIRECTORY = FindResources.getTestCasesDirectory();
+    public static final File DUMMY_KEY_FILE = new File(TESTCASE_DIRECTORY, "dummyTrue.key");
 
     
     private static final Profile profile = new JavaProfile() {
@@ -197,7 +173,7 @@ public class HelperClassForTests {
      * @throws ProblemLoaderException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    public static HashMap<String, String> setDefaultTacletOptions(String baseDir,
+    public static HashMap<String, String> setDefaultTacletOptions(File baseDir,
                                                                   String javaPathInBaseDir) throws ProblemLoaderException, ProofInputException {
        if (!ProofSettings.isChoiceSettingInitialised()) {
           // Make sure that required files exists
