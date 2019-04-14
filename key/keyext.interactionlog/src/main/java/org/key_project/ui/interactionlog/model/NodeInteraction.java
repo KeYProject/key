@@ -8,6 +8,8 @@ import java.beans.Transient;
 
 @XmlTransient
 public abstract class NodeInteraction extends Interaction {
+    private static final long serialVersionUID = 1L;
+
     private transient int serialNr;
 
     private NodeIdentifier nodeId;

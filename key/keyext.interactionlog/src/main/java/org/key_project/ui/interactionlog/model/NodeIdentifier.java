@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class NodeIdentifier implements Serializable {
+    private static final long serialVersionUID = 7147788921672163642L;
+
     @XmlElement(required = true, name = "select")
     private List<Integer> list = new ArrayList<>();
 

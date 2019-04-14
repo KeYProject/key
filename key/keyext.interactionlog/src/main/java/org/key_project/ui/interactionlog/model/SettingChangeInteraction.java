@@ -18,6 +18,8 @@ import java.util.Properties;
 @XmlRootElement()
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SettingChangeInteraction extends Interaction {
+    private static final long serialVersionUID = 1L;
+
     @XmlAttribute
     private String message;
 

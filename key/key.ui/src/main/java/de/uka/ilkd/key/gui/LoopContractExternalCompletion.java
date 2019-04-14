@@ -7,7 +7,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule.Instantiation;
+import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule.Instantiation;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopContractExternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopContractExternalRule;
@@ -20,7 +20,7 @@ import de.uka.ilkd.key.speclang.LoopContract;
 public class LoopContractExternalCompletion implements InteractiveRuleApplicationCompletion {
 
     private final MainWindow mainWindow;
-    
+
     LoopContractExternalCompletion(MainWindow mainWindow){
         this.mainWindow = mainWindow;
     }
@@ -45,15 +45,15 @@ public class LoopContractExternalCompletion implements InteractiveRuleApplicatio
                 .instantiate(application.posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<LoopContract> contracts =
                 LoopContractExternalRule.getApplicableContracts(instantiation, goal, services);
-        final BlockSpecificationElementConfigurator<LoopContract> configurator
-            = new BlockSpecificationElementConfigurator<>("Loop Contract Configurator",
+        final AuxiliaryContractConfigurator<LoopContract> configurator
+            = new AuxiliaryContractConfigurator<>("Loop Contract Configurator",
                     new LoopContractSelectionPanel(services, true),
                     mainWindow, services, contracts.toArray(new LoopContract[contracts.size()]),
-                    "Contracts for Block: " + instantiation.block);
+                    "Contracts for Block: " + instantiation.statement);
         if (configurator.wasSuccessful()) {
             final List<LocationVariable> heaps =
                     HeapContext.getModHeaps(services, instantiation.isTransactional());
-            result.update(instantiation.block, configurator.getContract(), heaps);
+            result.update(instantiation.statement, configurator.getContract(), heaps);
         }
         return result;
     }
@@ -62,9 +62,9 @@ public class LoopContractExternalCompletion implements InteractiveRuleApplicatio
     public boolean canComplete(final IBuiltInRuleApp app) {
         return checkCanComplete(app);
     }
-    
+
     /**
-     * Checks if the app is supported. 
+     * Checks if the app is supported.
      * This functionality is also used by the Eclipse plug-ins like the KeYIDE.
      */
     public static boolean checkCanComplete(final IBuiltInRuleApp app) {
