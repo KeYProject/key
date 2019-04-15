@@ -15,7 +15,9 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class LoopInvariantBuiltInRuleInteraction extends BuiltInRuleInteraction{
+public class LoopInvariantBuiltInRuleInteraction extends BuiltInRuleInteraction {
+    private static final long serialVersionUID = 1L;
+
     public <T extends IBuiltInRuleApp> LoopInvariantBuiltInRuleInteraction(LoopInvariantBuiltInRuleApp app, Node node) {
     }
 

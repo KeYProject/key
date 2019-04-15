@@ -18,6 +18,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class OSSBuiltInRuleInteraction extends BuiltInRuleInteraction {
+    private static final long serialVersionUID = 1L;
+
     private OccurenceIdentifier occurenceIdentifier;
     private NodeIdentifier nodeIdentifier;
 

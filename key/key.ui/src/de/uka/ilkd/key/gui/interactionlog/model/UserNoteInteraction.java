@@ -15,6 +15,8 @@ import java.awt.*;
 @XmlRootElement()
 @XmlAccessorType(XmlAccessType.FIELD)
 public class UserNoteInteraction extends Interaction {
+    private static final long serialVersionUID = 1L;
+
     private String note;
 
     public UserNoteInteraction() {

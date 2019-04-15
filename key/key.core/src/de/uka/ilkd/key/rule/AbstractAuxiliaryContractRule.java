@@ -11,6 +11,8 @@ import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.java.statement.JavaStatement;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -27,19 +29,19 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * <p>
- * Rule for the application of {@link BlockSpecificationElement}s.
+ * Rule for the application of {@link AuxiliaryContract}s.
  * </p>
  *
- * @see AbstractBlockSpecificationElementBuiltInRuleApp
+ * @see AbstractAuxiliaryContractBuiltInRuleApp
  *
  * @author wacker, lanzinger
  */
-public abstract class AbstractBlockSpecificationElementRule implements BuiltInRule {
+public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
 
     /**
      *
@@ -165,7 +167,7 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
     /**
      * This encapsulates all information from the rule application that is needed to apply the rule.
      *
-     * @see AbstractBlockSpecificationElementBuiltInRuleApp
+     * @see AbstractAuxiliaryContractBuiltInRuleApp
      */
     public static final class Instantiation {
 
@@ -190,9 +192,9 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
         public final Term self;
 
         /**
-         * The block the contract belongs to.
+         * The statement the contract belongs to.
          */
-        public final StatementBlock block;
+        public final JavaStatement statement;
 
         /**
          * The execution context in which the block occurs.
@@ -209,24 +211,24 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
          *            the modality.
          * @param self
          *            the self variable.
-         * @param block
-         *            the block the contract belongs to.
+         * @param statement
+         *            the statement the contract belongs to.
          * @param context
          *            the execution context in which the block occurs.
          */
         public Instantiation(final Term update, final Term formula, final Modality modality,
-                final Term self, final StatementBlock block, final ExecutionContext context) {
+                final Term self, final JavaStatement statement, final ExecutionContext context) {
             assert update != null;
             assert update.sort() == Sort.UPDATE;
             assert formula != null;
             assert formula.sort() == Sort.FORMULA;
             assert modality != null;
-            assert block != null;
+            assert statement != null;
             this.update = update;
             this.formula = formula;
             this.modality = modality;
             this.self = self;
-            this.block = block;
+            this.statement = statement;
             this.context = context;
         }
 
@@ -285,16 +287,17 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
                 return null;
             }
             final Modality modality = (Modality) target.op();
-            final StatementBlock block = getFirstBlockInPrefixWithAtLeastOneApplicableContract(
-                    modality, target.javaBlock(), goal);
-            if (block == null) {
+            final JavaStatement statement =
+                    getFirstStatementInPrefixWithAtLeastOneApplicableContract(
+                            modality, target.javaBlock(), goal);
+            if (statement == null) {
                 return null;
             }
             final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(),
                     services);
             final Term self = extractSelf(frame);
             final ExecutionContext context = extractExecutionContext(frame);
-            return new Instantiation(update, target, modality, self, block, context);
+            return new Instantiation(update, target, modality, self, statement, context);
         }
 
         /**
@@ -358,7 +361,7 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
          *            the current goal.
          * @return the first block in the java block's prefix with at least one applicable contract.
          */
-        private StatementBlock getFirstBlockInPrefixWithAtLeastOneApplicableContract(
+        private JavaStatement getFirstStatementInPrefixWithAtLeastOneApplicableContract(
                 final Modality modality, final JavaBlock java, final Goal goal) {
             SourceElement element = java.program().getFirstElement();
             while ((element instanceof ProgramPrefix || element instanceof CatchAllStatement)
@@ -373,6 +376,13 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
                     element = element.getFirstElement();
                 }
             }
+
+            if (element instanceof LoopStatement) {
+                if (hasApplicableContracts(services, (LoopStatement) element, modality, goal)) {
+                    return (LoopStatement) element;
+                }
+            }
+
             return null;
         }
 
@@ -380,8 +390,8 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
          *
          * @param services
          *            services.
-         * @param block
-         *            a block.
+         * @param element
+         *            a block or loop.
          * @param modality
          *            the current goal's modality.
          * @param goal
@@ -389,7 +399,7 @@ public abstract class AbstractBlockSpecificationElementRule implements BuiltInRu
          * @return {@code true} iff the block has applicable contracts.
          */
         protected abstract boolean hasApplicableContracts(final Services services,
-                final StatementBlock block, final Modality modality, Goal goal);
+                final JavaStatement element, final Modality modality, Goal goal);
     }
 
 }

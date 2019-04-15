@@ -24,7 +24,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule;
+import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
@@ -161,8 +161,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
          if ((rule instanceof WhileInvariantRule && WhileInvariantRule.INITIAL_INVARIANT_ONLY_HINT.equals(hint)) ||
              (rule instanceof WhileInvariantRule && WhileInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint)) ||
              (rule instanceof UseOperationContractRule && UseOperationContractRule.FINAL_PRE_TERM_HINT.equals(hint)) ||
-             (rule instanceof AbstractBlockSpecificationElementRule && AbstractBlockSpecificationElementRule.FULL_PRECONDITION_TERM_HINT.equals(hint)) ||
-             (rule instanceof AbstractBlockSpecificationElementRule && AbstractBlockSpecificationElementRule.NEW_POSTCONDITION_TERM_HINT.equals(hint)) ||
+             (rule instanceof AbstractAuxiliaryContractRule && AbstractAuxiliaryContractRule.FULL_PRECONDITION_TERM_HINT.equals(hint)) ||
+             (rule instanceof AbstractAuxiliaryContractRule && AbstractAuxiliaryContractRule.NEW_POSTCONDITION_TERM_HINT.equals(hint)) ||
              (rule instanceof CloseAfterMerge && CloseAfterMerge.FINAL_WEAKENING_TERM_HINT.equals(hint))) {
             ProofOblInput problem = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
             if (problem instanceof AbstractOperationPO) {

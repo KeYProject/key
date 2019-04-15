@@ -9,6 +9,8 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.informationflow.po.SymbolicExecutionPO;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.statement.JavaStatement;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -34,7 +36,7 @@ import de.uka.ilkd.key.speclang.LoopContract;
  *
  * @author lanzinger
  */
-public abstract class AbstractLoopContractRule extends AbstractBlockSpecificationElementRule {
+public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContractRule {
 
     /**
      *
@@ -51,16 +53,16 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
         if (instantiation == null) {
             return DefaultImmutableSet.nil();
         }
-        return getApplicableContracts(services.getSpecificationRepository(), instantiation.block,
-                instantiation.modality, goal);
+        return getApplicableContracts(services.getSpecificationRepository(),
+                instantiation.statement, instantiation.modality, goal);
     }
 
     /**
      *
      * @param specifications
      *            a specification repository.
-     * @param block
-     *            a block.
+     * @param statement
+     *            a statement.
      * @param modality
      *            the current goal's modality.
      * @param goal
@@ -68,17 +70,36 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
      * @return all applicable loop contracts for the block from the repository.
      */
     public static ImmutableSet<LoopContract> getApplicableContracts(
-            final SpecificationRepository specifications, final StatementBlock block,
+            final SpecificationRepository specifications, final JavaStatement statement,
             final Modality modality, final Goal goal) {
-        ImmutableSet<LoopContract> collectedContracts
+        ImmutableSet<LoopContract> collectedContracts;
+
+        if (statement instanceof StatementBlock) {
+            StatementBlock block = (StatementBlock) statement;
+
+            collectedContracts
                 = specifications.getLoopContracts(block, modality);
-        if (modality == Modality.BOX) {
-            collectedContracts = collectedContracts
-                    .union(specifications.getLoopContracts(block, Modality.DIA));
-        } else if (modality == Modality.BOX_TRANSACTION) {
-            collectedContracts = collectedContracts
-                    .union(specifications.getLoopContracts(block, Modality.DIA_TRANSACTION));
+            if (modality == Modality.BOX) {
+                collectedContracts = collectedContracts
+                        .union(specifications.getLoopContracts(block, Modality.DIA));
+            } else if (modality == Modality.BOX_TRANSACTION) {
+                collectedContracts = collectedContracts
+                        .union(specifications.getLoopContracts(block, Modality.DIA_TRANSACTION));
+            }
+        } else {
+            LoopStatement loop = (LoopStatement) statement;
+
+            collectedContracts
+                = specifications.getLoopContracts(loop, modality);
+            if (modality == Modality.BOX) {
+                collectedContracts = collectedContracts
+                        .union(specifications.getLoopContracts(loop, Modality.DIA));
+            } else if (modality == Modality.BOX_TRANSACTION) {
+                collectedContracts = collectedContracts
+                        .union(specifications.getLoopContracts(loop, Modality.DIA_TRANSACTION));
+            }
         }
+
         return filterAppliedContracts(collectedContracts, goal);
     }
 
@@ -117,7 +138,9 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
             if (app instanceof LoopContractInternalBuiltInRuleApp) {
                 LoopContractInternalBuiltInRuleApp blockRuleApp
                         = (LoopContractInternalBuiltInRuleApp) app;
-                if (blockRuleApp.getBlock().equals(contract.getBlock())
+                if ((contract.isOnBlock() && blockRuleApp.getStatement().equals(contract.getBlock())
+                        || !contract.isOnBlock() && blockRuleApp.getStatement()
+                            .equals(contract.getLoop()))
                         && selfOrParentNode.getChildNr(previousNode) == 0) {
                     // prevent application of contract in its own check validity branch
                     // but not in other branches, e.g., do-while
@@ -213,7 +236,7 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
         for (LocationVariable variable : variables) {
             if (contract.hasModifiesClause(variable)) {
                 final String anonymisationName
-                        = tb.newName(BlockContractBuilders.ANON_OUT_PREFIX + variable.name());
+                        = tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + variable.name());
                 final Function anonymisationFunction
                         = new Function(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
@@ -227,7 +250,7 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
      * A builder for {@link Instantiation}s.
      */
     protected static final class Instantiator
-            extends AbstractBlockSpecificationElementRule.Instantiator {
+            extends AbstractAuxiliaryContractRule.Instantiator {
 
         /**
          *
@@ -244,9 +267,12 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
 
         @Override
         protected boolean hasApplicableContracts(final Services services,
-                final StatementBlock block, final Modality modality, Goal goal) {
-            return !getApplicableContracts(services.getSpecificationRepository(), block, modality,
-                    goal).isEmpty();
+                final JavaStatement statement, final Modality modality, Goal goal) {
+            ImmutableSet<LoopContract> contracts = getApplicableContracts(
+                    services.getSpecificationRepository(),
+                    statement, modality, goal);
+
+            return contracts != null && !contracts.isEmpty();
         }
     }
 }

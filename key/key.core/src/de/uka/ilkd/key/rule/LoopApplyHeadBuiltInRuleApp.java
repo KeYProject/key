@@ -9,16 +9,16 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopContract;
 
 /**
- * Rule application for {@link LoopContractApplyHeadRule}.
+ * Rule application for {@link LoopApplyHeadRule}.
  *
  * @author lanzinger
  */
-public class LoopContractApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
+public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     /**
      * The rule being applied.
      */
-    protected LoopContractApplyHeadRule rule;
+    private LoopApplyHeadRule rule;
 
     /**
      * The loop contracts on which the rule is applied.
@@ -37,7 +37,7 @@ public class LoopContractApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp 
      * @param pio
      *            the position at which the rule is applied.
      */
-    public LoopContractApplyHeadBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio) {
+    public LoopApplyHeadBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio) {
         this(rule, pio, null);
     }
 
@@ -50,10 +50,10 @@ public class LoopContractApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp 
      * @param contracts
      *            the contracts on which the rule is applied.
      */
-    public LoopContractApplyHeadBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
+    public LoopApplyHeadBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
             ImmutableSet<LoopContract> contracts) {
         super(rule, pio);
-        this.rule = (LoopContractApplyHeadRule) rule;
+        this.rule = (LoopApplyHeadRule) rule;
         this.contracts = contracts;
     }
 
@@ -77,7 +77,7 @@ public class LoopContractApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp 
 
     @Override
     public AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos) {
-        return new LoopContractApplyHeadBuiltInRuleApp(rule, newPos, contracts);
+        return new LoopApplyHeadBuiltInRuleApp(rule, newPos, contracts);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class LoopContractApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp 
         Services services = goal.proof().getServices();
 
         contracts = AbstractLoopContractRule.getApplicableContracts(instantiation, goal, services);
-        rule = LoopContractApplyHeadRule.INSTANCE;
+        rule = LoopApplyHeadRule.INSTANCE;
         return this;
     }
 }

@@ -15,6 +15,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 public class HeatmapToggleAction extends MainWindowAction {
+    private static final long serialVersionUID = 1L;
 
     public static final Icon ICON_SELECTED = IconFontSwing.buildIcon(FontAwesomeBold.FIRE_EXTINGUISHER, MainWindow.TOOLBAR_ICON_SIZE);
     public static final Icon ICON_NOT_SELECTED = IconFontSwing.buildIcon(FontAwesomeBold.FIRE, MainWindow.TOOLBAR_ICON_SIZE);
