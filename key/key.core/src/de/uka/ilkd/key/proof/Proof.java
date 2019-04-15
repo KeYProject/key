@@ -224,9 +224,9 @@ public class Proof implements Named {
 
         this ( new Name ( name ), initConfig );
 
-    	if (!getSettings().getTermLabelSettings().getUseOriginLabels()) {
+        if (!getSettings().getTermLabelSettings().getUseOriginLabels()) {
             problem = OriginTermLabel.removeOriginLabels(problem, getServices()).sequent();
-    	}
+        }
 
         Node rootNode = new Node(this, problem);
 
