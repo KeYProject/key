@@ -37,13 +37,13 @@ public class TermLabelSettings implements Settings, Cloneable {
         String str = props.getProperty(USE_ORIGIN_LABELS);
 
         if (str != null && (str.equals("true") || str.equals("false"))) {
-            useOriginLabels = Boolean.parseBoolean(str);
+            setUseOriginLabels(Boolean.parseBoolean(str));
         } else {
             Debug.out(
                     "TermLabelSettings: Failure while reading the setting \"UseOriginLabels\".\n" +
                     "Using the default value: true." +
                     "\nThe string read was: ", str);
-            useOriginLabels = true;
+            setUseOriginLabels(true);
         }
     }
 
