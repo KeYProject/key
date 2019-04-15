@@ -698,7 +698,7 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
                                                       boolean leaf,
                                                       int row,
                                                       boolean hasFocus) {
-            if (proof == null) {
+            if (proof == null || proof.isDisposed()) {
                 // print dummy tree;
                 return super.getTreeCellRendererComponent(tree, value, sel,
                         expanded, leaf, row, hasFocus);
