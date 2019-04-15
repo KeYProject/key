@@ -95,6 +95,9 @@ public class OccurenceIdentifier {
 
     @Override
     public String toString() {
+        if (path == null) {
+            return " @toplevel";
+        }
         if (path.length != 0) {
             return getTerm() + " under " + getToplevelTerm() + "(Path: " + Arrays.toString(path) + ")";
         } else {

@@ -177,10 +177,15 @@ public final class KeYGuiExtensionFacade {
      * @param <T> the interface of the service
      * @return a list of all found service implementations
      */
+
+    private static Map<Class<?>, List<Object>> extensionCache = new HashMap<>();
+    @SuppressWarnings("unchecked")
     private static <T> List<T> getExtension(Class<T> c) {
-        Spliterator<T> iter = ServiceLoader.load(c).spliterator();
-        return StreamSupport.stream(iter, false)
-                .collect(Collectors.toList());
+        return (List<T>) extensionCache.computeIfAbsent(c, (k) -> {
+            Spliterator<T> iter = ServiceLoader.load(c).spliterator();
+            return StreamSupport.stream(iter, false)
+                    .collect(Collectors.toList());
+        });
     }
 
 

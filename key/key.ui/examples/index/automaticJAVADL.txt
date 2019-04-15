@@ -920,6 +920,9 @@ group permissionHeap {
 group reload_examples {
    provable ./firstTouch/05-ReverseArray/reverseArray.key
 
+   # This is a reload regression test. Since it is the only one
+   # it goes here with the sibling reload tests
+   loadable ./standard_key/arith/saveProofTest.key.proof
    loadable ./heap/permutedSum/perm.proof
    loadable ./firstTouch/05-ReverseArray/reverseArray.proof
    loadable ./heap/verifyThis15_1_RelaxedPrefix/relax.proof
