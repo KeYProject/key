@@ -173,8 +173,9 @@ public class Lookup {
      * @return
      * @throws InjectionException if non suitable constructors could be found.
      */
+    @SuppressWarnings("unchecked")
     public <T> T createInstance(Class<T> clazz) throws InjectionException {
-        for (var ctor : clazz.getConstructors()) {
+        for (Constructor<?> ctor : clazz.getConstructors()) {
             if (ctor.getAnnotation(Inject.class) != null) {
                 T instance = (T) tryToInject(ctor);
                 if (instance != null)
@@ -191,9 +192,9 @@ public class Lookup {
      * @throws InjectionException
      */
     protected <T> T tryToInject(Constructor<T> ctor) throws InjectionException {
-        var services = Arrays.stream(ctor.getParameterTypes())
+        List<?> services = Arrays.stream(ctor.getParameterTypes())
                 .map(this::get)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         if (services.stream().allMatch(Objects::nonNull)) {
             try {
@@ -215,7 +216,7 @@ public class Lookup {
      * @throws InjectionException is thrown iff a service is unknown but needed for an {@link Inject} method.
      */
     public void inject(Object instance) throws InjectionException {
-        var clazz = instance.getClass();
+        Class<?> clazz = instance.getClass();
         for (Method setter : clazz.getMethods()) {
             if (setter.getAnnotation(Inject.class) != null) {
                 inject(instance, setter);

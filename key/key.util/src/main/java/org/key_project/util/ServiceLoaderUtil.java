@@ -44,9 +44,10 @@ public final class ServiceLoaderUtil {
         ClassLoader cloader = c.getClassLoader();
         Set<String> classes = new HashSet<>();
         try {
-            Iterator<URL> iter = cloader.getResources(PREFIX + c.getName()).asIterator();
-            while (iter.hasNext()) {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(iter.next().openStream()))) {
+            Enumeration<URL> iter = cloader.getResources(PREFIX + c.getName());
+            while (iter.hasMoreElements()) {
+                try (BufferedReader br = new BufferedReader(
+                        new InputStreamReader(iter.nextElement().openStream()))) {
                     String line;
                     while ((line = br.readLine()) != null) {
                         line = line.trim();
