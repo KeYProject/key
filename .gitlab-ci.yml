@@ -36,11 +36,11 @@ stages:
 
 compile:classes:
   stage: primary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11gradle
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache classes
+    - gradle --build-cache classes
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
@@ -50,11 +50,11 @@ compile:classes:
 
 compile:testClasses:
   stage: secondary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11gradle
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --parallel testClasses
+    - gradle --build-cache --parallel testClasses
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull-push
@@ -62,30 +62,30 @@ compile:testClasses:
       - build
       - .gradle
 
-compile:testClassesOracle8:
-  stage: secondary
-  image: key-dev-jdk8
-  script:
-    - javac -version
-    - cd key
-    - ./gradlew --parallel classes testClasses
+#compile:testClassesOracle8:
+#  stage: secondary
+#  image: key-dev-jdk8
+#  script:
+#    - javac -version
+#    - cd key
+#    - gradle --parallel classes testClasses
 
-compile:testClassesJava11:
-  stage: secondary
-  image: key-dev-openjdk11
-  allow_failure: true
-  script:
-    - javac -version
-    - cd key
-    - ./gradlew --parallel classes testClasses
+#compile:testClassesJava11:
+#  stage: secondary
+#  image: key-dev-openjdk11
+#  allow_failure: true
+#  script:
+#    - javac -version
+#    - cd key
+#    - gradle --parallel classes testClasses
 
 compile:check:key.util:
   stage: ternary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11gradle
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :key.util:check
+    - gradle --build-cache --continue :key.util:check
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -100,11 +100,11 @@ compile:check:key.util:
 
 compile:check:key.core:
   stage: ternary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11gradle
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :key.core:check
+    - gradle --build-cache --continue :key.core:check
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -119,11 +119,11 @@ compile:check:key.core:
 
 compile:check:proofref:
   stage: ternary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11gradle
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :key.core.proof_references:check
+    - gradle --build-cache --continue :key.core.proof_references:check
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -138,11 +138,11 @@ compile:check:proofref:
 
 compile:check:testgen:
   stage: ternary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11gradle
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :key.core.testgen:check
+    - gradle --build-cache --continue :key.core.testgen:check
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -157,11 +157,11 @@ compile:check:testgen:
 
 compile:check:ui:
   stage: ternary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11gradle
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :key.ui:check
+    - gradle --build-cache --continue :key.ui:check
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -176,11 +176,11 @@ compile:check:ui:
 
 compile:check:removegenerics:
   stage: ternary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11gradle
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :key.removegenerics:check
+    - gradle --build-cache --continue :key.removegenerics:check
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -201,7 +201,7 @@ compile:check:removegenerics:
 #  script:
 #    - javac -version
 #    - cd key
-#    - ./gradlew --build-cache --continue :key.core:testRunAllProofs
+#    - gradle --build-cache --continue :key.core:testRunAllProofs
 #    - ls
 #  cache:
 #    key: "$CI_COMMIT_REF_NAME"
@@ -221,7 +221,7 @@ compile:check:removegenerics:
 #  script:
 #    - javac -version
 #    - cd key
-#    - ./gradlew --build-cache --continue :key.core:testProofRules
+#    - gradle --build-cache --continue :key.core:testProofRules
 #    - ls
 #  cache:
 #    key: "$CI_COMMIT_REF_NAME"
@@ -236,7 +236,7 @@ compile:check:removegenerics:
 
 checkstyle:
   stage: primary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11gradle
   allow_failure: true
   script:
     - echo "**** Check the commit's gitlab page for a readable checkstyle report ****"
