@@ -17,10 +17,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
-import de.uka.ilkd.key.gui.actions.exploration.AddFormulaToAntecedentAction;
-import de.uka.ilkd.key.gui.actions.exploration.AddFormulaToSuccedentAction;
-import de.uka.ilkd.key.gui.actions.exploration.DeleteFormulaAction;
-import de.uka.ilkd.key.gui.actions.exploration.EditFormulaAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
@@ -52,7 +48,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -213,7 +208,6 @@ public class TacletMenu extends JMenu {
         addMacroMenu();
 
         //        addPopFrameItem(control);
-        addExplorationMenu();
 
         List<Action> extensionMenu = KeYGuiExtensionFacade.getContextMenuItems(
                 ContextMenuKind.SEQUENT_VIEW, pos, mediator);
@@ -446,19 +440,6 @@ public class TacletMenu extends JMenu {
         //addSeparator();
         add(new JLabel(title));
     }
-
-    private void addExplorationMenu() {
-        if(mediator.getExplorationModeModel().isExplorationModeSelected()) {
-            addSeparator();
-            JMenu menuExploration = new JMenu("Exploration");
-            menuExploration.add(new AddFormulaToAntecedentAction());
-            menuExploration.add(new AddFormulaToSuccedentAction());
-            menuExploration.add(new EditFormulaAction(pos));
-            menuExploration.add(new DeleteFormulaAction(pos));
-            add(menuExploration);
-        }
-    }
-
 
     private void addClipboardItem(MenuControl control) {
         addSeparator();

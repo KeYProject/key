@@ -13,12 +13,12 @@
 
 package de.uka.ilkd.key.core;
 
+import java.util.Collection;
 import java.util.EventObject;
 
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
-import de.uka.ilkd.key.gui.proofExploration.ExplorationModeModel;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -66,6 +66,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
+import org.key_project.util.lookup.Lookup;
 
 /**
  * The {@link KeYMediator} provides control logic for the user interface implemented in Swing.
@@ -105,10 +106,6 @@ public class KeYMediator {
      * boolean flag indicating if the GUI is in auto mode
      */
     private boolean inAutoMode = false;
-    /**
-     * Model aof teh exploration mode  state
-     */
-    private ExplorationModeModel explorationModeModel;
 
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
@@ -550,15 +547,19 @@ public class KeYMediator {
        return inAutoMode;
    }
 
+    private Lookup userData = new Lookup();
 
-    public void setExplorationModeModel(ExplorationModeModel explorationModeModel) {
-        this.explorationModeModel = explorationModeModel;
+    public <T> Collection<T> lookupAll(Class<T> service) {
+        return userData.lookupAll(service);
     }
 
-    public ExplorationModeModel getExplorationModeModel() {
-        return explorationModeModel;
+    public <T> T get(Class<T> service) {
+        return userData.get(service);
     }
 
+    public <T> void register(T obj, Class<T> service) {
+        userData.register(obj, service);
+    }
 
     class KeYMediatorProofTreeListener extends ProofTreeAdapter {
        private boolean pruningInProcess;

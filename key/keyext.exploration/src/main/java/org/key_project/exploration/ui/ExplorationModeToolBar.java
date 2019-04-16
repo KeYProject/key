@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui.proofExploration;
+package org.key_project.exploration.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,7 +8,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.ShowExplorationStepAction;
+import org.key_project.exploration.ExplorationModeModel;
 
 /**
  * Button Toolbar for Exploration mode controls
@@ -16,9 +16,6 @@ import de.uka.ilkd.key.gui.actions.ShowExplorationStepAction;
  * @author Sarah Grebing
  */
 public class ExplorationModeToolBar extends JToolBar {
-
-    private static final long serialVersionUID = 2882840652498904204L;
-
     private MainWindow mw;
 
     private JToggleButton explorationMode;
@@ -26,8 +23,6 @@ public class ExplorationModeToolBar extends JToolBar {
     private JToggleButton showSecondBranch;
 
     private ExplorationModeModel explorationModeModel;
-
-    private JButton showExplorationSteps;
 
     /**
      * Combobox for choosing which kind of taclets to apply
@@ -60,10 +55,9 @@ public class ExplorationModeToolBar extends JToolBar {
 
         showSecondBranch = new JToggleButton("Show Second Branch");
 
-        showExplorationSteps = new JButton(new ShowExplorationStepAction(mw));
+        //showExplorationSteps = new JButton(new ShowExplorationStepAction(mw));
 
         showSecondBranch.setEnabled(false);
-        showExplorationSteps.setEnabled(false);
 
         explorationMode.setToolTipText("Choose to start ExplorationMode");
 
@@ -76,7 +70,6 @@ public class ExplorationModeToolBar extends JToolBar {
                 active = !active;
 
                 showSecondBranch.setEnabled(active);
-                showExplorationSteps.setEnabled(active);
 
                 if (active) {
                     explorationModeModel.setExplorationModeSelected(true);
@@ -96,7 +89,7 @@ public class ExplorationModeToolBar extends JToolBar {
 
         this.add(explorationMode);
         //soundExploration = new JComboBox<>();
-        //soundExploration.setToolTipText("Some exploration rules need a justification branch to be sound. Choose whether to see this branch or hide it.");
+        //soundExploration.setToolTipText("Some actions rules need a justification branch to be sound. Choose whether to see this branch or hide it.");
         //soundExploration.addItem(WHOLE_APPLICATIONS);
         //soundExploration.addItem(SIMPLIFFIED_APPLICATIONS);
         //soundExploration.addItemListener(new ItemListener() {
@@ -114,7 +107,7 @@ public class ExplorationModeToolBar extends JToolBar {
         //soundExploration.setEnabled(false);
         //this.add(soundExploration);
         showSecondBranch.setToolTipText("Exploration actions are \noften done using a cut. Choose to hide\n " +
-                "the second cut-branches from the view \nto focus on the exploration. Uncheck to focus on these branches.");
+                "the second cut-branches from the view \nto focus on the actions. Uncheck to focus on these branches.");
         showSecondBranch.addActionListener(new ActionListener() {
 
             boolean active = false;
@@ -146,10 +139,6 @@ public class ExplorationModeToolBar extends JToolBar {
         }*/
         this.add(showSecondBranch);
 
-        this.add(showExplorationSteps);
         this.setEnabled(true);
-
     }
-
-
 }

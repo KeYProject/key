@@ -1,27 +1,17 @@
-package de.uka.ilkd.key.gui.actions.exploration;
+package org.key_project.exploration.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.proofExploration.ExplorationModeModel;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import java.awt.event.ActionEvent;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
- * Action to edit formulas in the exploration mode
+ * Action to edit formulas in the actions mode
  * @author Alexander Weigl
  * @author Sarah Grebing
  * @version 2 (25.05.18)

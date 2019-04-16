@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui.proofExploration;
+package org.key_project.exploration.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

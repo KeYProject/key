@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui.proofExploration;
+package org.key_project.exploration.ui;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -14,22 +14,20 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ExplorationStepsList extends JFrame {
-//ButtonPaneö
-    private JPanel buttonPanel = new JPanel();
+public class ExplorationStepsList extends JPanel {
     private JButton cancelButton = new JButton("Cancel");
     private JButton jumpToNode = new JButton("Jump To Node");
     private JButton pruneExploration = new JButton("Prune Selected Exploration Steps");
-
     private DefaultListModel<Node> listModel = new DefaultListModel<>();
-
-
     private DefaultTreeModel dtm;
+    private JPanel buttonPanel = new JPanel();
 
-    public ExplorationStepsList(String title, Proof model) throws HeadlessException {
-        super(title);
-        createListModel(model);
+    public ExplorationStepsList() throws HeadlessException {
         initialize();
+    }
+
+    public void setProof(Proof proof) {
+        createListModel(proof);
     }
 
     private void createListModel(Proof model) {
@@ -46,8 +44,6 @@ public class ExplorationStepsList extends JFrame {
         System.out.println("explorationNodes = " + explorationNodes);
     }
 
-
-
     public List<Node> collectAllExplorationSteps(Node root, DefaultTreeModel dtm, MyTreeNode rootNode) {
         ArrayList<Node> list = new ArrayList<>();
         findExplorationchildren(root, list, dtm, rootNode);
@@ -55,8 +51,8 @@ public class ExplorationStepsList extends JFrame {
     }
 
     private void findExplorationchildren(Node n, ArrayList<Node> list, DefaultTreeModel dtm, MyTreeNode parent) {
-        if(n.leaf()){
-            if(!n.getNodeInfo().isExploration()) {
+        if (n.leaf()) {
+            if (!n.getNodeInfo().isExploration()) {
                 return;
             } else {
                 MyTreeNode newNode = new MyTreeNode(n);
@@ -65,7 +61,7 @@ public class ExplorationStepsList extends JFrame {
                 return;
             }
         }
-        if(n.getNodeInfo().isExploration()) {
+        if (n.getNodeInfo().isExploration()) {
             MyTreeNode newNode = new MyTreeNode(n);
             dtm.insertNodeInto(newNode, parent, 0);
 
@@ -74,26 +70,26 @@ public class ExplorationStepsList extends JFrame {
         }
         Iterator<Node> nodeIterator = n.childrenIterator();
 
-        while(nodeIterator.hasNext()){
+        while (nodeIterator.hasNext()) {
             list.addAll(collectAllExplorationSteps(nodeIterator.next(), dtm, parent));
         }
 
     }
 
 
-    public void initialize(){
+    public void initialize() {
         BorderLayout manager = new BorderLayout();
         this.setLayout(manager);
 
 
         //ButtonPanel
-        this.buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 2,2));
+        this.buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 2, 2));
         this.buttonPanel.add(jumpToNode);
         this.buttonPanel.add(pruneExploration);
         this.buttonPanel.add(cancelButton);
 
         JList explorationStepList = new JList<>(listModel);
-        explorationStepList.setCellRenderer(new MyCellrenderer());
+        explorationStepList.setCellRenderer(new MyCellRenderer());
         explorationStepList.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -104,43 +100,31 @@ public class ExplorationStepsList extends JFrame {
             }
         });
 
-
         JTree tree = new JTree(dtm);
         JScrollPane p1 = new JScrollPane(tree);
-
         JScrollPane p2 = new JScrollPane(explorationStepList);
-        tree.setCellRenderer(new MyTreeCellrenderer());
+        tree.setCellRenderer(new MyTreeCellRenderer());
         this.add(p1, BorderLayout.CENTER);
-
         this.add(p2, BorderLayout.NORTH);
-
         this.add(buttonPanel, BorderLayout.SOUTH);
-
-
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.setTitle("Exploration Steps");
-        this.setSize(600, 400);
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
-
     }
 
-    private class MyCellrenderer extends DefaultListCellRenderer {
+    private class MyCellRenderer extends DefaultListCellRenderer {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             JLabel listCellRendererComponent = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             Node n = (Node) value;
-            listCellRendererComponent.setText(n.serialNr() + " "+ n.getNodeInfo().getExplorationAction());
+            listCellRendererComponent.setText(n.serialNr() + " " + n.getNodeInfo().getExplorationAction());
             return listCellRendererComponent;
         }
     }
 
-    private class MyTreeCellrenderer extends DefaultTreeCellRenderer {
+    private class MyTreeCellRenderer extends DefaultTreeCellRenderer {
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            JLabel listCellRendererComponent = (JLabel)super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+            JLabel listCellRendererComponent = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             MyTreeNode n = (MyTreeNode) value;
-            listCellRendererComponent.setText(n.getData().serialNr() + " "+ n.getData().getNodeInfo().getExplorationAction());
+            listCellRendererComponent.setText(n.getData().serialNr() + " " + n.getData().getNodeInfo().getExplorationAction());
             return listCellRendererComponent;
         }
 
@@ -149,7 +133,7 @@ public class ExplorationStepsList extends JFrame {
     private class MyTreeNode extends DefaultMutableTreeNode {
         private Node data;
 
-        public MyTreeNode(Node data){
+        public MyTreeNode(Node data) {
             super(data);
             this.data = data;
         }
@@ -158,7 +142,6 @@ public class ExplorationStepsList extends JFrame {
             super(userObject);
             this.data = data;
         }
-
 
 
         public Node getData() {

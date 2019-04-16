@@ -87,7 +87,7 @@ public class Main {
             // Optionally, create an SymbolicExecutionEnvironment which provides access to all relevant objects for symbolic execution
             SymbolicExecutionEnvironment<DefaultUserInterfaceControl> symbolicEnv = new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(env, builder);
             printSymbolicExecutionTree("Initial State", builder);
-            // Configure strategy for full exploration
+            // Configure strategy for full actions
             SymbolicExecutionUtil.initializeStrategy(builder);
             SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, 
                                                                             100, 

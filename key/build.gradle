@@ -373,6 +373,7 @@ project(":key.ui") {
         compile 'com.miglayout:miglayout-swing:5.2'
 
         runtimeOnly project(":keyext.interactionlog")
+        runtimeOnly project(":keyext.exploration")
         //runtimeOnly project(":keyext.script.ui")
     }
 
@@ -410,6 +411,13 @@ project(":keyext.interactionlog") {
         compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
     }
 }
+
+project(":keyext.exploration") {
+    dependencies {
+        compile project(":key.ui")
+    }
+}
+
 
 task start {
     dependsOn project(":key.ui").run

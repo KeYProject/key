@@ -1,23 +1,18 @@
-package de.uka.ilkd.key.gui.proofExploration;
+package org.key_project.exploration;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.prooftree.GUIProofTreeModel;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
 
 public class ExplorationModeModel {
-
-
+    /**
+     * Mode which rules to use in actions mode
+     */
+    private ExplorationState explorationTacletAppState = ExplorationState.WHOLE_APP;
 
     /**
-     * Mode which rules to use in exploration mode
+     * boolean flag indicating whether actions mode is turned on and special rules are shown to the user
      */
-    private ExplorationState ExplorationTacletAppState = ExplorationState.WHOLE_APP;
-
-
-    /**
-     * boolean flag indicating whether exploration mode is turned on and special rules are shown to the user
-     */
-
     private boolean explorationModeSelected = false;
 
     /**
@@ -26,7 +21,6 @@ public class ExplorationModeModel {
     public enum ExplorationState{
         WHOLE_APP, SIMPLIFIED_APP;
     }
-
 
     /**
      * Boolean flag whether to show the second branch or not in sound apps
@@ -37,7 +31,7 @@ public class ExplorationModeModel {
      * @return
      */
     public ExplorationState getExplorationTacletAppState() {
-        return ExplorationTacletAppState;
+        return explorationTacletAppState;
     }
 
     /**
@@ -45,11 +39,11 @@ public class ExplorationModeModel {
      * @param explorationTacletAppState
      */
     public void setExplorationTacletAppState(ExplorationState explorationTacletAppState) {
-        ExplorationTacletAppState = explorationTacletAppState;
+        this.explorationTacletAppState = explorationTacletAppState;
     }
 
     /**
-     * Check whether exploration mode is selected
+     * Check whether actions mode is selected
      * @return
      */
     public boolean isExplorationModeSelected() {
@@ -84,6 +78,4 @@ public class ExplorationModeModel {
 
         delegateModel.setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS, showSecondBranches);
     }
-
-
 }

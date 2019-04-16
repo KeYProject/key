@@ -1,19 +1,8 @@
-package de.uka.ilkd.key.gui.actions.exploration;
+package org.key_project.exploration.actions;
 
-import de.uka.ilkd.key.gui.proofExploration.ExplorationModeModel;
-import de.uka.ilkd.key.gui.proofExploration.ExplorationModeToolBar;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import de.uka.ilkd.key.logic.Term;
+import org.key_project.exploration.ExplorationModeModel;
 
 import java.awt.event.ActionEvent;
 
@@ -46,7 +35,8 @@ public class AddFormulaToSuccedentAction extends AddFormulaToSequentAction {
     public void actionPerformed(ActionEvent e) {
         Term t = promptForTerm(mainWindow, null);
         if (t == null) return;
-        if(getMediator().getExplorationModeModel().getExplorationTacletAppState()
+        ExplorationModeModel model = getMediator().get(ExplorationModeModel.class);
+        if (model.getExplorationTacletAppState()
                 == ExplorationModeModel.ExplorationState.SIMPLIFIED_APP) {
             super.soundAddition(t, false, false);
         } else {
@@ -71,7 +61,7 @@ public class AddFormulaToSuccedentAction extends AddFormulaToSequentAction {
         result.forEach(goal -> goal.node().getNodeInfo().setExploration(true));
 
     }*/
-       //TODO change the focus and hide the cutformula = true branch
+    //TODO change the focus and hide the cutformula = true branch
 
     /**
      * Create a new Tacletapplication that is possibly unsound

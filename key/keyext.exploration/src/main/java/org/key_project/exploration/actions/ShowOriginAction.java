@@ -1,10 +1,10 @@
-package de.uka.ilkd.key.gui.actions.exploration;
+package org.key_project.exploration.actions;
 
 import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.proofExploration.OriginTermLabelWindow;
+import org.key_project.exploration.ui.OriginTermLabelWindow;
 import de.uka.ilkd.key.pp.PosInSequent;
 
 /**

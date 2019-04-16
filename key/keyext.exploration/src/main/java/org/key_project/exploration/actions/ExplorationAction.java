@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui.actions.exploration;
+package org.key_project.exploration.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.Reader;

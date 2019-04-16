@@ -1,33 +1,18 @@
-package de.uka.ilkd.key.gui.actions.exploration;
+package org.key_project.exploration.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.proofExploration.ExplorationModeModel;
-import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.io.Reader;
-import java.io.StringReader;
 
 /**
- * Action to handle proof exploration addition of formulas
+ * Action to handle proof actions addition of formulas
  */
 public class AddFormulaToSequentAction extends ExplorationAction {
     public AddFormulaToSequentAction(MainWindow mainWindow) {
@@ -83,7 +68,7 @@ public class AddFormulaToSequentAction extends ExplorationAction {
         app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), getMediator().getServices(), true);
         g.node().getNodeInfo().setExploration(true);
         ImmutableList<Goal> result = g.apply(app);
-        //set the exploration flag
+        //set the actions flag
         result.forEach(goal -> {
           //  goal.node().getNodeInfo().setExploration(true);
             goal.node().getNodeInfo().setExplorationAction("Add "+t);
