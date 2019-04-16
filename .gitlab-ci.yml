@@ -36,7 +36,7 @@ stages:
 
 compile:classes:
   stage: primary
-  image: wadoon/key-test-docker:jdk11gradle
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
@@ -50,7 +50,7 @@ compile:classes:
 
 compile:testClasses:
   stage: secondary
-  image: wadoon/key-test-docker:jdk11gradle
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
@@ -81,7 +81,7 @@ compile:testClasses:
 
 compile:check:key.util:
   stage: ternary
-  image: wadoon/key-test-docker:jdk11gradle
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
@@ -100,7 +100,7 @@ compile:check:key.util:
 
 compile:check:key.core:
   stage: ternary
-  image: wadoon/key-test-docker:jdk11gradle
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
@@ -119,7 +119,7 @@ compile:check:key.core:
 
 compile:check:proofref:
   stage: ternary
-  image: wadoon/key-test-docker:jdk11gradle
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
@@ -138,7 +138,7 @@ compile:check:proofref:
 
 compile:check:testgen:
   stage: ternary
-  image: wadoon/key-test-docker:jdk11gradle
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
@@ -157,7 +157,7 @@ compile:check:testgen:
 
 compile:check:ui:
   stage: ternary
-  image: wadoon/key-test-docker:jdk11gradle
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
@@ -176,7 +176,7 @@ compile:check:ui:
 
 compile:check:removegenerics:
   stage: ternary
-  image: wadoon/key-test-docker:jdk11gradle
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
@@ -236,7 +236,7 @@ compile:check:removegenerics:
 
 checkstyle:
   stage: primary
-  image: wadoon/key-test-docker:jdk11gradle
+  image: wadoon/key-test-docker:jdk11
   allow_failure: true
   script:
     - echo "**** Check the commit's gitlab page for a readable checkstyle report ****"
