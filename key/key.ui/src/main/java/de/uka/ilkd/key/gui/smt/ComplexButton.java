@@ -191,6 +191,7 @@ public class ComplexButton {
     JButton getActionButton(){
 	if(actionComponent == null){
 	    actionComponent = new JButton();
+	    //actionComponent.setFont(actionComponent.getFont().deriveFont(iconSize*0.8f));
 	    actionComponent.addChangeListener(new ChangeListener() {
 	        
 	        public void stateChanged(ChangeEvent arg0) {
