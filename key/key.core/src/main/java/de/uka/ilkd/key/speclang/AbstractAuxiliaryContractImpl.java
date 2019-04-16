@@ -32,11 +32,12 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
- * Abstract base class for all default implementations of {@link BlockSpecificationElement}.
+ * Abstract base class for all default implementations of the sub-interfaces of
+ * {@link AuxiliaryContract}.
  *
  * @author wacker, lanzinger
  */
-public abstract class AbstractBlockSpecificationElement implements BlockSpecificationElement {
+public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract {
 
     /**
      * @see #getBlock()
@@ -109,6 +110,11 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
     protected final String baseName;
 
     /**
+     * @see AuxiliaryContract#getFunctionalContracts()
+     */
+    private ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts;
+
+    /**
      *
      * @param baseName
      *            the base name.
@@ -136,14 +142,17 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
      *            whether or not this contract is applicable for transactions.
      * @param hasMod
      *            a map specifying on which heaps this contract has a modified clause.
+     * @param functionalContracts
+     *            the functional contracts corresponding to this contract.
      */
-    public AbstractBlockSpecificationElement(final String baseName, final StatementBlock block,
+    public AbstractAuxiliaryContractImpl(final String baseName, final StatementBlock block,
             final List<Label> labels, final IProgramMethod method, final Modality modality,
             final Map<LocationVariable, Term> preconditions, final Term measuredBy,
             final Map<LocationVariable, Term> postconditions,
             final Map<LocationVariable, Term> modifiesClauses,
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
-            final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod) {
+            final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
+            ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts) {
         assert block != null;
         assert labels != null;
         assert method != null;
@@ -169,6 +178,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         this.variables = variables;
         this.transactionApplicable = transactionApplicable;
         this.hasMod = hasMod;
+        this.functionalContracts = functionalContracts;
     }
 
     @Override
@@ -240,6 +250,50 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         return variables.termify(selfTerm);
     }
 
+    /**
+     * Replaces variables in a map of terms
+     *
+     * @param term a term.
+     * @param variables replacements for {@link #getVariables()}
+     * @param services services.
+     * @return the term with every occurrence of a variable from {@link #getVariables()} replaced.
+     */
+    public Term getTerm(
+            final Term term,
+            final Variables variables,
+            final Services services) {
+        assert variables != null;
+        assert (variables.self == null) == (this.variables.self == null);
+        assert services != null;
+
+        final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services),
+                services.getTermFactory());
+        return replacer.replace(term);
+    }
+
+    /**
+     * Replaces variables in a map of terms
+     *
+     * @param term a term.
+     * @param heap the replacement heap
+     * @param terms replacements for {@link #getVariables()}
+     * @param services services.
+     * @return the term with every occurrence of a variable from {@link #getVariables()} replaced.
+     */
+    public Term getTerm(
+            final Term term,
+            final Term heap,
+            final Terms terms,
+            final Services services) {
+        assert terms != null;
+        assert (terms.self == null) == (this.variables.self == null);
+        assert services != null;
+
+        final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services),
+                services.getTermFactory());
+        return replacer.replace(term);
+    }
+
     @Override
     public Term getMby() {
         return measuredBy;
@@ -247,56 +301,46 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
 
     @Override
     public Term getMby(Variables variables, Services services) {
-        Map<ProgramVariable, ProgramVariable> map = createReplacementMap(variables, services);
-        return new OpReplacer(map, services.getTermFactory()).replace(measuredBy);
+        return getTerm(measuredBy, variables, services);
     }
 
     @Override
     public Term getMby(ProgramVariable selfVar, Services services) {
-        final Map<ProgramVariable, ProgramVariable> replacementMap
-                = createReplacementMap(new Variables(selfVar, null, null, null, null, null, null,
-                        null, null, null, services), services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
-        return replacer.replace(measuredBy);
+        return getTerm(
+                measuredBy,
+                new Variables(selfVar, null, null, null, null, null, null,
+                        null, null, null, services),
+                services);
     }
 
     @Override
     public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
             Map<LocationVariable, Term> atPres, Services services) {
-        final Map<Term,
-                Term> replacementMap = createReplacementMap(null,
-                        new Terms(selfTerm, null, null, null, null, null, null, null, null, atPres),
-                        services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
-        return replacer.replace(measuredBy);
+        return getTerm(
+                measuredBy,
+                null,
+                new Terms(selfTerm, null, null, null, null, null, null, null, null, atPres),
+                services);
     }
 
     @Override
     public Term getPrecondition(final LocationVariable heap, final ProgramVariable self,
             final Map<LocationVariable, LocationVariable> atPres, final Services services) {
-        assert heap != null;
-        assert (self == null) == (variables.self == null);
-        assert atPres != null;
-        assert services != null;
-        final Map<ProgramVariable, ProgramVariable> replacementMap
-                = createReplacementMap(new Variables(self, null, null, null, null, null, null, null,
-                        null, atPres, services), services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
-        return replacer.replace(preconditions.get(heap));
+        return getTerm(
+                preconditions.get(heap),
+                new Variables(
+                        self, null, null, null, null, null, null, null, null, atPres, services),
+                services);
     }
 
     @Override
     public Term getPrecondition(final LocationVariable heapVariable, final Term heap,
             final Term self, final Map<LocationVariable, Term> atPres, final Services services) {
-        assert heapVariable != null;
-        assert heap != null;
-        assert (self == null) == (variables.self == null);
-        assert atPres != null;
-        assert services != null;
-        final Map<Term, Term> replacementMap = createReplacementMap(heap,
-                new Terms(self, null, null, null, null, null, null, null, null, atPres), services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
-        return replacer.replace(preconditions.get(heapVariable));
+        return getTerm(
+                preconditions.get(heapVariable),
+                heap,
+                new Terms(self, null, null, null, null, null, null, null, null, atPres),
+                services);
     }
 
     @Override
@@ -306,51 +350,25 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
 
     @Override
     public Term getPrecondition(LocationVariable heap, Variables variables, Services services) {
-        assert heap != null;
-        assert variables != null;
-        assert (variables.self == null) == (this.variables.self == null);
-        assert services != null;
-        final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services),
-                services.getTermFactory());
-        return replacer.replace(preconditions.get(heap));
+        return getTerm(preconditions.get(heap), variables, services);
     }
 
     @Override
     public Term getPrecondition(LocationVariable heapVariable, Term heap, Terms terms,
             Services services) {
-        assert heapVariable != null;
-        assert heap != null;
-        assert terms != null;
-        assert (terms.self == null) == (variables.self == null);
-        assert services != null;
-        final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services),
-                services.getTermFactory());
-        return replacer.replace(preconditions.get(heapVariable));
+        return getTerm(preconditions.get(heapVariable), heap, terms, services);
     }
 
     @Override
     public Term getPostcondition(final LocationVariable heap, final Variables variables,
             final Services services) {
-        assert heap != null;
-        assert variables != null;
-        assert (variables.self == null) == (this.variables.self == null);
-        assert services != null;
-        final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services),
-                services.getTermFactory());
-        return replacer.replace(postconditions.get(heap));
+        return getTerm(postconditions.get(heap), variables, services);
     }
 
     @Override
     public Term getPostcondition(final LocationVariable heapVariable, final Term heap,
             final Terms terms, final Services services) {
-        assert heapVariable != null;
-        assert heap != null;
-        assert terms != null;
-        assert (terms.self == null) == (variables.self == null);
-        assert services != null;
-        final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services),
-                services.getTermFactory());
-        return replacer.replace(postconditions.get(heapVariable));
+        return getTerm(postconditions.get(heapVariable), heap, terms, services);
     }
 
     @Override
@@ -361,27 +379,26 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
     @Override
     public Term getModifiesClause(final LocationVariable heap, final ProgramVariable self,
             final Services services) {
-        assert heap != null;
-        assert (self == null) == (variables.self == null);
-        assert services != null;
-        final Map<ProgramVariable, ProgramVariable> replacementMap = createReplacementMap(
+        return getTerm(
+                modifiesClauses.get(heap),
                 new Variables(self, null, null, null, null, null, null, null, null, null, services),
                 services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
-        return replacer.replace(modifiesClauses.get(heap));
     }
 
     @Override
     public Term getModifiesClause(final LocationVariable heapVariable, final Term heap,
             final Term self, final Services services) {
-        assert heapVariable != null;
-        assert heap != null;
-        assert (self == null) == (variables.self == null);
-        assert services != null;
-        final Map<Term, Term> replacementMap = createReplacementMap(heap,
-                new Terms(self, null, null, null, null, null, null, null, null, null), services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
-        return replacer.replace(modifiesClauses.get(heapVariable));
+        return getTerm(
+                modifiesClauses.get(heapVariable),
+                heap,
+                new Terms(self, null, null, null, null, null, null, null, null, null),
+                services);
+    }
+
+    @Override
+    public Term getModifiesClause(
+            final LocationVariable heap, final Variables variables, final Services services) {
+        return getTerm(modifiesClauses.get(heap), variables, services);
     }
 
     @Override
@@ -543,7 +560,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         } else if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        AbstractBlockSpecificationElement other = (AbstractBlockSpecificationElement) obj;
+        AbstractAuxiliaryContractImpl other = (AbstractAuxiliaryContractImpl) obj;
         if ((block == null && other.block != null)
                 || (block != null && !block.equals(other.block))) {
             return false;
@@ -601,6 +618,18 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         result = prime * result + (transactionApplicable ? 1231 : 1237);
         result = prime * result + ((variables == null) ? 0 : variables.hashCode());
         return result;
+    }
+
+    @Override
+    public ImmutableSet<FunctionalAuxiliaryContract<?>> getFunctionalContracts() {
+        return functionalContracts;
+    }
+
+    @Override
+    public void setFunctionalContract(FunctionalAuxiliaryContract<?> contract) {
+        assert contract.id() != Contract.INVALID_ID;
+        functionalContracts = DefaultImmutableSet.<FunctionalAuxiliaryContract<?>>nil()
+                .add(contract);
     }
 
     /**
@@ -999,32 +1028,32 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
     }
 
     /**
-     * This class contains a builder method for {@link AbstractBlockSpecificationElement}s
+     * This class contains a builder method for {@link AbstractAuxiliaryContractImpl}s
      * ({@link Creator#create()}). It should be overridden in every subclass.
      *
      * @param <T>
      *            the type of the subclass.
      */
-    protected static abstract class Creator<T extends BlockSpecificationElement>
+    protected static abstract class Creator<T extends AuxiliaryContract>
             extends TermBuilder {
 
         /**
-         * @see BlockSpecificationElement#getBaseName()
+         * @see AuxiliaryContract#getBaseName()
          */
         private final String baseName;
 
         /**
-         * @see BlockSpecificationElement#getBlock()
+         * @see AuxiliaryContract#getBlock()
          */
         private final StatementBlock block;
 
         /**
-         * @see BlockSpecificationElement#getLabels()
+         * @see AuxiliaryContract#getLabels()
          */
         private final List<Label> labels;
 
         /**
-         * @see BlockSpecificationElement#getMethod()
+         * @see AuxiliaryContract#getMethod()
          */
         private final IProgramMethod method;
 
@@ -1034,17 +1063,17 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         private final Behavior behavior;
 
         /**
-         * @see BlockSpecificationElement#getVariables()
+         * @see AuxiliaryContract#getVariables()
          */
         private final Variables variables;
 
         /**
-         * @see BlockSpecificationElement#getMby()
+         * @see AuxiliaryContract#getMby()
          */
         private final Term measuredBy;
 
         /**
-         * @see BlockSpecificationElement#getRequires(LocationVariable)
+         * @see AuxiliaryContract#getRequires(LocationVariable)
          */
         private final Map<LocationVariable, Term> requires;
 
@@ -1054,7 +1083,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         private final Map<LocationVariable, Term> ensures;
 
         /**
-         * @see BlockSpecificationElement#getInfFlowSpecs()
+         * @see AuxiliaryContract#getInfFlowSpecs()
          */
         private final ImmutableList<InfFlowSpec> infFlowSpecs;
 
@@ -1563,7 +1592,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
      * @param <T>
      *            the type of the subclass.
      */
-    protected static abstract class Combinator<T extends BlockSpecificationElement>
+    protected static abstract class Combinator<T extends AuxiliaryContract>
             extends TermBuilder {
 
         /**
@@ -1572,7 +1601,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         protected final T[] contracts;
 
         /**
-         * @see BlockSpecificationElement#getPlaceholderVariables()
+         * @see AuxiliaryContract#getPlaceholderVariables()
          */
         protected Variables placeholderVariables;
 
@@ -1582,17 +1611,17 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         protected Map<LocationVariable, LocationVariable> remembranceVariables;
 
         /**
-         * @see BlockSpecificationElement#getPrecondition(LocationVariable, Services)
+         * @see AuxiliaryContract#getPrecondition(LocationVariable, Services)
          */
         protected final Map<LocationVariable, Term> preconditions;
 
         /**
-         * @see BlockSpecificationElement#getPostcondition(LocationVariable, Services)
+         * @see AuxiliaryContract#getPostcondition(LocationVariable, Services)
          */
         protected final Map<LocationVariable, Term> postconditions;
 
         /**
-         * @see BlockSpecificationElement#getModifiesClause(LocationVariable, Services)
+         * @see AuxiliaryContract#getModifiesClause(LocationVariable, Services)
          */
         protected final Map<LocationVariable, Term> modifiesClauses;
 

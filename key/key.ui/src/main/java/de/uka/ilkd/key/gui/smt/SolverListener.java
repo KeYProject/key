@@ -32,6 +32,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
@@ -215,14 +216,20 @@ public class SolverListener implements SolverLauncherListener {
         }
 
         private void applyResults() {
+            KeYMediator mediator = MainWindow.getInstance().getMediator();
+            mediator.stopInterface(true);
+            try {
                 for (SMTProblem problem : smtProblems) {
                         if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-                        	IBuiltInRuleApp app = 
+                        	IBuiltInRuleApp app =
                         			RuleAppSMT.rule.createApp( null ).
                         					     setTitle( getTitle(problem) );
                         	problem.getGoal().apply(app);
                         }
                 }
+            } finally {
+                mediator.startInterface(true);
+            }
 
         }
         

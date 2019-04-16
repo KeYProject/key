@@ -14,6 +14,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 public class HeatmapToggleAction extends MainWindowAction {
+    private static final long serialVersionUID = 1L;
 
     public static final Icon ICON_SELECTED = KeYIcons.HEATMAP_DEACTIVATE.getIcon();
     public static final Icon ICON_NOT_SELECTED = KeYIcons.HEATMAP_ACTIVATE.getIcon();

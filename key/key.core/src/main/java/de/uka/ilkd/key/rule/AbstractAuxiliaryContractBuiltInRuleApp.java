@@ -5,25 +5,25 @@ import java.util.List;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 
 /**
- * Application for {@link AbstractBlockSpecificationElementRule}.
+ * Application for {@link AbstractAuxiliaryContractRule}.
  *
  * @author wacker, lanzinger
  */
-public abstract class AbstractBlockSpecificationElementBuiltInRuleApp
+public abstract class AbstractAuxiliaryContractBuiltInRuleApp
         extends AbstractBuiltInRuleApp {
 
     /**
-     * @see #getBlock()
+     * @see #getStatement()
      */
-    protected StatementBlock block;
+    private JavaStatement statement;
 
     /**
      * @see #getHeapContext()
@@ -49,24 +49,32 @@ public abstract class AbstractBlockSpecificationElementBuiltInRuleApp
      * @param ifInstantiations
      *            if instantiations.
      */
-    public AbstractBlockSpecificationElementBuiltInRuleApp(BuiltInRule rule,
+    public AbstractAuxiliaryContractBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence occurrence, ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
     }
 
     /**
      *
-     * @return the block which the applied contract belongs to.
+     * @param s the statement (block or loop) which the applied contract belongs to.
      */
-    public StatementBlock getBlock() {
-        return block;
+    public void setStatement(JavaStatement s) {
+        this.statement = s;
+    }
+
+    /**
+     *
+     * @return the statement (block or loop) which the applied contract belongs to.
+     */
+    public JavaStatement getStatement() {
+        return statement;
     }
 
     /**
      *
      * @return the contract being applied.
      */
-    public abstract BlockSpecificationElement getContract();
+    public abstract AuxiliaryContract getContract();
 
     /**
      *
@@ -91,7 +99,7 @@ public abstract class AbstractBlockSpecificationElementBuiltInRuleApp
 
     @Override
     public boolean complete() {
-        return pio != null && block != null && getContract() != null && heaps != null;
+        return pio != null && statement != null && getContract() != null && heaps != null;
     }
 
     @Override

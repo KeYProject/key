@@ -14,7 +14,9 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class LoopContractInternalBuiltInRuleInteraction extends BuiltInRuleInteraction{
+public class LoopContractInternalBuiltInRuleInteraction extends BuiltInRuleInteraction {
+    private static final long serialVersionUID = 1L;
+
     public LoopContractInternalBuiltInRuleInteraction() {
     }
 
