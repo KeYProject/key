@@ -1,15 +1,16 @@
 package de.uka.ilkd.key.gui.extension.impl;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.proof.Proof;
 import org.key_project.util.ServiceLoaderUtil;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -159,20 +160,30 @@ public final class KeYGuiExtensionFacade {
         return getExtensionInstances(KeYGuiExtension.ContextMenu.class);
     }
 
-    public static <T> List<Action> getContextMenuFor(ContextMenuKind kind, T underlyingObject,
-                                                     MainWindow window) {
+    public static JPopupMenu createContextMenu(ContextMenuKind kind, Object underlyingObject,
+                                               KeYMediator mediator) {
+        JPopupMenu menu = new JPopupMenu();
+        List<Action> content = getContextMenuItems(
+                kind, underlyingObject, mediator);
+        content.forEach(menu::add);
+        return menu;
+    }
+
+
+    public static List<Action> getContextMenuItems(ContextMenuKind kind, Object underlyingObject,
+                                                   KeYMediator mediator) {
         if (!kind.getType().isAssignableFrom(underlyingObject.getClass())) {
             throw new IllegalArgumentException();
         }
 
         return getContextMenuExtensions().stream()
-                .flatMap(it -> it.getContextActions(window, kind, underlyingObject).stream())
+                .flatMap(it -> it.getContextActions(mediator, kind, underlyingObject).stream())
                 .collect(Collectors.toList());
     }
 
-    public static <T> JMenu createTermMenu(ContextMenuKind kind, T underlyingObject, MainWindow window) {
+    public static JMenu createTermMenu(ContextMenuKind kind, Object underlyingObject, KeYMediator mediator) {
         JMenu menu = new JMenu("Extensions");
-        getContextMenuFor(kind, underlyingObject, window)
+        getContextMenuItems(kind, underlyingObject, mediator)
                 .forEach(it -> sortActionIntoMenu(it, menu));
         return menu;
     }

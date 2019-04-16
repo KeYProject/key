@@ -22,10 +22,7 @@ import java.awt.event.MouseListener;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import javax.swing.JTree;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 
@@ -33,6 +30,8 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
@@ -246,9 +245,26 @@ public class TaskTree extends JPanel {
      */
     class TaskTreeMouseListener extends MouseAdapter {
 
-    	public void mouseClicked(MouseEvent e) {
-    		problemChosen();
+        public void mouseClicked(MouseEvent e) {
+            problemChosen();
+            checkPopup(e);
     	}
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            checkPopup(e);
+        }
+
+        private void checkPopup(MouseEvent e) {
+            if(e.isPopupTrigger()) {
+                JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
+                        ContextMenuKind.PROOF_LIST, mediator.getSelectedProof(),
+                        mediator);
+                if(menu.getComponentCount()>0) {
+                    menu.show(TaskTree.this, e.getX(), e.getY());
+                }
+            }
+        }
     }
 
 

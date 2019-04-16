@@ -17,7 +17,7 @@ public enum ContextMenuKind {
 
     private final Class<?> clazz;
 
-    private ContextMenuKind(Class<?> clazz) {
+    ContextMenuKind(Class<?> clazz) {
         this.clazz = clazz;
     }
 
