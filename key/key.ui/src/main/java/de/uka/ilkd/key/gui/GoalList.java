@@ -19,6 +19,8 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
+import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.prooftree.DisableGoal;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -43,9 +45,11 @@ import java.util.List;
 import java.util.WeakHashMap;
 
 public class GoalList extends JList<Goal> implements KeYPaneExtension {
-
+    public static final Icon GOAL_LIST_ICON =
+            IconFontSwing.buildIcon(FontAwesomeBold.FLAG_CHECKERED,
+                                    MainWindowTabbedPane.TAB_ICON_SIZE);
     /**
-     *
+     * Generated UID.
      */
     private static final long serialVersionUID = 1632264315383703798L;
     private final static ImageIcon keyIcon = IconFactory.keyHole(20, 20);
@@ -123,7 +127,7 @@ public class GoalList extends JList<Goal> implements KeYPaneExtension {
 
     @Override
     public Icon getIcon() {
-        return null;
+        return GOAL_LIST_ICON;
     }
 
     @Override
