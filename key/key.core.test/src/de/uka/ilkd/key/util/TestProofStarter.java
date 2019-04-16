@@ -5,9 +5,9 @@ import java.io.File;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 
 /**
  * Tests for {@link ProofStarter}.

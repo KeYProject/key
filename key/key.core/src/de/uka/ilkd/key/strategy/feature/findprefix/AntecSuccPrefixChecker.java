@@ -19,7 +19,6 @@ import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 
-
 /**
  * Checks, whether the position in occurrence has antecedent/succedent polarity.
  * 
@@ -43,43 +42,43 @@ class AntecSuccPrefixChecker implements Checker {
 
     private AntecSuccPrefixChecker.Polarity polarity;
 
-    private int pol;
-
 
     private AntecSuccPrefixChecker(
             AntecSuccPrefixChecker.Polarity polarity) {
         this.polarity = polarity;
     }
-
-
-    @Override
-    public void initPrefixCheck(PosInOccurrence p_pos) {
-        pol = p_pos.isInAntec() ? -1 : 1;  // init polarity
-    }
-
-
-    @Override
-    public void checkOperator(Operator op,
-                              PIOPathIterator it) {
+    
+    private int checkOperator(Operator op, int child, int pol) {        
         // compute polarity
         // toggle polarity if find term is subterm of
         if ((op == Junctor.NOT) ||                                          //   not
-            (op == Junctor.IMP && it.getChild() == 0)) {                    //   left hand side of implication
+                (op == Junctor.IMP && child == 0)) {                    //   left hand side of implication
             pol = pol * -1;
             // do not change polarity if find term is subterm of
         } else if ((op == Junctor.AND) ||                                   //   and
-                   (op == Junctor.OR) ||                                    //   or
-                   (op == Junctor.IMP && it.getChild() != 0) ||             //   right hand side of implication
-                   (op == IfThenElse.IF_THEN_ELSE && it.getChild() != 0)) { //   then or else part of if-then-else
+                (op == Junctor.OR) ||                                    //   or
+                (op == Junctor.IMP && child != 0) ||             //   right hand side of implication
+                (op == IfThenElse.IF_THEN_ELSE &&  child!= 0)) { //   then or else part of if-then-else
             // do nothing
         } else {                                                            // find term has no polarity in any other case
             pol = 0;
         }
+        return pol;
     }
-
-
+    
     @Override
-    public boolean getResult() {
+    public boolean check(PosInOccurrence pio) {
+        int pol = pio.isInAntec() ? -1 : 1;
+        if (pio.posInTerm() != null) {
+            final PIOPathIterator it = pio.iterator();
+            while (pol != 0 && it.next() != -1) {
+                pol = checkOperator(pio.subTerm().op(), it.getChild(), pol);
+                if (pol == 0) { 
+                    break;
+                }
+            }
+        }         
+        
         if ((polarity == Polarity.ANTECEDENT && pol != -1) ||
             (polarity == Polarity.SUCCEDENT && pol != 1)) {
             return false;

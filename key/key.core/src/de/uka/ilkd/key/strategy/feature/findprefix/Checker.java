@@ -13,9 +13,7 @@
 
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
-import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.op.Operator;
 
 
 /**
@@ -28,29 +26,9 @@ import de.uka.ilkd.key.logic.op.Operator;
 interface Checker {
 
     /**
-     * Called on initialisation of the prefix check.
-     *
-     * @param pos   the initial position of occurrence
-     */
-    public void initPrefixCheck(PosInOccurrence pos);
-
-
-    /**
-     * Called on every operator of the prefix starting with the outermost
-     * operator.
-     *
-     * @param op   the operator to be checked
-     * @param it   the prefix iterator
-     */
-    public void checkOperator(Operator op,
-                              PIOPathIterator it);
-
-
-
-    /**
      * Called to get the result of the prefix check.
      *
-     * @param pos   the initial position of occurrence
+     * @param pio   the initial position of occurrence
      */
-    public boolean getResult();
+    public boolean check(PosInOccurrence pio);
 }

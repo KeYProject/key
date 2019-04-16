@@ -29,7 +29,8 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
             PosInOccurrence applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
             TacletLabelHint labelHint, Goal goal) {
         super(termLabelState, labelHint,
-                applicationPosInOccurrence, goal, rule, ruleApp, services);
+                applicationPosInOccurrence, goal, rule, ruleApp, 
+                services, services.getTermBuilder(false));
         this.metavariableInst = metavariableInst;
     }
     

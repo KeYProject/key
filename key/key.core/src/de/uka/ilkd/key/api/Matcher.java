@@ -78,9 +78,9 @@ public class Matcher {
         if(size > 0) {
             //Iteratoren durch die Sequent
             ImmutableList<IfFormulaInstantiation> antecCand =
-                    IfFormulaInstSeq.createList(currentSeq, true);
+                    IfFormulaInstSeq.createList(currentSeq, true, copyServices);
             ImmutableList<IfFormulaInstantiation> succCand =
-                    IfFormulaInstSeq.createList(currentSeq, false);
+                    IfFormulaInstSeq.createList(currentSeq, false, copyServices);
 
             SequentFormula[] patternArray = new SequentFormula[patternSeq.size()];
             {

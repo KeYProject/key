@@ -99,7 +99,7 @@ final class MultiThreadedTacletIndex extends TacletIndex {
             catch (InterruptedException | ExecutionException e) {
                 throw (IllegalStateException) new IllegalStateException().initCause(e);
             }
-            result = result.prepend(matchedRules);
+            result = result.prependReverse(matchedRules);
         } else {
             for (final NoPosTacletApp tacletApp : tacletApps) {
                 if ( !p_filter.filter(tacletApp.taclet()) ) {

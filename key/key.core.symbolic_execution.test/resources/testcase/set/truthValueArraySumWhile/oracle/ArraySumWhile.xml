@@ -3,11 +3,15 @@
    <methodCall name="&lt;call ArraySumWhile.sum(_array)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
-            <loopInvariant name="invariant: (  (i &gt;= 0
- &amp; i &lt;= _array.length)&lt;&lt;SC&gt;&gt;
+            <loopInvariant name="invariant: (  (geq(i, Z(0(#)))
+ &amp; leq(i, length(_array)))&lt;&lt;SC&gt;&gt;
  &amp;   result_1
-   = javaCastInt(bsum{int j;}(0, i, _array[j])))&lt;&lt;SC&gt;&gt;;
-variant: javaSubInt(_array.length, i)
+   = javaCastInt(bsum{int j;}(Z(0(#)),
+                              i,
+                              int::select(heap,
+                                          _array,
+                                          arr(j)))))&lt;&lt;SC&gt;&gt;;
+variant: javaSubInt(length(_array), i)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <branchCondition name="or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="true" branchCondition="or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <loopCondition name="i&lt;_array.length" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false" blockOpened="false">

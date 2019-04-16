@@ -24,8 +24,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.proof.io.ProofSaver;
-
+import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 
 /**
  * Instantiation of an if-formula that is a formula of an existing
@@ -36,15 +35,15 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
 
     /**
      * Sequent and formula
-     */ 
+     */
     private final Sequent            seq;
     private final boolean antec;	// formula is in antecedent?
     private final SequentFormula cf;
 
     public IfFormulaInstSeq(Sequent p_seq, boolean antec, SequentFormula p_cf ) {
-	seq = p_seq;	
+        seq = p_seq;
         this.antec = antec;
-	cf  = p_cf;
+        cf  = p_cf;
     }
 
 
@@ -53,70 +52,70 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     }
 
 
-
     /**
      * @return the cf this is pointing to
      */
+    @Override
     public SequentFormula getConstrainedFormula () {
-	return cf;
-    }    
+        return cf;
+    }
 
     /**
      * Create a list with all formulas of a given semisequent
      */
-    private static ImmutableList<IfFormulaInstantiation> createListHelp(Sequent     p_s,                                                               
-							       boolean antec ) {
-	
-	ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.<IfFormulaInstantiation>nil();
-	Iterator<SequentFormula>  it;
-        if (antec) it = p_s.antecedent().iterator ();
-           else it = p_s.succedent().iterator ();
-	while ( it.hasNext () ) {
-	    res = res.prepend(new IfFormulaInstSeq(p_s, antec, it.next()));
-	}
-
-	return res;
-
-    }
-
-    public static ImmutableList<IfFormulaInstantiation> createList ( Sequent     p_s,                                                            
-                                                            boolean antec ) {
-        final Semisequent ss = antec ? p_s.antecedent() : p_s.succedent();
-        
-        synchronized ( cache ) {
-            if ( ( antec ? cache.aKey : cache.sKey ) != ss ) {
-                final ImmutableList<IfFormulaInstantiation> val = createListHelp ( 
-		    p_s, antec );
-                if ( antec ) {
-                    cache.aKey = ss;
-                    cache.aVal = val;
-                } else {
-                    cache.sKey = ss;
-                    cache.sVal = val;
-                }
-            }
-
-            return antec ? cache.aVal : cache.sVal;
+    private static ImmutableList<IfFormulaInstantiation> createListHelp(Sequent     p_s,
+            boolean antec ) {
+        ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.<IfFormulaInstantiation>nil();
+        Iterator<SequentFormula>  it;
+        if (antec) {
+            it = p_s.antecedent().iterator ();
+        } else {
+            it = p_s.succedent().iterator ();
         }
-    }
-        
-    public String toString () {       
-	return toString(null);
-    }
-    
-    public String toString (Services services) {
-        return ProofSaver.printAnything(cf.formula(), services);
+        while ( it.hasNext () ) {
+            res = res.prepend(new IfFormulaInstSeq(p_s, antec, it.next()));
+        }
+
+        return res;
     }
 
+    public static ImmutableList<IfFormulaInstantiation> createList(Sequent p_s,
+            boolean antec, Services services) {
+        final IfFormulaInstantiationCache cache = services.getCaches().getIfFormulaInstantiationCache();
+        final Semisequent semi = antec ? p_s.antecedent() : p_s.succedent();
+        
+        ImmutableList<IfFormulaInstantiation> val = cache.get(antec, semi);
+        
+        if (val == null) {
+            val  = createListHelp(p_s, antec);
+            cache.put(antec, semi, val);
+        }
+        
+        return val;
+    }
+
+    @Override
+    public String toString () {
+        return toString(null);
+    }
+
+    @Override
+    public String toString (Services services) {
+        return OutputStreamProofSaver.printAnything(cf.formula(), services);
+    }
+
+    @Override
     public boolean equals(Object p_obj) {
         if ( ! ( p_obj instanceof IfFormulaInstSeq ) ) {
             return false;
         }
-        return seq == ( (IfFormulaInstSeq)p_obj ).seq
-               && cf == ( (IfFormulaInstSeq)p_obj ).cf
-               && antec == ( (IfFormulaInstSeq)p_obj ).antec;
+        final IfFormulaInstSeq other = (IfFormulaInstSeq)p_obj;
+        return seq == other.seq
+                && cf == other.cf
+                && antec == other.antec;
     }
 
+    @Override
     public int hashCode() {
         int result = 17;
         result = 37 * result + seq.hashCode ();
@@ -124,29 +123,22 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
         result = 37 * result + ( antec ? 0 : 1 );
         return result;
     }
-    
+
     public boolean inAntec() {
-       return antec;
+        return antec;
     }
 
-    private PosInOccurrence pioCache = null;
-    
+    private volatile PosInOccurrence pioCache = null;
+
     public PosInOccurrence toPosInOccurrence () {
-        if (pioCache == null)
-            pioCache = new PosInOccurrence ( getConstrainedFormula (),
-                                             PosInTerm.getTopLevel(),
-                                             inAntec () );
+        if (pioCache == null) {
+            PosInOccurrence localPioCache = 
+                    new PosInOccurrence ( cf,
+                            PosInTerm.getTopLevel(),
+                            antec );
+            pioCache = localPioCache;
+        }
         return pioCache;
     }
-    
-    // a simple cache for the results of the method <code>createList</code>
-    private static final class Cache {
-        public Semisequent aKey = null;
-        public ImmutableList<IfFormulaInstantiation> aVal = null;
 
-        public Semisequent sKey = null;
-        public ImmutableList<IfFormulaInstantiation> sVal = null;
-    }
-    
-    private static final Cache cache = new Cache ();
 }

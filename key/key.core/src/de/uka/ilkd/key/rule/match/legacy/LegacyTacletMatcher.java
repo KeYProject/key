@@ -219,10 +219,10 @@ public final class LegacyTacletMatcher implements TacletMatcher {
 
 
     /** (non-Javadoc)
-     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(java.util.Iterator, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
+     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(ImmutableList, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
      */
     @Override
-    public final IfMatchResult matchIf (   Iterable<IfFormulaInstantiation> p_toMatch,
+    public final IfMatchResult matchIf (   ImmutableList<IfFormulaInstantiation> p_toMatch,
             Term                             p_template,
             MatchConditions                  p_matchCond,
             Services                         p_services ) {

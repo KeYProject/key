@@ -78,8 +78,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.KeYSelectionModel;
-import de.uka.ilkd.key.proof.ApplyStrategy;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -87,11 +85,13 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.RuleAppListener;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
-import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
+import de.uka.ilkd.key.prover.ProverTaskListener;
+import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
@@ -104,7 +104,7 @@ import de.uka.ilkd.key.util.ProofUserManager;
 /**
  * This class represents the Editor for viewing KeY-Proofs
  * 
- * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
+ * @author Christoph Schneider, Niklas Bunzel, Stefan Kï¿½sdorf, Marco Drebing
  */
 public class KeYEditor extends SequentEditor implements IProofProvider, IProofNodeSearchSupport {
    /**
@@ -643,7 +643,7 @@ public class KeYEditor extends SequentEditor implements IProofProvider, IProofNo
    protected void handleTaskFinished(TaskFinishedInfo info) {
       if (info.getSource() instanceof ApplyStrategy &&
           currentProof == info.getProof()) {
-         ApplyStrategy.ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
+         ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
          if (!currentProof.closed()) {
             Goal g = result.nonCloseableGoal();
             if (g == null) {

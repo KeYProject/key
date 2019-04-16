@@ -42,7 +42,7 @@ public class SMTCommand
             throws ScriptException, InterruptedException {
         SolverTypeCollection su = computeSolvers(args.solver);
 
-        Goal goal = state.getFirstOpenGoal();
+        Goal goal = state.getFirstOpenAutomaticGoal();
 
         SMTSettings settings = new SMTSettings(
                 goal.proof().getSettings().getSMTSettings(),

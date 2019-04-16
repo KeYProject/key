@@ -171,9 +171,11 @@ public class SequentChangeInfo {
    * @return list of formulas added to sequent 
    */
   public ImmutableList<SequentFormula> addedFormulas() {
-    return addedFormulas(true).size() > addedFormulas(false).size() ?
-	addedFormulas(false).prepend(addedFormulas(true)) : 
-	addedFormulas(true).prepend(addedFormulas(false));
+    final ImmutableList<SequentFormula> addedFormulasAntec = addedFormulas(true);    
+    final ImmutableList<SequentFormula> addedFormulasSucc  = addedFormulas(false);
+    
+    return concatenateHelper(addedFormulasAntec, addedFormulasSucc);
+    
   }
 
   /** 
@@ -198,9 +200,10 @@ public class SequentChangeInfo {
    * @return list of formulas removed from the sequent 
    */
   public ImmutableList<SequentFormula> removedFormulas() {
-    return removedFormulas(true).size() > removedFormulas(false).size() ?
-	removedFormulas(false).prepend(removedFormulas(true)) : 
-	removedFormulas(true).prepend(removedFormulas(false));
+    final ImmutableList<SequentFormula> removedFormulasAntec = removedFormulas(true);
+    final ImmutableList<SequentFormula> removedFormulasSucc = removedFormulas(false);
+
+    return concatenateHelper(removedFormulasAntec, removedFormulasSucc);
   }
 
   /** 
@@ -227,9 +230,10 @@ public class SequentChangeInfo {
    * @return list of formulas modified to sequent 
    */
   public ImmutableList<FormulaChangeInfo> modifiedFormulas() {
-    return modifiedFormulas(true).size() > modifiedFormulas(false).size() ?
-	modifiedFormulas(false).prepend(modifiedFormulas(true)) : 
-	modifiedFormulas(true).prepend(modifiedFormulas(false));
+      final ImmutableList<FormulaChangeInfo> modifiedFormulasAntec = modifiedFormulas(true);
+      final ImmutableList<FormulaChangeInfo> modifiedFormulasSucc = modifiedFormulas(false);
+      
+      return concatenateHelper(modifiedFormulasAntec, modifiedFormulasSucc);
   }
   
   /** 
@@ -250,11 +254,35 @@ public class SequentChangeInfo {
    * @return list of rejected formulas 
    */
   public ImmutableList<SequentFormula> rejectedFormulas() {
-    return rejectedFormulas(true).size() > rejectedFormulas(false).size() ?
-        rejectedFormulas(false).prepend(rejectedFormulas(true)) : 
-        rejectedFormulas(true).prepend(rejectedFormulas(false));
+      final ImmutableList<SequentFormula> rejectedFormulasAntec = rejectedFormulas(true);
+      final ImmutableList<SequentFormula> rejectedFormulasSucc = rejectedFormulas(false);
+
+      return concatenateHelper(rejectedFormulasAntec, rejectedFormulasSucc);
   }
-  
+
+  /**
+   * concatenates the two lists in arbitrary but deterministic order
+   * @param antecList the list of antecedent elements
+   * @param succList the list of succeden elements
+   * @return the concatenated list
+   */
+  private <T> ImmutableList<T> concatenateHelper(
+          final ImmutableList<T> antecList,
+          final ImmutableList<T> succList) {
+      final int sizeAntec = antecList.size();
+      final int sizeSucc  = succList.size();
+
+      if (sizeAntec == 0) {
+          return succList;
+      } else if (sizeSucc == 0) {
+          return antecList;
+      } else {
+          return sizeAntec > sizeSucc ?
+                  succList.prepend(antecList) : 
+                      antecList.prepend(succList);
+      }
+  }
+
   /**
    * This method combines the change information from this info and its successor. 
    * ATTENTION: it takes over ownership over {@code succ} and does not release it. This means

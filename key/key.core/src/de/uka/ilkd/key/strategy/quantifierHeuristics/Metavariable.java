@@ -82,13 +82,6 @@ public final class Metavariable extends AbstractSortedOperator
 	return compareTo((Metavariable)o) == 0;
     }
     
-    
-    @Override
-    public int hashCode() {
-	return name().hashCode();
-    }
-    
-    
     /**
      * @return Returns the isTemporaryVariable.
      */

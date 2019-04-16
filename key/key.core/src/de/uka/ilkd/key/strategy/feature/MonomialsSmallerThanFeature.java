@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -77,20 +76,15 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
         final MonomialCollector m2 = new MonomialCollector ();
         m2.collect ( right.toTerm ( app, pos, goal ), goal.proof().getServices() );
 
-        setCurrentGoal ( goal );
+        return lessThan ( m1.getResult(), m2.getResult(), pos, goal );
         
-        final boolean res = lessThan ( m1.getResult(), m2.getResult(), goal.proof().getServices().getCaches() );
-        
-        setCurrentGoal ( null );
-        
-        return res;
     }
 
     /**
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(Term t1, Term t2, ServiceCaches caches) {
+    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, Goal goal) {
 
         // here, the ordering is graded concerning multiplication on integers
         final int t1Deg = degree ( t1 );
@@ -104,7 +98,8 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
             // the smaller the later they were introduced)
             
             final int v =
-                introductionTime ( t2.op (), caches ) - introductionTime ( t1.op (), caches );
+                introductionTime ( t2.op (), goal )
+                - introductionTime ( t1.op (), goal );
             if ( v < 0 ) return true;
             if ( v > 0 ) return false;
         } else {
@@ -114,23 +109,23 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
             if ( atoms1.size () < atoms2.size () ) return false;
             if ( atoms1.size () > atoms2.size () ) return true;
             
-            final int v = compareLexNewSyms ( atoms1, atoms2, caches );
+            final int v = compareLexNewSyms ( atoms1, atoms2, goal );
             if ( v < 0 ) return true;
             if ( v > 0 ) return false;
         }
         
-        return super.lessThan ( t1, t2, caches );
+        return super.lessThan ( t1, t2, focus, goal );
     }
 
-    private int compareLexNewSyms(ImmutableList<Term> atoms1, ImmutableList<Term> atoms2, ServiceCaches caches) {
+    private int compareLexNewSyms(ImmutableList<Term> atoms1, ImmutableList<Term> atoms2, Goal goal) {
         while ( !atoms1.isEmpty() ) {
             final Term t1 = atoms1.head ();
             final Term t2 = atoms2.head ();
             atoms1 = atoms1.tail ();
             atoms2 = atoms2.tail ();
             
-            final int c = introductionTime ( t2.op (), caches )
-                          - introductionTime ( t1.op (), caches );
+            final int c = introductionTime ( t2.op (), goal )
+                          - introductionTime ( t1.op (), goal );
             if ( c != 0 ) return c;
         }
         

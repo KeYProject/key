@@ -20,13 +20,9 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.ApplyStrategy;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -34,6 +30,11 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.prover.GoalChooser;
+import de.uka.ilkd.key.prover.ProverCore;
+import de.uka.ilkd.key.prover.ProverTaskListener;
+import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -239,8 +240,8 @@ public class ProofStarter {
             // set!
            OneStepSimplifier.refreshOSS(proof);
 
-           IGoalChooser goalChooser = profile.getSelectedGoalChooserBuilder().create();
-           ApplyStrategy prover = new ApplyStrategy(goalChooser);
+           GoalChooser goalChooser = profile.getSelectedGoalChooserBuilder().create();
+           ProverCore prover = new ApplyStrategy(goalChooser);
            if (ptl != null) {
               prover.addProverTaskObserver(ptl);
            }
@@ -249,7 +250,7 @@ public class ProofStarter {
               prover.addProverTaskObserver(autoSaver);
            }
 
-           ApplyStrategy.ApplyStrategyInfo result;
+           ApplyStrategyInfo result;
            proof.setRuleAppIndexToAutoMode();
            
            result = prover.start(proof, goals, maxSteps, timeout, strategy.isStopAtFirstNonCloseableGoal());          

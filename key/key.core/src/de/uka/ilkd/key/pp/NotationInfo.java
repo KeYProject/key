@@ -15,6 +15,7 @@ package de.uka.ilkd.key.pp;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -416,4 +417,7 @@ public final class NotationInfo {
         hidePackagePrefix = b;
     }
 
+    public Map<Object, Notation> getNotationTable() {
+        return notationTable;
+    }
 }

@@ -50,7 +50,7 @@ notprovable: ./heap/polarity_tests/wellformed10.key
 notprovable: ./heap/polarity_tests/wellformed11.key
 
 
-# Tests for block contracts:
+# Tests for block & loop contracts:
 provable: ./heap/block_contracts/Simple__add.key
 provable: ./heap/block_contracts/Simple__addAbsoluteValues.key
 provable: ./heap/block_contracts/Simple__addWithJump.key
@@ -63,6 +63,12 @@ provable: ./heap/block_contracts/Simple__unnecessaryLoopInvariant.key
 # the following test has a reload problem probably caused by the one-step-simplifier
 # provable: ./heap/block_contracts/GreatestCommonDivisor.key
 provable: ./standard_key/java_dl/jml-assert/assert.key
+provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_external.key
+provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_internal.key
+provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_loop.key
+provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_external.key
+provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_internal.key
+provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_loop.key
 
 # Other tests:
 provable: ./heap/fm12_01_LRS/lcp.key

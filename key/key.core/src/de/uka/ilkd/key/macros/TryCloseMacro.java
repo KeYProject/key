@@ -19,12 +19,13 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.ApplyStrategy;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.prover.ProverCore;
+import de.uka.ilkd.key.prover.ProverTaskListener;
+import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left
@@ -156,7 +157,7 @@ public class TryCloseMacro extends AbstractProofMacro {
 
         //
         // create the rule application engine
-        final ApplyStrategy applyStrategy =
+        final ProverCore applyStrategy =
                 new ApplyStrategy(proof.getServices().getProfile().getSelectedGoalChooserBuilder().create());
         // assert: all goals have the same proof
 
@@ -171,7 +172,7 @@ public class TryCloseMacro extends AbstractProofMacro {
         //
         // inform the listener
         ProofMacroFinishedInfo info =
-                new ProofMacroFinishedInfo(this, goals, proof, 0, 0, 0);
+                new ProofMacroFinishedInfo(this, goals, proof, 0, 0, 0, false);
 
         //
         // start actual autoprove

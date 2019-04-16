@@ -5,11 +5,12 @@ import java.io.File;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
+import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.Pair;
 
@@ -40,9 +41,9 @@ class DataRecordingTestFile extends TestFile<ProfilingDirectories> {
         // we skip reloading for these test cases
     }
     
-    private static ApplyStrategy.ApplyStrategyInfo applyStrategy(Proof proof, Strategy strategy) {
+    private static ApplyStrategyInfo applyStrategy(Proof proof, Strategy strategy) {
         proof.setActiveStrategy(strategy);
-        ApplyStrategy.ApplyStrategyInfo applyStrategyInfo = new ApplyStrategy(proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create()).start(proof, proof.openGoals().head());
+        ApplyStrategyInfo applyStrategyInfo = new ApplyStrategy(proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create()).start(proof, proof.openGoals().head());
         return applyStrategyInfo;
     }
 

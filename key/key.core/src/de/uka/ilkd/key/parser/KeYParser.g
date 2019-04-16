@@ -132,6 +132,7 @@ options {
          prooflabel2tag.put("contract", ProofElementID.CONTRACT);
          prooflabel2tag.put("ifInst", ProofElementID.ASSUMES_INST_BUILT_IN);     
          prooflabel2tag.put("userinteraction", ProofElementID.USER_INTERACTION);
+         prooflabel2tag.put("proofscript", ProofElementID.PROOF_SCRIPT);
          prooflabel2tag.put("newnames", ProofElementID.NEW_NAMES);
          prooflabel2tag.put("autoModeTime", ProofElementID.AUTOMODE_TIME);  
          prooflabel2tag.put("mergeProc", ProofElementID.MERGE_PROCEDURE);
@@ -2760,8 +2761,8 @@ term110 returns [Term _term110 = null]
 @after { _term110 = result; }
     :
         (
-            result = braces_term |
-            result = accessterm
+          result = braces_term
+        | { globalSelectNestingDepth=0; } result = accessterm
         )
         {
 	/*
@@ -3125,10 +3126,11 @@ array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = n
         }
 
 
-
+/*
+// This would require repeated { globalSelectNestingDepth=0; }
 accesstermlist returns [HashSet accessTerms = new LinkedHashSet()] :
      (t=accessterm {accessTerms.add(t);} ( COMMA t=accessterm {accessTerms.add(t);})* )? ;
-
+*/
 
 atom returns [Term _atom = null]
 @after { _atom = a; }
@@ -3540,9 +3542,7 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
         //args.size()==0 indicates open-close-parens ()
                 
         {  
-            if(varfuncid.equals("inReachableState") && args == null) {
-	        a = getServices().getTermBuilder().wellFormed(getServices().getTypeConverter().getHeapLDT().getHeap());
-	    } else if(varfuncid.equals("skip") && args == null) {
+            if(varfuncid.equals("skip") && args == null) {
 	        a = getTermFactory().createTerm(UpdateJunctor.SKIP);
 	    } else {
 	            Operator op;

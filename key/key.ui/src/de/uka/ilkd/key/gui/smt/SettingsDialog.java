@@ -36,23 +36,6 @@ import de.uka.ilkd.key.gui.IconFactory;
 
 
 
-class OptionContentNode extends DefaultMutableTreeNode{
-        private static final long serialVersionUID = 1L;
-        private final JComponent component;
-        
-       
-        public OptionContentNode(String title,JComponent component) {
-                super();
-                this.component = component;
-                this.setUserObject(title);
-        }
-
-        public JComponent getComponent(){
-                return component;
-        }
-                
-}
-
 public class SettingsDialog extends JDialog{
         private static final long serialVersionUID = 1L;
         public static final int APPLY_BUTTON =0;
@@ -90,7 +73,7 @@ public class SettingsDialog extends JDialog{
         };
         
         
-        public  SettingsDialog(TreeModel model, JComponent startComponent, ActionListener listener, JComponent bottomComponent){
+        public  SettingsDialog(TreeModel model, JComponent startComponent, ActionListener listener, JComponent bottomComponent, boolean editable){
                 this.listener = listener;
                 this.getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
                 Box box = Box.createHorizontalBox();
@@ -100,14 +83,18 @@ public class SettingsDialog extends JDialog{
                 box = Box.createHorizontalBox();
                 box.add(Box.createHorizontalStrut(5));
                 box.add(bottomComponent);
+                if(editable) {
                 box.add(Box.createHorizontalStrut(5));
                 box.add(Box.createHorizontalGlue());
                 box.add(getApplyButton());
+                }
                 box.add(Box.createHorizontalStrut(5));
                 box.add(getOkayButton());
                 box.add(Box.createHorizontalStrut(5));
+                if(editable) {
                 box.add(getCancelButton());
                 box.add(Box.createHorizontalStrut(5));
+                }
                 this.getContentPane().add(box);
                 this.getOptionTree().setModel(model);
                 getSplitPane().setRightComponent(startComponent);
@@ -124,7 +111,7 @@ public class SettingsDialog extends JDialog{
         private Dimension computePreferredSize(TreeModel model){
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode)model.getRoot();
                 Dimension dim = computePreferredSize(node);
-                dim.width = dim.width + getOptionTree().getPreferredSize().width+80;
+                dim.width = dim.width + getOptionTree().getPreferredSize().width+100;
                 dim.height = Math.min(dim.height,400);
                 return dim;
         }

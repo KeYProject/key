@@ -714,7 +714,7 @@ public class TestTermLabelManager extends TestCase {
       }
 
       @Override
-      public void updateLabels(TermLabelState state, Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm, Rule rule, RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock, Set<TermLabel> labels) {
+      public void updateLabels(TermLabelState state, Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm, Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock, Set<TermLabel> labels) {
          if (!labels.contains(toAdd)) {
             labels.add(toAdd);
          }

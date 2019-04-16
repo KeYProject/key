@@ -23,12 +23,12 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProverTaskListener;
-import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
+import de.uka.ilkd.key.prover.ProverTaskListener;
+import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
+import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 /**
  * The abstract class SequentialProofMacro can be used to create compound macros
@@ -102,7 +102,7 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
         }
         final ImmutableList<Goal> gs = initNodes.isEmpty() ?
                 proof.openEnabledGoals() : proof.getSubtreeEnabledGoals(initNodes.get(0));
-        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, gs, proof);
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, gs, proof, false);
         for (final ProofMacro macro : getProofMacros()) {
             // reverse to original nodes
             for (Node initNode : initNodes) {

@@ -98,11 +98,14 @@ public abstract class JavaNonTerminalProgramElement
     }
     
     @Override    
-    public int hashCode(){
-        return 17*super.hashCode() + getChildCount() * 7;
+    protected int computeHashCode(){
+        int localHash = 17*super.computeHashCode();
+        for (int i = 0, sz = getChildCount(); i<sz; i++) {
+            final ProgramElement pe = getChildAt(i);
+            localHash = 17 * localHash + (pe == null ? 0 : pe.hashCode());
+        }
+        return localHash;
     }
-    
-  
 
     @Override    
     public MatchConditions match(SourceData source, MatchConditions matchCond) {

@@ -2,7 +2,7 @@ public abstract class Subject {
     protected /*@spec_public@*/ Observer[] observers = new Observer[0];
     
     //@ public model \locset footprint;
-    //@ accessible \inv: footprint, observers, observers.*, \infinite_union(int i; 0 <= i && i < observers.length ? observers[i].* : \empty);    
+    //@ accessible \inv: footprint, observers, observers.*, (\infinite_union int i; 0 <= i && i < observers.length ? observers[i].* : \empty);
     //@ accessible footprint: footprint;
     
     /*@ public invariant \disjoint(footprint, \set_union(observers, observers[*]));
@@ -37,7 +37,7 @@ public abstract class Subject {
     
 
     /*@ public normal_behaviour
-      @   assignable \infinite_union(int x; 0 <= x && x < observers.length ? observers[x].* : \empty);
+      @   assignable (\infinite_union int x; 0 <= x && x < observers.length ? observers[x].* : \empty);
       @   ensures (\forall int i; 0 <= i && i < observers.length; observers[i].upToDate && observers[i].\inv);
       @*/
     public final void notifyObservers() {
@@ -45,7 +45,7 @@ public abstract class Subject {
 	  @                && (\forall int x; 0 <= x && x < observers.length; observers[x].\inv)
 	  @                && (\forall int x; 0 <= x && x < observers.length; observers[x].subject == this)
 	  @                && (\forall int x; 0 <= x && x < i; observers[x].upToDate);
-	  @ assignable \infinite_union(int x; 0 <= x && x < observers.length ? observers[x].* : \empty);
+	  @ assignable (\infinite_union int x; 0 <= x && x < observers.length ? observers[x].* : \empty);
 	  @ decreases observers.length - i; 
 	  @*/
 	for(int i = 0; i < observers.length; i++) {

@@ -19,7 +19,6 @@ import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
-import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -39,7 +38,6 @@ public abstract class AbstractMonomialSmallerThanFeature
     private static final Name newSymRuleSetName = new Name ( "polySimp_newSmallSym" );
     private final Function add, mul, Z;
 
-    private Goal currentGoal = null;
 
     protected AbstractMonomialSmallerThanFeature(IntegerLDT numbers) {
         this.add = numbers.getAdd();
@@ -47,10 +45,11 @@ public abstract class AbstractMonomialSmallerThanFeature
         this.Z = numbers.getNumberSymbol ();
     }
 
-    protected int introductionTime(Operator op, ServiceCaches caches) {
+    protected int introductionTime(Operator op, Goal goal) {
         if ( op == add || op == mul || op == Z ) return -1;
 
-        final LRUCache<Operator, Integer> introductionTimeCache = caches.getIntroductionTimeCache();
+        final LRUCache<Operator, Integer> introductionTimeCache = 
+                goal.proof().getServices().getCaches().getIntroductionTimeCache();
         Integer res;
         
         synchronized (introductionTimeCache) {
@@ -58,7 +57,7 @@ public abstract class AbstractMonomialSmallerThanFeature
         }
         
         if ( res == null ) {
-            res = Integer.valueOf ( introductionTimeHelp ( op ) );
+            res = Integer.valueOf ( introductionTimeHelp ( op, goal ) );
             synchronized (introductionTimeCache) {
                 introductionTimeCache.put ( op, res );
             }
@@ -67,8 +66,8 @@ public abstract class AbstractMonomialSmallerThanFeature
         return res.intValue ();
     }
 
-    private int introductionTimeHelp(Operator op) {
-        ImmutableList<RuleApp> appliedRules = getCurrentGoal().appliedRuleApps ();
+    private int introductionTimeHelp(Operator op, Goal goal) {
+        ImmutableList<RuleApp> appliedRules = goal.appliedRuleApps ();
         while ( !appliedRules.isEmpty () ) {
             final RuleApp app = appliedRules.head ();
             appliedRules = appliedRules.tail ();
@@ -122,19 +121,5 @@ public abstract class AbstractMonomialSmallerThanFeature
                 addTerm ( te );
             }
         }
-    }    
-
-    /**
-     * @param currentGoal The currentGoal to set.
-     */
-    protected void setCurrentGoal(Goal currentGoal) {
-        this.currentGoal = currentGoal;
-    }
-
-    /**
-     * @return Returns the currentGoal.
-     */
-    protected Goal getCurrentGoal() {
-        return currentGoal;
     }
 }

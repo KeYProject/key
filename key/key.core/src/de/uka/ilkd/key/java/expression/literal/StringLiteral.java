@@ -59,16 +59,10 @@ public class StringLiteral extends Literal implements ReferencePrefix {
 	return ((StringLiteral)o).getValue().equals(getValue()); 
     }
     
-    public int hashCode() {
-    	int result = 17;
-    	result = 37 * result + getValue().hashCode();
-    	return result;
+    @Override
+    public int computeHashCode() {
+    	return 17 * super.computeHashCode() + getValue().hashCode();
     }
-    
-    public boolean equals(Object o) {
-    	return super.equals(o);
-    }
-
 
     public String getValue() {
         return value;

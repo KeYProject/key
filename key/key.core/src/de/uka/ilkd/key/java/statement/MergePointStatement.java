@@ -58,11 +58,6 @@ public class MergePointStatement extends JavaStatement
         return comments;
     }
 
-    @Override
-    public int hashCode() {
-        return 17 * super.hashCode() + identifier.hashCode();
-    }
-
     /**
      * Get the number of expressions in this container.
      * 

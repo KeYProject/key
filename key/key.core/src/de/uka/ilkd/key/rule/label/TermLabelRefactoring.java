@@ -28,7 +28,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
@@ -37,8 +36,7 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 /**
  * <p>
  * A {@link TermLabelRefactoring} is used by
- * {@link TermLabelManager#refactorGoal(TermLabelState, Services, PosInOccurrence,
- *                                      Term, Rule, Goal, Term)}
+ * {@link TermLabelManager#refactorGoal(TermLabelState, Services, PosInOccurrence, Rule, Goal, Object, Term)}
  * to refactor the labels of each visited {@link Term}.
  * </p>
  * <p>
@@ -52,7 +50,8 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 public interface TermLabelRefactoring extends RuleSpecificTask {
 
     /**
-     * Determines whether any refatorings should be applied on an application of the given {@link BuiltInRule}.
+     * Determines whether any refatorings should be applied on an application of the given
+     * {@link de.uka.ilkd.key.rule.BuiltInRule}.
      * 
      * If you perform refactorings despite this method returning false, KeY will throw an exception
      * because the formula that contains the modality in which the contract was applied does not have
@@ -70,8 +69,9 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
             if ((rule instanceof WhileInvariantRule && WhileInvariantRule.INITIAL_INVARIANT_ONLY_HINT.equals(hint)) ||
                 (rule instanceof WhileInvariantRule && WhileInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint)) ||
                 (rule instanceof UseOperationContractRule && UseOperationContractRule.FINAL_PRE_TERM_HINT.equals(hint)) ||
-                (rule instanceof AbstractBlockSpecificationElementRule && AbstractBlockSpecificationElementRule.FULL_PRECONDITION_TERM_HINT.equals(hint)) ||
-                (rule instanceof AbstractBlockSpecificationElementRule && AbstractBlockSpecificationElementRule.NEW_POSTCONDITION_TERM_HINT.equals(hint)) ||
+                //TODO weigl: unresolved during merge
+                // (rule instanceof AbstractBlockSpecificationElementRule && AbstractBlockSpecificationElementRule.FULL_PRECONDITION_TERM_HINT.equals(hint)) ||
+                // (rule instanceof AbstractBlockSpecificationElementRule && AbstractBlockSpecificationElementRule.NEW_POSTCONDITION_TERM_HINT.equals(hint)) ||
                 (rule instanceof CloseAfterMerge && CloseAfterMerge.FINAL_WEAKENING_TERM_HINT.equals(hint))) {
                ProofOblInput problem = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
                if (problem instanceof AbstractOperationPO) {

@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Proof;
 
 /**
@@ -49,7 +48,6 @@ public abstract class AbstractBreakpoint implements IBreakpoint {
    public void updateState(int maxApplications, 
                           long timeout, 
                           Proof proof, 
-                          IGoalChooser goalChooser, 
                           long startTime, 
                           int countApplied, 
                           Goal goal) {

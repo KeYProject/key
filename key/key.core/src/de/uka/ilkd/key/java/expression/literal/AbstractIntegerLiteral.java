@@ -76,11 +76,10 @@ public abstract class AbstractIntegerLiteral extends Literal {
         return getValueString();
     }
 
-    @Override
-    public int hashCode() {
-        int result = 17;
-        result = (int) (37 * result + getValueString().hashCode());
-        return result;
+    @Override    
+    protected int computeHashCode(){
+        int localHash = (int) (17*super.computeHashCode() + getValue());
+        return localHash;
     }
 
     @Override

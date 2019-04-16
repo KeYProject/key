@@ -22,7 +22,7 @@
 [StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
 [StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_ON
 [Strategy]Timeout=-1
-[Strategy]MaximumNumberOfAutomaticApplications=200
+[Strategy]MaximumNumberOfAutomaticApplications=2000
 [SMTSettings]integersMaximum=2147483645
 [Choice]DefaultChoices=assertions-assertions\\:safe , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:ban , JavaCard-JavaCard\\:on , Strings-Strings\\:on , modelFields-modelFields\\:showSatisfiability , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , moreSeqRules-moreSeqRules\\:on , permissions-permissions\\:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off
 [SMTSettings]useConstantsForBigOrSmallIntegers=true
@@ -373,12 +373,7 @@ tryclose branch;
 # s_0[v_y_0]!= v_y_0  and s_0[v_x_0]!= v_y_0
 cut 'int::seqGet(s_0, v_y_0)=v_x_0';
 # This corresponds to case B4ii  in the Notes.
-instantiate hide var=v_r with='seqSwap(seqSwap(s_0,jv_1,v_y_0),jv_1,v_x_0)';
 # in the following r4 refers to this instantion
-rule andRight;
-rule andRight;
-rule andRight;
-rule andRight;
 tryclose branch;
 # established: r4 is of the correct length
 rule seqNPermSwapNPerm;
@@ -393,113 +388,14 @@ rule impLeft;
 tryclose branch;
 tryclose branch;
 # established: r4 is permutation
-rule allRight;
-rule impRight;
-rule andLeft;
-# start: providing equation for latter use
-#        in many case distinctions 
-instantiate var=iv with='v_iv_0';
-rule impLeft;
-tryclose branch;
-instantiate var=iv with='v_iv_0';
-rule impLeft;
-tryclose branch;
-# end: providing equation for latter use
-rule getOfSwap;
-rule ifthenelse_negated;
-rule ifthenelse_split occ=0;
-rule andLeft;
-rule andLeft;
-rule andLeft;
-rule ifthenelse_split occ=0;
-rule getOfSwap;
-rule ifthenelse_negated;
-rule ifthenelse_split occ=0;
-rule andLeft;
-rule andLeft;
-rule andLeft;
-rule ifthenelse_split occ=0;
-tryclose branch;
-rule ifthenelse_split occ=0;
-tryclose branch;
-tryclose branch;
-tryclose branch;
-rule ifthenelse_split occ=0;
-rule getOfSwap;
-rule ifthenelse_negated;
-rule ifthenelse_split occ=0;
-rule andLeft;
-rule andLeft;
-rule andLeft;
-rule ifthenelse_split occ=0;
-tryclose branch;
-rule ifthenelse_split occ=0;
-tryclose branch;
-tryclose branch;
-tryclose branch;
-rule getOfSwap;
-rule ifthenelse_negated;
-rule ifthenelse_split occ=0;
-rule andLeft;
-rule andLeft;
-rule andLeft;
-rule ifthenelse_split occ=0;
-tryclose branch;
-rule ifthenelse_split occ=0;
-tryclose branch;
-tryclose branch;
-tryclose branch;
-tryclose branch;
-# established: witness property for r4
-rule getOfSwap occ=0;
-rule ifthenelse_negated;
-rule ifthenelse_split occ=0;
-rule andLeft;
-rule andLeft;
-rule andLeft;
-rule ifthenelse_split occ=0;
-tryclose branch;
-rule ifthenelse_split occ=0;
-tryclose branch;
-rule getOfSwap occ=0;
-rule ifthenelse_negated;
-rule ifthenelse_split occ=0;
-rule andLeft;
-rule andLeft;
-rule andLeft;
-rule ifthenelse_split occ=0;
-tryclose branch;
-rule ifthenelse_split occ=0;
-tryclose branch;
-tryclose branch;
-tryclose branch;
-tryclose branch;
-# established: r4 fixes v_x_0
-rule getOfSwap;
-rule ifthenelse_negated;
-rule ifthenelse_split occ=0;
-rule andLeft;
-rule andLeft;
-rule andLeft;
-rule ifthenelse_split occ=0;
-tryclose branch;
-rule ifthenelse_split occ=0;
-tryclose branch;
-tryclose branch;
-tryclose branch;
 # established: r4 fixes v_y_0
 # from now on  v_x_0 != v_y_0 and s_0[v_x_0]!= v_x_0 and  
 # s_0[v_y_0]!= v_y_0  and s_0[v_x_0]!= v_y_0 and  s_0[v_y_0]!=v_x_0;
-instantiate hide var='v_r' with='seqSwap(seqSwap(s_0,v_x_0,jv_0),v_y_0,jv_1)';
 # this corresponds to case B4iv in the Notes
 # in the following r5 refers to this instantion
-rule andRight;
-rule andRight;
-rule andRight;
-rule andRight;
 tryclose branch;
 # established: r5 is of the correct length
-rule seqNPermSwapNPerm;
+rule seqNPermSwapNPerm formula='seqNPerm(s_0)';
 instantiate hide var=iv with='v_x_0';
 instantiate hide var=jv with='jv_0';
 rule impLeft;
@@ -507,122 +403,17 @@ tryclose branch;
 rule seqNPermSwapNPerm formula='seqNPerm(seqSwap(s_0,v_x_0,jv_0))';
 instantiate hide var=iv with='v_y_0';
 instantiate hide var=jv with='jv_1';
+instantiate hide var=v_r with='seqSwap(seqSwap(s_0, v_x_0, jv_0), v_y_0, jv_1)';
+tryclose branch;
+rule seqNPermSwapNPerm formula='seqNPerm(s_0)';
+instantiate hide var=iv with='v_x_0';
+instantiate hide var=jv with='jv_0';
 rule impLeft;
 tryclose branch;
+rule seqNPermSwapNPerm formula='seqNPerm(seqSwap(s_0,v_x_0,jv_0))';
+instantiate hide var=iv with='v_y_0';
+instantiate hide var=jv with='jv_1';
+instantiate hide var=v_r with='seqSwap(seqSwap(s_0, v_x_0, jv_0), v_y_0, jv_1)';
 tryclose branch;
-# established: r5 is permutation
-rule allRight;
-rule impRight;
-instantiate hide var=iv with='v_iv_0';
-rule impLeft;
-tryclose branch;
-rule andLeft;
-rule getOfSwap occ=0;
-rule ifthenelse_negated;
-rule ifthenelse_split occ=0;
-rule andLeft;
-rule andLeft;
-rule andLeft;
-tryclose branch;
-rule getOfSwap occ=0;
-rule ifthenelse_negated;
-rule ifthenelse_split occ=0;
-rule ifthenelse_split occ=0;
-rule andLeft;
-rule andLeft;
-rule andLeft;
-rule ifthenelse_split occ=0;
-tryclose branch;
-tryclose branch;
-tryclose branch;
-rule ifthenelse_split occ=0;
-tryclose branch;
-tryclose branch;
-tryclose branch;
-rule ifthenelse_split occ=0;
-rule getOfSwap occ=0;
-rule ifthenelse_negated;
-rule ifthenelse_split occ=0;
-rule andLeft;
-rule andLeft;
-rule andLeft;
-rule ifthenelse_split occ=0;
-tryclose branch;
-rule ifthenelse_split occ=0;
-tryclose branch;
-tryclose branch;
-tryclose branch;
-tryclose branch;
-rule getOfSwap occ=0;
-rule ifthenelse_negated;
-rule ifthenelse_split occ=0;
-rule andLeft;
-rule andLeft;
-rule andLeft;
-rule ifthenelse_split occ=0;
-tryclose branch;
-rule ifthenelse_split occ=0;
-tryclose branch;
-tryclose branch;
-tryclose branch;
-tryclose branch;
-# established: witness property for r5
-rule getOfSwap occ=0;
-rule ifthenelse_negated;
-rule ifthenelse_split occ=0;
-rule andLeft;
-rule andLeft;
-rule andLeft;
-rule ifthenelse_split occ=0;
-tryclose branch;
-rule ifthenelse_split occ=0;
-tryclose branch;
-rule getOfSwap occ=0;
-rule ifthenelse_negated;
-rule ifthenelse_split occ=0;
-rule andLeft;
-rule andLeft;
-rule andLeft;
-rule ifthenelse_split occ=0;
-tryclose branch;
-rule ifthenelse_split occ=0;
-tryclose branch;
-tryclose branch;
-tryclose branch;
-tryclose branch;
-rule getOfSwap;
-rule ifthenelse_negated;
-rule ifthenelse_split occ=0;
-rule andLeft;
-rule andLeft;
-rule andLeft;
-rule ifthenelse_split occ=0;
-tryclose branch;
-rule getOfSwap;
-rule ifthenelse_negated;
-rule ifthenelse_split occ=0;
-rule andLeft;
-rule andLeft;
-rule andLeft;
-rule ifthenelse_split occ=0;
-tryclose branch;
-rule ifthenelse_split occ=0;
-tryclose branch;
-tryclose branch;
-tryclose branch;
-tryclose branch;
-rule getOfSwap;
-rule ifthenelse_negated;
-rule ifthenelse_split occ=0;
-rule andLeft;
-rule andLeft;
-rule andLeft;
-rule ifthenelse_split occ=0;
-tryclose branch;
-rule ifthenelse_split occ=0;
-tryclose branch;
-tryclose branch;
-tryclose branch;
-# established: r5 fixes v_y_0
 "
 

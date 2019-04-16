@@ -61,11 +61,20 @@
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <loopInvariant name="invariant: (  i &lt;= javaAddInt(self.high, 1)
- &amp;   javaMulInt(self.low, 2)
-   = javaMulInt(i, javaSubInt(i, 1)))&lt;&lt;SC&gt;&gt;;
-variant: javaAddInt(javaSubInt(self.high, i), 1)
-mod: {(self, E_Loop::$low)}" pathCondition="true" pathConditionChanged="false" initiallyValid="false">
+            <loopInvariant name="invariant: (  leq(i,
+       javaAddInt(int::select(heap,
+                              self,
+                              E_Loop::$high),
+                  Z(1(#))))
+ &amp;   javaMulInt(int::select(heap, self, E_Loop::$low),
+                Z(2(#)))
+   = javaMulInt(i, javaSubInt(i, Z(1(#)))))&lt;&lt;SC&gt;&gt;;
+variant: javaAddInt(javaSubInt(int::select(heap,
+                                  self,
+                                  E_Loop::$high),
+                      i),
+           Z(1(#)))
+mod: singleton(self, E_Loop::$low)" pathCondition="true" pathConditionChanged="false" initiallyValid="false">
                <constraint name="wellFormed(heap)"/>
                <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>

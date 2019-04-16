@@ -14,15 +14,15 @@
    </variable>
    <methodCall name="&lt;call ConditionalValuesTest.main(x,y)&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="x" isArrayIndex="false">
-         <value name="x {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         <value name="x {equals(x,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(x,null)">
          </value>
-         <value name="x {true}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+         <value name="x {not(equals(x,null))}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(x,null))">
          </value>
       </variable>
       <variable name="y" isArrayIndex="false">
-         <value name="y {equals(y,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,null)">
+         <value name="y {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
-         <value name="y {not(equals(y,null))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,null))">
+         <value name="y {true}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
       <variable name="exc" isArrayIndex="false">
@@ -31,15 +31,15 @@
       </variable>
       <statement name="x.value=2;" pathCondition="true" pathConditionChanged="false">
          <variable name="x" isArrayIndex="false">
-            <value name="x {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            <value name="x {equals(x,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(x,null)">
             </value>
-            <value name="x {true}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+            <value name="x {not(equals(x,null))}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(x,null))">
             </value>
          </variable>
          <variable name="y" isArrayIndex="false">
-            <value name="y {equals(y,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,null)">
+            <value name="y {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
-            <value name="y {not(equals(y,null))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,null))">
+            <value name="y {true}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
          <variable name="exc" isArrayIndex="false">

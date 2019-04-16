@@ -80,7 +80,7 @@ class Instantiation {
       synchronized(Instantiation.class) {
          lastQuantifiedFormula = qf;
          lastSequent = seq;
-         lastResult = new Instantiation(qf, seq, services);
+         lastResult = result;
       }
       return result;
    }

@@ -107,7 +107,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -117,8 +116,9 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.AbstractBlockContractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementBuiltInRuleApp;
+import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractExternalBuiltInRuleApp;
@@ -1166,7 +1166,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} represent node as block contract, {@code false} represent node as something else. 
     */
    public static boolean isBlockSpecificationElement(Node node, RuleApp ruleApp) {
-      return ruleApp instanceof AbstractBlockSpecificationElementBuiltInRuleApp;
+      return ruleApp instanceof AbstractAuxiliaryContractBuiltInRuleApp;
    }
 
    /**
