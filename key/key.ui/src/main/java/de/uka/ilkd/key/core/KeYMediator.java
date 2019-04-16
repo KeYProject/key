@@ -15,10 +15,10 @@ package de.uka.ilkd.key.core;
 
 import java.util.EventObject;
 
-import javax.swing.Action;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
+import de.uka.ilkd.key.gui.proofExploration.ExplorationModeModel;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -105,7 +105,10 @@ public class KeYMediator {
      * boolean flag indicating if the GUI is in auto mode
      */
     private boolean inAutoMode = false;
-    
+    /**
+     * Model aof teh exploration mode  state
+     */
+    private ExplorationModeModel explorationModeModel;
 
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
@@ -547,7 +550,17 @@ public class KeYMediator {
        return inAutoMode;
    }
 
-   class KeYMediatorProofTreeListener extends ProofTreeAdapter {
+
+    public void setExplorationModeModel(ExplorationModeModel explorationModeModel) {
+        this.explorationModeModel = explorationModeModel;
+    }
+
+    public ExplorationModeModel getExplorationModeModel() {
+        return explorationModeModel;
+    }
+
+
+    class KeYMediatorProofTreeListener extends ProofTreeAdapter {
        private boolean pruningInProcess;
 
        @Override
@@ -659,7 +672,7 @@ public class KeYMediator {
      * Remove this method as soon as another solution can be found.
      */
     @Deprecated
-    public void enableWhenProofLoaded(final javax.swing.AbstractButton a) {
+    public void enableWhenProofLoaded(final AbstractButton a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
             public void selectedNodeChanged(KeYSelectionEvent e) {}

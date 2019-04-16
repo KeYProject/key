@@ -376,7 +376,7 @@ public class TermLabelManager {
          return factory.parseInstance(args, services);
       }
    }
-   
+
    /**
     * Computes the {@link TermLabel}s for the new {@link Term} via
     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock, ImmutableArray)}
@@ -393,7 +393,7 @@ public class TermLabelManager {
     * @param newTerm The new {@link Term} to update its labels.
     * @return The {@link Term} with updates labels.
     */
-   public static Term label(Services services, 
+   public static Term label(Services services,
                             TermLabelState state,
                             PosInOccurrence applicationPosInOccurrence,
                             Rule rule,
@@ -405,7 +405,7 @@ public class TermLabelManager {
       Term applicationTerm = applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
       return label(services, state, applicationTerm, applicationPosInOccurrence, rule, ruleApp, goal, hint, tacletTerm, newTerm);
    }
-   
+
    /**
     * Computes the {@link TermLabel}s for the new {@link Term} via
     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock, ImmutableArray)}
@@ -423,7 +423,7 @@ public class TermLabelManager {
     * @param newTerm The new {@link Term} to update its labels.
     * @return The {@link Term} with updates labels.
     */
-   public static Term label(Services services, 
+   public static Term label(Services services,
                             TermLabelState state,
                             Term applicationTerm,
                             PosInOccurrence applicationPosInOccurrence,
@@ -441,7 +441,7 @@ public class TermLabelManager {
          return newTerm;
       }
    }
-   
+
    /**
     * Computes the {@link TermLabel}s for the new {@link Term} via
     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock, ImmutableArray)}
@@ -558,7 +558,7 @@ public class TermLabelManager {
                                                              ImmutableArray<TermLabel> newTermOriginalLabels) {
       TermLabelManager manager = getTermLabelManager(services);
       if (manager != null) {
-         return manager.instantiateLabels(state, 
+         return manager.instantiateLabels(state,
                                           services,
                                           applicationPosInOccurrence,
                                           applicationTerm,
@@ -736,7 +736,7 @@ public class TermLabelManager {
 //         }
 //      }
    }
-   
+
    /**
     * <p>
     * Performs the given {@link TermLabelPolicy} instances.
@@ -885,7 +885,11 @@ public class TermLabelManager {
                                              Set<TermLabel> newLabels) {
       for (Term child : applicationTerm.subs()) {
          for (TermLabel label : child.getLabels()) {
+
             ChildTermLabelPolicy policy = policies.get(label.name());
+            if (rule.name().toString().startsWith("applyEq")) {
+                System.out.println("label=" + label + "\npolicy=" + policy + "\n\n");
+            }
             if (policy != null && policy.addLabel(services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, child, label)) {
                newLabels.add(label);
             }
@@ -988,7 +992,7 @@ public class TermLabelManager {
          update.updateLabels(state, services, applicationPosInOccurrence, applicationTerm, modalityTerm, rule, ruleApp, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, newLabels);
       }
    }
-   
+
    /**
     * Refactors all labels on the {@link PosInOccurrence} in the given {@link Term} of a {@link SequentFormula}.
     * @param state The {@link TermLabelState} of the current rule application.
@@ -1261,7 +1265,7 @@ public class TermLabelManager {
          refactorSemisequent(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, sequent.succedent(), false, refactorings.getSequentRefactorings());
       }
    }
-   
+
    /**
     * Replaces the {@link Term} at the specified {@link PosInOccurrence}.
     * @param state The {@link TermLabelState} of the current rule application.
@@ -1272,9 +1276,9 @@ public class TermLabelManager {
     * @return The root of the {@link PosInOccurrence} containing the new {@link Term} at the specified {@link PosInOccurrence}.
     */
    protected Term replaceTerm(TermLabelState state,
-                              PosInOccurrence pio, 
-                              Term newTerm, 
-                              TermFactory tf, 
+                              PosInOccurrence pio,
+                              Term newTerm,
+                              TermFactory tf,
                               ImmutableList<TermLabelRefactoring> parentRefactorings,
                               Services services,
                               PosInOccurrence applicationPosInOccurrence,
@@ -1310,7 +1314,7 @@ public class TermLabelManager {
       } while (pio != null);
       return newTerm;
    }
-   
+
    /**
     * Computes the {@link TermLabelRefactoring} to consider.
     * @param state The {@link TermLabelState} of the current rule application.
@@ -1332,7 +1336,7 @@ public class TermLabelManager {
                                                        Object hint,
                                                        Term tacletTerm) {
       ImmutableList<TermLabelRefactoring> sequentRefactorings = ImmutableSLList.nil();
-      ImmutableList<TermLabelRefactoring> belowUpdatesRefactorings = ImmutableSLList.nil();      
+      ImmutableList<TermLabelRefactoring> belowUpdatesRefactorings = ImmutableSLList.nil();
       ImmutableList<TermLabelRefactoring> childAndGrandchildRefactorings = ImmutableSLList.nil();
       ImmutableList<TermLabelRefactoring> directChildRefactorings = ImmutableSLList.nil();
       ImmutableList<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents = ImmutableSLList.nil();
@@ -1379,7 +1383,7 @@ public class TermLabelManager {
       }
       return new RefactoringsContainer(sequentRefactorings, belowUpdatesRefactorings, childAndGrandchildRefactorings, childAndGrandchildRefactoringsAndParents, directChildRefactorings);
    }
-   
+
    /**
     * Utility class used by {@link TermLabelManager#computeRefactorings(
     *     TermLabelState, TermServices, PosInOccurrence, Term, Rule, Goal,
@@ -1391,7 +1395,7 @@ public class TermLabelManager {
        * The {@link TermLabelRefactoring} for {@link RefactoringScope#SEQUENT}.
        */
       private final ImmutableList<TermLabelRefactoring> sequentRefactorings;
-      
+
       /**
        * The {@link TermLabelRefactoring} for {@link RefactoringScope#APPLICATION_BELOW_UPDATES}.
        */
@@ -1411,7 +1415,7 @@ public class TermLabelManager {
        * The {@link TermLabelRefactoring} for {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN}.
        */
       private final ImmutableList<TermLabelRefactoring> directChildRefactorings;
-      
+
       /**
        * Constructor.
        * @param sequentRefactorings The {@link TermLabelRefactoring} for {@link RefactoringScope#SEQUENT}.
@@ -1463,7 +1467,7 @@ public class TermLabelManager {
       public ImmutableList<TermLabelRefactoring> getDirectChildRefactorings() {
          return directChildRefactorings;
       }
-      
+
       /**
        * Returns all {@link TermLabelRefactoring}s which operate on application child and grand children,
        * which are {@link #getChildAndGrandchildRefactorings()} and {@link #getChildAndGrandchildRefactoringsAndParents()}.
@@ -1481,7 +1485,7 @@ public class TermLabelManager {
          return belowUpdatesRefactorings;
       }
    }
-   
+
    /**
     * Refactors the labels of the application term.
     * @param state The {@link TermLabelState} of the current rule application.
@@ -1505,8 +1509,8 @@ public class TermLabelManager {
                                           Term tacletTerm,
                                           RefactoringsContainer refactorings,
                                           TermFactory tf) {
-      if (applicationTerm != null && 
-          (!refactorings.getDirectChildRefactorings().isEmpty() || 
+      if (applicationTerm != null &&
+          (!refactorings.getDirectChildRefactorings().isEmpty() ||
            !refactorings.getChildAndGrandchildRefactorings().isEmpty() ||
            !refactorings.getBelowUpdatesRefactorings().isEmpty())) {
          Term newApplicationTerm = applicationTerm;
@@ -1628,7 +1632,7 @@ public class TermLabelManager {
          }
       }
       ImmutableArray<TermLabel> newLabels = performRefactoring(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, term, activeRefactorings);
-      return subsChanged || !newLabels.equals(term.getLabels()) ? 
+      return subsChanged || !newLabels.equals(term.getLabels()) ?
              services.getTermFactory().createTerm(term.op(), newSubs, term.boundVars(), term.javaBlock(), newLabels) :
              term;
    }
@@ -1664,7 +1668,7 @@ public class TermLabelManager {
       }
       // Give all TermLabelInstantiator instances the chance to remove or to add labels from/to the list
       for (TermLabelRefactoring refactoring : activeRefactorings) {
-         refactoring.refactoreLabels(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, term, newLabels);
+         refactoring.refactorLabels(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, term, newLabels);
       }
       return new ImmutableArray<TermLabel>(newLabels);
    }
@@ -1714,7 +1718,7 @@ public class TermLabelManager {
        * The {@link TermLabelRefactoring} instances.
        */
       private final ImmutableList<TermLabelRefactoring> termLabelRefactorings;
-      
+
       /**
        * The {@link TermLabelMerger} instance.
        */
@@ -1835,7 +1839,7 @@ public class TermLabelManager {
          return termLabelMerger;
       }
    }
-   
+
    /**
     * Searches the inner most {@link TermLabel} wit the given {@link Name} in the parent hierarchy of the {@link PosInOccurrence}.
     * @param pio The {@link PosInOccurrence} to search in.
@@ -1851,7 +1855,7 @@ public class TermLabelManager {
       }
       return label;
    }
-   
+
    /**
     * Merges the {@link TermLabel}s of the rejected {@link SequentFormula}s into the resulting {@link Sequent}.
     * @param currentSequent The {@link SequentChangeInfo} which lists the rejected {@link SequentFormula}s.
@@ -1863,7 +1867,7 @@ public class TermLabelManager {
          manager.mergeLabels(services, currentSequent);
       }
    }
-   
+
    /**
     * Merges the {@link TermLabel}s of the rejected {@link SequentFormula}s into the resulting {@link Sequent}.
     * @param services The {@link Services} to use.
@@ -1877,7 +1881,7 @@ public class TermLabelManager {
          mergeLabels(currentSequent, services, rejectedSF, false);
       }
    }
-   
+
    /**
     * Merges the {@link TermLabel}s of the given {@link SequentFormula} into the resulting {@link Sequent}.
     * @param currentSequent The {@link SequentChangeInfo} which lists the rejected {@link SequentFormula}s.
@@ -1885,9 +1889,9 @@ public class TermLabelManager {
     * @param rejectedSF The rejected {@link SequentFormula} to work with.
     * @param inAntecedent {@code true} rejected {@link SequentFormula} is in antecedent, {@code false} it is in succedent.
     */
-   protected void mergeLabels(SequentChangeInfo currentSequent, 
-                              Services services, 
-                              SequentFormula rejectedSF, 
+   protected void mergeLabels(SequentChangeInfo currentSequent,
+                              Services services,
+                              SequentFormula rejectedSF,
                               boolean inAntecedent) {
       final Term rejectedTerm = rejectedSF.formula();
       if (rejectedTerm.hasLabels()) {

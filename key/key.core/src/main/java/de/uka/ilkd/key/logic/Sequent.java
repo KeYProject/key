@@ -464,4 +464,8 @@ public class Sequent implements Iterable<SequentFormula> {
     public boolean contains(SequentFormula form) {
         return antecedent.contains(form) || succedent.contains(form);
     }
+
+    public ImmutableList<SequentFormula> asList () {
+    return antecedent.asList().append(succedent.asList());
+    }
 }

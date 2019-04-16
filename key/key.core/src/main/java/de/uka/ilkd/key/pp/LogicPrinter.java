@@ -24,6 +24,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -151,13 +152,17 @@ public class LogicPrinter {
 
     public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         final NotationInfo ni = new NotationInfo();
-
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(),
-                                          ni,
-                                          services);
         if (services != null) {
             ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
         }
+
+        // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
+        // because the SequentViewLogicPrinter respects default TermLabel visibility settings.
+        LogicPrinter p = new SequentViewLogicPrinter(
+                new ProgramPrinter(),
+                ni, services,
+                new TermLabelVisibilityManager());
+
         try {
             p.printTerm(t);
         } catch (IOException ioe) {
@@ -171,9 +176,13 @@ public class LogicPrinter {
         if (services != null) {
             ni.refresh(services);
         }
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(),
-                                          ni,
-                                          services);
+
+        // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
+        // because the SequentViewLogicPrinter respects default TermLabel visibility settings.
+        LogicPrinter p = new SequentViewLogicPrinter(
+                new ProgramPrinter(),
+                ni, services,
+                new TermLabelVisibilityManager());
 
         try {
 			p.printSemisequent(s);
@@ -189,9 +198,14 @@ public class LogicPrinter {
         if (services != null) {
             ni.refresh(services);
         }
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(),
-                                          ni,
-                                          services);
+
+        // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
+        // because the SequentViewLogicPrinter respects default TermLabel visibility settings.
+        LogicPrinter p = new SequentViewLogicPrinter(
+                new ProgramPrinter(),
+                ni, services,
+                new TermLabelVisibilityManager());
+
         p.printSequent(s);
         return p.result().toString();
     }

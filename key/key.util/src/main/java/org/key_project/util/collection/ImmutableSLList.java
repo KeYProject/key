@@ -245,12 +245,12 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
                 return result;
             }
         }
-        
+
         /**
          * return true if predicate is fullfilled for at least one element
          * @param predicate the predicate
          * @return true if predicate is fullfilled for at least one element
-         */    
+         */
         @Override
         public boolean exists(Predicate<S> predicate) {
             ImmutableList<S> list = this;

@@ -12,6 +12,7 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
@@ -19,12 +20,21 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 
 public class TermLabelVisibilityManager implements VisibleTermLabels {
+
+   private static Name[] HIDDEN_BY_DEFAULT = { OriginTermLabel.NAME };
+
    private boolean showLabels = true;
-   
+
    private final Set<Name> hiddenLabels = new HashSet<Name>();
-   
+
    private final List<TermLabelVisibilityManagerListener> listeners = new LinkedList<TermLabelVisibilityManagerListener>();
-   
+
+   public TermLabelVisibilityManager() {
+       for (Name name : HIDDEN_BY_DEFAULT) {
+           hiddenLabels.add(name);
+       }
+   }
+
    public boolean isShowLabels() {
       return showLabels;
    }
@@ -35,11 +45,11 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
          fireVisibleLabelsChanged(new TermLabelVisibilityManagerEvent(this));
       }
    }
-   
+
    public boolean isHidden(Name labelName) {
       return hiddenLabels.contains(labelName);
    }
-   
+
    public void setHidden(Name labelName, boolean hidden) {
       if (hidden) {
          if (hiddenLabels.add(labelName)) {
@@ -73,7 +83,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
          return false;
       }
    }
-   
+
    /**
     * Registers the given {@link TermLabelVisibilityManagerListener}.
     * @param l The {@link TermLabelVisibilityManagerListener} to add.
@@ -83,7 +93,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
          listeners.add(l);
       }
    }
-   
+
    /**
     * Unregisters the given {@link TermLabelVisibilityManagerListener}.
     * @param l The {@link TermLabelVisibilityManagerListener} to remove.
@@ -93,14 +103,14 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
          listeners.remove(l);
       }
    }
-   
+
    /**
     * Returns all available {@link TermLabelVisibilityManagerListener}.
     */
    public TermLabelVisibilityManagerListener[] getTermLabelVisibilityManagerListeners() {
       return listeners.toArray(new TermLabelVisibilityManagerListener[listeners.size()]);
    }
-   
+
    /**
     * Fires the event {@link TermLabelVisibilityManagerListener#visibleLabelsChanged(TermLabelVisibilityManagerEvent)} to all listener.
     * @param e The event object.

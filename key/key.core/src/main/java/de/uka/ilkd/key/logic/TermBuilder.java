@@ -160,7 +160,7 @@ public class TermBuilder {
      * {@link Name}s is free. This can be problematic, since {@link Namespace}s
      * are now local to goals. Use {@link #newName(String, NamespaceSet)} to
      * make sure that you have all the {@link Name}s you need available.
-     * 
+     *
      * @see #newName(String, NamespaceSet)
      * @param baseName
      *            The base name (prefix) for the name to generate.
@@ -176,13 +176,13 @@ public class TermBuilder {
      * Returns an available name constructed by affixing a counter to the passed
      * base name.
      * <p>
-     * 
+     *
      * Warning (DS): This method ignores the baseName if there are free name
      * proposals. This can, for instance, cause troubles in loading proofs
      * containing rule apps with more than one introduced (and saved) new name.
      * In this case, the order of new names in the saved proof file matters (the
      * first unused name is returned, regardless of the baseName).
-     * 
+     *
      * @param baseName
      *            The base name (prefix) for the name to generate.
      * @param localNamespace
@@ -564,7 +564,7 @@ public class TermBuilder {
     /** General (unbounded) sum */
     public Term sum(ImmutableList<QuantifiableVariable> qvs, Term range,
             Term t) {
-        final Function sum = (Function) services.getNamespaces().functions()
+        final Function sum = services.getNamespaces().functions()
                 .lookup("sum");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
         Term res = func(sum, new Term[] { convertToBoolean(range), t },
@@ -587,7 +587,7 @@ public class TermBuilder {
     /** General (unbounded) product */
     public Term prod(ImmutableList<QuantifiableVariable> qvs, Term range,
             Term t, TermServices services) {
-        final Function prod = (Function) services.getNamespaces().functions()
+        final Function prod = services.getNamespaces().functions()
                 .lookup("prod");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
         Term res = func(prod, new Term[] { convertToBoolean(range), t },
@@ -602,7 +602,7 @@ public class TermBuilder {
     /** minimum operator */
     public Term min(ImmutableList<QuantifiableVariable> qvs, Term range, Term t,
             TermServices services) {
-        final Function min = (Function) services.getNamespaces().functions()
+        final Function min = services.getNamespaces().functions()
                 .lookup("min");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
         Term res = func(min, new Term[] { convertToBoolean(range), t },
@@ -617,7 +617,7 @@ public class TermBuilder {
     /** minimum operator */
     public Term max(ImmutableList<QuantifiableVariable> qvs, Term range, Term t,
             TermServices services) {
-        final Function max = (Function) services.getNamespaces().functions()
+        final Function max = services.getNamespaces().functions()
                 .lookup("max");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
         Term res = func(max, new Term[] { convertToBoolean(range), t },
@@ -802,7 +802,7 @@ public class TermBuilder {
 
     /**
      * Creates a substitution term
-     * 
+     *
      * @param substVar
      *            the QuantifiableVariable to be substituted
      * @param substTerm
@@ -835,7 +835,7 @@ public class TermBuilder {
 
     public Term pair(Term first, Term second) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
-        final Function f = (Function) funcNS.lookup(new Name("pair"));
+        final Function f = funcNS.lookup(new Name("pair"));
         if (f == null)
             throw new RuntimeException("LDT: Function pair not found.\n"
                     + "It seems that there are definitions missing from the .key files.");
@@ -846,7 +846,7 @@ public class TermBuilder {
 
     public Term prec(Term mby, Term mbyAtPre) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
-        final Function f = (Function) funcNS.lookup(new Name("prec"));
+        final Function f = funcNS.lookup(new Name("prec"));
         if (f == null)
             throw new RuntimeException("LDT: Function prec not found.\n"
                     + "It seems that there are definitions missing from the .key files.");
@@ -856,7 +856,7 @@ public class TermBuilder {
 
     public Term measuredByCheck(Term mby) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
-        final Function f = (Function) funcNS
+        final Function f = funcNS
                 .lookup(new Name("measuredByCheck"));
         if (f == null)
             throw new RuntimeException(
@@ -867,7 +867,7 @@ public class TermBuilder {
 
     public Term measuredBy(Term mby) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
-        final Function f = (Function) funcNS.lookup(new Name("measuredBy"));
+        final Function f = funcNS.lookup(new Name("measuredBy"));
         if (f == null)
             throw new RuntimeException("LDT: Function measuredBy not found.\n"
                     + "It seems that there are definitions missing from the .key files.");
@@ -876,7 +876,7 @@ public class TermBuilder {
 
     public Function getMeasuredByEmpty() {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
-        final Function f = (Function) funcNS
+        final Function f = funcNS
                 .lookup(new Name("measuredByEmpty"));
         if (f == null)
             throw new RuntimeException(
@@ -1292,31 +1292,31 @@ public class TermBuilder {
     }
 
     public Term inByte(Term var) {
-        Function f = (Function) services.getNamespaces().functions()
+        Function f = services.getNamespaces().functions()
                 .lookup(new Name("inByte"));
         return func(f, var);
     }
 
     public Term inShort(Term var) {
-        Function f = (Function) services.getNamespaces().functions()
+        Function f = services.getNamespaces().functions()
                 .lookup(new Name("inShort"));
         return func(f, var);
     }
 
     public Term inChar(Term var) {
-        Function f = (Function) services.getNamespaces().functions()
+        Function f = services.getNamespaces().functions()
                 .lookup(new Name("inChar"));
         return func(f, var);
     }
 
     public Term inInt(Term var) {
-        Function f = (Function) services.getNamespaces().functions()
+        Function f = services.getNamespaces().functions()
                 .lookup(new Name("inInt"));
         return func(f, var);
     }
 
     public Term inLong(Term var) {
-        Function f = (Function) services.getNamespaces().functions()
+        Function f = services.getNamespaces().functions()
                 .lookup(new Name("inLong"));
         return func(f, var);
     }
@@ -1540,7 +1540,7 @@ public class TermBuilder {
      * null means that it is recursively defined for arrays. See bug #1392.
      */
     public Term deepNonNull(Term o, Term d) {
-        final Function nonNull = (Function) services.getNamespaces().functions()
+        final Function nonNull = services.getNamespaces().functions()
                 .lookup("nonNull");
         final Term heap = getBaseHeap();
         return func(nonNull, heap, o, d);
@@ -1646,6 +1646,59 @@ public class TermBuilder {
         return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
     }
 
+    /**
+     * Applies the labels to the term and almost every (direct or indirect) sub-term recursively.
+     *
+     * <p> The labels are not added to heap variables. </p>
+     *
+     * @param term term to label.
+     * @param labels the labels to apply.
+     * @return a labeled term.
+     */
+    public Term addLabelToAllSubs(Term term, ImmutableArray<TermLabel> labels) {
+        if (labels == null || labels.isEmpty()
+                || services.getTypeConverter().getHeapLDT().getHeap().sort().equals(term.sort())) {
+            return term;
+        }
+
+        ImmutableArray<Term> oldSubs = term.subs();
+        Term[] newSubs = new Term[oldSubs.size()];
+
+        for (int i = 0; i < newSubs.length; ++i) {
+            newSubs[i] = addLabelToAllSubs(oldSubs.get(i), labels);
+        }
+
+
+        Term result = tf.createTerm(
+                term.op(),
+                newSubs,
+                term.boundVars(),
+                term.javaBlock(),
+                term.getLabels());
+        result = addLabel(result, labels);
+        return result;
+    }
+
+    /**
+     * Applies the label to the term and almost every (direct or indirect) sub-term recursively.
+     *
+     * <p> The label is not added to heap variables. </p>
+     *
+     * @param term term to label.
+     * @param label the label to apply.
+     * @return a labeled term.
+     */
+    public Term addLabelToAllSubs(Term term, TermLabel label) {
+        return addLabelToAllSubs(term, new ImmutableArray<TermLabel>(label));
+    }
+
+    /**
+     * Adds labels to a term.
+     * 
+     * @param term the term.
+     * @param labels the labels to add.
+     * @return the term with the labels added.
+     */
     public Term addLabel(Term term, ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty()) && !term.hasLabels()) {
             return term;
@@ -1668,6 +1721,13 @@ public class TermBuilder {
         }
     }
 
+    /**
+     * Adds a label to a term.
+     * 
+     * @param term the term.
+     * @param label the label to add.
+     * @return the term with the label added.
+     */
     public Term addLabel(Term term, TermLabel label) {
         if (label == null && !term.hasLabels()) {
             return term;
@@ -1676,6 +1736,13 @@ public class TermBuilder {
         }
     }
 
+    /**
+     * Applies labels to a term, removing any existing labels.
+     * 
+     * @param term the term.
+     * @param labels the labels to apply.
+     * @return the modified term.
+     */
     public Term label(Term term, ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty())) {
             return term;
@@ -1685,6 +1752,13 @@ public class TermBuilder {
         }
     }
 
+    /**
+     * Applies a label to a term, removing any existing labels.
+     * 
+     * @param term the term.
+     * @param label the label to apply.
+     * @return the modified term.
+     */
     public Term label(Term term, TermLabel label) {
         if (label == null) {
             return term;
@@ -2027,6 +2101,42 @@ public class TermBuilder {
     // misc (moved from key.util.MiscTools)
     // -------------------------------------------------------------------------
 
+    /**
+     * Replaces a child term by another one.
+     *
+     * @param term the term in which to perform the replacement.
+     * @param pos the position at which to perform the replacement.
+     * @param replacement the replacement term.
+     * @return {@code term}, with the child at {@code pos} replaced by {@code replacement}.
+     */
+    public Term replace(Term term, PosInTerm pos, Term replacement) {
+        return replace(term, pos, replacement, 0);
+    }
+
+    private Term replace(Term term, PosInTerm pos, Term replacement, int depth) {
+        if (depth == pos.depth()) {
+            return replacement;
+        }
+
+        ImmutableArray<Term> oldSubs = term.subs();
+        Term[] newSubs = new Term[oldSubs.size()];
+
+        for (int i = 0; i < newSubs.length; ++i) {
+            if (pos.getIndexAt(depth) == i) {
+                newSubs[i] = replace(oldSubs.get(i), pos, replacement, depth + 1);
+            } else {
+                newSubs[i] = oldSubs.get(i);
+            }
+        }
+
+        return tf.createTerm(
+                term.op(),
+                newSubs,
+                term.boundVars(),
+                term.javaBlock(),
+                term.getLabels());
+    }
+
     public ImmutableSet<Term> unionToSet(Term s) {
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
         assert s.sort().equals(setLDT.targetSort());
@@ -2080,7 +2190,7 @@ public class TermBuilder {
 
     /**
      * Returns the {@link Sort}s of the given {@link Term}s.
-     * 
+     *
      * @param terms
      *            The given {@link Term}s.
      * @return The {@link Term} {@link Sort}s.
@@ -2096,7 +2206,7 @@ public class TermBuilder {
     /**
      * Similar behavior as {@link #imp(Term, Term)} but simplifications are not
      * performed if {@link TermLabel}s would be lost.
-     * 
+     *
      * @param t1
      *            The left side.
      * @param t2
@@ -2119,7 +2229,7 @@ public class TermBuilder {
     /**
      * Similar behavior as {@link #not(Term)} but simplifications are not
      * performed if {@link TermLabel}s would be lost.
-     * 
+     *
      * @param t
      *            The child {@link Term}.
      * @return The created {@link Term}.
@@ -2139,7 +2249,7 @@ public class TermBuilder {
     /**
      * Similar behavior as {@link #and(Iterable)} but simplifications are not
      * performed if {@link TermLabel}s would be lost.
-     * 
+     *
      * @param subTerms
      *            The sub {@link Term}s.
      * @return The created {@link Term}.
@@ -2155,7 +2265,7 @@ public class TermBuilder {
     /**
      * Similar behavior as {@link #and(Term, Term)} but simplifications are not
      * performed if {@link TermLabel}s would be lost.
-     * 
+     *
      * @param t1
      *            The left side.
      * @param t2
@@ -2178,7 +2288,7 @@ public class TermBuilder {
     /**
      * Similar behavior as {@link #or(Iterable)} but simplifications are not
      * performed if {@link TermLabel}s would be lost.
-     * 
+     *
      * @param subTerms
      *            The sub {@link Term}s.
      * @return The created {@link Term}.
@@ -2194,7 +2304,7 @@ public class TermBuilder {
     /**
      * Similar behavior as {@link #or(Term, Term)} but simplifications are not
      * performed if {@link TermLabel}s would be lost.
-     * 
+     *
      * @param t1
      *            The left side.
      * @param t2
@@ -2212,5 +2322,33 @@ public class TermBuilder {
         } else {
             return tf.createTerm(Junctor.OR, t1, t2);
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // information flow operators
+    // -------------------------------------------------------------------------
+
+    public Term eqAtLocs(Services services, Term heap1, Term locset1,
+            Term heap2, Term locset2) {
+        return (locset1.equals(empty()) && locset2.equals(empty())) ? tt
+                : func(services.getNamespaces().functions()
+                        .lookup(new Name("__EQUALS__LOCS__")), // TODO: define
+                                                               // string
+                                                               // constant
+                                                               // elsewhere
+                        heap1, locset1, heap2, locset2);
+    }
+
+    public Term eqAtLocsPost(Services services, Term heap1_pre, Term heap1_post,
+            Term locset1, Term heap2_pre, Term heap2_post, Term locset2) {
+        return (locset1.equals(empty()) && locset2.equals(empty())) ? tt
+                : func(services.getNamespaces().functions()
+                        .lookup(new Name("__EQUALS__LOCS__POST__")), // TODO:
+                                                                     // define
+                                                                     // string
+                                                                     // constant
+                                                                     // elsewhere
+                        heap1_pre, heap1_post, locset1, heap2_pre, heap2_post,
+                        locset2);
     }
 }

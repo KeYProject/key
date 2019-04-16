@@ -46,6 +46,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -75,22 +76,22 @@ import de.uka.ilkd.key.util.Triple;
 
 public final class JMLTranslator {
 
-    private final TermBuilder tb; 
+    private final TermBuilder tb;
     private final String fileName;
     private TermServices services;                          // to be used in future
     private SLTranslationExceptionManager excManager;
     private List<PositionedString> warnings = new ArrayList<PositionedString>();
 
     private EnumMap<JMLKeyWord, JMLTranslationMethod> translationMethods;
-    
+
     /*
      * Register new JML function symbols in this map. It maps JML function names
-     * to JDL function names. 
+     * to JDL function names.
      * The following files (and possibly additional ones) need adjustment
      * as well for proper recognition of the symbols:
      * ProofJavaParser.jj, jmlparser.g, jmllexer.g
      * (Kai Wallisch 04/2014)
-     * 
+     *
      */
     public static final Map<String,String> jml2jdl;
     static{
@@ -348,7 +349,7 @@ public final class JMLTranslator {
         translationMethods.put(JMLKeyWord.REQUIRES, termTranslationMethod);
         translationMethods.put(JMLKeyWord.REQUIRES_FREE, termTranslationMethod);
         translationMethods.put(JMLKeyWord.MERGE_PROC, new JMLTranslationMethod() {
-            
+
             @Override
             public Object translate(SLTranslationExceptionManager excManager,
                     Object... params) throws SLTranslationException {
@@ -447,7 +448,7 @@ public final class JMLTranslator {
                 checkParameters(params, Term.class, String.class, Services.class);
                 Term term = (Term) params[0];
                 String label = (String) params[1];
-                
+
                 @SuppressWarnings("unused")// please keep it for documentation purposes
                 TermServices services = (TermServices) params[2];
                 Term formula = term == null ? tb.tt() : tb.convertToFormula(term);
@@ -635,7 +636,7 @@ public final class JMLTranslator {
                 return res;
             }
 
-            
+
             @Override
             public Object translate(
                     SLTranslationExceptionManager excManager,
@@ -694,7 +695,7 @@ public final class JMLTranslator {
                 }
                 return res;
             }
-            
+
             @Override
             public Object translate(
                     SLTranslationExceptionManager excManager,
@@ -1089,7 +1090,7 @@ public final class JMLTranslator {
                     Object... params)
                     throws SLTranslationException {
                 checkParameters(params,
-                                ImmutableList.class, 
+                                ImmutableList.class,
                                 Map.class,
                                 Services.class);
                 @SuppressWarnings("unchecked")
@@ -1439,7 +1440,7 @@ public final class JMLTranslator {
 
                 // strip leading "\dl_"
                 String functName = escape.getText().substring(4);
-                
+
                 return translateToJDLTerm(escape, functName, services, tb, list, excManager);
                 }
         });
@@ -1720,7 +1721,7 @@ public final class JMLTranslator {
 			               .getKeYJavaType(PrimitiveType.JAVA_SEQ);
 				return new SLExpression(tb.values(),t);
 			}});
-        
+
         translationMethods.put(JMLKeyWord.INF_FLOW_SPEC_LIST, new JMLTranslationMethod() {
 
             @Override
@@ -1742,6 +1743,7 @@ public final class JMLTranslator {
                                   ProgramVariable resultVar,
                                   ProgramVariable excVar,
                                   Map<LocationVariable, Term> atPres,
+                                  OriginTermLabel.SpecType specType,
                                   Class<T> resultClass,
                                   Services services)
                     throws SLTranslationException {
@@ -1759,6 +1761,8 @@ public final class JMLTranslator {
             throw parser.getExceptionManager().convertException(e);
         }
         if (resultClass.equals(Term.class)) {
+            Term term;
+
             if (expr.hasLabels()) {
                 T o = castToReturnType(result, resultClass);
                 assert o instanceof Term;
@@ -1766,7 +1770,17 @@ public final class JMLTranslator {
                 t = services.getTermBuilder().label(
                         (Term)castToReturnType(result, resultClass),
                         expr.getLabels());
-                return castToReturnType(t, resultClass);
+                term = (Term) castToReturnType(t, resultClass);
+            } else {
+                term = (Term) castToReturnType(result, resultClass);
+            }
+
+            if (specType != null) {
+                return castToReturnType(services.getTermBuilder().addLabelToAllSubs(term,
+                        new OriginTermLabel(specType, expr.fileName, expr.pos.getLine())),
+                        resultClass);
+            } else {
+                return castToReturnType(result, resultClass);
             }
         }
         return castToReturnType(result, resultClass);
@@ -1780,6 +1794,7 @@ public final class JMLTranslator {
                                   ProgramVariable excVar,
                                   Map<LocationVariable, Term> atPres,
                                   Map<LocationVariable, Term> atBefores,
+                                  OriginTermLabel.SpecType specType,
                                   Class<T> resultClass,
                                   Services services)
             throws SLTranslationException {
@@ -1792,27 +1807,41 @@ public final class JMLTranslator {
         try {
             result = parser.top();
             // maybe return pair<T, Warnings>?
-            //List<PositionedString> warnings = parser.getWarnings();            
+            //List<PositionedString> warnings = parser.getWarnings();
         } catch (RecognitionException e) {
             throw parser.getExceptionManager().convertException(e);
         }
         if (resultClass.equals(Term.class)) {
+            Term term;
+
             if (expr.hasLabels()) {
                 T o = castToReturnType(result, resultClass);
                 assert o instanceof Term;
                 Term t = (Term)o;
                 t = services.getTermBuilder().label((Term)castToReturnType(result, resultClass), expr.getLabels());
-                return castToReturnType(t, resultClass);
+                term = (Term) castToReturnType(t, resultClass);
+            } else {
+                term = (Term) castToReturnType(result, resultClass);
             }
+
+            if (specType != null) {
+                return castToReturnType(services.getTermBuilder().addLabelToAllSubs(term,
+                        new OriginTermLabel(specType, expr.fileName, expr.pos.getLine())),
+                        resultClass);
+            } else {
+                return castToReturnType(result, resultClass);
+            }
+
         }
         return castToReturnType(result, resultClass);
     }
-    
+
     /**
      * For testing only.
      */
     static <T> T translate(String jmlExpr, KeYJavaType specInClass, Class<T> resultClass, Services services) throws SLTranslationException {
-        return translate(new PositionedString(jmlExpr), specInClass, null, null, null, null, null, resultClass, services);
+        return translate(new PositionedString(jmlExpr), specInClass,
+                null, null, null, null, null, null, resultClass, services);
     }
 
 
@@ -2119,7 +2148,7 @@ public final class JMLTranslator {
             Term cond = tb.convertToBoolean(tb.and(t1, t2));
             return new SLExpression(translateQuantifier(qv, cond),resultType);
         }
-        
+
 
         public abstract Term combineQuantifiedTerms(Term t1,
                                                     Term t2)
@@ -2290,7 +2319,7 @@ public final class JMLTranslator {
             return null;
         }
     }
-    
+
     private abstract class JMLEqualityTranslationMethod implements
             JMLTranslationMethod {
 
@@ -2513,7 +2542,7 @@ public final class JMLTranslator {
         }
 
     }
-    
+
     /*
      * Translate a term of type \map to JavaDL, if it occurs in a JML
      * expression.
@@ -2527,9 +2556,9 @@ public final class JMLTranslator {
         return translateToJDLTerm(t, functName, services, tb, list, excManager);
     }
 
-    /** Provide restriction terms for the declared KeYJavaType 
+    /** Provide restriction terms for the declared KeYJavaType
      *  Note that these restrictions only apply to the JML to DL translation.
-     *  See also {@link TermBuilder#reachableValue(Term, KeYJavaType)}. 
+     *  See also {@link TermBuilder#reachableValue(Term, KeYJavaType)}.
      */
     protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<? extends QuantifiableVariable> qvs, Services services) {
         final Type type = kjt.getJavaType();
@@ -2558,5 +2587,5 @@ public final class JMLTranslator {
         }
         return res;
     }
-    
+
 }

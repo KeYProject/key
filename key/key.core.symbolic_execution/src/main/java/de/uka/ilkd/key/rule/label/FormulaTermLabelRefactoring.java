@@ -1,36 +1,21 @@
 package de.uka.ilkd.key.rule.label;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.AbstractOperationPO;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+
+import java.util.*;
 
 /**
  * The {@link TermLabelRefactoring} used to label predicates with a
@@ -156,36 +141,14 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     * @return {@code true} perform refactoring, {@code false} do not perform refactoring.
     */
    protected boolean shouldRefactorSpecificationApplication(Rule rule, Goal goal, Object hint) {
-      if (goal != null) {
-         Proof proof = goal.proof();
-         if ((rule instanceof WhileInvariantRule && WhileInvariantRule.INITIAL_INVARIANT_ONLY_HINT.equals(hint)) ||
-             (rule instanceof WhileInvariantRule && WhileInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint)) ||
-             (rule instanceof UseOperationContractRule && UseOperationContractRule.FINAL_PRE_TERM_HINT.equals(hint)) ||
-             (rule instanceof AbstractAuxiliaryContractRule && AbstractAuxiliaryContractRule.FULL_PRECONDITION_TERM_HINT.equals(hint)) ||
-             (rule instanceof AbstractAuxiliaryContractRule && AbstractAuxiliaryContractRule.NEW_POSTCONDITION_TERM_HINT.equals(hint)) ||
-             (rule instanceof CloseAfterMerge && CloseAfterMerge.FINAL_WEAKENING_TERM_HINT.equals(hint))) {
-            ProofOblInput problem = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-            if (problem instanceof AbstractOperationPO) {
-               return ((AbstractOperationPO) problem).isAddSymbolicExecutionLabel();
-            }
-            else {
-               return false;
-            }
-         }
-         else {
-            return false;
-         }
-      }
-      else {
-         return false;
-      }
+      return TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint);
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public void refactoreLabels(TermLabelState state,
+   public void refactorLabels(TermLabelState state,
                                Services services, 
                                PosInOccurrence applicationPosInOccurrence, 
                                Term applicationTerm, 

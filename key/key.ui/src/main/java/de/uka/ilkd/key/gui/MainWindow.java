@@ -29,6 +29,8 @@ import de.uka.ilkd.key.gui.nodeviews.*;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.gui.proofExploration.ExplorationModeModel;
+import de.uka.ilkd.key.gui.proofExploration.ExplorationModeToolBar;
 import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
@@ -91,6 +93,9 @@ public final class MainWindow extends JFrame {
      * the second toolbar
      */
     private JToolBar fileOpToolBar;
+
+    /**Exploration toolbar*/
+    public ExplorationModeToolBar explorationToolBar;
 
     /**
      * JScrollPane for displaying SequentViews
@@ -402,6 +407,7 @@ public final class MainWindow extends JFrame {
         controlToolBar = createProofControlToolBar();
         fileOpToolBar = createFileOpsToolBar();
 
+        explorationToolBar = createExplorationModeToolBar();
         JPanel toolBarPanel = new JPanel();
         toolBarPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
         toolBarPanel.add(controlToolBar);
@@ -447,6 +453,12 @@ public final class MainWindow extends JFrame {
         setSize(1000, 600);
 
         loadPreferences(this);
+    }
+
+    private ExplorationModeToolBar createExplorationModeToolBar() {
+        ExplorationModeModel model = new ExplorationModeModel();
+        getMediator().setExplorationModeModel(model);
+        return new ExplorationModeToolBar(this, model);
     }
 
     private JToolBar createFileOpsToolBar() {
@@ -519,7 +531,6 @@ public final class MainWindow extends JFrame {
 
             }
         });
-
         updateSMTSelectMenu();
         mediator.addKeYSelectionListener(new DPEnableControl());
         return smtComponent;
@@ -1488,6 +1499,9 @@ public final class MainWindow extends JFrame {
      *
      * @param component the non-null component whose preferences are to be saved
      * @see PreferenceSaver
+     *
+     * @param component
+     *            the non-null component whose preferences are to be saved
      */
     public void savePreferences(Component component) {
         prefSaver.save(component);
@@ -1502,6 +1516,9 @@ public final class MainWindow extends JFrame {
      *
      * @param component the non-null component whose preferences are to be set
      * @see PreferenceSaver
+     *
+     * @param component
+     *            the non-null component whose preferences are to be set
      */
     public final void loadPreferences(Component component) {
         prefSaver.load(component);
