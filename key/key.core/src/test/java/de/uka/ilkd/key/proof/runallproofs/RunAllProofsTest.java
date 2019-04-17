@@ -30,6 +30,8 @@ import org.junit.Test;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
+import org.junit.experimental.categories.Category;
+import org.key_project.util.testcategories.Slow;
 
 /**
  * <p>
@@ -75,6 +77,7 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
  * @see RunAllProofsTestSuite
  * @see ListRunAllProofsTestCases
  */
+@Category(Slow.class)
 public class RunAllProofsTest {
 
    public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
@@ -108,11 +111,11 @@ public class RunAllProofsTest {
     /**
      * Creates a set of constructor parameters for this class. Uses JUnits
      * parameterized test case mechanism for to create several test cases from a
-     * set of data. {@link Object.#toString()} of first constructor parameter is
+     * set of data. {@link Object#toString()} of first constructor parameter is
      * used to determine name of individual test cases, see {@link
-     * RunAllProofsTestUnit.#toString()} for further information.
+     * RunAllProofsTestUnit#toString()} for further information.
      *
-     * @param proofIndex
+     * @param proofCollection
      *            The file name of the index file which parsed to produce test
      *            cases
      * @return The parameters. Each row will be one test case.

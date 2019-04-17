@@ -1,18 +1,5 @@
 package de.uka.ilkd.key.proof.proverules;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.util.*;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-import org.key_project.util.helper.FindResources;
-import org.key_project.util.java.IOUtil;
-
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
@@ -25,6 +12,19 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.key_project.util.helper.FindResources;
+import org.key_project.util.testcategories.Slow;
+
+import java.io.File;
+import java.util.*;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * JUnit test class for re-running taclet proofs (formerly implemented as Perl
@@ -43,6 +43,7 @@ import de.uka.ilkd.key.util.Pair;
  *
  */
 @RunWith(Parameterized.class)
+@Category(Slow.class)
 public class ProveRulesTest {
    /*
     * File object pointing to directory key/key.core.test
