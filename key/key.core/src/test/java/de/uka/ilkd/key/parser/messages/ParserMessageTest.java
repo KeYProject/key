@@ -105,8 +105,9 @@ public class ParserMessageTest {
                   && location.getFilename().length() > 0);
 
       assertEquals("Filename retrieved from parser message "
-            + "doesn't match filename of originally parsed file.", javaFile,
-            new File(location.getFilename()));
+            + "doesn't match filename of originally parsed file.",
+              javaFile.getAbsoluteFile(),
+              new File(location.getFilename()));
    }
 
    @Test

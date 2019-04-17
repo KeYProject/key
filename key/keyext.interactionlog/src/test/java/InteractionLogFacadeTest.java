@@ -1,5 +1,3 @@
-package de.uka.ilkd.key.util.script;
-
 import java.io.IOException;
 
 /**
