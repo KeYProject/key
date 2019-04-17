@@ -98,6 +98,8 @@ public class IconFactory {
 
     private static Image interactiveAppLogo =
         getImage("images/interactiveAppLogo.png");
+    private static Image scriptAppLogo =
+        getImage("images/scriptAppLogo.png");
 
     private static Image counterexampleImage = getImage("images/toolbar/ce.png");
     private static Image testgenerationImage = getImage("images/toolbar/tg.png");
@@ -361,6 +363,10 @@ public class IconFactory {
 
     public static Icon interactiveAppLogo(int size) {
        return scaleIcon(interactiveAppLogo, size, size);
+    }
+
+    public static Icon scriptAppLogo(int size) {
+       return scaleIcon(scriptAppLogo, size, size);
     }
 
     public static Icon heatmapIcon(int size) {

@@ -8,7 +8,7 @@ public final class IntLinkedList implements IntList {
 
     /*@
       @ invariant footprint == \set_union(this.*,
-      @      \infinite_union(int i; 0<=i && i<size; ((IntNode)nodeseq[i]).*));
+      @      (\infinite_union int i; 0<=i && i<size; ((IntNode)nodeseq[i]).*));
       @
       @ invariant (\forall int i; 0<=i && i<size; 
       @         ((IntNode)nodeseq[i]) != null  // this implies \typeof(nodeseq[i]) == \type(IntNode)
@@ -26,7 +26,7 @@ public final class IntLinkedList implements IntList {
       @ ensures (\forall int i; 0 <= i && i < size;
       @     ((int) seq[i]) == \old((int) seq[i]) + 1);
       @ ensures size == \old(size);
-      @ assignable \set_union(\singleton(seq), \infinite_union(int j; 0 <= j && j < size; \singleton(((IntNode)nodeseq[j]).data)));
+      @ assignable \set_union(\singleton(seq), (\infinite_union int j; 0 <= j && j < size; \singleton(((IntNode)nodeseq[j]).data)));
       @*/
     public void mapIncrement_loopContract() {
         IntNode current = first;
@@ -41,7 +41,7 @@ public final class IntLinkedList implements IntList {
           @ ensures (\forall int j; \before(i) <= j && j < size;
           @     (int) seq[j] == \before((int) seq[j]) + 1);
           @ ensures size == \before(size);
-          @ assignable \set_union(\singleton(seq), \infinite_union(int j; i <= j && j < size; \singleton(((IntNode)nodeseq[j]).data)));
+          @ assignable \set_union(\singleton(seq), (\infinite_union int j; i <= j && j < size; \singleton(((IntNode)nodeseq[j]).data)));
           @ decreases nodeseq.length - i;
           @*/
         {
@@ -58,7 +58,7 @@ public final class IntLinkedList implements IntList {
       @ ensures (\forall int i; 0 <= i && i < size;
       @     ((int) seq[i]) == \old((int) seq[i]) + 1);
       @ ensures size == \old(size);
-      @ assignable \set_union(\singleton(seq), \infinite_union(int j; 0 <= j && j < size; \singleton(((IntNode)nodeseq[j]).data)));
+      @ assignable \set_union(\singleton(seq), (\infinite_union int j; 0 <= j && j < size; \singleton(((IntNode)nodeseq[j]).data)));
       @*/
     public void mapIncrement_loopInvariant() {
         IntNode current = first;
@@ -73,7 +73,7 @@ public final class IntLinkedList implements IntList {
           @ loop_invariant (\forall int j; i <= j && j < size;
           @     (int) seq[j] == \old((int) seq[j]));
           @ loop_invariant size == \old(size);
-          @ assignable \set_union(\singleton(seq), \infinite_union(int j; i <= j && j < size; \singleton(((IntNode)nodeseq[j]).data)));
+          @ assignable \set_union(\singleton(seq), (\infinite_union int j; i <= j && j < size; \singleton(((IntNode)nodeseq[j]).data)));
           @ decreases nodeseq.length - i;
           @*/
         while (current != null) {

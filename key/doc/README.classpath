@@ -1,4 +1,3 @@
-
 Using the \classpath directives in KeY
 ======================================
 
@@ -15,9 +14,10 @@ do not contain a model of any contained code.
 0. Changes
 ----------
 
+Mar 6, 19   Wolfram Pfeifer
+    corrected wrong example, updated list of internal classes
 Sep 4, 09   mulbrich
 	dropping \noDefaultClasses, adding \bootclasspath
-	
 
 
 1. Syntax
@@ -28,9 +28,8 @@ The \classpath directive may be placed directly in front of the
 \javaSource directive or instead of it. There may be an arbitrary
 number of \classpath annotations, but at most one \bootclasspath.
 
-The \bootclasspath directive is optional. It it appears, however, it
-has to be placed directly in front of all \classpath directives
-directives.
+The \bootclasspath directive is optional. If it appears, however, it
+has to be placed directly in front of all \classpath directives.
 
 \classpath must be followed by a string describing either a directory
 or a zip file. Any jar file is a zip file. The path may either be
@@ -42,8 +41,8 @@ are not supported here at the moment.
 
 Example: A .key-file might begin with
 
-\classpath "/tmp/classes.jar";
 \bootclasspath "../systemDir/";
+\classpath "/tmp/classes.jar";
 \classpath "../classDir/";
 \classpath "someLibrary.jar";
 \javaSource "../sources";
@@ -53,7 +52,7 @@ Example: A .key-file might begin with
 2. Meaning
 ----------
 
-In KeY there are three kind of resources read in when loading sources.
+In KeY there are three kinds of resources read in when loading sources.
 
 2.1. Boot Classes / System Classes / Default Classes
 
@@ -149,7 +148,7 @@ of the default classes.
 If you forget to include classes, it may to lead to unexpected and 
 mysterious errors at runtime of KeY.
 
-[1] system/resources/de/uka/ilkd/key/java/JavaRedux
+[1] key.core/resources/de/uka/ilkd/key/java/JavaRedux
 
 4. Known issues
 ---------------
@@ -183,38 +182,10 @@ always contains fully qualified names.
 A. List of internally stored classes:
 -------------------------------------
 
-java.lang.Object
+See key.core/resources/de/uka/ilkd/key/java/JavaRedux/JAVALANG.TXT
+for a comprehensive and uptodate list of the classes currently comprised
+in the bootclasspath in KeY.
 
-java.lang.ArithmeticException
-java.lang.ArrayIndexOutOfBoundsException
-java.lang.ArrayStoreException
-java.lang.ClassCastException
-java.lang.CloneNotSupportedException
-java.lang.Cloneable
-java.lang.Comparable
-java.lang.Enum
-java.lang.Error
-java.lang.Exception
-java.lang.ExceptionInInitializerError
-java.lang.IndexOutOfBoundsException
-java.lang.InterruptedException
-java.lang.Iterable (*)
-java.lang.LinkageError
-java.lang.NegativeArraySizeException
-java.lang.NoClassDefFoundError
-java.lang.NullPointerException
-java.lang.NumberFormatException (*)
-java.lang.RuntimeException
-java.lang.String
-java.lang.Throwable
-java.util.Collection (*)
-java.util.Iterator (*)
-java.util.List (*)
-java.util.ListIterator (*)
-java.util.Map (*)
-java.util.Set (*)
-java.io.IOException (*)
-java.io.Serializable
-
-(*) If you want to overwrite the internal classes, these may be
-omitted, all the others must be present
+If you intend to override the bootclasspath, not all classes of these
+classes are required in your bootclasspath. However, ommiting essential
+classes may result in strange exceptions at runtime.

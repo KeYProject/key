@@ -59,6 +59,23 @@ public abstract class AbstractProofMacro implements ProofMacro {
     }
 
     @Override
+    public boolean hasParameter(String paramName) {
+        return false;
+    }
+
+    @Override
+    public void setParameter(String paramName, String paramValue)
+            throws IllegalArgumentException {
+        throw new IllegalArgumentException(
+                String.format("There is no parameter of name %s in macro %s",
+                        paramName, this.getClass().getSimpleName()));
+    }
+
+    @Override
+    public void resetParams() {
+    }
+
+    @Override
     public boolean canApplyTo(Node node,
                               PosInOccurrence posInOcc) {
         return canApplyTo(node.proof(), getGoals(node), posInOcc);

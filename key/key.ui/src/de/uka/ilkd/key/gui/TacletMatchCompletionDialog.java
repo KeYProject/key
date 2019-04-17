@@ -744,14 +744,15 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
         if(pretty) {
             // While the parser is not fully capable, deactivate a few things.
+			// Some of them seem to be implemented by now: Commenting out. Recomment if necessary.
             final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
             tbl.remove(setLDT.getUnion());
             tbl.remove(setLDT.getIntersect());
             tbl.remove(setLDT.getSetMinus());
             tbl.remove(setLDT.getElementOf());
             tbl.remove(setLDT.getSubset());
-            tbl.remove(setLDT.getEmpty());
-            tbl.remove(setLDT.getAllFields());
+            // tbl.remove(setLDT.getEmpty());
+            // tbl.remove(setLDT.getAllFields());
             tbl.remove(IObserverFunction.class);
             tbl.remove(IProgramMethod.class);
         }
