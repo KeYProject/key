@@ -76,6 +76,7 @@ public final class IconFactory {
     public static IconProvider INTERLOG_RESUME = new IconFontProvider(FontAwesomeSolid.PAUSE_CIRCLE);
     public static IconProvider INTERLOG_PAUSE = new IconFontProvider(FontAwesomeSolid.PLAY_CIRCLE);
     public static IconProvider INTERLOG_ICON = new IconFontProvider(FontAwesomeSolid.BOOK);
+
     public static IconProvider HEATMAP_DEACTIVATE = new IconFontProvider(FontAwesomeSolid.FIRE_EXTINGUISHER);
     public static IconProvider HEATMAP_ACTIVATE = new IconFontProvider(FontAwesomeSolid.FIRE);
 

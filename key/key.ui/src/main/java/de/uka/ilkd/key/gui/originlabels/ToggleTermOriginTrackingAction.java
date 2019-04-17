@@ -51,7 +51,7 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
             }
         });
 
-        setMenuPath("Origin Tracking");
+        setMenuPath("View");
         putValue(Action.LONG_DESCRIPTION, "Toggle Term Origin Tracking");
         lookupAcceleratorKey();
     }

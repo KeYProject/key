@@ -19,14 +19,10 @@ import java.util.stream.Stream;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
+@Deprecated
 public class MainWindowTabbedPane extends JTabbedPane {
     private static final long serialVersionUID = 1L;
-
     public static final float TAB_ICON_SIZE = 16f;
-
-    /**
-     * the current proof tree
-     */
     private ProofTreeView proofTreeView;
 
     MainWindowTabbedPane(MainWindow mainWindow, KeYMediator mediator, AutoModeAction autoModeAction) {

@@ -20,29 +20,35 @@ import java.util.List;
         experimental = false,
         priority = 10000)
 public class InteractionLogExt implements KeYGuiExtension, KeYGuiExtension.LeftPanel, KeYGuiExtension.MainMenu {
-
     private InteractionLogView interactionLogView;
 
 
     @Override
     public List<Action> getMainMenuActions(MainWindow mainWindow) {
+        InteractionLogView ilv = getView(mainWindow);
+
         return Arrays.asList(
-                interactionLogView.getActionAddUserNote(),
-                interactionLogView.getActionExportProofScript(),
-                interactionLogView.getActionJumpIntoTree(),
-                interactionLogView.getActionLoad(),
-                interactionLogView.getActionSave(),
-                interactionLogView.getActionTryReapply(),
-                interactionLogView.getActionKPSExport(),
-                interactionLogView.getActionToggleFavourite(),
-                interactionLogView.getActionExportMarkdown(),
-                interactionLogView.getActionMUCopyClipboard(),
-                interactionLogView.getActionPauseLogging());
+                ilv.getActionAddUserNote(),
+                ilv.getActionExportProofScript(),
+                ilv.getActionJumpIntoTree(),
+                ilv.getActionLoad(),
+                ilv.getActionSave(),
+                ilv.getActionTryReapply(),
+                ilv.getActionKPSExport(),
+                ilv.getActionToggleFavourite(),
+                ilv.getActionExportMarkdown(),
+                ilv.getActionMUCopyClipboard(),
+                ilv.getActionPauseLogging());
+    }
+
+    private InteractionLogView getView(MainWindow mainWindow) {
+        if (interactionLogView == null)
+            interactionLogView = new InteractionLogView(mainWindow, mainWindow.getMediator());
+        return interactionLogView;
     }
 
     @Override
     public Collection<TabPanel> getPanels(MainWindow window, KeYMediator mediator) {
-        interactionLogView = new InteractionLogView(window, mediator);
-        return Collections.singleton(interactionLogView);
+        return Collections.singleton(getView(window));
     }
 }

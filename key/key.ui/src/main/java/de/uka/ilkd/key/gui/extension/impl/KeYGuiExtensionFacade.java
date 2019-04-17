@@ -38,6 +38,9 @@ public final class KeYGuiExtensionFacade {
     public static List<KeYGuiExtension.LeftPanel> getLeftPanel() {
         return getExtensionInstances(KeYGuiExtension.LeftPanel.class);
     }
+    //endregion
+
+    //region main menu extension
 
     /**
      * Retrieves all known implementation of the {@link KeYGuiExtension.MainMenu}
@@ -47,30 +50,34 @@ public final class KeYGuiExtensionFacade {
     public static List<KeYGuiExtension.MainMenu> getMainMenuExtensions() {
         return getExtensionInstances(KeYGuiExtension.MainMenu.class);
     }
-    //endregion
 
-    //region main menu extension
-
-    /**
-     * Creates the extension menu of all known {@link KeYGuiExtension.MainMenu}.
-     *
-     * @return a menu
-     */
-    public static JMenu createExtensionMenu(MainWindow mainWindow) {
+    public static Stream<Action> getMainMenuActions(MainWindow mainWindow) {
         ToIntFunction<Action> func = (Action a) -> {
             Integer i = (Integer) a.getValue(KeyAction.PRIORITY);
             if (i == null) return 0;
             else return i;
         };
 
-        List<KeYGuiExtension.MainMenu> kmm = getMainMenuExtensions();
+        return KeYGuiExtensionFacade.getMainMenuExtensions()
+                .stream()
+                .flatMap(it -> it.getMainMenuActions(mainWindow).stream())
+                .sorted(Comparator.comparingInt(func));
+    }
+
+    /**
+     * Adds all registered and activated {@link KeYGuiExtension.MainMenu} to the given menuBar.
+     *
+     * @return a menu
+     */
+    public static void addExtensionsToMainMenu(MainWindow mainWindow, JMenuBar menuBar) {
         JMenu menu = new JMenu("Extensions");
-        for (KeYGuiExtension.MainMenu it : kmm) {
-            List<Action> actions = it.getMainMenuActions(mainWindow);
-            actions.sort(Comparator.comparingInt(func));
-            sortActionsIntoMenu(actions, menu);
+        getMainMenuActions(mainWindow).forEach(it ->
+                sortActionIntoMenu(it, menuBar, menu));
+
+        if (menu.getMenuComponents().length > 0) {
+            menuBar.add(menu);
         }
-        return menu;
+
     }
 
     /*
@@ -84,28 +91,54 @@ public final class KeYGuiExtensionFacade {
     }*/
 
     //region Menu Helper
-    private static void sortActionsIntoMenu(List<Action> actions, JMenu menu) {
-        actions.forEach(act -> sortActionIntoMenu(act, menu));
+    private static void sortActionsIntoMenu(List<Action> actions, JMenuBar menuBar) {
+        actions.forEach(act -> sortActionIntoMenu(act, menuBar, new JMenu()));
     }
-    //endregion
 
-    private static void sortActionIntoMenu(Action act, JMenu menu) {
+    private static Iterator<String> getMenuPath(Action act) {
         Object path = act.getValue(KeyAction.PATH);
         String spath;
         if (path == null) spath = "";
         else spath = path.toString();
-        Iterator<String> mpath = Pattern.compile(Pattern.quote(".")).splitAsStream(spath).iterator();
+        return Pattern.compile(Pattern.quote(".")).splitAsStream(spath).iterator();
+    }
+
+    private static void sortActionIntoMenu(Action act, JMenu menu) {
+        Iterator<String> mpath = getMenuPath(act);
         JMenu a = findMenu(menu, mpath);
         a.add(act);
+    }
+
+    private static void sortActionIntoMenu(Action act, JMenuBar menuBar, JMenu defaultMenu) {
+        Iterator<String> mpath = getMenuPath(act);
+        JMenu a = findMenu(menuBar, mpath, defaultMenu);
+        a.add(act);
+    }
+
+    private static JMenu findMenu(JMenuBar menuBar, Iterator<String> mpath, JMenu defaultMenu) {
+        if (mpath.hasNext()) {
+            String cur = mpath.next();
+            for (int i = 0; i < menuBar.getMenuCount(); i++) {
+                JMenu menu = menuBar.getMenu(i);
+                if (Objects.equals(menu.getText(), cur)) {
+                    return findMenu(menu, mpath);
+                }
+            }
+            JMenu menu = new JMenu(cur);
+            menu.setName(cur);
+            menuBar.add(menu);
+            return findMenu(menu, mpath);
+        }
+        return defaultMenu;
     }
 
     private static JMenu findMenu(JMenu menu, Iterator<String> mpath) {
         if (mpath.hasNext()) {
             String cur = mpath.next();
             Component[] children = menu.getMenuComponents();
-            for (int i = 0; i < children.length; i++) {
-                if (Objects.equals(children[i].getName(), cur)) {
-                    JMenu sub = (JMenu) children[i];
+            for (Component child : children) {
+                if (Objects.equals(child.getName(), cur)) {
+                    JMenu sub = (JMenu) child;
                     return findMenu(sub, mpath);
                 }
             }
@@ -116,6 +149,7 @@ public final class KeYGuiExtensionFacade {
         } else
             return menu;
     }
+    //endregion
 
     /**
      * Retrieves all known implementation of the {@link KeYGuiExtension.Toolbar}

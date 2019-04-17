@@ -23,8 +23,6 @@ public class ColorSettings extends AbstractPropertiesSettings {
 
     public ColorSettings(Properties settings) {
         readSettings(settings);
-        // save now and on close
-        save();
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
 
@@ -47,8 +45,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
     }
 
     public static Color fromHex(String s) {
-        Integer intval = Integer.decode(s);
-        int i = intval.intValue();
+        Integer i = Integer.decode(s);
         return new Color(
                 (i >> 16) & 0xFF,
                 (i >> 8) & 0xFF,

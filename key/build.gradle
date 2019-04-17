@@ -370,6 +370,16 @@ project(":key.ui") {
 
         compile 'com.miglayout:miglayout-swing:5.2'
 
+        /*compile group: 'net.sourceforge.mydoggy', name: 'mydoggy-plaf', version: '1.5.0-beta-r1389'
+        compile group: 'net.sourceforge.mydoggy', name: 'mydoggy-res', version: '1.5.0-beta-r1389'
+        compile group: 'net.sourceforge.mydoggy', name: 'mydoggy-api', version: '1.5.0-beta-r1389'
+        */
+
+        compile files('lib/docking-frames-common.jar',
+                'lib/docking-frames-core.jar')
+        //runtime name: 'docking-frames-ext-toolbar'
+        //runtime name: 'docking-frames-ext-toolbar-common'
+
         runtimeOnly project(":keyext.interactionlog")
         //runtimeOnly project(":keyext.script.ui")
     }

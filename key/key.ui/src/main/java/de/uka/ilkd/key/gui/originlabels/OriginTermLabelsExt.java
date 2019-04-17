@@ -25,7 +25,7 @@ import java.util.List;
  *
  * @author lanzinger
  */
-@KeYGuiExtension.Info(name = "Heatmap",
+@KeYGuiExtension.Info(name = "OriginLabels UI",
         optional = true,
         description = "UI support for origin labels" +
                 "Developer: Florian Lanzinger <xxx@student.kit.edu>",

@@ -6,10 +6,7 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeRegular;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.fonticons.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import org.key_project.ui.BoundsPopupMenuListener;
@@ -36,6 +33,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class InteractionLogView extends JPanel implements InteractionRecorderListener, TabPanel {
@@ -43,7 +41,15 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     private static final float SMALL_ICON_SIZE = 16f;
     private static final String MENU_ILOG = "Interaction Logging";
     private static final String MENU_ILOG_EXPORT = MENU_ILOG + ".Export";
+
+    private static final IconFontProvider ICON_LOAD = new IconFontProvider(FontAwesomeSolid.TRUCK_LOADING);
+    private static final IconFontProvider ICON_ADD_USER_ACTION = new IconFontProvider(FontAwesomeRegular.STICKY_NOTE);
+    private static final IconFontProvider ICON_TOGGLE_FAVOURITE = new IconFontProvider(FontAwesomeSolid.HEART, Color.red);
+    private static final IconFontProvider ICON_MARKDOWN = new IconFontProvider(FontAwesomeSolid.MARKDOWN);
+
+
     private final InteractionRecorder recorder = new InteractionRecorder();
+
 
     private final ExportMUScriptAction actionExportProofScript = new ExportMUScriptAction();
     private final ExportKPSAction actionKPSExport = new ExportKPSAction();
@@ -351,9 +357,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         LoadAction() {
             setName("Load");
             putValue(Action.SHORT_DESCRIPTION, "Load Interaction Log");
-            setIcon(
-                    IconFontSwing.buildIcon(FontAwesomeSolid.TRUCK_LOADING, SMALL_ICON_SIZE));
-            // new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/database_add.png")));
+            setIcon(ICON_LOAD.get(SMALL_ICON_SIZE));
             setPriority(0);
             setMenuPath(MENU_ILOG);
             lookupAcceleratorKey();
@@ -415,7 +419,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     private class AddUserNoteAction extends KeyAction {
         AddUserNoteAction() {
             setName("Add Note");
-            setIcon(IconFontSwing.buildIcon(FontAwesomeRegular.STICKY_NOTE, SMALL_ICON_SIZE));
+            setIcon(ICON_ADD_USER_ACTION.get(SMALL_ICON_SIZE));
             //new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/book_add.png")));
             setMenuPath(MENU_ILOG);
             lookupAcceleratorKey();
@@ -445,9 +449,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             setName("Toggle Fav");
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_F);
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_MASK));
-            setIcon(
-                    IconFontSwing.buildIcon(FontAwesomeSolid.HEART, SMALL_ICON_SIZE, Color.red));
-            //    new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/heart.png")));
+            setIcon(ICON_TOGGLE_FAVOURITE.get(SMALL_ICON_SIZE));
             setMenuPath(MENU_ILOG);
             lookupAcceleratorKey();
         }
@@ -548,7 +550,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         public ExportMarkdownAction() {
             setName("Export as markdown …");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into a markdown file.");
-            setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.MARKDOWN, SMALL_ICON_SIZE));
+            setIcon(ICON_MARKDOWN.get(SMALL_ICON_SIZE));
             setMenuPath(MENU_ILOG_EXPORT);
             lookupAcceleratorKey();
         }

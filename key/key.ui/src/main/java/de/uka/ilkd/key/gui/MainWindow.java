@@ -13,6 +13,13 @@
 
 package de.uka.ilkd.key.gui;
 
+import bibliothek.gui.dock.common.CControl;
+import bibliothek.gui.dock.common.CGrid;
+import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import bibliothek.gui.dock.common.SingleCDockable;
+import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CButton;
+import bibliothek.gui.dock.common.intern.CDockable;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -21,6 +28,7 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.help.HelpFacade;
@@ -49,10 +57,11 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
-import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -60,136 +69,131 @@ import java.util.List;
 import java.util.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @HelpInfo()
 public final class MainWindow extends JFrame {
-
-    private static final long serialVersionUID = 5853419918923902636L;
-
-    private static MainWindow instance = null;
-
-    /**
-     * Search bar for Sequent Views.
-     */
-    public final SequentViewSearchBar sequentViewSearchBar;
 
     /**
      * size of the tool bar icons
      */
     public static final int TOOLBAR_ICON_SIZE = 16;
-
+    public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
+    private static final long serialVersionUID = 5853419918923902636L;
+    private static final String PARA =
+            "<p style=\"font-family: lucida;font-size: 12pt;font-weight: bold\">";
+    private static MainWindow instance = null;
     /**
-     * the tab bar at the left
+     * Search bar for Sequent Views.
      */
-    private final MainWindowTabbedPane mainWindowTabbedPane;
-
-    /**
-     * the first toolbar
-     */
-    private JToolBar controlToolBar;
-
-    /**
-     * the second toolbar
-     */
-    private JToolBar fileOpToolBar;
-
-    /**
-     * JScrollPane for displaying SequentViews
-     */
-    private final MainFrame mainFrame;
-
-    /**
-     * the view to show source code and symbolic execution information
-     */
-    private final JComponent sourceView;
-
+    public final SequentViewSearchBar sequentViewSearchBar;
     /**
      * SequentView for the current goal
      */
     public final CurrentGoalView currentGoalView;
+    /**
+     * The menu for the SMT solver options
+     */
+    public final JMenu smtOptions = new JMenu("SMT Solvers...");
 
+    /**
+     * the tab bar at the left
+     */
+    //private final MainWindowTabbedPane mainWindowTabbedPane;
+    private final GoalList openGoalsView;
+    private final ProofTreeView proofTreeView;
+    private final InfoView infoView;
+    private final StrategySelectionView strategySelectionView;
+    /**
+     * JScrollPane for displaying SequentViews
+     */
+    private final MainFrame mainFrame;
+    /**
+     * the view to show source code and symbolic execution information
+     */
+    private final JComponent sourceView;
     /**
      * Use this SequentView in case no proof is loaded.
      */
     private final EmptySequent emptySequent;
-
     /**
      * contains a list of all proofs
      */
     private final JScrollPane proofListView;
-
     private final TaskTree proofList;
-
     /**
      * the mediator is stored here
      */
     private final KeYMediator mediator;
-
     /**
      * the user interface which direct all notifications to this window
      */
     private final WindowUserInterfaceControl userInterface;
-
-    /**
-     * the status line
-     */
-    private MainStatusLine statusLine;
-
     /**
      * listener to global proof events
      */
     private final MainProofListener proofListener;
 
     private final RecentFileMenu recentFileMenu;
-
-    public boolean frozen = false;
-
-    private static final String PARA =
-            "<p style=\"font-family: lucida;font-size: 12pt;font-weight: bold\">";
-
     /**
      * action for starting and stopping automatic mode
      */
     private final AutoModeAction autoModeAction;
-
+    private final NotificationManager notificationManager;
+    private final PreferenceSaver prefSaver =
+            new PreferenceSaver(Preferences.userNodeForPackage(MainWindow.class));
+    private final HidePackagePrefixToggleAction hidePackagePrefixToggleAction =
+            new HidePackagePrefixToggleAction(this);
+    private final TermLabelMenu termLabelMenu;
+    public boolean frozen = false;
+    /**
+     *
+     */
+    CControl dockControl = new CControl(this);
+    JCheckBoxMenuItem saveSMTFile;
+    /**
+     * the first toolbar
+     */
+    private JToolBar controlToolBar;
+    /**
+     * the second toolbar
+     */
+    private JToolBar fileOpToolBar;
+    /**
+     * the status line
+     */
+    private MainStatusLine statusLine;
     /**
      * action for opening a KeY file
      */
     private OpenFileAction openFileAction;
-
     /**
      * action for opening an example
      */
     private OpenExampleAction openExampleAction;
-
     /**
      * action for opening the most recent KeY file
      */
     private OpenMostRecentFileAction openMostRecentFileAction;
-
     /**
      * action for editing the most recent KeY file
      */
     private EditMostRecentFileAction editMostRecentFileAction;
-
     /**
      * action for saving a proof (attempt)
      */
     private SaveFileAction saveFileAction;
-
     /**
      * action for saving a proof as a bundle
      */
     private SaveBundleAction saveBundleAction;
-
     private QuickSaveAction quickSaveAction;
     private QuickLoadAction quickLoadAction;
-
     /**
      * action for opening the proof management dialog
      */
     private ProofManagementAction proofManagementAction;
-
     /**
      * action for loading taclets onto a ongoing proof
      */
@@ -197,39 +201,22 @@ public final class MainWindow extends JFrame {
     private LemmaGenerationAction loadUserDefinedTacletsForProvingAction;
     private LemmaGenerationAction loadKeYTaclets;
     private LemmaGenerationBatchModeAction lemmaGenerationBatchModeAction;
-
     /**
      * actions for changing the selection on the proof tree
      */
     private GoalSelectAboveAction goalSelectAboveAction;
     private GoalSelectBelowAction goalSelectBelowAction;
-
-
-    public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
-
-    private final NotificationManager notificationManager;
-
-    private final PreferenceSaver prefSaver =
-            new PreferenceSaver(Preferences.userNodeForPackage(MainWindow.class));
-
     private ComplexButton smtComponent;
-
-    /**
-     * The menu for the SMT solver options
-     */
-    public final JMenu smtOptions = new JMenu("SMT Solvers...");
-
     private ExitMainAction exitMainAction;
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
-    private final HidePackagePrefixToggleAction hidePackagePrefixToggleAction =
-            new HidePackagePrefixToggleAction(this);
-
-    private final TermLabelMenu termLabelMenu;
-
-    public TermLabelVisibilityManager getVisibleTermLabels() {
-        return termLabelMenu.getVisibleTermLabels();
-    }
+    private SingleCDockable dockProofListView;
+    private SingleCDockable dockSourceView;
+    private SingleCDockable dockSequent;
+    /**
+     * set to true if the view of the current goal should not be updated
+     */
+    private boolean disableCurrentGoalView = false;
 
     /*
      * This class should only be instantiated once!
@@ -254,12 +241,18 @@ public final class MainWindow extends JFrame {
         termLabelMenu = new TermLabelMenu(this);
         proofListView = new JScrollPane();
         autoModeAction = new AutoModeAction(this);
-        mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
+        //mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
         mainFrame = new MainFrame(this, emptySequent);
         sourceView = SourceView.getSourceView(this);
         proofList = new TaskTree(mediator);
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(mediator);
+
+        proofTreeView = new ProofTreeView(mediator);
+        infoView = new InfoView();
+        strategySelectionView = new StrategySelectionView();
+        openGoalsView = new GoalList();
+
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
@@ -306,6 +299,37 @@ public final class MainWindow extends JFrame {
      */
     public static boolean hasInstance() {
         return instance != null;
+    }
+
+    private static CDockable createDock(TabPanel p) {
+        CAction[] actions =
+                p.getTitleActions().stream().map(MainWindow::translateAction)
+                        .toArray(CAction[]::new);
+
+        return new DefaultSingleCDockable(p.getTitle(), p.getIcon(), p.getTitle(), p.getComponent(),
+                p.getPermissions(), actions);
+    }
+
+    private static CAction translateAction(Action action) {
+        CButton button = new CButton(
+                (String) action.getValue(Action.NAME),
+                (Icon) action.getValue(Action.SMALL_ICON));
+        button.addActionListener(action);
+        button.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
+        button.setEnabled(action.isEnabled());
+
+        action.addPropertyChangeListener(evt -> {
+            button.setText((String) action.getValue(Action.NAME));
+            button.setIcon((Icon) action.getValue(Action.SMALL_ICON));
+            button.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
+            button.setEnabled(action.isEnabled());
+        });
+
+        return button;
+    }
+
+    public TermLabelVisibilityManager getVisibleTermLabels() {
+        return termLabelMenu.getVisibleTermLabels();
     }
 
     /**
@@ -434,25 +458,45 @@ public final class MainWindow extends JFrame {
         proofListView.setPreferredSize(new java.awt.Dimension(350, 100));
         GuiUtilities.paintEmptyViewComponent(proofListView, "Proofs");
 
-        JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, proofListView, mainWindowTabbedPane);
-        leftPane.setName("leftPane");
-        leftPane.setOneTouchExpandable(true);
+        //JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, proofListView, mainWindowTabbedPane);
+        //leftPane.setName("leftPane");
+        //leftPane.setOneTouchExpandable(true);
 
-        JPanel rightPane = new JPanel();
-        rightPane.setLayout(new BorderLayout());
-        rightPane.add(mainFrame, BorderLayout.CENTER);
-        rightPane.add(sequentViewSearchBar, BorderLayout.SOUTH);
+        //JPanel rightPane = new JPanel();
+        //rightPane.setLayout(new BorderLayout());
+        //rightPane.add(mainFrame, BorderLayout.CENTER);
+        //rightPane.add(sequentViewSearchBar, BorderLayout.SOUTH);
 
-        JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rightPane, sourceView);
-        pane.setResizeWeight(0.5);
-        pane.setOneTouchExpandable(true);
-        pane.setName("split2");
+        //JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rightPane, sourceView);
+        //pane.setResizeWeight(0.5);
+        //pane.setOneTouchExpandable(true);
+        //pane.setName("split2");
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, pane);
-        splitPane.setResizeWeight(0); // the right pane is more important
-        splitPane.setOneTouchExpandable(true);
-        splitPane.setName("splitPane");
-        getContentPane().add(splitPane, BorderLayout.CENTER);
+        //JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, pane);
+        //splitPane.setResizeWeight(0); // the right pane is more important
+        //splitPane.setOneTouchExpandable(true);
+        //splitPane.setName("splitPane");
+        //getContentPane().add(splitPane, BorderLayout.CENTER);
+        getContentPane().add(dockControl.getContentArea());
+
+        dockProofListView = create("Loaded Proofs", proofListView);
+        dockSequent = create("Sequent", mainFrame);
+        dockSourceView = create("Source", sourceView);
+
+        Stream<TabPanel> extPanels = KeYGuiExtensionFacade.getAllPanels(this);
+        Stream<TabPanel> defaultPanels = Stream.of(proofTreeView, infoView,
+                strategySelectionView, openGoalsView);
+
+        CGrid grid = new CGrid(dockControl);
+        grid.add(0, 0, 1, 1, dockProofListView);
+        grid.add(0, 1, 1, 2,
+                Stream.concat(defaultPanels, extPanels)
+                        .map(MainWindow::createDock)
+                        .toArray(CDockable[]::new));
+        grid.add(1, 0, 2, 3, dockSequent);
+        grid.add(2, 0, 1, 3, dockSourceView);
+
+        dockControl.getContentArea().deploy(grid);
 
         statusLine = new MainStatusLine("<html>" + PARA + KeYConstants.COPYRIGHT + PARA
                 + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."
@@ -468,6 +512,20 @@ public final class MainWindow extends JFrame {
 
         loadPreferences(this);
     }
+
+    private SingleCDockable create(String title, JComponent component) {
+        return new DefaultSingleCDockable(title, title, component);
+    }
+
+    /*
+     * private JToggleButton createHeatmapToggle() { return new
+     * JToggleButton(new HeatmapToggleAction(this)); }
+     */
+
+    /*
+     * private JButton createHeatmapMenuOpener() { return new JButton(new
+     * HeatmapSettingsAction(this)); }
+     */
 
     private JToolBar createFileOpsToolBar() {
         JToolBar fileOperations = new JToolBar("File Operations");
@@ -507,16 +565,6 @@ public final class MainWindow extends JFrame {
         return toolBar;
     }
 
-    /*
-     * private JToggleButton createHeatmapToggle() { return new
-     * JToggleButton(new HeatmapToggleAction(this)); }
-     */
-
-    /*
-     * private JButton createHeatmapMenuOpener() { return new JButton(new
-     * HeatmapSettingsAction(this)); }
-     */
-
     private ComplexButton createSMTComponent() {
         smtComponent = new ComplexButton(TOOLBAR_ICON_SIZE);
         smtComponent.setEmptyItem("No solver available",
@@ -527,18 +575,14 @@ public final class MainWindow extends JFrame {
 
         smtComponent.setPrefix("Run ");
 
-        smtComponent.addListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                ComplexButton but = (ComplexButton) e.getSource();
-                if (but.getSelectedItem() instanceof SMTInvokeAction) {
-                    SMTInvokeAction action = (SMTInvokeAction) but.getSelectedItem();
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
-                            .setActiveSolverUnion(action.solverUnion);
-                }
-
+        smtComponent.addListener(e -> {
+            ComplexButton but = (ComplexButton) e.getSource();
+            if (but.getSelectedItem() instanceof SMTInvokeAction) {
+                SMTInvokeAction action = (SMTInvokeAction) but.getSelectedItem();
+                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
+                        .setActiveSolverUnion(action.solverUnion);
             }
+
         });
 
         updateSMTSelectMenu();
@@ -561,6 +605,10 @@ public final class MainWindow extends JFrame {
      */
     protected MainStatusLine getStatusLine() {
         return statusLine;
+    }
+
+    public void setStatusLine(String status) {
+        ThreadUtilities.invokeOnEventQueue(() -> statusLine.setStatusText(status));
     }
 
     private void setStandardStatusLineImmediately() {
@@ -597,23 +645,12 @@ public final class MainWindow extends JFrame {
      * the progress bar range to the given value, set the current progress to zero
      */
     public void setStatusLine(final String str, final int max) {
-        ThreadUtilities.invokeOnEventQueue(new Runnable() {
-            @Override
-            public void run() {
-                setStatusLineImmediately(str, max);
-            }
-        });
+        ThreadUtilities.invokeOnEventQueue(() -> setStatusLineImmediately(str, max));
     }
 
-    /**
-     * Display the given message in the status line, make progress bar and abort button invisible
-     */
-    public void setStatusLine(String s) {
-        setStatusLine(s, 0);
-    }
-
+    @Deprecated
     public void selectFirstTab() {
-        this.mainWindowTabbedPane.setSelectedIndex(0);
+        //weigl disable: this.mainWindowTabbedPane.setSelectedIndex(0);
     }
 
     /**
@@ -660,20 +697,13 @@ public final class MainWindow extends JFrame {
         menuBar.add(createViewMenu());
         menuBar.add(createProofMenu());
         menuBar.add(createOptionsMenu());
-        createExtensionMenu(menuBar);
+        KeYGuiExtensionFacade.addExtensionsToMainMenu(this, menuBar);
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(createHelpMenu());
 
         return menuBar;
     }
 
-    private void createExtensionMenu(JMenuBar menuBar) {
-        List<KeYGuiExtension.MainMenu> menus = KeYGuiExtensionFacade.getMainMenuExtensions();
-        if (!menus.isEmpty()) {
-            JMenu menu = KeYGuiExtensionFacade.createExtensionMenu(this);
-            menuBar.add(menu);
-        }
-    }
 
     private JMenu createFileMenu() {
         JMenu fileMenu = new JMenu("File");
@@ -908,8 +938,6 @@ public final class MainWindow extends JFrame {
         smtComponent.setSelectedItem(activeAction);
     }
 
-    JCheckBoxMenuItem saveSMTFile;
-
     @SuppressWarnings("unused")
     // currently not used because we only have one specification language
     private JMenuItem setupSpeclangMenu() {
@@ -947,7 +975,7 @@ public final class MainWindow extends JFrame {
     }
 
     public ProofTreeView getProofTreeView() {
-        return mainWindowTabbedPane.getProofTreeView();
+        return proofTreeView;
     }
 
     /**
@@ -975,111 +1003,6 @@ public final class MainWindow extends JFrame {
         getMediator().setProof(proof);
         return proof;
     }
-
-    /**
-     * invoked if a frame that wants modal access is opened
-     */
-    class MainGUIListener implements GUIListener {
-
-        private void enableMenuBar(JMenuBar m, boolean b) {
-            for (int i = 0; i < m.getMenuCount(); i++) {
-                JMenu menu = m.getMenu(i);
-                if (menu != null) {
-                    // otherwise it is a spacer
-                    menu.setEnabled(b);
-                }
-            }
-        }
-
-        private Set<Component> doNotReenable;
-
-        private void setToolBarDisabled() {
-            assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
-            doNotReenable = new LinkedHashSet<Component>();
-            Component[] cs = controlToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!cs[i].isEnabled()) {
-                    doNotReenable.add(cs[i]);
-                }
-                cs[i].setEnabled(false);
-            }
-            cs = fileOpToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!cs[i].isEnabled()) {
-                    doNotReenable.add(cs[i]);
-                }
-                cs[i].setEnabled(false);
-            }
-        }
-
-        private void setToolBarEnabled() {
-            assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
-            if (doNotReenable == null) {
-                // bug #1105 occurred
-                Debug.out("toolbar enabled w/o prior disable");
-                return;
-            }
-
-            Component[] cs = controlToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!doNotReenable.contains(cs[i])) {
-                    cs[i].setEnabled(true);
-                }
-            }
-            cs = fileOpToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!doNotReenable.contains(cs[i])) {
-                    cs[i].setEnabled(true);
-                }
-            }
-
-            doNotReenable = null;
-        }
-
-        @Override
-        public void modalDialogOpened(EventObject e) {
-
-            if (e.getSource() instanceof ApplyTacletDialog) {
-                // disable all elements except the sequent window (drag'n'drop !) ...
-                enableMenuBar(MainWindow.this.getJMenuBar(), false);
-                MainWindow.this.mainFrame.setEnabled(false);
-                mainWindowTabbedPane.setEnabledForAllTabs(false);
-                setToolBarDisabled();
-            } else {
-                // disable the whole main window ...
-                MainWindow.this.setEnabled(false);
-            }
-        }
-
-        /**
-         * invoked if a frame that wants modal access is closed
-         */
-        @Override
-        public void modalDialogClosed(EventObject e) {
-            if (e.getSource() instanceof ApplyTacletDialog) {
-                // enable all previously disabled elements ...
-                enableMenuBar(MainWindow.this.getJMenuBar(), true);
-                MainWindow.this.mainFrame.setEnabled(true);
-                mainWindowTabbedPane.setEnabledForAllTabs(true);
-                setToolBarEnabled();
-            } else {
-                // enable the whole main window ...
-                MainWindow.this.setEnabled(true);
-            }
-        }
-
-        @Override
-        public void shutDown(EventObject e) {
-            MainWindow.this.notify(new ExitKeYEvent());
-            MainWindow.this.setVisible(false);
-        }
-
-    }
-
-    /**
-     * set to true if the view of the current goal should not be updated
-     */
-    private boolean disableCurrentGoalView = false;
 
     /*
      * Updates the sequent displayed in the main frame.
@@ -1121,82 +1044,203 @@ public final class MainWindow extends JFrame {
 
     }
 
-    class MainProofListener implements AutoModeListener, KeYSelectionListener,
-            SettingsListener {
+    void displayResults(String message) {
+        setStatusLine(message);
+    }
 
-        Proof proof = null;
-
-        /**
-         * focused node has changed
-         */
-        @Override
-        public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
-            if (getMediator().isInAutoMode()) {
-                return;
-            }
-            updateSequentView();
-        }
-
-        /**
-         * the selected proof has changed (e.g. a new proof has been loaded)
-         */
-        @Override
-        public synchronized void selectedProofChanged(KeYSelectionEvent e) {
-            Debug.out("Main: initialize with new proof");
-
-            if (proof != null && !proof.isDisposed()) {
-                proof.getSettings().getStrategySettings().removeSettingsListener(this);
-            }
-            proof = e.getSource().getSelectedProof();
-            if (proof != null) {
-                proof.getSettings().getStrategySettings().addSettingsListener(this);
-            }
-
-            disableCurrentGoalView = false;
-            updateSequentView();
-            makePrettyView();
-        }
-
-        /**
-         * invoked if automatic execution has started
-         */
-        @Override
-        public synchronized void autoModeStarted(ProofEvent e) {
-            Debug.log4jWarn("Automode started", MainWindow.class.getName());
-            disableCurrentGoalView = true;
-            getMediator().removeKeYSelectionListener(proofListener);
-            freezeExceptAutoModeButton();
-        }
-
-        /**
-         * invoked if automatic execution has stopped
-         */
-        @Override
-        public synchronized void autoModeStopped(ProofEvent e) {
-            if (Debug.ENABLE_DEBUG) {
-                Debug.log4jWarn("Automode stopped", MainWindow.class.getName());
-                Debug.log4jDebug("From " + Debug.stackTrace(),
-                        MainWindow.class.getName());
-            }
-            unfreezeExceptAutoModeButton();
-            disableCurrentGoalView = false;
-            updateSequentView();
-            getMediator().addKeYSelectionListener(proofListener);
-        }
-
-        /**
-         * invoked when the strategy of a proof has been changed
-         */
-        @Override
-        public synchronized void settingsChanged(EventObject e) {
-            if (proof.getSettings().getStrategySettings() == e.getSource()) {
-                // updateAutoModeConfigButton();
-            }
+    /**
+     * informs the NotificationManager about an event
+     *
+     * @param event the NotificationEvent
+     */
+    public void notify(NotificationEvent event) {
+        if (notificationManager != null) {
+            notificationManager.handleNotificationEvent(event);
         }
     }
 
-    void displayResults(String message) {
-        setStatusLine(message);
+    public void popupInformationMessage(Object message, String title) {
+        JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void popupWarning(Object message, String title) {
+        JOptionPane.showMessageDialog(this, message, title, JOptionPane.WARNING_MESSAGE);
+    }
+
+    /**
+     * Brings up a dialog displaying a message.
+     *
+     * @param modal whether or not the message should be displayed in a modal dialog.
+     */
+    public void popupInformationMessage(Object message, String title, boolean modal) {
+        if (modal) {
+            popupInformationMessage(message, title);
+        } else {
+            if (!(message instanceof Component)) {
+                throw new InternalError("only messages of type " + Component.class + " supported, yet");
+            }
+            JFrame dlg = new JFrame(title);
+            dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            dlg.getContentPane().add((Component) message);
+            dlg.pack();
+            GuiUtilities.setCenter(dlg, this);
+            dlg.setVisible(true);
+        }
+    }
+
+    public TaskTree getProofList() {
+        return proofList;
+    }
+
+    public RecentFileMenu getRecentFiles() {
+        return recentFileMenu;
+    }
+
+    public WindowUserInterfaceControl getUserInterface() {
+        return userInterface;
+    }
+
+    public Action getOpenMostRecentFileAction() {
+        return openMostRecentFileAction;
+    }
+
+    public Action getUnicodeToggleAction() {
+        return unicodeToggleAction;
+    }
+
+    public Action getHidePackagePrefixToggleAction() {
+        return hidePackagePrefixToggleAction;
+    }
+
+    /**
+     * Store the properties of the named components under {@code component} to
+     * the system preferences.
+     * <p>
+     * This uses the {@link Preferences} class to access the system preferences.
+     * Preferences are not explicitly synchronised; this happens at application
+     * end using {@link #syncPreferences()}. All components which are in the
+     * component tree are queried.
+     *
+     * @param component the non-null component whose preferences are to be saved
+     * @see PreferenceSaver
+     */
+    public void savePreferences(Component component) {
+        prefSaver.save(component);
+    }
+
+    /**
+     * Load the properties of the named components under {@code component} from
+     * the system preferences.
+     * <p>
+     * This uses the {@link Preferences} class to access the system preferences.
+     * All components which are in the component tree are queried.
+     *
+     * @param component the non-null component whose preferences are to be set
+     * @see PreferenceSaver
+     */
+    public final void loadPreferences(Component component) {
+        prefSaver.load(component);
+    }
+
+    /**
+     * Synchronised the system properties with the background storage system.
+     * <p>
+     * This is typically called at application termination.
+     *
+     * @see PreferenceSaver
+     */
+    public final void syncPreferences() {
+        try {
+            prefSaver.flush();
+        } catch (BackingStoreException e) {
+            // it is not tragic if the preferences cannot be stored.
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * <p>
+     * Returns the {@link ExitMainAction} that is used to exit the {@link MainWindow}.
+     * </p>
+     * <p>
+     * This functionality is required because for instance other projects
+     * like the Eclipse integration has to close the main window.
+     * </p>
+     *
+     * @return The used {@link ExitMainAction}.
+     */
+    public ExitMainAction getExitMainAction() {
+        return exitMainAction;
+    }
+
+    /**
+     * <p>
+     * Returns the {@link NotificationManager}.
+     * </p>
+     * <p>
+     * This functionality is required because in other project is it
+     * required to execute the automatic mode without opening the result dialog
+     * which can be disabled in the {@link NotificationManager}.
+     * </p>
+     *
+     * @return
+     */
+    public NotificationManager getNotificationManager() {
+        return notificationManager;
+    }
+
+    protected void addRecentFile(String absolutePath) {
+        recentFileMenu.addRecentFile(absolutePath);
+    }
+
+    public void openExamples() {
+        openExampleAction.actionPerformed(null);
+    }
+
+    public void loadProblem(File file) {
+        getUserInterface().loadProblem(file);
+    }
+
+    public void loadProblem(File file, List<File> classPath, File bootClassPath, List<File> includes) {
+        getUserInterface().loadProblem(file, classPath, bootClassPath, includes);
+    }
+
+    /*
+     * Retrieves supported term label names from profile and returns a sorted
+     * list of them.
+     */
+    public List<Name> getSortedTermLabelNames() {
+        /*
+         * Get list of labels from profile. This list is not always identical,
+         * since the used Profile may change during execution.
+         */
+        return TermLabelVisibilityManager.getSortedTermLabelNames(getMediator().getProfile());
+    }
+
+    /**
+     * Returns the {@link JToolBar} with the proof control.
+     * <p>
+     * This method is used by the Eclipse world to add additional features!
+     *
+     * @return The {@link JToolBar} with the proof control.
+     */
+    public JToolBar getControlToolBar() {
+        return controlToolBar;
+    }
+
+    /**
+     * Defines if talcet infos are shown or not.
+     * <p>
+     * Used by the Eclipse integration.
+     *
+     * @param show {@code true} show taclet infos, {@code false} hide taclet infos.
+     */
+    public void setShowTacletInfo(boolean show) {
+        proofTreeView.tacletInfoToggle.setSelected(show);
+    }
+
+    public AutoModeAction getAutoModeAction() {
+        return autoModeAction;
     }
 
     /**
@@ -1354,6 +1398,180 @@ public final class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * invoked if a frame that wants modal access is opened
+     */
+    class MainGUIListener implements GUIListener {
+
+        private Set<Component> doNotReenable;
+
+        private void enableMenuBar(JMenuBar m, boolean b) {
+            for (int i = 0; i < m.getMenuCount(); i++) {
+                JMenu menu = m.getMenu(i);
+                if (menu != null) {
+                    // otherwise it is a spacer
+                    menu.setEnabled(b);
+                }
+            }
+        }
+
+        private void setToolBarDisabled() {
+            assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
+            doNotReenable = new LinkedHashSet<Component>();
+            Component[] cs = controlToolBar.getComponents();
+            for (int i = 0; i < cs.length; i++) {
+                if (!cs[i].isEnabled()) {
+                    doNotReenable.add(cs[i]);
+                }
+                cs[i].setEnabled(false);
+            }
+            cs = fileOpToolBar.getComponents();
+            for (int i = 0; i < cs.length; i++) {
+                if (!cs[i].isEnabled()) {
+                    doNotReenable.add(cs[i]);
+                }
+                cs[i].setEnabled(false);
+            }
+        }
+
+        private void setToolBarEnabled() {
+            assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
+            if (doNotReenable == null) {
+                // bug #1105 occurred
+                Debug.out("toolbar enabled w/o prior disable");
+                return;
+            }
+
+            Component[] cs = controlToolBar.getComponents();
+            for (int i = 0; i < cs.length; i++) {
+                if (!doNotReenable.contains(cs[i])) {
+                    cs[i].setEnabled(true);
+                }
+            }
+            cs = fileOpToolBar.getComponents();
+            for (int i = 0; i < cs.length; i++) {
+                if (!doNotReenable.contains(cs[i])) {
+                    cs[i].setEnabled(true);
+                }
+            }
+
+            doNotReenable = null;
+        }
+
+        @Override
+        public void modalDialogOpened(EventObject e) {
+
+            if (e.getSource() instanceof ApplyTacletDialog) {
+                // disable all elements except the sequent window (drag'n'drop !) ...
+                enableMenuBar(MainWindow.this.getJMenuBar(), false);
+                MainWindow.this.mainFrame.setEnabled(false);
+                //mainWindowTabbedPane.setEnabledForAllTabs(false);
+                setToolBarDisabled();
+            } else {
+                // disable the whole main window ...
+                MainWindow.this.setEnabled(false);
+            }
+        }
+
+        /**
+         * invoked if a frame that wants modal access is closed
+         */
+        @Override
+        public void modalDialogClosed(EventObject e) {
+            if (e.getSource() instanceof ApplyTacletDialog) {
+                // enable all previously disabled elements ...
+                enableMenuBar(MainWindow.this.getJMenuBar(), true);
+                MainWindow.this.mainFrame.setEnabled(true);
+                //mainWindowTabbedPane.setEnabledForAllTabs(true);
+                setToolBarEnabled();
+            } else {
+                // enable the whole main window ...
+                MainWindow.this.setEnabled(true);
+            }
+        }
+
+        @Override
+        public void shutDown(EventObject e) {
+            MainWindow.this.notify(new ExitKeYEvent());
+            MainWindow.this.setVisible(false);
+        }
+
+    }
+
+    class MainProofListener implements AutoModeListener, KeYSelectionListener,
+            SettingsListener {
+
+        Proof proof = null;
+
+        /**
+         * focused node has changed
+         */
+        @Override
+        public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
+            if (getMediator().isInAutoMode()) {
+                return;
+            }
+            updateSequentView();
+        }
+
+        /**
+         * the selected proof has changed (e.g. a new proof has been loaded)
+         */
+        @Override
+        public synchronized void selectedProofChanged(KeYSelectionEvent e) {
+            Debug.out("Main: initialize with new proof");
+
+            if (proof != null && !proof.isDisposed()) {
+                proof.getSettings().getStrategySettings().removeSettingsListener(this);
+            }
+            proof = e.getSource().getSelectedProof();
+            if (proof != null) {
+                proof.getSettings().getStrategySettings().addSettingsListener(this);
+            }
+
+            disableCurrentGoalView = false;
+            updateSequentView();
+            makePrettyView();
+        }
+
+        /**
+         * invoked if automatic execution has started
+         */
+        @Override
+        public synchronized void autoModeStarted(ProofEvent e) {
+            Debug.log4jWarn("Automode started", MainWindow.class.getName());
+            disableCurrentGoalView = true;
+            getMediator().removeKeYSelectionListener(proofListener);
+            freezeExceptAutoModeButton();
+        }
+
+        /**
+         * invoked if automatic execution has stopped
+         */
+        @Override
+        public synchronized void autoModeStopped(ProofEvent e) {
+            if (Debug.ENABLE_DEBUG) {
+                Debug.log4jWarn("Automode stopped", MainWindow.class.getName());
+                Debug.log4jDebug("From " + Debug.stackTrace(),
+                        MainWindow.class.getName());
+            }
+            unfreezeExceptAutoModeButton();
+            disableCurrentGoalView = false;
+            updateSequentView();
+            getMediator().addKeYSelectionListener(proofListener);
+        }
+
+        /**
+         * invoked when the strategy of a proof has been changed
+         */
+        @Override
+        public synchronized void settingsChanged(EventObject e) {
+            if (proof.getSettings().getStrategySettings() == e.getSource()) {
+                // updateAutoModeConfigButton();
+            }
+        }
+    }
+
     private final class DPEnableControl implements KeYSelectionListener {
 
         private void enable(boolean b) {
@@ -1378,7 +1596,6 @@ public final class MainWindow extends JFrame {
         }
 
     }
-
 
     /**
      * This action is responsible for the invocation of an SMT solver For
@@ -1453,202 +1670,5 @@ public final class MainWindow extends JFrame {
             return solverUnion.hashCode() * 7;
         }
 
-    }
-
-    /**
-     * informs the NotificationManager about an event
-     *
-     * @param event the NotificationEvent
-     */
-    public void notify(NotificationEvent event) {
-        if (notificationManager != null) {
-            notificationManager.handleNotificationEvent(event);
-        }
-    }
-
-    public void popupInformationMessage(Object message, String title) {
-        JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    public void popupWarning(Object message, String title) {
-        JOptionPane.showMessageDialog(this, message, title, JOptionPane.WARNING_MESSAGE);
-    }
-
-    /**
-     * Brings up a dialog displaying a message.
-     *
-     * @param modal whether or not the message should be displayed in a modal dialog.
-     */
-    public void popupInformationMessage(Object message, String title, boolean modal) {
-        if (modal) {
-            popupInformationMessage(message, title);
-        } else {
-            if (!(message instanceof Component)) {
-                throw new InternalError("only messages of type " + Component.class + " supported, yet");
-            }
-            JFrame dlg = new JFrame(title);
-            dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            dlg.getContentPane().add((Component) message);
-            dlg.pack();
-            GuiUtilities.setCenter(dlg, this);
-            dlg.setVisible(true);
-        }
-    }
-
-
-    public TaskTree getProofList() {
-        return proofList;
-    }
-
-    public RecentFileMenu getRecentFiles() {
-        return recentFileMenu;
-    }
-
-    public WindowUserInterfaceControl getUserInterface() {
-        return userInterface;
-    }
-
-    public Action getOpenMostRecentFileAction() {
-        return openMostRecentFileAction;
-    }
-
-    public Action getUnicodeToggleAction() {
-        return unicodeToggleAction;
-    }
-
-    public Action getHidePackagePrefixToggleAction() {
-        return hidePackagePrefixToggleAction;
-    }
-
-    /**
-     * Store the properties of the named components under {@code component} to
-     * the system preferences.
-     * <p>
-     * This uses the {@link Preferences} class to access the system preferences.
-     * Preferences are not explicitly synchronised; this happens at application
-     * end using {@link #syncPreferences()}. All components which are in the
-     * component tree are queried.
-     *
-     * @param component the non-null component whose preferences are to be saved
-     * @see PreferenceSaver
-     */
-    public void savePreferences(Component component) {
-        prefSaver.save(component);
-    }
-
-    /**
-     * Load the properties of the named components under {@code component} from
-     * the system preferences.
-     * <p>
-     * This uses the {@link Preferences} class to access the system preferences.
-     * All components which are in the component tree are queried.
-     *
-     * @param component the non-null component whose preferences are to be set
-     * @see PreferenceSaver
-     */
-    public final void loadPreferences(Component component) {
-        prefSaver.load(component);
-    }
-
-    /**
-     * Synchronised the system properties with the background storage system.
-     * <p>
-     * This is typically called at application termination.
-     *
-     * @see PreferenceSaver
-     */
-    public final void syncPreferences() {
-        try {
-            prefSaver.flush();
-        } catch (BackingStoreException e) {
-            // it is not tragic if the preferences cannot be stored.
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * <p>
-     * Returns the {@link ExitMainAction} that is used to exit the {@link MainWindow}.
-     * </p>
-     * <p>
-     * This functionality is required because for instance other projects
-     * like the Eclipse integration has to close the main window.
-     * </p>
-     *
-     * @return The used {@link ExitMainAction}.
-     */
-    public ExitMainAction getExitMainAction() {
-        return exitMainAction;
-    }
-
-    /**
-     * <p>
-     * Returns the {@link NotificationManager}.
-     * </p>
-     * <p>
-     * This functionality is required because in other project is it
-     * required to execute the automatic mode without opening the result dialog
-     * which can be disabled in the {@link NotificationManager}.
-     * </p>
-     *
-     * @return
-     */
-    public NotificationManager getNotificationManager() {
-        return notificationManager;
-    }
-
-    protected void addRecentFile(String absolutePath) {
-        recentFileMenu.addRecentFile(absolutePath);
-    }
-
-    public void openExamples() {
-        openExampleAction.actionPerformed(null);
-    }
-
-    public void loadProblem(File file) {
-        getUserInterface().loadProblem(file);
-    }
-
-    public void loadProblem(File file, List<File> classPath, File bootClassPath, List<File> includes) {
-        getUserInterface().loadProblem(file, classPath, bootClassPath, includes);
-    }
-
-    /*
-     * Retrieves supported term label names from profile and returns a sorted
-     * list of them.
-     */
-    public List<Name> getSortedTermLabelNames() {
-        /*
-         * Get list of labels from profile. This list is not always identical,
-         * since the used Profile may change during execution.
-         */
-        return TermLabelVisibilityManager.getSortedTermLabelNames(getMediator().getProfile());
-    }
-
-    /**
-     * Returns the {@link JToolBar} with the proof control.
-     * <p>
-     * This method is used by the Eclipse world to add additional features!
-     *
-     * @return The {@link JToolBar} with the proof control.
-     */
-    public JToolBar getControlToolBar() {
-        return controlToolBar;
-    }
-
-    /**
-     * Defines if talcet infos are shown or not.
-     * <p>
-     * Used by the Eclipse integration.
-     *
-     * @param show {@code true} show taclet infos, {@code false} hide taclet infos.
-     */
-    public void setShowTacletInfo(boolean show) {
-        mainWindowTabbedPane.getProofTreeView().tacletInfoToggle.setSelected(show);
-    }
-
-
-    public AutoModeAction getAutoModeAction() {
-        return autoModeAction;
     }
 }

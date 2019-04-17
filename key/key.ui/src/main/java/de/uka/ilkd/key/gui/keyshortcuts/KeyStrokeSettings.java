@@ -9,7 +9,10 @@ import de.uka.ilkd.key.settings.PathConfig;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Properties;
 
 /**
@@ -18,9 +21,9 @@ import java.util.Properties;
  */
 public class KeyStrokeSettings extends AbstractPropertiesSettings {
     private static final String SETTINGS_FILENAME = "keystrokes.properties";
-    private static final File SETTINGS_FILE = new File(PathConfig.getKeyConfigDir(), KeyStrokeSettings.SETTINGS_FILENAME);
+    private static final File SETTINGS_FILE = new File(PathConfig.getKeyConfigDir(),
+            KeyStrokeSettings.SETTINGS_FILENAME);
     private static KeyStrokeSettings INSTANCE = null;
-
     private static Properties DEFAULT_KEYSTROKES = new Properties();
 
     static {
@@ -73,21 +76,14 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyStrokeManager.SHORTCUT_KEY_MASK));
     }
 
-    private KeyStrokeSettings(Properties properties) {
-        //combine with default values
-        Properties p = new Properties(DEFAULT_KEYSTROKES);
-        p.putAll(properties);
-
-        //set internally
-        readSettings(p);
-        // save now and on close
+    private KeyStrokeSettings(Properties init) {
+        this.properties.putAll(DEFAULT_KEYSTROKES);
+        init.forEach((key, value) -> {
+            if (value != null && !value.toString().isEmpty())
+                this.properties.put(key, value);
+        });
         save();
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
-    }
-
-    @Override
-    public void readSettings(Properties props) {
-        properties.putAll(props);
     }
 
     private static <T> void defineDefault(T any, KeyStroke ks) {
@@ -105,6 +101,11 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     public static KeyStrokeSettings getInstance() {
         if (INSTANCE == null) INSTANCE = KeyStrokeSettings.loadFromConfig();
         return INSTANCE;
+    }
+
+    @Override
+    public void readSettings(Properties props) {
+        properties.putAll(props);
     }
 
     void setKeyStroke(String key, KeyStroke stroke, boolean override) {
