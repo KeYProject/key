@@ -170,9 +170,11 @@ public final class MainWindow extends JFrame {
      * action for saving a proof (attempt)
      */
     private SaveFileAction saveFileAction;
-    
-    /** action for saving a proof as a package */
-    private SaveBundleAction savePackageAction;
+
+    /**
+     * action for saving a proof as a bundle
+     */
+    private SaveBundleAction saveBundleAction;
 
     private QuickSaveAction quickSaveAction;
     private QuickLoadAction quickLoadAction;
@@ -371,6 +373,7 @@ public final class MainWindow extends JFrame {
         openMostRecentFileAction = new OpenMostRecentFileAction(this);
         editMostRecentFileAction = new EditMostRecentFileAction(this);
         saveFileAction = new SaveFileAction(this);
+        saveBundleAction = new SaveBundleAction(this);
         quickSaveAction = new QuickSaveAction(this);
         quickLoadAction = new QuickLoadAction(this);
         proofManagementAction = new ProofManagementAction(this);
@@ -446,7 +449,7 @@ public final class MainWindow extends JFrame {
         fileOperations.add(openMostRecentFileAction);
         fileOperations.add(editMostRecentFileAction);
         fileOperations.add(saveFileAction);
-        fileOperations.add(savePackageAction);
+        fileOperations.add(saveBundleAction);
         fileOperations.addSeparator();
         fileOperations.add(proofManagementAction);
 
@@ -653,7 +656,7 @@ public final class MainWindow extends JFrame {
         fileMenu.add(openMostRecentFileAction);
         fileMenu.add(editMostRecentFileAction);
         fileMenu.add(saveFileAction);
-        fileMenu.add(savePackageAction);
+        fileMenu.add(saveBundleAction);
         fileMenu.add(quickSaveAction);
         fileMenu.add(quickLoadAction);
         fileMenu.addSeparator();
