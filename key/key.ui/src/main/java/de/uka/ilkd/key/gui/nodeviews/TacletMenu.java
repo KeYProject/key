@@ -229,13 +229,11 @@ public class TacletMenu extends JMenu {
 
         //        addPopFrameItem(control);
 
-        JMenu extensionMenu = KeYGuiExtensionFacade.createTermMenu(
-                ContextMenuKind.SEQUENT_VIEW, pos, sequentView.getMainWindow());
-        if(extensionMenu.getMenuComponents().length>0) {
+        List<Action> extensionMenu = KeYGuiExtensionFacade.getContextMenuItems(
+                ContextMenuKind.SEQUENT_VIEW, pos, mediator);
+        if(!extensionMenu.isEmpty()) {
             addSeparator();
-            for (Component el : extensionMenu.getMenuComponents()) {
-                add(el);
-            }
+            extensionMenu.forEach(this::add);
         }
 
         addClipboardItem(control);

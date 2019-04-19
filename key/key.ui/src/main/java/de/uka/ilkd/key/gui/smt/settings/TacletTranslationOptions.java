@@ -74,7 +74,8 @@ public class TacletTranslationOptions extends TablePanel implements SettingsProv
         return addFileChooserPanel("Store taclet translation to file:",
                 "", infoFileChooserPanel, true, e -> {
                     piSettings.pathForTacletTranslation = fileChooserPanel.getText();
-                    piSettings.storeTacletTranslationToFile = !fileChooserPanel.getText().isBlank();
+                    piSettings.storeTacletTranslationToFile = !fileChooserPanel.getText()
+                            .trim().isEmpty();
                 });
     }
 

@@ -7,13 +7,13 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.SimpleLoopContract;
+import de.uka.ilkd.key.speclang.LoopContractImpl;
 
 /**
  * Application of {@link AbstractLoopContractRule}.
@@ -21,7 +21,7 @@ import de.uka.ilkd.key.speclang.SimpleLoopContract;
  * @author lanzinger
  */
 public abstract class AbstractLoopContractBuiltInRuleApp
-        extends AbstractBlockSpecificationElementBuiltInRuleApp {
+        extends AbstractAuxiliaryContractBuiltInRuleApp {
 
     /**
      * @see #getContract()
@@ -65,31 +65,36 @@ public abstract class AbstractLoopContractBuiltInRuleApp
                 .instantiate(posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<LoopContract> contracts = AbstractLoopContractRule
                 .getApplicableContracts(instantiation, goal, services);
-        block = instantiation.block;
+        setStatement(instantiation.statement);
         ImmutableSet<LoopContract> cons = DefaultImmutableSet.<LoopContract> nil();
         for (LoopContract cont : contracts) {
-            if (cont.getBlock().getStartPosition().getLine() == block.getStartPosition()
+            if (cont.isOnBlock() &&
+                    cont.getBlock().getStartPosition().getLine()
+                        == getStatement().getStartPosition().getLine()) {
+                cons = cons.add(cont);
+            } else if (!cont.isOnBlock() &&
+                    cont.getLoop().getStartPosition().getLine() == getStatement().getStartPosition()
                     .getLine()) {
                 cons = cons.add(cont);
             }
         }
-        contract = SimpleLoopContract.combine(cons, services);
+        contract = LoopContractImpl.combine(cons, services);
         heaps = HeapContext.getModHeaps(services, instantiation.isTransactional());
         return this;
     }
 
     /**
      *
-     * @param block
-     *            the new block.
+     * @param statement
+     *            the new statement.
      * @param contract
      *            the new contract.
      * @param heaps
      *            the new heap context.
      */
-    public void update(final StatementBlock block, final LoopContract contract,
+    public void update(final JavaStatement statement, final LoopContract contract,
             final List<LocationVariable> heaps) {
-        this.block = block;
+        setStatement(statement);
         this.contract = contract;
         this.heaps = heaps;
     }

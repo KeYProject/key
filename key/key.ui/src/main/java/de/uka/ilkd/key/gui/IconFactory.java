@@ -29,14 +29,13 @@ import javax.swing.plaf.metal.MetalIconFactory.FolderIcon16;
 import javax.swing.plaf.metal.MetalIconFactory.TreeControlIcon;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYResourceManager;
 
 public class IconFactory {
 
     private IconFactory() {}
-
-    static KeYResourceManager resManager = KeYResourceManager.getManager();
 
     private static Image keyHole             = getImage("images/ekey-mono.gif");
     private static Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
@@ -55,51 +54,42 @@ public class IconFactory {
     private static Icon expandedIcon   = KeYControlIcon.getKeYExpandedIcon();
     private static Icon collapsedIcon  = KeYControlIcon.getKeYCollapsedIcon();
 
-    private static Image prune		= getImage("images/toolbar/pruneProof.png");
-    private static Image goalBack = getImage("images/toolbar/goalBack.png");
-    private static Image autoModeStart =
-        getImage("images/toolbar/autoModeStart.png");
-    private static Image autoModeStop =
-        getImage("images/toolbar/autoModeStop.png");
-    private static Image decisionProcedureConfigArrow =
-	    getImage("images/toolbar/decProcArrow.png");
+    //private static Image prune		= getImage("images/toolbar/pruneProof.png");
+    //private static Image goalBack = getImage("images/toolbar/goalBack.png");
+    //private static Image autoModeStart = getImage("images/toolbar/autoModeStart.png");
+    //private static Image autoModeStop = getImage("images/toolbar/autoModeStop.png");
+    //private static Image decisionProcedureConfigArrow = getImage("images/toolbar/decProcArrow.png");
 
     private static Image junit = getImage("images/toolbar/junit_logo.png");
     private static Image jml   = getImage("images/toolbar/jml.png");
     private static Image uml   = getImage("images/toolbar/uml.png");
 
-    private static Image openKeYFile =
-        getImage("images/toolbar/open.png");
-    private static Image openMostRecentKeYFile =
-        getImage("images/toolbar/openMostRecent.png");
-    private static Image saveFile =
-        getImage("images/toolbar/saveFile.png");
-    private static Image editFile =
-        getImage("images/toolbar/edit.png");
-    private static Image abandonProof = getImage("images/toolbar/abandon.png");
-    private static Image configure = getImage("images/toolbar/config.png");
-    private static Image help = getImage("images/toolbar/help.png");
-    private static Image proofMgt = getImage("images/toolbar/mgt.png");
-    private static Image properties = getImage("images/toolbar/properties.png");
-    private static Image quit = getImage("images/toolbar/quit.png");
-    private static Image recentFiles = getImage("images/toolbar/recent.png");
-    private static Image search = getImage("images/toolbar/search.png");
-    private static Image search2 = getImage("images/toolbar/search2.png");
-    private static Image statistics = getImage("images/toolbar/statistics.png");
-    private static Image toolbox = getImage("images/toolbar/toolbox.png");
+    //private static Image openKeYFile = getImage("images/toolbar/open.png");
+    //private static Image openMostRecentKeYFile = getImage("images/toolbar/openMostRecent.png");
+    //private static Image saveFile =   getImage("images/toolbar/saveFile.png");
+    //private static Image editFile =  getImage("images/toolbar/edit.png");
+    //private static Image abandonProof = getImage("images/toolbar/abandon.png");
+    //private static Image configure = getImage("images/toolbar/config.png");
+    //private static Image help = getImage("images/toolbar/help.png");
+    //private static Image proofMgt = getImage("images/toolbar/mgt.png");
+    //private static Image properties = getImage("images/toolbar/properties.png");
+    //private static Image quit = getImage("images/toolbar/quit.png");
+    //private static Image recentFiles = getImage("images/toolbar/recent.png");
+    //private static Image search = getImage("images/toolbar/search.png");
+    //private static Image search2 = getImage("images/toolbar/search2.png");
+    //private static Image statistics = getImage("images/toolbar/statistics.png");
+    //private static Image toolbox = getImage("images/toolbar/toolbox.png");
 
-    private static Image plus = getImage("images/toolbar/plus.png");
-    private static Image minus = getImage("images/toolbar/minus.png");
+    //private static Image plus = getImage("images/toolbar/plus.png");
+    //private static Image minus = getImage("images/toolbar/minus.png");
     private static Image expandGoals = getImage("images/toolbar/expandGoals.png");
 
-    private static Image next = getImage("images/toolbar/go-next.png");
-    private static Image previous = getImage("images/toolbar/go-previous.png");
-    private static Image stop = getImage("images/toolbar/stop.png");
+    //private static Image next = getImage("images/toolbar/go-next.png");
+    //private static Image previous = getImage("images/toolbar/go-previous.png");
+    //private static Image stop = getImage("images/toolbar/stop.png");
 
-    private static Image interactiveAppLogo =
-        getImage("images/interactiveAppLogo.png");
-    private static Image scriptAppLogo =
-        getImage("images/scriptAppLogo.png");
+    //private static Image interactiveAppLogo = getImage("images/interactiveAppLogo.png");
+    private static Image scriptAppLogo = getImage("images/scriptAppLogo.png");
 
     private static Image counterexampleImage = getImage("images/toolbar/ce.png");
     private static Image testgenerationImage = getImage("images/toolbar/tg.png");
@@ -156,77 +146,94 @@ public class IconFactory {
 	return new ImageIcon(scaledim);
     }
 
-    public static ImageIcon abandon(int x) {
-        return scaleIcon(abandonProof ,x,x);
+    public static Icon abandon(int x) {
+        //return scaleIcon(abandonProof ,x,x);
+        return IconFontSwing.buildIcon(FontAwesomeSolid.TRASH_ALT, x);
     }
 
-    public static ImageIcon configure (int x) {
-        return scaleIcon(configure ,x,x);
+    public static Icon configure (int x) {
+        //return scaleIcon(configure ,x,x);
+        return IconFontSwing.buildIcon(FontAwesomeSolid.COGS, x);
     }
 
-    public static ImageIcon help (int x) {
-        return scaleIcon(help ,x,x);
+    public static Icon help (int x) {
+        //return scaleIcon(help ,x,x);
+        return IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, x, Color.BLUE);
     }
 
-    public static ImageIcon proofMgt (int x) {
-        return scaleIcon(proofMgt ,x,x);
+    public static Icon proofMgt (int x) {
+        //return scaleIcon(proofMgt ,x,x);
+        return IconFontSwing.buildIcon(FontAwesomeSolid.TASKS, x);
     }
 
     public static ImageIcon properties (int x) {
-        return scaleIcon(properties ,x,x);
+        //return IconFontSwing.buildIcon(FontAwesomeSolid., x);
+        //return scaleIcon(properties ,x,x);
+        return null; //TODO
     }
 
-    public static ImageIcon quit (int x) {
-        return scaleIcon(quit ,x,x);
+    public static Icon quit (int x) {
+        return IconFontSwing.buildIcon(FontAwesomeSolid.WINDOW_CLOSE, x);
+        //return scaleIcon(quit ,x,x);
     }
 
-    public static ImageIcon recentFiles (int x) {
-        return scaleIcon(recentFiles ,x,x);
+    public static Icon recentFiles (int x) {
+        return IconFontSwing.buildIcon(FontAwesomeSolid.CLOCK, x);
+        //return scaleIcon(recentFiles ,x,x);
     }
 
-    public static ImageIcon search (int x) {
-        return scaleIcon(search ,x,x);
+    public static Icon search (int x) {
+        return IconFontSwing.buildIcon(FontAwesomeSolid.SEARCH, x);
+
+        //return scaleIcon(search ,x,x);
     }
 
-    public static ImageIcon search2 (int x) {
-        return scaleIcon(search2 ,x,x);
+    public static Icon search2 (int x) {
+        return IconFontSwing.buildIcon(FontAwesomeSolid.SEARCH_LOCATION, x);
+        //return scaleIcon(search2 ,x,x);
     }
 
-    public static ImageIcon statistics(int x) {
-        return scaleIcon(statistics,x,x);
-    }
-
-
-    public static ImageIcon toolbox(int x) {
-        return scaleIcon(toolbox,x,x);
+    public static Icon statistics(int x) {
+        return IconFontSwing.buildIcon(FontAwesomeSolid.THERMOMETER_HALF, x);
+        //return scaleIcon(statistics,x,x);
     }
 
 
-    public static ImageIcon plus(int x) {
-        return scaleIcon(plus,x,x);
+    public static Icon toolbox(int x) {
+        return IconFontSwing.buildIcon(FontAwesomeSolid.TOOLBOX, x);
+        //return scaleIcon(toolbox,x,x);
     }
 
-    public static ImageIcon minus(int x) {
-        return scaleIcon(minus,x,x);
+
+    public static Icon plus(int x) {
+        return IconFontSwing.buildIcon(FontAwesomeSolid.MINUS_CIRCLE, x);
+        //return scaleIcon(plus,x,x);
+    }
+
+    public static Icon minus(int x) {
+        return IconFontSwing.buildIcon(FontAwesomeSolid.PLUS_CIRCLE, x);
+        //return scaleIcon(minus,x,x);
     }
 
     public static ImageIcon expandGoals(int x) {
         return scaleIcon(expandGoals,x,x);
     }
 
-    public static ImageIcon next(int x) {
-        return scaleIcon(next,x,x);
+    public static Icon next(int x) {
+        return IconFontSwing.buildIcon(FontAwesomeSolid.ARROW_RIGHT, x);
+        //return scaleIcon(next,x,x);
     }
 
-    public static ImageIcon previous(int x) {
-        return scaleIcon(previous,x,x);
+    public static Icon previous(int x) {
+        return IconFontSwing.buildIcon(FontAwesomeSolid.ARROW_LEFT, x);
+        //return scaleIcon(previous,x,x);
     }
 
 
-    public static ImageIcon stop(int x) {
-        return scaleIcon(stop,x,x);
+    public static Icon stop(int x) {
+        return IconFontSwing.buildIcon(FontAwesomeSolid.STOP, x, Color.RED);
+        //return scaleIcon(stop,x,x);
     }
-
 
     public static ImageIcon keyHole(int x, int y) {
 	return scaleIcon(keyHole,x,y);
@@ -256,36 +263,19 @@ public class IconFactory {
 	return  scaleIcon(keyLogo22,x,y);
     }
 
-    @Deprecated
-    public static ImageIcon reuseLogo() {
-	return null;
+    public static Icon autoModeStartLogo(int size) {
+        //return scaleIcon(autoModeStart, size, size);
+        return IconFontSwing.buildIcon(FontAwesomeSolid.PLAY_CIRCLE, size, Color.GREEN);
     }
 
-    @Deprecated
-    public static ImageIcon resumeLogo(int size) {
-	return null;
+    public static Icon autoModeStopLogo(int size) {
+        //return scaleIcon(autoModeStop, size, size);
+        return IconFontSwing.buildIcon(FontAwesomeSolid.STOP_CIRCLE, size, Color.red);
     }
 
-    @Deprecated
-    public static ImageIcon resumeDisabledLogo(int size) {
-	return null;
-    }
-
-    public static ImageIcon autoModeStartLogo(int size) {
-        return scaleIcon(autoModeStart, size, size);
-    }
-
-    public static ImageIcon autoModeStopLogo(int size) {
-        return scaleIcon(autoModeStop, size, size);
-    }
-
-    @Deprecated
-    public static ImageIcon selectStrategyArrow(int size) {
-        return null;
-    }
-
-    public static ImageIcon selectDecProcArrow(int size) {
-        return scaleIcon(decisionProcedureConfigArrow, size / 2, size);
+    public static Icon selectDecProcArrow(int size) {
+        //return scaleIcon(decisionProcedureConfigArrow, size / 2, size);
+        return IconFontSwing.buildIcon(FontAwesomeSolid.SORT_DOWN, size);
     }
 
     public static Icon oneStepSimplifier(int size) {
@@ -300,24 +290,27 @@ public class IconFactory {
     	return scaleIcon(counterexampleImage, size, size);
     }
 
-    public static ImageIcon junitLogo(int size) {
+    public static Icon junitLogo(int size) {
 	return scaleIcon(junit, size, size);
     }
 
-    public static ImageIcon jmlLogo(int size) {
+    public static Icon jmlLogo(int size) {
         return scaleIcon(jml, size, size);
     }
 
-    public static ImageIcon umlLogo(int size) {
+    /*public static Icon umlLogo(int size) {
         return scaleIcon(uml, size, size);
+    }*/
+
+    public static Icon pruneLogo(int size) {
+    	//return scaleIcon(prune, size, size);
+        return IconFontSwing.buildIcon(FontAwesomeSolid.HAND_SCISSORS, size);
     }
 
-    public static ImageIcon pruneLogo(int size) {
-    	return scaleIcon(prune, size, size);
-    }
-
-    public static ImageIcon goalBackLogo(int size) {
-	return scaleIcon(goalBack, size, size);
+    public static Icon goalBackLogo(int size) {
+	    //return scaleIcon(goalBack, size, size);
+        //alternative UNDO
+        return IconFontSwing.buildIcon(FontAwesomeSolid.BACKSPACE, size);
     }
 
     public static Icon provedFolderIcon() {
@@ -346,23 +339,28 @@ public class IconFactory {
     }
 
     public static Icon openMostRecent(int size) {
-        return scaleIcon(openMostRecentKeYFile, size, size);
+        return IconFontSwing.buildIcon(FontAwesomeSolid.FILE, size);
+        //return scaleIcon(openMostRecentKeYFile, size, size);
     }
 
     public static Icon openKeYFile(int size) {
-        return scaleIcon(openKeYFile, size, size);
+        return IconFontSwing.buildIcon(FontAwesomeSolid.FOLDER_OPEN, size);
+        //return scaleIcon(openKeYFile, size, size);
     }
 
     public static Icon saveFile(int size) {
-        return scaleIcon(saveFile, size, size);
+        return IconFontSwing.buildIcon(FontAwesomeSolid.SAVE, size);
+        //return scaleIcon(saveFile, size, size);
     }
 
     public static Icon editFile(int size) {
-        return scaleIcon(editFile, size, size);
+        return IconFontSwing.buildIcon(FontAwesomeSolid.EDIT, size);
+        //return scaleIcon(editFile, size, size);
     }
 
     public static Icon interactiveAppLogo(int size) {
-       return scaleIcon(interactiveAppLogo, size, size);
+        return IconFontSwing.buildIcon(FontAwesomeSolid.HAND_POINT_RIGHT, size);
+        //return scaleIcon(interactiveAppLogo, size, size);
     }
 
     public static Icon scriptAppLogo(int size) {

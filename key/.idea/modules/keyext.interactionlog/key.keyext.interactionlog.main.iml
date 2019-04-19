@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":keyext.interactionlog:main" external.linked.project.path="$MODULE_DIR$/../../../keyext.interactionlog" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="org.key_project" external.system.module.type="sourceSet" external.system.module.version="2.8.0-SNAPSHOT" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_12">
+    <output url="file://$MODULE_DIR$/../../../keyext.interactionlog/build/classes/java/main" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../keyext.interactionlog/src/main">
+      <sourceFolder url="file://$MODULE_DIR$/../../../keyext.interactionlog/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../keyext.interactionlog/src/main/resources" type="java-resource" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Gradle: com.atlassian.commonmark:commonmark-ext-gfm-tables:0.12.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.atlassian.commonmark:commonmark:0.12.1" level="project" />
+    <orderEntry type="library" name="Gradle: javax.xml.bind:jaxb-api:2.4.0-b180830.0359" level="project" />
+    <orderEntry type="library" name="Gradle: javax.activation:javax.activation-api:1.2.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.antlr:antlr:3.5.2" level="project" />
+    <orderEntry type="library" name="Gradle: :recoderKey:" level="project" />
+    <orderEntry type="library" name="Gradle: net.java.dev.javacc:javacc:4.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.antlr:ST4:4.0.8" level="project" />
+    <orderEntry type="library" name="Gradle: org.antlr:antlr-runtime:3.5.2" level="project" />
+    <orderEntry type="library" name="Gradle: antlr:antlr:2.7.7" level="project" />
+    <orderEntry type="module" module-name="key.key.util.main" />
+    <orderEntry type="module" module-name="key.key.removegenerics.main" />
+    <orderEntry type="module" module-name="key.key.core.symbolic_execution.main" />
+    <orderEntry type="module" module-name="key.key.ui.main" />
+    <orderEntry type="module" module-name="key.key.core.testgen.main" />
+    <orderEntry type="module" module-name="key.key.core.proof_references.main" />
+    <orderEntry type="module" module-name="key.key.util.main" />
+    <orderEntry type="module" module-name="key.key.removegenerics.main" />
+    <orderEntry type="module" module-name="key.key.core.testgen.main" />
+    <orderEntry type="module" module-name="key.key.core.symbolic_execution.main" />
+    <orderEntry type="module" module-name="key.key.core.main" />
+    <orderEntry type="module" module-name="key.key.core.main" />
+    <orderEntry type="module" module-name="key.key.core.proof_references.main" />
+  </component>
+</module>

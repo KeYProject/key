@@ -45,6 +45,9 @@ import java.util.WeakHashMap;
 
 public class GoalList extends JList<Goal> implements TabPanel {
 
+    public static final Icon GOAL_LIST_ICON =
+            IconFontSwing.buildIcon(FontAwesomeSolid.FLAG_CHECKERED,
+                                    MainWindowTabbedPane.TAB_ICON_SIZE);
     /**
      *
      */
@@ -112,13 +115,18 @@ public class GoalList extends JList<Goal> implements TabPanel {
     }
 
     @Override
+    public void init(MainWindow window, KeYMediator mediator) {
+        setMediator(mediator);
+    }
+
+    @Override
     public String getTitle() {
         return "Goals";
     }
 
     @Override
     public Icon getIcon() {
-        return null;
+        return GOAL_LIST_ICON;
     }
 
     @Override

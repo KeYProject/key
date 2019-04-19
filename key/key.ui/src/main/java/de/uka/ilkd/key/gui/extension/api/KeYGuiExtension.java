@@ -127,7 +127,7 @@ public interface KeYGuiExtension {
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        List<Action> getContextActions(MainWindow mainWindow, ContextMenuKind kind, Object underlyingObject);
+        List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, Object underlyingObject);
     }
 
     /**

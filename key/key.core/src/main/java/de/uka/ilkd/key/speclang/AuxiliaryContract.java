@@ -21,8 +21,10 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.Break;
 import de.uka.ilkd.key.java.statement.Continue;
 import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LabelJumpStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -34,7 +36,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.rule.BlockContractBuilders;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
@@ -44,7 +46,23 @@ import de.uka.ilkd.key.util.MiscTools;
  *
  * @author wacker, lanzinger
  */
-public interface BlockSpecificationElement extends SpecificationElement {
+public interface AuxiliaryContract extends SpecificationElement {
+
+    /**
+     *
+     * @return all {@link FunctionalAuxiliaryContract}s with a valid id that correspond to this
+     *         {@code BlockSpecificationElement}.
+     *         Unless this contract is a combination of other contracts, the resulting set will
+     *         only contain one element.
+     */
+    public ImmutableSet<FunctionalAuxiliaryContract<?>> getFunctionalContracts();
+
+    /**
+     *
+     * @param contract the new functional contract.
+     * @see #getFunctionalContracts()
+     */
+    public void setFunctionalContract(FunctionalAuxiliaryContract<?> contract);
 
     /**
      *
@@ -75,7 +93,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
      * are replaced by the real variables with the same names when the contract is applied.
      *
      * @return the placeholder variables used created during this contracts instantiation.
-     * @see BlockContractBuilders.VariablesCreatorAndRegistrar
+     * @see AuxiliaryContractBuilders.VariablesCreatorAndRegistrar
      */
     public Variables getPlaceholderVariables();
 
@@ -261,6 +279,18 @@ public interface BlockSpecificationElement extends SpecificationElement {
      *
      * @param heap
      *            the heap to use.
+     * @param variables
+     *            the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *            services.
+     * @return this contract's modifies clause on the specified heap.
+     */
+    Term getModifiesClause(LocationVariable heap, Variables variables, Services services);
+
+    /**
+     *
+     * @param heap
+     *            the heap to use.
      * @param services
      *            services.
      * @return this contract's modifies clause on the specified heap.
@@ -441,7 +471,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
      * @return a contract equal to this one except that it belongs to a different target.
      */
 
-    public BlockSpecificationElement setTarget(KeYJavaType newKJT, IObserverFunction newPM);
+    public AuxiliaryContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
 
     /**
      *
@@ -449,7 +479,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
      *            the new block.
      * @return a contract equal to this one except that it belongs to a different block.
      */
-    public BlockSpecificationElement setBlock(StatementBlock newBlock);
+    public AuxiliaryContract setBlock(StatementBlock newBlock);
 
     /**
      * @param services services.
@@ -466,7 +496,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
 
     /**
      * This class contains all new variables that are introduced during a
-     * {@link BlockSpecificationElement}'s instantiation.
+     * {@link AuxiliaryContract}'s instantiation.
      */
     public static class Variables {
 
@@ -591,7 +621,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
          * Creates a new instance.
          *
          * @param block
-         *            the block for which this insteance is created.
+         *            the block for which this instance is created.
          * @param labels
          *            all labels that belong to the block.
          * @param method
@@ -603,6 +633,24 @@ public interface BlockSpecificationElement extends SpecificationElement {
         public static Variables create(final StatementBlock block, final List<Label> labels,
                 final IProgramMethod method, final Services services) {
             return new VariablesCreator(block, labels, method, services).create();
+        }
+
+        /**
+         * Creates a new instance.
+         *
+         * @param loop
+         *            the loop for which this instance is created.
+         * @param labels
+         *            all labels that belong to the block.
+         * @param method
+         *            the method containing the block.
+         * @param services
+         *            services.
+         * @return a new instance.
+         */
+        public static Variables create(final LoopStatement loop, final List<Label> labels,
+                final IProgramMethod method, final Services services) {
+            return new VariablesCreator(loop, labels, method, services).create();
         }
 
         /**
@@ -786,21 +834,21 @@ public interface BlockSpecificationElement extends SpecificationElement {
          *
          * @see Variables#breakFlags
          */
-        private static final String BREAK_FLAG_BASE_NAME = "broke";
+        public static final String BREAK_FLAG_BASE_NAME = "broke";
 
         /**
          * Base name for all continue flags.
          *
          * @see Variables#continueFlags
          */
-        private static final String CONTINUE_FLAG_BASE_NAME = "continued";
+        public static final String CONTINUE_FLAG_BASE_NAME = "continued";
 
         /**
          * Name for the return flag.
          *
          * @see Variables#returnFlag
          */
-        private static final String RETURN_FLAG_NAME = "returned";
+        public static final String RETURN_FLAG_NAME = "returned";
 
         /**
          * Infix used between a flag's base name and the label name.
@@ -808,7 +856,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
          * @see Variables#breakFlags
          * @see Variables#continueFlags
          */
-        private static final String FLAG_INFIX = "To";
+        public static final String FLAG_INFIX = "To";
 
         /**
          * Suffix for all remembrance variables.
@@ -816,7 +864,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
          * @see Variables#remembranceHeaps
          * @see Variables#remembranceLocalVariables
          */
-        private static final String REMEMBRANCE_SUFFIX = "_Before_BLOCK";
+        public static final String REMEMBRANCE_SUFFIX = "_Before_BLOCK";
 
         /**
          * Suffix for all outer remembrance variables.
@@ -824,20 +872,21 @@ public interface BlockSpecificationElement extends SpecificationElement {
          * @see Variables#outerRemembranceHeaps
          * @see Variables#outerRemembranceVariables
          */
-        private static final String OUTER_REMEMBRANCE_SUFFIX = "_Before_METHOD";
+        public static final String OUTER_REMEMBRANCE_SUFFIX = "_Before_METHOD";
 
         /**
-         * @see BlockSpecificationElement#getBlock()
+         * @see AuxiliaryContract#getBlock()
+         * @see LoopContract#getLoop()
          */
-        private final StatementBlock block;
+        private final JavaStatement statement;
 
         /**
-         * @see BlockSpecificationElement#getLabels()
+         * @see AuxiliaryContract#getLabels()
          */
         private final List<Label> labels;
 
         /**
-         * @see BlockSpecificationElement#getMethod()
+         * @see AuxiliaryContract#getMethod()
          */
         private final IProgramMethod method;
 
@@ -859,8 +908,8 @@ public interface BlockSpecificationElement extends SpecificationElement {
         /**
          * Constructor.
          *
-         * @param block
-         *            the block the contract belongs to.
+         * @param statement
+         *            the block or loop the contract belongs to.
          * @param labels
          *            all labels belonging to the block.
          * @param method
@@ -868,10 +917,11 @@ public interface BlockSpecificationElement extends SpecificationElement {
          * @param services
          *            services.
          */
-        public VariablesCreator(final StatementBlock block, final List<Label> labels,
+        public VariablesCreator(final JavaStatement statement, final List<Label> labels,
                 final IProgramMethod method, final Services services) {
             super(services.getTermFactory(), services);
-            this.block = block;
+
+            this.statement = statement;
             this.labels = labels;
             this.method = method;
         }
@@ -903,7 +953,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
          */
         private void createAndStoreFlags() {
             final OuterBreakContinueAndReturnCollector collector
-                    = new OuterBreakContinueAndReturnCollector(block, labels, services);
+                    = new OuterBreakContinueAndReturnCollector(statement, labels, services);
             collector.collect();
 
             final List<Break> breaks = collector.getBreaks();
@@ -982,7 +1032,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
             final Map<LocationVariable, LocationVariable> result
                     = new LinkedHashMap<LocationVariable, LocationVariable>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                result.put(heap, heapAtPreVar(heap + suffix, heap.sort(), false));
+                result.put(heap, heapAtPreVar(heap + suffix, heap.sort(), true));
             }
             return result;
         }
@@ -994,9 +1044,17 @@ public interface BlockSpecificationElement extends SpecificationElement {
          */
         private Map<LocationVariable, LocationVariable> createRemembranceLocalVariables() {
             ImmutableSet<ProgramVariable> localOutVariables
-                    = MiscTools.getLocalOuts(block, services);
+                    = MiscTools.getLocalOuts(statement, services);
 
-            SourceElement first = block.getFirstElement();
+            SourceElement first;
+            if (statement instanceof LabeledStatement) {
+                // statement is a labeled loop.
+                first = statement;
+            } else {
+                // statement is a block starting with a (maybe labeled) loop.
+                first = statement.getFirstElement();
+            }
+
             while (first instanceof LabeledStatement) {
                 LabeledStatement s = (LabeledStatement) first;
                 first = s.getBody();
@@ -1041,27 +1099,36 @@ public interface BlockSpecificationElement extends SpecificationElement {
          * @see Variables#outerRemembranceVariables
          */
         private Map<LocationVariable, LocationVariable> createOuterRemembranceLocalVariables() {
-            ImmutableSet<ProgramVariable> localInVariables = MiscTools.getLocalIns(block, services);
+            ImmutableSet<ProgramVariable> localInVariables =
+                    MiscTools.getLocalIns(statement, services);
 
-            SourceElement first = block.getFirstElement();
-            while (first instanceof LabeledStatement) {
-                LabeledStatement s = (LabeledStatement) first;
-                first = s.getBody();
-            }
+            SourceElement first;
 
-            if (first instanceof For) {
-                ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
-                ProgramVariableCollector collector
-                        = new ProgramVariableCollector(new StatementBlock(inits), services);
-                collector.start();
+            if (statement instanceof LoopStatement) {
+            } else {
+                first = statement.getFirstElement();
+                while (first instanceof LabeledStatement) {
+                    LabeledStatement s = (LabeledStatement) first;
+                    first = s.getBody();
+                }
 
-                for (LocationVariable var : collector.result()) {
-                    if (!var.getKeYJavaType().equals(
-                            services.getTypeConverter().getHeapLDT().getHeap().getKeYJavaType())) {
-                        localInVariables = localInVariables.add(var);
+                if (first instanceof For) {
+                    ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
+                    ProgramVariableCollector collector
+                            = new ProgramVariableCollector(new StatementBlock(inits), services);
+                    collector.start();
+
+                    for (LocationVariable var : collector.result()) {
+                        if (!var.getKeYJavaType().equals(
+                                services.getTypeConverter().getHeapLDT()
+                                    .getHeap().getKeYJavaType())) {
+                            localInVariables = localInVariables.add(var);
+                        }
                     }
                 }
             }
+
+
 
             Map<LocationVariable, LocationVariable> result
                     = new LinkedHashMap<LocationVariable, LocationVariable>();

@@ -60,6 +60,8 @@ subprojects {
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
+        //weigl: enable for more work:
+        //options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
     }
 
     tasks.withType(Javadoc) {

@@ -16,13 +16,16 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.KeYSelectionModel;
+import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.KeYIcons;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.ThreadUtilities;
 import de.uka.ilkd.key.util.XMLResources;
 
@@ -31,6 +34,8 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * Class for info contents displayed in {@link MainWindow}.
@@ -118,6 +123,29 @@ public class InfoView extends JSplitPane implements TabPanel {
             }
         };
 
+        infoTree.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                checkPopup(e);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                checkPopup(e);
+            }
+
+            private void checkPopup(MouseEvent e) {
+                if(e.isPopupTrigger()) {
+                    Rule selected = infoTree.getLastSelectedPathComponent().getRule();
+                    JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
+                            ContextMenuKind.TACLET_INFO, selected,
+                            mediator);
+                    if(menu.getComponentCount()>0) {
+                        menu.show(InfoView.this, e.getX(), e.getY());
+                    }
+                }
+            }
+        });
+
 
         contentPane = new InfoViewContentPane();
 
@@ -143,6 +171,12 @@ public class InfoView extends JSplitPane implements TabPanel {
 
     public void setMainWindow(MainWindow w) {
         mainWindow = w;
+    }
+
+    @Override
+    public void init(MainWindow window, KeYMediator mediator) {
+        setMainWindow(window);
+        setMediator(mediator);
     }
 
     @Override

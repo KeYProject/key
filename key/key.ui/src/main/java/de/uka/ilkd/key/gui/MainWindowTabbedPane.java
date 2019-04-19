@@ -20,6 +20,8 @@ import java.util.stream.Stream;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class MainWindowTabbedPane extends JTabbedPane {
+    private static final long serialVersionUID = 1L;
+
     public static final float TAB_ICON_SIZE = 16f;
 
     /**

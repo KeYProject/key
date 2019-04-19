@@ -2,6 +2,7 @@ example.name = Simple Examples
 example.path = Dynamic Frames/Block & Loop Contracts
 example.additionalFile.1 = src/BlockContractExamples.java
 example.additionalFile.2 = src/LoopContractExamples.java
+example.additionalFile.3 = src/BlockContractExamplesWithoutPreconditions.java
 
 This example contains some simple examples for block and loop contracts.
 
