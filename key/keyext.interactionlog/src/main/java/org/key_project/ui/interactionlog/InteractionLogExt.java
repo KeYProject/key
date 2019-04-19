@@ -3,10 +3,13 @@ package org.key_project.ui.interactionlog;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.KeYIcons;
 
 import javax.swing.*;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -14,32 +17,10 @@ import java.util.List;
  * @version 1 (13.02.19)
  */
 @KeYGuiExtension.Info(name = "Interaction Logging", optional = true, priority = 10000)
-public class InteractionLogExt implements KeYGuiExtension,
-        KeYGuiExtension.LeftPanel, KeYGuiExtension.MainMenu {
-    private static final Icon INTERACTION_LOG_ICON = KeYIcons.INTERLOG_ICON.getIcon();
+public class InteractionLogExt implements KeYGuiExtension, KeYGuiExtension.LeftPanel, KeYGuiExtension.MainMenu {
 
-    private InteractionLogView interactionLogView = new InteractionLogView();
+    private InteractionLogView interactionLogView;
 
-    @Override
-    public void init(MainWindow window, KeYMediator mediator) {
-        interactionLogView.setMediator(mediator);
-        interactionLogView.setMainWindow(window);
-    }
-
-    @Override
-    public String getTitle() {
-        return "Interaction Log";
-    }
-
-    @Override
-    public Icon getIcon() {
-        return INTERACTION_LOG_ICON;
-    }
-
-    @Override
-    public JComponent getComponent() {
-        return interactionLogView;
-    }
 
     @Override
     public List<Action> getMainMenuActions(MainWindow mainWindow) {
@@ -55,5 +36,11 @@ public class InteractionLogExt implements KeYGuiExtension,
                 interactionLogView.getActionExportMarkdown(),
                 interactionLogView.getActionMUCopyClipboard(),
                 interactionLogView.getActionPauseLogging());
+    }
+
+    @Override
+    public Collection<TabPanel> getPanels(MainWindow window, KeYMediator mediator) {
+        interactionLogView = new InteractionLogView(window, mediator);
+        return Collections.singleton(interactionLogView);
     }
 }

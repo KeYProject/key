@@ -17,6 +17,7 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.KeYSelectionModel;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.KeYIcons;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -36,7 +37,7 @@ import java.awt.event.ComponentListener;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class InfoView extends JSplitPane implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
+public class InfoView extends JSplitPane implements TabPanel {
 
     /**
      *
@@ -125,6 +126,13 @@ public class InfoView extends JSplitPane implements KeYGuiExtension, KeYGuiExten
 
     }
 
+    public InfoView(MainWindow window, KeYMediator mediator) {
+        this();
+        setMainWindow(window);
+        setMediator(mediator);
+    }
+
+
     public void setMediator(KeYMediator m) {
         assert m != null;
         if (mediator != null)
@@ -133,15 +141,8 @@ public class InfoView extends JSplitPane implements KeYGuiExtension, KeYGuiExten
         mediator = m;
     }
 
-
     public void setMainWindow(MainWindow w) {
         mainWindow = w;
-    }
-
-    @Override
-    public void init(MainWindow window, KeYMediator mediator) {
-        setMainWindow(window);
-        setMediator(mediator);
     }
 
     @Override

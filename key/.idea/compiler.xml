@@ -25,6 +25,8 @@
       <module name="key.key.ui.test" target="12" />
       <module name="key.key.util.main" target="12" />
       <module name="key.key.util.test" target="12" />
+      <module name="key.keyext.interactionlog.main" target="12" />
+      <module name="key.keyext.interactionlog.test" target="12" />
       <module name="key.keyext.tacletide.main" target="12" />
       <module name="key.keyext.tacletide.test" target="12" />
       <module name="org.key_project.key.keyext.interactionlog.main" target="12" />

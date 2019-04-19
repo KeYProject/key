@@ -7,6 +7,7 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import javax.swing.*;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -81,52 +82,30 @@ public interface KeYGuiExtension {
     }
 
     /**
+     * Simplest extension point. Called during after the initialization of the {@link MainWindow}.
+     * Can be used for registering key binding.
+     */
+    interface Startup {
+        void init(MainWindow window, KeYMediator mediator);
+    }
+
+    /**
      * This interface describes the UI extension point
      * on the left bottom corner (JTabbedPane).
-     * <p>
-     * You can add various panels to the UI by implementing this
-     * interface and announcing it via the {@link java.util.ServiceLoader}.
-     * <p>
-     * Before mounting on the UI, the {@link LeftPanel#init(MainWindow, KeYMediator)}
-     * is called for injecting the dependencies.
      *
      * @author Alexander Weigl
-     * @version 1 (07.02.19)
+     * @version 2 (19.04.19)
      */
     interface LeftPanel {
         /**
-         * Initialization of the subcomponents.
+         * Initialization and return of the sub components.
          * <p>
          * Called before any other method; can be used to construct the UI.
          *
          * @param window   parent of this extension
          * @param mediator the current mediator
          */
-        void init(MainWindow window, KeYMediator mediator);
-
-        /**
-         * The title of the tab pane for the user.
-         *
-         * @return non-null and non-empty string
-         */
-        String getTitle();
-
-        /**
-         * An icon for viewing aside to the tab title.
-         *
-         * @return nullable icon
-         * @see de.uka.ilkd.key.gui.fonticons.KeYIcons
-         */
-        default Icon getIcon() {
-            return null;
-        }
-
-        /**
-         * The content of the tab pane
-         *
-         * @return non-null
-         */
-        JComponent getComponent();
+        Collection<TabPanel> getPanels(MainWindow window, KeYMediator mediator);
     }
 
     /**

@@ -2,14 +2,16 @@ package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
-import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * {@link JTabbedPane} displayed in {@link MainWindow}, to the left of
@@ -29,14 +31,17 @@ public class MainWindowTabbedPane extends JTabbedPane {
         assert mediator != null;
         assert mainWindow != null;
 
-        proofTreeView = KeYGuiExtensionFacade.getPanel(ProofTreeView.class).orElse(null);
-        //infoView = KeYGuiExtensionFacade.getPanel(InfoView.class).orElse(null);
-        //strategySelectionView = KeYGuiExtensionFacade.getPanel(StrategySelectionView.class).orElse(null);
-        //openGoalsView = KeYGuiExtensionFacade.getPanel(GoalList.class).orElse(null);
+        proofTreeView = new ProofTreeView(mediator);
+        InfoView infoView = new InfoView(mainWindow, mediator);
+        StrategySelectionView strategySelectionView = new StrategySelectionView(mainWindow, mediator);
+        GoalList openGoalsView = new GoalList(mediator);
 
-        List<KeYGuiExtension.LeftPanel> panels = KeYGuiExtensionFacade.getAllPanels();
-        panels.forEach(p -> p.init(mainWindow, mediator));
-        panels.forEach(p -> addTab(p.getTitle(), p.getIcon(), p.getComponent()));
+        Stream<TabPanel> panels = KeYGuiExtensionFacade.getAllPanels(mainWindow);
+        addPanel(infoView);
+        addPanel(strategySelectionView);
+        addPanel(openGoalsView);
+        addPanel(proofTreeView);
+        panels.forEach(this::addPanel);
 
 
         // change some key mappings which collide with font settings.
@@ -48,6 +53,10 @@ public class MainWindowTabbedPane extends JTabbedPane {
                 KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit
                         .getDefaultToolkit().getMenuShortcutKeyMask()));
         setName("leftTabbed");
+    }
+
+    protected void addPanel(TabPanel p){
+        addTab(p.getTitle(), p.getIcon(), p.getComponent());
     }
 
     protected void setEnabledForAllTabs(boolean b) {
