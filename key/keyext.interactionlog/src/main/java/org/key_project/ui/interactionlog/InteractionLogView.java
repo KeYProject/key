@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.fonticons.KeYIcons;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import org.key_project.ui.BoundsPopupMenuListener;
 import org.key_project.ui.interactionlog.algo.MUProofScriptExport;
 import org.key_project.ui.interactionlog.algo.MarkdownExport;
 import org.key_project.ui.interactionlog.algo.Reapplication;
@@ -74,6 +75,13 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         // register the recorder in the proof control
         listInteraction.setModel(interactionListModel);
         listInteraction.setCellRenderer(new InteractionCellRenderer());
+
+        BoundsPopupMenuListener listener =
+                new BoundsPopupMenuListener(true, false);
+        interactionLogSelection.addPopupMenuListener(listener);
+        interactionLogSelection.setPrototypeDisplayValue(
+                new InteractionLog("INTERACTION LOG"));
+
 
         JToolBar panelButtons = new JToolBar();
         panelButtons.add(interactionLogSelection);
