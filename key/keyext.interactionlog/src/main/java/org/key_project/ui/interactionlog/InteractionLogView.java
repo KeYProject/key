@@ -8,8 +8,8 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeRegular;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
-import de.uka.ilkd.key.gui.fonticons.KeYIcons;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import org.key_project.ui.BoundsPopupMenuListener;
@@ -36,7 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.Optional;
 
 public class InteractionLogView extends JPanel implements InteractionRecorderListener, TabPanel {
-    private static final Icon INTERACTION_LOG_ICON = KeYIcons.INTERLOG_ICON.getIcon();
+    private static final Icon INTERACTION_LOG_ICON = IconFactory.INTERLOG_ICON.get();
     private static final float SMALL_ICON_SIZE = 16f;
     private static final String MENU_ILOG = "Interaction Logging";
     private static final String MENU_ILOG_EXPORT = MENU_ILOG + ".Export";
@@ -311,7 +311,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         ExportMUScriptAction() {
             putValue(Action.NAME, "Export as Proof Script");
             putValue(Action.SMALL_ICON,
-                    KeYIcons.EXPORT_MU_SCRIPT.getIcon());
+                    IconFactory.EXPORT_MU_SCRIPT.get());
             setMenuPath(MENU_ILOG_EXPORT);
         }
 
@@ -331,7 +331,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         ExportMUScriptClipboardAction() {
             putValue(Action.NAME, "Copy MUScript");
             putValue(Action.SMALL_ICON,
-                    KeYIcons.EXPORT_MU_SCRIPT_CLIPBOARD.getIcon());
+                    IconFactory.EXPORT_MU_SCRIPT_CLIPBOARD.get());
             setMenuPath(MENU_ILOG_EXPORT);
         }
 
@@ -380,7 +380,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     private class SaveAction extends KeyAction {
         SaveAction() {
             putValue(Action.NAME, "Save");
-            putValue(Action.SMALL_ICON, KeYIcons.INTERLOG_SAVE.getIcon());
+            putValue(Action.SMALL_ICON, IconFactory.INTERLOG_SAVE.get());
             setMenuPath(MENU_ILOG);
             setPriority(1);
             //new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/database_save.png")));
@@ -457,7 +457,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     private class JumpIntoTreeAction extends KeyAction {
         JumpIntoTreeAction() {
             setName("Jump into tree");
-            putValue(SMALL_ICON, KeYIcons.JUMP_INTO_TREE.getIcon());
+            putValue(SMALL_ICON, IconFactory.JUMP_INTO_TREE.get());
             setMenuPath(MENU_ILOG);
         }
 
@@ -478,7 +478,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     private class TryReapplyAction extends KeyAction {
         TryReapplyAction() {
             putValue(NAME, "Re-apply action");
-            putValue(SMALL_ICON, KeYIcons.INTERLOG_TRY_APPLY.getIcon());
+            putValue(SMALL_ICON, IconFactory.INTERLOG_TRY_APPLY.get());
             setMenuPath(MENU_ILOG);
         }
 
@@ -524,7 +524,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         public ExportKPSAction() {
             setName("Export as KPS …");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into the KPS format.");
-            putValue(Action.SMALL_ICON, KeYIcons.INTERLOG_EXPORT_KPS.getIcon());
+            putValue(Action.SMALL_ICON, IconFactory.INTERLOG_EXPORT_KPS.get());
             setMenuPath(MENU_ILOG_EXPORT);
         }
 
@@ -558,7 +558,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         public ShowExtendedActionsAction() {
             setName("More …");
             putValue(Action.SHORT_DESCRIPTION, "Shows further options");
-            putValue(Action.SMALL_ICON, KeYIcons.INTERLOW_EXTENDED_ACTIONS.getIcon());
+            putValue(Action.SMALL_ICON, IconFactory.INTERLOW_EXTENDED_ACTIONS.get());
         }
 
         public JPopupMenu createMenu() {
@@ -595,10 +595,10 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
         private void update() {
             if (!isSelected()) {
-                setIcon(KeYIcons.INTERLOG_PAUSE.getIcon());
+                setIcon(IconFactory.INTERLOG_PAUSE.get());
                 setName("Pause Interaction Logging");
             } else {
-                setIcon(KeYIcons.INTERLOG_RESUME.getIcon());
+                setIcon(IconFactory.INTERLOG_RESUME.get());
                 setName("Resume Interaction Logging");
             }
         }
@@ -681,7 +681,7 @@ class InteractionCellRenderer extends JPanel implements ListCellRenderer<Interac
     private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final Color COLOR_FAVOURED = new Color(0xFFD373);
     private JLabel lblIconLeft = new JLabel(), lblIconRight = new JLabel(), lblText = new JLabel();
-    private Icon iconHeart = KeYIcons.INTERLOG_TOGGLE_FAV.getIcon();
+    private Icon iconHeart = IconFactory.INTERLOG_TOGGLE_FAV.get();
 
     InteractionCellRenderer() {
         setLayout(new BorderLayout());

@@ -121,7 +121,7 @@ public interface KeYGuiExtension {
          * Actions should use the {@link KeYExtConstants#PATH} and {@link KeYExtConstants#PRIORITY} to control their
          * position in the menu.
          *
-         * @param mainWindow       the window of the main menu
+         * @param mediator       the window of the main menu
          * @param kind             the type of context menu
          * @param underlyingObject the object for which the context menu is requested
          * @return non-null, emptiable list of actions.

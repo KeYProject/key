@@ -4,7 +4,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.impl.Extension;
 import de.uka.ilkd.key.gui.extension.impl.ExtensionSettings;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
-import de.uka.ilkd.key.gui.fonticons.KeYIcons;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.TablePanel;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -46,7 +46,7 @@ public class ExtensionManager extends TablePanel implements SettingsProvider {
 
         JLabel lblInfo = new JLabel("Settings will be applied on next restart");
         keywords += lblInfo.getText();
-        lblInfo.setIcon(KeYIcons.WARNING_INCOMPLETE.getIcon());
+        lblInfo.setIcon(IconFactory.WARNING_INCOMPLETE.get());
         lblInfo.setBackground(Color.orange.darker());
         lblHead.setFont(lblHead.getFont().deriveFont(16f));
         add(lblInfo, new CC().span().alignX("left"));

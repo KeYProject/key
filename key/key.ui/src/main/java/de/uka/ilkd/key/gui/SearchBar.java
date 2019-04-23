@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Insets;

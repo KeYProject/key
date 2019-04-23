@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.gui.settings;
 
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.fonticons.KeYIcons;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -22,9 +22,8 @@ import java.util.stream.Collectors;
  * @version 1 (08.04.19)
  */
 public class SettingsUi extends JPanel {
-    private static final Icon ICON_TREE_NODE_RETRACTED = KeYIcons.TREE_NODE_EXPANDED.getIcon();
-    private static final Icon ICON_TREE_NODE_EXPANDED = KeYIcons.TREE_NODE_RETRACTED.getIcon();
-
+    private static final Icon ICON_TREE_NODE_RETRACTED = IconFactory.TREE_NODE_EXPANDED.get();
+    private static final Icon ICON_TREE_NODE_EXPANDED = IconFactory.TREE_NODE_RETRACTED.get();
 
     private final JSplitPane root;
     private DefaultTreeModel treeModel = new DefaultTreeModel(null, false);

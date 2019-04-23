@@ -6,6 +6,7 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.settings.InvalidSettingsInputException;
@@ -18,6 +19,7 @@ import de.uka.ilkd.key.rule.Rule;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -67,24 +69,9 @@ public class TestExtension implements KeYGuiExtension,
     }
 
     @Override
-    public void init(MainWindow window, KeYMediator mediator) {
-        System.out.println("TestExtension.init");
-    }
-
-    @Override
-    public String getTitle() {
-        return "Test!";
-    }
-
-    @Override
-    public JComponent getComponent() {
-        return new JLabel("Test");
-    }
-
-    @Override
     public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, Object underlyingObject) {
         return cmAdapter.getContextActions(mediator, kind, underlyingObject);
-        }
+    }
 
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
@@ -101,6 +88,21 @@ public class TestExtension implements KeYGuiExtension,
     @Override
     public SettingsProvider getSettings() {
         return new TestSettingsProvider();
+    }
+
+    @Override
+    public Collection<TabPanel> getPanels(MainWindow window, KeYMediator mediator) {
+        return Collections.singleton(new TabPanel() {
+            @Override
+            public String getTitle() {
+                return "Test";
+            }
+
+            @Override
+            public JComponent getComponent() {
+                return new JLabel("Test");
+            }
+        });
     }
 
     private class TestAction extends KeyAction {

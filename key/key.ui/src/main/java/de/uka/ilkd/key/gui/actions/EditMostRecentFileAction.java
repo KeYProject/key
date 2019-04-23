@@ -18,7 +18,7 @@ import java.io.File;
 import java.io.IOException;
 
 import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 
 

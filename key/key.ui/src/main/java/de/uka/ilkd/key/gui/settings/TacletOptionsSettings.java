@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.gui.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.fonticons.KeYIcons;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import net.miginfocom.layout.AC;
@@ -17,7 +17,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class TacletOptionsSettings extends JPanel implements SettingsProvider {
@@ -167,13 +166,13 @@ public class TacletOptionsSettings extends JPanel implements SettingsProvider {
 
         if (warnNoProof) {
             JLabel lblHead2 = new JLabel("No Proof loaded. Taclet options may not be parsed.");
-            lblHead2.setIcon(KeYIcons.WARNING_INCOMPLETE.getIcon());
+            lblHead2.setIcon(IconFactory.WARNING_INCOMPLETE.get());
             lblHead2.setFont(lblHead2.getFont().deriveFont(14f));
             add(lblHead2, new CC().newline());
         }
 
         JLabel lblHead2 = new JLabel("Taclet options will take effect only on new proofs.");
-        lblHead2.setIcon(KeYIcons.WARNING_INCOMPLETE.getIcon());
+        lblHead2.setIcon(IconFactory.WARNING_INCOMPLETE.get());
         lblHead2.setFont(lblHead2.getFont().deriveFont(14f));
         add(lblHead2, new CC().newline());
 
@@ -226,12 +225,12 @@ public class TacletOptionsSettings extends JPanel implements SettingsProvider {
         b.add(button);
 
         if (c.incomplete) {
-            JLabel lbl = new JLabel(KeYIcons.WARNING_INCOMPLETE.getIcon());
+            JLabel lbl = new JLabel(IconFactory.WARNING_INCOMPLETE.get());
             lbl.setToolTipText("Incomplete");
             b.add(lbl);
         }
         if (c.unsound) {
-            JLabel lbl = new JLabel(KeYIcons.WARNING_UNSOUND.getIcon());
+            JLabel lbl = new JLabel(IconFactory.WARNING_UNSOUND.get());
             lbl.setToolTipText("Unsound " + button.getToolTipText());
             b.add(lbl);
         }

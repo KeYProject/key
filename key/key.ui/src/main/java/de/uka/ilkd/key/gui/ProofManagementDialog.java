@@ -51,6 +51,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -84,7 +85,7 @@ public final class ProofManagementDialog extends JDialog {
 
     private static final ImageIcon keyIcon = IconFactory.keyHole(20, 20);
     private static final ImageIcon keyAlmostClosedIcon = IconFactory.keyHoleAlmostClosed(20, 20);
-    private static final ImageIcon keyClosedIcon = IconFactory.keyHoleClosed(20, 20);
+    private static final Icon keyClosedIcon = IconFactory.keyHoleClosed(20);
     private boolean startedProof;
     private JTabbedPane tabbedPane;
     private Map<Pair<KeYJavaType, IObserverFunction>, Icon> targetIcons;

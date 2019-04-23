@@ -22,8 +22,10 @@ import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
-import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-import de.uka.ilkd.key.gui.fonticons.KeYIcons;
+import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.*;
@@ -43,6 +45,7 @@ import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
 public class ProofTreeView extends JPanel implements TabPanel {
 
@@ -65,14 +68,17 @@ public class ProofTreeView extends JPanel implements TabPanel {
     private static final long serialVersionUID = 3732875161168302809L;
     // Taclet info can be shown for inner nodes.
     public final TacletInfoToggle tacletInfoToggle = new TacletInfoToggle();
+
     /**
      * The JTree that is used for actual display and interaction
      */
     final JTree delegateView;
+
     /**
      * the model that is displayed by the delegateView
      */
     GUIProofTreeModel delegateModel;
+
     /**
      * the mediator is stored here
      */
@@ -107,6 +113,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * the search dialog
      */
     private ProofTreeSearchBar proofTreeSearchPanel;
+    private int iconHeight = 12;
 
     /**
      * creates a new proof tree
@@ -126,20 +133,27 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 new DefaultMutableTreeNode("No proof loaded")) {
             private static final long serialVersionUID = 6555955929759162324L;
 
+            @Override
+            public void setFont(Font font) {
+                iconHeight = font.getSize();
+                super.setFont(font);
+            }
+
             public void updateUI() {
                 super.updateUI();
                 /* we want plus/minus signs to expand/collapse tree nodes */
                 final TreeUI ui = getUI();
                 if (ui instanceof BasicTreeUI) {
                     final BasicTreeUI treeUI = (BasicTreeUI) ui;
-                    treeUI.setExpandedIcon(IconFactory.expandedIcon());
-                    treeUI.setCollapsedIcon(IconFactory.collapsedIcon());
+                    treeUI.setExpandedIcon(IconFactory.expandedIcon(iconHeight));
+                    treeUI.setCollapsedIcon(IconFactory.collapsedIcon(iconHeight));
                 }
                 if (ui instanceof CacheLessMetalTreeUI) {
                     ((CacheLessMetalTreeUI) ui).clearDrawingCache();
                 }
             }
         };
+        iconHeight = delegateView.getFontMetrics(delegateView.getFont()).getHeight();
         delegateView.setUI(new CacheLessMetalTreeUI());
 
         delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent()
@@ -475,7 +489,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
     @Override
     public Icon getIcon() {
-        return KeYIcons.PROOF.getIcon();
+        return IconFactory.PROOF_TREE.get(MainWindowTabbedPane.TAB_ICON_SIZE);
     }
 
     @Override
@@ -677,7 +691,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
          *
          */
         private static final long serialVersionUID = -4990023575036168279L;
-        private Icon keyHole20x20 = IconFactory.keyHole(20, 20);
+        private Icon keyHole20x20 = IconFactory.keyHole(iconHeight, iconHeight);
 
         public Component getTreeCellRendererComponent(JTree tree,
                                                       Object value,
@@ -697,7 +711,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 setBackgroundNonSelectionColor(BISQUE_COLOR);
                 if (((GUIBranchNode) value).isClosed()) {
                     // all goals below this node are closed
-                    this.setIcon(IconFactory.provedFolderIcon());
+                    this.setIcon(IconFactory.provedFolderIcon(iconHeight));
                 } else {
 
                     // Find leaf goal for node and check whether this is a linked goal.
@@ -727,7 +741,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
                     proof.breadthFirstSearch(((GUIBranchNode) value).getNode(), v);
                     if (v.isLinked()) {
-                        this.setIcon(IconFactory.linkedFolderIcon());
+                        this.setIcon(IconFactory.linkedFolderIcon(iconHeight));
                     }
 
                 }
@@ -738,7 +752,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (value instanceof GUIOneStepChildTreeNode) {
                 super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
                 setForeground(GRAY_COLOR);
-                setIcon(IconFactory.oneStepSimplifier(16));
+                setIcon(IconFactory.oneStepSimplifier(iconHeight));
                 setText(value.toString());
                 return this;
             }
@@ -765,23 +779,23 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 Goal goal = proof.getGoal(node);
                 if (goal == null || node.isClosed()) {
                     tree_cell.setForeground(DARK_GREEN_COLOR);
-                    tree_cell.setIcon(IconFactory.keyHoleClosed(20, 20));
+                    tree_cell.setIcon(IconFactory.keyHoleClosed(iconHeight));
                     ProofTreeView.this.setToolTipText("Closed Goal");
                     tree_cell.setToolTipText("A closed goal");
                 } else {
                     if (goal.isLinked()) {
                         tree_cell.setForeground(PINK_COLOR);
-                        tree_cell.setIcon(IconFactory.keyHoleLinked(20, 20));
+                        tree_cell.setIcon(IconFactory.keyHoleLinked(iconHeight, iconHeight));
                         ProofTreeView.this.setToolTipText("Linked Goal");
                         tree_cell.setToolTipText("Linked goal - no automatic rule application");
                     } else if (!goal.isAutomatic()) {
                         tree_cell.setForeground(ORANGE_COLOR);
-                        tree_cell.setIcon(IconFactory.keyHoleInteractive(20, 20));
+                        tree_cell.setIcon(IconFactory.keyHoleInteractive(iconHeight, iconHeight));
                         ProofTreeView.this.setToolTipText("Disabled Goal");
                         tree_cell.setToolTipText("Interactive goal - no automatic rule application");
                     } else {
                         tree_cell.setForeground(DARK_RED_COLOR);
-                        tree_cell.setIcon(keyHole20x20);
+                        tree_cell.setIcon(IconFactory.keyHole(iconHeight, iconHeight));
                         ProofTreeView.this.setToolTipText("Open Goal");
                         tree_cell.setToolTipText("An open goal");
                     }

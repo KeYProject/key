@@ -17,10 +17,9 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.KeYSelectionModel;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
-import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
-import de.uka.ilkd.key.gui.fonticons.KeYIcons;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
@@ -48,7 +47,7 @@ public class InfoView extends JSplitPane implements TabPanel {
      *
      */
     private static final long serialVersionUID = -6944612837850368411L;
-    public static final Icon INFO_ICON = KeYIcons.INFO_VIEW_ICON.getIcon();
+    public static final Icon INFO_ICON = IconFactory.INFO_VIEW.get(MainWindowTabbedPane.TAB_ICON_SIZE);
 
 
     private final InfoTree infoTree;
@@ -171,12 +170,6 @@ public class InfoView extends JSplitPane implements TabPanel {
 
     public void setMainWindow(MainWindow w) {
         mainWindow = w;
-    }
-
-    @Override
-    public void init(MainWindow window, KeYMediator mediator) {
-        setMainWindow(window);
-        setMediator(mediator);
     }
 
     @Override

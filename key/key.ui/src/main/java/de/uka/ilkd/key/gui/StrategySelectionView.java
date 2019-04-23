@@ -16,9 +16,8 @@ package de.uka.ilkd.key.gui;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
-import de.uka.ilkd.key.gui.fonticons.KeYIcons;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -658,7 +657,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
 
     @Override
     public Icon getIcon() {
-        return KeYIcons.PROOF_SEARCH_STRATEGY_ICON.getIcon();
+        return IconFactory.PROOF_SEARCH_STRATEGY.get(MainWindowTabbedPane.TAB_ICON_SIZE);
     }
 
     /**
