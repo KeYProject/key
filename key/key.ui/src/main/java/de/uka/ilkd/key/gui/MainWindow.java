@@ -254,6 +254,9 @@ public final class MainWindow extends JFrame {
         ToolTipManager.sharedInstance().setDismissDelay(30000);
         addWindowListener(exitMainAction.windowListener);
         MacroKeyBinding.registerMacroKeyBindings(mediator, currentGoalView, getRootPane());
+
+        KeYGuiExtensionFacade.getStartupExtensions()
+                .forEach(it -> it.init(this, mediator));
     }
 
     public static MainWindow getInstance() {

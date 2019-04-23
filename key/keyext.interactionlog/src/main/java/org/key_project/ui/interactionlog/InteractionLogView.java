@@ -5,6 +5,7 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeRegular;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
@@ -34,7 +35,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Optional;
 
-public class InteractionLogView extends JPanel implements InteractionRecorderListener {
+public class InteractionLogView extends JPanel implements InteractionRecorderListener, TabPanel {
+    private static final Icon INTERACTION_LOG_ICON = KeYIcons.INTERLOG_ICON.getIcon();
     private static final float SMALL_ICON_SIZE = 16f;
     private static final String MENU_ILOG = "Interaction Logging";
     private static final String MENU_ILOG_EXPORT = MENU_ILOG + ".Export";
@@ -71,7 +73,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     };
     private JFileChooser fileChooser;
 
-    public InteractionLogView() {
+    public InteractionLogView(MainWindow window, KeYMediator mediator) {
         // register the recorder in the proof control
         listInteraction.setModel(interactionListModel);
         listInteraction.setCellRenderer(new InteractionCellRenderer());
@@ -156,6 +158,9 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         recorder.addListener(this);
 
         setBorder(BorderFactory.createTitledBorder("Interactions"));
+
+        setMainWindow(window);
+        setMediator(mediator);
     }
 
     private void handleSelectionChange(ActionEvent actionEvent) {
@@ -281,6 +286,23 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     public DefaultListModel<Interaction> getInteractionListModel() {
         return interactionListModel;
     }
+
+
+    @Override
+    public String getTitle() {
+        return "Interaction Log";
+    }
+
+    @Override
+    public Icon getIcon() {
+        return INTERACTION_LOG_ICON;
+    }
+
+    @Override
+    public JComponent getComponent() {
+        return this;
+    }
+
 
     private class InteractionLogModelItem extends DefaultComboBoxModel<InteractionLog> {
     }

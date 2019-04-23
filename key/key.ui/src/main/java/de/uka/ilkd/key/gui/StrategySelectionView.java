@@ -17,6 +17,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.KeYIcons;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -65,8 +66,7 @@ import java.util.Map.Entry;
  *
  * @author Martin Hentschel
  */
-public final class StrategySelectionView extends JPanel
-        implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
+public final class StrategySelectionView extends JPanel implements TabPanel {
     /**
      * Generated UID.
      */
@@ -125,6 +125,12 @@ public final class StrategySelectionView extends JPanel
                 components.getMaxRuleAppSlider().refresh();
             }
         });
+    }
+
+    public StrategySelectionView(MainWindow window, KeYMediator mediator) {
+        this();
+        setMediator(mediator);
+        btnGo.setAction(window.getAutoModeAction());
     }
 
     /**
@@ -639,11 +645,6 @@ public final class StrategySelectionView extends JPanel
         refresh(proof);
     }
 
-    @Override
-    public void init(MainWindow window, KeYMediator mediator) {
-        setMediator(mediator);
-        btnGo.setAction(window.getAutoModeAction());
-    }
 
     @Override
     public String getTitle() {

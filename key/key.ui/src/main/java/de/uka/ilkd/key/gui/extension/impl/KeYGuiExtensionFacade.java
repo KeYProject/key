@@ -1,10 +1,9 @@
 package de.uka.ilkd.key.gui.extension.impl;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import org.key_project.util.ServiceLoaderUtil;
 
 import javax.swing.*;
@@ -32,23 +31,12 @@ public final class KeYGuiExtensionFacade {
 
     //region panel extension
     @SuppressWarnings("todo")
-    public static List<KeYGuiExtension.LeftPanel> getAllPanels() {
-        return getExtensionInstances(KeYGuiExtension.LeftPanel.class);
+    public static Stream<TabPanel> getAllPanels(MainWindow window) {
+        return getLeftPanel().stream().flatMap(it -> it.getPanels(window, window.getMediator()).stream());
     }
 
-    /**
-     * Try to find a specific implementation of a {@link KeYGuiExtension.LeftPanel}
-     *
-     * @param clazz
-     * @param <T>
-     * @return
-     */
-    @SuppressWarnings("cast")
-    public static <T extends KeYGuiExtension.LeftPanel> Optional<T> getPanel(Class<T> clazz) {
-        Optional<KeYGuiExtension.LeftPanel> v = getAllPanels().stream()
-                .filter(it -> it.getClass().isAssignableFrom(clazz))
-                .findAny();
-        return (Optional<T>) v;
+    public static List<KeYGuiExtension.LeftPanel> getLeftPanel() {
+        return getExtensionInstances(KeYGuiExtension.LeftPanel.class);
     }
 
     /**
@@ -252,6 +240,10 @@ public final class KeYGuiExtensionFacade {
 
     public static Collection<KeYGuiExtension.Settings> getSettingsProvider() {
         return getExtensionInstances(KeYGuiExtension.Settings.class);
+    }
+
+    public static List<KeYGuiExtension.Startup> getStartupExtensions() {
+        return getExtensionInstances(KeYGuiExtension.Startup.class);
     }
 
     /**
