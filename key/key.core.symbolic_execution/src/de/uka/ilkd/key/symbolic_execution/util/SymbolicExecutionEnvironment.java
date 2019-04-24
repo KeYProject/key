@@ -35,15 +35,15 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl> extend
     * The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
     */
    private SymbolicExecutionTreeBuilder builder;
-
+   
    /**
     * Constructor.
     * @param environment The parent {@link KeYEnvironment}.
     * @param builder The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
     */
    public SymbolicExecutionEnvironment(KeYEnvironment<U> environment, SymbolicExecutionTreeBuilder builder) {
-      this(environment.getUi(),
-           environment.getInitConfig(),
+      this(environment.getUi(), 
+           environment.getInitConfig(), 
            builder);
    }
 
@@ -54,7 +54,7 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl> extend
     * @param builder The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
     */
    public SymbolicExecutionEnvironment(U ui,
-                                       InitConfig initConfig,
+                                       InitConfig initConfig, 
                                        SymbolicExecutionTreeBuilder builder) {
       super(ui, initConfig);
       this.builder = builder;
@@ -67,7 +67,7 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl> extend
    public SymbolicExecutionTreeBuilder getBuilder() {
       return builder;
    }
-
+   
    /**
     * Returns the {@link Proof} of {@link #getBuilder()}.
     * @return The {@link Proof} of {@link #getBuilder()}.
@@ -82,7 +82,7 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl> extend
     * @param proof The {@link Proof} to configure.
     * @param maximalNumberOfNodesPerBranch The maximal number of nodes per branch.
     */
-   public static void configureProofForSymbolicExecution(Proof proof,
+   public static void configureProofForSymbolicExecution(Proof proof, 
                                                          int maximalNumberOfNodesPerBranch) {
       StrategyProperties sp = ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
       boolean methodTreatmentContract = StrategyProperties.METHOD_CONTRACT.equals(sp.get(StrategyProperties.METHOD_OPTIONS_KEY));
@@ -92,7 +92,7 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl> extend
       boolean nonExecutionBranchHidingSideProofs = StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(sp.get(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY));
       configureProofForSymbolicExecution(proof, maximalNumberOfNodesPerBranch, methodTreatmentContract, loopTreatmentInvariant, blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks);
    }
-
+   
    /**
     * Configures the given {@link Proof} to use the symbolic execution strategy.
     * @param proof The {@link Proof} to configure.
@@ -100,11 +100,11 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl> extend
     * @param methodTreatmentContract {@code true} use operation contracts, {@code false} expand methods.
     * @param loopTreatmentInvariant {@code true} use invariants, {@code false} expand loops.
     * @param blockTreatmentContract Block contracts or expand otherwise?
-    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels.
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     */
-   public static void configureProofForSymbolicExecution(Proof proof,
-                                                         int maximalNumberOfNodesPerBranch,
+   public static void configureProofForSymbolicExecution(Proof proof, 
+                                                         int maximalNumberOfNodesPerBranch, 
                                                          boolean methodTreatmentContract,
                                                          boolean loopTreatmentInvariant,
                                                          boolean blockTreatmentContract,
@@ -113,7 +113,6 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl> extend
       if (proof != null) {
          StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, methodTreatmentContract, loopTreatmentInvariant, blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks);
          proof.setActiveStrategy(proof.getActiveStrategyFactory().create(proof, strategyProperties));
-         proof.getSettings().getTermLabelSettings().setUseOriginLabels(false);
          proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
          proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfNodesPerBranch));
          SymbolicExecutionUtil.updateStrategySettings(proof, strategyProperties);

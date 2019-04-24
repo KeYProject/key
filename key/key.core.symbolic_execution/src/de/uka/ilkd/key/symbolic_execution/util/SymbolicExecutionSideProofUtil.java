@@ -68,7 +68,7 @@ public final class SymbolicExecutionSideProofUtil {
     */
    private SymbolicExecutionSideProofUtil() {
    }
-
+   
    /**
     * Computes a general {@link Sequent} to prove in a side proof which
     * contains all {@link SequentFormula} of the original {@link Sequent}
@@ -96,7 +96,7 @@ public final class SymbolicExecutionSideProofUtil {
       }
       return sequentToProve;
    }
-
+   
    /**
     * <p>
     * Starts the side proof and extracts the result {@link Term}.
@@ -115,11 +115,11 @@ public final class SymbolicExecutionSideProofUtil {
     * @return The found result {@link Term} and the conditions.
     * @throws ProofInputException Occurred Exception.
     */
-   public static List<Pair<Term, Node>> computeResults(Services services,
-                                                       Proof proof,
+   public static List<Pair<Term, Node>> computeResults(Services services, 
+                                                       Proof proof, 
                                                        ProofEnvironment sideProofEnvironment,
-                                                       Sequent sequentToProve,
-                                                       TermLabel label,
+                                                       Sequent sequentToProve, 
+                                                       TermLabel label, 
                                                        String description,
                                                        String methodTreatment,
                                                        String loopTreatment,
@@ -165,7 +165,7 @@ public final class SymbolicExecutionSideProofUtil {
          disposeOrStore(description, info);
       }
    }
-
+   
    /**
     * <p>
     * Starts the side proof and extracts the result {@link Term} and conditions.
@@ -184,11 +184,11 @@ public final class SymbolicExecutionSideProofUtil {
     * @return The found result {@link Term} and the conditions.
     * @throws ProofInputException Occurred Exception.
     */
-   public static List<Triple<Term, Set<Term>, Node>> computeResultsAndConditions(Services services,
-                                                                                 Proof proof,
-                                                                                 ProofEnvironment sideProofEnvironment,
-                                                                                 Sequent sequentToProve,
-                                                                                 Operator operator,
+   public static List<Triple<Term, Set<Term>, Node>> computeResultsAndConditions(Services services, 
+                                                                                 Proof proof, 
+                                                                                 ProofEnvironment sideProofEnvironment, 
+                                                                                 Sequent sequentToProve, 
+                                                                                 Operator operator, 
                                                                                  String description,
                                                                                  String methodTreatment,
                                                                                  String loopTreatment,
@@ -265,11 +265,11 @@ public final class SymbolicExecutionSideProofUtil {
          disposeOrStore(description, info);
       }
    }
-
+   
    private static Term constructResultIfContained(Services services, SequentFormula sf, Operator operator) {
       return constructResultIfContained(services, sf.formula(), operator);
    }
-
+   
    private static Term constructResultIfContained(Services services, Term term, Operator operator) {
       if (term.op() == operator) {
          return term.sub(0);
@@ -328,7 +328,7 @@ public final class SymbolicExecutionSideProofUtil {
          }
       });
    }
-
+   
    /**
     * Checks if the given {@link SequentFormula} contains a modality or query.
     * @param sf The {@link SequentFormula} to check.
@@ -347,8 +347,8 @@ public final class SymbolicExecutionSideProofUtil {
       ContainsModalityOrQueryVisitor visitor = new ContainsModalityOrQueryVisitor();
       term.execPostOrder(visitor);
       return visitor.isContainsModalityOrQuery();
-   }
-
+   } 
+   
    /**
     * Utility method used by {@link QuerySideProofRule#containsModalityOrQuery(Term)}.
     * @author Martin Hentschel
@@ -380,7 +380,7 @@ public final class SymbolicExecutionSideProofUtil {
          return containsModalityOrQuery;
       }
    }
-
+   
    /**
     * Extracts all {@link Operator}s from the given {@link Sequent} which
     * represents relevant things.
@@ -388,7 +388,7 @@ public final class SymbolicExecutionSideProofUtil {
     * @param sequentToProve The {@link Sequent} to extract relevant things from.
     * @return The found relevant things.
     */
-   public static Set<Operator> extractRelevantThings(final Services services,
+   public static Set<Operator> extractRelevantThings(final Services services, 
                                                      Sequent sequentToProve) {
       final Set<Operator> result = new HashSet<Operator>();
       for (SequentFormula sf : sequentToProve) {
@@ -403,9 +403,9 @@ public final class SymbolicExecutionSideProofUtil {
       }
       return result;
    }
-
+   
    /**
-    * Checks if the given {@link Term} describes a relevant thing.
+    * Checks if the given {@link Term} describes a relevant thing. 
     * Relevant things are:
     * <ul>
     *    <li>IProgramVariable</li>
@@ -443,9 +443,9 @@ public final class SymbolicExecutionSideProofUtil {
     * @param sf The {@link SequentFormula} to check.
     * @return {@code true} {@link SequentFormula} is relevant condition, {@code false} {@link SequentFormula} is not a relevant condition.
     */
-   public static boolean isIrrelevantCondition(Services services,
-                                               Sequent initialSequent,
-                                               Set<Operator> relevantThingsInSequentToProve,
+   public static boolean isIrrelevantCondition(Services services, 
+                                               Sequent initialSequent, 
+                                               Set<Operator> relevantThingsInSequentToProve, 
                                                SequentFormula sf) {
       return initialSequent.antecedent().contains(sf) || // Conditions which already exist in the initial sequent are irrelevant
              initialSequent.succedent().contains(sf) || // Conditions which already exist in the initial sequent are irrelevant
@@ -496,7 +496,7 @@ public final class SymbolicExecutionSideProofUtil {
       sf.formula().execPostOrder(visitor);
       return visitor.isContainsIrrelevantThings();
    }
-
+   
    /**
     * Utility class used by {@link QuerySideProofRule#containsIrrelevantThings(Services, SequentFormula, Set)}.
     * @author Martin Hentschel
@@ -506,17 +506,17 @@ public final class SymbolicExecutionSideProofUtil {
        * The {@link Services} to use.
        */
       private Services services;
-
+      
       /**
        * The relevant things.
        */
       private Set<Operator> relevantThings;
-
+      
       /**
        * The result.
        */
       boolean containsIrrelevantThings = false;
-
+      
       /**
        * Constructor.
        * @param services The {@link Services} to use.
@@ -551,7 +551,7 @@ public final class SymbolicExecutionSideProofUtil {
          return containsIrrelevantThings;
       }
    }
-
+   
    /**
     * Starts a site proof for the given {@link Sequent}.
     * @param proof The parent {@link Proof} of the site proof to do.
@@ -563,15 +563,15 @@ public final class SymbolicExecutionSideProofUtil {
    public static ApplyStrategyInfo startSideProof(Proof proof,
                                                   ProofEnvironment sideProofEnvironment,
                                                   Sequent sequentToProve) throws ProofInputException {
-      return startSideProof(proof,
+      return startSideProof(proof, 
                             sideProofEnvironment,
-                            sequentToProve,
+                            sequentToProve, 
                             StrategyProperties.METHOD_NONE,
                             StrategyProperties.LOOP_NONE,
                             StrategyProperties.QUERY_OFF,
                             StrategyProperties.SPLITTING_OFF);
    }
-
+   
    /**
     * Starts a site proof for the given {@link Sequent}.
     * @param proof The parent {@link Proof} of the site proof to do.
@@ -590,7 +590,7 @@ public final class SymbolicExecutionSideProofUtil {
       ProofStarter starter = createSideProof(sideProofEnvironment, sequentToProve, null);
       return startSideProof(proof, starter, methodTreatment, loopTreatment, queryTreatment, splittingOption);
    }
-
+   
    /**
     * Creates a new {@link ProofStarter} which contains a new site proof
     * of the given {@link Proof}.
@@ -605,7 +605,7 @@ public final class SymbolicExecutionSideProofUtil {
                                               String proofName) throws ProofInputException {
       return SideProofUtil.createSideProof(sideProofEnvironment, sequentToProve, proofName);
    }
-
+   
    /**
     * Starts a site proof.
     * @param proof The original {@link Proof}.
@@ -613,7 +613,7 @@ public final class SymbolicExecutionSideProofUtil {
     * @param splittingOption The splitting option to use.
     * @return The site proof result.
     */
-   public static ApplyStrategyInfo startSideProof(Proof proof,
+   public static ApplyStrategyInfo startSideProof(Proof proof, 
                                                   ProofStarter starter,
                                                   String methodTreatment,
                                                   String loopTreatment,
@@ -621,10 +621,9 @@ public final class SymbolicExecutionSideProofUtil {
                                                   String splittingOption) {
       assert starter != null;
       starter.setMaxRuleApplications(10000);
-      StrategyProperties sp = proof != null && !proof.isDisposed() ?
+      StrategyProperties sp = proof != null && !proof.isDisposed() ? 
                               proof.getSettings().getStrategySettings().getActiveStrategyProperties() : // Is a clone that can be modified
                               new StrategyProperties();
-      proof.getSettings().getTermLabelSettings().setUseOriginLabels(false);
       StrategyProperties.setDefaultStrategyProperties(sp, false, true, true, false, false, false);
       sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatment);
       sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatment);
@@ -659,7 +658,7 @@ public final class SymbolicExecutionSideProofUtil {
       Term operatorTerm = extractOperatorTerm(node, operator);
       return operatorTerm != null ? operatorTerm.sub(0) : null;
    }
-
+   
    /**
     * Extracts the operator term for the formula with the given {@link Operator}
     * from the site proof result ({@link ApplyStrategyInfo}).
@@ -717,7 +716,7 @@ public final class SymbolicExecutionSideProofUtil {
          return null;
       }
    }
-
+   
    /**
     * Creates a copy of the {@link ProofEnvironment} of the given {@link Proof}
     * which has his own {@link OneStepSimplifier} instance. Such copies are
@@ -731,7 +730,7 @@ public final class SymbolicExecutionSideProofUtil {
       assert !source.isDisposed();
       return cloneProofEnvironmentWithOwnOneStepSimplifier(source.getInitConfig(), useSimplifyTermProfile);
    }
-
+   
    /**
     * Creates a copy of the {@link ProofEnvironment} of the given {@link Proof}
     * which has his own {@link OneStepSimplifier} instance. Such copies are
@@ -782,7 +781,7 @@ public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(fin
       final InitConfig initConfig = new InitConfig(sourceInitConfig.getServices().copy(profile, false));
       // Set modified taclet options in which runtime exceptions are banned.
       Choice runtimeExceptionTreatment = new Choice("ban", "runtimeExceptions");
-      ImmutableSet<Choice> choices = SideProofUtil.activateChoice(sourceInitConfig.getActivatedChoices(),
+      ImmutableSet<Choice> choices = SideProofUtil.activateChoice(sourceInitConfig.getActivatedChoices(), 
               runtimeExceptionTreatment);
       initConfig.setActivatedChoices(choices);
       // Initialize InitConfig with settings from the original InitConfig.

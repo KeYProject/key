@@ -237,8 +237,9 @@ public class Proof implements Named {
         openGoals = openGoals.prepend(firstGoal);
         setRoot(rootNode);
 
-        if (closed())
-            fireProofClosed();
+        if (closed()) {
+			fireProofClosed();
+		}
     }
 
     public Proof(String name, Term problem, String header, InitConfig initConfig ) {
@@ -404,8 +405,9 @@ public class Proof implements Named {
         Strategy ourStrategy = getActiveStrategy();
 
         final Iterator<Goal> it = openGoals ().iterator ();
-        while ( it.hasNext () )
-            it.next ().setGoalStrategy(ourStrategy);
+        while ( it.hasNext () ) {
+			it.next ().setGoalStrategy(ourStrategy);
+		}
     }
 
 
@@ -413,8 +415,9 @@ public class Proof implements Named {
         // Taclet indices of the particular goals have to
         // be rebuilt
         final Iterator<Goal> it = openGoals ().iterator ();
-        while ( it.hasNext () )
-            it.next ().clearAndDetachRuleAppIndex ();
+        while ( it.hasNext () ) {
+			it.next ().clearAndDetachRuleAppIndex ();
+		}
     }
 
 
@@ -491,9 +494,9 @@ public class Proof implements Named {
     public void replace(Goal oldGoal, ImmutableList<Goal> newGoals) {
         openGoals = openGoals.removeAll(oldGoal);
 
-        if ( closed () )
-            fireProofClosed();
-        else {
+        if ( closed () ) {
+			fireProofClosed();
+		} else {
             fireProofGoalRemoved(oldGoal);
             add(newGoals);
         }
@@ -523,10 +526,11 @@ public class Proof implements Named {
             }
         }
 
-        if ( b )
-            // For the moment it is necessary to fire the message ALWAYS
+        if ( b ) {
+			// For the moment it is necessary to fire the message ALWAYS
             // in order to detect branch closing.
             fireProofGoalsAdded ( ImmutableSLList.<Goal>nil() );
+		}
     }
 
     /**
