@@ -127,7 +127,7 @@ public abstract class AbstractSlicer {
     * @return The computed slice.
     */
    protected abstract ImmutableArray<Node> doSlicing(Node seedNode, Location seedLocation, ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException;
-   
+
    /**
     * The result returned by {@link AbstractSlicer#analyzeSequent(Node)}.
     * @author Martin Hentschel
@@ -137,7 +137,7 @@ public abstract class AbstractSlicer {
        * The found aliases.
        */
       private final Map<Location, SortedSet<Location>> aliases;
-      
+
       /**
        * The local values.
        */
@@ -147,7 +147,7 @@ public abstract class AbstractSlicer {
        * The current {@link ExecutionContext}.
        */
       private final ExecutionContext executionContext;
-      
+
       /**
        * The this reference if available.
        */
@@ -158,8 +158,8 @@ public abstract class AbstractSlicer {
        * @param aliases The found aliases.
        * @param thisReference The this reference if available.
        */
-      public SequentInfo(Map<Location, SortedSet<Location>> aliases, 
-                         Map<ProgramVariable, Term> localValues, 
+      public SequentInfo(Map<Location, SortedSet<Location>> aliases,
+                         Map<ProgramVariable, Term> localValues,
                          ExecutionContext executionContext,
                          ReferencePrefix thisReference) {
          assert aliases != null;
@@ -202,7 +202,7 @@ public abstract class AbstractSlicer {
          return thisReference;
       }
    }
-   
+
    /**
     * Computes the aliases specified by the updates of the current {@link Node}
     * at the application {@link PosInOccurrence} and computes the current {@code this} reference.
@@ -233,7 +233,7 @@ public abstract class AbstractSlicer {
          return null; // Not the modality of interest.
       }
    }
-   
+
    /**
     * Analyzes the gievn {@link ISymbolicEquivalenceClass}es.
     * @param services The {@link Services} to use.
@@ -293,7 +293,7 @@ public abstract class AbstractSlicer {
          }
       }
    }
-   
+
    /**
     * Analyzes the given equality {@link Term} for aliased locations.
     * @param services The {@link Services} to use.
@@ -324,9 +324,9 @@ public abstract class AbstractSlicer {
     * @param ec The current {@link ExecutionContext}.
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
     */
-   protected void analyzeUpdates(ImmutableList<Term> updates, 
-                                 Services services, 
-                                 HeapLDT heapLDT, 
+   protected void analyzeUpdates(ImmutableList<Term> updates,
+                                 Services services,
+                                 HeapLDT heapLDT,
                                  Map<Location, SortedSet<Location>> aliases,
                                  Map<ProgramVariable, Term> localValues,
                                  ExecutionContext ec,
@@ -335,7 +335,7 @@ public abstract class AbstractSlicer {
          analyzeUpdate(update, services, heapLDT, aliases, localValues, ec, thisReference);
       }
    }
-   
+
    /**
     * Recursive utility method used by {@link #analyzeUpdates(ImmutableList, Services, HeapLDT, Map)} to analyze a given update.
     * @param term The update {@link Term} to analyze.
@@ -346,14 +346,14 @@ public abstract class AbstractSlicer {
     * @param ec The current {@link ExecutionContext}.
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
     */
-   protected void analyzeUpdate(Term term, 
-                                Services services, 
-                                HeapLDT heapLDT, 
-                                Map<Location, SortedSet<Location>> aliases, 
+   protected void analyzeUpdate(Term term,
+                                Services services,
+                                HeapLDT heapLDT,
+                                Map<Location, SortedSet<Location>> aliases,
                                 Map<ProgramVariable, Term> localValues,
                                 ExecutionContext ec,
                                 ReferencePrefix thisReference) {
-      if (term.op() == UpdateJunctor.PARALLEL_UPDATE || 
+      if (term.op() == UpdateJunctor.PARALLEL_UPDATE ||
           term.op() == UpdateApplication.UPDATE_APPLICATION) {
          for (int i = 0 ; i < term.arity(); i++) {
             analyzeUpdate(term.sub(i), services, heapLDT, aliases, localValues, ec, thisReference);
@@ -388,9 +388,9 @@ public abstract class AbstractSlicer {
     * @param aliases The alias {@link Map} to fill.
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
     */
-   protected void analyzeHeapUpdate(Term term, 
-                                    Services services, 
-                                    HeapLDT heapLDT, 
+   protected void analyzeHeapUpdate(Term term,
+                                    Services services,
+                                    HeapLDT heapLDT,
                                     Map<Location, SortedSet<Location>> aliases,
                                     ReferencePrefix thisReference) {
       final Function store = heapLDT.getStore();
@@ -422,7 +422,7 @@ public abstract class AbstractSlicer {
          throw new IllegalStateException("Can not analyze heap update '" + term + "'.");
       }
    }
-   
+
    /**
     * Recursive method to list all modified {@link Location}s in the given {@link Term}.
     * @param term The update {@link Term} to analyze.
@@ -432,15 +432,15 @@ public abstract class AbstractSlicer {
     * @param ec The current {@link ExecutionContext}.
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
     */
-   protected void listModifiedLocations(Term term, 
-                                        Services services, 
-                                        HeapLDT heapLDT, 
+   protected void listModifiedLocations(Term term,
+                                        Services services,
+                                        HeapLDT heapLDT,
                                         List<Location> listToFill,
                                         ExecutionContext ec,
                                         ReferencePrefix thisReference,
                                         Set<Location> relevantLocations,
                                         Node node) throws ProofInputException {
-      if (term.op() == UpdateJunctor.PARALLEL_UPDATE || 
+      if (term.op() == UpdateJunctor.PARALLEL_UPDATE ||
           term.op() == UpdateApplication.UPDATE_APPLICATION) {
          for (int i = 0 ; i < term.arity(); i++) {
             listModifiedLocations(term.sub(i), services, heapLDT, listToFill, ec, thisReference, relevantLocations, node);
@@ -470,9 +470,9 @@ public abstract class AbstractSlicer {
     * @param listToFill The result {@link List} with {@link Location}s to fill.
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
     */
-   protected void listModifiedHeapLocations(Term term, 
-                                            Services services, 
-                                            HeapLDT heapLDT, 
+   protected void listModifiedHeapLocations(Term term,
+                                            Services services,
+                                            HeapLDT heapLDT,
                                             List<Location> listToFill,
                                             ReferencePrefix thisReference,
                                             Set<Location> relevantLocations,
@@ -523,8 +523,8 @@ public abstract class AbstractSlicer {
 
                   Sequent sequentToProve = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, node.getAppliedRuleApp().posInOccurrence(), newTerm);
                   ProofStarter starter = SideProofUtil.createSideProof(sideProofEnv, sequentToProve, "Analyze Anon Update");
-                  info = SymbolicExecutionSideProofUtil.startSideProof(node.proof(), 
-                                                                       starter, 
+                  info = SymbolicExecutionSideProofUtil.startSideProof(node.proof(),
+                                                                       starter,
                                                                        StrategyProperties.METHOD_CONTRACT,
                                                                        StrategyProperties.LOOP_INVARIANT,
                                                                        StrategyProperties.QUERY_ON,
@@ -538,7 +538,7 @@ public abstract class AbstractSlicer {
                         Term valueTerm = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), operatorTerm.sub(i), services);
                         if (valueTerm.arity() >= 1) {
                            Term heap = valueTerm.sub(0);
-                           if (anonHeap.equals(heap)) {
+                           if (anonHeap.equalsModIrrelevantTermLabels(heap)) {
                               listToFill.add(resultLocations.get(i));
                            }
                         }
@@ -578,8 +578,8 @@ public abstract class AbstractSlicer {
                   newTerm = tb.apply(tb.elementary(heapLDT.getHeapForName(HeapLDT.BASE_HEAP_NAME), term), newTerm);
                   Sequent sequentToProve = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, null, newTerm);
                   ProofStarter starter = SideProofUtil.createSideProof(sideProofEnv, sequentToProve, "Analyze Anon Update");
-                  info = SymbolicExecutionSideProofUtil.startSideProof(node.proof(), 
-                                                                       starter, 
+                  info = SymbolicExecutionSideProofUtil.startSideProof(node.proof(),
+                                                                       starter,
                                                                        StrategyProperties.METHOD_CONTRACT,
                                                                        StrategyProperties.LOOP_INVARIANT,
                                                                        StrategyProperties.QUERY_ON,
@@ -621,8 +621,8 @@ public abstract class AbstractSlicer {
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
     */
    protected void updateAliases(Services services,
-                                Location first, 
-                                Location second, 
+                                Location first,
+                                Location second,
                                 Map<Location, SortedSet<Location>> aliases,
                                 ReferencePrefix thisReference) {
       // Try to get Set for key
@@ -655,7 +655,7 @@ public abstract class AbstractSlicer {
       values.add(first);
       values.add(second);
    }
-   
+
    /**
     * Creates a {@link SortedSet} which ensures that the elements are sorted.
     * @return The new created {@link SortedSet}.
@@ -681,7 +681,7 @@ public abstract class AbstractSlicer {
          }
       }); // Order is important for normalization;
    }
-   
+
    /**
     * Returns the representative alias for the given {@link ReferencePrefix}.
     * @param services The {@link Services} to use.
@@ -690,12 +690,12 @@ public abstract class AbstractSlicer {
     * @return The representative alias.
     */
    protected Location normalizeAlias(Services services,
-                                     ReferencePrefix referencePrefix, 
+                                     ReferencePrefix referencePrefix,
                                      SequentInfo info) {
       Location location = toLocation(services, referencePrefix, info.getExecutionContext(), info.getThisReference());
       return normalizeAlias(services, location, info);
    }
-   
+
    /**
     * Returns the representative alias for the given {@link Location}.
     * @param services The {@link Services} to use.
@@ -704,7 +704,7 @@ public abstract class AbstractSlicer {
     * @return The representative alias.
     */
    protected Location normalizeAlias(Services services,
-                                     Location location, 
+                                     Location location,
                                      SequentInfo info) {
       ImmutableList<Access> normalizedAccesses = ImmutableSLList.nil();
       for (Access access : location.getAccesses()) {
@@ -720,7 +720,7 @@ public abstract class AbstractSlicer {
       }
       return new Location(normalizedAccesses);
    }
-   
+
    /**
     * Normalizes the given array index.
     * @param access The {@link Access} representing an array index.
@@ -733,7 +733,7 @@ public abstract class AbstractSlicer {
       for (int i = 0; i < newTerms.length; i++) {
          Term oldTerm = oldTerms.get(i);
          if (oldTerm.op() instanceof ProgramVariable) {
-            Term value = info.getLocalValues().get((ProgramVariable) oldTerm.op());
+            Term value = info.getLocalValues().get(oldTerm.op());
             if (value != null) {
                oldTerm = value;
             }
@@ -749,7 +749,7 @@ public abstract class AbstractSlicer {
     * @param aliases The available aliases.
     * @return The representative alias.
     */
-   protected Location computeRepresentativeAlias(Location location, 
+   protected Location computeRepresentativeAlias(Location location,
                                                  Map<Location, SortedSet<Location>> aliases) {
       Set<Location> alternatives = aliases.get(location);
       if (alternatives != null) {
@@ -797,8 +797,8 @@ public abstract class AbstractSlicer {
     * @return {@code true} is relevant and was removed, {@code false} is not relevant and nothing has changed.
     */
    protected boolean removeRelevant(Services services,
-                                    ReferencePrefix sourceElement, 
-                                    Set<Location> relevantLocations, 
+                                    ReferencePrefix sourceElement,
+                                    Set<Location> relevantLocations,
                                     SequentInfo info) {
       Location normalized = normalizeAlias(services, sourceElement, info);
       return performRemoveRelevant(services, normalized, relevantLocations, info);
@@ -815,8 +815,8 @@ public abstract class AbstractSlicer {
     * @return {@code true} is relevant and was removed, {@code false} is not relevant and nothing has changed.
     */
    protected boolean removeRelevant(Services services,
-                                    Location location, 
-                                    Set<Location> relevantLocations, 
+                                    Location location,
+                                    Set<Location> relevantLocations,
                                     SequentInfo info) {
       Location normalized = normalizeAlias(services, location, info);
       return performRemoveRelevant(services, normalized, relevantLocations, info);
@@ -833,8 +833,8 @@ public abstract class AbstractSlicer {
     * @return {@code true} is relevant and was removed, {@code false} is not relevant and nothing has changed.
     */
    protected boolean performRemoveRelevant(Services services,
-                                           Location normalized, 
-                                           Set<Location> relevantLocations, 
+                                           Location normalized,
+                                           Set<Location> relevantLocations,
                                            SequentInfo info) {
       boolean relevant = false;
       Iterator<Location> iterator = relevantLocations.iterator();
@@ -858,13 +858,13 @@ public abstract class AbstractSlicer {
     * @return The {@link Location} representing the given {@link ReferencePrefix}.
     */
    protected Location toLocation(Services services,
-                                 ReferencePrefix prefix, 
+                                 ReferencePrefix prefix,
                                  ExecutionContext ec,
                                  ReferencePrefix thisReference) {
       ImmutableList<Access> accesses = toLocationRecursive(services, prefix, ec, thisReference, ImmutableSLList.<Access>nil());
       return new Location(accesses);
    }
-   
+
    /**
     * Utility method used by {@link #toLocation(Services, ReferencePrefix, ReferencePrefix)}
     * to recursively extract the {@link Access} instances.
@@ -876,9 +876,9 @@ public abstract class AbstractSlicer {
     * @return An {@link ImmutableList} containing all {@link Access}s of the {@link ReferencePrefix} in the order of access.
     */
    protected ImmutableList<Access> toLocationRecursive(Services services,
-                                                       ReferencePrefix prefix, 
+                                                       ReferencePrefix prefix,
                                                        ExecutionContext ec,
-                                                       ReferencePrefix thisReference, 
+                                                       ReferencePrefix thisReference,
                                                        ImmutableList<Access> children) {
       if (prefix instanceof ProgramVariable) {
          return children.prepend(new Access((ProgramVariable) prefix));
@@ -914,7 +914,7 @@ public abstract class AbstractSlicer {
          throw new IllegalStateException("Unsupported prefix '" + prefix + "'.");
       }
    }
-   
+
    /**
     * Converts the given {@link Expression}s into {@link Term}s.
     * @param services The {@link Services} to use.
@@ -922,7 +922,7 @@ public abstract class AbstractSlicer {
     * @param ec The current {@link ExecutionContext}.
     * @return The created {@link Term}s.
     */
-   public static ImmutableArray<Term> toTerm(Services services, 
+   public static ImmutableArray<Term> toTerm(Services services,
                                              ImmutableArray<Expression> expressions,
                                              ExecutionContext ec) {
       Term[] terms = new Term[expressions.size()];
@@ -933,7 +933,7 @@ public abstract class AbstractSlicer {
       }
       return new ImmutableArray<Term>(terms);
    }
-   
+
    /**
     * Converts the given {@link Expression} into a {@link Term}.
     * @param services The {@link Services} to use.
@@ -941,8 +941,8 @@ public abstract class AbstractSlicer {
     * @param ec The current {@link ExecutionContext}.
     * @return The created {@link Term}.
     */
-   public static Term toTerm(Services services, 
-                             Expression expression, 
+   public static Term toTerm(Services services,
+                             Expression expression,
                              ExecutionContext ec) {
       return services.getTypeConverter().convertToLogicElement(expression, ec);
    }
@@ -996,7 +996,7 @@ public abstract class AbstractSlicer {
     * @param newAlternatives The new alternatives.
     * @return The found alternative or {@code null} if not available.
     */
-   protected Location findNewAlternative(final SortedSet<Location> oldAlternatives, 
+   protected Location findNewAlternative(final SortedSet<Location> oldAlternatives,
                                          final SortedSet<Location> newAlternatives) {
       return CollectionUtil.search(oldAlternatives, new IFilter<Location>() {
          @Override
@@ -1012,7 +1012,7 @@ public abstract class AbstractSlicer {
     * @param toCheck The {@link ImmutableList} to check.
     * @return The common prefix length which is {@code 0} if no elements are common.
     */
-   public static <T> int computeFirstCommonPrefixLength(ImmutableList<ImmutableList<T>> candidates, 
+   public static <T> int computeFirstCommonPrefixLength(ImmutableList<ImmutableList<T>> candidates,
                                                         ImmutableList<T> toCheck) {
       int commonLength = 0;
       Iterator<ImmutableList<T>> iter = candidates.iterator();

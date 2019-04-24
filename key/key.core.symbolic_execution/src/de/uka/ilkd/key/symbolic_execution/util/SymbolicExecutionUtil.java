@@ -694,7 +694,7 @@ public final class SymbolicExecutionUtil {
    public static boolean canComputeVariables(IExecutionNode<?> node, Services services) throws ProofInputException {
       return node != null &&
              !node.isDisposed() &&
-             !services.getTermBuilder().ff().equals(node.getPathCondition());
+             !services.getTermBuilder().ff().equalsModIrrelevantTermLabels(node.getPathCondition());
    }
 
    /**
@@ -3768,8 +3768,9 @@ public final class SymbolicExecutionUtil {
              System.err.println(ioe);
          }
          result = logicPrinter.result();
-         if (result.charAt(result.length()-1) == '\n')
-             result.deleteCharAt(result.length()-1);
+         if (result.charAt(result.length()-1) == '\n') {
+			result.deleteCharAt(result.length()-1);
+		}
          return result.toString();
       }
       else {

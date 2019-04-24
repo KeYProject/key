@@ -36,7 +36,7 @@ import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
  * This means the cut is only applied if the cut formula is not an equality
  * or if it is not a negated formula or if the (negated) equality is not contained
  * as top term ({@link SequentFormula}) in the {@link Sequent} ignoring
- * the order of the equality children. 
+ * the order of the equality children.
  * </p>
  * @author Martin Hentschel
  */
@@ -63,12 +63,12 @@ public class CutHeapObjectsFeature extends BinaryFeature {
                }
                if (formula.op() == Equality.EQUALS) {
                   // Check equality ignore order of equality sub terms
-                  if (cutFormulaC0.equals(formula.sub(0))) {
-                     contains = cutFormulaC1.equals(formula.sub(1));
+                  if (cutFormulaC0.equalsModIrrelevantTermLabels(formula.sub(0))) {
+                     contains = cutFormulaC1.equalsModIrrelevantTermLabels(formula.sub(1));
                   }
                   else {
-                     contains = cutFormulaC0.equals(formula.sub(1)) &&
-                                cutFormulaC1.equals(formula.sub(0));
+                     contains = cutFormulaC0.equalsModIrrelevantTermLabels(formula.sub(1)) &&
+                                cutFormulaC1.equalsModIrrelevantTermLabels(formula.sub(0));
                   }
                }
             }

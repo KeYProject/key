@@ -11,7 +11,7 @@ public class Access {
     * The {@link ProgramVariable} or {@code null} if an array index is accessed.
     */
    private final ProgramVariable programVariable;
-   
+
    /**
     * The accessed array index or {@code null} if it is not an array access.
     */
@@ -89,8 +89,24 @@ public class Access {
    public boolean equals(Object obj) {
       if (obj instanceof Access) {
          Access other = (Access) obj;
-         return ObjectUtil.equals(programVariable, other.getProgramVariable()) &&
-                ObjectUtil.equals(dimensionExpressions, other.getDimensionExpressions());
+
+         if (!ObjectUtil.equals(programVariable, other.getProgramVariable())) {
+        	 return false;
+         } else if (dimensionExpressions == null) {
+        	 return other.getDimensionExpressions() == null;
+         } else if (other.getDimensionExpressions() == null
+        		 || dimensionExpressions.size() != other.getDimensionExpressions().size()) {
+        	 return false;
+         } else {
+        	 for (int i = 0; i < dimensionExpressions.size(); ++i) {
+        		 if (dimensionExpressions.get(i).equalsModIrrelevantTermLabels(
+        				 other.getDimensionExpressions().get(i))) {
+        			 return false;
+        		 }
+        	 }
+
+        	 return true;
+         }
       }
       else {
          return false;
