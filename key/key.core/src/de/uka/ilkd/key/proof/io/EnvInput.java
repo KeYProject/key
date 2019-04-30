@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
@@ -53,8 +54,8 @@ public interface EnvInput {
      * Reads the include section and returns an Includes object.
      */
     Includes readIncludes() throws ProofInputException;
-    
-    /** 
+
+    /**
      * Reads the Java path.
      */
     String readJavaPath() throws ProofInputException;

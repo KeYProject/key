@@ -36,6 +36,7 @@ import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationByAddRules;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
@@ -92,7 +93,9 @@ public class InitConfig {
 
     /** HashMap for quick lookups taclet name->taclet */
     private Map<Name, Taclet> activatedTacletCache = null;
-    
+
+    /** the fileRepo which is responsible for consistency between source code and proof */
+    private FileRepo fileRepo;
     
     private String originalKeYFileName;
     
@@ -432,6 +435,7 @@ public class InitConfig {
         ic.setTaclets(taclets);
         ic.originalKeYFileName = originalKeYFileName;
         ic.justifInfo = justifInfo.copy();
+        ic.fileRepo = fileRepo;     // TODO: copy instead? delete via dispose method?
         return ic;
     }
     
@@ -446,5 +450,11 @@ public class InitConfig {
             "Built-In:" + builtInRules() +"\n";
     }
 
+    public FileRepo getFileRepo() {
+        return fileRepo;
+    }
 
+    public void setFileRepo(FileRepo fileRepo) {
+        this.fileRepo = fileRepo;
+    }
 }

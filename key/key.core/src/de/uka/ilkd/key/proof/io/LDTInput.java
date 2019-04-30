@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
@@ -44,7 +45,6 @@ public class LDTInput implements EnvInput {
     private final Profile profile;
 
     private InitConfig initConfig = null;
-
 
     /** creates a representation of the LDT files to be used as input
      * to the KeY prover.
