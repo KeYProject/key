@@ -1943,7 +1943,7 @@ public class TermLabelManager {
                                             newApplicationTerm.boundVars(),
                                             newApplicationTerm.javaBlock(),
                                             newApplicationTerm.getLabels())
-                            : applicationTerm;
+                            : newApplicationTerm;
         }
         return newApplicationTerm;
     }
