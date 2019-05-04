@@ -286,7 +286,7 @@ public abstract class AbstractUpdateExtractor {
                if (SymbolicExecutionUtil.hasReferenceSort(getServices(), updateTerm.sub(0))) {
                   Term objectTerm = updateTerm.sub(0);
                   objectTerm = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), objectTerm, getServices());
-                  updateValueObjectsToFill.add(objectTerm);
+                  updateValueObjectsToFill.add(OriginTermLabel.removeOriginLabels(objectTerm, getServices()));
                }
             }
          }
@@ -385,7 +385,7 @@ public abstract class AbstractUpdateExtractor {
          if (SymbolicExecutionUtil.hasReferenceSort(getServices(), term.sub(3)) && term.sub(3).op() instanceof ProgramVariable) {
             Term objectTerm = term.sub(3);
             objectTerm = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), objectTerm, getServices());
-            updateValueObjectsToFill.add(objectTerm);
+            updateValueObjectsToFill.add(OriginTermLabel.removeOriginLabels(objectTerm, getServices()));
          }
          // Iterate over child heap modifications
          collectLocationsFromHeapUpdate(term.sub(0), locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill);
@@ -393,7 +393,7 @@ public abstract class AbstractUpdateExtractor {
       else if (term.op() == heapLDT.getCreate()) {
          Term newObject = term.sub(1);
          newObject = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), newObject, getServices());
-         updateCreatedObjectsToFill.add(newObject);
+         updateCreatedObjectsToFill.add(OriginTermLabel.removeOriginLabels(newObject, getServices()));
          // Iterate over child heap modifications
          collectLocationsFromHeapUpdate(term.sub(0), locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill);
       }
