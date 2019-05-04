@@ -3,8 +3,6 @@
    <equivalenceClass representativeTerm="self">
       <term term="self"/>
       <term term="summand"/>
-      <term term="self"/>
-      <term term="summand"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in {}">
       <value name="exc" programVariable="exc" isArrayIndex="false" value="exc" type="java.lang.Throwable" condition="true"/>
