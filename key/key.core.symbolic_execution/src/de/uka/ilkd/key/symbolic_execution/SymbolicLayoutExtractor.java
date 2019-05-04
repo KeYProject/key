@@ -703,7 +703,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
          ImmutableList<ISymbolicEquivalenceClass> equivalentClasses = layoutsEquivalentClasses.get(Integer.valueOf(layoutIndex));
          if (equivalentClasses == null) {
             ImmutableSet<Term> appliedCuts = appliedCutsPerLayout.get(layoutIndex);
-            equivalentClasses = lazyComputeEquivalenzClasses(appliedCuts);
+            equivalentClasses = lazyComputeEquivalenceClasses(appliedCuts);
             layoutsEquivalentClasses.put(Integer.valueOf(layoutIndex), equivalentClasses);
          }
          return equivalentClasses;
@@ -729,7 +729,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * @param appliedCuts The applied cut rules.
     * @return The created {@link ISymbolicEquivalenceClass} instances.
     */
-   protected ImmutableList<ISymbolicEquivalenceClass> lazyComputeEquivalenzClasses(ImmutableSet<Term> appliedCuts) {
+   protected ImmutableList<ISymbolicEquivalenceClass> lazyComputeEquivalenceClasses(ImmutableSet<Term> appliedCuts) {
       ImmutableList<ISymbolicEquivalenceClass> result = ImmutableSLList.nil();
       for (Term term : appliedCuts) {
          if (Junctor.NOT != term.op()) {

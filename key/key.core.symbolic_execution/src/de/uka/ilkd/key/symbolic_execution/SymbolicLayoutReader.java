@@ -620,6 +620,14 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
+      public String toString() {
+         return "Object " + getNameString();
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
       public Term getName() {
          return null;
       }
