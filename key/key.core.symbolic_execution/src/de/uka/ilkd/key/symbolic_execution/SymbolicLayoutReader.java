@@ -917,6 +917,14 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
+      public String toString() {
+         return "Association " + getName() + " to " + getTarget();
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
       public IProgramVariable getProgramVariable() {
          return null;
       }

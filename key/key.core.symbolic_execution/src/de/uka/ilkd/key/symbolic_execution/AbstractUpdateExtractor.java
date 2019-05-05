@@ -442,7 +442,7 @@ public abstract class AbstractUpdateExtractor {
                                                                        Set<Term> objectsToIgnore) throws ProofInputException {
       Set<ExtractLocationParameter> result = new LinkedHashSet<ExtractLocationParameter>();
       for (SequentFormula sf : sequent) {
-         result.addAll(extractLocationsFromTerm(sf.formula(), objectsToIgnore));
+         result.addAll(extractLocationsFromTerm(OriginTermLabel.removeOriginLabels(sf.formula(), getServices()), objectsToIgnore));
       }
       return result;
    }
@@ -475,6 +475,7 @@ public abstract class AbstractUpdateExtractor {
    protected void collectLocationsFromTerm(Set<ExtractLocationParameter> toFill,
                                            Term term,
                                            Set<Term> objectsToIgnore) throws ProofInputException {
+	  term = OriginTermLabel.removeOriginLabels(term, getServices());
       final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
       if (term.op() instanceof ProgramVariable) {
          ProgramVariable var = (ProgramVariable)term.op();
@@ -683,7 +684,7 @@ public abstract class AbstractUpdateExtractor {
       public ExtractLocationParameter(ExtractLocationParameter original, Term newParent) {
          this.programVariable = original.programVariable;
          this.arrayIndex = original.arrayIndex;
-         this.parentTerm = newParent;
+         this.parentTerm = OriginTermLabel.removeOriginLabels(newParent, getServices());
          this.parentTermIndexInStatePredicate = original.parentTermIndexInStatePredicate;
          this.valueTermIndexInStatePredicate = original.valueTermIndexInStatePredicate;
          this.preVariable = original.preVariable;
@@ -728,7 +729,7 @@ public abstract class AbstractUpdateExtractor {
                                          boolean stateMember) throws ProofInputException {
          assert programVariable != null;
          this.programVariable = programVariable;
-         this.parentTerm = parentTerm;
+         this.parentTerm = OriginTermLabel.removeOriginLabels(parentTerm, getServices());
          this.preVariable = createLocationVariable("Pre" + preVariableIndex++, parentTerm != null ? parentTerm.sort() : programVariable.sort());
          this.arrayIndex = null;
          this.stateMember = stateMember;
@@ -748,8 +749,8 @@ public abstract class AbstractUpdateExtractor {
                                       Term parentTerm) throws ProofInputException {
          assert parentTerm != null;
          this.programVariable = null;
-         this.arrayIndex = arrayIndex;
-         this.parentTerm = parentTerm;
+         this.arrayIndex = OriginTermLabel.removeOriginLabels(arrayIndex, getServices());
+         this.parentTerm = OriginTermLabel.removeOriginLabels(parentTerm, getServices());
          this.preVariable = createLocationVariable("Pre" + preVariableIndex++, parentTerm.sort());
          this.stateMember = false;
          this.arrayStartIndex = null;
@@ -773,11 +774,11 @@ public abstract class AbstractUpdateExtractor {
          assert parentTerm != null;
          this.programVariable = null;
          this.arrayIndex = null;
-         this.parentTerm = parentTerm;
+         this.parentTerm = OriginTermLabel.removeOriginLabels(parentTerm, getServices());
          this.preVariable = createLocationVariable("Pre" + preVariableIndex++, parentTerm.sort());
          this.stateMember = false;
-         this.arrayStartIndex = arrayStartIndex;
-         this.arrayEndIndex = arrayEndIndex;
+         this.arrayStartIndex = OriginTermLabel.removeOriginLabels(arrayStartIndex, getServices());
+         this.arrayEndIndex = OriginTermLabel.removeOriginLabels(arrayEndIndex, getServices());
          TermBuilder tb = getServices().getTermBuilder();
          Function constantFunction = new Function(new Name(tb.newName(ExecutionAllArrayIndicesVariable.ARRAY_INDEX_CONSTANT_NAME)), getServices().getTypeConverter().getIntegerLDT().targetSort());
          this.arrayRangeConstant = tb.func(constantFunction);
