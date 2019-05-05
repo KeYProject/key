@@ -15,6 +15,10 @@
    <methodCall name="&lt;call ArrayAssignmentTest.main(array)&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="array" isArrayIndex="false">
          <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+            <variable name="length" isArrayIndex="false">
+               <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
          </value>
       </variable>
       <variable name="exc" isArrayIndex="false">
@@ -24,6 +28,10 @@
       <statement name="array[0]=100;" pathCondition="true" pathConditionChanged="false">
          <variable name="array" isArrayIndex="false">
             <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+               <variable name="length" isArrayIndex="false">
+                  <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
             </value>
          </variable>
          <variable name="exc" isArrayIndex="false">
@@ -33,6 +41,10 @@
          <statement name="array[1]=array[2];" pathCondition="true" pathConditionChanged="false">
             <variable name="array" isArrayIndex="false">
                <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="length" isArrayIndex="false">
+                     <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
                   <variable name="[Z(0(#))]" arrayIndex="Z(0(#))" isArrayIndex="true">
                      <value name="[Z(0(#))] {true}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
@@ -46,6 +58,10 @@
             <statement name="array[3]=array[0];" pathCondition="true" pathConditionChanged="false">
                <variable name="array" isArrayIndex="false">
                   <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="length" isArrayIndex="false">
+                        <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
                      <variable name="[Z(1(#))]" arrayIndex="Z(1(#))" isArrayIndex="true">
                         <value name="[Z(1(#))] {true}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
@@ -63,6 +79,10 @@
                <statement name="return array;" pathCondition="true" pathConditionChanged="false">
                   <variable name="array" isArrayIndex="false">
                      <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
                         <variable name="[Z(3(#))]" arrayIndex="Z(3(#))" isArrayIndex="true">
                            <value name="[Z(3(#))] {true}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
@@ -84,6 +104,10 @@
                   <methodReturn name="&lt;return of main&gt;" signature="&lt;return of ArrayAssignmentTest.main(array)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                      <variable name="array" isArrayIndex="false">
                         <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
                            <variable name="[Z(3(#))]" arrayIndex="Z(3(#))" isArrayIndex="true">
                               <value name="[Z(3(#))] {true}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
@@ -105,6 +129,10 @@
                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         <variable name="array" isArrayIndex="false">
                            <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
                               <variable name="[Z(3(#))]" arrayIndex="Z(3(#))" isArrayIndex="true">
                                  <value name="[Z(3(#))] {true}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>

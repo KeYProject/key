@@ -212,6 +212,14 @@
                            </termination>
                            <callStateVariable name="b" isArrayIndex="false">
                               <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <variable name="x" isArrayIndex="false">
+                                    <value name="x {true}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                                 <variable name="y" isArrayIndex="false">
+                                    <value name="y {true}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
                               </value>
                            </callStateVariable>
                            <callStateVariable name="exc" isArrayIndex="false">
@@ -311,6 +319,14 @@
                         </termination>
                         <callStateVariable name="b" isArrayIndex="false">
                            <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="x" isArrayIndex="false">
+                                 <value name="x {true}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="y" isArrayIndex="false">
+                                 <value name="y {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
                            </value>
                         </callStateVariable>
                         <callStateVariable name="exc" isArrayIndex="false">
@@ -387,6 +403,10 @@
                   </termination>
                   <callStateVariable name="b" isArrayIndex="false">
                      <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="x" isArrayIndex="false">
+                           <value name="x {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
                      </value>
                   </callStateVariable>
                   <callStateVariable name="exc" isArrayIndex="false">
