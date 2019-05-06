@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.NoSuchElementException;
 
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import recoder.io.DataLocation;
 
 /**
@@ -124,5 +125,20 @@ public interface FileCollection {
          * @throws NoSuchElementException if the previous call to step returned false.
          */
         public InputStream openCurrent() throws IOException, NoSuchElementException;
+
+        /**
+         * Create a new InputStream for the current element of the iteration. A copy of the file
+         * the InputStream is read from is stored in the given FileRepo.
+         * It is in the user's obligation to close the stream after
+         * using it.
+         * @param repo the FileRepo to store a copy of the current element
+         * a freshly created InputStream, the dynamic type depends on
+         *         the implementation
+         * @return a freshly created InputStream, the dynamic type depends on
+         *         the implementation
+         * @throws IOException if the resource cannot be opened
+         * @throws NoSuchElementException if the previous call to step returned false.
+         */
+        public InputStream openCurrent(FileRepo repo) throws IOException, NoSuchElementException;
     }
 }

@@ -16,6 +16,7 @@ package de.uka.ilkd.key.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import recoder.io.DataLocation;
 
 
@@ -87,6 +89,20 @@ public class ZipFileCollection implements FileCollection {
                 throw new NoSuchElementException();
             else
                 return zipFile.getInputStream(currentEntry);
+        }
+
+        @Override
+        public InputStream openCurrent(FileRepo fileRepo) throws IOException {
+            if (currentEntry == null) {
+                throw new NoSuchElementException();
+            } else if (fileRepo != null) {
+                // build a URL from file and entry and request an InputStream from the FileRepo
+                URL jar = file.toURI().toURL();
+                URL entryUrl = new URL("jar:" + jar + "!/" + currentEntry.getName());
+                return fileRepo.getInputStream(entryUrl);
+            } else {
+                return openCurrent();       // fallback without FileRepo
+            }
         }
 
         public boolean step() {

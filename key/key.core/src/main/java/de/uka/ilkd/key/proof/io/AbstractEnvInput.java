@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
 
 
@@ -36,7 +37,7 @@ public abstract class AbstractEnvInput implements EnvInput {
     protected final Profile profile;
     
     protected InitConfig initConfig;
-    
+
 
     //-------------------------------------------------------------------------
     //constructors

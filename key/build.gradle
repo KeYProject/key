@@ -375,15 +375,14 @@ project(":key.ui") {
     task createExamplesZip(type: Zip) {
         destinationDirectory = file("$buildDir/resources/main/")
         archiveFileName = "examples.zip"
-        from 'examples'
-        include '*'
-        include '*/*'
+        from "examples"
+        include "**/**"
     }
 
     processResources.dependsOn << createExamplesZip
 
     shadowJar {
-        minimize()
+        //destroys the build: minimize()
     }
 
     application {
@@ -394,8 +393,6 @@ project(":key.ui") {
     run {
         systemProperties["key.examples.dir"] = "$projectDir/examples"
     }
-
-
 }
 
 project(":keyext.interactionlog") {
