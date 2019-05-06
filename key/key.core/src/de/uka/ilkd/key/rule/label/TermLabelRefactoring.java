@@ -28,7 +28,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule;
+import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
@@ -75,11 +75,11 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
                             && WhileInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint)) ||
                     (rule instanceof UseOperationContractRule
                             && UseOperationContractRule.FINAL_PRE_TERM_HINT.equals(hint)) ||
-                    (rule instanceof AbstractBlockSpecificationElementRule
-                            && AbstractBlockSpecificationElementRule
+                    (rule instanceof AbstractAuxiliaryContractRule
+                            && AbstractAuxiliaryContractRule
                             .FULL_PRECONDITION_TERM_HINT.equals(hint)) ||
-                    (rule instanceof AbstractBlockSpecificationElementRule
-                            && AbstractBlockSpecificationElementRule
+                    (rule instanceof AbstractAuxiliaryContractRule
+                            && AbstractAuxiliaryContractRule
                             .NEW_POSTCONDITION_TERM_HINT.equals(hint)) ||
                     (rule instanceof CloseAfterMerge && CloseAfterMerge
                             .FINAL_WEAKENING_TERM_HINT.equals(hint))) {
