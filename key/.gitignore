@@ -22,4 +22,9 @@ gradle-app.setting
 ### Gradle Patch ###
 **/build/
 
-# End of https://www.gitignore.io/api/gradle
+
+.idea/
+out/
+bin/
+.settings
+.project
