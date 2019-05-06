@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="org.key_project.key.core.example.main" target="1.8" />
+      <module name="org.key_project.key.core.example.test" target="1.8" />
+      <module name="org.key_project.key.core.main" target="1.8" />
+      <module name="org.key_project.key.core.proof_references.main" target="1.8" />
+      <module name="org.key_project.key.core.proof_references.test" target="1.8" />
+      <module name="org.key_project.key.core.symbolic_execution.main" target="1.8" />
+      <module name="org.key_project.key.core.symbolic_execution.test" target="1.8" />
+      <module name="org.key_project.key.core.test" target="1.8" />
+      <module name="org.key_project.key.core.testgen.main" target="1.8" />
+      <module name="org.key_project.key.core.testgen.test" target="1.8" />
+      <module name="org.key_project.key.removegenerics.main" target="1.8" />
+      <module name="org.key_project.key.removegenerics.test" target="1.8" />
+      <module name="org.key_project.key.ui.main" target="1.8" />
+      <module name="org.key_project.key.ui.test" target="1.8" />
+      <module name="org.key_project.key.util.main" target="1.8" />
+      <module name="org.key_project.key.util.test" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

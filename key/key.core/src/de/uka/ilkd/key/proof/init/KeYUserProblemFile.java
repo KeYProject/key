@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.CountingBufferedReader;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.proof.io.KeYFile;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
@@ -54,15 +55,19 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     //-------------------------------------------------------------------------
     //constructors
     //------------------------------------------------------------------------- 
-    
-    /** 
+
+    /**
      * Creates a new representation of a KeYUserFile with the given name,
      * a rule source representing the physical source of the input, and
      * a graphical representation to call back in order to report the progress
      * while reading.
+     * @param name the name of the file
+     * @param file the file to read from
+     * @param monitor the possibly <tt>null</tt> monitor for progress
+     * @param profile the KeY profile under which to load
      */
-    public KeYUserProblemFile(String name, 
-                              File file, 
+    public KeYUserProblemFile(String name,
+                              File file,
                               ProgressMonitor monitor,
                               Profile profile) {
         this(name, file, monitor, profile, false);
@@ -72,7 +77,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * Instantiates a new user problem file.
      *
      * @param name the name of the file
-     * @param file the file tp read from
+     * @param file the file to read from
      * @param monitor the possibly <tt>null</tt> monitor for progress
      * @param profile the KeY profile under which to load
      * @param compressed {@code true} iff the file is compressed
@@ -83,6 +88,25 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
                               Profile profile,
                               boolean compressed) {
         super(name, file, monitor, profile, compressed);
+    }
+
+    /**
+     * Instantiates a new user problem file.
+     *
+     * @param name the name of the file
+     * @param file the file tp read from
+     * @param fileRepo the fileRepo which will store the file
+     * @param monitor the possibly <tt>null</tt> monitor for progress
+     * @param profile the KeY profile under which to load
+     * @param compressed {@code true} iff the file is compressed
+     */
+    public KeYUserProblemFile(String name,
+                              File file,
+                              FileRepo fileRepo,
+                              ProgressMonitor monitor,
+                              Profile profile,
+                              boolean compressed) {
+        super(name, file, fileRepo, monitor, profile, compressed);
     }
     
     //-------------------------------------------------------------------------

@@ -21,9 +21,9 @@ import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
 import java.util.stream.Stream;
 
-/** interface implemented by non-destructive Sets.
- * CONVENTION: Each SetOf<T> implementation has to offer a public static
- *    final variable .<called>nil()
+/**
+ * interface implemented by non-destructive Sets. CONVENTION: Each SetOf<T> implementation has to
+ * offer a public static final variable .<called>nil()
  */
 
 public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
@@ -60,14 +60,22 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
         return result;
     }
 
-    /** adds an element */
+    /**
+     * @return a {@code Set} containing the same elements as this {@code ImmutableSet}
+     */
+    Set<T> toSet();
+
+    /**
+     * Adds an element
+     * @return a set containing all elements of this one and the specified element.
+     */
     ImmutableSet<T> add(T element);
 
     /** @return union of this set with set */
-    ImmutableSet<T> union(ImmutableSet<T> set);
+    ImmutableSet<T> union(ImmutableSet<? extends T> set);
 
     /** @return intersection of this set with set */
-    ImmutableSet<T> intersect(ImmutableSet<T> set);
+    ImmutableSet<T> intersect(ImmutableSet<? extends T> set);
 
     /** @return Iterator<T> of the set */
     @Override
@@ -78,6 +86,7 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
 
     /**
      * return true if predicate is fullfilled for at least one element
+     *
      * @param predicate the predicate
      * @return true if predicate is fullfilled for at least one element
      */
@@ -98,7 +107,8 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
     /** @return set without element */
     ImmutableSet<T> remove(T element);
 
-    /** @return true iff the this set is subset of o and vice versa.
+    /**
+     * @return true iff the this set is subset of o and vice versa.
      */
     @Override
     public boolean equals(Object o);
@@ -106,7 +116,9 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
     @Override
     public int hashCode();
 
-    /** adds an element, barfs if the element is already present
+    /**
+     * adds an element, barfs if the element is already present
+     *
      * @param element of type <T> that has to be added to this set
      * @throws org.key_project.utils.collection.NotUniqueException if the element is already present
      */

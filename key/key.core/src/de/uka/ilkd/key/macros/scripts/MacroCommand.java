@@ -85,7 +85,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
             }
         }
 
-        Goal g = state.getFirstOpenGoal();
+        Goal g = state.getFirstOpenAutomaticGoal();
         ProofMacroFinishedInfo info = ProofMacroFinishedInfo
                 .getDefaultInfo(macro, state.getProof());
         try {
@@ -100,31 +100,9 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
                         args.occ + 1 <= sequent.antecedent().size());
             }
 
-            if (args.matches != null) {
-                boolean matched = false;
-
-                for (int i = 1; i < sequent.size() + 1; i++) {
-                    final boolean matchesRegex = formatTermString(LogicPrinter
-                            .quickPrintTerm(sequent.getFormulabyNr(i).formula(),
-                                    services)).matches(
-                                            ".*" + args.matches + ".*");
-                    if (matchesRegex) {
-                        if (matched) {
-                            throw new ScriptException(
-                                    "More than one occurrence of a matching term.");
-                        }
-                        matched = true;
-                        pio = new PosInOccurrence(sequent.getFormulabyNr(i),
-                                PosInTerm.getTopLevel(),
-                                i <= sequent.antecedent().size());
-                    }
-                }
-
-                if (!matched) {
-                    throw new ScriptException(String.format(
-                            "Did not find a formula matching regex %s",
-                            args.matches));
-                }
+            final String matchRegEx = args.matches;
+            if (matchRegEx != null) {
+                pio = extractMatchingPio(sequent, matchRegEx, services);
             }
 
             synchronized (macro) {
@@ -137,6 +115,46 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
             uiControl.taskFinished(info);
             macro.resetParams();
         }
+    }
+
+    /**
+     * TODO
+     *
+     * @param sequent
+     * @param matchRegEx
+     * @param services
+     * @return
+     * @throws ScriptException
+     */
+    public static PosInOccurrence extractMatchingPio(final Sequent sequent,
+            final String matchRegEx, final Services services)
+            throws ScriptException {
+        PosInOccurrence pio = null;
+        boolean matched = false;
+
+        for (int i = 1; i < sequent.size() + 1; i++) {
+            final boolean matchesRegex = formatTermString(
+                    LogicPrinter.quickPrintTerm(
+                            sequent.getFormulabyNr(i).formula(), services))
+                                    .matches(".*" + matchRegEx + ".*");
+            if (matchesRegex) {
+                if (matched) {
+                    throw new ScriptException(
+                            "More than one occurrence of a matching term.");
+                }
+                matched = true;
+                pio = new PosInOccurrence(sequent.getFormulabyNr(i),
+                        PosInTerm.getTopLevel(),
+                        i <= sequent.antecedent().size());
+            }
+        }
+
+        if (!matched) {
+            throw new ScriptException(String.format(
+                    "Did not find a formula matching regex %s", matchRegEx));
+        }
+
+        return pio;
     }
 
     /**

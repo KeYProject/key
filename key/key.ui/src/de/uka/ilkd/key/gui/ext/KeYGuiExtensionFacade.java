@@ -30,7 +30,6 @@ import de.uka.ilkd.key.pp.PosInSequent;
  */
 public final class KeYGuiExtensionFacade {
     //region panel extension
-    @SuppressWarnings("todo")
     public static List<KeYPaneExtension> getAllPanels() {
         return getExtension(KeYPaneExtension.class, Comparator.comparingInt(KeYPaneExtension::priority));
     }
@@ -42,7 +41,6 @@ public final class KeYGuiExtensionFacade {
      * @param <T>
      * @return
      */
-    @SuppressWarnings("cast")
     public static <T extends KeYPaneExtension> Optional<T> getPanel(Class<T> clazz) {
         Optional<KeYPaneExtension> v = getAllPanels().stream()
                 .filter(it -> it.getClass().isAssignableFrom(clazz))
@@ -121,8 +119,9 @@ public final class KeYGuiExtensionFacade {
             String cur = mpath.next();
             Component[] children = menu.getMenuComponents();
             for (int i = 0; i < children.length; i++) {
-                if (children[i].getName().equals(cur)) {
-                    return (JMenu) children[i];
+                if (Objects.equals(children[i].getName(), cur)) {
+                    JMenu sub = (JMenu) children[i];
+                    return findMenu(sub, mpath);
                 }
             }
             JMenu m = new JMenu(cur);
@@ -216,10 +215,15 @@ public final class KeYGuiExtensionFacade {
      * @param <T> the interface of the service
      * @return a list of all found service implementations
      */
+
+    private static Map<Class<?>, List<Object>> extensionCache = new HashMap<>();
+    @SuppressWarnings("unchecked")
     private static <T> List<T> getExtension(Class<T> c) {
-        Spliterator<T> iter = ServiceLoader.load(c).spliterator();
-        return StreamSupport.stream(iter, false)
-                .collect(Collectors.toList());
+        return (List<T>) extensionCache.computeIfAbsent(c, (k) -> {
+            Spliterator<T> iter = ServiceLoader.load(c).spliterator();
+            return StreamSupport.stream(iter, false)
+                    .collect(Collectors.toList());
+        });
     }
 
 

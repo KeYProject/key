@@ -230,15 +230,14 @@ public class KeYMediator {
 	}
 
     public void setBack(Node node) {
-    	node.proof().pruneProof(node);
-    	finishSetBack(node.proof());
+        getUI().getProofControl().pruneTo(node);
+        finishSetBack(node.proof());
     }
 
     public void setBack(Goal goal) {
-    	if (getSelectedProof() != null) {
-    		goal.proof().pruneProof(goal);
-    		finishSetBack(goal.proof());
-
+        if (getSelectedProof() != null) {
+            getUI().getProofControl().pruneTo(goal);
+            finishSetBack(goal.proof());
     	}
     }
 

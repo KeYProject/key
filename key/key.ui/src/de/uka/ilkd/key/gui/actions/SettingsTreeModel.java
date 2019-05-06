@@ -27,6 +27,8 @@ import de.uka.ilkd.key.settings.Settings;
 
 public class SettingsTreeModel extends DefaultTreeModel {
 
+    private static final long serialVersionUID = -3282304543262262159L;
+
     private ProofSettings proofSettings;
 
     private ProofIndependentSettings independentSettings;
@@ -128,6 +130,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
         JTable table =  new JTable();
 
         DefaultTableModel tableModel = new DefaultTableModel() {
+            private static final long serialVersionUID = 1L;
 
             @Override
             public boolean isCellEditable(int row, int column) {

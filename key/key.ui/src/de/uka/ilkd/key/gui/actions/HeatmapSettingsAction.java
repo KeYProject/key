@@ -16,6 +16,8 @@ import java.awt.event.ActionEvent;
  * @author jschiffl
  */
 public class HeatmapSettingsAction extends MainWindowAction {
+    private static final long serialVersionUID = -6165100588113899099L;
+
     private HeatmapOptionsDialog dialog;
 
     /**

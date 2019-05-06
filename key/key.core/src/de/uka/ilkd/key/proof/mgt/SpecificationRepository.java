@@ -146,6 +146,12 @@ public final class SpecificationRepository {
     private final Map<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>>
         loopContracts =
             new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>>();
+    /**
+     * A map which relates each loop statement its starting line number and set of loop contracts.
+     */
+    private final Map<Pair<LoopStatement, Integer>, ImmutableSet<LoopContract>>
+        loopContractsOnLoops =
+            new LinkedHashMap<Pair<LoopStatement, Integer>, ImmutableSet<LoopContract>>();
     private Map<MergePointStatement, ImmutableSet<MergeContract>>
         mergeContracts =
             new LinkedHashMap<MergePointStatement, ImmutableSet<MergeContract>>();
@@ -1642,6 +1648,12 @@ public final class SpecificationRepository {
         }
     }
 
+    /**
+     * Returns all block contracts for the specified block.
+     *
+     * @param block a block.
+     * @return all block contracts for the specified block.
+     */
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
@@ -1653,10 +1665,33 @@ public final class SpecificationRepository {
         }
     }
 
+    /**
+     * Returns all loop contracts for the specified block.
+     *
+     * @param block a block.
+     * @return all loop contracts for the specified block.
+     */
     public ImmutableSet<LoopContract> getLoopContracts(StatementBlock block) {
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
         final ImmutableSet<LoopContract> contracts = loopContracts.get(b);
+        if (contracts == null) {
+            return DefaultImmutableSet.<LoopContract> nil();
+        } else {
+            return contracts;
+        }
+    }
+
+    /**
+     * Returns all loop contracts for the specified loop.
+     *
+     * @param loop a loop.
+     * @return all loop contracts for the specified loop.
+     */
+    public ImmutableSet<LoopContract> getLoopContracts(LoopStatement loop) {
+        final Pair<LoopStatement, Integer> b = new Pair<LoopStatement, Integer>(
+                loop, loop.getStartPosition().getLine());
+        final ImmutableSet<LoopContract> contracts = loopContractsOnLoops.get(b);
         if (contracts == null) {
             return DefaultImmutableSet.<LoopContract> nil();
         } else {
@@ -1674,6 +1709,14 @@ public final class SpecificationRepository {
         }
     }
 
+    /**
+     * Returns block contracts for according block statement
+     * and modality.
+     *
+     * @param block     the given block.
+     * @param modality the given modality.
+     * @return
+     */
     public ImmutableSet<BlockContract> getBlockContracts(
             final StatementBlock block, final Modality modality) {
         ImmutableSet<BlockContract> result = getBlockContracts(block);
@@ -1692,6 +1735,29 @@ public final class SpecificationRepository {
     public ImmutableSet<LoopContract> getLoopContracts(
             final StatementBlock block, final Modality modality) {
         ImmutableSet<LoopContract> result = getLoopContracts(block);
+        final Modality matchModality = getMatchModality(modality);
+        for (LoopContract contract : result) {
+            if (!contract.getModality().equals(matchModality)
+                    || (modality.transaction()
+                            && !contract.isTransactionApplicable()
+                            && !contract.isReadOnly(services))) {
+                result = result.remove(contract);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns loop contracts for according loop statement
+     * and modality.
+     *
+     * @param loop     the given loop.
+     * @param modality the given modality.
+     * @return the set of resulting loop statements.
+     */
+    public ImmutableSet<LoopContract> getLoopContracts(
+            final LoopStatement loop, final Modality modality) {
+        ImmutableSet<LoopContract> result = getLoopContracts(loop);
         final Modality matchModality = getMatchModality(modality);
         for (LoopContract contract : result) {
             if (!contract.getModality().equals(matchModality)
@@ -1766,13 +1832,24 @@ public final class SpecificationRepository {
      *  based on {@code contract}.
      */
     public void addLoopContract(final LoopContract contract, boolean addFunctionalContract) {
-        final StatementBlock block = contract.getBlock();
-        final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
-                block, block.getStartPosition().getLine());
-        loopContracts.put(b, getLoopContracts(block).add(contract));
+        if (contract.isOnBlock()) {
+            final StatementBlock block = contract.getBlock();
+            final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
+                    block, block.getStartPosition().getLine());
+            loopContracts.put(b, getLoopContracts(block).add(contract));
+        } else {
+            final LoopStatement loop = contract.getLoop();
+            final Pair<LoopStatement, Integer> b = new Pair<LoopStatement, Integer>(
+                    loop, loop.getStartPosition().getLine());
+            loopContractsOnLoops.put(b, getLoopContracts(loop).add(contract));
+        }
 
         if (addFunctionalContract) {
-            addContract(cf.funcLoop(contract));
+            if (contract.isInternalOnly()) {
+                addContract(cf.funcBlock(contract.toBlockContract()));
+            } else {
+                addContract(cf.funcLoop(contract));
+            }
         }
     }
 
@@ -1784,12 +1861,21 @@ public final class SpecificationRepository {
      * @param contract the {@code LoopContract} to remove.
      */
     public void removeLoopContract(final LoopContract contract) {
-        final StatementBlock block = contract.getBlock();
-        final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
-                block, block.getStartPosition().getLine());
+        if (contract.isOnBlock()) {
+            final StatementBlock block = contract.getBlock();
+            final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
+                    block, block.getStartPosition().getLine());
 
-        ImmutableSet<LoopContract> set = loopContracts.get(b);
-        loopContracts.put(b, set.remove(contract));
+            ImmutableSet<LoopContract> set = loopContracts.get(b);
+            loopContracts.put(b, set.remove(contract));
+        } else {
+            final LoopStatement loop = contract.getLoop();
+            final Pair<LoopStatement, Integer> b = new Pair<LoopStatement, Integer>(
+                    loop, loop.getStartPosition().getLine());
+
+            ImmutableSet<LoopContract> set = loopContractsOnLoops.get(b);
+            loopContractsOnLoops.put(b, set.remove(contract));
+        }
     }
 
     /**

@@ -32,10 +32,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
+import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -212,14 +216,20 @@ public class SolverListener implements SolverLauncherListener {
         }
 
         private void applyResults() {
+            KeYMediator mediator = MainWindow.getInstance().getMediator();
+            mediator.stopInterface(true);
+            try {
                 for (SMTProblem problem : smtProblems) {
                         if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-                        	IBuiltInRuleApp app = 
+                        	IBuiltInRuleApp app =
                         			RuleAppSMT.rule.createApp( null ).
                         					     setTitle( getTitle(problem) );
                         	problem.getGoal().apply(app);
                         }
                 }
+            } finally {
+                mediator.startInterface(true);
+            }
 
         }
         
@@ -253,7 +263,7 @@ public class SolverListener implements SolverLauncherListener {
                         i++;
                 }
 
-                
+                boolean problemContainsUpdOrDL = false;
                 String names[] = new String[smtproblems.size()]; //never read
                 int x = 0,y=0;
                 for (SMTProblem problem : smtproblems) {
@@ -265,7 +275,11 @@ public class SolverListener implements SolverLauncherListener {
                         }
                         names[x] = problem.getName();
                         x++;
+                        if (containsModalityOrQueryOrUpdate(problem.getTerm())) {
+                            problemContainsUpdOrDL = true;
+                        }
                 }
+
        
                 
                 boolean ce = solverTypes.contains(SolverType.Z3_CE_SOLVER);
@@ -279,6 +293,13 @@ public class SolverListener implements SolverLauncherListener {
                 	if(type.supportHasBeenChecked() && !type.isSupportedVersion()){
                 		addWarning(type);
                 	}
+                }
+
+                if (problemContainsUpdOrDL) {
+                    progressDialog.addInformation("One or more proof goals contain heap updates, method calls," +
+                            " and/or modalities. The SMT translation of these will be incomplete," +
+                                    " and the result will likely be unhelpful.",
+                            new Color(200,150,0), null);
                 }
          
                 SwingUtilities.invokeLater(new Runnable() {
@@ -471,10 +492,16 @@ public class SolverListener implements SolverLauncherListener {
         }
 
         private void unsuccessfullyStopped(InternSMTProblem problem, int x, int y) {
+            if(problem.solver.getType()==SolverType.Z3_CE_SOLVER){
                 progressModel.setProgress(0,x,y);
                 progressModel.setTextColor(RED,x,y);
                 progressModel.setText("Counter Example.",x,y);
-
+            } else {
+                progressModel.setProgress(0, x, y);
+                Color c = new Color(200, 150, 0);
+                progressModel.setTextColor(c, x, y);
+                progressModel.setText("Possible Counter Example.", x, y);
+            }
         }
 
         private void unknownStopped(InternSMTProblem problem, int x, int y) {
@@ -647,7 +674,52 @@ public class SolverListener implements SolverLauncherListener {
             	  }
             }
     };
-	
 
+    /**
+     * Checks if the given {@link Term} contains a modality, query, or update.
+     * @param term The {@link Term} to check.
+     * @return {@code true} contains at least one modality or query, {@code false} contains no modalities and no queries.
+     */
+    public static boolean containsModalityOrQueryOrUpdate(Term term) {
+        ContainsModalityOrQueryVisitor visitor = new ContainsModalityOrQueryVisitor();
+        term.execPostOrder(visitor);
+        return visitor.isContainsModQueryOrUpd();
+    }
+
+    /**
+     * Utility class used to check whether a term contains constructs that are not handled by the  SMT translation.
+     * Stolen from a very similar class by Martin Hentschel. Maybe should go to a utility class.
+     * @author jschiffl
+     */
+    protected static class ContainsModalityOrQueryVisitor extends DefaultVisitor {
+        /**
+         * The result.
+         */
+        boolean containsModQueryOrUpd = false;
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void visit(Term visited) {
+            if (visited.op() instanceof Modality
+                || visited.op() instanceof IProgramMethod
+                || visited.op() instanceof ElementaryUpdate
+                || visited.op() instanceof UpdateJunctor
+                || visited.op() instanceof UpdateSV
+                || visited.op() instanceof UpdateApplication) {
+                containsModQueryOrUpd = true;
+            }
+        }
+
+        /**
+         * Returns the result.
+         * @return {@code true} contains at least one modality, query, or update; {@code false} contains no modalities,
+         * no queries, and no updates.
+         */
+        public boolean isContainsModQueryOrUpd() {
+            return containsModQueryOrUpd;
+        }
+    }
 
 }

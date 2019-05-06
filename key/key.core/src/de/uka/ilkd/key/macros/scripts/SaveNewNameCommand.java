@@ -57,12 +57,8 @@ public class SaveNewNameCommand
         final String key = params.abbreviation.substring(1);
         final String stringToMatch = params.matches;
 
-        if (abbrMap.containsAbbreviation(key)) {
-            throw new ScriptException(key + " is already fixed in this script");
-        }
-
         try {
-            final Goal goal = stateMap.getFirstOpenGoal();
+            final Goal goal = stateMap.getFirstOpenAutomaticGoal();
             final Node node = goal.node().parent();
             final List<String> matches = node.getNameRecorder().getProposals()
                     .stream().map(Name::toString)
@@ -94,7 +90,11 @@ public class SaveNewNameCommand
                         lookupResult.getClass().getSimpleName()));
             }
 
-            abbrMap.put(t, key, true);
+            if (abbrMap.containsAbbreviation(key)) {
+                abbrMap.changeAbbrev(key, t, true);
+            } else {
+                abbrMap.put(t, key, true);
+            }
         } catch (Exception e) {
             throw new ScriptException(e);
         }

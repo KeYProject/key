@@ -36,7 +36,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
  * are only available for while-loops, not for for-loops.
  * 
  * The transformation behaviour is very similar to the superclass' behaviour
- * only the outermost for loop is treated silghtly differently.
+ * only the outermost for loop is treated slightly differently.
  * 
  * @see ForToWhile Here is an example
  * @author MU

@@ -2,7 +2,8 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Fri Jul 15 10:19:53 CEST 2016
+#Tue Mar 19 13:46:43 CET 2019
+[StrategyProperty]OSS_OPTIONS_KEY=OSS_ON
 [StrategyProperty]VBT_PHASE=VBT_SYM_EX
 [SMTSettings]useUninterpretedMultiplication=true
 [SMTSettings]SelectedTaclets=
@@ -24,7 +25,7 @@
 [Strategy]Timeout=-1
 [Strategy]MaximumNumberOfAutomaticApplications=1000
 [SMTSettings]integersMaximum=2147483645
-[Choice]DefaultChoices=wdChecks-wdChecks\\:off , JavaCard-JavaCard\\:off , bigint-bigint\\:on , programRules-programRules\\:Java , intRules-intRules\\:arithmeticSemanticsIgnoringOF , moreSeqRules-moreSeqRules\\:off , sequences-sequences\\:on , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off , runtimeExceptions-runtimeExceptions\\:allow , integerSimplificationRules-integerSimplificationRules\\:full , Strings-Strings\\:on , reach-reach\\:on , assertions-assertions\\:on , initialisation-initialisation\\:disableStaticInitialisation , modelFields-modelFields\\:showSatisfiability , wdOperator-wdOperator\\:L , permissions-permissions\\:off
+[Choice]DefaultChoices=assertions-assertions\\:on , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:allow , JavaCard-JavaCard\\:off , Strings-Strings\\:on , modelFields-modelFields\\:showSatisfiability , bigint-bigint\\:on , sequences-sequences\\:on , moreSeqRules-moreSeqRules\\:off , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , permissions-permissions\\:off , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off
 [SMTSettings]useConstantsForBigOrSmallIntegers=true
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
@@ -36,13 +37,14 @@
 [SMTSettings]explicitTypeHierarchy=false
 [Strategy]ActiveStrategy=Symbolic Execution Strategy
 [StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+[StrategyProperty]MPS_OPTIONS_KEY=MPS_MERGE
 "
 }
 
 \javaSource "";
 
 \proofObligation "#Proof Obligation Settings
-#Fri Jul 15 10:19:53 CEST 2016
+#Tue Mar 19 13:46:43 CET 2019
 name=main()
 addSymbolicExecutionLabel=true
 addUninterpretedPredicate=true
@@ -53,8 +55,9 @@ method=Figure2Instance\\#main()
 \proof {
 (keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 (keyLog "1" (keyUser "marti" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+(keyLog "2" (keyUser "wolfram" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "1894")
+(autoModeTime "2973")
 
 (branch "dummy ID"
 (builtin "One Step Simplification" (formula "1") (newnames "heapAtPre,SETAccumulate"))
@@ -168,9 +171,20 @@ method=Figure2Instance\\#main()
    (rule "dismissNonSelectedField" (formula "1") (term "0,0,1"))
    (rule "wellFormedStoreObject" (formula "1") (term "0"))
    (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "8")))
-   (rule "dismissNonSelectedField" (formula "1") (term "0,0"))
-   (rule "dismissNonSelectedField" (formula "1") (term "0,0"))
-   (rule "dismissNonSelectedField" (formula "1") (term "0,0"))
+   (rule "dismissNonSelectedField" (formula "1") (term "0,1,0"))
+   (rule "dismissNonSelectedField" (formula "1") (term "0,1,0"))
+   (rule "dismissNonSelectedField" (formula "1") (term "0,1,0"))
+   (rule "wellFormedStoreObject" (formula "1") (term "0,0"))
+   (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "8")))
+   (rule "wellFormedStorePrimitive" (formula "1") (term "0,0,0"))
+   (rule "dismissNonSelectedField" (formula "1") (term "0,1,0,0"))
+   (rule "dismissNonSelectedField" (formula "1") (term "0,1,0,0"))
+   (builtin "One Step Simplification" (formula "1"))
+   (rule "wellFormedStoreObject" (formula "1") (term "0,0"))
+   (builtin "One Step Simplification" (formula "1"))
+   (rule "wellFormedCreate" (formula "1") (term "0,0"))
+   (rule "replace_known_left" (formula "1") (term "0,0") (ifseqformula "4"))
+   (builtin "One Step Simplification" (formula "1"))
    (rule "pullOutSelect" (formula "1") (term "0,0,1") (inst "selectSK=java_lang_Object_created__0"))
    (rule "simplifySelectOfCreate" (formula "1"))
    (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "9")))
@@ -259,7 +273,7 @@ method=Figure2Instance\\#main()
       (rule "castDel" (formula "1") (term "0"))
       (rule "applyEqReverse" (formula "12") (term "0,1,0") (ifseqformula "1"))
       (rule "hideAuxiliaryEq" (formula "1"))
-      (rule "eval_order_access4" (formula "11") (term "1") (inst "#v0=a_7") (inst "#v1=b"))
+      (rule "eval_order_access4" (formula "11") (term "1") (inst "#v1=b") (inst "#v0=a_7"))
       (rule "variableDeclarationAssign" (formula "11") (term "1"))
       (rule "variableDeclaration" (formula "11") (term "1") (newnames "a_7"))
       (rule "assignment" (formula "11") (term "1"))
@@ -313,11 +327,7 @@ method=Figure2Instance\\#main()
             (builtin "One Step Simplification" (formula "1"))
             (rule "true_left" (formula "1"))
             (builtin "One Step Simplification" (formula "11"))
-            (rule "eval_order_access4" (formula "11") (term "1") (inst "#v1=b") (inst "#v0=f"))
-            (rule "variableDeclarationAssign" (formula "11") (term "1"))
-            (rule "variableDeclaration" (formula "11") (term "1") (newnames "f"))
-            (rule "assignment" (formula "11") (term "1"))
-            (builtin "One Step Simplification" (formula "11"))
+            (rule "eval_order_access4_this" (formula "11") (term "1") (inst "#v1=b"))
             (rule "variableDeclarationAssign" (formula "11") (term "1"))
             (rule "variableDeclaration" (formula "11") (term "1") (newnames "b_5"))
             (rule "eval_order_access2" (formula "11") (term "1") (inst "#v0=a"))
@@ -342,21 +352,13 @@ method=Figure2Instance\\#main()
                (rule "castDel" (formula "1") (term "0"))
                (rule "applyEqReverse" (formula "12") (term "0,1,0") (ifseqformula "1"))
                (rule "hideAuxiliaryEq" (formula "1"))
-               (rule "assignment_write_attribute" (formula "11") (term "1"))
-               (branch "Normal Execution (f != null)"
-                  (builtin "One Step Simplification" (formula "11") (ifInst ""  (formula "10")))
-                  (rule "false_right" (formula "11"))
-                  (builtin "One Step Simplification" (formula "11"))
-                  (rule "methodCallEmpty" (formula "11") (term "1"))
-                  (rule "tryEmpty" (formula "11") (term "1"))
-                  (rule "emptyModality" (formula "11") (term "1"))
-                  (builtin "One Step Simplification" (formula "11"))
-                  (opengoal " ")
-               )
-               (branch "Null Reference (f = null)"
-                  (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "11")))
-                  (rule "closeFalse" (formula "1"))
-               )
+               (rule "assignment_write_attribute_this" (formula "11") (term "1"))
+               (builtin "One Step Simplification" (formula "11"))
+               (rule "methodCallEmpty" (formula "11") (term "1"))
+               (rule "tryEmpty" (formula "11") (term "1"))
+               (rule "emptyModality" (formula "11") (term "1"))
+               (builtin "One Step Simplification" (formula "11"))
+                (opengoal " ")
             )
             (branch "Null Reference (a_10 = null)"
                (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "9")))
@@ -383,5 +385,4 @@ method=Figure2Instance\\#main()
    (rule "closeFalse" (formula "1"))
 )
 )
-
 }

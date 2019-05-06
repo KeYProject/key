@@ -14,8 +14,6 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import javax.swing.JCheckBox;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  * {@link JCheckBox} indicating whether taclet info is displayed for inner nodes
@@ -24,22 +22,18 @@ import javax.swing.event.ChangeListener;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class TacletInfoToggle extends JCheckBox {
+    private static final long serialVersionUID = 1L;
 
-    private static final long serialVersionUID = 8129996113987285946L;
-    InnerNodeView innerNodeView = null;
+    private InnerNodeView innerNodeView = null;
 
     public TacletInfoToggle() {
         setText("Show taclet info (Inner Nodes only)");
-        addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (innerNodeView != null) {
-                    innerNodeView.tacletInfo.setVisible(isSelected());
-                }
+        addChangeListener(e -> {
+            if (innerNodeView != null) {
+                innerNodeView.tacletInfo.setVisible(isSelected());
             }
         });
-        setVisible(false);
-        setName(this.getClass().getSimpleName());
+        setName(getClass().getSimpleName());
     }
 
    @Override
@@ -53,11 +47,11 @@ public class TacletInfoToggle extends JCheckBox {
    public void setSequentView(SequentView sequentView) {
         if (sequentView instanceof InnerNodeView) {
             innerNodeView = (InnerNodeView) sequentView;
-            setVisible(true);
+            setEnabled(true);
             innerNodeView.tacletInfo.setVisible(isSelected());
         } else {
             innerNodeView = null;
-            setVisible(false);
+            setEnabled(false);
         }
     }
 }

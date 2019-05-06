@@ -45,6 +45,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
@@ -65,8 +66,9 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.ParametricMergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.UnparametricMergeProcedure;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
+import de.uka.ilkd.key.speclang.BlockContractImpl;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassAxiomImpl;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -79,14 +81,13 @@ import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.InitiallyClauseImpl;
 import de.uka.ilkd.key.speclang.LoopContract;
+import de.uka.ilkd.key.speclang.LoopContractImpl;
 import de.uka.ilkd.key.speclang.LoopSpecImpl;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
-import de.uka.ilkd.key.speclang.SimpleBlockContract;
-import de.uka.ilkd.key.speclang.SimpleLoopContract;
 import de.uka.ilkd.key.speclang.UnparameterizedMergeContract;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
@@ -1312,11 +1313,46 @@ public class JMLSpecFactory {
                 = createProgramVariables(method, block, variables);
         final ContractClauses clauses
                 = translateJMLClauses(method, specificationCase, programVariables, behavior);
-        return new SimpleBlockContract.Creator("JML " + behavior + "block contract", block, labels,
+        return new BlockContractImpl.Creator("JML " + behavior + "block contract", block, labels,
                 method, behavior, variables, clauses.requires, clauses.measuredBy, clauses.ensures,
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
                 clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
                 clauses.hasMod, services).create();
+    }
+
+    /**
+     * Creates a set of loop contracts for a loop from a textual specification case.
+     *
+     * @param method
+     *            the method containing the block.
+     * @param labels
+     *            all labels belonging to the block.
+     * @param loop
+     *            the loop which the loop contracts belong to.
+     * @param specificationCase
+     *            the textual specification case.
+     * @return a set of loop contracts for a block from a textual specification case.
+     * @throws SLTranslationException a translation exception
+     */
+    public ImmutableSet<LoopContract> createJMLLoopContracts(final IProgramMethod method,
+            final List<Label> labels, final LoopStatement loop,
+            final TextualJMLSpecCase specificationCase) throws SLTranslationException {
+        if (!specificationCase.isLoopContract()) {
+            return DefaultImmutableSet.nil();
+        }
+
+        final Behavior behavior = specificationCase.getBehavior();
+        final LoopContract.Variables variables
+                = LoopContract.Variables.create(loop, labels, method, services);
+        final ProgramVariableCollection programVariables
+                = createProgramVariables(method, loop, variables);
+        final ContractClauses clauses
+                = translateJMLClauses(method, specificationCase, programVariables, behavior);
+        return new LoopContractImpl.Creator("JML " + behavior + "loop contract", loop, labels,
+                method, behavior, variables, clauses.requires, clauses.measuredBy, clauses.ensures,
+                clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
+                clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
+                clauses.hasMod, clauses.decreases, services).create();
     }
 
     /**
@@ -1347,7 +1383,7 @@ public class JMLSpecFactory {
                 = createProgramVariables(method, block, variables);
         final ContractClauses clauses
                 = translateJMLClauses(method, specificationCase, programVariables, behavior);
-        return new SimpleLoopContract.Creator("JML " + behavior + "loop contract", block, labels,
+        return new LoopContractImpl.Creator("JML " + behavior + "loop contract", block, labels,
                 method, behavior, variables, clauses.requires, clauses.measuredBy, clauses.ensures,
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
                 clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
@@ -1364,11 +1400,11 @@ public class JMLSpecFactory {
      * @param block
      *            the block.
      * @param variables
-     *            an instance of {@link BlockSpecificationElement.Variables} for the block.
+     *            an instance of {@link AuxiliaryContract.Variables} for the block.
      * @return
      */
     private ProgramVariableCollection createProgramVariables(final IProgramMethod method,
-            final StatementBlock block, final BlockContract.Variables variables) {
+            final JavaStatement block, final BlockContract.Variables variables) {
         final Map<LocationVariable, LocationVariable> remembranceVariables
                 = variables.combineRemembranceVariables();
         final Map<LocationVariable, LocationVariable> outerRemembranceVariables

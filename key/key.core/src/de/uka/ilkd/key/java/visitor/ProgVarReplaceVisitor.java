@@ -33,6 +33,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -47,7 +48,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
@@ -269,7 +270,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     public void performActionOnBlockContract(final StatementBlock oldBlock,
-            final StatementBlock newBlock) {
+                                             final StatementBlock newBlock) {
         ImmutableSet<BlockContract> oldContracts = services
                 .getSpecificationRepository().getBlockContracts(oldBlock);
         for (BlockContract oldContract : oldContracts) {
@@ -281,13 +282,25 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     public void performActionOnLoopContract(final StatementBlock oldBlock,
-            final StatementBlock newBlock) {
+                                            final StatementBlock newBlock) {
         ImmutableSet<LoopContract> oldContracts = services
                 .getSpecificationRepository().getLoopContracts(oldBlock);
         for (LoopContract oldContract : oldContracts) {
             services.getSpecificationRepository()
                     .addLoopContract(createNewLoopContract(oldContract,
                             newBlock, !oldBlock.equals(newBlock)));
+        }
+    }
+
+    @Override
+    public void performActionOnLoopContract(final LoopStatement oldLoop,
+                                            final LoopStatement newLoop) {
+        ImmutableSet<LoopContract> oldContracts = services
+                .getSpecificationRepository().getLoopContracts(oldLoop);
+        for (LoopContract oldContract : oldContracts) {
+            services.getSpecificationRepository()
+                    .addLoopContract(createNewLoopContract(oldContract,
+                            newLoop, !oldLoop.equals(newLoop)));
         }
     }
 
@@ -415,7 +428,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
     private LoopContract createNewLoopContract(
-            final LoopContract oldContract, final StatementBlock newBlock,
+            final LoopContract oldContract, final JavaStatement newStatement,
             final boolean blockChanged) {
         final LoopContract.Variables newVariables = replaceBlockContractVariables(
                 oldContract.getPlaceholderVariables());
@@ -458,16 +471,26 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         OpReplacer replacer = new OpReplacer(
                 replaceMap, services.getTermFactory(), services.getProof());
 
-        return changed ? oldContract.update(newBlock, newPreconditions,
-                newPostconditions, newModifiesClauses, newInfFlowSpecs,
-                newVariables,
-                replacer.replace(oldContract.getMby()),
-                replacer.replace(oldContract.getDecreases())) : oldContract;
+        if (!changed) {
+            return oldContract;
+        } else if (newStatement instanceof StatementBlock) {
+            return oldContract.update((StatementBlock) newStatement, newPreconditions,
+                    newPostconditions, newModifiesClauses, newInfFlowSpecs,
+                    newVariables,
+                    replacer.replace(oldContract.getMby()),
+                    replacer.replace(oldContract.getDecreases()));
+        } else {
+            return oldContract.update((LoopStatement) newStatement, newPreconditions,
+                    newPostconditions, newModifiesClauses, newInfFlowSpecs,
+                    newVariables,
+                    replacer.replace(oldContract.getMby()),
+                    replacer.replace(oldContract.getDecreases()));
+        }
     }
 
-    private BlockSpecificationElement.Variables replaceBlockContractVariables(
-            final BlockSpecificationElement.Variables variables) {
-        return new BlockSpecificationElement.Variables(replaceVariable(variables.self),
+    private AuxiliaryContract.Variables replaceBlockContractVariables(
+            final AuxiliaryContract.Variables variables) {
+        return new AuxiliaryContract.Variables(replaceVariable(variables.self),
                 replaceFlags(variables.breakFlags),
                 replaceFlags(variables.continueFlags),
                 replaceVariable(variables.returnFlag),

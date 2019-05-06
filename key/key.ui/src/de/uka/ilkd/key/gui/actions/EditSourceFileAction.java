@@ -35,8 +35,7 @@ import de.uka.ilkd.key.util.ExceptionTools;
  * @author Kai Wallisch
  */
 public class EditSourceFileAction extends AbstractAction {
-
-   private static final long serialVersionUID = 1970488880435921205L;
+    private static final long serialVersionUID = -2540941448174197032L;
 
    /**
     * Moves the caret in a {@link JTextArea} to the specified position. Assumes

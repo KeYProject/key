@@ -189,7 +189,7 @@ group applicationRestrictions {
    notprovable ./heap/polarity_tests/wellformed11.key
 }
 
-# Tests for block contracts:
+# Tests for block & loop contracts:
 group blockContracts {
    provable ./heap/block_contracts/Simple__add.key
    provable ./heap/block_contracts/Simple__addAbsoluteValues.key
@@ -203,6 +203,12 @@ group blockContracts {
 # the following test has a reload problem probably caused by the one-step-simplifier
 # provable: ./heap/block_contracts/GreatestCommonDivisor.key
    provable ./standard_key/java_dl/jml-assert/assert.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_external.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_internal.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_loop.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_external.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_internal.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_loop.key
 }
 
 # Tests for Java Card (should also include the API, pending fix to bug #1475)
@@ -217,6 +223,7 @@ group javaCard {
 
 # Other tests:
    provable ./heap/coincidence_count/project.key
+   provable ./heap/verifyThis11_1_Maximum/project.key
    provable ./heap/fm12_01_LRS/lcp.key
    provable ./heap/SemanticSlicing/project.key
    provable ./heap/information_flow/ArrayList_contains.key
@@ -919,6 +926,9 @@ group permissionHeap {
 group reload_examples {
    provable ./firstTouch/05-ReverseArray/reverseArray.key
 
+   # This is a reload regression test. Since it is the only one
+   # it goes here with the sibling reload tests
+   loadable ./standard_key/arith/saveProofTest.key.proof
    loadable ./heap/permutedSum/perm.proof
    loadable ./firstTouch/05-ReverseArray/reverseArray.proof
    loadable ./heap/verifyThis15_1_RelaxedPrefix/relax.proof

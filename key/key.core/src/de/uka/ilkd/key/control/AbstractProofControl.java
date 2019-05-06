@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.proof.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -12,10 +13,6 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
@@ -30,6 +27,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
+import de.uka.ilkd.key.strategy.DelegationBasedAutomatedRuleApplicationManager;
+import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.util.Debug;
 
@@ -55,7 +54,12 @@ public abstract class AbstractProofControl implements ProofControl {
 
    private boolean minimizeInteraction; // minimize user interaction
 
-   /**
+    /**
+     *
+     */
+    protected final List<InteractionListener> interactionListeners = new LinkedList<>();
+
+    /**
     * Constructor.
     * @param defaultProverTaskListener The default {@link ProverTaskListener} which will be added to all started {@link ApplyStrategy} instances.
     */
@@ -239,10 +243,44 @@ public abstract class AbstractProofControl implements ProofControl {
 
     @Override
     public void applyInteractive(RuleApp app, Goal goal) {
-       goal.node().getNodeInfo().setInteractiveRuleApplication(true);
-       goal.apply(app);
+        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
+        goal.apply(app);
+        emitInteractiveRuleApplication(goal, app);
     }
 
+
+    /**
+     * Prunes a proof to the given node.
+     *
+     * @param node
+     * @see {@link Proof#pruneProof(Node)}
+     */
+    public void pruneTo(Node node) {
+        node.proof().pruneProof(node);
+        emitInteractivePrune(node);
+    }
+
+    /**
+     * Undo the last rule application on the given goal.
+     *
+     * @param goal a non-null goal
+     * @see {@link Proof#pruneProof(Goal)}
+     */
+    public void pruneTo(Goal goal) {
+        if (goal.node().parent() != null) {
+            pruneTo(goal.node().parent());
+        }
+    }
+
+    protected void emitInteractivePrune(Node node) {
+        interactionListeners.forEach((l) -> l.runPrune(node));
+    }
+
+    protected void emitInteractiveRuleApplication(Goal goal, RuleApp app) {
+        interactionListeners.forEach((l) -> {
+            l.runRule(goal, app);
+        });
+    }
 
     /**
      * collects all Taclet applications at the given position of the specified
@@ -616,19 +654,30 @@ public abstract class AbstractProofControl implements ProofControl {
 
         @Override
         public void taskFinished(TaskFinishedInfo info) {
-           for (final Goal goal : proof.openGoals()) {
-              // remove any filtering rule app managers that are left in the proof
-              // goals
-              if (goal.getRuleAppManager() instanceof FocussedRuleApplicationManager) {
-                  final FocussedRuleApplicationManager focusManager
-                          = (FocussedRuleApplicationManager) goal.getRuleAppManager();
-                  goal.setRuleAppManager(null);
-                  final AutomatedRuleApplicationManager realManager
-                          = focusManager.getDelegate();
-                  realManager.clearCache();
-                  goal.setRuleAppManager(realManager);
-              }
-          }
+            for (final Goal goal : proof.openGoals()) {
+                // remove any filtering rule app managers that are left in the
+                // proof goals
+                final AutomatedRuleApplicationManager ruleAppManager = goal.getRuleAppManager();
+                if (ruleAppManager instanceof FocussedRuleApplicationManager
+                        || ruleAppManager instanceof FocussedBreakpointRuleApplicationManager) {
+                    final DelegationBasedAutomatedRuleApplicationManager focusManager = //
+                            (DelegationBasedAutomatedRuleApplicationManager) ruleAppManager;
+                    goal.setRuleAppManager(null);
+                    final AutomatedRuleApplicationManager realManager = focusManager
+                            .getDelegate();
+                    realManager.clearCache();
+                    goal.setRuleAppManager(realManager);
+                }
+            }
         }
     }
+
+    public void addInteractionListener(InteractionListener listener) {
+        interactionListeners.add(listener);
+    }
+
+    public void removeInteractionListener(InteractionListener listener) {
+        interactionListeners.remove(listener);
+    }
+
 }

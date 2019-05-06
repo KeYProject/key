@@ -35,6 +35,7 @@ import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -78,7 +79,12 @@ public class KeYFile implements EnvInput {
     private String bootClassPath;
 
     private Includes includes;
-    
+
+    /**
+     * The FileRepo that will store the files.
+     */
+    private FileRepo fileRepo;
+
     //-------------------------------------------------------------------------
     //constructors
     //------------------------------------------------------------------------- 
@@ -97,6 +103,23 @@ public class KeYFile implements EnvInput {
         this.file = file;
         this.monitor = monitor;
         this.profile = profile;
+    }
+
+    /** creates a new representation for a given file by indicating a name
+     * and a RuleSource representing the physical source of the .key file.
+     * @param name the name of the file
+     * @param file the physical rule source of the .key file
+     * @param monitor monitor for reporting progress
+     * @param profile the profile
+     * @param fileRepo the FileRepo which will store the file
+     */
+    public KeYFile(String name,
+                   RuleSource file,
+                   ProgressMonitor monitor,
+                   Profile profile,
+                   FileRepo fileRepo) {
+        this(name, file, monitor, profile);
+        this.fileRepo = fileRepo;
     }
 
         
@@ -134,8 +157,35 @@ public class KeYFile implements EnvInput {
         this(name, RuleSourceFactory.initRuleFile(file, compressed), monitor, profile);
     }
     
+    /**
+     * Creates a new representation for a given file by indicating a name and a
+     * file representing the physical source of the .key file.
+     *
+     * @param name
+     *            the name of the resource
+     * @param file
+     *            the file to find it
+     * @param fileRepo the FileRepo which will store the file
+     * @param monitor
+     *            a possibly null reference to a monitor for the loading
+     *            progress
+     * @param profile
+     *            the KeY profile under which the file is to be load
+     * @param compressed
+     *            <code>true</code> iff the file has compressed content
+     */
+    public KeYFile(String name,
+                   File file,
+                   FileRepo fileRepo,
+                   ProgressMonitor monitor,
+                   Profile profile,
+                   boolean compressed) {
+        this(name,
+             RuleSourceFactory.initRuleFile(file, compressed),
+             monitor, profile);
+        this.fileRepo = fileRepo;
+    }
 
-    
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
@@ -152,9 +202,24 @@ public class KeYFile implements EnvInput {
     protected InputStream getNewStream() throws FileNotFoundException {
         close();
         if (!file.isAvailable()) {
-            throw new FileNotFoundException("File/Resource " + file + " not found.");  
-        } 
-        input = file.getNewStream();
+            throw new FileNotFoundException("File/Resource " + file + " not found.");
+        }
+        // open a stream to the file (via FileRepo if possible)
+        try {
+            if (fileRepo != null) {
+//                input = fileRepo.getInputStream(file.file().toPath());
+//                if (input == null) {
+//                    // fileRepo could not provide a file (internal rule file?)
+//                    input = file.getNewStream();
+//                }
+                input = fileRepo.getInputStream(file);
+            } else {
+                input = file.getNewStream();
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return input;
     }
     
@@ -260,11 +325,12 @@ public class KeYFile implements EnvInput {
         File bootClassPathFile = new File(bootClassPath);
         
         if (!bootClassPathFile.isAbsolute()) {
+            // convert to absolute by resolving against the parent path of the parsed file
             String parentDirectory = file.file().getParent();
             bootClassPathFile = new File(parentDirectory, bootClassPath);            
         }
         
-        return bootClassPathFile.getCanonicalFile();         
+        return bootClassPathFile;
     }
     
 
@@ -310,14 +376,14 @@ public class KeYFile implements EnvInput {
             javaPath = problemParser.javaSource(); 
             
             if(javaPath != null) {
-                File cfile = new File(javaPath);
-                if (!cfile.isAbsolute()) { // test relative pathname
+                File absFile = new File(javaPath);
+                if (!absFile.isAbsolute()) {
+                    // convert to absolute by resolving against the parent path of the parsed file
                     File parent=file.file().getParentFile();
-                    cfile = new File(parent,javaPath).
-                    getCanonicalFile().getAbsoluteFile();
-                    javaPath = cfile.getAbsolutePath();
+                    absFile = new File(parent, javaPath);
+                    javaPath = absFile.getPath();
                 }
-                if (!cfile.exists()) {
+                if (!absFile.exists()) {
                     throw new ProofInputException("Declared Java source " 
                             + javaPath + " not found.");
                 }                      
