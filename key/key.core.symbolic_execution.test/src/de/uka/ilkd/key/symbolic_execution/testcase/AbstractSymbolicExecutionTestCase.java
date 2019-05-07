@@ -67,7 +67,7 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodeWriter;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicExecutionCompletions;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockSpecificationElement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionAuxiliaryContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
@@ -493,11 +493,11 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertVariables((IExecutionLoopInvariant)expected, (IExecutionLoopInvariant)current, compareVariables, compareConstraints);
          assertConstraints((IExecutionLoopInvariant)expected, (IExecutionLoopInvariant)current, compareConstraints);
       }
-      else if (expected instanceof IExecutionBlockSpecificationElement) {
-         assertTrue("Expected IExecutionBlockContract but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBlockSpecificationElement);
-         assertEquals(((IExecutionBlockSpecificationElement)expected).isPreconditionComplied(), ((IExecutionBlockSpecificationElement)current).isPreconditionComplied());
-         assertVariables((IExecutionBlockSpecificationElement)expected, (IExecutionBlockSpecificationElement)current, compareVariables, compareConstraints);
-         assertConstraints((IExecutionBlockSpecificationElement)expected, (IExecutionBlockSpecificationElement)current, compareConstraints);
+      else if (expected instanceof IExecutionAuxiliaryContract) {
+         assertTrue("Expected IExecutionBlockContract but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionAuxiliaryContract);
+         assertEquals(((IExecutionAuxiliaryContract)expected).isPreconditionComplied(), ((IExecutionAuxiliaryContract)current).isPreconditionComplied());
+         assertVariables((IExecutionAuxiliaryContract)expected, (IExecutionAuxiliaryContract)current, compareVariables, compareConstraints);
+         assertConstraints((IExecutionAuxiliaryContract)expected, (IExecutionAuxiliaryContract)current, compareConstraints);
       }
       else if (expected instanceof IExecutionJoin) {
          assertTrue("Expected IExecutionJoin but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionJoin);

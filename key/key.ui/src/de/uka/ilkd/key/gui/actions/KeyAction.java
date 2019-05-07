@@ -10,6 +10,8 @@ import java.awt.*;
  * @version 1 (13.02.19)
  */
 public abstract class KeyAction extends AbstractAction {
+    private static final long serialVersionUID = 3600716639751838717L;
+
     /**
      * This constant holds the typical key to be used for shortcuts (usually
      * {@link java.awt.Event#CTRL_MASK})

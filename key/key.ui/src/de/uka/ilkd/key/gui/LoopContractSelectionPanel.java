@@ -8,13 +8,13 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.AbstractLoopContractBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.SimpleLoopContract;
+import de.uka.ilkd.key.speclang.LoopContractImpl;
 
 /**
  * This panel used to select which {@link LoopContract}s to use for an
  * {@link AbstractLoopContractBuiltInRuleApp}.
  */
-public class LoopContractSelectionPanel extends BlockSpecificationElementSelectionPanel<LoopContract> {
+public class LoopContractSelectionPanel extends AuxiliaryContractSelectionPanel<LoopContract> {
     
     private static final long serialVersionUID = 5832235501095794321L;
 
@@ -37,7 +37,7 @@ public class LoopContractSelectionPanel extends BlockSpecificationElementSelecti
             for (LoopContract contract : selection) {
                 contracts = contracts.add(contract);
             }
-            return SimpleLoopContract.combine(contracts, services);
+            return LoopContractImpl.combine(contracts, services);
         }
     }
 }

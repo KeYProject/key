@@ -21,13 +21,13 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.AbstractBlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.SimpleBlockContract;
+import de.uka.ilkd.key.speclang.BlockContractImpl;
 
 /**
  * This panel used to select which {@link BlockContract}s to use for an
  * {@link AbstractBlockContractBuiltInRuleApp}.
  */
-public class BlockContractSelectionPanel extends BlockSpecificationElementSelectionPanel<BlockContract> {
+public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel<BlockContract> {
 
     private static final long serialVersionUID = 1681443715264203991L;
 
@@ -61,7 +61,7 @@ public class BlockContractSelectionPanel extends BlockSpecificationElementSelect
             for (BlockContract contract : selection) {
                 contracts = contracts.add(contract);
             }
-            return SimpleBlockContract.combine(contracts, services);
+            return BlockContractImpl.combine(contracts, services);
         }        
     }
 

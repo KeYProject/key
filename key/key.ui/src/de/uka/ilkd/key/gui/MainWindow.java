@@ -171,6 +171,11 @@ public final class MainWindow extends JFrame {
      */
     private SaveFileAction saveFileAction;
 
+    /**
+     * action for saving a proof as a bundle
+     */
+    private SaveBundleAction saveBundleAction;
+
     private QuickSaveAction quickSaveAction;
     private QuickLoadAction quickLoadAction;
 
@@ -368,6 +373,7 @@ public final class MainWindow extends JFrame {
         openMostRecentFileAction = new OpenMostRecentFileAction(this);
         editMostRecentFileAction = new EditMostRecentFileAction(this);
         saveFileAction = new SaveFileAction(this);
+        saveBundleAction = new SaveBundleAction(this);
         quickSaveAction = new QuickSaveAction(this);
         quickLoadAction = new QuickLoadAction(this);
         proofManagementAction = new ProofManagementAction(this);
@@ -443,6 +449,7 @@ public final class MainWindow extends JFrame {
         fileOperations.add(openMostRecentFileAction);
         fileOperations.add(editMostRecentFileAction);
         fileOperations.add(saveFileAction);
+        fileOperations.add(saveBundleAction);
         fileOperations.addSeparator();
         fileOperations.add(proofManagementAction);
 
@@ -474,13 +481,15 @@ public final class MainWindow extends JFrame {
         return toolBar;
     }
 
-    private JToggleButton createHeatmapToggle() {
-        return new JToggleButton(new HeatmapToggleAction(this));
-    }
+    /*
+     * private JToggleButton createHeatmapToggle() { return new
+     * JToggleButton(new HeatmapToggleAction(this)); }
+     */
 
-    private JButton createHeatmapMenuOpener() {
-        return new JButton(new HeatmapSettingsAction(this));
-    }
+    /*
+     * private JButton createHeatmapMenuOpener() { return new JButton(new
+     * HeatmapSettingsAction(this)); }
+     */
 
     private ComplexButton createSMTComponent() {
         smtComponent = new ComplexButton(TOOLBAR_ICON_SIZE);
@@ -649,6 +658,7 @@ public final class MainWindow extends JFrame {
         fileMenu.add(openMostRecentFileAction);
         fileMenu.add(editMostRecentFileAction);
         fileMenu.add(saveFileAction);
+        fileMenu.add(saveBundleAction);
         fileMenu.add(quickSaveAction);
         fileMenu.add(quickLoadAction);
         fileMenu.addSeparator();
@@ -772,6 +782,7 @@ public final class MainWindow extends JFrame {
         options.add(new JCheckBoxMenuItem(new AutoSave(this)));
         options.add(new MinimizeInteraction(this));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
+        options.add(new JCheckBoxMenuItem(new BundleSavingToggleAction(this)));
 
         return options;
 

@@ -193,7 +193,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * not null and in case of a reference array type that also its elements are
      * non-null In case of implicit fields or primitive typed fields/variables
      * the empty set is returned
-     * 
+     *
      * @param varName
      *            the String specifying the variable/field name
      * @param kjt
@@ -396,7 +396,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     /**
      * Extracts method specifications (i.e., contracts) from Java+JML input.
-     * 
+     *
      * @param pm
      *            method to extract for
      * @param addInvariant
@@ -605,6 +605,13 @@ public final class JMLSpecExtractor implements SpecExtractor {
             return DefaultImmutableSet.nil();
         }
     }
+    @Override
+    public ImmutableSet<LoopContract> extractLoopContracts(
+            final IProgramMethod method, final LoopStatement loop)
+            throws SLTranslationException {
+        return createLoopContracts(method, new LinkedList<Label>(), loop,
+                loop.getComments());
+    }
 
     @Override
     public ImmutableSet<LoopContract> extractLoopContracts(
@@ -629,6 +636,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
         if (nextNonLabeled instanceof StatementBlock) {
             return createLoopContracts(method, labels,
                     (StatementBlock) nextNonLabeled, labeled.getComments());
+        } else if (nextNonLabeled instanceof LoopStatement) {
+            return createLoopContracts(method, labels,
+                    (LoopStatement) nextNonLabeled, labeled.getComments());
         } else {
             return DefaultImmutableSet.nil();
         }
@@ -669,6 +679,28 @@ public final class JMLSpecExtractor implements SpecExtractor {
             try {
                 result = result.union(jsf.createJMLBlockContracts(method,
                         labels, block, specificationCase));
+            } catch (final SLWarningException exception) {
+                warnings = warnings.add(exception.getWarning());
+            }
+        }
+        return result;
+    }
+
+    private ImmutableSet<LoopContract> createLoopContracts(
+            final IProgramMethod method, final List<Label> labels,
+            final LoopStatement loop, final Comment[] comments)
+            throws SLTranslationException {
+        ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
+        // For some odd reason every comment block appears twice; thus we remove
+        // duplicates.
+        final TextualJMLConstruct[] constructs = parseMethodLevelComments(
+                removeDuplicates(comments), getFileName(method));
+        for (int i = constructs.length - 1; i >= 0
+                && constructs[i] instanceof TextualJMLSpecCase; i--) {
+            final TextualJMLSpecCase specificationCase = (TextualJMLSpecCase) constructs[i];
+            try {
+                result = result.union(jsf.createJMLLoopContracts(method,
+                        labels, loop, specificationCase));
             } catch (final SLWarningException exception) {
                 warnings = warnings.add(exception.getWarning());
             }
