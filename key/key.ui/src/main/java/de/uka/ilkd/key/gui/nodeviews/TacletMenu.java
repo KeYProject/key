@@ -18,6 +18,7 @@ import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem;
@@ -58,7 +59,7 @@ import java.util.*;
 /**
  * This class creates a menu with Taclets as entries. The invoker has
  * to be of type SequentView because of the method call selectedTaclet
- * that hands over the selected Taclet. The class is used to get all
+ * that hands over the selected Taclet. The class is used to lookupAndOverride all
  * Taclet that are applicable at a selected position in a sequent.
  */
 public class TacletMenu extends JMenu {
@@ -230,7 +231,7 @@ public class TacletMenu extends JMenu {
         //        addPopFrameItem(control);
 
         List<Action> extensionMenu = KeYGuiExtensionFacade.getContextMenuItems(
-                ContextMenuKind.SEQUENT_VIEW, pos, mediator);
+                DefaultContextMenuKind.SEQUENT_VIEW, pos, mediator);
         if(!extensionMenu.isEmpty()) {
             addSeparator();
             extensionMenu.forEach(this::add);

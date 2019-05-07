@@ -38,6 +38,7 @@ public final class SaveFileAction extends MainWindowAction {
         setAcceleratorLetter(KeyEvent.VK_S);
         
         mainWindow.getMediator().enableWhenProofLoaded(this);
+        lookupAcceleratorKey();
     }
 
     public void actionPerformed(ActionEvent e) {

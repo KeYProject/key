@@ -46,6 +46,7 @@ public class ExitMainAction extends MainWindowAction {
        setIcon(IconFactory.quit(16));
        setTooltip("Leave KeY.");
        setAcceleratorLetter(KeyEvent.VK_Q);
+       lookupAcceleratorKey();
    }
 
    public final WindowListener windowListener = new WindowAdapter() {

@@ -37,6 +37,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.*;
@@ -143,6 +145,9 @@ public abstract class SequentView extends JEditorPane {
         addHierarchyBoundsListener(changeListener);
 
         filter = new IdentitySequentPrintFilter();
+
+        KeYGuiExtensionFacade.installKeyboardShortcuts(getMainWindow().getMediator(),
+                this, KeYGuiExtension.KeyboardShortcuts.SEQUENT_VIEW);
     }
 
     public final void setFont() {
@@ -341,8 +346,8 @@ public abstract class SequentView extends JEditorPane {
      * Return the character index for a certain coordinate. The usual
      * viewToModel is focused on inter-character spaces, not characters, so it
      * returns the correct index in the left half of the glyph but one too many
-     * in the right half. Therefore, we get width of character before the one
-     * given by viewToModel, subtract it from the given x value, and get the
+     * in the right half. Therefore, we lookupAndOverride width of character before the one
+     * given by viewToModel, subtract it from the given x value, and lookupAndOverride the
      * character at the new position. That is the correct one.
      */
     public int correctedViewToModel(Point p) {

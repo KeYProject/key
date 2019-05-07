@@ -253,6 +253,9 @@ public final class MainWindow extends JFrame {
         addWindowListener(exitMainAction.windowListener);
         MacroKeyBinding.registerMacroKeyBindings(mediator, currentGoalView, getRootPane());
 
+        KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, (JComponent) getContentPane(),
+                KeYGuiExtension.KeyboardShortcuts.MAIN_WINDOW);
+
         KeYGuiExtensionFacade.getStartupExtensions()
                 .forEach(it -> it.init(this, mediator));
     }

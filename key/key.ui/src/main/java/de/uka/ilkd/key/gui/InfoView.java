@@ -16,7 +16,8 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.KeYSelectionModel;
-import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -136,7 +137,7 @@ public class InfoView extends JSplitPane implements TabPanel {
                 if(e.isPopupTrigger()) {
                     Rule selected = infoTree.getLastSelectedPathComponent().getRule();
                     JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
-                            ContextMenuKind.TACLET_INFO, selected,
+                            DefaultContextMenuKind.TACLET_INFO, selected,
                             mediator);
                     if(menu.getComponentCount()>0) {
                         menu.show(InfoView.this, e.getX(), e.getY());
@@ -151,6 +152,7 @@ public class InfoView extends JSplitPane implements TabPanel {
         setLeftComponent(new JScrollPane(infoTree));
         setRightComponent(contentPane);
 
+        KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this, KeYGuiExtension.KeyboardShortcuts.INFO_VIEW);
     }
 
     public InfoView(MainWindow window, KeYMediator mediator) {

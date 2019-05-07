@@ -121,7 +121,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
     /**
      * Constructs a new {@link AbstractionPredicatesChoiceDialog}. The given
-     * goal is used to get information about the proof.
+     * goal is used to lookupAndOverride information about the proof.
      *
      * @param goal
      *            The goal on which the merge rule is applied.

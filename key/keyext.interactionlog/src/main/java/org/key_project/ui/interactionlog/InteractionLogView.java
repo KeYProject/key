@@ -309,10 +309,10 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
     private class ExportMUScriptAction extends AbstractFileSaveAction {
         ExportMUScriptAction() {
-            putValue(Action.NAME, "Export as Proof Script");
-            putValue(Action.SMALL_ICON,
-                    IconFactory.EXPORT_MU_SCRIPT.get());
+            setName("Export as Proof Script");
+            setIcon(IconFactory.EXPORT_MU_SCRIPT.get());
             setMenuPath(MENU_ILOG_EXPORT);
+            lookupAcceleratorKey();
         }
 
         @Override
@@ -329,10 +329,10 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
     private class ExportMUScriptClipboardAction extends KeyAction {
         ExportMUScriptClipboardAction() {
-            putValue(Action.NAME, "Copy MUScript");
-            putValue(Action.SMALL_ICON,
-                    IconFactory.EXPORT_MU_SCRIPT_CLIPBOARD.get());
+            setName("Copy MUScript");
+            setSmallIcon(IconFactory.EXPORT_MU_SCRIPT_CLIPBOARD.get());
             setMenuPath(MENU_ILOG_EXPORT);
+            lookupAcceleratorKey();
         }
 
         @Override
@@ -346,13 +346,14 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
     private class LoadAction extends KeyAction {
         LoadAction() {
-            putValue(Action.NAME, "Load");
+            setName("Load");
             putValue(Action.SHORT_DESCRIPTION, "Load Interaction Log");
-            putValue(Action.SMALL_ICON,
+            setIcon(
                     IconFontSwing.buildIcon(FontAwesomeSolid.TRUCK_LOADING, SMALL_ICON_SIZE));
             // new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/database_add.png")));
             setPriority(0);
             setMenuPath(MENU_ILOG);
+            lookupAcceleratorKey();
         }
 
         @Override
@@ -379,10 +380,11 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
     private class SaveAction extends KeyAction {
         SaveAction() {
-            putValue(Action.NAME, "Save");
-            putValue(Action.SMALL_ICON, IconFactory.INTERLOG_SAVE.get());
+            setName("Save");
+            setIcon(IconFactory.INTERLOG_SAVE.get());
             setMenuPath(MENU_ILOG);
             setPriority(1);
+            lookupAcceleratorKey();
             //new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/database_save.png")));
         }
 
@@ -410,10 +412,10 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     private class AddUserNoteAction extends KeyAction {
         AddUserNoteAction() {
             setName("Add Note");
-            putValue(Action.SMALL_ICON,
-                    IconFontSwing.buildIcon(FontAwesomeRegular.STICKY_NOTE, SMALL_ICON_SIZE));
+            setIcon(IconFontSwing.buildIcon(FontAwesomeRegular.STICKY_NOTE, SMALL_ICON_SIZE));
             //new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/book_add.png")));
             setMenuPath(MENU_ILOG);
+            lookupAcceleratorKey();
         }
 
         @Override
@@ -440,10 +442,11 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             setName("Toggle Fav");
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_F);
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_MASK));
-            putValue(Action.SMALL_ICON,
+            setIcon(
                     IconFontSwing.buildIcon(FontAwesomeSolid.HEART, SMALL_ICON_SIZE, Color.red));
             //    new ImageIcon(getClass().getResource("/de/uka/ilkd/key/gui/icons/heart.png")));
             setMenuPath(MENU_ILOG);
+            lookupAcceleratorKey();
         }
 
         @Override
@@ -459,6 +462,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             setName("Jump into tree");
             putValue(SMALL_ICON, IconFactory.JUMP_INTO_TREE.get());
             setMenuPath(MENU_ILOG);
+            lookupAcceleratorKey();
         }
 
         @Override
@@ -480,6 +484,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             putValue(NAME, "Re-apply action");
             putValue(SMALL_ICON, IconFactory.INTERLOG_TRY_APPLY.get());
             setMenuPath(MENU_ILOG);
+            lookupAcceleratorKey();
         }
 
         @Override
@@ -524,8 +529,9 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         public ExportKPSAction() {
             setName("Export as KPS …");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into the KPS format.");
-            putValue(Action.SMALL_ICON, IconFactory.INTERLOG_EXPORT_KPS.get());
+            setIcon(IconFactory.INTERLOG_EXPORT_KPS.get());
             setMenuPath(MENU_ILOG_EXPORT);
+            lookupAcceleratorKey();
         }
 
         void save(File selectedFile) {
@@ -541,8 +547,9 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         public ExportMarkdownAction() {
             setName("Export as markdown …");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into a markdown file.");
-            putValue(Action.SMALL_ICON, IconFontSwing.buildIcon(FontAwesomeSolid.MARKDOWN, SMALL_ICON_SIZE));
+            setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.MARKDOWN, SMALL_ICON_SIZE));
             setMenuPath(MENU_ILOG_EXPORT);
+            lookupAcceleratorKey();
         }
 
         void save(File selectedFile) {
@@ -558,7 +565,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         public ShowExtendedActionsAction() {
             setName("More …");
             putValue(Action.SHORT_DESCRIPTION, "Shows further options");
-            putValue(Action.SMALL_ICON, IconFactory.INTERLOW_EXTENDED_ACTIONS.get());
+            setIcon(IconFactory.INTERLOW_EXTENDED_ACTIONS.get());
+            lookupAcceleratorKey();
         }
 
         public JPopupMenu createMenu() {
@@ -591,6 +599,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
                 if (evt.getPropertyName().equals(SELECTED_KEY))
                     update();
             });
+            lookupAcceleratorKey();
         }
 
         private void update() {

@@ -23,6 +23,8 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -216,6 +218,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
         registerKeyboardAction(keyboardAction,
                 searchKeyStroke,
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+        KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
+                KeYGuiExtension.KeyboardShortcuts.PROOF_TREE_VIEW);
     }
 
     protected void finalize() throws Throwable {
@@ -999,7 +1004,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             subtreeStatistics.addActionListener(this);
 
             List<Action> extensionActions =
-                    KeYGuiExtensionFacade.getContextMenuItems(ContextMenuKind.PROOF_TREE, invokedNode, mediator);
+                    KeYGuiExtensionFacade.getContextMenuItems(DefaultContextMenuKind.PROOF_TREE, invokedNode, mediator);
             if (!extensionActions.isEmpty()) {
                 add(new JSeparator());
                 extensionActions.forEach(this::add);

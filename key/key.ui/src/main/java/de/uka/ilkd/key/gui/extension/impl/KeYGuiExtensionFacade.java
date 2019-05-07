@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui.extension.impl;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
@@ -15,9 +16,6 @@ import java.util.function.ToIntFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static de.uka.ilkd.key.gui.extension.api.KeYExtConstants.PATH;
-import static de.uka.ilkd.key.gui.extension.api.KeYExtConstants.PRIORITY;
 
 /**
  * Facade for retrieving the GUI extensions.
@@ -59,7 +57,7 @@ public final class KeYGuiExtensionFacade {
      */
     public static JMenu createExtensionMenu(MainWindow mainWindow) {
         ToIntFunction<Action> func = (Action a) -> {
-            Integer i = (Integer) a.getValue(PRIORITY);
+            Integer i = (Integer) a.getValue(KeyAction.PRIORITY);
             if (i == null) return 0;
             else return i;
         };
@@ -91,7 +89,7 @@ public final class KeYGuiExtensionFacade {
     //endregion
 
     private static void sortActionIntoMenu(Action act, JMenu menu) {
-        Object path = act.getValue(PATH);
+        Object path = act.getValue(KeyAction.PATH);
         String spath;
         if (path == null) spath = "";
         else spath = path.toString();
@@ -247,6 +245,42 @@ public final class KeYGuiExtensionFacade {
         return getExtensionInstances(KeYGuiExtension.Startup.class);
     }
 
+
+    //region keyboard shortcuts
+    public static List<KeYGuiExtension.KeyboardShortcuts> getKeyboardShortcutsExtensions() {
+        return getExtensionInstances(KeYGuiExtension.KeyboardShortcuts.class);
+    }
+
+    public static Stream<Action> getKeyboardShortcuts(KeYMediator mediator, String componentId, JComponent component) {
+        return getKeyboardShortcutsExtensions().stream()
+                .flatMap(it -> it.getShortcuts(mediator, componentId, component).stream())
+                .sorted(new ActionPriorityComparator());
+    }
+
+    /**
+     *
+     * @param mediator
+     * @param component
+     * @param componentId
+     */
+    public static void installKeyboardShortcuts(KeYMediator mediator, JComponent component, String componentId) {
+        Stream<Action> provider = getKeyboardShortcuts(mediator, componentId, component);
+        provider.forEach(it -> {
+            int condition =
+                    it.getValue(KeyAction.SHORTCUT_FOCUSED_CONDITION) != null
+                            ? (int) it.getValue(KeyAction.SHORTCUT_FOCUSED_CONDITION)
+                            : JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
+
+            KeyStroke ks = (KeyStroke)
+                    (it.getValue(KeyAction.LOCAL_ACCELERATOR) != null
+                            ? it.getValue(KeyAction.LOCAL_ACCELERATOR)
+                            : it.getValue(Action.ACCELERATOR_KEY));
+
+            component.registerKeyboardAction(it, ks, condition);
+        });
+    }
+    //endregion
+
     /**
      * Disables the clazz from further loading.
      * <p>
@@ -273,5 +307,20 @@ public final class KeYGuiExtensionFacade {
      */
     public void allowClass(String clazz) {
         forbiddenPlugins.remove(clazz);
+    }
+
+    private static class ActionPriorityComparator implements Comparator<Action> {
+        @Override
+        public int compare(Action o1, Action o2) {
+            int a = getPriority(o1);
+            int b = getPriority(o1);
+            return a - b;
+        }
+
+        private int getPriority(Action action) {
+            if (action.getValue(KeyAction.PRIORITY) != null)
+                return (int) action.getValue(KeyAction.PRIORITY);
+            return 0;
+        }
     }
 }

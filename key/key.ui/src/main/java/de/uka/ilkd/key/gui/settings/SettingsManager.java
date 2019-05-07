@@ -111,6 +111,7 @@ public class SettingsManager {
             public ShowSettingsAction() {
                 setName("Show Settings");
                 setIcon(IconFactory.editFile(16));
+                lookupAcceleratorKey();
             }
 
             @Override

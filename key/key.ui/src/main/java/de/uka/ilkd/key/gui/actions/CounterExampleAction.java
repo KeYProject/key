@@ -55,6 +55,7 @@ public class CounterExampleAction extends MainWindowAction {
         Icon icon = IconFactory.counterExample(MainWindow.TOOLBAR_ICON_SIZE);
         putValue(SMALL_ICON, icon);
         init();
+        lookupAcceleratorKey();
     }
 
     /**

@@ -463,7 +463,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
              }
          } else {
             // should never happen as replay always returns a result object
-             //TODO (DS): Why is it then there? If this happens, we will get\\
+             //TODO (DS): Why is it then there? If this happens, we will lookupAndOverride\\
              // a NullPointerException just a line below...
             getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());                         
          }

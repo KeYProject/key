@@ -494,7 +494,7 @@ public final class ExampleChooser extends JDialog {
      * tries to find examples directory on its own.
      */
     public static File showInstance(String examplesDirString) {
-        // get examples directory
+        // lookupAndOverride examples directory
         File examplesDir;
         if(examplesDirString == null) {
             examplesDir = lookForExamples();

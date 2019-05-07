@@ -1,23 +1,52 @@
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.extension.api.KeYExtConstants;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 
 import javax.swing.*;
-import java.awt.*;
+import java.util.Iterator;
 
 /**
  * @author Alexander Weigl
  * @version 1 (13.02.19)
  */
 public abstract class KeyAction extends AbstractAction {
-    private static final long serialVersionUID = 3600716639751838717L;
+    /**
+     *
+     */
+    public static final String SHORTCUT_FOCUSED_CONDITION = "SHORTCUT_FOCUSED_CONDITION";
 
     /**
-     * This constant holds the typical key to be used for shortcuts (usually
-     * {@link java.awt.Event#CTRL_MASK})
+     * Additional key for {@link javax.swing.Action}s. Describes the priority,
+     * and therefor an order to arrange these actions.
      */
-    protected static final int SHORTCUT_KEY_MASK
-            = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    public static final String PRIORITY = "PRIORITY";
+
+    /**
+     * Additional key for {@link javax.swing.Action}s. Describes a path in a menu
+     * where an action should be injected in.
+     * <p>
+     * The path should be a dot-separated string, i.e. "Heatmap.Options" would inject an action
+     * into a sub-sub Menu Options below Heatmap.
+     *
+     * @see KeYGuiExtensionFacade#findMenu(JMenu, Iterator)
+     */
+    public static final String PATH = "PATH";
+
+    /**
+     * Key for defining local shortcuts which are prefered
+     * used by {@link de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.KeyboardShortcuts}.
+     * In comparision with {@code ACCELERATOR_KEY} which should be used for global shortcuts.
+     * <p>
+     * The stored values are {@link KeyStroke}.
+     */
+    public static final String LOCAL_ACCELERATOR = "LOCAL_ACCELERATOR";
+
+
+    /**
+     * @see KeyStrokeManager#SHORTCUT_KEY_MASK
+     */
+    protected static final int SHORTCUT_KEY_MASK = KeyStrokeManager.SHORTCUT_KEY_MASK;
 
     public String getName() {
         return (String) getValue(NAME);
@@ -39,12 +68,21 @@ public abstract class KeyAction extends AbstractAction {
         putValue(MNEMONIC_KEY, c);
     }
 
+    public KeyStroke getAcceleratorKey() {
+        return (KeyStroke) getValue(ACCELERATOR_KEY);
+    }
+
     protected void setAcceleratorKey(KeyStroke keyStroke) {
         putValue(ACCELERATOR_KEY, keyStroke);
     }
 
-    public KeyStroke getAcceleratorKey() {
-        return (KeyStroke) getValue(ACCELERATOR_KEY);
+    protected void lookupAcceleratorKey() {
+        lookupAcceleratorKey(getAcceleratorKey());
+    }
+
+    private void lookupAcceleratorKey(KeyStroke defaultValue) {
+        KeyStroke found = KeyStrokeManager.get(this, defaultValue);
+        setAcceleratorKey(found);
     }
 
     protected String getTooltip() {
@@ -88,20 +126,19 @@ public abstract class KeyAction extends AbstractAction {
     }
 
     public String getMenuPath() {
-        return (String) getValue(KeYExtConstants.PATH);
+        return (String) getValue(PATH);
     }
 
     protected void setMenuPath(String path) {
-        putValue(KeYExtConstants.PATH, path);
+        putValue(PATH, path);
     }
 
     public int getPriority() {
-        Integer i = (Integer) getValue(KeYExtConstants.PRIORITY);
+        Integer i = (Integer) getValue(PRIORITY);
         return i == null ? 0 : i;
     }
 
     protected void setPriority(int priority) {
-        putValue(KeYExtConstants.PRIORITY, priority);
+        putValue(PRIORITY, priority);
     }
-
 }

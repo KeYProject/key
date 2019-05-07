@@ -16,7 +16,9 @@ package de.uka.ilkd.key.gui;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -124,6 +126,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 components.getMaxRuleAppSlider().refresh();
             }
         });
+        KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
+                KeYGuiExtension.KeyboardShortcuts.STRATEGY_SELECTION_VIEW);
     }
 
     public StrategySelectionView(MainWindow window, KeYMediator mediator) {

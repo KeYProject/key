@@ -20,7 +20,7 @@ public class NIProofObligationSelector extends ConsoleProofObligationSelector {
          * I feel so sorry for you. You dug through a huge pile of crap
          * until you have reached this comment. And some of this crappy
          * code is from me. Sorry for that. But you can surely believe me,
-         * when I say it only get worse.
+         * when I say it only lookupAndOverride worse.
          */
 
 

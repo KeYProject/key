@@ -29,10 +29,9 @@ public abstract class MainWindowAction extends KeyAction {
     protected MainWindowAction(MainWindow mainWindow) {
         assert mainWindow != null;
         this.mainWindow = mainWindow;
-        putValue(ACCELERATOR_KEY, KeyStrokeManager.get(this));
+        putValue(ACCELERATOR_KEY, KeyStrokeManager.lookupAndOverride(this));
     }
 
-    @Deprecated // add a line in gui.utils.KeyStrokeManager instead
     protected void setAcceleratorLetter(int letter) {
         setAcceleratorKey(KeyStroke.getKeyStroke(letter, SHORTCUT_KEY_MASK));
     }

@@ -33,12 +33,13 @@ public class IncreaseFontSizeAction extends MainWindowAction implements ConfigCh
      * @param mainWindow the main window
      */
     public IncreaseFontSizeAction(MainWindow mainWindow) {
-	super(mainWindow);
+        super(mainWindow);
 	
-	setName("Larger");
+        setName("Larger");
         setIcon(IconFactory.plus(16));
 
         Config.DEFAULT.addConfigChangeListener(this);
+        lookupAcceleratorKey();
     }
     
     @Override

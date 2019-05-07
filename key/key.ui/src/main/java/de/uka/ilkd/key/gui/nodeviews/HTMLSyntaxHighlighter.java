@@ -192,7 +192,7 @@ public class HTMLSyntaxHighlighter {
             //         in the node's sequent.
             // 2. Find all really existing program variables using a visitor.
             //    Pro: No overhead for nonexisting variables.
-            //    Con: May take quite long to get these variables for big sequents.
+            //    Con: May take quite long to lookupAndOverride these variables for big sequents.
             // None of these option works sufficiently well for large sequents.
             // We therefore turn location variable highlighting off in case that
             // there are a lot of registered globals AND the number of formulae

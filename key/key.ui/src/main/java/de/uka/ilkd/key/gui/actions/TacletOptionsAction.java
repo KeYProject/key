@@ -30,13 +30,13 @@ public class TacletOptionsAction extends MainWindowAction {
     private static final long serialVersionUID = -6813540362001480606L;
 
     public TacletOptionsAction(MainWindow mainWindow) {
-	super(mainWindow);
-	setName("Taclet Options");
+        super(mainWindow);
+        setName("Taclet Options");
         setIcon(IconFactory.configure(16));
-	setAcceleratorLetter(KeyEvent.VK_T);
+        setAcceleratorLetter(KeyEvent.VK_T);
 	
-	getMediator().enableWhenProofLoaded(this);
-
+        getMediator().enableWhenProofLoaded(this);
+        lookupAcceleratorKey();
     }
 
     @Override

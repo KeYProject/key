@@ -70,7 +70,7 @@ public class PreferenceSaver {
     };
 
     /**
-     * get a saver for a component.
+     * lookupAndOverride a saver for a component.
      */
     @SuppressWarnings("unchecked")
     private static <C extends Component> Saver<C> getSaver(C component) {
@@ -185,7 +185,7 @@ public class PreferenceSaver {
     }
 
     /**
-     * Windows get their bounding box stored.
+     * Windows lookupAndOverride their bounding box stored.
      */
     private static class WindowSaver implements Saver<Window> {
 

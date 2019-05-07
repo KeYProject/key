@@ -38,6 +38,8 @@ import javax.swing.text.Highlighter.Highlight;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.SimpleAttributeSet;
 
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
 
@@ -108,7 +110,7 @@ public final class SourceView extends JComponent {
     private static final Color MOST_RECENT_HIGHLIGHT_COLOR = new Color(57, 210, 81);
 
     /**
-     * The main window of KeY (needed to get the mediator).
+     * The main window of KeY (needed to lookupAndOverride the mediator).
      */
     private final MainWindow mainWindow;
 
@@ -202,6 +204,10 @@ public final class SourceView extends JComponent {
                 updateGUI();
             }
         });
+
+        KeYGuiExtensionFacade.installKeyboardShortcuts(null,
+                this, KeYGuiExtension.KeyboardShortcuts.SOURCE_VIEW);
+
     }
 
     /**
@@ -273,7 +279,7 @@ public final class SourceView extends JComponent {
                     }
                     line++;
                 }
-                // jump in proof tree (get corresponding node from list)
+                // jump in proof tree (lookupAndOverride corresponding node from list)
                 Node n = null;
                 for (Pair<Node, PositionInfo> p : lines) {
                     if (p.second.getStartPosition().getLine() == line + 1
@@ -417,7 +423,7 @@ public final class SourceView extends JComponent {
             textPane.setEditable(false);
 
             // compare stored hash with a newly created
-            //String origHash = hashes.get(entry.getKey());
+            //String origHash = hashes.lookupAndOverride(entry.getKey());
             //String curHash = IOUtil.computeMD5(entry.getValue());
             //if (!origHash.equals(curHash)) {
                     // TODO: consistency problem, see comment in line 128
@@ -528,7 +534,7 @@ public final class SourceView extends JComponent {
             return;
         }
 
-        // get PositionInfo of all symbEx nodes
+        // lookupAndOverride PositionInfo of all symbEx nodes
         lines = constructLinesSet(currentNode);
         if (lines == null) {
             tabs.setBorder(new TitledBorder(NO_SOURCE));

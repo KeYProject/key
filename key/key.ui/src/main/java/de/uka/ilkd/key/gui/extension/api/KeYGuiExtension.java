@@ -1,8 +1,14 @@
 package de.uka.ilkd.key.gui.extension.api;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.GoalList;
+import de.uka.ilkd.key.gui.InfoView;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.StrategySelectionView;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.gui.sourceview.SourceView;
 
 import javax.swing.*;
 import java.lang.annotation.Retention;
@@ -121,7 +127,7 @@ public interface KeYGuiExtension {
          * Actions should use the {@link KeYExtConstants#PATH} and {@link KeYExtConstants#PRIORITY} to control their
          * position in the menu.
          *
-         * @param mediator       the window of the main menu
+         * @param mediator         the window of the main menu
          * @param kind             the type of context menu
          * @param underlyingObject the object for which the context menu is requested
          * @return non-null, emptiable list of actions.
@@ -170,4 +176,28 @@ public interface KeYGuiExtension {
          */
         SettingsProvider getSettings();
     }
+
+    /**
+     * Extension Point for defining keyboard shortcuts for various components.
+     *
+     * @see de.uka.ilkd.key.gui.utilities.KeyStrokeManager
+     */
+    interface KeyboardShortcuts {
+        String SEQUENT_VIEW = SequentView.class.getName();
+        String GOAL_LIST = GoalList.class.getName();
+        String PROOF_TREE_VIEW = ProofTreeView.class.getName();
+        String MAIN_WINDOW = MainWindow.class.getName();
+        String INFO_VIEW = InfoView.class.getName();
+        String STRATEGY_SELECTION_VIEW = StrategySelectionView.class.getName();
+        String SOURCE_VIEW = SourceView.class.getName();
+
+        /**
+         * @param
+         * @param mediator
+         * @param component
+         * @return non-null settings provider
+         */
+        Collection<Action> getShortcuts(KeYMediator mediator, String componentId, JComponent component);
+    }
+
 }

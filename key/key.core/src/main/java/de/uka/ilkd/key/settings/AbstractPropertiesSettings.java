@@ -12,7 +12,7 @@ import java.util.Properties;
  */
 public abstract class AbstractPropertiesSettings implements Settings {
     private List<SettingsListener> listenerList = new LinkedList<>();
-    protected Properties properties = new Properties();
+    protected Properties properties;
 
     public boolean isInitialized() {
         return properties != null;

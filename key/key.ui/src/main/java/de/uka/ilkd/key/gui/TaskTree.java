@@ -31,6 +31,7 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
@@ -259,7 +260,7 @@ public class TaskTree extends JPanel {
         private void checkPopup(MouseEvent e) {
             if(e.isPopupTrigger()) {
                 JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
-                        ContextMenuKind.PROOF_LIST, mediator.getSelectedProof(),
+                        DefaultContextMenuKind.PROOF_LIST, mediator.getSelectedProof(),
                         mediator);
                 if(menu.getComponentCount()>0) {
                     menu.show(TaskTree.this, e.getX(), e.getY());

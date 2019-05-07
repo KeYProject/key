@@ -278,7 +278,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                         services),
                 sequent, sourcePos.getPosInOccurrence(), services));
         
-        // get those without an if sequent, in these we will try to apply this rule
+        // lookupAndOverride those without an if sequent, in these we will try to apply this rule
         // if: * one sv instantiation is missing
         //     * the term dropped on is a legal instantiation for this sv
         applicableApps = applicableApps.prepend(completeInstantiations(

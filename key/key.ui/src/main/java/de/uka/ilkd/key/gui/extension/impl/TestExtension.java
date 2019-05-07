@@ -19,6 +19,7 @@ import de.uka.ilkd.key.rule.Rule;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +38,7 @@ public class TestExtension implements KeYGuiExtension,
         KeYGuiExtension.StatusLine,
         KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Toolbar,
+        KeYGuiExtension.KeyboardShortcuts,
         KeYGuiExtension.Settings {
 
     KeyAction actionTest = new TestAction();
@@ -61,7 +63,6 @@ public class TestExtension implements KeYGuiExtension,
             return Collections.singletonList(actionTest);
         }
     };
-
 
     @Override
     public List<Action> getMainMenuActions(MainWindow mainWindow) {
@@ -105,11 +106,18 @@ public class TestExtension implements KeYGuiExtension,
         });
     }
 
+    @Override
+    public Collection<Action> getShortcuts(KeYMediator mediator, String componentId, JComponent component) {
+        return Collections.singleton(actionTest);
+    }
+
     private class TestAction extends KeyAction {
         public TestAction() {
             setName("Test");
             setMenuPath("Test.Test.Test");
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.TEETH, 16, Color.BLUE));
+            putValue(LOCAL_ACCELERATOR, KeyStroke.getKeyStroke(KeyEvent.VK_1, KeyEvent.CTRL_DOWN_MASK));
+            lookupAcceleratorKey();
         }
 
         @Override

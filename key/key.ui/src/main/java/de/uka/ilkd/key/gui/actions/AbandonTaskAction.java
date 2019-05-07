@@ -27,13 +27,14 @@ public final class AbandonTaskAction extends MainWindowAction {
     private static final long serialVersionUID = 915588190956945751L;
 
     public AbandonTaskAction(MainWindow mainWindow) {
-	super(mainWindow);
-	setName("Abandon");
+        super(mainWindow);
+        setName("Abandon");
         setIcon(IconFactory.abandon(16));
-	setAcceleratorLetter(KeyEvent.VK_W);
-	setTooltip("Drop current proof.");
+        setAcceleratorLetter(KeyEvent.VK_W);
+        setTooltip("Drop current proof.");
 
-	getMediator().enableWhenProofLoaded(this);
+        getMediator().enableWhenProofLoaded(this);
+        lookupAcceleratorKey();
     }
 
     public synchronized void actionPerformed(ActionEvent e) {
