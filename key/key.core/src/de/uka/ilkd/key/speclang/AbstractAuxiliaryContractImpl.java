@@ -860,7 +860,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      *            the key and value type.
      */
     private abstract static class ReplacementMap<S extends Sorted & SVSubstitute>
-    extends de.uka.ilkd.key.proof.ReplacementMap.NoIrrelevantLabelsReplacementMap<S, S> {
+        extends de.uka.ilkd.key.proof.ReplacementMap.NoIrrelevantLabelsReplacementMap<S, S> {
 
         public ReplacementMap(TermFactory tf) {
             super(tf);
@@ -1000,7 +1000,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      */
     private static class VariableReplacementMap extends ReplacementMap<ProgramVariable> {
 
-    	public VariableReplacementMap(TermFactory tf) {
+        public VariableReplacementMap(TermFactory tf) {
             super(tf);
         }
 
@@ -1016,7 +1016,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      */
     private static class TermReplacementMap extends ReplacementMap<Term> {
 
-    	public TermReplacementMap(TermFactory tf) {
+        public TermReplacementMap(TermFactory tf) {
             super(tf);
         }
 
@@ -1259,7 +1259,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                         }
                     }
                     mbyTerm = measuredBy(new OpReplacer(replacementMap, services.getTermFactory(),
-                    		services.getProof())
+                            services.getProof())
                             .replace(measuredBy));
                 } else {
                     mbyTerm = measuredByEmpty();
@@ -1808,8 +1808,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                     }
                 }
                 return new OpReplacer(
-                		replacementMap, services.getTermFactory(), services.getProof())
-                		.replace(formula);
+                        replacementMap, services.getTermFactory(), services.getProof())
+                        .replace(formula);
             }
         }
 
