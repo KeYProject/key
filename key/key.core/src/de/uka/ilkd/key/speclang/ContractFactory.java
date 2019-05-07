@@ -511,7 +511,13 @@ public class ContractFactory {
             // if the first or the other contract do not have a
             // measured-by-clause, assume no clause at all
             if (mby == null || otherMby == null) {
-                mby = null;
+                if (mby != null) {
+                    mby = tb.ife(otherPre, mby, tb.zero());
+                } else if (otherMby != null) {
+                    mby = tb.ife(otherPre, otherMby, tb.zero());
+                } else {
+                    mby = null;
+                }
             } else {
                 mby = tb.ife(otherPre, otherMby, mby);
             }
@@ -547,7 +553,7 @@ public class ContractFactory {
                 } else {
                     Term ownPre = pres.get(h) != null ? pres.get(h) : tb.tt();
                     nm = tb.intersect(tb.ife(ownPre, m1, tb.allLocs()),
-                            tb.ife(otherPre, m2, tb.allLocs()));
+                                      tb.ife(otherPre, m2, tb.allLocs()));
                 }
                 mods.put(h, nm);
             }
@@ -563,10 +569,10 @@ public class ContractFactory {
         for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             Term a1 = deps.get(h);
             Term a2 = other.getDep(h, false,
-                    t.originalSelfVar,
-                    t.originalParamVars,
-                    t.originalAtPreVars,
-                    services);
+                                   t.originalSelfVar,
+                                   t.originalParamVars,
+                                   t.originalAtPreVars,
+                                   services);
             if (a1 != null || a2 != null) {
                 Term na = null;
                 if (a1 == null) {
@@ -583,10 +589,10 @@ public class ContractFactory {
                 LocationVariable hPre = t.originalAtPreVars.get(h);
                 Term a1Pre = deps.get(hPre);
                 Term a2Pre = other.getDep(hPre, true,
-                        t.originalSelfVar,
-                        t.originalParamVars,
-                        t.originalAtPreVars,
-                        services);
+                                          t.originalSelfVar,
+                                          t.originalParamVars,
+                                          t.originalAtPreVars,
+                                          services);
                 if (a1Pre != null || a2Pre != null) {
                     Term naPre = null;
                     if (a1Pre == null) {
@@ -603,6 +609,23 @@ public class ContractFactory {
         return deps;
     }
 
+
+    /**
+     * Join with other contracts.
+     * @param name      name of the contract union
+     * @param t         the first passed contract
+     * @param others    the other passed contracts
+     * @param pres      the first contract's precondition
+     * @param mby       the first contract's measuredBy term
+     * @param hasMod    whether the first contract has a modifies clause
+     * @param posts     the first contract's postcondition
+     * @param freePosts the first contract's free postconditions
+     * @param axioms    the first contract's axioms
+     * @param mods      the first contract's modifies clause
+     * @param deps      the first contract's dependency clause
+     * @param moda      the first contract's modality
+     * @return the joined contract
+     */
     private FunctionalOperationContract
                 joinWithOtherContracts(final String name,
                                        FunctionalOperationContractImpl t,
@@ -687,9 +710,9 @@ public class ContractFactory {
      * @param others the other contracts
      * @return the joined contract
      */
-    public FunctionalOperationContract union(final String name,
-                                             FunctionalOperationContractImpl t,
-                                             FunctionalOperationContract[] others) {
+    private FunctionalOperationContract union(final String name,
+                                              FunctionalOperationContractImpl t,
+                                              FunctionalOperationContract[] others) {
         // collect information
         Map<LocationVariable, Term> pres = new LinkedHashMap<LocationVariable, Term>(
                 t.originalPres.size());
@@ -697,23 +720,24 @@ public class ContractFactory {
             pres.put(h, t.originalPres.get(h));
         }
         Term mby = t.originalMby;
-        Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
-        Map<LocationVariable, Term> posts = new LinkedHashMap<LocationVariable, Term>(
-                t.originalPosts.size());
-        Map<LocationVariable, Term> freePosts = new LinkedHashMap<LocationVariable, Term>(
-                t.originalFreePosts.size());
+        Map<LocationVariable, Boolean> hasMod =
+                new LinkedHashMap<LocationVariable, Boolean>();
+        Map<LocationVariable, Term> posts =
+                new LinkedHashMap<LocationVariable, Term>(t.originalPosts.size());
+        Map<LocationVariable, Term> freePosts =
+                new LinkedHashMap<LocationVariable, Term>(t.originalFreePosts.size());
         for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             hasMod.put(h, false);
             Term oriPost = t.originalPosts.get(h);
             Term oriFreePost = t.originalFreePosts.get(h);
             if (oriPost != null) {
                 posts.put(h, tb.imp(atPreify(t.originalPres.get(h),
-                        t.originalAtPreVars),
-                        oriPost));
+                          t.originalAtPreVars),
+                          oriPost));
             }
             if (oriFreePost != null) {
                 freePosts.put(h, tb.imp(atPreify(t.originalFreePres.get(h), t.originalAtPreVars),
-                        oriFreePost));
+                                        oriFreePost));
             }
         }
 
@@ -723,7 +747,7 @@ public class ContractFactory {
                 Term oriAxiom = t.originalAxioms.get(h);
                 if (oriAxiom != null) {
                     axioms.put(h, tb.imp(atPreify(t.originalPres.get(h), t.originalAtPreVars),
-                            oriAxiom));
+                                         oriAxiom));
                 }
             }
         }
@@ -732,6 +756,29 @@ public class ContractFactory {
         Modality moda = t.modality;
         return joinWithOtherContracts(name, t, others, pres, mby, hasMod, posts,
                                       freePosts, axioms, mods, deps, moda);
+    }
+
+    /**
+     * Returns the union of the passed contracts. Probably you want to use
+     * SpecificationRepository.combineContracts() instead, which additionally takes care that the
+     * combined contract can be loaded later. The resulting contract has id "INVALID_ID".
+     * @param t      the first passed contract
+     * @param others the remaining passed contracts
+     * @return the union contract
+     */
+    private FunctionalOperationContract union(FunctionalOperationContractImpl t,
+                                              FunctionalOperationContract[] others) {
+        // determine names
+        StringBuffer nameSB = new StringBuffer(t.getName());
+        for (FunctionalOperationContract other : others) {
+            nameSB.append(CONTRACT_COMBINATION_MARKER).append(other.getName());
+        }
+        final String name = nameSB.toString();
+
+        for (FunctionalOperationContract contract : others) {
+            assert contract.getTarget().equals(t.pm);
+        }
+        return union(name, t, others);
     }
 
     /**
@@ -754,236 +801,7 @@ public class ContractFactory {
         FunctionalOperationContractImpl t = (FunctionalOperationContractImpl) contracts[0];
         FunctionalOperationContract[] others = Arrays.copyOfRange(contracts, 1, contracts.length);
         assert others != null;
-
-        // determine names
-        StringBuffer nameSB = new StringBuffer(t.getName());
-        for (FunctionalOperationContract other : others) {
-            nameSB.append(CONTRACT_COMBINATION_MARKER).append(other.getName());
-        }
-
-        for (FunctionalOperationContract contract : others) {
-            assert contract.getTarget().equals(t.pm);
-        }
-
-        //collect information
-        Map<LocationVariable,Term> pres =
-                new LinkedHashMap<LocationVariable, Term>(t.originalPres.size());
-        for(LocationVariable h : t.originalPres.keySet()) {
-           pres.put(h, t.originalPres.get(h));
-        }
-        Term mby = t.originalMby;
-        Map<LocationVariable,Boolean> hasMod = new LinkedHashMap<LocationVariable,Boolean>();
-        Map<LocationVariable,Term> posts =
-                new LinkedHashMap<LocationVariable, Term>(t.originalPosts.size());
-        Map<LocationVariable,Term> freePosts =
-                new LinkedHashMap<LocationVariable, Term>(t.originalFreePosts.size());
-        for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-           hasMod.put(h, false);
-           Term oriPost = t.originalPosts.get(h);
-           Term oriFreePost = t.originalFreePosts.get(h);
-           if(oriPost != null) {
-              posts.put(h,tb.imp(atPreify(t.originalPres.get(h),
-                        t.originalAtPreVars),
-                   oriPost));
-           }
-
-           if(oriFreePost != null) {
-               freePosts.put(h, tb.imp(atPreify(t.originalFreePres.get(h), t.originalAtPreVars),
-                                       oriFreePost));
-            }
-        }
-
-        Map<LocationVariable,Term> axioms = new LinkedHashMap<LocationVariable,Term>();
-        if(t.originalAxioms != null) { // TODO: what about the others?
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                Term oriAxiom = t.originalAxioms.get(h);
-                if(oriAxiom != null) {
-                    axioms.put(h,tb.imp(atPreify(t.originalPres.get(h), t.originalAtPreVars),
-                                        oriAxiom));
-                }
-            }
-        }
-        Map<LocationVariable,Term> mods = t.originalMods;
-        Map<ProgramVariable,Term> deps = t.originalDeps;
-        Modality moda = t.modality;
-        for(FunctionalOperationContract other : others) {
-            Modality otherModality = other.getModality();
-            if (moda != otherModality) {
-                // TODO are there other modalities to appear in contracts?
-                // I know that this is extremely ugly, but I don't know how to combine other kinds of modalities.
-                if (moda == Modality.BOX) {
-                    assert otherModality == Modality.DIA : "unknown modality "+otherModality+" in contract";
-                    // do nothing
-                } else {
-                    assert moda == Modality.DIA: "unknown modality "+moda+" in contract";
-                    moda = Modality.BOX;
-                }
-            }
-            Term otherMby = other.hasMby()
-            ? other.getMby(t.originalSelfVar,
-                    t.originalParamVars,
-                    services)
-                    : null;
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                Term otherPre = other.getPre(h, t.originalSelfVar,
-                        t.originalParamVars,
-                        t.originalAtPreVars,
-                        services);
-                Term otherPost = other.getPost(h, t.originalSelfVar,
-                        t.originalParamVars,
-                        t.originalResultVar,
-                        t.originalExcVar,
-                        t.originalAtPreVars,
-                        services);
-                Term otherFreePost = other.getFreePost(h, t.originalSelfVar,
-                                                       t.originalParamVars,
-                                                       t.originalResultVar,
-                                                       t.originalExcVar,
-                                                       t.originalAtPreVars,
-                                                       services);
-                Term otherAxiom = other.getRepresentsAxiom(h, t.originalSelfVar,
-                        t.originalParamVars,
-                        t.originalResultVar,
-                        t.originalAtPreVars,
-                        services);
-
-                if(h == services.getTypeConverter().getHeapLDT().getHeap()) {
-                    // bugfix (MU)
-                    // if the first or the other contract do not have a
-                    // measured-by-clause, assume no clause at all
-                    if(mby == null || otherMby == null) {
-                        if (mby != null) {
-                            mby = tb.ife(t.getPre(h, t.originalSelfVar,
-                                    t.originalParamVars, t.originalAtPreVars,
-                                    services), mby, tb.zero());
-                        } else if (otherMby != null) {
-                            mby = tb.ife(otherPre, otherMby, tb.zero());
-                        } else {
-                            mby = null;
-                        }
-                    } else {
-                        mby = tb.ife(otherPre, otherMby, mby);
-                    }
-                }
-
-                // the modifies clause must be computed before the preconditions
-                if (hasMod.get(h) || t.hasModifiesClause(h) || other.hasModifiesClause(h)) {
-                    hasMod.put(h, true);
-                    Term m1 = mods.get(h);
-                    Term m2 = other.getMod(h, t.originalSelfVar,
-                            t.originalParamVars,
-                            services);
-                    Function emptyMod = services.getTypeConverter().getLocSetLDT().getEmpty();
-                    if (m1 != null || m2 != null) {
-                        Term nm;
-                        if (m1 == null) {
-                            nm = m2;
-                        } else if (m2 == null) {
-                            nm = m1;
-                        } else if (m1.op().equals(emptyMod) && m2.op().equals(emptyMod)) {
-                        	// special case for both contracts being (weakly) pure
-                        	// fixes bug #1557
-                        	nm = m1;
-                        } else {
-                            Term ownPre = pres.get(h) != null ? pres.get(h) : tb.tt();
-                            nm = tb.intersect(tb.ife(ownPre, m1, tb.allLocs()),
-                                    tb.ife(otherPre, m2, tb.allLocs()));
-                        }
-                        mods.put(h, nm);
-                    }
-                }
-
-                if(otherPre != null) {
-                    pres.put(h,pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
-                }
-                if(otherPost != null) {
-                    final Term oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
-                    posts.put(h, posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost));
-                }
-                if(otherFreePost != null) {
-                    final Term oFreePost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherFreePost);
-                    freePosts.put(h, freePosts.get(h) == null ? oFreePost : tb.and(freePosts.get(h), oFreePost));
-                }
-                if(otherAxiom != null) {
-                    final Term oAxiom = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherAxiom);
-                    axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
-                }
-
-
-            }
-
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                Term a1 = deps.get(h);
-                Term a2 = other.getDep(h, false,
-                                       t.originalSelfVar,
-                                       t.originalParamVars,
-                                       t.originalAtPreVars,
-                                       services);
-                if (a1 != null || a2 != null) {
-                    Term na = null;
-                    if(a1 == null){
-                        na = a2;
-                    } else if(a2 == null) {
-                        na = a1;
-                    }else {
-                        na = tb.union(a1, a2);
-                    }
-                    deps.put(h, na);
-                }
-                boolean preHeap = t.originalAtPreVars.get(h) != null;
-                if (preHeap) {
-                    LocationVariable hPre = t.originalAtPreVars.get(h);
-                    Term a1Pre = deps.get(hPre);
-                    Term a2Pre = other.getDep(hPre, true,
-                                              t.originalSelfVar,
-                                              t.originalParamVars,
-                                              t.originalAtPreVars,
-                                              services);
-                    if (a1Pre != null || a2Pre != null) {
-                        Term naPre = null;
-                        if(a1Pre == null){
-                            naPre = a2Pre;
-                        }else if(a2Pre == null) {
-                            naPre = a1Pre;
-                        }else{
-                            naPre = tb.union(a1Pre, a2Pre);
-                        }
-                        deps.put(hPre, naPre);
-                    }
-                }
-             }
-        }
-
-        /* (*) free preconditions are not joined because no sensible joining operator
-         * suggests itself. This is no problem, however, since combined contracts are only used
-         * for contract application and free preconditions are not used there.
-         * 2015, mu
-         */
-
-        return new FunctionalOperationContractImpl(INVALID_ID,
-                                                   nameSB.toString(),
-                                                   t.kjt,
-                                                   t.pm,
-                                                   t.specifiedIn,
-                                                   moda,
-                                                   pres,
-                                                   new LinkedHashMap<LocationVariable, Term>(), // (*)
-                                                   mby,
-                                                   posts,
-                                                   freePosts,
-                                                   axioms,
-                                                   mods,
-                                                   deps,
-                                                   hasMod,
-                                                   t.originalSelfVar,
-                                                   t.originalParamVars,
-                                                   t.originalResultVar,
-                                                   t.originalExcVar,
-                                                   t.originalAtPreVars,
-                                                   t.globalDefs,
-                                                   Contract.INVALID_ID,
-                                                   t.toBeSaved,
-                                                   t.transaction, services);
+        return union(t, others);
     }
 
     // PRIVATE METHODS
@@ -1085,12 +903,12 @@ public class ContractFactory {
         return forClass.getJavaType().getFullName() + "[" +
                 specifiedIn.getJavaType().getFullName() + "::" +
                 methodShortName + "(" +
-                concadinate(",", target.getParamTypes()) + ")" + "]"
+                concatenate(",", target.getParamTypes()) + ")" + "]"
                 + "." + baseName;
     }
 
-    private static String concadinate(String delim,
-            ImmutableArray<KeYJavaType> elems) {
+    private static String concatenate(String delim,
+                                      ImmutableArray<KeYJavaType> elems) {
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < elems.size(); i++) {
             b.append(elems.get(i).getFullName());

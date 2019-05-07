@@ -52,7 +52,6 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;

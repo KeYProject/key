@@ -22,7 +22,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.StringJoiner;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -46,7 +45,6 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
 
     protected void showTermInfo(Point p) {
         MainWindow mainWindow = sequentView.getMainWindow();
-        KeYMediator mediator = mainWindow.getMediator();
 
         if (showTermInfo) {
             PosInSequent mousePos = sequentView.getPosInSequent(p);

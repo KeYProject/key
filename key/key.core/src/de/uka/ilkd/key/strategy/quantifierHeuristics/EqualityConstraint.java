@@ -862,10 +862,6 @@ public class EqualityConstraint implements Constraint {
         public ECPair copy () {
             return new ECPair ( first, second, hash );
         }
-        
-        public ECPair (Constraint first, Constraint second) {
-	    set ( first, second );
-        }
 
         public ECPair (Constraint first, Constraint second, int hash) {
             this.first = first;
