@@ -29,6 +29,7 @@ import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -39,7 +40,7 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 
 /**
- * This class is used to select and store <code>Trigger</code>s 
+ * This class is used to select and store <code>Trigger</code>s
  * for a quantified formula in Prenex CNF(PCNF).
  */
 public class TriggersSet {
@@ -48,8 +49,8 @@ public class TriggersSet {
     private final Term allTerm;
     /**all <code>Trigger</code>s  for <code>allTerm</code>*/
     private ImmutableSet<Trigger> allTriggers = DefaultImmutableSet.<Trigger>nil();
-    /**a <code>HashMap</code> from <code>Term</code> to <code>Trigger</code> 
-     * which stores different subterms of <code>allTerm</code> 
+    /**a <code>HashMap</code> from <code>Term</code> to <code>Trigger</code>
+     * which stores different subterms of <code>allTerm</code>
      * with its according trigger */
     private final Map<Term, Trigger> termToTrigger = new LinkedHashMap<Term, Trigger>();
     /**all universal variables of <code>allTerm</code>*/
@@ -69,19 +70,20 @@ public class TriggersSet {
 
     static TriggersSet create(Term allTerm, Services services) {
         final Map<Term, TriggersSet> triggerSetCache = services.getCaches().getTriggerSetCache();
+        allTerm = TermLabel.removeIrrelevantLabels(allTerm, services);
 		TriggersSet trs;
-		
+
 		synchronized(triggerSetCache) {
 		    trs = triggerSetCache.get(allTerm);
 		}
-        
+
 		if (trs == null) {
             // add check whether it is in PCNF
             trs = new TriggersSet(allTerm, services);
             synchronized(triggerSetCache) {
                 triggerSetCache.put(allTerm, trs);
             }
-        }   
+        }
         return trs;
     }
 
@@ -122,7 +124,7 @@ public class TriggersSet {
     }
 
     /**
-     * 
+     *
      * @param trigger
      *            a <code>Term</code>
      * @param qvs
@@ -146,7 +148,7 @@ public class TriggersSet {
     }
 
     /**
-     * 
+     *
      * @param trs
      * @param clause
      *            a <code>Term</code> of clause form
@@ -186,7 +188,7 @@ public class TriggersSet {
 
         public ClauseTrigger(Term clause) {
             this.clause = clause;
-            selfUQVS = TriggerUtils.intersect(uniQuantifiedVariables, 
+            selfUQVS = TriggerUtils.intersect(uniQuantifiedVariables,
                     clause.freeVars());
 
         }
@@ -195,7 +197,7 @@ public class TriggersSet {
          *Searching uni-triggers and elements of multi-triggers in every
          *literal in this <code>clause</code> and add those uni-triggers
          *to the goal trigger set. At last construct multi-triggers from
-         * those elements. 
+         * those elements.
          */
         public void createTriggers(Services services) {
             final Iterator<Term> it =
@@ -215,7 +217,7 @@ public class TriggersSet {
 
         /**
          * @param term    one atom at the begining
-         * @param services  the Services 
+         * @param services  the Services
          * @return true   if find any trigger from <code>term</code>
          */
         private boolean recAddTriggers(Term term, Services services) {
@@ -324,7 +326,7 @@ public class TriggersSet {
             final Operator op = term.op();
 
             // we do not want to match on expressions a.<created>
-            
+
             if(term.op() == services.getTypeConverter().getHeapLDT().getSelect(term.sort(), services)) {
         	if(term.sub(2).op().name().toString().endsWith(ImplicitFieldAdder.IMPLICIT_CREATED)) {
                     return false;
@@ -334,8 +336,8 @@ public class TriggersSet {
             final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
             // matching on equations and inequalities does not seem to have any
             // positive effect for the time being
-            if (op == Equality.EQUALS || 
-                    op == integerLDT.getLessOrEquals() || 
+            if (op == Equality.EQUALS ||
+                    op == integerLDT.getLessOrEquals() ||
                     op == integerLDT.getGreaterOrEquals()) {
                 return false;
             }
@@ -379,8 +381,8 @@ public class TriggersSet {
         /**
          * find all possible combination of <code>ts</code>. Once a
          * combination of elements contains all variables of this clause,
-         * it will be used to construct the multi-trigger which will be 
-         * add to triggers set    
+         * it will be used to construct the multi-trigger which will be
+         * add to triggers set
          * @param ts elements of multi-triggers at the beginning
          * @return a set of triggers
          */
@@ -407,7 +409,7 @@ public class TriggersSet {
 
         /**
          * try to construct a multi-trigger by given <code>ts</code>
-         * 
+         *
          * @param trs
          *            a set of trigger
          * @return true if <code>trs</code> contains all universal varaibles

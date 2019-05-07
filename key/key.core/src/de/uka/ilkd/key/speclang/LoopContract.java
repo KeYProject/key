@@ -2,6 +2,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -174,6 +175,9 @@ public interface LoopContract extends AuxiliaryContract {
      */
     @Override
     public LoopContract setBlock(StatementBlock newBlock);
+
+    @Override
+    public LoopContract map(UnaryOperator<Term> op, Services services);
 
     /**
      * @param newLoop

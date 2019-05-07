@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.util;
 
+import java.util.function.UnaryOperator;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -26,6 +28,19 @@ public class InfFlowSpec {
         this.preExpressions = preExpressions;
         this.postExpressions = postExpressions;
         this.newObjects = newObjects;
+    }
+
+    /**
+     * Applies a unary operator to every list of terms in this InfFlow specification element.
+     *
+     * @param op the operator to apply.
+     * @return this InfFlow specification element with the operator applied.
+     */
+    public InfFlowSpec map(UnaryOperator<Term> op) {
+        return new InfFlowSpec(
+                preExpressions.stream().map(op).collect(ImmutableList.collector()),
+                postExpressions.stream().map(op).collect(ImmutableList.collector()),
+                newObjects.stream().map(op).collect(ImmutableList.collector()));
     }
 
     private InfFlowSpec() {

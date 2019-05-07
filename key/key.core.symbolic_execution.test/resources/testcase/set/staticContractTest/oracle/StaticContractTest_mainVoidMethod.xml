@@ -2,10 +2,6 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call StaticContractTest.mainVoidMethod()&gt;" pathCondition="true" pathConditionChanged="false">
       <operationContract name="voidMethod() catch(exc_0)
-pre: true
-post: int::select(heap, null, StaticContractTest::$value)
-  = Z(2(4(#)))
-&amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" exceptionTerm="exc_0" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
          <statement name="return value;" pathCondition="true" pathConditionChanged="false">

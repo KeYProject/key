@@ -90,7 +90,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              false,
              false);
    }
-      
+
    /**
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
@@ -110,7 +110,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              false,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
@@ -150,7 +150,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              false,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
@@ -170,7 +170,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              false,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorExistsQuantifierTest".
     * @throws Exception Occurred Exception.
@@ -188,7 +188,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              2,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
@@ -227,7 +227,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              2,
              true);
    }
-   
+
    /**
     * Tests "configurationExtractorAssociationSourceIsNotRepresentativeTermOfEquivalenceClass" without precondition.
     * @throws Exception Occurred Exception.
@@ -246,7 +246,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              3,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorArrayInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
@@ -265,7 +265,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              2,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
@@ -284,7 +284,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              2,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorSimpleArrayCreation" without precondition.
     * @throws Exception Occurred Exception.
@@ -303,7 +303,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              1,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorMultiArrayIndexReadWriteAccess" without precondition.
     * @throws Exception Occurred Exception.
@@ -341,7 +341,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              5,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorObjectArrayIndexWriteAccess" without precondition.
     * @throws Exception Occurred Exception.
@@ -360,7 +360,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              1,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorArrayIndexWriteAccess" without precondition.
     * @throws Exception Occurred Exception.
@@ -379,7 +379,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              1,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorObjectArrayIndexReadAccess" without precondition.
     * @throws Exception Occurred Exception.
@@ -398,7 +398,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              1,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorOneAssignmentTest" without precondition.
     * @throws Exception Occurred Exception.
@@ -417,7 +417,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              1,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorOneAssignmentTest" without precondition.
     * @throws Exception Occurred Exception.
@@ -455,7 +455,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              2,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorSimpleLinkedOjbectsInsertion" without precondition.
     * @throws Exception Occurred Exception.
@@ -474,7 +474,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              4,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorIntegerConditionTest" without precondition.
     * @throws Exception Occurred Exception.
@@ -493,7 +493,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              1,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorIntegerConditionTest" without precondition.
     * @throws Exception Occurred Exception.
@@ -512,7 +512,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              1,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorIsInstanceTest" without precondition.
     * @throws Exception Occurred Exception.
@@ -531,7 +531,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              2,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorIsNullTest" without precondition.
     * @throws Exception Occurred Exception.
@@ -550,7 +550,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              1,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorSimpleLinkedOjbects" without precondition.
     * @throws Exception Occurred Exception.
@@ -569,7 +569,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              4,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorSimpleStaticAttributes" without precondition.
     * @throws Exception Occurred Exception.
@@ -588,7 +588,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              2,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorSimpleArrayLength" without precondition.
     * @throws Exception Occurred Exception.
@@ -607,7 +607,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              1,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorSimpleLinkedOjbectsDeletion" without precondition.
     * @throws Exception Occurred Exception.
@@ -626,7 +626,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              4,
              false);
    }
-   
+
 
    /**
     * Tests "configurationExtractorSimpleLinkedOjbectsDeletion" without precondition.
@@ -646,7 +646,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              4,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorSimpleLinkedOjbects" without precondition.
     * @throws Exception Occurred Exception.
@@ -665,7 +665,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              4,
              false);
    }
-   
+
    /**
     * Tests "configurationExtractorSimpleLinkedOjbects" with precondition.
     * @throws Exception Occurred Exception.
@@ -684,7 +684,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
              4,
              false);
    }
-   
+
    /**
     * Executes the test steps.
     * @param javaPathInkeyRepDirectory The path to the Java file.
@@ -817,7 +817,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          }
       }
    }
-   
+
    protected void doTestSteps(SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env,
                               String oraclePathInBaseDir,
                               String symbolicExecutionOracleFileName,
@@ -899,13 +899,13 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          assertSame(currentLayoutsFirstTime.get(i), current);
       }
    }
-   
+
    /**
     * Compares the given {@link ISymbolicLayout}s.
     * @param expected The expected instance.
     * @param current The current instance.
     */
-   protected static void createOracleFile(ISymbolicLayout model, 
+   protected static void createOracleFile(ISymbolicLayout model,
                                           String oraclePathInBaseDirFile) throws IOException, ProofInputException {
       if (tempNewOracleDirectory != null && tempNewOracleDirectory.isDirectory()) {
          // Create sub folder structure
@@ -918,7 +918,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          printOracleDirectory();
       }
    }
-   
+
    public static void assertModel(ISymbolicLayout expected, ISymbolicLayout current) {
       if (expected != null) {
          assertNotNull(current);
@@ -930,7 +930,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          assertNull(current);
       }
    }
-   
+
    /**
     * Compares the given {@link ISymbolicState}s.
     * @param expected The expected instance.
@@ -947,7 +947,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          assertNull(current);
       }
    }
-   
+
    /**
     * Compares the given {@link ISymbolicObject}s.
     * @param expected The expected instance.
@@ -965,7 +965,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
       assertFalse(expectedIter.hasNext());
       assertFalse(currentIter.hasNext());
    }
-   
+
    /**
     * Compares the given {@link ISymbolicObject}s.
     * @param expected The expected instance.
@@ -986,7 +986,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          assertNull(current);
       }
    }
-   
+
    /**
     * Compares the given {@link ISymbolicEquivalenceClass}s.
     * @param expected The expected instance.
@@ -1004,7 +1004,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
       assertFalse(expectedIter.hasNext());
       assertFalse(currentIter.hasNext());
    }
-   
+
    /**
     * Compares the given {@link ISymbolicEquivalenceClass}s.
     * @param expected The expected instance.
@@ -1020,7 +1020,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          assertNull(current);
       }
    }
-   
+
    /**
     * Compares the given {@link ImmutableList}s ignoring white space.
     * @param expected The expected instance.
@@ -1040,7 +1040,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
       assertFalse(expectedIter.hasNext());
       assertFalse(currentIter.hasNext());
    }
-   
+
    /**
     * Compares the given {@link ISymbolicValue}s.
     * @param expected The expected instance.
@@ -1049,6 +1049,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
    public static void assertValues(ImmutableList<ISymbolicValue> expected, ImmutableList<ISymbolicValue> current) {
       assertNotNull(expected);
       assertNotNull(current);
+
       assertEquals(expected.size(), current.size());
       Iterator<ISymbolicValue> expectedIter = expected.iterator();
       Iterator<ISymbolicValue> currentIter = current.iterator();
@@ -1079,7 +1080,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          assertNull(current);
       }
    }
-   
+
    /**
     * Compares the given {@link ISymbolicAssociation}s.
     * @param expected The expected instance.
@@ -1097,7 +1098,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
       assertFalse(expectedIter.hasNext());
       assertFalse(currentIter.hasNext());
    }
-   
+
    /**
     * Compares the given {@link ISymbolicAssociation}s.
     * @param expected The expected instance.

@@ -19,6 +19,8 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -97,6 +99,12 @@ import de.uka.ilkd.key.util.Pair;
 public final class SpecificationRepository {
 
     public static final String CONTRACT_COMBINATION_MARKER = "#";
+
+    /**
+     * @see #limitObs(IObserverFunction)
+     * @see #unlimitObs(IObserverFunction)
+     */
+    public static final String LIMIT_SUFFIX = "$lmtd";
 
     private final ContractFactory cf;
 
@@ -770,9 +778,90 @@ public final class SpecificationRepository {
         return invs;
     }
 
+    /**
+     * Helper for {@link #map(UnaryOperator, Services)}.
+     *
+     * @param map a map.
+     * @param op an operator.
+     * @param services services.
+     */
+    @SuppressWarnings("unchecked")
+    private <K, V extends SpecificationElement> void mapValueSets(
+            Map<K, ImmutableSet<V>> map,
+            UnaryOperator<Term> op,
+            Services services) {
+        for (Entry<K, ImmutableSet<V>> entry : map.entrySet()) {
+            final K key = entry.getKey();
+            final ImmutableSet<V> oldSet = entry.getValue();
+            ImmutableSet<V> newSet = DefaultImmutableSet.nil();
+
+            for (V oldContract : oldSet) {
+                V newContract = (V) oldContract.map(op, services);
+                newSet = newSet.add(newContract);
+
+                assert oldContract.getName().equals(newContract.getName());
+                if (oldContract instanceof Contract
+                        && contractsByName.containsKey(oldContract.getName())) {
+                    contractsByName.put(oldContract.getName(), (Contract) newContract);
+                }
+            }
+
+            map.put(key, (ImmutableSet<V>) oldSet.stream().map(
+                contract -> contract.map(op, services)).collect(ImmutableSet.collector()));
+        }
+    }
+
+    /**
+     * Helper for {@link #map(UnaryOperator, Services)}.
+     *
+     * @param map a map.
+     * @param op an operator.
+     * @param services services.
+     */
+    @SuppressWarnings("unchecked")
+    private <K, V extends SpecificationElement> void mapValues(
+            Map<K, V> map,
+            UnaryOperator<Term> op,
+            Services services) {
+        for (Entry<K, V> entry : map.entrySet()) {
+            final K key = entry.getKey();
+            final V oldContract = entry.getValue();
+            final V newContract = (V) oldContract.map(op, services);
+            map.put(key, newContract);
+
+            assert oldContract.getName().equals(newContract.getName());
+            if (oldContract instanceof Contract
+                    && contractsByName.containsKey(oldContract.getName())) {
+                contractsByName.put(oldContract.getName(), (Contract) newContract);
+            }
+        }
+    }
+
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
+
+    /**
+     * Applies the specified operator to every contract in this repository.
+     *
+     * @param op an operator.
+     * @param services services.
+     *
+     * @see SpecificationElement#map(java.util.function.UnaryOperator, Services)
+     */
+    public void map(UnaryOperator<Term> op, Services services) {
+        mapValueSets(contracts, op, services);
+        mapValueSets(operationContracts, op, services);
+        mapValueSets(wdChecks, op, services);
+        mapValueSets(invs, op, services);
+        mapValueSets(axioms, op, services);
+        mapValueSets(initiallyClauses, op, services);
+        mapValues(loopInvs, op, services);
+        mapValueSets(blockContracts, op, services);
+        mapValueSets(loopContracts, op, services);
+        mapValueSets(mergeContracts, op, services);
+        mapValueSets(allClassAxiomsCache, op, services);
+    }
 
     /**
      * Returns all registered contracts.
@@ -1856,7 +1945,7 @@ public final class SpecificationRepository {
 
         if (limited == null) {
             final String baseName = ((ProgramElementName) obs.name())
-                    .getProgramName() + "$lmtd";
+                    .getProgramName() + LIMIT_SUFFIX;
             final Sort heapSort = services.getTypeConverter().getHeapLDT()
                     .targetSort();
             limited = new ObserverFunction(baseName, obs.sort(), obs.getType(),

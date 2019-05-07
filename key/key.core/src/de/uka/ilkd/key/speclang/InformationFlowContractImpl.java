@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -12,6 +12,7 @@ package de.uka.ilkd.key.speclang;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -64,7 +65,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
      */
     final boolean hasRealModifiesClause;
 
-    
+
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
@@ -159,7 +160,21 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     //-------------------------------------------------------------------------
     //public interface
-    //-------------------------------------------------------------------------    
+    //-------------------------------------------------------------------------
+
+    @Override
+    public InformationFlowContract map(UnaryOperator<Term> op, Services services) {
+        return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
+                                               op.apply(origPre), op.apply(origMby),
+                                               op.apply(origMod), hasRealModifiesClause, origSelf,
+                                               origParams.stream().map(op)
+                                               .collect(ImmutableList.collector()),
+                                               op.apply(origResult), op.apply(origExc),
+                                               op.apply(origAtPre), op.apply(origDep),
+                                               origInfFlowSpecs.stream().map(spec -> spec.map(op))
+                                               .collect(ImmutableList.collector()),
+                                               toBeSaved, id);
+    }
 
     @Override
     public String getName() {
@@ -190,31 +205,31 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         return origMby != null;
     }
 
-    
+
     @Override
     public String getBaseName() {
         return baseName;
     }
 
-    
+
     @Override
     public Term getPre() {
         return origPre;
     }
 
-    
+
     @Override
     public Term getMod() {
         return origMod;
     }
 
-    
+
     @Override
     public Term getMby() {
         return origMby;
     }
 
-    
+
     @Override
     public Modality getModality() {
         return modality;
@@ -230,7 +245,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         return origSelf;
     }
 
-    
+
     @Override
     public ImmutableList<Term> getParams() {
         return origParams;
@@ -241,7 +256,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public Term getResult() {
         return origResult;
     }
-    
+
 
     @Override
     public Term getExc() {
@@ -272,8 +287,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public boolean hasModifiesClause() {
         return hasRealModifiesClause;
     }
-    
-    
+
+
     @Override
     public boolean hasInfFlowSpec() {
         return !(origInfFlowSpecs == InfFlowSpec.EMPTY_INF_FLOW_SPEC);
@@ -287,7 +302,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                + "</html>";
     }
 
-    
+
     public String getHTMLBody(Services services) {
         return "<html>"
                + getHTMLSignature()
@@ -306,7 +321,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                false) + "</i>";
     }
 
-    
+
     private StringBuffer getHTMLSignatureBody() {
         final StringBuffer sig = new StringBuffer();
 	if(origResult != null) {
@@ -335,7 +350,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         return sig;
     }
 
-        
+
     protected String getHTMLFor(Term originalTerm,
                                 String htmlName,
                                 Services services) {
@@ -397,7 +412,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         }
         return infFlowSpecString;
     }
-    
+
 
     @Override
     public String toString() {
@@ -459,13 +474,13 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         return false;
     }
 
-    
+
     @Override
     public KeYJavaType getSpecifiedIn() {
         return specifiedIn;
     }
 
-    
+
     @Override
     public InformationFlowContract setID(int newId) {
         return new InformationFlowContractImpl(baseName, null, forClass, pm,
@@ -579,8 +594,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                && origDep.equals(ifc.getDep())
                && origInfFlowSpecs.equals(ifc.getInfFlowSpecs());
     }
-    
-    
+
+
     @Override
     public boolean toBeSaved() {
         return false;   // because information flow contracts currently cannot
@@ -619,7 +634,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
    // the following code is legacy code
-    
+
     @Override
     @Deprecated
     public Term getPre(LocationVariable heap,
@@ -678,7 +693,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                 + "Please use the POSnippetFactory instead.");
     }
 
-    
+
     @Override
     @Deprecated
     public Term getMby(

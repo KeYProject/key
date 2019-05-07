@@ -70,12 +70,12 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
-import de.uka.ilkd.key.rule.AbstractBlockContractRule.BlockContractHint;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule.Instantiation;
+import de.uka.ilkd.key.rule.AbstractBlockContractRule.BlockContractHint;
 import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
-import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.AuxiliaryContract.Variables;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockWellDefinedness;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.LinkedHashMap;
@@ -752,7 +752,7 @@ public final class AuxiliaryContractBuilders {
                     .entrySet()) {
                 Term anonymisationUpdate = skip();
                 final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
-                if (!modifiesClause.equals(strictlyNothing())) {
+                if (!modifiesClause.equalsModIrrelevantTermLabels(strictlyNothing())) {
                     anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause,
                             services.getTermBuilder().label(
                                     services.getTermBuilder().func(anonymisationHeap.getValue()),
@@ -968,7 +968,7 @@ public final class AuxiliaryContractBuilders {
             }
 
             Term oldDecreases = new OpReplacer(variables.combineRemembranceVariables(),
-                    services.getTermFactory()).replace(decreases);
+                    services.getTermFactory(), services.getProof()).replace(decreases);
 
             // The condition (decreases >= 0) is part of the precondition
             // and does not need to be repeated here.
@@ -1001,7 +1001,7 @@ public final class AuxiliaryContractBuilders {
             for (LocationVariable heap : heaps) {
                 final Term modifiesClause = modifiesClauses.get(heap);
                 final Term frameCondition;
-                if (modifiesClause.equals(strictlyNothing())) {
+                if (modifiesClause.equalsModIrrelevantTermLabels(strictlyNothing())) {
                     frameCondition = frameStrictlyEmpty(var(heap), remembranceVariables.get(heap));
                 } else {
                     frameCondition

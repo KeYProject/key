@@ -22,8 +22,9 @@ public class HeatmapToggleAction extends MainWindowAction {
 
     public HeatmapToggleAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName("Toggle heatmap");
-        putValue(KeYExtConst.PATH, "Heatmap");
+        setName("Toggle Heatmaps");
+        setTooltip("Heatmap options");
+        putValue(KeYExtConst.PATH, "Heatmaps");
         setEnabled(getMediator().getSelectedProof() != null);
         putValue(Action.LONG_DESCRIPTION, "Enable or disable age heatmaps in the sequent view.");
 

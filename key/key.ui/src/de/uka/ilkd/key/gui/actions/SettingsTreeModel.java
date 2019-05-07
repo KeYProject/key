@@ -51,12 +51,13 @@ public class SettingsTreeModel extends DefaultTreeModel {
         proofSettingsNode.add(generateTableNode("Taclets", choiceSettings));
 
         Settings strategySettings = proofSettings.getStrategySettings();
-
         proofSettingsNode.add(generateTableNode("Strategy", strategySettings));
 
         Settings smtSettings = proofSettings.getSMTSettings();
-
         proofSettingsNode.add(generateTableNode("SMT", smtSettings));
+
+        Settings termLabelSettings = proofSettings.getTermLabelSettings();
+        proofSettingsNode.add(generateTableNode("Term Labels", termLabelSettings));
 
         OptionContentNode independentSettingsNode = generateOptionContentNode("Proof-Independent Settings", "These are the proof independent settings.");
         root.add(independentSettingsNode);

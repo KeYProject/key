@@ -1,13 +1,10 @@
 package de.uka.ilkd.key.gui.interactionlog.algo;
 
-import de.uka.ilkd.key.gui.interactionlog.model.Interaction;
 import de.uka.ilkd.key.gui.interactionlog.model.InteractionLog;
 import de.uka.ilkd.key.proof.Node;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -72,42 +69,6 @@ public class LogPrinter {
         if (state.getInteractions().size() != 0) {
             //HashMap<Interaction, List<Interaction>> tree = state.getInteractionTree();
             //body(tree, state.getInteractions().get(0));
-        }
-    }
-
-    private void body(HashMap<Interaction, List<Interaction>> tree,
-                      Interaction interaction) {
-
-        newline();
-        //TODO out.write(interaction.getProofScriptRepresentation(services));
-
-        List<Interaction> children = tree.get(interaction);
-        if (children != null) {
-            switch (children.size()) {
-                case 1:
-                    body(tree, children.get(0));
-                    break;
-                default:
-                    newline();
-                    out.write("cases {");
-                    indent++;
-
-                    for (Interaction c : children) {
-                        newline();
-                        out.write("case \"");
-                        //TODO out.write(matchExpr.apply(c.getNode()));
-                        out.write("\" {");
-                        indent++;
-                        body(tree, c);
-                        indent--;
-                        newline();
-                        out.write("}");
-                    }
-                    indent--;
-                    newline();
-                    out.write("}");
-                    break;
-            }
         }
     }
 

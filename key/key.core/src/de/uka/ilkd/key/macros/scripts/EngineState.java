@@ -3,9 +3,7 @@ package de.uka.ilkd.key.macros.scripts;
 import java.io.File;
 import java.io.StringReader;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Observer;
 import java.util.Optional;
 
@@ -30,7 +28,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
  */
 public class EngineState {
     private final static DefaultTermParser PARSER = new DefaultTermParser();
-    private final Map<String, Object> arbitraryVariables = new HashMap<>();
+    //private final Map<String, Object> arbitraryVariables = new HashMap<>();
     private final Proof proof;
     private AbbrevMap abbrevMap = new AbbrevMap();
     /**
