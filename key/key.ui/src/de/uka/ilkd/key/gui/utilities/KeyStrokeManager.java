@@ -113,6 +113,10 @@ public final class KeyStrokeManager {
                 KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
         mapping.put(de.uka.ilkd.key.gui.actions.GoalBackAction.class,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, SHORTCUT_KEY_MASK));
+        mapping.put(de.uka.ilkd.key.gui.actions.SearchNextAction.class,
+                KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
+        mapping.put(de.uka.ilkd.key.gui.actions.SearchPreviousAction.class,
+                KeyStroke.getKeyStroke(KeyEvent.VK_F3, KeyEvent.SHIFT_DOWN_MASK));
     }
     
     public static KeyStroke get (ProofMacro macro) {
