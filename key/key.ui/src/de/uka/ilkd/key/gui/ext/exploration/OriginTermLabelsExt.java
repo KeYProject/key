@@ -34,11 +34,11 @@ public class OriginTermLabelsExt
         KeYToolbarExtension,
         KeYTermInfoExtension {
 
-    private ToggleOriginLabelsAction action;
+    private ToggleTermOriginTrackingAction action;
 
-    private ToggleOriginLabelsAction getAction(MainWindow mainWindow) {
+    private ToggleTermOriginTrackingAction getAction(MainWindow mainWindow) {
         if (action == null) {
-            action = new ToggleOriginLabelsAction(mainWindow);
+            action = new ToggleTermOriginTrackingAction(mainWindow);
         }
 
         return action;

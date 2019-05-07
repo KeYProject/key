@@ -22,7 +22,7 @@ import de.uka.ilkd.key.settings.TermLabelSettings;
  *
  * @author lanzinger
  */
-public class ToggleOriginLabelsAction extends MainWindowAction {
+public class ToggleTermOriginTrackingAction extends MainWindowAction {
 
     private static final long serialVersionUID = -1055364184792335945L;
 
@@ -31,10 +31,11 @@ public class ToggleOriginLabelsAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      */
-    public ToggleOriginLabelsAction(MainWindow mainWindow) {
+    public ToggleTermOriginTrackingAction(MainWindow mainWindow) {
         super(mainWindow);
 
-        setName("Toggle Origin Labels");
+        setName("Toggle Term Origin Tracking");
+        setTooltip("Toggle term origin tracking");
         setIcon(IconFactory.originIcon(MainWindow.TOOLBAR_ICON_SIZE));
         setEnabled(getMediator().getSelectedProof() != null);
 
@@ -53,8 +54,8 @@ public class ToggleOriginLabelsAction extends MainWindowAction {
             }
         });
 
-        putValue(KeYExtConst.PATH, "Origin Term Labels");
-        putValue(Action.LONG_DESCRIPTION, "Toggle origin labels.");
+        putValue(KeYExtConst.PATH, "Origin Tracking");
+        putValue(Action.LONG_DESCRIPTION, "Toggle Term Origin Tracking");
     }
 
     private void handleAction() {
