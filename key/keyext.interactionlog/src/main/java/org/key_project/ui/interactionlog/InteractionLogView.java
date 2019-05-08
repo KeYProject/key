@@ -15,9 +15,11 @@ import de.uka.ilkd.key.proof.Proof;
 import org.key_project.ui.BoundsPopupMenuListener;
 import org.key_project.ui.interactionlog.algo.MUProofScriptExport;
 import org.key_project.ui.interactionlog.algo.MarkdownExport;
-import org.key_project.ui.interactionlog.algo.Reapplication;
 import org.key_project.ui.interactionlog.api.Interaction;
-import org.key_project.ui.interactionlog.model.*;
+import org.key_project.ui.interactionlog.model.InteractionLog;
+import org.key_project.ui.interactionlog.model.InteractionRecorderListener;
+import org.key_project.ui.interactionlog.model.NodeInteraction;
+import org.key_project.ui.interactionlog.model.UserNoteInteraction;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -338,7 +340,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String text = MUProofScriptExport.getScriptRepresentation(listInteraction.getSelectedValue());
+            String text = ((Interaction) listInteraction.getSelectedValue()).getProofScriptRepresentation();
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             StringSelection contents = new StringSelection(text);
             clipboard.setContents(contents, contents);
@@ -494,15 +496,13 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
             try {
                 //Reapplication should be ignored by the logging.
                 recorder.setDisableAll(true);
-                Reapplication reapplication = new Reapplication(mediator.getSelectedGoal());
-                if (inter != null) inter.accept(reapplication);
+                inter.reapply(/*TODO*/ null, mediator.getSelectedGoal());
             } catch (UnsupportedOperationException ex) {
                 JOptionPane.showMessageDialog(null,
                         String.format("<html>Reapplication of %s is not implemented<br>If you know how to do it, then override the corresponding method in %s.</html>",
-                                inter.getClass(), Reapplication.class),
-                        "A very expected error.", JOptionPane.ERROR_MESSAGE);
-            } catch (IllegalStateException ex) {
-
+                                inter.getClass()), "A very expected error.", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception e1) {
+                e1.printStackTrace();
             } finally {
                 recorder.setDisableAll(false);
             }
