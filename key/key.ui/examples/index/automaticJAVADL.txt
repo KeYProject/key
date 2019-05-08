@@ -364,6 +364,8 @@ group simpleTests {
    provable ./heap/strictly_pure/useStrictlyPureMethod.key
    provable ./heap/Wellfounded/ackermann.key
    provable ./standard_key/unicode_test.key
+   provable ./heap/strictlyModular/mayExpand.key
+   notprovable ./heap/strictlyModular/modularOnly.key
 }
 
 group SmansEtAl {
