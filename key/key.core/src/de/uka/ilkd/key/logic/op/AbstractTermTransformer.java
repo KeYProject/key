@@ -57,9 +57,9 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class AbstractTermTransformer extends AbstractSortedOperator
                                            implements TermTransformer {
 
-    /** Transformer producing condition for equality of observer terms */
-    public static final AbstractTermTransformer OBSERVER_EQUALITY =
-            new ObserverEqualityMetaConstruct();
+    /** A map from String names to meta operators **/
+    public static final Map<String, AbstractTermTransformer> NAME_TO_META_OP =
+            new LinkedHashMap<String, AbstractTermTransformer>(70);
 
     // TODO: This seems to be better handled using a ServiceLoader
 
@@ -115,10 +115,9 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 
     public static final AbstractTermTransformer EXPAND_QUERIES = new ExpandQueriesMetaConstruct();
 
-    /** A map from String names to meta operators **/
-    private static final Map<String, AbstractTermTransformer> NAME_TO_META_OP
-        = new LinkedHashMap<String, AbstractTermTransformer>(70);
-
+    /** Transformer producing condition for equality of observer terms */
+    public static final AbstractTermTransformer OBSERVER_EQUALITY =
+            new ObserverEqualityMetaConstruct();
 
     private static Sort[] createMetaSortArray(int arity) {
 	Sort[] result = new Sort[arity];
