@@ -20,10 +20,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
-import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
-import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
-import de.uka.ilkd.key.rule.BlockContractBuilders.UpdatesBuilder;
-import de.uka.ilkd.key.rule.BlockContractBuilders.VariablesCreatorAndRegistrar;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistrar;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.MiscTools;
@@ -214,13 +214,13 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
                 = instantiate(application.posInOccurrence().subTerm(), goal, services);
         final BlockContract contract = application.getContract();
         contract.setInstantiationSelf(instantiation.self);
-        assert contract.getBlock().equals(instantiation.block);
+        assert contract.getBlock().equals(instantiation.statement);
 
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables
-                = MiscTools.getLocalIns(instantiation.block, services);
+                = MiscTools.getLocalIns(instantiation.statement, services);
         final ImmutableSet<ProgramVariable> localOutVariables
-                = MiscTools.getLocalOuts(instantiation.block, services);
+                = MiscTools.getLocalOuts(instantiation.statement, services);
         final Map<LocationVariable, Function> anonymisationHeaps
                 = createAndRegisterAnonymisationVariables(heaps, contract, services);
         final BlockContract.Variables variables

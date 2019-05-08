@@ -16,11 +16,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author weigl
+ * @author Alexander Weigl
  */
 @XmlRootElement()
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class MacroInteraction extends NodeInteraction {
+    private static final long serialVersionUID = 1L;
+
     private String macroName;
 
     @XmlTransient
@@ -39,7 +41,6 @@ public final class MacroInteraction extends NodeInteraction {
     public MacroInteraction(Node node, ProofMacro macro,
                             PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
         super(node);
-        System.out.println("macro");
         this.macroName = macro.getScriptCommandName();
         this.pos = posInOcc;
         this.info = info.toString();

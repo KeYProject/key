@@ -61,6 +61,7 @@ import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.LDTInput;
 import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
 import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
@@ -90,6 +91,9 @@ public final class ProblemInitializer {
     private final ProgressMonitor progMon;
     private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
     private final ProblemInitializerListener listener;
+
+    /** the FileRepo responsible for consistency between source code and proofs */
+    private FileRepo fileRepo;
 
     private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
 
@@ -192,7 +196,10 @@ public final class ProblemInitializer {
         int i = 0;
         reportStatus("Read LDT Includes", in.getIncludes().size());
         for (String name : in.getLDTIncludes()) {
-            keyFile[i++] = new KeYFile(name, in.get(name), progMon, initConfig.getProfile());
+
+            keyFile[i] = new KeYFile(name, in.get(name), progMon, initConfig.getProfile(),
+                    fileRepo);
+            i++;
             setProgress(i);
         }
 
@@ -226,7 +233,8 @@ public final class ProblemInitializer {
         reportStatus("Read Includes", in.getIncludes().size());
         int i = 0;
         for (String fileName : in.getIncludes()) {
-            KeYFile keyFile = new KeYFile(fileName, in.get(fileName), progMon, envInput.getProfile());
+            KeYFile keyFile = new KeYFile(fileName, in.get(fileName), progMon,
+                    envInput.getProfile(), fileRepo);
             readEnvInput(keyFile, initConfig);
             setProgress(++i);
         }
@@ -280,7 +288,6 @@ public final class ProblemInitializer {
         envInput.setInitConfig(initConfig);
         final String javaPath = envInput.readJavaPath();
         final List<File> classPath = envInput.readClassPath();
-
         final File bootClassPath;
         try {
          bootClassPath = envInput.readBootClassPath();
@@ -290,9 +297,17 @@ public final class ProblemInitializer {
 
         final Includes includes = envInput.readIncludes();
 
+        if (fileRepo != null) {
+            // set the paths in the FileRepo (all three methods can deal with null parameters)
+            fileRepo.setJavaPath(javaPath);
+            fileRepo.setClassPath(classPath);
+            fileRepo.setBootClassPath(bootClassPath);
+        }
+
         //create Recoder2KeY, set classpath
         final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(),
                                            initConfig.namespaces());
+        //r2k.setFileRepository(envInput.getFileRepository()); xxx  // TODO:
         r2k.setClassPath(bootClassPath, classPath);
 
         //read Java (at least the library classes)
@@ -311,13 +326,13 @@ public final class ProblemInitializer {
         Vector<String> var = getClasses(javaPath);
         final String[] cus = var.toArray(new String[var.size()]);
             try {
-                r2k.readCompilationUnitsAsFiles(cus);
+                r2k.readCompilationUnitsAsFiles(cus, fileRepo);
             } catch (ParseExceptionInFile e) {
                 throw new ProofInputException(e);
             }
         } else {
             reportStatus("Reading Java libraries");
-            r2k.parseSpecialClasses();
+            r2k.parseSpecialClasses(fileRepo);
         }
         File initialFile = envInput.getInitialFile();
         initConfig.getServices().setJavaModel(JavaModel.createJavaModel(javaPath,
@@ -332,7 +347,7 @@ public final class ProblemInitializer {
      * depending symbols for a generic sort out of the namespaces.
      * Helper for readEnvInput().
      *
-     * See bug report #1185, #1189
+     * See bug report #1185, #1189 (in Mantis)
      */
     private void cleanupNamespaces(InitConfig initConfig) {
         Namespace<QuantifiableVariable> newVarNS = new Namespace<>();
@@ -608,4 +623,11 @@ public final class ProblemInitializer {
       return warnings;
    }
 
+    /**
+     * Sets the FileRepo responsible for consistency between source code and proof.
+     * @param fileRepo the FileRepo to set
+     */
+    public void setFileRepo(FileRepo fileRepo) {
+        this.fileRepo = fileRepo;
+    }
 }

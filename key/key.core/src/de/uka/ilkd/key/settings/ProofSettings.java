@@ -37,7 +37,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
  * // KeY-Configuration file
  * ActiveHeuristics=simplify_prog , simplify
  * MaximumNumberOfHeuristcsApplications=400
- * number  = IntegerLDT.class 
+ * number  = IntegerLDT.class
  * boolean = BooleanLDT.class
  * </code>
  */
@@ -45,6 +45,23 @@ public class ProofSettings {
     public static final File PROVER_CONFIG_FILE;
     public static final URL PROVER_CONFIG_FILE_TEMPLATE;
     public static final ProofSettings DEFAULT_SETTINGS;
+
+    /**
+     * Array index for the strategy settings.
+     */
+    private final static int STRATEGY_SETTINGS = 0;
+    /**
+     * Array index for the choice settings.
+     */
+    private final static int CHOICE_SETTINGS = 1;
+    /**
+     * Array index for the smt settings.
+     */
+    private final static int SMT_SETTINGS = 2;
+    /**
+     * Array index for the term label settings.
+     */
+    private final static int TERM_LABEL_SETTINGS = 3;
 
     static {
         PROVER_CONFIG_FILE = new File(PathConfig.getKeyConfigDir()
@@ -63,22 +80,6 @@ public class ProofSettings {
     /** the default listener to settings */
     private ProofSettingsListener listener = new ProofSettingsListener();
 
-    // NOTE: This was commented out in commit
-    // 4932e4d1210356455c04a1e9fb7f2fa1f21b3e9d, 2012/11/08, in the process of
-    // separating proof independent from proof dependent settings.
-    // Is not in ProofIndependentSettings. I dont't know why these code
-    // corpses have been left here as comments, therefore I don't removed them.
-    // (DS, 2017-05-11)
-
-    // private final static int STRATEGY_SETTINGS = 0;
-    // private final static int GENERAL_SETTINGS = 1;
-    // private final static int CHOICE_SETTINGS = 2;
-    // private final static int SMT_SETTINGS = 3;
-    // private final static int VIEW_SETTINGS = 4;
-    private final static int STRATEGY_SETTINGS = 0;
-    private final static int CHOICE_SETTINGS = 1;
-    private final static int SMT_SETTINGS = 2;
-
     /**
      * create a proof settings object. When you add a new settings object,
      * PLEASE UPDATE THE LIST ABOVE AND USE THOSE CONSTANTS INSTEAD OF USING
@@ -87,10 +88,9 @@ public class ProofSettings {
 
     private ProofSettings() {
         settings = new Settings[] { new StrategySettings(),
-                // new GeneralSettings(),
-                new ChoiceSettings(),
-                ProofDependentSMTSettings.getDefaultSettingsData(),
-                // new ViewSettings()
+            new ChoiceSettings(),
+            ProofDependentSMTSettings.getDefaultSettingsData(),
+            new TermLabelSettings(),
         };
 
         for (int i = 0; i < settings.length; i++) {
@@ -174,10 +174,10 @@ public class ProofSettings {
     public void loadSettingsFromStream(Reader in) {
         Properties defaultProps = new Properties();
 
-        if (PROVER_CONFIG_FILE_TEMPLATE == null)
+        if (PROVER_CONFIG_FILE_TEMPLATE == null) {
             System.err.println(
                     "Warning: default proof-settings file could not be found.");
-        else {
+        } else {
             try {
                 defaultProps.load(PROVER_CONFIG_FILE_TEMPLATE.openStream());
             } catch (IOException e) {
@@ -223,15 +223,16 @@ public class ProofSettings {
 
     /** Used to load Settings from a .key file */
     public void loadSettingsFromString(String s) {
-        if (s == null)
+        if (s == null) {
             return;
+        }
         StringReader reader = new StringReader(s);
         loadSettingsFromStream(reader);
     }
 
     /**
      * returns the StrategySettings object
-     * 
+     *
      * @return the StrategySettings object
      */
     public StrategySettings getStrategySettings() {
@@ -241,7 +242,7 @@ public class ProofSettings {
 
     /**
      * returns the ChoiceSettings object
-     * 
+     *
      * @return the ChoiceSettings object
      */
     public ChoiceSettings getChoiceSettings() {
@@ -256,12 +257,31 @@ public class ProofSettings {
 
     /**
      * returns the DecisionProcedureSettings object
-     * 
+     *
      * @return the DecisionProcedureSettings object
      */
     public ProofDependentSMTSettings getSMTSettings() {
         ensureInitialized();
         return (ProofDependentSMTSettings) settings[SMT_SETTINGS];
+    }
+
+    /**
+     * Returns the term label settings from the proof settings.
+     * @return the term label settings
+     */
+    public TermLabelSettings getTermLabelSettings() {
+        ensureInitialized();
+        return (TermLabelSettings) settings[TERM_LABEL_SETTINGS];
+    }
+
+    /**
+     * Set the passed term label settings in the proof settings and return the proof settings.
+     * @param tls the term label settings
+     * @return the proof settings
+     */
+    public ProofSettings setTermLabelSettings(TermLabelSettings tls) {
+        settings[TERM_LABEL_SETTINGS] = tls;
+        return this;
     }
 
     //
@@ -284,10 +304,11 @@ public class ProofSettings {
         /**
          * called by the Settings object to inform the listener that its state
          * has changed
-         * 
+         *
          * @param e
          *            the Event sent to the listener
          */
+        @Override
         public void settingsChanged(EventObject e) {
             saveSettings();
         }
@@ -295,7 +316,7 @@ public class ProofSettings {
 
     /**
      * Checks if the choice settings are initialized.
-     * 
+     *
      * @return {@code true} settings are initialized, {@code false} settings are
      *         not initialized.
      */

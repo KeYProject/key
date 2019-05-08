@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.function.UnaryOperator;
+
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
@@ -70,6 +72,18 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
+    public BlockWellDefinedness map(UnaryOperator<Term> op, Services services) {
+        return new BlockWellDefinedness(
+                getName(), id(), type(), getTarget(), getHeap(), getOrigVars(),
+                getRequires().map(op),
+                op.apply(getAssignable()), op.apply(getAccessible()),
+                getEnsures().map(op),
+                op.apply(getMby()), op.apply(getRepresents()),
+                block.map(op, services),
+                services.getTermBuilder());
+    }
+
+    @Override
     SequentFormula generateSequent(SequentTerms seq, TermServices services) {
         // wd(pre) & (pre & wf(anon) -> wd(mod) & {anon^mod}(wd(post)))
         final Term imp = TB.imp(TB.and(seq.pre, seq.wfAnon),
@@ -79,6 +93,7 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
                                            TB.and(wdPre, imp)));
     }
 
+    @Override
     public BlockContract getStatement() {
         return this.block;
     }

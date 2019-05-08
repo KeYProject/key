@@ -1,18 +1,29 @@
 package de.uka.ilkd.key.gui.ext;
 
-import de.uka.ilkd.key.gui.MainWindow;
+import static de.uka.ilkd.key.gui.ext.KeYExtConst.PATH;
+import static de.uka.ilkd.key.gui.ext.KeYExtConst.PRIORITY;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.ServiceLoader;
+import java.util.Spliterator;
 import java.util.function.ToIntFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static de.uka.ilkd.key.gui.ext.KeYExtConst.PATH;
-import static de.uka.ilkd.key.gui.ext.KeYExtConst.PRIORITY;
+import javax.swing.Action;
+import javax.swing.JMenu;
+import javax.swing.JToolBar;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.pp.PosInSequent;
 
 /**
  * Facade for retrieving the GUI extensions.
@@ -22,7 +33,6 @@ import static de.uka.ilkd.key.gui.ext.KeYExtConst.PRIORITY;
  */
 public final class KeYGuiExtensionFacade {
     //region panel extension
-    @SuppressWarnings("todo")
     public static List<KeYPaneExtension> getAllPanels() {
         return getExtension(KeYPaneExtension.class, Comparator.comparingInt(KeYPaneExtension::priority));
     }
@@ -34,7 +44,6 @@ public final class KeYGuiExtensionFacade {
      * @param <T>
      * @return
      */
-    @SuppressWarnings("cast")
     public static <T extends KeYPaneExtension> Optional<T> getPanel(Class<T> clazz) {
         Optional<KeYPaneExtension> v = getAllPanels().stream()
                 .filter(it -> it.getClass().isAssignableFrom(clazz))
@@ -72,8 +81,11 @@ public final class KeYGuiExtensionFacade {
     public static JMenu createExtensionMenu(MainWindow mainWindow) {
         ToIntFunction<Action> func = (Action a) -> {
             Integer i = (Integer) a.getValue(PRIORITY);
-            if (i == null) return 0;
-            else return i;
+            if (i == null) {
+                return 0;
+            } else {
+                return i;
+            }
         };
 
         List<KeYMainMenuExtension> kmm = getMainMenuExtensions();
@@ -95,8 +107,11 @@ public final class KeYGuiExtensionFacade {
     private static void sortActionIntoMenu(Action act, JMenu menu) {
         Object path = act.getValue(PATH);
         String spath;
-        if (path == null) spath = "";
-        else spath = path.toString();
+        if (path == null) {
+            spath = "";
+        } else {
+            spath = path.toString();
+        }
         Iterator<String> mpath = Pattern.compile(Pattern.quote(".")).splitAsStream(spath).iterator();
         JMenu a = findMenu(menu, mpath);
         a.add(act);
@@ -116,8 +131,9 @@ public final class KeYGuiExtensionFacade {
             m.setName(cur);
             menu.add(m);
             return findMenu(m, mpath);
-        } else
+        } else {
             return menu;
+        }
     }
     //endregion
 
@@ -149,24 +165,49 @@ public final class KeYGuiExtensionFacade {
     //region Term menu
 
     /**
-     * Retrieves all known implementation of the {@link KeYMainMenuExtension}
+     * Retrieves all known implementations of the {@link KeYMainMenuExtension}.
      *
-     * @return a list
+     * @return all known implementations of the {@link KeYMainMenuExtension}.
      */
     public static List<KeYTermMenuExtension> getTermMenuExtensions() {
         return getExtension(KeYTermMenuExtension.class);
     }
 
-    public static List<Action> getTermMenuActions(MainWindow window) {
+    public static List<Action> getTermMenuActions(MainWindow window, PosInSequent pos) {
         return getTermMenuExtensions().stream()
-                .flatMap(it -> it.getTermMenuActions(window).stream())
+                .flatMap(it -> it.getTermMenuActions(window, pos).stream())
                 .collect(Collectors.toList());
     }
 
-    public static JMenu createTermMenu(MainWindow window) {
+    public static JMenu createTermMenu(MainWindow window, PosInSequent pos) {
         JMenu menu = new JMenu("Extensions");
-        getTermMenuActions(window).forEach(it -> sortActionIntoMenu(it, menu));
+        getTermMenuActions(window, pos).forEach(it -> sortActionIntoMenu(it, menu));
         return menu;
+    }
+    //endregion
+
+    //region Term info
+
+    /**
+     * Retrieves all known implementations of the {@link KeYTermInfoExtension}.
+     *
+     * @return all known implementations of the {@link KeYTermInfoExtension}.
+     */
+    public static List<KeYTermInfoExtension> getTermInfoExtensions() {
+        return getExtension(
+                KeYTermInfoExtension.class,
+                Comparator.comparingInt(KeYTermInfoExtension::getPriority));
+    }
+
+    /**
+     *
+     * @param window the main window.
+     * @param pos the position the user selected.
+     * @return every term info string from every loaded extension.
+     */
+    public static List<String> getTermInfoStrings(MainWindow window, PosInSequent pos) {
+        return getTermInfoExtensions().stream().flatMap(
+                it -> it.getTermInfoStrings(window, pos).stream()).collect(Collectors.toList());
     }
     //endregion
 

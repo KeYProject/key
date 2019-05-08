@@ -45,6 +45,7 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
+import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -170,6 +171,11 @@ public final class MainWindow extends JFrame {
      * action for saving a proof (attempt)
      */
     private SaveFileAction saveFileAction;
+
+    /**
+     * action for saving a proof as a bundle
+     */
+    private SaveBundleAction saveBundleAction;
 
     private QuickSaveAction quickSaveAction;
     private QuickLoadAction quickLoadAction;
@@ -368,6 +374,7 @@ public final class MainWindow extends JFrame {
         openMostRecentFileAction = new OpenMostRecentFileAction(this);
         editMostRecentFileAction = new EditMostRecentFileAction(this);
         saveFileAction = new SaveFileAction(this);
+        saveBundleAction = new SaveBundleAction(this);
         quickSaveAction = new QuickSaveAction(this);
         quickLoadAction = new QuickLoadAction(this);
         proofManagementAction = new ProofManagementAction(this);
@@ -443,6 +450,7 @@ public final class MainWindow extends JFrame {
         fileOperations.add(openMostRecentFileAction);
         fileOperations.add(editMostRecentFileAction);
         fileOperations.add(saveFileAction);
+        fileOperations.add(saveBundleAction);
         fileOperations.addSeparator();
         fileOperations.add(proofManagementAction);
 
@@ -474,13 +482,15 @@ public final class MainWindow extends JFrame {
         return toolBar;
     }
 
-    private JToggleButton createHeatmapToggle() {
-        return new JToggleButton(new HeatmapToggleAction(this));
-    }
+    /*
+     * private JToggleButton createHeatmapToggle() { return new
+     * JToggleButton(new HeatmapToggleAction(this)); }
+     */
 
-    private JButton createHeatmapMenuOpener() {
-        return new JButton(new HeatmapSettingsAction(this));
-    }
+    /*
+     * private JButton createHeatmapMenuOpener() { return new JButton(new
+     * HeatmapSettingsAction(this)); }
+     */
 
     private ComplexButton createSMTComponent() {
         smtComponent = new ComplexButton(TOOLBAR_ICON_SIZE);
@@ -649,6 +659,7 @@ public final class MainWindow extends JFrame {
         fileMenu.add(openMostRecentFileAction);
         fileMenu.add(editMostRecentFileAction);
         fileMenu.add(saveFileAction);
+        fileMenu.add(saveBundleAction);
         fileMenu.add(quickSaveAction);
         fileMenu.add(quickLoadAction);
         fileMenu.addSeparator();
@@ -747,6 +758,17 @@ public final class MainWindow extends JFrame {
         proof.addSeparator();
         proof.add(new SearchInProofTreeAction(this));
         proof.add(new SearchInSequentAction(this));
+        proof.add(new SearchNextAction(this));
+        proof.add(new SearchPreviousAction(this));
+        {
+            JMenu searchModeMenu = new JMenu("Change Search Mode to...");
+
+            for (SequentViewSearchBar.SearchMode mode : SequentViewSearchBar.SearchMode.values()) {
+                searchModeMenu.add(new SearchModeChangeAction(this, mode));
+            }
+
+            proof.add(searchModeMenu);
+        }
         proof.addSeparator();
         proof.add(new ShowUsedContractsAction(this));
         proof.add(new ShowActiveTactletOptionsAction(this));
@@ -772,6 +794,7 @@ public final class MainWindow extends JFrame {
         options.add(new JCheckBoxMenuItem(new AutoSave(this)));
         options.add(new MinimizeInteraction(this));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
+        options.add(new JCheckBoxMenuItem(new BundleSavingToggleAction(this)));
 
         return options;
 

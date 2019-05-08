@@ -67,26 +67,17 @@ public class ProgressDialog extends JDialog{
         public enum Modus {stopModus,discardModus}
 
     private Modus modus = Modus.stopModus;
-        private Box statusMessageBox;
-        
-        private boolean counterexample;
-       
-        
-        public static interface ProgressDialogListener extends ProgressTableListener{
-                public void applyButtonClicked();
-                public void stopButtonClicked();
-                public void discardButtonClicked();
-                public void additionalInformationChosen(Object obj);
-              
-        }
-     
-     
-        
-  
-        
-        public ProgressDialog(ProgressModel model,ProgressDialogListener listener, boolean counterexample,
-                        int resolution, int progressBarMax,String[] labelTitles,String ... titles) {
-                this.counterexample = counterexample;
+    private Box statusMessageBox;
+
+    public static interface ProgressDialogListener extends ProgressTableListener{
+        public void applyButtonClicked();
+        public void stopButtonClicked();
+        public void discardButtonClicked();
+        public void additionalInformationChosen(Object obj);
+    }
+
+    public ProgressDialog(ProgressModel model,ProgressDialogListener listener, boolean counterexample,
+                          int resolution, int progressBarMax,String[] labelTitles,String ... titles) {
         	    table = new ProgressTable(resolution,listener,labelTitles); 
                 table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
                 table.setModel(model,titles);

@@ -3,14 +3,17 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
 package de.uka.ilkd.key.speclang;
 
+import java.util.function.UnaryOperator;
+
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -21,35 +24,35 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 
 /**
- * A contract about the dependencies of an observer symbol, consisting of 
+ * A contract about the dependencies of an observer symbol, consisting of
  * a precondition, a depends clause, and a measured-by clause.
  */
 public interface InformationFlowContract extends Contract {
 
     public String getBaseName();
 
-    
+
     @Override
     public IProgramMethod getTarget();
-    
-    
+
+
     public KeYJavaType getSpecifiedIn();
-    
+
 
     /**
      * Returns <code>true</code> iff the method (according to the contract) does
      * not modify the heap at all, i.e., iff it is "strictly pure."
-     * 
+     *
      * @return whether this contract is strictly pure.
      */
     public boolean hasModifiesClause();
-    
-    
+
+
     /**
      * Returns the original precondition of the contract.
      */
     Term getPre();
-    
+
 
     /**
      * Returns the original modifies clause of the contract.
@@ -60,9 +63,10 @@ public interface InformationFlowContract extends Contract {
     /**
      * Returns the original measured_by clause of the contract.
      */
+    @Override
     Term getMby();
 
-    
+
     /**
      * Get the exception-variable which is used in this contract.
      * @return used exception-variable
@@ -79,8 +83,8 @@ public interface InformationFlowContract extends Contract {
      * Returns the modality of the contract.
      */
     public Modality getModality();
-    
-    
+
+
     public InformationFlowContract setName(String name);
 
 
@@ -97,7 +101,7 @@ public interface InformationFlowContract extends Contract {
     @Override
     public InformationFlowContract setID(int newId);
 
-    
+
     /**
      * Get the self-variable which is used in this contract.
      * @return originally used self-variable
@@ -126,8 +130,8 @@ public interface InformationFlowContract extends Contract {
      * @return used result-variable
      */
     Term getResult();
-    
-    
+
+
     public boolean equals(Contract c);
 
 
@@ -151,4 +155,7 @@ public interface InformationFlowContract extends Contract {
 
 
     public boolean hasInfFlowSpec();
+
+    @Override
+    public InformationFlowContract map(UnaryOperator<Term> op, Services services);
 }

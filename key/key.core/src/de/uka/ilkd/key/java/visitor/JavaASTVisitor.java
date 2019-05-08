@@ -869,6 +869,24 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
+    public void performActionOnBlockContract(final StatementBlock oldBlock,
+                                             final StatementBlock newBlock) {
+        // do nothing
+    }
+
+    @Override
+    public void performActionOnLoopContract(final StatementBlock oldBlock,
+                                            final StatementBlock newBlock) {
+        // do nothing
+    }
+
+    @Override
+    public void performActionOnLoopContract(final LoopStatement oldLoop,
+                                            final LoopStatement newLoop) {
+        // do nothing
+    }
+
+    @Override
     public void performActionOnMergeContract(MergeContract x) {
         //do nothing
     }

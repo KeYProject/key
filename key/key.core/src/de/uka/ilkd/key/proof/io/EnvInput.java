@@ -53,8 +53,8 @@ public interface EnvInput {
      * Reads the include section and returns an Includes object.
      */
     Includes readIncludes() throws ProofInputException;
-    
-    /** 
+
+    /**
      * Reads the Java path.
      */
     String readJavaPath() throws ProofInputException;

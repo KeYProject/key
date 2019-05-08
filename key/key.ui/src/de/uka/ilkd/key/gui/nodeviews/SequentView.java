@@ -18,29 +18,52 @@ import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_CO
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Point;
-import java.util.*;
+import java.awt.Shape;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 
 import javax.swing.JEditorPane;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLDocument;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.logic.FormulaChangeInfo;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
+import de.uka.ilkd.key.pp.InitialPositionTable;
+import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.SequentPrintFilterEntry;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
+import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.Debug;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /*
  * Parent class of CurrentGoalView and InnerNodeView.
@@ -50,8 +73,10 @@ public abstract class SequentView extends JEditorPane {
 
     protected static final Color INACTIVE_BACKGROUND_COLOR
             = new Color(UIManager.getColor("Panel.background").getRGB());
-    // default starting color for heatmaps
-    private static final Color HEATMAP_DEFAULT_START_COLOR = new Color(.8f, .7f, .5f);
+    // rgb components of heatmap color
+    private static final Color HEATMAP_COLOR = new Color(252, 202, 80);
+    //maximum opacity of heatmap color
+    private static final float HEATMAP_DEFAULT_START_OPACITY = .7f;
 
     private final MainWindow mainWindow;
 
@@ -100,13 +125,13 @@ public abstract class SequentView extends JEditorPane {
     /*
      * Store highlights in a HashMap in order to prevent duplicate highlights.
      */
-    private final HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight
-            = new LinkedHashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
+    private final HashMap<Color, HighlightPainter> color2Highlight
+            = new LinkedHashMap<>();
 
     /** the last observed mouse position for which a highlight was created */
     private Point lastMousePosition;
 
-    SequentView(MainWindow mainWindow) {
+    protected SequentView(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
 
         setContentType("text/html");
@@ -191,7 +216,7 @@ public abstract class SequentView extends JEditorPane {
      * @param range the Range to be highlighted
      * @param highlighter the Object painting the highlight
      */
-    void paintHighlight(Range range, Object highlighter) {
+    public void paintHighlight(Range range, Object highlighter) {
         try {
             if (range != null) {
                 getHighlighter()
@@ -218,8 +243,16 @@ public abstract class SequentView extends JEditorPane {
     public final Object getColorHighlight(Color color) {
         Object highlight = null;
         if (!color2Highlight.containsKey(color)) {
-            color2Highlight.put(color,
-                    new DefaultHighlighter.DefaultHighlightPainter(color));
+            // show highlights above each other
+            // https://stackoverflow.com/questions/9083206/how-to-use-layeredhighlighter-one-highlight-on-top-of-another
+            final HighlightPainter painter = new Highlighter.HighlightPainter() {
+                final DefaultHighlightPainter helper = new DefaultHighlighter.DefaultHighlightPainter(color);
+                @Override
+                public void paint(Graphics g, int p0, int p1, Shape bounds, JTextComponent c) {
+                    helper.paint(g, p0, p1, bounds, c);
+                }
+            };
+            color2Highlight.put(color, painter);
         }
         Highlighter.HighlightPainter hp = color2Highlight.get(color);
         try {
@@ -671,25 +704,16 @@ public abstract class SequentView extends JEditorPane {
 
     /**
      * computes the appropriate color for a given age and maximum age.
-     * Implements linear interpolation between the starting colour and white.
+     * Implements linear interpolation of the opacity of the color starting at default opacity.
      * @param max_age the maximum age of a term / sf, specified in viewsettings
      * @param age the age of the given term / sf
-     * @return the appropriate color
+     * @return the color, with interpolated opacity
      */
     private Color computeColorForAge(int max_age, int age) {
-        float[] color = HEATMAP_DEFAULT_START_COLOR.getRGBColorComponents(null);
-        float redDiff = (1.f - color[0]);
-        float greenDiff = (1.f - color[1]);
-        float blueDiff = (1.f - color[2]);
-        // exponentieller abfall - unterschiede zwischen ersten zwei, drei formeln deutlicher, danach kaum noch unterschied
-        // float diff = (float) (1.f - Math.pow(.5f, age-1));
+        float[] color = HEATMAP_COLOR.getRGBColorComponents(null);
+        float alpha = HEATMAP_DEFAULT_START_OPACITY *(1- (float) age/max_age);
 
-        // linearer abfall
-        float diff = (float) age / max_age;
-        float red = color[0] + redDiff * diff;
-        float green = color[1] + greenDiff * diff;
-        float blue = color[2] + blueDiff * diff;
-        return new Color(red, green, blue);
+        return new Color(color[0], color[1], color[2], alpha);
     }
 
     /**
@@ -721,7 +745,10 @@ public abstract class SequentView extends JEditorPane {
 		    this.filter.setSequent(selectedNode.sequent());
 		}
 		printSequent();
-        getParent().revalidate();
+
+		if (getParent() != null) {
+	        getParent().revalidate();
+		}
 	}
 
     protected SequentPrintFilter getFilter() {
@@ -758,6 +785,15 @@ public abstract class SequentView extends JEditorPane {
         int orgSize = originalSequent.size();
         int newSize = filter.getFilteredAntec().size() + filter.getFilteredSucc().size();
         return orgSize != newSize;
+    }
+
+    /**
+     *
+     * @return {@code true} if this sequent view is supposed to be shown in the {@link MainFrame},
+     *  {@code false} if it is only supposed to be shown in some other frame.
+     */
+    public boolean isMainSequentView() {
+        return true;
     }
 
     /**

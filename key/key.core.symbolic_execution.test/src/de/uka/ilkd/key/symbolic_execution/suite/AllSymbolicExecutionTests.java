@@ -42,7 +42,7 @@ import org.junit.runners.Suite;
    de.uka.ilkd.key.symbolic_execution.testcase.util.TestSideProofStore.class,
    de.uka.ilkd.key.symbolic_execution.testcase.util.TestSymbolicExecutionUtil.class,
    de.uka.ilkd.key.symbolic_execution.testcase.slicing.TestThinBackwardSlicer.class,
-   
+
    de.uka.ilkd.key.symbolic_execution.testcase.strategy.TestExceptionBreakpointStopConditionCaughtOrUncaught.class,
    de.uka.ilkd.key.symbolic_execution.testcase.strategy.TestExceptionBreakpointStopConditionWithHitCount.class,
    de.uka.ilkd.key.symbolic_execution.testcase.strategy.TestExceptionBreakpointStopConditionWithSubclasses.class,

@@ -4,9 +4,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
-import de.uka.ilkd.key.gui.interactionlog.InteractionLogView;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 
 import javax.swing.*;
@@ -21,6 +18,8 @@ import java.util.List;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class MainWindowTabbedPane extends JTabbedPane {
+    private static final long serialVersionUID = 1L;
+
     public static final float TAB_ICON_SIZE = 16f;
 
     /**

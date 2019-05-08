@@ -37,6 +37,8 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -240,27 +242,29 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      */
     @Override
     protected Term buildFrameClause(List<LocationVariable> modHeaps,
-                                    Map<Term, Term> heapToAtPre,
-                                    ProgramVariable selfVar,
-                                    ImmutableList<ProgramVariable> paramVars, Services services) {
-       Term frameTerm = null;
-       for(LocationVariable heap : modHeaps) {
-          final Term ft;
-          if(!getContract().hasModifiesClause(heap)) {
-            // strictly pure have a different contract.
-            ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
-          }else{
-            ft = tb.frame(tb.var(heap), heapToAtPre,
-                 getContract().getMod(heap, selfVar,
-                         paramVars, services));
-          }
-          if(frameTerm == null) {
-            frameTerm = ft;
-          }else{
-            frameTerm = tb.and(frameTerm, ft);
-          }
-       }
-       return frameTerm;
+            Map<Term, Term> heapToAtPre,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars, Services services) {
+        Term frameTerm = null;
+        for(LocationVariable heap : modHeaps) {
+            final Term ft;
+            if(!getContract().hasModifiesClause(heap)) {
+                // strictly pure have a different contract.
+                ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
+            } else {
+                ft = tb.frame(tb.var(heap), heapToAtPre,
+                        getContract().getMod(heap, selfVar,
+                                paramVars, services));
+            }
+
+            if(frameTerm == null) {
+                frameTerm = ft;
+            } else {
+                frameTerm = tb.and(frameTerm, ft);
+            }
+        }
+
+        return tb.addLabelToAllSubs(frameTerm, new OriginTermLabel(SpecType.ASSIGNABLE, null, -1));
     }
 
     /**
