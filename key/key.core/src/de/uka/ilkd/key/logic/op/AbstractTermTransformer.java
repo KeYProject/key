@@ -112,8 +112,10 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer ADD_CAST = new AddCast();    
 
     public static final AbstractTermTransformer EXPAND_QUERIES = new ExpandQueriesMetaConstruct();
-        
-    public static final AbstractTermTransformer OBSERVER_EQUALITY = new ObserverEqualityMetaConstruct();
+
+    /** Transformer producing condition for equality of observer terms */
+    public static final AbstractTermTransformer OBSERVER_EQUALITY =
+            new ObserverEqualityMetaConstruct();
     
     private static Sort[] createMetaSortArray(int arity) {
 	Sort[] result = new Sort[arity];

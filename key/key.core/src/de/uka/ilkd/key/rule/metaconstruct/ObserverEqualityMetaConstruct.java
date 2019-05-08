@@ -188,12 +188,14 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
      *   depContract_f_pre(h, a1, ..., an)
      * by instantiating that part of the contract.
      */
-    private Term buildConditionPrecondition(Term app, DependencyContract contract, Services services) {
+    private Term buildConditionPrecondition(Term app,
+                                            DependencyContract contract, Services services) {
 
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         ImmutableList<Term> params = app.subs().toImmutableList().take(2);
 
-        return contract.getPre(baseHeap, app.sub(0), app.sub(1), params, Collections.emptyMap(), services);
+        return contract.getPre(baseHeap, app.sub(0), app.sub(1),
+                params, Collections.emptyMap(), services);
     }
 
     /*
