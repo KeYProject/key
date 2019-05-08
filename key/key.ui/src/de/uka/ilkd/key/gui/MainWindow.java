@@ -193,6 +193,13 @@ public final class MainWindow extends JFrame {
     private LemmaGenerationAction loadKeYTaclets;
     private LemmaGenerationBatchModeAction lemmaGenerationBatchModeAction;
 
+    /**
+     * actions for changing the selection on the proof tree
+     */
+    private GoalSelectAboveAction goalSelectAboveAction;
+    private GoalSelectBelowAction goalSelectBelowAction;
+
+
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
 
     private final NotificationManager notificationManager;
@@ -386,6 +393,8 @@ public final class MainWindow extends JFrame {
         loadKeYTaclets = new LemmaGenerationAction.ProveKeYTaclets(this);
         lemmaGenerationBatchModeAction = new LemmaGenerationBatchModeAction(this);
         unicodeToggleAction = new UnicodeToggleAction(this);
+        goalSelectAboveAction = new GoalSelectAboveAction(this);
+        goalSelectBelowAction = new GoalSelectBelowAction(this);
 
         Config.DEFAULT.setDefaultFonts();
 
@@ -721,11 +730,20 @@ public final class MainWindow extends JFrame {
 
         view.addSeparator();
 
+        view.add(createSelectionMenu());
+
         JMenuItem hmItem = new JMenuItem("Heatmap Options");
         hmItem.addActionListener(new HeatmapSettingsAction(this));
         view.add(hmItem);
 
         return view;
+    }
+
+    private JMenu createSelectionMenu() {
+        JMenu goalSelection = new JMenu("Select Goal ...");
+        goalSelection.add(goalSelectAboveAction);
+        goalSelection.add(goalSelectBelowAction);
+        return goalSelection;
     }
 
     private JMenu createProofMenu() {
