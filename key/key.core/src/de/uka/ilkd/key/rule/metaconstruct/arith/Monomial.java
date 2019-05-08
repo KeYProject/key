@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.LexPathOrdering;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
@@ -32,28 +33,30 @@ import de.uka.ilkd.key.util.Debug;
  * Class for analysing and modifying monomial expressions over the integers
  */
 public class Monomial {
-    
+
     private final ImmutableList<Term> parts;
     private final BigInteger coefficient;
-    
+
     private Monomial(final ImmutableList<Term> parts, final BigInteger coefficient) {
         this.parts = parts;
         this.coefficient = coefficient;
     }
-    
+
     public static final Monomial ONE = new Monomial ( ImmutableSLList.<Term>nil(),
                                                       BigInteger.ONE );
-    
+
     public static Monomial create(Term monoTerm, Services services) {
         final LRUCache<Term, Monomial> monomialCache = services.getCaches().getMonomialCache();
+        monoTerm = TermLabel.removeIrrelevantLabels(monoTerm, services);
         Monomial res;
-        synchronized (monomialCache) {            
+
+        synchronized (monomialCache) {
             res = monomialCache.get ( monoTerm );
         }
 
         if ( res == null ) {
             res = createHelp ( monoTerm, services );
-            synchronized (monomialCache) {            
+            synchronized (monomialCache) {
                 monomialCache.put ( monoTerm, res );
             }
         }
@@ -65,24 +68,24 @@ public class Monomial {
         a.analyse ( monomial );
         return new Monomial ( a.parts, a.coeff );
     }
-    
+
     public Monomial setCoefficient(BigInteger c) {
         return new Monomial ( parts, c );
     }
-    
+
     public Monomial multiply(BigInteger c) {
         return new Monomial ( parts, coefficient.multiply ( c ) );
     }
-    
+
     public Monomial multiply(Monomial m) {
         return new Monomial ( parts.prepend ( m.parts ),
                               coefficient.multiply ( m.coefficient ) );
     }
-    
+
     public Monomial addToCoefficient(BigInteger c) {
         return new Monomial ( parts, coefficient.add ( c ) );
     }
-    
+
     /**
      * @return true iff the monomial <code>this</code> divides the monomial
      *         <code>m</code>
@@ -92,10 +95,10 @@ public class Monomial {
         if ( this.coefficient.signum () == 0 ) return false;
         if ( m.coefficient.remainder ( this.coefficient ).signum () != 0 )
                 return false;
-        
+
         return difference ( this.parts, m.parts ).isEmpty ();
     }
-    
+
     /**
      * @return true iff the variables/parts of <code>this</code> subsume the
      *         variables of <code>m</code>, i.e., if each variable that
@@ -106,16 +109,16 @@ public class Monomial {
         return this.parts.size () >= m.parts.size ()
                && difference ( m.parts, this.parts ).isEmpty ();
     }
-    
+
     public boolean variablesEqual(Monomial m) {
         return this.parts.size () == m.parts.size ()
                && this.variablesSubsume ( m );
     }
-    
+
     public boolean variablesDisjoint(Monomial m) {
         return difference ( m.parts, this.parts ).size () == m.parts.size ();
     }
-    
+
     /**
      * @return true iff the coefficient of <code>m</code> can be made smaller
      *         (absolutely) by subtracting a multiple of <code>this</code>
@@ -130,7 +133,7 @@ public class Monomial {
 
         return difference ( this.parts, m.parts ).isEmpty ();
     }
-    
+
     /**
      * @return the result of dividing the monomial <code>m</code> by the
      *         monomial <code>this</code>
@@ -141,11 +144,11 @@ public class Monomial {
 
         if ( a.signum () == 0 || c.signum () == 0 )
             return new Monomial ( ImmutableSLList.<Term>nil(), BigInteger.ZERO );
-        
+
         return new Monomial ( difference ( m.parts, this.parts ),
                               LexPathOrdering.divide ( a, c ) );
     }
-    
+
     /**
      * @return the result of dividing the least common reducible (LCR) of
      *         monomial <code>m</code> and <code>this</code> by the monomial
@@ -154,17 +157,17 @@ public class Monomial {
     public Monomial divideLCR(Monomial m) {
         Debug.assertFalse ( coefficient.signum () == 0 );
         Debug.assertFalse ( m.coefficient.signum () == 0 );
-        
+
         final ImmutableList<Term> newParts = difference ( m.parts, this.parts );
 
         final BigInteger gcd = coefficient.abs ().gcd ( m.coefficient.abs () );
         return new Monomial ( newParts, m.coefficient.divide ( gcd ) );
-        
+
         /*
          The code for groebner bases over the integers. We do not use that
          anymore and instead compute groebner bases over the rationals
          (using pseudo-reduction)
-         
+
         // in case one the coefficient of one of the monomials divides the other
         // coefficient: simply make sure that the leading terms cancel out each
         // other. this makes the whole algorithm a bit more robust concerning
@@ -178,7 +181,7 @@ public class Monomial {
         // (any)one of the two cofactors has to be negated
         if ( coefficient.compareTo ( m.coefficient ) < 0 )
             cofactor = cofactor.negate ();
-        
+
         return new Monomial ( newParts, cofactor );
         */
     }
@@ -205,13 +208,13 @@ public class Monomial {
         if ( neg ) return c0.negate ();
         return c0;
     }
-    
-    
+
+
     public Term toTerm (Services services) {
-        final Operator mul = 
+        final Operator mul =
 	    services.getTypeConverter().getIntegerLDT().getMul();
         Term res = null;
-        
+
         final Iterator<Term> it = parts.iterator ();
         if ( it.hasNext () ) {
             res = it.next ();
@@ -219,17 +222,18 @@ public class Monomial {
                 res = services.getTermFactory().createTerm ( mul, res,
                                                                it.next () );
         }
-        
+
         final Term cTerm = services.getTermBuilder().zTerm(coefficient.toString());
 
         if ( res == null )
             res = cTerm;
         else if ( !BigInteger.ONE.equals ( coefficient ) )
             res = services.getTermFactory().createTerm ( mul, res, cTerm );
-        
-        return res;        
+
+        return res;
     }
-    
+
+    @Override
     public String toString() {
         final StringBuffer res = new StringBuffer ();
         res.append ( coefficient );
@@ -238,20 +242,20 @@ public class Monomial {
 
         return res.toString ();
     }
-    
+
     private static class Analyser {
         public BigInteger coeff = BigInteger.ONE;
         public ImmutableList<Term> parts = ImmutableSLList.<Term>nil();
         private final Services services;
         private final Operator numbers, mul;
-        	
+
         public Analyser(final Services services) {
             this.services = services;
 	    final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
             numbers = integerLDT.getNumberSymbol();
             mul     = integerLDT.getMul();
         }
-        
+
         public void analyse(Term monomial) {
             if ( monomial.op () == mul ) {
                 analyse ( monomial.sub ( 0 ) );
@@ -266,11 +270,12 @@ public class Monomial {
             }
         }
     }
-    
 
+
+    @Override
     public boolean equals(Object o) {
         if ( o == this ) return true;
-        
+
         if ( ! ( o instanceof Monomial ) ) return false;
 
         final Monomial m = (Monomial)o;
@@ -279,13 +284,14 @@ public class Monomial {
         if ( parts.size () != m.parts.size () ) return false;
         return difference ( parts, m.parts ).isEmpty ();
     }
-    
+
+    @Override
     public int hashCode() {
         int res = coefficient.hashCode ();
         for (Term part : parts) res += part.hashCode();
         return res;
     }
-    
+
     /**
      * @return the list of all terms that occur in <code>a</code> but not in
      *         <code>b</code>. multiplicity is treated as well here, so this
@@ -310,5 +316,5 @@ public class Monomial {
     public boolean variablesAreCoprime(Monomial m) {
         return difference ( parts, m.parts ).equals ( parts );
     }
-    
+
 }

@@ -567,7 +567,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 				less.setMargin(zeroIn);
 				JButton more=new JButton("+");
 				more.setMargin(zeroIn);
-				Dimension small=new Dimension(20,9999);
+				//Dimension small=new Dimension(20,9999);
 				//buttonPanel.setMaximumSize(small);
 				//buttonPanel.setPreferredSize(small);
 				Dimension smallSq=new Dimension(20,20);

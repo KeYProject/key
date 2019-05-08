@@ -16,6 +16,8 @@ import java.awt.event.ActionEvent;
  * @author jschiffl
  */
 public class HeatmapSettingsAction extends MainWindowAction {
+    private static final long serialVersionUID = -6165100588113899099L;
+
     private HeatmapOptionsDialog dialog;
 
     /**
@@ -26,7 +28,7 @@ public class HeatmapSettingsAction extends MainWindowAction {
     public HeatmapSettingsAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Heatmap Options");
-        putValue(KeYExtConst.PATH, "Heatmap");
+        putValue(KeYExtConst.PATH, "Heatmaps");
         setEnabled(getMediator().getSelectedProof() != null);
         setIcon(IconFactory.selectDecProcArrow(MainWindow.TOOLBAR_ICON_SIZE));
 

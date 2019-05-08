@@ -10,6 +10,8 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class BuiltInRuleInteraction extends NodeInteraction {
+    private static final long serialVersionUID = -4704080776691885200L;
+
     @XmlAttribute
     private String ruleName;
 

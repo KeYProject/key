@@ -35,11 +35,12 @@ public class KeYFileChooser {
                             || "java".equals(IOUtil.getFileExtension(f))
                             || "key".equals(IOUtil.getFileExtension(f))
                             || "proof".equals(IOUtil.getFileExtension(f))
-                            || f.getName().endsWith(".proof.gz");
+                            || f.getName().endsWith(".proof.gz")
+                            || f.getName().endsWith(".zproof");
         }
 
         public String getDescription() {
-            return "Java files, (compressed) KeY files and source directories";
+            return "Java files, (compressed) KeY files, proof packages, and source directories";
         }
     };
 
@@ -52,7 +53,6 @@ public class KeYFileChooser {
             return "compressed KeY proof files (.proof.gz)";
         }
     };
-
 
     private static KeYFileChooser INSTANCE;
 

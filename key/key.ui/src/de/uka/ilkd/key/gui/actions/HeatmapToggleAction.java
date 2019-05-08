@@ -15,14 +15,16 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 public class HeatmapToggleAction extends MainWindowAction {
+    private static final long serialVersionUID = 1L;
 
     public static final Icon ICON_SELECTED = IconFontSwing.buildIcon(FontAwesomeBold.FIRE_EXTINGUISHER, MainWindow.TOOLBAR_ICON_SIZE);
     public static final Icon ICON_NOT_SELECTED = IconFontSwing.buildIcon(FontAwesomeBold.FIRE, MainWindow.TOOLBAR_ICON_SIZE);
 
     public HeatmapToggleAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName("Toggle heatmap");
-        putValue(KeYExtConst.PATH, "Heatmap");
+        setName("Toggle Heatmaps");
+        setTooltip("Heatmap options");
+        putValue(KeYExtConst.PATH, "Heatmaps");
         setEnabled(getMediator().getSelectedProof() != null);
         putValue(Action.LONG_DESCRIPTION, "Enable or disable age heatmaps in the sequent view.");
 

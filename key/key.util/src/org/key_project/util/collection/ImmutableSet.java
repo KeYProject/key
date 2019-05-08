@@ -13,35 +13,80 @@
 
 package org.key_project.util.collection;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
+import java.util.stream.Collector.Characteristics;
 import java.util.stream.Stream;
 
-/** interface implemented by non-destructive Sets.
- * CONVENTION: Each SetOf<T> implementation has to offer a public static
- *    final variable .<called>nil()
+/**
+ * interface implemented by non-destructive Sets. CONVENTION: Each SetOf<T> implementation has to
+ * offer a public static final variable .<called>nil()
  */
 
 public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
 
-    /** adds an element */
+    /**
+     * Returns a Collector that accumulates the input elements into a new ImmutableSet.
+     *
+     * @return a Collector that accumulates the input elements into a new ImmutableSet.
+     */
+    public static <T> Collector<T, Set<T>, ImmutableSet<T>> collector() {
+        return Collector.of(
+                HashSet<T>::new,
+                (set, el) -> set.add(el),
+                (set1, set2) -> {
+                    set1.addAll(set2);
+                    return set1; },
+                ImmutableSet::<T>fromSet,
+                Characteristics.UNORDERED);
+    }
+
+    /**
+     * Creates an ImmutableSet from a Set.
+     *
+     * @param set a Set.
+     * @return an ImmutableSet containing the same elements as the specified set.
+     */
+    public static <T> ImmutableSet<T> fromSet(Set<T> set) {
+        ImmutableSet<T> result = DefaultImmutableSet.nil();
+
+        for (T el : set) {
+            result = result.add(el);
+        }
+
+        return result;
+    }
+
+    /**
+     * @return a {@code Set} containing the same elements as this {@code ImmutableSet}
+     */
+    Set<T> toSet();
+
+    /**
+     * Adds an element
+     * @return a set containing all elements of this one and the specified element.
+     */
     ImmutableSet<T> add(T element);
 
     /** @return union of this set with set */
-    ImmutableSet<T> union(ImmutableSet<T> set);
+    ImmutableSet<T> union(ImmutableSet<? extends T> set);
 
     /** @return intersection of this set with set */
-    ImmutableSet<T> intersect(ImmutableSet<T> set);
+    ImmutableSet<T> intersect(ImmutableSet<? extends T> set);
 
     /** @return Iterator<T> of the set */
     @Override
     Iterator<T> iterator();
-    
+
     /** @return Stream<T> of the set */
     Stream<T> stream();
-    
+
     /**
      * return true if predicate is fullfilled for at least one element
+     *
      * @param predicate the predicate
      * @return true if predicate is fullfilled for at least one element
      */
@@ -62,15 +107,18 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
     /** @return set without element */
     ImmutableSet<T> remove(T element);
 
-    /** @return true iff the this set is subset of o and vice versa.
+    /**
+     * @return true iff the this set is subset of o and vice versa.
      */
     @Override
     public boolean equals(Object o);
-    
+
     @Override
     public int hashCode();
 
-    /** adds an element, barfs if the element is already present
+    /**
+     * adds an element, barfs if the element is already present
+     *
      * @param element of type <T> that has to be added to this set
      * @throws org.key_project.utils.collection.NotUniqueException if the element is already present
      */

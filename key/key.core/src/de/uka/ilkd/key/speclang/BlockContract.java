@@ -14,9 +14,9 @@
 package de.uka.ilkd.key.speclang;
 
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -39,23 +39,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
  *
  * @author wacker, lanzinger
  */
-public interface BlockContract extends BlockSpecificationElement {
-
-    /**
-     *
-     * @return all {@link FunctionalBlockContract}s with a valid id that correspond to this
-     *         {@code BlockContract}. Unless this contract is a combination of other contracts (see
-     *         {@link SimpleBlockContract#combine(ImmutableSet, Services)}, the resulting set will
-     *         only contain one element.
-     */
-    public ImmutableSet<FunctionalBlockContract> getFunctionalContracts();
-
-    /**
-     *
-     * @param contract the new functional contract.
-     * @see #getFunctionalContracts()
-     */
-    public void setFunctionalBlockContract(FunctionalBlockContract contract);
+public interface BlockContract extends AuxiliaryContract {
 
     /**
     *
@@ -92,4 +76,14 @@ public interface BlockContract extends BlockSpecificationElement {
      */
     @Override
     public BlockContract setBlock(StatementBlock newBlock);
+
+    @Override
+    public BlockContract map(UnaryOperator<Term> op, Services services);
+
+    /**
+     *
+     * @return the {@code LoopContract} from which this contract was generated, or {@code null}.
+     * @see LoopContract#toBlockContract()
+     */
+    public LoopContract toLoopContract();
 }

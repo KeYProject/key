@@ -680,7 +680,7 @@ public class TestTermLabelManager extends TestCase {
       }
 
       @Override
-      public void refactoreLabels(TermLabelState state, Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Term term, List<TermLabel> labels) {
+      public void refactorLabels(TermLabelState state, Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Term term, List<TermLabel> labels) {
          List<TermLabel> changedLabels = new LinkedList<TermLabel>();
          for (TermLabel label : labels) {
             if (label.name().toString().endsWith("-CHANGED")) {

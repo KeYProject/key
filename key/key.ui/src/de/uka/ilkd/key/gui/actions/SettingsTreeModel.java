@@ -27,6 +27,8 @@ import de.uka.ilkd.key.settings.Settings;
 
 public class SettingsTreeModel extends DefaultTreeModel {
 
+    private static final long serialVersionUID = -3282304543262262159L;
+
     private ProofSettings proofSettings;
 
     private ProofIndependentSettings independentSettings;
@@ -49,12 +51,13 @@ public class SettingsTreeModel extends DefaultTreeModel {
         proofSettingsNode.add(generateTableNode("Taclets", choiceSettings));
 
         Settings strategySettings = proofSettings.getStrategySettings();
-
         proofSettingsNode.add(generateTableNode("Strategy", strategySettings));
 
         Settings smtSettings = proofSettings.getSMTSettings();
-
         proofSettingsNode.add(generateTableNode("SMT", smtSettings));
+
+        Settings termLabelSettings = proofSettings.getTermLabelSettings();
+        proofSettingsNode.add(generateTableNode("Term Labels", termLabelSettings));
 
         OptionContentNode independentSettingsNode = generateOptionContentNode("Proof-Independent Settings", "These are the proof independent settings.");
         root.add(independentSettingsNode);
@@ -127,6 +130,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
         JTable table =  new JTable();
 
         DefaultTableModel tableModel = new DefaultTableModel() {
+            private static final long serialVersionUID = 1L;
 
             @Override
             public boolean isCellEditable(int row, int column) {

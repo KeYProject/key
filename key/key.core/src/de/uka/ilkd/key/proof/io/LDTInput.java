@@ -45,7 +45,6 @@ public class LDTInput implements EnvInput {
 
     private InitConfig initConfig = null;
 
-
     /** creates a representation of the LDT files to be used as input
      * to the KeY prover.
      * @param keyFiles an array containing the LDT .key files
