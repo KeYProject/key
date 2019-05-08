@@ -37,7 +37,7 @@ import de.uka.ilkd.key.util.ExceptionTools;
 public class EditSourceFileAction extends AbstractAction {
     private static final long serialVersionUID = -2540941448174197032L;
 
-/**
+   /**
     * Moves the caret in a {@link JTextArea} to the specified position. Assumes
     * the first position in the textarea is in line 1 column 1.
     */

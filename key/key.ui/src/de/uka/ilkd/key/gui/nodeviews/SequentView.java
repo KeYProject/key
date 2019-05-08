@@ -18,34 +18,52 @@ import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_CO
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Point;
-import java.util.*;
-import java.awt.Shape;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Shape;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 
 import javax.swing.JEditorPane;
 import javax.swing.UIManager;
-import javax.swing.text.JTextComponent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
-import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLDocument;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.logic.FormulaChangeInfo;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
+import de.uka.ilkd.key.pp.InitialPositionTable;
+import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.SequentPrintFilterEntry;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
+import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.Debug;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /*
  * Parent class of CurrentGoalView and InnerNodeView.
@@ -113,7 +131,7 @@ public abstract class SequentView extends JEditorPane {
     /** the last observed mouse position for which a highlight was created */
     private Point lastMousePosition;
 
-    SequentView(MainWindow mainWindow) {
+    protected SequentView(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
 
         setContentType("text/html");
@@ -198,7 +216,7 @@ public abstract class SequentView extends JEditorPane {
      * @param range the Range to be highlighted
      * @param highlighter the Object painting the highlight
      */
-    void paintHighlight(Range range, Object highlighter) {
+    public void paintHighlight(Range range, Object highlighter) {
         try {
             if (range != null) {
                 getHighlighter()
@@ -727,7 +745,10 @@ public abstract class SequentView extends JEditorPane {
 		    this.filter.setSequent(selectedNode.sequent());
 		}
 		printSequent();
-        getParent().revalidate();
+
+		if (getParent() != null) {
+	        getParent().revalidate();
+		}
 	}
 
     protected SequentPrintFilter getFilter() {
@@ -764,6 +785,15 @@ public abstract class SequentView extends JEditorPane {
         int orgSize = originalSequent.size();
         int newSize = filter.getFilteredAntec().size() + filter.getFilteredSucc().size();
         return orgSize != newSize;
+    }
+
+    /**
+     *
+     * @return {@code true} if this sequent view is supposed to be shown in the {@link MainFrame},
+     *  {@code false} if it is only supposed to be shown in some other frame.
+     */
+    public boolean isMainSequentView() {
+        return true;
     }
 
     /**

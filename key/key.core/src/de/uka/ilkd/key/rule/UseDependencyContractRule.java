@@ -106,7 +106,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
     private ImmutableSet<Term> addEqualDefs(ImmutableSet<Term> terms, Goal g) {
 	ImmutableList<Term> result = ImmutableSLList.nil();
-	
+
 	for(SequentFormula cf : g.sequent().antecedent()) {
 	    final Term formula = cf.formula();
 	    if(formula.op() instanceof Equality
@@ -248,16 +248,16 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
 
     public static boolean isBaseOcc(Term focus, Term candidate) {
-	if(!candidate.op().equals(focus.op())) {
-	    return false;
-	}
-	for(int i = 1, n = candidate.arity(); i < n; i++) {
-	    if(!(candidate.sub(i).equals(focus.sub(i))
-		 || candidate.sub(i).op() instanceof LogicVariable)) {
-		return false;
-	    }
-	}
-	return true;
+        if(!candidate.op().equals(focus.op())) {
+            return false;
+        }
+        for(int i = 1, n = candidate.arity(); i < n; i++) {
+            if(!(candidate.sub(i).equalsModIrrelevantTermLabels(focus.sub(i))
+                || candidate.sub(i).op() instanceof LogicVariable)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 
@@ -383,53 +383,54 @@ public final class UseDependencyContractRule implements BuiltInRule {
     @Override
     public boolean isApplicable(Goal goal,
                                 PosInOccurrence pio) {
-	if(pio == null) {
-	    return false;
-	}
+        if(pio == null) {
+            return false;
+        }
 
-	//top level symbol must be observer
-	final Term focus = pio.subTerm();
-	if(!(focus.op() instanceof IObserverFunction)) {
-	    return false;
-	}
+        //top level symbol must be observer
+        final Term focus = pio.subTerm();
+        if(!(focus.op() instanceof IObserverFunction)) {
+            return false;
+        }
 
-	//there must not be free variables in the focus term
-	if(!focus.freeVars().isEmpty()) {
-	    return false;
-	}
+        //there must not be free variables in the focus term
+        if(!focus.freeVars().isEmpty()) {
+            return false;
+        }
 
-	// abort if inside of transformer
+        // abort if inside of transformer
         if (Transformer.inTransformer(pio)) {
             return false;
         }
 
-	//heap term of observer must be store-term (or anon, create,
-	//memset, ...)
-	final Services services = goal.proof().getServices();
-	final IObserverFunction target = (IObserverFunction) focus.op();
-	//final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
-	boolean hasRawSteps = false;
-	for(int i = 0; i<target.getHeapCount(services) * target.getStateCount(); i++) {
-	  if(hasRawSteps(focus.sub(i), goal.sequent(), services)) {
-        hasRawSteps = true;		  
-	    break;
-	  }
-	}
-	if(!hasRawSteps) {
-	    return false;
-	}
-	//there must be contracts for the observer
-	final KeYJavaType kjt
-		= target.isStatic()
-		  ? target.getContainerType()
-	          : services.getJavaInfo().getKeYJavaType(
-	                  focus.sub(target.getHeapCount(services)*target.getStateCount()).sort());
-	assert kjt != null : "could not determine receiver type for " + focus;
-	if(kjt.getSort() instanceof NullSort) {
-	    return false;
-	}
+        //heap term of observer must be store-term (or anon, create,
+        //memset, ...)
+        final Services services = goal.proof().getServices();
+        final IObserverFunction target = (IObserverFunction) focus.op();
+        //final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        boolean hasRawSteps = false;
+        for(int i = 0; i < target.getHeapCount(services) * target.getStateCount(); i++) {
+            if(hasRawSteps(focus.sub(i), goal.sequent(), services)) {
+                hasRawSteps = true;
+                break;
+            }
+        }
+        if(!hasRawSteps) {
+            return false;
+        }
+        //there must be contracts for the observer
+        final KeYJavaType kjt
+            = target.isStatic()
+                  ? target.getContainerType()
+                  : services.getJavaInfo().getKeYJavaType(
+                          focus.sub(target.getHeapCount(services) * target.getStateCount())
+                               .sort());
+        assert kjt != null : "could not determine receiver type for " + focus;
+        if(kjt.getSort() instanceof NullSort) {
+            return false;
+        }
         final ImmutableSet<Contract> contracts
-        	= getApplicableContracts(services, kjt, target);
+            = getApplicableContracts(services, kjt, target);
         if(contracts.isEmpty()) {
             return false;
         }
@@ -453,7 +454,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final IObserverFunction target = (IObserverFunction) focus.op();
         final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
         final TermBuilder TB = services.getTermBuilder();
-        
+
         final Term selfTerm;
         if (target.isStatic()) {
             selfTerm = null;
@@ -494,7 +495,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
            	 ? contract.getMby(heapTerms, selfTerm, paramTerms, atPres, services) : null;
 
         assert !step.subTerm().equals(focus);
-        
+
         Term freePre = !target.isStatic() ? TB.not(TB.equals(selfTerm, TB.NULL())) : null;
         Term disjoint = null;
         Term pre = null;
@@ -516,7 +517,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
                         services);
 
             assert changedLocs != null;
-            //store insts 
+            //store insts
             ifInsts = ifInsts.append(changedLocs.second.prepend(step));
             if(!target.isStatic()) {
                 final Term cr = TB.created(subStep, selfTerm);
@@ -586,22 +587,22 @@ public final class UseDependencyContractRule implements BuiltInRule {
         cjust.add(ruleApp, just);
 
         if(!useful) {
-        	return goal.split(1);        	
+            return goal.split(1);
         }
 
         //prepare cut formula
-  	    final ContractPO po
-		    = services.getSpecificationRepository()
-			    .getContractPOForProof(goal.proof());
-	    final Term mbyOk;
-	    if(po != null && /* po.getMbyAtPre() != null && */ mby != null) {
-//	        mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
-//		           TB.lt(mby, po.getMbyAtPre(), services));
-//                mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
+        final ContractPO po
+            = services.getSpecificationRepository()
+                .getContractPOForProof(goal.proof());
+        final Term mbyOk;
+        if(po != null && /* po.getMbyAtPre() != null && */ mby != null) {
+//          mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
+//                         TB.lt(mby, po.getMbyAtPre(), services));
+//          mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
             mbyOk = TB.measuredByCheck(mby);
-	    } else {
-	       mbyOk = TB.tt();
-	    }
+        } else {
+            mbyOk = TB.tt();
+        }
         final Term cutFormula = TB.and(freePre, pre, disjoint, mbyOk);
 
 
@@ -636,7 +637,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     public UseDependencyContractApp createApp(PosInOccurrence pos) {
        return createApp(pos, null);
     }
-    
+
     @Override
     public UseDependencyContractApp createApp(PosInOccurrence pos, TermServices services) {
 		return new UseDependencyContractApp(this, pos);

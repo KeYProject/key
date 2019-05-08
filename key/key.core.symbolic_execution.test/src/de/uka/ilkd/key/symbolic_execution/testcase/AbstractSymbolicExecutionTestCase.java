@@ -111,7 +111,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    /**
     * <p>
     * If this constant is {@code true} a temporary directory is created with
-    * new oracle files. The developer has than to copy the new required files
+    * new oracle files. The developer has then to copy the new required files
     * into the plug-in so that they are used during next test execution.
     * </p>
     * <p>
