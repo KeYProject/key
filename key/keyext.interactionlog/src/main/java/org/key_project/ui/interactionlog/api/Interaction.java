@@ -1,6 +1,8 @@
-package org.key_project.ui.interactionlog.model;
+package org.key_project.ui.interactionlog.api;
 
-import org.key_project.ui.interactionlog.algo.InteractionVisitor;
+import org.key_project.ui.interactionlog.api.Markdownable;
+import org.key_project.ui.interactionlog.api.Reapplicable;
+import org.key_project.ui.interactionlog.api.Scriptable;
 
 import javax.swing.*;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -17,7 +19,7 @@ import java.util.Date;
 
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
-public abstract class Interaction implements Serializable {
+public abstract class Interaction implements Serializable, Markdownable, Scriptable, Reapplicable {
     @XmlTransient
     protected InteractionGraphicStyle graphicalStyle = new InteractionGraphicStyle();
 
@@ -46,8 +48,6 @@ public abstract class Interaction implements Serializable {
     public InteractionGraphicStyle getGraphicalStyle() {
         return graphicalStyle;
     }
-
-    public abstract <T> T accept(InteractionVisitor<T> visitor);
 
     public static class InteractionGraphicStyle {
         private Icon icon;

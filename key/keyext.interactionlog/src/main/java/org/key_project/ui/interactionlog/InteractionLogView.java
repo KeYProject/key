@@ -16,6 +16,7 @@ import org.key_project.ui.BoundsPopupMenuListener;
 import org.key_project.ui.interactionlog.algo.MUProofScriptExport;
 import org.key_project.ui.interactionlog.algo.MarkdownExport;
 import org.key_project.ui.interactionlog.algo.Reapplication;
+import org.key_project.ui.interactionlog.api.Interaction;
 import org.key_project.ui.interactionlog.model.*;
 
 import javax.swing.*;
