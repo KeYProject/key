@@ -70,6 +70,7 @@ public class ProofSettings {
     private ChoiceSettings choiceSettings = new ChoiceSettings();
     private final ProofDependentSMTSettings smtSettings = ProofDependentSMTSettings.getDefaultSettingsData();
     private Properties lastLoadedProperties = null;
+    private TermLabelSettings termLabelSettings = new TermLabelSettings();
 
     /**
      * create a proof settings object. When you add a new settings object,
@@ -80,6 +81,7 @@ public class ProofSettings {
         addSettings(strategySettings);
         addSettings(choiceSettings);
         addSettings(smtSettings);
+        addSettings(termLabelSettings);
     }
 
     /*
@@ -272,5 +274,15 @@ public class ProofSettings {
         for (Settings s : settings) {
             s.readSettings(props);
         }
+    }
+
+
+    /**
+     * Returns the term label settings from the proof settings.
+     * @return the term label settings
+     */
+    public TermLabelSettings getTermLabelSettings() {
+        ensureInitialized();
+        return termLabelSettings;
     }
 }

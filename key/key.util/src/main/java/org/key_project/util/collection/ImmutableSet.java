@@ -13,9 +13,12 @@
 
 package org.key_project.util.collection;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
+import java.util.stream.Collector.Characteristics;
 import java.util.stream.Stream;
 
 /**
@@ -24,6 +27,38 @@ import java.util.stream.Stream;
  */
 
 public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
+
+    /**
+     * Returns a Collector that accumulates the input elements into a new ImmutableSet.
+     *
+     * @return a Collector that accumulates the input elements into a new ImmutableSet.
+     */
+    public static <T> Collector<T, Set<T>, ImmutableSet<T>> collector() {
+        return Collector.of(
+                HashSet<T>::new,
+                (set, el) -> set.add(el),
+                (set1, set2) -> {
+                    set1.addAll(set2);
+                    return set1; },
+                ImmutableSet::<T>fromSet,
+                Characteristics.UNORDERED);
+    }
+
+    /**
+     * Creates an ImmutableSet from a Set.
+     *
+     * @param set a Set.
+     * @return an ImmutableSet containing the same elements as the specified set.
+     */
+    public static <T> ImmutableSet<T> fromSet(Set<T> set) {
+        ImmutableSet<T> result = DefaultImmutableSet.nil();
+
+        for (T el : set) {
+            result = result.add(el);
+        }
+
+        return result;
+    }
 
     /**
      * @return a {@code Set} containing the same elements as this {@code ImmutableSet}

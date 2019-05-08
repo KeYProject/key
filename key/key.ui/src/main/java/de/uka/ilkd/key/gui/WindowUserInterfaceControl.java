@@ -21,6 +21,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -381,6 +382,29 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
        return file;
    }
 
+   public void saveProofBundle(Proof proof) {
+       final MainWindow mainWindow = MainWindow.getInstance();
+       final BundleFileChooser fileChooser = BundleFileChooser.getFileChooser("Choose filename to save proof");
+
+       final boolean saved = fileChooser.showSaveDialog(mainWindow, proof.getProofFile());
+       if (saved) {
+           Path path = fileChooser.getSaveFile();
+           ProofSaver saver = new ProofBundleSaver(proof, path.toFile());
+
+           String errorMsg;
+           try {
+               errorMsg = saver.save();
+           } catch (IOException e) {
+               errorMsg = e.toString();
+           }
+           if (errorMsg != null) {
+               mainWindow.notify(new GeneralFailureEvent("Saving Proof failed.\n Error: " + errorMsg));
+           } else {
+              proof.setProofFile(path.toFile());
+           }
+       }
+   }
+
    protected static Pair<File, String> fileName(Proof proof, String fileExtension) {
        // TODO: why do we use GUI components here?
        final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
@@ -490,13 +514,13 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
-   public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(File location,
-                                                                             List<File> classPaths,
-                                                                             File bootClassPath,
-                                                                             List<File> includes,
-                                                                             boolean makeMainWindowVisible) throws ProblemLoaderException {
-      return loadInMainWindow(null, location, classPaths, bootClassPath, includes, false, makeMainWindowVisible);
-   }
+//   public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(File location,
+//                                                                             List<File> classPaths,
+//                                                                             File bootClassPath,
+//                                                                             List<File> includes,
+//                                                                             boolean makeMainWindowVisible) throws ProblemLoaderException {
+//      return loadInMainWindow(null, location, classPaths, bootClassPath, includes, false, makeMainWindowVisible);
+//   }
    
    /**
     * Loads the given location and returns all required references as {@link KeYEnvironment}

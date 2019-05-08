@@ -16,6 +16,8 @@ package de.uka.ilkd.key.parser;
 import java.io.File;
 import java.io.IOException;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.rule.TacletForTests;
 import junit.framework.TestCase;
 
 import org.antlr.runtime.RecognitionException;
@@ -54,5 +56,37 @@ public class TestParser extends TestCase {
 	// moment, at least compare the list of filenames
 	final Includes actual = parser.getIncludes();
 	Assert.assertEquals(actual.getIncludes(), expected.getIncludes());
+    }
+
+
+
+    public void testGenericSort() throws RecognitionException {
+        String content = "\\sorts { \\generic gen; } \n\n" +
+                "\\rules { SomeRule { \\find(gen::instance(0)) \\replacewith(false) }; }\n" +
+                "\\problem { true }";
+
+        final KeYLexerF lexer = new KeYLexerF(content,
+                "No file. Test case TestParser#testGenericSort()");
+
+
+        Services services = TacletForTests.services();
+        final ParserConfig config = new ParserConfig(services, services.getNamespaces());
+
+        final KeYParserF parser = new KeYParserF(ParserMode.TACLET, lexer, services, services.getNamespaces());
+        try {
+            parser.parseSorts();
+            parser.parseTacletsAndProblem();
+        } catch(RecognitionException ex) {
+            System.err.println(parser.getErrorMessage(ex));
+            throw ex;
+        }
+
+        final KeYParserF parser2 = new KeYParserF(ParserMode.PROBLEM, lexer);
+        try {
+            parser2.parseProblem();
+        } catch(RecognitionException ex) {
+            System.err.println(parser.getErrorMessage(ex));
+            throw ex;
+        }
     }
 }

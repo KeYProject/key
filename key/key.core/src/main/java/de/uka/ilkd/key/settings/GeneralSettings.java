@@ -30,6 +30,12 @@ public class GeneralSettings implements Settings, Cloneable {
     public static boolean noPruningClosed = true;
 
     /**
+     * If this option is set, the (Disk)FileRepo does not delete its temporary directories
+     * (can be used for debugging).
+     */
+    public static boolean keepFileRepos = false;
+
+    /**
      * if true then JML specifications are globally disabled
      * in this run of KeY, regardless of the regular settings
      */
@@ -40,6 +46,9 @@ public class GeneralSettings implements Settings, Cloneable {
     private static final String USE_JML_KEY = "[General]UseJML";
     private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
     private static final String AUTO_SAVE = "[General]AutoSavePeriod";
+
+    /** The key for storing the allowBundleSaving flag in settings */
+    private static final String ALLOW_BUNDLE_SAVING = "[General]AllowBundleSaving";
 
     /** minimize interaction is on by default */
     private boolean tacletFilter = true;
@@ -57,6 +66,12 @@ public class GeneralSettings implements Settings, Cloneable {
      * Positive values indicate save period.
      */
     private int autoSave = 0;
+
+    /**
+     * If disabled, proofs can not be saved as bundle.
+     * Toggles saving of copies of loaded files via a FileRepo.
+     */
+    private boolean allowBundleSaving = false;
 
     private LinkedList<SettingsListener> listenerList = 
         new LinkedList<SettingsListener>();
@@ -84,6 +99,10 @@ public class GeneralSettings implements Settings, Cloneable {
 
     public int autoSavePeriod() {
         return autoSave;
+    }
+
+    public boolean isAllowBundleSaving() {
+        return allowBundleSaving;
     }
 
     // setter
@@ -120,6 +139,18 @@ public class GeneralSettings implements Settings, Cloneable {
         fireSettingsChanged();
     }
 
+    /**
+     * Sets the allowBundleSaving flag. This enables/disables the possibility to store proofs as
+     * bundles.
+     * @param b the new truth value of the flag
+     */
+    public void setAllowBundleSaving(boolean b) {
+        if (allowBundleSaving != b) {
+            allowBundleSaving = b;
+            fireSettingsChanged();
+        }
+    }
+
     /** gets a Properties object and has to perform the necessary
      * steps in order to change this object in a way that it
      * represents the stored settings
@@ -154,6 +185,11 @@ public class GeneralSettings implements Settings, Cloneable {
                 autoSave = 0;
             }
         }
+
+        val = props.getProperty(ALLOW_BUNDLE_SAVING);
+        if (val != null) {
+            allowBundleSaving = Boolean.valueOf(val).booleanValue();
+        }
     }
 
     /** implements the method required by the Settings interface. The
@@ -167,6 +203,7 @@ public class GeneralSettings implements Settings, Cloneable {
         props.setProperty(RIGHT_CLICK_MACROS_KEY, "" + rightClickMacros);
         props.setProperty(USE_JML_KEY, "" + useJML);
         props.setProperty(AUTO_SAVE, ""+ autoSave);
+        props.setProperty(ALLOW_BUNDLE_SAVING, "" + allowBundleSaving);
     }
 
     /** sends the message that the state of this setting has been

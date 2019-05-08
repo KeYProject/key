@@ -18,13 +18,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
 import org.antlr.runtime.MismatchedTokenException;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -38,6 +42,9 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -45,6 +52,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -173,6 +181,11 @@ public abstract class AbstractProblemLoader {
     private ReplayResult result;
 
     /**
+     * The FileRepo used to ensure consistency of proof and source code.
+     */
+    private FileRepo fileRepo;          // TODO: WP
+
+    /**
      * Maps internal error codes of the parser to human readable strings.
      * The integers refer to the common MismatchedTokenExceptions,
      * where one token is expected and another is found.
@@ -231,58 +244,68 @@ public abstract class AbstractProblemLoader {
      * @throws ProblemLoaderException Occurred Exception.
      */
     public void load() throws ProofInputException, IOException, ProblemLoaderException {
-            control.loadingStarted(this);
-            // Read environment
-            envInput = createEnvInput();
-            problemInitializer = createProblemInitializer();
-            initConfig = createInitConfig();
-            if (!problemInitializer.getWarnings().isEmpty()) {
-               control.reportWarnings(problemInitializer.getWarnings());
-            }
-            // Read proof obligation settings
-            LoadedPOContainer poContainer = createProofObligationContainer();
-            ProofAggregate proofList = null;
-            try {
-                if (poContainer == null) {
-                    if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
-                        if (control.selectProofObligation(initConfig)) {
-                            return;
-                        } else {
-                            // That message would be reported otherwise. Undesired.
-                            // return new ProblemLoaderException(this, "Aborted.");
-                            return;
-                        }
-                    }
-                    else {
-                        // Do not instantiate any proof but allow the user of the DefaultProblemLoader
-                        // to access the loaded InitConfig.
+        control.loadingStarted(this);
+
+        // create a FileRepo depending on the setting
+        boolean bundle = ProofIndependentSettings.DEFAULT_INSTANCE
+                                                 .getGeneralSettings()
+                                                 .isAllowBundleSaving();
+        if (bundle) {
+            fileRepo = new DiskFileRepo("KeYTmpFileRepo");
+        } else {
+            fileRepo = new TrivialFileRepo();
+        }
+
+        // Read environment
+        envInput = createEnvInput(fileRepo);
+        problemInitializer = createProblemInitializer(fileRepo);
+        initConfig = createInitConfig();
+        initConfig.setFileRepo(fileRepo);
+        if (!problemInitializer.getWarnings().isEmpty()) {
+            control.reportWarnings(problemInitializer.getWarnings());
+        }
+        // Read proof obligation settings
+        LoadedPOContainer poContainer = createProofObligationContainer();
+        ProofAggregate proofList = null;
+        try {
+            if (poContainer == null) {
+                if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
+                    if (control.selectProofObligation(initConfig)) {
+                        return;
+                    } else {
+                        // That message would be reported otherwise. Undesired.
+                        // return new ProblemLoaderException(this, "Aborted.");
                         return;
                     }
+                } else {
+                    // Do not instantiate any proof but allow the user of the DefaultProblemLoader
+                    // to access the loaded InitConfig.
+                    return;
                 }
-                
-                // Create and register proof at specification repository                    
-                proofList = createProof(poContainer); 
-                
-                // try to replay first proof
-                proof = proofList.getProof(poContainer.getProofNum());
-                
-                
-                if (proof != null) {
-                 OneStepSimplifier.refreshOSS(proof);
-                    result = replayProof(proof);
-                }
-                                      
-                // this message is propagated to the top level in console mode
-                return; // Everything fine
-            } catch (Throwable t) {
-                // Throw this exception; otherwise, it can for instance occur
-                // that "result" will be null (if replayProof(...) fails) and
-                // we get a NullPointerException that is hard to analyze.
-                throw t;
             }
-            finally {
-               control.loadingFinished(this, poContainer, proofList, result);
+
+            // Create and register proof at specification repository
+            proofList = createProof(poContainer);
+
+            // try to replay first proof
+            proof = proofList.getProof(poContainer.getProofNum());
+
+
+            if (proof != null) {
+                OneStepSimplifier.refreshOSS(proof);
+                result = replayProof(proof);
             }
+
+            // this message is propagated to the top level in console mode
+            return; // Everything fine
+        } catch (Throwable t) {
+            // Throw this exception; otherwise, it can for instance occur
+            // that "result" will be null (if replayProof(...) fails) and
+            // we get a NullPointerException that is hard to analyze.
+            throw t;
+        } finally {
+            control.loadingFinished(this, poContainer, proofList, result);
+        }
     }
 
     /**
@@ -336,43 +359,68 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Instantiates the {@link EnvInput} which represents the file to load.
+     * @param fileRepo the FileRepo used to ensure consistency between proof and source code
      * @return The created {@link EnvInput}.
      * @throws IOException Occurred Exception.
      */
-    protected EnvInput createEnvInput() throws IOException {
+    protected EnvInput createEnvInput(FileRepo fileRepo) throws IOException {
 
         final String filename = file.getName();
+
+        // set the root directory of the FileRepo (used for resolving paths)
+        fileRepo.setBaseDir(file.toPath());
 
         if (filename.endsWith(".java")) {
             // java file, probably enriched by specifications
             if (file.getParentFile() == null) {
                 return new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs, includes);
-            }
-            else {
+            } else {
                 return new SLEnvInput(file.getParentFile().getAbsolutePath(),
                                 classPath, bootClassPath, profileOfNewProofs, includes);
             }
-        }
-        else if (filename.endsWith(".key") || filename.endsWith(".proof")
+        } else if (filename.endsWith(".zproof")) {            // zipped proof package
+            // unzip to a temporary directory
+            Path tmpDir = Files.createTempDirectory("KeYunzip");
+            IOUtil.extractZip(file.toPath(), tmpDir);
+
+            // point the FileRepo to the temporary directory
+            fileRepo.setBaseDir(tmpDir);
+
+            // create new KeYUserProblemFile pointing to the (unzipped) proof file
+            PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.proof");
+
+            /* TODO: Currently it is not possible to load proof bundles with multiple proofs.
+             *  This feature is still pending, since the functionality to save multiple proofs in
+             *  one (consistent!) package is not yet implemented (see ProofManagement tool from
+             *  1st HacKeYthon).
+             *  So the current implementation just picks one of the proofs and loads it.
+             */
+            // pick one of the proofs
+            Path unzippedProof = Files.list(tmpDir)
+                    .filter(matcher::matches)
+                    .findFirst()
+                    .get(); // TODO: message if the path is null, i.e. no proof is in package
+
+            return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof.toFile(),
+                    fileRepo, control, profileOfNewProofs, false);
+        } else if (filename.endsWith(".key") || filename.endsWith(".proof")
               || filename.endsWith(".proof.gz")) {
             // KeY problem specification or saved proof
-            return new KeYUserProblemFile(filename, file, control,
+            return new KeYUserProblemFile(filename, file, fileRepo, control,
                         profileOfNewProofs, filename.endsWith(".proof.gz"));
-        }
-        else if (file.isDirectory()) {
+        } else if (file.isDirectory()) {
             // directory containing java sources, probably enriched
             // by specifications
-            return new SLEnvInput(file.getPath(), classPath, bootClassPath, profileOfNewProofs, includes);
-        }
-        else {
+            return new SLEnvInput(file.getPath(), classPath, bootClassPath, profileOfNewProofs,
+                    includes);
+        } else {
             if (filename.lastIndexOf('.') != -1) {
                 throw new IllegalArgumentException("Unsupported file extension \'"
                                 + filename.substring(filename.lastIndexOf('.'))
                                 + "\' of read-in file " + filename
                                 + ". Allowed extensions are: .key, .proof, .java or "
                                 + "complete directories.");
-            }
-            else {
+            } else {
                 throw new FileNotFoundException("File or directory\n\t " + filename
                                 + "\n not found.");
             }
@@ -381,12 +429,15 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Instantiates the {@link ProblemInitializer} to use.
+     * @param fileRepo the FileRepo used to ensure consistency between proof and source code
      * @param registerProof Register loaded {@link Proof}
      * @return The {@link ProblemInitializer} to use.
      */
-    protected ProblemInitializer createProblemInitializer() {
+    protected ProblemInitializer createProblemInitializer(FileRepo fileRepo) {
         Profile profile = forceNewProfileOfNewProofs ? profileOfNewProofs : envInput.getProfile();
-        return new ProblemInitializer(control, new Services(profile), control);
+        ProblemInitializer pi = new ProblemInitializer(control, new Services(profile), control);
+        pi.setFileRepo(fileRepo);
+        return pi;
     }
 
     /**
@@ -486,8 +537,10 @@ public abstract class AbstractProblemLoader {
         		problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
 
         for (Proof p : proofList.getProofs()) {
-        	// register proof 
-        	initConfig.getServices().getSpecificationRepository().registerProof(poContainer.getProofOblInput(), p);
+            // register proof
+            initConfig.getServices().getSpecificationRepository()
+                                    .registerProof(poContainer.getProofOblInput(), p);
+            initConfig.getFileRepo().registerProof(p);
         }
 
         return proofList;

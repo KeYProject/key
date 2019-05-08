@@ -6,6 +6,7 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.pp.PosInSequent;
 import org.key_project.util.ServiceLoaderUtil;
 
 import javax.swing.*;
@@ -258,7 +259,6 @@ public final class KeYGuiExtensionFacade {
     }
 
     /**
-     *
      * @param mediator
      * @param component
      * @param componentId
@@ -280,6 +280,13 @@ public final class KeYGuiExtensionFacade {
         });
     }
     //endregion
+
+
+    public static Stream<String> getTermInfoStrings(
+            MainWindow mainWindow, PosInSequent mousePos) {
+        return getExtensionInstances(KeYGuiExtension.TermInfo.class).stream().flatMap(
+                it -> it.getTermInfoStrings(mainWindow, mousePos).stream());
+    }
 
     /**
      * Disables the clazz from further loading.

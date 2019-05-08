@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -50,6 +51,8 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -451,7 +454,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         assert proofConfig == null;
         final Services proofServices = postInit();
         final IProgramMethod pm = getProgramMethod();
-        final List<Term> termPOs = new ArrayList<Term>();
+        List<Term> termPOs = new ArrayList<Term>();
 
         // prepare variables, program method
         boolean makeNamesUnique = isMakeNamesUnique();
@@ -510,6 +513,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 }
             } // for(boolean transactionFlag : transactionFlags)
         }
+        // initalize OriginTermLabels
+        termPOs = termPOs.stream().map(
+            t -> OriginTermLabel.collectSubtermOrigins(t, proofServices))
+            .collect(Collectors.toList());
+
         // save in field
         assignPOTerms(termPOs.toArray(new Term[termPOs.size()]));
 
@@ -693,9 +701,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
             }
         }
 
-        return tb.and(wellFormed != null ? wellFormed : tb.tt(),
+        Term result = tb.and(wellFormed != null ? wellFormed : tb.tt(),
                       selfNotNull, selfCreated, selfExactType,
                       paramsOK, mbyAtPreDef);
+
+        return tb.addLabelToAllSubs(result, new OriginTermLabel(SpecType.REQUIRES, null, -1));
     }
 
     /**

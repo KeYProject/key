@@ -41,17 +41,17 @@ public final class IconFactory {
     public static final IconFontProvider PRUNE = new IconFontProvider(FontAwesomeSolid.HAND_SCISSORS);
     public static final IconFontProvider GOAL_BACK = new IconFontProvider(FontAwesomeSolid.BACKSPACE);
     public static final IconFontProvider EXPAND_GOALS = new IconFontProvider(FontAwesomeSolid.EXPAND_ARROWS_ALT);
+    public static final IconFontProvider CONFIGURE = new IconFontProvider(FontAwesomeSolid.COGS);
+    public static final IconFontProvider HELP = new IconFontProvider(FontAwesomeSolid.QUESTION_CIRCLE);
+    public static final IconFontProvider PROOF_MANAGEMENT = new IconFontProvider(FontAwesomeSolid.TASKS);
+    public static final IconFontProvider PROPERTIES = new IconFontProvider(FontAwesomeSolid.COGS);
+    public static final IconProvider SEARCH_PREV = new IconFontProvider(FontAwesomeSolid.ARROW_RIGHT);
     public static Color CLOSED_GREEN = DuneColorScheme.green;
     public static final IconFontProvider AUTO_MODE_START = new IconFontProvider(FontAwesomeSolid.PLAY_CIRCLE, CLOSED_GREEN);
     public static Color BLUE = DuneColorScheme.blue;
     public static Color ERROR_COLOR = DuneColorScheme.red;
     public static final IconFontProvider AUTO_MODE_STOP = new IconFontProvider(FontAwesomeSolid.STOP_CIRCLE, ERROR_COLOR);
     public static Color WARNING_COLOR = DuneColorScheme.orange;
-
-    public static final IconFontProvider CONFIGURE = new IconFontProvider(FontAwesomeSolid.COGS);
-    public static final IconFontProvider HELP = new IconFontProvider(FontAwesomeSolid.QUESTION_CIRCLE);
-    public static final IconFontProvider PROOF_MANAGEMENT = new IconFontProvider(FontAwesomeSolid.TASKS);
-    public static final IconFontProvider PROPERTIES = new IconFontProvider(FontAwesomeSolid.COGS);
     public static IconProvider PROOF_SEARCH_STRATEGY = new IconFontProvider(FontAwesomeSolid.COGS);
     public static IconProvider PROOF_TREE = new IconFontProvider(FontAwesomeSolid.TREE);
     public static IconProvider INFO_VIEW = new IconFontProvider(FontAwesomeSolid.INFO_CIRCLE);
@@ -59,6 +59,7 @@ public final class IconFactory {
     public static IconProvider TREE_NODE_RETRACTED = new IconFontProvider(FontAwesomeSolid.CARET_RIGHT);
     public static IconProvider WARNING_UNSOUND = new IconFontProvider(FontAwesomeSolid.EXCLAMATION_TRIANGLE, ERROR_COLOR);
     public static IconProvider WARNING_INCOMPLETE = new IconFontProvider(FontAwesomeSolid.EXCLAMATION_TRIANGLE, WARNING_COLOR);
+    public static IconProvider SEARCH_REGROUP = new IconFontProvider(FontAwesomeSolid.EMBER);
 
     public static IconProvider EXPORT_MU_SCRIPT = new IconFontProvider(FontAwesomeSolid.FILE_EXPORT);
     public static IconProvider EXPORT_MU_SCRIPT_CLIPBOARD = new IconFontProvider(FontAwesomeRegular.COPY);
@@ -83,6 +84,9 @@ public final class IconFactory {
     public static IconFontProvider LINKED_FOLDER_ICON = new IconFontProvider(FontAwesomeSolid.FOLDER, new Color(255, 0, 240));
     public static IconFontProvider CLOSABLE_FOLDER_ICON = new IconFontProvider(FontAwesomeSolid.FOLDER, Color.blue.darker());
     public static IconFontProvider GOAL_CLOSED = new IconFontProvider(FontAwesomeSolid.CHECK, CLOSED_GREEN);
+    public static IconFontProvider SEARCH_HIGHLIGHT = new IconFontProvider(FontAwesomeSolid.HIGHLIGHTER);
+    public static IconFontProvider ABONDON = new IconFontProvider(FontAwesomeSolid.TRASH_ALT);
+    public static IconFontProvider SEARCH_HIDE = new IconFontProvider(FontAwesomeSolid.LOW_VISION);
 
     public static Image keyHole = getImage("images/ekey-mono.gif");
     public static Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
@@ -102,6 +106,8 @@ public final class IconFactory {
     public static Image testgenerationImage = getImage("images/toolbar/tg.png");
     public static Image heatmapImage = getImage("images/toolbar/heatmap.png");
     public static HashMap<String, Icon> cache = new HashMap<>();
+    public static IconFontProvider SEARCH_NEXT = new IconFontProvider(FontAwesomeSolid.ARROW_LEFT);
+    public static IconFontProvider ORIGIN_LABELS = new IconFontProvider(FontAwesomeSolid.ROUTE);
 
     private IconFactory() {
     }
@@ -143,8 +149,6 @@ public final class IconFactory {
         Image scaledim = im.getScaledInstance(x, y, Image.SCALE_SMOOTH);
         return new ImageIcon(scaledim);
     }
-
-    private static IconFontProvider ABONDON = new IconFontProvider(FontAwesomeSolid.TRASH_ALT);
 
     public static Icon abandon(int x) {
         return ABONDON.load(x);

@@ -9,6 +9,7 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
+import de.uka.ilkd.key.pp.PosInSequent;
 
 import javax.swing.*;
 import java.lang.annotation.Retention;
@@ -200,4 +201,23 @@ public interface KeYGuiExtension {
         Collection<Action> getShortcuts(KeYMediator mediator, String componentId, JComponent component);
     }
 
+    /**
+     * Extension interface for the term info string in the status line.
+     *
+     * @author lanzinger
+     * @see de.uka.ilkd.key.gui.nodeviews.SequentViewInputListener
+     * @see MainWindow#setStatusLine(String)
+     */
+    interface TermInfo {
+        /**
+         * @param mainWindow the main window.
+         * @param pos        the position of the term whose info shall be shown.
+         * @return this extension's term information.
+         */
+        List<String> getTermInfoStrings(MainWindow mainWindow, PosInSequent pos);
+
+        default int getTermLabelPriority() {
+            return 0;
+        }
+    }
 }

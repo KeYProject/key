@@ -317,7 +317,6 @@ public class TacletGenerator {
         }
 
         Term addForumlaTerm = originalPreTerm;
-        final Sequent addedSeq;
         // The presence of the precondition term means we are dealing with a model method definition
         // taclet, an \add section to check preconditions has to be added
         // FIXME does this also affect the satisfiability branches?
@@ -350,14 +349,13 @@ public class TacletGenerator {
             if (selfNull != null) {
                 addForumlaTerm = TB.and(addForumlaTerm, TB.not(selfNull));
             }
-            final TermAndBoundVarPair schemaAdd = createSchemaTerm(addForumlaTerm, pvs, svs, services);
+            // final TermAndBoundVarPair schemaAdd =
+            //        createSchemaTerm(addForumlaTerm, pvs, svs, services);
 
-            final Term addedFormula = schemaAdd.term;
-            final SequentFormula addedCf = new SequentFormula(addedFormula);
-            final Semisequent addedSemiSeq = Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
-            addedSeq = Sequent.createSuccSequent(addedSemiSeq);
-        } else {
-            addedSeq = null;
+            // final Term addedFormula = schemaAdd.term;
+            // final SequentFormula addedCf = new SequentFormula(addedFormula);
+            // final Semisequent addedSemiSeq =
+            //        Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
         }
 
         //create taclet
@@ -636,9 +634,10 @@ public class TacletGenerator {
         final ProgramSV selfProgSV = target.isStatic() ? null
             : SchemaVariableFactory.createProgramSV(new ProgramElementName("#self_sv"), ProgramSVSort.VARIABLE, false);
 
-        final ProgramSV heapProgSV = target.getStateCount() == 2 ?
-                 SchemaVariableFactory.createProgramSV(new ProgramElementName("#heap_sv"), ProgramSVSort.VARIABLE, false)
-            : null;
+        // final ProgramSV heapProgSV = target.getStateCount() == 2 ?
+        //         SchemaVariableFactory.createProgramSV(new ProgramElementName("#heap_sv"),
+        //                                               ProgramSVSort.VARIABLE, false)
+        //         : null;
 
         final ProgramSV[] paramProgSVs = new ProgramSV[target.getNumParams()];
         for(int i = 0; i < paramProgSVs.length; i++) {

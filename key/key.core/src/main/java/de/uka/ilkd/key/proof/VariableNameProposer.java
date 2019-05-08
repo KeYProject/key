@@ -48,7 +48,7 @@ public class VariableNameProposer implements InstantiationProposer {
     private static final String LABEL_NAME_PREFIX                = "_label";
 
     private static final String GENERALNAMECOUNTER_PREFIX   = "GenCnt";
-    private static final String SKOLEMTERMVARCOUNTER_PREFIX = "DepVarCnt";
+    //private static final String SKOLEMTERMVARCOUNTER_PREFIX = "DepVarCnt";
     private static final String LABELCOUNTER_NAME 	        = "LabelCnt";
 
 

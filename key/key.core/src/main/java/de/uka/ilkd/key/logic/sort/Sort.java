@@ -23,65 +23,81 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 
 public interface Sort extends Named {
-    
+
     /**
      * Formulas are represented as "terms" of this sort.
      */
-    final Sort FORMULA = new SortImpl(new Name("Formula"));
-    
+    public final Sort FORMULA = new SortImpl(new Name("Formula"));
+
     /**
      * Updates are represented as "terms" of this sort.
      */
-    final Sort UPDATE = new SortImpl(new Name("Update"));
+    public final Sort UPDATE = new SortImpl(new Name("Update"));
 
     /**
      * Term labels are represented as "terms" of this sort.
      */
-    final Sort TERMLABEL = new SortImpl(new Name("TermLabel"));
+    public final Sort TERMLABEL = new SortImpl(new Name("TermLabel"));
 
     /**
      * Any is a supersort of all sorts.
      */
-    final Sort ANY = new SortImpl(new Name("any"));    
-    
-    public final Name CAST_NAME = new Name("cast");
-    final Name INSTANCE_NAME = new Name("instance");
-    final Name EXACT_INSTANCE_NAME = new Name("exactInstance");    
-    
-    
-    /**
-     * Returns the direct supersorts of this sort. Not supported by NullSort.
-     */
-    ImmutableSet<Sort> extendsSorts();
-    
-    /**
-     * Returns the direct supersorts of this sort.
-     */
-    ImmutableSet<Sort> extendsSorts(Services services); 
+    public final Sort ANY = new SortImpl(new Name("any"));
 
     /**
-     * Tells whether the given sort is a reflexive, transitive subsort of this 
+     * Name of {@link #getCastSymbol(TermServices)}.
+     */
+    public final Name CAST_NAME = new Name("cast");
+
+    /**
+     * Name of {@link #getInstanceofSymbol(TermServices)}.
+     */
+    final Name INSTANCE_NAME = new Name("instance");
+
+    /**
+     * Name of {@link #getExactInstanceofSymbol(TermServices)}.
+     */
+    final Name EXACT_INSTANCE_NAME = new Name("exactInstance");
+
+
+    /**
+     * @return the direct supersorts of this sort. Not supported by {@code NullSort}.
+     */
+    ImmutableSet<Sort> extendsSorts();
+
+    /**
+     * @param services services.
+     * @return the direct supersorts of this sort.
+     */
+    ImmutableSet<Sort> extendsSorts(Services services);
+
+    /**
+     * @param s some sort.
+     * @return whether the given sort is a reflexive, transitive subsort of this
      * sort.
      */
     boolean extendsTrans(Sort s);
-    
+
     /**
-     * Tells whether this sort has no exact elements.
+     * @return whether this sort has no exact elements.
      */
     boolean isAbstract();
-    
+
     /**
-     * returns the cast symbol of this Sort
+     * @param services services.
+     * @return the cast symbol of this sort.
      */
     SortDependingFunction getCastSymbol(TermServices services);
-    
+
     /**
-     * returns the instanceof symbol of this Sort
+     * @param services services.
+     * @return the {@code instanceof} symbol of this sort.
      */
     SortDependingFunction getInstanceofSymbol(TermServices services);
-    
+
     /**
-     * returns the exactinstanceof symbol of this Sort
+     * @param services services.
+     * @return the {@code exactinstanceof} symbol of this sort.
      */
     SortDependingFunction getExactInstanceofSymbol(TermServices services);
 

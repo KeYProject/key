@@ -418,7 +418,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         final ImmutableList<InfFlowSpec> newInfFlowSpecs = replaceVariablesInTermListTriples(
                 oldContract.getInfFlowSpecs());
 
-        OpReplacer replacer = new OpReplacer(replaceMap, services.getTermFactory());
+        OpReplacer replacer = new OpReplacer(
+                replaceMap, services.getTermFactory(), services.getProof());
 
         return changed ? oldContract.update(newBlock, newPreconditions,
                 newPostconditions, newModifiesClauses, newInfFlowSpecs,
@@ -467,7 +468,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         final ImmutableList<InfFlowSpec> newInfFlowSpecs = replaceVariablesInTermListTriples(
                 oldContract.getInfFlowSpecs());
 
-        OpReplacer replacer = new OpReplacer(replaceMap, services.getTermFactory());
+        OpReplacer replacer = new OpReplacer(
+                replaceMap, services.getTermFactory(), services.getProof());
 
         if (!changed) {
             return oldContract;

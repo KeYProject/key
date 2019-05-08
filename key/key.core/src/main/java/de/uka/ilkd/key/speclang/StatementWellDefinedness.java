@@ -15,6 +15,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -172,6 +173,9 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         return generateSequent(self, null, null, heap, null, anonHeap, ps, leadingUpdate,
                                localAnonUpdate, services);
     }
+
+    @Override
+    public abstract StatementWellDefinedness map(UnaryOperator<Term> op, Services services);
 
     @Override
     public final String getBehaviour() {
