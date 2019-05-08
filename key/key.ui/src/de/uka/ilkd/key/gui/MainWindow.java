@@ -45,6 +45,7 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
+import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -757,6 +758,17 @@ public final class MainWindow extends JFrame {
         proof.addSeparator();
         proof.add(new SearchInProofTreeAction(this));
         proof.add(new SearchInSequentAction(this));
+        proof.add(new SearchNextAction(this));
+        proof.add(new SearchPreviousAction(this));
+        {
+            JMenu searchModeMenu = new JMenu("Change Search Mode to...");
+
+            for (SequentViewSearchBar.SearchMode mode : SequentViewSearchBar.SearchMode.values()) {
+                searchModeMenu.add(new SearchModeChangeAction(this, mode));
+            }
+
+            proof.add(searchModeMenu);
+        }
         proof.addSeparator();
         proof.add(new ShowUsedContractsAction(this));
         proof.add(new ShowActiveTactletOptionsAction(this));

@@ -20,6 +20,8 @@ import de.uka.ilkd.key.settings.SettingsListener;
  */
 public final class SaveBundleAction extends MainWindowAction {
 
+    private static final long serialVersionUID = 5275664295885839738L;
+
     /**
      * Creates a new SaveBundleAction with the required listeners.
      * @param mainWindow the main window of the program

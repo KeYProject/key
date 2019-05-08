@@ -36,8 +36,13 @@ class SequentViewChangeListener implements ComponentListener, PropertyChangeList
         if (lw != SequentView.getLineWidth()) {
             SequentView.setLineWidth(lw);
             sequentView.printSequent();
+            
             // Update the search results, they are lost otherwise! (MU)
-            MainWindow.getInstance().sequentViewSearchBar.setSequentView(sequentView);
+            // But only update them if we have the correct SequentView
+            // (i.e., the main window's sequent view) (lanzinger)
+            if (sequentView.isMainSequentView()) {
+                MainWindow.getInstance().sequentViewSearchBar.setSequentView(sequentView);
+            }
         }
     }
 

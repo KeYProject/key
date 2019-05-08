@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.speclang;
 
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -31,10 +32,13 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 
 /**
- * A loop invariant, consisting of an invariant formula, a set of loop 
+ * A loop invariant, consisting of an invariant formula, a set of loop
  * predicates, a modifies clause, and a variant term.
  */
 public interface LoopSpecification extends SpecificationElement {
+
+    @Override
+    public LoopSpecification map(UnaryOperator<Term> op, Services services);
 
     /**
      * Returns the loop to which the invariant belongs.
@@ -274,13 +278,13 @@ public interface LoopSpecification extends SpecificationElement {
                                           Map<LocationVariable, Term> atPres,
                                           Services services);
 
-    /** 
+    /**
      * Loop invariants can be visited like source elements:
      * This method calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element.
      */
     public void visit(Visitor v);
-    
+
     /**
      * Returns the invariant in pretty plain text format.
      * @param services the Services object.
@@ -297,6 +301,7 @@ public interface LoopSpecification extends SpecificationElement {
 
     public String getUniqueName();
 
+    @Override
     public KeYJavaType getKJT();
 
     public LoopSpecification setTarget(KeYJavaType newKJT, IObserverFunction newPM);

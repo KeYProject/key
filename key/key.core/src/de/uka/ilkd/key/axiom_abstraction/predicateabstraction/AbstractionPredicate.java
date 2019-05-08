@@ -58,7 +58,7 @@ public abstract class AbstractionPredicate
      * The predicate term. Contains a placeholder ({@link #placeholderVariable})
      * which is to be replaced by the concrete argument of the predicate.
      * <p>
-     * 
+     *
      * This field is needed to save proofs with abstraction predicates.
      */
     private Term predicateFormWithPlaceholder = null;
@@ -68,7 +68,7 @@ public abstract class AbstractionPredicate
      * {@link #predicateFormWithPlaceholder} which is to be replaced by the
      * concrete argument of the predicate.
      * <p>
-     * 
+     *
      * This field is needed to save proofs with abstraction predicates.s
      */
     private LocationVariable placeholderVariable = null;
@@ -77,7 +77,7 @@ public abstract class AbstractionPredicate
      * Creates a new {@link AbstractionPredicate}. Constructor is hidden since
      * elements fo this class should be created by the factory method
      * {@link #create(String, Function)}.
-     * 
+     *
      * @param argSort
      *            The expected sort for the arguments of the predicate.
      */
@@ -98,10 +98,10 @@ public abstract class AbstractionPredicate
      * Creates a new {@link AbstractionPredicate} with the given name and
      * mapping. You may use nice Java 8 lambdas for the second argument!
      * <p>
-     * 
+     *
      * This method has been created for testing purposes; you should rather user
      * {@link #create(Term, LocationVariable, Services)} instead.
-     * 
+     *
      * @param argSort
      *            The expected sort for the arguments of the predicate.
      * @param mapping
@@ -125,7 +125,7 @@ public abstract class AbstractionPredicate
      * Creates a new {@link AbstractionPredicate} for the given predicate. The
      * predicate should contain the given placeholder variable, which is
      * substituted by the argument supplied to the generated mapping.
-     * 
+     *
      * @param predicate
      *            The predicate formula containing the placeholder.
      * @param placeholder
@@ -158,7 +158,7 @@ public abstract class AbstractionPredicate
                         }
 
                         return OpReplacer.replace(tb.var(placeholder), param,
-                                predicate, tf);
+                                predicate, tf, services.getProof());
                     };
                 }
 
@@ -186,7 +186,7 @@ public abstract class AbstractionPredicate
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.util.function.Function#apply(java.lang.Object)
      */
     @Override
@@ -194,7 +194,7 @@ public abstract class AbstractionPredicate
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
@@ -205,7 +205,7 @@ public abstract class AbstractionPredicate
     /**
      * Returns a parseable String representation of this abstraction predicate
      * of the form "('[[TYPE]] [[PLACEHOLDER]]', '[[PREDICATE]]')".
-     * 
+     *
      * @param services
      *            The services object.
      * @return A parseable String representation of this predicate.
@@ -231,7 +231,7 @@ public abstract class AbstractionPredicate
 
     /**
      * Parses the String representation of an abstraction predicates.
-     * 
+     *
      * @param s
      *            {@link String} to parse.
      * @param services

@@ -15,6 +15,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -62,58 +63,75 @@ import de.uka.ilkd.key.util.Pair;
  * method body.
  */
 public final class QueryAxiom extends ClassAxiom {
-    
+
+    /**
+     * The unique internal name of the query axiom.
+     */
     private final String name;
-    private final IProgramMethod target;    
-    private final KeYJavaType kjt;        
-    
+    /**
+     * The axiomatised query function symbol.
+     */
+    private final IProgramMethod target;
+    /**
+     * The KeYJavaType representing the function to which the
+     * query belongs.
+     */
+    private final KeYJavaType kjt;
+
     public QueryAxiom(String name, IProgramMethod target, KeYJavaType kjt) {
-	assert name != null;
-	assert target != null;
-	assert target.getReturnType() != null;	
-	assert kjt != null;
-	this.name = name;
-	this.target = target;
-	this.kjt = kjt;
+        assert name != null;
+        assert target != null;
+        assert target.getReturnType() != null;
+        assert kjt != null;
+        this.name = name;
+        this.target = target;
+        this.kjt = kjt;
     }
 
-    
     @Override
-    public boolean equals(Object o) {       
-       if (o == null || o.getClass() != getClass()) {
-          return false;
-       }
-       final QueryAxiom other = (QueryAxiom) o;
-       return name.equals(other.name) && target.equals(other.target) && kjt.equals(other.kjt);  
+    public QueryAxiom map(UnaryOperator<Term> op, Services services) {
+        return this;
     }
-    
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || o.getClass() != getClass()) {
+            return false;
+        }
+        final QueryAxiom other = (QueryAxiom) o;
+        return name.equals(other.name)
+                && target.equals(other.target)
+                && kjt.equals(other.kjt);
+    }
+
     @Override
     public int hashCode() {
        return name.hashCode() * 7 + target.hashCode() * 49 + kjt.hashCode() * 17;
     }
-    
+
 
     @Override
     public String getName() {
-	return name;
+        return name;
     }
-    
-    
+
+
     @Override
     public IObserverFunction getTarget() {
-	return target;
-    }    
-    
+        return target;
+    }
+
 
     @Override
     public KeYJavaType getKJT() {
-	return kjt;
+        return kjt;
     }
-    
-    
+
+
     @Override
     public VisibilityModifier getVisibility() {
-	return new Private();
+        return new Private();
     }
 
 
@@ -298,13 +316,12 @@ public final class QueryAxiom extends ClassAxiom {
     @Override
     public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
 	    						Services services) {
-	return DefaultImmutableSet.nil();
+        return DefaultImmutableSet.nil();
     }
-    
-    
+
+
     @Override
     public String toString() {
-	return "query axiom for " + target;
+        return "query axiom for " + target;
     }
-    
 }

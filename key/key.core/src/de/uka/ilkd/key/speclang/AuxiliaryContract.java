@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -493,6 +494,9 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @see #getVariables()
      */
     public OriginalVariables getOrigVars();
+
+    @Override
+    public AuxiliaryContract map(UnaryOperator<Term> op, Services services);
 
     /**
      * This class contains all new variables that are introduced during a

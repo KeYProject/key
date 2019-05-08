@@ -17,7 +17,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
+
+import org.key_project.util.java.MapUtil;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
@@ -63,6 +66,15 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     }
 
     @Override
+    public PredicateAbstractionMergeContract map(UnaryOperator<Term> op, Services services) {
+        return new PredicateAbstractionMergeContract(
+                mps,
+                atPres.entrySet().stream().collect(
+                        MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue()))),
+                kjt, latticeTypeName, abstractionPredicates);
+    }
+
+    @Override
     public Class<? extends MergeProcedure> getMergeProcedure() {
         return MergeWithPredicateAbstraction.class;
     }
@@ -93,7 +105,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
 
     /**
      * TODO
-     * 
+     *
      * @param atPres
      * @param services
      * @return
@@ -102,7 +114,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
             Map<LocationVariable, Term> atPres, Services services) {
         final Map<Term, Term> replaceMap = getReplaceMap(atPres, services);
         final OpReplacer or = new OpReplacer(replaceMap,
-                services.getTermFactory());
+                services.getTermFactory(), services.getProof());
 
         return abstractionPredicates.stream().map(pred -> {
             final Term newPred = or
@@ -133,7 +145,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
 
     /**
      * TODO
-     * 
+     *
      * @param atPres
      * @param services
      * @return

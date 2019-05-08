@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Extension adapter for Heatmap
+ * Extension adapter for heat maps
  *
  * @author Alexander Weigl
  */
@@ -39,7 +39,7 @@ public class HeatmapExt implements KeYMainMenuExtension, KeYToolbarExtension {
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         getActions(mainWindow);//initialize
-        JToolBar tb = new JToolBar("Heatmap");
+        JToolBar tb = new JToolBar("Heatmaps");
         JToggleButton comp = new JToggleButton(toggleAction);
         comp.setHideActionText(true);
         tb.add(comp);
