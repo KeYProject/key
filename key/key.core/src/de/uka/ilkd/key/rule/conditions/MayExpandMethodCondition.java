@@ -24,16 +24,13 @@ import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.util.collection.ImmutableArray;
 
 import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -48,40 +45,72 @@ import java.util.Set;
  * <li>the receiver class is final, or
  * <li>the corresponding taclet option is set to relaxed inlining.
  * </ul>
+ *
+ * @author Mattias Ulbrich, 2019
  */
 public final class MayExpandMethodCondition extends VariableConditionAdapter {
 
-    private final static String TACLET_OPTION_KEY = "methodExpansion";
-    private final static String RELAXED_VALUE = "methodExpansion:noRestriction";
+    /**
+     * The name of this this variable condition
+     */
     public final static String NAME = "\\mayExpandMethod";
 
+    /**
+     * Name of the taclet option.
+     * Index to the choice settings
+     */
+    private final static String TACLET_OPTION_KEY = "methodExpansion";
+
+    /**
+     * Value of the unrestricted case.
+     * Expansion allowed unconditionally.
+     */
+    private final static String RELAXED_VALUE = "methodExpansion:noRestriction";
+
+    /**
+     * To indicate if this condition instance has been prefixed with "\not"
+     */
     private final boolean negation;
-    private final SchemaVariable caller;
+
+    /**
+     * Schema variable used as first argument: The receiver of the call
+     * may be null (if class local)
+     */
+    private final SchemaVariable receiver;
+
+    /**
+     * Schema variable used as 2nd argument: The method name
+     */
     private final SchemaVariable methname;
+
+    /**
+     * Schema variable used as 3rd argument: The arguments of the call
+     */
     private final SchemaVariable args;
 
     /**
      * Instantiate a new variable condition.
      *
      * @param negation {@code true} iff the condition is to be negated
-     * @param caller program schema var for the receiver, may be null for class-local calls
+     * @param receiver program schema var for the receiver, may be null for class-local calls
      * @param methname non-null program schema var for the methodname
      * @param args non-null program schema var for the arguments of the call
      */
     public MayExpandMethodCondition(boolean negation,
-                                    SchemaVariable caller,
+                                    SchemaVariable receiver,
                                     SchemaVariable methname,
                                     SchemaVariable args) {
         this.negation = negation;
-        this.caller = caller;
+        this.receiver = receiver;
         this.methname = methname;
         this.args = args;
     }
 
-    private static ImmutableArray<Expression> toExpArray(ImmutableArray<? extends ProgramElement> a) {
+    private static ImmutableArray<Expression>
+                         toExpArray(ImmutableArray<? extends ProgramElement> a) {
         Expression[] result = new Expression[a.size()];
-        for (int i=0; i<a.size(); i++) {
-            result[i]=(Expression)a.get(i);
+        for (int i = 0; i < a.size(); i++) {
+            result[i] = (Expression)a.get(i);
         }
         return new ImmutableArray<Expression>(result);
     }
@@ -103,10 +132,10 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
 
         ExecutionContext ec = svInst.getContextInstantiation().activeStatementContext();
         ReferencePrefix rp;
-        if (caller == null) {
+        if (receiver == null) {
             rp = ec.getRuntimeInstance();
         } else {
-            rp = (ReferencePrefix) svInst.getInstantiation(caller);
+            rp = (ReferencePrefix) svInst.getInstantiation(receiver);
         }
 
         MethodName mn = (MethodName) svInst.getInstantiation(methname);
@@ -122,12 +151,14 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         MethodReference mr = new MethodReference(ar, mn, rp);
         IProgramMethod method;
         KeYJavaType prefixType = services.getTypeConverter().getKeYJavaType((Expression) rp, ec);
-        if (ec!=null) {
+        if (ec != null) {
             method = mr.method(services, prefixType, ec);
             // we are only interested in the signature. The method
             // must be declared in the static context.
-        } else { //no execution context
-            method = mr.method (services, prefixType, mr.getMethodSignature(services, ec), prefixType);
+        } else {
+            // no execution context
+            method = mr.method(services, prefixType,
+                               mr.getMethodSignature(services, ec), prefixType);
         }
 
         if (method == null) {
@@ -144,7 +175,9 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         }
 
         Type type = method.getContainerType().getJavaType();
-        assert type instanceof ClassType : "Calling a method on sth that does not have a class type";
+        assert type instanceof ClassType :
+                "Calling a method on sth that does not have a class type";
+
         ClassType classType = (ClassType) type;
         if (classType.isFinal()) {
             return true;
@@ -156,7 +189,7 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
 
     @Override
     public String toString () {
-        return (negation ? "\\not " : "") + NAME + "(" + caller
+        return (negation ? "\\not " : "") + NAME + "(" + receiver
                 + ", " + methname + ", " + args + ")";
     }
 }
