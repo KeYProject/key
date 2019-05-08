@@ -168,6 +168,7 @@ class SelectPrinter extends FieldPrinter {
         lp.markStartSub(2);
         lp.startTerm(0);
         lp.layouter.print(getPrettySyntaxForFieldConstant(objectTerm, fieldTerm));
+        lp.printLabels(fieldTerm);
         lp.markEndSub();
         printHeap(heapTerm, tacitHeap);
     }

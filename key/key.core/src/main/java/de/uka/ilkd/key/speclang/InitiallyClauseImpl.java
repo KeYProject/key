@@ -15,7 +15,9 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.OpCollector;
@@ -28,46 +30,68 @@ import de.uka.ilkd.key.proof.OpReplacer;
 
 /**
  * Standard implementation of the InitiallyClause interface.
- * @author Daniel Bruns 
+ * @author Daniel Bruns
  */
 public final class InitiallyClauseImpl implements InitiallyClause {
-        
+
+    /**
+     * The unique internal name of the initially clause.
+     */
     private final String name;
+    /**
+     * The displayed name.
+     */
     private final String displayName;
+    /**
+     * The KeYJavaType representing the function to which the
+     * initially clause belongs.
+     */
     private final KeYJavaType kjt;
-    private final VisibilityModifier visibility;    
+    /**
+     * The visibility of the initially clause (null for default visibility).
+     */
+    private final VisibilityModifier visibility;
+    /**
+     * The invariant from which the initially clause is derived.
+     */
     private final Term originalInv;
+    /**
+     * The original self variable of the receiver object.
+     */
     private final ParsableVariable originalSelfVar;
+    /**
+     * The original specification.
+     */
     private final PositionedString originalSpec;
-    
-    
+
+
     //-------------------------------------------------------------------------
     //constructors
-    //------------------------------------------------------------------------- 
+    //-------------------------------------------------------------------------
 
     /**
      * Creates a class invariant.
      * @param name the unique internal name of the invariant
      * @param displayName the displayed name of the invariant
      * @param kjt the KeYJavaType to which the invariant belongs
-     * @param visibility the visibility of the invariant 
+     * @param visibility the visibility of the invariant
      *        (null for default visibility)
      * @param inv the invariant formula itself
      * @param selfVar the variable used for the receiver object
      */
-    public InitiallyClauseImpl(String name, 
+    public InitiallyClauseImpl(String name,
                               String displayName,
-                              KeYJavaType kjt, 
-                              VisibilityModifier visibility,                              
+                              KeYJavaType kjt,
+                              VisibilityModifier visibility,
                               Term inv,
                               ParsableVariable selfVar, PositionedString originalSpec) {
         assert name != null && !name.equals("");
         assert displayName != null && !displayName.equals("");
-	assert kjt != null;
+        assert kjt != null;
         assert inv != null;
         this.name            = name;
         this.displayName     = displayName;
-	this.kjt             = kjt;
+        this.kjt             = kjt;
         this.visibility      = visibility;
         this.originalInv     = inv;
         this.originalSelfVar = selfVar;
@@ -75,18 +99,17 @@ public final class InitiallyClauseImpl implements InitiallyClause {
         originalInv.execPostOrder(oc);
         this.originalSpec = originalSpec;
     }
-    
 
-    
+
     //-------------------------------------------------------------------------
     //internal methods
-    //------------------------------------------------------------------------- 
-    
+    //-------------------------------------------------------------------------
+
     private Map<Operator, Operator> getReplaceMap(
-                ParsableVariable selfVar, 
+                ParsableVariable selfVar,
                 TermServices services) {
         Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
-        
+
         if(selfVar != null && originalSelfVar != null) {
             assert selfVar.sort().extendsTrans(originalSelfVar.sort());
             result.put(originalSelfVar, selfVar);
@@ -94,69 +117,70 @@ public final class InitiallyClauseImpl implements InitiallyClause {
 
         return result;
     }
-    
 
-    
+
     //-------------------------------------------------------------------------
     //public interface
-    //------------------------------------------------------------------------- 
-    
+    //-------------------------------------------------------------------------
+
+    @Override
+    public InitiallyClause map(UnaryOperator<Term> op, Services services) {
+        return new InitiallyClauseImpl(
+                name, displayName, kjt, visibility,
+                op.apply(originalInv),
+                originalSelfVar, originalSpec);
+    }
+
     @Override
     public String getName() {
         return name;
     }
-    
-    
+
     @Override
     public String getDisplayName() {
         return displayName;
     }
-    
-        
+
+
     @Override
     public KeYJavaType getKJT() {
-	return kjt;
+        return kjt;
     }
-    
-    
+
     @Override
     public Term getClause(ParsableVariable selfVar, TermServices services) {
-        final Map<Operator, Operator> replaceMap 
+        final Map<Operator, Operator> replaceMap
         	= getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         Term res = or.replace(originalInv);
         res = services.getTermBuilder().convertToFormula(res);
         return res;
     }
-     
+
     @Override
     public PositionedString getOriginalSpec(){
         return originalSpec;
     }
-    
+
     @Override
     public VisibilityModifier getVisibility() {
-	return visibility;
+        return visibility;
     }
-    
-    
-    
-    
+
     @Override
     public String toString() {
         return originalInv.toString();
     }
-    
+
     @Override
     public InitiallyClause setKJT(KeYJavaType newKjt) {
-	InitiallyClauseImpl res= new InitiallyClauseImpl(name, 
-                                      displayName,
-                                      newKjt, 
-                                      visibility,
-                                      originalInv,
-                                      originalSelfVar,originalSpec);
-	return res;
+        InitiallyClauseImpl res = new InitiallyClauseImpl(name,
+                                                          displayName,
+                                                          newKjt,
+                                                          visibility,
+                                                          originalInv,
+                                                          originalSelfVar,
+                                                          originalSpec);
+        return res;
     }
-    
-
 }

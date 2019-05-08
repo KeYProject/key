@@ -3,6 +3,40 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/key.iml" filepath="$PROJECT_DIR$/.idea/key.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/org.key_project.key.iml" filepath="$PROJECT_DIR$/.idea/modules/org.key_project.key.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core/org.key_project.key.core.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core/org.key_project.key.core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core.example/org.key_project.key.core.example.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core.example/org.key_project.key.core.example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core.example/org.key_project.key.core.example.main.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core.example/org.key_project.key.core.example.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core.example/org.key_project.key.core.example.test.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core.example/org.key_project.key.core.example.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core/org.key_project.key.core.main.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core/org.key_project.key.core.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core.proof_references/org.key_project.key.core.proof_references.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core.proof_references/org.key_project.key.core.proof_references.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core.proof_references/org.key_project.key.core.proof_references.main.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core.proof_references/org.key_project.key.core.proof_references.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core.proof_references/org.key_project.key.core.proof_references.test.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core.proof_references/org.key_project.key.core.proof_references.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core.symbolic_execution/org.key_project.key.core.symbolic_execution.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core.symbolic_execution/org.key_project.key.core.symbolic_execution.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core.symbolic_execution.example/org.key_project.key.core.symbolic_execution.example.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core.symbolic_execution.example/org.key_project.key.core.symbolic_execution.example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core.symbolic_execution.example/org.key_project.key.core.symbolic_execution.example.main.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core.symbolic_execution.example/org.key_project.key.core.symbolic_execution.example.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core.symbolic_execution.example/org.key_project.key.core.symbolic_execution.example.test.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core.symbolic_execution.example/org.key_project.key.core.symbolic_execution.example.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core.symbolic_execution/org.key_project.key.core.symbolic_execution.main.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core.symbolic_execution/org.key_project.key.core.symbolic_execution.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core.symbolic_execution/org.key_project.key.core.symbolic_execution.test.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core.symbolic_execution/org.key_project.key.core.symbolic_execution.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core/org.key_project.key.core.test.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core/org.key_project.key.core.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core.testgen/org.key_project.key.core.testgen.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core.testgen/org.key_project.key.core.testgen.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core.testgen/org.key_project.key.core.testgen.main.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core.testgen/org.key_project.key.core.testgen.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core.testgen/org.key_project.key.core.testgen.test.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core.testgen/org.key_project.key.core.testgen.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.removegenerics/org.key_project.key.removegenerics.iml" filepath="$PROJECT_DIR$/.idea/modules/key.removegenerics/org.key_project.key.removegenerics.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.removegenerics/org.key_project.key.removegenerics.main.iml" filepath="$PROJECT_DIR$/.idea/modules/key.removegenerics/org.key_project.key.removegenerics.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.removegenerics/org.key_project.key.removegenerics.test.iml" filepath="$PROJECT_DIR$/.idea/modules/key.removegenerics/org.key_project.key.removegenerics.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.ui/org.key_project.key.ui.iml" filepath="$PROJECT_DIR$/.idea/modules/key.ui/org.key_project.key.ui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.ui/org.key_project.key.ui.main.iml" filepath="$PROJECT_DIR$/.idea/modules/key.ui/org.key_project.key.ui.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.ui/org.key_project.key.ui.test.iml" filepath="$PROJECT_DIR$/.idea/modules/key.ui/org.key_project.key.ui.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.util/org.key_project.key.util.iml" filepath="$PROJECT_DIR$/.idea/modules/key.util/org.key_project.key.util.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.util/org.key_project.key.util.main.iml" filepath="$PROJECT_DIR$/.idea/modules/key.util/org.key_project.key.util.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.util/org.key_project.key.util.test.iml" filepath="$PROJECT_DIR$/.idea/modules/key.util/org.key_project.key.util.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/keyext.interactionlog/org.key_project.keyext.interactionlog.iml" filepath="$PROJECT_DIR$/.idea/modules/keyext.interactionlog/org.key_project.keyext.interactionlog.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/keyext.interactionlog/org.key_project.keyext.interactionlog.main.iml" filepath="$PROJECT_DIR$/.idea/modules/keyext.interactionlog/org.key_project.keyext.interactionlog.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/keyext.interactionlog/org.key_project.keyext.interactionlog.test.iml" filepath="$PROJECT_DIR$/.idea/modules/keyext.interactionlog/org.key_project.keyext.interactionlog.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core/rifl/org.key_project.rifl.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core/rifl/org.key_project.rifl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core/rifl/org.key_project.rifl.main.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core/rifl/org.key_project.rifl.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/key.core/rifl/org.key_project.rifl.test.iml" filepath="$PROJECT_DIR$/.idea/modules/key.core/rifl/org.key_project.rifl.test.iml" />
     </modules>
   </component>
 </project>

@@ -14,6 +14,8 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
  */
 public class BundleSavingToggleAction extends MainWindowAction {
 
+    private static final long serialVersionUID = -6884872135310450140L;
+
     /**
      * Creates a new BundleSavingToggleAction.
      * @param mainWindow the main window of the program

@@ -15,9 +15,11 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.OpCollector;
@@ -33,29 +35,52 @@ import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 
 
 /**
- * Standard implementation of the ClassInvariant interface. 
+ * Standard implementation of the ClassInvariant interface.
  */
 public final class ClassInvariantImpl implements ClassInvariant {
-    
+
+    /**
+     * The unique internal name of the class invariant.
+     */
     private final String name;
+    /**
+     * The displayed name.
+     */
     private final String displayName;
+    /**
+     * The KeYJavaType representing the function to which the
+     * class invariant belongs.
+     */
     private final KeYJavaType kjt;
-    private final VisibilityModifier visibility;    
+    /**
+     * The visibility of the class invariant (null for default visibility).
+     */
+    private final VisibilityModifier visibility;
+    /**
+     * The original invariant from which the class invariant is derived.
+     */
     private final Term originalInv;
+    /**
+     * The original self variable of the receiver object.
+     */
     private final ParsableVariable originalSelfVar;
+    /**
+     * Whether the class invariant is a static (i.e., &lt;$inv&gt;)
+     * or an instance invariant (i.e., &lt;inv&gt;).
+     */
     private final boolean isStatic;
-    
-    
+
+
     //-------------------------------------------------------------------------
     //constructors
-    //------------------------------------------------------------------------- 
+    //-------------------------------------------------------------------------
 
     /**
      * Creates a class invariant.
      * @param name the unique internal name of the invariant
      * @param displayName the displayed name of the invariant
      * @param kjt the KeYJavaType to which the invariant belongs
-     * @param visibility the visibility of the invariant 
+     * @param visibility the visibility of the invariant
      *        (null for default visibility)
      * @param inv the invariant formula itself
      * @param selfVar the variable used for the receiver object
@@ -81,18 +106,17 @@ public final class ClassInvariantImpl implements ClassInvariant {
         this.isStatic        = selfVar == null;
 //        assert isStatic == !oc.contains(originalSelfVar);
     }
-    
 
-    
+
     //-------------------------------------------------------------------------
     //internal methods
-    //------------------------------------------------------------------------- 
-    
+    //-------------------------------------------------------------------------
+
     private Map<Operator, Operator> getReplaceMap(
-                ParsableVariable selfVar, 
+                ParsableVariable selfVar,
                 TermServices services) {
         Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
-        
+
         if(selfVar != null && originalSelfVar != null) {
             assert selfVar.sort().extendsTrans(originalSelfVar.sort());
             result.put(originalSelfVar, selfVar);
@@ -100,34 +124,40 @@ public final class ClassInvariantImpl implements ClassInvariant {
 
         return result;
     }
-    
 
-    
+
+
     //-------------------------------------------------------------------------
     //public interface
-    //------------------------------------------------------------------------- 
-    
+    //-------------------------------------------------------------------------
+
+    @Override
+    public ClassInvariant map(UnaryOperator<Term> op, Services services) {
+        return new ClassInvariantImpl(
+                name, displayName, kjt, visibility, op.apply(originalInv), originalSelfVar);
+    }
+
     @Override
     public String getName() {
         return name;
     }
-    
-    
+
+
     @Override
     public String getDisplayName() {
         return displayName;
     }
-    
-        
+
+
     @Override
     public KeYJavaType getKJT() {
 	return kjt;
     }
-    
-    
+
+
     @Override
     public Term getInv(ParsableVariable selfVar, TermServices services) {
-        final Map<Operator, Operator> replaceMap 
+        final Map<Operator, Operator> replaceMap
         	= getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         Term res = or.replace(originalInv);
@@ -140,32 +170,32 @@ public final class ClassInvariantImpl implements ClassInvariant {
     public Term getOriginalInv() {
         return originalInv;
     }
-    
- 
+
+
     @Override
     public boolean isStatic() {
 	return isStatic;
-    }    
-    
-    
+    }
+
+
     @Override
     public VisibilityModifier getVisibility() {
 	return visibility;
     }
-    
-    
+
+
     @Override
     public ClassInvariant setKJT(KeYJavaType newKjt) {
         String newName = name.replaceFirst(kjt.getName(), newKjt.getName());
-	return new ClassInvariantImpl(newName, 
+        return new ClassInvariantImpl(newName,
                                       displayName,
-                                      newKjt, 
+                                      newKjt,
                                       visibility,
                                       originalInv,
                                       originalSelfVar);
     }
-    
-    
+
+
     @Override
     public String toString() {
         return originalInv.toString();

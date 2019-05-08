@@ -28,7 +28,7 @@ public class HeatmapSettingsAction extends MainWindowAction {
     public HeatmapSettingsAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Heatmap Options");
-        putValue(KeYExtConst.PATH, "Heatmap");
+        putValue(KeYExtConst.PATH, "Heatmaps");
         setEnabled(getMediator().getSelectedProof() != null);
         setIcon(IconFactory.selectDecProcArrow(MainWindow.TOOLBAR_ICON_SIZE));
 

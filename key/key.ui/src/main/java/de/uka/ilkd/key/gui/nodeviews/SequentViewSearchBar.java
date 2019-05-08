@@ -31,6 +31,11 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.RegroupSequentPrintFilter;
 import de.uka.ilkd.key.pp.SearchSequentPrintFilter;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
+import de.uka.ilkd.key.gui.fonticons.IconCode;
+import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import javax.swing.Icon;
+
 
 /*
  * Search bar implementing search function for SequentView.
@@ -43,11 +48,15 @@ public class SequentViewSearchBar extends SearchBar {
     public static final Color SEARCH_HIGHLIGHT_COLOR_2 = new Color(0, 140, 255, 100);
 
     public static enum SearchMode {
-        HIGHLIGHT("Highlight"), HIDE("Hide"), REGROUP("Regroup");
+        HIGHLIGHT("Highlight", FontAwesomeBold.HIGHLIGHTER),
+        HIDE("Hide", FontAwesomeBold.LOW_VISION),
+        REGROUP("Regroup", FontAwesomeBold.INDENT);
         private String displayName;
+        public final Icon icon;
 
-        private SearchMode(String name) {
+        private SearchMode(String name, IconCode icon) {
             this.displayName = name;
+            this.icon = IconFontSwing.buildIcon(icon, 16);
         }
 
         @Override
@@ -77,6 +86,10 @@ public class SequentViewSearchBar extends SearchBar {
 
     public SequentView getSequentView() {
         return this.sequentView;
+    }
+
+    public void setSearchMode(SearchMode mode) {
+        searchModeBox.setSelectedItem(mode);
     }
 
     @Override

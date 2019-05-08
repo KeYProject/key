@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.function.UnaryOperator;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -61,6 +63,18 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         setEnsures(inv.getOriginalInv());
         setAccessible(accessible);
         setMby(mby);
+    }
+
+    @Override
+    public ClassWellDefinedness map(UnaryOperator<Term> op, Services services) {
+        return new ClassWellDefinedness(
+                getName(), id(), type(), getTarget(), getHeap(), getOrigVars(),
+                getRequires().map(op),
+                op.apply(getAssignable()), op.apply(getAccessible()),
+                getEnsures().map(op),
+                op.apply(getMby()), op.apply(getRepresents()),
+                inv.map(op, services),
+                services.getTermBuilder());
     }
 
     @Override
