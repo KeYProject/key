@@ -3840,6 +3840,7 @@ varexp[TacletBuilder b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
     | varcond_differentFields[b]
+    | varcond_sameObserver[b]
   ) 
   | 
   ( (NOT_ {negated = true;} )? 
@@ -3861,10 +3862,18 @@ varexp[TacletBuilder b]
         | varcond_label[b, negated]
         | varcond_static_field[b, negated]
         | varcond_subFormulas[b, negated]
-        | varcond_containsAssignment[b, negated]        
+        | varcond_containsAssignment[b, negated]
       )
   )
 ;
+
+varcond_sameObserver[TacletBuilder b]
+:
+  SAME_OBSERVER LPAREN t1=varId COMMA t2=varId RPAREN
+  {
+    b.addVariableCondition(new SameObserverCondition(t1, t2));
+  }
+  ;
 
 
 varcond_applyUpdateOnRigid [TacletBuilder b]
