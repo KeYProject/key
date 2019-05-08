@@ -272,6 +272,25 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
         mediator.removeGUIListener(guiListener);
     }
 
+    public boolean selectAbove() {
+        return selectRelative(+1);
+    }
+    public boolean selectBelow() {
+        return selectRelative(-1);
+    }
+
+    private boolean selectRelative(int i) {
+        TreePath path = delegateView.getSelectionPath();
+        int row = delegateView.getRowForPath(path);
+        TreePath newPath = delegateView.getPathForRow(row-i);
+        if (newPath != null) {
+            delegateView.setSelectionPath(newPath);
+            return true;
+        }
+        return false;
+    }
+
+
     public void removeNotify() {
         unregister();
         try {
