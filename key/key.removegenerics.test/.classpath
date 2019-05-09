@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/key.util.test/lib/junit-4.12.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/key.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/key.core.test"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/key.util"/>
