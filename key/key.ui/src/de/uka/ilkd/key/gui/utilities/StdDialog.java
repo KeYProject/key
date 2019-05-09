@@ -126,7 +126,7 @@ public class StdDialog extends JDialog{
     
     public JButton getOkayButton() {
         if(okayButton == null){
-            okayButton = new JButton("Okay");
+            okayButton = new JButton("OK");
             okayButton.addActionListener(new ActionListener() {
                 
                 @Override
@@ -171,7 +171,7 @@ public class StdDialog extends JDialog{
             
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                JOptionPane.showMessageDialog(dialog, "Okay");
+                JOptionPane.showMessageDialog(dialog, "OK");
             }
         });
         dialog.setModal(true);

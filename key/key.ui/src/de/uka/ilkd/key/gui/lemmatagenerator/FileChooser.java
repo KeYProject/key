@@ -536,7 +536,7 @@ public class FileChooser extends JPanel{
         
         private JButton getOkayButton(){
                 if(okayButton == null){
-                      okayButton  = new JButton("Okay"); 
+                      okayButton  = new JButton("OK"); 
                       Dimension dim = getCancelButton().getPreferredSize();
                       okayButton.setEnabled(false);
                       okayButton.setPreferredSize(dim);
