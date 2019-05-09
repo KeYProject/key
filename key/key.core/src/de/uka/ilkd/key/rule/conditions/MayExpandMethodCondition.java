@@ -122,7 +122,6 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
                          SVSubstitute subst,
                          SVInstantiations svInst,
                          Services services) {
-
         Map<String, String> tacletOptions = services.getProof().getSettings().
                 getChoiceSettings().getDefaultChoices();
 
@@ -139,8 +138,6 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         }
 
         MethodName mn = (MethodName) svInst.getInstantiation(methname);
-        ImmutableArray<ProgramElement> ape =
-                (ImmutableArray<ProgramElement>) svInst.getInstantiation(args);
 
         ImmutableArray<Expression> ar =
                 toExpArray((ImmutableArray<ProgramElement>)svInst.getInstantiation(args));
@@ -148,24 +145,27 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
             ar = toExpArray((ImmutableArray<? extends ProgramElement>)subst);
         }
 
-        MethodReference mr = new MethodReference(ar, mn, rp);
-        IProgramMethod method;
-        KeYJavaType prefixType = services.getTypeConverter().getKeYJavaType((Expression) rp, ec);
-        if (ec != null) {
-            method = mr.method(services, prefixType, ec);
-            // we are only interested in the signature. The method
-            // must be declared in the static context.
-        } else {
-            // no execution context
-            method = mr.method(services, prefixType,
-                               mr.getMethodSignature(services, ec), prefixType);
-        }
+        if (rp != null && mn != null) {
+            MethodReference mr = new MethodReference(ar, mn, rp);
+            IProgramMethod method;
+            KeYJavaType prefixType = services.getTypeConverter().getKeYJavaType((Expression) rp, ec);
+            if (ec != null) {
+                method = mr.method(services, prefixType, ec);
+                // we are only interested in the signature. The method
+                // must be declared in the static context.
+            } else {
+                // no execution context
+                method = mr.method(services, prefixType,
+                                   mr.getMethodSignature(services, ec), prefixType);
+            }
 
-        if (method == null) {
-            return false;
+            if (method == null) {
+                return false;
+            }
+            return negation ^ cannotBeOverriden(method, services);
         }
-
-        return negation ^ cannotBeOverriden(method, services);
+        // Probably this value does not really matter
+        return false;
     }
 
     private boolean cannotBeOverriden(IProgramMethod method, Services services) {
