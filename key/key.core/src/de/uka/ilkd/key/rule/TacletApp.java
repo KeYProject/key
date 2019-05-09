@@ -37,6 +37,7 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -499,23 +500,30 @@ public abstract class TacletApp implements RuleApp {
      *            the SchemaVariable to be instantiated
      * @param term
      *            the Term the SchemaVariable is instantiated with
+     * @param services
+     *            the services object
+     * @param interesting
+     *            whether instantiations for this schema variable should
+     *            be kept in the list of "interesting" instantiations
      * @return the new TacletApp
      */
     public TacletApp addCheckedInstantiation(SchemaVariable sv,
-	    				     Term term,
-	    				     Services services,
-	    				     boolean interesting) {
+                                             Term term,
+                                             Services services,
+                                             boolean interesting) {
+        final Term t = TermLabel.removeIrrelevantLabels(term, services);
 
-        if (sv instanceof VariableSV && !(term.op() instanceof LogicVariable)) {
+        if (sv instanceof VariableSV && !(t.op() instanceof LogicVariable)) {
             throw new IllegalInstantiationException("Could not add "
-                + "the instantiation of " + sv + " because " + term
+                + "the instantiation of " + sv + " because " + t
                 + " is no variable.");
         }
 
-        final MatchConditions newMC = taclet.getMatcher().matchSV(sv, term, matchConditions(), services);
+        final MatchConditions newMC =
+                taclet.getMatcher().matchSV(sv, t, matchConditions(), services);
 
         if (newMC == null) {
-            throw new IllegalInstantiationException("Instantiation " + term
+            throw new IllegalInstantiationException("Instantiation " + t
                     + " of " + sv + "does not satisfy the variable conditions");
         }
 
