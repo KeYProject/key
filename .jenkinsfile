@@ -1,5 +1,9 @@
 pipeline {
-  agent any
+  agent {
+    docker {
+      image 'key-test-docker:jdk8'
+    }
+  }
 
   environment {
       GRADLE_OPTS = '-Dorg.gradle.daemon=false'
