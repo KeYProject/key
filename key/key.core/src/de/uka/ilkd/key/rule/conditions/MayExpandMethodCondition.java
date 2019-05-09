@@ -145,28 +145,31 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
             ar = toExpArray((ImmutableArray<? extends ProgramElement>)subst);
         }
 
-        if (rp != null && mn != null) {
-            MethodReference mr = new MethodReference(ar, mn, rp);
-            IProgramMethod method;
-            KeYJavaType prefixType =
-                    services.getTypeConverter().getKeYJavaType((Expression) rp, ec);
-            if (ec != null) {
-                method = mr.method(services, prefixType, ec);
-                // we are only interested in the signature. The method
-                // must be declared in the static context.
-            } else {
-                // no execution context
-                method = mr.method(services, prefixType,
-                                   mr.getMethodSignature(services, ec), prefixType);
-            }
-
-            if (method == null) {
-                return false;
-            }
-            return negation ^ cannotBeOverriden(method, services);
+        if (rp == null || mn == null) {
+            // unusable prefixes or method names falsify the condition
+            // TODO should that perhaps raise an exception or assertion failure?
+            // It should never happen. Silently ignoring may be a bad idea.
+            return false;
         }
-        // Probably this value does not really matter
-        return false;
+
+        MethodReference mr = new MethodReference(ar, mn, rp);
+        IProgramMethod method;
+        KeYJavaType prefixType =
+                services.getTypeConverter().getKeYJavaType((Expression) rp, ec);
+        if (ec != null) {
+            method = mr.method(services, prefixType, ec);
+            // we are only interested in the signature. The method
+            // must be declared in the static context.
+        } else {
+            // no execution context
+            method = mr.method(services, prefixType,
+                    mr.getMethodSignature(services, ec), prefixType);
+        }
+
+        if (method == null) {
+            return false;
+        }
+        return negation ^ cannotBeOverriden(method, services);
     }
 
     private boolean cannotBeOverriden(IProgramMethod method, Services services) {
@@ -180,11 +183,8 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
                 "Calling a method on sth that does not have a class type";
 
         ClassType classType = (ClassType) type;
-        if (classType.isFinal()) {
-            return true;
-        }
 
-        return false;
+        return classType.isFinal();
     }
 
 
