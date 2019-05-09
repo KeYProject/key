@@ -635,7 +635,7 @@ class MultiLineInputPrompt {
             JPanel box = new JPanel(new FlowLayout(FlowLayout.CENTER));
             root.add(box, BorderLayout.SOUTH);
             JTextArea area = new JTextArea(text);
-            JButton btnOk = new JButton("Ok");
+            JButton btnOk = new JButton("OK");
             JButton btnCancel = new JButton("Cancel");
             box.add(btnOk);
             box.add(btnCancel);
