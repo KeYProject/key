@@ -13,7 +13,7 @@ class Modular {
     Final _final;
 
     private void privateMethod() { }
-    
+
     //@ ensures true;
     void m() {
         privateMethod();
@@ -22,4 +22,3 @@ class Modular {
         other.other();
     }
 }
-        
