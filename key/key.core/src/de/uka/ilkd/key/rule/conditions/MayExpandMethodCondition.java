@@ -148,7 +148,8 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         if (rp != null && mn != null) {
             MethodReference mr = new MethodReference(ar, mn, rp);
             IProgramMethod method;
-            KeYJavaType prefixType = services.getTypeConverter().getKeYJavaType((Expression) rp, ec);
+            KeYJavaType prefixType =
+                    services.getTypeConverter().getKeYJavaType((Expression) rp, ec);
             if (ec != null) {
                 method = mr.method(services, prefixType, ec);
                 // we are only interested in the signature. The method
