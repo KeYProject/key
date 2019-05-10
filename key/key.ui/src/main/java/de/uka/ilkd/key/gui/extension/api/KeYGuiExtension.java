@@ -5,6 +5,7 @@ import de.uka.ilkd.key.gui.GoalList;
 import de.uka.ilkd.key.gui.InfoView;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.StrategySelectionView;
+import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
@@ -69,6 +70,14 @@ public interface KeYGuiExtension {
          * @return
          */
         int priority() default 0;
+
+        /**
+         * Marks an extensions as experimental.
+         *
+         * Experimental extensions are only available if the KeY is started
+         * with the experimental flag on the command line <code>--experimental</code>.
+         */
+        boolean experimental() default true;
     }
 
     /**
@@ -78,8 +87,8 @@ public interface KeYGuiExtension {
         /**
          * A list of actions which should be added to the main menu.
          * <p>
-         * Actions should use the {@link KeYExtConstants#PATH} and {@link KeYExtConstants#PRIORITY} to control their
-         * position in the menu.
+         * Actions should use the {@link de.uka.ilkd.key.gui.actions.KeyAction#PATH} and {@link de.uka.ilkd.key.gui.actions.KeyAction#PRIORITY}
+         * to control their position in the menu.
          *
          * @param mainWindow the window of the main menu
          * @return non-null, emptiable list of actions.
@@ -125,7 +134,8 @@ public interface KeYGuiExtension {
         /**
          * A list of actions which should be added to the main menu.
          * <p>
-         * Actions should use the {@link KeYExtConstants#PATH} and {@link KeYExtConstants#PRIORITY} to control their
+         * Actions should use the {@link de.uka.ilkd.key.gui.actions.KeyAction#PATH}
+         * and {@link de.uka.ilkd.key.gui.actions.KeyAction#PRIORITY} to control their
          * position in the menu.
          *
          * @param mediator         the window of the main menu
@@ -181,7 +191,7 @@ public interface KeYGuiExtension {
     /**
      * Extension Point for defining keyboard shortcuts for various components.
      *
-     * @see de.uka.ilkd.key.gui.utilities.KeyStrokeManager
+     * @see KeyStrokeManager
      */
     interface KeyboardShortcuts {
         String SEQUENT_VIEW = SequentView.class.getName();

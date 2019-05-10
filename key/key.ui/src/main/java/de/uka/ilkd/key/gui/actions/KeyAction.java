@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
-import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
+import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 
 import javax.swing.*;
 import java.util.Iterator;
@@ -81,8 +81,9 @@ public abstract class KeyAction extends AbstractAction {
     }
 
     private void lookupAcceleratorKey(KeyStroke defaultValue) {
-        KeyStroke found = KeyStrokeManager.get(this, defaultValue);
-        setAcceleratorKey(found);
+        KeyStrokeManager.lookupAndOverride(this);
+        //KeyStroke found = KeyStrokeManager.get(this, defaultValue);
+        //setAcceleratorKey(found);
     }
 
     protected String getTooltip() {

@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.help;
 
 import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 
 import javax.swing.*;
 import java.awt.*;

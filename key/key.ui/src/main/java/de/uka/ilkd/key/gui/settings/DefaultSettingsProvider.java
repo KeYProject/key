@@ -51,7 +51,7 @@ public class DefaultSettingsProvider implements SettingsProvider {
     }
 
     @Override
-    public void applySettings(MainWindow window) {
+    public void applySettings(MainWindow window) throws InvalidSettingsInputException {
     }
 
     @Override

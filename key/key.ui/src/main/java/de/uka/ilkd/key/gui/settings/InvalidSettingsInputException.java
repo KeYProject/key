@@ -38,4 +38,12 @@ public class InvalidSettingsInputException extends Exception {
         this.panel = panel;
         this.focusable = focusable;
     }
+
+    public SettingsProvider getPanel() {
+        return panel;
+    }
+
+    public JComponent getFocusable() {
+        return focusable;
+    }
 }

@@ -1,16 +1,18 @@
 package de.uka.ilkd.key.gui.settings;
 
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.ExtensionManager;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.keyshortcuts.ShortcutSettings;
 import de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider;
 import de.uka.ilkd.key.gui.testgen.TestGenOptionsPanel;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.*;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -25,6 +27,7 @@ public class SettingsManager {
     public static final ExtensionManager EXTENSION_MANAGER = new ExtensionManager();
     public static final SettingsProvider SMT_SETTINGS = new SMTSettingsProvider();
     public static final TacletOptionsSettings TACLET_OPTIONS_SETTINGS = new TacletOptionsSettings();
+    public static final ShortcutSettings SHORTCUT_SETTINGS = new ShortcutSettings();
 
     private static SettingsManager INSTANCE;
     private List<SettingsProvider> settingsProviders = new LinkedList<>();
@@ -39,10 +42,12 @@ public class SettingsManager {
     public static SettingsManager getInstance() {
         if (INSTANCE == null) {
             INSTANCE = createWithExtensions();
+            INSTANCE.add(SHORTCUT_SETTINGS);
             INSTANCE.add(SMT_SETTINGS);
             INSTANCE.add(EXTENSION_MANAGER);
             INSTANCE.add(TEST_GEN_OPTIONS_PANEL);
             INSTANCE.add(TACLET_OPTIONS_SETTINGS);
+
         }
         return INSTANCE;
     }
@@ -74,6 +79,18 @@ public class SettingsManager {
         }*/
     }
 
+    public static JComponent createSettingsHeaderPanel(String header, String subhead) {
+        Box pNorth = new Box(BoxLayout.Y_AXIS);
+        pNorth.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        pNorth.setBackground(Color.WHITE);
+        pNorth.setOpaque(true);
+        JLabel lblHead = new JLabel(header);
+        lblHead.setFont(lblHead.getFont().deriveFont(16f).deriveFont(Font.BOLD));
+        pNorth.add(lblHead);
+        pNorth.add(new JLabel(subhead));
+        pNorth.add(new JSeparator());
+        return pNorth;
+    }
 
 
     public void showSettingsDialog(MainWindow mainWindow) {
