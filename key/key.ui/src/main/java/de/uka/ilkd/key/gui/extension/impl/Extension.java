@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.extension.impl;
 
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.extension.ExtensionManager;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 
@@ -44,9 +45,14 @@ public class Extension<T> implements Comparable<Extension> {
     }
 
     public boolean isDisabled() {
-        return (info != null && info.disabled()) ||
-                ExtensionManager.getExtensionSettings()
+        return (info != null && info.disabled()) //disabled by options
+                || (!Main.isExperimentalMode() && isExperimental()) //disabled because of wrong mode
+                || ExtensionManager.getExtensionSettings() //disabled by command line
                         .getForbiddenClasses().contains(getType().getName());
+    }
+
+    private boolean isExperimental() {
+        return info == null || info.experimental();
     }
 
     public Class<T> getType() {
@@ -100,8 +106,11 @@ public class Extension<T> implements Comparable<Extension> {
         return supports(KeYGuiExtension.StatusLine.class);
     }
 
-
     public boolean supportsToolbar() {
         return supports(KeYGuiExtension.Toolbar.class);
+    }
+
+    public boolean supportsKeyboardShortcuts() {
+        return supports(KeYGuiExtension.KeyboardShortcuts.class);
     }
 }

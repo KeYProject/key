@@ -180,9 +180,9 @@ public final class KeYGuiExtensionFacade {
     private static void loadExtensions() {
         extensions = ServiceLoaderUtil.stream(KeYGuiExtension.class)
                 .filter(KeYGuiExtensionFacade::isNotForbidden)
+                .distinct()
                 .map(Extension::new)
                 .sorted()
-                .distinct()
                 .collect(Collectors.toList());
     }
 
