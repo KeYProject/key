@@ -120,8 +120,8 @@ public class OutputStreamProofSaver {
     }
 
     /**
-     * Write the log information of the proof including the KeY version and the user name.
-     * @return a string buffer containing the log information mentioned above
+     * Write users and KeY versions to buffer.
+     * @return a buffer containing user and KeY version.
      */
     public StringBuffer writeLog() {
         final StringBuffer logstr = new StringBuffer();
@@ -667,9 +667,9 @@ public class OutputStreamProofSaver {
     /**
      * Check whether the applied rule of the passed proof node was performed interactively.
      * If this is the case, a user interaction label is appended.
-     * @param node            the proof node to be checked
-     * @param output            the writer to which the label is appended
-     * @throws IOException             an exception thrown when printing fails
+     * @param node         the proof node to be checked
+     * @param output       the writer to which the label should be appended
+     * @throws IOException an exception thrown in case printing fails
      */
     private void userInteraction2Proof(Node node, Appendable output)
             throws IOException {
