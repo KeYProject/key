@@ -1,16 +1,15 @@
 #!/bin/sh -x
+unset DISPLAY
 export KEY_VERSION="2.7.$BUILD_NUMBER"
-export ANT_HOME=/opt/ant/
-export ANT_OPTS="-Xmx4096m -Xms512m -XX:-UseGCOverheadLimit"
+export JAVA_OPTS="-Xmx64m -XX:MaxPermSize=64m -Dfile.encoding=UTF-8"
 export PATH=$PATH:/home/hudson/key/bin/
 export STATISTICS_DIR="$JENKINS_HOME/userContent/statistics-$JOB_NAME"
-unset DISPLAY
-
+export GRADLE_OPTS="-Dorg.gradle.daemon=false org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=512m -Dfile.encoding=UTF-8"
 #
 # Run unit tests
 #
-cd key/scripts
-ant -logger org.apache.tools.ant.NoBannerLogger test-deploy-all
+cd key
+./gradlew test testProofRules testRunAllProofs --parallel
 EXIT_UNIT_TESTS=$?
 
 #

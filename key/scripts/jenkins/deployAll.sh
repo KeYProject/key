@@ -1,8 +1,12 @@
 #!/bin/sh
-cd key/scripts
-export ANT_HOME=/opt/ant/
-export ANT_OPTS="-Xmx2048m -Xms512m"
-export PATH=$PATH:/home/hudson/key/bin/
-export KEY_VERSION="2.7.$BUILD_NUMBER"
-ant -logger org.apache.tools.ant.NoBannerLogger deployAll fatJar
+cd key/
+export GRADLE_OPTS="-Dorg.gradle.daemon=false"
+./gradlew --parallel compileTest :key.ui:shadowJar :key.ui:distZip
 
+mkdir -p key/deployment/
+
+#debugging for the start
+ls -lR key.ui/build/
+
+mv key.ui/build/distributions/*.zip key/deployment/
+mv key.ui/build/libs/key*exe.jar key/deployment/
