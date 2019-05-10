@@ -57,14 +57,15 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class AbstractTermTransformer extends AbstractSortedOperator
                                            implements TermTransformer {
 
+    // must be first
+    /** The metasort sort **/
+    public static final Sort METASORT = new SortImpl(new Name("Meta"));
+
     /** A map from String names to meta operators **/
     public static final Map<String, AbstractTermTransformer> NAME_TO_META_OP =
             new LinkedHashMap<String, AbstractTermTransformer>(70);
 
     // TODO: This seems to be better handled using a ServiceLoader
-
-    /** The metasort sort **/
-    public static final Sort METASORT = new SortImpl(new Name("Meta"));
 
     public static final AbstractTermTransformer META_SHIFTRIGHT = new MetaShiftRight();
 

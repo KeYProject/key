@@ -546,10 +546,6 @@ public class ContractFactory {
                     nm = m2;
                 } else if (m2 == null) {
                     nm = m1;
-                } else if (m1.op().equals(emptyMod) && m2.op().equals(emptyMod)) {
-                    // special case for both contracts being (weakly) pure
-                    // fixes bug #1557
-                    nm = m1;
                 } else {
                     nm = tb.intersect(m1,
                                       tb.ife(otherPre, m2, tb.allLocs()));
@@ -729,20 +725,20 @@ public class ContractFactory {
     private FunctionalOperationContract union(final String name,
                                               FunctionalOperationContractImpl t,
                                               FunctionalOperationContract[] others) {
-        Map<LocationVariable, Term> mods = t.originalMods;
-        Map<ProgramVariable, Term> deps = t.originalDeps;
         // MU: Bugfix #1489
         // Do not modify the data stores in t but make new copies
-        mods = new LinkedHashMap<>(mods);
-        deps = new LinkedHashMap<>(deps);
+        Map<LocationVariable, Term> mods =
+                new LinkedHashMap<LocationVariable, Term>(t.originalMods);
+        Map<ProgramVariable, Term> deps =
+                new LinkedHashMap<ProgramVariable, Term>(t.originalDeps);
 
         // keep this to check if every contract has the same mod
         // then no if-then-else cascades are needed.
-        Map<LocationVariable, Term> uniformMod = new LinkedHashMap<>();
+        Map<LocationVariable, Term> uniformMod = new LinkedHashMap<LocationVariable, Term>();
 
         // collect information
-        Map<LocationVariable, Term> pres = new LinkedHashMap<LocationVariable, Term>(
-                t.originalPres.size());
+        Map<LocationVariable, Term> pres =
+                new LinkedHashMap<LocationVariable, Term>(t.originalPres.size());
         for (LocationVariable h : t.originalPres.keySet()) {
             pres.put(h, t.originalPres.get(h));
         }
