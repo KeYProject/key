@@ -34,63 +34,26 @@ pre: (i &lt; 0 &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
 | ((!array = null
 &amp; i &gt;= 0)&lt;&lt;SC&gt;&gt;
 &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
-mod: \if ((i &lt; 0 &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-         \then (     \if ((i &lt; 0 &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                         \then (     \if ((  i &lt; 0
-                                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                                         \then (     \if ((    i
-                                                             &lt; 0
-                                                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                                                         \then (     \if ((    i
-                                                                             &lt; 0
-                                                                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                                                                         \then (     \if ((    i
-                                                                                             &lt; 0
-                                                                                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                                                                                         \then (allLocs)
-                                                                                         \else (allLocs)
-                                                                                \cap \if ((  (!  array
-                                                                                               = null
-                                                                                           &amp;    i
-                                                                                             &gt;= 0)&lt;&lt;SC&gt;&gt;
-                                                                                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                                                                                         \then (allLocs)
-                                                                                         \else (allLocs))
-                                                                         \else (allLocs)
-                                                                \cap \if ((  (!  array
-                                                                               = null
-                                                                           &amp;    i
-                                                                             &gt;= 0)&lt;&lt;SC&gt;&gt;
-                                                                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                                                                         \then (allLocs)
-                                                                         \else (allLocs))
-                                                         \else (allLocs)
-                                                \cap \if ((  (!  array
-                                                               = null
-                                                           &amp;    i
-                                                             &gt;= 0)&lt;&lt;SC&gt;&gt;
-                                                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                                                         \then (allLocs)
-                                                         \else (allLocs))
-                                         \else (allLocs)
-                                \cap \if ((  (!  array
-                                               = null
-                                           &amp; i &gt;= 0)&lt;&lt;SC&gt;&gt;
-                                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                                         \then (allLocs)
-                                         \else (allLocs))
-                         \else (allLocs)
-                \cap \if ((  (!array = null
-                           &amp; i &gt;= 0)&lt;&lt;SC&gt;&gt;
-                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                         \then (allLocs)
-                         \else (allLocs))
-         \else (allLocs)
-\cap \if ((  (!array = null
-           &amp; i &gt;= 0)&lt;&lt;SC&gt;&gt;
-           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-         \then (allLocs)
-         \else (allLocs)
+post: (   (i &lt; 0 &amp; x.&lt;inv&gt;@heapBefore_goOnNice&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
+   -&gt;   !(exc_2 = null)&lt;&lt;impl&gt;&gt;
+      &amp; (  ((     java.lang.Throwable::instance(exc_2)
+                = TRUE
+             -&gt; x.&lt;inv&gt;)&lt;&lt;impl&gt;&gt;)
+         &amp; (  java.lang.Error::instance(exc_2) = TRUE
+            |   java.lang.RuntimeException::instance(exc_2)
+              = TRUE
+            |   java.lang.RuntimeException::instance(exc_2)
+              = TRUE)))
+&amp; (   (  (!array = null
+       &amp; i &gt;= 0)&lt;&lt;SC&gt;&gt;
+       &amp; x.&lt;inv&gt;@heapBefore_goOnNice&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
+   -&gt;   (  result_2
+         = \if (i &lt; array.length)
+               \then (TRUE)
+               \else (FALSE)
+      &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
+      &amp; (exc_2 = null)&lt;&lt;impl&gt;&gt;)
+mod: allLocs
 termination: diamond" pathCondition="not(or(or(or(or(not(or(equals(array,null),equals(exc_0,null))),not(imp(equals(exc_0,null),or(or(equals(array,null),equals(x,null)),java.lang.Object::&lt;inv&gt;(heapBefore_goOnNice,x))))),not(imp(and(java.lang.Object::&lt;inv&gt;(heapBefore_goOnNice,x),equals(exc_0,null)),or(or(equals(array,null),equals(x,null)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
     b=x.goOnNice(array,i);
   }
@@ -173,63 +136,26 @@ pre: (i &lt; 0 &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
 | ((!array = null
 &amp; i &gt;= 0)&lt;&lt;SC&gt;&gt;
 &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
-mod: \if ((i &lt; 0 &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-         \then (     \if ((i &lt; 0 &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                         \then (     \if ((  i &lt; 0
-                                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                                         \then (     \if ((    i
-                                                             &lt; 0
-                                                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                                                         \then (     \if ((    i
-                                                                             &lt; 0
-                                                                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                                                                         \then (     \if ((    i
-                                                                                             &lt; 0
-                                                                                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                                                                                         \then (allLocs)
-                                                                                         \else (allLocs)
-                                                                                \cap \if ((  (!  array
-                                                                                               = null
-                                                                                           &amp;    i
-                                                                                             &gt;= 0)&lt;&lt;SC&gt;&gt;
-                                                                                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                                                                                         \then (allLocs)
-                                                                                         \else (allLocs))
-                                                                         \else (allLocs)
-                                                                \cap \if ((  (!  array
-                                                                               = null
-                                                                           &amp;    i
-                                                                             &gt;= 0)&lt;&lt;SC&gt;&gt;
-                                                                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                                                                         \then (allLocs)
-                                                                         \else (allLocs))
-                                                         \else (allLocs)
-                                                \cap \if ((  (!  array
-                                                               = null
-                                                           &amp;    i
-                                                             &gt;= 0)&lt;&lt;SC&gt;&gt;
-                                                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                                                         \then (allLocs)
-                                                         \else (allLocs))
-                                         \else (allLocs)
-                                \cap \if ((  (!  array
-                                               = null
-                                           &amp; i &gt;= 0)&lt;&lt;SC&gt;&gt;
-                                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                                         \then (allLocs)
-                                         \else (allLocs))
-                         \else (allLocs)
-                \cap \if ((  (!array = null
-                           &amp; i &gt;= 0)&lt;&lt;SC&gt;&gt;
-                           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-                         \then (allLocs)
-                         \else (allLocs))
-         \else (allLocs)
-\cap \if ((  (!array = null
-           &amp; i &gt;= 0)&lt;&lt;SC&gt;&gt;
-           &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;)
-         \then (allLocs)
-         \else (allLocs)
+post: (   (i &lt; 0 &amp; x.&lt;inv&gt;@heapBefore_goOnNice&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
+   -&gt;   !(exc_2 = null)&lt;&lt;impl&gt;&gt;
+      &amp; (  ((     java.lang.Throwable::instance(exc_2)
+                = TRUE
+             -&gt; x.&lt;inv&gt;)&lt;&lt;impl&gt;&gt;)
+         &amp; (  java.lang.Error::instance(exc_2) = TRUE
+            |   java.lang.RuntimeException::instance(exc_2)
+              = TRUE
+            |   java.lang.RuntimeException::instance(exc_2)
+              = TRUE)))
+&amp; (   (  (!array = null
+       &amp; i &gt;= 0)&lt;&lt;SC&gt;&gt;
+       &amp; x.&lt;inv&gt;@heapBefore_goOnNice&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
+   -&gt;   (  result_2
+         = \if (i &lt; array.length)
+               \then (TRUE)
+               \else (FALSE)
+      &amp; x.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
+      &amp; (exc_2 = null)&lt;&lt;impl&gt;&gt;)
+mod: allLocs
 termination: diamond" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
     b=x.goOnNice(array,i);
   }

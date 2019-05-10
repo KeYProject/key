@@ -174,7 +174,7 @@ public class SettingsDialog extends JDialog{
         
         public JButton getOkayButton() {
                 if(okayButton == null){
-                        okayButton = new JButton("Okay");
+                        okayButton = new JButton("OK");
                         okayButton.addActionListener(buttonListener);
                 }
                 return okayButton;

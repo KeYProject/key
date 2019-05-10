@@ -526,9 +526,9 @@ public class ContractFactory {
     }
 
     private static void combineModifies(FunctionalOperationContractImpl t,
-                                        Map<LocationVariable, Term> pres,
                                         Map<LocationVariable, Boolean> hasMod,
                                         Map<LocationVariable, Term> mods,
+                                        Map<LocationVariable, Term> uniformMod,
                                         FunctionalOperationContract other,
                                         LocationVariable h, Term otherPre,
                                         Services services) {
@@ -546,14 +546,14 @@ public class ContractFactory {
                     nm = m2;
                 } else if (m2 == null) {
                     nm = m1;
-                } else if (m1.op().equals(emptyMod) && m2.op().equals(emptyMod)) {
-                    // special case for both contracts being (weakly) pure
-                    // fixes bug #1557
-                    nm = m1;
                 } else {
-                    Term ownPre = pres.get(h) != null ? pres.get(h) : tb.tt();
-                    nm = tb.intersect(tb.ife(ownPre, m1, tb.allLocs()),
+                    nm = tb.intersect(m1,
                                       tb.ife(otherPre, m2, tb.allLocs()));
+
+                    // check if the other mod is the same as the one in the uniform store.
+                    if(uniformMod.containsKey(h) && !uniformMod.get(h).equals(m2)) {
+                        uniformMod.remove(h);
+                    }
                 }
                 mods.put(h, nm);
             }
@@ -633,6 +633,7 @@ public class ContractFactory {
                                        Map<LocationVariable, Term> pres,
                                        Term mby,
                                        Map<LocationVariable, Boolean> hasMod,
+                                       Map<LocationVariable, Term> uniformMod,
                                        Map<LocationVariable, Term> posts,
                                        Map<LocationVariable, Term> freePosts,
                                        Map<LocationVariable, Term> axioms,
@@ -660,7 +661,7 @@ public class ContractFactory {
                 mby = combineMeasuredBy(mby, otherMby, h, otherPre, services);
 
                 // the modifies clause must be computed before the preconditions
-                combineModifies(t, pres, hasMod, mods, other, h, otherPre, services);
+                combineModifies(t, hasMod, mods, uniformMod, other, h, otherPre, services);
 
                 if (otherPre != null) {
                     pres.put(h, pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
@@ -682,6 +683,17 @@ public class ContractFactory {
                 }
             }
             deps = joinDependencies(t, deps, other, services);
+        }
+
+        /*
+         * If there is a uniform mod clause (i.e., the same for all joined contracts),
+         * then use that instead of the disjunction of if-then-else expressions.
+         * (Related to an older fix by Daniel Grahl for MT-1557.)
+         */
+        for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            if (uniformMod.containsKey(h)) {
+                mods.put(h, uniformMod.get(h));
+            }
         }
 
         /*
@@ -713,9 +725,20 @@ public class ContractFactory {
     private FunctionalOperationContract union(final String name,
                                               FunctionalOperationContractImpl t,
                                               FunctionalOperationContract[] others) {
+        // MU: Bugfix #1489
+        // Do not modify the data stores in t but make new copies
+        Map<LocationVariable, Term> mods =
+                new LinkedHashMap<LocationVariable, Term>(t.originalMods);
+        Map<ProgramVariable, Term> deps =
+                new LinkedHashMap<ProgramVariable, Term>(t.originalDeps);
+
+        // keep this to check if every contract has the same mod
+        // then no if-then-else cascades are needed.
+        Map<LocationVariable, Term> uniformMod = new LinkedHashMap<LocationVariable, Term>();
+
         // collect information
-        Map<LocationVariable, Term> pres = new LinkedHashMap<LocationVariable, Term>(
-                t.originalPres.size());
+        Map<LocationVariable, Term> pres =
+                new LinkedHashMap<LocationVariable, Term>(t.originalPres.size());
         for (LocationVariable h : t.originalPres.keySet()) {
             pres.put(h, t.originalPres.get(h));
         }
@@ -739,6 +762,11 @@ public class ContractFactory {
                 freePosts.put(h, tb.imp(atPreify(t.originalFreePres.get(h), t.originalAtPreVars),
                                         oriFreePost));
             }
+            Term origMod = t.originalMods.get(h);
+            if (origMod != null) {
+                mods.put(h, tb.ife(t.originalPres.get(h), origMod, tb.allLocs()));
+                uniformMod.put(h, origMod);
+            }
         }
 
         Map<LocationVariable, Term> axioms = new LinkedHashMap<LocationVariable, Term>();
@@ -751,11 +779,9 @@ public class ContractFactory {
                 }
             }
         }
-        Map<LocationVariable, Term> mods = t.originalMods;
-        Map<ProgramVariable, Term> deps = t.originalDeps;
         Modality moda = t.modality;
-        return joinWithOtherContracts(name, t, others, pres, mby, hasMod, posts,
-                                      freePosts, axioms, mods, deps, moda);
+        return joinWithOtherContracts(name, t, others, pres, mby, hasMod, uniformMod,
+                                      posts, freePosts, axioms, mods, deps, moda);
     }
 
     /**

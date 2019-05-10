@@ -46,8 +46,7 @@ import de.uka.ilkd.key.util.Debug;
  */
 
 public class VariableSpecification extends JavaNonTerminalProgramElement
-    implements NamedProgramElement, ExpressionContainer, Variable//,Declaration
- {       
+    implements NamedProgramElement, ExpressionContainer, Variable { //,Declaration
      /**
       *	Initializer.
       */     
@@ -146,10 +145,10 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     }
 
     @Override
-    protected int computeHashCode(){
+    protected int computeHashCode() {
         return 37*super.computeHashCode() + 31 * ((type==null) ? 0 : type.hashCode()) + dimensions;
     }
-     
+
     /**
      *      Get the number of expressions in this container.
      *      @return the number of expressions.

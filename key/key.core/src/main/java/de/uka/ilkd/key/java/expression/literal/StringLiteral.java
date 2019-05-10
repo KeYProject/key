@@ -61,7 +61,7 @@ public class StringLiteral extends Literal implements ReferencePrefix {
     
     @Override
     public int computeHashCode() {
-    	return 17 * super.computeHashCode() + getValue().hashCode();
+        return 17 * super.computeHashCode() + getValue().hashCode();
     }
 
     public String getValue() {

@@ -116,7 +116,6 @@ public class MethodFrame extends JavaStatement implements
 
     }
 
-   
     @Override
     public boolean hasNextPrefixElement() {
         return !body.isEmpty() && body.getStatementAt(0) instanceof ProgramPrefix;
