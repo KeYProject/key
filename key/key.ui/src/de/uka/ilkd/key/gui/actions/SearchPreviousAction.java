@@ -13,17 +13,11 @@
 
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
-import javax.swing.KeyStroke;
-
-import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.nodeviews.SequentView;
 
 /*
  * Menu option for showing the next search result

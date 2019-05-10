@@ -355,7 +355,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             final ImmutableArray<QuantifiableVariable> boundVars = instantiateBoundVariables(visited);
 
             // instantiate sub terms
-            final Term[] neededsubs = neededSubs(newOp.arity());
+            final Term[] neededsubs = neededSubs(newOp != null ? newOp.arity() : 0);
             if (boundVars != visited.boundVars() || jblockChanged
                     || (newOp != visitedOp)
                     || (!subStack.empty() && subStack.peek() == newMarker)) {

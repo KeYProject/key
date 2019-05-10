@@ -143,7 +143,7 @@ public abstract class JavaProgramElement extends JavaSourceElement
      * please override method {@link #computeHashCode()}
      */
     @Override
-    public final int hashCode(){
+    public final int hashCode() {
         if (hashCode == -1) {
             int localHash = computeHashCode();
             if (localHash == -1) {
@@ -151,11 +151,9 @@ public abstract class JavaProgramElement extends JavaSourceElement
             }
             this.hashCode = localHash;
         }
-    	
-    	return hashCode;
+        return hashCode;
     }
-    
-    
+
     @Override    
     public boolean equals(Object o){
     	if(o == this) { 
