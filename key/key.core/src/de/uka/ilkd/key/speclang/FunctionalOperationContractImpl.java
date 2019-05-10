@@ -1061,7 +1061,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 getClauseText("free post", originalFreePosts, includeHtmlMarkup,
                                  services, usePrettyPrinting, useUnicodeSymbols);
 
-        final String posts = getPostText(originalAxioms, originalAxioms, includeHtmlMarkup,
+        final String posts = getPostText(originalPosts, originalAxioms, includeHtmlMarkup,
                                          services, usePrettyPrinting, useUnicodeSymbols);
 
         final String clauses = globalUpdates + pres + freePres + posts + freePosts + mods;

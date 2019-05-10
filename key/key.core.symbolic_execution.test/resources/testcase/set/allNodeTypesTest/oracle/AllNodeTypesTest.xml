@@ -5,6 +5,7 @@
          <branchCondition name="not(equals(obj,null))" pathCondition="not(equals(obj,null))" pathConditionChanged="true" branchCondition="not(equals(obj,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <operationContract name="result_0 = doubleValue(1) catch(exc_1)
 pre: 1 &gt;= 0
+post: result_0 = javaAddInt(1, 1) &amp; (exc_1 = null)&lt;&lt;impl&gt;&gt;
 mod: allLocs
 termination: diamond" pathCondition="not(equals(obj,null))" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_1" contractParameters="Z(1(#))" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                <statement name="int result = 0;" pathCondition="not(equals(obj,null))" pathConditionChanged="false">
