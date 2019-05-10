@@ -1,6 +1,10 @@
 package de.uka.ilkd.key.gui.sourceview;
 
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
+
 import java.awt.Color;
+import java.util.EventObject;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,21 +30,31 @@ public class JavaDocument extends DefaultStyledDocument {
     // highlighting colors (same as in HTMLSyntaxHighlighter of SequentView for consistency)
 
     /** highight color for Java keywords (dark red/violet) */
-    private static final Color JAVA_KEYWORD_COLOR = new Color(0x7f0055);
+    private static final ColorSettings.ColorProperty JAVA_KEYWORD_COLOR =
+            ColorSettings.define("[java]keyword", "",
+            new Color(0x7f0055));
 
     //private static final Color JAVA_STRING_COLOR = new Color(0x000000);
 
     /** highight color for comments (dull green) */
-    private static final Color COMMENT_COLOR = new Color(0x3f7f5f);
+    private static final ColorSettings.ColorProperty COMMENT_COLOR =
+            ColorSettings.define("[java]comment", "",
+                    new Color(0x3f7f5f));
 
     /** highight color for JavaDoc (dull green) */
-    private static final Color JAVADOC_COLOR = new Color(0x3f7f5f);
+    private static final ColorSettings.ColorProperty JAVADOC_COLOR =
+            ColorSettings.define("[java]javadoc", "",
+                    new Color(0x3f7f5f));
 
     /** highight color for JML (dark blue) */
-    private static final Color JML_COLOR = new Color(0x0000c0);
+    private static final ColorSettings.ColorProperty JML_COLOR =
+            ColorSettings.define("[java]jml", "",
+                    new Color(0x0000c0));
 
     /** highight color for JML keywords (blue) */
-    private static final Color JML_KEYWORD_COLOR = new Color(0x0000f0);
+    private static final ColorSettings.ColorProperty JML_KEYWORD_COLOR =
+            ColorSettings.define("[java]jmlKeyword", "",
+                    new Color(0x0000f0));
 
     /**
      * Enum to indicate the current mode (environment) of the parser.
@@ -234,15 +248,8 @@ public class JavaDocument extends DefaultStyledDocument {
      * (as in eclipse default settings).
      */
     public JavaDocument () {
-        // set the styles
-        StyleConstants.setBold(keyword, true);
-        StyleConstants.setForeground(keyword, JAVA_KEYWORD_COLOR);
-        StyleConstants.setForeground(comment, COMMENT_COLOR);
-        StyleConstants.setForeground(javadoc, JAVADOC_COLOR);
-        //StyleConstants.setForeground(string, JAVA_STRING_COLOR);
-        StyleConstants.setForeground(jml, JML_COLOR);
-        StyleConstants.setForeground(jmlkeyword, JML_KEYWORD_COLOR);
-        StyleConstants.setBold(jmlkeyword, true);
+        updateStyles();
+        ColorSettings.getInstance().addSettingsListener(e -> updateStyles());
 
         // fill the keyword hash sets
         for (String k : KEYWORDS) {
@@ -252,6 +259,18 @@ public class JavaDocument extends DefaultStyledDocument {
         for (String k : JMLKEYWORDS) {
             jmlkeywords.add(k);
         }
+    }
+
+    private void updateStyles() {
+        // set the styles
+        StyleConstants.setBold(keyword, true);
+        StyleConstants.setForeground(keyword, JAVA_KEYWORD_COLOR.get());
+        StyleConstants.setForeground(comment, COMMENT_COLOR.get());
+        StyleConstants.setForeground(javadoc, JAVADOC_COLOR.get());
+        //StyleConstants.setForeground(string, JAVA_STRING_COLOR);
+        StyleConstants.setForeground(jml, JML_COLOR.get());
+        StyleConstants.setForeground(jmlkeyword, JML_KEYWORD_COLOR.get());
+        StyleConstants.setBold(jmlkeyword, true);
     }
 
     private void checkAt() {

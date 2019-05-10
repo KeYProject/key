@@ -30,13 +30,19 @@ import java.awt.*;
 import java.text.Format;
 
 /**
+ * A panel used inside the settings dialog.
+ * <p>
+ * Allows a simple building of the UI by defining several factory methods.
+ * <p>
+ * Uses a three-column miglayout layout.
+ * <p>
  * 2019-04-08, weigl: rewrite to mig layout
  *
  * @author weigl
  */
-public abstract class TablePanel extends JPanel {
-    protected TablePanel() {
-        setLayout(new MigLayout(
+public abstract class SettingsPanel extends SimpleSettingsPanel {
+    protected SettingsPanel() {
+        pCenter.setLayout(new MigLayout(
                 new LC().fillX().wrapAfter(3),
                 new AC().count(3).fill(1)
                         .sizeGroup()
@@ -46,20 +52,9 @@ public abstract class TablePanel extends JPanel {
                         .align("right", 0)));
     }
 
-    public static JLabel createHelpLabel(String s) {
-        if (s == null || s.isEmpty())
-            s = "";
-        else
-            s = "<html>" + s.replaceAll("\n", "<br>");
-        JLabel infoButton = new JLabel(
-                IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
-        infoButton.setToolTipText(s);
-        return infoButton;
-    }
-
-    protected JTextArea createInfoArea(String info) {
+    protected static JTextArea createInfoArea(String info) {
         JTextArea textArea = new JTextArea(info);
-        textArea.setBackground(this.getBackground());
+        //textArea.setBackground(this.getBackground());
         textArea.setEditable(false);
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
@@ -72,7 +67,7 @@ public abstract class TablePanel extends JPanel {
             JComponent component = components[i];
             component.setAlignmentX(LEFT_ALIGNMENT);
             //last component, either line break or info
-            add(component);
+            pCenter.add(component);
         }
 
         JLabel infoButton;
@@ -81,22 +76,9 @@ public abstract class TablePanel extends JPanel {
         } else {
             infoButton = new JLabel();
         }
-        add(infoButton);
-
+        pCenter.add(infoButton);
     }
 
-    protected JCheckBox createCheckBox(String title, boolean value, final Validator<Boolean> validator) {
-        JCheckBox checkBox = new JCheckBox(title, value);
-        checkBox.addActionListener(e -> {
-            try {
-                validator.validate(checkBox.isSelected());
-                demarkComponentAsErrornous(checkBox);
-            } catch (Exception ex) {
-                markComponentAsErrornous(checkBox, ex.getMessage());
-            }
-        });
-        return checkBox;
-    }
 
     protected JCheckBox addCheckBox(String title, String info,
                                     boolean value, final Validator<Boolean> validator) {
@@ -119,7 +101,7 @@ public abstract class TablePanel extends JPanel {
         });
         JLabel lbl = new JLabel(title);
         lbl.setLabelFor(textField);
-        add(lbl);
+        pCenter.add(lbl);
         Box box = new Box(BoxLayout.X_AXIS);
         JButton btnFileChooser = new JButton(IconFontSwing.buildIcon(FontAwesomeSolid.SEARCH, 12f));
         /*btnFileChooser.setBorderPainted(false);
@@ -137,10 +119,10 @@ public abstract class TablePanel extends JPanel {
                 textField.setText(f.getSelectedFile().getAbsolutePath());
             }
         });
-        add(box);
+        pCenter.add(box);
         box.add(textField);
         box.add(btnFileChooser);
-        add(createHelpLabel(info), new CC().wrap());
+        pCenter.add(createHelpLabel(info), new CC().wrap());
         return textField;
     }
 
@@ -158,20 +140,15 @@ public abstract class TablePanel extends JPanel {
         });
         if (info != null && !info.isEmpty()) {
             add(new JLabel());
-            add(comboBox);
+            pCenter.add(comboBox);
             JLabel infoButton = createHelpLabel(info);
-            add(infoButton, new CC().wrap());
+            pCenter.add(infoButton, new CC().wrap());
         } else {
             add(comboBox, new CC().span(2).wrap());
         }
         return comboBox;
     }
 
-    protected JTextField createTextField(String text, final Validator<String> validator) {
-        JTextField field = new JTextField(text);
-        field.getDocument().addDocumentListener(new DocumentValidatorAdapter(field, validator));
-        return field;
-    }
 
     protected void addTitledComponent(String title, JComponent component, String helpText) {
         JLabel label = new JLabel(title);
@@ -182,24 +159,6 @@ public abstract class TablePanel extends JPanel {
     protected JTextField addTextField(String title, String text, String info, final Validator<String> validator) {
         JTextField field = createTextField(text, validator);
         addTitledComponent(title, field, info);
-        return field;
-    }
-
-
-    protected JFormattedTextField createNumberFormattedTextField(Format format, final Validator<String> validator) {
-        JFormattedTextField field = new JFormattedTextField(format);
-        field.getDocument().addDocumentListener(new DocumentValidatorAdapter(field, validator));
-        return field;
-    }
-
-    protected JSpinner createNumberTextField(int min, int max, int step, final Validator<Integer> validator) {
-        SpinnerModel spinnerModel = new SpinnerNumberModel(min, min, max, step);
-        return createNumberTextField(spinnerModel, validator);
-    }
-
-    protected <T> JSpinner createNumberTextField(SpinnerModel model, final Validator<T> validator) {
-        JSpinner field = new JSpinner(model);
-        field.addChangeListener(new ValidatorSpinnerAdapter<>(field, validator));
         return field;
     }
 
@@ -222,71 +181,10 @@ public abstract class TablePanel extends JPanel {
         Box box = new Box(BoxLayout.X_AXIS);
         box.add(new JLabel(titleText));
         box.add(pane);
-        add(box, new CC().span().grow().alignX("left"));
+        pCenter.add(box, new CC().span().grow().alignX("left"));
     }
 
-    @SuppressWarnings("unchecked")
-    private class ValidatorSpinnerAdapter<T> implements ChangeListener {
-        private final Validator<T> validator;
-        private final JSpinner model;
-
-        public ValidatorSpinnerAdapter(JSpinner model, Validator<T> validator) {
-            this.model = model;
-            this.validator = validator;
-        }
-
-        @Override
-        public void stateChanged(ChangeEvent e) {
-            Object current = model.getValue();
-            try {
-                validator.validate((T) current);
-                demarkComponentAsErrornous(model);
-            } catch (Exception ex) {
-                markComponentAsErrornous(model, ex.getMessage());
-            }
-        }
-    }
-
-    protected void demarkComponentAsErrornous(JComponent component) {
-        component.setBackground(Color.white);//find color
-    }
-
-    protected void markComponentAsErrornous(JComponent component, String error) {
-        component.setBackground(Color.RED);
-        component.setToolTipText(error);
-    }
-
-    private class DocumentValidatorAdapter implements DocumentListener {
-        private final JTextField field;
-        private final Validator<String> validator;
-
-        private DocumentValidatorAdapter(JTextField field, Validator<String> validator) {
-            this.field = field;
-            this.validator = validator;
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            update();
-        }
-
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            update();
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-            update();
-        }
-
-        void update() {
-            try {
-                validator.validate(field.getText());
-                demarkComponentAsErrornous(field);
-            } catch (Exception ex) {
-                markComponentAsErrornous(field, ex.getMessage());
-            }
-        }
+    protected <T> Validator<T> emptyValidator() {
+        return s -> {};
     }
 }

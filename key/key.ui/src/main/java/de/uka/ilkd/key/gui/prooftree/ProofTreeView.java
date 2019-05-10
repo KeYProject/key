@@ -19,6 +19,7 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.*;
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
@@ -51,14 +52,22 @@ import java.util.List;
 
 public class ProofTreeView extends JPanel implements TabPanel {
 
-    public static final Color GRAY_COLOR = Color.DARK_GRAY;
-    public static final Color BISQUE_COLOR = new Color(240, 228, 196);
-    public static final Color LIGHT_BLUE_COLOR = new Color(230, 254, 255);
-    public static final Color DARK_BLUE_COLOR = new Color(31, 77, 153);
-    public static final Color DARK_GREEN_COLOR = new Color(0, 128, 51);
-    public static final Color DARK_RED_COLOR = new Color(191, 0, 0);
-    public static final Color PINK_COLOR = new Color(255, 0, 240);
-    public static final Color ORANGE_COLOR = new Color(255, 140, 0);
+    public static final ColorSettings.ColorProperty GRAY_COLOR =
+            ColorSettings.define("[proofTree]gray", "", Color.DARK_GRAY);
+    public static final ColorSettings.ColorProperty BISQUE_COLOR =
+            ColorSettings.define("[proofTree]bisque", "", new Color(240, 228, 196));
+    public static final ColorSettings.ColorProperty LIGHT_BLUE_COLOR =
+            ColorSettings.define("[proofTree]lightBlue", "", new Color(230, 254, 255));
+    public static final ColorSettings.ColorProperty DARK_BLUE_COLOR =
+            ColorSettings.define("[proofTree]darkBlue", "", new Color(31, 77, 153));
+    public static final ColorSettings.ColorProperty DARK_GREEN_COLOR =
+            ColorSettings.define("[proofTree]darkGreen", "", new Color(0, 128, 51));
+    public static final ColorSettings.ColorProperty DARK_RED_COLOR =
+            ColorSettings.define("[proofTree]darkRed", "", new Color(191, 0, 0));
+    public static final ColorSettings.ColorProperty PINK_COLOR =
+            ColorSettings.define("[proofTree]pink", "", new Color(255, 0, 240));
+    public static final ColorSettings.ColorProperty ORANGE_COLOR =
+            ColorSettings.define("[proofTree]orange", "", new Color(255, 140, 0));
     /**
      * KeYStroke for the search panel: STRG+SHIFT+F
      */
@@ -713,7 +722,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             if (value instanceof GUIBranchNode) {
                 super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-                setBackgroundNonSelectionColor(BISQUE_COLOR);
+                setBackgroundNonSelectionColor(BISQUE_COLOR.get());
                 if (((GUIBranchNode) value).isClosed()) {
                     // all goals below this node are closed
                     this.setIcon(IconFactory.provedFolderIcon(iconHeight));
@@ -756,7 +765,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             if (value instanceof GUIOneStepChildTreeNode) {
                 super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-                setForeground(GRAY_COLOR);
+                setForeground(GRAY_COLOR.get());
                 setIcon(IconFactory.oneStepSimplifier(iconHeight));
                 setText(value.toString());
                 return this;
@@ -783,23 +792,23 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (node.leaf()) {
                 Goal goal = proof.getGoal(node);
                 if (goal == null || node.isClosed()) {
-                    tree_cell.setForeground(DARK_GREEN_COLOR);
+                    tree_cell.setForeground(DARK_GREEN_COLOR.get());
                     tree_cell.setIcon(IconFactory.keyHoleClosed(iconHeight));
                     ProofTreeView.this.setToolTipText("Closed Goal");
                     tree_cell.setToolTipText("A closed goal");
                 } else {
                     if (goal.isLinked()) {
-                        tree_cell.setForeground(PINK_COLOR);
+                        tree_cell.setForeground(PINK_COLOR.get());
                         tree_cell.setIcon(IconFactory.keyHoleLinked(iconHeight, iconHeight));
                         ProofTreeView.this.setToolTipText("Linked Goal");
                         tree_cell.setToolTipText("Linked goal - no automatic rule application");
                     } else if (!goal.isAutomatic()) {
-                        tree_cell.setForeground(ORANGE_COLOR);
+                        tree_cell.setForeground(ORANGE_COLOR.get());
                         tree_cell.setIcon(IconFactory.keyHoleInteractive(iconHeight, iconHeight));
                         ProofTreeView.this.setToolTipText("Disabled Goal");
                         tree_cell.setToolTipText("Interactive goal - no automatic rule application");
                     } else {
-                        tree_cell.setForeground(DARK_RED_COLOR);
+                        tree_cell.setForeground(DARK_RED_COLOR.get());
                         tree_cell.setIcon(IconFactory.keyHole(iconHeight, iconHeight));
                         ProofTreeView.this.setToolTipText("Open Goal");
                         tree_cell.setToolTipText("An open goal");
@@ -836,14 +845,14 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
 
             if (node.getNodeInfo().getNotes() != null) {
-                tree_cell.setBackgroundNonSelectionColor(ORANGE_COLOR);
+                tree_cell.setBackgroundNonSelectionColor(ORANGE_COLOR.get());
             } else if (node.getNodeInfo().getActiveStatement() != null) {
-                tree_cell.setBackgroundNonSelectionColor(LIGHT_BLUE_COLOR);
+                tree_cell.setBackgroundNonSelectionColor(LIGHT_BLUE_COLOR.get());
 
             } else {
                 tree_cell.setBackgroundNonSelectionColor(Color.white);
             }
-            if (sel) tree_cell.setBackground(DARK_BLUE_COLOR);
+            if (sel) tree_cell.setBackground(DARK_BLUE_COLOR.get());
 
             tree_cell.setFont(tree.getFont());
             tree_cell.setText(nodeText);

@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.gui.settings;
 
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -32,6 +32,7 @@ public class SettingsUi extends JPanel {
     private JScrollPane center;
 
     public SettingsUi(MainWindow mainWindow) {
+        treeSettingsPanels.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         treeSettingsPanels.setCellRenderer(new DefaultTreeCellRenderer() {
             @Override
             public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {

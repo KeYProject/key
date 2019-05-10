@@ -2,15 +2,15 @@ package de.uka.ilkd.key.gui.keyshortcuts;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.InvalidSettingsInputException;
-import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import java.awt.*;
+import javax.swing.table.TableRowSorter;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -19,19 +19,13 @@ import java.util.stream.Collectors;
  * @author Alexander Weigl
  * @version 1 (09.05.19)
  */
-public class ShortcutSettings extends JPanel implements SettingsProvider {
+public class ShortcutSettings extends SimpleSettingsPanel implements SettingsProvider {
     private final JTable tblShortcuts = new JTable();
     private ShortcutsTableModel modelShortcuts;
 
     public ShortcutSettings() {
-        setLayout(new BorderLayout());
-        JComponent pNorth = SettingsManager.createSettingsHeaderPanel(
-                "Keyboard Shortcuts", "");
-
-        tblShortcuts.setModel(new ShortcutsTableModel(Collections.emptyList(),
-                Collections.emptyList(), Collections.emptyList()));
-
-        add(pNorth, BorderLayout.NORTH);
+        super();
+        setHeaderText("Keyboard Shortcuts");
         add(new JScrollPane(tblShortcuts));
     }
 
@@ -46,14 +40,29 @@ public class ShortcutSettings extends JPanel implements SettingsProvider {
         Properties p = new Properties();
         settings.writeSettings(p);
 
-        List<String> actionNames = p.keySet().stream().sorted().map(Object::toString).collect(Collectors.toList());
-        List<String> shortcuts = actionNames.stream().map(p::getProperty).collect(Collectors.toList());
+        List<String> actionNames = p.keySet().stream()
+                .sorted()
+                .map(Object::toString)
+                .collect(Collectors.toList());
+
+        List<String> shortcuts = actionNames.stream()
+                .map(p::getProperty)
+                .collect(Collectors.toList());
+
         List<Action> actions = actionNames.stream()
                 .map(KeyStrokeManager::findAction)
                 .collect(Collectors.toList());
 
         modelShortcuts = new ShortcutsTableModel(actionNames, shortcuts, actions);
         tblShortcuts.setModel(modelShortcuts);
+
+        TableRowSorter<ShortcutsTableModel> sorter = new TableRowSorter<>(modelShortcuts);
+        tblShortcuts.setRowSorter(sorter);
+
+        List<RowSorter.SortKey> sortKeys = new ArrayList<>(25);
+        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+        sorter.setSortKeys(sortKeys);
+
 
         JTextField txtCaptureShortcut = new JTextField();
         DefaultCellEditor cellEditor = new DefaultCellEditor(txtCaptureShortcut);
@@ -79,6 +88,7 @@ public class ShortcutSettings extends JPanel implements SettingsProvider {
                         ks.getModifiers() > 0
                                 && ks.getKeyCode() != KeyEvent.VK_UNDEFINED
                                 && ks.getKeyCode() != KeyEvent.VK_CONTROL
+                                && ks.getKeyCode() != KeyEvent.VK_SHIFT
                                 && ks.getKeyCode() != KeyEvent.VK_ALT;
 
                 if (shortcutComplete)
@@ -101,16 +111,21 @@ public class ShortcutSettings extends JPanel implements SettingsProvider {
     public void applySettings(MainWindow window)
             throws InvalidSettingsInputException {
 
-        List<String> s = modelShortcuts.shortcut.stream()
-                .filter(it -> it == null || it.isEmpty())
-                .collect(Collectors.toList());
+        List<String> s = modelShortcuts.shortcut;
 
+        /*weigl: disable duplicate check, because we have many in the default config
         for (int i = 0; i < s.size() - 1; i++) {
             for (int j = i + 1; j < s.size(); j++) {
-                if (s.get(i).equals(s.get(j))) {
+                String a = s.get(i);
+                String b = s.get(j);
+
+                if (a == null || b == null || a.isEmpty() || b.isEmpty())
+                    continue;
+
+                if (a.equals(b)) {
                     //found duplicate
                     throw new InvalidSettingsInputException(
-                            String.format("<html>Clash of key bindings: %s<br>For keys: %s and %s",
+                            String.format("Clash of key bindings: %s<br>For keys: %s and %s",
                                     s.get(i),
                                     modelShortcuts.actionName.get(i),
                                     modelShortcuts.actionName.get(j)),
@@ -118,18 +133,20 @@ public class ShortcutSettings extends JPanel implements SettingsProvider {
                 }
             }
         }
+        */
 
-        List<KeyStroke> keystrokes = modelShortcuts.shortcut
-                .stream().map(KeyStroke::getKeyStroke)
-                .collect(Collectors.toList());
-
+        List<KeyStroke> keystrokes =
+                s.stream().map(KeyStroke::getKeyStroke)
+                        .collect(Collectors.toList());
+        /*
         if (keystrokes.contains(null)) {
             throw new InvalidSettingsInputException(
-                    "<html>Invalid keystroke specified",
+                    "Invalid keystroke specified",
                     this, tblShortcuts);
         }
+        */
 
-        for (int i = 0; i <= modelShortcuts.shortcut.size(); i++) {
+        for (int i = 0; i < modelShortcuts.shortcut.size(); i++) {
             String key = modelShortcuts.actionName.get(i);
             KeyStroke ks = keystrokes.get(i);
             KeyStrokeManager.getSettings().setKeyStroke(key, ks, true);

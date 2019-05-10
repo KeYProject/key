@@ -46,6 +46,8 @@ public final class IconFactory {
     public static final IconFontProvider PROOF_MANAGEMENT = new IconFontProvider(FontAwesomeSolid.TASKS);
     public static final IconFontProvider PROPERTIES = new IconFontProvider(FontAwesomeSolid.COGS);
     public static final IconProvider SEARCH_PREV = new IconFontProvider(FontAwesomeSolid.ARROW_RIGHT);
+    public static final IconFontProvider EXPERIMENTAL_EXTENSION = new IconFontProvider(FontAwesomeSolid.FLASK);
+    public static float DEFAULT_SIZE = 16;
     public static Color CLOSED_GREEN = DuneColorScheme.green;
     public static final IconFontProvider AUTO_MODE_START = new IconFontProvider(FontAwesomeSolid.PLAY_CIRCLE, CLOSED_GREEN);
     public static Color BLUE = DuneColorScheme.blue;
@@ -60,7 +62,6 @@ public final class IconFactory {
     public static IconProvider WARNING_UNSOUND = new IconFontProvider(FontAwesomeSolid.EXCLAMATION_TRIANGLE, ERROR_COLOR);
     public static IconProvider WARNING_INCOMPLETE = new IconFontProvider(FontAwesomeSolid.EXCLAMATION_TRIANGLE, WARNING_COLOR);
     public static IconProvider SEARCH_REGROUP = new IconFontProvider(FontAwesomeSolid.EMBER);
-
     public static IconProvider EXPORT_MU_SCRIPT = new IconFontProvider(FontAwesomeSolid.FILE_EXPORT);
     public static IconProvider EXPORT_MU_SCRIPT_CLIPBOARD = new IconFontProvider(FontAwesomeRegular.COPY);
     public static IconProvider INTERLOG_LOAD = new IconFontProvider(FontAwesomeSolid.TRUCK_LOADING);
@@ -75,7 +76,6 @@ public final class IconFactory {
     public static IconProvider INTERLOG_RESUME = new IconFontProvider(FontAwesomeSolid.PAUSE_CIRCLE);
     public static IconProvider INTERLOG_PAUSE = new IconFontProvider(FontAwesomeSolid.PLAY_CIRCLE);
     public static IconProvider INTERLOG_ICON = new IconFontProvider(FontAwesomeSolid.BOOK);
-
     public static IconProvider HEATMAP_DEACTIVATE = new IconFontProvider(FontAwesomeSolid.FIRE_EXTINGUISHER);
     public static IconProvider HEATMAP_ACTIVATE = new IconFontProvider(FontAwesomeSolid.FIRE);
 

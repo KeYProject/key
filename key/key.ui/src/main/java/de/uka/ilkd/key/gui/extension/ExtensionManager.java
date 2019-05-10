@@ -5,51 +5,47 @@ import de.uka.ilkd.key.gui.extension.impl.Extension;
 import de.uka.ilkd.key.gui.extension.impl.ExtensionSettings;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.gui.settings.TablePanel;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import net.miginfocom.layout.CC;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
-public class ExtensionManager extends TablePanel implements SettingsProvider {
+public class ExtensionManager extends SettingsPanel
+        implements SettingsProvider {
     private static final ExtensionSettings EXTENSION_SETTINGS = new ExtensionSettings();
     private HashMap<JCheckBox, Extension> map;
+    private String keywords = "";
+
+    public ExtensionManager() {
+        setHeaderText("Extension Settings");
+        setSubHeaderText("Settings will be applied on next restart");
+        lblSubhead.setIcon(IconFactory.WARNING_INCOMPLETE.get());
+        lblSubhead.setBackground(Color.orange.darker());
+        refresh();
+    }
 
     public static ExtensionSettings getExtensionSettings() {
         ProofIndependentSettings.DEFAULT_INSTANCE.addSettings(EXTENSION_SETTINGS);
         return EXTENSION_SETTINGS;
     }
 
-    private String keywords = "";
-
-    public ExtensionManager() {
-        refresh();
-    }
-
     private void refresh() {
-        removeAll();
+        pCenter.removeAll();
         map = new HashMap<>();
         keywords = "";
-
-        JLabel lblHead = new JLabel("Extension Settings");
         keywords += lblHead.getText();
-        lblHead.setFont(lblHead.getFont().deriveFont(16f));
-        add(lblHead, new CC().span().alignX("left"));
 
-        JLabel lblInfo = new JLabel("Settings will be applied on next restart");
-        keywords += lblInfo.getText();
-        lblInfo.setIcon(IconFactory.WARNING_INCOMPLETE.get());
-        lblInfo.setBackground(Color.orange.darker());
-        lblHead.setFont(lblHead.getFont().deriveFont(16f));
-        add(lblInfo, new CC().span().alignX("left"));
+        keywords += lblSubhead.getText();
 
         KeYGuiExtensionFacade.getExtensions().forEach(it -> {
             JCheckBox box = new JCheckBox();
@@ -59,18 +55,20 @@ public class ExtensionManager extends TablePanel implements SettingsProvider {
             map.put(box, it);
 
             keywords += box.getText();
-            add(new JLabel(), new CC().newline());
-            add(box);
+            pCenter.add(new JLabel(it.isExperimental()
+                    ? IconFactory.EXPERIMENTAL_EXTENSION.get()
+                    : null), new CC().newline());
+            pCenter.add(box);
 
             JLabel lblProvides = new JLabel(getSupportLabel(it));
             keywords += lblProvides.getText();
             lblProvides.setFont(lblProvides.getFont().deriveFont(Font.ITALIC));
-            add(new JLabel(), new CC().newline());
-            add(lblProvides);
+            pCenter.add(new JLabel(), new CC().newline());
+            pCenter.add(lblProvides);
 
             if (!it.getDescription().isEmpty()) {
-                add(new JLabel(), new CC().newline());
-                add(createInfoArea(it.getDescription()));
+                pCenter.add(new JLabel(), new CC().newline());
+                pCenter.add(createInfoArea(it.getDescription()));
                 keywords += it.getDescription();
             }
         });

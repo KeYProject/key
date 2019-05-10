@@ -5,7 +5,7 @@ import de.uka.ilkd.key.gui.actions.HeatmapSettingsAction;
 import de.uka.ilkd.key.gui.actions.HeatmapToggleAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.gui.settings.TablePanel;
+import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import net.miginfocom.layout.CC;
@@ -23,7 +23,7 @@ import java.util.Map;
  */
 @KeYGuiExtension.Info(name = "Heatmap", optional = true,
         description = "Colorize the formulae on the sequence based on the most recent changes\n" +
-                "Developer: Jonas Schiffl <jonas.schiffl@kit.edu>")
+                "Developer: Jonas Schiffl <jonas.schiffl@kit.edu>", experimental = false)
 public class HeatmapExt implements KeYGuiExtension,
         KeYGuiExtension.MainMenu,
         KeYGuiExtension.Toolbar,
@@ -71,7 +71,7 @@ public class HeatmapExt implements KeYGuiExtension,
  * @author weigl
  * @author jschiffl
  */
-class HeatmapSettingsProvider extends TablePanel implements SettingsProvider {
+class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider {
     /**
      * The view settings
      */
@@ -148,6 +148,8 @@ class HeatmapSettingsProvider extends TablePanel implements SettingsProvider {
     private Map<HeatmapMode, JRadioButton> map = new HashMap<>();
 
     HeatmapSettingsProvider() {
+        setHeaderText("Heatmap Options");
+
         ButtonGroup group = new ButtonGroup();
         for (HeatmapMode m : HeatmapMode.values()) {
             JRadioButton radio = new JRadioButton(m.text);
@@ -155,7 +157,7 @@ class HeatmapSettingsProvider extends TablePanel implements SettingsProvider {
             group.add(radio);
             map.put(m, radio);
         }
-        add(new JLabel(INTRO_LABEL), new CC().span().alignX("left"));
+        pCenter.add(new JLabel(INTRO_LABEL), new CC().span().alignX("left"));
 
         addSeparator("Disable Heatmaps");
         addRadio(HeatmapMode.DEFAULT);

@@ -39,6 +39,7 @@ import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLDocument;
 
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -75,8 +76,13 @@ public abstract class SequentView extends JEditorPane {
 
     protected static final Color INACTIVE_BACKGROUND_COLOR
             = new Color(UIManager.getColor("Panel.background").getRGB());
-    // rgb components of heatmap color
-    private static final Color HEATMAP_COLOR = new Color(252, 202, 80);
+
+    //
+    private static final ColorSettings.ColorProperty HEATMAP_COLOR =
+            ColorSettings.define("[Heatmap]basecolor",
+                    "Base color of the heatmap. Other colors are derived from this one.",
+                    new Color(252, 202, 80));
+
     //maximum opacity of heatmap color
     private static final float HEATMAP_DEFAULT_START_OPACITY = .7f;
 
@@ -151,9 +157,9 @@ public abstract class SequentView extends JEditorPane {
 
         // sets the painter for the highlightning
         setHighlighter(new DefaultHighlighter());
-        additionalJavaHighlight = getColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR);
-        defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR);
-        dndHighlight = getColorHighlight(CurrentGoalView.DND_HIGHLIGHT_COLOR);
+        additionalJavaHighlight = getColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR.get());
+        defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR.get());
+        dndHighlight = getColorHighlight(CurrentGoalView.DND_HIGHLIGHT_COLOR.get());
         currentHighlight = defaultHighlight;
 
         // add a SeqViewChangeListener to this component
@@ -715,7 +721,7 @@ public abstract class SequentView extends JEditorPane {
      * @return the color, with interpolated opacity
      */
     private Color computeColorForAge(int max_age, int age) {
-        float[] color = HEATMAP_COLOR.getRGBColorComponents(null);
+        float[] color = HEATMAP_COLOR.get().getRGBColorComponents(null);
         float alpha = HEATMAP_DEFAULT_START_OPACITY *(1- (float) age/max_age);
 
         return new Color(color[0], color[1], color[2], alpha);

@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.colors.ColorSettingsProvider;
 import de.uka.ilkd.key.gui.extension.ExtensionManager;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -12,11 +13,14 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.*;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author Alexander Weigl
@@ -28,6 +32,8 @@ public class SettingsManager {
     public static final SettingsProvider SMT_SETTINGS = new SMTSettingsProvider();
     public static final TacletOptionsSettings TACLET_OPTIONS_SETTINGS = new TacletOptionsSettings();
     public static final ShortcutSettings SHORTCUT_SETTINGS = new ShortcutSettings();
+    public static final StandardUISettings STANDARD_UI_SETTINGS = new StandardUISettings();
+    public static final ColorSettingsProvider COLOR_SETTINGS = new ColorSettingsProvider();
 
     private static SettingsManager INSTANCE;
     private List<SettingsProvider> settingsProviders = new LinkedList<>();
@@ -42,12 +48,13 @@ public class SettingsManager {
     public static SettingsManager getInstance() {
         if (INSTANCE == null) {
             INSTANCE = createWithExtensions();
+            INSTANCE.add(STANDARD_UI_SETTINGS);
             INSTANCE.add(SHORTCUT_SETTINGS);
             INSTANCE.add(SMT_SETTINGS);
             INSTANCE.add(EXTENSION_MANAGER);
             INSTANCE.add(TEST_GEN_OPTIONS_PANEL);
             INSTANCE.add(TACLET_OPTIONS_SETTINGS);
-
+            INSTANCE.add(COLOR_SETTINGS);
         }
         return INSTANCE;
     }
@@ -79,19 +86,17 @@ public class SettingsManager {
         }*/
     }
 
-    public static JComponent createSettingsHeaderPanel(String header, String subhead) {
-        Box pNorth = new Box(BoxLayout.Y_AXIS);
-        pNorth.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        pNorth.setBackground(Color.WHITE);
-        pNorth.setOpaque(true);
-        JLabel lblHead = new JLabel(header);
-        lblHead.setFont(lblHead.getFont().deriveFont(16f).deriveFont(Font.BOLD));
-        pNorth.add(lblHead);
-        pNorth.add(new JLabel(subhead));
-        pNorth.add(new JSeparator());
-        return pNorth;
+    public static Properties loadProperties(File settingsFile) {
+        Properties props = new Properties();
+        if (settingsFile.exists()) {
+            try (FileReader reader = new FileReader(settingsFile)) {
+                props.load(reader);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return props;
     }
-
 
     public void showSettingsDialog(MainWindow mainWindow) {
         SettingsDialog dialog = createDialog(mainWindow);
@@ -100,6 +105,8 @@ public class SettingsManager {
 
     private SettingsDialog createDialog(MainWindow mainWindow) {
         settingsProviders.sort(Comparator.comparingInt(SettingsProvider::getPriorityOfSettings));
+        initializeProviders(settingsProviders, mainWindow);
+
         SettingsDialog dialog = new SettingsDialog(mainWindow);
         dialog.setSettingsProvider(settingsProviders);
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -107,6 +114,18 @@ public class SettingsManager {
         dialog.setSize(800, 600);
         dialog.setLocationByPlatform(true);
         return dialog;
+    }
+
+    /**
+     * ensures that every given setting provider can update its model based on the current mainWindow.
+     * This also includes the children of the settings.
+     *
+     * @param providers
+     * @param mainWindow
+     */
+    private void initializeProviders(List<SettingsProvider> providers, MainWindow mainWindow) {
+        providers.forEach(it -> it.getPanel(mainWindow));
+        providers.forEach(it -> initializeProviders(it.getChildren(), mainWindow));
     }
 
     public void showSettingsDialog(MainWindow mainWindow, SettingsProvider selectedPanel) {

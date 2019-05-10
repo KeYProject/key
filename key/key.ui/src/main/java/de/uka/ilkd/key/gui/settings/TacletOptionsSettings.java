@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class TacletOptionsSettings extends JPanel implements SettingsProvider {
+public class TacletOptionsSettings extends SimpleSettingsPanel implements SettingsProvider {
     private static final String EXPLANATIONS_RESOURCE = "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
     private static Properties explanationMap;
     private HashMap<String, String> category2Choice;
@@ -28,7 +28,8 @@ public class TacletOptionsSettings extends JPanel implements SettingsProvider {
     private boolean warnNoProof = true;
 
     public TacletOptionsSettings() {
-        setLayout(new MigLayout(
+        setHeaderText(getDescription());
+        pCenter.setLayout(new MigLayout(
                 new LC().fillX(),
                 new AC().fill().grow().gap("3mm")
         ));
@@ -160,21 +161,17 @@ public class TacletOptionsSettings extends JPanel implements SettingsProvider {
     }
 
     protected void layoutChoiceSelector() {
-        JLabel lblHead1 = new JLabel("Taclet Options");
-        lblHead1.setFont(lblHead1.getFont().deriveFont(16f));
-        add(lblHead1, new CC().newline());
-
         if (warnNoProof) {
             JLabel lblHead2 = new JLabel("No Proof loaded. Taclet options may not be parsed.");
             lblHead2.setIcon(IconFactory.WARNING_INCOMPLETE.get());
             lblHead2.setFont(lblHead2.getFont().deriveFont(14f));
-            add(lblHead2, new CC().newline());
+            pNorth.add(lblHead2);
         }
 
         JLabel lblHead2 = new JLabel("Taclet options will take effect only on new proofs.");
         lblHead2.setIcon(IconFactory.WARNING_INCOMPLETE.get());
         lblHead2.setFont(lblHead2.getFont().deriveFont(14f));
-        add(lblHead2, new CC().newline());
+        pNorth.add(lblHead2);
 
         category2Choice.keySet().stream().sorted().forEach(this::addCategory);
     }
@@ -214,7 +211,7 @@ public class TacletOptionsSettings extends JPanel implements SettingsProvider {
         explanationArea.setText(explanation);
         explanationArea.setCaretPosition(0);
         explanationArea.setBackground(getBackground());
-        add(explanationArea, new CC().span().newline());
+        pCenter.add(explanationArea, new CC().span().newline());
     }
 
     private JRadioButton addRadioButton(ChoiceEntry c, ButtonGroup btnGroup) {
@@ -235,16 +232,16 @@ public class TacletOptionsSettings extends JPanel implements SettingsProvider {
             b.add(lbl);
         }
         if (c.information != null) {
-            JLabel lbl = TablePanel.createHelpLabel(c.information);
+            JLabel lbl = SettingsPanel.createHelpLabel(c.information);
             b.add(lbl);
         }
-        add(b, new CC().newline());
+        pCenter.add(b, new CC().newline());
         return button;
     }
 
     private void addTitleRow(String cat) {
         JLabel lbl = new JLabel(cat);
-        add(lbl, new CC().span().newline());
+        pCenter.add(lbl, new CC().span().newline());
     }
 
     @Override

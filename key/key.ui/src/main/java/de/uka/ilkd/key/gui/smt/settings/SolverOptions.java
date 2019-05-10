@@ -3,7 +3,7 @@ package de.uka.ilkd.key.gui.smt.settings;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.gui.settings.TablePanel;
+import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.smt.SolverType;
 
@@ -13,7 +13,7 @@ import javax.swing.*;
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
-class SolverOptions extends TablePanel implements SettingsProvider {
+class SolverOptions extends SettingsPanel implements SettingsProvider {
     private static final String infoSolverName =
             "There are two ways to make supported provers applicable for KeY:\n"
                     + "1. Specify the absolute path of the prover in the field 'Command'.\n"
@@ -48,6 +48,7 @@ class SolverOptions extends TablePanel implements SettingsProvider {
     public SolverOptions(SolverType solverType) {
         this.setName(solverType.getName());
         this.solverType = solverType;
+        setHeaderText("SMT Solver: "+getDescription());
 
         JTextField solverName = createSolverName();
         JTextField solverInstalled = createSolverInstalled();

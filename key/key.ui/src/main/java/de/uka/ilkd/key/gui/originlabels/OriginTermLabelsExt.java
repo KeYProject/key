@@ -25,6 +25,11 @@ import java.util.List;
  *
  * @author lanzinger
  */
+@KeYGuiExtension.Info(name = "Heatmap",
+        optional = true,
+        description = "UI support for origin labels" +
+                "Developer: Florian Lanzinger <xxx@student.kit.edu>",
+        experimental = false)
 public class OriginTermLabelsExt
         implements KeYGuiExtension,
         KeYGuiExtension.ContextMenu,

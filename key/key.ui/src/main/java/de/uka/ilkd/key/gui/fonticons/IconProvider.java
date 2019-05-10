@@ -12,7 +12,7 @@ public abstract class IconProvider {
     abstract String getKey(float size);
 
     public Icon get() {
-        return get(16);
+        return get(IconFactory.DEFAULT_SIZE);
     }
 
     public Icon get(float height) {

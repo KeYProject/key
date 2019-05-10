@@ -51,7 +51,7 @@ public class Extension<T> implements Comparable<Extension> {
                         .getForbiddenClasses().contains(getType().getName());
     }
 
-    private boolean isExperimental() {
+    public boolean isExperimental() {
         return info == null || info.experimental();
     }
 

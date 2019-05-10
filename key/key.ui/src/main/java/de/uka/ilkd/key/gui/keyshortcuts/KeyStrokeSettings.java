@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui.keyshortcuts;
 
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.help.HelpFacade;
+import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.macros.*;
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 import de.uka.ilkd.key.settings.PathConfig;
@@ -84,6 +85,11 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
 
+    @Override
+    public void readSettings(Properties props) {
+        properties.putAll(props);
+    }
+
     private static <T> void defineDefault(T any, KeyStroke ks) {
         defineDefault(any.getClass(), ks);
     }
@@ -93,15 +99,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     }
 
     static KeyStrokeSettings loadFromConfig() {
-        Properties props = new Properties();
-        if (SETTINGS_FILE.exists()) {
-            try (FileReader reader = new FileReader(SETTINGS_FILE)) {
-                props.load(reader);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return new KeyStrokeSettings(props);
+        return new KeyStrokeSettings(SettingsManager.loadProperties(SETTINGS_FILE));
     }
 
     public static KeyStrokeSettings getInstance() {
@@ -127,7 +125,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     }
 
     public void save() {
-        System.out.println("Save keyboard shortcuts to: " + SETTINGS_FILE.getAbsolutePath());
+        System.out.println("[KeyStrokeSettings] Save keyboard shortcuts to: " + SETTINGS_FILE.getAbsolutePath());
         try (Writer writer = new FileWriter(SETTINGS_FILE)) {
             properties.store(writer, "KeY's KeyStrokes");
             writer.flush();

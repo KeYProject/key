@@ -38,6 +38,7 @@ import javax.swing.text.Highlighter.Highlight;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.SimpleAttributeSet;
 
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import org.key_project.util.java.IOUtil;
@@ -102,12 +103,17 @@ public final class SourceView extends JComponent {
     /**
      * The color of normal highlights in source code (light green).
      */
-    private static final Color NORMAL_HIGHLIGHT_COLOR = new Color(194, 245, 194);
+    private static final ColorSettings.ColorProperty NORMAL_HIGHLIGHT_COLOR =
+            ColorSettings.define("[SourceView]normalHighlight",
+            "Color for Highlighting things in source view", new Color(194, 245, 194));
 
     /**
      * The color of the most recent highlight in source code (green).
      */
-    private static final Color MOST_RECENT_HIGHLIGHT_COLOR = new Color(57, 210, 81);
+    private static final ColorSettings.ColorProperty MOST_RECENT_HIGHLIGHT_COLOR =
+            ColorSettings.define("[SourceView]mostRecentHighlight",
+                    "Second color for highlightning",
+                    new Color(57, 210, 81));
 
     /**
      * The main window of KeY (needed to lookupAndOverride the mediator).
@@ -314,7 +320,7 @@ public final class SourceView extends JComponent {
                     // use a different color for most recent
                     if (i == 0) {
                         textPane.getHighlighter().addHighlight(r.start(), r.end(),
-                                new DefaultHighlightPainter(MOST_RECENT_HIGHLIGHT_COLOR));
+                                new DefaultHighlightPainter(MOST_RECENT_HIGHLIGHT_COLOR.get()));
                     } else {
                         textPane.getHighlighter().addHighlight(r.start(), r.end(), hp);
                     }
@@ -442,7 +448,7 @@ public final class SourceView extends JComponent {
 
             // add a listener to highlight the line currently pointed to
             Object selectionHL = textPane.getHighlighter().addHighlight(0, 0,
-                    new DefaultHighlightPainter(DEFAULT_HIGHLIGHT_COLOR));
+                    new DefaultHighlightPainter(DEFAULT_HIGHLIGHT_COLOR.get()));
             textPane.addMouseMotionListener(new MouseMotionListener() {
                 @Override
                 public void mouseMoved(MouseEvent e) {
@@ -455,7 +461,7 @@ public final class SourceView extends JComponent {
             });
 
             // paint the highlights (symbolically executed lines) for this file
-            HighlightPainter hp = new DefaultHighlightPainter(NORMAL_HIGHLIGHT_COLOR);
+            HighlightPainter hp = new DefaultHighlightPainter(NORMAL_HIGHLIGHT_COLOR.get());
             paintSymbExHighlights(textPane, li, entry.getKey(), hp);
 
             textPane.addMouseListener(new TextPaneMouseAdapter(textPane, li, hp, entry.getKey()));
