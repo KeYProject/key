@@ -1,4 +1,4 @@
-/.gradle/
+.gradle/
 
 # Created by https://www.gitignore.io/api/gradle
 # Edit at https://www.gitignore.io/?templates=gradle
@@ -22,7 +22,7 @@ gradle-app.setting
 ### Gradle Patch ###
 **/build/
 
-
+# We do not need to checkin eclipse or intellij stuff:
 .idea/
 out/
 bin/
