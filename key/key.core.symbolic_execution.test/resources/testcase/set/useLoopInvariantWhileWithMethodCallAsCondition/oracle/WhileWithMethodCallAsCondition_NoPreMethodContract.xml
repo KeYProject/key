@@ -31,6 +31,15 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                         <callStackEntry path="/0"/>
                         <operationContract name="result_2 = goOnNice(array, i) catch(exc_2)
 pre: i &lt; 0 | (!array = null &amp; i &gt;= 0)&lt;&lt;SC&gt;&gt;
+post: (   i &lt; 0
+   -&gt;   !(exc_2 = null)&lt;&lt;impl&gt;&gt;
+      &amp; java.lang.Exception::instance(exc_2) = TRUE)
+&amp; (   (!array = null &amp; i &gt;= 0)&lt;&lt;SC&gt;&gt;
+   -&gt;     result_2
+        = \if (i &lt; array.length)
+              \then (TRUE)
+              \else (FALSE)
+      &amp; (exc_2 = null)&lt;&lt;impl&gt;&gt;)
 mod: allLocs
 termination: diamond" pathCondition="not(or(or(not(equals(exc_0,null)),not(imp(equals(exc_0,null),or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b=goOnNice(array,i);
@@ -111,6 +120,15 @@ termination: diamond" pathCondition="not(or(or(not(equals(exc_0,null)),not(imp(e
                         <callStackEntry path="/0"/>
                         <operationContract name="result_2 = goOnNice(array, i) catch(exc_2)
 pre: i &lt; 0 | (!array = null &amp; i &gt;= 0)&lt;&lt;SC&gt;&gt;
+post: (   i &lt; 0
+   -&gt;   !(exc_2 = null)&lt;&lt;impl&gt;&gt;
+      &amp; java.lang.Exception::instance(exc_2) = TRUE)
+&amp; (   (!array = null &amp; i &gt;= 0)&lt;&lt;SC&gt;&gt;
+   -&gt;     result_2
+        = \if (i &lt; array.length)
+              \then (TRUE)
+              \else (FALSE)
+      &amp; (exc_2 = null)&lt;&lt;impl&gt;&gt;)
 mod: allLocs
 termination: diamond" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b=goOnNice(array,i);
