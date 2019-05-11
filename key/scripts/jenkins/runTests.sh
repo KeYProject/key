@@ -1,10 +1,9 @@
 #!/bin/sh -x
 unset DISPLAY
 export KEY_VERSION="2.7.$BUILD_NUMBER"
-export JAVA_OPTS="-Xmx64m -XX:MaxPermSize=64m -Dfile.encoding=UTF-8"
 export PATH=$PATH:/home/hudson/key/bin/
 export STATISTICS_DIR="$JENKINS_HOME/userContent/statistics-$JOB_NAME"
-export GRADLE_OPTS="-Dorg.gradle.daemon=false org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=512m -Dfile.encoding=UTF-8"
+
 #
 # Run unit tests
 #

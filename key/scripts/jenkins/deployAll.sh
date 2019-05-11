@@ -1,6 +1,5 @@
 #!/bin/sh
 cd key/
-export GRADLE_OPTS="-Dorg.gradle.daemon=false"
 ./gradlew --parallel compileTest :key.ui:shadowJar :key.ui:distZip
 
 if [ $? -gt 0 ]; then
