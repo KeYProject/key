@@ -419,6 +419,10 @@ task alldoc(type: Javadoc) {
     classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
     destinationDir = file("${buildDir}/docs/javadoc")
 
+    if (JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption('html5', true)
+    }
+
     configure(options) {
         //showFromPrivate()
         addBooleanOption 'Xdoclint:none', true
