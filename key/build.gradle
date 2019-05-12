@@ -197,6 +197,7 @@ subprojects {
 allprojects {
     tasks.withType(Javadoc) {
         if (JavaVersion.current().isJava9Compatible()) {
+            options.encoding = 'UTF-8'
             //not working jenkins: options.addBooleanOption('html5', true)
         }
     }
