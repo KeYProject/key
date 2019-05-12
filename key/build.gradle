@@ -197,7 +197,7 @@ subprojects {
 allprojects {
     tasks.withType(Javadoc) {
         if (JavaVersion.current().isJava9Compatible()) {
-            options.addBooleanOption('html5', true)
+            //not working jenkins: options.addBooleanOption('html5', true)
         }
     }
 }
@@ -420,7 +420,7 @@ task alldoc(type: Javadoc) {
     destinationDir = file("${buildDir}/docs/javadoc")
 
     if (JavaVersion.current().isJava9Compatible()) {
-            options.addBooleanOption('html5', true)
+        //notworking on jenkins    options.addBooleanOption('html5', true)
     }
 
     configure(options) {
