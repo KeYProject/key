@@ -8,7 +8,7 @@ export STATISTICS_DIR="$JENKINS_HOME/userContent/statistics-$JOB_NAME"
 # Run unit tests
 #
 cd key
-#./gradlew test testProofRules testRunAllProofs --parallel
+./gradlew --parallel test #testProofRules testRunAllProofs 
 EXIT_UNIT_TESTS=$?
 
 #
