@@ -8,8 +8,15 @@ export STATISTICS_DIR="$JENKINS_HOME/userContent/statistics-$JOB_NAME"
 # Run unit tests
 #
 cd key
-./gradlew --parallel test #testProofRules testRunAllProofs 
+./gradlew --parallel :key.util:test #test #testProofRules testRunAllProofs 
 EXIT_UNIT_TESTS=$?
+
+# Adapt to old scheme. copy tests xml to a folder where jenkins find them.
+# Change if there is no ant build.
+# Old regex: key/**/testresults/*.xml
+XMLTESTFOLDER="tests/testresults"
+mkdir -p $XMLTESTFOLDER
+cp "key.*/build/test-results/*/*.xml" $XMLTESTFOLDER
 
 #
 # create statistics if successful
