@@ -3,11 +3,9 @@
 //TODO figure out why javacc is always executed
 
 plugins {
-    id("ca.coglinc.javacc") version("2.4.0") apply false
     id("idea")
     id("eclipse")
     id "com.jfrog.bintray" version "1.8.4" apply false
-    id 'com.github.johnrengelman.shadow' version "5.0.0" apply false
 }
 
 idea {
@@ -205,7 +203,7 @@ subprojects {
 
 
 task start {
-    dependsOn project(":key.ui").run
+    //dependsOn project(":key.ui").run
 }
 
 task alldoc(type: Javadoc) {
@@ -239,7 +237,7 @@ task alldocJar(type: Zip) {
     destinationDirectory = file("$buildDir/distribution")
 }
 
-task fatJar(type: Jar) {
+/*task fatJar(type: Jar) {
     dependsOn project(":key.ui").jar
     dependsOn project(":keyext.interactionlog").jar
     //dependsOn project(":keyext.script.ui").jar
@@ -262,4 +260,4 @@ task fatJar(type: Jar) {
     from jarFiles
     with project(":key.ui").jar
     from "$rootDir/LICENSE.TXT"
-}
+}*/
