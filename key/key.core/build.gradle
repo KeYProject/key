@@ -56,6 +56,6 @@ task testProofRules(type: Test) {
 task testRunAllProofs(type: Test) {
     group "verification"
     filter { includeTestsMatching "RunAllProofsTestSuite" }
-^}
+}
 
 //check.dependsOn << testProofRules << testRunAllProofs
