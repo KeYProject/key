@@ -27,7 +27,12 @@ task createExamplesZip(type: Zip) {
 processResources.dependsOn << createExamplesZip
 
 shadowJar {
-    minimize()
+    archiveClassifier = "exe"
+    archiveBaseName = "key"
+}
+
+distZip {
+    archiveBaseName = "key"
 }
 
 application {
@@ -38,3 +43,5 @@ application {
 run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
 }
+
+
