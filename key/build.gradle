@@ -90,21 +90,20 @@ subprojects {
         systemProperty "EXAMPLES_DIR", file("$rootProject/key.ui/examples")
         systemProperty "RUNALLPROOFS_DIR", "$buildDir/report/runallproves"
 
-
         systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
     }
 
     test {
-        useJUnit {
-            excludeCategories 'org.key_project.util.testcategories.Interactive'
+        useJUnitPlatform() {
+            excludeTags 'org.key_project.util.testcategories.Interactive'
         }
     }
 
     task testFast(type: Test) {
-        useJUnit {
-            excludeCategories 'org.key_project.util.testcategories.Slow'
-            excludeCategories 'org.key_project.util.testcategories.Interactive'
+        useJUnitPlatform() {
+            excludeTags 'org.key_project.util.testcategories.Slow'
+            excludeTags 'org.key_project.util.testcategories.Interactive'
         }
     }
 
@@ -132,7 +131,13 @@ subprojects {
     }
 
     dependencies {
-        testCompile("junit:junit:4.12")
+        //testCompile("junit:junit:4.12")
+
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+        testCompileOnly 'junit:junit:4.12'
+        testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.3.1'
+
         testCompile project(":key.util")
     }
 
