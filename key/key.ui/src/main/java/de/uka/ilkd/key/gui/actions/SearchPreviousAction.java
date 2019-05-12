@@ -15,8 +15,8 @@ package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-
 import java.awt.event.ActionEvent;
+
 
 /*
  * Menu option for showing the next search result

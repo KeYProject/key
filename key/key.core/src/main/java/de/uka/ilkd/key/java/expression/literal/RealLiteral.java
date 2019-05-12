@@ -88,8 +88,8 @@ public class RealLiteral extends Literal {
     }
 
     @Override
-    public int computeHashCode(){
-    	return 17*super.computeHashCode() + getValue().hashCode();
+    public int computeHashCode() {
+        return 17 * super.computeHashCode() + getValue().hashCode();
     }
 
     /**

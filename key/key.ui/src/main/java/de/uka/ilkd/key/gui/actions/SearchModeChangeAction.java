@@ -13,11 +13,11 @@
 
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 
 
 /*

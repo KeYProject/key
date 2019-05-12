@@ -17,21 +17,22 @@ idea {
     }
 }
 
-group = "org.key_project"
-version = "2.8.0-SNAPSHOT"
-
 static def getDate() {
     return new Date().format('yyyyMMdd')
 }
 
 static def getGitRevision() {
-    def cmd = "git rev-parse HEAD"
+    def cmd = "git rev-parse --short HEAD"
     def process = cmd.execute()
-    return process.text
+    return process.text.trim()
 }
 
 ext.dateVersion = getDate()
 ext.gitRevision = getGitRevision()
+
+group = "org.key_project"
+version = "2.7.0-${System.env.BUILD_NUMBER ?: ext.gitRevision}"
+
 
 try {
     ext.gitRevision = "git rev-parse HEAD".execute().in.readLines().get(0)
@@ -70,7 +71,7 @@ subprojects {
         options.verbose()
     }
 
- tasks.withType(Test) {//Configure all tests
+    tasks.withType(Test) {//Configure all tests
         systemProperty "testcases", "src/test/resources/testcase"
         systemProperty "TACLET_PROOFS", "tacletProofs"
         systemProperty "EXAMPLES_DIR", new File(project(":key.ui").projectDir, "examples")
@@ -198,7 +199,8 @@ subprojects {
 allprojects {
     tasks.withType(Javadoc) {
         if (JavaVersion.current().isJava9Compatible()) {
-            options.addBooleanOption('html5', true)
+            options.encoding = 'UTF-8'
+            //not working jenkins: options.addBooleanOption('html5', true)
         }
     }
 }
@@ -278,7 +280,6 @@ project(":key.core") {
         filter {
             includeTestsMatching "JavaTests"
             includeTestsMatching "LogicModelTests"
-
             includeTestsMatching "ParserTests"
             includeTestsMatching "ProofConstructionTests"
             includeTestsMatching "RuleTests"
@@ -296,9 +297,6 @@ project(":key.core") {
     task testRunAllProofs(type: Test) {
         group "verification"
         filter { includeTestsMatching "RunAllProofsTestSuite" }
-        afterTest { desc, result ->
-            logger.quiet "Executing test ${desc.name} [${desc.className}] with result: ${result.resultType}"
-        }
     }
 
     //check.dependsOn << testProofRules << testRunAllProofs
@@ -386,7 +384,12 @@ project(":key.ui") {
     processResources.dependsOn << createExamplesZip
 
     shadowJar {
-        //destroys the build: minimize()
+        archiveClassifier = "exe"
+        archiveBaseName = "key"
+    }
+
+    distZip {
+        archiveBaseName = "key"
     }
 
     application {
@@ -412,6 +415,7 @@ task start {
     dependsOn project(":key.ui").run
 }
 
+
 task alldoc(type: Javadoc) {
     group "documentation"
     def projects = subprojects
@@ -420,13 +424,17 @@ task alldoc(type: Javadoc) {
     classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
     destinationDir = file("${buildDir}/docs/javadoc")
 
+    if (JavaVersion.current().isJava9Compatible()) {
+        //notworking on jenkins    options.addBooleanOption('html5', true)
+    }
+
     configure(options) {
         //showFromPrivate()
         addBooleanOption 'Xdoclint:none', true
         // overview = new File( projectDir, 'src/javadoc/package.html' )
         //stylesheetFile = new File( projectDir, 'src/javadoc/stylesheet.css' )
         windowTitle = 'KeY API Documentation'
-        docTitle = "KeY JavaDoc ($project.version)"
+        docTitle = "KeY JavaDoc ($project.version) -- ${getDate()}"
         bottom = "Copyright &copy; 2003-2019 <a href=\"http://key-project.org\">The KeY-Project</a>."
         use = true
         links += 'http://download.oracle.com/javase/8/docs/api/'
@@ -434,6 +442,13 @@ task alldoc(type: Javadoc) {
         links += "http://www.antlr3.org/api/Java/"
         links += "http://recoder.sourceforge.net/doc/api/"
     }
+}
+
+task alldocJar(type: Zip) {
+    dependsOn alldoc
+    from alldoc
+    archiveFileName = "key-api-doc-${project.version}.zip"
+    destinationDirectory = file("$buildDir/distribution")
 }
 
 task fatJar(type: Jar) {
