@@ -1,7 +1,10 @@
 package de.uka.ilkd.key.speclang;
 
+import java.util.function.UnaryOperator;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalLoopContractPO;
@@ -36,6 +39,11 @@ public class FunctionalLoopContract extends FunctionalAuxiliaryContract<LoopCont
      */
     FunctionalLoopContract(LoopContract contract, int id) {
         super(contract, id);
+    }
+
+    @Override
+    public FunctionalLoopContract map(UnaryOperator<Term> op, Services services) {
+        return new FunctionalLoopContract(getAuxiliaryContract().map(op, services), id());
     }
 
     @Override

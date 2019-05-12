@@ -3,9 +3,11 @@
 //TODO figure out why javacc is always executed
 
 plugins {
+    id("ca.coglinc.javacc") version("2.4.0") apply false
     id("idea")
     id("eclipse")
     id "com.jfrog.bintray" version "1.8.4" apply false
+    id 'com.github.johnrengelman.shadow' version "5.0.0" apply false
 }
 
 idea {
@@ -15,21 +17,22 @@ idea {
     }
 }
 
-group = "org.key_project"
-version = "2.8.0-SNAPSHOT"
 
 static def getDate() {
     return new Date().format('yyyyMMdd')
 }
 
 static def getGitRevision() {
-    def cmd = "git rev-parse HEAD"
+    def cmd = "git rev-parse --short HEAD"
     def process = cmd.execute()
-    return process.text
+    return process.text.trim()
 }
 
 ext.dateVersion = getDate()
 ext.gitRevision = getGitRevision()
+
+group = "org.key_project"
+version = "2.7.0-${System.env.BUILD_NUMBER ?: ext.gitRevision}"
 
 subprojects {
     apply plugin: "java"
@@ -57,21 +60,20 @@ subprojects {
         //failOnError=false
         options.addBooleanOption 'Xdoclint:none', true
         options.verbose()
-
         if (JavaVersion.current().isJava9Compatible()) {
-            options.addBooleanOption('html5', true)
+            // not working on jenkins: options.addBooleanOption('html5', true)
         }
     }
 
-    tasks.withType(Test) {//Configure all tests
+ tasks.withType(Test) {//Configure all tests
         systemProperty "test-resources", "src/test/resources"
         systemProperty "testcases", "src/test/resources/testcase"
         systemProperty "TACLET_PROOFS", "tacletProofs"
         systemProperty "EXAMPLES_DIR", file("$rootProject/key.ui/examples")
         systemProperty "RUNALLPROOFS_DIR", "$buildDir/report/runallproves"
 
-        systemProperty "key.disregardSettings", "true"
 
+        systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
     }
 
@@ -87,8 +89,6 @@ subprojects {
             excludeCategories 'org.key_project.util.testcategories.Interactive'
         }
     }
-
-
 
     /*findbugs { findbugsTest.enabled = false; ignoreFailures = true }
     pmd { pmdTest.enabled = false; ignoreFailures = true }
@@ -117,6 +117,7 @@ subprojects {
         testCompile("junit:junit:4.12")
         testCompile project(":key.util")
     }
+
 
     task sourcesJar(type: Jar) {
         from sourceSets.main.allJava
@@ -187,6 +188,7 @@ subprojects {
         }
     }
 
+
     eclipse {
         classpath {
             file {
@@ -201,8 +203,9 @@ subprojects {
     }
 }
 
+
 task start {
-//    dependsOn project(":key.ui").run
+    dependsOn project(":key.ui").run
 }
 
 task alldoc(type: Javadoc) {
@@ -219,7 +222,7 @@ task alldoc(type: Javadoc) {
         // overview = new File( projectDir, 'src/javadoc/package.html' )
         //stylesheetFile = new File( projectDir, 'src/javadoc/stylesheet.css' )
         windowTitle = 'KeY API Documentation'
-        docTitle = "KeY JavaDoc ($project.version)"
+        docTitle = "KeY JavaDoc ($project.version) -- ${getDate()}"
         bottom = "Copyright &copy; 2003-2019 <a href=\"http://key-project.org\">The KeY-Project</a>."
         use = true
         links += 'http://download.oracle.com/javase/8/docs/api/'
@@ -229,8 +232,13 @@ task alldoc(type: Javadoc) {
     }
 }
 
-/*
-replace in favour of shadow plugin.
+task alldocJar(type: Zip) {
+    dependsOn alldoc
+    from alldoc
+    archiveFileName = "key-api-doc-${project.version}.zip"
+    destinationDirectory = file("$buildDir/distribution")
+}
+
 task fatJar(type: Jar) {
     dependsOn project(":key.ui").jar
     dependsOn project(":keyext.interactionlog").jar
@@ -255,4 +263,3 @@ task fatJar(type: Jar) {
     with project(":key.ui").jar
     from "$rootDir/LICENSE.TXT"
 }
-*/

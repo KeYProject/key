@@ -36,7 +36,7 @@ public abstract class AbstractEnvInput implements EnvInput {
     protected final Profile profile;
     
     protected InitConfig initConfig;
-    
+
 
     //-------------------------------------------------------------------------
     //constructors

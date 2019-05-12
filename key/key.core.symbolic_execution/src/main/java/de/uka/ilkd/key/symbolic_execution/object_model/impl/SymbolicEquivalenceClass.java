@@ -21,6 +21,7 @@ import org.key_project.util.java.IFilter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
@@ -35,7 +36,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
     * The {@link Services} to use.
     */
    private final Services services;
-   
+
    /**
     * The contained {@link Term}s which represents the same {@link ISymbolicObject}.
     */
@@ -69,21 +70,21 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
    public ImmutableList<Term> getTerms() {
       return terms;
    }
-   
+
    /**
     * Adds a new {@link Term}.
     * @param value The new {@link Term} to add.
     */
    public void addTerm(Term term) {
-      terms = terms.append(term);
+      terms = terms.append(OriginTermLabel.removeOriginLabels(term, services));
    }
-   
+
    /**
     * {@inheritDoc}
     */
    @Override
    public boolean containsTerm(Term term) {
-      return terms.contains(term);
+      return terms.contains(OriginTermLabel.removeOriginLabels(term, services));
    }
 
    /**
@@ -122,8 +123,8 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
                return element.op() instanceof IProgramVariable;
             }
          });
-         return representative != null ? 
-                representative : // Return term with program variable 
+         return representative != null ?
+                representative : // Return term with program variable
                 terms.head(); // Return the first term
       }
    }

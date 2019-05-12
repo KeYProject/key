@@ -89,7 +89,7 @@ public class DoubleLiteral extends Literal {
     
     @Override
     protected int computeHashCode(){
-    	return 37 * super.computeHashCode() + getValue().hashCode();
+        return 37 * super.computeHashCode() + getValue().hashCode();
     }
     
     public boolean equals(Object o){

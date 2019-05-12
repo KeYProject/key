@@ -652,7 +652,6 @@ public class SolverListener implements SolverLauncherListener {
                     discardEvent(launcher);
                     //remove semantics blasting proof for ce dialog
                     if(counterexample && smtProof != null){
-                    	   MainWindow mw = MainWindow.getInstance();
                         smtProof.dispose();
                     }
                     

@@ -39,6 +39,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -73,20 +74,20 @@ import de.uka.ilkd.key.util.ProofStarter;
  * Instances of this class can be used to compute memory layouts
  * (objects with values and associations to other objects on the heap together
  * with objects and associations to objects on the current state of the stack)
- * which a given {@link Node} of KeY's proof tree can have based on 
+ * which a given {@link Node} of KeY's proof tree can have based on
  * equivalence classes (aliasing) of objects.
  * Such memory layouts are named <i>current memory layouts</i>. It is also possible
  * to compute how the heap and stack was when the proof was started. Such
- * memory layouts are named <i>initial memory layouts</i>. 
+ * memory layouts are named <i>initial memory layouts</i>.
  * </p>
  * <p>
  * Example program:
  * <pre><code>
  * public class Example {
  *    private int value;
- *    
+ *
  *    private Example next;
- *    
+ *
  *    public static int main(Example e) {
  *       e.value = 1;
  *       e.next.value = 2;
@@ -94,9 +95,9 @@ import de.uka.ilkd.key.util.ProofStarter;
  *    }
  * }
  * </code></pre>
- * If the symbolic execution stops at the return statement, 
+ * If the symbolic execution stops at the return statement,
  * two memory layouts are possible. In the first case refers
- * {@code e} and {@code e.next} to different objects (result is {@code 3}). 
+ * {@code e} and {@code e.next} to different objects (result is {@code 3}).
  * In the second case refers both to the same object (result is {@code 4}).
  * That both objects can't be {@code null} is ensured by the path condition from root to the current node in KeY's proof tree.
  * </p>
@@ -133,15 +134,15 @@ import de.uka.ilkd.key.util.ProofStarter;
  *             objects on the right side of updates, objects in conditions of node's antecedent and null.
  *          </li>
  *          <li>
- *             Create a site proof which starts in a modified version of the root node. 
+ *             Create a site proof which starts in a modified version of the root node.
  *             It contains the given path condition as additional antecedent and the modality with he java code is removed.
- *             Cut rules are applied to this sequent for each possible combination of two different objects. 
+ *             Cut rules are applied to this sequent for each possible combination of two different objects.
  *             Each goal represents a memory layout and the applied cuts in each goal represents the equality classes.
  *          </li>
  *          <li>
  *             Create a predicate which is used to compute the objects, values and associations of an initial/a current memory layout.
  *             Objects are represented as expressions like {@code e} or {@code e.next}. The problem is that in a current memory layout the
- *             object structure might have changed and {@code e.next} is a different object compared to the initial memory layout. 
+ *             object structure might have changed and {@code e.next} is a different object compared to the initial memory layout.
  *             To solve this issue is an additional update is used which stores each object in a temporary program variable, e.g.
  *             {@code pre0 = e}, {@code pre1 = e.next}. This makes sure that the objects are the same in initial and current memory layouts.
  *          </li>
@@ -169,44 +170,44 @@ import de.uka.ilkd.key.util.ProofStarter;
  * @see ISymbolicLayout
  * @see ExecutionNodeSymbolicLayoutExtractor
  */
-public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {   
+public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
    /**
     * The used {@link IModelSettings}.
     */
    private final IModelSettings settings;
-   
+
    /**
     * Contains the applied cuts of each possible memory layout.
     * An applied cut is represented as {@link Term} of the from
     * {@code equals(obj1, obj2)} or {@code not(equals(obj1, obj2))}.
     */
    private List<ImmutableSet<Term>> appliedCutsPerLayout;
-   
+
    /**
     * Contains the current memory layouts accessible via {@link #getCurrentLayout(int)}.
     */
    private Map<Integer, ISymbolicLayout> currentLayouts;
-   
+
    /**
     * The {@link ExtractLocationParameter} instances used to compute a current memory layout.
     */
    private Set<ExtractLocationParameter> currentLocations;
-   
+
    /**
     * Contains the initial memory layouts accessible via {@link #getInitialLayout(int)}.
     */
    private Map<Integer, ISymbolicLayout> initialLayouts;
-   
+
    /**
     * The {@link ExtractLocationParameter} instances used to compute an initial memory layout.
     */
    private Set<ExtractLocationParameter> initialLocations;
-   
+
    /**
     * Contains the equivalent classes accessible via {@link #getEquivalenceClasses(int)}.
     */
    private Map<Integer, ImmutableList<ISymbolicEquivalenceClass>> layoutsEquivalentClasses;
-   
+
    /**
     * Contains objects which should be ignored in the state because they
     * are created during symbolic execution or part of the proof obligation.
@@ -217,7 +218,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * The updates to consider.
     */
    private ImmutableList<Term> updates;
-   
+
    /**
     * Constructor.
     * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
@@ -226,7 +227,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
     */
-   public SymbolicLayoutExtractor(Node node, 
+   public SymbolicLayoutExtractor(Node node,
                                   PosInOccurrence modalityPio,
                                   boolean useUnicode,
                                   boolean usePrettyPrinting,
@@ -249,7 +250,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
       synchronized (this) {
          if (!isAnalysed()) {
             // Get path condition
-            Term pathCondition = SymbolicExecutionUtil.computePathCondition(node, 
+            Term pathCondition = SymbolicExecutionUtil.computePathCondition(node,
                                                                             true, // Path condition needs always to be simplified, because otherwise additinal symbolic values might be introduced.
                                                                             false);
             pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
@@ -282,8 +283,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                // Apply cut rules to compute equivalent classes
                applyCutRules(equivalentClassesProofStarter, symbolicObjectsResultingInCurrentState, updates);
                // Finish proof automatically
-               info = SymbolicExecutionSideProofUtil.startSideProof(getProof(), 
-                                                   equivalentClassesProofStarter, 
+               info = SymbolicExecutionSideProofUtil.startSideProof(getProof(),
+                                                   equivalentClassesProofStarter,
                                                    StrategyProperties.METHOD_CONTRACT,
                                                    StrategyProperties.LOOP_INVARIANT,
                                                    StrategyProperties.QUERY_ON,
@@ -301,7 +302,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
          }
       }
    }
-   
+
    /**
     * Computes the initial updates to consider.
     * @return The initial updates to consider.
@@ -341,7 +342,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * @return A new {@link Set} which contains all objects of the first {@link Set} which are not contained in the second {@link Set}.
     * @throws ProofInputException
     */
-   protected Set<Term> filterOutObjectsToIgnore(Set<Term> objectsToFilter, 
+   protected Set<Term> filterOutObjectsToIgnore(Set<Term> objectsToFilter,
                                                 Set<Term> objectsToIgnore) throws ProofInputException {
       Set<Term> result = new LinkedHashSet<Term>();
       for (Term symbolicObject : objectsToFilter) {
@@ -351,7 +352,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
       }
       return result;
    }
-   
+
    /**
     * <p>
     * Creates a {@link Sequent} which is used to compute equivalence classes.
@@ -363,14 +364,14 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * @return The created {@link Sequent} to use for equivalence class computation.
     */
    protected Sequent createSequentForEquivalenceClassComputation() {
-      return SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, 
-                                                                        modalityPio, 
+      return SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node,
+                                                                        modalityPio,
                                                                         null,
                                                                         null,
                                                                         updates,
                                                                         false);
    }
-   
+
    /**
     * <p>
     * Applies cut rules to the given side proofs to compute equivalence classes.
@@ -432,7 +433,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * Each open {@link Goal} of the proof results in its own memory layout.
     * </p>
     * <p>
-    * The applied cuts per memory layout are represented as {@link Term} 
+    * The applied cuts per memory layout are represented as {@link Term}
     * stored in the {@link ImmutableSet}s. Each {@link Term} has the form
     * {@code equals(obj1, obj2)} or {@code not(equals(obj1, obj2))}
     * </p>
@@ -448,7 +449,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
       }
       return new ArrayList<ImmutableSet<Term>>(resultSet);
    }
-   
+
    /**
     * Extracts the applied cut rules in the given {@link Node}. Each cut
     * rule is represented as {@link Term} of the form {@code equals(obj1, obj2)} or {@code not(equals(obj1, obj2))}.
@@ -495,7 +496,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * Returns the number of available memory layouts.
     * </p>
     * <p>
-    * <b>Attention:</b> Requires that {@link #analyse()} was executed. 
+    * <b>Attention:</b> Requires that {@link #analyse()} was executed.
     * </p>
     * @return The number of available memory layouts.
     */
@@ -505,16 +506,16 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
          return appliedCutsPerLayout.size();
       }
    }
-   
+
    /**
     * <p>
     * Returns the initial memory layout at the given index.
     * </p>
     * <p>
-    * <b>Attention:</b> Requires that {@link #analyse()} was executed. 
+    * <b>Attention:</b> Requires that {@link #analyse()} was executed.
     * </p>
     * @param layoutIndex The index of the initial memory layout.
-    * @return The initial memory layout at the given index. 
+    * @return The initial memory layout at the given index.
     * @throws ProofInputException Occurred Exception
     */
    public ISymbolicLayout getInitialLayout(int layoutIndex) throws ProofInputException {
@@ -534,16 +535,16 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * Returns the current memory layout at the given index.
     * </p>
     * <p>
-    * <b>Attention:</b> Requires that {@link #analyse()} was executed. 
+    * <b>Attention:</b> Requires that {@link #analyse()} was executed.
     * </p>
     * @param layoutIndex The index of the current memory layout.
-    * @return The current memory layout at the given index. 
+    * @return The current memory layout at the given index.
     * @throws ProofInputException Occurred Exception
     */
    public ISymbolicLayout getCurrentLayout(int layoutIndex) throws ProofInputException {
       return getLayout(currentLayouts, layoutIndex, currentLocations, computeCurrentStateName(), true);
    }
-   
+
    /**
     * Computes the state name of a current memory layout.
     * @return The state name of a current memory layout.
@@ -563,7 +564,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * @return The lazily computed memory layout.
     * @throws ProofInputException Occurred Exception.
     */
-   protected ISymbolicLayout getLayout(Map<Integer, ISymbolicLayout> confiurationsMap, 
+   protected ISymbolicLayout getLayout(Map<Integer, ISymbolicLayout> confiurationsMap,
                                        int layoutIndex,
                                        Set<ExtractLocationParameter> locations,
                                        String stateName,
@@ -583,10 +584,10 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
          return result;
       }
    }
-   
+
    /**
     * <p>
-    * Computes a memory layout lazily when it is first time requested via 
+    * Computes a memory layout lazily when it is first time requested via
     * {@link #getLayout(Map, int, Term, Set, String, boolean)}.
     * </p>
     * <p>
@@ -601,7 +602,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * @return The created memory layout.
     * @throws ProofInputException Occurred Exception.
     */
-   protected ISymbolicLayout lazyComputeLayout(ImmutableSet<Term> layout, 
+   protected ISymbolicLayout lazyComputeLayout(ImmutableSet<Term> layout,
                                                Set<ExtractLocationParameter> locations,
                                                ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
                                                String stateName,
@@ -624,7 +625,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
    }
 
    /**
-    * Replaces the parent of each {@link ExtractLocationParameter} according 
+    * Replaces the parent of each {@link ExtractLocationParameter} according
     * to the {@link ISymbolicEquivalenceClass}es, because there is no guarantee
     * that the strategy evaluates each aliased location to the same symbolic value.
     * @param locations The available {@link ExtractLocationParameter}s.
@@ -663,7 +664,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
       }
       return result;
    }
-   
+
    /**
     * Collects all objects which are used in the given {@link Term}.
     * @param term The {@link Term} to collect objects in.
@@ -671,13 +672,14 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * @return The found objects.
     * @throws ProofInputException Occurred Exception.
     */
-   protected Set<Term> collectSymbolicObjectsFromTerm(Term term, 
+   protected Set<Term> collectSymbolicObjectsFromTerm(Term term,
                                                       final Set<Term> objectsToIgnore) throws ProofInputException {
       final Set<Term> result = new LinkedHashSet<Term>();
       term.execPreOrder(new DefaultVisitor() {
          @Override
          public void visit(Term visited) {
-            if (SymbolicExecutionUtil.hasReferenceSort(getServices(), visited) && 
+        	visited = OriginTermLabel.removeOriginLabels(visited, getServices());
+            if (SymbolicExecutionUtil.hasReferenceSort(getServices(), visited) &&
                 visited.freeVars().isEmpty() &&
                 !objectsToIgnore.contains(visited) &&
                 !SymbolicExecutionUtil.isSkolemConstant(visited)) {
@@ -687,13 +689,13 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
       });
       return result;
    }
-   
+
    /**
     * <p>
     * Returns the equivalence class of the memory layout defined by the index.
     * </p>
     * <p>
-    * <b>Attention:</b> Requires that {@link #analyse()} was executed. 
+    * <b>Attention:</b> Requires that {@link #analyse()} was executed.
     * </p>
     * @param layoutIndex The index of the memory layout to get its equivalence classes.
     * @return The equivalence classes of the memory layout at the given index.
@@ -703,7 +705,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
          ImmutableList<ISymbolicEquivalenceClass> equivalentClasses = layoutsEquivalentClasses.get(Integer.valueOf(layoutIndex));
          if (equivalentClasses == null) {
             ImmutableSet<Term> appliedCuts = appliedCutsPerLayout.get(layoutIndex);
-            equivalentClasses = lazyComputeEquivalenzClasses(appliedCuts);
+            equivalentClasses = lazyComputeEquivalenceClasses(appliedCuts);
             layoutsEquivalentClasses.put(Integer.valueOf(layoutIndex), equivalentClasses);
          }
          return equivalentClasses;
@@ -729,11 +731,12 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * @param appliedCuts The applied cut rules.
     * @return The created {@link ISymbolicEquivalenceClass} instances.
     */
-   protected ImmutableList<ISymbolicEquivalenceClass> lazyComputeEquivalenzClasses(ImmutableSet<Term> appliedCuts) {
+   protected ImmutableList<ISymbolicEquivalenceClass> lazyComputeEquivalenceClasses(ImmutableSet<Term> appliedCuts) {
       ImmutableList<ISymbolicEquivalenceClass> result = ImmutableSLList.nil();
       for (Term term : appliedCuts) {
          if (Junctor.NOT != term.op()) {
             assert term.op() == Equality.EQUALS;
+
             final Iterator<Term> iter = term.subs().iterator();
             ISymbolicEquivalenceClass ec = null;
             while (ec == null && iter.hasNext()) {
@@ -741,7 +744,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             }
             if (ec == null) {
                ec = new SymbolicEquivalenceClass(getServices(), settings);
-               result = result.append(ec); 
+               result = result.append(ec);
             }
             for (Term sub : term.subs()) {
                if (!ec.containsTerm(sub)) {
@@ -752,7 +755,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
       }
       return result;
    }
-   
+
    /**
     * Searches the {@link ISymbolicEquivalenceClass} from the given one
     * which contains the given {@link Term}.
@@ -760,7 +763,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * @param term The {@link Term} to search.
     * @return The found {@link ISymbolicEquivalenceClass} which contains the given {@link Term} or {@code null} if no one was found.
     */
-   protected ISymbolicEquivalenceClass findEquivalentClass(ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, 
+   protected ISymbolicEquivalenceClass findEquivalentClass(ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
                                                            final Term term) {
       return CollectionUtil.search(equivalentClasses, new IFilter<ISymbolicEquivalenceClass>() {
          @Override
@@ -769,7 +772,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
          }
       });
    }
-   
+
    /**
     * Creates an {@link ISymbolicLayout} which shows the objects,
     * values and associations defined by the given {@link ExecutionVariableValuePair}s.
@@ -779,7 +782,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * @return The created {@link ISymbolicLayout} with the given content.
     * @throws ProofInputException Occurred Exception.
     */
-   protected ISymbolicLayout createLayoutFromExecutionVariableValuePairs(ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, 
+   protected ISymbolicLayout createLayoutFromExecutionVariableValuePairs(ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
                                                                          Set<ExecutionVariableValuePair> pairs,
                                                                          String stateName) throws ProofInputException {
       SymbolicLayout result = new SymbolicLayout(settings, equivalentClasses);
@@ -806,7 +809,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
          }
          else {
             if (pair.isStateMember() || !objectsToIgnore.contains(valueTerm)) {
-               container = state; // Add only updates of local variables to the  
+               container = state; // Add only updates of local variables to the
             }
             else {
                container = null;

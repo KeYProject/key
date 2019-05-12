@@ -80,8 +80,9 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
          * This holds information relevant for retrieving information on a model
          * from an SMT instance.
          * null in the beginning, is created at translation time.
+         * FIXME: Why is this here? It is currently not being used!
          */
-        private ProblemTypeInformation problemTypeInformation = null;
+        // private ProblemTypeInformation problemTypeInformation = null;
 
         /**
          * This lock variable is responsible for the state variable
@@ -341,55 +342,48 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         }
 
 
-        private String[] translateToCommand(Term term)
-        		throws IllegalFormulaException, IOException {
+    private String[] translateToCommand(Term term)
+                throws IllegalFormulaException, IOException {
+        if (getType() == SolverType.Z3_CE_SOLVER) {
+            Proof proof = problem.getGoal().proof();
+            SpecificationRepository specrep = proof.getServices().getSpecificationRepository();
 
+            Proof originalProof = null;
+            for (Proof pr : specrep.getAllProofs()) {
+                if (proof.name().toString().endsWith(pr.name().toString())) {
+                    originalProof = pr;
+                    break;
+                }
+            }
+            // System.out.println(originalProof.name());
 
-        	if(getType() == SolverType.Z3_CE_SOLVER){
-        	   Proof proof = problem.getGoal().proof();
-        	   SpecificationRepository specrep = proof.getServices().getSpecificationRepository();
-        	   
-        	   
-        	   Proof originalProof = null;
-        	   for(Proof pr : specrep.getAllProofs()){
-        		   if(proof.name().toString().endsWith(pr.name().toString())){
-        			   originalProof = pr;
-        			   break;
-        		   }
-        		   
-        		   
-        	   }
-        	   //System.out.println(originalProof.name());
-        	   
-        	   
-        	   
-        	   KeYJavaType typeOfClassUnderTest = specrep.getProofOblInput(originalProof).getContainerType();
-        	   
-        		SMTObjTranslator objTrans = new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
-        		problemString = objTrans.translateProblem(term, services, smtSettings).toString();
-        		problemTypeInformation = objTrans.getTypes();
-        		ModelExtractor query = objTrans.getQuery();
-        		getSocket().setQuery(query);
-        		tacletTranslation = null;
-        		
-        		exceptionsForTacletTranslation.addAll(objTrans.getExceptionsOfTacletTranslation());
+            KeYJavaType typeOfClassUnderTest =
+                    specrep.getProofOblInput(originalProof).getContainerType();
 
-        	}
-        	else{
-        		SMTTranslator trans = getType().createTranslator(services);
-            	//instantiateTaclets(trans);
-            	problemString = indent(trans.translateProblem(term, services, smtSettings).toString());
-            	tacletTranslation = ((AbstractSMTTranslator) trans).getTacletSetTranslation();
-            	exceptionsForTacletTranslation.addAll(trans.getExceptionsOfTacletTranslation());
-        	}
-        	
-        	String parameters [] = this.type.getSolverParameters().split(" "); 
-        	String result [] = new String[parameters.length+1];
-        	for(int i=0; i < result.length; i++){
-        		result[i] = i==0? type.getSolverCommand() : parameters[i-1];
-        	}
-        	return result;
+            SMTObjTranslator objTrans =
+                    new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
+            problemString = objTrans.translateProblem(term, services, smtSettings).toString();
+            // problemTypeInformation = objTrans.getTypes();
+            ModelExtractor query = objTrans.getQuery();
+            getSocket().setQuery(query);
+            tacletTranslation = null;
+
+            exceptionsForTacletTranslation.addAll(objTrans.getExceptionsOfTacletTranslation());
+        } else {
+            SMTTranslator trans = getType().createTranslator(services);
+            //instantiateTaclets(trans);
+            problemString = indent(trans.translateProblem(term, services, smtSettings).toString());
+            tacletTranslation = ((AbstractSMTTranslator) trans).getTacletSetTranslation();
+            exceptionsForTacletTranslation.addAll(trans.getExceptionsOfTacletTranslation());
         }
+
+        String parameters [] = this.type.getSolverParameters().split(" ");
+        String result [] = new String[parameters.length + 1];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = i == 0 ? type.getSolverCommand() : parameters[i - 1];
+        }
+        return result;
+    }
 
         @Override
         public void interrupt(ReasonOfInterruption reason) {
@@ -470,6 +464,4 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 	        
 	        return socket;
         }
-
-
 }

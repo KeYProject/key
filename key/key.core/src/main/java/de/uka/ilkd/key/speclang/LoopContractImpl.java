@@ -8,11 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.MapUtil;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -736,14 +738,16 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
     public Term getDecreases(Term heap, Term self, Services services) {
         final Map<Term, Term> replacementMap = createReplacementMap(heap,
                 new Terms(self, null, null, null, null, null, null, null, null, null), services);
-        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
+        final OpReplacer replacer = new OpReplacer(
+                replacementMap, services.getTermFactory(), services.getProof());
         return replacer.replace(decreases);
     }
 
     @Override
     public Term getDecreases(Variables variables, Services services) {
         Map<ProgramVariable, ProgramVariable> map = createReplacementMap(variables, services);
-        return new OpReplacer(map, services.getTermFactory()).replace(decreases);
+        return new OpReplacer(
+                map, services.getTermFactory(), services.getProof()).replace(decreases);
     }
 
     @Override
@@ -771,6 +775,26 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
     @Override
     public String getDisplayName() {
         return "Loop Contract";
+    }
+
+    @Override
+    public LoopContract map(UnaryOperator<Term> op, Services services) {
+        Map<LocationVariable, Term> newPreconditions = preconditions.entrySet().stream().collect(
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newPostconditions = postconditions.entrySet().stream().collect(
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newModifiesClauses =
+                modifiesClauses.entrySet().stream().collect(
+                        MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Term newMeasuredBy = op.apply(measuredBy);
+        Term newDecreases = op.apply(decreases);
+
+        return update(
+                block,
+                newPreconditions, newPostconditions, newModifiesClauses,
+                infFlowSpecs.stream().map(spec -> spec.map(op)).collect(ImmutableList.collector()),
+                variables,
+                newMeasuredBy, newDecreases);
     }
 
     @Override

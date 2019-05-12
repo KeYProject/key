@@ -13,8 +13,12 @@
 
 package org.key_project.util.collection;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -22,6 +26,37 @@ import java.util.stream.StreamSupport;
  * List interface to be implemented by non-destructive lists
  */
 public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
+
+    /**
+     * Returns a Collector that accumulates the input elements into a new ImmutableList.
+     *
+     * @return a Collector that accumulates the input elements into a new ImmutableList.
+     */
+    public static <T> Collector<T, List<T>, ImmutableList<T>> collector() {
+        return Collector.of(
+                LinkedList<T>::new,
+                (list, el) -> list.add(el),
+                (list1, list2) -> {
+                    list1.addAll(list2);
+                    return list1; },
+                ImmutableList::<T>fromList);
+    }
+
+    /**
+     * Creates an ImmutableList from a List.
+     *
+     * @param list a List.
+     * @return an ImmutableList containing the same elements as the specified list.
+     */
+    public static <T> ImmutableList<T> fromList(List<T> list) {
+        ImmutableList<T> result = ImmutableSLList.nil();
+
+        for (T el : list) {
+            result = result.append(el);
+        }
+
+        return result;
+    }
 
     /**
      * prepends element to the list (non-destructive)
@@ -47,7 +82,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @return reverse(collection)++this
      */
     ImmutableList<T> prependReverse(ImmutableList<T> collection);
-    
+
     /**
      * prepends an iterable collection in reverse order, i.e.,
      * [4,5,6].prepend([1,2,3]) will be [3,2,1,4,5,6]
@@ -96,14 +131,14 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @return <T> the first element in list
      */
     T head();
-    
+
     /**
      * return true if predicate is fullfilled for at least one element
      * @param predicate the predicate
      * @return true if predicate is fullfilled for at least one element
      */
     boolean exists(Predicate<T> predicate);
-    
+
     /**
      * @return IList<T> tail of list
      */
@@ -176,4 +211,17 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
         return StreamSupport.stream(this.spliterator(), false);
     }
 
+    /**
+     * Convert an {@link ImmutableList} to a {@link List}.
+     *
+     * @return This element converted to a {@link List}.
+     */
+    default List<T> toList() {
+        List<T> result = new ArrayList<>();
+        Iterator<T> it = iterator();
+        while (it.hasNext()) {
+            result.add(it.next());
+        }
+        return result;
+    }
 }

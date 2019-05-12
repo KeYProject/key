@@ -121,8 +121,8 @@ public class BooleanLiteral extends Literal {
     }
 
     @Override
-    protected int computeHashCode(){
-    	return 37 * super.computeHashCode() + (getValue() ? 0 : 1);
+    protected int computeHashCode() {
+        return 37 * super.computeHashCode() + (getValue() ? 0 : 1);
     }
     
     @Override

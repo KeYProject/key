@@ -2,12 +2,9 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call self.mainVoidMethod()&gt;" pathCondition="true" pathConditionChanged="false">
       <operationContract name="self.voidMethod() catch(exc_0)
-pre: java.lang.Object::&lt;inv&gt;(heap, self)&lt;&lt;impl&gt;&gt;
-post: (  int::select(heap,
-                 self,
-                 InstanceContractTest::$value)
-   = Z(2(4(#)))
-&amp; java.lang.Object::&lt;inv&gt;(heap, self)&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
+pre: self.&lt;inv&gt;&lt;&lt;impl&gt;&gt;
+post: (self.value = 42
+&amp; self.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
 &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" exceptionTerm="exc_0" selfTerm="self" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">

@@ -1,6 +1,10 @@
 package de.uka.ilkd.key.speclang;
 
+import java.util.function.UnaryOperator;
+
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
@@ -35,6 +39,11 @@ public class FunctionalBlockContract extends FunctionalAuxiliaryContract<BlockCo
      */
     FunctionalBlockContract(BlockContract contract, int id) {
         super(contract, id);
+    }
+
+    @Override
+    public FunctionalBlockContract map(UnaryOperator<Term> op, Services services) {
+        return new FunctionalBlockContract(getAuxiliaryContract().map(op, services), id());
     }
 
     @Override

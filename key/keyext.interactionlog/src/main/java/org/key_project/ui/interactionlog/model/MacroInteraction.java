@@ -41,7 +41,6 @@ public final class MacroInteraction extends NodeInteraction {
     public MacroInteraction(Node node, ProofMacro macro,
                             PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
         super(node);
-        System.out.println("macro");
         this.macroName = macro.getScriptCommandName();
         this.pos = posInOcc;
         this.info = info.toString();
