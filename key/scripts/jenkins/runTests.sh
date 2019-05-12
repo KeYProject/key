@@ -14,9 +14,9 @@ EXIT_UNIT_TESTS=$?
 # Adapt to old scheme. copy tests xml to a folder where jenkins find them.
 # Change if there is no ant build.
 # Old regex: key/**/testresults/*.xml
-XMLTESTFOLDER="tests/testresults"
+XMLTESTFOLDER="xxx/testresults"
 mkdir -p $XMLTESTFOLDER
-cp "key.*/build/test-results/*/*.xml" $XMLTESTFOLDER
+find -iname 'TEST-*.xml' -exec cp {} $XMLTESTFOLDER \;
 
 #
 # create statistics if successful
