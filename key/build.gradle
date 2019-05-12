@@ -40,7 +40,6 @@ def getGitBranch = { ->
 ext.dateVersion = getDate()
 ext.gitRevision = getGitRevision()
 ext.gitBranch = getGitBranch()
-version = "2.7"
 
 def resourceDir = new File(project(":key.core").projectDir, "src/main/resources")
 def utilResourceDir = new File(resourceDir, "de/uka/ilkd/key/util")
@@ -50,7 +49,7 @@ new File(utilResourceDir, "branch").text = gitBranch
 new File(utilResourceDir, "version").text = version
 
 group = "org.key_project"
-version = "${version}.0-${System.env.BUILD_NUMBER ?: ext.gitRevision}"
+version = "2.7.0-${System.env.BUILD_NUMBER ?: ext.gitRevision}"
 
 subprojects {
     apply plugin: "java"

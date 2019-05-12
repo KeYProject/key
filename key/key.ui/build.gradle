@@ -21,7 +21,7 @@ task createExamplesZip(type: Zip) {
     archiveFileName = "examples.zip"
     from 'examples'
     include '*'
-    include '*/*'
+    include '**/**'
 }
 
 processResources.dependsOn << createExamplesZip
