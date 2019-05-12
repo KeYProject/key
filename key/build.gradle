@@ -284,25 +284,16 @@ project(":key.core") {
             includeTestsMatching "SpeclangTests"
             includeTestsMatching "UtilityTests"
         }
-        afterTest { desc, result ->
-            logger.quiet "Executed test ${desc.name} [${desc.className}] with result: ${result.resultType}"
-        }
     }
 
     task testProofRules(type: Test) {
         group "verification"
         filter { includeTestsMatching "ProveRulesTest" }
-        afterTest { desc, result ->
-            logger.quiet "Executed test ${desc.name} [${desc.className}] with result: ${result.resultType}"
-        }
     }
 
     task testRunAllProofs(type: Test) {
         group "verification"
         filter { includeTestsMatching "RunAllProofsTestSuite" }
-        afterTest { desc, result ->
-            logger.quiet "Executed test ${desc.name} [${desc.className}] with result: ${result.resultType}"
-        }
     }
 
     //check.dependsOn << testProofRules << testRunAllProofs
