@@ -31,6 +31,12 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.RegroupSequentPrintFilter;
 import de.uka.ilkd.key.pp.SearchSequentPrintFilter;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
+import de.uka.ilkd.key.gui.fonticons.IconCode;
+import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import javax.swing.Icon;
+
+
 
 /*
  * Search bar implementing search function for SequentView.
@@ -43,11 +49,15 @@ public class SequentViewSearchBar extends SearchBar {
     public static final Color SEARCH_HIGHLIGHT_COLOR_2 = new Color(0, 140, 255, 100);
 
     public static enum SearchMode {
-        HIGHLIGHT("Highlight"), HIDE("Hide"), REGROUP("Regroup");
+        HIGHLIGHT("Highlight", FontAwesomeBold.HIGHLIGHTER),
+        HIDE("Hide", FontAwesomeBold.LOW_VISION),
+        REGROUP("Regroup", FontAwesomeBold.INDENT);
         private String displayName;
+        public final Icon icon;
 
-        private SearchMode(String name) {
+        private SearchMode(String name, IconCode icon) {
             this.displayName = name;
+            this.icon = IconFontSwing.buildIcon(icon, 16);
         }
 
         @Override
@@ -77,6 +87,10 @@ public class SequentViewSearchBar extends SearchBar {
 
     public SequentView getSequentView() {
         return this.sequentView;
+    }
+
+    public void setSearchMode(SearchMode mode) {
+        searchModeBox.setSelectedItem(mode);
     }
 
     @Override
@@ -206,6 +220,22 @@ public class SequentViewSearchBar extends SearchBar {
             loopEnterd = true;
         }
         return loopEnterd;
+    }
+
+    /**
+    * searches for the given string and displays the search-bar.
+    * @param searchTerm string to search for. If regex is enabled, the string will be escaped
+    */
+    public void searchFor(String searchTerm) {
+        if (regExpCheckBox.isSelected()) {
+            // https://stackoverflow.com/questions/60160/how-to-escape-text-for-regular-expression-in-java
+            String escaped = searchTerm.replaceAll("[-\\[\\]{}()*+?.,\\\\\\\\^$|#\\\\s]", "\\\\$0");
+            searchField.setText(escaped);
+        } else {
+            searchField.setText(searchTerm);
+        }
+        setVisible(true);
+        search();
     }
 
     private void setExtraHighlight(int resultIndex) {

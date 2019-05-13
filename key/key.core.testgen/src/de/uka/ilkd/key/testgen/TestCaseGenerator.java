@@ -1043,29 +1043,29 @@ public class TestCaseGenerator {
         return o.getName().replace("#", "_");
     }
 
-    private String getTypeOfValue(Heap heap, Model m, String val){
-        String type = "int";
-        if (val.equals("true") || val.equals("false")) {
-            type = "boolean";
-        } else if (val.startsWith("#o")) {
-            final ObjectVal o = getObject(heap, val);
-            if (o != null) {
-                if (val.equals("#o0")){
-                    /*				        && m.getTypes().getOriginalConstantType(c) != null) {
-					type = m.getTypes().getOriginalConstantType(c)
-					        .name().toString();
-                     */
-                    type = "Object";
-                } else {
-                    //System.out.println(o);
-                    type = o.getSort().name().toString();
-                }
-            } else {
-                type = "Object";
-            }			
-        }
-        return type;
-    }
+//    private String getTypeOfValue(Heap heap, Model m, String val){
+//        String type = "int";
+//        if (val.equals("true") || val.equals("false")) {
+//            type = "boolean";
+//        } else if (val.startsWith("#o")) {
+//            final ObjectVal o = getObject(heap, val);
+//            if (o != null) {
+//                if (val.equals("#o0")){
+//                    /*				        && m.getTypes().getOriginalConstantType(c) != null) {
+//					type = m.getTypes().getOriginalConstantType(c)
+//					        .name().toString();
+//                     */
+//                    type = "Object";
+//                } else {
+//                    //System.out.println(o);
+//                    type = o.getSort().name().toString();
+//                }
+//            } else {
+//                type = "Object";
+//            }			
+//        }
+//        return type;
+//    }
 
     private String getDummyClassNameFor(Sort sort) {
         final JavaInfo jinfo = services.getJavaInfo();
@@ -1124,17 +1124,17 @@ public class TestCaseGenerator {
         return res;
     }
 
-    private ObjectVal getObject(Heap h, String name) {
-        if (h == null) {
-            return null;
-        }
-        for (final ObjectVal o : h.getObjects()) {
-            if (o.getName().equals(name)) {
-                return o;
-            }
-        }
-        return null;
-    }
+//    private ObjectVal getObject(Heap h, String name) {
+//        if (h == null) {
+//            return null;
+//        }
+//        for (final ObjectVal o : h.getObjects()) {
+//            if (o.getName().equals(name)) {
+//                return o;
+//            }
+//        }
+//        return null;
+//    }
 
     private String createBoolSet(){
 

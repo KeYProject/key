@@ -29,6 +29,8 @@ import javax.swing.plaf.metal.MetalIconFactory.FolderIcon16;
 import javax.swing.plaf.metal.MetalIconFactory.TreeControlIcon;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
+import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -105,6 +107,10 @@ public class IconFactory {
     private static Image testgenerationImage = getImage("images/toolbar/tg.png");
 
     private static Image heatmapImage = getImage("images/toolbar/heatmap.png");
+
+    // private static Image originImage = getImage("images/toolbar/origin.png");
+    private static final Icon ORIGIN_ICON =
+            IconFontSwing.buildIcon(FontAwesomeBold.ROUTE, MainWindowTabbedPane.TAB_ICON_SIZE);
 
     public static Image getImage(String s) {
 	ImageIcon ii=createImageIcon(IconFactory.class, s);
@@ -371,6 +377,11 @@ public class IconFactory {
 
     public static Icon heatmapIcon(int size) {
         return scaleIcon(heatmapImage, size, size);
+    }
+
+    public static Icon originIcon(int size) {
+        // return scaleIcon(originImage, size, size);
+        return ORIGIN_ICON;
     }
 
     public static class KeYFolderIcon extends FolderIcon16 {

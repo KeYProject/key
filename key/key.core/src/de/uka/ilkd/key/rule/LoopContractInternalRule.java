@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.rule;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,17 +10,16 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
-import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
-import de.uka.ilkd.key.rule.BlockContractBuilders.UpdatesBuilder;
-import de.uka.ilkd.key.rule.BlockContractBuilders.VariablesCreatorAndRegistrar;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
+import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistrar;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -150,27 +148,18 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
      *            the heaps.
      * @param updatesBuilder
      *            an update builder.
+     * @param instantiation
+     *            the instantiation for the current rule application.
      * @param services
      *            services.
      * @return the update for the validity branch.
      */
     private static Term createContext(final List<LocationVariable> heaps,
-            final UpdatesBuilder updatesBuilder, final Services services) {
-        final Term outerRemembranceUpdate = updatesBuilder.buildOuterRemembranceUpdate();
-        Map<LocationVariable, Function> anonInHeaps
-                = new LinkedHashMap<LocationVariable, Function>(40);
-        final TermBuilder tb = services.getTermBuilder();
-
-        for (LocationVariable heap : heaps) {
-            final String anonymisationName
-                    = tb.newName(BlockContractBuilders.ANON_IN_PREFIX + heap.name());
-            final Function anonymisationFunction
-                    = new Function(new Name(anonymisationName), heap.sort(), true);
-            services.getNamespaces().functions().addSafely(anonymisationFunction);
-            anonInHeaps.put(heap, anonymisationFunction);
-        }
-        final Term anonInUpdate = updatesBuilder.buildAnonInUpdate(anonInHeaps);
-        return tb.sequential(outerRemembranceUpdate, anonInUpdate);
+            final UpdatesBuilder updatesBuilder, final Instantiation instantiation,
+            final Services services) {
+        return services.getTermBuilder().sequential(
+                updatesBuilder.buildOuterRemembranceUpdate(),
+                instantiation.update);
     }
 
     /**
@@ -341,15 +330,19 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
 
         final Instantiation instantiation
                 = instantiate(application.posInOccurrence().subTerm(), goal, services);
-        final LoopContract contract = application.getContract();
+        LoopContract contract = application.getContract();
+
+        assert contract.isOnBlock() && contract.getBlock().equals(instantiation.statement)
+            || !contract.isOnBlock() && contract.getLoop().equals(instantiation.statement);
+
+        contract = contract.replaceEnhancedForVariables(contract.getBlock(), services);
         contract.setInstantiationSelf(instantiation.self);
-        assert contract.getBlock().equals(instantiation.block);
 
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables
-                = MiscTools.getLocalIns(instantiation.block, services);
+                = MiscTools.getLocalIns(instantiation.statement, services);
         final ImmutableSet<ProgramVariable> localOutVariables
-                = MiscTools.getLocalOuts(instantiation.block, services);
+                = MiscTools.getLocalOuts(instantiation.statement, services);
         final Map<LocationVariable, Function> anonOutHeaps
                 = createAndRegisterAnonymisationVariables(heaps, contract, services);
         final LoopContract.Variables[] vars
@@ -374,7 +367,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
                 updatesBuilder);
         final Term nextRemembranceUpdate
                 = new UpdatesBuilder(vars[1], services).buildRemembranceUpdate(heaps);
-        final Term context = createContext(heaps, updatesBuilder, services);
+        final Term context = createContext(heaps, updatesBuilder, instantiation, services);
         final GoalsConfigurator configurator = new GoalsConfigurator(application,
                 new TermLabelState(), instantiation, contract.getLabels(), vars[0],
                 application.posInOccurrence(), services, this);

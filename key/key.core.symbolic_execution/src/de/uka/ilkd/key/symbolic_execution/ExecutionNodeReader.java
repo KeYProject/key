@@ -65,7 +65,7 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockSpecificationElement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionAuxiliaryContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
@@ -2675,11 +2675,11 @@ public class ExecutionNodeReader {
    }
 
    /**
-    * An implementation of {@link IExecutionBlockSpecificationElement} which is independent
+    * An implementation of {@link IExecutionAuxiliaryContract} which is independent
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessBlockContract extends AbstractKeYlessExecutionNode<SourceElement> implements IExecutionBlockSpecificationElement {
+   public static class KeYlessBlockContract extends AbstractKeYlessExecutionNode<SourceElement> implements IExecutionAuxiliaryContract {
       /**
        * Precondition complied?
        */

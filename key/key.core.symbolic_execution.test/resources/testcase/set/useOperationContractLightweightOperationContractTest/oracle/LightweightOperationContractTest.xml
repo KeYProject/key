@@ -3,36 +3,25 @@
    <methodCall name="&lt;call LightweightOperationContractTest.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="return magic(x);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = magic(x) catch(exc_0)
-pre: gt(x, Z(0(#))) | lt(x, Z(0(#))) | x = Z(0(#))
-post: (   gt(x, Z(0(#)))
-   -&gt;   ((exc_0 = null)&lt;&lt;impl&gt;&gt; -&gt; result_0 = Z(1(#)))
+pre: x &gt;  0 | x &lt; 0 | x = 0
+post: (   x &gt;  0
+   -&gt;   ((exc_0 = null)&lt;&lt;impl&gt;&gt; -&gt; result_0 = 1)
       &amp; (   !(exc_0 = null)&lt;&lt;impl&gt;&gt;
          -&gt;   java.lang.Error::instance(exc_0) = TRUE
             |   java.lang.RuntimeException::instance(exc_0)
               = TRUE))
-&amp; (   lt(x, Z(0(#)))
-   -&gt;   (   (exc_0 = null)&lt;&lt;impl&gt;&gt;
-         -&gt; result_0 = Z(neglit(1(#))))
+&amp; (   x &lt; 0
+   -&gt;   ((exc_0 = null)&lt;&lt;impl&gt;&gt; -&gt; result_0 = -1)
       &amp; (   !(exc_0 = null)&lt;&lt;impl&gt;&gt;
          -&gt;   java.lang.Error::instance(exc_0) = TRUE
             |   java.lang.RuntimeException::instance(exc_0)
               = TRUE))
-&amp; (   x = Z(0(#))
+&amp; (   x = 0
    -&gt; !(exc_0 = null)&lt;&lt;impl&gt;&gt;
    -&gt;   java.lang.Error::instance(exc_0) = TRUE
       |   java.lang.RuntimeException::instance(exc_0)
         = TRUE)
-mod: intersect(\if (gt(x, Z(0(#))) | lt(x, Z(0(#))))
-              \then (intersect(\if (gt(x, Z(0(#))))
-                                   \then (allLocs)
-                                   \else (allLocs),
-                               \if (lt(x, Z(0(#))))
-                                   \then (allLocs)
-                                   \else (allLocs)))
-              \else (allLocs),
-          \if (x = Z(0(#)))
-              \then (allLocs)
-              \else (allLocs))
+mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,or(gt(x,Z(0(#))),lt(x,Z(0(#))))))" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,or(gt(x,Z(0(#))),lt(x,Z(0(#))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,or(gt(x,Z(0(#))),lt(x,Z(0(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                <methodReturn name="&lt;return of main&gt;" signature="&lt;return of LightweightOperationContractTest.main(x)&gt;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,or(gt(x,Z(0(#))),lt(x,Z(0(#))))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(heapBefore_magic)(heap)),and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,or(gt(x,Z(0(#))),lt(x,Z(0(#))))))">

@@ -462,6 +462,11 @@ public final class SourceView extends JComponent {
             textScrollPane.setViewportView(nowrap);
             textScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             textScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+            // increase unit increment (for faster scrolling)
+            textScrollPane.getVerticalScrollBar().setUnitIncrement(30);
+            textScrollPane.getHorizontalScrollBar().setUnitIncrement(30);
+
             tabs.addTab(entry.getValue().getName(), textScrollPane);
 
             // add the full path as tooltip for the tab

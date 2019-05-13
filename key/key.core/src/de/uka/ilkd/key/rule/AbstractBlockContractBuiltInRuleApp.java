@@ -7,13 +7,13 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.SimpleBlockContract;
+import de.uka.ilkd.key.speclang.BlockContractImpl;
 
 /**
  * Application of {@link AbstractBlockContractRule}.
@@ -21,7 +21,7 @@ import de.uka.ilkd.key.speclang.SimpleBlockContract;
  * @author wacker, lanzinger
  */
 public abstract class AbstractBlockContractBuiltInRuleApp
-        extends AbstractBlockSpecificationElementBuiltInRuleApp {
+        extends AbstractAuxiliaryContractBuiltInRuleApp {
 
     /**
      * @see #getContract()
@@ -65,31 +65,31 @@ public abstract class AbstractBlockContractBuiltInRuleApp
                 .instantiate(posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<BlockContract> contracts = AbstractBlockContractRule
                 .getApplicableContracts(instantiation, goal, services);
-        block = instantiation.block;
+        setStatement(instantiation.statement);
         ImmutableSet<BlockContract> cons = DefaultImmutableSet.<BlockContract> nil();
         for (BlockContract cont : contracts) {
-            if (cont.getBlock().getStartPosition().getLine() == block.getStartPosition()
+            if (cont.getBlock().getStartPosition().getLine() == getStatement().getStartPosition()
                     .getLine()) {
                 cons = cons.add(cont);
             }
         }
-        contract = SimpleBlockContract.combine(cons, services);
+        contract = BlockContractImpl.combine(cons, services);
         heaps = HeapContext.getModHeaps(services, instantiation.isTransactional());
         return this;
     }
 
     /**
      *
-     * @param block
-     *            the new block.
+     * @param statement
+     *            the new statement.
      * @param contract
      *            the new contract.
      * @param heaps
      *            the new heap context.
      */
-    public void update(final StatementBlock block, final BlockContract contract,
+    public void update(final JavaStatement statement, final BlockContract contract,
             final List<LocationVariable> heaps) {
-        this.block = block;
+        setStatement(statement);
         this.contract = contract;
         this.heaps = heaps;
     }

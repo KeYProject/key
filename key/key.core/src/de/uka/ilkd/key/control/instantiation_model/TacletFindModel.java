@@ -286,13 +286,12 @@ public class TacletFindModel extends AbstractTableModel {
             Location loc = pe.getLocation();
             if (loc != null) {
                 throw new SVInstantiationParserException(instantiation,
-                                                         irow + (loc.getLine() <= 0 ? 0
-                                                                 : loc.getLine()),
+                                                         (loc.getLine() <= 0 ? 0 : loc.getLine()),
                                                          loc.getColumn(), pe.getMessage(),
                                                          false).initCause(pe);
             } else {
                 throw new SVInstantiationParserException(instantiation,
-                                                         irow, -1,
+                                                         -1, -1,
                                                          pe.getMessage(),
                                                          false).initCause(pe);
             }
@@ -325,12 +324,12 @@ public class TacletFindModel extends AbstractTableModel {
                                                          irow + (loc.getLine() <= 0 ? 0
                                                                  : loc.getLine()),
                                                          loc.getColumn(), pe.getMessage(),
-                                                         false);
+                                                         false).initCause(pe);
             } else {
                 throw new SVInstantiationParserException(instantiation,
                                                          irow, -1,
                                                          pe.getMessage(),
-                                                         false);
+                                                         false).initCause(pe);
             }
         }
     }

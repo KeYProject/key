@@ -76,9 +76,9 @@ public abstract class AbstractIntegerLiteral extends Literal {
         return getValueString();
     }
 
-    @Override    
-    protected int computeHashCode(){
-        int localHash = (int) (17*super.computeHashCode() + getValue());
+    @Override
+    protected int computeHashCode() {
+        int localHash = (int) (17 * super.computeHashCode() + getValue());
         return localHash;
     }
 

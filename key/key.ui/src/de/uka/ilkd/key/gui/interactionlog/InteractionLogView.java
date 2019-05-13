@@ -33,6 +33,8 @@ import java.text.SimpleDateFormat;
 import java.util.Optional;
 
 public class InteractionLogView extends JPanel implements InteractionRecorderListener {
+    private static final long serialVersionUID = 3556470808320035874L;
+
     private static final float SMALL_ICON_SIZE = 16f;
     private static final String MENU_ILOG = "Interaction Logging";
     private static final String MENU_ILOG_EXPORT = MENU_ILOG + ".Export";
@@ -112,8 +114,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         listInteraction.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
-                JList l = (JList) e.getSource();
-                ListModel m = l.getModel();
+                JList<?> l = (JList<?>) e.getSource();
+                ListModel<?> m = l.getModel();
                 int index = l.locationToIndex(e.getPoint());
                 if (index > -1) {
                     Interaction inter = (Interaction) m.getElementAt(index);
@@ -166,7 +168,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private void rebuildList() {
-        InteractionLog currentInteractionLog = getSelectedItem();
+        //InteractionLog currentInteractionLog = getSelectedItem();
         if (currentProof != null) {
             InteractionLog state = recorder.get(currentProof);
             updateList(state);
@@ -273,10 +275,15 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         return interactionListModel;
     }
 
-    private class InteractionLogModelItem extends DefaultComboBoxModel<InteractionLog> {
-    }
+    /*
+     * private class InteractionLogModelItem extends
+     * DefaultComboBoxModel<InteractionLog> { private static final long
+     * serialVersionUID = -7718209435802926054L; }
+     */
 
     private class ExportMUScriptAction extends AbstractFileSaveAction {
+        private static final long serialVersionUID = 6021191398782299315L;
+
         ExportMUScriptAction() {
             putValue(Action.NAME, "Export as Proof Script");
             putValue(Action.SMALL_ICON,
@@ -298,6 +305,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class ExportMUScriptClipboardAction extends KeyAction {
+        private static final long serialVersionUID = -5096089246533676984L;
+
         ExportMUScriptClipboardAction() {
             putValue(Action.NAME, "Copy MUScript");
             putValue(Action.SMALL_ICON,
@@ -315,6 +324,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class LoadAction extends KeyAction {
+        private static final long serialVersionUID = 5740272811052759510L;
+
         LoadAction() {
             putValue(Action.NAME, "Load");
             putValue(Action.SHORT_DESCRIPTION, "Load Interaction Log");
@@ -348,6 +359,9 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class SaveAction extends KeyAction {
+        private static final long serialVersionUID = -7317047376590585833L;
+
+
         SaveAction() {
             putValue(Action.NAME, "Save");
             putValue(Action.SMALL_ICON,
@@ -379,6 +393,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class AddUserNoteAction extends KeyAction {
+        private static final long serialVersionUID = -8392942513574886611L;
+
         AddUserNoteAction() {
             setName("Add Note");
             putValue(Action.SMALL_ICON,
@@ -406,6 +422,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class ToggleFavouriteAction extends KeyAction {
+        private static final long serialVersionUID = 8585424784487607094L;
+
         ToggleFavouriteAction() {
             setName("Toggle Fav");
             setName("Toggle Fav");
@@ -426,6 +444,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class JumpIntoTreeAction extends KeyAction {
+        private static final long serialVersionUID = -2838023649682832870L;
+
         JumpIntoTreeAction() {
             setName("Jump into tree");
             putValue(SMALL_ICON, IconFontSwing.buildIcon(FontAwesome.CODE, SMALL_ICON_SIZE));
@@ -447,6 +467,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class TryReapplyAction extends KeyAction {
+        private static final long serialVersionUID = 8388941798029540127L;
+
         TryReapplyAction() {
             putValue(NAME, "Re-apply action");
             putValue(SMALL_ICON, IconFontSwing.buildIcon(FontAwesome.APPER, SMALL_ICON_SIZE));
@@ -475,6 +497,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private abstract class AbstractFileSaveAction extends KeyAction {
+        private static final long serialVersionUID = 4631583590128782895L;
+
         public AbstractFileSaveAction() {
             super();
         }
@@ -492,6 +516,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class ExportKPSAction extends AbstractFileSaveAction {
+        private static final long serialVersionUID = 1580180870530511695L;
+
         public ExportKPSAction() {
             setName("Export as KPS …");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into the KPS format.");
@@ -509,6 +535,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class ExportMarkdownAction extends AbstractFileSaveAction {
+        private static final long serialVersionUID = 1637885391150216633L;
+
         public ExportMarkdownAction() {
             setName("Export as markdown …");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into a markdown file.");
@@ -526,6 +554,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class ShowExtendedActionsAction extends KeyAction {
+        private static final long serialVersionUID = 7815446860188097043L;
+
         public ShowExtendedActionsAction() {
             setName("More …");
             putValue(Action.SHORT_DESCRIPTION, "Shows further options");
@@ -544,13 +574,15 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         public void actionPerformed(ActionEvent e) {
             JComponent btn = (JComponent) e.getSource();
             JPopupMenu menu = createMenu();
-            PointerInfo pi = MouseInfo.getPointerInfo();
+            //PointerInfo pi = MouseInfo.getPointerInfo();
             menu.show(btn, 0, 0);
             //pi.getLocation().x, pi.getLocation().y);
         }
     }
 
     private class PauseLoggingAction extends KeyAction {
+        private static final long serialVersionUID = 1502857162501676456L;
+
         public PauseLoggingAction() {
             setSelected(recorder.isDisableAll());
             setPriority(-1);
@@ -603,7 +635,7 @@ class MultiLineInputPrompt {
             JPanel box = new JPanel(new FlowLayout(FlowLayout.CENTER));
             root.add(box, BorderLayout.SOUTH);
             JTextArea area = new JTextArea(text);
-            JButton btnOk = new JButton("Ok");
+            JButton btnOk = new JButton("OK");
             JButton btnCancel = new JButton("Cancel");
             box.add(btnOk);
             box.add(btnCancel);
@@ -649,6 +681,8 @@ class MultiLineInputPrompt {
 }
 
 class InteractionCellRenderer extends JPanel implements ListCellRenderer<Interaction> {
+    private static final long serialVersionUID = 1026769807453070070L;
+
     private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final Color COLOR_FAVOURED = new Color(0xFFD373);
     private JLabel lblIconLeft = new JLabel(), lblIconRight = new JLabel(), lblText = new JLabel();
@@ -712,6 +746,4 @@ class InteractionCellRenderer extends JPanel implements ListCellRenderer<Interac
 
         return this;
     }
-
-
 }

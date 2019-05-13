@@ -22,13 +22,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -64,6 +65,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
@@ -340,12 +342,13 @@ public class Recoder2KeY implements JavaReader {
     /**
      * parse a list of java files and transform it to the corresponding KeY
      * entities.
-     * 
+     *
      * Each element of the array is treated as a filename to read in.
-     * 
+     *
      * @param cUnitStrings
      *            a list of strings, each element is interpreted as a file to be
      *            read. not null.
+     * @param fileRepo the fileRepo which will store the files
      * @return a new list containing the recoder compilation units corresponding
      *         to the given files.
      * @throws ParseExceptionInFile
@@ -354,9 +357,11 @@ public class Recoder2KeY implements JavaReader {
      */
 
     public de.uka.ilkd.key.java.CompilationUnit[]
-            readCompilationUnitsAsFiles(String[] cUnitStrings) throws ParseExceptionInFile {
+            readCompilationUnitsAsFiles(String[] cUnitStrings, FileRepo fileRepo)
+                    throws ParseExceptionInFile {
 
-        List<recoder.java.CompilationUnit> cUnits = recoderCompilationUnitsAsFiles(cUnitStrings);
+        List<recoder.java.CompilationUnit> cUnits =
+                recoderCompilationUnitsAsFiles(cUnitStrings, fileRepo);
         de.uka.ilkd.key.java.CompilationUnit[] result = new de.uka.ilkd.key.java.CompilationUnit[cUnits.size()];
         for (int i = 0, sz = cUnits.size(); i < sz; i++) {
             Debug.out("converting now " + cUnitStrings[i]);
@@ -371,36 +376,45 @@ public class Recoder2KeY implements JavaReader {
 
     /**
      * parse a list of java files.
-     * 
+     *
      * Each element of the array is treated as a filename to read in.
-     * 
+     *
      * @param cUnitStrings
      *            a list of strings, each element is interpreted as a file to be
      *            read. not null.
+     * @param fileRepo the fileRepo which will store the files
      * @return a new list containing the recoder compilation units corresponding
      *         to the given files.
      */
-    private List<recoder.java.CompilationUnit> recoderCompilationUnitsAsFiles(String[] cUnitStrings) {
+    private List<recoder.java.CompilationUnit> recoderCompilationUnitsAsFiles(String[] cUnitStrings,
+            FileRepo fileRepo) {
         List<recoder.java.CompilationUnit> cUnits = new ArrayList<recoder.java.CompilationUnit>();
-        parseSpecialClasses();
+        parseSpecialClasses(fileRepo);
         try {
             for (String filename : cUnitStrings) {
                 final CompilationUnit cu;
                 Reader fr = null;
                 try {
-                    fr = new BufferedReader(new FileReader(filename));
+                    if (fileRepo != null) {
+                        fr = new InputStreamReader(fileRepo.getInputStream(Paths.get(filename)),
+                                StandardCharsets.UTF_8);
+                    } else {
+                        // fallback if no repo present (e.g. in tests)
+                        fr = new FileReader(filename);
+                    }
+                    fr = new BufferedReader(fr);
                     cu = servConf.getProgramFactory().parseCompilationUnit(fr);
                 } catch (Exception e) {
                     throw new ParseExceptionInFile(filename, e);
                 } finally {
                     if (fr != null) {
-                	fr.close();
+                        fr.close();
                     }
                 }
                 cu.setDataLocation(new DataFileLocation(filename));
                 cUnits.add(cu);
             }
-            
+
             final ChangeHistory changeHistory = servConf.getChangeHistory();
             for (int i = 0, sz = cUnits.size(); i < sz; i++) {
                 cUnits.get(i).makeAllParentRolesValid();
@@ -534,9 +548,10 @@ public class Recoder2KeY implements JavaReader {
      * as a directory (not a JAR file at the moment) and all files in this
      * directory are read in. This is done using a
      * {@link DirectoryFileCollection}.
+     * @param fileRepo the FileRepo that provides the InputStream to resources
      */
-    private void parseInternalClasses(ProgramFactory pf, List<recoder.java.CompilationUnit> rcuList) 
-                    throws IOException, ParseException, ParserException {
+    private void parseInternalClasses(ProgramFactory pf, List<recoder.java.CompilationUnit> rcuList,
+            FileRepo fileRepo) throws IOException, ParseException, ParserException {
         
         FileCollection bootCollection;
         FileCollection.Walker walker = null;
@@ -551,7 +566,7 @@ public class Recoder2KeY implements JavaReader {
         
         while(walker.step()) {
             DataLocation loc = walker.getCurrentDataLocation();
-            InputStream is = walker.openCurrent();
+            InputStream is = walker.openCurrent(fileRepo);
             Reader f = new BufferedReader(new InputStreamReader(is));
             
             try {
@@ -588,29 +603,34 @@ public class Recoder2KeY implements JavaReader {
      * </ol>
      * <li>else read a special collection of classes that is stored internally
      * </ol>
-     * 
+     *
      * @author mulbrich
+     * @param fileRepo the FileRepo for obtaining InputStreams
      * @throws ParserException
      * @throws IOException
      * @throws ParseException
      */
-    private List<recoder.java.CompilationUnit> parseLibs() throws ParseException, IOException, ParserException {
-        
+    private List<recoder.java.CompilationUnit> parseLibs(FileRepo fileRepo)
+            throws ParseException, IOException, ParserException {
+
         recoder.ProgramFactory pf = servConf.getProgramFactory();
         List<recoder.java.CompilationUnit> rcuList = new LinkedList<recoder.java.CompilationUnit>();
         List<FileCollection> sources = new ArrayList<FileCollection>();
-        
-        parseInternalClasses(pf, rcuList);
+
+        parseInternalClasses(pf, rcuList, fileRepo);
 
         if(classPath != null) {
             for(File cp : classPath) {
-                if(cp.isDirectory())
+                if(cp.isDirectory()) {
                     sources.add(new DirectoryFileCollection(cp));
-                else
+                } else {
                     sources.add(new ZipFileCollection(cp));
+                }
             }
         }
 
+        /* While the resources are read (and possibly copied) via the FileRepo, the data location
+         * is left as it is. This leaves the line information intact. */
         DataLocation currentDataLocation = null;
 
         // -- read jml files --
@@ -620,7 +640,7 @@ public class Recoder2KeY implements JavaReader {
         	Reader f = null;
         	try {
                     currentDataLocation = walker.getCurrentDataLocation();
-                    InputStream is = walker.openCurrent();
+                    InputStream is = walker.openCurrent(fileRepo);
                     f = new BufferedReader(new InputStreamReader(is));
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
                     rcu.setDataLocation(currentDataLocation);
@@ -643,7 +663,7 @@ public class Recoder2KeY implements JavaReader {
         	Reader f = null;
         	try {
                     currentDataLocation = walker.getCurrentDataLocation();
-                    InputStream is = walker.openCurrent();
+                    InputStream is = walker.openCurrent(fileRepo);
                     f = new BufferedReader(new InputStreamReader(is));
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
                     rcu.setDataLocation(currentDataLocation);
@@ -668,7 +688,7 @@ public class Recoder2KeY implements JavaReader {
         	InputStream is = null;
         	try {
                     currentDataLocation = walker.getCurrentDataLocation();
-                    is = new BufferedInputStream(walker.openCurrent());
+                    is = new BufferedInputStream(walker.openCurrent(fileRepo));
                     ClassFile cf;
                     try {
                         cf = parser.parseClassFile(is);
@@ -746,20 +766,37 @@ public class Recoder2KeY implements JavaReader {
     /**
      * makes sure that the special classes (library classes) have been parsed
      * in.
-     * 
+     *
      * If not parsed yet, the special classes are read in and converted.
      * This method throws only runtime exceptions for historical reasons.
      */
     public void parseSpecialClasses() {
         try {
-            parseLibraryClasses0();
+            parseLibraryClasses0(null);
         } catch (Exception e) {
             reportError("An error occurred while parsing the libraries", e);
         }
     }
-    
-    
-    private void parseLibraryClasses0() throws ParseException, IOException, ParserException {
+
+    /**
+     * makes sure that the special classes (library classes) have been parsed
+     * in.
+     *
+     * If not parsed yet, the special classes are read in and converted.
+     * This method throws only runtime exceptions for historical reasons.
+     *
+     * @param fileRepo the fileRepo which will store the files
+     */
+    public void parseSpecialClasses(FileRepo fileRepo) {
+        try {
+            parseLibraryClasses0(fileRepo);
+        } catch (Exception e) {
+            reportError("An error occurred while parsing the libraries", e);
+        }
+    }
+
+    private void parseLibraryClasses0(FileRepo fileRepo)
+            throws ParseException, IOException, ParserException {
         if (mapping.parsedSpecial()) {
             return;
         }
@@ -767,12 +804,8 @@ public class Recoder2KeY implements JavaReader {
         // go to special mode -> used by the converter!
         setParsingLibs(true);
 
-        List<recoder.java.CompilationUnit> specialClasses = parseLibs();
+        List<recoder.java.CompilationUnit> specialClasses = parseLibs(fileRepo);
 
-//        for (recoder.java.CompilationUnit compilationUnit : specialClasses) {
-//            System.out.println(compilationUnit.toSource());
-//        }
-        
         ChangeHistory changeHistory = servConf.getChangeHistory();
         for (int i = 0, sz = specialClasses.size(); i < sz; i++) {
             specialClasses.get(i).makeAllParentRolesValid();

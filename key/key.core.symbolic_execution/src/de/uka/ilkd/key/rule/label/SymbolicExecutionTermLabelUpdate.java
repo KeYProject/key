@@ -32,7 +32,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.AbstractBlockContractRule;
-import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule;
+import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.LoopContractExternalRule;
@@ -79,7 +79,7 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
                             JavaBlock newTermJavaBlock,
                             Set<TermLabel> labels) {
       if (rule instanceof WhileInvariantRule && "LoopBodyModality".equals(hint) ||
-          ( rule instanceof AbstractBlockSpecificationElementRule && 
+          ( rule instanceof AbstractAuxiliaryContractRule && 
                   ((AbstractBlockContractRule.BlockContractHint)hint).getExceptionalVariable() != null) 
           ) {
          TermLabel label = CollectionUtil.searchAndRemove(labels, new IFilter<TermLabel>() {

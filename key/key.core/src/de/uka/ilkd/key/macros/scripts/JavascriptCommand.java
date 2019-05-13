@@ -58,11 +58,9 @@ public class JavascriptCommand
     }
 
     public static class JavascriptInterface {
-        private final Proof proof;
         private final EngineState state;
 
         public JavascriptInterface(Proof proof, EngineState state) {
-            this.proof = proof;
             this.state = state;
         }
 

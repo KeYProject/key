@@ -3,7 +3,7 @@
    <methodCall name="&lt;call LoopUsageBranchClosed.deadCodeAfterLoop()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int i = 2;" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
-         <loopInvariant name="invariant: geq(i, Z(0(#)));
+         <loopInvariant name="invariant: i &gt;= 0;
 variant: i
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
             <callStackEntry path="/0"/>
