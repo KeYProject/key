@@ -44,6 +44,7 @@ import java.util.zip.ZipFile;
 
 /**
  * Provides static methods to work with java IO.
+ *
  * @author Martin Hentschel
  */
 public final class IOUtil {
