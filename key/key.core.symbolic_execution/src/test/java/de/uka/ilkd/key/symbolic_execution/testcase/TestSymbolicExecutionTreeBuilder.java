@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.junit.FixMethodOrder;
+import org.junit.experimental.categories.Category;
 import org.junit.runners.MethodSorters;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -36,6 +37,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import org.key_project.util.testcategories.Slow;
 
 /**
  * Tests for {@link SymbolicExecutionTreeBuilder},
@@ -44,6 +46,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
  * @author Martin Hentschel
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Category(Slow.class)
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests example: /set/joinTest

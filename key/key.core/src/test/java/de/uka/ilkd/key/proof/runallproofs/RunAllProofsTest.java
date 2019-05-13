@@ -18,7 +18,8 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
 import org.antlr.runtime.*;
 import org.junit.Test;
-import org.junit.jupiter.api.Tag;
+import org.junit.experimental.categories.Category;
+import org.key_project.util.testcategories.Slow;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,7 +72,7 @@ import static org.junit.Assert.assertTrue;
  * @see RunAllProofsTestSuite
  * @see ListRunAllProofsTestCases
  */
-@Tag("slow")
+@Category(Slow.class)
 public class RunAllProofsTest {
 
    public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";

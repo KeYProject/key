@@ -7,13 +7,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import org.antlr.runtime.RecognitionException;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Stream;
+import org.junit.Test;
 
 import static org.junit.Assert.*;
 
@@ -148,34 +142,28 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
         return parser.termexpression();
     }
 
-    public Stream<DynamicTest> createTestCases(String[] testData) {
-        List<DynamicTest> tests = new LinkedList<>();
+    public void createTestCases(String[] testData) throws RecognitionException {
         for (int i = 0; i < testData.length / 2; i++) {
             String input = testData[i * 2];
             String expected = testData[i * 2 + 1];
-
-            tests.add(DynamicTest.dynamicTest(input, () -> {
-                String actual = parseTerm(input).toString();
-                assertEquals(expected, actual);
-
-            }));
+            String actual = parseTerm(input).toString();
+            assertEquals(expected, actual);
         }
-        return tests.stream();
     }
 
-    @TestFactory
-    public Stream<DynamicTest> testCharLiteralParsing() throws RecognitionException {
-        return createTestCases(CHARSTRINGS);
+    @Test
+    public void testCharLiteralParsing() throws RecognitionException {
+        createTestCases(CHARSTRINGS);
     }
 
-    @TestFactory
-    public Stream<DynamicTest> testIntLiteralParsing() throws RecognitionException {
-        return createTestCases(INTSTRINGS);
+    @Test
+    public void testIntLiteralParsing() throws RecognitionException {
+        createTestCases(INTSTRINGS);
     }
 
-    @TestFactory
-    public Stream<DynamicTest> testLongLiteralParsing() throws RecognitionException {
-        return createTestCases(LONGSTRINGS);
+    @Test
+    public void testLongLiteralParsing() throws RecognitionException {
+        createTestCases(LONGSTRINGS);
     }
 
     /**
@@ -184,17 +172,16 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
      *
      * @throws RecognitionException if a parsing error occurs
      */
-    @TestFactory
-    public Stream<DynamicTest> testIntRange() throws RecognitionException {
-        return Arrays.stream(INTRANGESTRINGS)
-                .map(it -> DynamicTest.dynamicTest(it, () -> {
-                    try {
-                        parseTerm(it);
-                        fail();
-                    } catch (SLTranslationException e) {
-                        assertTrue(e.getMessage().startsWith("Number constant out of bounds"));
-                    }
-                }));
+    @Test
+    public void testIntRange() throws RecognitionException {
+        for (String it : INTRANGESTRINGS) {
+            try {
+                parseTerm(it);
+                fail();
+            } catch (SLTranslationException e) {
+                assertTrue(e.getMessage().startsWith("Number constant out of bounds"));
+            }
+        }
     }
 
     /**
@@ -203,16 +190,15 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
      *
      * @throws RecognitionException if a parsing error occurs
      */
-    @TestFactory
-    public Stream<DynamicTest> testLongRange() throws RecognitionException {
-        return Arrays.stream(LONGRANGESTRINGS)
-                .map(it -> DynamicTest.dynamicTest(it, () -> {
-                    try {
-                        parseTerm(it);
-                        fail();
-                    } catch (SLTranslationException e) {
-                        assertTrue(e.getMessage().startsWith("Number constant out of bounds"));
-                    }
-                }));
+    @Test
+    public void testLongRange() throws RecognitionException {
+        for (String it : LONGRANGESTRINGS) {
+            try {
+                parseTerm(it);
+                fail();
+            } catch (SLTranslationException e) {
+                assertTrue(e.getMessage().startsWith("Number constant out of bounds"));
+            }
+        }
     }
 }
