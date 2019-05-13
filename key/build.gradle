@@ -96,14 +96,13 @@ subprojects {
 
     test {
         useJUnitPlatform() {
-            excludeTags 'org.key_project.util.testcategories.Interactive'
+            excludeTags 'interactive'
         }
     }
 
     task testFast(type: Test) {
         useJUnitPlatform() {
-            excludeTags 'org.key_project.util.testcategories.Slow'
-            excludeTags 'org.key_project.util.testcategories.Interactive'
+            excludeTags 'slow', 'interactive'
         }
     }
 

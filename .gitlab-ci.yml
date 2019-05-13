@@ -40,7 +40,7 @@ compile:classes:
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache classes
+    - gradle --build-cache classes
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
@@ -54,7 +54,7 @@ compile:testClasses:
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --parallel testClasses
+    - gradle --build-cache --parallel testClasses
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull-push
@@ -68,7 +68,7 @@ compile:testClasses8:
   script:
     - javac -version
     - cd key
-    - ./gradlew --parallel classes testClasses
+    - gradle --parallel classes testClasses
 
 compile:testFast:key.util:
   stage: ternary
@@ -76,7 +76,7 @@ compile:testFast:key.util:
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :key.util:testFast
+    - gradle --build-cache --continue :key.util:testFast
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -95,7 +95,7 @@ compile:testFast:key.core:
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :key.core:testFast
+    - gradle --build-cache --continue :key.core:testFast
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -114,7 +114,7 @@ compile:testFast:proofref:
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :key.core.proof_references:testFast
+    - gradle --build-cache --continue :key.core.proof_references:testFast
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -133,7 +133,7 @@ compile:testFast:testgen:
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :key.core.testgen:testFast
+    - gradle --build-cache --continue :key.core.testgen:testFast
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
@@ -151,7 +151,7 @@ compile:testFast:interactionlog:
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :keyex.interactionlog:testFast
+    - gradle --build-cache --continue :keyex.interactionlog:testFast
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
@@ -169,7 +169,7 @@ compile:testFast:ui:
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :key.ui:testFast
+    - gradle --build-cache --continue :key.ui:testFast
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -188,7 +188,7 @@ compile:testFast:removegenerics:
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :key.removegenerics:testFast
+    - gradle --build-cache --continue :key.removegenerics:testFast
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -209,7 +209,7 @@ compile:testFast:removegenerics:
 #  script:
 #    - javac -version
 #    - cd key
-#    - ./gradlew --build-cache --continue :key.core:testRunAllProofs
+#    - gradle --build-cache --continue :key.core:testRunAllProofs
 #    - ls
 #  cache:
 #    key: "$CI_COMMIT_REF_NAME"
@@ -229,7 +229,7 @@ compile:testFast:removegenerics:
 #  script:
 #    - javac -version
 #    - cd key
-#    - ./gradlew --build-cache --continue :key.core:testProofRules
+#    - gradle --build-cache --continue :key.core:testProofRules
 #    - ls
 #  cache:
 #    key: "$CI_COMMIT_REF_NAME"

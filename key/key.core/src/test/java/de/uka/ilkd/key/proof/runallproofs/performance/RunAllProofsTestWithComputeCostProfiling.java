@@ -9,6 +9,7 @@ import org.antlr.runtime.TokenStream;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -20,7 +21,6 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
-import org.key_project.util.testcategories.Performance;
 
 /**
  * Same as {@link RunAllProofsFunctional} but we alter
@@ -29,7 +29,7 @@ import org.key_project.util.testcategories.Performance;
  * number of invocations and potentially other stuff).
  */
 @RunWith(Parameterized.class)
-@Category(Performance.class)
+@Tag("performance")
 public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
 
     private static ProfilingDirectories directories;
