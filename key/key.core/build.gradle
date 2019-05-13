@@ -53,7 +53,7 @@ test {
         // use testProofRules or testRunAllProofs, avoid double execution on jenkins
         excludeTestsMatching "ProveRulesTest"
         excludeTestsMatching "RunAllProofsTestSuite"
-        excludeTestsMatching "RunAllProofsInfFlow", 
+        excludeTestsMatching "RunAllProofsInfFlow"
         excludeTestsMatching "RunAllProofsTestWithComputeCostProfiling"
         excludeTestsMatching "RunAllProofsFunctional"
         excludeCategories 'org.key_project.util.testcategories.Interactive'
