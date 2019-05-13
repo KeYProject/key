@@ -13,25 +13,19 @@
 
 package de.uka.ilkd.key.proof.runallproofs;
 
-import static org.junit.Assert.assertTrue;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
+import org.antlr.runtime.*;
+import org.junit.Test;
+import org.junit.jupiter.api.Tag;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.antlr.runtime.ANTLRFileStream;
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.TokenStream;
-import org.junit.Test;
-
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
-import org.junit.experimental.categories.Category;
-import org.key_project.util.testcategories.Slow;
+import static org.junit.Assert.assertTrue;
 
 /**
  * <p>
@@ -77,7 +71,7 @@ import org.key_project.util.testcategories.Slow;
  * @see RunAllProofsTestSuite
  * @see ListRunAllProofsTestCases
  */
-@Category(Slow.class)
+@Tag("slow")
 public class RunAllProofsTest {
 
    public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";

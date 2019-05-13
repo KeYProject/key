@@ -24,8 +24,7 @@ import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import junit.framework.TestCase;
 import org.junit.Assert;
-import org.junit.experimental.categories.Category;
-import org.key_project.util.testcategories.Slow;
+import org.junit.jupiter.api.Tag;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +38,7 @@ import java.util.LinkedList;
  * tests.
  * 
  */
-@Category(Slow.class)
+@Tag("slow")
 public abstract class TestCommons extends TestCase {
 	protected static String folder = HelperClassForTests.TESTCASE_DIRECTORY
 	        + File.separator + "smt" + File.separator + "tacletTranslation"
