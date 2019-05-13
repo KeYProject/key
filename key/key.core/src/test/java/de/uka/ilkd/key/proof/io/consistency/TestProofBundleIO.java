@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.key_project.util.java.IOUtil;
 
@@ -86,7 +87,7 @@ public class TestProofBundleIO {
      * and *.zip files.
      * @throws Exception on errors (should not happen)
      */
-    @Test
+    @Test @Ignore("TODO")
     public void testComplexBundleGeneration() throws Exception {
         /* size of file should be about 22 kb,
          * to be robust against small changes (or different compression),
