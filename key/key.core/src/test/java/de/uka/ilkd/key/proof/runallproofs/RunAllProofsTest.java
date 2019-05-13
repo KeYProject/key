@@ -73,7 +73,7 @@ import static org.junit.Assert.assertTrue;
  * @see ListRunAllProofsTestCases
  */
 @Category(Slow.class)
-public class RunAllProofsTest {
+public abstract class RunAllProofsTest {
 
    public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
 
