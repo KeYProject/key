@@ -1,17 +1,22 @@
 #!/bin/sh -x
+unset DISPLAY
 export KEY_VERSION="2.7.$BUILD_NUMBER"
-export ANT_HOME=/opt/ant/
-export ANT_OPTS="-Xmx4096m -Xms512m -XX:-UseGCOverheadLimit"
 export PATH=$PATH:/home/hudson/key/bin/
 export STATISTICS_DIR="$JENKINS_HOME/userContent/statistics-$JOB_NAME"
-unset DISPLAY
 
 #
 # Run unit tests
 #
-cd key/scripts
-ant -logger org.apache.tools.ant.NoBannerLogger test-deploy-all
+cd key
+./gradlew --parallel test testProofRules testRunAllProofs 
 EXIT_UNIT_TESTS=$?
+
+# Adapt to old scheme. copy tests xml to a folder where jenkins find them.
+# Change if there is no ant build.
+# Old regex: key/**/testresults/*.xml
+XMLTESTFOLDER="xxx/testresults"
+mkdir -p $XMLTESTFOLDER
+find -iname 'TEST-*.xml' -exec cp {} $XMLTESTFOLDER \;
 
 #
 # create statistics if successful
