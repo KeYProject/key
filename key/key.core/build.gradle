@@ -50,7 +50,7 @@ compileJavacc {
 
 test {
     filter {
-        # use testProofRules or testRunAllProofs, avoid double execution on jenkins
+        // use testProofRules or testRunAllProofs, avoid double execution on jenkins
         excludeTestsMatching "ProveRulesTest"
         excludeTestsMatching "RunAllProofsTestSuite", "RunAllProofsInfFlow", 
                              "RunAllProofsTestWithComputeCostProfiling", "RunAllProofsFunctional"
