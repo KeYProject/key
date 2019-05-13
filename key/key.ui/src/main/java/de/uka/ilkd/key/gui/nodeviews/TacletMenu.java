@@ -102,7 +102,8 @@ public class TacletMenu extends JMenu {
     private static final long serialVersionUID = -4659105575090816693L;
     private static final Set<Name> CLUTTER_RULESETS = new LinkedHashSet<Name>();
     private static final Set<Name> CLUTTER_RULES = new LinkedHashSet<Name>();
-    public static final int TOO_MANY_TACLETS = 3; //reduce for debugging.
+    public static final int TOO_MANY_TACLETS_THRESHOLD = 15; //reduce for debugging.
+
     static {
         CLUTTER_RULESETS.add(new Name("notHumanReadable"));
         CLUTTER_RULESETS.add(new Name("obsolete"));
@@ -474,7 +475,6 @@ public class TacletMenu extends JMenu {
      * adds a TacletMenuItem for each taclet in the list and sets
      * the given MenuControl as the ActionListener
      *
-     * @param target
      * @param taclets {@link ImmutableList<Taclet>} with the Taclets the items represent
      * @param control the ActionListener
      */
@@ -520,7 +520,7 @@ public class TacletMenu extends JMenu {
         for (TacletApp app : normalTaclets) {
             target.add(createMenuItem(app, control));
             ++currentSize;
-            if(currentSize>=TOO_MANY_TACLETS){
+            if(currentSize>= TOO_MANY_TACLETS_THRESHOLD){
                 JMenu newTarget = new JMenu(MORE_RULES);
                 target.add(newTarget);
                 target = newTarget;
@@ -607,7 +607,7 @@ public class TacletMenu extends JMenu {
      */
     class MenuControl implements ActionListener {
 
-        private boolean validabbreviation(String s) {
+        private boolean validAbbreviation(String s) {
             if (s == null || s.length() == 0) {
                 return false;
             }
@@ -634,22 +634,18 @@ public class TacletMenu extends JMenu {
                 final Goal goal = mediator.getSelectedGoal();
                 assert goal != null;
 
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        SMTSettings settings = new SMTSettings(goal.proof().getSettings().getSMTSettings(),
-                                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), goal.proof());
-                        SolverLauncher launcher = new SolverLauncher(settings);
-                        launcher.addListener(new SolverListener(settings, goal.proof()));
-                        Collection<SMTProblem> list = new LinkedList<SMTProblem>();
-                        list.add(new SMTProblem(goal));
-                        launcher.launch(solverUnion.getTypes(),
-                                list,
-                                goal.proof().getServices());
+                Thread thread = new Thread(() -> {
+                    SMTSettings settings = new SMTSettings(goal.proof().getSettings().getSMTSettings(),
+                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), goal.proof());
+                    SolverLauncher launcher = new SolverLauncher(settings);
+                    launcher.addListener(new SolverListener(settings, goal.proof()));
+                    Collection<SMTProblem> list = new LinkedList<SMTProblem>();
+                    list.add(new SMTProblem(goal));
+                    launcher.launch(solverUnion.getTypes(),
+                            list,
+                            goal.proof().getServices());
 
 
-                    }
                 }, "SMTRunner");
                 thread.start();
             } else if (e.getSource() instanceof BuiltInRuleMenuItem) {
@@ -702,7 +698,7 @@ public class TacletMenu extends JMenu {
 
                         try {
                             if (abbreviation != null) {
-                                if (!validabbreviation(abbreviation)) {
+                                if (!validAbbreviation(abbreviation)) {
                                     JOptionPane.showMessageDialog(new JFrame(),
                                             "Only letters, numbers and '_' are allowed for Abbreviations",
                                             "Sorry",
@@ -734,7 +730,7 @@ public class TacletMenu extends JMenu {
                                                 getAbbrevMap().getAbbrev(occ.subTerm()).substring(1));
                         try {
                             if (abbreviation != null) {
-                                if (!validabbreviation(abbreviation)) {
+                                if (!validAbbreviation(abbreviation)) {
                                     JOptionPane.showMessageDialog(new JFrame(),
                                             "Only letters, numbers and '_' are allowed for Abbreviations",
                                             "Sorry",
