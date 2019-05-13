@@ -13,11 +13,12 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
 import org.junit.Test;
-import org.junit.jupiter.api.Tag;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.key_project.util.helper.FindResources;
+import org.key_project.util.testcategories.Slow;
 
 import java.io.File;
 import java.util.*;
@@ -42,7 +43,7 @@ import static org.junit.Assert.assertTrue;
  *
  */
 @RunWith(Parameterized.class)
-@Tag("slow")
+@Category(Slow.class)
 public class ProveRulesTest {
    /*
     * File object pointing to directory key/key.core.test

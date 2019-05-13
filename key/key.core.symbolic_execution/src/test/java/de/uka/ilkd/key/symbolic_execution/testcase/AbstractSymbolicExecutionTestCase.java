@@ -108,7 +108,7 @@ import de.uka.ilkd.key.util.KeYConstants;
  * the symbolic execution features.
  * @author Martin Hentschel
  */
-public class AbstractSymbolicExecutionTestCase extends TestCase {
+public abstract class AbstractSymbolicExecutionTestCase extends TestCase {
    /**
     * <p>
     * If this constant is {@code true} a temporary directory is created with

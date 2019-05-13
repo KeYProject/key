@@ -11,8 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -34,7 +34,7 @@ import de.uka.ilkd.key.util.ExceptionTools;
  * @author Kai Wallisch
  */
 @RunWith(Parameterized.class)
-@Disabled("See issue #1500")
+@Ignore("See issue #1500")
 public class ParserMessageTest {
    private final String docFile = "key/doc/README.parserMessageTest";
 

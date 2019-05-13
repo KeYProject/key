@@ -38,9 +38,7 @@ import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -113,7 +111,7 @@ public class TestTriggersSet {
 		super();
 	}
 
-	@BeforeEach
+	@Before
 	public void setUp() {
 		//sort
 		r = new SortImpl(new Name("r"));
@@ -244,7 +242,7 @@ public class TestTriggersSet {
 	}
 
 	@Test
-	@Disabled("See Issues #1499")
+	@Ignore("See Issues #1499")
 	public void testTrigger2(){
 		String term1 = "\\forall r x;(frr(x)=frr(frr(x)))";
 		Term allterm = parseTerm(term1);
