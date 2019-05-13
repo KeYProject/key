@@ -48,6 +48,13 @@ compileJavacc {
     }
 }
 
+test {
+    filter {
+        excludeTestsMatching "ProveRulesTest"
+        excludeTestsMatching "RunAllProofsTestSuite"
+    }
+}
+
 task testProofRules(type: Test) {
     group "verification"
     filter { includeTestsMatching "ProveRulesTest" }
