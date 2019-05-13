@@ -73,7 +73,6 @@ task testRunAllProofs(type: Test) {
     filter { 
         includeTestsMatching "RunAllProofsTestSuite"
         includeTestsMatching "RunAllProofsInfFlow"
-        includeTestsMatching "RunAllProofsTestWithComputeCostProfiling"
         includeTestsMatching "RunAllProofsFunctional"
     }
 }
