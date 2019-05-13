@@ -70,7 +70,12 @@ task testProofRules(type: Test) {
 
 task testRunAllProofs(type: Test) {
     group "verification"
-    filter { includeTestsMatching "RunAllProofsTestSuite" }
+    filter { 
+        includeTestsMatching "RunAllProofsTestSuite"
+        includeTestsMatching "RunAllProofsInfFlow"
+        includeTestsMatching "RunAllProofsTestWithComputeCostProfiling"
+        includeTestsMatching "RunAllProofsFunctional"
+    }
 }
 
 //check.dependsOn << testProofRules << testRunAllProofs
