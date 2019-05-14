@@ -55,9 +55,10 @@ subprojects {
     }
 
     tasks.withType(Javadoc) {
-        //failOnError=false
+        failOnError = false
         options.addBooleanOption 'Xdoclint:none', true
-        options.verbose()
+        //options.verbose()
+        options.encoding = 'UTF-8'
         if (JavaVersion.current().isJava9Compatible()) {
             // not working on jenkins: options.addBooleanOption('html5', true)
         }
@@ -222,6 +223,7 @@ task alldoc(type: Javadoc) {
 
     configure(options) {
         //showFromPrivate()
+        encoding = 'UTF-8'
         addBooleanOption 'Xdoclint:none', true
         // overview = new File( projectDir, 'src/javadoc/package.html' )
         //stylesheetFile = new File( projectDir, 'src/javadoc/stylesheet.css' )
