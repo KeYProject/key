@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.settings;
 
+import java.util.Set;
+
 /**
  * This class encapsulates information about:
  * 1) relative font size in the prover view
@@ -26,6 +28,31 @@ public class ViewSettings extends AbstractPropertiesSettings {
      * default max number of displayed tooltip lines is 40
      */
     private static final String MAX_TOOLTIP_LINES_KEY = "[View]MaxTooltipLines";
+
+    /**
+     *
+     */
+    private static final String CLUTTER_RULES = "[View]clutterRules";
+
+    /**
+     *
+     */
+    private static final String CLUTTER_RULES_DEFAULT = "cut_direct_r,cut_direct_l,case_distinction_r," +
+            "case_distinction_l,local_cut,commute_and_2,commute_or_2,boxToDiamond,pullOut,typeStatic," +
+            "less_is_total,less_zero_is_total,applyEqReverse,eqTermCut,instAll,instEx";
+
+
+    /**
+     *
+     */
+    private static final String CLUTTER_RULESSETS = "[View]clutterRuleSets";
+
+    /**
+     *
+     */
+    private static final String CLUTTER_RULESETS_DEFAULT = "notHumanReadable,obsolete,pullOutQuantifierAll," +
+            "pullOutQuantifierEx";
+
 
     /**
      * do not print the find, varcond and heuristics part of taclets in
@@ -100,7 +127,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     private static final String SHOW_UNINSTANTIATED_TACLET = "[View]showUninstantiatedTaclet";
     /**
-     *
+     * Show heatmap for sequent formulas (true) or terms (false)
      */
     private static final String HEATMAP_SHOW = "[View][Heatmap]enabled";
     /**
@@ -120,27 +147,16 @@ public class ViewSettings extends AbstractPropertiesSettings {
      * Show Taclet uninstantiated in tooltip -- for learning
      */
     private PropertyEntry<Boolean> showUninstantiatedTaclet = createBooleanProperty(SHOW_UNINSTANTIATED_TACLET, true);
-
-    /**
-     * Show heatmap of most recently used sequent formulae
-     */
     private PropertyEntry<Boolean> showHeatmap = createBooleanProperty(HEATMAP_SHOW, false);
-
-    /**
-     * Show heatmap for sequent formulas (true) or terms (false)
-     */
     private PropertyEntry<Boolean> heatmapSF = createBooleanProperty(HEATMAP_SF, true);
-
     /**
      * Highlight newest formulas/terms (true) or all formulas/terms below specified age (false)
      */
     private PropertyEntry<Boolean> heatmapNewest = createBooleanProperty(HEATMAP_NEWEST, true);
-
     /**
      * Maximum age/number of newest terms/formulas for heatmap highlighting
      */
     private PropertyEntry<Integer> maxAgeForHeatmap = createIntegerProperty(HEATMAP_MAXAGE, 5);
-
     private PropertyEntry<Double> uiFontSizeFactor = createDoubleProperty(FONT_SIZE_FACTOR, 1.0);
     private PropertyEntry<Integer> maxTooltipLines = createIntegerProperty(MAX_TOOLTIP_LINES_KEY, 40);
     private PropertyEntry<Boolean> hideIntermediateProofsteps = createBooleanProperty(HIDE_INTERMEDIATE_PROOFSTEPS, false);
@@ -155,7 +171,27 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private PropertyEntry<Boolean> showWholeTaclet = createBooleanProperty(SHOW_WHOLE_TACLET, false);
     private PropertyEntry<Integer> sizeIndex = createIntegerProperty(FONT_INDEX, 2);
     private PropertyEntry<Boolean> useSystemLaF = createBooleanProperty(USE_SYSTEM_LAF, false);
+    private PropertyEntry<Set<String>> clutterRules = createStringSetProperty(CLUTTER_RULES, CLUTTER_RULES_DEFAULT);
 
+    private PropertyEntry<Set<String>> clutterRuleSets =
+            createStringSetProperty(CLUTTER_RULESSETS, CLUTTER_RULESETS_DEFAULT);
+
+    /**
+     * Clutter rules are rules with less priority in the taclet menu
+     */
+    public Set<String> getClutterRules() {
+        return clutterRules.get();
+    }
+
+    public PropertyEntry<Set<String>> clutterRules() {return clutterRules;}
+    public PropertyEntry<Set<String>> clutterRuleSets() {return this.clutterRuleSets; }
+
+    /**
+     * Name of rule sets containing clutter rules, which has a minor priority in the taclet menu.
+     */
+    public Set<String> getClutterRuleSets() {
+        return clutterRuleSets.get();
+    }
 
     /**
      * @return the current maxTooltipLines

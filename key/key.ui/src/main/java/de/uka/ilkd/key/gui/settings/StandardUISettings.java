@@ -12,6 +12,11 @@ import javax.swing.*;
  * @version 1 (10.05.19)
  */
 public class StandardUISettings extends SettingsPanel implements SettingsProvider {
+    private static final String INFO_CLUTTER_RULESET =
+            "Comma separated list of rule set names, containing clutter rules.";
+    private static final String INFO_CLUTTER_RULE = "Comma separated listof clutter rules, \n" +
+            "which are rules with less priority in the taclet menu";
+
     private final JSpinner spFontSizeGlobal;
     private final JSpinner txtMaxTooltipLines;
     private final JCheckBox chkShowWholeTacletCB;
@@ -26,6 +31,8 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     private final JCheckBox chkMinimizeInteraction;
     private final JSpinner spFontSizeTreeSequent;
     private final JCheckBox chkAllowProofBundleSaving;
+    private final JTextField txtClutterRules;
+    private final JTextField txtClutterRuleSets;
 
     public StandardUISettings() {
         setHeaderText(getDescription());
@@ -50,6 +57,9 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         chkShowUninstantiatedTaclet = addCheckBox("Show uninstantiated taclet", "recommended for unexperienced users",
                 false, emptyValidator());
 
+        txtClutterRules = addTextField("Clutter rules", "", INFO_CLUTTER_RULE, emptyValidator());
+        txtClutterRuleSets = addTextField("Clutter rules", "", INFO_CLUTTER_RULESET, emptyValidator());
+
         chkPrettyPrint = addCheckBox("Pretty print terms", "", false, emptyValidator());
         chkUseUnicode = addCheckBox("Use unicode", "", false, emptyValidator());
         chkSyntaxHighlightning = addCheckBox("Use syntax highlightning", "", false, emptyValidator());
@@ -68,23 +78,27 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
 
     @Override
     public JComponent getPanel(MainWindow window) {
-        ViewSettings viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         GeneralSettings generalSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
-        spFontSizeGlobal.setValue(viewSettings.getUIFontSizeFactor());
-        txtMaxTooltipLines.setValue(viewSettings.getMaxTooltipLines());
-        chkShowWholeTacletCB.setSelected(viewSettings.getShowWholeTaclet());
-        chkShowUninstantiatedTaclet.setSelected(viewSettings.getShowUninstantiatedTaclet());
-        chkHidePackagePrefix.setSelected(viewSettings.isHidePackagePrefix());
-        chkPrettyPrint.setSelected(viewSettings.isUsePretty());
-        chkUseUnicode.setSelected(viewSettings.isUseUnicode());
-        chkSyntaxHighlightning.setSelected(viewSettings.isUseSyntaxHighlighting());
+
+        txtClutterRules.setText(vs.clutterRules().value());
+        txtClutterRuleSets.setText(vs.clutterRuleSets().value());
+
+        spFontSizeGlobal.setValue(vs.getUIFontSizeFactor());
+        txtMaxTooltipLines.setValue(vs.getMaxTooltipLines());
+        chkShowWholeTacletCB.setSelected(vs.getShowWholeTaclet());
+        chkShowUninstantiatedTaclet.setSelected(vs.getShowUninstantiatedTaclet());
+        chkHidePackagePrefix.setSelected(vs.isHidePackagePrefix());
+        chkPrettyPrint.setSelected(vs.isUsePretty());
+        chkUseUnicode.setSelected(vs.isUseUnicode());
+        chkSyntaxHighlightning.setSelected(vs.isUseSyntaxHighlighting());
         chkAllowProofBundleSaving.setSelected(generalSettings.isAllowBundleSaving());
         chkRightClickMacros.setSelected(generalSettings.isRightClickMacro());
-        chkConfirmExit.setSelected(viewSettings.confirmExit());
+        chkConfirmExit.setSelected(vs.confirmExit());
         spAutoSaveProof.setValue(generalSettings.autoSavePeriod());
         chkMinimizeInteraction.setSelected(generalSettings.tacletFilter());
-        spFontSizeTreeSequent.setValue(viewSettings.sizeIndex());
+        spFontSizeTreeSequent.setValue(vs.sizeIndex());
 
         return this;
     }
@@ -96,6 +110,10 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
 
         vs.setUIFontSizeFactor((Double) spFontSizeGlobal.getValue());
         vs.setMaxTooltipLines((Integer) txtMaxTooltipLines.getValue());
+
+        vs.clutterRules().set(txtClutterRules.getText());
+        vs.clutterRuleSets().set(txtClutterRuleSets.getText());
+
 
         vs.setShowWholeTaclet(chkShowWholeTacletCB.isSelected());
         vs.setShowUninstantiatedTaclet(chkShowUninstantiatedTaclet.isSelected());

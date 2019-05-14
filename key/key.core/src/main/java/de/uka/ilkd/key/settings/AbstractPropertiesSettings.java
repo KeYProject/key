@@ -1,10 +1,7 @@
 package de.uka.ilkd.key.settings;
 
 
-import java.util.EventObject;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -13,6 +10,7 @@ import java.util.function.Function;
  * @author weigl
  */
 public abstract class AbstractPropertiesSettings implements Settings {
+    private static final String SET_DELIMITER = ",";
     private static Function<String, Integer> parseInt = Integer::parseInt;
     private static Function<String, Float> parseFloat = Float::parseFloat;
     private static Function<String, Boolean> parseBoolean = Boolean::parseBoolean;
@@ -33,6 +31,20 @@ public abstract class AbstractPropertiesSettings implements Settings {
      */
     protected List<SettingsListener> listenerList = new LinkedList<>();
 
+    private static Set<String> parseStringSet(String o) {
+        Set<String> set = new TreeSet<>();
+        for (String entry : o.split(SET_DELIMITER)) {
+            if (!entry.isBlank()) {
+                set.add(entry.trim());
+            }
+        }
+        return set;
+    }
+
+    private static String stringSetToString(Set<String> set) {
+        return String.join(SET_DELIMITER, set);
+    }
+
     public boolean isInitialized() {
         return properties != null;
     }
@@ -48,6 +60,9 @@ public abstract class AbstractPropertiesSettings implements Settings {
 
     @Override
     public void writeSettings(Properties props) {
+        propertyEntries.forEach(it -> {
+            it.update();
+        });
         props.putAll(properties);
     }
 
@@ -61,7 +76,6 @@ public abstract class AbstractPropertiesSettings implements Settings {
             listener.settingsChanged(new EventObject(this));
         }
     }
-
 
     protected PropertyEntry<Double> createDoubleProperty(String key, double defValue) {
         PropertyEntry<Double> pe = new DefaultPropertyEntry<>(key, defValue, parseDouble);
@@ -93,12 +107,30 @@ public abstract class AbstractPropertiesSettings implements Settings {
         return pe;
     }
 
+    protected PropertyEntry<Set<String>> createStringSetProperty(String key, String defValue) {
+        PropertyEntry<Set<String>> pe = new DefaultPropertyEntry<>(key,
+                parseStringSet(defValue),
+                AbstractPropertiesSettings::parseStringSet,
+                AbstractPropertiesSettings::stringSetToString);
+        propertyEntries.add(pe);
+        return pe;
+    }
+
+
     public interface PropertyEntry<T> {
         String getKey();
+
+        void set(String value);
 
         void set(T value);
 
         T get();
+
+        default void update() {
+            set(get());
+        }
+
+        String value();
     }
 
 
@@ -106,11 +138,19 @@ public abstract class AbstractPropertiesSettings implements Settings {
         private final String key;
         private final T defaultValue;
         private final Function<String, T> convert;
+        private final Function<T, String> toString;
 
         private DefaultPropertyEntry(String key, T defaultValue, Function<String, T> convert) {
+            this(key, defaultValue, convert, Objects::toString);
+        }
+
+        private DefaultPropertyEntry(String key, T defaultValue,
+                                     Function<String, T> convert,
+                                     Function<T, String> toString) {
             this.key = key;
             this.defaultValue = defaultValue;
             this.convert = convert;
+            this.toString = toString;
         }
 
         @Override
@@ -118,20 +158,37 @@ public abstract class AbstractPropertiesSettings implements Settings {
             return key;
         }
 
+        @Override
+        public void set(String value) {
+            set(convert.apply(value));
+        }
+
+        @Override
         public void set(T value) {
             T old = get();
+            properties.setProperty(key, toString.apply(value));
             if (!value.equals(old)) {
-                properties.setProperty(key, value.toString());
                 fireSettingsChange();
             }
         }
 
+        @Override
         public T get() {
             String v = properties.getProperty(key);
             if (v == null) {
                 return defaultValue;
             } else {
                 return convert.apply(v);
+            }
+        }
+
+        @Override
+        public String value() {
+            String v = properties.getProperty(key);
+            if (v == null) {
+                return toString.apply(defaultValue);
+            } else {
+                return v;
             }
         }
     }
