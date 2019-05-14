@@ -80,6 +80,14 @@ tokens {
     REWRITE='->';
 }
 
+@lexer::header {
+  package de.uka.ilkd.key.parser;
+}
+
+@parser::header {
+  package de.uka.ilkd.key.parser;
+}
+
 @members {
 	int gtype;
 	

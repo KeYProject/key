@@ -22,9 +22,10 @@ gradle-app.setting
 ### Gradle Patch ###
 **/build/
 
-# We do not need to checkin eclipse or intellij stuff:
+# We do not need to check-in eclipse or intellij stuff:
 .idea/
 out/
 bin/
 .settings
 .project
+.classpath
