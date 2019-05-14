@@ -96,42 +96,14 @@ public class TacletMenu extends JMenu {
     private static final String ENTER_LOOP_SPECIFICATION = "Enter Loop Specification";
     private static final String APPLY_RULE = "Apply Rule";
     private static final String NO_RULES_APPLICABLE = "No rules applicable.";
-    /**
-     *
-     */
-    private static final long serialVersionUID = -4659105575090816693L;
-    private static final Set<Name> CLUTTER_RULESETS = new LinkedHashSet<Name>();
-    private static final Set<Name> CLUTTER_RULES = new LinkedHashSet<Name>();
+
+    private static final Set<String> CLUTTER_RULESETS =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getClutterRuleSets();
+
+    private static final Set<String> CLUTTER_RULES =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getClutterRules();
+
     public static final int TOO_MANY_TACLETS_THRESHOLD = 15; //reduce for debugging.
-
-    static {
-        CLUTTER_RULESETS.add(new Name("notHumanReadable"));
-        CLUTTER_RULESETS.add(new Name("obsolete"));
-        CLUTTER_RULESETS.add(new Name("pullOutQuantifierAll"));
-        CLUTTER_RULESETS.add(new Name("pullOutQuantifierEx"));
-    }
-
-    static {
-        CLUTTER_RULES.add(new Name("cut_direct_r"));
-        CLUTTER_RULES.add(new Name("cut_direct_l"));
-        CLUTTER_RULES.add(new Name("case_distinction_r"));
-        CLUTTER_RULES.add(new Name("case_distinction_l"));
-        CLUTTER_RULES.add(new Name("local_cut"));
-        CLUTTER_RULES.add(new Name("commute_and_2"));
-        CLUTTER_RULES.add(new Name("commute_or_2"));
-        CLUTTER_RULES.add(new Name("boxToDiamond"));
-        CLUTTER_RULES.add(new Name("pullOut"));
-        CLUTTER_RULES.add(new Name("typeStatic"));
-        CLUTTER_RULES.add(new Name("less_is_total"));
-        CLUTTER_RULES.add(new Name("less_zero_is_total"));
-        CLUTTER_RULES.add(new Name("applyEqReverse"));
-
-
-        // the following are used for drag'n'drop interactions
-        CLUTTER_RULES.add(new Name("eqTermCut"));
-        CLUTTER_RULES.add(new Name("instAll"));
-        CLUTTER_RULES.add(new Name("instEx"));
-    }
 
     private PosInSequent pos;
     private CurrentGoalView sequentView;
@@ -578,9 +550,9 @@ public class TacletMenu extends JMenu {
         }*/
         }
     private boolean isRareRule(Taclet taclet) {
-        if( CLUTTER_RULES.contains(taclet.name())) return true;
+        if( CLUTTER_RULES.contains(taclet.name().toString())) return true;
         return taclet.getRuleSets().stream()
-                .anyMatch(it -> CLUTTER_RULESETS.contains(it.name()));
+                .anyMatch(it -> CLUTTER_RULESETS.contains(it.name().toString()));
     }
 
     private Component createMenuItem(TacletApp app, MenuControl control) {
