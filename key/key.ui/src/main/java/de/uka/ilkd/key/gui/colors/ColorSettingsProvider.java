@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.colors;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.settings.InvalidSettingsInputException;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
 
@@ -41,7 +40,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
     public JComponent getPanel(MainWindow window) {
         List<ColorPropertyData> properties
                 = ColorSettings.getInstance().getProperties()
-                .map(it -> new ColorPropertyData(it.getKey(), it.getDescription(), it.get()))
+                .map(it -> new ColorPropertyData(it, it.get()))
                 .collect(Collectors.toList());
 
         modelColor = new ColorSettingsTableModel(properties);
@@ -81,10 +80,8 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
     }
 
     @Override
-    public void applySettings(MainWindow window) throws InvalidSettingsInputException {
-        modelColor.colorData.forEach(it -> {
-
-        });
+    public void applySettings(MainWindow window) {
+        modelColor.colorData.forEach(it -> it.property.set(it.color));
     }
 
     private static class ColorSettingsTableModel extends AbstractTableModel {
@@ -114,9 +111,9 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
         public Object getValueAt(int rowIndex, int columnIndex) {
             switch (columnIndex) {
                 case 0:
-                    return colorData.get(rowIndex).key;
+                    return colorData.get(rowIndex).property.getKey();
                 case 1:
-                    return colorData.get(rowIndex).description;
+                    return colorData.get(rowIndex).property.getDescription();
                 case 2:
                     return colorData.get(rowIndex).color;
             }
@@ -132,7 +129,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
         @Override
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
             if (columnIndex == 2) {
-                colorData.get(columnIndex).color = ColorSettings.fromHex(aValue.toString());
+                colorData.get(rowIndex).color = ColorSettings.fromHex(aValue.toString());
             } else {
                 super.setValueAt(aValue, rowIndex, columnIndex);
             }
@@ -145,12 +142,11 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
     }
 
     private static class ColorPropertyData {
-        String key, description;
+        private final ColorSettings.ColorProperty property;
         Color color;
 
-        public ColorPropertyData(String key, String description, Color color) {
-            this.key = key;
-            this.description = description;
+        public ColorPropertyData(ColorSettings.ColorProperty property, Color color) {
+            this.property = property;
             this.color = color;
         }
     }
@@ -184,7 +180,8 @@ class HexColorCellEditor extends DefaultCellEditor {
                 try {
                     Color c = ColorSettings.fromHex(textField.getText());
                     textField.setBackground(c);
-                } catch (NumberFormatException a) {
+                    textField.setForeground(ColorSettings.invert(c));
+                } catch (NumberFormatException ignored) {
 
                 }
             }
@@ -199,8 +196,11 @@ class HexColorCellEditor extends DefaultCellEditor {
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-        Component txt = super.getTableCellEditorComponent(table, ColorSettings.toHex((Color) value), isSelected, row, column);
-        txt.setBackground((Color) value);
+        Component txt = super.getTableCellEditorComponent(table,
+                ColorSettings.toHex((Color) value), isSelected, row, column);
+        Color c = (Color) value;
+        txt.setBackground(c);
+        txt.setForeground(ColorSettings.invert(c));
         return txt;
     }
 }

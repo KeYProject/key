@@ -2,7 +2,6 @@ package de.uka.ilkd.key.gui.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
-import net.miginfocom.layout.PlatformDefaults;
 
 import javax.swing.*;
 import java.awt.*;
@@ -69,15 +68,20 @@ public class SettingsDialog extends JDialog {
 
     private List<Exception> apply() {
         List<Exception> exc = new LinkedList<>();
+        apply(providers, exc);
+        return exc;
+    }
+
+    private void apply(List<SettingsProvider> providers, List<Exception> exceptions) {
         for (SettingsProvider it : providers) {
             try {
                 it.applySettings(mainWindow);
+                apply(it.getChildren(), exceptions);
             } catch (Exception e) {
                 e.printStackTrace();
-                exc.add(e);
+                exceptions.add(e);
             }
         }
-        return exc;
     }
 
     private boolean showErrors(List<Exception> apply) {

@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Stream;
 
@@ -45,14 +46,17 @@ public class ColorSettings extends AbstractPropertiesSettings {
     }
 
     public static Color fromHex(String s) {
-        Integer i = Integer.decode(s);
+        Long i = Long.decode(s);
         return new Color(
-                (i >> 16) & 0xFF,
-                (i >> 8) & 0xFF,
-                i & 0xFF,
-                (i >> 24) & 0xFF);
+                (int) ((i >> 16) & 0xFF),
+                (int) ((i >> 8) & 0xFF),
+                (int) (i & 0xFF),
+                (int) ((i >> 24) & 0xFF));
     }
 
+    public static Color invert(Color c) {
+        return new Color(255 - c.getRed(), 255 - c.getGreen(), 255 - c.getBlue());
+    }
 
     public void save() {
         System.out.println("[ColorSettings] Save color settings to: " + SETTINGS_FILE.getAbsolutePath());
@@ -64,9 +68,9 @@ public class ColorSettings extends AbstractPropertiesSettings {
         }
     }
 
-    public ColorProperty createColorProperty(String key,
-                                             String description,
-                                             Color defaultValue) {
+    private ColorProperty createColorProperty(String key,
+                                              String description,
+                                              Color defaultValue) {
         ColorProperty pe = new ColorProperty(key, description, defaultValue);
         propertyEntries.add(pe);
         return pe;
@@ -88,7 +92,8 @@ public class ColorSettings extends AbstractPropertiesSettings {
             }
         }
 
-        @Override public String value() {
+        @Override
+        public String value() {
             if (currentValue != null)
                 return toHex(currentValue);
 
@@ -101,9 +106,10 @@ public class ColorSettings extends AbstractPropertiesSettings {
             }
         }
 
-        @Override public void set(String v) {
-            if (value() != v) {
-                currentValue=fromHex(v);
+        @Override
+        public void set(String v) {
+            if (!Objects.equals(value(), v)) {
+                currentValue = fromHex(v);
                 properties.setProperty(getKey(), v);
                 fireSettingsChange();
             }
