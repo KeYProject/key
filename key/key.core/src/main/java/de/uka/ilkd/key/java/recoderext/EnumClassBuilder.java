@@ -147,6 +147,7 @@ public class EnumClassBuilder extends RecoderModelTransformer {
      * @see de.uka.ilkd.key.java.recoderext.RecoderModelTransformer#makeExplicit(recoder.java.declaration.TypeDeclaration)
      * @deprecated THIS DOES NOT WORK ANY MORE, SINCE THE CACHE ONLY CONSIDERS CLASSE TYPES, NOT ENUMS!
      */
+    @Deprecated
     protected void makeExplicit(TypeDeclaration td) { }
     
     /**
