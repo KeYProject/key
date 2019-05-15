@@ -19,6 +19,7 @@
 (assert (forall ((u U)) (=> (= (typeof u) sort_boolean) (or (= u TRUE) (= u FALSE)))))
 (assert (u2b TRUE))
 (assert (not (u2b FALSE)))
+(assert (forall ((x U)) (=> (instanceof x sort_boolean)  (= (typeof x ) sort_boolean))))
     </entry>
 
 </properties>
