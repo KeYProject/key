@@ -110,10 +110,10 @@ public class TacletMenu extends JMenu {
      */
     TacletMenu() {
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
-        clutterRules =vs.getClutterRuleSets();
-        clutterRules    = vs.getClutterRules();
+        clutterRuleSets = vs.getClutterRuleSets();
+        clutterRules = vs.getClutterRules();
         vs.addSettingsListener(e -> {
-            clutterRules = vs.getClutterRuleSets();
+            clutterRuleSets = vs.getClutterRuleSets();
             clutterRules = vs.getClutterRules();
         });
     }
@@ -134,7 +134,7 @@ public class TacletMenu extends JMenu {
                ImmutableList<TacletApp> findList, ImmutableList<TacletApp> rewriteList,
                ImmutableList<TacletApp> noFindList, ImmutableList<BuiltInRule> builtInList,
                PosInSequent pos) {
-        super();
+        this();
         this.sequentView = sequentView;
         this.mediator = sequentView.getMediator();
         this.pos = pos;
