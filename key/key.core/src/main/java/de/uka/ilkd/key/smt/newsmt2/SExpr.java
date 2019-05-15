@@ -30,10 +30,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public class SExpr implements Writable {
 
-    public static final String DECLARE_CONST = "declare-const";
-
     public enum Type {
-        INT, BOOL, UNIVERSE, PATTERN, NONE, HEAP
+        INT, BOOL, UNIVERSE, PATTERN, NONE
     }
 
     private static final Pattern EXTRACHAR_PATTERN =
@@ -67,7 +65,7 @@ public class SExpr implements Writable {
     public SExpr(String name, Type type, String... children) {
         this.name = name;
         this.type = type;
-        this.children = new ArrayList<SExpr>();
+        this.children = new ArrayList<>();
         for (String string : children) {
             this.children.add(new SExpr(string));
         }
@@ -93,15 +91,15 @@ public class SExpr implements Writable {
         this("", Type.NONE, children);
     }
 
-    public static SExpr patternSExpr(SExpr e, SExpr... patterns) {
+    static SExpr patternSExpr(SExpr e, SExpr... patterns) {
         return new SExpr("! " + e.toString() + " :pattern ", Type.PATTERN, new SExpr(patterns));
     }
 
-    public static SExpr sortExpr(Sort sort) {
+    static SExpr sortExpr(Sort sort) {
         return new SExpr(ModularSMTLib2Translator.SORT_PREFIX + sort.toString());
     }
 
-    public static SExpr castExpr(SExpr sortExp, SExpr exp) {
+    static SExpr castExpr(SExpr sortExp, SExpr exp) {
         // REVIEW MU: Should there perhaps be a coercion to Universe before the call?
         // What if a "Int" is given. That would fail.
         return new SExpr("cast", Type.UNIVERSE, exp, sortExp);
@@ -114,7 +112,7 @@ public class SExpr implements Writable {
         return sb.toString();
     }
 
-    public String getEscapedName() {
+    private String getEscapedName() {
         if (name.length() > 0 && name.charAt(0) == '|' && name.charAt(name.length() - 1) == '|') {
             return name; //already escaped
         }

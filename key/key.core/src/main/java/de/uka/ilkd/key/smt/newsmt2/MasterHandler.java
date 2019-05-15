@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -23,23 +21,28 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 public class MasterHandler {
 
+    /** Exceptions that occur during translation */
     private List<Throwable> exceptions = new ArrayList<>();
 
+    /** The different handlers */
     private List<SMTHandler> handlers = new ArrayList<>();
 
+    /** All declarations */
     private List<Writable> declarations = new ArrayList<>();
 
+    /** All axioms */
     private List<Writable> axioms = new ArrayList<>();
 
+    /** A list of known symbols */
     private Set<String> knownSymbols  = new HashSet<>();
 
+    /** Properties files */
     private Properties snippets = new Properties();
 
+    /** A set of sorts occurring in a problem */
     private HashSet<Sort> sorts = new HashSet<>();
 
-    public static final Set<String> SPECIAL_SORTS =
-            Stream.of("int", "boolean", "Null").collect(Collectors.toSet());
-
+    /** Global state, i.e. a counter for the number of distinct field variables */
     private Map<String, Object> translationState = new HashMap<>();
 
     public MasterHandler(Services services) throws IOException {
@@ -88,6 +91,11 @@ public class MasterHandler {
         }
     }
 
+    /**
+     * If no handler can handle a term, it is taken care of here.
+     * @param problem the problematic term
+     * @return a generic translation as unknown value
+     */
     private SExpr handleAsUnknownValue(Term problem) {
         String pr = "KeY_"+problem.toString();
         if(!isKnownSymbol(pr)) {
@@ -97,20 +105,31 @@ public class MasterHandler {
         return new SExpr(pr, Type.UNIVERSE);
     }
 
-    public SExpr handleAsFunctionCall(String functioName, Term term) {
-        addFromSnippets(functioName);
+    /**
+     * Treats the given term as a function call.
+     * @param functionName the name of the function
+     * @param term the term to be translated
+     * @return an expression with the name functionName and subterms as children
+     */
+    SExpr handleAsFunctionCall(String functionName, Term term) {
+        addFromSnippets(functionName);
         List<SExpr> children = new ArrayList<>();
         for (int i = 0; i < term.arity(); i++) {
             children.add(translate(term.sub(i), Type.UNIVERSE));
         }
-        return new SExpr(functioName, Type.UNIVERSE, children);
+        return new SExpr(functionName, Type.UNIVERSE, children);
     }
 
-    public boolean isKnownSymbol(String pr) {
+    /**
+     * Decides whether a symbol is already known to the master handler.
+     * @param pr the string to test
+     * @return true iff the name is already known
+     */
+    boolean isKnownSymbol(String pr) {
         return knownSymbols.contains(pr);
     }
 
-    public void addKnownSymbol(String symbol) {
+    void addKnownSymbol(String symbol) {
         knownSymbols.add(symbol);
     }
 
@@ -122,7 +141,7 @@ public class MasterHandler {
         return coerce(translate(terms), type);
     }
 
-    public List<SExpr> coerce(List<SExpr> exprs, Type type) throws SMTTranslationException {
+    private List<SExpr> coerce(List<SExpr> exprs, Type type) throws SMTTranslationException {
         ListIterator<SExpr> it = exprs.listIterator();
         while(it.hasNext()) {
             it.set(coerce(it.next(), type));
@@ -130,7 +149,14 @@ public class MasterHandler {
         return exprs;
     }
 
-    public SExpr coerce(SExpr exp, Type type) throws SMTTranslationException {
+    /**
+     * Takes an SExpression and converts it to the given type, if possible.
+     * @param exp the SExpression to convert
+     * @param type the desired type
+     * @return The same SExpr, but with the desired type
+     * @throws SMTTranslationException if an impossible conversion is attempted
+     */
+    SExpr coerce(SExpr exp, Type type) throws SMTTranslationException {
         switch(type) {
         case BOOL:
             switch(exp.getType()) {
@@ -150,15 +176,6 @@ public class MasterHandler {
             default:
                 throw new SMTTranslationException("Cannot convert to int: " + exp);
             }
-        case HEAP:
-            switch(exp.getType()) {
-            case HEAP:
-                return exp;
-            case UNIVERSE:
-                return new SExpr("u2h", Type.INT, exp);
-            default:
-                throw new SMTTranslationException("Cannot convert to heap: " + exp);
-            }
         case UNIVERSE:
             switch(exp.getType()) {
             case UNIVERSE:
@@ -167,8 +184,6 @@ public class MasterHandler {
                 return new SExpr("i2u", Type.UNIVERSE, exp);
             case BOOL:
                 return new SExpr("b2u", Type.UNIVERSE, exp);
-            case HEAP:
-                return new SExpr("h2u", Type.UNIVERSE, exp);
             default:
                 throw new SMTTranslationException("Cannot convert to universe: " + exp);
             }
@@ -189,11 +204,11 @@ public class MasterHandler {
         return declarations;
     }
 
-    public void addDeclaration(Writable decl) {
+    void addDeclaration(Writable decl) {
         declarations.add(decl);
     }
 
-    public void addAxiom(Writable decl) {
+    void addAxiom(Writable decl) {
         axioms.add(decl);
     }
 
@@ -209,7 +224,7 @@ public class MasterHandler {
         return sorts;
     }
 
-    public void addFromSnippets(String functionName) {
+    void addFromSnippets(String functionName) {
         if (isKnownSymbol(functionName)) {
             return;
         }
@@ -232,7 +247,7 @@ public class MasterHandler {
         }
     }
 
-    public Map<String, Object> getTranslationState() {
+    Map<String, Object> getTranslationState() {
         return translationState;
     }
 }

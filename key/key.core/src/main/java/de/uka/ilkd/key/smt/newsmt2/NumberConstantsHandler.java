@@ -5,7 +5,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 public class NumberConstantsHandler implements SMTHandler {
@@ -28,7 +27,7 @@ public class NumberConstantsHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
+    public SExpr handle(MasterHandler trans, Term term) {
         if (term.sub(0).op() == negNumberSign) {
             String s = AbstractTermTransformer.convertToDecimalString(term, services);
             return new SExpr("-", Type.INT, s.substring(1));

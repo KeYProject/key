@@ -16,12 +16,12 @@ import java.util.Map;
 
 public class HeapHandler implements SMTHandler {
 
-    public static final String WELL_FORMED = "wellFormed";
-    public static final String KEYSELECT = "keyselect";
-    public static final String KEYSTORE = "keystore";
-    public static final String KEYANON = "keyanon";
-    public static final String KEYMEMSET = "keymemset";
-    public static final String KEYCREATE = "keycreate";
+    private static final String WELL_FORMED = "wellFormed";
+    private static final String KEYSELECT = "keyselect";
+    private static final String KEYSTORE = "keystore";
+    private static final String KEYANON = "keyanon";
+    private static final String KEYMEMSET = "keymemset";
+    private static final String KEYCREATE = "keycreate";
 
     private Services services;
     private Map<Function, String> supportedFunctions =
@@ -29,7 +29,7 @@ public class HeapHandler implements SMTHandler {
 
 
     @Override
-    public void init(Services services) throws IOException {
+    public void init(Services services) {
         this.services = services;
 
         supportedFunctions.clear();
@@ -52,17 +52,6 @@ public class HeapHandler implements SMTHandler {
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
-
-        /* REVIEW MU: We decided to remove special casing of heaps.
-        if (term.op().toString().contains(HEAP)) {
-            String s = term.toString();
-            if (!trans.isKnownSymbol(s)) {
-                trans.addKnownSymbol(s);
-                trans.addDeclaration(new SExpr(SExpr.DECLARE_CONST, s, "sort_Heap"));
-            }
-            return new SExpr(s, Type.UNIVERSE);
-        }
-        */
 
         Operator op = term.op();
 

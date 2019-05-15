@@ -6,7 +6,6 @@ import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ public class UpdateHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
+    public SExpr handle(MasterHandler trans, Term term) {
 
         Term update = term.sub(0);
         assert update.sort() == Sort.UPDATE;

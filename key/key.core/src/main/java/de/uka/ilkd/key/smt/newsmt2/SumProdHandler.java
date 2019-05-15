@@ -13,8 +13,7 @@ import java.util.List;
 
 public class SumProdHandler implements SMTHandler {
 
-    private Services services;
-    Function bsumOp, bprodOp;
+    private Function bsumOp, bprodOp;
 
     //key is the term to identify the bsum, value is the name used for that function.
     private final HashMap<Term, SExpr> usedBsumTerms = new LinkedHashMap();
@@ -24,7 +23,6 @@ public class SumProdHandler implements SMTHandler {
 
     @Override
     public void init(Services services) {
-        this.services = services;
         bsumOp = services.getTypeConverter().getIntegerLDT().getBsum();
         bprodOp = services.getTypeConverter().getIntegerLDT().getBprod();
     }
@@ -73,7 +71,7 @@ public class SumProdHandler implements SMTHandler {
         }
     }
 
-    SExpr bsumOrProdDecl(String fun, String number) {
+    private SExpr bsumOrProdDecl(String fun, String number) {
         return new SExpr("declare-fun", SExpr.Type.INT,
                 new SExpr(fun + number),
                 new SExpr(new SExpr("Int"), new SExpr("Int")), new SExpr("Int"));

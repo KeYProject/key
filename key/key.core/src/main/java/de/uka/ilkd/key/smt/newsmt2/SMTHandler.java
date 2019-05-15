@@ -17,7 +17,6 @@ public interface SMTHandler {
 
     default URL getSnippetResource() {
         String resourceName = getClass().getSimpleName() + ".preamble.xml";
-        URL resource = getClass().getResource(resourceName);
-        return resource;
+        return getClass().getResource(resourceName);
     }
 }

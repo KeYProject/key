@@ -9,9 +9,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
@@ -39,7 +37,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
         Operator op = term.op();
 
         // TODO js: should this go in a special literalHandler?
-        if (term.sort().name().toString() == "Null") {
+        if (term.sort().name().toString().equals("Null")) {
             return new SExpr("null", Type.UNIVERSE);
         }
 
@@ -68,7 +66,17 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
         return new SExpr(name, Type.UNIVERSE, children);
     }
 
-    public static SExpr funTypeAxiomFromTerm(Term term, String name, MasterHandler master) {
+    /**
+     * Takes a term which represents a function with multiple parameters, and expresses this
+     * function along with assertions as to parameter types.
+     * "f : int -> boolean" will be translated as a function "ui_f (U) U" along
+     * with the assertion that if x is an int, f(x) will be a boolean.
+     * @param term the term to translate
+     * @param name the name of the function
+     * @param master the associated master handler
+     * @return the function expression
+     */
+    private static SExpr funTypeAxiomFromTerm(Term term, String name, MasterHandler master) {
         SortedOperator op = (SortedOperator) term.op();
         List<SExpr> vars_U = new ArrayList<>();
         List<SExpr> vars = new ArrayList<>();

@@ -24,27 +24,15 @@ public class BooleanConnectiveHandler implements SMTHandler {
         supportedOperators.put(Junctor.FALSE, "false");
         supportedOperators.put(Junctor.TRUE, "true");
         supportedOperators.put(Equality.EQV, "=");
-    };
-
-    private Operator logicFalse;
-    private Operator logicTrue;
+    }
 
     @Override
     public void init(Services services) {
         BooleanLDT ldt = services.getTypeConverter().getBooleanLDT();
-
-        // Review MU: I believe the put below already removes the old value
-//        if(logicFalse != null) {
-//            supportedOperators.remove(logicFalse);
-//        }
-        this.logicFalse = ldt.getFalseConst();
+        Operator logicFalse = ldt.getFalseConst();
         supportedOperators.put(logicFalse, "false");
 
-
-//        if(logicTrue != null) {
-//            supportedOperators.remove(logicTrue);
-//        }
-        this.logicTrue = ldt.getTrueConst();
+        Operator logicTrue = ldt.getTrueConst();
         supportedOperators.put(logicTrue, "true");
     }
 

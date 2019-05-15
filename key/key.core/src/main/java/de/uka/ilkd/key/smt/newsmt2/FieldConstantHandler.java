@@ -5,14 +5,13 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import java.util.Map;
 
 public class FieldConstantHandler implements SMTHandler {
 
-    public static final String CONSTANT_COUNTER_PROPERTY = "fieldConstant.counter";
+    private static final String CONSTANT_COUNTER_PROPERTY = "fieldConstant.counter";
     private Services services;
 
     @Override
@@ -32,7 +31,7 @@ public class FieldConstantHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
+    public SExpr handle(MasterHandler trans, Term term) {
         String name = term.op().name().toString();
         String smtName = "field_" + name;
 
