@@ -88,6 +88,27 @@ public class ColorSettings extends AbstractPropertiesSettings {
             }
         }
 
+        @Override public String value() {
+            if (currentValue != null)
+                return toHex(currentValue);
+
+            String v = properties.getProperty(key);
+
+            try {
+                return v;
+            } catch (NumberFormatException e) {
+                return toHex(Color.MAGENTA);
+            }
+        }
+
+        @Override public void set(String v) {
+            if (value() != v) {
+                currentValue=fromHex(v);
+                properties.setProperty(getKey(), v);
+                fireSettingsChange();
+            }
+        }
+
         @Override
         public String getKey() {
             return key;
