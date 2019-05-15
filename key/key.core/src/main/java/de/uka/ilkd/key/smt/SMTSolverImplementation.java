@@ -373,7 +373,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
             SMTTranslator trans = getType().createTranslator(services);
             //instantiateTaclets(trans);
             problemString = indent(trans.translateProblem(term, services, smtSettings).toString());
-            tacletTranslation = ((AbstractSMTTranslator) trans).getTacletSetTranslation();
+//            tacletTranslation = ((AbstractSMTTranslator) trans).getTacletSetTranslation();
             exceptionsForTacletTranslation.addAll(trans.getExceptionsOfTacletTranslation());
         }
 
