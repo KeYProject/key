@@ -29,7 +29,4 @@ smt-solvers
 
 # *.orig files are created by git during merges
 *.orig
-
-# Intellij config files
-.idea/
-key/.idea/
+key/key.ui/examples/**/**.proof

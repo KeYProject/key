@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    
+<comment>
+    These properties define the help comments which are to be displayed
+    in the view pane when selecting term label tree elements.
+</comment>
+
+<entry key="SC">
+The term label SC is used to indicate that a logical operator has originally been "shortcut" operator.
+
+For instance, both conjunction operators in JML (i.e., &amp;&amp; and &amp;) are translated to the same function in JavaDL. To differentiate between the two, the translation of &amp;&amp; adds the label SC. 
+
+This is relevant for welldefinedness checks.
+</entry>
+
+<entry key="origin">
+This label saves a term's origin in the JML specification as well as the origins of all of its subterms and former subterms.
+
+For example, if the file "Example.java" contains the clause "requires R" at line 20, then every JavaDL term that is generated from R will have the origin 
+"requires @ Example.java @ line 20".
+
+Origin labels are not printed in the sequent view. To see a term's origin, you can mouse over it while holding the ALT button. If you want more detailed information, left click on the term and then on "Show Origin".
+</entry>
+
+</properties>
