@@ -91,8 +91,17 @@ public final class KeyStrokeManager {
      * @return
      */
     public static KeyStroke lookupAndOverride(Action action) {
+        return lookupAndOverride(action, action.getClass().getName());
+    }
+
+    /**
+     * @param action
+     * @param name
+     * @return
+     */
+    public static KeyStroke lookupAndOverride(Action action, String name) {
         KeyStroke def = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
-        KeyStroke found = get(action, def);
+        KeyStroke found = get(name, def);
         action.putValue(Action.ACCELERATOR_KEY, found);
         actions.add(new WeakReference<>(action));
         return found;

@@ -77,11 +77,11 @@ public abstract class KeyAction extends AbstractAction {
     }
 
     protected void lookupAcceleratorKey() {
-        lookupAcceleratorKey(getAcceleratorKey());
+        KeyStrokeManager.lookupAndOverride(this);
     }
 
-    private void lookupAcceleratorKey(KeyStroke defaultValue) {
-        KeyStrokeManager.lookupAndOverride(this);
+    protected void lookupAcceleratorKey(KeyStroke defaultValue) {
+        KeyStrokeManager.lookupAndOverride(this, getClass().getName());
         //KeyStroke found = KeyStrokeManager.get(this, defaultValue);
         //setAcceleratorKey(found);
     }

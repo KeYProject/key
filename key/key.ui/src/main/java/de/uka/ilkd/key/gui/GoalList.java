@@ -178,18 +178,20 @@ public class GoalList extends JList<Goal> implements TabPanel {
     }
 
     private void unregister() {
-        mediator().removeKeYSelectionListener(selectionListener);
-        // This method delegates the request only to the UserInterfaceControl
-        // which implements the functionality.
-        // No functionality is allowed in this method body!
-        mediator().getUI().getProofControl()
-                .removeAutoModeListener(interactiveListener);
-        mediator().removeGUIListener(guiListener);
+        if(mediator()!=null) {
+            mediator().removeKeYSelectionListener(selectionListener);
+            // This method delegates the request only to the UserInterfaceControl
+            // which implements the functionality.
+            // No functionality is allowed in this method body!
+            mediator().getUI().getProofControl()
+                    .removeAutoModeListener(interactiveListener);
+            mediator().removeGUIListener(guiListener);
+        }
     }
 
     public void removeNotify() { // not used?
-        unregister();
-        super.removeNotify();
+        //unregister();
+        //super.removeNotify();
     }
 
     private KeYMediator mediator() {

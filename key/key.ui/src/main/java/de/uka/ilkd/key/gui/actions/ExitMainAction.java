@@ -21,6 +21,7 @@ import java.util.EventObject;
 
 import javax.swing.JOptionPane;
 
+import de.uka.ilkd.key.gui.DockingHelper;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.PathConfig;

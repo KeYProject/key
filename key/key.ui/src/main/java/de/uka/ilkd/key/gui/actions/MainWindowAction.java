@@ -29,14 +29,13 @@ public abstract class MainWindowAction extends KeyAction {
     protected MainWindowAction(MainWindow mainWindow) {
         assert mainWindow != null;
         this.mainWindow = mainWindow;
-        putValue(ACCELERATOR_KEY, KeyStrokeManager.lookupAndOverride(this));
+        putValue(ACCELERATOR_KEY, KeyStrokeManager.lookupAndOverride(this, getClass().getName()));
     }
 
     protected void setAcceleratorLetter(int letter) {
         setAcceleratorKey(KeyStroke.getKeyStroke(letter, SHORTCUT_KEY_MASK));
     }
 
-    @Deprecated // add a line in gui.utils.KeyStrokeManager instead
     protected void setAcceleratorKey(KeyStroke keyStroke) {
         putValue(ACCELERATOR_KEY, keyStroke);
     }

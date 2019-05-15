@@ -17,8 +17,6 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.SingleCDockable;
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CButton;
 import bibliothek.gui.dock.common.intern.CDockable;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
@@ -69,7 +67,6 @@ import java.util.List;
 import java.util.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @HelpInfo()
@@ -150,7 +147,7 @@ public final class MainWindow extends JFrame {
     /**
      *
      */
-    CControl dockControl = new CControl(this);
+    private CControl dockControl = new CControl(this);
     JCheckBoxMenuItem saveSMTFile;
     /**
      * the first toolbar
@@ -259,7 +256,7 @@ public final class MainWindow extends JFrame {
         addWindowListener(exitMainAction.windowListener);
         MacroKeyBinding.registerMacroKeyBindings(mediator, currentGoalView, getRootPane());
 
-        DockingHelper.configure(dockControl);
+        DockingHelper.configure(this);
 
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, (JComponent) getContentPane(),
                 KeYGuiExtension.KeyboardShortcuts.MAIN_WINDOW);
@@ -359,6 +356,10 @@ public final class MainWindow extends JFrame {
         result.getUI().getProofControl().addAutoModeListener(proofListener);
         result.addGUIListener(new MainGUIListener());
         return result;
+    }
+
+    public CControl getDockControl() {
+        return dockControl;
     }
 
     /**
