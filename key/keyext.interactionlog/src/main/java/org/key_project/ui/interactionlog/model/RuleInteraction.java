@@ -24,6 +24,7 @@ import java.util.Iterator;
  */
 @XmlRootElement
 public final class RuleInteraction extends NodeInteraction {
+    private static final long serialVersionUID = -3178292652264875668L;
     private String ruleName;
     private OccurenceIdentifier posInOccurence;
     private HashMap<String, String> arguments = new HashMap<>();
