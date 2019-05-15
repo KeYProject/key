@@ -16,6 +16,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
+
 public class UninterpretedSymbolsHandler implements SMTHandler {
 
     public final static String PREFIX = "ui_";
@@ -48,10 +50,17 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
             trans.addDeclaration(
                     new SExpr("declare-fun", new SExpr(name), signature, new SExpr("U")));
             trans.addKnownSymbol(name);
-
-            if (op.arity() > 0 && op instanceof SortedOperator) {
-                SExpr axiom = funTypeAxiomFromTerm(term, name, trans);
-                trans.addAxiom(axiom);
+            if (op instanceof SortedOperator) {
+                if (op.arity() > 0) {
+                    SExpr axiom = funTypeAxiomFromTerm(term, name, trans);
+                    trans.addAxiom(axiom);
+                }
+                if (op.arity() == 0) {
+                    SortedOperator sop = (SortedOperator) op;
+                    SExpr axiom = new SExpr("assert", Type.BOOL,
+                            new SExpr("instanceof", Type.BOOL, name, SExpr.sortExpr(sop.sort()).toString()));
+                    trans.addAxiom(axiom);
+                }
             }
         }
 
@@ -73,8 +82,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
         for (Sort sort : op.argSorts()) {
             master.addSort(sort);
             SExpr var = new SExpr(LogicalVariableHandler.VAR_PREFIX + i);
-            SExpr to = new SExpr("typeof", var);
-            tos.add(new SExpr("=", to, SExpr.sortExpr(sort)));
+            tos.add(new SExpr("instanceof", var, SExpr.sortExpr(sort)));
             ++i;
         }
         SExpr ante;
@@ -83,11 +91,11 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
         } else {
             ante = new SExpr("and", tos);
         }
-        SExpr cons = new SExpr("=", new SExpr("typeof", new SExpr(name, vars)),
+        SExpr cons = new SExpr("instanceof", new SExpr(name, vars),
                 SExpr.sortExpr(op.sort()));
         SExpr matrix = new SExpr("=>", ante, cons);
         SExpr pattern = SExpr.patternSExpr(matrix, new SExpr(name, vars));
-        SExpr axiom = new SExpr("forall", Type.BOOL, new SExpr(vars_U), pattern);
+        SExpr axiom = new SExpr("forall", BOOL, new SExpr(vars_U), pattern);
         return new SExpr("assert", axiom);
     }
 

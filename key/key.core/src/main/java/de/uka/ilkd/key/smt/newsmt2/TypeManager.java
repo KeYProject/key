@@ -15,7 +15,9 @@ public class TypeManager {
         for (Sort s : master.getSorts()) {
             Set<Sort> children = directChildSorts(s, master.getSorts());
             for (Sort child : children) {
-                master.addAxiom(new SExpr("assert", new SExpr("subtype", SExpr.sortExpr(child), SExpr.sortExpr(s))));
+                if (!MasterHandler.SPECIAL_SORTS.contains(s.toString())) {
+                    master.addAxiom(new SExpr("assert", new SExpr("subtype", SExpr.sortExpr(child), SExpr.sortExpr(s))));
+                }
                 for (Sort otherChild : children) {
                     if (!(child.equals(otherChild)) && (otherChild.name().toString() != ("Null")) && (child.name().toString() != ("Null"))) {
                         SExpr st = new SExpr("subtype", SExpr.sortExpr(child), SExpr.sortExpr(otherChild));
