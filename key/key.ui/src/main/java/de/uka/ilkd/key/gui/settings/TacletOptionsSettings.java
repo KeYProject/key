@@ -11,12 +11,14 @@ import net.miginfocom.swing.MigLayout;
 import org.key_project.util.java.ObjectUtil;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class TacletOptionsSettings extends SimpleSettingsPanel implements SettingsProvider {
@@ -26,13 +28,18 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     private HashMap<String, Set<String>> category2Choices;
     private ChoiceSettings settings;
     private boolean warnNoProof = true;
+    private JScrollPane root = new JScrollPane();
 
     public TacletOptionsSettings() {
         setHeaderText(getDescription());
+        root.setViewportView(pCenter);
+        add(root, BorderLayout.CENTER);
+
         pCenter.setLayout(new MigLayout(
                 new LC().fillX(),
                 new AC().fill().grow().gap("3mm")
         ));
+        layoutHead();
         setFocusable(true);
         setChoiceSettings(ProofSettings.DEFAULT_SETTINGS.getChoiceSettings());
     }
@@ -160,7 +167,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
                 getInformation(choice));
     }
 
-    protected void layoutChoiceSelector() {
+    protected void layoutHead() {
         if (warnNoProof) {
             JLabel lblHead2 = new JLabel("No Proof loaded. Taclet options may not be parsed.");
             lblHead2.setIcon(IconFactory.WARNING_INCOMPLETE.get());
@@ -172,7 +179,10 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         lblHead2.setIcon(IconFactory.WARNING_INCOMPLETE.get());
         lblHead2.setFont(lblHead2.getFont().deriveFont(14f));
         pNorth.add(lblHead2);
+    }
 
+    protected void layoutChoiceSelector() {
+        pCenter.removeAll();
         category2Choice.keySet().stream().sorted().forEach(this::addCategory);
     }
 
@@ -260,7 +270,6 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         this.settings = choiceSettings;
         category2Choice = settings.getDefaultChoices();
         category2Choices = settings.getChoices();
-        removeAll();
         layoutChoiceSelector();
     }
 

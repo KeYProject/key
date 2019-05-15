@@ -44,11 +44,11 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     protected SettingsPanel() {
         pCenter.setLayout(new MigLayout(
                 new LC().fillX().wrapAfter(3),
-                new AC().count(3).fill(1)
-                        .sizeGroup()
+                new AC().count(3)
+                        .fill(1)
+                        .grow(1000f, 1)
                         .size("16px", 2)
                         .grow(0f, 0)
-                        .grow(1000f, 1)
                         .align("right", 0)));
     }
 

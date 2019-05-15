@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import net.miginfocom.layout.PlatformDefaults;
 
 import javax.swing.*;
 import java.awt.*;

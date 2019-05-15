@@ -49,12 +49,12 @@ public class SettingsManager {
         if (INSTANCE == null) {
             INSTANCE = createWithExtensions();
             INSTANCE.add(STANDARD_UI_SETTINGS);
-            INSTANCE.add(SHORTCUT_SETTINGS);
+            //INSTANCE.add(SHORTCUT_SETTINGS);
             INSTANCE.add(SMT_SETTINGS);
             INSTANCE.add(EXTENSION_MANAGER);
             INSTANCE.add(TEST_GEN_OPTIONS_PANEL);
             INSTANCE.add(TACLET_OPTIONS_SETTINGS);
-            INSTANCE.add(COLOR_SETTINGS);
+            //INSTANCE.add(COLOR_SETTINGS);
         }
         return INSTANCE;
     }

@@ -73,11 +73,6 @@ public class HeatmapExt implements KeYGuiExtension,
  */
 class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider {
     /**
-     * The view settings
-     */
-    private static final ViewSettings VS = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
-
-    /**
      * Minimal setting for number of highlighted terms
      */
     private static final int MIN_AGE = 1;
@@ -185,6 +180,7 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
 
     @Override
     public JComponent getPanel(MainWindow window) {
+        final ViewSettings VS = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         for (Map.Entry<HeatmapMode, JRadioButton> entry : map.entrySet()) {
             HeatmapMode mode = entry.getKey();
             if (mode.enableHeatmap == VS.isShowHeatmap() &&
@@ -200,6 +196,7 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
 
     @Override
     public void applySettings(MainWindow window) {
+        final ViewSettings VS = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         for (Map.Entry<HeatmapMode, JRadioButton> entry : map.entrySet()) {
             if (entry.getValue().isSelected()) {
                 HeatmapMode mode = entry.getKey();
@@ -207,5 +204,11 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
                 break;
             }
         }
+    }
+
+
+    @Override
+    public int getPriorityOfSettings() {
+        return 10000;
     }
 }

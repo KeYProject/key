@@ -6,6 +6,8 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
 import javax.swing.*;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Alexander Weigl
@@ -58,7 +60,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
                 false, emptyValidator());
 
         txtClutterRules = addTextField("Clutter rules", "", INFO_CLUTTER_RULE, emptyValidator());
-        txtClutterRuleSets = addTextField("Clutter rules", "", INFO_CLUTTER_RULESET, emptyValidator());
+        txtClutterRuleSets = addTextField("Clutter Rulesets", "", INFO_CLUTTER_RULESET, emptyValidator());
 
         chkPrettyPrint = addCheckBox("Pretty print terms", "", false, emptyValidator());
         chkUseUnicode = addCheckBox("Use unicode", "", false, emptyValidator());
@@ -104,6 +106,11 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     }
 
     @Override
+    public List<SettingsProvider> getChildren() {
+        return Arrays.asList(SettingsManager.COLOR_SETTINGS, SettingsManager.SHORTCUT_SETTINGS);
+    }
+
+    @Override
     public void applySettings(MainWindow window) throws InvalidSettingsInputException {
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
@@ -128,5 +135,10 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         gs.setTacletFilter(chkMinimizeInteraction.isSelected());
         vs.setFontIndex((Integer) spFontSizeTreeSequent.getValue());
         FontSizeFacade.resizeFonts(vs.getUIFontSizeFactor());
+    }
+
+    @Override
+    public int getPriorityOfSettings() {
+        return Integer.MIN_VALUE;
     }
 }

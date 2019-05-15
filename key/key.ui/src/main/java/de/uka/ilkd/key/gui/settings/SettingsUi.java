@@ -9,6 +9,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Collections;
@@ -29,16 +31,18 @@ public class SettingsUi extends JPanel {
     private DefaultTreeModel treeModel = new DefaultTreeModel(null, false);
     private JTree treeSettingsPanels = new JTree(treeModel);
     private JTextField txtSearch = new JTextField();
-    private JScrollPane center;
+    private MainWindow mainWindow;
+    //private JScrollPane center;
 
     public SettingsUi(MainWindow mainWindow) {
+        this.mainWindow = mainWindow;
         treeSettingsPanels.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         treeSettingsPanels.setCellRenderer(new DefaultTreeCellRenderer() {
             @Override
             public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
                 SettingsTreeNode node = (SettingsTreeNode) value;
                 SettingsProvider panel = node.provider;
-                JLabel lbl = null;
+                JLabel lbl;
                 if (panel == null) {
                     lbl = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
                 } else {
@@ -72,20 +76,32 @@ public class SettingsUi extends JPanel {
         });
 
         root = new JSplitPane();
-        root.setRightComponent(center = new JScrollPane());
+        //root.setRightComponent(center = new JScrollPane());
         treeSettingsPanels.addTreeSelectionListener(e -> {
             SettingsTreeNode n = (SettingsTreeNode) e.getPath().getLastPathComponent();
             if (n.provider != null && n.provider.getPanel(mainWindow) != null) {
-                center.setViewportView(n.provider.getPanel(mainWindow));
-                center.getVerticalScrollBar().setValue(0);
+                JComponent comp = n.provider.getPanel(mainWindow);
+                //center.setViewportView(comp);
+                //center.getVerticalScrollBar().setValue(0);
+                //center.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                //comp.setSize(center.getWidth(), comp.getHeight());
+                //comp.setPreferredSize(new Dimension(center.getWidth(), comp.getHeight()));
+                setSettingsPanel(comp);
             }
         });
 
         treeSettingsPanels.setRootVisible(false);
         setLayout(new BorderLayout(5, 5));
         root.setLeftComponent(createWestPanel());
-        root.setDividerLocation(0.3d);
+        root.setRightComponent(new JLabel("empty"));
         add(root, BorderLayout.CENTER);
+        root.setDividerLocation(0.3d);
+    }
+
+    private void setSettingsPanel(JComponent comp) {
+        int dividerLocation = root.getDividerLocation();
+        root.setRightComponent(comp);
+        root.setDividerLocation(dividerLocation);
     }
 
     private JPanel createWestPanel() {
@@ -108,6 +124,10 @@ public class SettingsUi extends JPanel {
         LinkedList<TreePath> list = new LinkedList<>();
         getPaths(new TreePath(treeModel.getPathToRoot(root)), list);
         list.forEach(it -> treeSettingsPanels.expandPath(it));
+
+        if(!providers.isEmpty()){
+            setSettingsPanel(providers.get(0).getPanel(mainWindow));
+        }
     }
 
     public void getPaths(TreePath parent, List<TreePath> list) {
