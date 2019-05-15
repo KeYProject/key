@@ -259,6 +259,8 @@ public final class MainWindow extends JFrame {
         addWindowListener(exitMainAction.windowListener);
         MacroKeyBinding.registerMacroKeyBindings(mediator, currentGoalView, getRootPane());
 
+        DockingHelper.configure(dockControl);
+
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, (JComponent) getContentPane(),
                 KeYGuiExtension.KeyboardShortcuts.MAIN_WINDOW);
 
@@ -299,33 +301,6 @@ public final class MainWindow extends JFrame {
      */
     public static boolean hasInstance() {
         return instance != null;
-    }
-
-    private static CDockable createDock(TabPanel p) {
-        CAction[] actions =
-                p.getTitleActions().stream().map(MainWindow::translateAction)
-                        .toArray(CAction[]::new);
-
-        return new DefaultSingleCDockable(p.getTitle(), p.getIcon(), p.getTitle(), p.getComponent(),
-                p.getPermissions(), actions);
-    }
-
-    private static CAction translateAction(Action action) {
-        CButton button = new CButton(
-                (String) action.getValue(Action.NAME),
-                (Icon) action.getValue(Action.SMALL_ICON));
-        button.addActionListener(action);
-        button.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
-        button.setEnabled(action.isEnabled());
-
-        action.addPropertyChangeListener(evt -> {
-            button.setText((String) action.getValue(Action.NAME));
-            button.setIcon((Icon) action.getValue(Action.SMALL_ICON));
-            button.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
-            button.setEnabled(action.isEnabled());
-        });
-
-        return button;
     }
 
     public TermLabelVisibilityManager getVisibleTermLabels() {
@@ -491,7 +466,7 @@ public final class MainWindow extends JFrame {
         grid.add(0, 0, 1, 1, dockProofListView);
         grid.add(0, 1, 1, 2,
                 Stream.concat(defaultPanels, extPanels)
-                        .map(MainWindow::createDock)
+                        .map(DockingHelper::createDock)
                         .toArray(CDockable[]::new));
         grid.add(1, 0, 2, 3, dockSequent);
         grid.add(2, 0, 1, 3, dockSourceView);
