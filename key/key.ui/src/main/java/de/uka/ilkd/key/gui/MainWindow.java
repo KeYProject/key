@@ -25,6 +25,8 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.docking.DockingHelper;
+import de.uka.ilkd.key.gui.docking.DockingLayout;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
@@ -255,8 +257,6 @@ public final class MainWindow extends JFrame {
         ToolTipManager.sharedInstance().setDismissDelay(30000);
         addWindowListener(exitMainAction.windowListener);
         MacroKeyBinding.registerMacroKeyBindings(mediator, currentGoalView, getRootPane());
-
-        DockingHelper.configure(this);
 
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, (JComponent) getContentPane(),
                 KeYGuiExtension.KeyboardShortcuts.MAIN_WINDOW);

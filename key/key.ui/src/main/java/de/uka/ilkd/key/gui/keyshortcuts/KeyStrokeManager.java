@@ -22,9 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Manages keyboard shortcuts for proof macros and GUI actions.
- * If possible, all keyboard shortcuts should be defined here and
- * accessed through one of the <code>lookupAndOverride()</code> methods.
+ * Manager of the configurable {@link KeyStroke}s for proof macros and GUI actions.
+ * <p>
+ * If possible, all actions should ask this interface for a {@link KeyStroke},
+ * by calling {@link #lookupAndOverride(Action)}.
+ * <p>
  * The general guidelines for adding new keyboard shortcuts are<ul>
  * <li> they must not produce a printable character,
  * <li> they must not interfere with shortcuts already defined by the
@@ -36,6 +38,7 @@ import java.util.List;
  * </ul>
  *
  * @author bruns
+ * @author weigl, 2019-05
  */
 public final class KeyStrokeManager {
     /**
@@ -43,17 +46,37 @@ public final class KeyStrokeManager {
      * (usually {@link java.awt.Event#CTRL_MASK})
      */
     public static final int SHORTCUT_KEY_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+
     /**
      * If true, F keys are used for macros, otherwise CTRL+SHIFT+letter.
      */
     static final boolean FKEY_MACRO_SCHEME = Boolean.getBoolean("key.gui.fkeyscheme");
+
     /**
      * This constant holds the typical key combination to be used for auxiliary shortcuts
      * ({@link KeyEvent#SHIFT_MASK} plus usually {@link KeyEvent#CTRL_MASK})
      */
     static final int MULTI_KEY_MASK = SHORTCUT_KEY_MASK | KeyEvent.SHIFT_DOWN_MASK;
-    static List<WeakReference<Action>> actions = new ArrayList<>(100);
 
+
+    /**
+     * List of actions, that requested a {@link KeyStroke}.
+     * <p>
+     * Needed for dynamical configurability of the {@link KeyStroke} via {@link ShortcutSettings }
+     */
+    static final List<WeakReference<Action>> actions = new ArrayList<>(100);
+
+    /**
+     * Get a {@link KeyStroke} for the given <code>key</code>.
+     * If no {@link KeyStroke} is defined, <code>defaultValue</code> is returned.
+     * <p>
+     * Also thsi method sets the determined key stroke in the settings.
+     *
+     * @param key          key
+     * @param defaultValue default value
+     * @return nullable
+     * @see KeyStrokeSettings
+     */
     public static KeyStroke get(String key, KeyStroke defaultValue) {
         KeyStroke ks = KeyStrokeSettings.getInstance().getKeyStroke(key, defaultValue);
         KeyStrokeSettings.getInstance().setKeyStroke(key, ks, false);
@@ -61,6 +84,8 @@ public final class KeyStrokeManager {
     }
 
     /**
+     * The same as {@link #get(Object, KeyStroke)} but uses the given object's class name as key.
+     *
      * @param action
      * @param defaultValue
      * @return
@@ -70,6 +95,8 @@ public final class KeyStrokeManager {
     }
 
     /**
+     * The same as {@link #get(Object, KeyStroke)} but uses the given object's class name as key.
+     *
      * @param action
      * @param defaultValue
      * @return
@@ -79,6 +106,9 @@ public final class KeyStrokeManager {
     }
 
     /**
+     * The same as {@link #get(Object, KeyStroke)} but uses the given object's class name
+     * as key and non-default keystroke.
+     *
      * @param action
      * @return
      */
@@ -89,19 +119,25 @@ public final class KeyStrokeManager {
     /**
      * @param action
      * @return
+     * @see #lookupAndOverride(Action, String)
      */
     public static KeyStroke lookupAndOverride(Action action) {
         return lookupAndOverride(action, action.getClass().getName());
     }
 
     /**
+     * Lookup a user-defined key stroke via {@link #get(String, KeyStroke)} for the given key.
+     * If no key stroke is defined it uses the defined key stroke in the given <code>action</code>.
+     * <p>
+     * Also adds the action to the list of {@link #actions}.
+     *
      * @param action
-     * @param name
+     * @param key
      * @return
      */
-    public static KeyStroke lookupAndOverride(Action action, String name) {
+    public static KeyStroke lookupAndOverride(Action action, String key) {
         KeyStroke def = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
-        KeyStroke found = get(name, def);
+        KeyStroke found = get(key, def);
         action.putValue(Action.ACCELERATOR_KEY, found);
         actions.add(new WeakReference<>(action));
         return found;
@@ -111,6 +147,10 @@ public final class KeyStrokeManager {
         return KeyStrokeSettings.getInstance();
     }
 
+    /**
+     * @param clazz
+     * @return
+     */
     static Action findAction(String clazz) {
         return actions.stream()
                 .map(Reference::get)

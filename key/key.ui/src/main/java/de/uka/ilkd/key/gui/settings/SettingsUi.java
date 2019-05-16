@@ -99,9 +99,11 @@ public class SettingsUi extends JPanel {
     }
 
     private void setSettingsPanel(JComponent comp) {
-        int dividerLocation = root.getDividerLocation();
+        //int dividerLocation = root.getDividerLocation();
         root.setRightComponent(comp);
-        root.setDividerLocation(dividerLocation);
+        //root.setDividerLocation(dividerLocation);
+
+        root.setDividerLocation(root.getLeftComponent().getPreferredSize().width);
     }
 
     private JPanel createWestPanel() {

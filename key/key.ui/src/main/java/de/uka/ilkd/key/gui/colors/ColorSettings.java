@@ -14,15 +14,19 @@ import java.util.Properties;
 import java.util.stream.Stream;
 
 /**
+ * Configurable colors for KeY.
+ * <p>
+ * If you need a new color use: {@link #define(String, String, Color)}.
+ *
  * @author Alexander Weigl
  * @version 1 (10.05.19)
  */
 public class ColorSettings extends AbstractPropertiesSettings {
-    private static final String SETTINGS_FILENAME = "colors.properties";
-    static final File SETTINGS_FILE = new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
+    public static final String SETTINGS_FILENAME = "colors.properties";
+    public static final File SETTINGS_FILE = new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
     private static ColorSettings INSTANCE;
 
-    public ColorSettings(Properties settings) {
+    private ColorSettings(Properties settings) {
         readSettings(settings);
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
@@ -58,6 +62,10 @@ public class ColorSettings extends AbstractPropertiesSettings {
         return new Color(255 - c.getRed(), 255 - c.getGreen(), 255 - c.getBlue());
     }
 
+    /**
+     * Writes the current settings to default location.
+     * @see #SETTINGS_FILE
+     */
     public void save() {
         System.out.println("[ColorSettings] Save color settings to: " + SETTINGS_FILE.getAbsolutePath());
         try (Writer writer = new FileWriter(SETTINGS_FILE)) {
@@ -80,6 +88,9 @@ public class ColorSettings extends AbstractPropertiesSettings {
         return propertyEntries.stream().map(it -> (ColorProperty) it);
     }
 
+    /**
+     * A property for handling colors.
+     */
     public class ColorProperty implements PropertyEntry<Color> {
         private final String key, description;
         private Color currentValue;

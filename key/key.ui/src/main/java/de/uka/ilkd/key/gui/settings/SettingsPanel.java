@@ -30,11 +30,11 @@ import java.awt.*;
 import java.text.Format;
 
 /**
- * A panel used inside the settings dialog.
+ * Extension of {@link SimpleSettingsPanel} which uses {@link MigLayout} to
+ * create a nice three-column view.
  * <p>
- * Allows a simple building of the UI by defining several factory methods.
- * <p>
- * Uses a three-column miglayout layout.
+ * Allows a simple building of the UI by defining several factory methods, e.g.
+ * {@link #addTextField(String, String, String, Validator)}
  * <p>
  * 2019-04-08, weigl: rewrite to mig layout
  *
@@ -52,6 +52,11 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
                         .align("right", 0)));
     }
 
+    /**
+     *
+     * @param info
+     * @return
+     */
     protected static JTextArea createInfoArea(String info) {
         JTextArea textArea = new JTextArea(info);
         //textArea.setBackground(this.getBackground());
@@ -61,6 +66,11 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         return textArea;
     }
 
+    /**
+     *
+     * @param info
+     * @param components
+     */
     protected void addRowWithHelp(String info, JComponent... components) {
         boolean hasInfo = info != null && !info.isEmpty();
         for (int i = 0, length = components.length; i < length; i++) {
@@ -79,7 +89,34 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         pCenter.add(infoButton);
     }
 
+    /**
+     * @param elements
+     * @param validator
+     * @param <T>
+     * @return
+     */
+    protected <T> JComboBox<T> createSelection(T[] elements, Validator<T> validator) {
+        JComboBox<T> comboBox = new JComboBox<>(elements);
+        comboBox.addActionListener(e -> {
+            try {
+                validator.validate((T) comboBox.getSelectedItem());
+                demarkComponentAsErrornous(comboBox);
+            } catch (Exception ex) {
+                markComponentAsErrornous(comboBox, ex.getMessage());
+            }
+        });
+        return comboBox;
 
+    }
+
+
+    /**
+     * @param title
+     * @param info
+     * @param value
+     * @param validator
+     * @return
+     */
     protected JCheckBox addCheckBox(String title, String info,
                                     boolean value, final Validator<Boolean> validator) {
         JCheckBox checkBox = createCheckBox(title, value, validator);
@@ -88,6 +125,14 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     }
 
 
+    /**
+     * @param title
+     * @param file
+     * @param info
+     * @param isSave
+     * @param validator
+     * @return
+     */
     protected JTextField addFileChooserPanel(String title, String file, String info,
                                              boolean isSave, final Validator<String> validator) {
         JTextField textField = new JTextField(file);
@@ -126,6 +171,14 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         return textField;
     }
 
+    /**
+     * @param info
+     * @param selectionIndex
+     * @param validator
+     * @param items
+     * @param <T>
+     * @return
+     */
     protected <T> JComboBox<T> addComboBox(String info, int selectionIndex,
                                            final Validator<T> validator, T... items) {
         JComboBox<T> comboBox = new JComboBox<>(items);
@@ -149,19 +202,39 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         return comboBox;
     }
 
-
+    /**
+     * @param title
+     * @param component
+     * @param helpText
+     */
     protected void addTitledComponent(String title, JComponent component, String helpText) {
         JLabel label = new JLabel(title);
         label.setLabelFor(component);
         addRowWithHelp(helpText, label, component);
     }
 
+    /**
+     * @param title
+     * @param text
+     * @param info
+     * @param validator
+     * @return
+     */
     protected JTextField addTextField(String title, String text, String info, final Validator<String> validator) {
         JTextField field = createTextField(text, validator);
         addTitledComponent(title, field, info);
         return field;
     }
 
+    /**
+     * @param title
+     * @param min
+     * @param max
+     * @param step
+     * @param info
+     * @param validator
+     * @return
+     */
     protected JSpinner addNumberField(String title, int min, int max, int step, String info,
                                       final Validator<Integer> validator) {
         JSpinner field = createNumberTextField(min, max, step, validator);
@@ -169,6 +242,11 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         return field;
     }
 
+    /**
+     * Add a separator line with the given title.
+     *
+     * @param titleText
+     */
     protected void addSeparator(String titleText) {
         JPanel pane = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -184,7 +262,14 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         pCenter.add(box, new CC().span().grow().alignX("left"));
     }
 
+    /**
+     * Creates an empty validator instance.
+     *
+     * @param <T> arbitrary
+     * @return non-null
+     */
     protected <T> Validator<T> emptyValidator() {
-        return s -> {};
+        return s -> {
+        };
     }
 }

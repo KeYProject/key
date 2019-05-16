@@ -16,14 +16,31 @@ import java.io.Writer;
 import java.util.Properties;
 
 /**
+ * A settings for storing and retrieving {@link KeyStroke}s.
+ *
  * @author Alexander Weigl
  * @version 1 (09.05.19)
  */
 public class KeyStrokeSettings extends AbstractPropertiesSettings {
+    /**
+     * filename of the properties file
+     */
     private static final String SETTINGS_FILENAME = "keystrokes.properties";
+
+    /**
+     * path of the properties file
+     */
     private static final File SETTINGS_FILE = new File(PathConfig.getKeyConfigDir(),
             KeyStrokeSettings.SETTINGS_FILENAME);
+
+    /**
+     * singleton instance
+     */
     private static KeyStrokeSettings INSTANCE = null;
+
+    /**
+     * default {@link KeyStroke}s
+     */
     private static Properties DEFAULT_KEYSTROKES = new Properties();
 
     static {
@@ -103,6 +120,9 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         return INSTANCE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void readSettings(Properties props) {
         properties.putAll(props);

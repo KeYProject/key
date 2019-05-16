@@ -30,15 +30,23 @@ import java.awt.*;
 import java.text.Format;
 
 /**
- * 2019-04-08, weigl: rewrite to mig layout
+ * A simple panel for using inside of the {@link SettingsUi}.
+ * <p>
+ * This panel provides a header and center pane.
+ * <p>
+ * The header already contains a two labels {@link #lblHead} and {@link #lblSubhead} with appropriate fonts.
+ * <p>
+ * The {@link #pCenter} can be used to add create a settings dialog.
+ * <p>
+ * Holds various factory methods for creating input components which can be validated.
  *
  * @author weigl
  */
 public class SimpleSettingsPanel extends JPanel {
-    protected Box pNorth  = new Box(BoxLayout.Y_AXIS);
+    protected Box pNorth = new Box(BoxLayout.Y_AXIS);
     protected JPanel pCenter = new JPanel();
     protected JLabel lblHead = new JLabel();
-    protected JLabel lblSubhead  = new JLabel();
+    protected JLabel lblSubhead = new JLabel();
 
     protected SimpleSettingsPanel() {
         setLayout(new BorderLayout());
@@ -57,8 +65,13 @@ public class SimpleSettingsPanel extends JPanel {
         add(pCenter, BorderLayout.CENTER);
     }
 
-    public void setHeaderText(String text) { lblHead.setText(text);}
-    public void setSubHeaderText(String text) { lblSubhead.setText(text);}
+    public void setHeaderText(String text) {
+        lblHead.setText(text);
+    }
+
+    public void setSubHeaderText(String text) {
+        lblSubhead.setText(text);
+    }
 
     protected void demarkComponentAsErrornous(JComponent component) {
         component.setBackground(Color.white);//find color

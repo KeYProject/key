@@ -16,6 +16,8 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
+ * UI for configuring the {@link KeyStroke}s inside KeY.
+ *
  * @author Alexander Weigl
  * @version 1 (09.05.19)
  */
@@ -108,9 +110,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
     }
 
     @Override
-    public void applySettings(MainWindow window)
-            throws InvalidSettingsInputException {
-
+    public void applySettings(MainWindow window) {
         List<String> s = modelShortcuts.shortcut;
 
         /*weigl: disable duplicate check, because we have many in the default config

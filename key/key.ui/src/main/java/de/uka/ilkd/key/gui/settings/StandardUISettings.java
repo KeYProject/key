@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
@@ -8,6 +9,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
 import javax.swing.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -31,7 +33,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     private final JCheckBox chkConfirmExit;
     private final JSpinner spAutoSaveProof;
     private final JCheckBox chkMinimizeInteraction;
-    private final JSpinner spFontSizeTreeSequent;
+    private final JComboBox<String> spFontSizeTreeSequent;
     private final JCheckBox chkAllowProofBundleSaving;
     private final JTextField txtClutterRules;
     private final JTextField txtClutterRuleSets;
@@ -42,8 +44,9 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         spFontSizeGlobal = createNumberTextField(new SpinnerNumberModel(1, 0.1, 5, 0.1),
                 emptyValidator());
         addTitledComponent("Global font factor: ", spFontSizeGlobal, "");
-        spFontSizeTreeSequent = createNumberTextField(new SpinnerNumberModel(1, 0.1, 5, 0.1),
-                emptyValidator());
+
+        String[] sizes = Arrays.stream(Config.SIZES).boxed().map(it -> it + " pt").toArray(String[]::new);
+        spFontSizeTreeSequent = this.<String>createSelection(sizes, emptyValidator());
         addTitledComponent("Tree&Sequent font factor: ", spFontSizeTreeSequent, "");
 
 
@@ -73,6 +76,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         chkRightClickMacros = addCheckBox("Right click for Macros", "", false, emptyValidator());
     }
 
+
     @Override
     public String getDescription() {
         return "Appearance & Behaviour";
@@ -100,7 +104,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         chkConfirmExit.setSelected(vs.confirmExit());
         spAutoSaveProof.setValue(generalSettings.autoSavePeriod());
         chkMinimizeInteraction.setSelected(generalSettings.tacletFilter());
-        spFontSizeTreeSequent.setValue(vs.sizeIndex());
+        spFontSizeTreeSequent.setSelectedIndex(vs.sizeIndex());
 
         return this;
     }
@@ -133,7 +137,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         vs.setConfirmExit(chkConfirmExit.isSelected());
         gs.setAutoSave((Integer) spAutoSaveProof.getValue());
         gs.setTacletFilter(chkMinimizeInteraction.isSelected());
-        vs.setFontIndex((Integer) spFontSizeTreeSequent.getValue());
+        vs.setFontIndex((Integer) spFontSizeTreeSequent.getSelectedIndex());
         FontSizeFacade.resizeFonts(vs.getUIFontSizeFactor());
     }
 

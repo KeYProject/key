@@ -12,6 +12,10 @@ import java.net.URISyntaxException;
 
 /**
  * A gate to the KeY documentation system.
+ * <p>
+ * Provides the facility to open the documentation at press of F1.
+ * The opened page is determined context-sensitive by the current focused component
+ * and parent components. Specify the URL via {@HelpInfo}.
  *
  * @author Alexander Weigl
  * @version 1 (10.04.19)
@@ -32,7 +36,7 @@ public class HelpFacade {
      *
      * @see #KEY_HELP_URL
      */
-    private static String HELP_BASE_URL = "https://key-project.org/docs/";
+    public static String HELP_BASE_URL = "https://key-project.org/docs/";
 
     static {
         if (System.getProperty("KEY_HELP_URL") != null) {
