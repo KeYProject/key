@@ -97,8 +97,7 @@ public class ExitMainAction extends MainWindowAction {
         System.out.println("Have a nice day.");
         saveSettings();
         if (exitSystem) {
-            // TODO: why -1 and not 0 ???
-           System.exit(-1);
+           System.exit(0);
         }
         else {
             mainWindow.setVisible(false);
