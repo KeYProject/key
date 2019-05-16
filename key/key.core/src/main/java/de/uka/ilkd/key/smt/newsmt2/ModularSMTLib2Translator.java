@@ -7,6 +7,8 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.IllegalFormulaException;
 import de.uka.ilkd.key.smt.SMTSettings;
@@ -49,10 +51,20 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         master.addFromSnippets("int");
         master.addFromSnippets("instanceof");
 
-        SExpr result = master.translate(problem, Type.BOOL);
+        List<Term> sequentAsserts = smashProblem(problem, services);
+
+        List<SExpr> results = new LinkedList<>();
+        for (Term t : sequentAsserts) {
+            // TODO js: convert FORMULA to bool somehow, avoid this weird special casing
+            if (!(t.op().equals(services.getTermBuilder().getMeasuredByEmpty()))) {
+                results.add(master.translate(t));
+            }
+        }
+
+//        SExpr result = master.translate(problem, Type.BOOL);
         exceptions = master.getExceptions();
 
-        postProcess(result);
+//        postProcess(result);
 
         StringBuffer sb = new StringBuffer();
 
@@ -84,20 +96,23 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         for (Writable decl : master.getDeclarations()) {
             decl.appendTo(sb);
-            sb.append("\n\n");
+            sb.append("\n");
         }
 
-        sb.append("; --- Axioms\n\n");
+        sb.append("\n; --- Axioms\n");
         for (Writable ax : master.getAxioms()) {
             ax.appendTo(sb);
-            sb.append("\n\n");
+            sb.append("\n");
         }
 
-        sb.append("; --- Sequent\n\n");
-        SExpr assertion = new SExpr("assert", Type.NONE, new SExpr("not", Type.NONE, result));
-        assertion.appendTo(sb);
+        sb.append("\n; --- Sequent\n");
+        for (SExpr ass : results) {
+            SExpr assertion = new SExpr("assert", Type.NONE, ass);
+            assertion.appendTo(sb);
+            sb.append("\n");
+        }
 
-        sb.append("\n\n(check-sat)");
+        sb.append("\n(check-sat)");
 
         return sb;
     }
@@ -133,6 +148,28 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
     }
 
+    //just testing: break the top-level seq formula into single assertions
+    private List<Term> smashProblem(Term problem, Services s) {
+        TermBuilder tb = s.getTermBuilder();
+        List<Term> res = new LinkedList<>();
+        if (problem.op() == Junctor.IMP) {
+            Term left = problem.sub(0);
+            Term right = problem.sub(1);
+            while (left.op() == Junctor.AND) {
+                res.add(left.sub(1));
+                left = left.sub(0);
+            }
+            res.add(left);
+            while (right.op() == Junctor.OR) {
+                res.add(tb.not(right.sub(1)));
+                right = right.sub(0);
+            }
+            res.add(tb.not(right));
+        } else {
+            res.add(problem);
+        }
+        return res;
+    }
 
     private void postProcess(SExpr result) {
         // TODO: remove (u2i (i2u x)) --->  x
