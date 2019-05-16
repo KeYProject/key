@@ -28,7 +28,6 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;

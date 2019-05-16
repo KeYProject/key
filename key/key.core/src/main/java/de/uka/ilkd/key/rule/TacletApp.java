@@ -37,7 +37,6 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -511,19 +510,17 @@ public abstract class TacletApp implements RuleApp {
                                              Term term,
                                              Services services,
                                              boolean interesting) {
-        final Term t = TermLabel.removeIrrelevantLabels(term, services);
-
-        if (sv instanceof VariableSV && !(t.op() instanceof LogicVariable)) {
+        if (sv instanceof VariableSV && !(term.op() instanceof LogicVariable)) {
             throw new IllegalInstantiationException("Could not add "
-                + "the instantiation of " + sv + " because " + t
+                + "the instantiation of " + sv + " because " + term
                 + " is no variable.");
         }
 
         final MatchConditions newMC =
-                taclet.getMatcher().matchSV(sv, t, matchConditions(), services);
+                taclet.getMatcher().matchSV(sv, term, matchConditions(), services);
 
         if (newMC == null) {
-            throw new IllegalInstantiationException("Instantiation " + t
+            throw new IllegalInstantiationException("Instantiation " + term
                     + " of " + sv + "does not satisfy the variable conditions");
         }
 
