@@ -3,9 +3,11 @@
 //TODO figure out why javacc is always executed
 
 plugins {
+    id("ca.coglinc.javacc") version("2.4.0") apply false
     id("idea")
     id("eclipse")
     id "com.jfrog.bintray" version "1.8.4" apply false
+    id 'com.github.johnrengelman.shadow' version "5.0.0" apply false
 }
 
 idea {
@@ -15,41 +17,24 @@ idea {
     }
 }
 
+static def gitRevParse(String args) {
+    try {
+        return "git rev-parse $args".execute().text.trim()
+    } catch (Exception e) {
+        return ""
+}
+
+}
+
 static def getDate() {
     return new Date().format('yyyyMMdd')
 }
 
-def getGitRevision = { ->
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'rev-parse', 'HEAD'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
-}
-
-def getGitBranch = { ->
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
-}
-
-ext.dateVersion = getDate()
-ext.gitRevision = getGitRevision()
-ext.gitBranch = getGitBranch()
-
-def resourceDir = new File(project(":key.core").projectDir, "src/main/resources")
-def utilResourceDir = new File(resourceDir, "de/uka/ilkd/key/util")
-
-new File(utilResourceDir, "sha1").text = gitRevision
-new File(utilResourceDir, "branch").text = gitBranch
-new File(utilResourceDir, "version").text = version
+def gitRevision = gitRevParse('--short HEAD')
+def gitBranch = gitRevParse('--abbrev-ref HEAD')
 
 group = "org.key_project"
-version = "2.7.0-${System.env.BUILD_NUMBER ?: ext.gitRevision}"
+version = "2.7.0-${System.env.BUILD_NUMBER ?: gitRevision}"
 
 subprojects {
     apply plugin: "java"
@@ -65,10 +50,6 @@ subprojects {
     apply plugin: 'findbugs'
     */
 
-    group = rootProject.group
-    version = rootProject.version
-    ext.gitRevision = rootProject.ext.gitRevision
-    ext.gitBranch = rootProject.ext.gitBranch
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
@@ -90,6 +71,7 @@ subprojects {
         systemProperty "TACLET_PROOFS", "tacletProofs"
         systemProperty "EXAMPLES_DIR", file("$rootProject/key.ui/examples")
         systemProperty "RUNALLPROOFS_DIR", "$buildDir/report/runallproves"
+
 
         systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
@@ -135,11 +117,9 @@ subprojects {
 
     dependencies {
         testCompile("junit:junit:4.12")
-
         //testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
         //testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
         //testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.3.1'
-
         testCompile project(":key.util")
     }
 
