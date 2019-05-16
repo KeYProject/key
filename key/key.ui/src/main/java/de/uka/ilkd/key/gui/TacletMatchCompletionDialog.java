@@ -406,10 +406,11 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 							String droppedString;
 
 							Point dropLocation = event.getLocation();
-							int row = DataTable.this.rowAtPoint( dropLocation );
-							int column = DataTable.this.columnAtPoint( dropLocation );
+							final DataTable dt = DataTable.this;
+							int row = dt.rowAtPoint( dropLocation );
+							int column = dt.columnAtPoint( dropLocation );
 
-							if ((row != -1) && (column == 1)){
+							if ((row != -1) && (column == 1) && dt.isCellEditable(row, column)) {
 								// The point lies within the table and within the instantiation
 								// column ...
 
