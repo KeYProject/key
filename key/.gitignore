@@ -22,11 +22,6 @@ gradle-app.setting
 ### Gradle Patch ###
 **/build/
 
-# Local git information #
-key.core/src/main/resources/de/uka/ilkd/key/util/sha1
-key.core/src/main/resources/de/uka/ilkd/key/util/branch
-
-
 # We do not need to check-in eclipse or intellij stuff:
 .idea/
 out/
