@@ -7,6 +7,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import org.key_project.ui.interactionlog.algo.InteractionVisitor;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -45,7 +46,9 @@ public final class MacroInteraction extends NodeInteraction {
         this.pos = posInOcc;
         this.info = info.toString();
 
-        ImmutableList<Goal> openGoals = info.getProof().openGoals();
+        ImmutableList<Goal> openGoals =
+                info.getProof() != null ?
+                        info.getProof().openGoals() : ImmutableSLList.<Goal>nil();
         this.openGoalSerialNumbers = openGoals.stream().map(g -> g.node().serialNr()).collect(Collectors.toList());
         this.openGoalNodeIds = openGoals.stream().map(g -> NodeIdentifier.get(g.node())).collect(Collectors.toList());
     }
