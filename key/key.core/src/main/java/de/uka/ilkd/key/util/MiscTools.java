@@ -13,11 +13,9 @@
 
 package de.uka.ilkd.key.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.Map.Entry;
 
 import org.key_project.util.Filenames;
 import org.key_project.util.Strings;

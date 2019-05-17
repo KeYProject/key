@@ -10,6 +10,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement()
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PruneInteraction extends NodeInteraction {
+    private static final long serialVersionUID = -8499747129362589793L;
+
     public PruneInteraction() {
     }
 

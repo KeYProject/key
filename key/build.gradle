@@ -21,25 +21,38 @@ static def getDate() {
     return new Date().format('yyyyMMdd')
 }
 
-static def getGitRevision() {
-    def cmd = "git rev-parse --short HEAD"
-    def process = cmd.execute()
-    return process.text.trim()
+def getGitRevision = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+def getGitBranch = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
 }
 
 ext.dateVersion = getDate()
 ext.gitRevision = getGitRevision()
+ext.gitBranch = getGitBranch()
+version = "2.7"
+
+def resourceDir = new File(project(":key.core").projectDir, "src/main/resources")
+def utilResourceDir = new File(resourceDir, "de/uka/ilkd/key/util")
+
+new File(utilResourceDir, "sha1").text = gitRevision
+new File(utilResourceDir, "branch").text = gitBranch
+new File(utilResourceDir, "version").text = version
 
 group = "org.key_project"
-version = "2.7.0-${System.env.BUILD_NUMBER ?: ext.gitRevision}"
-
-
-try {
-    ext.gitRevision = "git rev-parse HEAD".execute().in.readLines().get(0)
-} catch (Exception e) {
-    println e.message
-    ext.gitRevision = ""
-}
+version = "${version}.0-${System.env.BUILD_NUMBER ?: ext.gitRevision}"
 
 subprojects {
     apply plugin: "java"
@@ -58,6 +71,7 @@ subprojects {
     group = rootProject.group
     version = rootProject.version
     ext.gitRevision = rootProject.ext.gitRevision
+    ext.gitBranch = rootProject.ext.gitBranch
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
@@ -184,9 +198,7 @@ subprojects {
         classpath {
             file {
                 whenMerged {
-                    def source = entries.find { it.path == 'src/main/java' }
-                    source.entryAttributes['ignore_optional_problems'] = 'true'
-
+                    entries.findAll { it.path.endsWith('src/test/antlr') }.each { it.excludes = ["**/*.java"] }
                     entries.findAll { it.path.endsWith('/resources') }.each { it.excludes = ["**/*.java"] }
                 }
             }

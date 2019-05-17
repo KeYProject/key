@@ -29,7 +29,6 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
 
 import static de.uka.ilkd.key.util.rifl.SpecificationEntity.*;
-import static de.uka.ilkd.key.util.MiscTools.apply;
 
 /**
  * XML content handler for the RIFL language. Produces a RIFL
