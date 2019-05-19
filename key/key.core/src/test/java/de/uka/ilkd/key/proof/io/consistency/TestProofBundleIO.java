@@ -88,7 +88,7 @@ public class TestProofBundleIO {
      * and *.zip files.
      * @throws Exception on errors (should not happen)
      */
-    @Test @Ignore("TODO")
+    @Test
     public void testComplexBundleGeneration() throws Exception {
         /* size of file should be about 22 kb,
          * to be robust against small changes (or different compression),
