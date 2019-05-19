@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
@@ -40,6 +41,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.inst.TermInstantiation;
 
 
 /**
@@ -319,8 +321,17 @@ public class NodeInfo {
                             + ". Probably branch label not up to date in "
                             + tacletApp.rule().name());
                     res = arg; // use sv name instead
-                } else
+                } else {
+                    if (val instanceof Term) {
+                        val = TermLabel.removeIrrelevantLabels((Term) val,
+                                                               node.proof().getServices());
+                    } else if (val instanceof TermInstantiation) {
+                        val = TermLabel.removeIrrelevantLabels(((TermInstantiation) val)
+                                                                .getInstantiation(),
+                                                               node.proof().getServices());
+                    }
                     res = ProofSaver.printAnything(val, node.proof().getServices());
+                }
                 m.appendReplacement(sb, res.replace("$", "\\$"));
             }
             m.appendTail(sb);
