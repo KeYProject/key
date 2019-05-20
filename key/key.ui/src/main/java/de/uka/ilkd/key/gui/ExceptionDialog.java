@@ -301,7 +301,7 @@ public class ExceptionDialog extends JDialog {
 //         elistScroll.setPreferredSize(new Dimension(500, 300));
 //         ListSelectionListener listListener = new ListSelectionListener() {
 //             public void valueChanged(ListSelectionEvent e) {
-//                 Throwable exc = exceptions.get(list.getSelectedIndex());
+//                 Throwable exc = exceptions.lookupAndOverride(list.getSelectedIndex());
 //                 setStackTraceText(exc);
 //             }
 //         };

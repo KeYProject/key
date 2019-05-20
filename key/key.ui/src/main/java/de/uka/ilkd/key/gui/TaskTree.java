@@ -31,7 +31,9 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
@@ -258,7 +260,7 @@ public class TaskTree extends JPanel {
         private void checkPopup(MouseEvent e) {
             if(e.isPopupTrigger()) {
                 JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
-                        ContextMenuKind.PROOF_LIST, mediator.getSelectedProof(),
+                        DefaultContextMenuKind.PROOF_LIST, mediator.getSelectedProof(),
                         mediator);
                 if(menu.getComponentCount()>0) {
                     menu.show(TaskTree.this, e.getX(), e.getY());
@@ -295,16 +297,11 @@ public class TaskTree extends JPanel {
 
 
     static class TaskTreeIconCellRenderer extends DefaultTreeCellRenderer
-				             implements java.io.Serializable { 
-	
-	/**
-         * 
-         */
-        private static final long serialVersionUID = 4580251672266092290L;
-    static final ImageIcon keyIcon=IconFactory.keyHole(20,20);
-	static final ImageIcon keyClosedIcon=IconFactory.keyHoleClosed(20,20);
-	static final ImageIcon keyAlmostClosedIcon
-	    =IconFactory.keyHoleAlmostClosed(20,20);
+            implements java.io.Serializable {
+
+        static final Icon keyIcon = IconFactory.keyHole(20, 20);
+        static final Icon keyClosedIcon = IconFactory.keyHoleClosed(20);
+        static final Icon keyAlmostClosedIcon = IconFactory.keyHoleAlmostClosed(20, 20);
 
 
 	public TaskTreeIconCellRenderer() {

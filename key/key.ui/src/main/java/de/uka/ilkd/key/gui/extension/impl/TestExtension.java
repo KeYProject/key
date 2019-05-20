@@ -6,6 +6,7 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.settings.InvalidSettingsInputException;
@@ -18,6 +19,8 @@ import de.uka.ilkd.key.rule.Rule;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +38,7 @@ public class TestExtension implements KeYGuiExtension,
         KeYGuiExtension.StatusLine,
         KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Toolbar,
+        KeYGuiExtension.KeyboardShortcuts,
         KeYGuiExtension.Settings {
 
     KeyAction actionTest = new TestAction();
@@ -60,31 +64,15 @@ public class TestExtension implements KeYGuiExtension,
         }
     };
 
-
     @Override
     public List<Action> getMainMenuActions(MainWindow mainWindow) {
         return Collections.singletonList(actionTest);
     }
 
     @Override
-    public void init(MainWindow window, KeYMediator mediator) {
-        System.out.println("TestExtension.init");
-    }
-
-    @Override
-    public String getTitle() {
-        return "Test!";
-    }
-
-    @Override
-    public JComponent getComponent() {
-        return new JLabel("Test");
-    }
-
-    @Override
     public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, Object underlyingObject) {
         return cmAdapter.getContextActions(mediator, kind, underlyingObject);
-        }
+    }
 
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
@@ -103,11 +91,33 @@ public class TestExtension implements KeYGuiExtension,
         return new TestSettingsProvider();
     }
 
+    @Override
+    public Collection<TabPanel> getPanels(MainWindow window, KeYMediator mediator) {
+        return Collections.singleton(new TabPanel() {
+            @Override
+            public String getTitle() {
+                return "Test";
+            }
+
+            @Override
+            public JComponent getComponent() {
+                return new JLabel("Test");
+            }
+        });
+    }
+
+    @Override
+    public Collection<Action> getShortcuts(KeYMediator mediator, String componentId, JComponent component) {
+        return Collections.singleton(actionTest);
+    }
+
     private class TestAction extends KeyAction {
         public TestAction() {
             setName("Test");
             setMenuPath("Test.Test.Test");
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.TEETH, 16, Color.BLUE));
+            putValue(LOCAL_ACCELERATOR, KeyStroke.getKeyStroke(KeyEvent.VK_1, KeyEvent.CTRL_DOWN_MASK));
+            lookupAcceleratorKey();
         }
 
         @Override

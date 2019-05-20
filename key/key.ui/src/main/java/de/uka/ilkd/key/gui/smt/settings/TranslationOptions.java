@@ -3,7 +3,7 @@ package de.uka.ilkd.key.gui.smt.settings;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.gui.settings.TablePanel;
+import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 
 import javax.swing.*;
@@ -13,7 +13,7 @@ import java.awt.*;
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
-class TranslationOptions extends TablePanel implements SettingsProvider {
+class TranslationOptions extends SettingsPanel implements SettingsProvider {
     private static final String infoUseExplicitTypeHierarchy = "If this option is selected, the transitive inheritance between classes is modeled by "
             + "assumptions.\n\n"
             + "Example: Let A, B and C  be classes such that C extends B and B extends A.\n"
@@ -75,6 +75,7 @@ class TranslationOptions extends TablePanel implements SettingsProvider {
 
 
     public TranslationOptions() {
+        setHeaderText(getDescription());
         useExplicitTypeHierachy = createUseExplicitTypeHierachy();
         useNullInstantiation = createNullInstantiation();
         useBuiltInUniqueness = createBuiltInUniqueness();

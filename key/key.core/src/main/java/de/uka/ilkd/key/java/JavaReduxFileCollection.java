@@ -27,6 +27,7 @@ import java.util.NoSuchElementException;
 import recoder.io.DataLocation;
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.FileCollection;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -192,6 +193,16 @@ public class JavaReduxFileCollection implements FileCollection {
             }
 
             return currentURL.openStream();
+        }
+
+        @Override
+        public InputStream openCurrent(FileRepo fileRepo) throws IOException,
+                NoSuchElementException {
+            if (fileRepo != null) {
+                return fileRepo.getInputStream(currentURL);
+            } else {
+                return openCurrent();       // fallback without FileRepo
+            }
         }
 
         public boolean step() {

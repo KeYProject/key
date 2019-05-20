@@ -17,13 +17,13 @@ package de.uka.ilkd.key.gui.smt.settings;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.gui.settings.TablePanel;
+import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 
 import javax.swing.*;
 
-public class TacletTranslationOptions extends TablePanel implements SettingsProvider {
+public class TacletTranslationOptions extends SettingsPanel implements SettingsProvider {
     private static final String infoFileChooserPanel = "Activate this option to store the translations of taclets"
             + " that are handed over to the externals solvers:\n"
             + "1. Choose the folder.\n"
@@ -52,6 +52,7 @@ public class TacletTranslationOptions extends TablePanel implements SettingsProv
 
 
     public TacletTranslationOptions() {
+        setHeaderText("Taclet Translation Options for SMT");
         fileChooserPanel = createFileChooserPanel();
         maxNumberOfGenerics = createMaxNumberOfGenerics();
     }

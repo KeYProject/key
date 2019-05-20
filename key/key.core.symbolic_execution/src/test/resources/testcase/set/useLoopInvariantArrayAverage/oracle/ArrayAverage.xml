@@ -38,15 +38,10 @@
                         <statement name="int i = 0;" pathCondition="not(equals(array,null))" pathConditionChanged="false">
                            <callStackEntry path="/0/0/0"/>
                            <callStackEntry path="/0"/>
-                           <loopInvariant name="invariant: (  (geq(i, Z(0(#)))
- &amp; leq(i, length(array_1)))&lt;&lt;SC&gt;&gt;
- &amp;   sum_2
-   = javaCastInt(bsum{int j;}(Z(0(#)),
-                              i,
-                              int::select(heap,
-                                          array_1,
-                                          arr(j)))))&lt;&lt;SC&gt;&gt;;
-variant: javaSubInt(length(array_1), i)
+                           <loopInvariant name="invariant: (  (i &gt;= 0
+ &amp; i &lt;= array_1.length)&lt;&lt;SC&gt;&gt;
+ &amp; sum_2 = javaCastInt(bsum{int j;}(0, i, array_1[j])))&lt;&lt;SC&gt;&gt;;
+variant: javaSubInt(array_1.length, i)
 mod: false" pathCondition="not(equals(array,null))" pathConditionChanged="false" initiallyValid="true">
                               <callStackEntry path="/0/0/0"/>
                               <callStackEntry path="/0"/>

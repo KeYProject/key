@@ -14,6 +14,8 @@
 package de.uka.ilkd.key.speclang;
 
 
+import java.util.function.UnaryOperator;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -70,7 +72,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
 	originalRep.execPostOrder(oc);
 	this.isStatic        = !oc.contains(originalSelfVar);
     }
-    
+
 
     public ClassAxiomImpl(String name, String displayName,
         KeYJavaType kjt,
@@ -81,30 +83,46 @@ public final class ClassAxiomImpl extends ClassAxiom {
         this.displayName = displayName;
     }
 
+    @Override
+    public ClassAxiomImpl map(UnaryOperator<Term> op, Services services) {
+        return new ClassAxiomImpl(
+                name, name, kjt, visibility, op.apply(originalRep), originalSelfVar);
+    }
+
 
     @Override
     public boolean equals(Object o) {
-       if (o == null || this.getClass() != o.getClass()) return false;
-       final ClassAxiomImpl other = (ClassAxiomImpl) o;
-       
-       if (isStatic != other.isStatic) return false;
-       if (!name.equals(other.name)) return false;
-       if (!kjt.equals(other.kjt)) return false;
-       if (originalSelfVar != null) {
-          if (other.originalSelfVar == null)  return false;
-          else if (!originalSelfVar.getKeYJavaType().equals(other.originalSelfVar.getKeYJavaType())) { // not interested in names
-             return false;                
-          }
-       }
-       
-       return true;
+        if (o == null || this.getClass() != o.getClass()) {
+            return false;
+        }
+        final ClassAxiomImpl other = (ClassAxiomImpl) o;
+
+        if (isStatic != other.isStatic) {
+            return false;
+        }
+        if (!name.equals(other.name)) {
+            return false;
+        }
+        if (!kjt.equals(other.kjt)) {
+            return false;
+        }
+        if (originalSelfVar != null) {
+            if (other.originalSelfVar == null) {
+                return false;
+            } else if (!originalSelfVar.getKeYJavaType()
+                    .equals(other.originalSelfVar.getKeYJavaType())) {
+                // not interested in names
+                return false;
+            }
+        }
+        return true;
     }
-    
+
     @Override
     public int hashCode() {
        return 17*(name.hashCode() + 17 * kjt.hashCode()) + (isStatic ? 13 : 7);
     }
-    
+
     @Override
     public String getName() {
 	return name;
@@ -123,7 +141,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
 	return visibility;
     }
 
-    
+
     @Override
     public ImmutableSet<Taclet> getTaclets(
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
@@ -152,7 +170,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
     public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
 	    Services services) {
 	return DefaultImmutableSet.nil();
-    }    
+    }
 
 
     @Override

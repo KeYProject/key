@@ -35,7 +35,7 @@ public class Config {
 	= "KEY_FONT_PROOF_LIST_VIEW";
 
     /** An array of font sizes for the goal view */
-    private static final int[] sizes = new int[]{10,12,14,17,20,24};
+    public static final int[] SIZES = new int[]{10,12,14,17,20,24};
 
     public static final Config DEFAULT = new Config();
     
@@ -43,7 +43,7 @@ public class Config {
     private int sizeIndex; 
     { 
         sizeIndex = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().sizeIndex();
-        if (sizeIndex < 0 || sizeIndex > sizes.length) {
+        if (sizeIndex < 0 || sizeIndex > SIZES.length) {
             sizeIndex = 0;
         }
     }
@@ -85,18 +85,18 @@ public class Config {
     }
     
     public boolean isMaximumSize() {
-	return sizeIndex==sizes.length-1;
+	return sizeIndex== SIZES.length-1;
     }
 
     public void setDefaultFonts() {
 	UIManager.put(KEY_FONT_PROOF_TREE, 
-		      new Font("Default", Font.PLAIN, sizes[sizeIndex]));
+		      new Font("Default", Font.PLAIN, SIZES[sizeIndex]));
 	UIManager.put(KEY_FONT_SEQUENT_VIEW, 
-		      new Font("Monospaced", Font.PLAIN, sizes[sizeIndex]));
+		      new Font("Monospaced", Font.PLAIN, SIZES[sizeIndex]));
 	UIManager.put(KEY_FONT_GOAL_LIST_VIEW, 
-		      new Font("Default", Font.PLAIN, sizes[2]));
+		      new Font("Default", Font.PLAIN, SIZES[2]));
 	UIManager.put(KEY_FONT_PROOF_LIST_VIEW, 
-		      new Font("Default", Font.PLAIN, sizes[2]));
+		      new Font("Default", Font.PLAIN, SIZES[2]));
     }
 
 

@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.function.UnaryOperator;
+
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
@@ -68,8 +70,21 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
                                            TB.and(wdPre, imp)));
     }
 
+    @Override
     public LoopSpecification getStatement() {
         return this.inv;
+    }
+
+    @Override
+    public LoopWellDefinedness map(UnaryOperator<Term> op, Services services) {
+        return new LoopWellDefinedness(
+                getName(), id(), type(), getTarget(), getHeap(), getOrigVars(),
+                getRequires().map(op),
+                op.apply(getAssignable()), op.apply(getAccessible()),
+                getEnsures().map(op),
+                op.apply(getMby()), op.apply(getRepresents()),
+                inv.map(op, services),
+                services.getTermBuilder());
     }
 
     @Override

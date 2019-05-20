@@ -19,7 +19,7 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.KeyStroke;
 
-import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 
@@ -46,8 +46,6 @@ public class SearchInSequentAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         SequentView view = mainWindow.sequentViewSearchBar.getSequentView();
         String searchString = view.getHighlightedText();
-        mainWindow.sequentViewSearchBar.searchField.setText(searchString);
-        mainWindow.sequentViewSearchBar.setVisible(true);
-        mainWindow.sequentViewSearchBar.search();
+        mainWindow.sequentViewSearchBar.searchFor(searchString);
     }
 }

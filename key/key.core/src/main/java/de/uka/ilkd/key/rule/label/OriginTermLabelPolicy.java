@@ -7,21 +7,19 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;;
 
 /**
  * Policy for {@link OriginTermLabel}s.
- * 
+ *
  * This ensures that every term always has a valid term label, i.e., that no labels are lost.
- * 
+ *
  * @author lanzinger
  */
 public class OriginTermLabelPolicy implements TermLabelPolicy {
@@ -32,11 +30,18 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
             Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs,
             ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock,
             ImmutableArray<TermLabel> newTermOriginalLabels, TermLabel label) {
-        if (rule instanceof BuiltInRule
-                && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
+        if (services.getProof() == null) {
             return label;
         }
-        
+
+        if (!services.getProof().getSettings().getTermLabelSettings().getUseOriginLabels()) {
+            return null;
+        }
+
+        if (!OriginTermLabel.canAddLabel(newTermOp, services)) {
+            return null;
+        }
+
         OriginTermLabel newLabel = (OriginTermLabel) label;
         OriginTermLabel oldLabel = null;
 
@@ -55,14 +60,8 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
             result = oldLabel;
         }
 
-        //TODO This is probably not correct, but it prevents the origin being lost in some cases
-        // (like for OneStepSimplification).
-        if (result.getSubtermOrigins().size() == 1
-                && result.getOrigin().specType == SpecType.NONE) {
-            Origin origin = result.getSubtermOrigins().iterator().next();
-
-            result = new OriginTermLabel(origin.specType, origin.fileName, origin.line,
-                    result.getSubtermOrigins());
+        if (result.getOrigin().specType == SpecType.NONE && result.getSubtermOrigins().isEmpty()) {
+            result = null;
         }
 
         return result;

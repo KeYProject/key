@@ -152,7 +152,7 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
 
         private JButton getOkayButton() {
                 if (okayButton == null) {
-                        okayButton = new JButton("Okay");
+                        okayButton = new JButton("OK");
                         okayButton.addActionListener(new ActionListener() {
 
                                 @Override

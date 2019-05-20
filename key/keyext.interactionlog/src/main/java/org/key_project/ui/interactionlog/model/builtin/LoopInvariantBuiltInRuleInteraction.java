@@ -3,7 +3,6 @@ package org.key_project.ui.interactionlog.model.builtin;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import org.key_project.ui.interactionlog.algo.InteractionVisitor;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -21,8 +20,4 @@ public class LoopInvariantBuiltInRuleInteraction extends BuiltInRuleInteraction 
     public <T extends IBuiltInRuleApp> LoopInvariantBuiltInRuleInteraction(LoopInvariantBuiltInRuleApp app, Node node) {
     }
 
-    @Override
-    public <T> T accept(InteractionVisitor<T> visitor) {
-        return visitor.visit(this);
-    }
 }

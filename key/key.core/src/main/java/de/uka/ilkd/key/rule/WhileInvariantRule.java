@@ -288,27 +288,27 @@ public final class WhileInvariantRule implements BuiltInRule {
     private static AnonUpdateData createAnonUpdate(LocationVariable heap, Term mod,
                                                    LoopSpecification inv, Services services) {
         final TermBuilder tb = services.getTermBuilder();
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final Name loopHeapName = new Name(tb.newName(heap+"_After_LOOP"));
-	final Function loopHeapFunc = new Function(loopHeapName, heapLDT.targetSort(), true);
-	services.getNamespaces().functions().addSafely(loopHeapFunc);
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
+        final Function loopHeapFunc = new Function(loopHeapName, heapLDT.targetSort(), true);
+        services.getNamespaces().functions().addSafely(loopHeapFunc);
 
         final Term loopHeap = tb.func(loopHeapFunc);
-	final Name anonHeapName = new Name(tb.newName("anon_"+heap+"_LOOP"));
-	final Function anonHeapFunc = new Function(anonHeapName,heap.sort());
-	services.getNamespaces().functions().addSafely(anonHeapFunc);
+        final Name anonHeapName = new Name(tb.newName("anon_" + heap + "_LOOP"));
+        final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
+        services.getNamespaces().functions().addSafely(anonHeapFunc);
         final Term anonHeapTerm =
                 tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
 
-	// check for strictly pure loops
-	final Term anonUpdate;
-	if(tb.strictlyNothing().equals(mod)) {
-	    anonUpdate = tb.skip();
-	} else {
-	    anonUpdate = tb.anonUpd(heap, mod, anonHeapTerm);
-	}
+        // check for strictly pure loops
+        final Term anonUpdate;
+        if (tb.strictlyNothing().equalsModIrrelevantTermLabels(mod)) {
+            anonUpdate = tb.skip();
+        } else {
+            anonUpdate = tb.anonUpd(heap, mod, anonHeapTerm);
+        }
 
-	return new AnonUpdateData(anonUpdate, loopHeap, tb.getBaseHeap(), anonHeapTerm);
+        return new AnonUpdateData(anonUpdate, loopHeap, tb.getBaseHeap(), anonHeapTerm);
     }
 
     private static boolean checkFocus(final Term progPost) {
@@ -937,14 +937,14 @@ public final class WhileInvariantRule implements BuiltInRule {
             }
             final Term m = mods.get(heap);
             final Term fc;
-          if (tb.strictlyNothing().equals(m)) {
-                fc = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap)); 
-            } else{
+            if (tb.strictlyNothing().equalsModIrrelevantTermLabels(m)) {
+                fc = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap));
+            } else {
                 fc = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), m);
             }
-            if(frameCondition == null){
+            if (frameCondition == null) {
                 frameCondition = fc;
-            } else{
+            } else {
                 frameCondition = tb.and(frameCondition, fc);
             }
             if (reachableState == null) {

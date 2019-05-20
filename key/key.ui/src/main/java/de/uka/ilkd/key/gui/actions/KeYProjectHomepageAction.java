@@ -21,7 +21,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 
 /**

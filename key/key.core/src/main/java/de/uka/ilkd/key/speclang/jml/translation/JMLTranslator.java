@@ -76,6 +76,9 @@ import de.uka.ilkd.key.util.Triple;
 
 public final class JMLTranslator {
 
+    /**
+     * The term builder object.
+     */
     private final TermBuilder tb;
     private final String fileName;
     private TermServices services;                          // to be used in future

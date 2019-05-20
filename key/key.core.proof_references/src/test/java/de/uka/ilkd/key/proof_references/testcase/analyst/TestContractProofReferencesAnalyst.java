@@ -32,6 +32,6 @@ public class TestContractProofReferencesAnalyst extends AbstractProofReferenceTe
                             "main", 
                             true,
                             new ContractProofReferencesAnalyst(),
-                            new ExpectedProofReferences(IProofReference.USE_CONTRACT, "pre: {heap=java.lang.Object::<inv>(heap,self)<<impl>>}; mby: null; post: {heap=and(and(equals(result,Z(2(4(#)))),java.lang.Object::<inv>(heap,self)<<impl>>)<<SC>>,equals(exc,null)<<impl>>)}; mods: {heap=allLocs, savedHeap=null}; hasMod: {heap=true, savedHeap=true}; termination: diamond; transaction: false"));
+                            new ExpectedProofReferences(IProofReference.USE_CONTRACT, "pre: {heap=java.lang.Object::<inv>(heap,self)<<impl>>}; mby: null; post: {heap=and(and(equals(result<<origin(ensures @ UseOperationContractTest.java @ line 12) ([])>>,Z(2(4(#))))<<origin(ensures @ UseOperationContractTest.java @ line 12) ([])>>,java.lang.Object::<inv>(heap,self)<<impl>>)<<SC>>,equals(exc<<origin(ensures (implicit)) ([])>>,null)<<impl, origin(ensures (implicit)) ([])>>)}; mods: {heap=allLocs, savedHeap=null}; hasMod: {heap=true, savedHeap=true}; termination: diamond; transaction: false"));
    }
 }

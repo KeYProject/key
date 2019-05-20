@@ -3,7 +3,7 @@ package de.uka.ilkd.key.gui.smt.settings;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.gui.settings.TablePanel;
+import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.smt.SolverType;
 
@@ -15,7 +15,7 @@ import java.util.List;
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
-public class SMTSettingsProvider extends TablePanel implements SettingsProvider {
+public class SMTSettingsProvider extends SettingsPanel implements SettingsProvider {
     public final static String PROGRESS_MODE_USER = "Progress dialog remains open after executing solvers.";
     public final static String PROGRESS_MODE_CLOSE = "Close progress dialog after all solvers have finished.";
     public final static String PROGRESS_MODE_CLOSE_FIRST = "Close progress dialog after the first solver has finished.";

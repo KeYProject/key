@@ -38,6 +38,9 @@ import javax.swing.text.Highlighter.Highlight;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.SimpleAttributeSet;
 
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
 
@@ -100,15 +103,20 @@ public final class SourceView extends JComponent {
     /**
      * The color of normal highlights in source code (light green).
      */
-    private static final Color NORMAL_HIGHLIGHT_COLOR = new Color(194, 245, 194);
+    private static final ColorSettings.ColorProperty NORMAL_HIGHLIGHT_COLOR =
+            ColorSettings.define("[SourceView]normalHighlight",
+            "Color for Highlighting things in source view", new Color(194, 245, 194));
 
     /**
      * The color of the most recent highlight in source code (green).
      */
-    private static final Color MOST_RECENT_HIGHLIGHT_COLOR = new Color(57, 210, 81);
+    private static final ColorSettings.ColorProperty MOST_RECENT_HIGHLIGHT_COLOR =
+            ColorSettings.define("[SourceView]mostRecentHighlight",
+                    "Second color for highlightning",
+                    new Color(57, 210, 81));
 
     /**
-     * The main window of KeY (needed to get the mediator).
+     * The main window of KeY (needed to lookupAndOverride the mediator).
      */
     private final MainWindow mainWindow;
 
@@ -202,6 +210,10 @@ public final class SourceView extends JComponent {
                 updateGUI();
             }
         });
+
+        KeYGuiExtensionFacade.installKeyboardShortcuts(null,
+                this, KeYGuiExtension.KeyboardShortcuts.SOURCE_VIEW);
+
     }
 
     /**
@@ -273,7 +285,7 @@ public final class SourceView extends JComponent {
                     }
                     line++;
                 }
-                // jump in proof tree (get corresponding node from list)
+                // jump in proof tree (lookupAndOverride corresponding node from list)
                 Node n = null;
                 for (Pair<Node, PositionInfo> p : lines) {
                     if (p.second.getStartPosition().getLine() == line + 1
@@ -308,7 +320,7 @@ public final class SourceView extends JComponent {
                     // use a different color for most recent
                     if (i == 0) {
                         textPane.getHighlighter().addHighlight(r.start(), r.end(),
-                                new DefaultHighlightPainter(MOST_RECENT_HIGHLIGHT_COLOR));
+                                new DefaultHighlightPainter(MOST_RECENT_HIGHLIGHT_COLOR.get()));
                     } else {
                         textPane.getHighlighter().addHighlight(r.start(), r.end(), hp);
                     }
@@ -417,7 +429,7 @@ public final class SourceView extends JComponent {
             textPane.setEditable(false);
 
             // compare stored hash with a newly created
-            //String origHash = hashes.get(entry.getKey());
+            //String origHash = hashes.lookupAndOverride(entry.getKey());
             //String curHash = IOUtil.computeMD5(entry.getValue());
             //if (!origHash.equals(curHash)) {
                     // TODO: consistency problem, see comment in line 128
@@ -436,7 +448,7 @@ public final class SourceView extends JComponent {
 
             // add a listener to highlight the line currently pointed to
             Object selectionHL = textPane.getHighlighter().addHighlight(0, 0,
-                    new DefaultHighlightPainter(DEFAULT_HIGHLIGHT_COLOR));
+                    new DefaultHighlightPainter(DEFAULT_HIGHLIGHT_COLOR.get()));
             textPane.addMouseMotionListener(new MouseMotionListener() {
                 @Override
                 public void mouseMoved(MouseEvent e) {
@@ -449,7 +461,7 @@ public final class SourceView extends JComponent {
             });
 
             // paint the highlights (symbolically executed lines) for this file
-            HighlightPainter hp = new DefaultHighlightPainter(NORMAL_HIGHLIGHT_COLOR);
+            HighlightPainter hp = new DefaultHighlightPainter(NORMAL_HIGHLIGHT_COLOR.get());
             paintSymbExHighlights(textPane, li, entry.getKey(), hp);
 
             textPane.addMouseListener(new TextPaneMouseAdapter(textPane, li, hp, entry.getKey()));
@@ -462,6 +474,11 @@ public final class SourceView extends JComponent {
             textScrollPane.setViewportView(nowrap);
             textScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             textScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+            // increase unit increment (for faster scrolling)
+            textScrollPane.getVerticalScrollBar().setUnitIncrement(30);
+            textScrollPane.getHorizontalScrollBar().setUnitIncrement(30);
+
             tabs.addTab(entry.getValue().getName(), textScrollPane);
 
             // add the full path as tooltip for the tab
@@ -528,7 +545,7 @@ public final class SourceView extends JComponent {
             return;
         }
 
-        // get PositionInfo of all symbEx nodes
+        // lookupAndOverride PositionInfo of all symbEx nodes
         lines = constructLinesSet(currentNode);
         if (lines == null) {
             tabs.setBorder(new TitledBorder(NO_SOURCE));

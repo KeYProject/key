@@ -16,10 +16,11 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.KeYSelectionModel;
-import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
-import de.uka.ilkd.key.gui.fonticons.KeYIcons;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
@@ -41,13 +42,13 @@ import java.awt.event.MouseEvent;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class InfoView extends JSplitPane implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
+public class InfoView extends JSplitPane implements TabPanel {
 
     /**
      *
      */
     private static final long serialVersionUID = -6944612837850368411L;
-    public static final Icon INFO_ICON = KeYIcons.INFO_VIEW_ICON.getIcon();
+    public static final Icon INFO_ICON = IconFactory.INFO_VIEW.get(MainWindowTabbedPane.TAB_ICON_SIZE);
 
 
     private final InfoTree infoTree;
@@ -136,7 +137,7 @@ public class InfoView extends JSplitPane implements KeYGuiExtension, KeYGuiExten
                 if(e.isPopupTrigger()) {
                     Rule selected = infoTree.getLastSelectedPathComponent().getRule();
                     JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
-                            ContextMenuKind.TACLET_INFO, selected,
+                            DefaultContextMenuKind.TACLET_INFO, selected,
                             mediator);
                     if(menu.getComponentCount()>0) {
                         menu.show(InfoView.this, e.getX(), e.getY());
@@ -151,7 +152,15 @@ public class InfoView extends JSplitPane implements KeYGuiExtension, KeYGuiExten
         setLeftComponent(new JScrollPane(infoTree));
         setRightComponent(contentPane);
 
+        KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this, KeYGuiExtension.KeyboardShortcuts.INFO_VIEW);
     }
+
+    public InfoView(MainWindow window, KeYMediator mediator) {
+        this();
+        setMainWindow(window);
+        setMediator(mediator);
+    }
+
 
     public void setMediator(KeYMediator m) {
         assert m != null;
@@ -161,15 +170,8 @@ public class InfoView extends JSplitPane implements KeYGuiExtension, KeYGuiExten
         mediator = m;
     }
 
-
     public void setMainWindow(MainWindow w) {
         mainWindow = w;
-    }
-
-    @Override
-    public void init(MainWindow window, KeYMediator mediator) {
-        setMainWindow(window);
-        setMediator(mediator);
     }
 
     @Override

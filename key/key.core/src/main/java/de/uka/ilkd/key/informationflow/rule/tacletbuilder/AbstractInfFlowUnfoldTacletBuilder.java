@@ -20,6 +20,7 @@ import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -78,6 +79,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         // create find term and replace information flow variables by
         // schema variables
         final Term find = createFindTerm(ifVars);
+
         Term schemaFind = replace(find, ifVars, schemaVars, services);
 
         // create replacewith term and replace information flow variables by
@@ -236,7 +238,8 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
                 map.put(origTerm, svTerm);
             }
         }
-        OpReplacer or = new OpReplacer(map, services.getTermFactory());
+        OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
+        term = TermLabel.removeIrrelevantLabels(term, services.getTermFactory());
         Term result = or.replace(term);
 
         return result;

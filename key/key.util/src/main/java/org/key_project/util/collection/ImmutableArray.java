@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Serializable {
 
@@ -208,4 +210,13 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
         return result;
     }
 
+
+    /**
+     * A stream object for this collection.
+     *
+     * @return a non-null stream object
+     */
+    public Stream<S> stream() {
+        return StreamSupport.stream(spliterator(), false);
+    }
 }

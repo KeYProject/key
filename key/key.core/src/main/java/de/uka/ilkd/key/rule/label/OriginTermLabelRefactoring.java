@@ -13,18 +13,21 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.Taclet;
 
 /**
  * Refactoring for {@link OriginTermLabel}s.
- * 
+ *
  * This ensures that {@link OriginTermLabel#getSubtermOrigins()}
  * always returns an up-to-date value.
- * 
+ *
  * @author lanzinger
  */
 public class OriginTermLabelRefactoring implements TermLabelRefactoring {
@@ -36,24 +39,36 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
     @Override
     public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint,
-            Term tacletTerm) {
-        return RefactoringScope.SEQUENT;
+            PosInOccurrence applicationPosInOccurrence, Term applicationTerm,
+            Rule rule, Goal goal, Object hint, Term tacletTerm) {
+        if (rule instanceof BuiltInRule
+                && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
+            return RefactoringScope.NONE;
+        } else {
+            return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE;
+        }
     }
 
     @Override
-    public void refactorLabels(TermLabelState state, Services services, PosInOccurrence applicationPosInOccurrence,
-            Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Term term,
-            List<TermLabel> labels) {
+    public void refactorLabels(TermLabelState state, Services services,
+                               PosInOccurrence applicationPosInOccurrence,
+                               Term applicationTerm, Rule rule, Goal goal,
+                               Object hint, Term tacletTerm, Term term,
+                               List<TermLabel> labels) {
+        if (services.getProof() == null) {
+            return;
+        }
+
         if (rule instanceof BuiltInRule
                 && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
             return;
         }
-        
-        OriginTermLabel oldLabel = null;
-        OriginTermLabel newLabel;
 
-        Set<Origin> subtermOrigins = collectSubtermOrigins(term.subs(), new HashSet<>());
+        if (rule instanceof Taclet && !shouldRefactorOnTaclet((Taclet) rule)) {
+            return;
+        }
+
+        OriginTermLabel oldLabel = null;
 
         for (TermLabel label : labels) {
             if (label instanceof OriginTermLabel) {
@@ -62,19 +77,33 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             }
         }
 
-        if (oldLabel != null) {
-            labels.remove(oldLabel);
-
-            newLabel = new OriginTermLabel(
-                    oldLabel.getOrigin().specType,
-                    oldLabel.getOrigin().fileName,
-                    oldLabel.getOrigin().line,
-                    subtermOrigins);
-        } else {
-            newLabel = new OriginTermLabel(subtermOrigins);
+        if (!services.getProof().getSettings().getTermLabelSettings().getUseOriginLabels()) {
+            if (oldLabel != null) {
+                labels.remove(oldLabel);
+            }
+            return;
         }
 
-        labels.add(newLabel);
+        Set<Origin> subtermOrigins = collectSubtermOrigins(term.subs(), new HashSet<>());
+
+        final OriginTermLabel newLabel;
+        if (oldLabel != null) {
+            labels.remove(oldLabel);
+            final Origin oldOrigin = oldLabel.getOrigin();
+            newLabel = new OriginTermLabel(oldOrigin.specType,
+                                           oldOrigin.fileName,
+                                           oldOrigin.line,
+                                           subtermOrigins);
+        } else {
+            final Origin commonOrigin = OriginTermLabel.computeCommonOrigin(subtermOrigins);
+            newLabel = new OriginTermLabel(commonOrigin, subtermOrigins);
+        }
+
+        if (OriginTermLabel.canAddLabel(term, services)
+                && (!subtermOrigins.isEmpty()
+                        || newLabel.getOrigin().specType != SpecType.NONE)) {
+            labels.add(newLabel);
+        }
     }
 
     private Set<Origin> collectSubtermOrigins(ImmutableArray<Term> terms,
@@ -84,6 +113,20 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
         }
 
         return result;
+    }
+
+    /**
+     * Determines whether any refactorings should be applied on an application of the given taclet.
+     * For some taclets, performing refactorings causes {@link FormulaTag}s to go missing.
+     *
+     * @param taclet a taclet rule.
+     * @return whether any refactorings should be applied on an application of the given rule.
+     *
+     * @see TermLabelRefactoring#shouldRefactorOnBuiltInRule(Rule, Goal, Object)
+     */
+    private boolean shouldRefactorOnTaclet(Taclet taclet) {
+        return !taclet.name().toString().startsWith("arrayLength")
+                && taclet.goalTemplates().size() <= 1;
     }
 
     @SuppressWarnings("unchecked")

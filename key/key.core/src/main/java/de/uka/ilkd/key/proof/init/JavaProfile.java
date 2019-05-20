@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooserBuilder;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -27,10 +26,13 @@ import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
+import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooserBuilder;
+import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.LoopApplyHeadRule;
 import de.uka.ilkd.key.rule.LoopContractExternalRule;
 import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
@@ -100,7 +102,8 @@ public class JavaProfile extends AbstractProfile {
         ImmutableList<TermLabelPolicy> originTermLabelPolicyList =
                 ImmutableSLList.<TermLabelPolicy>nil().append(new OriginTermLabelPolicy());
         ImmutableList<TermLabelRefactoring> originTermLabelRefactorings =
-                ImmutableSLList.<TermLabelRefactoring>nil().append(new OriginTermLabelRefactoring());
+                ImmutableSLList.<TermLabelRefactoring>nil().append(
+                        new OriginTermLabelRefactoring());
 
         ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
         result = result.prepend(
@@ -182,7 +185,7 @@ public class JavaProfile extends AbstractProfile {
                                    .prepend(getOneStepSimpilifier())
                                    .prepend(QueryExpand.INSTANCE)
                                    .prepend(MergeRule.INSTANCE)
-                                   ;//TODO unresolved during merge .prepend(LoopContractApplyHeadRule.INSTANCE);
+                                   .prepend(LoopApplyHeadRule.INSTANCE);
 
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact
         // that Contract insertion rule is the FIRST element of this list!
@@ -289,8 +292,7 @@ public class JavaProfile extends AbstractProfile {
     @Override
     public boolean isSpecificationInvolvedInRuleApp(RuleApp app) {
         return app instanceof LoopInvariantBuiltInRuleApp ||
-                app instanceof AbstractContractRuleApp;
-                //TODO weigl unresolved during merge
-                // ||app instanceof AbstractBlockSpecificationElementBuiltInRuleApp;
+                app instanceof AbstractContractRuleApp ||
+                app instanceof AbstractAuxiliaryContractBuiltInRuleApp;
     }
 }

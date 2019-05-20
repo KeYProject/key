@@ -64,7 +64,7 @@ public class SymbolicLayoutReader {
    public ISymbolicLayout read(File file) throws ParserConfigurationException, SAXException, IOException {
       return read(new FileInputStream(file));
    }
-   
+
    /**
     * Reads from the given {@link InputStream} and closes it.
     * @param in The {@link InputStream} to read from.
@@ -82,7 +82,7 @@ public class SymbolicLayoutReader {
             SAXParser saxParser = factory.newSAXParser();
             SEDSAXHandler handler = new SEDSAXHandler();
             saxParser.parse(in, handler);
-            // Get root 
+            // Get root
             ISymbolicLayout root = handler.getRoot();
             // Return result
             return root;
@@ -95,7 +95,7 @@ public class SymbolicLayoutReader {
          return null;
       }
    }
-   
+
    /**
     * {@link DefaultHandler} implementation used in {@link ExecutionNodeReader#read(InputStream)}.
     * @author Martin Hentschel
@@ -105,22 +105,22 @@ public class SymbolicLayoutReader {
        * The root of the model.
        */
       private ISymbolicLayout root;
-      
+
       /**
        * The hierarchy in building phase.
        */
       private Deque<Object> parentStack = new LinkedList<Object>();
-      
+
       /**
        * Maps each unique object ID to the instantiated {@link ISymbolicObject}.
        */
       private Map<String, ISymbolicObject> objectIdMapping = new LinkedHashMap<String, ISymbolicObject>();
-      
+
       /**
        * Maps a {@link KeYlessAssociation} to its target object ID.
        */
-      private Map<KeYlessAssociation, String> associationTargetMapping = new LinkedHashMap<KeYlessAssociation, String>(); 
-      
+      private Map<KeYlessAssociation, String> associationTargetMapping = new LinkedHashMap<KeYlessAssociation, String>();
+
       /**
        * {@inheritDoc}
        */
@@ -201,7 +201,7 @@ public class SymbolicLayoutReader {
             parentStack.removeFirst();
          }
       }
-      
+
       /**
        * {@inheritDoc}
        */
@@ -347,7 +347,7 @@ public class SymbolicLayoutReader {
    protected String getName(Attributes attributes) {
       return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_NAME);
    }
-   
+
    /**
     * Returns the array index value.
     * @param attributes The {@link Attributes} which provides the content.
@@ -402,7 +402,7 @@ public class SymbolicLayoutReader {
       return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_TERM);
    }
 
-   
+
    /**
     * An implementation of {@link ISymbolicElement} which is independent
     * from KeY and provides such only children and default attributes.
@@ -428,7 +428,7 @@ public class SymbolicLayoutReader {
        * The state.
        */
       private ISymbolicState state;
-      
+
       /**
        * The objects.
        */
@@ -463,7 +463,7 @@ public class SymbolicLayoutReader {
       public ImmutableList<ISymbolicObject> getObjects() {
          return objects;
       }
-      
+
       /**
        * Add a new child {@link ISymbolicObject}.
        * @param object The {@link ISymbolicObject} to add.
@@ -479,7 +479,7 @@ public class SymbolicLayoutReader {
       public ImmutableList<ISymbolicEquivalenceClass> getEquivalenceClasses() {
          return equivalenceClasses;
       }
-      
+
       /**
        * Add a new child {@link ISymbolicEquivalenceClass}.
        * @param object The {@link ISymbolicEquivalenceClass} to add.
@@ -488,7 +488,7 @@ public class SymbolicLayoutReader {
          equivalenceClasses = equivalenceClasses.append(ec);
       }
    }
-   
+
    /**
     * An implementation of {@link ISymbolicAssociationValueContainer} which is independent
     * from KeY and provides such only children and default attributes.
@@ -499,7 +499,7 @@ public class SymbolicLayoutReader {
        * The associations.
        */
       private ImmutableList<ISymbolicAssociation> associations = ImmutableSLList.nil();
-      
+
       /**
        * The values.
        */
@@ -512,7 +512,7 @@ public class SymbolicLayoutReader {
       public ImmutableList<ISymbolicAssociation> getAssociations() {
          return associations;
       }
-      
+
       /**
        * Adds a new child {@link ISymbolicAssociation}
        * @param association The {@link ISymbolicAssociation} to add.
@@ -528,7 +528,7 @@ public class SymbolicLayoutReader {
       public ImmutableList<ISymbolicValue> getValues() {
          return values;
       }
-      
+
       /**
        * Adds a new child {@link ISymbolicValue}.
        * @param value The value to add.
@@ -537,7 +537,7 @@ public class SymbolicLayoutReader {
          values = values.append(value);
       }
    }
-   
+
    /**
     * An implementation of {@link ISymbolicState} which is independent
     * from KeY and provides such only children and default attributes.
@@ -570,8 +570,8 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
-      public ISymbolicAssociation getAssociation(IProgramVariable programVariable, 
-                                                 boolean isArrayIndex, 
+      public ISymbolicAssociation getAssociation(IProgramVariable programVariable,
+                                                 boolean isArrayIndex,
                                                  Term arrayIndex,
                                                  Term condition) {
          return null;
@@ -581,14 +581,14 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
-      public ISymbolicValue getValue(IProgramVariable programVariable, 
-                                     boolean isArrayIndex, 
+      public ISymbolicValue getValue(IProgramVariable programVariable,
+                                     boolean isArrayIndex,
                                      Term arrayIndex,
                                      Term condition) {
          return null;
       }
    }
-   
+
    /**
     * An implementation of {@link ISymbolicObject} which is independent
     * from KeY and provides such only children and default attributes.
@@ -599,7 +599,7 @@ public class SymbolicLayoutReader {
        * The name.
        */
       private String nameString;
-      
+
       /**
        * The type.
        */
@@ -614,6 +614,14 @@ public class SymbolicLayoutReader {
          super();
          this.nameString = nameString;
          this.typeString = typeString;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String toString() {
+         return "Object " + getNameString();
       }
 
       /**
@@ -652,8 +660,8 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
-      public ISymbolicAssociation getAssociation(IProgramVariable programVariable, 
-                                                 boolean isArrayIndex, 
+      public ISymbolicAssociation getAssociation(IProgramVariable programVariable,
+                                                 boolean isArrayIndex,
                                                  Term arrayIndex,
                                                  Term condition) {
          return null;
@@ -663,14 +671,14 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
-      public ISymbolicValue getValue(IProgramVariable programVariable, 
-                                     boolean isArrayIndex, 
+      public ISymbolicValue getValue(IProgramVariable programVariable,
+                                     boolean isArrayIndex,
                                      Term arrayIndex,
                                      Term condition) {
          return null;
       }
    }
-   
+
    /**
     * An implementation of {@link ISymbolicValue} which is independent
     * from KeY and provides such only children and default attributes.
@@ -681,7 +689,7 @@ public class SymbolicLayoutReader {
        * The program variable.
        */
       private String programVariableString;
-      
+
       /**
        * The value.
        */
@@ -711,7 +719,7 @@ public class SymbolicLayoutReader {
        * The optional condition under which this value is valid.
        */
       private String conditionString;
-      
+
       /**
        * Constructor.
        * @param name The name.
@@ -731,6 +739,14 @@ public class SymbolicLayoutReader {
          this.valueString = valueString;
          this.typeString = typeString;
          this.conditionString = conditionString;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String toString() {
+         return "Value of " + getName() + " is " + getValueString();
       }
 
       /**
@@ -829,7 +845,7 @@ public class SymbolicLayoutReader {
          return conditionString;
       }
    }
-   
+
    /**
     * An implementation of {@link ISymbolicAssociation} which is independent
     * from KeY and provides such only children and default attributes.
@@ -840,7 +856,7 @@ public class SymbolicLayoutReader {
        * The program variable.
        */
       private String programVariableString;
-      
+
       /**
        * The target.
        */
@@ -895,6 +911,14 @@ public class SymbolicLayoutReader {
          this.arrayIndexString = arrayIndexString;
          this.target = target;
          this.conditionString = conditionString;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String toString() {
+         return "Association " + getName() + " to " + getTarget();
       }
 
       /**
@@ -977,7 +1001,7 @@ public class SymbolicLayoutReader {
          return conditionString;
       }
    }
-   
+
    /**
     * An implementation of {@link ISymbolicEquivalenceClass} which is independent
     * from KeY and provides such only children and default attributes.
@@ -988,7 +1012,7 @@ public class SymbolicLayoutReader {
        * The terms.
        */
       private ImmutableList<String> termStrings;
-      
+
       /**
        * The representative term.
        */
@@ -1027,7 +1051,7 @@ public class SymbolicLayoutReader {
       public ImmutableList<String> getTermStrings() {
          return termStrings;
       }
-      
+
       /**
        * Add a new child term string.
        * @param object The term string to add.

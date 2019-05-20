@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -200,7 +200,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
             quantifiableVarsToSchemaVars.putAll(
                     collectQuantifiableVariables(replaceWithTerm, services));
             final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars,
-                                                 services.getTermFactory());
+                                                 services.getTermFactory(), services.getProof());
             schemaFind = or.replace(schemaFind);
             schemaAssumes = or.replace(schemaAssumes);
             replaceWithTerm = or.replace(replaceWithTerm);

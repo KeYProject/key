@@ -1,16 +1,21 @@
 package org.key_project.ui.interactionlog.model;
 
+import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.macros.scripts.EngineState;
+import de.uka.ilkd.key.macros.scripts.RuleCommand;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import org.key_project.ui.interactionlog.algo.InteractionVisitor;
 import org.key_project.util.collection.ImmutableMapEntry;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -19,6 +24,7 @@ import java.util.Iterator;
  */
 @XmlRootElement
 public final class RuleInteraction extends NodeInteraction {
+    private static final long serialVersionUID = -3178292652264875668L;
     private String ruleName;
     private OccurenceIdentifier posInOccurence;
     private HashMap<String, String> arguments = new HashMap<>();
@@ -66,11 +72,6 @@ public final class RuleInteraction extends NodeInteraction {
         return ruleName;
     }
 
-    @Override
-    public <T> T accept(InteractionVisitor<T> visitor) {
-        return visitor.visit(this);
-    }
-
     public OccurenceIdentifier getPosInOccurence() {
         return posInOccurence;
     }
@@ -93,5 +94,54 @@ public final class RuleInteraction extends NodeInteraction {
 
     public void setArguments(HashMap<String, String> arguments) {
         this.arguments = arguments;
+    }
+
+    @Override
+    public String getMarkdown() {
+        StringBuilder out = new StringBuilder();
+        out.append(String.format("## Rule applied %s%n%n", getRuleName()));
+        out.append(String.format("* applied on%s%n", getPosInOccurence()));
+        out.append(String.format("* Parameters %n"));
+        getArguments().forEach((key, value) ->
+                out.append(String.format("  * %s : %s%n", key, value)));
+        out.append('\n');
+        return out.toString();
+    }
+
+    @Override
+    public String getProofScriptRepresentation() {
+        StringWriter sout = new StringWriter();
+        PrintWriter out = new PrintWriter(sout);
+
+        out.format("rule %s%n", getRuleName());
+        out.format("\t     on = \"%s\"%n\tformula = \"%s\"%n",
+                getPosInOccurence().getTerm(),
+                getPosInOccurence().getToplevelTerm()
+        );
+
+        getArguments().forEach((k, v) ->
+                out.format("     inst_%s = \"%s\"%n", firstWord(k), v.trim()));
+        out.format(";%n");
+        return sout.toString();
+    }
+
+    private String firstWord(String k) {
+        k = k.trim();
+        int p = k.indexOf(' ');
+        if (p <= 0) return k;
+        else return k.substring(0, p);
+    }
+
+    @Override
+    public void reapply(WindowUserInterfaceControl uic, Goal goal) throws Exception {
+        RuleCommand ruleCommand = new RuleCommand();
+        EngineState state = new EngineState(goal.proof());
+        RuleCommand.Parameters parameter = null;
+        try {
+            parameter = ruleCommand.evaluateArguments(state, getArguments());
+            ruleCommand.execute(uic, parameter, state);
+        } catch (Exception e) {
+            throw new IllegalStateException("Rule application", e);
+        }
     }
 }

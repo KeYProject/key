@@ -50,7 +50,7 @@ public class LoopInvariantRuleCompletion implements
         final While loop = loopApp.getLoopStatement();
 
         LoopSpecification inv = loopApp.getSpec();
-        if (inv == null) { // no invariant present, get it interactively
+        if (inv == null) { // no invariant present, lookupAndOverride it interactively
             MethodFrame mf = JavaTools.getInnermostMethodFrame(progPost.javaBlock(),
                                                                services);
             inv = new LoopSpecImpl(loop,
@@ -75,7 +75,7 @@ public class LoopInvariantRuleCompletion implements
                     && !loopApp.variantAvailable();
             // Check if a variant is required
             if (!forced || !loopApp.invariantAvailable() || requiresVariant) {
-                // get invariant or variant interactively
+                // lookupAndOverride invariant or variant interactively
                 try {
                     inv = InvariantConfigurator.getInstance().getLoopInvariant(
                             inv, services, requiresVariant, loopApp.getHeapContext());

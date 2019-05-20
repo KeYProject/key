@@ -181,7 +181,7 @@ public class ClassTree extends JTree {
         int index = -1;
         DefaultMutableTreeNode node = rootNode;
         do {
-            //get next part of the name
+            //lookupAndOverride next part of the name
             int lastIndex = index;
             index = fullClassName.indexOf(".", ++index);
             if(index == -1) {
@@ -189,7 +189,7 @@ public class ClassTree extends JTree {
             }
             String namePart = fullClassName.substring(lastIndex + 1, index);
             
-            //try to get child node; otherwise, create and insert it
+            //try to lookupAndOverride child node; otherwise, create and insert it
             DefaultMutableTreeNode childNode = getChildByString(node, namePart);
             if(childNode == null) {
                 Entry te = new Entry(namePart);
@@ -308,7 +308,7 @@ public class ClassTree extends JTree {
     private static DefaultMutableTreeNode createTree(boolean addContractTargets,
 	    					     boolean skipLibraryClasses,
 	    					     Services services) {
-	//get all classes
+	//lookupAndOverride all classes
 	final Set<KeYJavaType> kjts 
 		= services.getJavaInfo().getAllKeYJavaTypes();
 	final Iterator<KeYJavaType> it = kjts.iterator();
@@ -344,7 +344,7 @@ public class ClassTree extends JTree {
     
     
     private void open(KeYJavaType kjt, IObserverFunction target) {
-        //get tree path to class
+        //lookupAndOverride tree path to class
         Vector<DefaultMutableTreeNode> pathVector  = new Vector<DefaultMutableTreeNode>();
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) getModel().getRoot();
         assert node != null;        

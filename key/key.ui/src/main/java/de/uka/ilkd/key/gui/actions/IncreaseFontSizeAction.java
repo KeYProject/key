@@ -15,7 +15,7 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 
-import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
@@ -33,12 +33,13 @@ public class IncreaseFontSizeAction extends MainWindowAction implements ConfigCh
      * @param mainWindow the main window
      */
     public IncreaseFontSizeAction(MainWindow mainWindow) {
-	super(mainWindow);
+        super(mainWindow);
 	
-	setName("Larger");
+        setName("Larger");
         setIcon(IconFactory.plus(16));
 
         Config.DEFAULT.addConfigChangeListener(this);
+        lookupAcceleratorKey();
     }
     
     @Override

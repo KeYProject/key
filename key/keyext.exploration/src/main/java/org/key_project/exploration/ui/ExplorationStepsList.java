@@ -1,5 +1,7 @@
 package org.key_project.exploration.ui;
 
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -14,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ExplorationStepsList extends JPanel {
+public class ExplorationStepsList extends JPanel implements TabPanel {
     private JButton cancelButton = new JButton("Cancel");
     private JButton jumpToNode = new JButton("Jump To Node");
     private JButton pruneExploration = new JButton("Prune Selected Exploration Steps");
@@ -22,7 +24,7 @@ public class ExplorationStepsList extends JPanel {
     private DefaultTreeModel dtm;
     private JPanel buttonPanel = new JPanel();
 
-    public ExplorationStepsList() throws HeadlessException {
+    public ExplorationStepsList(MainWindow window) throws HeadlessException {
         initialize();
     }
 
@@ -107,6 +109,16 @@ public class ExplorationStepsList extends JPanel {
         this.add(p1, BorderLayout.CENTER);
         this.add(p2, BorderLayout.NORTH);
         this.add(buttonPanel, BorderLayout.SOUTH);
+    }
+
+    @Override
+    public String getTitle() {
+        return "Exploration Steps";
+    }
+
+    @Override
+    public JComponent getComponent() {
+        return this;
     }
 
     private class MyCellRenderer extends DefaultListCellRenderer {

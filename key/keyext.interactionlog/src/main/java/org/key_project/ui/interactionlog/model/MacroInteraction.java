@@ -1,11 +1,12 @@
 package org.key_project.ui.interactionlog.model;
 
+import de.uka.ilkd.key.api.ProofMacroApi;
+import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import org.key_project.ui.interactionlog.algo.InteractionVisitor;
 import org.key_project.util.collection.ImmutableList;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -41,7 +42,6 @@ public final class MacroInteraction extends NodeInteraction {
     public MacroInteraction(Node node, ProofMacro macro,
                             PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
         super(node);
-        System.out.println("macro");
         this.macroName = macro.getScriptCommandName();
         this.pos = posInOcc;
         this.info = info.toString();
@@ -54,11 +54,6 @@ public final class MacroInteraction extends NodeInteraction {
     @Override
     public String toString() {
         return macroName;
-    }
-
-    @Override
-    public <T> T accept(InteractionVisitor<T> visitor) {
-        return visitor.visit(this);
     }
 
     public String getMacro() {
@@ -99,5 +94,32 @@ public final class MacroInteraction extends NodeInteraction {
 
     public void setOpenGoalNodeIds(List<NodeIdentifier> openGoalNodeIds) {
         this.openGoalNodeIds = openGoalNodeIds;
+    }
+
+    @Override
+    public String getMarkdown() {
+        return String.format("## Applied macro %s%n```%n%s%n```", getMacro(), getInfo());
+    }
+
+    @Override
+    public String getProofScriptRepresentation() {
+        return String.format("macro %s;%n", getMacro());
+    }
+
+    @Override
+    public void reapply(WindowUserInterfaceControl uic, Goal goal) throws Exception {
+        ProofMacro macro = new ProofMacroApi().getMacro(getMacro());
+        PosInOccurrence pio = getPos();
+        if (macro != null) {
+            if (!macro.canApplyTo(goal.node(), pio)) {
+                throw new IllegalStateException("Macro not applicable");
+            }
+
+            try {
+                macro.applyTo(uic, goal.node(), pio, uic);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

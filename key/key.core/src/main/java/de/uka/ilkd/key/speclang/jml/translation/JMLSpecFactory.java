@@ -615,7 +615,7 @@ public class JMLSpecFactory {
                     paramVars, null, null, atPres, atBefores, specType, Term.class, services);
 
             // less than nothing is marked by some special term;
-            if (translated == tb.strictlyNothing()) {
+            if (translated.equalsModIrrelevantTermLabels(tb.strictlyNothing())) {
                 if (originalClauses.size() > 1) {
                     throw new SLTranslationException(
                             "\"assignable \\less_than_nothing\" does not go with other "
@@ -751,7 +751,7 @@ public class JMLSpecFactory {
                     paramVars, null, null, null, null, Term.class, services);
 
             // less than nothing is marked by some special term;
-            if (translated == tb.strictlyNothing()) {
+            if (translated.equalsModIrrelevantTermLabels(tb.strictlyNothing())) {
                 return true;
             }
         }

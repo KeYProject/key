@@ -15,6 +15,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -94,6 +95,14 @@ public final class ContractAxiom extends ClassAxiom {
     }
 
     @Override
+    public ContractAxiom map(UnaryOperator<Term> op, Services services) {
+        return new ContractAxiom(
+                name, displayName, target, kjt, visibility,
+                op.apply(originalPre), op.apply(originalPost), op.apply(originalMby),
+                atPreVars, originalSelfVar, originalResultVar, originalParamVars);
+    }
+
+    @Override
     public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, Services services) {
 
         final boolean satisfiabilityGuard = true; // XXX
@@ -122,35 +131,40 @@ public final class ContractAxiom extends ClassAxiom {
     public boolean equals(Object o) {
        if (o == null || this.getClass() != o.getClass()) return false;
        final ContractAxiom other = (ContractAxiom) o;
-       
+
        if (!name.equals(other.name)) return false;
        if (!target.equals(other.target)) return false;
        if (!kjt.equals(other.kjt)) return false;
-       
+
        return true;
     }
-    
+
     @Override
     public int hashCode() {
        return 17*(name.hashCode() + 17 * target.hashCode());
     }
-    
+
+    @Override
     public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(Services services) {
         return MiscTools.collectObservers(originalPre).union(MiscTools.collectObservers(originalPost));
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public IObserverFunction getTarget() {
         return target;
     }
 
+    @Override
     public KeYJavaType getKJT() {
         return kjt;
     }
 
+    @Override
     public VisibilityModifier getVisibility() {
         return visibility;
     }

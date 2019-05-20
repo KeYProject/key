@@ -13,7 +13,14 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Color;
+import de.uka.ilkd.key.gui.SearchBar;
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.util.Pair;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
@@ -21,16 +28,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import de.uka.ilkd.key.gui.SearchBar;
-import de.uka.ilkd.key.pp.HideSequentPrintFilter;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.IllegalRegexException;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.RegroupSequentPrintFilter;
-import de.uka.ilkd.key.pp.SearchSequentPrintFilter;
-import de.uka.ilkd.key.util.Pair;
+
 
 /*
  * Search bar implementing search function for SequentView.
@@ -39,15 +37,24 @@ import de.uka.ilkd.key.util.Pair;
 public class SequentViewSearchBar extends SearchBar {
 
     private static final long serialVersionUID = 9102464983776181771L;
-    public static final Color SEARCH_HIGHLIGHT_COLOR_1 = new Color(0, 140, 255, 178);
-    public static final Color SEARCH_HIGHLIGHT_COLOR_2 = new Color(0, 140, 255, 100);
+    public static final ColorSettings.ColorProperty SEARCH_HIGHLIGHT_COLOR_1 =
+            ColorSettings.define("[sequentSearchBar]highlight_1", "",
+                    new Color(0, 140, 255, 178));
+
+    public static final ColorSettings.ColorProperty SEARCH_HIGHLIGHT_COLOR_2 =
+            ColorSettings.define("[sequentSearchBar]highlight_2", "",
+                    new Color(0, 140, 255, 100));
 
     public static enum SearchMode {
-        HIGHLIGHT("Highlight"), HIDE("Hide"), REGROUP("Regroup");
+        HIGHLIGHT("Highlight", IconFactory.SEARCH_HIGHLIGHT.get(16)),
+        HIDE("Hide", IconFactory.SEARCH_HIDE.get(16)),
+        REGROUP("Regroup", IconFactory.SEARCH_REGROUP.get(16));
         private String displayName;
+        public final Icon icon;
 
-        private SearchMode(String name) {
+        private SearchMode(String name, Icon icon) {
             this.displayName = name;
+            this.icon = icon;
         }
 
         @Override
@@ -77,6 +84,10 @@ public class SequentViewSearchBar extends SearchBar {
 
     public SequentView getSequentView() {
         return this.sequentView;
+    }
+
+    public void setSearchMode(SearchMode mode) {
+        searchModeBox.setSelectedItem(mode);
     }
 
     @Override
@@ -200,7 +211,7 @@ public class SequentViewSearchBar extends SearchBar {
         boolean loopEnterd = false;
         while (m.find()) {
             int foundAt = m.start();
-            Object highlight = sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2);
+            Object highlight = sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2.get());
             searchResults.add(new Pair<Integer, Object>(foundAt, highlight));
             sequentView.paintHighlight(new Range(foundAt, m.end()), highlight);
             loopEnterd = true;
@@ -208,19 +219,35 @@ public class SequentViewSearchBar extends SearchBar {
         return loopEnterd;
     }
 
+    /**
+    * searches for the given string and displays the search-bar.
+    * @param searchTerm string to search for. If regex is enabled, the string will be escaped
+    */
+    public void searchFor(String searchTerm) {
+        if (regExpCheckBox.isSelected()) {
+            // https://stackoverflow.com/questions/60160/how-to-escape-text-for-regular-expression-in-java
+            String escaped = searchTerm.replaceAll("[-\\[\\]{}()*+?.,\\\\\\\\^$|#\\\\s]", "\\\\$0");
+            searchField.setText(escaped);
+        } else {
+            searchField.setText(searchTerm);
+        }
+        setVisible(true);
+        search();
+    }
+
     private void setExtraHighlight(int resultIndex) {
-        resetHighlight(resultIndex, sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_1));
+        resetHighlight(resultIndex, sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_1.get()));
         sequentView.setCaretPosition(searchResults.get(resultIndex).first);
     }
 
     private void resetExtraHighlight() {
-        resetHighlight(resultIteratorPos, sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2));
+        resetHighlight(resultIteratorPos, sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2.get()));
     }
 
     private void resetHighlight(int resultIndex, Object highlight) {
         int pos = searchResults.get(resultIndex).first;
         sequentView.removeHighlight(searchResults.get(resultIndex).second);
-        Pair<Integer, Object> highlightPair = new Pair<Integer, Object>(pos, highlight);
+        Pair<Integer, Object> highlightPair = new Pair<>(pos, highlight);
         sequentView.paintHighlight(new Range(pos, pos + searchField.getText().length()), highlight);
         searchResults.set(resultIndex, highlightPair);
     }

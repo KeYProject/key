@@ -17,7 +17,7 @@ import java.util.List;
 public abstract class ContextMenuAdapter implements KeYGuiExtension.ContextMenu {
     @Override
     public final List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, Object underlyingObject) {
-        switch (kind) {
+        switch ((DefaultContextMenuKind) kind) {
             case PROOF_LIST:
                 return getContextActions(mediator, kind, (Proof) underlyingObject);
             case PROOF_TREE:

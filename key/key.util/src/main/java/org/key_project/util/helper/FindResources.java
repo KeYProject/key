@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
  * @author Alexander Weigl
  * @version 1 (13.02.19)
  */
-@SuppressWarnings("Duplicates")
 public final class FindResources {
     /**
      * List directory contents for a resource folder. Not recursive.

@@ -3,7 +3,7 @@
    <methodCall name="&lt;call LoopSplittingCondition.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int i = x&gt;=0 ?x :-x;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <loopInvariant name="invariant: geq(i, Z(0(#)));
+            <loopInvariant name="invariant: i &gt;= 0;
 variant: i
 mod: false" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" initiallyValid="true">
                <branchCondition name="update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\[{method-frame(source=main(int)@LoopSplittingCondition): {
@@ -103,7 +103,7 @@ mod: false" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" i
             </loopInvariant>
          </branchCondition>
          <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <loopInvariant name="invariant: geq(i, Z(0(#)));
+            <loopInvariant name="invariant: i &gt;= 0;
 variant: i
 mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initiallyValid="true">
                <branchCondition name="update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\[{method-frame(source=main(int)@LoopSplittingCondition): {

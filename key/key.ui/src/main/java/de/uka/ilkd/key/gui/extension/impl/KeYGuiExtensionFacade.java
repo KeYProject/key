@@ -2,9 +2,11 @@ package de.uka.ilkd.key.gui.extension.impl;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.pp.PosInSequent;
 import org.key_project.util.ServiceLoaderUtil;
 
 import javax.swing.*;
@@ -15,9 +17,6 @@ import java.util.function.ToIntFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static de.uka.ilkd.key.gui.extension.api.KeYExtConstants.PATH;
-import static de.uka.ilkd.key.gui.extension.api.KeYExtConstants.PRIORITY;
 
 /**
  * Facade for retrieving the GUI extensions.
@@ -32,24 +31,16 @@ public final class KeYGuiExtensionFacade {
 
     //region panel extension
     @SuppressWarnings("todo")
-    public static List<KeYGuiExtension.LeftPanel> getAllPanels() {
-        return getExtensionInstances(KeYGuiExtension.LeftPanel.class);
+    public static Stream<TabPanel> getAllPanels(MainWindow window) {
+        return getLeftPanel().stream().flatMap(it -> it.getPanels(window, window.getMediator()).stream());
     }
 
-    /**
-     * Try to find a specific implementation of a {@link KeYGuiExtension.LeftPanel}
-     *
-     * @param clazz
-     * @param <T>
-     * @return
-     */
-    @SuppressWarnings("cast")
-    public static <T extends KeYGuiExtension.LeftPanel> Optional<T> getPanel(Class<T> clazz) {
-        Optional<KeYGuiExtension.LeftPanel> v = getAllPanels().stream()
-                .filter(it -> it.getClass().isAssignableFrom(clazz))
-                .findAny();
-        return (Optional<T>) v;
+    public static List<KeYGuiExtension.LeftPanel> getLeftPanel() {
+        return getExtensionInstances(KeYGuiExtension.LeftPanel.class);
     }
+    //endregion
+
+    //region main menu extension
 
     /**
      * Retrieves all known implementation of the {@link KeYGuiExtension.MainMenu}
@@ -59,30 +50,34 @@ public final class KeYGuiExtensionFacade {
     public static List<KeYGuiExtension.MainMenu> getMainMenuExtensions() {
         return getExtensionInstances(KeYGuiExtension.MainMenu.class);
     }
-    //endregion
 
-    //region main menu extension
-
-    /**
-     * Creates the extension menu of all known {@link KeYGuiExtension.MainMenu}.
-     *
-     * @return a menu
-     */
-    public static JMenu createExtensionMenu(MainWindow mainWindow) {
+    public static Stream<Action> getMainMenuActions(MainWindow mainWindow) {
         ToIntFunction<Action> func = (Action a) -> {
-            Integer i = (Integer) a.getValue(PRIORITY);
+            Integer i = (Integer) a.getValue(KeyAction.PRIORITY);
             if (i == null) return 0;
             else return i;
         };
 
-        List<KeYGuiExtension.MainMenu> kmm = getMainMenuExtensions();
+        return KeYGuiExtensionFacade.getMainMenuExtensions()
+                .stream()
+                .flatMap(it -> it.getMainMenuActions(mainWindow).stream())
+                .sorted(Comparator.comparingInt(func));
+    }
+
+    /**
+     * Adds all registered and activated {@link KeYGuiExtension.MainMenu} to the given menuBar.
+     *
+     * @return a menu
+     */
+    public static void addExtensionsToMainMenu(MainWindow mainWindow, JMenuBar menuBar) {
         JMenu menu = new JMenu("Extensions");
-        for (KeYGuiExtension.MainMenu it : kmm) {
-            List<Action> actions = it.getMainMenuActions(mainWindow);
-            actions.sort(Comparator.comparingInt(func));
-            sortActionsIntoMenu(actions, menu);
+        getMainMenuActions(mainWindow).forEach(it ->
+                sortActionIntoMenu(it, menuBar, menu));
+
+        if (menu.getMenuComponents().length > 0) {
+            menuBar.add(menu);
         }
-        return menu;
+
     }
 
     /*
@@ -96,28 +91,54 @@ public final class KeYGuiExtensionFacade {
     }*/
 
     //region Menu Helper
-    private static void sortActionsIntoMenu(List<Action> actions, JMenu menu) {
-        actions.forEach(act -> sortActionIntoMenu(act, menu));
+    private static void sortActionsIntoMenu(List<Action> actions, JMenuBar menuBar) {
+        actions.forEach(act -> sortActionIntoMenu(act, menuBar, new JMenu()));
     }
-    //endregion
 
-    private static void sortActionIntoMenu(Action act, JMenu menu) {
-        Object path = act.getValue(PATH);
+    private static Iterator<String> getMenuPath(Action act) {
+        Object path = act.getValue(KeyAction.PATH);
         String spath;
         if (path == null) spath = "";
         else spath = path.toString();
-        Iterator<String> mpath = Pattern.compile(Pattern.quote(".")).splitAsStream(spath).iterator();
+        return Pattern.compile(Pattern.quote(".")).splitAsStream(spath).iterator();
+    }
+
+    private static void sortActionIntoMenu(Action act, JMenu menu) {
+        Iterator<String> mpath = getMenuPath(act);
         JMenu a = findMenu(menu, mpath);
         a.add(act);
+    }
+
+    private static void sortActionIntoMenu(Action act, JMenuBar menuBar, JMenu defaultMenu) {
+        Iterator<String> mpath = getMenuPath(act);
+        JMenu a = findMenu(menuBar, mpath, defaultMenu);
+        a.add(act);
+    }
+
+    private static JMenu findMenu(JMenuBar menuBar, Iterator<String> mpath, JMenu defaultMenu) {
+        if (mpath.hasNext()) {
+            String cur = mpath.next();
+            for (int i = 0; i < menuBar.getMenuCount(); i++) {
+                JMenu menu = menuBar.getMenu(i);
+                if (Objects.equals(menu.getText(), cur)) {
+                    return findMenu(menu, mpath);
+                }
+            }
+            JMenu menu = new JMenu(cur);
+            menu.setName(cur);
+            menuBar.add(menu);
+            return findMenu(menu, mpath);
+        }
+        return defaultMenu;
     }
 
     private static JMenu findMenu(JMenu menu, Iterator<String> mpath) {
         if (mpath.hasNext()) {
             String cur = mpath.next();
             Component[] children = menu.getMenuComponents();
-            for (int i = 0; i < children.length; i++) {
-                if (Objects.equals(children[i].getName(), cur)) {
-                    JMenu sub = (JMenu) children[i];
+            for (Component child : children) {
+                if (Objects.equals(child.getName(), cur)) {
+                    JMenu sub = (JMenu) child;
                     return findMenu(sub, mpath);
                 }
             }
@@ -128,6 +149,7 @@ public final class KeYGuiExtensionFacade {
         } else
             return menu;
     }
+    //endregion
 
     /**
      * Retrieves all known implementation of the {@link KeYGuiExtension.Toolbar}
@@ -192,9 +214,9 @@ public final class KeYGuiExtensionFacade {
     private static void loadExtensions() {
         extensions = ServiceLoaderUtil.stream(KeYGuiExtension.class)
                 .filter(KeYGuiExtensionFacade::isNotForbidden)
+                .distinct()
                 .map(Extension::new)
                 .sorted()
-                .distinct()
                 .collect(Collectors.toList());
     }
 
@@ -254,6 +276,52 @@ public final class KeYGuiExtensionFacade {
         return getExtensionInstances(KeYGuiExtension.Settings.class);
     }
 
+    public static List<KeYGuiExtension.Startup> getStartupExtensions() {
+        return getExtensionInstances(KeYGuiExtension.Startup.class);
+    }
+
+
+    //region keyboard shortcuts
+    public static List<KeYGuiExtension.KeyboardShortcuts> getKeyboardShortcutsExtensions() {
+        return getExtensionInstances(KeYGuiExtension.KeyboardShortcuts.class);
+    }
+
+    public static Stream<Action> getKeyboardShortcuts(KeYMediator mediator, String componentId, JComponent component) {
+        return getKeyboardShortcutsExtensions().stream()
+                .flatMap(it -> it.getShortcuts(mediator, componentId, component).stream())
+                .sorted(new ActionPriorityComparator());
+    }
+
+    /**
+     * @param mediator
+     * @param component
+     * @param componentId
+     */
+    public static void installKeyboardShortcuts(KeYMediator mediator, JComponent component, String componentId) {
+        Stream<Action> provider = getKeyboardShortcuts(mediator, componentId, component);
+        provider.forEach(it -> {
+            int condition =
+                    it.getValue(KeyAction.SHORTCUT_FOCUSED_CONDITION) != null
+                            ? (int) it.getValue(KeyAction.SHORTCUT_FOCUSED_CONDITION)
+                            : JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
+
+            KeyStroke ks = (KeyStroke)
+                    (it.getValue(KeyAction.LOCAL_ACCELERATOR) != null
+                            ? it.getValue(KeyAction.LOCAL_ACCELERATOR)
+                            : it.getValue(Action.ACCELERATOR_KEY));
+
+            component.registerKeyboardAction(it, ks, condition);
+        });
+    }
+    //endregion
+
+
+    public static Stream<String> getTermInfoStrings(
+            MainWindow mainWindow, PosInSequent mousePos) {
+        return getExtensionInstances(KeYGuiExtension.TermInfo.class).stream().flatMap(
+                it -> it.getTermInfoStrings(mainWindow, mousePos).stream());
+    }
+
     /**
      * Disables the clazz from further loading.
      * <p>
@@ -280,5 +348,20 @@ public final class KeYGuiExtensionFacade {
      */
     public void allowClass(String clazz) {
         forbiddenPlugins.remove(clazz);
+    }
+
+    private static class ActionPriorityComparator implements Comparator<Action> {
+        @Override
+        public int compare(Action o1, Action o2) {
+            int a = getPriority(o1);
+            int b = getPriority(o1);
+            return a - b;
+        }
+
+        private int getPriority(Action action) {
+            if (action.getValue(KeyAction.PRIORITY) != null)
+                return (int) action.getValue(KeyAction.PRIORITY);
+            return 0;
+        }
     }
 }

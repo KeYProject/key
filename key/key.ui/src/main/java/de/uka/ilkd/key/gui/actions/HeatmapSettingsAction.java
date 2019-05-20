@@ -3,9 +3,8 @@ package de.uka.ilkd.key.gui.actions;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.HeatmapOptionsDialog;
-import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.extension.api.KeYExtConstants;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 
 import java.awt.event.ActionEvent;
@@ -28,7 +27,7 @@ public class HeatmapSettingsAction extends MainWindowAction {
     public HeatmapSettingsAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Heatmap Options");
-        putValue(KeYExtConstants.PATH, "Heatmap");
+        setMenuPath("View.Heatmap");
         setEnabled(getMediator().getSelectedProof() != null);
         setIcon(IconFactory.selectDecProcArrow(MainWindow.TOOLBAR_ICON_SIZE));
 

@@ -15,6 +15,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -273,6 +274,21 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     //-------------------------------------------------------------------------
     // Public Interface
     //-------------------------------------------------------------------------
+
+    @Override
+    public MethodWellDefinedness map(UnaryOperator<Term> op, Services services) {
+        // TODO Auto-generated method stub
+        return new MethodWellDefinedness(
+                getName(), id(), type(), getTarget(), getHeap(), getOrigVars(),
+                getRequires().map(op),
+                op.apply(getAssignable()), op.apply(getAccessible()),
+                getEnsures().map(op),
+                op.apply(getMby()), op.apply(getRepresents()),
+                contract.map(op, services),
+                op.apply(globalDefs), op.apply(axiom),
+                modelField,
+                services.getTermBuilder());
+    }
 
     public Contract getMethodContract() {
         return this.contract;

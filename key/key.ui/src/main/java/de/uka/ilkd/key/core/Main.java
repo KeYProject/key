@@ -20,6 +20,7 @@ import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -73,6 +74,11 @@ public final class Main {
      * fallback solution if storing all closed goals needs too much memory.
      */
     private static final String NO_PRUNING_CLOSED = "--no-pruning-closed";
+    /**
+     * If this option is set, the (Disk)FileRepo does not delete its temporary directories
+     * (can be used for debugging).
+     */
+    private static final String KEEP_FILEREPOS = "--keep-fileRepos";
     private static final String DEBUG = "--debug";
     private static final String MACRO = "--macro";
     private static final String NO_JMLSPECS = "--no-jmlspecs";
@@ -187,6 +193,8 @@ public final class Main {
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
 
     public static void main(final String[] args) {
+        Locale.setDefault(Locale.US);
+
         // this property overrides the default
         if (Boolean.getBoolean("key.verbose-ui")) {
             verbosity = Verbosity.DEBUG;
@@ -253,6 +261,8 @@ public final class Main {
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
         cl.addOption(NO_PRUNING_CLOSED, null,
                 "disables pruning and goal back in closed branches (saves memory)");
+        cl.addOption(KEEP_FILEREPOS, null, "disables the automatic deletion of temporary"
+                + "directories of file repos (for debugging)");
         cl.addSection("Batchmode options:");
         cl.addOption(TACLET_DIR, "<dir>", "load base taclets from a directory, not from internal structures");
         cl.addOption(DEBUG, null, "start KeY in debug mode");
@@ -454,6 +464,10 @@ public final class Main {
 
         if (cl.isSet(NO_PRUNING_CLOSED)) {
             GeneralSettings.noPruningClosed = true;
+        }
+
+        if (cl.isSet(KEEP_FILEREPOS)) {
+            GeneralSettings.keepFileRepos = true;
         }
     }
 

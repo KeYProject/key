@@ -137,7 +137,7 @@ public class LogicPrinter {
 
     private final SelectPrinter selectPrinter = new SelectPrinter(this);
     private final StorePrinter storePrinter = new StorePrinter(this);
-    
+
     protected HeapLDT getHeapLDT() {
         return services == null ? null : services.getTypeConverter().getHeapLDT();
     }
@@ -448,7 +448,7 @@ public class LogicPrinter {
 
         if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty() || !varsNewDependingOn.isEmpty()) {
             layouter.brk().beginC(2).print("\\varcond (").brk();
-            
+
             int countNewDependingOn = varsNewDependingOn.size() - 1;
             for (NewDependingOn ndo: varsNewDependingOn) {
                 printNewVarDepOnCond(ndo);
@@ -460,7 +460,7 @@ public class LogicPrinter {
                 }
                 --countNewDependingOn;
             }
-            
+
             int countVarsNew = varsNew.size() - 1;
             for (final NewVarcond nvc: varsNew) {
                 printNewVarcond(nvc);
@@ -468,7 +468,7 @@ public class LogicPrinter {
                     layouter.print(",").brk();
                 }
             }
-            
+
             int countNotFreeIn = varsNotFreeIn.size() - 1;
             for (final NotFreeIn pair: varsNotFreeIn) {
                 printNotFreeIn(pair);
@@ -481,9 +481,9 @@ public class LogicPrinter {
             final int countVC = variableConditions.size() - 1;
             for (final VariableCondition vc : variableConditions) {
                 printVariableCondition(vc);
-                if (countVC > 0) { 
+                if (countVC > 0) {
                     layouter.print(",").brk();
-                } 
+                }
             }
             layouter.brk(1,-2).print(")").end();
         }
@@ -1004,15 +1004,18 @@ public class LogicPrinter {
      *
      * @param t the term to be printed.  */
     public void printFunctionTerm(Term t) throws IOException {
-       boolean isKeyword = false;
-       if (services != null) {
-           Function measuredByEmpty =  services.getTermBuilder().getMeasuredByEmpty();
-           BooleanLDT bool = services.getTypeConverter().getBooleanLDT();
-           IntegerLDT integer = services.getTypeConverter().getIntegerLDT();
-           
-           isKeyword = (t.op() == getHeapLDT().getWellFormed() || t.op() == measuredByEmpty 
-                 || t.op() == bool.getFalseConst() || t.op() == bool.getTrueConst()
-                 || t.op() == integer.getBsum());
+        boolean isKeyword = false;
+        if (services != null) {
+            Function measuredByEmpty =  services.getTermBuilder().getMeasuredByEmpty();
+            BooleanLDT bool = services.getTypeConverter().getBooleanLDT();
+            IntegerLDT integer = services.getTypeConverter().getIntegerLDT();
+
+            isKeyword =
+                    (t.op() == getHeapLDT().getWellFormed()
+                    || t.op() == measuredByEmpty
+                    || t.op() == bool.getFalseConst()
+                    || t.op() == bool.getTrueConst()
+                    || t.op() == integer.getBsum());
         }
         if (notationInfo.isPrettySyntax()
                 && services != null && FieldPrinter.isJavaFieldConstant(t, getHeapLDT(), services)
@@ -1023,50 +1026,49 @@ public class LogicPrinter {
             int index = name.lastIndexOf(".");
             String prettyFieldName = name.substring(index+1);
             if (isKeyword) {
-               markStartKeyword(); 
-             }
+                markStartKeyword();
+            }
             layouter.print(prettyFieldName);
             if (isKeyword) {
-               markEndKeyword();
+                markEndKeyword();
             }
-        }
-        else {
+        } else {
             String name = t.op().name().toString();
             startTerm(t.arity());
             boolean alreadyPrinted = false;
-            if (t.op() instanceof SortDependingFunction) {  
-               SortDependingFunction op = (SortDependingFunction) t.op();
-               if (op.getKind().compareTo(AbstractSort.EXACT_INSTANCE_NAME) == 0) {
-                  layouter.print(op.getSortDependingOn().declarationString());
-                  layouter.print("::");
-                  markStartKeyword();
-                  layouter.print(op.getKind().toString());
-                  markEndKeyword();
-                  alreadyPrinted = true;
-               }
+            if (t.op() instanceof SortDependingFunction) {
+                SortDependingFunction op = (SortDependingFunction) t.op();
+                if (op.getKind().compareTo(AbstractSort.EXACT_INSTANCE_NAME) == 0) {
+                    layouter.print(op.getSortDependingOn().declarationString());
+                    layouter.print("::");
+                    markStartKeyword();
+                    layouter.print(op.getKind().toString());
+                    markEndKeyword();
+                    alreadyPrinted = true;
+                }
             }
             if (isKeyword) {
-              markStartKeyword(); 
+                markStartKeyword();
             }
             if (!alreadyPrinted) {
-               layouter.print(name);
+                layouter.print(name);
             }
             if (isKeyword) {
-               markEndKeyword();
+                markEndKeyword();
             }
-            if(!t.boundVars().isEmpty()) {
-        	layouter.print("{").beginC(0);
-        	printVariables(t.boundVars(), quantifiableVariablePrintMode);
-        	layouter.print("}").end();
+            if (!t.boundVars().isEmpty()) {
+                layouter.print("{").beginC(0);
+                printVariables(t.boundVars(), quantifiableVariablePrintMode);
+                layouter.print("}").end();
             }
             if(t.arity() > 0) {
                 layouter.print("(").beginC(0);
-                for(int i = 0, n = t.arity(); i < n; i++) {
+                for (int i = 0, n = t.arity(); i < n; i++) {
                     markStartSub();
                     printTerm(t.sub(i));
                     markEndSub();
 
-                    if(i < n - 1) {
+                    if (i < n - 1) {
                         layouter.print(",").brk(1,0);
                     }
                 }
@@ -1190,7 +1192,7 @@ public class LogicPrinter {
     public void printStore(Term t, boolean closingBrace) throws IOException {
         storePrinter.printStore(t, closingBrace);
     }
-    
+
     /*
      * Print a term of the form: T::seqGet(Seq, int).
      */
@@ -1385,26 +1387,26 @@ public class LogicPrinter {
     public void printElementOf(Term t) throws IOException {
    	assert t.arity() == 3;
    	startTerm(3);
-   
+
    	layouter.print("(").beginC(0);
-   
+
    	markStartSub();
    	printTerm(t.sub(0));
    	markEndSub();
-   
+
    	layouter.print(",").brk(1,0);
-   
+
    	markStartSub();
    	printTerm(t.sub(1));
    	markEndSub();
-   
+
    	layouter.print(")").end();
    	layouter.print(" ");
    	markStartKeyword();
    	layouter.print("\\in");
    	markEndKeyword();
    	layouter.print(" ");
-   
+
    	markStartSub();
    	printTerm(t.sub(2));
    	markEndSub();
@@ -1534,9 +1536,9 @@ public class LogicPrinter {
     {
         boolean isKeyword = false;
         if (services != null) {
-           LocSetLDT loc = services.getTypeConverter().getLocSetLDT();
-           isKeyword = (t.op() == Junctor.AND || t.op() == Junctor.OR || t.op() == Junctor.IMP 
-                 || t.op() == Equality.EQV || t.op() == loc.getUnion());
+            LocSetLDT loc = services.getTypeConverter().getLocSetLDT();
+            isKeyword = (t.op() == Junctor.AND || t.op() == Junctor.OR || t.op() == Junctor.IMP
+                    || t.op() == Equality.EQV || t.op() == loc.getUnion());
         }
         int indent = name.length()+1;
         startTerm(2);
@@ -1685,7 +1687,7 @@ public class LogicPrinter {
     public void printIfThenElseTerm(Term t, String keyword) throws IOException {
         startTerm(t.arity());
 
-        layouter.beginC ( 0 ); 
+        layouter.beginC(0);
         markStartKeyword();
         layouter.print(keyword);
         markEndKeyword();
@@ -1805,18 +1807,17 @@ public class LogicPrinter {
         startTerm(0);
         layouter.print(s);
     }
-    /** Print a constant.  This just prints the string <code>s</code> and
+    /** Print a constant. This just prints the string <code>s</code> and
      * marks it as a nullary term.
      * @param t constant as term to be printed
      * @param s name of the constant
-     * @throws IOException
+     * @throws IOException in case the layout printing fails
      */
-    public void printConstant(Term t, String s)
-        throws IOException {
+    public void printConstant(Term t, String s) throws IOException {
         startTerm(0);
         boolean isKeyword = false;
         if (getHeapLDT() != null) {
-           isKeyword = (t.op() == Junctor.FALSE || t.op() == Junctor.TRUE 
+            isKeyword = (t.op() == Junctor.FALSE || t.op() == Junctor.TRUE
                  || t.op() == getHeapLDT().getCreated());
         }
         if (isKeyword) {
@@ -1827,7 +1828,7 @@ public class LogicPrinter {
            markEndKeyword();
         }
     }
- 
+
     /**
      * Print a Java block.  This is formatted using the ProgramPrinter
      * given to the constructor.  The result is indented according to
@@ -1867,25 +1868,25 @@ public class LogicPrinter {
      *
      * @param s   the string containing a program
      * @param r   the range of the first statement
-     * @param keywords the ranges of the java keywords in this program 
+     * @param keywords the ranges of the java keywords in this program
      */
     private void printMarkingFirstStatement(String s,Range r, Range[] keywords)
-          throws IOException    {
-          // calculate the bounds of the first statement and split program string accordingly
-          int iEnd   = r.end() <= s.length() ? r.end() : s.length();
-          int iStart = r.start() <= iEnd ? r.start() : iEnd;
-          String start = s.substring(0, iStart);
-          String firstStmt = s.substring(iStart, iEnd);
-          String end = s.substring(iEnd);
-          // remember length of the splits
-          int startTotal = start.length();
-          int firstTotal = firstStmt.length();
-          int endTotal = end.length();
-          layouter.beginC(0);
-          // mark keywords and print the string before the first statement 
-          for (int i = 0; i < keywords.length; i++) {
-             Range keyword = keywords[i];
-             if (keyword.start() < iStart && keyword.end() < iStart) {
+            throws IOException {
+        // calculate the bounds of the first statement and split program string accordingly
+        int iEnd   = r.end() <= s.length() ? r.end() : s.length();
+        int iStart = r.start() <= iEnd ? r.start() : iEnd;
+        String start = s.substring(0, iStart);
+        String firstStmt = s.substring(iStart, iEnd);
+        String end = s.substring(iEnd);
+        // remember length of the splits
+        int startTotal = start.length();
+        int firstTotal = firstStmt.length();
+        int endTotal = end.length();
+        layouter.beginC(0);
+        // mark keywords and print the string before the first statement
+        for (int i = 0; i < keywords.length; i++) {
+            Range keyword = keywords[i];
+            if (keyword.start() < iStart && keyword.end() < iStart) {
                 int printed = startTotal - start.length();
                 String beforeKeyword = start.substring(0, keyword.start() - printed);
                 String key = start.substring(keyword.start() - printed, keyword.end() - printed);
@@ -1894,14 +1895,14 @@ public class LogicPrinter {
                 markStartKeyword();
                 printVerbatim(key);
                 markEndKeyword();
-             }
-          }        
-          printVerbatim(start);
-          // mark keywords in first statement and print it
-          mark(MarkType.MARK_START_FIRST_STMT);
-          for (int i = 0; i < keywords.length; i++) {
-             Range keyword = keywords[i];
-             if (keyword.start() >= iStart && keyword.end() <= iEnd) {
+            }
+        }
+        printVerbatim(start);
+        // mark keywords in first statement and print it
+        mark(MarkType.MARK_START_FIRST_STMT);
+        for (int i = 0; i < keywords.length; i++) {
+            Range keyword = keywords[i];
+            if (keyword.start() >= iStart && keyword.end() <= iEnd) {
                 int printed = startTotal + (firstTotal - firstStmt.length());
                 String beforeKeyword = firstStmt.substring(0, keyword.start() - printed);
                 String key = firstStmt.substring(keyword.start() - printed, keyword.end() - printed);
@@ -1910,14 +1911,14 @@ public class LogicPrinter {
                 markStartKeyword();
                 printVerbatim(key);
                 markEndKeyword();
-             }
-          }
-          printVerbatim(firstStmt);
-          mark(MarkType.MARK_END_FIRST_STMT);
-          // mark keywords and print the string after the first statement
-          for (int i = 0; i < keywords.length; i++) {
-             Range keyword = keywords[i];
-             if (keyword.end() > iEnd) {
+            }
+        }
+        printVerbatim(firstStmt);
+        mark(MarkType.MARK_END_FIRST_STMT);
+        // mark keywords and print the string after the first statement
+        for (int i = 0; i < keywords.length; i++) {
+            Range keyword = keywords[i];
+            if (keyword.end() > iEnd) {
                 int printed = startTotal + firstTotal + (endTotal - end.length());
                 String beforeKeyword = end.substring(0, keyword.start() - printed);
                 String key = end.substring(keyword.start() - printed, keyword.end() - printed);
@@ -1926,11 +1927,11 @@ public class LogicPrinter {
                 markStartKeyword();
                 printVerbatim(key);
                 markEndKeyword();
-             }
-          }
-          printVerbatim(end);
-          layouter.end();
-      }
+            }
+        }
+        printVerbatim(end);
+        layouter.end();
+    }
 
     /** Print a string containing newlines to the layouter.  This is like
      * {@link de.uka.ilkd.key.util.pp.Layouter#pre(String)}, but
@@ -2443,10 +2444,10 @@ public class LogicPrinter {
 
         /** Remembers the start of an update to create a range */
         private final Stack<Integer> updateStarts = new Stack<Integer>();
-        
+
         /** Remembers the start of a keyword to create a range. */
         private final Stack<Integer> keywordStarts = new Stack<Integer>();
-        
+
         /** Remembers the start of a java block to create a range. */
         private final Stack<Integer> javaBlockStarts = new Stack<Integer>();
 
