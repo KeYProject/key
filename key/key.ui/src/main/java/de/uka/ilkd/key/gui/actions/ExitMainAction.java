@@ -69,11 +69,11 @@ public class ExitMainAction extends MainWindowAction {
            exitMainWithoutInteraction();
        }
    }
-
-
+   
+   
     /**
      * makes all GUI settings persistence; this method is also called by the Eclipse
-     * integration to store the settings
+     * integration to store the settings   
      */
     public void saveSettings() {
        mainWindow.savePreferences(mainWindow);

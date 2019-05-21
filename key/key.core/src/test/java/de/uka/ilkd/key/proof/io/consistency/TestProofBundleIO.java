@@ -6,9 +6,14 @@ import static org.junit.Assert.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -36,8 +41,7 @@ public class TestProofBundleIO {
      */
     @BeforeClass
     public static void prepare() {
-        Path projectRoot = IOUtil.getProjectRoot(TestProofBundleIO.class).toPath();
-        testDir = projectRoot.resolve("resources").resolve("testcase").resolve("proofBundle");
+        testDir = Paths.get(HelperClassForTests.TESTCASE_DIRECTORY.getAbsolutePath(), "proofBundle");
 
         // remember setting to be able to reset after the test
         allowBundleSaving = ProofIndependentSettings.DEFAULT_INSTANCE

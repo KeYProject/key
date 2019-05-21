@@ -60,6 +60,7 @@ import de.uka.ilkd.key.gui.utilities.BracketMatchingTextArea;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.pp.*;
@@ -405,10 +406,11 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 							String droppedString;
 
 							Point dropLocation = event.getLocation();
-							int row = DataTable.this.rowAtPoint( dropLocation );
-							int column = DataTable.this.columnAtPoint( dropLocation );
+							final DataTable dt = DataTable.this;
+							int row = dt.rowAtPoint( dropLocation );
+							int column = dt.columnAtPoint( dropLocation );
 
-							if ((row != -1) && (column == 1)){
+							if ((row != -1) && (column == 1) && dt.isCellEditable(row, column)) {
 								// The point lies within the table and within the instantiation
 								// column ...
 
@@ -737,6 +739,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         final NotationInfo ni = new NotationInfo();
 
         Services services = mediator.getServices();
+        final Term t = TermLabel.removeIrrelevantLabels(term, services);
         LogicPrinter p = new LogicPrinter(new ProgramPrinter(), ni, services);
         boolean pretty = mediator.getNotationInfo().isPrettySyntax();
         ni.refresh(services, pretty, false);
@@ -758,9 +761,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         }
 
         try {
-            p.printTerm(term);
+            p.printTerm(t);
         } catch (IOException ioe) {
-            return term.toString();
+            return t.toString();
         }
         return p.result().toString();
     }
