@@ -499,20 +499,25 @@ public abstract class TacletApp implements RuleApp {
      *            the SchemaVariable to be instantiated
      * @param term
      *            the Term the SchemaVariable is instantiated with
+     * @param services
+     *            the services object
+     * @param interesting
+     *            whether instantiations for this schema variable should
+     *            be kept in the list of "interesting" instantiations
      * @return the new TacletApp
      */
     public TacletApp addCheckedInstantiation(SchemaVariable sv,
-	    				     Term term,
-	    				     Services services,
-	    				     boolean interesting) {
-
+                                             Term term,
+                                             Services services,
+                                             boolean interesting) {
         if (sv instanceof VariableSV && !(term.op() instanceof LogicVariable)) {
             throw new IllegalInstantiationException("Could not add "
                 + "the instantiation of " + sv + " because " + term
                 + " is no variable.");
         }
 
-        final MatchConditions newMC = taclet.getMatcher().matchSV(sv, term, matchConditions(), services);
+        final MatchConditions newMC =
+                taclet.getMatcher().matchSV(sv, term, matchConditions(), services);
 
         if (newMC == null) {
             throw new IllegalInstantiationException("Instantiation " + term
