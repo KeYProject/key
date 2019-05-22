@@ -4,7 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -44,7 +44,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
@@ -129,9 +128,6 @@ public final class OriginTermLabelWindow extends JFrame {
     private TermView view;
     private JTree tree;
 
-    private JLabel originJLabel;
-    private JLabel subtermOriginsJLabel;
-
     private Services services;
     private PosInOccurrence termPio;
     private Sequent sequent;
@@ -179,7 +175,6 @@ public final class OriginTermLabelWindow extends JFrame {
                     ImmutableList<Integer> path = getPosTablePath(source.pos);
 
                     highlightInView(path);
-                    updateJLabels(source.pos);
                 }
 
                 revalidate();
@@ -205,12 +200,6 @@ public final class OriginTermLabelWindow extends JFrame {
         }
 
         {
-            JSplitPane rightPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-            JPanel bottomRightPanel = new JPanel(new GridLayout(1, 2, COMPONENT_GAP, COMPONENT_GAP));
-
-            originJLabel = new JLabel();
-            subtermOriginsJLabel = new JLabel();
-
             view = new TermView(pos, node, MainWindow.getInstance());
             view.setPreferredSize(new Dimension(WIDTH / 2, HEIGHT));
 
@@ -253,7 +242,6 @@ public final class OriginTermLabelWindow extends JFrame {
 
                     highlightInView(path);
                     highlightInTree(getTreePath(path));
-                    updateJLabels(pos);
 
                     revalidate();
                     repaint();
@@ -264,26 +252,10 @@ public final class OriginTermLabelWindow extends JFrame {
                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             viewScrollPane.setBorder(new TitledBorder(VIEW_TITLE));
-            rightPanel.add(viewScrollPane);
 
             view.printSequent();
 
-            bottomRightPanel.add(originJLabel);
-            JScrollPane subtermOriginsScrollPane = new JScrollPane(subtermOriginsJLabel,
-                    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            bottomRightPanel.add(subtermOriginsScrollPane);
-            bottomRightPanel.setBorder(new TitledBorder(ORIGIN_INFO_TITLE));
-            originJLabel.setBorder(new TitledBorder(ORIGIN_TITLE));
-            subtermOriginsScrollPane.setBorder(new TitledBorder(SUBTERM_ORIGINS_TITLE));
-
-            originJLabel.setBackground(Color.WHITE);
-            subtermOriginsJLabel.setBackground(Color.WHITE);
-
-            rightPanel.add(bottomRightPanel);
-
-            rightPanel.setDividerLocation(HEIGHT / 4 * 3);
-            add(rightPanel);
+            add(viewScrollPane);
 
             viewScrollPane.addComponentListener(new ComponentAdapter() {
 
@@ -368,74 +340,6 @@ public final class OriginTermLabelWindow extends JFrame {
         }
     }
 
-    private void updateJLabels(PosInOccurrence pos) {
-        originJLabel.setOpaque(false);
-        subtermOriginsJLabel.setOpaque(false);
-
-        if (pos == null) {
-            originJLabel.setText("");
-
-            subtermOriginsJLabel.setText("");
-
-            return;
-        }
-
-        OriginTermLabel label = (OriginTermLabel) pos.subTerm().getLabel(OriginTermLabel.NAME);
-
-        StringBuilder originText = new StringBuilder("<html>");
-        StringBuilder subtermOriginsText = new StringBuilder("<html>");
-
-        if (label != null) {
-            // The term has an origin label. Show the term's origin.
-
-            if (label.getOrigin().specType != SpecType.NONE) {
-                originText.append(label.getOrigin());
-                originJLabel.setOpaque(true);
-            }
-
-            for (Origin origin : label.getSubtermOrigins()) {
-                subtermOriginsText.append(origin);
-                subtermOriginsText.append("<br>");
-                subtermOriginsJLabel.setOpaque(true);
-            }
-
-            if (label.getSubtermOrigins().isEmpty() && pos.subTerm().subs().size() != 0
-                    && label.getOrigin().specType != SpecType.NONE) {
-                subtermOriginsText.append(label.getOrigin());
-                subtermOriginsJLabel.setOpaque(true);
-            }
-        } else {
-            // The term has no origin label.
-            // Iterate over its parent terms until we find one with an origin label,
-            // then show that term's origin.
-
-            final PosInOccurrence oldPos = pos;
-
-            while (label == null && !pos.isTopLevel()) {
-                pos = pos.up();
-                label = (OriginTermLabel) pos.subTerm().getLabel(OriginTermLabel.NAME);
-            }
-
-            if (label != null && label.getOrigin().specType != SpecType.NONE) {
-                originText.append(label.getOrigin());
-                originJLabel.setOpaque(true);
-            }
-
-            if (label != null && oldPos.subTerm().subs().size() != 0
-                    && label.getOrigin().specType != SpecType.NONE) {
-                subtermOriginsText.append(label.getOrigin());
-                subtermOriginsJLabel.setOpaque(true);
-            }
-        }
-
-        originText.append("</html>");
-        subtermOriginsText.append("</html>");
-
-        originJLabel.setText(originText.toString());
-
-        subtermOriginsJLabel.setText(subtermOriginsText.toString());
-    }
-
     private ImmutableList<Integer> getPosTablePath(PosInOccurrence pos) {
         if (pos == null) {
             return ImmutableSLList.<Integer>nil().prepend(0);
@@ -485,6 +389,69 @@ public final class OriginTermLabelWindow extends JFrame {
         return result;
     }
 
+    /**
+     * Returns the term's {@link OriginTermLabel}. If the term has no such label, iterates over its
+     * parents until it finds one with a label.
+     *
+     * @param pio the position of the term.
+     * @return the {@link OriginTermLabel} of the nearest possible parent term, or {@code null} if
+     *  no parent term has an {@link OriginTermLabel}.
+     */
+    private OriginTermLabel getOriginLabel(PosInOccurrence pio) {
+        if (pio == null) {
+            return null;
+        }
+
+        Term term = pio.subTerm();
+        OriginTermLabel originLabel =
+                (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
+
+        while (originLabel == null && !pio.isTopLevel()) {
+            pio = pio.up();
+            term = pio.subTerm();
+
+            originLabel =
+                    (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
+        }
+
+        return originLabel;
+    }
+
+    private String getTooltipText() {
+        PosInSequent pis = getPosInSequent(event.getPoint());
+
+        if (pis == null) {
+            return null;
+        }
+
+        PosInOccurrence pio = pis.getPosInOccurrence();
+
+        if (pio == null) {
+            return null;
+        }
+
+        // Convert pio on sequent to pio on termPio.subTerm().
+        if (termPio != null) {
+            PosInTerm completePos = termPio.posInTerm();
+
+            IntIterator it = pio.posInTerm().iterator();
+            while (it.hasNext()) {
+                completePos = completePos.down(it.next());
+            }
+
+            pio = new PosInOccurrence(
+                    termPio.sequentFormula(),
+                    completePos,
+                    termPio.isInAntec());
+        }
+
+        OriginTermLabel label = getOriginLabel(pio);
+        return "<html>Origin of selected term: <b>" + label.getOrigin() +
+                "</b><hr>Origin of sub-terms:<br>" +
+                label.getSubtermOrigins().stream()
+                .map(o -> "" + o + "<br>").reduce("", String::concat);
+    }
+
     private class CellRenderer extends DefaultTreeCellRenderer {
 
         private static final long serialVersionUID = -7479404026154193661L;
@@ -495,7 +462,11 @@ public final class OriginTermLabelWindow extends JFrame {
                 boolean selected, boolean expanded,
                 boolean leaf, int row, boolean hasFocus) {
             TreeNode node = (TreeNode) value;
+
+            PosInOccurrence pio = node.pos;
             Term term = node.term;
+            assert pio.subTerm().equals(term);
+
             BasicTreeUI ui = (BasicTreeUI) tree.getUI();
 
             JLabel termTextLabel = (JLabel) super.getTreeCellRendererComponent(
@@ -505,9 +476,7 @@ public final class OriginTermLabelWindow extends JFrame {
             termTextLabel.setBackground(OriginTermLabelWindow.this.getBackground());
 
             JLabel originTextLabel = new JLabel();
-            OriginTermLabel originLabel = term == null
-                    ? null
-                    : (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
+            OriginTermLabel originLabel = getOriginLabel(pio);
 
             if (originLabel != null) {
                 originTextLabel.setText(getShortOriginText(originLabel.getOrigin()));
@@ -530,7 +499,7 @@ public final class OriginTermLabelWindow extends JFrame {
             result.setBackground(Color.WHITE);
 
             if (originLabel != null) {
-                result.setToolTipText(getFullText(term, originLabel.getOrigin()));
+                result.setToolTipText(OriginTermLabelWindow.this.getTooltipText());
             }
 
             return result;
@@ -538,26 +507,6 @@ public final class OriginTermLabelWindow extends JFrame {
 
         private String getShortOriginText(Origin origin) {
             return origin.specType.toString();
-        }
-
-        private String getFullText(Term term, Origin origin) {
-            String text;
-
-            if (term == null) {
-                text = LogicPrinter.quickPrintSequent(sequent, services);
-            } else {
-                text = LogicPrinter.quickPrintTerm(term, services);
-            }
-
-            return "<html><b>" + origin + "</b><hr>"
-                + text
-                    .replace("&", "&amp;")
-                    .replace("<", "&lt;")
-                    .replace(">", "&gt;")
-                    .replace(" ", "&nbsp;")
-                    .replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
-                    .replace("\n", "<br>")
-                + "</html>";
         }
 
         private String getShortTermText(Term term) {
@@ -652,6 +601,20 @@ public final class OriginTermLabelWindow extends JFrame {
             } else {
                 setFilter(new IdentitySequentPrintFilter());
             }
+
+            // Register tooltip
+            setToolTipText("");
+        }
+
+        @Override
+        public String getToolTipText(MouseEvent event) {
+            return OriginTermLabelWindow.this.getTooltipText();
+        }
+
+        @Override
+        public Point getToolTipLocation(MouseEvent event) {
+            Point p = event.getPoint();
+            return new Point(p.x + 10, p.y);
         }
 
         @Override
