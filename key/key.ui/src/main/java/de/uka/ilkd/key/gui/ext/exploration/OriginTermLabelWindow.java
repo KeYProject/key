@@ -213,33 +213,8 @@ public final class OriginTermLabelWindow extends JFrame {
                         return;
                     }
 
-                    PosInOccurrence pos = pis.getPosInOccurrence();
-
-                    if (pos == null) {
-                        if (termPio != null) {
-                            pos = new PosInOccurrence(
-                                    termPio.sequentFormula(),
-                                    termPio.posInTerm(),
-                                    termPio.isInAntec());
-                        }
-                    } else {
-                        if (termPio != null) {
-                            PosInTerm completePos = termPio.posInTerm();
-
-                            IntIterator it = pos.posInTerm().iterator();
-                            while (it.hasNext()) {
-                                completePos = completePos.down(it.next());
-                            }
-
-                            pos = new PosInOccurrence(
-                                    termPio.sequentFormula(),
-                                    completePos,
-                                    termPio.isInAntec());
-                        }
-                    }
-
-                    ImmutableList<Integer> path = getPosTablePath(pos);
-
+                    ImmutableList<Integer> path = getPosTablePath(
+                            convertPio(pis.getPosInOccurrence()));
                     highlightInView(path);
                     highlightInTree(getTreePath(path));
 
@@ -267,6 +242,35 @@ public final class OriginTermLabelWindow extends JFrame {
         }
 
         contentPane.setDividerLocation(WIDTH / 2);
+    }
+
+    /**
+     * Convert a pio on the sequent to a pio on {@code this.termPio.subTerm()}.
+     *
+     * @param pio a pio on the sequent.
+     * @return a pio on {@code this.termPio.subTerm()}.
+     */
+    private PosInOccurrence convertPio(PosInOccurrence pio) {
+        if (termPio == null) {
+            return pio;
+        } else if (pio == null) {
+            return new PosInOccurrence(
+                    termPio.sequentFormula(),
+                    termPio.posInTerm(),
+                    termPio.isInAntec());
+        } else {
+            PosInTerm completePos = termPio.posInTerm();
+
+            IntIterator it = pio.posInTerm().iterator();
+            while (it.hasNext()) {
+                completePos = completePos.down(it.next());
+            }
+
+            return new PosInOccurrence(
+                    termPio.sequentFormula(),
+                    completePos,
+                    termPio.isInAntec());
+        }
     }
 
     private DefaultTreeModel buildModel(PosInOccurrence pos) {
@@ -417,35 +421,12 @@ public final class OriginTermLabelWindow extends JFrame {
         return originLabel;
     }
 
-    private String getTooltipText() {
-        PosInSequent pis = getPosInSequent(event.getPoint());
-
-        if (pis == null) {
-            return null;
-        }
-
-        PosInOccurrence pio = pis.getPosInOccurrence();
-
+    private String getTooltipText(PosInOccurrence pio) {
         if (pio == null) {
             return null;
         }
 
-        // Convert pio on sequent to pio on termPio.subTerm().
-        if (termPio != null) {
-            PosInTerm completePos = termPio.posInTerm();
-
-            IntIterator it = pio.posInTerm().iterator();
-            while (it.hasNext()) {
-                completePos = completePos.down(it.next());
-            }
-
-            pio = new PosInOccurrence(
-                    termPio.sequentFormula(),
-                    completePos,
-                    termPio.isInAntec());
-        }
-
-        OriginTermLabel label = getOriginLabel(pio);
+        OriginTermLabel label = getOriginLabel(convertPio(pio));
         return "<html>Origin of selected term: <b>" + label.getOrigin() +
                 "</b><hr>Origin of sub-terms:<br>" +
                 label.getSubtermOrigins().stream()
@@ -499,7 +480,7 @@ public final class OriginTermLabelWindow extends JFrame {
             result.setBackground(Color.WHITE);
 
             if (originLabel != null) {
-                result.setToolTipText(OriginTermLabelWindow.this.getTooltipText());
+                result.setToolTipText(OriginTermLabelWindow.this.getTooltipText(pio));
             }
 
             return result;
@@ -608,7 +589,13 @@ public final class OriginTermLabelWindow extends JFrame {
 
         @Override
         public String getToolTipText(MouseEvent event) {
-            return OriginTermLabelWindow.this.getTooltipText();
+            PosInSequent pis = getPosInSequent(event.getPoint());
+
+            if (pis == null) {
+                return null;
+            }
+
+            return OriginTermLabelWindow.this.getTooltipText(pis.getPosInOccurrence());
         }
 
         @Override
