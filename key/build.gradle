@@ -268,7 +268,7 @@ task alldocJar(type: Zip) {
     destinationDirectory = file("$buildDir/distribution")
 }
 
-task fatJar(type: Jar) {
+/*task fatJar(type: Jar) {
     dependsOn project(":key.ui").jar
     dependsOn project(":keyext.interactionlog").jar
     //dependsOn project(":keyext.script.ui").jar
@@ -291,4 +291,4 @@ task fatJar(type: Jar) {
     from jarFiles
     with project(":key.ui").jar
     from "$rootDir/LICENSE.TXT"
-}
+}*/
