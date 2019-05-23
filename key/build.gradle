@@ -15,7 +15,6 @@ idea {
     }
 }
 
-
 static def getDate() {
     return new Date().format('yyyyMMdd')
 }
@@ -41,7 +40,6 @@ def getGitBranch = { ->
 ext.dateVersion = getDate()
 ext.gitRevision = getGitRevision()
 ext.gitBranch = getGitBranch()
-version = "2.7"
 
 def resourceDir = new File(project(":key.core").projectDir, "src/main/resources")
 def utilResourceDir = new File(resourceDir, "de/uka/ilkd/key/util")
@@ -51,7 +49,7 @@ new File(utilResourceDir, "branch").text = gitBranch
 new File(utilResourceDir, "version").text = version
 
 group = "org.key_project"
-version = "${version}.0-${System.env.BUILD_NUMBER ?: ext.gitRevision}"
+version = "2.7.0-${System.env.BUILD_NUMBER ?: ext.gitRevision}"
 
 subprojects {
     apply plugin: "java"
@@ -82,7 +80,7 @@ subprojects {
         //options.verbose()
         options.encoding = 'UTF-8'
         if (JavaVersion.current().isJava9Compatible()) {
-            // not working on jenkins: options.addBooleanOption('html5', true)
+            //options.addBooleanOption('html5', true)
         }
     }
 
@@ -230,8 +228,9 @@ subprojects {
 
 
 task start {
-    //dependsOn project(":key.ui").run
+//    dependsOn project(":key.ui").run
 }
+
 
 task alldoc(type: Javadoc) {
     group "documentation"
@@ -240,6 +239,10 @@ task alldoc(type: Javadoc) {
     source projects.collect { it.sourceSets.main.allJava }
     classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
     destinationDir = file("${buildDir}/docs/javadoc")
+
+    if (JavaVersion.current().isJava9Compatible()) {
+        //notworking on jenkins    options.addBooleanOption('html5', true)
+    }
 
     configure(options) {
         //showFromPrivate()

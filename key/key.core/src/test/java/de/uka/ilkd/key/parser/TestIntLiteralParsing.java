@@ -38,7 +38,10 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
             "'0'", "C(8(4(#)))",
             "'9'", "C(7(5(#)))",
             "'\\u0000'", "C(0(#))",
-            "'\\uffff'", "C(5(3(5(5(6(#))))))"
+            "'\\uffff'", "C(5(3(5(5(6(#))))))",
+        "'\u0000'"         ,       "C(0(#))",
+        "'\u0394'"         ,       "C(6(1(9(#))))",        // greek uppercase delta
+        "'\uffff'"         ,       "C(5(3(5(5(6(#))))))"
     };
 
     /**

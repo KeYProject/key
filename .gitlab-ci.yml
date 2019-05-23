@@ -201,7 +201,8 @@ compile:testFast:removegenerics:
       junit:
         - "**/**/build/test-results/*/TEST-*.xml"
 
-
+#
+#
 #compile:testFast:testRunAllProofs:
 #  stage: primary
 #  image: wadoon/key-test-docker:jdk11
@@ -254,4 +255,4 @@ checkstyle:
     expire_in: 1 year
     when: always
     paths:
-      - report.txt
+    - report.txt
