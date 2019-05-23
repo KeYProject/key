@@ -1,6 +1,6 @@
 #!/bin/sh
 cd key/
-./gradlew --parallel compileTest :key.ui:shadowJar :key.ui:distZip
+./gradlew --parallel clean compileTest :key.ui:shadowJar :key.ui:distZip
 
 if [ $? -gt 0 ]; then
   exit $?
