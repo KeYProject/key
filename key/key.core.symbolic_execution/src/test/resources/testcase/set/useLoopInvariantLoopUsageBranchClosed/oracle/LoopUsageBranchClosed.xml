@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call LoopUsageBranchClosed.deadCodeAfterLoop()&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="int i = 2;" pathCondition="true" pathConditionChanged="false">
+         <callStackEntry path="/0"/>
+         <loopInvariant name="invariant: i &gt;= 0;
+variant: i
+mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
+            <callStackEntry path="/0"/>
+            <termination name="&lt;loop body end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+            </termination>
+         </loopInvariant>
+      </statement>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0"/>
+</start>

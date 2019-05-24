@@ -189,7 +189,7 @@ group applicationRestrictions {
    notprovable ./heap/polarity_tests/wellformed11.key
 }
 
-# Tests for block contracts:
+# Tests for block & loop contracts:
 group blockContracts {
    provable ./heap/block_contracts/Simple__add.key
    provable ./heap/block_contracts/Simple__addAbsoluteValues.key
@@ -203,6 +203,12 @@ group blockContracts {
 # the following test has a reload problem probably caused by the one-step-simplifier
 # provable: ./heap/block_contracts/GreatestCommonDivisor.key
    provable ./standard_key/java_dl/jml-assert/assert.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_external.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_internal.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_loop.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_external.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_internal.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_loop.key
 }
 
 # Tests for Java Card (should also include the API, pending fix to bug #1475)
@@ -599,7 +605,7 @@ group javadl {
    provable ./standard_key/staticInitialisation/objectOfErroneousClass.key
    provable ./standard_key/staticInitialisation/staticInitialisersAreNonSimple.key
    provable ./standard_key/types/disjoint.key
-   provable ../../key.core.test/resources/testcase/classpath/classpath.key
+   provable ../../key.core/src/test/resources/testcase/classpath/classpath.key
    notprovable ./heap/inconsistent_represents/MyClass_m.key
    notprovable ./heap/inconsistent_represents/MyClass_n.key
 }
