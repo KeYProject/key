@@ -13,9 +13,10 @@
 
 package de.uka.ilkd.key.settings;
 
-import java.util.EventObject;
-import java.util.LinkedList;
-import java.util.Properties;
+import de.uka.ilkd.key.logic.Name;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -27,6 +28,24 @@ import java.util.Properties;
  * 3) whether intermediate proofsteps should be hidden in the proof tree view
  */
 public class ViewSettings implements Settings, Cloneable {
+    private static final String CLUTTER_RULES = "[View]clutterRules";
+
+    private static final String CLUTTER_RULES_DEFAULT = "cut_direct_r,cut_direct_l," +
+            "case_distinction_r,case_distinction_l,local_cut,commute_and_2,commute_or_2," +
+            "boxToDiamond,pullOut,typeStatic,less_is_total,less_zero_is_total,apply_eq_monomials" +
+            "eqTermCut,instAll,instEx,divIncreasingPos,divIncreasingNeg,jmodUnique1,jmodeUnique2," +
+            "jmodjmod,jmodDivisble,jdivAddMultDenom,jmodAltZero,add_non_neq_square,divide_geq," +
+            "add_greatereq,geq_add_one,leq_add_one,polySimp_addOrder,polySimp_expand,add_lesseq," +
+            "divide_equation,equal_add_one,add_eq";
+
+    private static final String CLUTTER_RULESSETS = "[View]clutterRuleSets";
+
+    private static final String CLUTTER_RULESETS_DEFAULT = "notHumanReadable,obsolete," +
+            "pullOutQuantifierAll,inEqSimp_commute,inEqSimp_expand,pullOutQuantifierEx," +
+            "inEqSimp_nonLin_divide,inEqSimp_special_nonLin,inEqSimp_nonLin,polySimp_normalise," +
+            "polySimp_directEquations";
+
+
     private static final String MAX_TOOLTIP_LINES_KEY = "[View]MaxTooltipLines";
     private static final String SHOW_WHOLE_TACLET = "[View]ShowWholeTaclet";
     private static final String FONT_INDEX = "[View]FontIndex";
@@ -44,6 +63,10 @@ public class ViewSettings implements Settings, Cloneable {
     private static final String CONFIRM_EXIT = "[View]ConfirmExit";
     /** Heatmap options property */
     private static final String HEATMAP_OPTIONS = "[View]HeatmapOptions";
+    /**
+     * Delimiter string for specifying strings
+     */
+    public static final String SET_DELIMITER = ",";
 
     /** default max number of displayed tooltip lines is 40 */
     private int maxTooltipLines = 40;
@@ -80,6 +103,23 @@ public class ViewSettings implements Settings, Cloneable {
     private int maxAgeForHeatmap = 5;
     /** List of listeners that are notified if the settings change */
     private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
+
+    private Set<String> clutterRules = new TreeSet<>();
+    private Set<String> clutterRuleSets = new TreeSet<>();
+
+    /**
+     * Clutter rules are rules with less priority in the taclet menu
+     */
+    public Set<String> getClutterRules() {
+        return clutterRules;
+    }
+
+    /**
+     * Name of rule sets containing clutter rules, which has a minor priority in the taclet menu.
+     */
+    public Set<String> getClutterRuleSets() {
+        return clutterRuleSets;
+    }
 
     /**
      * @return the current maxTooltipLines
@@ -170,7 +210,7 @@ public class ViewSettings implements Settings, Cloneable {
     }
 
     /**
-     * @param Whether a notification when opening a file should be shown
+     * @param show Whether a notification when opening a file should be shown
      */
     public void setNotifyLoadBehaviour(boolean show) {
     	notifyLoadBehaviour = show;
@@ -234,7 +274,14 @@ public class ViewSettings implements Settings, Cloneable {
      */
     @Override
     public void readSettings(Object sender, Properties props) {
-		String val1 = props.getProperty(MAX_TOOLTIP_LINES_KEY);
+        String valueClutterRules = props.getProperty(CLUTTER_RULES);
+        String valueClutterRuleSets  = props.getProperty(CLUTTER_RULESSETS);
+        setSet(clutterRules, valueClutterRules, CLUTTER_RULES_DEFAULT);
+        setSet(clutterRuleSets, valueClutterRuleSets, CLUTTER_RULESETS_DEFAULT);
+
+
+
+        String val1 = props.getProperty(MAX_TOOLTIP_LINES_KEY);
 		String val2 = props.getProperty(FONT_INDEX);
 		String val3 = props.getProperty(SHOW_WHOLE_TACLET);
 		String val4 = props.getProperty(HIDE_INTERMEDIATE_PROOFSTEPS);
@@ -296,6 +343,16 @@ public class ViewSettings implements Settings, Cloneable {
         }
 	}
 
+    private void setSet(Set<String> set, String value, String defaultValue) {
+        value = (value != null && !value.isEmpty()) ? value : defaultValue;
+        set.clear();
+        for (String entry : value.split(SET_DELIMITER)) {
+            if (!entry.trim().isEmpty()) {
+                set.add(entry.trim());
+            }
+        }
+    }
+
 
     /**
 	 * implements the method required by the Settings interface. The settings
@@ -308,6 +365,9 @@ public class ViewSettings implements Settings, Cloneable {
 	 */
     @Override
     public void writeSettings(Object sender,Properties props) {
+        props.setProperty(CLUTTER_RULESSETS, setToString(getClutterRuleSets()));
+        props.setProperty(CLUTTER_RULES, setToString(getClutterRules()));
+
     	props.setProperty(MAX_TOOLTIP_LINES_KEY, "" + maxTooltipLines);
     	props.setProperty(SHOW_WHOLE_TACLET, "" + showWholeTaclet);
     	props.setProperty(FONT_INDEX, "" + sizeIndex);
@@ -326,6 +386,10 @@ public class ViewSettings implements Settings, Cloneable {
     	props.setProperty(CONFIRM_EXIT, ""+confirmExit);
         props.setProperty(HEATMAP_OPTIONS, "" + isShowHeatmap() + " " +
                     isHeatmapSF() + " " + isHeatmapNewest() + " " + getMaxAgeForHeatmap());
+    }
+
+    private String setToString(Set<String> set) {
+        return String.join(SET_DELIMITER, set);
     }
 
     /** sends the message that the state of this setting has been
