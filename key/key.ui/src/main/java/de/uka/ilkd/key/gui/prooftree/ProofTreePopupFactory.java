@@ -8,6 +8,7 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewDock;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
+import de.uka.ilkd.key.gui.proofdiff.ProofDifferenceView;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -83,6 +84,7 @@ public class ProofTreePopupFactory {
         addAction(SubtreeStatistics::new);
 
         addAction(ctx -> new SequentViewDock.OpenCurrentNodeAction(ctx.window, ctx.invokedNode));
+        addAction(ctx -> new ProofDifferenceView.OpenDifferenceWithParent(ctx.window, ctx.invokedNode));
     }
 
     public static ProofTreeContext createContext(ProofTreeView view, TreePath selectedPath) {
