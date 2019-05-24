@@ -20,7 +20,7 @@ public class DockingHelper {
                 p.getPermissions(), actions);
     }
 
-    private static CAction translateAction(Action action) {
+    public static CAction translateAction(Action action) {
         if (action.getValue(Action.SELECTED_KEY) != null) {
             return createCheckBox(action);
 
