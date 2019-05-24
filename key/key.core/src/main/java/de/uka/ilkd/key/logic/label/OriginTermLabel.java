@@ -288,14 +288,19 @@ public class OriginTermLabel implements TermLabel {
             if (commonFileName == null) {
                 commonFileName = origin.fileName;
             } else if (!commonFileName.equals(origin.fileName)) {
-                commonFileName = Origin.MULTIPLE_FILES;
-                commonLine = Origin.MULTIPLE_LINES;
+                commonSpecType = SpecType.NONE;
+                commonFileName = null;
+                commonLine = -1;
+                break;
             }
 
             if (commonLine == -1) {
                 commonLine = origin.line;
             } else if (commonLine != origin.line) {
-                commonLine = Origin.MULTIPLE_LINES;
+                commonSpecType = SpecType.NONE;
+                commonFileName = null;
+                commonLine = -1;
+                break;
             }
         }
 
@@ -480,16 +485,6 @@ public class OriginTermLabel implements TermLabel {
         public static final int IMPLICIT_LINE = -1;
 
         /**
-         * Placeholder line number used for specifications across multiple lines.
-         */
-        public static final String MULTIPLE_FILES = "<multiple>";
-
-        /**
-         * Placeholder line number used for specifications across multiple lines.
-         */
-        public static final int MULTIPLE_LINES = -2;
-
-        /**
          * The JML spec type the term originates from.
          */
         public final SpecType specType;
@@ -523,18 +518,8 @@ public class OriginTermLabel implements TermLabel {
 
             if (fileName.equals(IMPLICIT_FILE_NAME)) {
                 sb.append(" (implicit)");
-            } else if (fileName.equals(MULTIPLE_FILES)) {
-                sb.append(" (multiple files)");
             } else {
-                sb.append(" @ ");
-                sb.append(fileName);
-
-                if (line == MULTIPLE_LINES) {
-                    sb.append(" (multiple lines)");
-                } else {
-                    sb.append(" @ line ");
-                    sb.append(line);
-                }
+                sb.append(" @ " + fileName + " @ line " + line);
             }
 
             return sb.toString();
