@@ -32,6 +32,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
+import de.uka.ilkd.key.gui.AdditionalWindow;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
@@ -64,7 +65,7 @@ import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
  *
  * @author lanzinger
  */
-public final class OriginTermLabelWindow extends JFrame {
+public final class OriginTermLabelWindow extends AdditionalWindow {
 
     private static final long serialVersionUID = -2791483814174192622L;
 
@@ -135,12 +136,15 @@ public final class OriginTermLabelWindow extends JFrame {
     /**
      * Creates a new {@link OriginTermLabelWindow}.
      *
+     * @param mainWindow the main window.
      * @param pos the position of the term whose origin shall be visualized.
      * @param node the node representing the proof state for which the term's origins shall be
      *  visualized.
      * @param services services.
      */
     public OriginTermLabelWindow(PosInOccurrence pos, Node node, Services services) {
+        super(node, "Origin: " + (pos == null ? "(whole sequent)" : pos.subTerm()));
+
         // TermView can only print sequents or formulas, not terms.
         if (pos != null) {
             while (!pos.subTerm().sort().equals(Sort.FORMULA)) {
@@ -426,9 +430,9 @@ public final class OriginTermLabelWindow extends JFrame {
             return null;
         }
 
-        OriginTermLabel label = getOriginLabel(convertPio(pio));
+        OriginTermLabel label = getOriginLabel(pio);
         return "<html>Origin of selected term: <b>" + label.getOrigin() +
-                "</b><hr>Origin of sub-terms:<br>" +
+                "</b><hr>Origin of (former) sub-terms:<br>" +
                 label.getSubtermOrigins().stream()
                 .map(o -> "" + o + "<br>").reduce("", String::concat);
     }
@@ -511,8 +515,6 @@ public final class OriginTermLabelWindow extends JFrame {
 
     private class TreeNode extends DefaultMutableTreeNode {
 
-        private static final long serialVersionUID = 8257931535327190600L;
-
         private PosInOccurrence pos;
         private Term term;
 
@@ -527,8 +529,6 @@ public final class OriginTermLabelWindow extends JFrame {
     }
 
     private class TermView extends SequentView {
-
-        private static final long serialVersionUID = 2048113301808983374L;
 
         private InitialPositionTable posTable = new InitialPositionTable();
         private Node node;
@@ -595,7 +595,7 @@ public final class OriginTermLabelWindow extends JFrame {
                 return null;
             }
 
-            return OriginTermLabelWindow.this.getTooltipText(pis.getPosInOccurrence());
+            return OriginTermLabelWindow.this.getTooltipText(convertPio(pis.getPosInOccurrence()));
         }
 
         @Override
