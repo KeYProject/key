@@ -12,8 +12,10 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -32,9 +34,10 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
-import de.uka.ilkd.key.gui.AdditionalWindow;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.NodeInfoWindow;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.IntIterator;
@@ -58,6 +61,8 @@ import de.uka.ilkd.key.pp.SequentPrintFilterEntry;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.ShowSelectedSequentPrintFilter;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
 /**
@@ -65,7 +70,7 @@ import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
  *
  * @author lanzinger
  */
-public final class OriginTermLabelWindow extends AdditionalWindow {
+public final class OriginTermLabelWindow extends NodeInfoWindow {
 
     private static final long serialVersionUID = -2791483814174192622L;
 
@@ -129,6 +134,8 @@ public final class OriginTermLabelWindow extends AdditionalWindow {
     private TermView view;
     private JTree tree;
 
+    private JButton nodeLinkButton;
+
     private Services services;
     private PosInOccurrence termPio;
     private Sequent sequent;
@@ -156,15 +163,77 @@ public final class OriginTermLabelWindow extends AdditionalWindow {
         this.termPio = pos;
         this.sequent = node.sequent();
 
-        JSplitPane contentPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        setContentPane(contentPane);
-
         setSize(WIDTH, HEIGHT);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setTitle("Term Origin");
         setIconImage(IconFactory.keyLogo());
         setLocationRelativeTo(null);
         setVisible(true);
+
+        JPanel headPane = new JPanel();
+        headPane.add(new JLabel("Showing origin information for "));
+        nodeLinkButton = new JButton();
+        headPane.add(nodeLinkButton);
+        headPane.add(new JLabel(" in proof \"" + node.proof().name().toString() + "\""));
+        nodeLinkButton.addActionListener(event -> {
+            KeYMediator mediator = MainWindow.getInstance().getMediator();
+
+            if (!mediator.getSelectedProof().equals(node.proof())) {
+                int choice = JOptionPane.showOptionDialog(
+                        this,
+                        "The proof containing this node is not currently selected."
+                                + " Do you want to select it?",
+                        "Switch Proof?",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        null,
+                        null);
+
+                if (choice == 0) {
+                    mediator.getSelectionModel().setSelectedProof(node.proof());
+                } else {
+                    return;
+                }
+            }
+
+            mediator.getSelectionModel().setSelectedNode(node);
+        });
+
+        updateNodeLink();
+
+        node.proof().addRuleAppListener(event -> {
+            updateNodeLink();
+        });
+        node.proof().addProofTreeListener(new ProofTreeAdapter() {
+
+            @Override
+            public void proofStructureChanged(ProofTreeEvent e) {
+                updateNodeLink();
+            }
+
+            @Override
+            public void proofPruned(ProofTreeEvent e) {
+                updateNodeLink();
+            }
+
+            @Override
+            public void proofGoalsChanged(ProofTreeEvent e) {
+                updateNodeLink();
+            }
+
+            @Override
+            public void proofExpanded(ProofTreeEvent e) {
+                updateNodeLink();
+            }
+        });
+
+        JSplitPane bodyPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+
+        JPanel contentPane = new JPanel();
+        contentPane.setLayout(new BorderLayout());
+        contentPane.add(headPane, BorderLayout.PAGE_START);
+        contentPane.add(bodyPane, BorderLayout.CENTER);
+        setContentPane(contentPane);
 
         DefaultTreeModel treeModel = buildModel(pos);
         {
@@ -191,7 +260,7 @@ public final class OriginTermLabelWindow extends AdditionalWindow {
             treeScrollPane.setBorder(new TitledBorder(TREE_TITLE));
 
             treeScrollPane.setPreferredSize(new Dimension(WIDTH / 2, HEIGHT));
-            add(treeScrollPane);
+            bodyPane.add(treeScrollPane);
 
             treeScrollPane.addComponentListener(new ComponentAdapter() {
 
@@ -234,7 +303,7 @@ public final class OriginTermLabelWindow extends AdditionalWindow {
 
             view.printSequent();
 
-            add(viewScrollPane);
+            bodyPane.add(viewScrollPane);
 
             viewScrollPane.addComponentListener(new ComponentAdapter() {
 
@@ -245,7 +314,18 @@ public final class OriginTermLabelWindow extends AdditionalWindow {
             });
         }
 
-        contentPane.setDividerLocation(WIDTH / 2);
+        bodyPane.setDividerLocation(WIDTH / 2);
+    }
+
+    private void updateNodeLink() {
+        Node node = getNode();
+
+        if (!node.proof().find(node)) {
+            nodeLinkButton.setText("DELETED NODE");
+            nodeLinkButton.setEnabled(false);
+        } else if (nodeLinkButton.isEnabled()) {
+            nodeLinkButton.setText(node.serialNr() + ": " + node.name());
+        }
     }
 
     /**
@@ -342,7 +422,7 @@ public final class OriginTermLabelWindow extends AdditionalWindow {
         } catch (ArrayIndexOutOfBoundsException e) {
             // The path does not point to a valid sub-term.
             // E.g., this can happen if pretty-printing is activated and the user selects
-            // the subterm "#" of some number
+            // the sub-term "#" of some number
             // (which only exists in the view when pretty-printing is deactivated.)
             // We simply ignore this error and do not paint any highlights.
         }

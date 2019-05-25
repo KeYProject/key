@@ -13,8 +13,13 @@
 
 package de.uka.ilkd.key.proof;
 
+@FunctionalInterface
 public interface RuleAppListener {
 
-    /** invoked when a rule has been applied */
+    /**
+     * Invoked when a rule has been applied.
+     *
+     * @param e the proof event containing the rule application.
+     */
     void ruleApplied(de.uka.ilkd.key.proof.ProofEvent e);
 }
