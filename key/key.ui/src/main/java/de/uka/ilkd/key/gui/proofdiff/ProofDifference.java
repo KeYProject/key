@@ -5,7 +5,6 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 import java.util.*;
@@ -87,13 +86,13 @@ public class ProofDifference {
         return current;
     }
 
-    static List<Pair<String, String>> findPairs(List<String> left, List<String> right) {
-        List<Pair<String, String>> pairs = new ArrayList<>(left.size() + right.size());
+    static List<Matching> findPairs(List<String> left, List<String> right) {
+        List<Matching> pairs = new ArrayList<>(left.size() + right.size());
         PriorityQueue<Triple<Integer, Integer, Integer>> queue = new PriorityQueue<>(left.size() * right.size(),
                 Comparator.comparingInt((t) -> t.third));
         for (int i = 0; i < left.size(); i++) {
             for (int j = 0; j < right.size(); j++) {
-                queue.add(new Triple<>(i, j, Levensthein.calculate(left.get(i), right.get(j))));
+                queue.add(new Triple<Integer, Integer, Integer>(i, j, Levensthein.calculate(left.get(i), right.get(j))));
             }
         }
 
@@ -107,7 +106,7 @@ public class ProofDifference {
             if (!matchedLeft[t.first] && !matchedRight[t.second]) {
                 String l = left.get((int) t.first);
                 String r = right.get((int) t.second);
-                pairs.add(new Pair<>(l, r));
+                pairs.add(new Matching(l, r, t.third));
                 matchedLeft[t.first] = true;
                 matchedRight[t.second] = true;
             }
@@ -115,11 +114,11 @@ public class ProofDifference {
 
         for (int i = 0; i < matchedLeft.length; i++) {
             if (!matchedLeft[i])
-                pairs.add(new Pair<>(left.get(i), null));
+                pairs.add(new Matching(left.get(i), null, left.get(i).length()));
         }
         for (int i = 0; i < matchedRight.length; i++) {
             if (!matchedRight[i])
-                pairs.add(new Pair<>(null, right.get(i)));
+                pairs.add(new Matching(null, right.get(i), right.get(i).length()));
         }
 
         return pairs;
@@ -162,11 +161,11 @@ public class ProofDifference {
         return commonAntec;
     }
 
-    public List<Pair<String, String>> getSuccPairs() {
+    public List<Matching> getSuccPairs() {
         return findPairs(getLeftSucc(), getRightSucc());
     }
 
-    public List<Pair<String, String>> getAntecPairs() {
+    public List<Matching> getAntecPairs() {
         return findPairs(getLeftAntec(), getRightAntec());
     }
 
@@ -204,4 +203,31 @@ public class ProofDifference {
         }
     }
 
+    static class Matching {
+        final String left, right;
+        final int distance;
+
+        Matching(String left, String right, int distance) {
+            this.left = left;
+            this.right = right;
+            this.distance = distance;
+        }
+
+        public String getLeft() {
+            return left;
+        }
+
+        public String getRight() {
+            return right;
+        }
+
+        public int getDistance() {
+            return distance;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("(%s, %s)", left, right);
+        }
+    }
 }

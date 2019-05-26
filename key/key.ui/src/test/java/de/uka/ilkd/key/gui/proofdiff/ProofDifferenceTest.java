@@ -33,10 +33,9 @@ public class ProofDifferenceTest {
     }
 
     public void testPairs(List<String> seq1, List<String> seq2, String exp) {
-        List<Pair<String, String>> pairs = ProofDifference.findPairs(
+        List<ProofDifference.Matching> pairs = ProofDifference.findPairs(
                 new ArrayList<>(seq1),
                 new ArrayList<>(seq2));
-
         assertEquals(exp, pairs.toString());
     }
 

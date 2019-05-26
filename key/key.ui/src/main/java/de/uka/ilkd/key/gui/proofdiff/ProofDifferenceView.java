@@ -4,6 +4,7 @@ import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.java.Services;
@@ -15,8 +16,12 @@ import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.List;
 
 /**
@@ -24,21 +29,18 @@ import java.util.List;
  * @version 1 (24.05.19)
  */
 public class ProofDifferenceView extends DefaultMultipleCDockable {
-    /**
-     * Threshold for maximum levensthein distant.
-     */
-    private static final int THRESHOLD = 25;
+    public static final String PROPERTY_LEFT_NODE = "left";
+    public static final String PROPERTY_RIGHT_NODE = "right";
     private static final String EDITOR_TYPE = "plain/text";
-    private final Node left, right;
     private final JPanel contentPanel;
-    private int line = 0;
+    private final KeyAction actionHideCommonFormulas = new HideCommandFormulaAction();
+    private final Services services;
+    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    private Node left, right;
 
     public ProofDifferenceView(Node left, Node right, Services services) {
         super(NullMultipleCDockableFactory.NULL);
-        this.left = left;
-        this.right = right;
-
-        setTitleText("Difference between: " + left.serialNr() + " and " + right.serialNr());
+        this.services = services;
         setCloseable(true);
         setRemoveOnClose(true);
 
@@ -52,38 +54,85 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         AC rc = new AC();
         contentPanel = new JPanel();
         contentPanel.setLayout(new MigLayout(lc, cc, rc));
-        /*JPanel boxLeftAntec = new JPanel(new MigLayout(lc, cc)),
-                boxRightAntec = new JPanel(new MigLayout(lc, cc)),
-                boxLeftSucc = new JPanel(new MigLayout(lc, cc)),
-                boxRightSucc = new JPanel(new MigLayout(lc, cc));*/
+        computeDifferences();
 
+        getContentPane().setLayout(new BorderLayout());
+        add(new JScrollPane(contentPanel));
+        JPanel pNorth = new JPanel();
+        JLabel lblLeftNode = new JLabel();
+        JLabel lblRightNode = new JLabel();
+        JTextField txtLeftNode = new JTextField();
+        JTextField txtRightNode = new JTextField();
+        pNorth.add(lblLeftNode);
+        pNorth.add(txtLeftNode);
+        pNorth.add(lblRightNode);
+        pNorth.add(txtRightNode);
+        txtLeftNode.setEditable(false);
+        txtRightNode.setEditable(false);
+        addPropertyChangeListener(PROPERTY_LEFT_NODE, (evt) ->
+                txtLeftNode.setText(String.valueOf(left.serialNr())));
+
+        addPropertyChangeListener(PROPERTY_RIGHT_NODE, (evt) ->
+                txtRightNode.setText(String.valueOf(right.serialNr())));
+
+        addPropertyChangeListener((evt ->
+                setTitleText("Difference between: " + left.serialNr() + " and " + right.serialNr())));
+
+        add(pNorth, BorderLayout.NORTH);
+        JPanel pSouth = new JPanel();
+        JCheckBox chkBox = new JCheckBox(actionHideCommonFormulas);
+        pSouth.add(chkBox);
+        add(pSouth, BorderLayout.SOUTH);
+
+
+        this.left = left;
+        this.right = right;
+    }
+
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    public Services getServices() {
+        return services;
+    }
+
+    public Node getLeft() {
+        return left;
+    }
+
+    public void setLeft(Node left) {
+        Node oldLeft = this.left;
+        this.left = left;
+        propertyChangeSupport.firePropertyChange(PROPERTY_LEFT_NODE, oldLeft, left);
+    }
+
+    public Node getRight() {
+        return right;
+    }
+
+    public void setRight(Node right) {
+        Node old = this.right;
+        this.right = right;
+        propertyChangeSupport.firePropertyChange(PROPERTY_RIGHT_NODE, old, right);
+    }
+
+    private void computeDifferences() {
+        contentPanel.removeAll();
         ProofDifference pd = ProofDifference.create(services, left, right);
-
         fill(pd.getAntecPairs());
-        //boxLeftAntec, boxRightAntec);
-
         JSeparator sep = new JSeparator();
         sep.setBorder(BorderFactory.createLineBorder(Color.BLACK, 5));
         contentPanel.add(sep, "span 2");
-
         fill(pd.getSuccPairs());
-        //boxLeftSucc, boxRightSucc);
-
-        /*JSplitPane splitAntec = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, boxLeftAntec, boxRightAntec);
-        JSplitPane splitSucc = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, boxLeftSucc, boxRightSucc);
-        JSplitPane splitSequent = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                wrapScrollable(splitAntec, "Antecedent"),
-                wrapScrollable(splitSucc, "Succedent"));
-
-        splitAntec.setDividerLocation(.5);
-        splitSequent.setDividerLocation(.5);
-        splitSucc.setDividerLocation(.5);
-
-        splitAntec.setOneTouchExpandable(true);
-        splitSequent.setOneTouchExpandable(true);
-        splitSucc.setOneTouchExpandable(true);*/
-        getContentPane().setLayout(new BorderLayout());
-        add(new JScrollPane(contentPanel));
     }
 
     private static void equaliseSize(JComponent txtL, JComponent txtR) {
@@ -96,23 +145,26 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         txtL.setPreferredSize(max);
     }
 
-    private void fill(List<Pair<String, String>> pairs/*, JPanel boxLeft, JPanel boxRight*/) {
-        for (Pair<String, String> pair : pairs) {
-            JTextArea txtL = createEditor(pair.first);
-            JTextArea txtR = createEditor(pair.second);
-            //equaliseSize(txtL, txtR);
-            //hightlightDifferences(txtL, txtR);
-            txtL.setRows(3);
-            txtR.setRows(3);
-            CC cc = new CC().sizeGroupY("abc" + (++line));
-            contentPanel.add(txtL, cc);
-            contentPanel.add(txtR, cc);
+    private void fill(List<ProofDifference.Matching> pairs/*, JPanel boxLeft, JPanel boxRight*/) {
+        for (ProofDifference.Matching pair : pairs) {
+            if (isHideCommonFormulas() || pair.distance > 0) { // skip formulas that have no differences
+                JEditorPane txtL = createEditor(pair.left);
+                JEditorPane txtR = createEditor(pair.right);
+                //equaliseSize(txtL, txtR);
+                //txtL.setRows(3);
+                //txtR.setRows(3);
+                CC cc = new CC();//.sizeGroupY("abc" + (++line));
+                contentPanel.add(txtL, cc);
+                contentPanel.add(txtR, cc);
+
+                hightlightDifferences(txtL, txtR);
+            }
         }
     }
 
-    protected JTextArea createEditor(String content) {
-        //JEditorPane je = new JEditorPane(EDITOR_TYPE, content != null ? content : "");
-        JTextArea je = new JTextArea(content);
+    protected JEditorPane createEditor(String content) {
+        JEditorPane je = new JEditorPane(EDITOR_TYPE, content != null ? content : "");
+        //JTextArea je = new JTextArea(content);
         je.setEditable(false);
         je.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         je.setFont(UIManager.getDefaults().getFont(Config.KEY_FONT_SEQUENT_VIEW));
@@ -120,32 +172,42 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
     }
 
     private void hightlightDifferences(JEditorPane txtL, JEditorPane txtR) {
-        return;/*
         DefaultHighlighter df1 = new DefaultHighlighter();
         txtL.setHighlighter(df1);
-        DefaultHighlighter df2= new DefaultHighlighter();
+        DefaultHighlighter df2 = new DefaultHighlighter();
         txtL.setHighlighter(df2);
         char[] l = txtL.getText().toCharArray();
         char[] r = txtR.getText().toCharArray();
+
         try {
             for (int i = 0; i < Math.min(l.length, r.length); i++) {
-                if (l[i] != r[i]) {
-                    df1.addHighlight(i, i + 1, new DefaultHighlighter.DefaultHighlightPainter(Color.RED));
-                    df2.addHighlight(i, i + 1, new DefaultHighlighter.DefaultHighlightPainter(Color.RED));
+                int start = i;
+                for (; i < Math.min(l.length, r.length); i++)
+                    ;
+                if (start != i) {
+                    df1.addHighlight(start, i, new DefaultHighlighter.DefaultHighlightPainter(Color.RED));
+                    df2.addHighlight(start, i, new DefaultHighlighter.DefaultHighlightPainter(Color.RED));
                 }
             }
-        } catch (BadLocationException e) {
+        } catch (BadLocationException | NullPointerException e) {
             e.printStackTrace();
-        }*/
-
+        }
     }
 
-    private Component wrapScrollable(JComponent component, String title) {
+    public boolean isHideCommonFormulas() {
+        return actionHideCommonFormulas.isSelected();
+    }
+
+    public void setHideCommonFormulas(boolean hideCommonFormulas) {
+        this.actionHideCommonFormulas.setEnabled(hideCommonFormulas);
+    }
+
+    /*private Component wrapScrollable(JComponent component, String title) {
         JPanel titlePanel = new JPanel(new BorderLayout());
         titlePanel.add(component);
         titlePanel.setBorder(BorderFactory.createTitledBorder(title));
         return new JScrollPane(titlePanel);
-    }
+    }*/
 
     public static class OpenDifferenceWithParent extends MainWindowAction {
         private Node left;
@@ -164,6 +226,17 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
             mainWindow.getDockControl().addDockable(pdv);
             pdv.setLocation(CLocation.base());
             pdv.setVisible(true);
+        }
+    }
+
+    private class HideCommandFormulaAction extends KeyAction {
+        public HideCommandFormulaAction() {
+            setName("Hide common");
+            setSelected(false);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
         }
     }
 }
