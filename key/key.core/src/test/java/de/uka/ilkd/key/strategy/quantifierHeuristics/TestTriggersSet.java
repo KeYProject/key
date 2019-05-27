@@ -35,11 +35,17 @@ import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 
 //most Code are copyed from Logic.TestUpdateFactory
 
-public class TestTriggersSet extends TestCase {
+public class TestTriggersSet {
 
 	private Proof proof;
     
@@ -105,6 +111,7 @@ public class TestTriggersSet extends TestCase {
 		super();
 	}
 
+	@Before
 	public void setUp() {
 		//sort
 		r = new SortImpl(new Name("r"));
@@ -222,6 +229,7 @@ public class TestTriggersSet extends TestCase {
 				new Namespace<Choice>(), new Namespace<IProgramVariable>()));
 	}
 
+	@Test
 	public void testTrigger1(){
 		String term1 = "\\forall s x;(ps(x))";
 		Term allterm = parseTerm(term1);
@@ -232,7 +240,9 @@ public class TestTriggersSet extends TestCase {
 		Term trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
 		assertEquals (trigger1,trigger2);
 	}
-	 
+
+	@Test
+	@Ignore("See Issues #1499")
 	public void testTrigger2(){
 		String term1 = "\\forall r x;(frr(x)=frr(frr(x)))";
 		Term allterm = parseTerm(term1);

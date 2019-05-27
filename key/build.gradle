@@ -3,11 +3,9 @@
 //TODO figure out why javacc is always executed
 
 plugins {
-    id("ca.coglinc.javacc") version("2.4.0") apply false
     id("idea")
     id("eclipse")
     id "com.jfrog.bintray" version "1.8.4" apply false
-    id 'com.github.johnrengelman.shadow' version "5.0.0" apply false
 }
 
 idea {
@@ -42,7 +40,6 @@ def getGitBranch = { ->
 ext.dateVersion = getDate()
 ext.gitRevision = getGitRevision()
 ext.gitBranch = getGitBranch()
-version = "2.7"
 
 def resourceDir = new File(project(":key.core").projectDir, "src/main/resources")
 def utilResourceDir = new File(resourceDir, "de/uka/ilkd/key/util")
@@ -52,7 +49,7 @@ new File(utilResourceDir, "branch").text = gitBranch
 new File(utilResourceDir, "version").text = version
 
 group = "org.key_project"
-version = "${version}.0-${System.env.BUILD_NUMBER ?: ext.gitRevision}"
+version = "2.7.0-${System.env.BUILD_NUMBER ?: ext.gitRevision}"
 
 subprojects {
     apply plugin: "java"
@@ -78,22 +75,40 @@ subprojects {
     }
 
     tasks.withType(Javadoc) {
-        //failOnError=false
+        failOnError = false
         options.addBooleanOption 'Xdoclint:none', true
-        options.verbose()
+        //options.verbose()
+        options.encoding = 'UTF-8'
+        if (JavaVersion.current().isJava9Compatible()) {
+            //options.addBooleanOption('html5', true)
+        }
     }
 
     tasks.withType(Test) {//Configure all tests
+        systemProperty "test-resources", "src/test/resources"
         systemProperty "testcases", "src/test/resources/testcase"
         systemProperty "TACLET_PROOFS", "tacletProofs"
-        systemProperty "EXAMPLES_DIR", new File(project(":key.ui").projectDir, "examples")
+        systemProperty "EXAMPLES_DIR", file("$rootProject/key.ui/examples")
         systemProperty "RUNALLPROOFS_DIR", "$buildDir/report/runallproves"
-
 
         systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
     }
 
+
+    test {
+        useJUnit {
+            excludeCategories 'org.key_project.util.testcategories.Interactive',  'org.key_project.util.testcategories.Performance'
+        }
+    }
+
+    task testFast(type: Test) {
+        group "verification"
+        useJUnit {
+            excludeCategories 'org.key_project.util.testcategories.Slow'
+            excludeCategories 'org.key_project.util.testcategories.Interactive'
+        }
+    }
 
     /*findbugs { findbugsTest.enabled = false; ignoreFailures = true }
     pmd { pmdTest.enabled = false; ignoreFailures = true }
@@ -120,6 +135,11 @@ subprojects {
 
     dependencies {
         testCompile("junit:junit:4.12")
+
+        //testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+        //testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+        //testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.3.1'
+
         testCompile project(":key.util")
     }
 
@@ -206,221 +226,9 @@ subprojects {
     }
 }
 
-allprojects {
-    tasks.withType(Javadoc) {
-        if (JavaVersion.current().isJava9Compatible()) {
-            options.encoding = 'UTF-8'
-            //not working jenkins: options.addBooleanOption('html5', true)
-        }
-    }
-}
-
-
-project(":key.util") {
-    test {
-        useJUnit()
-        systemProperty "test-resources", "src/test/resources"
-        filter {
-            //https://docs.gradle.org/current/userguide/java_testing.html#test_filtering
-            includeTestsMatching '*Tests' // only run the Test suites
-        }
-    }
-}
-
-project(":key.core") {
-    apply plugin: "ca.coglinc.javacc"
-    apply plugin: "antlr"
-
-    dependencies {
-        compile project(":key.util")
-        compile name: 'recoderKey'
-        //compile name: 'javacc'
-        //compile name: 'antlr'
-        compile 'net.java.dev.javacc:javacc:4.0'
-        compile "org.antlr:antlr-runtime:3.5.2"
-        compile group: 'antlr', name: 'antlr', version: '2.7.7'
-
-        //antlr name: 'antlr'
-        //javacc name: 'javacc'
-        javacc 'net.java.dev.javacc:javacc:4.0'
-        antlr "org.antlr:antlr:3.5.2"   // use ANTLR version 3
-    }
-
-    def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
-    def javaCCOutputDirMain = file("$javaCCOutputDir/main")
-    sourceSets.main.java.srcDirs(javaCCOutputDirMain)
-
-    generateGrammarSource {
-        maxHeapSize = "64m"
-        arguments += ["-visitor", "-listener", "-long-messages"]
-    }
-
-    generateTestGrammarSource {
-        maxHeapSize = "64m"
-        arguments += ["-visitor", "-listener", "-long-messages"]
-    }
-
-    compileJavacc {
-        outputDirectory = javaCCOutputDirMain
-        inputDirectory = file("src/main/javacc")
-        doLast {
-            copy {
-                from("src/main/javacc/de/uka/ilkd/key/parser/schemajava/Token.java")
-                into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/schemajava/"
-            }
-            copy {
-                from("src/main/javacc/de/uka/ilkd/key/parser/proofjava/Token.java")
-                into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/proofjava/"
-            }
-        }
-    }
-
-    tasks.withType(Test) {//Configure all tests
-        systemProperty "testcases", "src/test/resources/testcase"
-        systemProperty "TACLET_PROOFS", "tacletProofs"
-        systemProperty "EXAMPLES_DIR", new File(project(":key.ui").projectDir, "examples")
-        systemProperty "RUNALLPROOFS_DIR", "$buildDir/report/runallproves"
-
-
-        systemProperty "key.disregardSettings", "true"
-        maxHeapSize = "4g"
-    }
-
-    test {
-        filter {
-            includeTestsMatching "JavaTests"
-            includeTestsMatching "LogicModelTests"
-            includeTestsMatching "ParserTests"
-            includeTestsMatching "ProofConstructionTests"
-            includeTestsMatching "RuleTests"
-            includeTestsMatching "SmtTests"
-            includeTestsMatching "SpeclangTests"
-            includeTestsMatching "UtilityTests"
-        }
-    }
-
-    task testProofRules(type: Test) {
-        group "verification"
-        filter { includeTestsMatching "ProveRulesTest" }
-    }
-
-    task testRunAllProofs(type: Test) {
-        group "verification"
-        filter { includeTestsMatching "RunAllProofsTestSuite" }
-    }
-
-    //check.dependsOn << testProofRules << testRunAllProofs
-}
-
-project(":key.core.example") {
-    dependencies {
-        compile project(":key.core")
-    }
-}
-
-project(":key.core.symbolic_execution.example") {
-    dependencies {
-        compile project(":key.core")
-        compile project(":key.core.symbolic_execution")
-    }
-}
-
-project(":key.core.proof_references") {
-    dependencies {
-        compile project(":key.core")
-    }
-    test {
-        systemProperty "testcases", "src/test/resources/testcase"
-        maxHeapSize = "4g"
-        systemProperty "testcases", "src/test/resources/testcase"
-        filter { includeTestsMatching "AllProofReferencesTests" }
-    }
-}
-
-project(":key.core.symbolic_execution") {
-    dependencies {
-        compile project(":key.core")
-    }
-    test {
-        systemProperty "testcases", "src/test/resources/testcase"
-        maxHeapSize = "4g"
-        filter { includeTestsMatching "AllSymbolicExecutionTests" }
-    }
-}
-
-project(":key.core.testgen") {
-    dependencies {
-        compile project(":key.core")
-    }
-
-    test {
-        systemProperty "testcases", "src/test/resources/testcase"
-        filter { includeTestsMatching "AllTestGenTests" }
-    }
-}
-
-project(":key.removegenerics") {
-    dependencies {
-        compile project(":key.core")
-    }
-}
-
-project(":key.ui") {
-    apply plugin: "application"
-    apply plugin: 'com.github.johnrengelman.shadow'
-
-    dependencies {
-        compile project(":key.core")
-        compile project(":key.core:rifl")
-
-        compile(project(":key.core.proof_references"))
-        compile(project(":key.core.symbolic_execution"))
-        compile(project(":key.core.testgen"))
-        compile(project(":key.removegenerics"))
-
-        runtimeOnly project(":keyext.interactionlog")
-        //runtimeOnly project(":keyext.script.ui")
-    }
-
-    task createExamplesZip(type: Zip) {
-        destinationDirectory = file("$buildDir/resources/main/")
-        archiveFileName = "examples.zip"
-        from "examples"
-        include "**/**"
-    }
-
-    processResources.dependsOn << createExamplesZip
-
-    shadowJar {
-        archiveClassifier = "exe"
-        archiveBaseName = "key"
-    }
-
-    distZip {
-        archiveBaseName = "key"
-    }
-
-    application {
-        //dependsOn(createExamplesZip)
-        mainClassName = "de.uka.ilkd.key.core.Main"
-    }
-
-    run {
-        systemProperties["key.examples.dir"] = "$projectDir/examples"
-    }
-}
-
-project(":keyext.interactionlog") {
-    dependencies {
-        compile project(":key.ui")
-        compile group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.12.1'
-        compile group: 'com.atlassian.commonmark', name: 'commonmark-ext-gfm-tables', version: '0.12.1'
-        compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
-    }
-}
 
 task start {
-    dependsOn project(":key.ui").run
+//    dependsOn project(":key.ui").run
 }
 
 
@@ -438,6 +246,7 @@ task alldoc(type: Javadoc) {
 
     configure(options) {
         //showFromPrivate()
+        encoding = 'UTF-8'
         addBooleanOption 'Xdoclint:none', true
         // overview = new File( projectDir, 'src/javadoc/package.html' )
         //stylesheetFile = new File( projectDir, 'src/javadoc/stylesheet.css' )
@@ -459,7 +268,7 @@ task alldocJar(type: Zip) {
     destinationDirectory = file("$buildDir/distribution")
 }
 
-task fatJar(type: Jar) {
+/*task fatJar(type: Jar) {
     dependsOn project(":key.ui").jar
     dependsOn project(":keyext.interactionlog").jar
     //dependsOn project(":keyext.script.ui").jar
@@ -482,4 +291,4 @@ task fatJar(type: Jar) {
     from jarFiles
     with project(":key.ui").jar
     from "$rootDir/LICENSE.TXT"
-}
+}*/
