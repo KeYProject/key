@@ -37,6 +37,7 @@ public class ProofDifference {
 
     public static ProofDifference create(Node left, Node right, Function<Term, String> printer) {
         ProofDifference pd = new ProofDifference();
+        assert left != null && right != null;
         pd.leftAntec = initialise(printer, left.sequent().antecedent());
         pd.leftSucc = initialise(printer, left.sequent().succedent());
         pd.rightAntec = initialise(printer, right.sequent().antecedent());
