@@ -150,7 +150,11 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
      * @param services services.
      */
     public OriginTermLabelWindow(PosInOccurrence pos, Node node, Services services) {
-        super(node, "Origin: " + (pos == null ? "(whole sequent)" : pos.subTerm()));
+        super(node, "Origin for node " + node.serialNr() + ": "
+                + (pos == null
+                    ? "whole sequent"
+                    : LogicPrinter.quickPrintTerm(pos.subTerm(), services)
+                        .replaceAll("\\s+", " ")));
 
         // TermView can only print sequents or formulas, not terms.
         if (pos != null) {
@@ -228,6 +232,8 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
         });
 
         JSplitPane bodyPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        bodyPane.setResizeWeight(0.5);
+        bodyPane.setOneTouchExpandable(true);
 
         JPanel contentPane = new JPanel();
         contentPane.setLayout(new BorderLayout());
@@ -299,7 +305,8 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
             JScrollPane viewScrollPane = new JScrollPane(view,
                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            viewScrollPane.setBorder(new TitledBorder(VIEW_TITLE));
+            viewScrollPane.setBorder(new TitledBorder(
+                    VIEW_TITLE + " (" + posSemisequentStr(pos) + ")"));
 
             view.printSequent();
 
@@ -315,6 +322,16 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
         }
 
         bodyPane.setDividerLocation(WIDTH / 2);
+    }
+
+    private String posSemisequentStr(PosInOccurrence pos) {
+        if (pos == null) {
+            return "whole sequent";
+        } else if (pos.isInAntec()) {
+            return "in antecendent";
+        } else {
+            return "in succedent";
+        }
     }
 
     private void updateNodeLink() {
