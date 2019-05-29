@@ -31,6 +31,7 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -108,9 +109,11 @@ public class IconFactory {
 
     private static Image heatmapImage = getImage("images/toolbar/heatmap.png");
 
-    // private static Image originImage = getImage("images/toolbar/origin.png");
     private static final Icon ORIGIN_ICON =
             IconFontSwing.buildIcon(FontAwesomeBold.ROUTE, MainWindowTabbedPane.TAB_ICON_SIZE);
+
+    private static final Icon WINDOW_ICON =
+            IconFontSwing.buildIcon(FontAwesomeBold.WINDOW_RESTORE, ProofTreeView.ICON_SIZE);
 
     public static Image getImage(String s) {
 	ImageIcon ii=createImageIcon(IconFactory.class, s);
@@ -379,8 +382,11 @@ public class IconFactory {
         return scaleIcon(heatmapImage, size, size);
     }
 
-    public static Icon originIcon(int size) {
-        // return scaleIcon(originImage, size, size);
+    public static Icon windowIcon() {
+        return WINDOW_ICON;
+    }
+
+    public static Icon originIcon() {
         return ORIGIN_ICON;
     }
 

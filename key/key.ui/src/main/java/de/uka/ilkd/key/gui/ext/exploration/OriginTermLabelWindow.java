@@ -340,6 +340,8 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
         if (!node.proof().find(node)) {
             nodeLinkButton.setText("DELETED NODE");
             nodeLinkButton.setEnabled(false);
+
+            unregister(this);
         } else if (nodeLinkButton.isEnabled()) {
             nodeLinkButton.setText(node.serialNr() + ": " + node.name());
         }

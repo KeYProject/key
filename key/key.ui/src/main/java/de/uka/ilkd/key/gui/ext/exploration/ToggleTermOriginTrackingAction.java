@@ -36,7 +36,7 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
 
         setName("Toggle Term Origin Tracking");
         setTooltip("Toggle term origin tracking");
-        setIcon(IconFactory.originIcon(MainWindow.TOOLBAR_ICON_SIZE));
+        setIcon(IconFactory.originIcon());
         setEnabled(getMediator().getSelectedProof() != null);
 
         getMediator().addKeYSelectionListener(new KeYSelectionListener() {
