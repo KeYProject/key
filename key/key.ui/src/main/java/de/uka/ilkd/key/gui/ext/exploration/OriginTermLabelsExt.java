@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.ext.exploration;
 
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ext.KeYMainMenuExtension;
 import de.uka.ilkd.key.gui.ext.KeYTermInfoExtension;
-import de.uka.ilkd.key.gui.ext.KeYTermMenuExtension;
+import de.uka.ilkd.key.gui.ext.KeYSequentViewMenuExtension;
 import de.uka.ilkd.key.gui.ext.KeYToolbarExtension;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -29,7 +30,7 @@ import de.uka.ilkd.key.settings.TermLabelSettings;
  */
 public class OriginTermLabelsExt
     implements
-        KeYTermMenuExtension,
+        KeYSequentViewMenuExtension,
         KeYMainMenuExtension,
         KeYToolbarExtension,
         KeYTermInfoExtension {
@@ -52,10 +53,15 @@ public class OriginTermLabelsExt
     }
 
     @Override
-    public List<Action> getTermMenuActions(MainWindow mainWindow, PosInSequent pos) {
+    public List<Action> getSequentViewMenuActions(MainWindow mainWindow, PosInSequent pos) {
         List<Action> result = new LinkedList<>();
         result.add(new ShowOriginAction(pos));
         return result;
+    }
+
+    @Override
+    public EnumSet<SequentViewMenuType> getSequentViewMenuTypes() {
+        return EnumSet.allOf(SequentViewMenuType.class);
     }
 
     @Override

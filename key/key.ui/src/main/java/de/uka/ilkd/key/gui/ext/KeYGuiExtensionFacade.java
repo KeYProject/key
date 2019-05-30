@@ -4,7 +4,9 @@ import static de.uka.ilkd.key.gui.ext.KeYExtConst.PATH;
 import static de.uka.ilkd.key.gui.ext.KeYExtConst.PRIORITY;
 
 import java.awt.Component;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -169,19 +171,44 @@ public final class KeYGuiExtensionFacade {
      *
      * @return all known implementations of the {@link KeYMainMenuExtension}.
      */
-    public static List<KeYTermMenuExtension> getTermMenuExtensions() {
-        return getExtension(KeYTermMenuExtension.class);
+    public static List<KeYSequentViewMenuExtension> getTermMenuExtensions() {
+        return getExtension(KeYSequentViewMenuExtension.class);
     }
 
-    public static List<Action> getTermMenuActions(MainWindow window, PosInSequent pos) {
+    /**
+     * Returns a list of all extension actions under the specified filters.
+     *
+     * @param window the main window.
+     * @param pos the position of the selected term.
+     * @param filter the menu types for which extensions should be added.
+     * @return a list of all extension actions under the specified filters.
+     */
+    public static List<Action> getSequentViewMenuActions(
+            MainWindow window,
+            PosInSequent pos,
+            EnumSet<KeYSequentViewMenuExtension.SequentViewMenuType> filter) {
         return getTermMenuExtensions().stream()
-                .flatMap(it -> it.getTermMenuActions(window, pos).stream())
+                .filter(ext -> !Collections.disjoint(filter, ext.getSequentViewMenuTypes()))
+                .flatMap(it -> it.getSequentViewMenuActions(window, pos).stream())
                 .collect(Collectors.toList());
     }
 
-    public static JMenu createTermMenu(MainWindow window, PosInSequent pos) {
+    /**
+     * Returns a menu containing all extensions under the specified filters.
+     *
+     * @param window the main window.
+     * @param pos the position of the selected term.
+     * @param filter the menu types for which extensions should be added.
+     * @return a menu containing all extensions under the specified filters.
+     *
+     * @see KeYSequentViewMenuExtension#getSequentViewMenuTypes()
+     */
+    public static JMenu createSequentViewMenu(
+            MainWindow window,
+            PosInSequent pos,
+            EnumSet<KeYSequentViewMenuExtension.SequentViewMenuType> filter) {
         JMenu menu = new JMenu("Extensions");
-        getTermMenuActions(window, pos).forEach(it -> sortActionIntoMenu(it, menu));
+        getSequentViewMenuActions(window, pos, filter).forEach(it -> sortActionIntoMenu(it, menu));
         return menu;
     }
     //endregion
