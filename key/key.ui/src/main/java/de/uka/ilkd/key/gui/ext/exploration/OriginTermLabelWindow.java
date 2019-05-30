@@ -657,7 +657,9 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
                         printSemisequent(antec);
 
                         if (pos == null) {
-                            layouter.brk(1,-1).print("==>").brk(1);
+                            layouter.brk(1,-1);
+                            printSequentArrow();
+                            layouter.brk(1);
                         }
 
                         printSemisequent(succ);

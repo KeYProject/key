@@ -77,6 +77,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.UnicodeHelper;
 import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
@@ -560,11 +561,13 @@ public class LogicPrinter {
                 }
                 layouter.brk().beginC(2).print("\\find (").brk();
                 if (taclet instanceof SuccTaclet) {
-                    layouter.print("==>").brk();
+                    printSequentArrow();
+                    layouter.brk();
                 }
                 printTerm(((FindTaclet)taclet).find());
                 if (taclet instanceof AntecTaclet) {
-                    layouter.brk().print("==>");
+                    printSequentArrow();
+                    layouter.brk();
                 }
                 layouter.brk(1,-2).print(")").end();
     }
@@ -740,15 +743,22 @@ public class LogicPrinter {
         try {
             ImmutableList<SequentPrintFilterEntry> antec = filter.getFilteredAntec();
             ImmutableList<SequentPrintFilterEntry> succ  = filter.getFilteredSucc();
+
             markStartSub();
             startTerm(antec.size()+succ.size());
+
             layouter.beginC(1).ind();
             printSemisequent(antec);
-            layouter.brk(1,-1).print("==>").brk(1);
+
+            layouter.brk(1,-1);
+            printSequentArrow();
+            layouter.brk(1);
+
             printSemisequent(succ);
             if (finalbreak) {
                 layouter.brk(0);
             }
+
             markEndSub();
             layouter.end();
         } catch (IOException e) {
@@ -767,13 +777,19 @@ public class LogicPrinter {
             Semisequent succ  = seq.succedent();
             markStartSub();
             startTerm(antec.size()+succ.size());
+
             layouter.beginC(1).ind();
             printSemisequent(antec);
-            layouter.brk(1,-1).print("==>").brk(1);
+
+            layouter.brk(1,-1);
+            printSequentArrow();
+            layouter.brk(1);
+
             printSemisequent(succ);
             if (finalbreak) {
                 layouter.brk(0);
             }
+
             markEndSub();
             layouter.end();
         } catch (IOException e) {
@@ -2145,6 +2161,14 @@ public class LogicPrinter {
 	    }
 	    markEndSub();
 	}
+    }
+
+    protected void printSequentArrow() throws IOException {
+        if (getNotationInfo().isUnicodeEnabled()) {
+            layouter.print(Character.toString(UnicodeHelper.SEQUENT_ARROW));
+        } else {
+            layouter.print("==>");
+        }
     }
 
     /**
