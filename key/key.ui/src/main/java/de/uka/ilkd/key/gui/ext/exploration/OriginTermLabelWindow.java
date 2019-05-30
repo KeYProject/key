@@ -5,16 +5,23 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -135,6 +142,34 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
     private JTree tree;
 
     private JButton nodeLinkButton;
+    private Action nodeLinkAction = new AbstractAction() {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            KeYMediator mediator = MainWindow.getInstance().getMediator();
+
+            if (!mediator.getSelectedProof().equals(getNode().proof())) {
+                int choice = JOptionPane.showOptionDialog(
+                        OriginTermLabelWindow.this,
+                        "The proof containing this node is not currently selected."
+                                + " Do you want to select it?",
+                        "Switch Proof?",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        null,
+                        null);
+
+                if (choice == 0) {
+                    mediator.getSelectionModel().setSelectedProof(getNode().proof());
+                } else {
+                    return;
+                }
+            }
+
+            mediator.getSelectionModel().setSelectedNode(getNode());
+        }
+    };
 
     private Services services;
     private PosInOccurrence termPio;
@@ -173,63 +208,66 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
         setLocationRelativeTo(null);
         setVisible(true);
 
+        JMenuBar menuBar = new JMenuBar();
+        {
+            JMenu menu = new JMenu("Origin");
+            menu.setMnemonic(KeyEvent.VK_O);
+
+            JMenuItem gotoNodeItem = new JMenuItem();
+            gotoNodeItem.setAction(nodeLinkAction);
+            gotoNodeItem.setText("Go to node");
+            gotoNodeItem.setToolTipText("Go to the proof node associated with this window");
+            menu.add(gotoNodeItem);
+
+            JMenuItem closeItem = new JMenuItem("Close");
+            closeItem.setIcon(IconFactory.quit(16));
+            closeItem.setToolTipText("Close this window");
+            closeItem.addActionListener(event -> {
+                OriginTermLabelWindow.this.dispose();
+            });
+            menu.add(closeItem);
+
+            menuBar.add(menu);
+            setJMenuBar(menuBar);
+        }
+
         JPanel headPane = new JPanel();
-        headPane.add(new JLabel("Showing origin information for "));
-        nodeLinkButton = new JButton();
-        headPane.add(nodeLinkButton);
-        headPane.add(new JLabel(" in proof \"" + node.proof().name().toString() + "\""));
-        nodeLinkButton.addActionListener(event -> {
-            KeYMediator mediator = MainWindow.getInstance().getMediator();
+        {
 
-            if (!mediator.getSelectedProof().equals(node.proof())) {
-                int choice = JOptionPane.showOptionDialog(
-                        this,
-                        "The proof containing this node is not currently selected."
-                                + " Do you want to select it?",
-                        "Switch Proof?",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        null,
-                        null);
+            headPane.add(new JLabel("Showing origin information for "));
+            nodeLinkButton = new JButton();
+            headPane.add(nodeLinkButton);
+            headPane.add(new JLabel(" in proof \"" + node.proof().name().toString() + "\""));
+            nodeLinkButton.setAction(nodeLinkAction);
 
-                if (choice == 0) {
-                    mediator.getSelectionModel().setSelectedProof(node.proof());
-                } else {
-                    return;
-                }
-            }
-
-            mediator.getSelectionModel().setSelectedNode(node);
-        });
-
-        updateNodeLink();
-
-        node.proof().addRuleAppListener(event -> {
             updateNodeLink();
-        });
-        node.proof().addProofTreeListener(new ProofTreeAdapter() {
 
-            @Override
-            public void proofStructureChanged(ProofTreeEvent e) {
+            node.proof().addRuleAppListener(event -> {
                 updateNodeLink();
-            }
+            });
+            node.proof().addProofTreeListener(new ProofTreeAdapter() {
 
-            @Override
-            public void proofPruned(ProofTreeEvent e) {
-                updateNodeLink();
-            }
+                @Override
+                public void proofStructureChanged(ProofTreeEvent e) {
+                    updateNodeLink();
+                }
 
-            @Override
-            public void proofGoalsChanged(ProofTreeEvent e) {
-                updateNodeLink();
-            }
+                @Override
+                public void proofPruned(ProofTreeEvent e) {
+                    updateNodeLink();
+                }
 
-            @Override
-            public void proofExpanded(ProofTreeEvent e) {
-                updateNodeLink();
-            }
-        });
+                @Override
+                public void proofGoalsChanged(ProofTreeEvent e) {
+                    updateNodeLink();
+                }
+
+                @Override
+                public void proofExpanded(ProofTreeEvent e) {
+                    updateNodeLink();
+                }
+            });
+        }
 
         JSplitPane bodyPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         bodyPane.setResizeWeight(0.5);
@@ -339,7 +377,7 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
 
         if (!node.proof().find(node)) {
             nodeLinkButton.setText("DELETED NODE");
-            nodeLinkButton.setEnabled(false);
+            nodeLinkAction.setEnabled(false);
 
             unregister(this);
         } else if (nodeLinkButton.isEnabled()) {
