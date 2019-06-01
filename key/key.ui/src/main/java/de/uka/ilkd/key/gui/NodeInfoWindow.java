@@ -4,7 +4,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -26,6 +28,8 @@ public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeIn
 
     private static Map<Name, Map<Integer, SortedSet<NodeInfoWindow>>> instances = new HashMap<>();
 
+    private static Set<NodeInfoWindowListener> listeners = new HashSet<>();
+
     /**
      * Returns {@code true} iff there are any open {@code NodeInfoWindow}s
      * associated with the specified node.
@@ -35,9 +39,7 @@ public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeIn
      *  associated with the specified node.
      */
     public static boolean hasInstances(Node node) {
-        return instances
-                .getOrDefault(node.proof().name(), Collections.emptyMap())
-                .containsKey(node.serialNr());
+        return !getInstances(node).isEmpty();
     }
 
     /**
@@ -53,6 +55,24 @@ public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeIn
     }
 
     /**
+     * Adds a listener.
+     *
+     * @param listener the listener to add.
+     */
+    public static void addListener(NodeInfoWindowListener listener) {
+        listeners.add(listener);
+    }
+
+    /**
+     * Removes a listener.
+     *
+     * @param listener the listener to remove.
+     */
+    public static void removeListener(NodeInfoWindowListener listener) {
+        listeners.remove(listener);
+    }
+
+    /**
      * Ensures that the specified window will not be returned by {@link #getInstances(Node)}.
      *
      * @param win the window to unregister.
@@ -61,6 +81,12 @@ public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeIn
     protected static void unregister(NodeInfoWindow win) {
         Node node = win.getNode();
         instances.get(node.proof().name()).get(node.serialNr()).remove(win);
+
+        synchronized (listeners) {
+            for (NodeInfoWindowListener listener : listeners) {
+                listener.windowUnregistered(win);
+            }
+        }
     }
 
     private static void register(NodeInfoWindow win) {
@@ -82,6 +108,12 @@ public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeIn
                unregister(win);
             }
         });
+
+        synchronized (listeners) {
+            for (NodeInfoWindowListener listener : listeners) {
+                listener.windowRegistered(win);
+            }
+        }
     }
 
     private Node node;

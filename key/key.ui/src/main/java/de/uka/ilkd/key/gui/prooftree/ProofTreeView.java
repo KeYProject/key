@@ -75,6 +75,7 @@ import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.MainWindowTabbedPane;
 import de.uka.ilkd.key.gui.NodeInfoWindow;
+import de.uka.ilkd.key.gui.NodeInfoWindowListener;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
@@ -145,6 +146,18 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
     private GUIProofTreeProofListener proofListener;
     private GUITreeSelectionListener treeSelectionListener;
     private GUIProofTreeGUIListener guiListener;
+
+    private NodeInfoWindowListener nodeInfoWindowListener = new NodeInfoWindowListener() {
+
+        @Override
+        public void windowUnregistered(NodeInfoWindow win) {
+            delegateModel.updateTree(win.getNode());
+        }
+
+        @Override
+        public void windowRegistered(NodeInfoWindow win) { }
+    };
+
     private ConfigChangeListener configChangeListener = new ConfigChangeListener() {
         @Override
         public void configChanged(ConfigChangeEvent e) {
@@ -235,6 +248,7 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
 
         delegateView.addMouseListener(ml);
 
+        NodeInfoWindow.addListener(nodeInfoWindowListener);
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
 
         setProofTreeFont();
@@ -265,6 +279,7 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
     protected void finalize() throws Throwable {
         super.finalize();
         Config.DEFAULT.removeConfigChangeListener(configChangeListener);
+        NodeInfoWindow.removeListener(nodeInfoWindowListener);
     }
 
     private void setProofTreeFont() {
