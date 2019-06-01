@@ -97,16 +97,6 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
     public static final Color HIGHLIGHT_COLOR = Color.ORANGE;
 
     /**
-     * The title of the tree view.
-     */
-    public static final String TREE_TITLE = "Selected formula as tree";
-
-    /**
-     * The title of the term view.
-     */
-    public static final String VIEW_TITLE = "Selected formula";
-
-    /**
      * The title for the origin information for the selected term.
      *
      * @see #ORIGIN_TITLE
@@ -161,7 +151,8 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
                         null);
 
                 if (choice == 0) {
-                    mediator.getSelectionModel().setSelectedProof(getNode().proof());
+                    mediator.setProof(getNode().proof());
+                    //mediator.getSelectionModel().setSelectedProof(getNode().proof());
                 } else {
                     return;
                 }
@@ -279,6 +270,16 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
         contentPane.add(bodyPane, BorderLayout.CENTER);
         setContentPane(contentPane);
 
+        String borderTitle;
+
+        if (pos == null) {
+            borderTitle = "selected sequent";
+        } else if (pos.isInAntec()) {
+            borderTitle = "selected formula in antecedent";
+        } else {
+            borderTitle = "selected formula in succedent";
+        }
+
         DefaultTreeModel treeModel = buildModel(pos);
         {
             tree = new JTree(treeModel);
@@ -301,7 +302,7 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
             JScrollPane treeScrollPane = new JScrollPane(tree,
                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-            treeScrollPane.setBorder(new TitledBorder(TREE_TITLE));
+            treeScrollPane.setBorder(new TitledBorder(borderTitle + " as tree"));
 
             treeScrollPane.setPreferredSize(new Dimension(WIDTH / 2, HEIGHT));
             bodyPane.add(treeScrollPane);
@@ -343,8 +344,7 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
             JScrollPane viewScrollPane = new JScrollPane(view,
                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            viewScrollPane.setBorder(new TitledBorder(
-                    VIEW_TITLE + " (" + posSemisequentStr(pos) + ")"));
+            viewScrollPane.setBorder(new TitledBorder(borderTitle));
 
             view.printSequent();
 
@@ -360,16 +360,6 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
         }
 
         bodyPane.setDividerLocation(WIDTH / 2);
-    }
-
-    private String posSemisequentStr(PosInOccurrence pos) {
-        if (pos == null) {
-            return "whole sequent";
-        } else if (pos.isInAntec()) {
-            return "in antecendent";
-        } else {
-            return "in succedent";
-        }
     }
 
     private void updateNodeLink() {

@@ -105,7 +105,7 @@ public class KeYMediator {
      * boolean flag indicating if the GUI is in auto mode
      */
     private boolean inAutoMode = false;
-    
+
 
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
@@ -204,8 +204,8 @@ public class KeYMediator {
     public boolean ensureProofLoaded() {
     	return getSelectedProof() != null;
     }
-   
-   
+
+
     /**
      * Returns a filter that is used for filtering taclets that should not be showed while
      * interactive proving.
@@ -262,9 +262,10 @@ public class KeYMediator {
         }
     }
 
-
     /**
-     * initializes proof (this is Swing thread-safe)
+     * Selects the specified proof and initializes it.
+     *
+     * @param p the proof to select.
      */
     public void setProof(Proof p) {
         final Proof pp = p;
@@ -272,7 +273,8 @@ public class KeYMediator {
 	    setProofHelper(pp);
         } else {
             Runnable swingProzac = new Runnable() {
-               public void run() { setProofHelper(pp); }
+               @Override
+            public void run() { setProofHelper(pp); }
             };
             ThreadUtilities.invokeAndWait(swingProzac);
         }
@@ -356,7 +358,7 @@ public class KeYMediator {
 	listenerList.remove(GUIListener.class, listener);
     }
 
-         
+
     public void addInterruptedListener(InterruptListener listener) {
         listenerList.add(InterruptListener.class, listener);
     }
@@ -508,7 +510,8 @@ public class KeYMediator {
    public void stopInterface(boolean fullStop) {
       final boolean b = fullStop;
       Runnable interfaceSignaller = new Runnable() {
-         public void run() {
+         @Override
+        public void run() {
             ui.notifyAutoModeBeingStarted();
             if (b) {
                inAutoMode = true;
@@ -523,20 +526,22 @@ public class KeYMediator {
    public void startInterface(boolean fullStop) {
       final boolean b = fullStop;
       Runnable interfaceSignaller = new Runnable() {
-         public void run() {
+         @Override
+        public void run() {
             if ( b ) {
                inAutoMode = false;
                getUI().getProofControl().fireAutoModeStopped (new ProofEvent(getSelectedProof())); // TODO: Is this wrong use of auto mode really required?
             }
             ui.notifyAutomodeStopped();
-            if (getSelectedProof() != null)
+            if (getSelectedProof() != null) {
                 keySelectionModel.fireSelectedProofChanged();
+            }
          }
       };
       ThreadUtilities.invokeOnEventQueue(interfaceSignaller);
    }
 
-   
+
    /**
     * Checks if the auto mode is currently running.
     *
@@ -565,7 +570,8 @@ public class KeYMediator {
        @Override
        public void proofPruned(final ProofTreeEvent e) {
            SwingUtilities.invokeLater(new Runnable() {
-               public void run () {
+               @Override
+            public void run () {
                    if (!e.getSource().find(getSelectedNode())) {
                        keySelectionModel.setSelectedNode(e.getNode());
                    }
@@ -585,7 +591,9 @@ public class KeYMediator {
 
        @Override
        public void proofStructureChanged(ProofTreeEvent e) {
-           if (isInAutoMode() || pruningInProcess) return;
+           if (isInAutoMode() || pruningInProcess) {
+            return;
+        }
            Proof p = e.getSource();
            if (p == getSelectedProof()) {
                Node sel_node = getSelectedNode();
@@ -605,8 +613,11 @@ public class KeYMediator {
                                                             AutoModeListener {
 
 	/** invoked when a rule has been applied */
-	public void ruleApplied(ProofEvent e) {
-	    if (isInAutoMode()) return;
+	@Override
+    public void ruleApplied(ProofEvent e) {
+	    if (isInAutoMode()) {
+            return;
+        }
 	    if (e.getSource() == getSelectedProof()) {
 	        keySelectionModel.defaultSelection();
 	    }
@@ -615,26 +626,30 @@ public class KeYMediator {
 
 	/** invoked if automatic execution has started
 	 */
-	public void autoModeStarted(ProofEvent e) {
+	@Override
+    public void autoModeStarted(ProofEvent e) {
 	    resetNrGoalsClosedByHeuristics();
 	}
 
 	/** invoked if automatic execution has stopped
 	 */
-	public void autoModeStopped(ProofEvent e) {
+	@Override
+    public void autoModeStopped(ProofEvent e) {
 	}
     }
 
     class KeYMediatorSelectionListener implements KeYSelectionListener {
 	/** focused node has changed */
-	public void selectedNodeChanged(KeYSelectionEvent e) {
+	@Override
+    public void selectedNodeChanged(KeYSelectionEvent e) {
 	    // empty
 	}
 
 	/** the selected proof has changed (e.g. a new proof has been
 	 * loaded)
 	 */
-	public void selectedProofChanged(KeYSelectionEvent e) {
+	@Override
+    public void selectedProofChanged(KeYSelectionEvent e) {
 	    setProof(e.getSource().getSelectedProof());
 	}
     }
@@ -645,7 +660,9 @@ public class KeYMediator {
     public void enableWhenProofLoaded(final Action a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
+            @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {}
+            @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
                 a.setEnabled(
                     e.getSource().getSelectedProof() != null);
@@ -662,14 +679,16 @@ public class KeYMediator {
     public void enableWhenProofLoaded(final javax.swing.AbstractButton a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
+            @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {}
+            @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
                 a.setEnabled(
                     e.getSource().getSelectedProof() != null);
             }
         });
     }
-    
+
     /**
      * takes a notification event and informs the notification
      * manager
