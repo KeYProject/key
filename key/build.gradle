@@ -29,7 +29,7 @@ def gitRevision = gitRevParse('--short HEAD')
 def gitBranch = gitRevParse('--abbrev-ref HEAD')
 
 group = "org.key_project"
-version = "2.7${System.env.BUILD_NUMBER ? -System.env.BUILD_NUMBER :''}"
+version = "2.7${System.env.BUILD_NUMBER ? '-' + $System.env.BUILD_NUMBER : ''}"
 
 subprojects {
     apply plugin: "java"
@@ -46,7 +46,7 @@ subprojects {
     */
 
     group = "org.key_project"
-    version = "2.7-${System.env.BUILD_NUMBER ? -System.env.BUILD_NUMBER :''}"
+    version = "2.7-${System.env.BUILD_NUMBER ? '-' + $System.env.BUILD_NUMBER : ''}"
 
 
     tasks.withType(JavaCompile) {
