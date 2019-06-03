@@ -93,6 +93,9 @@ subprojects {
 
         systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
+
+        forkEvery = 0 //default
+        maxParallelForks = 1 // weigl: test on master
     }
 
 
