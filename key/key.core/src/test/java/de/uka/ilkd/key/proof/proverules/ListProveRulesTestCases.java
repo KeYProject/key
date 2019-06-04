@@ -13,16 +13,12 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
  * key/scripts/proveRules
  *
  * @author Kai Wallisch
- *
  */
 public class ListProveRulesTestCases {
-
-   public static void main(String[] args) throws IOException,
-         RecognitionException, ProblemLoaderException {
-      Collection<Object[]> units = ProveRulesTest.data();
-      for (Object[] testParams : units) {
-         System.out.println(testParams[0]);
-      }
-   }
-
+    public static void main(String[] args) throws ProblemLoaderException {
+        Collection<Object[]> units = ProveRulesTest.data();
+        for (Object[] testParams : units) {
+            System.out.println(testParams[0]);
+        }
+    }
 }
