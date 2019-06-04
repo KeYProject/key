@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.junit.FixMethodOrder;
+import org.junit.experimental.categories.Category;
 import org.junit.runners.MethodSorters;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -36,6 +37,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import org.key_project.util.testcategories.Slow;
 
 /**
  * Tests for {@link SymbolicExecutionTreeBuilder},
@@ -44,6 +46,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
  * @author Martin Hentschel
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Category(Slow.class)
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests example: /set/joinTest
@@ -667,10 +670,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests example: /set/anotherStaticContractTest in the Symbolic Execution Profile
     * and ensures that no rules are applied forever.
     */
-   //weigl: disabled this test because of assertion is hit
-   // junit.framework.AssertionFailedError: Child Operation Contract result_0 = magic(x) catch(exc_0) pre: true post: (   (exc_0 = null)<<impl>>    -> result_0 = Z(1(1(7(4(#)))))) & (   !(exc_0 = null)<<impl>>    ->   java.lang.Error::instance(exc_0) = TRUE       |   java.lang.RuntimeException::instance(exc_0)         = TRUE) & (   x = Z(4(#))    ->   !(exc_0 = null)<<impl>>       & (  java.lang.Error::instance(exc_0) = TRUE          |   java.lang.RuntimeException::instance(exc_0)            = TRUE)) & (   geq(x, Z(0(1(#))))    -> result_0 = Z(0(1(#))) & (exc_0 = null)<<impl>>) & (   lt(x, Z(neglit(2(2(#)))))    ->   result_0 = Z(neglit(2(2(#))))       & (exc_0 = null)<<impl>>) & (   x = Z(neglit(3(#)))    ->   (   (exc_0 = null)<<impl>>          -> result_0 = Z(neglit(3(#))))       & (   !(exc_0 = null)<<impl>>          ->   java.lang.Error::instance(exc_0) = TRUE             |   java.lang.RuntimeException::instance(exc_0)               = TRUE)) mod: allLocs termination: diamond is not contained in Statement return magic(x);.
-   //Issue: https://git.key-project.org/key/key/issues/1498
-   public void xtestAnotherStaticContractTest() throws Exception {
+   public void testAnotherStaticContractTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/anotherStaticContractTest/test/AnotherStaticContractTest.java", 
                 "AnotherStaticContractTest", 

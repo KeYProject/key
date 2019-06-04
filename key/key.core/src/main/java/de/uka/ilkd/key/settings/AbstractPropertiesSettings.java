@@ -34,7 +34,7 @@ public abstract class AbstractPropertiesSettings implements Settings {
     private static Set<String> parseStringSet(String o) {
         Set<String> set = new TreeSet<>();
         for (String entry : o.split(SET_DELIMITER)) {
-            if (!entry.isBlank()) {
+            if (!entry.isEmpty()) {
                 set.add(entry.trim());
             }
         }
