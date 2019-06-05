@@ -55,7 +55,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -180,14 +179,11 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
                 + (pos == null
                     ? "whole sequent"
                     : LogicPrinter.quickPrintTerm(pos.subTerm(), services)
-                        .replaceAll("\\s+", " ")));
-
-        // TermView can only print sequents or formulas, not terms.
-        if (pos != null) {
-            while (!pos.subTerm().sort().equals(Sort.FORMULA)) {
-                pos = pos.up();
-            }
-        }
+                        .replaceAll("\\s+", " ")),
+                "Origin for: "+ (pos == null
+                    ? "Whole sequent"
+                    : "Formula " + pos.getIndex()
+                        + (pos.isInAntec() ? " (in antecedent)" : " (in succedent)")));
 
         this.services = services;
         this.termPio = pos;
@@ -553,15 +549,11 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
     }
 
     private String getTooltipText(PosInOccurrence pio) {
-        if (pio == null) {
-            return null;
-        }
-
         OriginTermLabel label = getOriginLabel(pio);
-        return "<html>Origin of selected term: <b>" + label.getOrigin() +
+        return "<html>Origin of selected term: <b>" + (label == null ? "" : label.getOrigin()) +
                 "</b><hr>Origin of (former) sub-terms:<br>" +
-                label.getSubtermOrigins().stream()
-                .map(o -> "" + o + "<br>").reduce("", String::concat);
+                (label == null ? "" : label.getSubtermOrigins().stream()
+                .map(o -> "" + o + "<br>").reduce("", String::concat));
     }
 
     private class CellRenderer extends DefaultTreeCellRenderer {

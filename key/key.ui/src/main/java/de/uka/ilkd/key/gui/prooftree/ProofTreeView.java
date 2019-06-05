@@ -155,7 +155,9 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
         }
 
         @Override
-        public void windowRegistered(NodeInfoWindow win) { }
+        public void windowRegistered(NodeInfoWindow win) {
+            delegateModel.updateTree(win.getNode());
+        }
     };
 
     private ConfigChangeListener configChangeListener = new ConfigChangeListener() {
@@ -1067,7 +1069,7 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
             if (NodeInfoWindow.hasInstances(invokedNode)) {
                 JMenu windows = new JMenu("Show Origin Windows");
                 for (NodeInfoWindow win : NodeInfoWindow.getInstances(invokedNode)) {
-                    JMenuItem item = new JMenuItem(win.getTitle());
+                    JMenuItem item = new JMenuItem(win.getShortName());
                     item.addActionListener(event -> {
                         win.requestFocus();
                         win.toFront();

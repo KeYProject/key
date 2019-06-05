@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.ext.KeYExtConst;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
@@ -44,8 +46,17 @@ public class ShowOriginAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        PosInOccurrence pio = pos.getPosInOccurrence();
+
+        // TermView can only print sequents or formulas, not terms.
+        if (pio != null) {
+            while (!pio.subTerm().sort().equals(Sort.FORMULA)) {
+                pio = pio.up();
+            }
+        }
+
         new OriginTermLabelWindow(
-                pos.getPosInOccurrence(),
+                pio,
                 getMediator().getSelectedNode(),
                 getMediator().getServices());
     }

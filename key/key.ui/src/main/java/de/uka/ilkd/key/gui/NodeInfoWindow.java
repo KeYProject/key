@@ -13,6 +13,7 @@ import java.util.TreeSet;
 
 import javax.swing.JFrame;
 
+import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -117,25 +118,30 @@ public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeIn
     }
 
     private Node node;
-    private String name;
+    private String longName;
+    private String shortName;
 
     /**
      * Creates a new {@link NodeInfoWindow}.
      *
      * @param node the node this window is associated with.
-     * @param name the window's name.
+     * @param longName the window's long name, used as title.
+     * @param shortName the window's short name, used in the list of window in the
+     *  {@link ProofTreeView}.
      */
-    public NodeInfoWindow(Node node, String name) {
+    public NodeInfoWindow(Node node, String longName, String shortName) {
         this.node = node;
-        this.name = name;
-        setTitle(name);
+        this.longName = longName;
+        this.shortName = shortName;
+
+        setTitle(longName);
 
         register(this);
     }
 
     @Override
     public int compareTo(NodeInfoWindow other) {
-        return name.compareTo(other.name);
+        return longName.compareTo(other.longName);
     }
 
     /**
@@ -148,6 +154,24 @@ public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeIn
 
     @Override
     public final String toString() {
-        return name;
+        return longName;
+    }
+
+    /**
+     *
+     * @return the window's long name
+     * @see #getShortName()
+     */
+    public final String getLongName() {
+        return longName;
+    }
+
+    /**
+     *
+     * @return the window's short name
+     * @see #getLongName()
+     */
+    public final String getShortName() {
+        return shortName;
     }
 }
