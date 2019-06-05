@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.logic.label;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 
@@ -57,6 +57,48 @@ public class OriginTermLabel implements TermLabel {
      * @see #getChildCount()
      */
     public final static int CHILD_COUNT = 2;
+
+
+    /**
+     * Find a term's origin.
+     * If the term has no origin, iterate through its parent terms until we find one with an origin.
+     *
+     * @param pos the position of the term whose origin to find.
+     * @return the term's origin, or the origin of one of its parents.
+     */
+    public static Origin getOrigin(PosInSequent pos) {
+        if (pos == null) {
+            return null;
+        }
+
+        PosInOccurrence pio = pos.getPosInOccurrence();
+
+        if (pio == null) {
+            return null;
+        }
+
+        Term term = pio.subTerm();
+
+        OriginTermLabel originLabel =
+                (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
+
+        // If the term has no origin label,
+        // iterate over its parent terms until we find one with an origin label,
+        // then show that term's origin.
+        while (originLabel == null && !pio.isTopLevel()) {
+            pio = pio.up();
+            term = pio.subTerm();
+
+            originLabel =
+                    (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
+        }
+
+        if (originLabel != null && originLabel.getOrigin().specType != SpecType.NONE) {
+            return originLabel.getOrigin();
+        } else {
+            return null;
+        }
+    }
 
     /**
      * The term's origin.
@@ -116,13 +158,7 @@ public class OriginTermLabel implements TermLabel {
      * @param line the line in the file.
      */
     public OriginTermLabel(SpecType specType, String file, int line) {
-        String filename = file == null || file.equals("no file")
-                ? null
-                : new File(file).getName();
-                //weigl: fix #1504: On Windows the filename was not parseable as it was not a valid filename (containing ':').
-                // use more liberal old File API instead of Paths.get(file).getFileName().toString();
-
-        this.origin = new Origin(specType, filename, line);
+        this.origin = new Origin(specType, file, line);
         this.subtermOrigins = new HashSet<>();
     }
 
@@ -522,7 +558,11 @@ public class OriginTermLabel implements TermLabel {
             if (fileName.equals(IMPLICIT_FILE_NAME)) {
                 sb.append(" (implicit)");
             } else {
-                sb.append(" @ " + fileName + " @ line " + line);
+                sb.append(" @ " + new File(fileName).getName() + " @ line " + line);
+                //weigl: fix #1504:
+                // On Windows the filename was not parseable as it was not a valid filename
+                // (containing ':').
+                // use more liberal old File API instead of Paths.get(file).getFileName().toString();
             }
 
             return sb.toString();

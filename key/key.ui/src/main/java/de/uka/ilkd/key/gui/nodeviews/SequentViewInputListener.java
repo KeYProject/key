@@ -24,6 +24,7 @@ import java.util.StringJoiner;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -136,9 +137,13 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
     @Override
     public void mouseMoved(MouseEvent me) {
         showTermInfo(me.getPoint());
-        if (sequentView.refreshHighlightning && refresh && sequentView.getDocument().getLength() > 0) {
+        if (sequentView.refreshHighlightning && refresh
+                && sequentView.getDocument().getLength() > 0) {
             sequentView.highlight(me.getPoint());
         }
+
+        SourceView.getSourceView(sequentView.getMainWindow())
+            .highlightOrigin(sequentView.getPosInSequent(me.getPoint()));
     }
 
     @Override

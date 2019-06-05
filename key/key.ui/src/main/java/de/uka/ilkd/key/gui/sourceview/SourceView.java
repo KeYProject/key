@@ -14,10 +14,15 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -54,6 +59,11 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.Else;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.Debug;
@@ -108,6 +118,17 @@ public final class SourceView extends JComponent {
     private static final Color MOST_RECENT_HIGHLIGHT_COLOR = new Color(57, 210, 81);
 
     /**
+     * The color for the origin of the currently selected term in the sequent view (bright orange).
+     */
+    private static final Color ORIGIN_HIGHLIGHT_COLOR = new Color(252, 202, 80);
+
+    /**
+     * The color for the origin of the (former) subterms of the
+     * currently selected term in the sequent view (faint orange).
+     */
+    private static final Color SUBTERM_ORIGIN_HIGHLIGHT_COLOR = new Color(252, 225, 156);
+
+    /**
      * The main window of KeY (needed to get the mediator).
      */
     private final MainWindow mainWindow;
@@ -148,9 +169,22 @@ public final class SourceView extends JComponent {
     private HashMap<String, String> sources = new HashMap<String, String>();
 
     /**
+     * The text pane containing the source code of the currently selected file.
+     *
+     * @see #initTextPane(Entry)
+     */
+    private JTextPane textPane;
+
+    /**
      * Lines to highlight (contains all highlights of the current proof) and corresponding Nodes.
      */
     private LinkedList<Pair<Node, PositionInfo>> lines;
+
+    private Object originHighlighter;
+
+    private Set<Object> subtermOriginsHighlighters = new HashSet<>();
+
+    private LineInformation[] lineInformation;
 
     /**
      * Creates a new JComponent with the given MainWindow and adds change listeners.
@@ -202,6 +236,120 @@ public final class SourceView extends JComponent {
                 updateGUI();
             }
         });
+    }
+
+    /**
+     * Adds additional tabs for the specified files.
+     *
+     * @param filenames the names of the files to open.
+     */
+    public void openFiles(Set<String> filenames) {
+        boolean updateNecessary = false;
+
+        for (String filename : filenames) {
+            if (addFile(filename)) {
+                updateNecessary = true;
+            }
+        }
+
+        if (updateNecessary) {
+            updateGUI();
+        }
+    }
+
+    /**
+     * Highlights the origin of the term at the specified position.
+     *
+     * @param pos the position of the term whose origin should be highlighted.
+     */
+    public void highlightOrigin(PosInSequent pos) {
+        if (textPane != null) {
+            subtermOriginsHighlighters.forEach(textPane.getHighlighter()::removeHighlight);
+        }
+
+        if (pos == null || pos.getPosInOccurrence() == null) {
+            if (originHighlighter != null) {
+                textPane.getHighlighter().removeHighlight(originHighlighter);
+                originHighlighter = null;
+            }
+
+            return;
+        }
+
+        Origin origin;
+        Set<Origin> subtermOrigins;
+
+        Term term = pos.getPosInOccurrence().subTerm();
+        OriginTermLabel label = (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
+
+        if (label == null) {
+            origin = OriginTermLabel.getOrigin(pos);
+            subtermOrigins = Collections.emptySet();
+        } else {
+            origin = label.getOrigin().specType == SpecType.NONE ? null : label.getOrigin();
+            subtermOrigins = label.getSubtermOrigins();
+        }
+
+        Set<String> filesToOpen =
+                subtermOrigins.stream().map(o -> o.fileName).collect(Collectors.toSet());
+
+        if (origin != null) {
+            filesToOpen.add(origin.fileName);
+        }
+
+        openFiles(filesToOpen);
+
+        try {
+            for (Origin subtermOrigin : subtermOrigins) {
+                if (isFileSelected(subtermOrigin.fileName) && subtermOrigin.line > 0) {
+                    Range range = calculateJMLSpecRange(subtermOrigin.line);
+                    subtermOriginsHighlighters.add(textPane.getHighlighter().addHighlight(
+                                range.start(), range.end(),
+                                new DefaultHighlightPainter(SUBTERM_ORIGIN_HIGHLIGHT_COLOR)));
+                }
+            }
+
+            if (origin != null && isFileSelected(origin.fileName) && origin.line > 0) {
+                Range range = calculateJMLSpecRange(origin.line);
+
+                if (originHighlighter == null) {
+                    originHighlighter = textPane.getHighlighter().addHighlight(
+                            range.start(), range.end(),
+                            new DefaultHighlightPainter(ORIGIN_HIGHLIGHT_COLOR));
+                } else {
+                    textPane.getHighlighter().changeHighlight(
+                            originHighlighter, range.start(), range.end());
+                }
+            }
+        } catch (BadLocationException e) {
+            throw new AssertionError();
+        }
+
+        if (textPane != null) {
+            textPane.revalidate();
+            textPane.repaint();
+        }
+    }
+
+    private Range calculateJMLSpecRange(int firstLine) {
+        int start = calculateLineRange(textPane, lineInformation[firstLine - 1].getOffset())
+                .start();
+
+
+        List<String> lines = textPane.getText().lines().collect(Collectors.toList());
+
+        int lastLine = IntStream.range(start - 1, lines.size())
+            .filter(i -> lines.get(i).strip().endsWith(";"))
+            .findFirst().orElse(firstLine - 1) + 1;
+
+        int end = calculateLineRange(textPane, lineInformation[lastLine - 1].getOffset()).end();
+
+        return new Range(start, end);
+    }
+
+    public boolean isFileSelected(String file) {
+        return file != null && tabs.getSelectedIndex() >= 0
+                && tabs.getTitleAt(tabs.getSelectedIndex()).equals(new File(file).getName());
     }
 
     /**
@@ -408,7 +556,7 @@ public final class SourceView extends JComponent {
      */
     private void initTextPane(Entry<String, File> entry) {
         try {
-            JTextPane textPane = new JTextPane();
+            textPane = new JTextPane();
             textPanes.add(textPane);
 
             // We use the same font as in SequentView for consistency.
@@ -428,7 +576,7 @@ public final class SourceView extends JComponent {
 
             // use input stream here to compute line information of the string with replaced tabs
             InputStream inStream = new ByteArrayInputStream(source.getBytes());
-            LineInformation[] li = IOUtil.computeLineInformation(inStream);
+            lineInformation = IOUtil.computeLineInformation(inStream);
 
             JavaDocument doc = new JavaDocument();
             textPane.setDocument(doc);
@@ -448,11 +596,13 @@ public final class SourceView extends JComponent {
                 }
             });
 
+
+
             // paint the highlights (symbolically executed lines) for this file
             HighlightPainter hp = new DefaultHighlightPainter(NORMAL_HIGHLIGHT_COLOR);
-            paintSymbExHighlights(textPane, li, entry.getKey(), hp);
+            paintSymbExHighlights(textPane, lineInformation, entry.getKey(), hp);
 
-            textPane.addMouseListener(new TextPaneMouseAdapter(textPane, li, hp, entry.getKey()));
+            textPane.addMouseListener(new TextPaneMouseAdapter(textPane, lineInformation, hp, entry.getKey()));
 
             /* for each File, create a Tab in TabbedPane
              * (additional panel is needed to prevent line wrapping) */
@@ -490,19 +640,32 @@ public final class SourceView extends JComponent {
     private void fillMaps() {
         for (Pair<Node, PositionInfo> p : lines) {
             PositionInfo l = p.second;
-            File f = new File(l.getFileName());
-            if (f.exists() && files.putIfAbsent(l.getFileName(), f) == null) {
-                try {
-                    String text = IOUtil.readFrom(f);
-                    if (text != null && !text.isEmpty()) {
-                        hashes.put(l.getFileName(), IOUtil.computeMD5(f));
-                        sources.put(l.getFileName(), text);
-                    }
-                } catch (IOException e) {
-                    Debug.out("Unknown IOException!", e);
-                }
-            }
+            addFile(l.getFileName());
         }
+    }
+
+    /**
+     * Adds a file to this source view.
+     *
+     * @param filename the name of the file to add.
+     * @return {@code true} if this source view did not already contain the file.
+     */
+    private boolean addFile(String filename) {
+        File f = new File(filename);
+        if (f.exists() && files.putIfAbsent(filename, f) == null) {
+            try {
+                String text = IOUtil.readFrom(f);
+                if (text != null && !text.isEmpty()) {
+                    hashes.put(filename, IOUtil.computeMD5(f));
+                    sources.put(filename, text);
+                }
+            } catch (IOException e) {
+                Debug.out("Unknown IOException!", e);
+            }
+
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -510,7 +673,7 @@ public final class SourceView extends JComponent {
      * @param mainWindow KeY's main window
      * @return the component responsible for showing source code and symbolic execution information
      */
-    public static JComponent getSourceView(MainWindow mainWindow) {
+    public static SourceView getSourceView(MainWindow mainWindow) {
         if (instance == null) {
             instance = new SourceView(mainWindow);
         }

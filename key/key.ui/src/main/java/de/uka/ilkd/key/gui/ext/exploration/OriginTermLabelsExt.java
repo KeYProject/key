@@ -14,11 +14,8 @@ import de.uka.ilkd.key.gui.ext.KeYSequentViewMenuExtension;
 import de.uka.ilkd.key.gui.ext.KeYStatusBarExtension;
 import de.uka.ilkd.key.gui.ext.KeYToolbarExtension;
 import de.uka.ilkd.key.gui.ext.KeYTooltipExtension;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.pp.PosInSequent;
 
 /**
@@ -79,7 +76,7 @@ public class OriginTermLabelsExt
 
     @Override
     public List<String> getStatusBarStrings(MainWindow mainWindow, PosInSequent pos) {
-        Origin origin = getOrigin(pos);
+        Origin origin = OriginTermLabel.getOrigin(pos);
 
         List<String> result = new LinkedList<>();
 
@@ -92,7 +89,7 @@ public class OriginTermLabelsExt
 
     @Override
     public List<String> getTooltipStrings(MainWindow mainWindow, PosInSequent pos) {
-        Origin origin = getOrigin(pos);
+        Origin origin = OriginTermLabel.getOrigin(pos);
 
         List<String> result = new LinkedList<>();
 
@@ -101,39 +98,5 @@ public class OriginTermLabelsExt
         }
 
         return result;
-    }
-
-    private Origin getOrigin(PosInSequent pos) {
-        if (pos == null) {
-            return null;
-        }
-
-        PosInOccurrence pio = pos.getPosInOccurrence();
-
-        if (pio == null) {
-            return null;
-        }
-
-        Term term = pio.subTerm();
-
-        OriginTermLabel originLabel =
-                (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
-
-        // If the term has no origin label,
-        // iterate over its parent terms until we find one with an origin label,
-        // then show that term's origin.
-        while (originLabel == null && !pio.isTopLevel()) {
-            pio = pio.up();
-            term = pio.subTerm();
-
-            originLabel =
-                    (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
-        }
-
-        if (originLabel != null && originLabel.getOrigin().specType != SpecType.NONE) {
-            return originLabel.getOrigin();
-        } else {
-            return null;
-        }
     }
 }
