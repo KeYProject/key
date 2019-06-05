@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.macros.scripts.meta;
 
+import de.uka.ilkd.key.macros.scripts.LetCommand;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,7 +38,7 @@ public class ValueInjectorTest {
         args.put("b", "true");
         args.put("s", "blubb");
 
-        ValueInjector.injection(null, pp, args);
+        ValueInjector.injection(new LetCommand(), pp, args);
     }
 
     @Test public void testInferScriptArguments() throws NoSuchFieldException {

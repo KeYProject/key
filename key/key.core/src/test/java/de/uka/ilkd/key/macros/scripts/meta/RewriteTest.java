@@ -6,7 +6,11 @@ import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.util.HelperClassForTests;
+import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -17,27 +21,24 @@ public class RewriteTest {
      * Taclet to be found and applied: eqSymm on `f=x`
      */
     @Test
-    public void testTransitive() throws IOException, ScriptException, InterruptedException {
+    public void testTransitive() throws IOException, ScriptException, InterruptedException, ProblemLoaderException {
+        File script = new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/rewrite.script");
+        File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/transitive.key");
 
-        KeYEnvironment<DefaultUserInterfaceControl> env = null;
-        try {
-            File f = new File("../key.core.test/resources/testcase/scriptCommands/transitive.key");
-            // env = KeYEnvironment.load(new File("../key.ui/examples/heap/vstte10_01_SumAndMax/SumAndMax_sumAndMax.key"));
-            env = KeYEnvironment.load(f);
-        } catch (ProblemLoaderException e) {
-            e.printStackTrace();
-        }
-        Proof proof = env.getLoadedProof();
+        Assume.assumeTrue("Required script file not found: " + script, script.exists());
+        Assume.assumeTrue("Required KeY file not found: " + keyFile, keyFile.exists());
 
-        //KeY Script
-        ProofScriptEngine engine = new ProofScriptEngine(new File("../key.core.test/resources/testcase/scriptCommands/rewrite.script"));
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
+        Assert.assertNotNull(env);
 
-        engine.execute(env.getUi(), proof);
-        assert proof.openGoals().take(0).head().sequent().toString().equals("[equals(x,f),equals(x,z)]==>[equals(z,f)]");
+        Proof p = env.getLoadedProof();
+        ProofScriptEngine engine = new ProofScriptEngine(script);
+        engine.execute(env.getUi(), p);
 
+        String firstOpenGoal = p.openGoals().head().sequent().toString();
+        String expectedSequent = "[equals(x,f),equals(x,z)]==>[equals(z,f)]";
 
-
-
+        Assert.assertEquals(expectedSequent, firstOpenGoal);
     }
 
     /**
@@ -45,49 +46,21 @@ public class RewriteTest {
      * Taclet to be found and applied: lt_to_gt on `f>x`
      */
     @Test
-    public void testLessTransitive() throws IOException, ScriptException, InterruptedException {
+    public void testLessTransitive() throws IOException, ScriptException, InterruptedException, ProblemLoaderException {
+        File script = new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/lesstrans.script");
+        File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/less_trans.key");
 
-        //File
-        KeYEnvironment<DefaultUserInterfaceControl> env = null;
-        try {
-            File f = new File("../key.core.test/resources/testcase/scriptCommands/less_trans.key");
-            env = KeYEnvironment.load(f);
-        } catch (ProblemLoaderException e) {
-            e.printStackTrace();
-        }
+        Assume.assumeTrue("Required script file not found: " + script, script.exists());
+        Assume.assumeTrue("Required KeY file not found: " + keyFile, keyFile.exists());
+
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         Proof proof = env.getLoadedProof();
-
-
-        //KeY Script
-        ProofScriptEngine engine = new ProofScriptEngine(new File("../key.core.test/resources/testcase/scriptCommands/lesstrans.script"));
-
+        ProofScriptEngine engine = new ProofScriptEngine(script);
         engine.execute(env.getUi(), proof);
 
-        assert proof.openGoals().take(0).head().sequent().toString().equals("[]==>[imp(and(gt(x,f),lt(x,z)),lt(f,z))]");
+        String firstOpenGoal = proof.openGoals().head().sequent().toString();
+        String expectedSequent = "[]==>[imp(and(gt(x,f),lt(x,z)),lt(f,z))]";
 
+        Assert.assertEquals(expectedSequent, firstOpenGoal);
     }
-
-    /*
-    @Test
-    public void equality() throws IOException, ScriptException, InterruptedException {
-
-        //File
-        KeYEnvironment<DefaultUserInterfaceControl> env = null;
-        try {
-            File f = new File("../key.core.test/resources/testcase/scriptCommands/eq.key");
-            env = KeYEnvironment.load(f);
-        } catch (ProblemLoaderException e) {
-            e.printStackTrace();
-        }
-        Proof proof = env.getLoadedProof();
-
-
-        //KeY Script
-        ProofScriptEngine engine = new ProofScriptEngine(new File("../key.core.test/resources/testcase/scriptCommands/eq.script"));
-
-        engine.execute(env.getUi(), proof);
-
-
-    }
-    */
 }

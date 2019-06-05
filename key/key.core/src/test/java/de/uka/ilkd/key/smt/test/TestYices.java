@@ -14,8 +14,11 @@
 package de.uka.ilkd.key.smt.test;
 
 import de.uka.ilkd.key.smt.SolverType;
+import org.junit.Ignore;
 
 
+@Ignore("weigl/schiffl: Yices support is out-of-date. Support is for 1.x, " +
+        "Current version 2.6.X. Solver will not be maintained further.")
 public class TestYices extends TestSMTSolver {
     private static final String SYSTEM_PROPERTY_SOLVER_PATH = "yicesSolverPath";
 

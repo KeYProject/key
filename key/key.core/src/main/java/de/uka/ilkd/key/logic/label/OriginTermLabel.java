@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.logic.label;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashSet;
@@ -117,7 +118,9 @@ public class OriginTermLabel implements TermLabel {
     public OriginTermLabel(SpecType specType, String file, int line) {
         String filename = file == null || file.equals("no file")
                 ? null
-                        : Paths.get(file).getFileName().toString();
+                : new File(file).getName();
+                //weigl: fix #1504: On Windows the filename was not parseable as it was not a valid filename (containing ':').
+                // use more liberal old File API instead of Paths.get(file).getFileName().toString();
 
         this.origin = new Origin(specType, filename, line);
         this.subtermOrigins = new HashSet<>();
