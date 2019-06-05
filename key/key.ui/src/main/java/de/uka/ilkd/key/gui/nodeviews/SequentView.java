@@ -21,6 +21,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Shape;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.StringJoiner;
 
 import javax.swing.JEditorPane;
 import javax.swing.UIManager;
@@ -46,12 +48,14 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
+import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -161,6 +165,9 @@ public abstract class SequentView extends JEditorPane {
         addHierarchyBoundsListener(changeListener);
 
         filter = new IdentitySequentPrintFilter();
+
+        // Register tooltip
+        setToolTipText("");
     }
 
     public final void setFont() {
@@ -175,6 +182,34 @@ public abstract class SequentView extends JEditorPane {
 
     public void unregisterListener() {
        Config.DEFAULT.removeConfigChangeListener(configChangeListener);
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent event) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .isShowSequentViewTooltips()) {
+            return null;
+        }
+
+        PosInSequent pis = getPosInSequent(event.getPoint());
+
+        String text = "";
+
+        if (pis != null && !pis.isSequent()) {
+            Term term = pis.getPosInOccurrence().subTerm();
+            text += "<b>Operator:</b> " + term.op() + "<br><b>Sort</b>: " + term.sort();
+        }
+
+        StringJoiner extensionStr = new StringJoiner("<br>", "<br>", "");
+        extensionStr.setEmptyValue("");
+        KeYGuiExtensionFacade.getTooltipStrings(getMainWindow(), pis).forEach(extensionStr::add);
+        text += extensionStr;
+
+        if (text.isEmpty()) {
+            return null;
+        } else {
+            return "<html>" + text + "</html>";
+        }
     }
 
     @Override

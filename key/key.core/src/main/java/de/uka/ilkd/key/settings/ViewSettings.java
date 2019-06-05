@@ -45,6 +45,8 @@ public class ViewSettings implements Settings, Cloneable {
     /** Heatmap options property */
     private static final String HEATMAP_OPTIONS = "[View]HeatmapOptions";
 
+    private static final String SEQUENT_VIEW_TOOLTIP = "[View]SequentViewTooltips";
+
     /** default max number of displayed tooltip lines is 40 */
     private int maxTooltipLines = 40;
     /** do not print the find, varcond and heuristics part of taclets in
@@ -70,6 +72,8 @@ public class ViewSettings implements Settings, Cloneable {
     private boolean confirmExit = true;
     /**Show Taclet uninstantiated in tooltip -- for learning  */
     private boolean showUninstantiatedTaclet = false;
+    /**Show tooltips in sequent view. */
+    private boolean showSequentViewTooltips = true;
     /** Show heatmap of most recently used sequent formulae*/
     private boolean showHeatmap = false;
     /** Show heatmap for sequent formulas (true) or terms (false) */
@@ -460,6 +464,23 @@ public void setUseUnicode(boolean useUnicode) {
         this.heatmapNewest = heatmapNewest;
         this.maxAgeForHeatmap = maxAgeForHeatmap;
         fireSettingsChanged();
+    }
+
+    /**
+     *
+     * @return whether tooltips in the sequent view should be displayed.
+     */
+    public boolean isShowSequentViewTooltips() {
+        return showSequentViewTooltips;
+    }
+
+    /**
+     * Sets optinons for the sequent view tooltips.
+     *
+     * @param showSequentViewTooltips whether tooltips in the sequent view should be displayed.
+     */
+    public void setShowSequentViewTooltips(boolean showSequentViewTooltips) {
+        this.showSequentViewTooltips = showSequentViewTooltips;
     }
 
     /** @return whether sequent formulas or terms should be highlighted */

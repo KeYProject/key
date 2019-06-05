@@ -703,9 +703,6 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
             } else {
                 setFilter(new IdentitySequentPrintFilter());
             }
-
-            // Register tooltip
-            setToolTipText("");
         }
 
         @Override

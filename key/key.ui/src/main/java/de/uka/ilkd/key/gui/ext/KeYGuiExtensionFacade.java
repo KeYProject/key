@@ -213,17 +213,17 @@ public final class KeYGuiExtensionFacade {
     }
     //endregion
 
-    //region Term info
+    //region Status bar
 
     /**
-     * Retrieves all known implementations of the {@link KeYTermInfoExtension}.
+     * Retrieves all known implementations of the {@link KeYStatusBarExtension}.
      *
-     * @return all known implementations of the {@link KeYTermInfoExtension}.
+     * @return all known implementations of the {@link KeYStatusBarExtension}.
      */
-    public static List<KeYTermInfoExtension> getTermInfoExtensions() {
+    public static List<KeYStatusBarExtension> getStatusBarExtensions() {
         return getExtension(
-                KeYTermInfoExtension.class,
-                Comparator.comparingInt(KeYTermInfoExtension::getPriority));
+                KeYStatusBarExtension.class,
+                Comparator.comparingInt(KeYStatusBarExtension::getPriority));
     }
 
     /**
@@ -232,9 +232,34 @@ public final class KeYGuiExtensionFacade {
      * @param pos the position the user selected.
      * @return every term info string from every loaded extension.
      */
-    public static List<String> getTermInfoStrings(MainWindow window, PosInSequent pos) {
-        return getTermInfoExtensions().stream().flatMap(
-                it -> it.getTermInfoStrings(window, pos).stream()).collect(Collectors.toList());
+    public static List<String> getStatusBarStrings(MainWindow window, PosInSequent pos) {
+        return getStatusBarExtensions().stream().flatMap(
+                it -> it.getStatusBarStrings(window, pos).stream()).collect(Collectors.toList());
+    }
+    //endregion
+
+    //region Term tool tip
+
+    /**
+     * Retrieves all known implementations of the {@link KeYStatusBarExtension}.
+     *
+     * @return all known implementations of the {@link KeYStatusBarExtension}.
+     */
+    public static List<KeYTooltipExtension> getTooltipExtensions() {
+        return getExtension(
+                KeYTooltipExtension.class,
+                Comparator.comparingInt(KeYTooltipExtension::getPriority));
+    }
+
+    /**
+     *
+     * @param window the main window.
+     * @param pos the position the user selected.
+     * @return every term info string from every loaded extension.
+     */
+    public static List<String> getTooltipStrings(MainWindow window, PosInSequent pos) {
+        return getTooltipExtensions().stream().flatMap(
+                it -> it.getTooltipStrings(window, pos).stream()).collect(Collectors.toList());
     }
     //endregion
 

@@ -12,12 +12,14 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ext.KeYMainMenuExtension;
-import de.uka.ilkd.key.gui.ext.KeYTermInfoExtension;
 import de.uka.ilkd.key.gui.ext.KeYSequentViewMenuExtension;
+import de.uka.ilkd.key.gui.ext.KeYStatusBarExtension;
 import de.uka.ilkd.key.gui.ext.KeYToolbarExtension;
+import de.uka.ilkd.key.gui.ext.KeYTooltipExtension;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
@@ -33,7 +35,8 @@ public class OriginTermLabelsExt
         KeYSequentViewMenuExtension,
         KeYMainMenuExtension,
         KeYToolbarExtension,
-        KeYTermInfoExtension {
+        KeYTooltipExtension,
+        KeYStatusBarExtension {
 
     private ToggleTermOriginTrackingAction action;
 
@@ -98,14 +101,46 @@ public class OriginTermLabelsExt
     }
 
     @Override
-    public List<String> getTermInfoStrings(MainWindow mainWindow, PosInSequent pos) {
+    public List<String> getStatusBarStrings(MainWindow mainWindow, PosInSequent pos) {
+        Origin origin = getOrigin(pos);
+
+        List<String> result = new LinkedList<>();
+
+        if (origin != null) {
+            result.add("Origin: " + origin);
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<String> getTooltipStrings(MainWindow mainWindow, PosInSequent pos) {
+        Origin origin = getOrigin(pos);
+
+        List<String> result = new LinkedList<>();
+
+        if (origin != null) {
+            result.add("<b>Origin:</b> " + origin);
+        }
+
+        return result;
+    }
+
+    private Origin getOrigin(PosInSequent pos) {
+        if (pos == null) {
+            return null;
+        }
+
         PosInOccurrence pio = pos.getPosInOccurrence();
+
+        if (pio == null) {
+            return null;
+        }
+
         Term term = pio.subTerm();
 
         OriginTermLabel originLabel =
                 (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
-
-        List<String> result = new LinkedList<>();
 
         // If the term has no origin label,
         // iterate over its parent terms until we find one with an origin label,
@@ -119,9 +154,9 @@ public class OriginTermLabelsExt
         }
 
         if (originLabel != null && originLabel.getOrigin().specType != SpecType.NONE) {
-            result.add("Origin: " + originLabel.getChild(0));
+            return originLabel.getOrigin();
+        } else {
+            return null;
         }
-
-        return result;
     }
 }

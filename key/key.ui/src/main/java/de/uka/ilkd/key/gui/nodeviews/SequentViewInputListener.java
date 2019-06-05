@@ -69,7 +69,7 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
 
                     StringJoiner extensionStr = new StringJoiner(", ", ", ", "");
                     extensionStr.setEmptyValue("");
-                    KeYGuiExtensionFacade.getTermInfoStrings(sequentView.getMainWindow(), mousePos)
+                    KeYGuiExtensionFacade.getStatusBarStrings(sequentView.getMainWindow(), mousePos)
                         .forEach(extensionStr::add);
                     info += extensionStr;
                 }

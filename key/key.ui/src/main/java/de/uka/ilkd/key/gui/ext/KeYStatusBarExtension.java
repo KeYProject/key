@@ -14,7 +14,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
  * @see SequentViewInputListener
  * @see MainWindow#setStatusLine(String)
  */
-public interface KeYTermInfoExtension {
+public interface KeYStatusBarExtension {
 
     /**
     *
@@ -22,7 +22,7 @@ public interface KeYTermInfoExtension {
     * @param pos the position of the term whose info shall be shown.
     * @return this extension's term information.
     */
-   List<String> getTermInfoStrings(MainWindow mainWindow, PosInSequent pos);
+   List<String> getStatusBarStrings(MainWindow mainWindow, PosInSequent pos);
 
    /**
     * This extension's priority. Used for sorting.
