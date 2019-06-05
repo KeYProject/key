@@ -8,8 +8,6 @@ import javax.swing.Action;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ext.KeYMainMenuExtension;
 import de.uka.ilkd.key.gui.ext.KeYSequentViewMenuExtension;
@@ -22,8 +20,6 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.settings.TermLabelSettings;
 
 /**
  * Extension adapter for {@link OriginTermLabel}s and {@link OriginTermLabelWindow}s.
@@ -71,25 +67,6 @@ public class OriginTermLabelsExt
     public JToolBar getToolbar(MainWindow mainWindow) {
         JToolBar tb = new JToolBar("Origin");
         JToggleButton toggle = new JToggleButton(getAction(mainWindow));
-
-        mainWindow.getMediator().addKeYSelectionListener(new KeYSelectionListener() {
-
-            @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
-                Proof proof = mainWindow.getMediator().getSelectedProof();
-
-                if (proof != null) {
-                    TermLabelSettings settings = proof.getSettings().getTermLabelSettings();
-                    toggle.setSelected(settings.getUseOriginLabels());
-                    settings.addSettingsListener(
-                            event -> toggle.setSelected(settings.getUseOriginLabels()));
-                }
-            }
-
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) { }
-        });
-
         toggle.setHideActionText(true);
         tb.add(toggle);
         return tb;

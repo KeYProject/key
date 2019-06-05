@@ -13,7 +13,8 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.Rule;;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;;
 
 /**
  * Policy for {@link OriginTermLabel}s.
@@ -34,7 +35,8 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
             return label;
         }
 
-        if (!services.getProof().getSettings().getTermLabelSettings().getUseOriginLabels()) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE
+                .getTermLabelSettings().getUseOriginLabels()) {
             return null;
         }
 

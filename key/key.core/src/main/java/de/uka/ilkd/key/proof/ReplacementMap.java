@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
@@ -34,7 +35,7 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
      */
     public static <S extends SVSubstitute, T>
         ReplacementMap<S, T> create(TermFactory tf, Proof proof) {
-        if (proof == null || proof.getSettings().getTermLabelSettings().getUseOriginLabels()) {
+        if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()) {
             return new NoIrrelevantLabelsReplacementMap<S, T>(tf);
         } else {
             return new DefaultReplacementMap<S, T>();

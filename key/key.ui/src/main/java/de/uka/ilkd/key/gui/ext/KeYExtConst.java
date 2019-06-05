@@ -1,7 +1,8 @@
 package de.uka.ilkd.key.gui.ext;
 
-import javax.swing.*;
 import java.util.Iterator;
+
+import javax.swing.JMenu;
 
 /**
  * Constants used in the KeY GUI Extensions.
@@ -9,6 +10,7 @@ import java.util.Iterator;
  * @author Alexander Weigl <weigl@kit.edu>
  */
 public interface KeYExtConst {
+
     /**
      * Additional key for {@link javax.swing.Action}s. Describes the priority,
      * and therefor an order to arrange these actions.
@@ -26,4 +28,9 @@ public interface KeYExtConst {
      */
     String PATH = "PATH";
 
+    /**
+     * {@code Boolean} used to indicate whether the main menu entry for this action should display
+     * a checkmark next to the action's text. {@code false} by default.
+     */
+    String CHECKMARK = "CHECKMARK";
 }

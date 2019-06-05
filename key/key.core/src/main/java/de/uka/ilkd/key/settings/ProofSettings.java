@@ -58,10 +58,6 @@ public class ProofSettings {
      * Array index for the smt settings.
      */
     private final static int SMT_SETTINGS = 2;
-    /**
-     * Array index for the term label settings.
-     */
-    private final static int TERM_LABEL_SETTINGS = 3;
 
     static {
         PROVER_CONFIG_FILE = new File(PathConfig.getKeyConfigDir()
@@ -263,25 +259,6 @@ public class ProofSettings {
     public ProofDependentSMTSettings getSMTSettings() {
         ensureInitialized();
         return (ProofDependentSMTSettings) settings[SMT_SETTINGS];
-    }
-
-    /**
-     * Returns the term label settings from the proof settings.
-     * @return the term label settings
-     */
-    public TermLabelSettings getTermLabelSettings() {
-        ensureInitialized();
-        return (TermLabelSettings) settings[TERM_LABEL_SETTINGS];
-    }
-
-    /**
-     * Set the passed term label settings in the proof settings and return the proof settings.
-     * @param tls the term label settings
-     * @return the proof settings
-     */
-    public ProofSettings setTermLabelSettings(TermLabelSettings tls) {
-        settings[TERM_LABEL_SETTINGS] = tls;
-        return this;
     }
 
     //

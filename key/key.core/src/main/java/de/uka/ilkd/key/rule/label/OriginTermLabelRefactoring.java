@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
  * Refactoring for {@link OriginTermLabel}s.
@@ -77,7 +78,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             }
         }
 
-        if (!services.getProof().getSettings().getTermLabelSettings().getUseOriginLabels()) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE
+                .getTermLabelSettings().getUseOriginLabels()) {
             if (oldLabel != null) {
                 labels.remove(oldLabel);
             }

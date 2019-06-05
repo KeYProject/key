@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.ext;
 
+import static de.uka.ilkd.key.gui.ext.KeYExtConst.CHECKMARK;
 import static de.uka.ilkd.key.gui.ext.KeYExtConst.PATH;
 import static de.uka.ilkd.key.gui.ext.KeYExtConst.PRIORITY;
 
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import javax.swing.Action;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JToolBar;
 
@@ -116,7 +118,12 @@ public final class KeYGuiExtensionFacade {
         }
         Iterator<String> mpath = Pattern.compile(Pattern.quote(".")).splitAsStream(spath).iterator();
         JMenu a = findMenu(menu, mpath);
-        a.add(act);
+
+        if (Boolean.TRUE.equals(act.getValue(CHECKMARK))) {
+            a.add(new JCheckBoxMenuItem(act));
+        } else {
+            a.add(act);
+        }
     }
 
     private static JMenu findMenu(JMenu menu, Iterator<String> mpath) {

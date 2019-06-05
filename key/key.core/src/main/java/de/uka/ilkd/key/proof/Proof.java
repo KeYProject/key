@@ -224,7 +224,8 @@ public class Proof implements Named {
 
         this ( new Name ( name ), initConfig );
 
-        if (!getSettings().getTermLabelSettings().getUseOriginLabels()) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE
+                .getTermLabelSettings().getUseOriginLabels()) {
             problem = OriginTermLabel.removeOriginLabels(problem, getServices()).sequent();
         }
 

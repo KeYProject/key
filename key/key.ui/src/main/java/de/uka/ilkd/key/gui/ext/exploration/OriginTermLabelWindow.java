@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -714,12 +713,6 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
             }
 
             return OriginTermLabelWindow.this.getTooltipText(convertPio(pis.getPosInOccurrence()));
-        }
-
-        @Override
-        public Point getToolTipLocation(MouseEvent event) {
-            Point p = event.getPoint();
-            return new Point(p.x + 10, p.y);
         }
 
         @Override
