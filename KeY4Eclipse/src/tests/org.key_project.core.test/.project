@@ -6,19 +6,6 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
-			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
-			<arguments>
-				<dictionary>
-					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/Generate ProofCollectionParser (Plug-in).launch</value>
-				</dictionary>
-				<dictionary>
-					<key>incclean</key>
-					<value>true</value>
-				</dictionary>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
 			<name>org.eclipse.jdt.core.javabuilder</name>
 			<arguments>
 			</arguments>
@@ -41,19 +28,24 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>key.genSrc</name>
+			<name>key.genSrc.antlr</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core.test/genSrc</locationURI>
+			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core/build/generated-src/antlr/test</locationURI>
+		</link>
+		<link>
+			<name>key.genSrc.javacc</name>
+			<type>2</type>
+			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core/build/generated-src/javacc/main</locationURI>
 		</link>
 		<link>
 			<name>key.resources</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core.test/resources</locationURI>
+			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core/src/test/resources</locationURI>
 		</link>
 		<link>
 			<name>key.src</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core.test/src</locationURI>
+			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core/src/test/java</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
