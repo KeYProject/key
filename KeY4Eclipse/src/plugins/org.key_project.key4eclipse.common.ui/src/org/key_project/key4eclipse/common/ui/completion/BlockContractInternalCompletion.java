@@ -21,8 +21,8 @@ import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule.Instantiation;
 import de.uka.ilkd.key.rule.AbstractBlockContractRule;
-import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule.Instantiation;
 import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -99,7 +99,7 @@ public class BlockContractInternalCompletion extends AbstractInteractiveRuleAppl
        */
       @Override
       public String getWindowTitle() {
-         return "Contracts for Block: " + instantiation.block;
+         return "Contracts for Block: " + instantiation.statement;
       }
 
       /**
@@ -107,7 +107,7 @@ public class BlockContractInternalCompletion extends AbstractInteractiveRuleAppl
        */
       @Override
       public String getTitle() {
-         return "Contracts for Block: " + instantiation.block;
+         return "Contracts for Block: " + instantiation.statement;
       }
 
       /**
@@ -157,7 +157,7 @@ public class BlockContractInternalCompletion extends AbstractInteractiveRuleAppl
          if(contract != null) {
             BlockContractInternalBuiltInRuleApp result = (BlockContractInternalBuiltInRuleApp) getApp();
             final List<LocationVariable> heaps = HeapContext.getModHeaps(services, instantiation.isTransactional());
-            result.update(instantiation.block, contract, heaps);
+            result.update(instantiation.statement, contract, heaps);
             return result;
          } else {
             return getApp();

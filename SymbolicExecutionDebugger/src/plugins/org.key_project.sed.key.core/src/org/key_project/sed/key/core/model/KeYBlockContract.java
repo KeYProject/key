@@ -28,7 +28,7 @@ import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockSpecificationElement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionAuxiliaryContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -38,11 +38,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYBlockContract extends AbstractSEBlockContract implements IKeYSENode<IExecutionBlockSpecificationElement> {
+public class KeYBlockContract extends AbstractSEBlockContract implements IKeYSENode<IExecutionAuxiliaryContract> {
    /**
     * The {@link IExecutionMethodContract} to represent by this debug node.
     */
-   private final IExecutionBlockSpecificationElement executionNode;
+   private final IExecutionAuxiliaryContract executionNode;
 
    /**
     * The contained children.
@@ -99,7 +99,7 @@ public class KeYBlockContract extends AbstractSEBlockContract implements IKeYSEN
    public KeYBlockContract(KeYDebugTarget target, 
                             IKeYSENode<?> parent, 
                             KeYThread thread, 
-                            IExecutionBlockSpecificationElement executionNode) throws DebugException {
+                            IExecutionAuxiliaryContract executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
@@ -152,7 +152,7 @@ public class KeYBlockContract extends AbstractSEBlockContract implements IKeYSEN
     * {@inheritDoc}
     */
    @Override
-   public IExecutionBlockSpecificationElement getExecutionNode() {
+   public IExecutionAuxiliaryContract getExecutionNode() {
       return executionNode;
    }
 

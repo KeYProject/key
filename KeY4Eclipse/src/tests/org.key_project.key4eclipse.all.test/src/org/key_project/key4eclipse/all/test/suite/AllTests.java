@@ -23,9 +23,6 @@ import org.key_project.key4eclipse.starter.ui.test.suite.AllStarterUITests;
 import org.key_project.ui.test.suite.AllUITests;
 import org.key_project.util.test.suite.AllUtilTests;
 
-import de.uka.ilkd.key.proof_references.suite.AllProofReferencesTests;
-import de.uka.ilkd.key.suite.AllTestGenTests;
-import de.uka.ilkd.key.symbolic_execution.suite.AllSymbolicExecutionTests;
 
 /**
  * Run all contained JUnit 4 test cases.
@@ -35,11 +32,11 @@ import de.uka.ilkd.key.symbolic_execution.suite.AllSymbolicExecutionTests;
 @Suite.SuiteClasses({
    AllUtilTests.class,
    AllCoreTests.class,
-   AllProofReferencesTests.class,
-   AllSymbolicExecutionTests.class,
-   AllTestGenTests.class,
+ //  AllProofReferencesTests.class,
+  // AllSymbolicExecutionTests.class,
+  // AllTestGenTests.class,
    AllUITests.class,
-   de.uka.ilkd.key.util.removegenerics.AllTests.class,
+  // de.uka.ilkd.key.util.removegenerics.AllTests.class,
    AllStarterCoreTests.class,
    AllCommonUiTests.class,
    AllStarterUITests.class,
