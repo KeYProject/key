@@ -63,16 +63,25 @@ public class OriginTermLabel implements TermLabel {
      * Find a term's origin.
      * If the term has no origin, iterate through its parent terms until we find one with an origin.
      *
-     * @param pos the position of the term whose origin to find.
+     * @param pis the position of the term whose origin to find.
      * @return the term's origin, or the origin of one of its parents.
      */
-    public static Origin getOrigin(PosInSequent pos) {
-        if (pos == null) {
+    public static Origin getOrigin(PosInSequent pis) {
+        if (pis == null) {
             return null;
         }
 
-        PosInOccurrence pio = pos.getPosInOccurrence();
+        return getOrigin(pis.getPosInOccurrence());
+    }
 
+    /**
+     * Find a term's origin.
+     * If the term has no origin, iterate through its parent terms until we find one with an origin.
+     *
+     * @param pio the position of the term whose origin to find.
+     * @return the term's origin, or the origin of one of its parents.
+     */
+    public static Origin getOrigin(PosInOccurrence pio) {
         if (pio == null) {
             return null;
         }
@@ -549,6 +558,8 @@ public class OriginTermLabel implements TermLabel {
             this.specType = specType;
             this.fileName = fileName == null ? IMPLICIT_FILE_NAME : fileName;
             this.line = line;
+
+            assert specType != null;
         }
 
         @Override

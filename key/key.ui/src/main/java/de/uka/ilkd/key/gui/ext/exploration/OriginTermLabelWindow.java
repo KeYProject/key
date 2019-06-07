@@ -519,37 +519,15 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
         return result;
     }
 
-    /**
-     * Returns the term's {@link OriginTermLabel}. If the term has no such label, iterates over its
-     * parents until it finds one with a label.
-     *
-     * @param pio the position of the term.
-     * @return the {@link OriginTermLabel} of the nearest possible parent term, or {@code null} if
-     *  no parent term has an {@link OriginTermLabel}.
-     */
-    private OriginTermLabel getOriginLabel(PosInOccurrence pio) {
+    private String getTooltipText(PosInOccurrence pio) {
         if (pio == null) {
             return null;
         }
 
-        Term term = pio.subTerm();
-        OriginTermLabel originLabel =
-                (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
+        OriginTermLabel label = (OriginTermLabel) pio.subTerm().getLabel(OriginTermLabel.NAME);
+        Origin origin = OriginTermLabel.getOrigin(pio);
 
-        while (originLabel == null && !pio.isTopLevel()) {
-            pio = pio.up();
-            term = pio.subTerm();
-
-            originLabel =
-                    (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
-        }
-
-        return originLabel;
-    }
-
-    private String getTooltipText(PosInOccurrence pio) {
-        OriginTermLabel label = getOriginLabel(pio);
-        return "<html>Origin of selected term: <b>" + (label == null ? "" : label.getOrigin()) +
+        return "<html>Origin of selected term: <b>" + (origin == null ? "" : origin) +
                 "</b><hr>Origin of (former) sub-terms:<br>" +
                 (label == null ? "" : label.getSubtermOrigins().stream()
                 .map(o -> "" + o + "<br>").reduce("", String::concat));
@@ -579,10 +557,10 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
             termTextLabel.setBackground(OriginTermLabelWindow.this.getBackground());
 
             JLabel originTextLabel = new JLabel();
-            OriginTermLabel originLabel = getOriginLabel(pio);
+            Origin origin = OriginTermLabel.getOrigin(pio);
 
-            if (originLabel != null) {
-                originTextLabel.setText(getShortOriginText(originLabel.getOrigin()));
+            if (origin != null) {
+                originTextLabel.setText(getShortOriginText(origin));
                 originTextLabel.setHorizontalAlignment(SwingConstants.TRAILING);
             }
 
@@ -601,7 +579,7 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
             result.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             result.setBackground(Color.WHITE);
 
-            if (originLabel != null) {
+            if (origin != null) {
                 result.setToolTipText(OriginTermLabelWindow.this.getTooltipText(pio));
             }
 
