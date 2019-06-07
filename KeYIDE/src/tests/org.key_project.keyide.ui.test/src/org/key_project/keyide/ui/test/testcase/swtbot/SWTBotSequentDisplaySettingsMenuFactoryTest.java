@@ -26,6 +26,7 @@ import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
 import de.uka.ilkd.key.gui.actions.TermLabelMenu;
 import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
@@ -125,7 +126,7 @@ public class SWTBotSequentDisplaySettingsMenuFactoryTest extends AbstractSWTBotK
                final Shell shell = keyEditor.getSite().getShell();
                // Instantiate a proof also in KeY's MainWindow
                final File keyFile = proof.getEnv().getJavaModel().getInitialFile();
-               final KeYEnvironment<WindowUserInterfaceControl> uiEnvironment = WindowUserInterfaceControl.loadInMainWindow(keyFile, null, null, null, true);
+               final KeYEnvironment<WindowUserInterfaceControl> uiEnvironment = WindowUserInterfaceControl.loadInMainWindow(AbstractProfile.getDefaultProfile(), null, null, null, null, false, true);
                try {
                   SwingBotJFrame keyMainFrame = TestKeYUIUtil.keyGetMainWindow();
                   // Close editor, it is not needed because it shows a different proof
@@ -274,7 +275,7 @@ public class SWTBotSequentDisplaySettingsMenuFactoryTest extends AbstractSWTBotK
                              KeYEditor keyEditor) throws Exception {
                // Instantiate a proof also in KeY's MainWindow
                File keyFile = proof.getEnv().getJavaModel().getInitialFile();
-               KeYEnvironment<WindowUserInterfaceControl> uiEnvironment = WindowUserInterfaceControl.loadInMainWindow(keyFile, null, null, null, true);
+               KeYEnvironment<WindowUserInterfaceControl> uiEnvironment = WindowUserInterfaceControl.loadInMainWindow(AbstractProfile.getDefaultProfile(),keyFile, null, null, null, false, true);
                try {
                   SwingBotJFrame keyMainFrame = TestKeYUIUtil.keyGetMainWindow();
                   SWTBotEclipseEditor textEditor = editor.toTextEditor();

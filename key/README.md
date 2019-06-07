@@ -35,7 +35,7 @@ Assuming you are in directory `key/`.
 
 **Quick Start:** 
 ```
-./gradlew start
+./gradlew run
 ```
 
 Compile KeY, includes running JavaCC and Antlr

@@ -227,8 +227,8 @@ public final class KeYModelUtil {
          else if (executionNode instanceof IExecutionOperationContract) {
             result = new KeYMethodContract(target, parent, thread, (IExecutionOperationContract)executionNode);
          }
-         else if (executionNode instanceof IExecutionBlockSpecificationElement) {
-            result = new KeYBlockContract(target, parent, thread, (IExecutionBlockSpecificationElement)executionNode);
+         else if (executionNode instanceof IExecutionAuxiliaryContract) {
+            result = new KeYBlockContract(target, parent, thread, (IExecutionAuxiliaryContract)executionNode);
          }
          else if (executionNode instanceof IExecutionLoopInvariant) {
             result = new KeYLoopInvariant(target, parent, thread, (IExecutionLoopInvariant)executionNode);

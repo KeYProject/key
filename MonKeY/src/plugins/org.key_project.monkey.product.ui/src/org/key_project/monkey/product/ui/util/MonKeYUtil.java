@@ -37,6 +37,7 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.speclang.Contract;
 
 /**
@@ -90,7 +91,7 @@ public final class MonKeYUtil {
       monitor.beginTask("Loading in KeY", IProgressMonitor.UNKNOWN);
       KeYEnvironment<?> environment;
       if (showKeYMainWindow) {
-         environment = WindowUserInterfaceControl.loadInMainWindow(location, null, bootClassPath, null, true);
+         environment = WindowUserInterfaceControl.loadInMainWindow(AbstractProfile.getDefaultProfile(),location, null, bootClassPath, null, false, true);
       }
       else {
          environment = KeYEnvironment.load(location, null, bootClassPath, null);
