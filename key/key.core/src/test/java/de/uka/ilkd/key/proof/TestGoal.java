@@ -16,8 +16,10 @@ package de.uka.ilkd.key.proof;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import junit.framework.TestCase;
-
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
@@ -28,25 +30,27 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.TacletForTests;
 
+import static org.junit.Assert.*;
+
 /** class tests the goal, especially the split and set back mechanism. */
 
-public class TestGoal extends TestCase {
+public class TestGoal {
 
-        Proof proof;
+        private Proof proof;
 
-        public TestGoal(String name) {
-                super(name);
-        }
-
+        @Before
         public void setUp() {
                 TacletForTests.parse();
                 proof = new Proof("", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));     
         }
 
+        @After
         public void tearDown() {
-                proof = null;
+            proof.dispose();
+            proof = null;
         }
 
+        @Test @Ignore
         public void testSetBack0() {
                 Sequent seq = Sequent
                                 .createSuccSequent(Semisequent.EMPTY_SEMISEQUENT
@@ -103,6 +107,7 @@ public class TestGoal extends TestCase {
 
         }
 
+        @Test @Ignore
         public void testSetBack1() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
                 Sequent seq = Sequent
                                 .createSuccSequent(Semisequent.EMPTY_SEMISEQUENT

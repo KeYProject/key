@@ -309,6 +309,7 @@ public class TestTermParser extends AbstractTestTermParser {
 
 
 
+    @Ignore("weigl: #1506")
 	@Test
     public void test12() throws Exception {
 	    String s="\\<{int i; i=0;}\\> \\<{ while (i>0) ;}\\>true";
