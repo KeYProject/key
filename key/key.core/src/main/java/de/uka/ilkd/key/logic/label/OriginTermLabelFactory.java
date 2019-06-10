@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 
@@ -69,10 +71,6 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
      */
     private Origin parseOrigin(String str) throws TermLabelException {
         try {
-            if (str.equals("<none>")) {
-                return new Origin(SpecType.NONE, "", -1);
-            }
-
             StringTokenizer tokenizer = new StringTokenizer(str, " ");
 
             SpecType specType = parseSpecType(tokenizer.nextToken());
@@ -82,24 +80,46 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
             if (token.equals("(implicit)")) {
                 matchEnd(tokenizer, str);
 
-                return new Origin(specType, Origin.IMPLICIT_FILE_NAME, Origin.IMPLICIT_LINE);
+                return new Origin(specType);
             } else {
                 matchChar(token, str, "@");
-                String filename = tokenizer.nextToken();
 
-                matchChar(tokenizer.nextToken(), str, "@");
-                matchId(tokenizer.nextToken(), str, "line");
-                int line = Integer.parseInt(tokenizer.nextToken());
-                matchEnd(tokenizer, str);
+                token = tokenizer.nextToken();
 
-                return new Origin(specType, filename, line);
+                if (token.equals("file")) {
+                    String filename = tokenizer.nextToken();
+
+                    matchChar(tokenizer.nextToken(), str, "@");
+                    matchId(tokenizer.nextToken(), str, "line");
+                    int line = Integer.parseInt(tokenizer.nextToken());
+                    matchEnd(tokenizer, str);
+
+                    return new FileOrigin(specType, filename, line);
+                } else if (token.equals("node")) {
+                    int number = Integer.parseInt(tokenizer.nextToken());
+
+                    String ruleName = tokenizer.nextToken();
+
+                    if (!ruleName.startsWith("(") || !ruleName.endsWith(")")) {
+                        throw new IllegalArgumentException();
+                    }
+
+                    ruleName = ruleName.substring(1, ruleName.length() - 1);
+
+                    matchEnd(tokenizer, str);
+
+                    return new NodeOrigin(specType, ruleName, number);
+                } else {
+                    throw new IllegalArgumentException();
+                }
             }
         } catch (NoSuchElementException | IllegalArgumentException e) {
             throw new TermLabelException(
                       "Malformed origin string: \""
                     + str + "\"\n"
-                    + "(Well-formed origins have either this format: \""
-                    + "spec_type @ filename @ line xx\")\n"
+                    + "(Well-formed origins have one of the following formats: \""
+                    + "spec_type @ file <file name> @ line <line number>\")\n"
+                    + "spec_type @ node <node number> (<rule name>)\")\n"
                     + "spec_type (implicit)\")\n"
             );
         }

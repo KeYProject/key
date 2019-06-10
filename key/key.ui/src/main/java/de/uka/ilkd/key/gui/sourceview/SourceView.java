@@ -61,8 +61,8 @@ import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
@@ -276,18 +276,24 @@ public final class SourceView extends JComponent {
             return;
         }
 
-        Origin origin;
-        Set<Origin> subtermOrigins;
+        FileOrigin origin;
+        Set<FileOrigin> subtermOrigins;
 
         Term term = pos.getPosInOccurrence().subTerm();
         OriginTermLabel label = (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
 
         if (label == null) {
-            origin = OriginTermLabel.getOrigin(pos);
+            Origin or = OriginTermLabel.getOrigin(pos);
+
+            origin = or instanceof FileOrigin ? (FileOrigin) or : null;
             subtermOrigins = Collections.emptySet();
         } else {
-            origin = label.getOrigin().specType == SpecType.NONE ? null : label.getOrigin();
-            subtermOrigins = label.getSubtermOrigins();
+            Origin or = label.getOrigin();
+
+            origin = or instanceof FileOrigin ? (FileOrigin) or : null;
+            subtermOrigins = label.getSubtermOrigins().stream()
+                    .filter(o -> o instanceof FileOrigin)
+                    .map(o -> (FileOrigin) o).collect(Collectors.toSet());
         }
 
         Set<String> filesToOpen =
@@ -300,7 +306,7 @@ public final class SourceView extends JComponent {
         openFiles(filesToOpen);
 
         try {
-            for (Origin subtermOrigin : subtermOrigins) {
+            for (FileOrigin subtermOrigin : subtermOrigins) {
                 if (isFileSelected(subtermOrigin.fileName) && subtermOrigin.line > 0) {
                     Range range = calculateJMLSpecRange(subtermOrigin.line);
                     subtermOriginsHighlighters.add(textPane.getHighlighter().addHighlight(

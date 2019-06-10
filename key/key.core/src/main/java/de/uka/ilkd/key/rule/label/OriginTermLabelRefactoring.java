@@ -92,10 +92,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
         if (oldLabel != null) {
             labels.remove(oldLabel);
             final Origin oldOrigin = oldLabel.getOrigin();
-            newLabel = new OriginTermLabel(oldOrigin.specType,
-                                           oldOrigin.fileName,
-                                           oldOrigin.line,
-                                           subtermOrigins);
+            newLabel = new OriginTermLabel(oldOrigin, subtermOrigins);
         } else {
             final Origin commonOrigin = OriginTermLabel.computeCommonOrigin(subtermOrigins);
             newLabel = new OriginTermLabel(commonOrigin, subtermOrigins);

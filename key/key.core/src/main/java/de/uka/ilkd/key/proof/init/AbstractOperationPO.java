@@ -52,6 +52,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -705,7 +706,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
                       selfNotNull, selfCreated, selfExactType,
                       paramsOK, mbyAtPreDef);
 
-        return tb.addLabelToAllSubs(result, new OriginTermLabel(SpecType.REQUIRES, null, -1));
+        return tb.addLabelToAllSubs(result, new OriginTermLabel(
+                new Origin(SpecType.REQUIRES)));
     }
 
     /**
