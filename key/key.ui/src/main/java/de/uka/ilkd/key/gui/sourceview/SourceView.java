@@ -342,10 +342,10 @@ public final class SourceView extends JComponent {
                 .start();
 
 
-        List<String> lines = textPane.getText().lines().collect(Collectors.toList());
+        String[] lines = textPane.getText().split("\\n (\\r?)");
 
-        int lastLine = IntStream.range(start - 1, lines.size())
-            .filter(i -> lines.get(i).strip().endsWith(";"))
+        int lastLine = IntStream.range(start - 1, lines.length)
+            .filter(i -> lines[i].trim().endsWith(";"))
             .findFirst().orElse(firstLine - 1) + 1;
 
         int end = calculateLineRange(textPane, lineInformation[lastLine - 1].getOffset()).end();
