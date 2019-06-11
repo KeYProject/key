@@ -65,8 +65,9 @@ public class ProofIndependentSettings implements SettingsListener {
             File testFile = new File(filename);
             if(testFile.exists()) {
                 if(Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
-                    System.err.println("The settings in " +
-                            filename + " are *not* read.");
+                    //weigl: silently ignore because of huge test reports
+                    //System.err.println("The settings in " +
+                    //        filename + " are *not* read.");
                 } else {
                     load(testFile);
                 }

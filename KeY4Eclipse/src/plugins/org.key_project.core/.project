@@ -6,19 +6,6 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
-			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
-			<arguments>
-				<dictionary>
-					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/Copy Resources and Generate Parsers (Plug-in).launch</value>
-				</dictionary>
-				<dictionary>
-					<key>incclean</key>
-					<value>true</value>
-				</dictionary>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
 			<name>org.eclipse.jdt.core.javabuilder</name>
 			<arguments>
 			</arguments>
@@ -41,9 +28,14 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>key.genSrc</name>
+			<name>java</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core/genSrc</locationURI>
+			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core/src/main/java</locationURI>
+		</link>
+		<link>
+			<name>javaccGen</name>
+			<type>2</type>
+			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core/build/generated-src/javacc/main</locationURI>
 		</link>
 		<link>
 			<name>key.lib</name>
@@ -53,12 +45,12 @@
 		<link>
 			<name>key.resources</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core/resources</locationURI>
+			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core/src/main/resources</locationURI>
 		</link>
 		<link>
-			<name>key.src</name>
+			<name>main</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core/src</locationURI>
+			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core/build/generated-src/antlr/main</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
