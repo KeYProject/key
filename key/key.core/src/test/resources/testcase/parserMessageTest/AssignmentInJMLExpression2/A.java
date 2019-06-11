@@ -1,6 +1,6 @@
 //MSG .*=.*
-//LINE 6
-//COL 24
+//LINE 7
+//COL 23
 
 class A {
 

@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.junit.FixMethodOrder;
+import org.junit.experimental.categories.Category;
 import org.junit.runners.MethodSorters;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
@@ -40,12 +41,14 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import org.key_project.util.testcategories.Slow;
 
 /**
  * Tests {@link SymbolicLayoutExtractor}.
  * @author Martin Hentschel
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Category(Slow.class)
 public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCase {
 //   public void testSimpleLinkedOjbectsWithAdditionalInstances() throws Exception {
 //      doTest("/set/configurationExtractorSimpleLinkedOjbectsWithAdditionalInstances/test/SimpleLinkedOjbectsWithAdditionalInstances.java",
