@@ -197,7 +197,9 @@ public abstract class SequentView extends JEditorPane {
 
         if (pis != null && !pis.isSequent()) {
             Term term = pis.getPosInOccurrence().subTerm();
-            text += "<b>Operator:</b> " + term.op() + "<br><b>Sort</b>: " + term.sort();
+            text += "<b>Operator:</b> " + term.op().getClass().getSimpleName()
+                    + " (" + term.op() + ")";
+            text += "<br><b>Sort</b>: " + term.sort();
         }
 
         StringJoiner extensionStr = new StringJoiner("<br>", "<br>", "");

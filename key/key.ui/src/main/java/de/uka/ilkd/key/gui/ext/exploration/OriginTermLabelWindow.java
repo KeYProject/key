@@ -68,6 +68,8 @@ import de.uka.ilkd.key.pp.ShowSelectedSequentPrintFilter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
 /**
@@ -181,8 +183,11 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
                         .replaceAll("\\s+", " ")),
                 "Origin for: "+ (pos == null
                     ? "Whole sequent"
-                    : "Formula " + pos.getIndex()
-                        + (pos.isInAntec() ? " (in antecedent)" : " (in succedent)")));
+                    : "Formula " + node.sequent()
+                            .formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula())
+                        + (pos.isInAntec() ? " in antecedent" : " in succedent"
+                        + ", Operator: " + pos.subTerm().op().getClass().getSimpleName()
+                        + " (" + pos.subTerm().op() + ")")));
 
         this.services = services;
         this.termPio = pos;
@@ -250,6 +255,17 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
 
                 @Override
                 public void proofExpanded(ProofTreeEvent e) {
+                    updateNodeLink();
+                }
+            });
+
+            node.proof().addProofDisposedListener(new ProofDisposedListener() {
+
+                @Override
+                public void proofDisposing(ProofDisposedEvent e) { }
+
+                @Override
+                public void proofDisposed(ProofDisposedEvent e) {
                     updateNodeLink();
                 }
             });
@@ -360,7 +376,7 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
     private void updateNodeLink() {
         Node node = getNode();
 
-        if (!node.proof().find(node)) {
+        if (node.proof().isDisposed() || !node.proof().find(node)) {
             nodeLinkButton.setText("DELETED NODE");
             nodeLinkAction.setEnabled(false);
 

@@ -13,7 +13,6 @@ import java.util.TreeSet;
 
 import javax.swing.JFrame;
 
-import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -125,16 +124,15 @@ public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeIn
      * Creates a new {@link NodeInfoWindow}.
      *
      * @param node the node this window is associated with.
-     * @param longName the window's long name, used as title.
-     * @param shortName the window's short name, used in the list of window in the
-     *  {@link ProofTreeView}.
+     * @param longName the window's long name.
+     * @param shortName the window's short name.
      */
     public NodeInfoWindow(Node node, String longName, String shortName) {
         this.node = node;
         this.longName = longName;
         this.shortName = shortName;
 
-        setTitle(longName);
+        setTitle(shortName);
 
         register(this);
     }
