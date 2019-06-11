@@ -61,8 +61,8 @@ import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
@@ -276,24 +276,18 @@ public final class SourceView extends JComponent {
             return;
         }
 
-        FileOrigin origin;
-        Set<FileOrigin> subtermOrigins;
+        Origin origin;
+        Set<Origin> subtermOrigins;
 
         Term term = pos.getPosInOccurrence().subTerm();
         OriginTermLabel label = (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
 
         if (label == null) {
-            Origin or = OriginTermLabel.getOrigin(pos);
-
-            origin = or instanceof FileOrigin ? (FileOrigin) or : null;
+            origin = OriginTermLabel.getOrigin(pos);
             subtermOrigins = Collections.emptySet();
         } else {
-            Origin or = label.getOrigin();
-
-            origin = or instanceof FileOrigin ? (FileOrigin) or : null;
-            subtermOrigins = label.getSubtermOrigins().stream()
-                    .filter(o -> o instanceof FileOrigin)
-                    .map(o -> (FileOrigin) o).collect(Collectors.toSet());
+            origin = label.getOrigin().specType == SpecType.NONE ? null : label.getOrigin();
+            subtermOrigins = label.getSubtermOrigins();
         }
 
         Set<String> filesToOpen =
@@ -306,7 +300,7 @@ public final class SourceView extends JComponent {
         openFiles(filesToOpen);
 
         try {
-            for (FileOrigin subtermOrigin : subtermOrigins) {
+            for (Origin subtermOrigin : subtermOrigins) {
                 if (isFileSelected(subtermOrigin.fileName) && subtermOrigin.line > 0) {
                     Range range = calculateJMLSpecRange(subtermOrigin.line);
                     subtermOriginsHighlighters.add(textPane.getHighlighter().addHighlight(
@@ -341,11 +335,10 @@ public final class SourceView extends JComponent {
         int start = calculateLineRange(textPane, lineInformation[firstLine - 1].getOffset())
                 .start();
 
+        String[] lines = textPane.getText().split("\\n (\\r?)");
 
-        List<String> lines = textPane.getText().lines().collect(Collectors.toList());
-
-        int lastLine = IntStream.range(start - 1, lines.size())
-            .filter(i -> lines.get(i).strip().endsWith(";"))
+        int lastLine = IntStream.range(start - 1, lines.length)
+            .filter(i -> lines[i].trim().endsWith(";"))
             .findFirst().orElse(firstLine - 1) + 1;
 
         int end = calculateLineRange(textPane, lineInformation[lastLine - 1].getOffset()).end();
