@@ -82,10 +82,10 @@ subprojects {
 
     test {
         useJUnit {
-            excludeCategories 'org.key_project.util.testcategories.Interactive',  'org.key_project.util.testcategories.Performance'
+            excludeCategories 'org.key_project.util.testcategories.Interactive', 'org.key_project.util.testcategories.Performance'
         }
-        afterTest {desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}"}
-        beforeTest {desc -> logger.error "> ${desc.className}#${desc.name}"}
+        afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
+        beforeTest { desc -> logger.error "> ${desc.className}#${desc.name}" }
 
     }
 
@@ -122,6 +122,7 @@ subprojects {
 
     dependencies {
         testCompile("junit:junit:4.12")
+        compile 'org.jetbrains:annotations:17.0.0'
         //testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
         //testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
         //testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.3.1'

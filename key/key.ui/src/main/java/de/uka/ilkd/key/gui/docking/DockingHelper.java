@@ -6,21 +6,23 @@ import bibliothek.gui.dock.common.action.CButton;
 import bibliothek.gui.dock.common.action.CCheckBox;
 import bibliothek.gui.dock.common.intern.CDockable;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class DockingHelper {
-    public static CDockable createDock(TabPanel p) {
-        CAction[] actions =
-                p.getTitleActions().stream().map(DockingHelper::translateAction)
-                        .toArray(CAction[]::new);
+    public static @NotNull CDockable createDock(@NotNull TabPanel p) {
+        Stream<CAction> actions = p.getTitleActions().stream().map(DockingHelper::translateAction);
+        CAction[] a = Stream.concat(actions, p.getTitleCActions().stream()).toArray(CAction[]::new);
 
         return new DefaultSingleCDockable(p.getClass().getName(),
                 p.getIcon(), p.getTitle(), p.getComponent(),
-                p.getPermissions(), actions);
+                p.getPermissions(), a);
     }
 
-    public static CAction translateAction(Action action) {
+    public static @NotNull CAction translateAction(@NotNull Action action) {
         if (action.getValue(Action.SELECTED_KEY) != null) {
             return createCheckBox(action);
 
@@ -29,7 +31,7 @@ public class DockingHelper {
         }
     }
 
-    private static CAction createCheckBox(Action action) {
+    private static @NotNull CAction createCheckBox(@NotNull Action action) {
         CCheckBox button = new CCheckBox(
                 (String) action.getValue(Action.NAME),
                 (Icon) action.getValue(Action.SMALL_ICON)) {
@@ -42,6 +44,7 @@ public class DockingHelper {
 
         button.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
         button.setEnabled(action.isEnabled());
+        button.setSelected(Boolean.TRUE == action.getValue(Action.SELECTED_KEY));
         action.addPropertyChangeListener(evt -> {
             button.setText((String) action.getValue(Action.NAME));
             button.setIcon((Icon) action.getValue(Action.SMALL_ICON));
