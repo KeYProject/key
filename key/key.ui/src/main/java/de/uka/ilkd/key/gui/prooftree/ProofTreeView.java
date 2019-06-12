@@ -71,14 +71,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
             ColorSettings.define("[proofTree]orange", "", new Color(255, 140, 0));
 
 
-    public static final ColorSettings.ColorProperty DARK_TURQOUIS_COLOR =
-            ColorSettings.define("[proofTree]turqois", "", new Color(19, 110, 128));
-    public static final ColorSettings.ColorProperty DARK_PURPLE_COLOR =
-            ColorSettings.define("[proofTree]darkPurple", "", new Color(112, 17, 191));
-    public static final ColorSettings.ColorProperty LIGHT_PURPLE_COLOR =
-            ColorSettings.define("[proofTree]lightPurple", "", new Color(165, 146, 191));
-
-
     /**
      * KeYStroke for the search panel: STRG+SHIFT+F
      */
@@ -262,12 +254,17 @@ public class ProofTreeView extends JPanel implements TabPanel {
         }
     }
 
+    private final ProofRenderer renderer = new ProofRenderer();
+
+    public ProofRenderer getRenderer() {
+        return renderer;
+    }
+
     /**
      * layout the component
      */
     protected void layoutKeYComponent() {
         delegateView.setBackground(Color.white);
-        ProofRenderer renderer = new ProofRenderer();
         delegateView.setCellRenderer(renderer);
         delegateView.putClientProperty("JTree.lineStyle", "Angled");
         delegateView.setVisible(true);
@@ -737,7 +734,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     }
 
 
-    class ProofRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
+    public class ProofRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
         private List<Styler<GUIAbstractTreeNode>> stylers = new LinkedList<>();
         private Icon keyHole20x20 = IconFactory.keyHole(iconHeight, iconHeight);
 
@@ -747,8 +744,13 @@ public class ProofTreeView extends JPanel implements TabPanel {
             stylers.add(this::renderLeaf);
             stylers.add(this::renderNonLeaf);
             stylers.add(this::checkNotes);
-            stylers.add(this::checkExploration);//TODO put in extension
         }
+
+        public boolean add(Styler<GUIAbstractTreeNode> guiAbstractTreeNodeStyler) {
+            return stylers.add(guiAbstractTreeNodeStyler);
+        }
+
+
 
         private void closedGoal(Style style, GUIAbstractTreeNode treeNode) {
             try {
@@ -865,16 +867,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
         }
 
-        private void checkExploration(Style style, GUIAbstractTreeNode treeNode) {
-            Node node = treeNode.getNode();
-            if (node != null && node.getNodeInfo().isExploration()) {
-                style.setBorder(DARK_PURPLE_COLOR.get());
-                style.setBackground(LIGHT_PURPLE_COLOR.get());
-                style.setTooltip("Exploration Action Performed");
-            } else {
-                style.setBorder(null);
-            }
-        }
 
         private void oneStepSimplification(Style style, GUIAbstractTreeNode node) {
             try {

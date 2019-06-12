@@ -41,6 +41,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import org.key_project.util.lookup.Lookup;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
 
 
@@ -81,9 +82,7 @@ public class NodeInfo {
     /** Information about changes respective to the parent of this node. */
     private SequentChangeInfo sequentChangeInfo;
 
-    private boolean exploration;
-
-    private String explorationAction;
+    private Lookup userData = new Lookup();
 
     public NodeInfo(Node node) {
         this.node = node;
@@ -410,22 +409,16 @@ public class NodeInfo {
         this.sequentChangeInfo = sequentChangeInfo;
     }
 
-    /**
-     * Information for the explorationmode
-     */
-    public boolean isExploration() {
-        return exploration;
+
+    public <T> T get(Class<T> service) {
+        return userData.get(service);
     }
 
-    public void setExploration(boolean exploration) {
-        this.exploration = exploration;
+    public <T> void register(T obj, Class<T> service) {
+        userData.register(obj, service);
     }
 
-    public String getExplorationAction() {
-        return explorationAction;
-    }
-
-    public void setExplorationAction(String explorationAction) {
-        this.explorationAction = explorationAction;
+    public <T> void deregister(T obj, Class<T> service) {
+        userData.deregister(obj, service);
     }
 }
