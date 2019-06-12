@@ -324,7 +324,8 @@ public class TacletFindModel extends AbstractTableModel {
 
     private Term addOrigin(Term term) {
         if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()) {
-            return services.getTermBuilder().addLabelToAllSubs(term,
+            return services.getTermBuilder().addLabelToAllSubs(
+                    OriginTermLabel.removeOriginLabels(term, services),
                     new OriginTermLabel(new NodeOrigin(
                             SpecType.INTERACTION,
                             originalApp.rule().displayName(),
