@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public class DockingHelper {
     public static @NotNull CDockable createDock(@NotNull TabPanel p) {

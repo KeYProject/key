@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
@@ -87,6 +88,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     private final ActivateAction actionActivate = new ActivateAction();
     private final FilterMouseAction actionFilterUsingMouse = new FilterMouseAction();
     private final DirectModeAction actionDirectMode = new DirectModeAction();
+    private final OnlyCompleteTacletsAction actionOnlyCompleteTaclets = new OnlyCompleteTacletsAction();
     private final MainWindow mainWindow;
     @Nullable
     private KeyboardTacletModel model;
@@ -131,6 +133,11 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
             }
         });
 
+        mainWindow.currentGoalView.addPropertyChangeListener(SequentView.PROP_LAST_MOUSE_POSITION, e -> {
+            if (actionFilterUsingMouse.isSelected())
+                buildModel();
+        });
+
         pCenter.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(new JScrollPane(pCenter));
         addPropertyChangeListener(PROP_MODEL, (e) -> {
@@ -147,7 +154,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
             model.setCurrentPrefix(txtInput.getText());
             if (isDirectMode()) {
                 Optional<RuleApp> app = model.getSelectedTacletsApp();
-                app.ifPresent(ruleApp -> applyRule(ruleApp));
+                app.ifPresent(this::applyRule);
             }
         }
     }
@@ -155,7 +162,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     private void applyCurrentTaclet() {
         if (model != null) {
             Optional<RuleApp> app = model.getFirstMatchingTacletApp();
-            app.ifPresent(ruleApp -> applyRule(ruleApp));
+            app.ifPresent(this::applyRule);
             System.out.println("applied");
         }
     }
@@ -185,6 +192,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         btnOptions.addSeparator();
         btnOptions.add(DockingHelper.translateAction(actionDirectMode));
         btnOptions.add(DockingHelper.translateAction(actionFilterUsingMouse));
+        btnOptions.add(DockingHelper.translateAction(actionOnlyCompleteTaclets));
         return Collections.singleton(btnOptions);
     }
 
@@ -270,7 +278,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
 
         long time = System.currentTimeMillis();
         List<RuleApp> taclets = new LinkedList<>();
-        PosInSequent pos = MainWindow.getInstance().currentGoalView.getMousePosInSequent();
+        PosInSequent pos = mainWindow.currentGoalView.getLastPosInSequent();
 
         if (actionFilterUsingMouse.isSelected() && pos == null) {
             pCenter.add(new JLabel("<html><b>Warning:</b> No last mouse position found in the sequent."));
@@ -283,15 +291,26 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
                     return true;
                 }
             };
-            ImmutableList<NoPosTacletApp> t = lastGoal.ruleAppIndex().getFindTaclet(
-                    filter, pos.getPosInOccurrence(), services
-            );
-            t.forEach(taclets::add);
+            try {
+                ImmutableList<NoPosTacletApp> t = lastGoal.ruleAppIndex().getFindTaclet(
+                        filter, pos.getPosInOccurrence(), services
+                );
+                t.forEach(taclets::add);
+            }catch(NullPointerException e) {
+                //	at de.uka.ilkd.key.proof.TacletAppIndex.getIndex(TacletAppIndex.java:215)
+                e.printStackTrace();
+            }
         } else {
             taclets = lastGoal.getAllBuiltInRuleApps();
             taclets.addAll(lastGoal.getAllTacletApps(services));
         }
         System.out.format("Found %d taclets\n", taclets.size());
+
+        if (actionOnlyCompleteTaclets.isSelected()) {
+            taclets = taclets.stream().filter(RuleApp::complete)
+                    .collect(Collectors.toList());
+        }
+
         KeyboardTacletModel newModel = new KeyboardTacletModel(taclets);
         setModel(newModel);
         System.out.format("Took: %d ms%n", System.currentTimeMillis() - time);
@@ -359,6 +378,18 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
 
+        }
+    }
+
+    private class OnlyCompleteTacletsAction extends KeyAction {
+        public OnlyCompleteTacletsAction() {
+            setName("Show only completed taclets");
+            setSelected(false);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            buildModel();
         }
     }
 }

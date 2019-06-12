@@ -85,6 +85,7 @@ public abstract class SequentView extends JEditorPane {
 
     //maximum opacity of heatmap color
     private static final float HEATMAP_DEFAULT_START_OPACITY = .7f;
+    public static final String PROP_LAST_MOUSE_POSITION = "lastMousePosition";
 
     private final MainWindow mainWindow;
 
@@ -516,7 +517,13 @@ public abstract class SequentView extends JEditorPane {
     public void highlight(Point p) {
         setCurrentHighlight(defaultHighlight);
         paintHighlights(p);
-        lastMousePosition = p;
+        setLastMousePosition(p);
+    }
+
+    private void setLastMousePosition(Point p) {
+        Point old = this.lastMousePosition;
+        lastMousePosition=p;
+        firePropertyChange(PROP_LAST_MOUSE_POSITION, old, p);
     }
 
     @Override
