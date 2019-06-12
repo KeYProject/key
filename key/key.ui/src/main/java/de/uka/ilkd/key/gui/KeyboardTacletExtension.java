@@ -140,7 +140,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     }
 
     private void buildModel() {
-        if (lastGoal != null) return;
+        if (lastGoal == null) return;
         long time = System.currentTimeMillis();
         List<RuleApp> taclets = new LinkedList<>();
         PosInSequent pos = MainWindow.getInstance().currentGoalView.getMousePosInSequent();
