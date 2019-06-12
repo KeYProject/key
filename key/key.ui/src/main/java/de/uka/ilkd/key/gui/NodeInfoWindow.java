@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -80,11 +78,11 @@ public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeIn
      */
     protected static void unregister(NodeInfoWindow win) {
         Node node = win.getNode();
-        instances.get(node.proof().name()).get(node.serialNr()).remove(win);
-
-        synchronized (listeners) {
-            for (NodeInfoWindowListener listener : listeners) {
-                listener.windowUnregistered(win);
+        if (instances.get(node.proof().name()).get(node.serialNr()).remove(win)) {
+            synchronized (listeners) {
+                for (NodeInfoWindowListener listener : listeners) {
+                    listener.windowUnregistered(win);
+                }
             }
         }
     }
@@ -100,14 +98,6 @@ public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeIn
         Map<Integer, SortedSet<NodeInfoWindow>> map = instances.get(proofName);
         map.putIfAbsent(nodeNr, new TreeSet<>());
         map.get(nodeNr).add(win);
-
-        win.addWindowListener(new WindowAdapter() {
-
-           @Override
-            public void windowClosed(WindowEvent event) {
-               unregister(win);
-            }
-        });
 
         synchronized (listeners) {
             for (NodeInfoWindowListener listener : listeners) {
@@ -135,6 +125,13 @@ public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeIn
         setTitle(shortName);
 
         register(this);
+    }
+
+    @Override
+    public void dispose() {
+        unregister(this);
+        node = null;
+        super.dispose();
     }
 
     @Override

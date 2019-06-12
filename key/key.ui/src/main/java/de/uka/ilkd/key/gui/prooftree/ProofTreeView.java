@@ -151,7 +151,7 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
 
         @Override
         public void windowUnregistered(NodeInfoWindow win) {
-            if (mediator.getSelectedProof() == proof && proof != null) {
+            if (win.getNode().proof() != null && !win.getNode().proof().isDisposed() && win.getNode().proof() == proof) {
                 delegateModel.updateTree(win.getNode());
             }
         }

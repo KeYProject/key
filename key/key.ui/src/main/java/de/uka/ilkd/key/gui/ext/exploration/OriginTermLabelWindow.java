@@ -68,6 +68,8 @@ import de.uka.ilkd.key.pp.ShowSelectedSequentPrintFilter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
@@ -116,7 +118,8 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
      *
      * @see #ORIGIN_INFO_TITLE
      */
-    public static final String SUBTERM_ORIGINS_TITLE = "Origins of (former) subformulas and subterms";
+    public static final String SUBTERM_ORIGINS_TITLE =
+            "Origins of (former) subformulas and subterms";
 
     /**
      * The gap between a term and its origin in the tree view.
@@ -152,13 +155,50 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
 
                 if (choice == 0) {
                     mediator.setProof(getNode().proof());
-                    //mediator.getSelectionModel().setSelectedProof(getNode().proof());
                 } else {
                     return;
                 }
             }
 
             mediator.getSelectionModel().setSelectedNode(getNode());
+        }
+    };
+
+    private RuleAppListener ruleAppListener = event -> {
+        updateNodeLink();
+    };
+
+    private ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
+
+        @Override
+        public void proofStructureChanged(ProofTreeEvent e) {
+            updateNodeLink();
+        }
+
+        @Override
+        public void proofPruned(ProofTreeEvent e) {
+            updateNodeLink();
+        }
+
+        @Override
+        public void proofGoalsChanged(ProofTreeEvent e) {
+            updateNodeLink();
+        }
+
+        @Override
+        public void proofExpanded(ProofTreeEvent e) {
+            updateNodeLink();
+        }
+    };
+
+    private ProofDisposedListener proofDisposedListener = new ProofDisposedListener() {
+
+        @Override
+        public void proofDisposing(ProofDisposedEvent e) { }
+
+        @Override
+        public void proofDisposed(ProofDisposedEvent e) {
+            updateNodeLink();
         }
     };
 
@@ -233,42 +273,9 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
 
             updateNodeLink();
 
-            node.proof().addRuleAppListener(event -> {
-                updateNodeLink();
-            });
-            node.proof().addProofTreeListener(new ProofTreeAdapter() {
-
-                @Override
-                public void proofStructureChanged(ProofTreeEvent e) {
-                    updateNodeLink();
-                }
-
-                @Override
-                public void proofPruned(ProofTreeEvent e) {
-                    updateNodeLink();
-                }
-
-                @Override
-                public void proofGoalsChanged(ProofTreeEvent e) {
-                    updateNodeLink();
-                }
-
-                @Override
-                public void proofExpanded(ProofTreeEvent e) {
-                    updateNodeLink();
-                }
-            });
-
-            node.proof().addProofDisposedListener(new ProofDisposedListener() {
-
-                @Override
-                public void proofDisposing(ProofDisposedEvent e) { }
-
-                @Override
-                public void proofDisposed(ProofDisposedEvent e) {
-                    updateNodeLink();
-                }
-            });
+            node.proof().addRuleAppListener(ruleAppListener);
+            node.proof().addProofTreeListener(proofTreeListener);
+            node.proof().addProofDisposedListener(proofDisposedListener);
         }
 
         JSplitPane bodyPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -371,6 +378,24 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
         }
 
         bodyPane.setDividerLocation(WIDTH / 2);
+    }
+
+    @Override
+    public void dispose() {
+        if (!getNode().proof().isDisposed()) {
+            getNode().proof().removeRuleAppListener(ruleAppListener);
+            getNode().proof().removeProofTreeListener(proofTreeListener);
+            getNode().proof().removeProofDisposedListener(proofDisposedListener);
+        }
+
+        ruleAppListener = null;
+        proofTreeListener = null;
+        proofDisposedListener = null;
+        services = null;
+        termPio = null;
+        sequent = null;
+
+        super.dispose();
     }
 
     private void updateNodeLink() {
