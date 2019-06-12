@@ -28,6 +28,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
@@ -48,6 +49,7 @@ import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -1854,9 +1856,12 @@ public final class JMLTranslator {
             }
 
             if (specType != null) {
+                Origin origin = expr.pos == Position.UNDEFINED
+                        ? new Origin(specType)
+                        : new FileOrigin(specType, expr.fileName, expr.pos.getLine());
+
                 return castToReturnType(services.getTermBuilder().addLabelToAllSubs(term,
-                        new OriginTermLabel(
-                                new FileOrigin(specType, expr.fileName, expr.pos.getLine()))),
+                        new OriginTermLabel(origin)),
                         resultClass);
             } else {
                 return castToReturnType(result, resultClass);

@@ -648,16 +648,6 @@ public class OriginTermLabel implements TermLabel {
     public static final class FileOrigin extends Origin {
 
         /**
-         * Placeholder file name used for implicit specifications.
-         */
-        public static final String IMPLICIT_FILE_NAME = "<implicit>";
-
-        /**
-         * Placeholder line number used for implicit specifications.
-         */
-        public static final int IMPLICIT_LINE = -1;
-
-        /**
          * The file the term originates from.
          */
         public final String fileName;
@@ -678,6 +668,7 @@ public class OriginTermLabel implements TermLabel {
             super(specType);
 
             assert fileName != null;
+            assert line >= 0;
 
             this.fileName = fileName;
             this.line = line;
