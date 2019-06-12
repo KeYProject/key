@@ -10,6 +10,7 @@ import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import org.key_project.exploration.ExplorationNodeData;
 import org.key_project.util.collection.ImmutableList;
 
 import java.awt.event.ActionEvent;
@@ -46,7 +47,8 @@ public class DeleteFormulaAction extends ExplorationAction {
         PosInOccurrence pio = posInSeq.getPosInOccurrence();
         Term term = pio.subTerm();
         Goal g = getMediator().getSelectedGoal();
-        g.node().getNodeInfo().setExploration(true);
+       // g.node().getNodeInfo().get(ExplorationNodeData.class).setExploration(true);
+        g.node().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
 
         TacletApp app;
         //boolean isSoundMode = getMediator().getExplorationModeModel().getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.WHOLE_APP;
@@ -54,7 +56,7 @@ public class DeleteFormulaAction extends ExplorationAction {
         ImmutableList<Goal> result = g.apply(app);
         result.forEach(goal -> {
             //goal.node().getNodeInfo().setExploration(true);
-            goal.node().getNodeInfo().setExplorationAction("Hide "+term);
+            goal.node().getNodeInfo().get(ExplorationNodeData.class).setExplorationAction("Hide "+term);
 
         });
     }

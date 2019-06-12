@@ -109,12 +109,19 @@ class ExplorationRenderer implements Styler<GUIAbstractTreeNode> {
     @Override
     public void style(Style style, GUIAbstractTreeNode treeNode) {
         Node node = treeNode.getNode();
-        ExplorationNodeData data = node.getNodeInfo().get(ExplorationNodeData.class);
-        if (node != null && data != null) {
-            style.setBorder(DARK_PURPLE_COLOR.get());
-            style.setBackground(LIGHT_PURPLE_COLOR.get());
-            style.setTooltip("Exploration Action Performed");
-        } else {
+        ExplorationNodeData data = null;
+        try {
+            data = node.getNodeInfo().get(ExplorationNodeData.class);
+
+            if (node != null && data.getExplorationAction() != null) {
+                style.setBorder(DARK_PURPLE_COLOR.get());
+                style.setBackground(LIGHT_PURPLE_COLOR.get());
+                style.setTooltip("Exploration Action Performed");
+
+            } else {
+                style.setBorder(null);
+            }
+        } catch (IllegalStateException e){
             style.setBorder(null);
         }
     }

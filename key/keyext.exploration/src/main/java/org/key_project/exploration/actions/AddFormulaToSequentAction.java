@@ -7,6 +7,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import org.key_project.exploration.ExplorationNodeData;
 import org.key_project.util.collection.ImmutableList;
 
 import java.awt.event.ActionEvent;
@@ -66,12 +67,14 @@ public class AddFormulaToSequentAction extends ExplorationAction {
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
         app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), getMediator().getServices(), true);
-        g.node().getNodeInfo().setExploration(true);
+         g.node().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
+
+//         g.node().getNodeInfo().setExploration(true);
         ImmutableList<Goal> result = g.apply(app);
         //set the actions flag
         result.forEach(goal -> {
           //  goal.node().getNodeInfo().setExploration(true);
-            goal.node().getNodeInfo().setExplorationAction("Add "+t);
+            goal.node().getNodeInfo().get(ExplorationNodeData.class).setExplorationAction("Add "+t);
             String s = goal.node().getNodeInfo().getBranchLabel();
             goal.node().getNodeInfo().setBranchLabel("ExplorationNode: " + s);
 

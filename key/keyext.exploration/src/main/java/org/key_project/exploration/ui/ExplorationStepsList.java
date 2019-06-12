@@ -4,6 +4,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import org.key_project.exploration.ExplorationNodeData;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -54,21 +55,26 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
     private void findExplorationchildren(Node n, ArrayList<Node> list, DefaultTreeModel dtm, MyTreeNode parent) {
         if (n.leaf()) {
-            if (!n.getNodeInfo().isExploration()) {
-                return;
-            } else {
+            try{
+                n.getNodeInfo().get(ExplorationNodeData.class);
+
                 MyTreeNode newNode = new MyTreeNode(n);
                 dtm.insertNodeInto(newNode, parent, 0);
                 list.add(n);
                 return;
+            } catch (IllegalStateException e){
+                return;
             }
         }
-        if (n.getNodeInfo().isExploration()) {
+        try  {
+            n.getNodeInfo().get(ExplorationNodeData.class);
             MyTreeNode newNode = new MyTreeNode(n);
             dtm.insertNodeInto(newNode, parent, 0);
 
             parent = newNode;
             list.add(n);
+        } catch (IllegalStateException e){
+            //Do nothing its intended
         }
         Iterator<Node> nodeIterator = n.childrenIterator();
 
@@ -126,7 +132,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             JLabel listCellRendererComponent = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             Node n = (Node) value;
-            listCellRendererComponent.setText(n.serialNr() + " " + n.getNodeInfo().getExplorationAction());
+            listCellRendererComponent.setText(n.serialNr() + " " + n.getNodeInfo().get(ExplorationNodeData.class).getExplorationAction());
             return listCellRendererComponent;
         }
     }
@@ -136,7 +142,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             JLabel listCellRendererComponent = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             MyTreeNode n = (MyTreeNode) value;
-            listCellRendererComponent.setText(n.getData().serialNr() + " " + n.getData().getNodeInfo().getExplorationAction());
+            listCellRendererComponent.setText(n.getData().serialNr() + " " + n.getData().getNodeInfo().get(ExplorationNodeData.class).getExplorationAction());
             return listCellRendererComponent;
         }
 
