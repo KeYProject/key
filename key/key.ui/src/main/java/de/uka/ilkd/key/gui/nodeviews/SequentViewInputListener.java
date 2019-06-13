@@ -51,7 +51,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 public class SequentViewInputListener implements KeyListener, MouseMotionListener, MouseListener {
 
     private static final Color ORIGIN_HIGHLIGHT_COLOR = new Color(252, 202, 80);
-    private static final Color SUBTERM_ORIGIN_HIGHLIGHT_COLOR = new Color(252, 225, 156);
+    private static final Color SUBTERM_ORIGIN_HIGHLIGHT_COLOR = new Color(252, 228, 169);
 
     private Highlight originHighlight;
     private Set<Highlight> subtermOriginsHighlights = new HashSet<>();
