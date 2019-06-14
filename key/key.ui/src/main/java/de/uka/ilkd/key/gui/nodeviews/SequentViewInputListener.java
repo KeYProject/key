@@ -42,6 +42,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
  * This class implements all input listener interfaces for SequentView.
@@ -136,6 +137,16 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
      * @param pos the position of the term whose origin should be highlighted.
      */
     public void highlightOriginInSourceView(PosInSequent pos) {
+        if (!sequentView.isMainSequentView()) {
+            return;
+        }
+
+        if (!ProofIndependentSettings
+                .DEFAULT_INSTANCE.getViewSettings().isHighlightOrigin()) {
+            // Don't highlight anything and delete existing highlights.
+            pos = null;
+        }
+
         SourceView sourceView = SourceView.getSourceView(sequentView.getMainWindow());
 
         subtermOriginsHighlights.forEach(sourceView::removeHighlight);

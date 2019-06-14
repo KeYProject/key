@@ -641,19 +641,25 @@ public final class SourceView extends JComponent {
         return "Show Postcondition/Assignable";
     }
 
-
-
-    private class TabbedPane extends JTabbedPane {
-
-        public Tab getTabAt(int index) {
-            return (Tab) getComponentAt(index);
-        }
+    /**
+     * The type of the tabbed pane contained in this {@code SourceView}.
+     *
+     * @author lanzinger
+     * @see #tabPane
+     */
+    private static class TabbedPane extends JTabbedPane {
 
         public Tab getSelectedTab() {
             return (Tab) getSelectedComponent();
         }
     };
 
+    /**
+     * Wrapper for all tab-specific data, i.e., all data pertaining to the file shown in the tab.
+     *
+     * @author lanzinger
+     *
+     */
     private class Tab extends JScrollPane {
 
         /**
@@ -916,7 +922,7 @@ public final class SourceView extends JComponent {
      *  A highlight consists of the name of a file, a line in that file, a color, and a level.
      * </p>
      *
-     * <p> If the are multiple highlight for a given line, the highlight with the highest level
+     * <p> If there are multiple highlights for a given line, the highlight with the highest level
      *  is used. </p>
      *
      * <p> The highlights added by the {@code SourceView} itself have level {@code 0},

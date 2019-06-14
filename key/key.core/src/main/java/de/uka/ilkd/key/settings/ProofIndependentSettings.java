@@ -89,7 +89,6 @@ public class ProofIndependentSettings implements SettingsListener {
     }
 
     public void saveSettings() {
-
         try {
             File file = new File(filename);
             if (!file.exists()) {

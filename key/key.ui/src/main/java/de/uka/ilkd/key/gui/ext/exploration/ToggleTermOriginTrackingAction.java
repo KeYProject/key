@@ -22,8 +22,6 @@ import de.uka.ilkd.key.settings.TermLabelSettings;
  */
 public class ToggleTermOriginTrackingAction extends MainWindowAction {
 
-    private static final long serialVersionUID = -1055364184792335945L;
-
     /**
      * Create a new action.
      *

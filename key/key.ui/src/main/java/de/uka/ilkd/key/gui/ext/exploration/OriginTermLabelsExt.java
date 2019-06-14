@@ -31,20 +31,30 @@ public class OriginTermLabelsExt
         KeYTooltipExtension,
         KeYStatusBarExtension {
 
-    private ToggleTermOriginTrackingAction action;
+    private ToggleTermOriginTrackingAction toggleTrackingAction;
+    private ToggleOriginHighlightAction toggleSourceViewHighlightAction;
 
-    private ToggleTermOriginTrackingAction getAction(MainWindow mainWindow) {
-        if (action == null) {
-            action = new ToggleTermOriginTrackingAction(mainWindow);
+    private ToggleTermOriginTrackingAction getToggleTrackingAction(MainWindow mainWindow) {
+        if (toggleTrackingAction == null) {
+            toggleTrackingAction = new ToggleTermOriginTrackingAction(mainWindow);
         }
 
-        return action;
+        return toggleTrackingAction;
+    }
+
+    private ToggleOriginHighlightAction getToggleSourceViewHighlightAction(MainWindow mainWindow) {
+        if (toggleSourceViewHighlightAction == null) {
+            toggleSourceViewHighlightAction = new ToggleOriginHighlightAction(mainWindow);
+        }
+
+        return toggleSourceViewHighlightAction;
     }
 
     @Override
     public List<Action> getMainMenuActions(MainWindow mainWindow) {
         List<Action> result = new LinkedList<>();
-        result.add(getAction(mainWindow));
+        result.add(getToggleTrackingAction(mainWindow));
+        result.add(getToggleSourceViewHighlightAction(mainWindow));
         return result;
     }
 
@@ -63,7 +73,7 @@ public class OriginTermLabelsExt
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         JToolBar tb = new JToolBar("Origin");
-        JToggleButton toggle = new JToggleButton(getAction(mainWindow));
+        JToggleButton toggle = new JToggleButton(getToggleTrackingAction(mainWindow));
         toggle.setHideActionText(true);
         tb.add(toggle);
         return tb;
