@@ -202,8 +202,8 @@ public class ProofSettings {
     public void loadSettings() {
         try (FileReader in = new FileReader(PROVER_CONFIG_FILE)) {
             if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
-                System.err.println("The settings in " +
-                        PROVER_CONFIG_FILE + " are *not* read.");
+                //System.err.println("The settings in " +
+                //        PROVER_CONFIG_FILE + " are *not* read.");
             } else {
                 loadSettingsFromStream(in);
             }

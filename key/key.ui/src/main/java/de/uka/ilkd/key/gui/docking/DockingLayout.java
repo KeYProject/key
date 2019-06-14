@@ -1,11 +1,6 @@
 package de.uka.ilkd.key.gui.docking;
 
 import bibliothek.gui.dock.common.CControl;
-import bibliothek.gui.dock.common.DefaultSingleCDockable;
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CButton;
-import bibliothek.gui.dock.common.action.CCheckBox;
-import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.util.IconManager;
 import bibliothek.gui.dock.util.Priority;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -13,7 +8,6 @@ import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeRegular;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
@@ -21,11 +15,13 @@ import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.settings.PathConfig;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.*;
 
 /**
@@ -41,15 +37,22 @@ public final class DockingLayout
         KeYGuiExtension.MainMenu,
         KeYGuiExtension.Toolbar {
 
-    public static float SIZE_ICON_DOCK = 12f;
     public static final File LAYOUT_FILE = new File(PathConfig.getKeyConfigDir(), "layout.xml");
-
     public static final String[] LAYOUT_NAMES = new String[]{"default", "slot 1", "slot 2"};
     public static final int[] LAYOUT_KEYS = new int[]{KeyEvent.VK_F11, KeyEvent.VK_F12};
-
+    public static float SIZE_ICON_DOCK = 12f;
     private List<Action> actions = new LinkedList<>();
     private MainWindow window;
 
+    private static void loadLayouts(CControl globalPort) {
+        try {
+            if (LAYOUT_FILE.exists()) {
+                globalPort.readXML(LAYOUT_FILE);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void installIcons(MainWindow mw) {
         CControl globalPort = mw.getDockControl();
@@ -69,7 +72,8 @@ public final class DockingLayout
                 IconFontSwing.buildIcon(FontAwesomeSolid.EXTERNAL_LINK_SQUARE_ALT, SIZE_ICON_DOCK));
 
         icons.setIcon("locationmanager.unexternalize", p,
-                IconFontSwing.buildIcon(FontAwesomeSolid.MOUSE_POINTER, SIZE_ICON_DOCK));
+                new ImageIcon(IconFontSwing.buildImage(FontAwesomeSolid.EXTERNAL_LINK_ALT,
+                        SIZE_ICON_DOCK, Color.black, Math.PI)));
 
         icons.setIcon("locationmanager.unmaximize_externalized", p,
                 IconFontSwing.buildIcon(FontAwesomeSolid.EXTERNAL_LINK_ALT, SIZE_ICON_DOCK));
@@ -79,16 +83,6 @@ public final class DockingLayout
 
         icons.setIcon("close", p,
                 IconFontSwing.buildIcon(FontAwesomeRegular.WINDOW_CLOSE, SIZE_ICON_DOCK));
-    }
-
-    private static void loadLayouts(CControl globalPort) {
-        try {
-            if (LAYOUT_FILE.exists()) {
-                globalPort.readXML(LAYOUT_FILE);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private void ensureActions(MainWindow mw) {

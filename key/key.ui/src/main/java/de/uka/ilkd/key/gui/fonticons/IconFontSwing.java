@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui.fonticons;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 public final class IconFontSwing {
@@ -28,6 +29,23 @@ public final class IconFontSwing {
         Font font = buildFont(iconCode, size);
         String text = Character.toString(iconCode.getUnicode());
         return buildImage(text, font, color);
+    }
+
+    /**
+     *
+     * @param iconCode
+     * @param size
+     * @param color
+     * @return
+     */
+    public static Image buildImage(IconFont iconCode, float size, Color color, double rotation) {
+        Image img = buildImage(iconCode, size, color);
+        BufferedImage newImage = new BufferedImage((int) size, (int) size, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = (Graphics2D) newImage.getGraphics();
+        AffineTransform transform = new AffineTransform();
+        transform.rotate(rotation, size/2,size/2);
+        graphics.drawImage(img, transform, null);
+        return img;
     }
 
     /**

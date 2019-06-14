@@ -25,12 +25,12 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     /**
      * filename of the properties file
      */
-    private static final String SETTINGS_FILENAME = "keystrokes.properties";
+    public static final String SETTINGS_FILENAME = "keystrokes.properties";
 
     /**
      * path of the properties file
      */
-    private static final File SETTINGS_FILE = new File(PathConfig.getKeyConfigDir(),
+    public static final File SETTINGS_FILE = new File(PathConfig.getKeyConfigDir(),
             KeyStrokeSettings.SETTINGS_FILENAME);
 
     /**

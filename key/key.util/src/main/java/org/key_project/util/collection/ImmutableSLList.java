@@ -47,6 +47,10 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	     return (ImmutableSLList<T>) NIL.NIL;
     }
 
+    public static <T> ImmutableSLList<T> singleton(T obj) {
+		return new Cons(obj, nil());
+    }
+
     /**
      * Reverses this list (O(N))
      */

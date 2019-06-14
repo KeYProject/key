@@ -26,7 +26,6 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
-import de.uka.ilkd.key.gui.docking.DockingLayout;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
@@ -146,11 +145,11 @@ public final class MainWindow extends JFrame {
             new HidePackagePrefixToggleAction(this);
     private final TermLabelMenu termLabelMenu;
     public boolean frozen = false;
+    JCheckBoxMenuItem saveSMTFile;
     /**
      *
      */
     private CControl dockControl = new CControl(this);
-    JCheckBoxMenuItem saveSMTFile;
     /**
      * the first toolbar
      */
@@ -248,9 +247,9 @@ public final class MainWindow extends JFrame {
         recentFileMenu = new RecentFileMenu(mediator);
 
         proofTreeView = new ProofTreeView(mediator);
-        infoView = new InfoView();
-        strategySelectionView = new StrategySelectionView();
-        openGoalsView = new GoalList();
+        infoView = new InfoView(this, mediator);
+        strategySelectionView = new StrategySelectionView(this, mediator);
+        openGoalsView = new GoalList(mediator);
 
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);

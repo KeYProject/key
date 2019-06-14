@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.pp.PosInSequent;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.lang.annotation.Retention;
@@ -73,7 +74,7 @@ public interface KeYGuiExtension {
 
         /**
          * Marks an extensions as experimental.
-         *
+         * <p>
          * Experimental extensions are only available if the KeY is started
          * with the experimental flag on the command line <code>--experimental</code>.
          */
@@ -94,7 +95,7 @@ public interface KeYGuiExtension {
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        List<Action> getMainMenuActions(MainWindow mainWindow);
+        @NotNull List<Action> getMainMenuActions(@NotNull MainWindow mainWindow);
     }
 
     /**
@@ -121,7 +122,7 @@ public interface KeYGuiExtension {
          * @param window   parent of this extension
          * @param mediator the current mediator
          */
-        Collection<TabPanel> getPanels(MainWindow window, KeYMediator mediator);
+        @NotNull Collection<TabPanel> getPanels(@NotNull MainWindow window, @NotNull KeYMediator mediator);
     }
 
     /**
@@ -144,7 +145,9 @@ public interface KeYGuiExtension {
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, Object underlyingObject);
+        @NotNull List<Action> getContextActions(@NotNull KeYMediator mediator,
+                                                @NotNull ContextMenuKind kind,
+                                                @NotNull Object underlyingObject);
     }
 
     /**
@@ -159,7 +162,7 @@ public interface KeYGuiExtension {
          * @param mainWindow the parent of the toolbar
          * @return non-null
          */
-        JToolBar getToolbar(MainWindow mainWindow);
+        @NotNull JToolBar getToolbar(MainWindow mainWindow);
     }
 
     /**
@@ -224,7 +227,7 @@ public interface KeYGuiExtension {
          * @param pos        the position of the term whose info shall be shown.
          * @return this extension's term information.
          */
-        List<String> getTermInfoStrings(MainWindow mainWindow, PosInSequent pos);
+        @NotNull List<String> getTermInfoStrings(@NotNull MainWindow mainWindow, @NotNull PosInSequent pos);
 
         default int getTermLabelPriority() {
             return 0;

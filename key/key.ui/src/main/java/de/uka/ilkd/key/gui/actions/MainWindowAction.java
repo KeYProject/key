@@ -29,7 +29,7 @@ public abstract class MainWindowAction extends KeyAction {
     protected MainWindowAction(MainWindow mainWindow) {
         assert mainWindow != null;
         this.mainWindow = mainWindow;
-        putValue(ACCELERATOR_KEY, KeyStrokeManager.lookupAndOverride(this, getClass().getName()));
+        putValue(ACCELERATOR_KEY, KeyStrokeManager.get(this, getClass().getName()));
     }
 
     protected void setAcceleratorLetter(int letter) {

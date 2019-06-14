@@ -19,13 +19,9 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
-import de.uka.ilkd.key.rule.RuleAbortException;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.LoopSpecImpl;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -50,7 +46,7 @@ public class LoopInvariantRuleCompletion implements
         final While loop = loopApp.getLoopStatement();
 
         LoopSpecification inv = loopApp.getSpec();
-        if (inv == null) { // no invariant present, lookupAndOverride it interactively
+        if (inv == null) { // no invariant present, get it interactively
             MethodFrame mf = JavaTools.getInnermostMethodFrame(progPost.javaBlock(),
                                                                services);
             inv = new LoopSpecImpl(loop,
@@ -75,7 +71,7 @@ public class LoopInvariantRuleCompletion implements
                     && !loopApp.variantAvailable();
             // Check if a variant is required
             if (!forced || !loopApp.invariantAvailable() || requiresVariant) {
-                // lookupAndOverride invariant or variant interactively
+                // get invariant or variant interactively
                 try {
                     inv = InvariantConfigurator.getInstance().getLoopInvariant(
                             inv, services, requiresVariant, loopApp.getHeapContext());
