@@ -13,29 +13,6 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.Component;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-
-import javax.swing.Icon;
-import javax.swing.JLabel;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
-
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.ObjectUtil;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -48,6 +25,13 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.ObjectUtil;
+
+import javax.swing.*;
+import javax.swing.tree.*;
+import java.awt.*;
+import java.util.*;
 
 
 public class ClassTree extends JTree {
@@ -181,7 +165,7 @@ public class ClassTree extends JTree {
         int index = -1;
         DefaultMutableTreeNode node = rootNode;
         do {
-            //lookupAndOverride next part of the name
+            //get next part of the name
             int lastIndex = index;
             index = fullClassName.indexOf(".", ++index);
             if(index == -1) {
@@ -189,7 +173,7 @@ public class ClassTree extends JTree {
             }
             String namePart = fullClassName.substring(lastIndex + 1, index);
             
-            //try to lookupAndOverride child node; otherwise, create and insert it
+            //try to get child node; otherwise, create and insert it
             DefaultMutableTreeNode childNode = getChildByString(node, namePart);
             if(childNode == null) {
                 Entry te = new Entry(namePart);
@@ -308,7 +292,7 @@ public class ClassTree extends JTree {
     private static DefaultMutableTreeNode createTree(boolean addContractTargets,
 	    					     boolean skipLibraryClasses,
 	    					     Services services) {
-	//lookupAndOverride all classes
+	//get all classes
 	final Set<KeYJavaType> kjts 
 		= services.getJavaInfo().getAllKeYJavaTypes();
 	final Iterator<KeYJavaType> it = kjts.iterator();
@@ -344,7 +328,7 @@ public class ClassTree extends JTree {
     
     
     private void open(KeYJavaType kjt, IObserverFunction target) {
-        //lookupAndOverride tree path to class
+        //get tree path to class
         Vector<DefaultMutableTreeNode> pathVector  = new Vector<DefaultMutableTreeNode>();
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) getModel().getRoot();
         assert node != null;        

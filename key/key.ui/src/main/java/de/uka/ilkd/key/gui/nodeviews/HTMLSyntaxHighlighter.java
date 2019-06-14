@@ -1,25 +1,5 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import static de.uka.ilkd.key.util.UnicodeHelper.AND;
-import static de.uka.ilkd.key.util.UnicodeHelper.BOT;
-import static de.uka.ilkd.key.util.UnicodeHelper.EMPTY;
-import static de.uka.ilkd.key.util.UnicodeHelper.EQV;
-import static de.uka.ilkd.key.util.UnicodeHelper.EXISTS;
-import static de.uka.ilkd.key.util.UnicodeHelper.FORALL;
-import static de.uka.ilkd.key.util.UnicodeHelper.IMP;
-import static de.uka.ilkd.key.util.UnicodeHelper.IN;
-import static de.uka.ilkd.key.util.UnicodeHelper.NEG;
-import static de.uka.ilkd.key.util.UnicodeHelper.OR;
-import static de.uka.ilkd.key.util.UnicodeHelper.TOP;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.swing.JEditorPane;
-import javax.swing.text.html.HTMLDocument;
-
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -27,6 +7,15 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
+import javax.swing.*;
+import javax.swing.text.html.HTMLDocument;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static de.uka.ilkd.key.util.UnicodeHelper.*;
 
 /**
  * Performs a simple pattern-based syntax highlighting for KeY sequents by
@@ -192,7 +181,7 @@ public class HTMLSyntaxHighlighter {
             //         in the node's sequent.
             // 2. Find all really existing program variables using a visitor.
             //    Pro: No overhead for nonexisting variables.
-            //    Con: May take quite long to lookupAndOverride these variables for big sequents.
+            //    Con: May take quite long to get these variables for big sequents.
             // None of these option works sufficiently well for large sequents.
             // We therefore turn location variable highlighting off in case that
             // there are a lot of registered globals AND the number of formulae

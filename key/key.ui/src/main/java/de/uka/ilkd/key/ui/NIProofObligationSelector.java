@@ -2,7 +2,10 @@ package de.uka.ilkd.key.ui;
 
 import de.uka.ilkd.key.informationflow.macros.FullInformationFlowAutoPilotMacro;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.speclang.Contract;
 
@@ -20,7 +23,7 @@ public class NIProofObligationSelector extends ConsoleProofObligationSelector {
          * I feel so sorry for you. You dug through a huge pile of crap
          * until you have reached this comment. And some of this crappy
          * code is from me. Sorry for that. But you can surely believe me,
-         * when I say it only lookupAndOverride worse.
+         * when I say it only get worse.
          */
 
 
