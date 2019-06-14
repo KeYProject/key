@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
+import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -104,7 +105,9 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
             sequentView.highlight(me.getPoint());
         }
 
-        highlightOriginInSourceView(sequentView.getPosInSequent(me.getPoint()));
+        if (sequentView.isInUserSelectionHighlight(null)) {
+            highlightOriginInSourceView(sequentView.getPosInSequent(me.getPoint()));
+        }
     }
 
     @Override
@@ -113,14 +116,35 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
             sequentView.disableHighlights();
         }
 
-        highlightOriginInSourceView(null);
+        if (sequentView.isInUserSelectionHighlight(null)) {
+            highlightOriginInSourceView(null);
+        }
     }
 
     @Override
     public void keyTyped(KeyEvent e) { }
 
     @Override
-    public void mouseClicked(MouseEvent e) { }
+    public void mouseClicked(MouseEvent e) {
+        if (!sequentView.isMainSequentView()) {
+            return;
+        }
+
+        if (SwingUtilities.isMiddleMouseButton(e)
+                || e.isControlDown() && SwingUtilities.isLeftMouseButton(e)) {
+            Point point = e.getPoint();
+            PosInSequent pis = sequentView.getPosInSequent(point);
+
+            if (pis == null || pis.isSequent()
+                    || sequentView.isInUserSelectionHighlight(point)) {
+                sequentView.removeUserSelectionHighlight();
+            } else {
+                sequentView.setUserSelectionHighlight(point);
+            }
+
+            highlightOriginInSourceView(pis);
+        }
+    }
 
     @Override
     public void mousePressed(MouseEvent e) { }

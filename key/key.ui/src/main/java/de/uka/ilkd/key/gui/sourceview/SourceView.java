@@ -166,9 +166,11 @@ public final class SourceView extends JComponent {
 
             @Override
             public void stateChanged(ChangeEvent e) {
-                selectedFile = tabPane.getSelectedTab() == null
-                        ? null
-                        : tabPane.getSelectedTab().file.getAbsolutePath();
+                if (tabPane.getSelectedTab() == null) {
+                    selectedFile = null;
+                } else {
+                    selectedFile = tabPane.getSelectedTab().file.getAbsolutePath();
+                }
             }
         });
 
@@ -746,25 +748,41 @@ public final class SourceView extends JComponent {
             }
 
             // add a listener to highlight the line currently pointed to
-            try {
-                selectionHL = addHighlight(
-                        getFileName(),
-                        1,
-                        CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR,
-                        Integer.MAX_VALUE - 1);
-
-                textPane.addMouseMotionListener(new MouseMotionListener() {
-                    @Override
-                    public void mouseMoved(MouseEvent e) {
-                        paintSelectionHighlight(e.getPoint(), selectionHL);
+            textPane.addMouseMotionListener(new MouseMotionListener() {
+                @Override
+                public void mouseMoved(MouseEvent e) {
+                    synchronized(SourceView.this) {
+                        if (selectionHL != null) {
+                            paintSelectionHighlight(e.getPoint(), selectionHL);
+                        }
                     }
+                }
 
-                    @Override
-                    public void mouseDragged(MouseEvent e) { }
-                });
-            } catch (BadLocationException | IOException e) {
-                throw new AssertionError();
-            }
+                @Override
+                public void mouseDragged(MouseEvent e) { }
+            });
+
+            textPane.addMouseListener(new MouseAdapter() {
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    synchronized(SourceView.this) {
+                        if (selectionHL != null) {
+                            removeHighlight(selectionHL);
+                            selectionHL = null;
+                        }
+                    }
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    synchronized(SourceView.this) {
+                        if (selectionHL == null) {
+                            initSelectionHL();
+                        }
+                    }
+                }
+            });
 
             textPane.addMouseListener(new TextPaneMouseAdapter(
                     textPane, lineInformation, getFileName()));
@@ -791,6 +809,18 @@ public final class SourceView extends JComponent {
             resetHighlights();
         }
 
+        private void initSelectionHL() {
+            try {
+                selectionHL = addHighlight(
+                        getFileName(),
+                        1,
+                        CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR,
+                        Integer.MAX_VALUE - 1);
+            } catch (BadLocationException | IOException e) {
+                Debug.out(e);
+            }
+        }
+
         private void resetHighlights() {
             try {
                 for (int i = 0; i < lineInformation.length; ++i) {
@@ -812,10 +842,6 @@ public final class SourceView extends JComponent {
         }
 
         private void removeHighlights(int line) {
-            if (!isSelected(this)) {
-                return;
-            }
-
             SortedSet<Highlight> set = highlights.get(line);
 
             if (set == null) {
@@ -832,10 +858,6 @@ public final class SourceView extends JComponent {
 
         private void applyHighlights(int line)
                 throws BadLocationException, IOException {
-            if (!isSelected(this)) {
-                return;
-            }
-
             SortedSet<Highlight> set = highlights.get(line);
 
             if (set != null && !set.isEmpty()) {

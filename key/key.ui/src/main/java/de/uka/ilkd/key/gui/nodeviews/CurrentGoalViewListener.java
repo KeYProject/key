@@ -69,7 +69,8 @@ final class CurrentGoalViewListener
         if (!modalDragNDropEnabled()) {
             if (Math.abs(System.currentTimeMillis() - getLastPopupCloseTime()) >= POPUP_DELAY) {
                 PosInSequent mousePos = getSequentView().getPosInSequent(me.getPoint());
-                boolean macroActive = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isRightClickMacro();
+                boolean macroActive = ProofIndependentSettings.DEFAULT_INSTANCE
+                        .getGeneralSettings().isRightClickMacro();
                 if (mediator != null && mousePos != null) {
                     if (me.isShiftDown()) {
                         mediator.getUI().getProofControl().
@@ -84,7 +85,7 @@ final class CurrentGoalViewListener
                         JPopupMenu popupMenu = macroMenu.getPopupMenu();
                         popupMenu.setLabel("Strategy macros");
                         popupMenu.show(getSequentView(), me.getX() - 5, me.getY() - 5);
-                    } else {
+                    } else if (!me.isControlDown() && SwingUtilities.isLeftMouseButton(me)) {
                         //done before collecting the taclets because initialising
                         //built in rules may have side effects on the set of applicable
                         //taclets
@@ -93,11 +94,12 @@ final class CurrentGoalViewListener
                          (mediator.getSelectedGoal(), mousePos.getPosInOccurrence());
 
                         menu = new CurrentGoalViewMenu(getSequentView(),
-                                mediator.getUI().getProofControl().getFindTaclet(mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
-                                mediator.getUI().getProofControl().getRewriteTaclet(mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
-                                mediator.getUI().getProofControl().getNoFindTaclet(mediator.getSelectedGoal()),
-                                builtInRules,
-                                mousePos);
+                                mediator.getUI().getProofControl().getFindTaclet(
+                                        mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
+                                mediator.getUI().getProofControl().getRewriteTaclet(
+                                        mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
+                                mediator.getUI().getProofControl().getNoFindTaclet(
+                                        mediator.getSelectedGoal()), builtInRules, mousePos);
 
                         showPopup(me, menu);
                     }

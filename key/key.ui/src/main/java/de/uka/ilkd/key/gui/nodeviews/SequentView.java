@@ -13,9 +13,6 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.ADDITIONAL_HIGHLIGHT_COLOR;
-import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -29,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.StringJoiner;
 
 import javax.swing.JEditorPane;
@@ -73,7 +71,16 @@ import de.uka.ilkd.key.util.Debug;
  * Parent class of CurrentGoalView and InnerNodeView.
  */
 public abstract class SequentView extends JEditorPane {
-    private static final long serialVersionUID = 5012937393965787981L;
+
+    public static final Color PERMANENT_HIGHLIGHT_COLOR = new Color(110, 85, 181, 76);
+
+    public static final Color DEFAULT_HIGHLIGHT_COLOR = new Color(70, 100, 170, 76);
+
+    public static final Color ADDITIONAL_HIGHLIGHT_COLOR = new Color(0, 0, 0, 38);
+
+    public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
+
+    protected static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
 
     protected static final Color INACTIVE_BACKGROUND_COLOR
             = new Color(UIManager.getColor("Panel.background").getRGB());
@@ -135,6 +142,11 @@ public abstract class SequentView extends JEditorPane {
     /** the last observed mouse position for which a highlight was created */
     private Point lastMousePosition;
 
+    private SequentViewInputListener sequentViewInputListener;
+
+    private Object userSelectionHighlight = null;
+    private Range userSelectionHighlightRange = null;
+
     protected SequentView(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
 
@@ -146,7 +158,7 @@ public abstract class SequentView extends JEditorPane {
         setEditable(false);
         setFont();
 
-        SequentViewInputListener sequentViewInputListener = new SequentViewInputListener(this);
+        sequentViewInputListener = new SequentViewInputListener(this);
         addKeyListener(sequentViewInputListener);
         addMouseMotionListener(sequentViewInputListener);
         addMouseListener(sequentViewInputListener);
@@ -537,6 +549,38 @@ public abstract class SequentView extends JEditorPane {
                 }
             }
         }
+    }
+
+    void setUserSelectionHighlight(Point p) {
+        removeUserSelectionHighlight();
+
+        try {
+            userSelectionHighlightRange = getHighlightRange(p);
+            userSelectionHighlight = getHighlighter().addHighlight(
+                    userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
+                    new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+        } catch (BadLocationException e) {
+            Debug.out("Error while setting permanent highlight", e);
+        }
+    }
+
+    void removeUserSelectionHighlight() {
+        if (userSelectionHighlight != null) {
+            getHighlighter().removeHighlight(userSelectionHighlight);
+        }
+
+        userSelectionHighlight = null;
+        userSelectionHighlightRange = null;
+
+        sequentViewInputListener.highlightOriginInSourceView(null);
+    }
+
+    boolean isInUserSelectionHighlight(Point point) {
+        return point == null && userSelectionHighlightRange == null
+                || point != null && userSelectionHighlightRange != null
+                        && Objects.equals(
+                                userSelectionHighlightRange,
+                                getHighlightRange(point));
     }
 
     public void highlight(Point p) {
