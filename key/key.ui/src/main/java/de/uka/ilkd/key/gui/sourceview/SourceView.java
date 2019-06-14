@@ -243,6 +243,8 @@ public final class SourceView extends JComponent {
             throw new BadLocationException("Not a valid line number for " + fileName, line);
         }
 
+        tabPane.setBackgroundAt(tabPane.indexOfComponent(tab), Color.GREEN);
+
         if (!tab.highlights.containsKey(line)) {
             tab.highlights.put(line, new TreeSet<>());
         }
@@ -286,6 +288,10 @@ public final class SourceView extends JComponent {
         tab.highlights.get(oldLine).remove(highlight);
         tab.applyHighlights(oldLine);
 
+        if (tab.highlights.get(oldLine).isEmpty()) {
+            tab.highlights.remove(oldLine);
+        }
+
         highlight.line = newLine;
         highlight.setTag(null);
 
@@ -320,12 +326,22 @@ public final class SourceView extends JComponent {
                 && tab.highlights.get(highlight.getLine()).remove(highlight);
         highlight.setTag(null);
 
-        try {
-            tab.applyHighlights(highlight.getLine());
-        } catch (BadLocationException | IOException e) {
-            // The locations of the highlights have already been checked
-            // in addHighlight & changeHighlight, so no error can occur here.
-            throw new AssertionError();
+        if (result && tab.highlights.get(highlight.getLine()).isEmpty()) {
+            tab.highlights.remove(highlight.getLine());
+        } else {
+            try {
+                tab.applyHighlights(highlight.getLine());
+            } catch (BadLocationException | IOException e) {
+                // The locations of the highlights have already been checked
+                // in addHighlight & changeHighlight, so no error can occur here.
+                throw new AssertionError();
+            }
+        }
+
+        if (tab.highlights.isEmpty()) {
+            tabPane.setBackgroundAt(
+                    tabPane.indexOfComponent(tab),
+                    UIManager.getColor("TabbedPane.background"));
         }
 
         return result;
