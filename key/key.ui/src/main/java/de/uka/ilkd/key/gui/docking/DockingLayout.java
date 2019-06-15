@@ -1,6 +1,11 @@
 package de.uka.ilkd.key.gui.docking;
 
 import bibliothek.gui.dock.common.CControl;
+import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CButton;
+import bibliothek.gui.dock.common.action.CCheckBox;
+import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.util.IconManager;
 import bibliothek.gui.dock.util.Priority;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -8,6 +13,7 @@ import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeRegular;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
@@ -21,8 +27,9 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.*;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Extension for working with layouts.
@@ -37,22 +44,14 @@ public final class DockingLayout
         KeYGuiExtension.MainMenu,
         KeYGuiExtension.Toolbar {
 
+    public static float SIZE_ICON_DOCK = 12f;
     public static final File LAYOUT_FILE = new File(PathConfig.getKeyConfigDir(), "layout.xml");
+
     public static final String[] LAYOUT_NAMES = new String[]{"default", "slot 1", "slot 2"};
     public static final int[] LAYOUT_KEYS = new int[]{KeyEvent.VK_F11, KeyEvent.VK_F12};
-    public static float SIZE_ICON_DOCK = 12f;
+
     private List<Action> actions = new LinkedList<>();
     private MainWindow window;
-
-    private static void loadLayouts(CControl globalPort) {
-        try {
-            if (LAYOUT_FILE.exists()) {
-                globalPort.readXML(LAYOUT_FILE);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     private void installIcons(MainWindow mw) {
         CControl globalPort = mw.getDockControl();
@@ -83,6 +82,16 @@ public final class DockingLayout
 
         icons.setIcon("close", p,
                 IconFontSwing.buildIcon(FontAwesomeRegular.WINDOW_CLOSE, SIZE_ICON_DOCK));
+    }
+
+    private static void loadLayouts(CControl globalPort) {
+        try {
+            if (LAYOUT_FILE.exists()) {
+                globalPort.readXML(LAYOUT_FILE);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void ensureActions(MainWindow mw) {
@@ -171,6 +180,8 @@ public final class DockingLayout
         toolBar.add(comboLayouts);
         toolBar.add(new LoadAction(mainWindow));
         toolBar.add(new SaveAction(mainWindow));
+        toolBar.addSeparator();
+        toolBar.add(new ResetLayoutAction(mainWindow));
         return toolBar;
     }
 
@@ -230,5 +241,21 @@ class LoadLayoutAction extends MainWindowAction {
         } else {
             mainWindow.setStatusLine("Layout " + layoutName + " could not be found.");
         }
+    }
+}
+
+class ResetLayoutAction extends MainWindowAction {
+    public ResetLayoutAction(MainWindow mainWindow) {
+        super(mainWindow);
+        setName("Reset Layout");
+        KeyStrokeManager.lookupAndOverride(this);
+        setPriority(-1);
+        setMenuPath("View.Layout");
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        DockingHelper.restoreFactoryDefault(mainWindow);
+        mainWindow.setStatusLine("Factory reset of the layout.");
     }
 }
