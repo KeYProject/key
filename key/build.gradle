@@ -4,6 +4,8 @@ plugins {
     id("idea")
     id("eclipse")
     id "com.jfrog.bintray" version "1.8.4" apply false
+    id "com.github.hierynomus.license-base" version"0.15.0"
+    id "com.github.hierynomus.license-report" version"0.15.0"
 }
 
 idea {
@@ -198,6 +200,17 @@ subprojects {
         }
     }
 
+    license {
+        header = file("$rootDir/gradle/header")
+
+        mapping {
+            //find styles here:
+            // http://code.mycila.com/license-maven-plugin/#supported-comment-types
+            java="SLASHSTAR_STYLE" // DOUBLESLASH_STYLE
+            javascript="SLASHSTAR_STYLE"
+        }
+        mapping("key", "SLASHSTAR_STYLE")
+    }
 
     eclipse {
         classpath {
