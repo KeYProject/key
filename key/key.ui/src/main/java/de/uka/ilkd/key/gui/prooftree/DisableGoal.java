@@ -20,7 +20,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.ListSelectionModel;
 
-import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
 
 /**

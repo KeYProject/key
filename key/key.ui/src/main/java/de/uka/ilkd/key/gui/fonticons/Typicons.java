@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.fonticons;
 
-import java.io.InputStream;
+import java.awt.*;
+import java.io.IOException;
 
 /*
  * Copyright (c) 2016 jIconFont <BR>
@@ -23,7 +24,7 @@ import java.io.InputStream;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-public enum Typicons implements IconCode {
+public enum Typicons implements IconFont {
 
     ADJUST_BRIGHTNESS('\uE000'),
     ADJUST_CONTRAST('\uE001'),
@@ -362,6 +363,7 @@ public enum Typicons implements IconCode {
     ZOOM_OUTLINE('\uE14E'),
     ZOOM_OUT_OUTLINE('\uE14C');
 
+    private static Font font;
     private final char character;
 
     Typicons(char character) {
@@ -369,27 +371,16 @@ public enum Typicons implements IconCode {
     }
 
     @Override
-    public char getUnicode() {
-        return character;
+    public Font getFont() throws IOException, FontFormatException {
+        if (font == null)
+            font = Font.createFont(Font.TRUETYPE_FONT,
+                    getClass().getResourceAsStream("/fonts/typicons.ttf"));
+        return font;
+
     }
 
     @Override
-    public String getFontFamily() {
-        return "typicons";
+    public char getUnicode() {
+        return character;
     }
-
-    public static IconFont getIconFont() {
-        return new IconFont() {
-            @Override
-            public String getFontFamily() {
-                return "typicons";
-            }
-
-            @Override
-            public InputStream getFontInputStream() {
-                return Typicons.class.getResourceAsStream("/fonts/typicons.ttf");
-            }
-        };
-    }
-
 }

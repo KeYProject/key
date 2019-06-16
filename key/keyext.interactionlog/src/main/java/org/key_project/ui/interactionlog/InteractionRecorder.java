@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.Settings;
+import org.key_project.ui.interactionlog.api.Interaction;
 import org.key_project.ui.interactionlog.model.*;
 import org.key_project.ui.interactionlog.model.builtin.BuiltInRuleInteraction;
 import org.key_project.ui.interactionlog.model.builtin.BuiltInRuleInteractionFactory;
@@ -110,7 +111,7 @@ public class InteractionRecorder implements InteractionListener, AutoModeListene
         if (disableAll) return;
 
         Properties p = new Properties();
-        settings.writeSettings(p, p);
+        settings.writeSettings(p);
         SettingChangeInteraction sci = new SettingChangeInteraction(p, type);
         if (message != null) sci.setMessage(message);
         InteractionLog log = get(proof);

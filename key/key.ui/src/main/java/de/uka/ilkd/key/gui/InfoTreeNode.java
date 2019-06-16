@@ -7,6 +7,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 
 /**
@@ -17,9 +19,11 @@ import de.uka.ilkd.key.rule.Taclet;
 public class InfoTreeNode extends DefaultMutableTreeNode {
 
 	private static final long serialVersionUID = 4187650510339169399L;
-	// the original taclet name
+	// the original rule name
     private final String altName;
     private final String description;
+
+    private Rule rule;
 
     /*
      * This constructor should only be used for the invisible root node of
@@ -31,7 +35,7 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
         description = "This is the root node of InfoTreeModel. It should not be visible.";
     }
 
-    /*
+    /**
      * @param title The name of the node.
      * @param explanations An XML resource containing node descriptions.
      */
@@ -51,6 +55,7 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
 
     InfoTreeNode(Taclet taclet) {
         super(taclet.displayName());
+        this.rule = taclet;
         altName = taclet.name().toString();
         LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
         lp.printTaclet(taclet);
@@ -63,12 +68,17 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
         this.description = description;
     }
 
+    public InfoTreeNode(BuiltInRule br, Properties ruleExplanations) {
+        this(br.displayName(), ruleExplanations);
+        rule = br;
+    }
+
     String getTitle() {
         return (String) getUserObject();
     }
     
     /**
-     * switch title to alternative name (i.e., internal taclet name)
+     * switch title to alternative name (i.e., internal rule name)
      */
     void setTitleToAltName() {
     	assert altName != null;
@@ -79,4 +89,7 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
         return description;
     }
 
+    public Rule getRule() {
+        return rule;
+    }
 }

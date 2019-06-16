@@ -27,7 +27,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 public class ComplexButton {
     
@@ -191,6 +191,7 @@ public class ComplexButton {
     JButton getActionButton(){
 	if(actionComponent == null){
 	    actionComponent = new JButton();
+	    //actionComponent.setFont(actionComponent.getFont().deriveFont(iconSize*0.8f));
 	    actionComponent.addChangeListener(new ChangeListener() {
 	        
 	        public void stateChanged(ChangeEvent arg0) {

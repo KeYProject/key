@@ -20,7 +20,7 @@ import java.io.File;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;

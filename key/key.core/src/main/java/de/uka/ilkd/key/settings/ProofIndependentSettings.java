@@ -17,14 +17,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.EventObject;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.pp.NotationInfo;
 
 
-
-public class ProofIndependentSettings implements SettingsListener {
+/**
+ * Top of the proof independent settings.
+ * <p>
+ *     You can add your own settings by calling {@link #addSettings(Settings)}.
+ *
+ * @see Settings
+ */
+public class ProofIndependentSettings {
     public static final ProofIndependentSettings DEFAULT_INSTANCE =
             new ProofIndependentSettings(PathConfig.getProofIndependentSettings());
     private final ProofIndependentSMTSettings smtSettings =
@@ -37,27 +45,33 @@ public class ProofIndependentSettings implements SettingsListener {
 
     private final TestGenerationSettings testGenSettings = new TestGenerationSettings();
 
-    private final Settings[] settingsSet =
-        { smtSettings,
-          lemmaGeneratorSettings,
-          generalSettings,
-          viewSettings,
-          testGenSettings};
+    private final List<Settings> settings = new LinkedList<>();
 
-
+    private SettingsListener settingsListener = e -> saveSettings();
+    private Properties lastReadedProperties;
 
     private ProofIndependentSettings(String filename) {
+        addSettings(smtSettings);
+        addSettings(lemmaGeneratorSettings);
+        addSettings(generalSettings);
+        addSettings(viewSettings);
+        addSettings(testGenSettings);
+
         this.filename = filename;
-        for (Settings settings : settingsSet) {
-            settings.addSettingsListener(this);
+        for (Settings settings : settings) {
+            settings.addSettingsListener(settingsListener);
         }
         loadSettings();
     }
 
-    @Override
-    public void settingsChanged(EventObject e) {
-        saveSettings();
-
+    public void addSettings(Settings settings) {
+        if (!this.settings.contains(settings)) {
+            this.settings.add(settings);
+            settings.addSettingsListener(settingsListener);
+            if (lastReadedProperties != null) {
+                settings.readSettings(lastReadedProperties);
+            }
+        }
     }
 
     private void loadSettings() {
@@ -65,9 +79,7 @@ public class ProofIndependentSettings implements SettingsListener {
             File testFile = new File(filename);
             if(testFile.exists()) {
                 if(Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
-                    //weigl: silently ignore because of huge test reports
-                    //System.err.println("The settings in " +
-                    //        filename + " are *not* read.");
+                    //System.err.println("The settings in " + filename + " are *not* read.");
                 } else {
                     load(testFile);
                 }
@@ -78,37 +90,32 @@ public class ProofIndependentSettings implements SettingsListener {
     }
 
     private void load(File file) throws IOException {
-        FileInputStream in = new FileInputStream(file);
-        Properties properties = new Properties();
-        properties.load(in);
-        for(Settings settings : settingsSet) {
-            settings.readSettings(this, properties);
+        try(FileInputStream in = new FileInputStream(file)) {
+            Properties properties = new Properties();
+            properties.load(in);
+            for (Settings settings : settings) {
+                settings.readSettings(properties);
+            }
+            lastReadedProperties = properties;
         }
-        in.close();
     }
 
     public void saveSettings() {
+        Properties result = new Properties();
+        for (Settings settings : settings) {
+            settings.writeSettings(result);
+        }
 
-        try {
-            File file = new File(filename);
-            if (!file.exists()) {
-                new File(PathConfig.getKeyConfigDir() + File.separator).mkdirs();
-                file.createNewFile();
-            }
-            Properties result = new Properties();
-            for (Settings settings : settingsSet) {
-                settings.writeSettings(this, result);
-            }
-            FileOutputStream out = new FileOutputStream(file);
-            try {
-                result.store(out, "Proof-Independent-Settings-File");
-            } finally {
-                out.close();
-            }
+        File file = new File(filename);
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+        }
+
+        try (FileOutputStream out = new FileOutputStream(file)) {
+            result.store(out, "Proof-Independent-Settings-File. Generated "+ new Date());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     public GeneralSettings getGeneralSettings() {
@@ -120,6 +127,7 @@ public class ProofIndependentSettings implements SettingsListener {
         //ensureInitialized();
         return viewSettings;
     }
+
     public LemmaGeneratorSettings getLemmaGeneratorSettings() {
         return lemmaGeneratorSettings;
     }

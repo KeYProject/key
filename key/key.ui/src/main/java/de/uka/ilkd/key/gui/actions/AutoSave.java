@@ -8,9 +8,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 public class AutoSave extends MainWindowAction {
-    
     private static final long serialVersionUID = -2598146925208531491L;
-    private static final int DEFAULT_PERIOD = 2000;
+    public static final int DEFAULT_PERIOD = 2000;
 
     public AutoSave(MainWindow mainWindow) {
         super(mainWindow);

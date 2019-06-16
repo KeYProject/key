@@ -21,7 +21,7 @@ import java.util.EventObject;
 
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -46,6 +46,7 @@ public class ExitMainAction extends MainWindowAction {
        setIcon(IconFactory.quit(16));
        setTooltip("Leave KeY.");
        setAcceleratorLetter(KeyEvent.VK_Q);
+       lookupAcceleratorKey();
    }
 
    public final WindowListener windowListener = new WindowAdapter() {
@@ -97,6 +98,7 @@ public class ExitMainAction extends MainWindowAction {
         System.out.println("Have a nice day.");
         saveSettings();
         if (exitSystem) {
+           //weigl: change to 0, so no error is shown in gradle run
            System.exit(0);
         }
         else {

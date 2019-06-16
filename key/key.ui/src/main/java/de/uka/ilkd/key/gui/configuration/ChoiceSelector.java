@@ -48,7 +48,7 @@ import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 
-import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 
@@ -72,7 +72,7 @@ public class ChoiceSelector extends JDialog {
     private JTextArea explanationArea;
     private static Properties explanationMap;
 
-    /** creates a new ChoiceSelector, using the <code>ChoiceSettings</code>
+    /** creates a new TacletOptionsSettings, using the <code>ChoiceSettings</code>
      * from <code>settings</code> */
     public ChoiceSelector(ChoiceSettings settings) {  
 	super(new JFrame(), "Taclet Base Configuration", true);
@@ -97,7 +97,7 @@ public class ChoiceSelector extends JDialog {
 	}
     }
 
-    /** creates a new ChoiceSelector */
+    /** creates a new TacletOptionsSettings */
     public ChoiceSelector(){
 	this(ProofSettings.DEFAULT_SETTINGS.getChoiceSettings());
     }
