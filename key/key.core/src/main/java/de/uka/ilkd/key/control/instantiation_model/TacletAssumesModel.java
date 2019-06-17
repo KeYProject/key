@@ -94,13 +94,14 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
     }
 
     public static IfFormulaInstantiation[] createIfInsts(
-            ImmutableList<IfFormulaInstantiation> p_candidates) {
-        IfFormulaInstantiation[] res = new IfFormulaInstantiation[p_candidates.size()];
-        Iterator<IfFormulaInstantiation> it = p_candidates.iterator();
+            ImmutableList<IfFormulaInstantiation> candidates) {
+        IfFormulaInstantiation[] res = new IfFormulaInstantiation[candidates.size()];
+        Iterator<IfFormulaInstantiation> it = candidates.iterator();
         int i = 0;
 
         while (it.hasNext()) {
-            res[i++] = it.next();
+            res[i] = it.next();
+            ++i;
         }
 
         return res;
@@ -121,8 +122,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
      *
      * @param s the String to parse
      * @return the term encoded in 's'
-     * @throws org.antlr.runtime.RecognitionException In case an exceptions occurs
-     *                                                during parse.
+     * @throws RecognitionException In case an exception occurs during parse.
      */
     public Term parseFormula(String s) throws RecognitionException {
         KeYParserF p = stringParser(s);
@@ -133,6 +133,8 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
      * @param pos int describes position of the if-sequent (only required for error
      *            message)
      * @return the selected instantiation of the if sequent
+     * @throws SVInstantiationParserException
+     * @throws MissingInstantiationException
      */
     public IfFormulaInstantiation getSelection(int pos)
             throws SVInstantiationParserException, MissingInstantiationException {

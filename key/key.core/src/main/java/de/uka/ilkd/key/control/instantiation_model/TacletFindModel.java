@@ -98,9 +98,13 @@ public class TacletFindModel extends AbstractTableModel {
     private InstantiationProposerCollection instantiationProposers;
 
     /**
-     * create new data model for tree
+     * Create new data model for tree.
      *
      * @param app the TacletApp where to get the necessary entries
+     * @param services services.
+     * @param nss universal namespace of variables, minimum for input in a row.
+     * @param scm the abbreviation map.
+     * @param goal the current goal.
      */
     public TacletFindModel(TacletApp app, Services services, NamespaceSet nss, AbbrevMap scm,
             Goal goal) {
@@ -222,11 +226,7 @@ public class TacletFindModel extends AbstractTableModel {
     private IdDeclaration parseIdDeclaration(String s) throws ParserException {
         KeYParserF parser = null;
         try {
-            parser = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s, ""), services, // should
-                                                                                            // not
-                                                                                            // be
-                                                                                            // needed
-                    nss);
+            parser = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s, ""), services, nss);
             return parser.id_declaration();
         } catch (RecognitionException re) {
             // parser cannot be null
@@ -374,8 +374,7 @@ public class TacletFindModel extends AbstractTableModel {
     }
 
     /**
-     * creates new rule app with all inserted instantiations in the variable
-     * instantiations table
+     * @return new rule app with all inserted instantiations in the variable instantiations table
      *
      * @throws SVInstantiationException if the instantiation is incorrect
      */

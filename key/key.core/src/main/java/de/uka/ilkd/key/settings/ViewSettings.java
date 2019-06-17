@@ -27,6 +27,7 @@ import java.util.TreeSet;
  * intermediate proofsteps should be hidden in the proof tree view
  */
 public class ViewSettings implements Settings, Cloneable {
+
     private static final String CLUTTER_RULES = "[View]clutterRules";
 
     private static final String CLUTTER_RULES_DEFAULT = "cut_direct_r,cut_direct_l,"
@@ -193,14 +194,16 @@ public class ViewSettings implements Settings, Cloneable {
     }
 
     /**
-     * Are system look and feel activated?
+     * @return {@code true} iff the system look-and-feel is activated.
      */
     public boolean useSystemLaF() {
         return useSystemLaF;
     }
 
     /**
-     * Sets the system look and feel option.
+     * Sets the system look-and-feel option.
+     *
+     * @param b whether to activate the system look-and-feel
      */
     public void setUseSystemLaF(boolean b) {
         if (b != useSystemLaF) {
@@ -213,6 +216,8 @@ public class ViewSettings implements Settings, Cloneable {
      * When loading a Java file, all other java files in the parent directory are
      * loaded as well. Should there be a notification about this when opening a
      * file?
+     *
+     * @return whether to show the notification.
      */
     public boolean getNotifyLoadBehaviour() {
         return notifyLoadBehaviour;
@@ -577,7 +582,7 @@ public class ViewSettings implements Settings, Cloneable {
     /**
      * Sets options for highlighting of origins.
      *
-     * @param highlightOriginwhether the origin of the selected term should be
+     * @param highlightOrigin whether the origin of the selected term should be
      *                               highlighted in the source view.
      */
     public void setHighlightOrigin(boolean highlightOrigin) {

@@ -45,9 +45,10 @@ import de.uka.ilkd.key.rule.inst.SortException;
 
 public class TacletInstantiationModel {
 
+    private static final TacletAssumesModel[] EMPTY_IF_CHOICES = new TacletAssumesModel[0];
+
     /** the model used for the instantiation of the if-sequent */
     private TacletAssumesModel[] ifChoiceModel;
-    private static final TacletAssumesModel[] EMPTY_IF_CHOICES = new TacletAssumesModel[0];
     /** the model used for the instantiation of the schemavariables */
     private final TacletFindModel tableModel;
 
@@ -74,8 +75,14 @@ public class TacletInstantiationModel {
     private final Goal goal;
 
     /**
-     * create new data model for the apply Taclet dialog wrapping a combo box model
-     * and a table model
+     * Create new data model for the apply Taclet dialog wrapping a combo box model
+     * and a table model.
+     *
+     * @param app
+     * @param seq
+     * @param nss
+     * @param scm
+     * @param goal
      */
     public TacletInstantiationModel(TacletApp app, Sequent seq, NamespaceSet nss, AbbrevMap scm,
             Goal goal) {
@@ -165,8 +172,7 @@ public class TacletInstantiationModel {
         ImmutableList<IfFormulaInstantiation> instList = ImmutableSLList
                 .<IfFormulaInstantiation>nil();
 
-        int i = ifChoiceModel.length;
-        while (i-- != 0) {
+        for (int i = ifChoiceModel.length - 1; i >= 0; --i) {
             instList = instList.prepend(ifChoiceModel[i].getSelection(i));
         }
 

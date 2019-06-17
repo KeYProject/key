@@ -583,7 +583,12 @@ public class OriginTermLabel implements TermLabel {
 
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof Origin && hashCode() == obj.hashCode();
+            return obj.getClass().equals(getClass()) && ((Origin) obj).specType == specType;
+        }
+
+        @Override
+        public int hashCode() {
+            return specType.hashCode();
         }
 
         @Override
@@ -602,16 +607,17 @@ public class OriginTermLabel implements TermLabel {
         /**
          * The name of the rule applied at the node the term originates from.
          */
-        public String ruleName;
+        public final String ruleName;
 
         /**
          * The {@link Node#serialNr()} of the node the term originates from.
          */
-        public int nodeNr;
+        public final int nodeNr;
 
         /**
          * Creates a new {@link OriginTermLabel.Origin}.
          *
+         * @param specType the spec type the term originates from.
          * @param ruleName the name of the rule applied at the node the term originates from.
          * @param nodeNr the {@link Node#serialNr()} of the node the term originates from.
          */
@@ -630,12 +636,36 @@ public class OriginTermLabel implements TermLabel {
         }
 
         @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!super.equals(obj)) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            NodeOrigin other = (NodeOrigin) obj;
+            if (nodeNr != other.nodeNr) {
+                return false;
+            }
+            if (ruleName == null) {
+                if (other.ruleName != null) {
+                    return false;
+                }
+            } else if (!ruleName.equals(other.ruleName)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
         public int hashCode() {
             final int prime = 31;
-            int result = 1;
+            int result = super.hashCode();
             result = prime * result + nodeNr;
             result = prime * result + ((ruleName == null) ? 0 : ruleName.hashCode());
-            result = prime * result + ((specType == null) ? 0 : specType.hashCode());
             return result;
         }
     }
@@ -682,11 +712,35 @@ public class OriginTermLabel implements TermLabel {
         @Override
         public int hashCode() {
             final int prime = 31;
-            int result = 1;
+            int result = super.hashCode();
             result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
             result = prime * result + line;
-            result = prime * result + ((specType == null) ? 0 : specType.hashCode());
             return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!super.equals(obj)) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            FileOrigin other = (FileOrigin) obj;
+            if (fileName == null) {
+                if (other.fileName != null) {
+                    return false;
+                }
+            } else if (!fileName.equals(other.fileName)) {
+                return false;
+            }
+            if (line != other.line) {
+                return false;
+            }
+            return true;
         }
     }
 

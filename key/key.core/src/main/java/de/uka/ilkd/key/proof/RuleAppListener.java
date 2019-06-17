@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.proof;
 
+/**
+ * This listener is notified whenever a rule is applied in an ongoing proof.
+ */
 @FunctionalInterface
 public interface RuleAppListener {
 

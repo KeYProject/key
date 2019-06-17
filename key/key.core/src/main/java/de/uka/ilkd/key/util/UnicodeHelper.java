@@ -119,7 +119,7 @@ public final class UnicodeHelper {
      */
     public static String emSpaces (int em) {
         final StringBuffer sb = new StringBuffer();
-        for (int i= 0; i < em; i++) {
+        for (int i = 0; i < em; i++) {
             sb.append(EMSPACE);
         }
         return sb.toString();
