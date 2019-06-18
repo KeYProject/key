@@ -55,10 +55,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         List<SExpr> results = new LinkedList<>();
         for (Term t : sequentAsserts) {
-            // TODO js: convert FORMULA to bool somehow, avoid this weird special casing
-            if (!(t.op().equals(services.getTermBuilder().getMeasuredByEmpty()))) {
-                results.add(master.translate(t));
-            }
+            results.add(master.translate(t, Type.BOOL));
         }
 
 //        SExpr result = master.translate(problem, Type.BOOL);
@@ -107,12 +104,18 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         sb.append("\n; --- Sequent\n");
         for (SExpr ass : results) {
-            SExpr assertion = new SExpr("assert", Type.NONE, ass);
+            SExpr assertion = new SExpr("assert", ass);
             assertion.appendTo(sb);
             sb.append("\n");
         }
 
         sb.append("\n(check-sat)");
+
+
+        // any exceptions?
+        for (Throwable t : exceptions) {
+            sb.append("; " + t.toString());
+        }
 
         return sb;
     }

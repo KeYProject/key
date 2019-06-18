@@ -15,6 +15,7 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
+import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
 
 public class UninterpretedSymbolsHandler implements SMTHandler {
 
@@ -41,29 +42,33 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
             return new SExpr("null", Type.UNIVERSE);
         }
 
+        SExpr.Type exprType = term.sort() == Sort.FORMULA ? BOOL : UNIVERSE;
+        String sortString = term.sort() == Sort.FORMULA ? "Bool" : "U";
+
         String name = PREFIX + op.name().toString();
         if(!trans.isKnownSymbol(name)) {
             int a = op.arity();
             SExpr signature = new SExpr(Collections.nCopies(a, new SExpr("U")));
             trans.addDeclaration(
-                    new SExpr("declare-fun", new SExpr(name), signature, new SExpr("U")));
+                    new SExpr("declare-fun", new SExpr(name), signature, new SExpr(sortString)));
             trans.addKnownSymbol(name);
-            if (op instanceof SortedOperator) {
+            if (op instanceof SortedOperator && term.sort() != Sort.FORMULA) {
                 if (op.arity() > 0) {
                     SExpr axiom = funTypeAxiomFromTerm(term, name, trans);
                     trans.addAxiom(axiom);
                 }
                 if (op.arity() == 0) {
                     SortedOperator sop = (SortedOperator) op;
-                    SExpr axiom = new SExpr("assert", Type.BOOL,
+                    SExpr axiom = new SExpr("assert",
                             new SExpr("instanceof", Type.BOOL, name, SExpr.sortExpr(sop.sort()).toString()));
                     trans.addAxiom(axiom);
+
                 }
             }
         }
 
         List<SExpr> children = trans.translate(term.subs(), Type.UNIVERSE);
-        return new SExpr(name, Type.UNIVERSE, children);
+        return new SExpr(name, exprType, children);
     }
 
     /**
