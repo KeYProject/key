@@ -164,7 +164,7 @@ public class HTMLSyntaxHighlighter {
         final String commentHighlightRule =
                 ".comment_highlight { color: #3F7F5F; }";
         final String sequentArrowHighlightRule =
-                ".sequent_arrow_highlight { color: #000000; font-size: 150% }";
+                ".sequent_arrow_highlight { color: #000000; font-size: 1.7em }";
 
         document.getStyleSheet().addRule(propLogicHighlightRule);
         document.getStyleSheet().addRule(progVarHighlightRule);
