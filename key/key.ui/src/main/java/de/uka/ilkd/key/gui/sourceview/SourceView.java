@@ -814,7 +814,7 @@ public final class SourceView extends JComponent {
             getHorizontalScrollBar().setUnitIncrement(30);
 
             //add Line numbers to each Scrollview
-            TextLineNumber tln = new TextLineNumber(textPane, 4);
+            TextLineNumber tln = new TextLineNumber(textPane, 1);
             setRowHeaderView(tln);
 
             // Add tab to tab pane.
