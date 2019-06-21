@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.ext.exploration;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +15,7 @@ import de.uka.ilkd.key.gui.ext.KeYSequentViewMenuExtension;
 import de.uka.ilkd.key.gui.ext.KeYStatusBarExtension;
 import de.uka.ilkd.key.gui.ext.KeYToolbarExtension;
 import de.uka.ilkd.key.gui.ext.KeYTooltipExtension;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -99,14 +101,31 @@ public class OriginTermLabelsExt
 
     @Override
     public List<String> getTooltipStrings(MainWindow mainWindow, PosInSequent pos) {
-        Origin origin = OriginTermLabel.getOrigin(pos);
-
-        List<String> result = new LinkedList<>();
-
-        if (origin != null) {
-            result.add("<b>Origin:</b> " + origin);
+        if (pos == null || pos.isSequent()) {
+            return Collections.emptyList();
         }
 
-        return result;
+        Origin origin = OriginTermLabel.getOrigin(pos);
+
+        String result = "";
+
+        if (origin != null) {
+            result += "<b>Origin:</b> " + origin + "<br>";
+        }
+
+        PosInOccurrence pio = pos.getPosInOccurrence();
+
+        OriginTermLabel label = pio == null ? null : (OriginTermLabel) pio
+                .subTerm().getLabel(OriginTermLabel.NAME);
+
+        if (label != null && !label.getSubtermOrigins().isEmpty()) {
+            result += "<b>Origin of (former) sub-terms:</b><br>" +
+                    label.getSubtermOrigins().stream()
+                    .map(o -> "" + o + "<br>").reduce("", String::concat);
+        }
+
+        List<String> resultList = new LinkedList<>();
+        resultList.add(result);
+        return resultList;
     }
 }

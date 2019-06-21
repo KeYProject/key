@@ -214,7 +214,7 @@ public abstract class SequentView extends JEditorPane {
             text += "<br><b>Sort</b>: " + term.sort();
         }
 
-        StringJoiner extensionStr = new StringJoiner("<br>", "<br>", "");
+        StringJoiner extensionStr = new StringJoiner("<hr>", "<hr>", "");
         extensionStr.setEmptyValue("");
         KeYGuiExtensionFacade.getTooltipStrings(getMainWindow(), pis).forEach(extensionStr::add);
         text += extensionStr;
