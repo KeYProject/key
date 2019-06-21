@@ -8,6 +8,8 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.gui.actions.QuickLoadAction;
+import de.uka.ilkd.key.gui.actions.QuickSaveAction;
 import de.uka.ilkd.key.gui.ext.KeYExtConst;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
@@ -91,8 +93,8 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
 
             switch (selection) {
             case 0:
-                mainWindow.loadProblem(new File(
-                        mainWindow.getRecentFiles().getMostRecent().getAbsolutePath()));
+                QuickSaveAction.quickSave(mainWindow);
+                QuickLoadAction.quickLoad(mainWindow);
                 //fallthrough
             case 1:
                 settings.setUseOriginLabels(!settings.getUseOriginLabels());

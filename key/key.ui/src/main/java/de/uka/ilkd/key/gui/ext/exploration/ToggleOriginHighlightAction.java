@@ -7,10 +7,21 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.ext.KeYExtConst;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 
+/**
+ * Action to toggle {@link ViewSettings#isHighlightOrigin()}.
+ *
+ * @author lanzinger
+ */
 public class ToggleOriginHighlightAction extends MainWindowAction {
 
-    protected ToggleOriginHighlightAction(MainWindow mainWindow) {
+    /**
+     * Create a new action.
+     *
+     * @param mainWindow the main window.
+     */
+    public ToggleOriginHighlightAction(MainWindow mainWindow) {
         super(mainWindow);
         setIcon(IconFactory.heatmapIcon(16));
         setEnabled(true);
