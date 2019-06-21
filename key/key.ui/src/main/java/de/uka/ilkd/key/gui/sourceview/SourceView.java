@@ -243,7 +243,11 @@ public final class SourceView extends JComponent {
             throw new BadLocationException("Not a valid line number for " + fileName, line);
         }
 
-        tabPane.setBackgroundAt(tabPane.indexOfComponent(tab), Color.GREEN);
+        if (isSelected(tab)) {
+            tabPane.setForegroundAt(tabPane.indexOfComponent(tab), Color.GREEN);
+        } else {
+            tabPane.setBackgroundAt(tabPane.indexOfComponent(tab), Color.GREEN);
+        }
 
         if (!tab.highlights.containsKey(line)) {
             tab.highlights.put(line, new TreeSet<>());
@@ -339,6 +343,9 @@ public final class SourceView extends JComponent {
         }
 
         if (tab.highlights.isEmpty()) {
+            tabPane.setForegroundAt(
+                    tabPane.indexOfComponent(tab),
+                    UIManager.getColor("TabbedPane.foreground"));
             tabPane.setBackgroundAt(
                     tabPane.indexOfComponent(tab),
                     UIManager.getColor("TabbedPane.background"));
@@ -839,16 +846,8 @@ public final class SourceView extends JComponent {
 
         private void resetHighlights() {
             try {
-                for (int i = 0; i < lineInformation.length; ++i) {
-                    removeHighlights(i);
-                }
-
                 calculateSymbExHighlights();
-
-                for (int i = 0; i < lineInformation.length; ++i) {
-                    applyHighlights(i);
-                }
-            } catch (IOException | BadLocationException e) {
+            } catch (IOException e) {
                 Debug.out(e);
             }
         }
