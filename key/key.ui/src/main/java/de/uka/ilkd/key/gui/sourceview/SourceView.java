@@ -171,6 +171,11 @@ public final class SourceView extends JComponent {
                 } else {
                     selectedFile = tabPane.getSelectedTab().file.getAbsolutePath();
                 }
+
+                // Mark tabs that contain highlights.
+                for (Tab tab : tabs.values()) {
+                    tab.mark();
+                }
             }
         });
 
@@ -243,11 +248,7 @@ public final class SourceView extends JComponent {
             throw new BadLocationException("Not a valid line number for " + fileName, line);
         }
 
-        if (isSelected(tab)) {
-            tabPane.setForegroundAt(tabPane.indexOfComponent(tab), Color.GREEN);
-        } else {
-            tabPane.setBackgroundAt(tabPane.indexOfComponent(tab), Color.GREEN);
-        }
+        tab.mark();
 
         if (!tab.highlights.containsKey(line)) {
             tab.highlights.put(line, new TreeSet<>());
@@ -342,14 +343,7 @@ public final class SourceView extends JComponent {
             }
         }
 
-        if (tab.highlights.isEmpty()) {
-            tabPane.setForegroundAt(
-                    tabPane.indexOfComponent(tab),
-                    UIManager.getColor("TabbedPane.foreground"));
-            tabPane.setBackgroundAt(
-                    tabPane.indexOfComponent(tab),
-                    UIManager.getColor("TabbedPane.background"));
-        }
+        tab.mark();
 
         return result;
     }
@@ -831,6 +825,27 @@ public final class SourceView extends JComponent {
 
             resetHighlights();
         }
+
+        private void mark() {
+                if (highlights.isEmpty()) {
+                    tabPane.setForegroundAt(
+                            tabPane.indexOfComponent(this),
+                            UIManager.getColor("TabbedPane.foreground"));
+                    tabPane.setBackgroundAt(
+                            tabPane.indexOfComponent(this),
+                            UIManager.getColor("TabbedPane.background"));
+                } else {
+                    if (isSelected(this)) {
+                        tabPane.setForegroundAt(
+                                tabPane.indexOfComponent(this),
+                                new Color(0, 145, 0));
+                    } else {
+                        tabPane.setBackgroundAt(
+                                tabPane.indexOfComponent(this),
+                                Color.GREEN);
+                    }
+                }
+            }
 
         private void initSelectionHL() {
             try {
