@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
@@ -382,6 +383,7 @@ public final class SourceView extends JComponent {
         for (String filename : filenames) {
             if (addFile(filename)) {
                 updateNecessary = true;
+                mainWindow.getMediator().getSelectedNode().getNodeInfo().addRelevantFile(filename);
             }
         }
 
@@ -441,14 +443,29 @@ public final class SourceView extends JComponent {
     }
 
     /**
-     * Adds all files in {@link #lines}.
+     * Adds all files relevant to the currently selected node, closing all others
      *
-     * @throws IOException if one of the files cannot be opened.
+     * @see NodeInfo#getRelevantFiles()
      */
     private void addFiles() throws IOException {
-        for (Pair<Node, PositionInfo> p : lines) {
-            PositionInfo l = p.second;
-            addFile(l.getFileName());
+        Set<String> files =
+                mainWindow.getMediator().getSelectedNode().getNodeInfo().getRelevantFiles();
+
+        Iterator<String> it = tabs.keySet().iterator();
+
+        while (it.hasNext()) {
+            String fileName = it.next();
+
+            if (!files.contains(fileName)) {
+                Tab tab = tabs.get(fileName);
+                it.remove();
+                tabPane.remove(tab);
+            }
+        }
+
+        for (String fileName
+                : files) {
+            addFile(fileName);
         }
     }
 
@@ -612,16 +629,18 @@ public final class SourceView extends JComponent {
 
     /**
      * Collects the set of lines to highlight starting from the given node in the proof tree.
-     * @param cur the given node
+     * @param node the given node
      * @return a linked list of pairs of PositionInfo objects containing the start and end
      * positions for the highlighting and Nodes.
      */
-    private static LinkedList<Pair<Node, PositionInfo>> constructLinesSet(Node cur) {
+    private static LinkedList<Pair<Node, PositionInfo>> constructLinesSet(Node node) {
         LinkedList<Pair<Node, PositionInfo>> list = new LinkedList<Pair<Node, PositionInfo>>();
 
-        if (cur == null) {
+        if (node == null) {
             return null;
         }
+
+        Node cur = node;
 
         do {
             SourceElement activeStatement = cur.getNodeInfo().getActiveStatement();
@@ -633,6 +652,7 @@ public final class SourceView extends JComponent {
                     if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
                             && pos.getFileName() != null) {
                         list.addLast(new Pair<Node, PositionInfo>(cur, pos));
+                        node.getNodeInfo().addRelevantFile(pos.getFileName());
                     }
                 }
             }

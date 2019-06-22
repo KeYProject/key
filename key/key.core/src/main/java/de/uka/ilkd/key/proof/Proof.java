@@ -43,6 +43,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
@@ -230,6 +231,23 @@ public class Proof implements Named {
         }
 
         Node rootNode = new Node(this, problem);
+
+        NodeInfo info = rootNode.getNodeInfo();
+
+        rootNode.sequent().forEach(formula -> {
+            OriginTermLabel originLabel = (OriginTermLabel)
+                    formula.formula().getLabel(OriginTermLabel.NAME);
+            if (originLabel != null) {
+                if (originLabel.getOrigin() instanceof FileOrigin) {
+                    info.addRelevantFile(((FileOrigin) originLabel.getOrigin()).fileName);
+                }
+
+                originLabel.getSubtermOrigins().stream()
+                    .filter(o -> o instanceof FileOrigin)
+                    .map(o -> (FileOrigin) o)
+                    .forEach(o -> info.addRelevantFile(o.fileName));
+            }
+        });
 
         Goal firstGoal = new Goal(rootNode,
                 new RuleAppIndex(new TacletAppIndex(rules, getServices()),
