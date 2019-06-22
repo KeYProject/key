@@ -52,8 +52,8 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
  */
 public class SequentViewInputListener implements KeyListener, MouseMotionListener, MouseListener {
 
-    private static final Color ORIGIN_HIGHLIGHT_COLOR = new Color(252, 202, 80);
-    private static final Color SUBTERM_ORIGIN_HIGHLIGHT_COLOR = new Color(252, 228, 169);
+    private static final Color ORIGIN_HIGHLIGHT_COLOR = Color.RED;
+    private static final Color SUBTERM_ORIGIN_HIGHLIGHT_COLOR = new Color(255, 150, 150);
 
     private Highlight originHighlight;
     private Set<Highlight> subtermOriginsHighlights = new HashSet<>();

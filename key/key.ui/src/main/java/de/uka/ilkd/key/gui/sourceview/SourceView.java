@@ -116,12 +116,12 @@ public final class SourceView extends JComponent {
     /**
      * The color of normal highlights in source code (light green).
      */
-    private static final Color NORMAL_HIGHLIGHT_COLOR = new Color(194, 245, 194);
+    private static final Color NORMAL_HIGHLIGHT_COLOR = new Color(150, 255, 150);
 
     /**
      * The color of the most recent highlight in source code (green).
      */
-    private static final Color MOST_RECENT_HIGHLIGHT_COLOR = new Color(57, 210, 81);
+    private static final Color MOST_RECENT_HIGHLIGHT_COLOR = Color.GREEN;
 
     /**
      * The main window of KeY (needed to get the mediator).
@@ -231,8 +231,8 @@ public final class SourceView extends JComponent {
     /**
      * <p> Creates a new highlight. </p>
      *
-     * <p> If the are multiple highlight for a given line, the highlight with the highest level
-     *  is used. </p>
+     * <p> If the are multiple highlight for a given line, they are drawn on top of each other,
+     *  starting with the one with the lowest level. </p>
      *
      * <p> The highlights added by the {@code SourceView} itself have level {@code 0},
      *  except for the highlight that appears when the user moves the mouse over a line,
@@ -268,10 +268,8 @@ public final class SourceView extends JComponent {
 
         tab.mark();
 
-        if (highlight.compareTo(highlights.last()) >= 0) {
-            tab.removeHighlights(line);
-            tab.applyHighlights(line);
-        }
+        tab.removeHighlights(line);
+        tab.applyHighlights(line);
 
         return highlight;
     }
@@ -314,10 +312,8 @@ public final class SourceView extends JComponent {
         }
 
         tab.highlights.get(newLine).add(highlight);
-
-        if (highlight.compareTo(tab.highlights.get(newLine).last()) >= 0) {
-            tab.applyHighlights(newLine);
-        }
+        tab.removeHighlights(newLine);
+        tab.applyHighlights(newLine);
     }
 
     /**
@@ -967,15 +963,21 @@ public final class SourceView extends JComponent {
             SortedSet<Highlight> set = highlights.get(line);
 
             if (set != null && !set.isEmpty()) {
-                Highlight highlight = set.last();
-                Range range = calculateLineRange(
-                        textPane,
-                        lineInformation[highlight.getLine() - 1].getOffset());
+                for (Highlight highlight : set) {
+                    Range range = calculateLineRange(
+                            textPane,
+                            lineInformation[highlight.getLine() - 1].getOffset());
 
-                highlight.setTag(textPane.getHighlighter().addHighlight(
-                        range.start(),
-                        range.end(),
-                        new DefaultHighlightPainter(highlight.getColor())));
+                    Color c = highlight.getColor();
+                    int alpha = set.size() == 1 ? c.getAlpha() : 256 / set.size();
+                    Color color = new Color(
+                            c.getRed(), c.getGreen(), c.getBlue(), alpha);
+
+                    highlight.setTag(textPane.getHighlighter().addHighlight(
+                            range.start(),
+                            range.end(),
+                            new DefaultHighlightPainter(color)));
+                }
             }
 
             textPane.revalidate();
@@ -1046,18 +1048,11 @@ public final class SourceView extends JComponent {
      * <p> An object of this class represents a highlight of a specific line in the
      *  {@code SourceView}. </p>
      *
-     * <p>
-     *  A highlight consists of the name of a file, a line in that file, a color, and a level.
-     * </p>
-     *
-     * <p> If there are multiple highlights for a given line, the highlight with the highest level
-     *  is used. </p>
-     *
-     * <p> The highlights added by the {@code SourceView} itself have level {@code 0},
-     *  except for the highlight that appears when the user moves the mouse over a line,
-     *  which has level {@code Integer.maxValue() - 1}. </p>
-     *
      * @author lanzinger
+     *
+     * @see SourceView#addHighlight(String, int, Color, int)
+     * @see SourceView#changeHighlight(Highlight, int)
+     * @see SourceView#removeHighlight(Highlight)
      */
     public static class Highlight implements Comparable<Highlight> {
 
