@@ -583,7 +583,8 @@ public class OriginTermLabel implements TermLabel {
 
         @Override
         public boolean equals(Object obj) {
-            return obj.getClass().equals(getClass()) && ((Origin) obj).specType == specType;
+            return obj != null
+                    && obj.getClass().equals(getClass()) && ((Origin) obj).specType == specType;
         }
 
         @Override

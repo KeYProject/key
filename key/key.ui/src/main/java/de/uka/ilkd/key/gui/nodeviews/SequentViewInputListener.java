@@ -222,11 +222,13 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
             }
 
             for (FileOrigin subtermOrigin : subtermOrigins) {
-                subtermOriginsHighlights.add(sourceView.addHighlight(
-                        subtermOrigin.fileName,
-                        subtermOrigin.line,
-                        SUBTERM_ORIGIN_HIGHLIGHT_COLOR,
-                        10));
+                if (!subtermOrigin.equals(origin)) {
+                    subtermOriginsHighlights.add(sourceView.addHighlight(
+                            subtermOrigin.fileName,
+                            subtermOrigin.line,
+                            SUBTERM_ORIGIN_HIGHLIGHT_COLOR,
+                            10));
+                }
             }
         } catch (BadLocationException | IOException e) {
             e.printStackTrace();
