@@ -65,7 +65,7 @@ public class DockingHelper {
             CDockable cur = mainWindow.getDockControl().getCDockable(i);
             if (cur instanceof SingleCDockable) {
                 String id = ((SingleCDockable) cur).getUniqueId();
-                System.out.println(id);
+                //System.out.println(id);
                 if (LEFT_PANEL.contains(id)) {
                     leftPanels.add(cur);
                     continue;
