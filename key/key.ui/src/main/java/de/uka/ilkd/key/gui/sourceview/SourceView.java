@@ -12,6 +12,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -52,6 +54,7 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
+import de.uka.ilkd.key.java.JavaReduxFileCollection;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -148,6 +151,11 @@ public final class SourceView extends JComponent {
      * Lines to highlight (contains all highlights of the current proof) and corresponding Nodes.
      */
     private LinkedList<Pair<Node, PositionInfo>> lines;
+
+    /**
+     * Unpacked JavaRedux files.
+     */
+    private Map<String, File> tmpReduxFiles = new HashMap<>();
 
     Set<Highlight> symbExHighlights = new HashSet<>();
 
@@ -248,8 +256,6 @@ public final class SourceView extends JComponent {
             throw new BadLocationException("Not a valid line number for " + fileName, line);
         }
 
-        tab.mark();
-
         if (!tab.highlights.containsKey(line)) {
             tab.highlights.put(line, new TreeSet<>());
         }
@@ -258,6 +264,8 @@ public final class SourceView extends JComponent {
 
         Highlight highlight = new Highlight(fileName, line, color, level);
         highlights.add(highlight);
+
+        tab.mark();
 
         if (highlight.compareTo(highlights.last()) >= 0) {
             tab.removeHighlights(line);
@@ -352,8 +360,10 @@ public final class SourceView extends JComponent {
      * Adds an additional tab for the specified file.
      *
      * @param filename the name of the file to open.
+     *
+     * @throws IOException if the file cannot be opened.
      */
-    public void openFile(String filename) {
+    public void openFile(String filename) throws IOException {
         Set<String> set = new HashSet<>();
         set.add(filename);
         openFiles(set);
@@ -363,8 +373,10 @@ public final class SourceView extends JComponent {
      * Adds additional tabs for the specified files.
      *
      * @param filenames the names of the files to open.
+     *
+     * @throws IOException if one of the files cannot be opened.
      */
-    public void openFiles(Set<String> filenames) {
+    public void openFiles(Set<String> filenames) throws IOException {
         boolean updateNecessary = false;
 
         for (String filename : filenames) {
@@ -430,8 +442,10 @@ public final class SourceView extends JComponent {
 
     /**
      * Adds all files in {@link #lines}.
+     *
+     * @throws IOException if one of the files cannot be opened.
      */
-    private void addFiles() {
+    private void addFiles() throws IOException {
         for (Pair<Node, PositionInfo> p : lines) {
             PositionInfo l = p.second;
             addFile(l.getFileName());
@@ -443,16 +457,41 @@ public final class SourceView extends JComponent {
      *
      * @param filename the name of the file to add.
      * @return {@code true} if this source view did not already contain the file.
+     * @throws IOException if the file cannot be opened.
      */
-    private boolean addFile(String fileName) {
-        File file = new File(fileName);
-
-        if (file.exists() && !tabs.containsKey(fileName)) {
-            new Tab(file);
-            return true;
+    private boolean addFile(String fileName) throws IOException {
+        if (tmpReduxFiles.containsKey(fileName)) {
+            return false;
         }
 
-        return false;
+        File file = new File(fileName);
+
+        if (tabs.containsKey(fileName)) {
+            return false;
+        } else if (file.exists()) {
+            // File exists in working directory.
+            new Tab(file);
+            return true;
+        } else {
+            // File does not exist in working directory. Search for it in Java Redux instead.
+            int idx = fileName.indexOf("JavaRedux");
+
+            if (idx >= 0) {
+                InputStream stream = JavaReduxFileCollection.class.getResourceAsStream(
+                        fileName.substring(idx));
+
+                if (stream != null) {
+                    File tmpFile = File.createTempFile(file.getName(), "");
+                    Files.copy(stream, tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    tmpReduxFiles.put(fileName, tmpFile);
+
+                    new Tab(file);
+                    return true;
+                }
+            }
+        }
+
+        throw new IOException();
     }
 
     /**
@@ -494,7 +533,11 @@ public final class SourceView extends JComponent {
                 return;
             }
 
-            addFiles();
+            try {
+                addFiles();
+            } catch (IOException e) {
+                Debug.out(e);
+            }
         }
 
         tabs.values().forEach(Tab::resetHighlights);
@@ -535,7 +578,7 @@ public final class SourceView extends JComponent {
      * @param line the line to scroll to
      * @param f the file of the JTextPane
      */
-    private static void scrollNestedTextPaneToLine(Component comp, int line, File f) {
+    private void scrollNestedTextPaneToLine(Component comp, int line, File f) {
         if (comp instanceof JScrollPane) {
             JScrollPane sp = (JScrollPane)comp;
             if (sp.getComponent(0) instanceof JViewport) {
@@ -545,7 +588,10 @@ public final class SourceView extends JComponent {
                     if (panel.getComponent(0) instanceof JTextPane) {
                         JTextPane tp = (JTextPane)panel.getComponent(0);
                         try {
-                            String original = IOUtil.readFrom(f);
+                            File tmpFile = tmpReduxFiles.get(f.getAbsolutePath());
+                            String original = tmpFile == null
+                                    ? IOUtil.readFrom(f)
+                                    : IOUtil.readFrom(tmpFile);
                             String source = replaceTabs(original);  // replace all tabs by spaces
 
                             /* use input stream here to compute line information of the string with
@@ -726,10 +772,20 @@ public final class SourceView extends JComponent {
             tabs.put(getFileName(), this);
 
             try {
-                String text = IOUtil.readFrom(file);
-                if (text != null && !text.isEmpty()) {
-                    sourceHash = IOUtil.computeMD5(file);
-                    source = replaceTabs(text);
+                if (tmpReduxFiles.containsKey(file.getAbsolutePath())) {
+                    File tmpFile = tmpReduxFiles.get(file.getAbsolutePath());
+
+                    String text = IOUtil.readFrom(tmpFile);
+                    if (text != null && !text.isEmpty()) {
+                        sourceHash = IOUtil.computeMD5(tmpFile);
+                        source = replaceTabs(text);
+                    }
+                } else {
+                    String text = IOUtil.readFrom(file);
+                    if (text != null && !text.isEmpty()) {
+                        sourceHash = IOUtil.computeMD5(file);
+                        source = replaceTabs(text);
+                    }
                 }
             } catch (IOException e) {
                 Debug.out("Unknown IOException!", e);
@@ -827,25 +883,25 @@ public final class SourceView extends JComponent {
         }
 
         private void mark() {
-                if (highlights.isEmpty()) {
+            if (highlights.isEmpty()) {
+                tabPane.setForegroundAt(
+                        tabPane.indexOfComponent(this),
+                        UIManager.getColor("TabbedPane.foreground"));
+                tabPane.setBackgroundAt(
+                        tabPane.indexOfComponent(this),
+                        UIManager.getColor("TabbedPane.background"));
+            } else {
+                if (isSelected(this)) {
                     tabPane.setForegroundAt(
                             tabPane.indexOfComponent(this),
-                            UIManager.getColor("TabbedPane.foreground"));
+                            new Color(0, 200, 0));
+                } else {
                     tabPane.setBackgroundAt(
                             tabPane.indexOfComponent(this),
-                            UIManager.getColor("TabbedPane.background"));
-                } else {
-                    if (isSelected(this)) {
-                        tabPane.setForegroundAt(
-                                tabPane.indexOfComponent(this),
-                                new Color(0, 145, 0));
-                    } else {
-                        tabPane.setBackgroundAt(
-                                tabPane.indexOfComponent(this),
-                                Color.GREEN);
-                    }
+                            Color.GREEN);
                 }
             }
+        }
 
         private void initSelectionHL() {
             try {
