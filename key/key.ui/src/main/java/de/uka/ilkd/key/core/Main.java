@@ -20,6 +20,7 @@ import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -192,6 +193,8 @@ public final class Main {
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
 
     public static void main(final String[] args) {
+        Locale.setDefault(Locale.US);
+
         // this property overrides the default
         if (Boolean.getBoolean("key.verbose-ui")) {
             verbosity = Verbosity.DEBUG;

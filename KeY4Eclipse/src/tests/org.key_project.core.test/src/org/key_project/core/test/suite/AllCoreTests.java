@@ -17,7 +17,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.core.test.testcase.RefreshProofSaverListenerTest;
 
-import de.uka.ilkd.key.suite.TestKey;
 
 /**
  * Run all contained JUnit 4 test cases.
@@ -26,7 +25,7 @@ import de.uka.ilkd.key.suite.TestKey;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
    RefreshProofSaverListenerTest.class,
-   TestKey.class
+   //TestKey.class
    //RunAllProofsTest.class // This class is not listed because it takes to much time.
 })
 public class AllCoreTests {

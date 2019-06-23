@@ -1,20 +1,16 @@
 package de.uka.ilkd.key.gui.originlabels;
 
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.ext.KeYMainMenuExtension;
-import de.uka.ilkd.key.gui.ext.KeYSequentViewMenuExtension;
-import de.uka.ilkd.key.gui.ext.KeYStatusBarExtension;
-import de.uka.ilkd.key.gui.ext.KeYToolbarExtension;
-import de.uka.ilkd.key.gui.ext.KeYTooltipExtension;
+import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
@@ -25,13 +21,17 @@ import de.uka.ilkd.key.pp.PosInSequent;
  *
  * @author lanzinger
  */
+@KeYGuiExtension.Info(name = "OriginLabels UI",
+        optional = true,
+        description = "UI support for origin labels" +
+                "Developer: Florian Lanzinger <uiekn@student.kit.edu>",
+        experimental = false)
 public class OriginTermLabelsExt
-    implements
-        KeYSequentViewMenuExtension,
-        KeYMainMenuExtension,
-        KeYToolbarExtension,
-        KeYTooltipExtension,
-        KeYStatusBarExtension {
+        implements KeYGuiExtension,
+        KeYGuiExtension.ContextMenu,
+        KeYGuiExtension.Tooltip,
+        KeYGuiExtension.MainMenu,
+        KeYGuiExtension.TermInfo {
 
     /** @see ToggleTermOriginTrackingAction */
     private ToggleTermOriginTrackingAction toggleTrackingAction;
@@ -64,33 +64,20 @@ public class OriginTermLabelsExt
     }
 
     @Override
-    public List<Action> getSequentViewMenuActions(MainWindow mainWindow, PosInSequent pos) {
-        List<Action> result = new LinkedList<>();
-        result.add(new ShowOriginAction(pos));
-        return result;
+    public List<Action> getContextActions(
+            KeYMediator mediator,
+            ContextMenuKind kind,
+            Object underlyingObject) {
+        if (kind == DefaultContextMenuKind.SEQUENT_VIEW) {
+            return Collections.singletonList(new ShowOriginAction((PosInSequent) underlyingObject));
+        } else if (kind == DefaultContextMenuKind.PROOF_TREE) {
+
+        }
+        return Collections.emptyList();
     }
 
     @Override
-    public EnumSet<SequentViewMenuType> getSequentViewMenuTypes() {
-        return EnumSet.allOf(SequentViewMenuType.class);
-    }
-
-    @Override
-    public JToolBar getToolbar(MainWindow mainWindow) {
-        JToolBar tb = new JToolBar("Origin");
-        JToggleButton toggle = new JToggleButton(getToggleTrackingAction(mainWindow));
-        toggle.setHideActionText(true);
-        tb.add(toggle);
-        return tb;
-    }
-
-    @Override
-    public int getPriority() {
-        return 0;
-    }
-
-    @Override
-    public List<String> getStatusBarStrings(MainWindow mainWindow, PosInSequent pos) {
+    public List<String> getTermInfoStrings(MainWindow mainWindow, PosInSequent pos) {
         Origin origin = OriginTermLabel.getOrigin(pos);
 
         List<String> result = new LinkedList<>();

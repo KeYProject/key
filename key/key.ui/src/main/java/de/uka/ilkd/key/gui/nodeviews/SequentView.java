@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
+import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.ADDITIONAL_HIGHLIGHT_COLOR;
+import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -43,10 +46,12 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
-import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -74,20 +79,22 @@ public abstract class SequentView extends JEditorPane {
 
     public static final Color PERMANENT_HIGHLIGHT_COLOR = new Color(110, 85, 181, 76);
 
-    public static final Color DEFAULT_HIGHLIGHT_COLOR = new Color(70, 100, 170, 76);
-
-    public static final Color ADDITIONAL_HIGHLIGHT_COLOR = new Color(0, 0, 0, 38);
-
     public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
 
     protected static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
 
     protected static final Color INACTIVE_BACKGROUND_COLOR
             = new Color(UIManager.getColor("Panel.background").getRGB());
-    // rgb components of heatmap color
-    private static final Color HEATMAP_COLOR = new Color(252, 202, 80);
+
+    //
+    private static final ColorSettings.ColorProperty HEATMAP_COLOR =
+            ColorSettings.define("[Heatmap]basecolor",
+                    "Base color of the heatmap. Other colors are derived from this one.",
+                    new Color(252, 202, 80));
+
     //maximum opacity of heatmap color
     private static final float HEATMAP_DEFAULT_START_OPACITY = .7f;
+    public static final String PROP_LAST_MOUSE_POSITION = "lastMousePosition";
 
     private final MainWindow mainWindow;
 
@@ -165,9 +172,9 @@ public abstract class SequentView extends JEditorPane {
 
         // sets the painter for the highlightning
         setHighlighter(new DefaultHighlighter());
-        additionalJavaHighlight = getColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR);
-        defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR);
-        dndHighlight = getColorHighlight(CurrentGoalView.DND_HIGHLIGHT_COLOR);
+        additionalJavaHighlight = getColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR.get());
+        defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR.get());
+        dndHighlight = getColorHighlight(CurrentGoalView.DND_HIGHLIGHT_COLOR.get());
         currentHighlight = defaultHighlight;
 
         // add a SeqViewChangeListener to this component
@@ -180,6 +187,9 @@ public abstract class SequentView extends JEditorPane {
 
         // Register tooltip
         setToolTipText("");
+
+        KeYGuiExtensionFacade.installKeyboardShortcuts(getMainWindow().getMediator(),
+                this, KeYGuiExtension.KeyboardShortcuts.SEQUENT_VIEW);
     }
 
     public final void setFont() {
@@ -586,7 +596,13 @@ public abstract class SequentView extends JEditorPane {
     public void highlight(Point p) {
         setCurrentHighlight(defaultHighlight);
         paintHighlights(p);
-        lastMousePosition = p;
+        setLastMousePosition(p);
+    }
+
+    private void setLastMousePosition(Point p) {
+        Point old = this.lastMousePosition;
+        lastMousePosition=p;
+        firePropertyChange(PROP_LAST_MOUSE_POSITION, old, p);
     }
 
     @Override
@@ -791,7 +807,7 @@ public abstract class SequentView extends JEditorPane {
      * @return the color, with interpolated opacity
      */
     private Color computeColorForAge(int max_age, int age) {
-        float[] color = HEATMAP_COLOR.getRGBColorComponents(null);
+        float[] color = HEATMAP_COLOR.get().getRGBColorComponents(null);
         float alpha = HEATMAP_DEFAULT_START_OPACITY *(1- (float) age/max_age);
 
         return new Color(color[0], color[1], color[2], alpha);

@@ -2,14 +2,15 @@ package de.uka.ilkd.key.gui.originlabels;
 
 import java.awt.event.ActionEvent;
 
+import javax.swing.Action;
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.actions.QuickLoadAction;
 import de.uka.ilkd.key.gui.actions.QuickSaveAction;
-import de.uka.ilkd.key.gui.ext.KeYExtConst;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.proof.Goal;
@@ -31,15 +32,19 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
      */
     public ToggleTermOriginTrackingAction(MainWindow mainWindow) {
         super(mainWindow);
-        setIcon(IconFactory.originIcon());
+
+        setName("Toggle Term Origin Tracking");
+        setTooltip("Track where in the JML specification a every term in the sequent originates.");
+        setIcon(IconFactory.ORIGIN_LABELS.get(MainWindow.TOOLBAR_ICON_SIZE));
+
         setEnabled(true);
         setSelected(ProofIndependentSettings.DEFAULT_INSTANCE
                 .getTermLabelSettings().getUseOriginLabels());
 
-        putValue(KeYExtConst.PATH, "Origin Tracking");
-        setName("Toggle Origin Tracking");
-        setTooltip("Track where in the JML specification a every term in the sequent originates.");
-        putValue(KeYExtConst.CHECKMARK, true);
+        setMenuPath("View");
+        putValue(Action.LONG_DESCRIPTION, "Toggle Term Origin Tracking");
+        putValue(KeyAction.CHECKBOX, true);
+        lookupAcceleratorKey();
     }
 
     private void handleAction() {

@@ -134,7 +134,7 @@ public class InfoTreeModel extends DefaultTreeModel {
 
             if (goal != null && goal.proof() != null && goal.proof().mgt() != null) {
                 for (final BuiltInRule br : goal.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex().rules()) {
-                    insertAsLast(new InfoTreeNode(br.displayName(), ruleExplanations), builtInRoot);
+                    insertAsLast(new InfoTreeNode(br, ruleExplanations), builtInRoot);
                 }
                 Set<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
                 OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(goal.proof());

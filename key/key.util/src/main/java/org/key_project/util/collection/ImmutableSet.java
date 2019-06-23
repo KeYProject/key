@@ -13,6 +13,8 @@
 
 package org.key_project.util.collection;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -58,6 +60,14 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
         }
 
         return result;
+    }
+
+    /**
+     * Builds a single set with the given obj.
+     */
+    static <T>  @NotNull ImmutableSet<T> singleton(T obj) {
+        ImmutableSet<T> result = DefaultImmutableSet.nil();
+        return result.add(obj);
     }
 
     /**

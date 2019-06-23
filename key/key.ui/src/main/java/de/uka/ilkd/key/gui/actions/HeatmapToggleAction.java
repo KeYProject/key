@@ -3,9 +3,7 @@ package de.uka.ilkd.key.gui.actions;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.ext.KeYExtConst;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
@@ -17,14 +15,13 @@ import java.awt.event.ActionEvent;
 public class HeatmapToggleAction extends MainWindowAction {
     private static final long serialVersionUID = 1L;
 
-    public static final Icon ICON_SELECTED = IconFontSwing.buildIcon(FontAwesomeBold.FIRE_EXTINGUISHER, MainWindow.TOOLBAR_ICON_SIZE);
-    public static final Icon ICON_NOT_SELECTED = IconFontSwing.buildIcon(FontAwesomeBold.FIRE, MainWindow.TOOLBAR_ICON_SIZE);
+    public static final Icon ICON_SELECTED = IconFactory.HEATMAP_DEACTIVATE.get();
+    public static final Icon ICON_NOT_SELECTED = IconFactory.HEATMAP_ACTIVATE.get();
 
     public HeatmapToggleAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName("Toggle Heatmaps");
-        setTooltip("Heatmap options");
-        putValue(KeYExtConst.PATH, "Heatmaps");
+        setName("Toggle heatmap");
+        setMenuPath("View.Heatmap");
         setEnabled(getMediator().getSelectedProof() != null);
         putValue(Action.LONG_DESCRIPTION, "Enable or disable age heatmaps in the sequent view.");
 

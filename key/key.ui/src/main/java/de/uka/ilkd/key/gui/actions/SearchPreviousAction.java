@@ -13,11 +13,10 @@
 
 package de.uka.ilkd.key.gui.actions;
 
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import java.awt.event.ActionEvent;
 
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
-import de.uka.ilkd.key.gui.MainWindow;
 
 /*
  * Menu option for showing the next search result
@@ -30,9 +29,7 @@ public class SearchPreviousAction extends MainWindowAction {
     public SearchPreviousAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Find previous occurence");
-        setIcon(
-            IconFontSwing.buildIcon(FontAwesomeBold.ARROW_RIGHT, 16)
-        );
+        setIcon(IconFactory.SEARCH_PREV.get(16));
         setTooltip("Find the previous occurence of current search term in sequent.");
         getMediator().enableWhenProofLoaded(this);
     }

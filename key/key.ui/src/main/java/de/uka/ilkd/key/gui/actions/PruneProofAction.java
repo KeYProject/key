@@ -18,7 +18,7 @@ import java.awt.event.ActionEvent;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -53,6 +53,7 @@ public final class PruneProofAction extends MainWindowAction {
         putValue(NAME, "Prune Proof");
         putValue(SMALL_ICON, IconFactory.pruneLogo(MainWindow.TOOLBAR_ICON_SIZE));
         putValue(SHORT_DESCRIPTION, "Prune the tree below the selected node.");
+        lookupAcceleratorKey();
     }
 
     /**

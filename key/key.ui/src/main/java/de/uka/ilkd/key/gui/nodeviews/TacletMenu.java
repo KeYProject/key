@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -39,6 +40,8 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
+import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
@@ -75,6 +78,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
@@ -98,13 +102,10 @@ public final class TacletMenu extends SequentViewMenu<CurrentGoalView> {
     private static final String APPLY_RULE = "Apply Rule";
     private static final String NO_RULES_APPLICABLE = "No rules applicable.";
 
-    private static final Set<String> CLUTTER_RULESETS =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getClutterRuleSets();
+    private Set<String> clutterRuleSets;
+    private Set<String> clutterRules;
 
-    private static final Set<String> CLUTTER_RULES =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getClutterRules();
-
-    public static final int RULES_PER_MENU = 15; //reduce for debugging.
+    public static final int TOO_MANY_TACLETS_THRESHOLD = 15; //reduce for debugging.
 
     private KeYMediator mediator;
     private TacletAppComparator comp = new TacletAppComparator();
@@ -113,6 +114,13 @@ public final class TacletMenu extends SequentViewMenu<CurrentGoalView> {
      * Creates an empty menu.
      */
     TacletMenu() {
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        clutterRuleSets = vs.getClutterRuleSets();
+        clutterRules = vs.getClutterRules();
+        vs.addSettingsListener(e -> {
+            clutterRuleSets = vs.getClutterRuleSets();
+            clutterRules = vs.getClutterRules();
+        });
     }
 
     /**
@@ -192,7 +200,13 @@ public final class TacletMenu extends SequentViewMenu<CurrentGoalView> {
         addSeparator();
         addExtensionMenu();
 
-        addSeparator();
+        List<Action> extensionMenu = KeYGuiExtensionFacade.getContextMenuItems(
+                DefaultContextMenuKind.SEQUENT_VIEW, getPos(), mediator);
+        if(!extensionMenu.isEmpty()) {
+            addSeparator();
+            extensionMenu.forEach(this::add);
+        }
+
         addClipboardItem(control);
 
         if (getPos() != null) {
@@ -415,7 +429,7 @@ public final class TacletMenu extends SequentViewMenu<CurrentGoalView> {
             }
             if (!mediator.getFilterForInteractiveProving().filter(taclet)) {
                 continue;
-            }
+        }
 
             if (isRareRule(taclet)) {
                 rareTaclets.add(app);
@@ -423,19 +437,19 @@ public final class TacletMenu extends SequentViewMenu<CurrentGoalView> {
                 normalTaclets.add(app);
             }
         }
-        int remainingTacletSize = normalTaclets.size();
         normalTaclets.addAll(rareTaclets);
 
+        int currentSize = 0;
         JMenu target = this;
         for (TacletApp app : normalTaclets) {
-            if(remainingTacletSize == 0){
+            target.add(createMenuItem(app, control));
+            ++currentSize;
+            if(currentSize>= TOO_MANY_TACLETS_THRESHOLD){
                 JMenu newTarget = new JMenu(MORE_RULES);
                 target.add(newTarget);
                 target = newTarget;
-                remainingTacletSize = RULES_PER_MENU;
+                currentSize = 0;
             }
-            target.add(createMenuItem(app, control));
-            remainingTacletSize --;
         }
 
         //add globally
@@ -464,11 +478,11 @@ public final class TacletMenu extends SequentViewMenu<CurrentGoalView> {
                 item.addActionListener(control);
                 boolean rareRule = false;
                 for (RuleSet rs : taclet.getRuleSets()) {
-                    if (CLUTTER_RULESETS.contains(rs.name())) {
+                    if (clutterRuleSets.contains(rs.name())) {
                         rareRule = true;
                     }
                 }
-                if (CLUTTER_RULES.contains(taclet.name())) {
+                if (clutterRules.contains(taclet.name())) {
                     rareRule = true;
                 }
 
@@ -484,14 +498,13 @@ public final class TacletMenu extends SequentViewMenu<CurrentGoalView> {
         /*if (more.getItemCount() > 0) {
             add(more);
         }*/
-    }
-
+        }
     private boolean isRareRule(Taclet taclet) {
-        if (CLUTTER_RULES.contains(taclet.name().toString())) {
+        if( clutterRules.contains(taclet.name().toString())) {
             return true;
         }
         return taclet.getRuleSets().stream()
-                .anyMatch(it -> CLUTTER_RULESETS.contains(it.name().toString()));
+                .anyMatch(it -> clutterRuleSets.contains(it.name().toString()));
     }
 
     private Component createMenuItem(TacletApp app, MenuControl control) {

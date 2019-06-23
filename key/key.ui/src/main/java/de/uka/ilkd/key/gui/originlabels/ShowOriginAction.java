@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.ext.KeYExtConst;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -37,7 +36,8 @@ public class ShowOriginAction extends MainWindowAction {
         setName("Show origin");
         setEnabled(settings.getUseOriginLabels());
         settings.addSettingsListener(event -> setEnabled(settings.getUseOriginLabels()));
-        putValue(KeYExtConst.PATH, ".");
+        setMenuPath("View");
+        lookupAcceleratorKey();
     }
 
     @Override

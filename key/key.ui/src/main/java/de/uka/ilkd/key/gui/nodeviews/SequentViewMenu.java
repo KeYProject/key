@@ -1,17 +1,17 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.EnumSet;
+import java.util.List;
 
+import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
-import de.uka.ilkd.key.gui.ext.KeYSequentViewMenuExtension;
-import de.uka.ilkd.key.gui.ext.KeYSequentViewMenuExtension.SequentViewMenuType;
+import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.NameCreationInfo;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -83,14 +83,13 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
      *  de.uka.ilkd.key.gui.MainWindow, PosInSequent, EnumSet)
      */
     protected void addExtensionMenu() {
-        JMenu extensionMenu =
-                KeYGuiExtensionFacade.createSequentViewMenu(
-                        getSequentView().getMainWindow(),
-                        getPos(),
-                        EnumSet.of(SequentViewMenuType.of(getClass())));
+        List<Action> actions = KeYGuiExtensionFacade.getContextMenuItems(
+                DefaultContextMenuKind.SEQUENT_VIEW,
+                getPos(),
+                getSequentView().getMainWindow().getMediator());
 
-        for (Component el : extensionMenu.getMenuComponents()) {
-            add(el);
+        for (Action action : actions) {
+            add(action);
         }
     }
 

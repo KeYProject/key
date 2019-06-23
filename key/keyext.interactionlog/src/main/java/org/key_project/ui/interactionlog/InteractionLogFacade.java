@@ -1,5 +1,6 @@
 package org.key_project.ui.interactionlog;
 
+import org.key_project.ui.interactionlog.api.Interaction;
 import org.key_project.ui.interactionlog.model.*;
 import org.key_project.ui.interactionlog.model.builtin.*;
 

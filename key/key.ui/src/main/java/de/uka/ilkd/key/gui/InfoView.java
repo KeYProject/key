@@ -16,13 +16,16 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.KeYSelectionModel;
-import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.ThreadUtilities;
 import de.uka.ilkd.key.util.XMLResources;
 
@@ -31,19 +34,21 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * Class for info contents displayed in {@link MainWindow}.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class InfoView extends JSplitPane implements KeYPaneExtension {
+public class InfoView extends JSplitPane implements TabPanel {
 
     /**
      *
      */
     private static final long serialVersionUID = -6944612837850368411L;
-    public static final Icon INFO_ICON = IconFontSwing.buildIcon(FontAwesomeBold.INFO_CIRCLE, MainWindowTabbedPane.TAB_ICON_SIZE);
+    public static final Icon INFO_ICON = IconFactory.INFO_VIEW.get(MainWindowTabbedPane.TAB_ICON_SIZE);
 
 
     private final InfoTree infoTree;
@@ -118,13 +123,45 @@ public class InfoView extends JSplitPane implements KeYPaneExtension {
             }
         };
 
+        infoTree.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                checkPopup(e);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                checkPopup(e);
+            }
+
+            private void checkPopup(MouseEvent e) {
+                if(e.isPopupTrigger()) {
+                    Rule selected = infoTree.getLastSelectedPathComponent().getRule();
+                    JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
+                            DefaultContextMenuKind.TACLET_INFO, selected,
+                            mediator);
+                    if(menu.getComponentCount()>0) {
+                        menu.show(InfoView.this, e.getX(), e.getY());
+                    }
+                }
+            }
+        });
+
 
         contentPane = new InfoViewContentPane();
 
         setLeftComponent(new JScrollPane(infoTree));
         setRightComponent(contentPane);
 
+        KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this, KeYGuiExtension.KeyboardShortcuts.INFO_VIEW);
     }
+
+    public InfoView(MainWindow window, KeYMediator mediator) {
+        this();
+        setMainWindow(window);
+        setMediator(mediator);
+    }
+
+
 
     public void setMediator(KeYMediator m) {
         assert m != null;
@@ -134,15 +171,8 @@ public class InfoView extends JSplitPane implements KeYPaneExtension {
         mediator = m;
     }
 
-
     public void setMainWindow(MainWindow w) {
         mainWindow = w;
-    }
-
-    @Override
-    public void init(MainWindow window, KeYMediator mediator) {
-        setMainWindow(window);
-        setMediator(mediator);
     }
 
     @Override
@@ -208,10 +238,4 @@ public class InfoView extends JSplitPane implements KeYPaneExtension {
         }
 
     }
-
-    @Override
-    public int priority() {
-        return 1000;
-    }
-
 }

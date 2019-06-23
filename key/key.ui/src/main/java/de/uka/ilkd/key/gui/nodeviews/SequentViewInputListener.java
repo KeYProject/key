@@ -32,7 +32,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.sourceview.SourceView.Highlight;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -294,7 +294,7 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
 
                     StringJoiner extensionStr = new StringJoiner(", ", ", ", "");
                     extensionStr.setEmptyValue("");
-                    KeYGuiExtensionFacade.getStatusBarStrings(sequentView.getMainWindow(), mousePos)
+                    KeYGuiExtensionFacade.getTermInfoStrings(sequentView.getMainWindow(), mousePos)
                         .forEach(extensionStr::add);
                     info += extensionStr;
                 }

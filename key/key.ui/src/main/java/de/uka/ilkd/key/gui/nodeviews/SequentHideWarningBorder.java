@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -23,7 +25,10 @@ import javax.swing.border.TitledBorder;
 public class SequentHideWarningBorder extends TitledBorder {
 
     /** The constant color is used as background for the window. */
-    private static final Color ALERT_COLOR = new Color(255, 178, 178);
+    private static final ColorSettings.ColorProperty ALERT_COLOR =
+            ColorSettings.define("[sequentHideWarningBorder]alert",
+                    "",
+                    new Color(255, 178, 178));
 
     /** The constant is used to write the warning. */
     private static final Font FONT = new Font("sans-serif", Font.PLAIN, 12);
@@ -63,9 +68,9 @@ public class SequentHideWarningBorder extends TitledBorder {
             return;
         }
 
-        Map<?, ?> desktopHints = 
+        Map<?, ?> desktopHints =
                 (Map<?, ?>) Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");
-        
+
         Graphics2D g2d = (Graphics2D) g;
         if (desktopHints != null) {
             g2d.setRenderingHints(desktopHints);
@@ -75,7 +80,7 @@ public class SequentHideWarningBorder extends TitledBorder {
         int strWidth = SwingUtilities.computeStringWidth(g2d.getFontMetrics(), WARNING);
 
         int lx = (width-strWidth)/2;
-        g2d.setColor(ALERT_COLOR);
+        g2d.setColor(ALERT_COLOR.get());
         g2d.fillRect(lx, 0, strWidth + 2*DELTAX, borderHeight);
         g2d.setColor(Color.BLACK);
         g2d.drawString(WARNING, lx + DELTAX, borderHeight / 2 + 5);

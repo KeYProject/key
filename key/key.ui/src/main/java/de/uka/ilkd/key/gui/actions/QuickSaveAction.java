@@ -48,7 +48,6 @@ public final class QuickSaveAction extends MainWindowAction {
         super(mainWindow);
         setName("Quicksave");
         setTooltip("Save current proof to a temporal location.");
-
         mainWindow.getMediator().enableWhenProofLoaded(this);
     }
 

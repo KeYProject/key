@@ -51,9 +51,12 @@ import org.key_project.util.java.IOUtil.LineInformation;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.java.JavaReduxFileCollection;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
@@ -116,12 +119,17 @@ public final class SourceView extends JComponent {
     /**
      * The color of normal highlights in source code (light green).
      */
-    private static final Color NORMAL_HIGHLIGHT_COLOR = new Color(150, 255, 150);
+    private static final ColorSettings.ColorProperty NORMAL_HIGHLIGHT_COLOR =
+            ColorSettings.define("[SourceView]normalHighlight",
+            "Color for Highlighting things in source view", new Color(150, 255, 150));
 
     /**
      * The color of the most recent highlight in source code (green).
      */
-    private static final Color MOST_RECENT_HIGHLIGHT_COLOR = Color.GREEN;
+    private static final ColorSettings.ColorProperty MOST_RECENT_HIGHLIGHT_COLOR =
+            ColorSettings.define("[SourceView]mostRecentHighlight",
+                    "Second color for highlightning",
+                    Color.GREEN);
 
     /**
      * The main window of KeY (needed to get the mediator).
@@ -227,6 +235,10 @@ public final class SourceView extends JComponent {
                 updateGUI();
             }
         });
+
+        KeYGuiExtensionFacade.installKeyboardShortcuts(null,
+                this, KeYGuiExtension.KeyboardShortcuts.SOURCE_VIEW);
+
     }
 
     /**
@@ -928,7 +940,7 @@ public final class SourceView extends JComponent {
                 selectionHL = addHighlight(
                         getFileName(),
                         1,
-                        CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR,
+                        CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR.get(),
                         Integer.MAX_VALUE - 1);
             } catch (BadLocationException | IOException e) {
                 Debug.out(e);
@@ -1010,13 +1022,13 @@ public final class SourceView extends JComponent {
                             symbExHighlights.add(addHighlight(
                                     getFileName(),
                                     l.second.getStartPosition().getLine() - 1,
-                                    MOST_RECENT_HIGHLIGHT_COLOR,
+                                    MOST_RECENT_HIGHLIGHT_COLOR.get(),
                                     0));
                         } else {
                             symbExHighlights.add(addHighlight(
                                     getFileName(),
                                     l.second.getStartPosition().getLine() - 1,
-                                    NORMAL_HIGHLIGHT_COLOR,
+                                    NORMAL_HIGHLIGHT_COLOR.get(),
                                     0));
                         }
                     }
