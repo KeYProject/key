@@ -28,7 +28,7 @@ public class ToggleOriginHighlightAction extends MainWindowAction {
         setSelected(ProofIndependentSettings.DEFAULT_INSTANCE
                 .getViewSettings().isHighlightOrigin());
 
-        putValue(KeyAction.PATH, "Origin Tracking");
+        setMenuPath("Origin Tracking");
         setName("Highlight Origins");
         setTooltip("When moving the mouse over a term in the sequent view,"
                 + "highlight its origin in the source view.");

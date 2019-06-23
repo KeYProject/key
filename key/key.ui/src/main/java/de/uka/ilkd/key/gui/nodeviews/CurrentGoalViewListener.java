@@ -50,13 +50,13 @@ final class CurrentGoalViewListener
 
     private final KeYMediator mediator;
 
-    private TacletMenu menu;
+    private CurrentGoalViewMenu menu;
     private boolean modalDragNDropEnabled;
 
     CurrentGoalViewListener(final CurrentGoalView currentGoalView, final KeYMediator mediator) {
         super(currentGoalView);
         this.mediator = mediator;
-        menu = new TacletMenu();
+        menu = new CurrentGoalViewMenu();
         setModalDragNDropEnabled(false);
     }
 
@@ -93,7 +93,7 @@ final class CurrentGoalViewListener
                                 = mediator.getUI().getProofControl().getBuiltInRule
                          (mediator.getSelectedGoal(), mousePos.getPosInOccurrence());
 
-                        menu = new TacletMenu(getSequentView(),
+                        menu = new CurrentGoalViewMenu(getSequentView(),
                                 mediator.getUI().getProofControl().getFindTaclet(
                                         mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
                                 mediator.getUI().getProofControl().getRewriteTaclet(

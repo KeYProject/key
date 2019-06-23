@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -40,8 +39,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
-import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
-import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
@@ -89,7 +86,7 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
  *
  * Shows all {@link Taclet}s that are applicable at a selected position.
  */
-public final class TacletMenu extends SequentViewMenu<CurrentGoalView> {
+public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> {
 
     private static final String CREATE_ABBREVIATION = "Create abbreviation";
     private static final String ENABLE_ABBREVIATION = "Enable abbreviation";
@@ -113,14 +110,8 @@ public final class TacletMenu extends SequentViewMenu<CurrentGoalView> {
     /**
      * Creates an empty menu.
      */
-    TacletMenu() {
-        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
-        clutterRuleSets = vs.getClutterRuleSets();
-        clutterRules = vs.getClutterRules();
-        vs.addSettingsListener(e -> {
-            clutterRuleSets = vs.getClutterRuleSets();
-            clutterRules = vs.getClutterRules();
-        });
+    CurrentGoalViewMenu() {
+        initClutterRules();
     }
 
     /**
@@ -134,11 +125,13 @@ public final class TacletMenu extends SequentViewMenu<CurrentGoalView> {
      * @param builtInList with all applicable BuiltInRules
      * @param pos         the PosInSequent
      */
-    TacletMenu(CurrentGoalView sequentView, ImmutableList<TacletApp> findList,
+    CurrentGoalViewMenu(CurrentGoalView sequentView, ImmutableList<TacletApp> findList,
             ImmutableList<TacletApp> rewriteList, ImmutableList<TacletApp> noFindList,
             ImmutableList<BuiltInRule> builtInList, PosInSequent pos) {
         super(sequentView, pos);
         this.mediator = sequentView.getMediator();
+
+        initClutterRules();
 
         // delete RewriteTaclet from findList because they will be in
         // the rewrite list and concatenate both lists
@@ -162,6 +155,16 @@ public final class TacletMenu extends SequentViewMenu<CurrentGoalView> {
             result = (taclet instanceof RewriteTaclet ? result : result.prepend(tacletApp));
         }
         return result;
+    }
+
+    private void initClutterRules() {
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        clutterRuleSets = vs.getClutterRuleSets();
+        clutterRules = vs.getClutterRules();
+        vs.addSettingsListener(e -> {
+            clutterRuleSets = vs.getClutterRuleSets();
+            clutterRules = vs.getClutterRules();
+        });
     }
 
     /**
@@ -200,13 +203,7 @@ public final class TacletMenu extends SequentViewMenu<CurrentGoalView> {
         addSeparator();
         addExtensionMenu();
 
-        List<Action> extensionMenu = KeYGuiExtensionFacade.getContextMenuItems(
-                DefaultContextMenuKind.SEQUENT_VIEW, getPos(), mediator);
-        if(!extensionMenu.isEmpty()) {
-            addSeparator();
-            extensionMenu.forEach(this::add);
-        }
-
+        addSeparator();
         addClipboardItem(control);
 
         if (getPos() != null) {

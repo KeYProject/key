@@ -128,7 +128,7 @@ public final class KeYGuiExtensionFacade {
         Iterator<String> mpath = getMenuPath(act);
         JMenu a = findMenu(menu, mpath);
 
-        if (Boolean.TRUE.equals(act.getValue("key_checkbox"))) {
+        if (Boolean.TRUE.equals(act.getValue(KeyAction.CHECKBOX))) {
             a.add(new JCheckBoxMenuItem(act));
         } else {
             a.add(act);
@@ -138,7 +138,12 @@ public final class KeYGuiExtensionFacade {
     private static void sortActionIntoMenu(Action act, JMenuBar menuBar, JMenu defaultMenu) {
         Iterator<String> mpath = getMenuPath(act);
         JMenu a = findMenu(menuBar, mpath, defaultMenu);
-        a.add(act);
+
+        if (Boolean.TRUE.equals(act.getValue(KeyAction.CHECKBOX))) {
+            a.add(new JCheckBoxMenuItem(act));
+        } else {
+            a.add(act);
+        }
     }
 
     private static JMenu findMenu(JMenuBar menuBar, Iterator<String> mpath, JMenu defaultMenu) {

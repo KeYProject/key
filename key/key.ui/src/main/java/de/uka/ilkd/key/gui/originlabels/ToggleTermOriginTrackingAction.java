@@ -41,7 +41,7 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
         setSelected(ProofIndependentSettings.DEFAULT_INSTANCE
                 .getTermLabelSettings().getUseOriginLabels());
 
-        setMenuPath("View");
+        setMenuPath("Origin Tracking");
         putValue(Action.LONG_DESCRIPTION, "Toggle Term Origin Tracking");
         putValue(KeyAction.CHECKBOX, true);
         lookupAcceleratorKey();
