@@ -89,10 +89,6 @@ public class NodeInfo {
 
     public NodeInfo(Node node) {
         this.node = node;
-
-        if (node.parent != null) {
-            relevantFiles.addAll(node.parent.getNodeInfo().relevantFiles);
-        }
     }
 
     static {
