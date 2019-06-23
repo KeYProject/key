@@ -6,7 +6,7 @@ import java.util.List;
 import javax.swing.Action;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.nodeviews.CurrentGoalViewMenu;
+import de.uka.ilkd.key.gui.nodeviews.TacletMenu;
 import de.uka.ilkd.key.gui.nodeviews.InnerNodeViewMenu;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewMenu;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -36,7 +36,7 @@ public interface KeYSequentViewMenuExtension {
     public enum SequentViewMenuType {
 
         /** @see CurrentGoalViewMenu */
-        CURRENT_GOAL_VIEW(CurrentGoalViewMenu.class),
+        CURRENT_GOAL_VIEW(TacletMenu.class),
 
         /** @see InnerNodeViewMenu */
         INNER_NODE_VIEW(InnerNodeViewMenu.class);
@@ -59,7 +59,7 @@ public interface KeYSequentViewMenuExtension {
          * @return the corresponding instance.
          */
         public static SequentViewMenuType of(Class<? extends SequentViewMenu> clazz) {
-            if (clazz.equals(CurrentGoalViewMenu.class)) {
+            if (clazz.equals(TacletMenu.class)) {
                 return CURRENT_GOAL_VIEW;
             } else if (clazz.equals(InnerNodeViewMenu.class)) {
                 return INNER_NODE_VIEW;

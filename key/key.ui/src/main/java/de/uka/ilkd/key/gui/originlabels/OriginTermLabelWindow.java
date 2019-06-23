@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui.ext.exploration;
+package de.uka.ilkd.key.gui.originlabels;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

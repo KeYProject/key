@@ -85,7 +85,7 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
  *
  * Shows all {@link Taclet}s that are applicable at a selected position.
  */
-public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> {
+public final class TacletMenu extends SequentViewMenu<CurrentGoalView> {
 
     private static final String CREATE_ABBREVIATION = "Create abbreviation";
     private static final String ENABLE_ABBREVIATION = "Enable abbreviation";
@@ -112,7 +112,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     /**
      * Creates an empty menu.
      */
-    CurrentGoalViewMenu() {
+    TacletMenu() {
     }
 
     /**
@@ -126,7 +126,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * @param builtInList with all applicable BuiltInRules
      * @param pos         the PosInSequent
      */
-    CurrentGoalViewMenu(CurrentGoalView sequentView, ImmutableList<TacletApp> findList,
+    TacletMenu(CurrentGoalView sequentView, ImmutableList<TacletApp> findList,
             ImmutableList<TacletApp> rewriteList, ImmutableList<TacletApp> noFindList,
             ImmutableList<BuiltInRule> builtInList, PosInSequent pos) {
         super(sequentView, pos);
