@@ -23,7 +23,7 @@ public class ToggleOriginHighlightAction extends MainWindowAction {
      */
     public ToggleOriginHighlightAction(MainWindow mainWindow) {
         super(mainWindow);
-        setIcon(IconFactory.heatmapIcon(16));
+        setIcon(IconFactory.originHighlightIcon());
         setEnabled(true);
         setSelected(ProofIndependentSettings.DEFAULT_INSTANCE
                 .getViewSettings().isHighlightOrigin());

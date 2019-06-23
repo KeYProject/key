@@ -109,6 +109,10 @@ public class IconFactory {
 
     private static Image heatmapImage = getImage("images/toolbar/heatmap.png");
 
+    private static final Icon ORIGIN_HIGHLIGHT_ICON =
+            IconFontSwing.buildIcon(
+                    FontAwesomeBold.HIGHLIGHTER, MainWindowTabbedPane.TAB_ICON_SIZE);
+
     private static final Icon ORIGIN_ICON =
             IconFontSwing.buildIcon(FontAwesomeBold.ROUTE, MainWindowTabbedPane.TAB_ICON_SIZE);
 
@@ -384,6 +388,10 @@ public class IconFactory {
 
     public static Icon windowIcon() {
         return WINDOW_ICON;
+    }
+
+    public static Icon originHighlightIcon() {
+        return ORIGIN_HIGHLIGHT_ICON;
     }
 
     public static Icon originIcon() {
