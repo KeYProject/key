@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.ext.exploration;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
 
 import javax.swing.JOptionPane;
 
@@ -74,9 +73,9 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
 
         if (!settings.getUseOriginLabels()) {
             Object[] options = {
-                    "Reload",
-                    "Continue without reloading",
-                    "Cancel"
+                "Reload",
+                "Continue without reloading",
+                "Cancel"
             };
 
             int selection = JOptionPane.showOptionDialog(
@@ -102,8 +101,8 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
             }
         } else {
             Object[] options = {
-                    "Remove",
-                    "Cancel"
+                "Remove",
+                "Cancel"
             };
 
             int selection = JOptionPane.showOptionDialog(

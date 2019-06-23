@@ -17,19 +17,19 @@ public interface KeYTooltipExtension {
 
 
     /**
-    *
-    * @param mainWindow the main window.
-    * @param pos the position of the term whose info shall be shown.
-    * @return this extension's term information.
-    */
-   List<String> getTooltipStrings(MainWindow mainWindow, PosInSequent pos);
+     *
+     * @param mainWindow the main window.
+     * @param pos the position of the term whose info shall be shown.
+     * @return this extension's term information.
+     */
+    List<String> getTooltipStrings(MainWindow mainWindow, PosInSequent pos);
 
-   /**
-    * This extension's priority. Used for sorting.
-    *
-    * @return this extension's priority.
-    */
-   default int getPriority() {
-       return 0;
-   }
+    /**
+     * This extension's priority. Used for sorting.
+     *
+     * @return this extension's priority.
+     */
+    default int getPriority() {
+        return 0;
+    }
 }

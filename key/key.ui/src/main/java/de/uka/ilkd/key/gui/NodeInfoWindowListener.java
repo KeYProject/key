@@ -8,6 +8,17 @@ package de.uka.ilkd.key.gui;
  */
 public interface NodeInfoWindowListener {
 
+    /**
+     * Called when a new winder has been registered.
+     *
+     * @param win the registered window.
+     */
     void windowRegistered(NodeInfoWindow win);
+
+    /**
+     * Called when a window has been unregistered.
+     *
+     * @param win the unregistered window.
+     */
     void windowUnregistered(NodeInfoWindow win);
 }

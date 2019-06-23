@@ -158,7 +158,8 @@ public final class SourceView extends JComponent {
      */
     private Map<String, File> tmpReduxFiles = new HashMap<>();
 
-    Set<Highlight> symbExHighlights = new HashSet<>();
+    /** The symbolic execution highlights. */
+    private Set<Highlight> symbExHighlights = new HashSet<>();
 
     /**
      * Creates a new JComponent with the given MainWindow and adds change listeners.
@@ -728,7 +729,7 @@ public final class SourceView extends JComponent {
      * @author lanzinger
      * @see #tabPane
      */
-    private static class TabbedPane extends JTabbedPane {
+    private final static class TabbedPane extends JTabbedPane {
 
         public Tab getSelectedTab() {
             return (Tab) getSelectedComponent();
@@ -741,7 +742,7 @@ public final class SourceView extends JComponent {
      * @author lanzinger
      *
      */
-    private class Tab extends JScrollPane {
+    private final class Tab extends JScrollPane {
 
         /**
          * The file this tab belongs to.
@@ -753,6 +754,9 @@ public final class SourceView extends JComponent {
          */
         private final JTextPane textPane = new JTextPane();
 
+        /**
+         * The line information for the file this tab belongs to.
+         */
         private LineInformation[] lineInformation;
 
         /**
@@ -807,25 +811,46 @@ public final class SourceView extends JComponent {
                 Debug.out("Unknown IOException!", e);
             }
 
-            // We use the same font as in SequentView for consistency.
-            textPane.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
-            textPane.setToolTipText(TEXTPANE_TOOLTIP);
-            textPane.setEditable(false);
+            initLineInfo();
 
-            // compare stored hash with a newly created
-            //String origHash = hashes.get(entry.getKey());
-            //String curHash = IOUtil.computeMD5(entry.getValue());
-            //if (!origHash.equals(curHash)) {
-            // TODO: consistency problem, see comment in line 128
-            //}
+            initTextPane();
 
-            // set lineInformation
+            JPanel nowrap = new JPanel(new BorderLayout());
+            nowrap.add(textPane);
+            setViewportView(nowrap);
+            setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+            // increase unit increment (for faster scrolling)
+            getVerticalScrollBar().setUnitIncrement(30);
+            getHorizontalScrollBar().setUnitIncrement(30);
+
+            //add Line numbers to each Scrollview
+            TextLineNumber tln = new TextLineNumber(textPane, 1);
+            setRowHeaderView(tln);
+
+            // Add tab to tab pane.
+            tabPane.addTab(file.getName(), this);
+            int index = tabPane.indexOfComponent(this);
+            tabPane.setToolTipTextAt(index, file.getAbsolutePath());
+
+            resetHighlights();
+        }
+
+        private void initLineInfo() {
             try {
                 InputStream inStream = new ByteArrayInputStream(source.getBytes());
                 lineInformation = IOUtil.computeLineInformation(inStream);
             } catch (IOException e) {
                 Debug.out("Error while computing line information from " + file, e);
             }
+        }
+
+        private void initTextPane() {
+            // We use the same font as in SequentView for consistency.
+            textPane.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
+            textPane.setToolTipText(TEXTPANE_TOOLTIP);
+            textPane.setEditable(false);
 
             // insert source code into text pane
             try {
@@ -874,28 +899,7 @@ public final class SourceView extends JComponent {
             });
 
             textPane.addMouseListener(new TextPaneMouseAdapter(
-                    textPane, lineInformation, getFileName()));
-
-            JPanel nowrap = new JPanel(new BorderLayout());
-            nowrap.add(textPane);
-            setViewportView(nowrap);
-            setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-
-            // increase unit increment (for faster scrolling)
-            getVerticalScrollBar().setUnitIncrement(30);
-            getHorizontalScrollBar().setUnitIncrement(30);
-
-            //add Line numbers to each Scrollview
-            TextLineNumber tln = new TextLineNumber(textPane, 1);
-            setRowHeaderView(tln);
-
-            // Add tab to tab pane.
-            tabPane.addTab(file.getName(), this);
-            int index = tabPane.indexOfComponent(this);
-            tabPane.setToolTipTextAt(index, file.getAbsolutePath());
-
-            resetHighlights();
+                textPane, lineInformation, getFileName()));
         }
 
         private void mark() {
@@ -1056,13 +1060,29 @@ public final class SourceView extends JComponent {
      */
     public static class Highlight implements Comparable<Highlight> {
 
+        /** @see #getTag() */
         private static final Map<Highlight, Object> tags = new HashMap<>();
 
+        /** @see #getLevel() */
         private int level;
+
+        /** @see #getColor() */
         private Color color;
+
+        /** @see #getFileName() */
         private String fileName;
+
+        /** @see #getLine() */
         private int line;
 
+        /**
+         * Creates a new highlight.
+         *
+         * @param fileName the file in which this highlight is used.
+         * @param line the line being highlighted.
+         * @param color this highlight's color.
+         * @param level this highlight's level.
+         */
         private Highlight(String fileName, int line, Color color, int level) {
             this.level = level;
             this.color = color;
@@ -1205,7 +1225,7 @@ public final class SourceView extends JComponent {
      *
      * @author Wolfram Pfeifer
      */
-    private class TextPaneMouseAdapter extends MouseAdapter {
+    private final class TextPaneMouseAdapter extends MouseAdapter {
         /**
          * The precalculated start indices of the lines. Used to compute the clicked line number.
          */

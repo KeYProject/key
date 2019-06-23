@@ -33,7 +33,10 @@ public class OriginTermLabelsExt
         KeYTooltipExtension,
         KeYStatusBarExtension {
 
+    /** @see ToggleTermOriginTrackingAction */
     private ToggleTermOriginTrackingAction toggleTrackingAction;
+
+    /** @see ToggleOriginHighlightAction */
     private ToggleOriginHighlightAction toggleSourceViewHighlightAction;
 
     private ToggleTermOriginTrackingAction getToggleTrackingAction(MainWindow mainWindow) {

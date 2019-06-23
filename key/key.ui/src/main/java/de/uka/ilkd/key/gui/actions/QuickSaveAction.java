@@ -33,7 +33,10 @@ import de.uka.ilkd.key.util.KeYConstants;
  */
 public final class QuickSaveAction extends MainWindowAction {
 
+    /** The OS's tmp directory. */
     private static final File TMP_DIR = IOUtil.getTempDirectory();
+
+    /** The path to the quick save file. */
     public static final String QUICK_SAVE_PATH = TMP_DIR + File.separator + ".quicksave.key";
 
     /**

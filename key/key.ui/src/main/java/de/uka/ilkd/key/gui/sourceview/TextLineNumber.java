@@ -161,8 +161,7 @@ public class TextLineNumber extends JPanel
      * <li>TextLineNumber.RIGHT (default)
      * </ul>
      *
-     * @param currentLineForeground
-     *            the Color used to render the current line
+     * @param digitAlignment the new alignment.
      */
     public void setDigitAlignment(float digitAlignment) {
         this.digitAlignment
@@ -258,8 +257,9 @@ public class TextLineNumber extends JPanel
     /**
      * Get the line number to be drawn. The empty string will be returned when a line of text has
      * wrapped.
-     * 
+     *
      * @param rowStartOffset offset.
+     * @return the line number to be drawn.
      */
     protected String getTextLineNumber(int rowStartOffset) {
         Element root = component.getDocument().getDefaultRootElement();
@@ -295,11 +295,11 @@ public class TextLineNumber extends JPanel
         // The text needs to be positioned above the bottom of the bounding
         // rectangle based on the descent of the font(s) contained on the row.
 
-        if (r.height == lineHeight) // default font is being used
-        {
+        if (r.height == lineHeight) {
+            // default font is being used
             descent = fontMetrics.getDescent();
-        } else // We need to check all the attributes for font changes
-        {
+        } else {
+            // We need to check all the attributes for font changes
             if (fonts == null) {
                 fonts = new HashMap<String, FontMetrics>();
             }

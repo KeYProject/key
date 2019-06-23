@@ -14,6 +14,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
  */
 public class InnerNodeViewListener extends SequentViewListener<InnerNodeView> {
 
+    /** The menu shown on a mouse click. */
     private InnerNodeViewMenu menu;
 
     /**
@@ -31,7 +32,8 @@ public class InnerNodeViewListener extends SequentViewListener<InnerNodeView> {
         if (Math.abs(System.currentTimeMillis() - getLastPopupCloseTime()) >= POPUP_DELAY) {
             PosInSequent mousePos = getSequentView().getPosInSequent(me.getPoint());
             if (mousePos != null) {
-                if (!me.isShiftDown() && !me.isControlDown() && SwingUtilities.isLeftMouseButton(me)) {
+                if (!me.isShiftDown() && !me.isControlDown()
+                        && SwingUtilities.isLeftMouseButton(me)) {
                     menu = new InnerNodeViewMenu(getSequentView(), mousePos);
                     showPopup(me, menu);
                 }

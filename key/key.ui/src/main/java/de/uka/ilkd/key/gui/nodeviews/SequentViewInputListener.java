@@ -52,18 +52,46 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
  */
 public class SequentViewInputListener implements KeyListener, MouseMotionListener, MouseListener {
 
+    /**
+     * The color for origin highlights.
+     *
+     * @see #highlightOriginInSourceView(PosInSequent)
+     */
     private static final Color ORIGIN_HIGHLIGHT_COLOR = Color.RED;
+
+    /**
+     * The color for subterm origin highlights.
+     *
+     * @see #highlightOriginInSourceView(PosInSequent)
+     */
     private static final Color SUBTERM_ORIGIN_HIGHLIGHT_COLOR = new Color(255, 150, 150);
 
+    /**
+     * The current origin highlight.
+     *
+     * @see #highlightOriginInSourceView(PosInSequent)
+     */
     private Highlight originHighlight;
+
+    /**
+     * The current subterm origin highlights.
+     *
+     * @see #highlightOriginInSourceView(PosInSequent)
+     */
     private Set<Highlight> subtermOriginsHighlights = new HashSet<>();
 
+    /** The sequent view associated with this listener. */
     private final SequentView sequentView;
+
+    /** Whether term info should be shown in the status line. */
     private boolean showTermInfo = false;
 
-    //do not refresh when set to false
+    /** @see #isRefresh() */
     private static boolean refresh = true;
 
+    /**
+     * @return whether this listener should react to changes.
+     */
     public static boolean isRefresh() {
 		return refresh;
 	}
@@ -235,6 +263,11 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
         }
     }
 
+    /**
+     * Show info about the term at the specified point in the status line.
+     *
+     * @param p a point.
+     */
     protected void showTermInfo(Point p) {
         MainWindow mainWindow = sequentView.getMainWindow();
 

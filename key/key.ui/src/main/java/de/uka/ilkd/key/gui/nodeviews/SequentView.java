@@ -95,7 +95,7 @@ public abstract class SequentView extends JEditorPane {
         return mainWindow;
     }
 
-    /*
+    /**
      * The current line width. Static declaration for this prevents constructors from
      * using lineWidth 0.
      */

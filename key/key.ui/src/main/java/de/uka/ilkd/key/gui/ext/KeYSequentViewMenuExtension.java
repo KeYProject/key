@@ -24,7 +24,6 @@ public interface KeYSequentViewMenuExtension {
     List<Action> getSequentViewMenuActions(MainWindow mainWindow, PosInSequent pos);
 
     /**
-     *
      * @return the set of sequent view types for which this menu should be shown.
      */
     EnumSet<SequentViewMenuType> getSequentViewMenuTypes();
@@ -36,19 +35,29 @@ public interface KeYSequentViewMenuExtension {
     @SuppressWarnings("rawtypes")
     public enum SequentViewMenuType {
 
+        /** @see CurrentGoalViewMenu */
         CURRENT_GOAL_VIEW(CurrentGoalViewMenu.class),
+
+        /** @see InnerNodeViewMenu */
         INNER_NODE_VIEW(InnerNodeViewMenu.class);
 
         private Class<? extends SequentViewMenu> clazz;
 
-        SequentViewMenuType(Class<? extends SequentViewMenu> clazz) {
+        private SequentViewMenuType(Class<? extends SequentViewMenu> clazz) {
             this.clazz = clazz;
         }
 
+        /**
+         * @return the subtype of {@link SequentViewMenu} corresponding to this instance.
+         */
         public Class<? extends SequentViewMenu> getType() {
             return clazz;
         }
 
+        /**
+         * @param clazz a valid subtype of {@link SequentViewMenu} corresponding to this instance.
+         * @return the corresponding instance.
+         */
         public static SequentViewMenuType of(Class<? extends SequentViewMenu> clazz) {
             if (clazz.equals(CurrentGoalViewMenu.class)) {
                 return CURRENT_GOAL_VIEW;

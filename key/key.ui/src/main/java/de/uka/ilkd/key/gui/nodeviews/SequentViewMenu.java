@@ -26,11 +26,18 @@ import de.uka.ilkd.key.pp.PosInSequent;
  */
 public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
 
+    /** @see #addClipboardItem(MenuControl) */
     private static final String COPY_TO_CLIPBOARD = "Copy to clipboard";
+
+    /** @see #createNameCreationInfoSection(MenuControl) */
     private static final String NAME_CREATION_INFO = "View name creation info";
 
+    /** The position of the selected term. */
     private PosInSequent pos;
+
+    /** The sequent view associated with this menu. */
     private T sequentView;
+
     /**
      * Creates an empty menu.
      */

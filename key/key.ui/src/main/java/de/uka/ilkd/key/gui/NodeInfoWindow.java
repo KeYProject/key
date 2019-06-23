@@ -24,9 +24,40 @@ import de.uka.ilkd.key.proof.Proof;
  */
 public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeInfoWindow> {
 
+    /** @see #getInstances(Node) */
     private static Map<Name, Map<Integer, SortedSet<NodeInfoWindow>>> instances = new HashMap<>();
 
+    /**
+     * @see #addListener(NodeInfoWindowListener)
+     * @see #removeListener(NodeInfoWindowListener)
+     */
     private static Set<NodeInfoWindowListener> listeners = new HashSet<>();
+
+    /** @see #getNode() */
+    private Node node;
+
+    /** @see #getLongName() */
+    private String longName;
+
+    /** @see #getShortName() */
+    private String shortName;
+
+    /**
+     * Creates a new {@link NodeInfoWindow}.
+     *
+     * @param node the node this window is associated with.
+     * @param longName the window's long name.
+     * @param shortName the window's short name.
+     */
+    public NodeInfoWindow(Node node, String longName, String shortName) {
+        this.node = node;
+        this.longName = longName;
+        this.shortName = shortName;
+
+        setTitle(shortName);
+
+        register(this);
+    }
 
     /**
      * Returns {@code true} iff there are any open {@code NodeInfoWindow}s
@@ -104,27 +135,6 @@ public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeIn
                 listener.windowRegistered(win);
             }
         }
-    }
-
-    private Node node;
-    private String longName;
-    private String shortName;
-
-    /**
-     * Creates a new {@link NodeInfoWindow}.
-     *
-     * @param node the node this window is associated with.
-     * @param longName the window's long name.
-     * @param shortName the window's short name.
-     */
-    public NodeInfoWindow(Node node, String longName, String shortName) {
-        this.node = node;
-        this.longName = longName;
-        this.shortName = shortName;
-
-        setTitle(shortName);
-
-        register(this);
     }
 
     @Override

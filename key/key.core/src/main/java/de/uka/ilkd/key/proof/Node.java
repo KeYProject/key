@@ -246,26 +246,32 @@ public class Node {
     /**
      * adds a new NoPosTacletApp to the set of available NoPosTacletApps at this
      * node
+     *
+     * @param s the app to add.
      */
     public void addNoPosTacletApp(NoPosTacletApp s) {
         localIntroducedRules = localIntroducedRules.add(s);
     }
 
     /**
-     * returns the parent node of this node.
+     * @return the parent node of this node.
      */
     public Node parent() {
         return parent;
     }
 
     /**
-     * returns true, iff this node is a leaf, i.e. has no children.
+     * @return true iff this node is a leaf, i.e., has no children.
      */
     public boolean leaf() {
         return children.size() == 0;
     }
 
-    /** searches for a given node in the subtree starting with this node */
+    /**
+     * Searches for a given node in the subtree starting with this node.
+     *
+     * @return {@code true} iff the node was found.
+     */
     public boolean find(Node node) {
         // we assume that the proof tree node is part of has proper
         // links
@@ -281,17 +287,19 @@ public class Node {
     }
 
     /**
-     * Search for the node being the root of the smallest subtree containing
-     * <code>this</code> and <code>p_node</code>; we assume that the two nodes are
+     * Search for the root of the smallest subtree containing
+     * <code>this</code> and <code>other</code>; we assume that the two nodes are
      * part of the same proof tree
+     *
+     * @param other a node.
+     * @return the most recent common ancestor of {@code this} and the specified node.
      */
-    // XXX this method is never used
-    public Node commonAncestor(Node p_node) {
+    public Node commonAncestor(Node other) {
         if (root()) {
             return this;
         }
-        if (p_node.root()) {
-            return p_node;
+        if (other.root()) {
+            return other;
         }
 
         HashSet<Node> paths = new LinkedHashSet<>();
@@ -306,25 +314,25 @@ public class Node {
             }
             n = n.parent();
 
-            if (!paths.add(p_node)) {
-                return p_node;
+            if (!paths.add(other)) {
+                return other;
             }
-            if (p_node.root()) {
-                p_node = n;
+            if (other.root()) {
+                other = n;
                 break;
             }
-            p_node = p_node.parent();
+            other = other.parent();
         }
 
-        while (!paths.contains(p_node)) {
-            p_node = p_node.parent();
+        while (!paths.contains(other)) {
+            other = other.parent();
         }
 
-        return p_node;
+        return other;
     }
 
     /**
-     * returns true, iff this node is root, i.e. has no parents.
+     * @return true iff this node is the root, i.e., has no parents.
      */
     public boolean root() {
         return parent == null;
@@ -335,18 +343,22 @@ public class Node {
     }
 
     /**
-     * makes the given node a child of this node.
+     * Makes the given node a child of this node.
+     *
+     * @param newChild the node to make a child of this node.
      */
-    public void add(Node child) {
-        child.siblingNr = children.size();
-        children.add(child);
-        child.parent = this;
+    public void add(Node newChild) {
+        newChild.siblingNr = children.size();
+        children.add(newChild);
+        newChild.parent = this;
         proof().fireProofExpanded(this);
-        child.nodeInfo.addRelevantFiles(nodeInfo.getRelevantFiles());
+        newChild.nodeInfo.addRelevantFiles(nodeInfo.getRelevantFiles());
     }
 
     /**
-     * makes the given node a child of this node.
+     * Makes the given node children of this node.
+     *
+     * @param newChildren the node to make into children of this node.
      */
     public void addAll(Node[] newChildren) {
         final int size = children.size();
@@ -362,7 +374,7 @@ public class Node {
     }
 
     /**
-     * removes child/parent relationship between this node and its parent; if this
+     * Removes child/parent relationship between this node and its parent; if this
      * node is root nothing happens. This is only used for testing purposes.
      */
     void remove() {
@@ -372,10 +384,11 @@ public class Node {
     }
 
     /**
-     * removes child/parent relationship between the given node and this node; if
+     * Removes child/parent relationship between the given node and this node; if
      * the given node is not child of this node, nothing happens and then and only
      * then false is returned.
      *
+     * @param child the child to remove.
      * @return false iff the given node was not child of this node and nothing has
      *         been done.
      */
@@ -394,7 +407,9 @@ public class Node {
     }
 
     /**
-     * computes the leaves of the current subtree and returns them
+     * Computes the leaves of the current subtree and returns them.
+     *
+     * @return the leaves of the current subtree.
      */
     List<Node> getLeaves() {
         final List<Node> leaves = new LinkedList<>();
@@ -412,47 +427,52 @@ public class Node {
     }
 
     /**
-     * returns an iterator for the leaves of the subtree below this node. The
-     * computation is called at every call!
+     * @return an iterator for the leaves of the subtree below this node. The
+     *  computation is called at every call!
      */
     public Iterator<Node> leavesIterator() {
         return new NodeIterator(getLeaves().iterator());
     }
 
     /**
-     * returns an iterator for the direct children of this node.
+     * @return an iterator for the direct children of this node.
      */
     public Iterator<Node> childrenIterator() {
         return new NodeIterator(children.iterator());
     }
 
     /**
-     * returns an iterator for all nodes in the subtree.
+     * @return an iterator for all nodes in the subtree.
      */
     public Iterator<Node> subtreeIterator() {
         return new SubtreeIterator(this);
     }
 
-    /** returns number of children */
+    /** @return number of children */
     public int childrenCount() {
         return children.size();
     }
 
-    /** returns i-th child */
+    /**
+     *
+     * @param i an index.
+     * @return the i-th child of this node.
+     */
     public Node child(int i) {
         return children.get(i);
     }
 
     /**
-     * @return the number of the node <code>p_node</code>, if it is a child of this
+     * @param child a child of this node.
+     * @return the number of the node <code>child</code>, if it is a child of this
      *         node (starting with <code>0</code>), <code>-1</code> otherwise
      */
-    public int getChildNr(Node p_node) {
+    public int getChildNr(Node child) {
         int res = 0;
         final Iterator<Node> it = childrenIterator();
 
         while (it.hasNext()) {
-            if (it.next() == p_node) {
+            if (it.next() == child) {
                 return res;
             }
             ++res;
@@ -482,7 +502,7 @@ public class Node {
     }
 
     /**
-     * helps toString method
+     * Helper for {@link #toString()}
      *
      * @param prefix needed to keep track if a line has to be printed
      * @param tree   the tree representation we want to add this subtree " @param
@@ -491,6 +511,7 @@ public class Node {
      * @param postNr the last number of the parents enumeration
      * @param maxNr  the number of nodes at this level
      * @param ownNr  the place of this node at this level
+     * @return the string representation of this node.
      */
 
     private StringBuffer toString(String prefix, StringBuffer tree, String preEnumeration,
@@ -595,7 +616,7 @@ public class Node {
     }
 
     /**
-     * checks if the parent has this node as child and continues recursively with
+     * Checks if the parent has this node as child and continues recursively with
      * the children of this node.
      *
      * @return true iff the parent of this node has this node as child and this
@@ -654,7 +675,7 @@ public class Node {
         clearNameCache();
     }
 
-    /** checks if an inner node is closeable */
+    /** @return true iff this inner node is closeable */
     private boolean isCloseable() {
         assert childrenCount() > 0;
         for (Node child : children) {
@@ -670,7 +691,7 @@ public class Node {
     }
 
     /**
-     * retrieves number of nodes
+     * @return number of nodes in the subtree below this node.
      */
     public int countNodes() {
         Iterator<Node> it = subtreeIterator();
@@ -682,7 +703,7 @@ public class Node {
     }
 
     /**
-     * retrieves number of branches
+     * @return number of branches in the subtree below this node.
      */
     public int countBranches() {
         return getLeaves().size();
@@ -693,7 +714,7 @@ public class Node {
     }
 
     /**
-     * returns the sibling number of this node or <tt>-1</tt> if it is the root node
+     * Returns the sibling number of this node or <tt>-1</tt> if it is the root node
      *
      * @return the sibling number of this node or <tt>-1</tt> if it is the root node
      */
@@ -710,8 +731,10 @@ public class Node {
     }
 
     /**
-     * Iterator over children. Use <code>leavesIterator()</code> if you need to
-     * iterate over leaves instead.
+     * Returns an iterator over this node's children.
+     * Use {@link #leavesIterator()} if you need to iterate over leaves instead.
+     *
+     * @return iterator over children.
      */
     public Iterator<Node> iterator() {
         return childrenIterator();

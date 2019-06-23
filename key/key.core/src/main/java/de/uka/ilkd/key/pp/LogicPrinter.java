@@ -139,10 +139,6 @@ public class LogicPrinter {
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
             QuantifiableVariablePrintMode.NORMAL;
 
-    protected HeapLDT getHeapLDT() {
-        return services == null ? null : services.getTypeConverter().getHeapLDT();
-    }
-
     private enum QuantifiableVariablePrintMode {
         NORMAL, WITH_OUT_DECLARATION
     }
@@ -155,6 +151,7 @@ public class LogicPrinter {
      * @param prgPrinter   the ProgramPrinter that pretty-prints Java programs
      * @param notationInfo the NotationInfo for the concrete syntax
      * @param backend      the Backend for the output
+     * @param services     services.
      * @param purePrint    if true the PositionTable will not be calculated
      *                     (simulates the behaviour of the former
      *                     PureSequentPrinter)
@@ -249,7 +246,7 @@ public class LogicPrinter {
     /**
      * Converts a semisequent to a string.
      *
-     * @param t a term.
+     * @param s a semisequent.
      * @param services services.
      * @return the printed semisequent.
      */
@@ -276,7 +273,7 @@ public class LogicPrinter {
     /**
      * Converts a sequent to a string.
      *
-     * @param t a term.
+     * @param s a sequent.
      * @param services services.
      * @return the printed sequent.
      */
@@ -417,6 +414,10 @@ public class LogicPrinter {
     public void printTaclet(Taclet taclet) {
         // the last argument used to be false. Changed that - M.Ulbrich
         printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, true);
+    }
+
+    protected HeapLDT getHeapLDT() {
+        return services == null ? null : services.getTypeConverter().getHeapLDT();
     }
 
     protected void printAttribs(Taclet taclet) throws IOException {
@@ -722,8 +723,8 @@ public class LogicPrinter {
     /**
      * Pretty-prints a ProgramSV.
      *
-     * @param pe You've guessed it, the ProgramSV to be pretty-printed
-     * @throws IOException
+     * @param pe the ProgramSV to be pretty-printed.
+     * @throws IOException if the ProgramSV cannot be printed.
      */
     public void printProgramSV(ProgramSV pe) throws IOException {
         StringWriter w = new StringWriter();
@@ -826,6 +827,8 @@ public class LogicPrinter {
      * Pretty-prints a Semisequent. Formulae are separated by commas.
      *
      * @param semiseq the semisequent to be printed
+     *
+     * @throws IOException if the semisequent cannot be printed.
      */
     public void printSemisequent(Semisequent semiseq) throws IOException {
         for (int i = 0; i < semiseq.size(); i++) {
@@ -838,12 +841,12 @@ public class LogicPrinter {
         }
     }
 
-    public void printSemisequent(ImmutableList<SequentPrintFilterEntry> p_formulas)
+    public void printSemisequent(ImmutableList<SequentPrintFilterEntry> formulas)
             throws IOException {
-        Iterator<SequentPrintFilterEntry> it = p_formulas.iterator();
+        Iterator<SequentPrintFilterEntry> it = formulas.iterator();
         SequentPrintFilterEntry entry;
-        int size = p_formulas.size();
-        while (size-- != 0) {
+
+        for (int size = formulas.size() - 1; size >= 0; --size) {
             entry = it.next();
             markStartSub();
             printConstrainedFormula(entry.getFilteredFormula());
@@ -859,6 +862,8 @@ public class LogicPrinter {
      * suppressed
      *
      * @param cfma the constrained formula to be printed
+     *
+     * @throws IOException if the formula cannot be printed.
      */
     public void printConstrainedFormula(SequentFormula cfma) throws IOException {
         printTerm(cfma.formula());
@@ -869,6 +874,8 @@ public class LogicPrinter {
      * NotationInfo given to the constructor.
      *
      * @param t the Term to be printed
+     *
+     * @throws IOException if the term cannot be printed.
      */
     public void printTerm(Term t) throws IOException {
         if (notationInfo.getAbbrevMap().isEnabled(t)) {
@@ -1432,7 +1439,7 @@ public class LogicPrinter {
      * @param t    whole term
      * @param sub  the subterm to be printed
      * @param ass  the associativity for the subterm
-     * @throws IOException
+     * @throws IOException if the term cannot be printed.
      */
     public void printPrefixTerm(String name, Term t, Term sub, int ass) throws IOException {
         startTerm(1);
@@ -1453,6 +1460,7 @@ public class LogicPrinter {
      * @param name the postfix operator
      * @param t    the subterm to be printed
      * @param ass  the associativity for the subterm
+     * @throws IOException if the term cannot be printed.
      */
     public void printPostfixTerm(Term t, int ass, String name) throws IOException {
         startTerm(1);
@@ -1477,6 +1485,7 @@ public class LogicPrinter {
      * @param t        whole term
      * @param r        the right subterm
      * @param assRight associativity for right subterm
+     * @throws IOException if the term cannot be printed.
      */
     public void printInfixTerm(Term l, int assLeft, String name, Term t, Term r, int assRight)
             throws IOException {
@@ -1497,7 +1506,7 @@ public class LogicPrinter {
      * @param t        whole term
      * @param r        the right subterm
      * @param assRight associativity for right subterm
-     * @throws IOException
+     * @throws IOException if the term cannot be printed.
      */
     public void printInfixTermContinuingBlock(Term l, int assLeft, String name, Term t, Term r,
             int assRight) throws IOException {
@@ -1536,6 +1545,7 @@ public class LogicPrinter {
      * @param r    the right brace
      * @param t    the update term
      * @param ass3 associativity for phi
+     * @throws IOException if the term cannot be printed.
      */
     public void printUpdateApplicationTerm(String l, String r, Term t, int ass3)
             throws IOException {
@@ -1563,6 +1573,7 @@ public class LogicPrinter {
      *
      * @param asgn the assignment operator (including spaces)
      * @param ass2 associativity for the new values
+     * @throws IOException if the term cannot be printed.
      */
     public void printElementaryUpdate(String asgn, Term t, int ass2) throws IOException {
         ElementaryUpdate op = (ElementaryUpdate) t.op();

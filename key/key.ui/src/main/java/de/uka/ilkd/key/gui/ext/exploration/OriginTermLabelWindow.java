@@ -81,22 +81,20 @@ import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
  */
 public final class OriginTermLabelWindow extends NodeInfoWindow {
 
-    private static final long serialVersionUID = -2791483814174192622L;
-
     /**
      * The window's initial width.
      */
-    public static final int WIDTH = 1280;
+    public final static int WIDTH = 1280;
 
     /**
      * The window's initial height.
      */
-    public static final int HEIGHT = 720;
+    public final static int HEIGHT = 720;
 
     /**
      * The background color to use to highlight a sub-term.
      */
-    public static final Color HIGHLIGHT_COLOR = Color.ORANGE;
+    public final static Color HIGHLIGHT_COLOR = Color.ORANGE;
 
     /**
      * The title for the origin information for the selected term.
@@ -104,21 +102,21 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
      * @see #ORIGIN_TITLE
      * @see #SUBTERM_ORIGINS_TITLE
      */
-    public static final String ORIGIN_INFO_TITLE = "Origin information";
+    public final static String ORIGIN_INFO_TITLE = "Origin information";
 
     /**
      * The title for the selected term's origin.
      *
      * @see #ORIGIN_INFO_TITLE
      */
-    public static final String ORIGIN_TITLE = "Origin of formula";
+    public final static String ORIGIN_TITLE = "Origin of formula";
 
     /**
      * The title for the origin of the selected term's sub-terms and former sub-terms.
      *
      * @see #ORIGIN_INFO_TITLE
      */
-    public static final String SUBTERM_ORIGINS_TITLE =
+    public final static String SUBTERM_ORIGINS_TITLE =
             "Origins of (former) subformulas and subterms";
 
     /**
@@ -131,10 +129,21 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
      */
     public static final int COMPONENT_GAP = 20;
 
+    /** This window's {@link TermView}. */
     private TermView view;
+
+    /** This window tree view. */
     private JTree tree;
 
+    /** The button for the {@link #nodeLinkAction} */
+
     private JButton nodeLinkButton;
+
+    /**
+     * Action to select {@link #getNode()} in the main window.
+     *
+     * @see #updateNodeLink()
+     */
     private Action nodeLinkAction = new AbstractAction() {
 
         @Override
@@ -164,10 +173,16 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
         }
     };
 
+    /**
+     * Listens to rule application to call {@link #updateNodeLink()}.
+     */
     private RuleAppListener ruleAppListener = event -> {
         updateNodeLink();
     };
 
+    /**
+     * Listens to changes to the proof to call {@link #updateNodeLink()}.
+     */
     private ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
 
         @Override
@@ -191,6 +206,9 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
         }
     };
 
+    /**
+     * Listens to changes to the proof to call {@link #updateNodeLink()}.
+     */
     private ProofDisposedListener proofDisposedListener = new ProofDisposedListener() {
 
         @Override
@@ -202,14 +220,18 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
         }
     };
 
+    /** services */
     private Services services;
+
+    /** The position of the term being shown in this window. */
     private PosInOccurrence termPio;
+
+    /** The sequent containing the term being shown in this window. */
     private Sequent sequent;
 
     /**
      * Creates a new {@link OriginTermLabelWindow}.
      *
-     * @param mainWindow the main window.
      * @param pos the position of the term whose origin shall be visualized.
      * @param node the node representing the proof state for which the term's origins shall be
      *  visualized.
@@ -221,7 +243,7 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
                     ? "whole sequent"
                     : LogicPrinter.quickPrintTerm(pos.subTerm(), services)
                         .replaceAll("\\s+", " ")),
-                "Origin for: "+ (pos == null
+                "Origin for: " + (pos == null
                     ? "Whole sequent"
                     : "Formula " + node.sequent()
                             .formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula())
@@ -695,7 +717,7 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
                         printSemisequent(antec);
 
                         if (pos == null) {
-                            layouter.brk(1,-1);
+                            layouter.brk(1, -1);
                             printSequentArrow();
                             layouter.brk(1);
                         }

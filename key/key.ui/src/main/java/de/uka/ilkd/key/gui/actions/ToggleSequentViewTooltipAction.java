@@ -6,28 +6,42 @@ import java.util.EventObject;
 import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.ext.KeYTooltipExtension;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
+import de.uka.ilkd.key.settings.ViewSettings;
 
+/**
+ * Toggles the tooltips on the sequent view.
+ *
+ * @author lanzinger
+ *
+ * @see SequentView#getToolTipText()
+ * @see KeYTooltipExtension
+ */
 public class ToggleSequentViewTooltipAction extends MainWindowAction {
 
+    /** This action's name. */
     public static final String NAME = "Show tooltips in sequent view";
 
+    /** This action's tooltip. */
     public static final String TOOL_TIP = "If ticked, moving the mouse over a term in the"
             + " sequent view will show a tooltip with additional information.";
 
-    /**
-     * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()}.
-     * <p>
-     * Such changes can occur in the Eclipse context when settings are changed in for instance the KeYIDE.
-     */
+    /** Listens to changes to the view settings to call {@link #updateSelectedState()}. */
     private final SettingsListener viewSettingsListener = new SettingsListener() {
         @Override
         public void settingsChanged(EventObject e) {
-            handleViewSettingsChanged(e);
+            updateSelectedState();
         }
     };
 
+    /**
+     * Crate a new action.
+     *
+     * @param mainWindow the main window.
+     */
     public ToggleSequentViewTooltipAction(MainWindow mainWindow) {
         super(mainWindow);
         setName(NAME);
@@ -37,6 +51,10 @@ public class ToggleSequentViewTooltipAction extends MainWindowAction {
         updateSelectedState();
     }
 
+    /**
+     * Updates the state of this action according to
+     * {@link ViewSettings#isShowSequentViewTooltips()}
+     */
     protected void updateSelectedState() {
         final boolean setting = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                 .isShowSequentViewTooltips();
@@ -48,9 +66,5 @@ public class ToggleSequentViewTooltipAction extends MainWindowAction {
         boolean selected = ((JCheckBoxMenuItem) e.getSource()).isSelected();
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
             .setShowSequentViewTooltips(selected);
-    }
-
-    protected void handleViewSettingsChanged(EventObject e) {
-        updateSelectedState();
     }
 }

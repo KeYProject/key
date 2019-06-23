@@ -149,20 +149,20 @@ public class NodeInfo {
      * @return The first statement or {@code null} if no one is provided.
      */
     public static SourceElement computeFirstStatement(RuleApp ruleApp) {
-       SourceElement firstStatement = null;
-       // TODO: unify with MiscTools getActiveStatement
-       if (ruleApp instanceof PosTacletApp) {
-           PosTacletApp pta = (PosTacletApp) ruleApp;
-           if (!isSymbolicExecution(pta.taclet())) {
-            return null;
+        SourceElement firstStatement = null;
+        // TODO: unify with MiscTools getActiveStatement
+        if (ruleApp instanceof PosTacletApp) {
+            PosTacletApp pta = (PosTacletApp) ruleApp;
+            if (!isSymbolicExecution(pta.taclet())) {
+                return null;
+            }
+            Term t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
+            final ProgramElement pe = t.javaBlock().program();
+            if (pe != null) {
+                firstStatement = pe.getFirstElement();
+            }
         }
-           Term t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
-           final ProgramElement pe = t.javaBlock().program();
-           if (pe != null) {
-               firstStatement = pe.getFirstElement();
-           }
-       }
-       return firstStatement;
+        return firstStatement;
     }
 
     /**
@@ -217,24 +217,24 @@ public class NodeInfo {
      */
     public static boolean isSymbolicExecutionRuleApplied(RuleApp app) {
         return app instanceof AbstractAuxiliaryContractBuiltInRuleApp ||
-                app instanceof AbstractContractRuleApp ||
-                app instanceof LoopInvariantBuiltInRuleApp ||
-                app instanceof TacletApp
-                    && NodeInfo.isSymbolicExecution(((TacletApp) app).taclet());
+            app instanceof AbstractContractRuleApp ||
+            app instanceof LoopInvariantBuiltInRuleApp ||
+            app instanceof TacletApp
+            && NodeInfo.isSymbolicExecution(((TacletApp) app).taclet());
     }
 
     public static boolean isSymbolicExecution(Taclet t) {
         ImmutableList<RuleSet> list = t.getRuleSets();
-	RuleSet       rs;
-	while (!list.isEmpty()) {
-	    rs = list.head ();
+        RuleSet       rs;
+        while (!list.isEmpty()) {
+            rs = list.head ();
             Name name = rs.name();
-	    if (symbolicExecNames.contains(name)) {
-            return true;
+            if (symbolicExecNames.contains(name)) {
+                return true;
+            }
+            list = list.tail();
         }
-	    list = list.tail();
-	}
-	return false;
+        return false;
     }
 
     /**
@@ -244,7 +244,7 @@ public class NodeInfo {
      * @return active statement as described above
      */
     public SourceElement getActiveStatement() {
-	determineFirstAndActiveStatement();
+        determineFirstAndActiveStatement();
         return activeStatement;
     }
 
