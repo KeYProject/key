@@ -67,7 +67,8 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
             result = null;
         }
 
-        if (result != null && result.getOrigin() instanceof FileOrigin) {
+        if (result != null && result.getOrigin() instanceof FileOrigin
+                && goal != null && goal.node() != null) {
             goal.node().getNodeInfo().addRelevantFile(((FileOrigin) result.getOrigin()).fileName);
         }
 

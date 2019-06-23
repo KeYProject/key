@@ -105,7 +105,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             labels.add(newLabel);
         }
 
-        if (newLabel.getOrigin() instanceof FileOrigin) {
+        if (newLabel.getOrigin() instanceof FileOrigin
+                && goal != null && goal.node() != null) {
             goal.node().getNodeInfo().addRelevantFile(((FileOrigin) newLabel.getOrigin()).fileName);
         }
     }
