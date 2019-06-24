@@ -132,6 +132,25 @@ public class TestProofBundleIO {
         IOUtil.delete(unzip.toFile());
     }
 
+    @Test
+    public void testSimpleFileRepo()throws Exception {
+        ProofIndependentSettings.DEFAULT_INSTANCE
+                                .getGeneralSettings()
+                                .setEnsureSourceConsistency(false);
+
+        AbstractFileRepo simple = new SimpleFileRepo();
+        Path base = testDir.resolve("simpleBundleGeneration");
+
+        simple.setBaseDir(base);
+        simple.setJavaPath(base.resolve("src").toString());
+
+        simple.getInputStream(base.resolve("test.key")).close();
+        simple.getInputStream(base.resolve("src").resolve("Client.java")).close();
+        simple.getInputStream(base.resolve("src").resolve("Test.java")).close();
+
+        simple.saveProof(base.resolve("test.zip"));
+    }
+
     /**
      * Loads a proof from a bundle.
      * @param p the path of the bundle
