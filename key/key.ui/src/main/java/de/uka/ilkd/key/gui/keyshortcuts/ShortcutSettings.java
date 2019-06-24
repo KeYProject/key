@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.keyshortcuts;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.settings.InvalidSettingsInputException;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
 
@@ -28,6 +27,8 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
     public ShortcutSettings() {
         super();
         setHeaderText("Keyboard Shortcuts");
+        setSubHeaderText("These settings are stored in " +
+                KeyStrokeSettings.SETTINGS_FILE.getAbsolutePath());
         add(new JScrollPane(tblShortcuts));
     }
 

@@ -1,8 +1,7 @@
 package de.uka.ilkd.key.gui.utilities;
 
+import javax.swing.*;
 import java.awt.*;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 
 /**
  *  FlowLayout subclass that fully supports wrapping of components.
@@ -81,7 +80,7 @@ public class WrapLayout extends FlowLayout
 	* Returns the minimum or preferred dimension needed to layout the target
 	* container.
 	*
-	* @param target target to lookupAndOverride layout size for
+	* @param target target to get layout size for
 	* @param preferred should preferred size be calculated
 	* @return the dimension to layout the target container
 	*/

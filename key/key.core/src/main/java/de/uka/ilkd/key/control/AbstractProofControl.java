@@ -185,14 +185,18 @@ public abstract class AbstractProofControl implements ProofControl {
 
     @Override
     public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos) {
-   final Services services = goal.proof().getServices();
-   ImmutableSet<TacletApp> applics =
-         getAppsForName(goal, taclet.name().toString(), pos);
+        ImmutableSet<TacletApp> applics =
+                getAppsForName(goal, taclet.name().toString(), pos);
         if (applics.size() == 0) {
-           return false;
+            return false;
         }
-   Iterator<TacletApp> it = applics.iterator();
-   if (applics.size() == 1) {
+        return selectedTaclet(applics, goal);
+    }
+
+    public boolean selectedTaclet(ImmutableSet<TacletApp> applics, Goal goal) {
+        final Services services = goal.proof().getServices();
+        Iterator<TacletApp> it = applics.iterator();
+        if (applics.size() == 1) {
        TacletApp firstApp = it.next();
             boolean ifSeqInteraction =
                !firstApp.taclet().ifSequent().isEmpty() ;

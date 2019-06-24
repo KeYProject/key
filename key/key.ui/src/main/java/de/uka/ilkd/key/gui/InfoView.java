@@ -162,6 +162,7 @@ public class InfoView extends JSplitPane implements TabPanel {
     }
 
 
+
     public void setMediator(KeYMediator m) {
         assert m != null;
         if (mediator != null)

@@ -37,6 +37,7 @@ import org.key_project.util.jdt.JDTUtil;
 import de.uka.ilkd.key.util.removegenerics.PreviewGenericRemover;
 import de.uka.ilkd.key.util.removegenerics.monitor.GenericRemoverMonitor;
 
+
 /**
  * {@link Wizard} to remove generics.
  * @author Martin Hentschel

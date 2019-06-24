@@ -56,6 +56,8 @@ test {
         excludeTestsMatching "RunAllProofsInfFlow"
         excludeTestsMatching "RunAllProofsTestWithComputeCostProfiling"
         excludeTestsMatching "RunAllProofsFunctional"
+        excludeTestsMatching "TestParallelParsing"
+        excludeTestsMatching "TestCvc4"
     }
     useJUnit {
             excludeCategories 'org.key_project.util.testcategories.Performance'
@@ -76,5 +78,24 @@ task testRunAllProofs(type: Test) {
         includeTestsMatching "RunAllProofsFunctional"
     }
 }
+
+task generateVersionFiles() {
+    def outputFolder = file("build/resources/main/de/uka/ilkd/key/util")
+    def sha1 = new File(outputFolder, "sha1")
+    def branch = new File(outputFolder, "branch")
+    def versionf = new File(outputFolder, "version")
+
+    outputs.files sha1, branch, versionf
+
+    def gitRevision = gitRevParse('--short HEAD')
+    def gitBranch = gitRevParse('--abbrev-ref HEAD')
+
+    doLast {
+        sha1.text = gitRevision
+        branch.text = gitBranch
+        versionf.text = rootProject.version
+    }
+}
+processResources.dependsOn generateVersionFiles
 
 //check.dependsOn << testProofRules << testRunAllProofs

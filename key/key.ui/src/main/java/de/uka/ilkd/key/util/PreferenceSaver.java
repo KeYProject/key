@@ -13,17 +13,10 @@
 
 package de.uka.ilkd.key.util;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Rectangle;
-import java.awt.Window;
+import javax.swing.*;
+import java.awt.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-
-import javax.swing.AbstractButton;
-import javax.swing.JMenu;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 
 /**
  * A simple utility which stores and loads user manipulatable properties of
@@ -70,7 +63,7 @@ public class PreferenceSaver {
     };
 
     /**
-     * lookupAndOverride a saver for a component.
+     * get a saver for a component.
      */
     @SuppressWarnings("unchecked")
     private static <C extends Component> Saver<C> getSaver(C component) {
@@ -185,7 +178,7 @@ public class PreferenceSaver {
     }
 
     /**
-     * Windows lookupAndOverride their bounding box stored.
+     * Windows get their bounding box stored.
      */
     private static class WindowSaver implements Saver<Window> {
 

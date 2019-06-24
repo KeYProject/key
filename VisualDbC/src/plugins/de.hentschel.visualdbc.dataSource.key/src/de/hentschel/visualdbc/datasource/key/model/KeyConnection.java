@@ -114,6 +114,7 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.ClassAxiom;
@@ -289,7 +290,7 @@ public class KeyConnection extends MemoryConnection {
          
          // Establish connection
          if (interactive) {
-            environment = WindowUserInterfaceControl.loadInMainWindow(location, classPathEntries, bootClassPath, includes, true);
+            environment = WindowUserInterfaceControl.loadInMainWindow(JavaProfile.getDefaultProfile(),location, classPathEntries, bootClassPath, includes, false, true);
             getMediator().addGUIListener(mainGuiListener);
          }
          else {

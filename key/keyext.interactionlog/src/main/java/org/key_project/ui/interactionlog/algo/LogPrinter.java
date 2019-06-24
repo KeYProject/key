@@ -74,7 +74,7 @@ public class LogPrinter {
     private void body() {
         if (state.getInteractions().size() != 0) {
             //HashMap<Interaction, List<Interaction>> tree = state.getInteractionTree();
-            //body(tree, state.getInteractions().lookupAndOverride(0));
+            //body(tree, state.getInteractions().get(0));
         }
     }
 

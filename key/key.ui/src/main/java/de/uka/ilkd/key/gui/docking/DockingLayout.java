@@ -21,12 +21,15 @@ import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.settings.PathConfig;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Extension for working with layouts.
@@ -50,7 +53,6 @@ public final class DockingLayout
     private List<Action> actions = new LinkedList<>();
     private MainWindow window;
 
-
     private void installIcons(MainWindow mw) {
         CControl globalPort = mw.getDockControl();
         IconManager icons = globalPort.getController().getIcons();
@@ -69,7 +71,8 @@ public final class DockingLayout
                 IconFontSwing.buildIcon(FontAwesomeSolid.EXTERNAL_LINK_SQUARE_ALT, SIZE_ICON_DOCK));
 
         icons.setIcon("locationmanager.unexternalize", p,
-                IconFontSwing.buildIcon(FontAwesomeSolid.MOUSE_POINTER, SIZE_ICON_DOCK));
+                new ImageIcon(IconFontSwing.buildImage(FontAwesomeSolid.EXTERNAL_LINK_ALT,
+                        SIZE_ICON_DOCK, Color.black, Math.PI)));
 
         icons.setIcon("locationmanager.unmaximize_externalized", p,
                 IconFontSwing.buildIcon(FontAwesomeSolid.EXTERNAL_LINK_ALT, SIZE_ICON_DOCK));
@@ -177,6 +180,8 @@ public final class DockingLayout
         toolBar.add(comboLayouts);
         toolBar.add(new LoadAction(mainWindow));
         toolBar.add(new SaveAction(mainWindow));
+        toolBar.addSeparator();
+        toolBar.add(new ResetLayoutAction(mainWindow));
         return toolBar;
     }
 
@@ -236,5 +241,21 @@ class LoadLayoutAction extends MainWindowAction {
         } else {
             mainWindow.setStatusLine("Layout " + layoutName + " could not be found.");
         }
+    }
+}
+
+class ResetLayoutAction extends MainWindowAction {
+    public ResetLayoutAction(MainWindow mainWindow) {
+        super(mainWindow);
+        setName("Reset Layout");
+        KeyStrokeManager.lookupAndOverride(this);
+        setPriority(-1);
+        setMenuPath("View.Layout");
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        DockingHelper.restoreFactoryDefault(mainWindow);
+        mainWindow.setStatusLine("Factory reset of the layout.");
     }
 }

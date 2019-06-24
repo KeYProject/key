@@ -14,8 +14,6 @@
 package de.uka.ilkd.key.gui;
 
 import bibliothek.gui.dock.common.CControl;
-import bibliothek.gui.dock.common.CGrid;
-import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.SingleCDockable;
 import bibliothek.gui.dock.common.intern.CDockable;
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -26,7 +24,6 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
-import de.uka.ilkd.key.gui.docking.DockingLayout;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
@@ -146,11 +143,11 @@ public final class MainWindow extends JFrame {
             new HidePackagePrefixToggleAction(this);
     private final TermLabelMenu termLabelMenu;
     public boolean frozen = false;
+    JCheckBoxMenuItem saveSMTFile;
     /**
      *
      */
     private CControl dockControl = new CControl(this);
-    JCheckBoxMenuItem saveSMTFile;
     /**
      * the first toolbar
      */
@@ -212,6 +209,7 @@ public final class MainWindow extends JFrame {
     private SingleCDockable dockProofListView;
     private SingleCDockable dockSourceView;
     private SingleCDockable dockSequent;
+
     /**
      * set to true if the view of the current goal should not be updated
      */
@@ -248,9 +246,9 @@ public final class MainWindow extends JFrame {
         recentFileMenu = new RecentFileMenu(mediator);
 
         proofTreeView = new ProofTreeView(mediator);
-        infoView = new InfoView();
-        strategySelectionView = new StrategySelectionView();
-        openGoalsView = new GoalList();
+        infoView = new InfoView(this, mediator);
+        strategySelectionView = new StrategySelectionView(this, mediator);
+        openGoalsView = new GoalList(mediator);
 
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
@@ -455,24 +453,26 @@ public final class MainWindow extends JFrame {
         //getContentPane().add(splitPane, BorderLayout.CENTER);
         getContentPane().add(dockControl.getContentArea());
 
-        dockProofListView = create("Loaded Proofs", proofListView);
-        dockSequent = create("Sequent", mainFrame);
-        dockSourceView = create("Source", sourceView);
+        dockProofListView = DockingHelper.createSingleDock("Loaded Proofs", proofListView,
+                TaskTree.class.getName());
+        dockSequent = DockingHelper.createSingleDock("Sequent", mainFrame);
+        dockSourceView = DockingHelper.createSingleDock("Source", sourceView);
 
-        Stream<TabPanel> extPanels = KeYGuiExtensionFacade.getAllPanels(this);
+        Stream<TabPanel> extensionPanels = KeYGuiExtensionFacade.getAllPanels(this);
         Stream<TabPanel> defaultPanels = Stream.of(proofTreeView, infoView,
                 strategySelectionView, openGoalsView);
+        Stream.concat(defaultPanels, extensionPanels)
+                .map(DockingHelper::createSingleDock)
+                .forEach(it -> dockControl.addDockable(it));
+        dockControl.addDockable(dockProofListView);
+        dockControl.addDockable(dockSequent);
+        dockControl.addDockable(dockSourceView);
 
-        CGrid grid = new CGrid(dockControl);
-        grid.add(0, 0, 1, 1, dockProofListView);
-        grid.add(0, 1, 1, 2,
-                Stream.concat(defaultPanels, extPanels)
-                        .map(DockingHelper::createDock)
-                        .toArray(CDockable[]::new));
-        grid.add(1, 0, 2, 3, dockSequent);
-        grid.add(2, 0, 1, 3, dockSourceView);
+        dockProofListView.setVisible(true);
+        dockSequent.setVisible(true);
+        dockSourceView.setVisible(true);
 
-        dockControl.getContentArea().deploy(grid);
+        DockingHelper.restoreFactoryDefault(this);
 
         statusLine = new MainStatusLine("<html>" + PARA + KeYConstants.COPYRIGHT + PARA
                 + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."
@@ -487,10 +487,6 @@ public final class MainWindow extends JFrame {
         setSize(1000, 600);
 
         loadPreferences(this);
-    }
-
-    private SingleCDockable create(String title, JComponent component) {
-        return new DefaultSingleCDockable(title, title, component);
     }
 
     /*
@@ -1219,6 +1215,9 @@ public final class MainWindow extends JFrame {
         return autoModeAction;
     }
 
+    public CDockable getDockProofListView() {
+        return dockProofListView;
+    }
     /**
      * Glass pane that only delivers events for the status line (i.e. the abort button)
      * <p>
@@ -1647,4 +1646,14 @@ public final class MainWindow extends JFrame {
         }
 
     }
+
+
+    public SingleCDockable getDockSourceView() {
+        return dockSourceView;
+    }
+
+    public SingleCDockable getDockSequent() {
+        return dockSequent;
+    }
+
 }
