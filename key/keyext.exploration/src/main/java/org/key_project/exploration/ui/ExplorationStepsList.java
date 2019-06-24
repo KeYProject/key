@@ -132,8 +132,13 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             JLabel listCellRendererComponent = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             Node n = (Node) value;
-            listCellRendererComponent.setText(n.serialNr() + " " + n.getNodeInfo().get(ExplorationNodeData.class).getExplorationAction());
+
+            ExplorationNodeData explorationNodeData = n.getNodeInfo().get(ExplorationNodeData.class);
+            if(explorationNodeData != null) {
+                listCellRendererComponent.setText(n.serialNr() + " " + explorationNodeData.getExplorationAction());
+            }
             return listCellRendererComponent;
+
         }
     }
 

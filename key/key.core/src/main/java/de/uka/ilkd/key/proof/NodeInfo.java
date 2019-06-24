@@ -411,7 +411,11 @@ public class NodeInfo {
 
 
     public <T> T get(Class<T> service) {
-        return userData.get(service);
+        try {
+            return userData.get(service);
+        }catch(IllegalStateException ignored) {
+            return null;
+        }
     }
 
     public <T> void register(T obj, Class<T> service) {

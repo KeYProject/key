@@ -113,7 +113,7 @@ class ExplorationRenderer implements Styler<GUIAbstractTreeNode> {
         try {
             data = node.getNodeInfo().get(ExplorationNodeData.class);
 
-            if (node != null && data.getExplorationAction() != null) {
+            if (data != null) {
                 style.setBorder(DARK_PURPLE_COLOR.get());
                 style.setBackground(LIGHT_PURPLE_COLOR.get());
                 style.setTooltip("Exploration Action Performed");

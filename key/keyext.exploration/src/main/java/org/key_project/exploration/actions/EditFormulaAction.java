@@ -46,7 +46,7 @@ public class EditFormulaAction extends ExplorationAction {
         Term term = pio.subTerm();
         SequentFormula sf = pio.sequentFormula();
         Goal g = getMediator().getSelectedGoal();
-        g.node().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
+        //g.node().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
 
 //        g.node().getNodeInfo().setExploration(true);
 
@@ -70,7 +70,7 @@ public class EditFormulaAction extends ExplorationAction {
         ImmutableList<Goal> result = g.apply(app);
         result.forEach(goal -> {
             //goal.node().getNodeInfo().setExploration(true);
-
+            goal.node().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
             goal.node().getNodeInfo().get(ExplorationNodeData.class).setExplorationAction("Edit " + term + " to " + newTerm);
             String s = goal.node().getNodeInfo().getBranchLabel();
             goal.node().getNodeInfo().setBranchLabel("ExplorationNode: " + s);
