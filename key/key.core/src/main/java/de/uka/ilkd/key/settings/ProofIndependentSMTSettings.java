@@ -202,7 +202,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
 
 
 
-        public void readSettings(Object sender, Properties props){
+        public void readSettings(Properties props){
                 timeout = SettingsConverter.read(props, TIMEOUT, timeout);
                 showResultsAfterExecution = SettingsConverter.read(props,SHOW_SMT_RES_DIA,showResultsAfterExecution);
                 pathForSMTTranslation    = SettingsConverter.read(props, PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
@@ -226,7 +226,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
     
 
 
-        public void writeSettings(Object sender, Properties props){
+        public void writeSettings(Properties props){
                 SettingsConverter.store(props,TIMEOUT,timeout);
                 SettingsConverter.store(props,SHOW_SMT_RES_DIA,showResultsAfterExecution);
                 SettingsConverter.store(props,PROGRESS_DIALOG_MODE,modeOfProgressDialog);

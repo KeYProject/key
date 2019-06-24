@@ -15,6 +15,7 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
 import java.awt.Insets;
+import java.util.ArrayList;
 
 import javax.swing.JTextArea;
 import javax.swing.border.CompoundBorder;
@@ -24,6 +25,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -43,6 +46,17 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 public class InnerNodeView extends SequentView {
 
+    private static final ColorSettings.ColorProperty RULE_APP_HIGHLIGHT_COLOR =
+            ColorSettings.define("[innerNodeView]ruleAppHighlight", "",
+                    new Color(0.5f, 1.0f, 0.5f, 0.4f));
+
+    private static final ColorSettings.ColorProperty IF_FORMULA_HIGHLIGHT_COLOR =
+            ColorSettings.define("[innerNodeView]ifFormulaHighlight", "",
+                    new Color(0.8f, 1.0f, 0.8f, 0.5f));
+
+    private static final ColorSettings.ColorProperty SELECTION_COLOR =
+            ColorSettings.define("[innerNodeView]selection", "", new Color(10, 180, 50));
+
     /**
      *
      */
@@ -60,7 +74,7 @@ public class InnerNodeView extends SequentView {
                         mainWindow.getMediator().getNotationInfo(),
                         mainWindow.getMediator().getServices(),
                         getVisibleTermLabels()));
-        setSelectionColor(new Color(10, 180, 50));
+        setSelectionColor(SELECTION_COLOR.get());
         setBackground(INACTIVE_BACKGROUND_COLOR);
 
         tacletInfo = new JTextArea(TacletDescriber.getTacletDescription(mainWindow.getMediator(), node, getFilter()));
@@ -74,9 +88,10 @@ public class InnerNodeView extends SequentView {
     }
 
     static final HighlightPainter RULEAPP_HIGHLIGHTER
-            = new DefaultHighlighter.DefaultHighlightPainter(new Color(0.5f, 1.0f, 0.5f, 0.4f));
+            = new DefaultHighlighter.DefaultHighlightPainter(RULE_APP_HIGHLIGHT_COLOR.get());
+
     static final HighlightPainter IF_FORMULA_HIGHLIGHTER
-            = new DefaultHighlighter.DefaultHighlightPainter(new Color(0.8f, 1.0f, 0.8f, 0.5f));
+            = new DefaultHighlighter.DefaultHighlightPainter(IF_FORMULA_HIGHLIGHT_COLOR.get());
 
     private void highlightRuleAppPosition(RuleApp app) {
         try {

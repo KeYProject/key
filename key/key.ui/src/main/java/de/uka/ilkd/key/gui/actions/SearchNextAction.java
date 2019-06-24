@@ -13,11 +13,10 @@
 
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
+import java.awt.event.ActionEvent;
 
 /*
  * Menu option for showing the next search result of sequent search
@@ -30,9 +29,7 @@ public class SearchNextAction extends MainWindowAction {
     public SearchNextAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Find next occurence");
-        setIcon(
-            IconFontSwing.buildIcon(FontAwesomeBold.ARROW_LEFT, 16)
-        );
+        setIcon(IconFactory.SEARCH_NEXT.get(16));
         setTooltip("Find the next occurence of current search term in sequent.");
         getMediator().enableWhenProofLoaded(this);
     }

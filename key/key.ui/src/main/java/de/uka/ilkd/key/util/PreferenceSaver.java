@@ -13,17 +13,10 @@
 
 package de.uka.ilkd.key.util;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Rectangle;
-import java.awt.Window;
+import javax.swing.*;
+import java.awt.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-
-import javax.swing.AbstractButton;
-import javax.swing.JMenu;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 
 /**
  * A simple utility which stores and loads user manipulatable properties of

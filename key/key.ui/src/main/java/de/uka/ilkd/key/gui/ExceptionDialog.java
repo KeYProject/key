@@ -13,14 +13,16 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.Container;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
+import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
+import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
+import de.uka.ilkd.key.util.ExceptionTools;
+import org.key_project.util.java.StringUtil;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -31,23 +33,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
-
-import org.key_project.util.java.StringUtil;
-
-import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
-import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
-import de.uka.ilkd.key.util.ExceptionTools;
 
 /**
  * Dialog to display error messages.
