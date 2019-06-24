@@ -31,7 +31,7 @@ public interface FileRepo extends ProofDisposedListener {
 
     /**
      * Provides access to the InputStream of a RuleSource. The file the RuleSource is read from
-     * is copied to the FileRepo.
+     * is registered to the FileRepo.
      * @param ruleSource the RuleSource
      * @return an InputStream of the RuleSource
      * @throws IOException on IO errors
@@ -39,8 +39,8 @@ public interface FileRepo extends ProofDisposedListener {
     public InputStream getInputStream(RuleSource ruleSource) throws IOException;
 
     /**
-     * Provides access to the InputStream of a file identified by an URL. The file is copied to the
-     * FileRepo.
+     * Provides access to the InputStream of a file identified by an URL. The file is registered to
+     * the FileRepo.
      * @param url the URL of the file
      * @return an InputStream to the file identified by the URL
      * @throws IOException on IO errors

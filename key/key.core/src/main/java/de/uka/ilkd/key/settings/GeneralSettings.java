@@ -73,6 +73,12 @@ public class GeneralSettings implements Settings, Cloneable {
      */
     private boolean allowBundleSaving = false;
 
+    /**
+     * If enabled, source files are cached at first use to ensure consistency between proof
+     * and source code. Toggles between SimpleFilerepo (false) and DiskFileRepo (true).
+     */
+    private boolean ensureSourceConsistency = false;
+
     private LinkedList<SettingsListener> listenerList = 
         new LinkedList<SettingsListener>();
 
@@ -103,6 +109,10 @@ public class GeneralSettings implements Settings, Cloneable {
 
     public boolean isAllowBundleSaving() {
         return allowBundleSaving;
+    }
+
+    public boolean isEnsureSourceConsistency() {
+        return ensureSourceConsistency;
     }
 
     // setter
@@ -147,6 +157,18 @@ public class GeneralSettings implements Settings, Cloneable {
     public void setAllowBundleSaving(boolean b) {
         if (allowBundleSaving != b) {
             allowBundleSaving = b;
+            fireSettingsChanged();
+        }
+    }
+
+    /**
+     * Sets the ensureSourceConsistency flag. This enables/disables caching of source files at first
+     * use via a FileRepo.
+     * @param b the new truth value of the flag
+     */
+    public void setEnsureSourceConsistency(boolean b) {
+        if (ensureSourceConsistency != b) {
+            ensureSourceConsistency = b;
             fireSettingsChanged();
         }
     }
