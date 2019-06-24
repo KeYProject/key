@@ -832,6 +832,7 @@ public final class MainWindow extends JFrame {
         options.add(new MinimizeInteraction(this));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
         options.add(new JCheckBoxMenuItem(new BundleSavingToggleAction(this)));
+        options.add(new JCheckBoxMenuItem(new EnsureSourceConsistencyToggleAction(this)));
 
         return options;
 
