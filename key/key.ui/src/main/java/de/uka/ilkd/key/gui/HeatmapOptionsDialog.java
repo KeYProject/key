@@ -46,6 +46,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
@@ -121,8 +122,7 @@ public class HeatmapOptionsDialog extends JDialog {
     private static final int NUMRADIOBUTTONS = 5;
 
     /** question mark icon */
-    private static final Icon HELPICON = IconFactory
-        .scaleIcon(IconFactory.getImage("images/questionIcon.png"), 20, 20);
+    private static final Icon HELPICON = IconFactory.HELP.get(20);
 
     /**
      * Opens a dialog for choosing if and how to display heatmap highlighting.

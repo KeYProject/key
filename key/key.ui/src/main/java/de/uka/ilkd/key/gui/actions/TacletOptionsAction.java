@@ -16,7 +16,7 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
@@ -30,13 +30,13 @@ public class TacletOptionsAction extends MainWindowAction {
     private static final long serialVersionUID = -6813540362001480606L;
 
     public TacletOptionsAction(MainWindow mainWindow) {
-	super(mainWindow);
-	setName("Taclet Options");
+        super(mainWindow);
+        setName("Taclet Options");
         setIcon(IconFactory.configure(16));
-	setAcceleratorLetter(KeyEvent.VK_T);
+        setAcceleratorLetter(KeyEvent.VK_T);
 	
-	getMediator().enableWhenProofLoaded(this);
-
+        getMediator().enableWhenProofLoaded(this);
+        lookupAcceleratorKey();
     }
 
     @Override

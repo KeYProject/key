@@ -24,7 +24,7 @@ import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
 
 public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Settings, Cloneable {
-
+	
 
 
         private static final String EXPLICIT_TYPE_HIERARCHY = "[SMTSettings]explicitTypeHierarchy";
@@ -42,10 +42,10 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
         private static final String USE_UNINTERPRETED_MULTIPLICATION = "[SMTSettings]useUninterpretedMultiplication";
 
         private static final String USE_CONSTANTS_FOR_BIGSMALL_INTEGERS = "[SMTSettings]useConstantsForBigOrSmallIntegers";
-
+        
         private static final String INTEGERS_MAXIMUM = "[SMTSettings]integersMaximum";
         private static final String INTEGERS_MINIMUM = "[SMTSettings]integersMinimum";
-
+        
         private static final String INVARIANT_FORALL = "[SMTSettings]invariantForall";
 
         private static final String LEGACY_TRANSLATION = "[SMTSettings]legacyTranslation";
@@ -69,14 +69,14 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
         public  SupportedTaclets supportedTaclets;
 
         private ProofDependentSMTSettings(){
-
+ 
                 supportedTaclets =  SupportedTaclets.REFERENCE;
         }
 
     private ProofDependentSMTSettings(ProofDependentSMTSettings data) {
-                copy(data);
+                copy(data);                
         }
-
+        
         public void copy(ProofDependentSMTSettings data){
                 supportedTaclets = new SupportedTaclets(data.supportedTaclets.getNamesOfSelectedTaclets());
                 this.useExplicitTypeHierarchy      = data.useExplicitTypeHierarchy;
@@ -84,14 +84,15 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
                 this.maxGenericSorts               = data.maxGenericSorts;
                 this.useBuiltInUniqueness          = data.useBuiltInUniqueness;
                 this.useUIMultiplication           = data.useUIMultiplication;
-                this.useConstantsForIntegers       = data.useConstantsForIntegers;
+                this.useConstantsForIntegers       = data.useConstantsForIntegers; 
                 this.maxInteger                    = data.maxInteger;
                 this.minInteger                    = data.minInteger;
                 this.invariantForall               = data.invariantForall;
+             
         }
 
 
-        private static final ProofDependentSMTSettings DEFAULT_DATA =
+        private static final ProofDependentSMTSettings DEFAULT_DATA = 
                 new ProofDependentSMTSettings();
 
         public static ProofDependentSMTSettings getDefaultSettingsData(){
@@ -106,8 +107,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
         }
 
 
-        @Override
-        public void readSettings(Object sender, Properties props){
+        public void readSettings(Properties props){
 
                 useExplicitTypeHierarchy = SettingsConverter.read(props,EXPLICIT_TYPE_HIERARCHY,
                                 useExplicitTypeHierarchy);
@@ -119,18 +119,18 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
 
                 useUIMultiplication      = SettingsConverter.read(props,USE_UNINTERPRETED_MULTIPLICATION,useUIMultiplication);
                 useConstantsForIntegers  = SettingsConverter.read(props,USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,useConstantsForIntegers);
-
+             
                 maxInteger = SettingsConverter.read(props,INTEGERS_MAXIMUM,maxInteger);
                 minInteger = SettingsConverter.read(props,INTEGERS_MINIMUM,minInteger);
-
+                
                 invariantForall = SettingsConverter.read(props,INVARIANT_FORALL,invariantForall);
-
+                
                 supportedTaclets.selectTaclets(SettingsConverter.read(props, TACLET_SELECTION,
                                 supportedTaclets.getNamesOfSelectedTaclets()));
+     
         }
 
-        @Override
-        public void writeSettings(Object sender, Properties props){
+        public void writeSettings(Properties props){
                 SettingsConverter.store(props,EXPLICIT_TYPE_HIERARCHY,useExplicitTypeHierarchy);
                 SettingsConverter.store(props,INSTANTIATE_NULL_PREDICATES,useNullInstantiation);
                 SettingsConverter.store(props,MAX_GENERIC_SORTS,maxGenericSorts);
@@ -142,23 +142,23 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
                 SettingsConverter.store(props,INTEGERS_MINIMUM,minInteger);
                 SettingsConverter.store(props, INVARIANT_FORALL, invariantForall);
         }
-
-
+        
+        
         public void fireSettingsChanged() {
                 for (SettingsListener aListenerList : listeners) {
                         aListenerList.settingsChanged(new EventObject(this));
                 }
-
+   
         }
 
         @Override
         public void addSettingsListener(SettingsListener l) {
                listeners.add(l);
-
+                
         }
+        
 
-
-
-
+        
+       
 
 }

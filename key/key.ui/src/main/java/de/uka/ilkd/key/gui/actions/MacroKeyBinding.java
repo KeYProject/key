@@ -22,7 +22,7 @@ import javax.swing.KeyStroke;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
-import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
+import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.PosInSequent;

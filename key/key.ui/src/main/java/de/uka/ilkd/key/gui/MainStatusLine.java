@@ -13,78 +13,62 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.SwingUtilities;
-import javax.swing.border.BevelBorder;
-
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.util.TipOfTheDay;
 
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import java.awt.*;
+
+/**
+ * Status line of the KeY MainWindow.
+ * <p>
+ * The status line hold a lblStatusText and a progress panel.
+ * <p>
+ * You add additional components by using the extension points {@link de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.StatusLine}
+ *
+ * <p>
+ * <ul>
+ * <li>08.04.2019, weigl: Clean up, add extension point</li>
+ * </ul>
+ * </p>
+ *
+ * @see MainWindow
+ * @see de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.StatusLine
+ */
 class MainStatusLine extends JPanel {
+    private final JLabel lblStatusText = new JLabel();
+    private final JProgressBar progressBar = new JProgressBar();
+    //private boolean phantomBoxAdded = false;
 
-    private static final long serialVersionUID = -4324361226332870737L;
-    private JLabel       text;
-    private JPanel       progressPanel;
-    private JProgressBar progressBar;
-    private int          max             = 0;
-    private boolean      phantomBoxAdded = false;
-
-    MainStatusLine ( String p_initialText,
-                    Font   p_font ) {
-        setLayout ( new BoxLayout ( this, BoxLayout.X_AXIS ) );
+    MainStatusLine(String initialText, Font font) {
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         setBorder(new BevelBorder(BevelBorder.LOWERED));
         setBackground(Color.gray);
-        setFont(p_font);
+        setFont(font);
         setOpaque(false);
 
-        text = new JLabel( p_initialText );
+        lblStatusText.setText(initialText);
+        lblStatusText.setIcon(IconFactory.keyLogo(35, 20));
 
-        text.setIcon(IconFactory.keyLogo(35,20));
+        //add(Box.createHorizontalGlue());
+        add(lblStatusText);
+        add(Box.createHorizontalStrut(50));
 
-        add ( Box.createHorizontalGlue () );
-        add ( text );
-        add ( Box.createHorizontalGlue () );
-
-        createProgressPanel ();
-        progressPanel.setVisible ( false );
-        add ( progressPanel );
-
-        setVisible(true);
-    }
-
-    private void createProgressPanel () {
-        Dimension s;
-
-        progressPanel = new JPanel ();
-        progressPanel.setLayout ( new BoxLayout ( progressPanel,
-                        BoxLayout.X_AXIS ) );
-
-        progressBar = new JProgressBar(0, max);
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
-
-        s = new Dimension ( Short.MAX_VALUE, Short.MAX_VALUE );
-        progressBar.setMaximumSize ( s );
-
+        progressBar.setMaximumSize(new Dimension(100, Short.MAX_VALUE));
         progressBar.setEnabled(true);
-        progressPanel.add(progressBar);
+        progressBar.setVisible(false);
+        add(progressBar);
 
-        s = new Dimension ( 100, Short.MAX_VALUE );
-        progressPanel.setMaximumSize ( s );	    
+        add(Box.createHorizontalGlue());
+        KeYGuiExtensionFacade.getStatusLineComponents().forEach(this::add);
     }
 
-    /**
+    /*
      * The following methods should only be called from the event
      * dispatching thread
      */
@@ -92,55 +76,49 @@ class MainStatusLine extends JPanel {
     /**
      * Make the status line display a standard message
      */
-    public void reset () {
-        setProgressPanelVisible ( false );
-        setStatusText ("Hint: "+TipOfTheDay.get());
+    public void reset() {
+        setProgressPanelVisible(false);
+        setStatusText("Hint: " + TipOfTheDay.get());
     }
 
     /**
      * Set the range of values the progress bar can display (see
      * <code>setMaximum</code> of <code>ProgressBar</code>)
      */
-    public void setProgressBarMaximum(int value){
+    public void setProgressBarMaximum(int value) {
         progressBar.setMaximum(value);
     }
 
     /**
      * Set the value the progress bar currently displays
      */
-    public void setProgress(final int value){
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setValue(value);
-            }
-        });
+    public void setProgress(final int value) {
+        SwingUtilities.invokeLater(() -> progressBar.setValue(value));
     }
 
     /**
      * Set the visibility of the progress bar and the abort button
      */
-    public void setProgressPanelVisible ( boolean p_visible ) {
-        progressPanel.setVisible ( p_visible );
+    public void setProgressPanelVisible(boolean visible) {
+        progressBar.setVisible(visible);
+        if (visible) {
+            setProgress(0);
 
-        if ( p_visible ) {
-            setProgress ( 0 );
-
-            // To avoid later resizing of the status line, add an
+            /* To avoid later resizing of the status line, add an
             // invisible element with the same height as the abort button
-            if ( !phantomBoxAdded ) {
+            if (!phantomBoxAdded) {
                 phantomBoxAdded = true;
-                ComponentListener phantomAdder = new ComponentAdapter () {
+                ComponentListener phantomAdder = new ComponentAdapter() {
                     @Override
                     public void componentResized(ComponentEvent e) {
-                        progressPanel.removeComponentListener ( this );
-                        Dimension s = progressPanel.getSize ();
-                        s           = new Dimension ( 0, (int)s.getHeight () );
+                        progressPanel.removeComponentListener(this);
+                        Dimension s = progressPanel.getSize();
+                        s = new Dimension(0, (int) s.getHeight());
                         add(Box.createRigidArea(s));
                     }
                 };
-                progressPanel.addComponentListener ( phantomAdder );
-            }
+                progressPanel.addComponentListener(phantomAdder);
+            }*/
         }
     }
 
@@ -149,6 +127,6 @@ class MainStatusLine extends JPanel {
      * anything else
      */
     public void setStatusText(String s) {
-        text.setText(s);
+        lblStatusText.setText(s);
     }
 }

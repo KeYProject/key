@@ -1,0 +1,55 @@
+plugins {
+    id("application")
+    id 'com.github.johnrengelman.shadow' version "5.0.0"
+}
+
+dependencies {
+    compile project(":key.core")
+    compile project(":key.core:rifl")
+
+    compile project(":key.core.proof_references")
+    compile project(":key.core.symbolic_execution")
+    compile project(":key.core.testgen")
+    compile project(":key.removegenerics")
+
+    compile 'com.miglayout:miglayout-swing:5.2'
+
+    compile files('lib/docking-frames-common.jar',
+                'lib/docking-frames-core.jar')
+
+    runtimeOnly project(":keyext.interactionlog")
+    //runtimeOnly project(":keyext.script.ui")
+
+    compile 'org.jetbrains:annotations:17.0.0'
+}
+
+task createExamplesZip(type: Zip) {
+    destinationDirectory = file("$buildDir/resources/main/")
+    archiveFileName = "examples.zip"
+    from 'examples'
+    include '*'
+    include '**/**'
+}
+
+processResources.dependsOn << createExamplesZip
+
+shadowJar {
+    archiveClassifier = "exe"
+    archiveBaseName = "key"
+}
+
+distZip {
+    archiveBaseName = "key"
+}
+
+application {
+    //dependsOn(createExamplesZip)
+    mainClassName = "de.uka.ilkd.key.core.Main"
+}
+
+run {
+    systemProperties["key.examples.dir"] = "$projectDir/examples"
+    args "--experimental"
+}
+
+

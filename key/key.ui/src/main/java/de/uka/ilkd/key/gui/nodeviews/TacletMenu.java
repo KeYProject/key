@@ -16,24 +16,11 @@ package de.uka.ilkd.key.gui.nodeviews;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
+import de.uka.ilkd.key.settings.ViewSettings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -41,7 +28,8 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
-import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
@@ -49,7 +37,6 @@ import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NameCreationInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -106,41 +93,11 @@ public class TacletMenu extends JMenu {
     private static final String ENTER_LOOP_SPECIFICATION = "Enter Loop Specification";
     private static final String APPLY_RULE = "Apply Rule";
     private static final String NO_RULES_APPLICABLE = "No rules applicable.";
-    /**
-     *
-     */
-    private static final long serialVersionUID = -4659105575090816693L;
-    private static final Set<Name> CLUTTER_RULESETS = new LinkedHashSet<Name>();
-    private static final Set<Name> CLUTTER_RULES = new LinkedHashSet<Name>();
 
-    static {
-        CLUTTER_RULESETS.add(new Name("notHumanReadable"));
-        CLUTTER_RULESETS.add(new Name("obsolete"));
-        CLUTTER_RULESETS.add(new Name("pullOutQuantifierAll"));
-        CLUTTER_RULESETS.add(new Name("pullOutQuantifierEx"));
-    }
+    private Set<String> clutterRuleSets;
+    private Set<String> clutterRules;
 
-    static {
-        CLUTTER_RULES.add(new Name("cut_direct_r"));
-        CLUTTER_RULES.add(new Name("cut_direct_l"));
-        CLUTTER_RULES.add(new Name("case_distinction_r"));
-        CLUTTER_RULES.add(new Name("case_distinction_l"));
-        CLUTTER_RULES.add(new Name("local_cut"));
-        CLUTTER_RULES.add(new Name("commute_and_2"));
-        CLUTTER_RULES.add(new Name("commute_or_2"));
-        CLUTTER_RULES.add(new Name("boxToDiamond"));
-        CLUTTER_RULES.add(new Name("pullOut"));
-        CLUTTER_RULES.add(new Name("typeStatic"));
-        CLUTTER_RULES.add(new Name("less_is_total"));
-        CLUTTER_RULES.add(new Name("less_zero_is_total"));
-        CLUTTER_RULES.add(new Name("applyEqReverse"));
-
-
-        // the following are used for drag'n'drop interactions
-        CLUTTER_RULES.add(new Name("eqTermCut"));
-        CLUTTER_RULES.add(new Name("instAll"));
-        CLUTTER_RULES.add(new Name("instEx"));
-    }
+    public static final int TOO_MANY_TACLETS_THRESHOLD = 15; //reduce for debugging.
 
     private PosInSequent pos;
     private CurrentGoalView sequentView;
@@ -152,6 +109,13 @@ public class TacletMenu extends JMenu {
      * creates empty menu
      */
     TacletMenu() {
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        clutterRuleSets = vs.getClutterRuleSets();
+        clutterRules = vs.getClutterRules();
+        vs.addSettingsListener(e -> {
+            clutterRuleSets = vs.getClutterRuleSets();
+            clutterRules = vs.getClutterRules();
+        });
     }
 
 
@@ -170,7 +134,7 @@ public class TacletMenu extends JMenu {
                ImmutableList<TacletApp> findList, ImmutableList<TacletApp> rewriteList,
                ImmutableList<TacletApp> noFindList, ImmutableList<BuiltInRule> builtInList,
                PosInSequent pos) {
-        super();
+        this();
         this.sequentView = sequentView;
         this.mediator = sequentView.getMediator();
         this.pos = pos;
@@ -224,7 +188,7 @@ public class TacletMenu extends JMenu {
 //         }
 
         if (rulesAvailable) {
-            createMenuItems(toAdd, control);
+            addToMenu(toAdd, control);
         } else {
             createSection(NO_RULES_APPLICABLE);
         }
@@ -241,12 +205,11 @@ public class TacletMenu extends JMenu {
 
         //        addPopFrameItem(control);
 
-        addSeparator();
-        JMenu extensionMenu =
-                KeYGuiExtensionFacade.createTermMenu(sequentView.getMainWindow(), pos);
-
-        for (Component el : extensionMenu.getMenuComponents()) {
-            add(el);
+        List<Action> extensionMenu = KeYGuiExtensionFacade.getContextMenuItems(
+                DefaultContextMenuKind.SEQUENT_VIEW, pos, mediator);
+        if(!extensionMenu.isEmpty()) {
+            addSeparator();
+            extensionMenu.forEach(this::add);
         }
 
         addClipboardItem(control);
@@ -484,11 +447,10 @@ public class TacletMenu extends JMenu {
      * adds a TacletMenuItem for each taclet in the list and sets
      * the given MenuControl as the ActionListener
      *
-     * @param taclets with the Taclets the items represent
+     * @param taclets {@link ImmutableList<Taclet>} with the Taclets the items represent
      * @param control the ActionListener
      */
-    private void createMenuItems(ImmutableList<TacletApp> taclets,
-                                 MenuControl control) {
+    private void addToMenu(ImmutableList<TacletApp> taclets, MenuControl control) {
 
         final InsertHiddenTacletMenuItem insHiddenItem =
                 new InsertHiddenTacletMenuItem(MainWindow.getInstance(),
@@ -498,30 +460,61 @@ public class TacletMenu extends JMenu {
                 new InsertSystemInvariantTacletMenuItem(MainWindow.getInstance(),
                         mediator.getNotationInfo(), mediator.getServices());
 
+        List<TacletApp> normalTaclets = new ArrayList<>();
+        List<TacletApp> rareTaclets = new ArrayList<>();
 
-        for (final TacletApp app : taclets) {
-            final Taclet taclet = app.taclet();
+        for (TacletApp app : taclets) {
+            Taclet taclet = app.taclet();
 
             if (insHiddenItem.isResponsible(taclet)) {
                 insHiddenItem.add(app);
-            } else if (insSystemInvItem.isResponsible(taclet)) {
+                continue;
+            }
+
+            if (insSystemInvItem.isResponsible(taclet)) {
                 insSystemInvItem.add(app);
+                continue;
+            }
+            if (!mediator.getFilterForInteractiveProving().filter(taclet)) {
+                continue;
+        }
+
+            if (isRareRule(taclet)) {
+                rareTaclets.add(app);
+            } else {
+                normalTaclets.add(app);
+            }
+        }
+        normalTaclets.addAll(rareTaclets);
+
+        int currentSize = 0;
+        JMenu target = this;
+        for (TacletApp app : normalTaclets) {
+            target.add(createMenuItem(app, control));
+            ++currentSize;
+            if(currentSize>= TOO_MANY_TACLETS_THRESHOLD){
+                JMenu newTarget = new JMenu(MORE_RULES);
+                target.add(newTarget);
+                target = newTarget;
+                currentSize = 0;
             }
         }
 
+        //add globally
         if (insHiddenItem.getAppSize() > 0) {
             add(insHiddenItem);
             insHiddenItem.addActionListener(control);
         }
 
+        //add globally
         if (insSystemInvItem.getAppSize() > 0) {
             add(insSystemInvItem);
             insSystemInvItem.addActionListener(control);
         }
 
-        JMenu more = new JMenu(MORE_RULES);
+        //JMenu more = new JMenu(MORE_RULES);
 
-        for (final TacletApp app : taclets) {
+        /*for (final TacletApp app : taclets) {
             final Taclet taclet = app.taclet();
             if (!mediator.getFilterForInteractiveProving().filter(taclet)) {
                 continue;
@@ -535,11 +528,11 @@ public class TacletMenu extends JMenu {
                 item.addActionListener(control);
                 boolean rareRule = false;
                 for (RuleSet rs : taclet.getRuleSets()) {
-                    if (CLUTTER_RULESETS.contains(rs.name())) {
+                    if (clutterRuleSets.contains(rs.name())) {
                         rareRule = true;
                     }
                 }
-                if (CLUTTER_RULES.contains(taclet.name())) {
+                if (clutterRules.contains(taclet.name())) {
                     rareRule = true;
                 }
 
@@ -550,10 +543,24 @@ public class TacletMenu extends JMenu {
                 }
             }
         }
+        */
 
-        if (more.getItemCount() > 0) {
+        /*if (more.getItemCount() > 0) {
             add(more);
+        }*/
         }
+    private boolean isRareRule(Taclet taclet) {
+        if( clutterRules.contains(taclet.name().toString())) return true;
+        return taclet.getRuleSets().stream()
+                .anyMatch(it -> clutterRuleSets.contains(it.name().toString()));
+    }
+
+    private Component createMenuItem(TacletApp app, MenuControl control) {
+        final DefaultTacletMenuItem item =
+                new DefaultTacletMenuItem(this, app,
+                        mediator.getNotationInfo(), mediator.getServices());
+        item.addActionListener(control);
+        return item;
     }
 
     /**
@@ -572,7 +579,7 @@ public class TacletMenu extends JMenu {
      */
     class MenuControl implements ActionListener {
 
-        private boolean validabbreviation(String s) {
+        private boolean validAbbreviation(String s) {
             if (s == null || s.length() == 0) {
                 return false;
             }
@@ -599,22 +606,18 @@ public class TacletMenu extends JMenu {
                 final Goal goal = mediator.getSelectedGoal();
                 assert goal != null;
 
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        SMTSettings settings = new SMTSettings(goal.proof().getSettings().getSMTSettings(),
-                                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), goal.proof());
-                        SolverLauncher launcher = new SolverLauncher(settings);
-                        launcher.addListener(new SolverListener(settings, goal.proof()));
-                        Collection<SMTProblem> list = new LinkedList<SMTProblem>();
-                        list.add(new SMTProblem(goal));
-                        launcher.launch(solverUnion.getTypes(),
-                                list,
-                                goal.proof().getServices());
+                Thread thread = new Thread(() -> {
+                    SMTSettings settings = new SMTSettings(goal.proof().getSettings().getSMTSettings(),
+                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), goal.proof());
+                    SolverLauncher launcher = new SolverLauncher(settings);
+                    launcher.addListener(new SolverListener(settings, goal.proof()));
+                    Collection<SMTProblem> list = new LinkedList<SMTProblem>();
+                    list.add(new SMTProblem(goal));
+                    launcher.launch(solverUnion.getTypes(),
+                            list,
+                            goal.proof().getServices());
 
 
-                    }
                 }, "SMTRunner");
                 thread.start();
             } else if (e.getSource() instanceof BuiltInRuleMenuItem) {
@@ -667,7 +670,7 @@ public class TacletMenu extends JMenu {
 
                         try {
                             if (abbreviation != null) {
-                                if (!validabbreviation(abbreviation)) {
+                                if (!validAbbreviation(abbreviation)) {
                                     JOptionPane.showMessageDialog(new JFrame(),
                                             "Only letters, numbers and '_' are allowed for Abbreviations",
                                             "Sorry",
@@ -699,7 +702,7 @@ public class TacletMenu extends JMenu {
                                                 getAbbrevMap().getAbbrev(occ.subTerm()).substring(1));
                         try {
                             if (abbreviation != null) {
-                                if (!validabbreviation(abbreviation)) {
+                                if (!validAbbreviation(abbreviation)) {
                                     JOptionPane.showMessageDialog(new JFrame(),
                                             "Only letters, numbers and '_' are allowed for Abbreviations",
                                             "Sorry",

@@ -29,6 +29,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.Debug;
 

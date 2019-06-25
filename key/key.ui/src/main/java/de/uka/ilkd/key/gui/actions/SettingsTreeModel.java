@@ -95,7 +95,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
     private OptionContentNode generateTableNode(String title, Settings settings) {
 
         Properties props = new Properties();
-        settings.writeSettings(this, props);
+        settings.writeSettings(props);
 
         return new OptionContentNode(title, generateJTable(props));
 

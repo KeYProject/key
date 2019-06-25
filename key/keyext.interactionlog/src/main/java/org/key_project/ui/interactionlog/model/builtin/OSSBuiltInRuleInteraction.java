@@ -1,8 +1,11 @@
 package org.key_project.ui.interactionlog.model.builtin;
 
+import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
-import org.key_project.ui.interactionlog.algo.InteractionVisitor;
 import org.key_project.ui.interactionlog.model.NodeIdentifier;
 import org.key_project.ui.interactionlog.model.OccurenceIdentifier;
 
@@ -32,8 +35,21 @@ public class OSSBuiltInRuleInteraction extends BuiltInRuleInteraction {
     }
 
     @Override
-    public <T> T accept(InteractionVisitor<T> visitor) {
-        return visitor.visit(this);
+    public String getMarkdown() {
+        return String.format("## One step simplification%n"
+                        + "* applied on %n  * Term:%s%n  * Toplevel %s%n",
+                getOccurenceIdentifier().getTerm(),
+                getOccurenceIdentifier().getToplevelTerm());
+    }
+
+    @Override
+    public String getProofScriptRepresentation() {
+        return String.format("one_step_simplify %n" +
+                        "\t     on = \"%s\"%n" +
+                        "\tformula = \"%s\"%n;%n",
+                getOccurenceIdentifier().getTerm(),
+                getOccurenceIdentifier().getToplevelTerm()
+        );
     }
 
     @Override
@@ -55,5 +71,13 @@ public class OSSBuiltInRuleInteraction extends BuiltInRuleInteraction {
 
     public void setNodeIdentifier(NodeIdentifier nodeIdentifier) {
         this.nodeIdentifier = nodeIdentifier;
+    }
+
+    @Override
+    public void reapply(WindowUserInterfaceControl uic, Goal goal) throws Exception {
+        OneStepSimplifier oss = new OneStepSimplifier();
+        PosInOccurrence pio = getOccurenceIdentifier().rebuildOn(goal);
+        OneStepSimplifierRuleApp app = oss.createApp(pio, goal.proof().getServices());
+        goal.apply(app);
     }
 }

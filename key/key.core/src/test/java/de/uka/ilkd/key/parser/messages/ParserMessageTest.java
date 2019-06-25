@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -33,6 +34,7 @@ import de.uka.ilkd.key.util.ExceptionTools;
  * @author Kai Wallisch
  */
 @RunWith(Parameterized.class)
+@Ignore("See issue #1500")
 public class ParserMessageTest {
    private final String docFile = "key/doc/README.parserMessageTest";
 
@@ -62,7 +64,6 @@ public class ParserMessageTest {
    public ParserMessageTest(String testName, File sourceDir) throws IOException {
 
       // retrieve the Java file contained in the given source directory:
-      File javaFile = null;
       for (File file : sourceDir.listFiles()) {
          if (file.getName().endsWith(".java")) {
             assertEquals("Found multiple Java files in directory " + sourceDir
@@ -105,8 +106,9 @@ public class ParserMessageTest {
                   && location.getFilename().length() > 0);
 
       assertEquals("Filename retrieved from parser message "
-            + "doesn't match filename of originally parsed file.", javaFile,
-            new File(location.getFilename()));
+            + "doesn't match filename of originally parsed file.",
+              javaFile.getAbsoluteFile(),
+              new File(location.getFilename()));
    }
 
    @Test

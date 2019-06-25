@@ -35,7 +35,10 @@ import javax.swing.text.PlainDocument;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
-
+/**
+ * @deprecated weigl, 2019-05-10: integrated into the {@link de.uka.ilkd.key.gui.settings.StandardUISettings}
+ */
+@Deprecated
 public class ViewSelector extends JDialog {
 
     /**

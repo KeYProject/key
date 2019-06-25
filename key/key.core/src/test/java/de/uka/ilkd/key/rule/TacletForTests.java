@@ -14,13 +14,6 @@
 /** this class is used to parse in Taclet from a file that are used by tests */
 package de.uka.ilkd.key.rule;
 
-import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
-
-import java.io.File;
-import java.io.StringReader;
-
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -40,14 +33,17 @@ import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.RuleCollection;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.KeYFileForTests;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.junit.Assert;
+import org.key_project.util.collection.ImmutableSLList;
+
+import java.io.File;
+import java.io.StringReader;
+
+import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
 public class TacletForTests {
 
@@ -101,9 +97,8 @@ public class TacletForTests {
 		schemaVariables = envInput.schemaVariables();
 	    }
 	} catch (Exception e) {
-	    System.err.println("Exception occurred while parsing "+file+"\n");
 	    e.printStackTrace();
-	    System.exit(-1);
+            Assert.fail("Exception occurred while parsing "+file);
 	}
     }
 
@@ -211,10 +206,9 @@ public class TacletForTests {
 		    TacletForTests.getAbbrevs());
 	    return parser.term();
 	} catch (Exception e) {
-	    System.err.println("Exception during parsing!");
 	    e.printStackTrace();
-	    System.exit(-1);
-	    return null;
+        Assert.fail("Exception occurred while parsing of " + termstr);
+        return null;
 	} finally {
 	    if (br != null) br.close();
 	}

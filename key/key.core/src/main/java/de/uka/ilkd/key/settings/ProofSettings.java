@@ -13,20 +13,14 @@
 
 package de.uka.ilkd.key.settings;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.net.URL;
-import java.util.EventObject;
-import java.util.Properties;
-
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
+
+import java.io.*;
+import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * This class is used to load and save settings for proofs such as which data
@@ -40,62 +34,54 @@ import de.uka.ilkd.key.util.KeYResourceManager;
  * number  = IntegerLDT.class
  * boolean = BooleanLDT.class
  * </code>
+ *
+ * @see Properties
+ * @see Settings
  */
 public class ProofSettings {
-    public static final File PROVER_CONFIG_FILE;
-    public static final URL PROVER_CONFIG_FILE_TEMPLATE;
-    public static final ProofSettings DEFAULT_SETTINGS;
+    public static final File PROVER_CONFIG_FILE = new File(PathConfig.getKeyConfigDir(), "proof-settings.props");
+    public static final URL PROVER_CONFIG_FILE_TEMPLATE = KeYResourceManager.getManager()
+            .getResourceFile(ProofSettings.class, "default-proof-settings.props");
+    public static final ProofSettings DEFAULT_SETTINGS = new ProofSettings();
 
     /**
-     * Array index for the strategy settings.
+     * all setting objects in the following order: heuristicSettings
      */
-    private final static int STRATEGY_SETTINGS = 0;
+    private List<Settings> settings = new LinkedList<>();
+
     /**
-     * Array index for the choice settings.
+     * the default listener to settings
      */
-    private final static int CHOICE_SETTINGS = 1;
-    /**
-     * Array index for the smt settings.
-     */
-    private final static int SMT_SETTINGS = 2;
-    /**
-     * Array index for the term label settings.
-     */
-    private final static int TERM_LABEL_SETTINGS = 3;
+    private SettingsListener listener = e -> saveSettings();
 
-    static {
-        PROVER_CONFIG_FILE = new File(PathConfig.getKeyConfigDir()
-                + File.separator + "proof-settings.props");
-        PROVER_CONFIG_FILE_TEMPLATE = KeYResourceManager.getManager()
-                .getResourceFile(ProofSettings.class,
-                        "default-proof-settings.props");
-        DEFAULT_SETTINGS = new ProofSettings();
-    }
+    // NOTE: This was commented out in commit
+    // 4932e4d1210356455c04a1e9fb7f2fa1f21b3e9d, 2012/11/08, in the process of
+    // separating proof independent from proof dependent settings.
+    // Is not in ProofIndependentSettings. I don't know why these code
+    // corpses have been left here as comments, therefore I don't removed them.
+    // (DS, 2017-05-11)
 
-    private boolean initialized = false;
-
-    /** all setting objects in the following order: heuristicSettings */
-    private Settings[] settings;
-
-    /** the default listener to settings */
-    private ProofSettingsListener listener = new ProofSettingsListener();
+    // private final static int strategySettings = 0;
+    // private final static int GENERAL_SETTINGS = 1;
+    // private final static int choiceSettings = 2;
+    // private final static int smtSettings = 3;
+    // private final static int VIEW_SETTINGS = 4;
+    private final StrategySettings strategySettings = new StrategySettings();
+    private ChoiceSettings choiceSettings = new ChoiceSettings();
+    private final ProofDependentSMTSettings smtSettings = ProofDependentSMTSettings.getDefaultSettingsData();
+    private Properties lastLoadedProperties = null;
+    private TermLabelSettings termLabelSettings = new TermLabelSettings();
 
     /**
      * create a proof settings object. When you add a new settings object,
      * PLEASE UPDATE THE LIST ABOVE AND USE THOSE CONSTANTS INSTEAD OF USING
      * INTEGERS DIRECTLY
      */
-
     private ProofSettings() {
-        settings = new Settings[] { new StrategySettings(),
-            new ChoiceSettings(),
-            ProofDependentSMTSettings.getDefaultSettingsData(),
-            new TermLabelSettings(),
-        };
-
-        for (int i = 0; i < settings.length; i++) {
-            settings[i].addSettingsListener(listener);
-        }
+        addSettings(strategySettings);
+        addSettings(choiceSettings);
+        addSettings(smtSettings);
+        addSettings(termLabelSettings);
     }
 
     /*
@@ -104,38 +90,55 @@ public class ProofSettings {
     public ProofSettings(ProofSettings toCopy) {
         this();
         Properties result = new Properties();
-        Settings[] s = toCopy.settings;
-
-        for (int i = 0; i < s.length; i++) {
-            s[i].writeSettings(this, result);
+        lastLoadedProperties = toCopy.lastLoadedProperties;
+        for (Settings s : toCopy.settings) {
+            s.writeSettings(result);
         }
-
-        for (int i = settings.length - 1; i >= 0; i--) {
-            settings[i].readSettings(this, result);
+        for (Settings s : settings) {
+            s.readSettings(result);
         }
-        initialized = true;
     }
 
-    public void ensureInitialized() {
-        if (!initialized) {
-            loadSettings();
-            initialized = true;
+
+    public void addSettings(Settings settings) {
+        this.settings.add(settings);
+        settings.addSettingsListener(listener);
+        if (lastLoadedProperties != null) {
+            settings.readSettings(lastLoadedProperties);
         }
+    }
+
+
+    public void ensureInitialized() {
+        if (isInitialized()) {
+            loadSettings();
+        }
+    }
+
+    private boolean isInitialized() {
+        return lastLoadedProperties != null;
+    }
+
+    /**
+     *
+     */
+    public Properties getProperties() {
+        Properties result = new Properties();
+        for (Settings s : settings) {
+            s.writeSettings(result);
+        }
+        return result;
     }
 
     /**
      * Used by saveSettings() and settingsToString()
      */
-    public void settingsToStream(Settings[] s, OutputStream out) {
+    public void settingsToStream(Writer out) {
         try {
-            Properties result = new Properties();
-            for (int i = 0; i < s.length; i++) {
-                s[i].writeSettings(this, result);
-            }
-            result.store(out, "Proof-Settings-Config-File");
+            getProperties().store(out, "Proof-Settings-Config-File");
         } catch (IOException e) {
             System.err.println("Warning: could not save proof-settings.");
-            System.err.println(e);
+            e.printStackTrace();
             Debug.out(e);
         }
     }
@@ -147,42 +150,37 @@ public class ProofSettings {
         ensureInitialized();
         try {
             if (!PROVER_CONFIG_FILE.exists()) {
-                new File(PathConfig.getKeyConfigDir() + File.separator)
-                        .mkdirs();
-                PROVER_CONFIG_FILE.createNewFile();
+                PROVER_CONFIG_FILE.getParentFile().mkdirs();
             }
-            FileOutputStream out = new FileOutputStream(PROVER_CONFIG_FILE);
-            try {
-                settingsToStream(settings, out);
-            } finally {
-                out.close();
+            try (Writer out = new FileWriter(PROVER_CONFIG_FILE)) {
+                settingsToStream(out);
             }
         } catch (IOException e) {
             System.err.println("Warning: could not save proof-settings.");
-            System.err.println(e);
+            e.printStackTrace();
             Debug.out(e);
         }
     }
 
     public String settingsToString() {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        settingsToStream(settings, out);
-        return new String(out.toByteArray());
+        StringWriter out = new StringWriter();
+        settingsToStream(out);
+        return out.getBuffer().toString();
     }
 
-    /** Used by loadSettings() and loadSettingsFromString(...) */
+    /**
+     * Used by loadSettings() and loadSettingsFromString(...)
+     */
     public void loadSettingsFromStream(Reader in) {
         Properties defaultProps = new Properties();
 
-        if (PROVER_CONFIG_FILE_TEMPLATE == null) {
-            System.err.println(
-                    "Warning: default proof-settings file could not be found.");
-        } else {
+        if (PROVER_CONFIG_FILE_TEMPLATE == null)
+            System.err.println("Warning: default proof-settings file could not be found.");
+        else {
             try {
                 defaultProps.load(PROVER_CONFIG_FILE_TEMPLATE.openStream());
             } catch (IOException e) {
-                System.err.println(
-                        "Warning: default proof-settings could not be loaded.");
+                System.err.println("Warning: default proof-settings could not be loaded.");
                 Debug.out(e);
             }
         }
@@ -191,16 +189,11 @@ public class ProofSettings {
         try {
             props.load(in);
         } catch (IOException e) {
-            System.err.println(
-                    "Warning: no proof-settings could be loaded, using defaults");
+            System.err.println("Warning: no proof-settings could be loaded, using defaults");
             Debug.out(e);
         }
-
-        for (int i = settings.length - 1; i >= 0; i--) {
-            settings[i].readSettings(this, props);
-        }
-
-        initialized = true;
+        lastLoadedProperties = props;
+        for (Settings s : settings) s.readSettings(props);
     }
 
     /**
@@ -208,9 +201,9 @@ public class ProofSettings {
      */
     public void loadSettings() {
         try (FileReader in = new FileReader(PROVER_CONFIG_FILE)) {
-            if(Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
-                System.err.println("The settings in " +
-                        PROVER_CONFIG_FILE + " are *not* read.");
+            if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
+                //System.err.println("The settings in " +
+                //        PROVER_CONFIG_FILE + " are *not* read.");
             } else {
                 loadSettingsFromStream(in);
             }
@@ -221,11 +214,12 @@ public class ProofSettings {
         }
     }
 
-    /** Used to load Settings from a .key file */
+    /**
+     * Used to load Settings from a .key file
+     */
     public void loadSettingsFromString(String s) {
-        if (s == null) {
+        if (s == null)
             return;
-        }
         StringReader reader = new StringReader(s);
         loadSettingsFromStream(reader);
     }
@@ -237,7 +231,7 @@ public class ProofSettings {
      */
     public StrategySettings getStrategySettings() {
         ensureInitialized();
-        return (StrategySettings) settings[STRATEGY_SETTINGS];
+        return strategySettings;
     }
 
     /**
@@ -247,12 +241,7 @@ public class ProofSettings {
      */
     public ChoiceSettings getChoiceSettings() {
         ensureInitialized();
-        return (ChoiceSettings) settings[CHOICE_SETTINGS];
-    }
-
-    public ProofSettings setChoiceSettings(ChoiceSettings cs) {
-        settings[CHOICE_SETTINGS] = cs;
-        return this;
+        return choiceSettings;
     }
 
     /**
@@ -262,63 +251,14 @@ public class ProofSettings {
      */
     public ProofDependentSMTSettings getSMTSettings() {
         ensureInitialized();
-        return (ProofDependentSMTSettings) settings[SMT_SETTINGS];
-    }
-
-    /**
-     * Returns the term label settings from the proof settings.
-     * @return the term label settings
-     */
-    public TermLabelSettings getTermLabelSettings() {
-        ensureInitialized();
-        return (TermLabelSettings) settings[TERM_LABEL_SETTINGS];
-    }
-
-    /**
-     * Set the passed term label settings in the proof settings and return the proof settings.
-     * @param tls the term label settings
-     * @return the proof settings
-     */
-    public ProofSettings setTermLabelSettings(TermLabelSettings tls) {
-        settings[TERM_LABEL_SETTINGS] = tls;
-        return this;
-    }
-
-    //
-    //
-    // public GeneralSettings getGeneralSettings() {
-    // ensureInitialized();
-    // return (GeneralSettings) settings[GENERAL_SETTINGS];
-    // }
-    //
-    // public ViewSettings getViewSettings() {
-    // ensureInitialized();
-    // return (ViewSettings) settings[VIEW_SETTINGS];
-    // }
-
-    private class ProofSettingsListener implements SettingsListener {
-
-        ProofSettingsListener() {
-        }
-
-        /**
-         * called by the Settings object to inform the listener that its state
-         * has changed
-         *
-         * @param e
-         *            the Event sent to the listener
-         */
-        @Override
-        public void settingsChanged(EventObject e) {
-            saveSettings();
-        }
+        return smtSettings;
     }
 
     /**
      * Checks if the choice settings are initialized.
      *
      * @return {@code true} settings are initialized, {@code false} settings are
-     *         not initialized.
+     * not initialized.
      */
     public static boolean isChoiceSettingInitialised() {
         return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getChoices()
@@ -328,13 +268,21 @@ public class ProofSettings {
     /**
      * Update the proof settings according to the entries on the properties.
      *
-     * @param p
-     *            a non-<code>null</code> object with KeY properties.
+     * @param props a non-<code>null</code> object with KeY properties.
      */
     public void update(Properties props) {
-        for (int i = settings.length - 1; i >= 0; i--) {
-            settings[i].readSettings(this, props);
+        for (Settings s : settings) {
+            s.readSettings(props);
         }
     }
 
+
+    /**
+     * Returns the term label settings from the proof settings.
+     * @return the term label settings
+     */
+    public TermLabelSettings getTermLabelSettings() {
+        ensureInitialized();
+        return termLabelSettings;
+    }
 }

@@ -1,14 +1,17 @@
 package org.key_project.ui.interactionlog.model;
 
+import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
-import org.key_project.ui.interactionlog.algo.InteractionVisitor;
+import org.key_project.ui.interactionlog.api.Interaction;
 import org.key_project.util.collection.ImmutableList;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,11 +35,6 @@ public class AutoModeInteraction extends Interaction {
         this.openGoalNodeIds = openGoals.stream().map(NodeIdentifier::get).collect(Collectors.toList());
 
         this.info = info;
-    }
-
-    @Override
-    public <T> T accept(InteractionVisitor<T> visitor) {
-        return visitor.visit(this);
     }
 
     public ApplyStrategyInfo getInfo() {
@@ -66,5 +64,32 @@ public class AutoModeInteraction extends Interaction {
     @Override
     public String toString() {
         return "Auto Mode";
+    }
+
+    @Override
+    public String getMarkdown() {
+        StringWriter sout = new StringWriter();
+        PrintWriter out = new PrintWriter(sout);
+        out.write("## Apply auto strategy%n%n");
+        out.write("* Started on:");
+        getInitialNodeIds().forEach(nr -> out.format("  * %s%n", nr));
+        if (getOpenGoalNodeIds().isEmpty())
+            out.format("* **Closed all goals**");
+        else {
+            out.format("* finished on:%n");
+            getInitialNodeIds().forEach(nr -> out.format("  * %s%n", nr));
+        }
+        out.format("```%n%s%n```", getInfo());
+        return sout.toString();
+    }
+
+    @Override
+    public String getProofScriptRepresentation() {
+        return ("auto;%n");
+    }
+
+    @Override
+    public void reapply(WindowUserInterfaceControl uic, Goal goal) throws Exception {
+        uic.getProofControl().startAutoMode(goal.proof(), goal.proof().openGoals(), uic);
     }
 }
