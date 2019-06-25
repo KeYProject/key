@@ -27,8 +27,7 @@ import java.util.List;
  */
 @KeYGuiExtension.Info(name = "OriginLabels UI",
         optional = true,
-        description = "UI support for origin labels" +
-                "Developer: Florian Lanzinger <xxx@student.kit.edu>",
+        description = "UI support for origin labels",
         experimental = false)
 public class OriginTermLabelsExt
         implements KeYGuiExtension,

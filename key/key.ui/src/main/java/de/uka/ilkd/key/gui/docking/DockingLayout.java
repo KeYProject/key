@@ -37,7 +37,7 @@ import java.util.stream.Stream;
  * @author Alexander Weigl
  * @version 1 (15.05.19)
  */
-@KeYGuiExtension.Info(name = "Docking Helpers", optional = false, experimental = false)
+@KeYGuiExtension.Info(name = "Docking Helpers", optional = false, experimental = false, priority = 1)
 public final class DockingLayout
         implements KeYGuiExtension,
         KeYGuiExtension.Startup,
