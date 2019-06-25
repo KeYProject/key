@@ -32,6 +32,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.sourceview.SourceView.Highlight;
@@ -57,14 +58,20 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
      *
      * @see #highlightOriginInSourceView(PosInSequent)
      */
-    private static final Color ORIGIN_HIGHLIGHT_COLOR = Color.RED;
+    private static final ColorSettings.ColorProperty ORIGIN_HIGHLIGHT_COLOR =
+        ColorSettings.define("[SourceView]originHighlight",
+                "Color for highlighting origin of selected term in source view",
+                new Color(252, 202, 80));
 
     /**
      * The color for subterm origin highlights.
      *
      * @see #highlightOriginInSourceView(PosInSequent)
      */
-    private static final Color SUBTERM_ORIGIN_HIGHLIGHT_COLOR = new Color(255, 150, 150);
+    private static final ColorSettings.ColorProperty SUBTERM_ORIGIN_HIGHLIGHT_COLOR =
+        ColorSettings.define("[SourceView]originHighlight",
+                "Color for highlighting origin of subterms of selected term in source view",
+                new Color(252, 228, 169));
 
     /**
      * The current origin highlight.
@@ -242,7 +249,7 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
                     originHighlight = sourceView.addHighlight(
                             origin.fileName,
                             origin.line,
-                            ORIGIN_HIGHLIGHT_COLOR,
+                            ORIGIN_HIGHLIGHT_COLOR.get(),
                             20);
                 } else {
                     sourceView.changeHighlight(originHighlight, origin.line);
@@ -254,7 +261,7 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
                     subtermOriginsHighlights.add(sourceView.addHighlight(
                             subtermOrigin.fileName,
                             subtermOrigin.line,
-                            SUBTERM_ORIGIN_HIGHLIGHT_COLOR,
+                            SUBTERM_ORIGIN_HIGHLIGHT_COLOR.get(),
                             10));
                 }
             }

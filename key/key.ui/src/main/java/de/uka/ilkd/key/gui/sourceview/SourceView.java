@@ -10,10 +10,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -68,6 +68,7 @@ import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 
@@ -121,15 +122,26 @@ public final class SourceView extends JComponent {
      */
     private static final ColorSettings.ColorProperty NORMAL_HIGHLIGHT_COLOR =
             ColorSettings.define("[SourceView]normalHighlight",
-            "Color for Highlighting things in source view", new Color(150, 255, 150));
+            "Color for highlighting symbolically executed lines in source view",
+            new Color(194, 245, 194));
 
     /**
      * The color of the most recent highlight in source code (green).
      */
     private static final ColorSettings.ColorProperty MOST_RECENT_HIGHLIGHT_COLOR =
             ColorSettings.define("[SourceView]mostRecentHighlight",
-                    "Second color for highlightning",
-                    Color.GREEN);
+                    "Color for highlighting most recently"
+                    + " symbolically executed line in source view",
+                    new Color(57, 210, 81));
+
+    /**
+     * The color of the most recent highlight in source code (green).
+     */
+    private static final ColorSettings.ColorProperty TAB_HIGHLIGHT_COLOR =
+            ColorSettings.define("[SourceView]tabHighlight",
+                    "Color for highlighting source view tabs"
+                    + " whose files contain highlighted lines.",
+                    new Color(57, 210, 81));
 
     /**
      * The main window of KeY (needed to get the mediator).
@@ -161,11 +173,6 @@ public final class SourceView extends JComponent {
      */
     private LinkedList<Pair<Node, PositionInfo>> lines;
 
-    /**
-     * Unpacked JavaRedux files.
-     */
-    private Map<String, File> tmpReduxFiles = new HashMap<>();
-
     /** The symbolic execution highlights. */
     private Set<Highlight> symbExHighlights = new HashSet<>();
 
@@ -187,7 +194,7 @@ public final class SourceView extends JComponent {
                 if (tabPane.getSelectedTab() == null) {
                     selectedFile = null;
                 } else {
-                    selectedFile = tabPane.getSelectedTab().file.getAbsolutePath();
+                    selectedFile = tabPane.getSelectedTab().absoluteFileName;
                 }
 
                 // Mark tabs that contain highlights.
@@ -448,7 +455,7 @@ public final class SourceView extends JComponent {
     }
 
     private boolean isSelected(Tab tab) {
-        return Objects.equals(selectedFile, tab.getFileName());
+        return Objects.equals(selectedFile, tab.absoluteFileName);
     }
 
     /**
@@ -486,10 +493,6 @@ public final class SourceView extends JComponent {
      * @throws IOException if the file cannot be opened.
      */
     private boolean addFile(String fileName) throws IOException {
-        if (tmpReduxFiles.containsKey(fileName)) {
-            return false;
-        }
-
         File file = new File(fileName);
 
         if (tabs.containsKey(fileName)) {
@@ -507,11 +510,7 @@ public final class SourceView extends JComponent {
                         fileName.substring(idx));
 
                 if (stream != null) {
-                    File tmpFile = File.createTempFile(file.getName(), "");
-                    Files.copy(stream, tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    tmpReduxFiles.put(fileName, tmpFile);
-
-                    new Tab(file);
+                    new Tab(file.getAbsolutePath(), file.getName(), stream);
                     return true;
                 }
             }
@@ -574,16 +573,16 @@ public final class SourceView extends JComponent {
             // activate the tab with the most recent file
             PositionInfo p = lines.isEmpty() ? null : lines.getFirst().second;
             if (p != null) {
-                File f = tabs.get(p.getFileName()).file;
-                if (f != null) {
-                    String s = f.getName();
+                Tab t = tabs.get(p.getFileName());
+                if (t != null) {
+                    String s = t.simpleFileName;
                     for (int i = 0; i < tabPane.getTabCount(); i++) {
                         if (tabPane.getTitleAt(i).equals(s)) {
                             tabPane.setSelectedIndex(i);
 
                             // scroll to most recent highlight
                             int line = lines.getFirst().second.getEndPosition().getLine();
-                            scrollNestedTextPaneToLine(tabPane.getComponent(i), line, f);
+                            scrollNestedTextPaneToLine(tabPane.getComponent(i), line, t);
                         }
                     }
                 }
@@ -604,7 +603,7 @@ public final class SourceView extends JComponent {
      * @param line the line to scroll to
      * @param f the file of the JTextPane
      */
-    private void scrollNestedTextPaneToLine(Component comp, int line, File f) {
+    private void scrollNestedTextPaneToLine(Component comp, int line, Tab t) {
         if (comp instanceof JScrollPane) {
             JScrollPane sp = (JScrollPane)comp;
             if (sp.getComponent(0) instanceof JViewport) {
@@ -614,11 +613,7 @@ public final class SourceView extends JComponent {
                     if (panel.getComponent(0) instanceof JTextPane) {
                         JTextPane tp = (JTextPane)panel.getComponent(0);
                         try {
-                            File tmpFile = tmpReduxFiles.get(f.getAbsolutePath());
-                            String original = tmpFile == null
-                                    ? IOUtil.readFrom(f)
-                                    : IOUtil.readFrom(tmpFile);
-                            String source = replaceTabs(original);  // replace all tabs by spaces
+                            String source = t.source;  // replace all tabs by spaces
 
                             /* use input stream here to compute line information of the string with
                              * replaced tabs
@@ -759,7 +754,12 @@ public final class SourceView extends JComponent {
         /**
          * The file this tab belongs to.
          */
-        private final File file;
+        private final String absoluteFileName;
+
+        /**
+         * The file this tab belongs to.
+         */
+        private final String simpleFileName;
 
         /**
          * The text pane containing the file's content.
@@ -770,11 +770,6 @@ public final class SourceView extends JComponent {
          * The line information for the file this tab belongs to.
          */
         private LineInformation[] lineInformation;
-
-        /**
-         * Hash of the file's contents.
-         */
-        private String sourceHash;
 
         /**
          * The file's content.
@@ -798,26 +793,16 @@ public final class SourceView extends JComponent {
          */
         private Map<Integer, SortedSet<Highlight>> highlights = new HashMap<>();
 
-        private Tab(File file) {
-            this.file = file;
+        private Tab(String absoluteFilename, String simpleFileName, InputStream stream) {
+            this.absoluteFileName = absoluteFilename;
+            this.simpleFileName  = simpleFileName;
 
-            tabs.put(getFileName(), this);
+            tabs.put(absoluteFileName, this);
 
             try {
-                if (tmpReduxFiles.containsKey(file.getAbsolutePath())) {
-                    File tmpFile = tmpReduxFiles.get(file.getAbsolutePath());
-
-                    String text = IOUtil.readFrom(tmpFile);
-                    if (text != null && !text.isEmpty()) {
-                        sourceHash = IOUtil.computeMD5(tmpFile);
-                        source = replaceTabs(text);
-                    }
-                } else {
-                    String text = IOUtil.readFrom(file);
-                    if (text != null && !text.isEmpty()) {
-                        sourceHash = IOUtil.computeMD5(file);
-                        source = replaceTabs(text);
-                    }
+                String text = IOUtil.readFrom(stream);
+                if (text != null && !text.isEmpty()) {
+                    source = replaceTabs(text);
                 }
             } catch (IOException e) {
                 Debug.out("Unknown IOException!", e);
@@ -842,11 +827,15 @@ public final class SourceView extends JComponent {
             setRowHeaderView(tln);
 
             // Add tab to tab pane.
-            tabPane.addTab(file.getName(), this);
+            tabPane.addTab(simpleFileName, this);
             int index = tabPane.indexOfComponent(this);
-            tabPane.setToolTipTextAt(index, file.getAbsolutePath());
+            tabPane.setToolTipTextAt(index, absoluteFilename);
 
             resetHighlights();
+        }
+
+        private Tab(File file) throws FileNotFoundException {
+            this(file.getAbsolutePath(), file.getName(), new FileInputStream(file));
         }
 
         private void initLineInfo() {
@@ -854,7 +843,7 @@ public final class SourceView extends JComponent {
                 InputStream inStream = new ByteArrayInputStream(source.getBytes());
                 lineInformation = IOUtil.computeLineInformation(inStream);
             } catch (IOException e) {
-                Debug.out("Error while computing line information from " + file, e);
+                Debug.out("Error while computing line information from " + absoluteFileName, e);
             }
         }
 
@@ -911,7 +900,7 @@ public final class SourceView extends JComponent {
             });
 
             textPane.addMouseListener(new TextPaneMouseAdapter(
-                textPane, lineInformation, getFileName()));
+                textPane, lineInformation, absoluteFileName));
         }
 
         private void mark() {
@@ -926,11 +915,11 @@ public final class SourceView extends JComponent {
                 if (isSelected(this)) {
                     tabPane.setForegroundAt(
                             tabPane.indexOfComponent(this),
-                            new Color(0, 200, 0));
+                            TAB_HIGHLIGHT_COLOR.get());
                 } else {
                     tabPane.setBackgroundAt(
                             tabPane.indexOfComponent(this),
-                            Color.GREEN);
+                            TAB_HIGHLIGHT_COLOR.get());
                 }
             }
         }
@@ -938,7 +927,7 @@ public final class SourceView extends JComponent {
         private void initSelectionHL() {
             try {
                 selectionHL = addHighlight(
-                        getFileName(),
+                        absoluteFileName,
                         1,
                         CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR.get(),
                         Integer.MAX_VALUE - 1);
@@ -953,10 +942,6 @@ public final class SourceView extends JComponent {
             } catch (IOException e) {
                 Debug.out(e);
             }
-        }
-
-        private String getFileName() {
-            return file.getAbsolutePath();
         }
 
         private void removeHighlights(int line) {
@@ -1016,17 +1001,17 @@ public final class SourceView extends JComponent {
             try {
                 for (int i = 0; i < lines.size(); i++) {
                     Pair<Node, PositionInfo> l = lines.get(i);
-                    if (getFileName().equals(l.second.getFileName())) {
+                    if (absoluteFileName.equals(l.second.getFileName())) {
                         // use a different color for most recent
                         if (i == 0) {
                             symbExHighlights.add(addHighlight(
-                                    getFileName(),
+                                    absoluteFileName,
                                     l.second.getStartPosition().getLine() - 1,
                                     MOST_RECENT_HIGHLIGHT_COLOR.get(),
                                     0));
                         } else {
                             symbExHighlights.add(addHighlight(
-                                    getFileName(),
+                                    absoluteFileName,
                                     l.second.getStartPosition().getLine() - 1,
                                     NORMAL_HIGHLIGHT_COLOR.get(),
                                     0));

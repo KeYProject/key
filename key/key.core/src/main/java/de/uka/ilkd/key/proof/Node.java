@@ -351,8 +351,8 @@ public class Node {
         newChild.siblingNr = children.size();
         children.add(newChild);
         newChild.parent = this;
-        proof().fireProofExpanded(this);
         newChild.nodeInfo.addRelevantFiles(nodeInfo.getRelevantFiles());
+        proof().fireProofExpanded(this);
     }
 
     /**
@@ -365,6 +365,7 @@ public class Node {
         for (int i = 0; i < newChildren.length; i++) {
             newChildren[i].siblingNr = i + size;
             newChildren[i].parent = this;
+            newChildren[i].nodeInfo.addRelevantFiles(nodeInfo.getRelevantFiles());
         }
 
         Collections.addAll(children, newChildren);

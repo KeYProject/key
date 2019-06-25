@@ -226,7 +226,9 @@ public abstract class SequentView extends JEditorPane {
 
         StringJoiner extensionStr = new StringJoiner("<hr>", "<hr>", "");
         extensionStr.setEmptyValue("");
-        KeYGuiExtensionFacade.getTooltipStrings(getMainWindow(), pis).forEach(extensionStr::add);
+        KeYGuiExtensionFacade.getTooltipStrings(getMainWindow(), pis).stream()
+            .filter(s -> !s.isEmpty())
+            .forEach(extensionStr::add);
         text += extensionStr;
 
         if (text.isEmpty()) {
