@@ -29,19 +29,28 @@ public class QuantifierHandler implements SMTHandler {
 
         SExpr matrix = trans.translate(term.sub(0), Type.BOOL);
         List<SExpr> vars = new ArrayList<>();
+        List<SExpr> typeGuards = new ArrayList<>();
         for(QuantifiableVariable bv : term.boundVars()) {
-            vars.add(new SExpr(LogicalVariableHandler.VAR_PREFIX + bv.name(), Type.NONE, "U"));
+            String varName = LogicalVariableHandler.VAR_PREFIX + bv.name();
+            vars.add(new SExpr(varName, Type.NONE, "U"));
+            typeGuards.add(new SExpr("instanceof", Type.BOOL,
+                    new SExpr(varName), SExpr.sortExpr(bv.sort())));
         }
-
+        SExpr typeGuard = new SExpr("and", Type.BOOL, typeGuards);
+        SExpr typeGuardConnector;
         String smtOp;
         Operator op = term.op();
         if(op == Quantifier.ALL) {
             smtOp = "forall";
+            typeGuardConnector = new SExpr("=>", Type.BOOL);
         } else if(op == Quantifier.EX) {
             smtOp = "exists";
+            typeGuardConnector = new SExpr("and", Type.BOOL);
         } else {
             throw new SMTTranslationException("Unknown quantifier " + op);
         }
+
+        matrix = new SExpr(typeGuardConnector, typeGuard, matrix);
 
         return new SExpr(smtOp, Type.BOOL, new SExpr(vars), matrix);
 
