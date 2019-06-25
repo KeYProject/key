@@ -36,6 +36,9 @@ public class MasterHandler {
     /** A list of known symbols */
     private Set<String> knownSymbols  = new HashSet<>();
 
+    /** A list of untranslatable values*/
+    private Map<Term, SExpr> unknownValues  = new HashMap<>();
+
     /** Properties files */
     private Properties snippets = new Properties();
 
@@ -97,12 +100,14 @@ public class MasterHandler {
      * @return a generic translation as unknown value
      */
     private SExpr handleAsUnknownValue(Term problem) {
-        String pr = "KeY_"+problem.toString();
-        if(!isKnownSymbol(pr)) {
-            addKnownSymbol(pr);
-            addDeclaration(new SExpr("declare-const", pr, "U"));
+        if (unknownValues.containsKey(problem)) {
+            return unknownValues.get(problem);
         }
-        return new SExpr(pr, Type.UNIVERSE);
+        int number = unknownValues.size();
+        String pr = "unknown_" + number;
+        SExpr e = new SExpr("declare-const", pr, "U");
+        unknownValues.put(problem, e);
+        return e;
     }
 
     /**

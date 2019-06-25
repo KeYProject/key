@@ -125,6 +125,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * @param problem the given problem
      * @param master the master handler of the problem
      */
+    // TODO js: expressions within updates are not found by this, which leads to failures.
     private void addAllSorts(Term problem, MasterHandler master) {
         Sort s = problem.sort();
         master.addSort(s);
