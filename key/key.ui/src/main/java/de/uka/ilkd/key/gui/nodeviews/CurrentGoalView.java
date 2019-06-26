@@ -30,6 +30,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ApplyTacletDialog;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -55,13 +56,21 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      */
     private static final long serialVersionUID = 8494000234215913553L;
 
-    public static final Color DEFAULT_HIGHLIGHT_COLOR = new Color(70, 100, 170, 76);
+    public static final ColorSettings.ColorProperty DEFAULT_HIGHLIGHT_COLOR =
+            ColorSettings.define("[currentGoal]defaultHighlight", "",
+                    new Color(70, 100, 170, 76));
 
-    public static final Color ADDITIONAL_HIGHLIGHT_COLOR = new Color(0, 0, 0, 38);
+    public static final ColorSettings.ColorProperty ADDITIONAL_HIGHLIGHT_COLOR =
+            ColorSettings.define("[currentGoal]addtionalHighlight", "",
+                    new Color(0, 0, 0, 38));
 
-    private static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
+    private static final ColorSettings.ColorProperty UPDATE_HIGHLIGHT_COLOR =
+            ColorSettings.define("[currentGoal]updateHighlight", "",
+                    new Color(0, 150, 130, 38));
 
-    public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
+    public static final ColorSettings.ColorProperty DND_HIGHLIGHT_COLOR =
+            ColorSettings.define("[currentGoal]dndHighlight", "",
+                    new Color(0, 150, 130, 104));
 
 
     // the mediator
@@ -179,7 +188,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                 // be a starting place to find the mistake.
                 range = new Range(range.start() + 1, range.end() + 1);
 
-                Object tag = getColorHighlight(UPDATE_HIGHLIGHT_COLOR);
+                Object tag = getColorHighlight(UPDATE_HIGHLIGHT_COLOR.get());
                 updateHighlights.add(tag);
                 paintHighlight(range, tag);
             }

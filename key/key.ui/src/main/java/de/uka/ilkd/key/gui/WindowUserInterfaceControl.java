@@ -13,23 +13,6 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-
-import javax.swing.*;
-
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
@@ -42,10 +25,12 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
-import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.prover.ProverCore;
@@ -62,6 +47,19 @@ import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ThreadUtilities;
+import org.key_project.util.collection.ImmutableSet;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Implementation of {@link UserInterfaceControl} which controls the {@link MainWindow}

@@ -2,6 +2,7 @@ package org.key_project.ui.interactionlog.model;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import org.key_project.ui.interactionlog.api.Interaction;
 
 import javax.xml.bind.annotation.XmlTransient;
 import java.beans.Transient;

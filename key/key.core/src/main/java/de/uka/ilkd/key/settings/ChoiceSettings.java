@@ -163,7 +163,7 @@ public class ChoiceSettings implements Settings, Cloneable {
      * steps in order to change this object in a way that it
      * represents the stored settings
      */
-    public void readSettings(Object sender,Properties props) {
+    public void readSettings(Properties props) {
 	String choiceSequence = props.getProperty(DEFAULTCHOICES_KEY);
 	// set choices
 	if (choiceSequence != null) {
@@ -183,10 +183,10 @@ public class ChoiceSettings implements Settings, Cloneable {
     /** implements the method required by the Settings interface. The
      * settings are written to the given Properties object. Only entries of 
      * the form &lt; key &gt; = &lt; value &gt; (,&lt; value &gt;)* are allowed.
-     * @param props the Properties object where to write the 
-     * settings as (key, value) pair
-     */
-    public void writeSettings(Object sender, Properties props) {
+	 * @param props the Properties object where to write the
+	 * settings as (key, value) pair
+	 */
+    public void writeSettings(Properties props) {
 	String choiceSequence = "";
 	for (final Map.Entry<String, String> entry : category2Default.entrySet()){
 	    if (choiceSequence.length() > 0) {

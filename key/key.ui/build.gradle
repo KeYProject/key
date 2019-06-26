@@ -12,8 +12,15 @@ dependencies {
     compile project(":key.core.testgen")
     compile project(":key.removegenerics")
 
+    compile 'com.miglayout:miglayout-swing:5.2'
+
+    compile files('lib/docking-frames-common.jar',
+                'lib/docking-frames-core.jar')
+
     runtimeOnly project(":keyext.interactionlog")
     //runtimeOnly project(":keyext.script.ui")
+
+    compile 'org.jetbrains:annotations:17.0.0'
 }
 
 task createExamplesZip(type: Zip) {
@@ -42,8 +49,7 @@ application {
 
 run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
-    
-    run
+    args "--experimental"
 }
 
 

@@ -87,6 +87,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		listeners.add(l);
 	}
 
+	//FIXME weigl: This method seems broken. I would expect: clone() = new TGS(this)
 	public TestGenerationSettings clone(TestGenerationSettings data) {
 		return new TestGenerationSettings(data);
 	}
@@ -113,7 +114,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		return outputPath;
 	}
 
-	public boolean invaraiantForAll() {
+	public boolean invariantForAll() {
 		return invariantForAll;
 	}
 	
@@ -122,7 +123,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	}
 
 	@Override
-	public void readSettings(Object sender, Properties props) {
+	public void readSettings(Properties props) {
 	    applySymbolicExecution =  SettingsConverter.read(props,
                 TestGenerationSettings.propApplySymbolicExecution,
                 TestGenerationSettings.DEFAULT_APPLYSYMBOLICEX);
@@ -199,8 +200,6 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	public void setUseJunit(boolean useJunit) {
 		this.useJunit = useJunit;
 	}
-	
-	
 
 	public String getObjenesisPath() {
 		return objenesisPath;
@@ -228,7 +227,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 
 
 	@Override
-	public void writeSettings(Object sender, Properties props) {
+	public void writeSettings(Properties props) {
 		//System.out.println("Saving: "+maxUnwinds);
         SettingsConverter.store(props,
                 TestGenerationSettings.propApplySymbolicExecution,
@@ -257,5 +256,11 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		        objenesisPath);
 		SettingsConverter.store(props, TestGenerationSettings.propIncludePostCondition,
 				includePostCondition);
+	}
+
+	public void set(TestGenerationSettings settings) {
+		Properties p = new Properties();
+		settings.writeSettings(p);
+		readSettings(p);
 	}
 }

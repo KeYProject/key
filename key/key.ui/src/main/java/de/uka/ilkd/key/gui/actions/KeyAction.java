@@ -1,25 +1,54 @@
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.ext.KeYExtConst;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 
 import javax.swing.*;
-import java.awt.*;
+import java.util.Iterator;
 
 /**
  * @author Alexander Weigl
  * @version 1 (13.02.19)
  */
 public abstract class KeyAction extends AbstractAction {
-    private static final long serialVersionUID = 3600716639751838717L;
+    /**
+     *
+     */
+    public static final String SHORTCUT_FOCUSED_CONDITION = "SHORTCUT_FOCUSED_CONDITION";
 
     /**
-     * This constant holds the typical key to be used for shortcuts (usually
-     * {@link java.awt.Event#CTRL_MASK})
+     * Additional key for {@link javax.swing.Action}s. Describes the priority,
+     * and therefor an order to arrange these actions.
      */
-    protected static final int SHORTCUT_KEY_MASK
-            = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    public static final String PRIORITY = "PRIORITY";
 
-    protected String getName() {
+    /**
+     * Additional key for {@link javax.swing.Action}s. Describes a path in a menu
+     * where an action should be injected in.
+     * <p>
+     * The path should be a dot-separated string, i.e. "Heatmap.Options" would inject an action
+     * into a sub-sub Menu Options below Heatmap.
+     *
+     * @see KeYGuiExtensionFacade#findMenu(JMenu, Iterator)
+     */
+    public static final String PATH = "PATH";
+
+    /**
+     * Key for defining local shortcuts which are prefered
+     * used by {@link de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.KeyboardShortcuts}.
+     * In comparision with {@code ACCELERATOR_KEY} which should be used for global shortcuts.
+     * <p>
+     * The stored values are {@link KeyStroke}.
+     */
+    public static final String LOCAL_ACCELERATOR = "LOCAL_ACCELERATOR";
+
+
+    /**
+     * @see KeyStrokeManager#SHORTCUT_KEY_MASK
+     */
+    protected static final int SHORTCUT_KEY_MASK = KeyStrokeManager.SHORTCUT_KEY_MASK;
+
+    public String getName() {
         return (String) getValue(NAME);
     }
 
@@ -27,14 +56,34 @@ public abstract class KeyAction extends AbstractAction {
         putValue(NAME, name);
     }
 
-    @Deprecated // add a line in gui.utils.KeyStrokeManager instead
     protected void setAcceleratorLetter(int letter) {
         setAcceleratorKey(KeyStroke.getKeyStroke(letter, SHORTCUT_KEY_MASK));
     }
 
-    @Deprecated // add a line in gui.utils.KeyStrokeManager instead
+    public int getMnemonic() {
+        return (int) getValue(MNEMONIC_KEY);
+    }
+
+    protected void setMnemonic(int c) {
+        putValue(MNEMONIC_KEY, c);
+    }
+
+    public KeyStroke getAcceleratorKey() {
+        return (KeyStroke) getValue(ACCELERATOR_KEY);
+    }
+
     protected void setAcceleratorKey(KeyStroke keyStroke) {
         putValue(ACCELERATOR_KEY, keyStroke);
+    }
+
+    protected void lookupAcceleratorKey() {
+        KeyStrokeManager.lookupAndOverride(this);
+    }
+
+    protected void lookupAcceleratorKey(KeyStroke defaultValue) {
+        KeyStrokeManager.lookupAndOverride(this, getClass().getName());
+        //KeyStroke found = KeyStrokeManager.get(this, defaultValue);
+        //setAcceleratorKey(found);
     }
 
     protected String getTooltip() {
@@ -53,11 +102,11 @@ public abstract class KeyAction extends AbstractAction {
         putValue(LARGE_ICON_KEY, icon);
     }
 
-    protected Icon getIcon(Icon icon) {
+    public Icon getIcon(Icon icon) {
         return getSmallIcon();
     }
 
-    protected Icon getSmallIcon() {
+    public Icon getSmallIcon() {
         return (Icon) getValue(SMALL_ICON);
     }
 
@@ -69,7 +118,7 @@ public abstract class KeyAction extends AbstractAction {
         return (Icon) getValue(LARGE_ICON_KEY);
     }
 
-    protected boolean isSelected() {
+    public boolean isSelected() {
         return getValue(SELECTED_KEY) == Boolean.TRUE;
     }
 
@@ -77,21 +126,20 @@ public abstract class KeyAction extends AbstractAction {
         putValue(SELECTED_KEY, b);
     }
 
-    protected String getMenuPath() {
-        return (String) getValue(KeYExtConst.PATH);
+    public String getMenuPath() {
+        return (String) getValue(PATH);
     }
 
     protected void setMenuPath(String path) {
-        putValue(KeYExtConst.PATH, path);
+        putValue(PATH, path);
     }
 
-    protected int getPriority() {
-        Integer i = (Integer) getValue(KeYExtConst.PRIORITY);
+    public int getPriority() {
+        Integer i = (Integer) getValue(PRIORITY);
         return i == null ? 0 : i;
     }
 
     protected void setPriority(int priority) {
-        putValue(KeYExtConst.PRIORITY, priority);
+        putValue(PRIORITY, priority);
     }
-
 }

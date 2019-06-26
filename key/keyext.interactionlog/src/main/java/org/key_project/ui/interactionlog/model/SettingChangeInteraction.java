@@ -1,13 +1,18 @@
 package org.key_project.ui.interactionlog.model;
 
 import de.uka.ilkd.key.control.InteractionListener;
-import org.key_project.ui.interactionlog.algo.InteractionVisitor;
+import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.settings.ProofSettings;
+import org.key_project.ui.interactionlog.api.Interaction;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.awt.*;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Properties;
 
 /**
@@ -60,12 +65,34 @@ public class SettingChangeInteraction extends Interaction {
         this.savedSettings = savedSettings;
     }
 
-    @Override
-    public <T> T accept(InteractionVisitor<T> visitor) {
-        return visitor.visit(this);
-    }
-
     public InteractionListener.SettingType getType() {
         return type;
+    }
+
+    @Override
+    public String getMarkdown() {
+        StringWriter writer = new StringWriter();
+        try {
+            getSavedSettings().store(writer, "");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return String.format("Setting changed: %s%n%n```%n%s%n````%n", getType().name(), writer);
+    }
+
+    @Override
+    public void reapply(WindowUserInterfaceControl uic, Goal goal) throws Exception {
+        ProofSettings settings = goal.proof().getSettings();
+        switch (getType()) {
+            case SMT:
+                settings.getSMTSettings().readSettings(getSavedSettings());
+                break;
+            case CHOICE:
+                settings.getChoiceSettings().readSettings(getSavedSettings());
+                break;
+            case STRATEGY:
+                settings.getStrategySettings().readSettings(getSavedSettings());
+                break;
+        }
     }
 }

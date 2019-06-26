@@ -23,7 +23,7 @@ import java.awt.event.MouseMotionListener;
 import java.util.StringJoiner;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;

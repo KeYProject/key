@@ -4,6 +4,8 @@ plugins {
     id("idea")
     id("eclipse")
     id "com.jfrog.bintray" version "1.8.4" apply false
+    id "com.github.hierynomus.license-base" version"0.15.0"
+    id "com.github.hierynomus.license-report" version"0.15.0"
 }
 
 idea {
@@ -82,10 +84,10 @@ subprojects {
 
     test {
         useJUnit {
-            excludeCategories 'org.key_project.util.testcategories.Interactive',  'org.key_project.util.testcategories.Performance'
+            excludeCategories 'org.key_project.util.testcategories.Interactive', 'org.key_project.util.testcategories.Performance'
         }
-        afterTest {desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}"}
-        beforeTest {desc -> logger.error "> ${desc.className}#${desc.name}"}
+        afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
+        beforeTest { desc -> logger.error "> ${desc.className}#${desc.name}" }
 
     }
 
@@ -122,6 +124,7 @@ subprojects {
 
     dependencies {
         testCompile("junit:junit:4.12")
+        compile 'org.jetbrains:annotations:17.0.0'
         //testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
         //testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
         //testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.3.1'
@@ -197,6 +200,17 @@ subprojects {
         }
     }
 
+    license {
+        header = file("$rootDir/gradle/header")
+
+        mapping {
+            //find styles here:
+            // http://code.mycila.com/license-maven-plugin/#supported-comment-types
+            java="SLASHSTAR_STYLE" // DOUBLESLASH_STYLE
+            javascript="SLASHSTAR_STYLE"
+        }
+        mapping("key", "SLASHSTAR_STYLE")
+    }
 
     eclipse {
         classpath {

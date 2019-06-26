@@ -13,7 +13,23 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Point;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -26,30 +42,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.swing.JPopupMenu;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
  * <p>

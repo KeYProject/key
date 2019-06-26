@@ -13,24 +13,24 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.ADDITIONAL_HIGHLIGHT_COLOR;
-import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
+import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Shape;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-
-import javax.swing.JEditorPane;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
@@ -38,32 +38,11 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLDocument;
+import java.awt.*;
+import java.util.*;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.InitialPositionTable;
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
-import de.uka.ilkd.key.pp.SequentPrintFilterEntry;
-import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
-import de.uka.ilkd.key.pp.VisibleTermLabels;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.ViewSettings;
-import de.uka.ilkd.key.util.Debug;
+import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.ADDITIONAL_HIGHLIGHT_COLOR;
+import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR;
 
 /*
  * Parent class of CurrentGoalView and InnerNodeView.
@@ -73,10 +52,16 @@ public abstract class SequentView extends JEditorPane {
 
     protected static final Color INACTIVE_BACKGROUND_COLOR
             = new Color(UIManager.getColor("Panel.background").getRGB());
-    // rgb components of heatmap color
-    private static final Color HEATMAP_COLOR = new Color(252, 202, 80);
+
+    //
+    private static final ColorSettings.ColorProperty HEATMAP_COLOR =
+            ColorSettings.define("[Heatmap]basecolor",
+                    "Base color of the heatmap. Other colors are derived from this one.",
+                    new Color(252, 202, 80));
+
     //maximum opacity of heatmap color
     private static final float HEATMAP_DEFAULT_START_OPACITY = .7f;
+    public static final String PROP_LAST_MOUSE_POSITION = "lastMousePosition";
 
     private final MainWindow mainWindow;
 
@@ -149,9 +134,9 @@ public abstract class SequentView extends JEditorPane {
 
         // sets the painter for the highlightning
         setHighlighter(new DefaultHighlighter());
-        additionalJavaHighlight = getColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR);
-        defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR);
-        dndHighlight = getColorHighlight(CurrentGoalView.DND_HIGHLIGHT_COLOR);
+        additionalJavaHighlight = getColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR.get());
+        defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR.get());
+        dndHighlight = getColorHighlight(CurrentGoalView.DND_HIGHLIGHT_COLOR.get());
         currentHighlight = defaultHighlight;
 
         // add a SeqViewChangeListener to this component
@@ -161,6 +146,9 @@ public abstract class SequentView extends JEditorPane {
         addHierarchyBoundsListener(changeListener);
 
         filter = new IdentitySequentPrintFilter();
+
+        KeYGuiExtensionFacade.installKeyboardShortcuts(getMainWindow().getMediator(),
+                this, KeYGuiExtension.KeyboardShortcuts.SEQUENT_VIEW);
     }
 
     public final void setFont() {
@@ -505,7 +493,13 @@ public abstract class SequentView extends JEditorPane {
     public void highlight(Point p) {
         setCurrentHighlight(defaultHighlight);
         paintHighlights(p);
-        lastMousePosition = p;
+        setLastMousePosition(p);
+    }
+
+    private void setLastMousePosition(Point p) {
+        Point old = this.lastMousePosition;
+        lastMousePosition=p;
+        firePropertyChange(PROP_LAST_MOUSE_POSITION, old, p);
     }
 
     @Override
@@ -710,7 +704,7 @@ public abstract class SequentView extends JEditorPane {
      * @return the color, with interpolated opacity
      */
     private Color computeColorForAge(int max_age, int age) {
-        float[] color = HEATMAP_COLOR.getRGBColorComponents(null);
+        float[] color = HEATMAP_COLOR.get().getRGBColorComponents(null);
         float alpha = HEATMAP_DEFAULT_START_OPACITY *(1- (float) age/max_age);
 
         return new Color(color[0], color[1], color[2], alpha);

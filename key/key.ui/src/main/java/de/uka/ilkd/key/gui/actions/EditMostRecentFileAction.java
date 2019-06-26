@@ -18,7 +18,7 @@ import java.io.File;
 import java.io.IOException;
 
 import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 
 
@@ -33,15 +33,16 @@ public final class EditMostRecentFileAction extends MainWindowAction {
     private static final long serialVersionUID = -6214327707255790570L;
 
     public EditMostRecentFileAction(MainWindow mainWindow) {
-	super(mainWindow);
+        super(mainWindow);
 	
-	setName("Edit last opened file");
-	setIcon(IconFactory.editFile(MainWindow.TOOLBAR_ICON_SIZE));
-	setTooltip("Open the last opened file with the default external editor");
+        setName("Edit last opened file");
+        setIcon(IconFactory.editFile(MainWindow.TOOLBAR_ICON_SIZE));
+        setTooltip("Open the last opened file with the default external editor");
 	
-	if (!Main.getKeyDesktop().supportsEdit() && !Main.getKeyDesktop().supportsOpen()) {
-	    setEnabled(false);
-	}
+        if (!Main.getKeyDesktop().supportsEdit() && !Main.getKeyDesktop().supportsOpen()) {
+            setEnabled(false);
+        }
+        lookupAcceleratorKey();
     }
 
     public void actionPerformed(ActionEvent e) {

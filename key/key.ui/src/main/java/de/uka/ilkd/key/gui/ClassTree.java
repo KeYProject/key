@@ -13,29 +13,6 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.Component;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-
-import javax.swing.Icon;
-import javax.swing.JLabel;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
-
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.ObjectUtil;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -48,6 +25,13 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.ObjectUtil;
+
+import javax.swing.*;
+import javax.swing.tree.*;
+import java.awt.*;
+import java.util.*;
 
 
 public class ClassTree extends JTree {

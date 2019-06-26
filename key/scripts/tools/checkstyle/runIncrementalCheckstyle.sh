@@ -38,4 +38,6 @@ java -ea -cp .:checkstyle-7.6-all.jar \
     -Ddiff.file=$DIFF_FILE \
     com.puppycrawl.tools.checkstyle.Main \
     -c key_checks_incremental.xml \
-    $OPTIONS $HOME_DIR/key/key.core/src
+    $OPTIONS \
+    $HOME_DIR/key/*/*/src/main/java \
+    $HOME_DIR/key/*/src/main/java
