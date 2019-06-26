@@ -4,6 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,6 +37,9 @@ public class TestProofBundleIO {
     /** to reset the setting after the tests (usually should be false if not in GUI mode) */
     private static boolean allowBundleSaving = false;
 
+    /** to reset the setting after the tests (usually should be false if not in GUI mode) */
+    private static boolean ensureConsistency = false;
+
     /**
      * Set up the test path and store the current allowBundleSaving setting.
      */
@@ -43,43 +47,51 @@ public class TestProofBundleIO {
     public static void prepare() {
         testDir = Paths.get(HelperClassForTests.TESTCASE_DIRECTORY.getAbsolutePath(), "proofBundle");
 
-        // remember setting to be able to reset after the test
+        // remember settings to be able to reset after the test
         allowBundleSaving = ProofIndependentSettings.DEFAULT_INSTANCE
                                                     .getGeneralSettings()
                                                     .isAllowBundleSaving();
+        ensureConsistency = ProofIndependentSettings.DEFAULT_INSTANCE
+                                                    .getGeneralSettings()
+                                                    .isEnsureSourceConsistency();
 
-        // ensure that allowBundleSaving is true to enable repo
+        // ensure that allowBundleSaving is true to enable FileRepos
         ProofIndependentSettings.DEFAULT_INSTANCE
                                 .getGeneralSettings()
                                 .setAllowBundleSaving(true);
     }
 
     /**
-     * Reset allowBundleSaving setting to value before tests.
+     * Reset settings to value before tests.
      */
     @AfterClass
     public static void cleanUp() {
-        // reset the setting to value before test
+        // reset the settings to value before test
         ProofIndependentSettings.DEFAULT_INSTANCE
                                 .getGeneralSettings()
                                 .setAllowBundleSaving(allowBundleSaving);
+        ProofIndependentSettings.DEFAULT_INSTANCE
+                                .getGeneralSettings()
+                                .setEnsureSourceConsistency(ensureConsistency);
     }
 
-    /**
-     * Tests if:
-     * <ul>
-     *  <li> an existing bundle is loadable
-     *  <li> the containing proof is closed
-     * </ul>
-     * @throws Exception on errors (should not happen)
-     */
-    @Test
-    public void testBundleLoading() throws Exception {
-        // load a bundle and test if proof is closed
-        Path file = testDir.resolve("bundleLoading").resolve("loadingTest.zproof");
-        Proof proof = loadBundle(file);
-        assertTrue(proof.closed());
-    }
+// TODO: this test is disabled because it depends on the pre-saved proof file, which means that
+//       it may fail if there are changes in rules
+//    /**
+//     * Tests if:
+//     * <ul>
+//     *  <li> an existing bundle is loadable
+//     *  <li> the containing proof is closed
+//     * </ul>
+//     * @throws Exception on errors (should not happen)
+//     */
+//    @Test
+//    public void testBundleLoading() throws Exception {
+//        // load a bundle and test if proof is closed
+//        Path file = testDir.resolve("bundleLoading").resolve("loadingTest.zproof");
+//        Proof proof = loadBundle(file);
+//        assertTrue(proof.closed());
+//    }
 
     /**
      * Tests loading a *.key file, closing the proof by auto mode, and saving a bundle from it.
@@ -95,8 +107,10 @@ public class TestProofBundleIO {
          * we check only for 10 kb -> not empty */
         Path zip = testBundleGeneration("complexBundleGeneration", 10000);
 
-        // test if bundle is loadable again
-        assertNotNull(loadBundle(zip));
+        // test that bundle is loadable again and proof is closed
+        Proof proof = loadBundle(zip);
+        assertNotNull(proof);
+        assertTrue(proof.closed());
 
         // clean up
         Files.delete(zip);
@@ -116,8 +130,10 @@ public class TestProofBundleIO {
          * we check only for 1 kb -> not empty */
         Path zip = testBundleGeneration("simpleBundleGeneration", 1000);
 
-        // test if bundle is loadable again
-        assertNotNull(loadBundle(zip));
+        // test that bundle is loadable again and proof is closed
+        Proof proof = loadBundle(zip);
+        assertNotNull(proof);
+        assertTrue(proof.closed());
 
         Path unzip = zip.getParent().resolve("unzip");
         IOUtil.extractZip(zip, unzip);
@@ -132,8 +148,12 @@ public class TestProofBundleIO {
         IOUtil.delete(unzip.toFile());
     }
 
+    /**
+     * Tests that the SimpleFileRepo is able to save a proof as bundle (without consistency).
+     * @throws Exception
+     */
     @Test
-    public void testSimpleFileRepo()throws Exception {
+    public void testSimpleFileRepo() throws Exception {
         ProofIndependentSettings.DEFAULT_INSTANCE
                                 .getGeneralSettings()
                                 .setEnsureSourceConsistency(false);
@@ -144,11 +164,24 @@ public class TestProofBundleIO {
         simple.setBaseDir(base);
         simple.setJavaPath(base.resolve("src").toString());
 
-        simple.getInputStream(base.resolve("test.key")).close();
-        simple.getInputStream(base.resolve("src").resolve("Client.java")).close();
-        simple.getInputStream(base.resolve("src").resolve("Test.java")).close();
+        Path src = base.resolve("src");
+        InputStream is1 = simple.getInputStream(base.resolve("test.key"));
+        InputStream is2 = simple.getInputStream(src.resolve("Client.java"));
+        InputStream is3 = simple.getInputStream(src.resolve("Test.java"));
 
-        simple.saveProof(base.resolve("test.zip"));
+        Path zip = base.resolve("test.zproof");
+        simple.saveProof(zip);
+
+        assertNotNull(is1);
+        assertNotNull(is2);
+        assertNotNull(is3);
+        assertTrue(Files.exists(zip));
+
+        // clean up
+        is1.close();
+        is2.close();
+        is3.close();
+        Files.delete(zip);
     }
 
     /**

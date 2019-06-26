@@ -69,13 +69,17 @@ public class SimpleFileRepo extends AbstractFileRepo {
     }
 
     private Path getKeyFilePath(Path keyFile) {
-        // compute the relative target path (top level in repo)
-        return getBaseDir().relativize(keyFile);
+        if (keyFile.isAbsolute()) {
+            // compute the relative target path (top level in repo)
+            return getBaseDir().relativize(keyFile);
+        } else {
+            // already relative to top level in repo
+            return keyFile;
+        }
     }
 
     private Path getZipFilePath(Path zipFile) {
         // zip/jar may only occur in classpath
-        //Path rel = zipFile.getParent().relativize(zipFile);
         Path rel = zipFile.getFileName();
         return Paths.get("classpath").resolve(rel);
     }
@@ -127,7 +131,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
             String path = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8);
 
             return copyAndOpenInputStream(Paths.get(path));
-        } else if (protocol.equals("jar")) {        // TODO: zip?
+        } else if (protocol.equals("jar")) {
             JarURLConnection juc = (JarURLConnection) url.openConnection();
             Path jarPath = Paths.get(juc.getJarFile().getName());
             addFile(jarPath);
@@ -161,6 +165,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
         Path absTarget = getBaseDir().resolve(path);
         addFile(path);
 
+        // TODO: This silently creates files in the baseDir of the FileRepo!
         return new FileOutputStream(absTarget.toFile());
     }
 }

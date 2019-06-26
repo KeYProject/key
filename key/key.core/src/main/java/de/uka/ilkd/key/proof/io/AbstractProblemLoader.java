@@ -43,6 +43,7 @@ import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
+import de.uka.ilkd.key.proof.io.consistency.SimpleFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -181,11 +182,6 @@ public abstract class AbstractProblemLoader {
     private ReplayResult result;
 
     /**
-     * The FileRepo used to ensure consistency of proof and source code.
-     */
-    private FileRepo fileRepo;          // TODO: WP
-
-    /**
      * Maps internal error codes of the parser to human readable strings.
      * The integers refer to the common MismatchedTokenExceptions,
      * where one token is expected and another is found.
@@ -246,15 +242,7 @@ public abstract class AbstractProblemLoader {
     public void load() throws ProofInputException, IOException, ProblemLoaderException {
         control.loadingStarted(this);
 
-        // create a FileRepo depending on the setting
-        boolean bundle = ProofIndependentSettings.DEFAULT_INSTANCE
-                                                 .getGeneralSettings()
-                                                 .isAllowBundleSaving();
-        if (bundle) {
-            fileRepo = new DiskFileRepo("KeYTmpFileRepo");
-        } else {
-            fileRepo = new TrivialFileRepo();
-        }
+        FileRepo fileRepo = createFileRepo();
 
         // Read environment
         envInput = createEnvInput(fileRepo);
@@ -355,6 +343,33 @@ public abstract class AbstractProblemLoader {
         }
         // default
         return new ProblemLoaderException(this, "Loading proof input failed", e);
+    }
+
+    /**
+     * Creates a new FileRepo (with or without consistency) based on the settings.
+     * @return a FileRepo that can be used for proof bundle saving
+     * @throws IOException if for some reason the FileRepo can not be created
+     *   (e.g. temporary directory can not be created).
+     */
+    protected FileRepo createFileRepo() throws IOException {
+        // create a FileRepo depending on the settings
+        boolean bundle = ProofIndependentSettings.DEFAULT_INSTANCE
+            .getGeneralSettings()
+            .isAllowBundleSaving();
+
+        boolean consistent = ProofIndependentSettings.DEFAULT_INSTANCE
+            .getGeneralSettings()
+            .isEnsureSourceConsistency();
+
+        if (bundle) {
+            if (consistent) {
+                return new DiskFileRepo("KeYTmpFileRepo");
+            } else {
+                return new SimpleFileRepo();
+            }
+        } else {
+            return new TrivialFileRepo();
+        }
     }
 
     /**
