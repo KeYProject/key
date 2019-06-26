@@ -18,6 +18,8 @@ import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.java.IOUtil;
@@ -481,20 +483,25 @@ public final class SourceView extends JComponent {
      * Fills the HashMaps containing Files and translations from lines (in source code) to
      * corresponding nodes in proof tree.
      */
-    private void fillMaps() {
+    private void fillMaps(Proof selectedProof) {
         for (Pair<Node, PositionInfo> p : lines) {
             PositionInfo l = p.second;
             File f = new File(l.getFileName());
-            if (f.exists() && files.putIfAbsent(l.getFileName(), f) == null) {
-                try {
-                    String text = IOUtil.readFrom(f);
+            FileRepo repo = selectedProof.getInitConfig().getFileRepo();
+            // TODO: this works, but there is a GUI problem in ProofTree
+            // read content from FileRepo!
+            try (InputStream is = repo.getInputStream(f.toPath());
+                 InputStream is2 = repo.getInputStream(f.toPath())) {
+                if (is != null && files.putIfAbsent(l.getFileName(), f) == null) {
+                    String text = IOUtil.readFrom(is);
                     if (text != null && !text.isEmpty()) {
-                        hashes.put(l.getFileName(), IOUtil.computeMD5(f));
+                        // TODO: hashes not used -> delete
+                        hashes.put(l.getFileName(), IOUtil.computeMD5(is2));
                         sources.put(l.getFileName(), text);
                     }
-                } catch (IOException e) {
-                    Debug.out("Unknown IOException!", e);
                 }
+            } catch (IOException e) {
+                Debug.out("Unknown IOException!", e);
             }
         }
     }
@@ -539,7 +546,7 @@ public final class SourceView extends JComponent {
             return;
         }
 
-        fillMaps();
+        fillMaps(mainWindow.getMediator().getSelectedProof());
 
         // create and initialize a new TextPane for every file
         for (Entry<String, File> entry : files.entrySet()) {
