@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -278,7 +279,7 @@ public final class SourceView extends JComponent {
         }
 
         if (!tab.highlights.containsKey(line)) {
-            tab.highlights.put(line, new TreeSet<>());
+            tab.highlights.put(line, new TreeSet<>(Collections.reverseOrder()));
         }
 
         SortedSet<Highlight> highlights = tab.highlights.get(line);
