@@ -66,7 +66,10 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.Else;
 import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -689,13 +692,23 @@ public final class SourceView extends JComponent {
         }
     }
 
+    private void addPosToList(
+            PositionInfo pos, LinkedList<Pair<Node, PositionInfo>> list, Node node) {
+        if (pos != null
+                && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
+                && pos.getFileName() != null) {
+            list.addLast(new Pair<Node, PositionInfo>(node, pos));
+            node.getNodeInfo().addRelevantFile(pos.getFileName());
+        }
+    }
+
     /**
      * Collects the set of lines to highlight starting from the given node in the proof tree.
      * @param node the given node
      * @return a linked list of pairs of PositionInfo objects containing the start and end
      * positions for the highlighting and Nodes.
      */
-    private static LinkedList<Pair<Node, PositionInfo>> constructLinesSet(Node node) {
+    private LinkedList<Pair<Node, PositionInfo>> constructLinesSet(Node node) {
         LinkedList<Pair<Node, PositionInfo>> list = new LinkedList<Pair<Node, PositionInfo>>();
 
         if (node == null) {
@@ -708,19 +721,57 @@ public final class SourceView extends JComponent {
             SourceElement activeStatement = cur.getNodeInfo().getActiveStatement();
             if (activeStatement != null) {
                 if (activeStatement instanceof SourceElement) {
-                    PositionInfo pos = joinPositionsRec(activeStatement);
-
-                    // we are only interested in well defined PositionInfo objects with a file name
-                    if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
-                            && pos.getFileName() != null) {
-                        list.addLast(new Pair<Node, PositionInfo>(cur, pos));
-                        node.getNodeInfo().addRelevantFile(pos.getFileName());
-                    }
+                    addPosToList(joinPositionsRec(activeStatement), list, node);
                 }
             }
             cur = cur.parent();
 
         } while (cur != null);
+
+        if (list.isEmpty()) {
+            // If the list is empty, search the sequent for method body statements
+            // and add the files containing the called methods.
+            // This is a hack to make sure that the file containing the method which the current
+            // proof obligation belongs to is always loaded.
+
+            node.sequent().forEach(formula -> {
+                formula.formula().execPostOrder(new de.uka.ilkd.key.logic.Visitor() {
+
+                    @Override
+                    public boolean visitSubtree(Term visited) {
+                        return visited.containsJavaBlockRecursive();
+                    }
+
+                    @Override
+                    public void visit(Term visited) { }
+
+                    @Override
+                    public void subtreeLeft(Term subtreeRoot) { }
+
+                    @Override
+                    public void subtreeEntered(Term subtreeRoot) {
+                        if (subtreeRoot.javaBlock() != null) {
+                            JavaASTVisitor visitor = new JavaASTVisitor(
+                                    subtreeRoot.javaBlock().program(),
+                                    mainWindow.getMediator().getServices()) {
+
+                                @Override
+                                protected void doDefaultAction(SourceElement el) {
+                                    if (el instanceof MethodBodyStatement) {
+                                        MethodBodyStatement methodBody = (MethodBodyStatement) el;
+                                        addPosToList(
+                                                methodBody.getBody(services).getPositionInfo(),
+                                                list, node);
+                                    }
+                                }
+                            };
+                            visitor.start();
+                        }
+                    }
+                });
+            });
+        }
+
         return list;
     }
 
