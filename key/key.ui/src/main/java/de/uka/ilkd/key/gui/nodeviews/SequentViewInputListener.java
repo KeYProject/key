@@ -74,18 +74,11 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
                 new Color(252, 228, 169));
 
     /**
-     * The current origin highlight.
+     * The current origin highlights.
      *
      * @see #highlightOriginInSourceView(PosInSequent)
      */
-    private Highlight originHighlight;
-
-    /**
-     * The current subterm origin highlights.
-     *
-     * @see #highlightOriginInSourceView(PosInSequent)
-     */
-    private Set<Highlight> subtermOriginsHighlights = new HashSet<>();
+    private Set<Highlight> originHighlights = new HashSet<>();
 
     /** The sequent view associated with this listener. */
     private final SequentView sequentView;
@@ -208,15 +201,10 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
 
         SourceView sourceView = SourceView.getSourceView(sequentView.getMainWindow());
 
-        subtermOriginsHighlights.forEach(sourceView::removeHighlight);
-        subtermOriginsHighlights.clear();
+        originHighlights.forEach(sourceView::removeHighlight);
+        originHighlights.clear();
 
         if (pos == null || pos.getPosInOccurrence() == null) {
-            if (originHighlight != null) {
-                sourceView.removeHighlight(originHighlight);
-                originHighlight = null;
-            }
-
             return;
         }
 
@@ -241,24 +229,17 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
         }
 
         try {
-            if (origin == null && originHighlight != null) {
-                sourceView.removeHighlight(originHighlight);
-                originHighlight = null;
-            } else if (origin != null) {
-                if (originHighlight == null) {
-                    originHighlight = sourceView.addHighlight(
-                            origin.fileName,
-                            origin.line,
-                            ORIGIN_HIGHLIGHT_COLOR.get(),
-                            20);
-                } else {
-                    sourceView.changeHighlight(originHighlight, origin.line);
-                }
+            if (origin != null) {
+                originHighlights.addAll(sourceView.addHighlightsForJMLStatement(
+                        origin.fileName,
+                        origin.line,
+                        ORIGIN_HIGHLIGHT_COLOR.get(),
+                        20));
             }
 
             for (FileOrigin subtermOrigin : subtermOrigins) {
                 if (!subtermOrigin.equals(origin)) {
-                    subtermOriginsHighlights.add(sourceView.addHighlight(
+                    originHighlights.addAll(sourceView.addHighlightsForJMLStatement(
                             subtermOrigin.fileName,
                             subtermOrigin.line,
                             SUBTERM_ORIGIN_HIGHLIGHT_COLOR.get(),

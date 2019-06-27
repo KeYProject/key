@@ -251,7 +251,7 @@ public final class SourceView extends JComponent {
     /**
      * <p> Creates a new highlight. </p>
      *
-     * <p> If the are multiple highlight for a given line, they are drawn on top of each other,
+     * <p> If the are multiple highlights for a given line, they are drawn on top of each other,
      *  starting with the one with the lowest level. </p>
      *
      * <p> The highlights added by the {@code SourceView} itself have level {@code 0},
@@ -292,6 +292,63 @@ public final class SourceView extends JComponent {
         tab.applyHighlights(line);
 
         return highlight;
+    }
+
+    /**
+     * <p> Creates a new set of highlights for a range of lines starting with {@code firstLine}. </p>
+     *
+     * <p> This method applies a heuristic to try and highlight the complete JML statement
+     *  starting in {@code firstLine}. </p>
+     *
+     * @param fileName the name of the file in which to create the highlights.
+     * @param firstLine the first line to highlight.
+     * @param color the color to use for the highlights.
+     * @param level the level of the highlights.
+     * @return the highlights.
+     *
+     * @throws BadLocationException if the line number is invalid.
+     * @throws IOException if the file cannot be read.
+     */
+    public Set<Highlight> addHighlightsForJMLStatement(
+            String fileName, int firstLine, Color color, int level)
+            throws BadLocationException, IOException {
+        openFile(fileName);
+
+        Tab tab = tabs.get(fileName);
+
+        String[] lines = tab.source.split("\\R", -1);
+
+        int lastLine = firstLine;
+
+        if (lines[firstLine - 1].trim().startsWith("@")) {
+            // If we are in a JML comment, highlight everything until the next semicolon.
+            int parens = 0;
+
+            outer_loop:
+            for (int i = firstLine; i <= lines.length; ++i) {
+                for (int j = 0; j < lines[i - 1].length(); ++j) {
+                    if (lines[i - 1].charAt(j) == '(') {
+                        ++parens;
+                    } else if (lines[i - 1].charAt(j) == ')') {
+                        --parens;
+                    } else if (parens == 0 && lines[i - 1].charAt(j) == ';') {
+                        lastLine = i;
+                        break outer_loop;
+                    }
+                }
+            }
+        } else {
+            // Otherwise only highlight the current line.
+            lastLine = firstLine;
+        }
+
+        Set<Highlight> result = new HashSet<>();
+
+        for (int i = firstLine; i <= lastLine; ++i) {
+            result.add(addHighlight(fileName, i, color, level));
+        }
+
+        return result;
     }
 
     /**
