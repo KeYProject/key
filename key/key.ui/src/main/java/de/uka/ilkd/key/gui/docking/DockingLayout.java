@@ -212,7 +212,7 @@ class SaveLayoutAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         mainWindow.getDockControl().save(layoutName);
-        mainWindow.setStatusLine("Layout save at " + layoutName);
+        mainWindow.setStatusLine("Save layout as " + layoutName);
     }
 }
 
