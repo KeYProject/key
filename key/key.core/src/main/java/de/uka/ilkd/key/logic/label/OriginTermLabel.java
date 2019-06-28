@@ -703,11 +703,6 @@ public class OriginTermLabel implements TermLabel {
 
             this.fileName = fileName;
             this.line = line;
-
-            if (line == 12 || line == 13) {
-                System.err.println(this);
-                System.err.println();
-            }
         }
 
         @Override
