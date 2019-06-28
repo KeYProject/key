@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -221,7 +222,7 @@ public class OriginTermLabel implements TermLabel {
                 return false;
             }
         } else {
-            return true;
+            return !(op instanceof Function) || ((Function) op).sort().extendsTrans(Sort.FORMULA);
         }
     }
 
