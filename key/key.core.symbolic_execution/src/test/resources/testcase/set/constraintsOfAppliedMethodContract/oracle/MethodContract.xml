@@ -70,7 +70,6 @@
             </variable>
             <variable name="m" isArrayIndex="false">
                <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                  <constraint name="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(gt(m,Z(0(1(#)))),TRUE,FALSE))),equals(x,TRUE))"/>
                </value>
             </variable>
             <variable name="exc" isArrayIndex="false">
@@ -107,7 +106,6 @@
                </variable>
                <variable name="m" isArrayIndex="false">
                   <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                     <constraint name="geq(m,Z(1(1(#))))"/>
                   </value>
                </variable>
                <variable name="exc" isArrayIndex="false">
@@ -148,7 +146,6 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                   </variable>
                   <variable name="m" isArrayIndex="false">
                      <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                        <constraint name="geq(m,Z(1(1(#))))"/>
                      </value>
                   </variable>
                   <variable name="exc" isArrayIndex="false">
@@ -192,7 +189,6 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                      </variable>
                      <variable name="m" isArrayIndex="false">
                         <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                           <constraint name="geq(m,Z(1(1(#))))"/>
                         </value>
                      </variable>
                      <variable name="exc" isArrayIndex="false">
@@ -231,7 +227,6 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                            <value name="self {true}" typeString="MethodContract" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                               <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
-                              <constraint name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
                               <variable name="h1" isArrayIndex="false">
                                  <value name="h1 {true}" typeString="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
@@ -249,7 +244,6 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                         </variable>
                         <variable name="m" isArrayIndex="false">
                            <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                              <constraint name="geq(m,Z(1(1(#))))"/>
                            </value>
                         </variable>
                         <variable name="exc" isArrayIndex="false">
@@ -275,15 +269,12 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                            <value name="self {true}" typeString="MethodContract" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                               <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
-                              <constraint name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
                               <variable name="h1" isArrayIndex="false">
                                  <value name="h1 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                                    <constraint name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
                                  </value>
                               </variable>
                               <variable name="h2" isArrayIndex="false">
                                  <value name="h2 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                                    <constraint name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
                                  </value>
                               </variable>
                               <variable name="l" isArrayIndex="false">
@@ -294,7 +285,6 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                         </callStateVariable>
                         <callStateVariable name="m" isArrayIndex="false">
                            <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                              <constraint name="geq(m,Z(1(1(#))))"/>
                            </value>
                         </callStateVariable>
                         <callStateVariable name="exc" isArrayIndex="false">
@@ -345,7 +335,6 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
             </variable>
             <variable name="m" isArrayIndex="false">
                <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                  <constraint name="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(gt(m,Z(0(1(#)))),TRUE,FALSE))),equals(x,FALSE))"/>
                </value>
             </variable>
             <variable name="exc" isArrayIndex="false">
@@ -382,7 +371,6 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                </variable>
                <variable name="m" isArrayIndex="false">
                   <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                     <constraint name="leq(m,Z(0(1(#))))"/>
                   </value>
                </variable>
                <variable name="exc" isArrayIndex="false">
@@ -415,7 +403,6 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                   </variable>
                   <variable name="m" isArrayIndex="false">
                      <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                        <constraint name="leq(m,Z(0(1(#))))"/>
                      </value>
                   </variable>
                   <variable name="exc" isArrayIndex="false">
@@ -453,7 +440,6 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                   </callStateVariable>
                   <callStateVariable name="m" isArrayIndex="false">
                      <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                        <constraint name="leq(m,Z(0(1(#))))"/>
                      </value>
                   </callStateVariable>
                   <callStateVariable name="exc" isArrayIndex="false">
