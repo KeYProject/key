@@ -205,6 +205,9 @@ public class OriginTermLabel implements TermLabel {
      *  with the specified operator.
      */
     public static boolean canAddLabel(Operator op, Services services) {
+        //TODO: Instead of not adding origin labels to certain terms, we should investigate why
+        // adding labels to these kinds of terms breaks the prover and fix these issues.
+
         final TypeConverter tc = services.getTypeConverter();
         final JavaInfo ji = services.getJavaInfo();
 
@@ -222,7 +225,9 @@ public class OriginTermLabel implements TermLabel {
                 return false;
             }
         } else {
-            return !(op instanceof Function) || ((Function) op).sort().extendsTrans(Sort.FORMULA);
+            return !(op instanceof Function)
+                    || (op.getClass().equals(Function.class)
+                            && ((Function) op).sort().extendsTrans(Sort.FORMULA));
         }
     }
 
