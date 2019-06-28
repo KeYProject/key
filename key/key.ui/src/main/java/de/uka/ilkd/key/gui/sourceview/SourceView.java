@@ -20,6 +20,9 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.Settings;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.java.IOUtil;
@@ -123,11 +126,6 @@ public final class SourceView extends JComponent {
      */
     private final JLabel sourceStatusBar;
 
-    /* TODO: make proof independent, move sources and hashes to proof.services.JavaModel or similar
-     * There is still a consistency problem here if the proof is change: In that case the code is
-     * silently reloaded from the (possibly changed) file. This will be solved in future work.
-     * Corresponding feature request:
-     */
     /**
      * HashMap mapping filenames to files (of the current proof!).
      */
@@ -419,9 +417,7 @@ public final class SourceView extends JComponent {
             // compare stored hash with a newly created
             //String origHash = hashes.get(entry.getKey());
             //String curHash = IOUtil.computeMD5(entry.getValue());
-            //if (!origHash.equals(curHash)) {
-                    // TODO: consistency problem, see comment in line 128
-            //}
+            // TODO: detect changes in source file, print warning/option to use FileRepo next time
 
             String original = sources.get(entry.getKey());
             String source = replaceTabs(original);  // replace all tabs by spaces
@@ -471,7 +467,8 @@ public final class SourceView extends JComponent {
 
             // add the full path as tooltip for the tab
             int index = tabs.indexOfTab(entry.getValue().getName());
-            tabs.setToolTipTextAt(index, entry.getValue().getAbsolutePath());
+            //tabs.setToolTipTextAt(index, entry.getValue().getAbsolutePath());
+            tabs.setToolTipTextAt(index, createToolTipText(entry));
         } catch (IOException e) {
             Debug.out("An error occurred while reading " + entry.getValue().getAbsolutePath(), e);
         } catch (BadLocationException e) {
@@ -479,24 +476,36 @@ public final class SourceView extends JComponent {
         }
     }
 
+    private String createToolTipText(Entry<String, File> entry) {
+        Proof proof = mainWindow.getMediator().getSelectedProof();
+        FileRepo repo = proof.getInitConfig().getFileRepo();
+        String res = "";
+        if (ProofIndependentSettings.DEFAULT_INSTANCE
+                                    .getGeneralSettings()
+                                    .isEnsureSourceConsistency()) {
+            res = "copy of ";
+            res += entry.getValue().getAbsolutePath();
+        }
+        res += entry.getValue().getAbsolutePath();
+        return res;
+    }
+
     /**
      * Fills the HashMaps containing Files and translations from lines (in source code) to
      * corresponding nodes in proof tree.
      */
-    private void fillMaps(Proof selectedProof) {
+    private void fillMaps() {
         for (Pair<Node, PositionInfo> p : lines) {
             PositionInfo l = p.second;
             File f = new File(l.getFileName());
-            FileRepo repo = selectedProof.getInitConfig().getFileRepo();
-            // TODO: this works, but there is a GUI problem in ProofTree
+            Proof proof = mainWindow.getMediator().getSelectedProof();
+            FileRepo repo = proof.getInitConfig().getFileRepo();
             // read content from FileRepo!
             try (InputStream is = repo.getInputStream(f.toPath());
                  InputStream is2 = repo.getInputStream(f.toPath())) {
                 if (is != null && files.putIfAbsent(l.getFileName(), f) == null) {
                     String text = IOUtil.readFrom(is);
                     if (text != null && !text.isEmpty()) {
-                        // TODO: hashes not used -> delete
-                        hashes.put(l.getFileName(), IOUtil.computeMD5(is2));
                         sources.put(l.getFileName(), text);
                     }
                 }
@@ -546,7 +555,7 @@ public final class SourceView extends JComponent {
             return;
         }
 
-        fillMaps(mainWindow.getMediator().getSelectedProof());
+        fillMaps();
 
         // create and initialize a new TextPane for every file
         for (Entry<String, File> entry : files.entrySet()) {
@@ -588,7 +597,7 @@ public final class SourceView extends JComponent {
      * @param line the line to scroll to
      * @param f the file of the JTextPane
      */
-    private static void scrollNestedTextPaneToLine(Component comp, int line, File f) {
+    private void scrollNestedTextPaneToLine(Component comp, int line, File f) {
         if (comp instanceof JScrollPane) {
             JScrollPane sp = (JScrollPane)comp;
             if (sp.getComponent(0) instanceof JViewport) {
@@ -598,7 +607,8 @@ public final class SourceView extends JComponent {
                     if (panel.getComponent(0) instanceof JTextPane) {
                         JTextPane tp = (JTextPane)panel.getComponent(0);
                         try {
-                            String original = IOUtil.readFrom(f);
+                            // assumes that the map is filled
+                            String original = sources.get(f.toString());
                             String source = replaceTabs(original);  // replace all tabs by spaces
 
                             /* use input stream here to compute line information of the string with
