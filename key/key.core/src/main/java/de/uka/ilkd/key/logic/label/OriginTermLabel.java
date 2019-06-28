@@ -22,7 +22,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -222,7 +221,7 @@ public class OriginTermLabel implements TermLabel {
                 return false;
             }
         } else {
-            return !(op instanceof Function);
+            return true;
         }
     }
 
@@ -389,7 +388,7 @@ public class OriginTermLabel implements TermLabel {
             SpecType commonSpecType = SpecType.NONE;
 
             for (Origin origin : origins) {
-                if (commonSpecType == null) {
+                if (commonSpecType == SpecType.NONE) {
                     commonSpecType = origin.specType;
                 } else if (commonSpecType != origin.specType) {
                     return new Origin(SpecType.NONE);
@@ -698,11 +697,17 @@ public class OriginTermLabel implements TermLabel {
         public FileOrigin(SpecType specType, String fileName, int line) {
             super(specType);
 
+
             assert fileName != null;
             assert line >= 0;
 
             this.fileName = fileName;
             this.line = line;
+
+            if (line == 12 || line == 13) {
+                System.err.println(this);
+                System.err.println();
+            }
         }
 
         @Override
