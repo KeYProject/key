@@ -54,6 +54,7 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
@@ -164,6 +165,9 @@ public final class MainWindow extends JFrame {
      * action for opening a KeY file
      */
     private OpenFileAction openFileAction;
+
+    private OpenSingleJavaFileAction openSingleJavaFileAction;
+
     /**
      * action for opening an example
      */
@@ -391,6 +395,7 @@ public final class MainWindow extends JFrame {
 
         // set up actions
         openFileAction = new OpenFileAction(this);
+        openSingleJavaFileAction = new OpenSingleJavaFileAction(this);
         openExampleAction = new OpenExampleAction(this);
         openMostRecentFileAction = new OpenMostRecentFileAction(this);
         editMostRecentFileAction = new EditMostRecentFileAction(this);
@@ -683,6 +688,7 @@ public final class MainWindow extends JFrame {
 
         fileMenu.add(openExampleAction);
         fileMenu.add(openFileAction);
+        fileMenu.add(openSingleJavaFileAction);
         fileMenu.add(openMostRecentFileAction);
         fileMenu.add(editMostRecentFileAction);
         fileMenu.add(saveFileAction);
@@ -1161,7 +1167,11 @@ public final class MainWindow extends JFrame {
         return notificationManager;
     }
 
-    protected void addRecentFile(String absolutePath) {
+    /**
+     * A file to the menu of recent opened files.
+     * @see RecentFileMenu#addRecentFile(String)
+     */
+    public void addRecentFile(@NotNull String absolutePath) {
         recentFileMenu.addRecentFile(absolutePath);
     }
 
