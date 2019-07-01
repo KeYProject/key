@@ -18,10 +18,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
+import java.nio.file.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -113,6 +110,11 @@ public abstract class AbstractProblemLoader {
      * The file or folder to load.
      */
     private final File file;
+
+    /**
+     * The name of the proof in the zipped file (null if file is not a proof bundle).
+     */
+    private String proofName;
 
     /**
      * The optional class path entries to use.
@@ -394,30 +396,32 @@ public abstract class AbstractProblemLoader {
                                 classPath, bootClassPath, profileOfNewProofs, includes);
             }
         } else if (filename.endsWith(".zproof")) {            // zipped proof package
-            // unzip to a temporary directory
-            Path tmpDir = Files.createTempDirectory("KeYunzip");
-            IOUtil.extractZip(file.toPath(), tmpDir);
-
-            // point the FileRepo to the temporary directory
-            fileRepo.setBaseDir(tmpDir);
-
-            // create new KeYUserProblemFile pointing to the (unzipped) proof file
-            PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.proof");
-
             /* TODO: Currently it is not possible to load proof bundles with multiple proofs.
              *  This feature is still pending, since the functionality to save multiple proofs in
              *  one (consistent!) package is not yet implemented (see ProofManagement tool from
              *  1st HacKeYthon).
-             *  So the current implementation just picks one of the proofs and loads it.
+             *  The current implementation allows the user to picks one of the proofs via a dialog.
+             *  The user choice is given to the AbstractProblem Loader via the proofName field.
              */
-            // pick one of the proofs
-            Path unzippedProof = Files.list(tmpDir)
-                    .filter(matcher::matches)
-                    .findFirst()
-                    .get(); // TODO: message if the path is null, i.e. no proof is in package
+            if (proofName != null) {         // bundle contains no proof!
+                // unzip to a temporary directory
+                Path tmpDir = Files.createTempDirectory("KeYunzip");
+                IOUtil.extractZip(file.toPath(), tmpDir);
 
-            return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof.toFile(),
+                // point the FileRepo to the temporary directory
+                fileRepo.setBaseDir(tmpDir);
+
+                // create new KeYUserProblemFile pointing to the (unzipped) proof file
+                PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.proof");
+
+                // construct the absolute path to the unzipped proof file
+                Path unzippedProof = tmpDir.resolve(Paths.get(proofName));
+
+                return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof.toFile(),
                     fileRepo, control, profileOfNewProofs, false);
+            } else {
+                throw new IllegalArgumentException("The bundle contains no proof to load!");   // TODO: WP: better exception
+            }
         } else if (filename.endsWith(".key") || filename.endsWith(".proof")
               || filename.endsWith(".proof.gz")) {
             // KeY problem specification or saved proof
@@ -730,5 +734,9 @@ public abstract class AbstractProblemLoader {
      */
     public ReplayResult getResult() {
        return result;
+    }
+
+    public void setProofPath(String proofName) {
+        this.proofName = proofName;
     }
 }

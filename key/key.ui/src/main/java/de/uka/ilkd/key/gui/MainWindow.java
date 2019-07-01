@@ -1174,8 +1174,12 @@ public final class MainWindow extends JFrame {
         getUserInterface().loadProblem(file);
     }
 
+    public void loadProblem(File file, String proofName) {
+        getUserInterface().loadProblem(file, proofName);
+    }
+
     public void loadProblem(File file, List<File> classPath, File bootClassPath, List<File> includes) {
-        getUserInterface().loadProblem(file, classPath, bootClassPath, includes);
+        getUserInterface().loadProblem(file, null, classPath, bootClassPath, includes);
     }
 
     /*
