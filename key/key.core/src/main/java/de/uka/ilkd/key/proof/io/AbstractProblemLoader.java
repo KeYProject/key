@@ -400,7 +400,7 @@ public abstract class AbstractProblemLoader {
              *  This feature is still pending, since the functionality to save multiple proofs in
              *  one (consistent!) package is not yet implemented (see ProofManagement tool from
              *  1st HacKeYthon).
-             *  The current implementation allows the user to picks one of the proofs via a dialog.
+             *  The current implementation allows the user to pick one of the proofs via a dialog.
              *  The user choice is given to the AbstractProblem Loader via the proofName field.
              */
             if (proofName != null) {         // bundle contains no proof!

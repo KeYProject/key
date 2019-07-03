@@ -13,113 +13,21 @@
 
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.JarURLConnection;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.zip.ZipFile;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.ProofSelectionDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
 public class OpenFileAction extends MainWindowAction {
 
-    private final class ProofSelectionDialog extends JDialog {
-        private String proofToLoad;
-
-        private ProofSelectionDialog(Path bundlePath) throws IOException {
-            super(mainWindow, "", true);
-
-            // read zip
-            ZipFile bundle = new ZipFile(bundlePath.toFile());
-
-            // create a list of all *.proof files (only top level in bundle)
-            List proofs = bundle.stream()
-                                .filter(e -> !e.isDirectory())
-                                .filter(e -> e.getName().endsWith(".proof"))  // *.key not allowed!
-                                .map(e -> e.getName())
-                                .collect(Collectors.toList());
-
-            // show list in a JList
-            DefaultListModel<String> model = new DefaultListModel<>();
-            model.addAll(proofs);
-            JList<String> list = new JList<>(model);
-            list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            list.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent mouseEvent) {
-                    if (mouseEvent.getClickCount() >= 2) {
-                        proofToLoad = list.getSelectedValue();
-                        setVisible(false);
-                        dispose();
-                    }
-                }
-            });
-
-            //create type scroll pane
-            JScrollPane scrollPane = new JScrollPane(list);
-            scrollPane.setBorder(new TitledBorder("Proofs found in bundle:"));
-            Dimension scrollPaneDim = new Dimension(500, 600);
-            scrollPane.setPreferredSize(scrollPaneDim);
-            scrollPane.setMinimumSize(scrollPaneDim);
-            getContentPane().add(scrollPane);
-
-            //create button panel
-            JPanel buttonPanel = new JPanel();
-            buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
-            Dimension buttonDim = new Dimension(100, 27);
-            getContentPane().add(buttonPanel);
-
-            //create "ok" button
-            JButton okButton = new JButton("OK");
-            okButton.setPreferredSize(buttonDim);
-            okButton.setMinimumSize(buttonDim);
-            okButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    proofToLoad = list.getSelectedValue();
-                    setVisible(false);
-                    dispose();
-                }
-            });
-            buttonPanel.add(okButton);
-            getRootPane().setDefaultButton(okButton);
-
-            //create "cancel" button
-            JButton cancelButton = new JButton("Cancel");
-            cancelButton.setPreferredSize(buttonDim);
-            cancelButton.setMinimumSize(buttonDim);
-            cancelButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    setVisible(false);
-                    dispose();
-                }
-            });
-            buttonPanel.add(cancelButton);
-
-            //show
-            getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
-            pack();
-            setLocation(70, 70);
-            setVisible(true);
-        }
-
-        private String getProofName() {
-            return proofToLoad;
-        }
-    }
-    
     /**
      * 
      */
@@ -143,7 +51,7 @@ public class OpenFileAction extends MainWindowAction {
             File file = keYFileChooser.getSelectedFile();
             if (file.toString().endsWith(".zproof")) {
                 try {
-                    String proofName = new ProofSelectionDialog(file.toPath()).getProofName();
+                    String proofName = new ProofSelectionDialog(mainWindow, file.toPath()).getProofName();
                     if (proofName != null) {
                         mainWindow.loadProblem(file, proofName);
                     }
