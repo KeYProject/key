@@ -119,10 +119,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         loadProblem(file, null, null, null, null);
     }
 
-    public void loadProblem(File file, String proofName) {
-        loadProblem(file, proofName, null, null, null);
-    }
-
     @Override
     public void progressStarted(Object sender) {
         mainWindow.getMediator().stopInterface(true);

@@ -15,6 +15,7 @@ package de.uka.ilkd.key.ui;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import de.uka.ilkd.key.proof.init.*;
 
@@ -225,6 +226,23 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
          */
         keyProblemFile = file;
         getProblemLoader(file, null, null, null, mediator).runSynchronously();
+    }
+
+    /**
+     * loads the problem or proof from the given file
+     *
+     * @param file the File with the problem description or the proof
+     * @param classPath the class path entries to use.
+     * @param bootClassPath the boot class path to use.
+     */
+    public void loadProblem(File file,
+                            String proofName,
+                            List<File> classPath,
+                            File bootClassPath,
+                            List<File> includes) {
+        ProblemLoader problemLoader = getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
+        problemLoader.setProofPath(proofName);
+        problemLoader.runAsynchronously();
     }
 
     @Override

@@ -86,7 +86,21 @@ public class RecentFileMenu {
         this.lissy = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mediator.getUI().loadProblem(new File(getAbsolutePath((JMenuItem) e.getSource())));
+                String absPath = getAbsolutePath((JMenuItem) e.getSource());
+                File f = new File(absPath);
+                if (absPath.endsWith(".zproof")) {
+                    try {
+                        String proofName = new ProofSelectionDialog(null, f.toPath())
+                            .getProofName();
+                        if (proofName != null) {
+                            mediator.getUI().loadProblem(f, proofName);
+                        }
+                        return;
+                    } catch (IOException exc) {
+                        ExceptionDialog.showDialog(null, exc);
+                    }
+                }
+                mediator.getUI().loadProblem(f);
             }
         };
         this.maxNumberOfEntries = MAX_RECENT_FILES;
