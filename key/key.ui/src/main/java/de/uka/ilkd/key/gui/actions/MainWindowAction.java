@@ -30,6 +30,7 @@ public abstract class MainWindowAction extends KeyAction {
         assert mainWindow != null;
         this.mainWindow = mainWindow;
         putValue(ACCELERATOR_KEY, KeyStrokeManager.get(this, getClass().getName()));
+        KeyStrokeManager.registerAction(this);
     }
 
     protected void setAcceleratorLetter(int letter) {
