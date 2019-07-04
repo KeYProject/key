@@ -130,10 +130,8 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         }
 
         ExecutionContext ec = svInst.getContextInstantiation().activeStatementContext();
-        ReferencePrefix rp;
-        if (receiver == null) {
-            rp = ec.getRuntimeInstance();
-        } else {
+        ReferencePrefix rp = null;
+        if (receiver != null) {
             rp = (ReferencePrefix) svInst.getInstantiation(receiver);
         }
 
@@ -145,8 +143,8 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
             ar = toExpArray((ImmutableArray<? extends ProgramElement>)subst);
         }
 
-        if (rp == null || mn == null) {
-            // unusable prefixes or method names falsify the condition
+        if (mn == null) {
+            // unusable method name falsifies the condition
             // TODO should that perhaps raise an exception or assertion failure?
             // It should never happen. Silently ignoring may be a bad idea.
             return false;
@@ -154,8 +152,14 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
 
         MethodReference mr = new MethodReference(ar, mn, rp);
         IProgramMethod method;
-        KeYJavaType prefixType =
-                services.getTypeConverter().getKeYJavaType((Expression) rp, ec);
+        KeYJavaType prefixType;
+        if (rp == null && ec != null) {
+            // This there is no receiver, so take the context of method frame
+            prefixType = ec.getTypeReference().getKeYJavaType();
+        } else {
+            prefixType = services.getTypeConverter().getKeYJavaType((Expression) rp, ec);
+        }
+
         if (ec != null) {
             method = mr.method(services, prefixType, ec);
             // we are only interested in the signature. The method
