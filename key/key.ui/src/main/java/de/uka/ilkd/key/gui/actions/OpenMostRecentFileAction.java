@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.ProofSelectionDialog;
@@ -52,19 +53,18 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
                 KeYFileChooser fileChooser =
                     KeYFileChooser.getFileChooser("Select file to load proof or problem");
                 fileChooser.selectFile(file);
-                if (recentFile.endsWith(".zproof")) {
-                    try {
-                        String proofName = new ProofSelectionDialog(mainWindow, file.toPath())
-                                                .getProofName();
-                        if (proofName != null) {
-                            mainWindow.loadProblem(file, proofName);
-                        }
+
+                if (ProofSelectionDialog.isProofBundle(file.toPath())) {
+                    String proofName = ProofSelectionDialog.getProofName(mainWindow, file.toPath());
+                    if (proofName == null) {
+                        // canceled by user
                         return;
-                    } catch (IOException exc) {
-                        ExceptionDialog.showDialog(mainWindow, exc);
+                    } else {
+                        mainWindow.loadProblem(file, proofName);
                     }
+                } else {
+                    mainWindow.loadProblem(file);
                 }
-                mainWindow.loadProblem(file);
             }
         }
     }

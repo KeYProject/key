@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -29,7 +30,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.Debug;
 
@@ -82,25 +85,24 @@ public class RecentFileMenu {
      */
     public RecentFileMenu(final KeYMediator mediator) {
         this.menu = new JMenu("Recent Files");
-
         this.lissy = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String absPath = getAbsolutePath((JMenuItem) e.getSource());
                 File f = new File(absPath);
-                if (absPath.endsWith(".zproof")) {
-                    try {
-                        String proofName = new ProofSelectionDialog(null, f.toPath())
-                            .getProofName();
-                        if (proofName != null) {
-                            mediator.getUI().loadProblem(f, proofName);
-                        }
+
+                if (ProofSelectionDialog.isProofBundle(f.toPath())) {
+                    String proofName = ProofSelectionDialog.getProofName(MainWindow.getInstance(),
+                        Paths.get(absPath));
+                    if (proofName == null) {
+                        // canceled by user
                         return;
-                    } catch (IOException exc) {
-                        ExceptionDialog.showDialog(null, exc);
+                    } else {
+                        mediator.getUI().loadProblem(f, proofName);
                     }
+                } else {
+                    mediator.getUI().loadProblem(f);
                 }
-                mediator.getUI().loadProblem(f);
             }
         };
         this.maxNumberOfEntries = MAX_RECENT_FILES;

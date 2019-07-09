@@ -24,6 +24,7 @@ import de.uka.ilkd.key.gui.ProofSelectionDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 public class OpenFileAction extends MainWindowAction {
@@ -49,17 +50,18 @@ public class OpenFileAction extends MainWindowAction {
 
         if (loaded) {
             File file = keYFileChooser.getSelectedFile();
-            if (file.toString().endsWith(".zproof")) {
-                try {
-                    String proofName = new ProofSelectionDialog(mainWindow, file.toPath()).getProofName();
-                    if (proofName != null) {
-                        mainWindow.loadProblem(file, proofName);
-                    }
+
+            if (ProofSelectionDialog.isProofBundle(file.toPath())) {
+                String proofName = ProofSelectionDialog.getProofName(mainWindow, file.toPath());
+                if (proofName == null) {
+                    // canceled by user
                     return;
-                } catch (IOException exc) {
-                    ExceptionDialog.showDialog(mainWindow, exc);
+                } else {
+                    mainWindow.loadProblem(file, proofName);
                 }
+                return;
             }
+
             if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getNotifyLoadBehaviour() &&
                     file.toString().endsWith(".java")) {
                 JCheckBox checkbox = new JCheckBox("Don't show this warning again");

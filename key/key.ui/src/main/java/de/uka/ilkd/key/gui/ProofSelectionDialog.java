@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
+
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
@@ -11,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
@@ -31,7 +34,7 @@ public final class ProofSelectionDialog extends JDialog {
      * @param bundlePath the path of the proof bundle to load
      * @throws IOException if the proof bundle can not be read for some reason
      */
-    public ProofSelectionDialog(Frame parent, Path bundlePath) throws IOException {
+    private ProofSelectionDialog(Frame parent, Path bundlePath) throws IOException {
         super(parent, "Choose proof to load", true);
 
         // read zip
@@ -75,6 +78,20 @@ public final class ProofSelectionDialog extends JDialog {
                 } else {
                     label.setBackground(list.getBackground());
                     label.setForeground(list.getForeground());
+                }
+
+                final String identifier = "[a-zA-Z0-9_.]*";
+                final String paramsRegex = "(\\([^()]*\\))?";       // zero or more parameters
+                final String typeRegex = "[^\\.]*";
+                final String extension = "proof";
+
+                final String regex = identifier + "\\(" + identifier + "__" + identifier
+                    + "\\(" + paramsRegex + "\\)" + typeRegex + "\\.\\d*\\." + extension;
+
+                if (!Pattern.compile(regex).matcher(value).matches()) {
+                    // fallback: use complete filename as cell text
+                    label.setText(value);
+                    return label;
                 }
 
                 String[] parts = value.split("\\.");
@@ -123,6 +140,10 @@ public final class ProofSelectionDialog extends JDialog {
                 dispose();
             }
         });
+        // disable "Ok" button if no proof was found
+        if (proofs.size() == 0) {
+            okButton.setEnabled(false);
+        }
         buttonPanel.add(okButton);
         getRootPane().setDefaultButton(okButton);
 
@@ -138,14 +159,48 @@ public final class ProofSelectionDialog extends JDialog {
         });
         buttonPanel.add(cancelButton);
 
-        // show
         setMinimumSize(new Dimension(300, 200));
         pack();
-        setLocationRelativeTo(parent);
-        setVisible(true);
     }
 
-    public String getProofName() {
-        return proofToLoad;
+    /**
+     * Shows the dialog with the given parent and path and returns the name of the proof to load.
+     * @param parent the parent window of the dialog
+     * @param path the file to load
+     * @return the name of the proof to load or null if an exception occured
+     */
+    public static String showDialog(Frame parent, Path path) {
+        String proofName = null;
+        try {
+            ProofSelectionDialog dialog = new ProofSelectionDialog(parent, path);
+            dialog.setLocationRelativeTo(parent); // center dialog over parent
+            dialog.setVisible(true);
+            proofName = dialog.proofToLoad;
+        } catch (IOException exc) {
+            ExceptionDialog.showDialog(parent, exc);
+        }
+        return proofName;
+    }
+
+    /**
+     * Auxiliary method that may or may not show the dialog depending on the file extension.
+     * @param parent the parent window of the dialog
+     * @param path the file or directory to load
+     * @return the name of the proof to load or null if path does not denote a proof bundle
+     */
+    public static String getProofName(Frame parent, Path path) {
+        if (isProofBundle(path)) {
+            return showDialog(parent, path);
+        }
+        return null;
+    }
+
+    /**
+     * Helper method to check if a path denotes a proof bundle.
+     * @param path the path to check
+     * @return true if the path denotes a proof bundle and false if not
+     */
+    public static boolean isProofBundle(Path path) {
+        return path.toString().endsWith(".zproof");
     }
 }
