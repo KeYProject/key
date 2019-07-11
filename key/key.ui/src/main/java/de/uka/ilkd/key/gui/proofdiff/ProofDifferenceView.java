@@ -223,6 +223,8 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
     }
 
     static class MyPanel extends JPanel implements Scrollable {
+        private static final long serialVersionUID = -3046025680639399997L;
+
         MyPanel(LayoutManager layout) {
             super(layout);
         }
@@ -256,6 +258,7 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
     }*/
 
     public static class OpenDifferenceWithParent extends MainWindowAction {
+        private static final long serialVersionUID = -7820466004457781393L;
         private Node left;
 
         public OpenDifferenceWithParent(MainWindow mainWindow, Node node) {
@@ -276,6 +279,8 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
     }
 
     private class HideCommandFormulaAction extends KeyAction {
+        private static final long serialVersionUID = -77545377028639666L;
+
         public HideCommandFormulaAction() {
             setName("Hide common formulas");
             setSelected(false);

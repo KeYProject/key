@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.logic.label;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;

@@ -30,7 +30,7 @@ public final class KeYGuiExtensionFacade {
     //private static Map<Class<?>, List<Object>> extensionCache = new HashMap<>();
 
     //region panel extension
-    @SuppressWarnings("todo")
+    //@SuppressWarnings("todo")
     public static Stream<TabPanel> getAllPanels(MainWindow window) {
         return getLeftPanel().stream().flatMap(it -> it.getPanels(window, window.getMediator()).stream());
     }
@@ -210,7 +210,6 @@ public final class KeYGuiExtensionFacade {
         return menu;
     }
 
-    @SuppressWarnings("unchecked")
     private static void loadExtensions() {
         extensions = ServiceLoaderUtil.stream(KeYGuiExtension.class)
                 .filter(KeYGuiExtensionFacade::isNotForbidden)

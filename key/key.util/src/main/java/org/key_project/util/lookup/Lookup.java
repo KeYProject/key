@@ -101,7 +101,6 @@ public class Lookup {
      * @param service
      * @param <T>
      */
-    @SuppressWarnings("unchecked")
     public <T> void register(T obj, Class<T> service) {
         List<T> list = getList(service);
         list.add(0, obj);

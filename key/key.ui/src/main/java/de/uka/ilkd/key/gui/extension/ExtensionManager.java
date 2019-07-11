@@ -22,6 +22,7 @@ import java.util.Set;
  */
 public class ExtensionManager extends SettingsPanel
         implements SettingsProvider {
+    private static final long serialVersionUID = 6682677093231975786L;
     private static final ExtensionSettings EXTENSION_SETTINGS = new ExtensionSettings();
     private HashMap<JCheckBox, Extension> map;
     private String keywords = "";

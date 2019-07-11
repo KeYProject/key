@@ -113,6 +113,8 @@ public class TestExtension implements KeYGuiExtension,
     }
 
     private class TestAction extends KeyAction {
+        private static final long serialVersionUID = -2701623640497343330L;
+
         public TestAction() {
             setName("Test");
             setMenuPath("Test.Test.Test");
