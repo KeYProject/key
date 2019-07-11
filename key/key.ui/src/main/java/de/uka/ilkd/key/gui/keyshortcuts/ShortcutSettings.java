@@ -189,7 +189,9 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         public Object getValueAt(int rowIndex, int columnIndex) {
             switch (columnIndex) {
                 case 0:
-                    return actionName.get(rowIndex);
+                    return actionName.get(rowIndex)
+                            //remove common package prefixes
+                            .replaceAll("([a-z]\\w*\\.)*", "");
                 case 1:
                     Action a = actions.get(rowIndex);
                     if (a == null) return "";
