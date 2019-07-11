@@ -14,6 +14,7 @@ import javax.swing.*;
  * @version 1 (08.04.19)
  */
 class SolverOptions extends SettingsPanel implements SettingsProvider {
+    private static final long serialVersionUID = 4425059748947494605L;
     private static final String infoSolverName =
             "There are two ways to make supported provers applicable for KeY:\n"
                     + "1. Specify the absolute path of the prover in the field 'Command'.\n"

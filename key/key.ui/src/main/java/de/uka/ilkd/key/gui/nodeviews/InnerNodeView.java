@@ -15,7 +15,6 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
 import java.awt.Insets;
-import java.util.ArrayList;
 
 import javax.swing.JTextArea;
 import javax.swing.border.CompoundBorder;
@@ -26,7 +25,6 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.gui.MainWindow;

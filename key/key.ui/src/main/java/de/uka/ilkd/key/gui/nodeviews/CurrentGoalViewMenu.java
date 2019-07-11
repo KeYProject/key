@@ -87,6 +87,7 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
  * Shows all {@link Taclet}s that are applicable at a selected position.
  */
 public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> {
+    private static final long serialVersionUID = 8151230546928796116L;
 
     private static final String CREATE_ABBREVIATION = "Create abbreviation";
     private static final String ENABLE_ABBREVIATION = "Enable abbreviation";

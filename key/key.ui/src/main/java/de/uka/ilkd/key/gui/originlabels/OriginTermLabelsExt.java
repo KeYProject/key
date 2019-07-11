@@ -23,8 +23,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
  */
 @KeYGuiExtension.Info(name = "OriginLabels UI",
         optional = true,
-        description = "UI support for origin labels" +
-                "Developer: Florian Lanzinger <uiekn@student.kit.edu>",
+        description = "UI support for origin labels",
         experimental = false)
 public class OriginTermLabelsExt
         implements KeYGuiExtension,

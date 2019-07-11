@@ -30,7 +30,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -298,7 +297,7 @@ public class TaskTree extends JPanel {
 
     static class TaskTreeIconCellRenderer extends DefaultTreeCellRenderer
             implements java.io.Serializable {
-
+        private static final long serialVersionUID = 2423935787625012908L;
         static final Icon keyIcon = IconFactory.keyHole(20, 20);
         static final Icon keyClosedIcon = IconFactory.keyHoleClosed(20);
         static final Icon keyAlmostClosedIcon = IconFactory.keyHoleAlmostClosed(20, 20);
