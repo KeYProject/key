@@ -64,14 +64,11 @@ public class ProofTreePopupFactory {
 
         addSeparator();
 
-        ButtonGroup btnGroup = new ButtonGroup();
         for (ProofTreeViewFilter filter : ProofTreeViewFilter.ALL) {
             add(ctx -> {
                 FilterAction action = new FilterAction(ctx, filter);
                 //JRadioButtonMenuItem item = new JRadioButtonMenuItem(action);
-                JCheckBoxMenuItem item = new JCheckBoxMenuItem(action);
-                btnGroup.add(item);
-                return item;
+                return new JCheckBoxMenuItem(action);
             });
         }
 
