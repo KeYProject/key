@@ -33,7 +33,7 @@ public final class IconFactory {
     public static final IconFontProvider PREVIOUS = new IconFontProvider(FontAwesomeSolid.ARROW_LEFT);
     public static final IconFontProvider STOP = new IconFontProvider(FontAwesomeSolid.STOP, Color.RED);
     public static final IconFontProvider CONFIGURE_MENU = new IconFontProvider(FontAwesomeSolid.SORT_DOWN);
-    public static final IconFontProvider MOST_RECENT = new IconFontProvider(FontAwesomeSolid.FILE);
+    public static final IconFontProvider OPEN_MOST_RECENT = new IconFontProvider(FontAwesomeSolid.REDO_ALT);
     public static final IconFontProvider OPEN_KEY_FILE = new IconFontProvider(FontAwesomeSolid.FOLDER_OPEN);
     public static final IconFontProvider SAVE_FILE = new IconFontProvider(FontAwesomeSolid.SAVE);
     public static final IconFontProvider EDIT = new IconFontProvider(FontAwesomeSolid.EDIT);
@@ -41,12 +41,15 @@ public final class IconFactory {
     public static final IconFontProvider PRUNE = new IconFontProvider(FontAwesomeSolid.HAND_SCISSORS);
     public static final IconFontProvider GOAL_BACK = new IconFontProvider(FontAwesomeSolid.BACKSPACE);
     public static final IconFontProvider EXPAND_GOALS = new IconFontProvider(FontAwesomeSolid.EXPAND_ARROWS_ALT);
-    public static final IconFontProvider CONFIGURE = new IconFontProvider(FontAwesomeSolid.COGS);
+    public static final IconFontProvider CONFIGURE = new IconFontProvider(FontAwesomeSolid.COG);
     public static final IconFontProvider HELP = new IconFontProvider(FontAwesomeSolid.QUESTION_CIRCLE);
     public static final IconFontProvider PROOF_MANAGEMENT = new IconFontProvider(FontAwesomeSolid.TASKS);
-    public static final IconFontProvider PROPERTIES = new IconFontProvider(FontAwesomeSolid.COGS);
+    public static final IconFontProvider PROPERTIES = new IconFontProvider(FontAwesomeSolid.COG);
     public static final IconProvider SEARCH_PREV = new IconFontProvider(FontAwesomeSolid.ARROW_RIGHT);
     public static final IconFontProvider EXPERIMENTAL_EXTENSION = new IconFontProvider(FontAwesomeSolid.FLASK);
+    public static final IconFontProvider COUNTER_EXAMPLE = new IconFontProvider(FontAwesomeSolid.BOMB); // OR BUG or BOLT
+    public static final IconFontProvider TEST_CASE_GENERATION = new IconFontProvider(FontAwesomeSolid.VIALS); // OR VIAL
+
     public static float DEFAULT_SIZE = 16;
     public static Color CLOSED_GREEN = DuneColorScheme.green;
     public static final IconFontProvider AUTO_MODE_START = new IconFontProvider(FontAwesomeSolid.PLAY_CIRCLE, CLOSED_GREEN);
@@ -54,8 +57,8 @@ public final class IconFactory {
     public static Color ERROR_COLOR = DuneColorScheme.red;
     public static final IconFontProvider AUTO_MODE_STOP = new IconFontProvider(FontAwesomeSolid.STOP_CIRCLE, ERROR_COLOR);
     public static Color WARNING_COLOR = DuneColorScheme.orange;
-    public static IconProvider PROOF_SEARCH_STRATEGY = new IconFontProvider(FontAwesomeSolid.COGS);
-    public static IconProvider PROOF_TREE = new IconFontProvider(FontAwesomeSolid.TREE);
+    public static IconProvider PROOF_SEARCH_STRATEGY = new IconFontProvider(FontAwesomeSolid.COG);
+    public static IconProvider PROOF_TREE = new IconFontProvider(FontAwesomeSolid.SITEMAP);//OR CODE_BRANCH
     public static IconProvider INFO_VIEW = new IconFontProvider(FontAwesomeSolid.INFO_CIRCLE);
     public static IconProvider TREE_NODE_EXPANDED = new IconFontProvider(FontAwesomeSolid.CARET_DOWN);
     public static IconProvider TREE_NODE_RETRACTED = new IconFontProvider(FontAwesomeSolid.CARET_RIGHT);
@@ -77,8 +80,8 @@ public final class IconFactory {
     public static IconProvider INTERLOG_PAUSE = new IconFontProvider(FontAwesomeSolid.PLAY_CIRCLE);
     public static IconProvider INTERLOG_ICON = new IconFontProvider(FontAwesomeSolid.BOOK);
 
-    public static IconProvider HEATMAP_DEACTIVATE = new IconFontProvider(FontAwesomeSolid.FIRE_EXTINGUISHER);
-    public static IconProvider HEATMAP_ACTIVATE = new IconFontProvider(FontAwesomeSolid.FIRE);
+    public static IconProvider HEATMAP_DEACTIVATE = new IconFontProvider(FontAwesomeSolid.SHOE_PRINTS);
+    public static IconProvider HEATMAP_ACTIVATE = new IconFontProvider(FontAwesomeSolid.SHOE_PRINTS);
 
 
     public static IconFontProvider PROVED_FOLDER_ICON = new IconFontProvider(FontAwesomeSolid.FOLDER, CLOSED_GREEN);
@@ -283,11 +286,11 @@ public final class IconFactory {
     }
 
     public static Icon testGeneration(int size) {
-        return scaleIcon(testgenerationImage, size, size);
+        return TEST_CASE_GENERATION.get(size);//scaleIcon(testgenerationImage, size, size);
     }
 
     public static Icon counterExample(int size) {
-        return scaleIcon(counterexampleImage, size, size);
+        return COUNTER_EXAMPLE.get(size);//scaleIcon(counterexampleImage, size, size);
     }
 
     public static Icon junitLogo(int size) {
@@ -338,7 +341,7 @@ public final class IconFactory {
     }
 
     public static Icon openMostRecent(int size) {
-        return MOST_RECENT.load(size);
+        return OPEN_MOST_RECENT.load(size);
         //return scaleIcon(openMostRecentKeYFile, size, size);
     }
 
