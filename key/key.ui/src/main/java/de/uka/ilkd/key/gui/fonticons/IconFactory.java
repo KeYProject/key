@@ -52,9 +52,11 @@ public final class IconFactory {
     public static final IconFontProvider EXPERIMENTAL_EXTENSION = new IconFontProvider(FontAwesomeSolid.FLASK);
     public static final IconFontProvider COUNTER_EXAMPLE = new IconFontProvider(FontAwesomeSolid.BOMB); // OR BUG or BOLT
     public static final IconFontProvider TEST_CASE_GENERATION = new IconFontProvider(FontAwesomeSolid.VIALS); // OR VIAL
-    public static final IconFontProvider ORIGIN_HIGHLIGHT_ICON = new IconFontProvider(FontAwesomeSolid.HIGHLIGHTER);
+    public static final IconFontProvider ORIGIN_HIGHLIGHT_ICON =
+            new IconFontProvider(FontAwesomeSolid.HIGHLIGHTER);
     public static final IconFontProvider ORIGIN_ICON = new IconFontProvider(FontAwesomeSolid.ROUTE);
-    public static final IconFontProvider WINDOW_ICON = new IconFontProvider(FontAwesomeSolid.WINDOW_RESTORE);
+    public static final IconFontProvider WINDOW_ICON =
+            new IconFontProvider(FontAwesomeSolid.WINDOW_RESTORE);
 
     public static float DEFAULT_SIZE = 16;
     public static Color CLOSED_GREEN = DuneColorScheme.green;

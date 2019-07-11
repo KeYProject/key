@@ -498,7 +498,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         }*/
         }
     private boolean isRareRule(Taclet taclet) {
-        if( clutterRules.contains(taclet.name().toString())) {
+        if (clutterRules.contains(taclet.name().toString())) {
             return true;
         }
         return taclet.getRuleSets().stream()

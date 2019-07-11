@@ -299,7 +299,8 @@ public final class SourceView extends JComponent {
     }
 
     /**
-     * <p> Creates a new set of highlights for a range of lines starting with {@code firstLine}. </p>
+     * <p> Creates a new set of highlights for a range of lines starting with {@code firstLine}.
+     * </p>
      *
      * <p> This method applies a heuristic to try and highlight the complete JML statement
      *  starting in {@code firstLine}. </p>
@@ -1164,10 +1165,10 @@ public final class SourceView extends JComponent {
      * @see SourceView#changeHighlight(Highlight, int)
      * @see SourceView#removeHighlight(Highlight)
      */
-    public static class Highlight implements Comparable<Highlight> {
+    public static final class Highlight implements Comparable<Highlight> {
 
         /** @see #getTag() */
-        private static final Map<Highlight, Object> tags = new HashMap<>();
+        private static final Map<Highlight, Object> TAGS = new HashMap<>();
 
         /** @see #getLevel() */
         private int level;
@@ -1271,9 +1272,9 @@ public final class SourceView extends JComponent {
          */
         private void setTag(Object tag) {
             if (tag == null) {
-                tags.remove(this);
+                TAGS.remove(this);
             } else {
-                tags.put(this, tag);
+                TAGS.put(this, tag);
             }
         }
 
@@ -1286,7 +1287,7 @@ public final class SourceView extends JComponent {
          * @see Highlighter#removeHighlight(Object)
          */
         private Object getTag() {
-            return tags.get(this);
+            return TAGS.get(this);
         }
 
         /**

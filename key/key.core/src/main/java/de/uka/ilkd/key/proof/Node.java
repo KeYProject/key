@@ -38,6 +38,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 
 public class Node {
+    Node parent = null;
+
     private static final String RULE_WITHOUT_NAME = "rule without name";
 
     private static final String RULE_APPLICATION_WITHOUT_RULE = "rule application without rule";
@@ -58,8 +60,6 @@ public class Node {
     private Sequent seq = Sequent.EMPTY_SEQUENT;
 
     private final ArrayList<Node> children = new ArrayList<>(1);
-
-    Node parent = null;
 
     private RuleApp appliedRuleApp;
 

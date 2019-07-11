@@ -148,7 +148,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         @Override
         public void windowUnregistered(NodeInfoWindow win) {
-            if (win.getNode().proof() != null && !win.getNode().proof().isDisposed() && win.getNode().proof() == proof) {
+            if (win.getNode().proof() != null
+                    && !win.getNode().proof().isDisposed()
+                    && win.getNode().proof() == proof) {
                 delegateModel.updateTree(win.getNode());
             }
         }
@@ -711,8 +713,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
          */
         @Override
         public void autoModeStopped(ProofEvent e) {
-            if (mediator.getSelectedProof() == null)
-             {
+            if (mediator.getSelectedProof() == null) {
                 return; // no proof (yet)
             }
             delegateView.removeTreeSelectionListener(treeSelectionListener);

@@ -141,7 +141,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
     /**
      * Show Taclet uninstantiated in tooltip -- for learning
      */
-    private PropertyEntry<Boolean> showUninstantiatedTaclet = createBooleanProperty(SHOW_UNINSTANTIATED_TACLET, true);
+    private PropertyEntry<Boolean> showUninstantiatedTaclet =
+            createBooleanProperty(SHOW_UNINSTANTIATED_TACLET, true);
     private PropertyEntry<Boolean> showHeatmap = createBooleanProperty(HEATMAP_SHOW, false);
     private PropertyEntry<Boolean> heatmapSF = createBooleanProperty(HEATMAP_SF, true);
     /**
@@ -153,22 +154,32 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     private PropertyEntry<Integer> maxAgeForHeatmap = createIntegerProperty(HEATMAP_MAXAGE, 5);
     private PropertyEntry<Double> uiFontSizeFactor = createDoubleProperty(FONT_SIZE_FACTOR, 1.0);
-    private PropertyEntry<Integer> maxTooltipLines = createIntegerProperty(MAX_TOOLTIP_LINES_KEY, 40);
-    private PropertyEntry<Boolean> hideIntermediateProofsteps = createBooleanProperty(HIDE_INTERMEDIATE_PROOFSTEPS, false);
-    private PropertyEntry<Boolean> hideAutomodeProofsteps = createBooleanProperty(HIDE_AUTOMODE_PROOFSTEPS, false);
-    private PropertyEntry<Boolean> hideClosedSubtrees = createBooleanProperty(HIDE_CLOSED_SUBTREES, false);
-    private PropertyEntry<Boolean> notifyLoadBehaviour = createBooleanProperty(NOTIFY_LOAD_BEHAVIOUR, false);
+    private PropertyEntry<Integer> maxTooltipLines =
+            createIntegerProperty(MAX_TOOLTIP_LINES_KEY, 40);
+    private PropertyEntry<Boolean> hideIntermediateProofsteps =
+            createBooleanProperty(HIDE_INTERMEDIATE_PROOFSTEPS, false);
+    private PropertyEntry<Boolean> hideAutomodeProofsteps =
+            createBooleanProperty(HIDE_AUTOMODE_PROOFSTEPS, false);
+    private PropertyEntry<Boolean> hideClosedSubtrees =
+            createBooleanProperty(HIDE_CLOSED_SUBTREES, false);
+    private PropertyEntry<Boolean> notifyLoadBehaviour =
+            createBooleanProperty(NOTIFY_LOAD_BEHAVIOUR, false);
     private PropertyEntry<Boolean> usePretty = createBooleanProperty(PRETTY_SYNTAX, true);
     private PropertyEntry<Boolean> useUnicode = createBooleanProperty(USE_UNICODE, false);
-    private PropertyEntry<Boolean> useSyntaxHighlighting = createBooleanProperty(SYNTAX_HIGHLIGHTING, true);
-    private PropertyEntry<Boolean> hidePackagePrefix = createBooleanProperty(HIDE_PACKAGE_PREFIX, false);
+    private PropertyEntry<Boolean> useSyntaxHighlighting =
+            createBooleanProperty(SYNTAX_HIGHLIGHTING, true);
+    private PropertyEntry<Boolean> hidePackagePrefix =
+            createBooleanProperty(HIDE_PACKAGE_PREFIX, false);
     private PropertyEntry<Boolean> confirmExit = createBooleanProperty(CONFIRM_EXIT, false);
-    private PropertyEntry<Boolean> showWholeTaclet = createBooleanProperty(SHOW_WHOLE_TACLET, false);
+    private PropertyEntry<Boolean> showWholeTaclet =
+            createBooleanProperty(SHOW_WHOLE_TACLET, false);
     private PropertyEntry<Integer> sizeIndex = createIntegerProperty(FONT_INDEX, 2);
     private PropertyEntry<Boolean> useSystemLaF = createBooleanProperty(USE_SYSTEM_LAF, false);
-    private PropertyEntry<Boolean> showSequentViewTooltips = createBooleanProperty(SEQUENT_VIEW_TOOLTIP, true);
+    private PropertyEntry<Boolean> showSequentViewTooltips =
+            createBooleanProperty(SEQUENT_VIEW_TOOLTIP, true);
     private PropertyEntry<Boolean> highlightOrigin = createBooleanProperty(HIGHLIGHT_ORIGIN, true);
-    private PropertyEntry<Set<String>> clutterRules = createStringSetProperty(CLUTTER_RULES, CLUTTER_RULES_DEFAULT);
+    private PropertyEntry<Set<String>> clutterRules =
+            createStringSetProperty(CLUTTER_RULES, CLUTTER_RULES_DEFAULT);
 
     private PropertyEntry<Set<String>> clutterRuleSets =
             createStringSetProperty(CLUTTER_RULESSETS, CLUTTER_RULESETS_DEFAULT);

@@ -277,7 +277,8 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
                     // equal string representation are still different.
                     info = operator + ", Sort: " + t.sort() + ", Hash:" + t.hashCode();
 
-                    Sequent seq = sequentView.getMainWindow().getMediator().getSelectedNode().sequent();
+                    Sequent seq =
+                            sequentView.getMainWindow().getMediator().getSelectedNode().sequent();
                     info += ProofSaver.posInOccurrence2Proof(seq, posInOcc);
 
                     StringJoiner extensionStr = new StringJoiner(", ", ", ", "");
