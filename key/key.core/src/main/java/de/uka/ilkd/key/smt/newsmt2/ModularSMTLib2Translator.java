@@ -111,10 +111,15 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         sb.append("\n(check-sat)");
 
+        sb.append("\n\n; --- Translation of unknown values\n");
+        for (Term t : master.getUnknownValues().keySet()) {
+            sb.append("; " + master.getUnknownValues().get(t).toString() + " :  " + t.toString() + "\n");
+        }
+
 
         // any exceptions?
         for (Throwable t : exceptions) {
-            sb.append("; " + t.toString());
+            sb.append("\n; " + t.toString());
         }
 
         return sb;

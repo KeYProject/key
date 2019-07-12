@@ -104,10 +104,11 @@ public class MasterHandler {
             return unknownValues.get(problem);
         }
         int number = unknownValues.size();
-        String pr = "unknown_" + number;
-        SExpr e = new SExpr("declare-const", pr, "U");
-        unknownValues.put(problem, e);
-        return e;
+        SExpr abbr = new SExpr("unknown_", Integer.toString(number));
+        SExpr e = new SExpr("declare-const", Type.UNIVERSE, abbr.toString(), "U");
+        addAxiom(e);
+        unknownValues.put(problem, abbr);
+        return abbr;
     }
 
     /**
@@ -227,6 +228,10 @@ public class MasterHandler {
 
     public HashSet<Sort> getSorts() {
         return sorts;
+    }
+
+    public Map<Term, SExpr> getUnknownValues() {
+        return unknownValues;
     }
 
     void addFromSnippets(String functionName) {
