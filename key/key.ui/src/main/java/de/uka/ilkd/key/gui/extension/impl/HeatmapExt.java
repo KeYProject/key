@@ -68,10 +68,11 @@ public class HeatmapExt implements KeYGuiExtension,
  * It is possible to highlight all sf/terms up to a specified age, or to
  * highlight the x newest sf/terms, x being specified by the user.
  *
- * @author weigl
- * @author jschiffl
+ * @author weigl, jschiffl
  */
 class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider {
+    private static final long serialVersionUID = 7783431483026950930L;
+
     /**
      * Minimal setting for number of highlighted terms
      */

@@ -33,10 +33,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Optional;
 
 public class InteractionLogView extends JPanel implements InteractionRecorderListener, TabPanel {
+    private static final long serialVersionUID = -7022558787824644419L;
     private static final Icon INTERACTION_LOG_ICON = IconFactory.INTERLOG_ICON.get();
     private static final float SMALL_ICON_SIZE = 16f;
     private static final String MENU_ILOG = "Interaction Logging";
@@ -314,9 +314,12 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
 
     private class InteractionLogModelItem extends DefaultComboBoxModel<InteractionLog> {
+        private static final long serialVersionUID = -865181384700785594L;
     }
 
     private class ExportMUScriptAction extends AbstractFileSaveAction {
+        private static final long serialVersionUID = -1452819623911938236L;
+
         ExportMUScriptAction() {
             setName("Export as Proof Script");
             setIcon(IconFactory.EXPORT_MU_SCRIPT.get());
@@ -337,6 +340,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class ExportMUScriptClipboardAction extends KeyAction {
+        private static final long serialVersionUID = 3061052373321132190L;
+
         ExportMUScriptClipboardAction() {
             setName("Copy MUScript");
             setSmallIcon(IconFactory.EXPORT_MU_SCRIPT_CLIPBOARD.get());
@@ -354,6 +359,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class LoadAction extends KeyAction {
+        private static final long serialVersionUID = 7081382326391914209L;
+
         LoadAction() {
             setName("Load");
             putValue(Action.SHORT_DESCRIPTION, "Load Interaction Log");
@@ -386,6 +393,9 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class SaveAction extends KeyAction {
+        private static final long serialVersionUID = 152427005520690908L;
+
+
         SaveAction() {
             setName("Save");
             setIcon(IconFactory.INTERLOG_SAVE.get());
@@ -417,6 +427,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class AddUserNoteAction extends KeyAction {
+        private static final long serialVersionUID = -4194158336899285273L;
+
         AddUserNoteAction() {
             setName("Add Note");
             setIcon(ICON_ADD_USER_ACTION.get(SMALL_ICON_SIZE));
@@ -444,6 +456,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class ToggleFavouriteAction extends KeyAction {
+        private static final long serialVersionUID = -8405580442311567192L;
+
         ToggleFavouriteAction() {
             setName("Toggle Fav");
             setName("Toggle Fav");
@@ -463,6 +477,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class JumpIntoTreeAction extends KeyAction {
+        private static final long serialVersionUID = -2750634259700985279L;
+
         JumpIntoTreeAction() {
             setName("Jump into tree");
             putValue(SMALL_ICON, IconFactory.JUMP_INTO_TREE.get());
@@ -485,6 +501,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class TryReapplyAction extends KeyAction {
+        private static final long serialVersionUID = -5660321248967150793L;
+
         TryReapplyAction() {
             putValue(NAME, "Re-apply action");
             putValue(SMALL_ICON, IconFactory.INTERLOG_TRY_APPLY.get());
@@ -512,6 +530,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private abstract class AbstractFileSaveAction extends KeyAction {
+        private static final long serialVersionUID = -5654233544157162006L;
+
         public AbstractFileSaveAction() {
             super();
         }
@@ -529,6 +549,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class ExportKPSAction extends AbstractFileSaveAction {
+        private static final long serialVersionUID = -5601133423736836904L;
+
         public ExportKPSAction() {
             setName("Export as KPS …");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into the KPS format.");
@@ -547,6 +569,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class ExportMarkdownAction extends AbstractFileSaveAction {
+        private static final long serialVersionUID = 1108419704071886953L;
+
         public ExportMarkdownAction() {
             setName("Export as markdown …");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into a markdown file.");
@@ -565,6 +589,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class ShowExtendedActionsAction extends KeyAction {
+        private static final long serialVersionUID = -2526178400655285314L;
+
         public ShowExtendedActionsAction() {
             setName("More …");
             putValue(Action.SHORT_DESCRIPTION, "Shows further options");
@@ -591,6 +617,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     }
 
     private class PauseLoggingAction extends KeyAction {
+        private static final long serialVersionUID = 714043827891022783L;
+
         public PauseLoggingAction() {
             setSelected(recorder.isDisableAll());
             setPriority(-1);
@@ -690,6 +718,7 @@ class MultiLineInputPrompt {
 }
 
 class InteractionCellRenderer extends JPanel implements ListCellRenderer<Interaction> {
+    private static final long serialVersionUID = -2667005473245735632L;
     private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final Color COLOR_FAVOURED = new Color(0xFFD373);
     private JLabel lblIconLeft = new JLabel(), lblIconRight = new JLabel(), lblText = new JLabel();

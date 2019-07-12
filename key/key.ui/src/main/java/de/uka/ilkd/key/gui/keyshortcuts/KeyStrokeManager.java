@@ -16,11 +16,8 @@ package de.uka.ilkd.key.gui.keyshortcuts;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

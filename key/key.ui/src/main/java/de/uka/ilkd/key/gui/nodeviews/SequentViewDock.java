@@ -8,7 +8,6 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.prooftree.ProofTreePopupFactory;
 import de.uka.ilkd.key.proof.Node;
 
 import javax.swing.*;
@@ -38,6 +37,7 @@ public class SequentViewDock extends DefaultMultipleCDockable {
     }
 
     public static class OpenCurrentNodeAction extends MainWindowAction {
+        private static final long serialVersionUID = 8488446344747995700L;
         private final Node node;
 
         public OpenCurrentNodeAction(MainWindow mainWindow, Node node) {
@@ -57,6 +57,8 @@ public class SequentViewDock extends DefaultMultipleCDockable {
     }
 
     private class JumpIntoTreeAction extends KeyAction {
+        private static final long serialVersionUID = 2784076203317037461L;
+
         JumpIntoTreeAction() {
             setName("Jump into tree");
             putValue(SMALL_ICON, IconFactory.JUMP_INTO_TREE.get());

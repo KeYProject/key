@@ -60,6 +60,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
      * The old (cleaned up) SettingsDialog.
      */
     private class ViewSettingsDialog extends JDialog {
+        private static final long serialVersionUID = -3780496399924182275L;
         private JTree optionTree;
         private JSplitPane splitPane;
         private JPanel optionPanel;

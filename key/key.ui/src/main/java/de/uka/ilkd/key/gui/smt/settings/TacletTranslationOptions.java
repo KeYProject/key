@@ -24,6 +24,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import javax.swing.*;
 
 public class TacletTranslationOptions extends SettingsPanel implements SettingsProvider {
+    private static final long serialVersionUID = 5273966151509876358L;
     private static final String infoFileChooserPanel = "Activate this option to store the translations of taclets"
             + " that are handed over to the externals solvers:\n"
             + "1. Choose the folder.\n"

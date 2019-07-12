@@ -38,6 +38,7 @@ import java.awt.*;
  * @see de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.StatusLine
  */
 class MainStatusLine extends JPanel {
+    private static final long serialVersionUID = 2278249652314818379L;
     private final JLabel lblStatusText = new JLabel();
     private final JProgressBar progressBar = new JProgressBar();
     //private boolean phantomBoxAdded = false;

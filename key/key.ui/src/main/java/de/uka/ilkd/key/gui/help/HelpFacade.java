@@ -104,6 +104,8 @@ public class HelpFacade {
     }
 
     private static class OpenHelpAction extends KeyAction {
+        private static final long serialVersionUID = 85722762932429493L;
+
         public OpenHelpAction() {
             setName("Open help");
             setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
