@@ -81,6 +81,7 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
  * Taclet that are applicable at a selected position in a sequent.
  */
 public class TacletMenu extends JMenu {
+    private static final long serialVersionUID = 8151230546928796116L;
 
     private static final String MORE_RULES = "More rules";
     private static final String COPY_TO_CLIPBOARD = "Copy to clipboard";

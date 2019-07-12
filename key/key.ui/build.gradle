@@ -49,7 +49,7 @@ application {
 
 run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
-    args "--experimental"
+    // args "--experimental"
 }
 
 

@@ -56,11 +56,7 @@ public class ProofIndependentSettings {
         addSettings(generalSettings);
         addSettings(viewSettings);
         addSettings(testGenSettings);
-
         this.filename = filename;
-        for (Settings settings : settings) {
-            settings.addSettingsListener(settingsListener);
-        }
         loadSettings();
     }
 

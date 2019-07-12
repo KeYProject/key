@@ -144,6 +144,8 @@ public class SettingsManager {
 
     public Action getActionShowSettings(MainWindow window) {
         class ShowSettingsAction extends KeyAction {
+            private static final long serialVersionUID = 153753479823919818L;
+
             public ShowSettingsAction() {
                 setName("Show Settings");
                 setIcon(IconFactory.editFile(16));

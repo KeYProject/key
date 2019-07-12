@@ -14,6 +14,7 @@ import java.awt.*;
  * @version 1 (08.04.19)
  */
 class TranslationOptions extends SettingsPanel implements SettingsProvider {
+    private static final long serialVersionUID = 7299370317491756605L;
     private static final String infoUseExplicitTypeHierarchy = "If this option is selected, the transitive inheritance between classes is modeled by "
             + "assumptions.\n\n"
             + "Example: Let A, B and C  be classes such that C extends B and B extends A.\n"

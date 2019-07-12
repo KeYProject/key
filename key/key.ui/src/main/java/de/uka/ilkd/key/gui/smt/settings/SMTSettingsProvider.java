@@ -16,6 +16,7 @@ import java.util.List;
  * @version 1 (08.04.19)
  */
 public class SMTSettingsProvider extends SettingsPanel implements SettingsProvider {
+    private static final long serialVersionUID = -5374124826295959483L;
     public final static String PROGRESS_MODE_USER = "Progress dialog remains open after executing solvers.";
     public final static String PROGRESS_MODE_CLOSE = "Close progress dialog after all solvers have finished.";
     public final static String PROGRESS_MODE_CLOSE_FIRST = "Close progress dialog after the first solver has finished.";

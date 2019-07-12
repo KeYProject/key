@@ -64,14 +64,11 @@ public class ProofTreePopupFactory {
 
         addSeparator();
 
-        ButtonGroup btnGroup = new ButtonGroup();
         for (ProofTreeViewFilter filter : ProofTreeViewFilter.ALL) {
             add(ctx -> {
                 FilterAction action = new FilterAction(ctx, filter);
                 //JRadioButtonMenuItem item = new JRadioButtonMenuItem(action);
-                JCheckBoxMenuItem item = new JCheckBoxMenuItem(action);
-                btnGroup.add(item);
-                return item;
+                return new JCheckBoxMenuItem(action);
             });
         }
 
@@ -173,6 +170,8 @@ public class ProofTreePopupFactory {
     }
 
     class SubtreeStatistics extends ProofTreeAction {
+        private static final long serialVersionUID = -8452239418108180349L;
+
         protected SubtreeStatistics(ProofTreeContext context) {
             super(context);
             setName("Show Subtree Statistics");
@@ -217,6 +216,8 @@ public class ProofTreePopupFactory {
     }
 
     class CollapseOtherBranches extends ProofTreeAction {
+        private static final long serialVersionUID = -6461403850298323327L;
+
         protected CollapseOtherBranches(ProofTreeContext context) {
             super(context);
             setName("Collapse Other Branches");
@@ -229,6 +230,8 @@ public class ProofTreePopupFactory {
     }
 
     class ExpandGoalsBelow extends ProofTreeAction {
+        private static final long serialVersionUID = -500754845710844009L;
+
         protected ExpandGoalsBelow(ProofTreeContext context) {
             super(context);
             setName("Expand Goals Only Below");
@@ -265,6 +268,8 @@ public class ProofTreePopupFactory {
     }
 
     class ExpandAll extends ProofTreeAction {
+        private static final long serialVersionUID = -8996407746579766286L;
+
         protected ExpandAll(ProofTreeContext context) {
             super(context);
             setName("Expand All");
@@ -279,6 +284,8 @@ public class ProofTreePopupFactory {
     }
 
     class ExpandAllBelow extends ProofTreeAction {
+        private static final long serialVersionUID = 850060084128297700L;
+
         public ExpandAllBelow(ProofTreeContext context) {
             super(context);
 
@@ -292,6 +299,8 @@ public class ProofTreePopupFactory {
     }
 
     class ExpandGoals extends ProofTreeAction {
+        private static final long serialVersionUID = -8404655108317574685L;
+
         public ExpandGoals(ProofTreeContext context) {
             super(context);
             setName("Expand Goals Only");
@@ -312,6 +321,8 @@ public class ProofTreePopupFactory {
     }
 
     class CollapseAll extends ProofTreeAction {
+        private static final long serialVersionUID = 5343671322035834491L;
+
         public CollapseAll(ProofTreeContext context) {
             super(context);
             setName("Collapse All");
@@ -326,6 +337,8 @@ public class ProofTreePopupFactory {
     }
 
     class CollapseBelow extends ProofTreeAction {
+        private static final long serialVersionUID = -7283113335781286556L;
+
         public CollapseBelow(ProofTreeContext context) {
             super(context);
             setName("Collapse Below");
@@ -347,6 +360,8 @@ public class ProofTreePopupFactory {
     }
 
     class PrevSibling extends ProofTreeAction {
+        private static final long serialVersionUID = 8705344500396898345L;
+
         public PrevSibling(ProofTreeContext context) {
             super(context);
             setName("Previous Sibling");
@@ -379,6 +394,8 @@ public class ProofTreePopupFactory {
     }
 
     class NextSibling extends ProofTreeAction {
+        private static final long serialVersionUID = 2337297147243419973L;
+
         public NextSibling(ProofTreeContext context) {
             super(context);
             setName("Next Sibling");
@@ -411,6 +428,8 @@ public class ProofTreePopupFactory {
     }
 
     class Notes extends ProofTreeAction {
+        private static final long serialVersionUID = -6871120844080468856L;
+
         public Notes(ProofTreeContext context) {
             super(context);
             setName("Edit Notes");
@@ -438,6 +457,8 @@ public class ProofTreePopupFactory {
     }
 
     class Search extends ProofTreeAction {
+        private static final long serialVersionUID = -6543488911281521583L;
+
         public Search(ProofTreeContext context) {
             super(context);
             setName("Search");
@@ -452,6 +473,8 @@ public class ProofTreePopupFactory {
     }
 
     class Prune extends ProofTreeAction {
+        private static final long serialVersionUID = -1744963704210861370L;
+
         public Prune(ProofTreeContext context) {
             super(context);
             setName("Prune Proof");
@@ -481,6 +504,8 @@ public class ProofTreePopupFactory {
     }
 
     class DelayedCut extends ProofTreeAction {
+        private static final long serialVersionUID = 2264044175802298829L;
+
         public DelayedCut(ProofTreeContext context) {
             super(context);
             setName("Delayed Cut");
@@ -505,6 +530,8 @@ public class ProofTreePopupFactory {
     }
 
     class RunStrategyOnNode extends ProofTreeAction {
+        private static final long serialVersionUID = -7028621462695539683L;
+
         protected RunStrategyOnNode(ProofTreeContext context) {
             super(context);
             setName("Apply Strategy");
@@ -542,6 +569,7 @@ public class ProofTreePopupFactory {
      * @author mulbrich
      */
     private final class SetGoalsBelowEnableStatus extends DisableGoal {
+        private static final long serialVersionUID = -2150188528163599512L;
         private final ProofTreeContext context;
 
         public SetGoalsBelowEnableStatus(ProofTreeContext ctx, boolean enableGoals) {
@@ -583,6 +611,7 @@ public class ProofTreePopupFactory {
     }
 
     public abstract class ProofTreeAction extends KeyAction {
+        private static final long serialVersionUID = 2686349019163064481L;
         protected final ProofTreeContext context;
 
         protected ProofTreeAction(ProofTreeContext context) {
@@ -591,6 +620,7 @@ public class ProofTreePopupFactory {
     }
 
     private class FilterAction extends ProofTreeAction {
+        private static final long serialVersionUID = -2972127068771960203L;
         private final ProofTreeViewFilter filter;
 
         public FilterAction(ProofTreeContext context, ProofTreeViewFilter filter) {

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class TacletOptionsSettings extends SimpleSettingsPanel implements SettingsProvider {
+    private static final long serialVersionUID = 1455572432081960150L;
     private static final String EXPLANATIONS_RESOURCE = "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
     private static Properties explanationMap;
     private HashMap<String, String> category2Choice;

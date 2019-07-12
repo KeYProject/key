@@ -11,8 +11,10 @@ import java.util.Iterator;
  * @version 1 (13.02.19)
  */
 public abstract class KeyAction extends AbstractAction {
+    private static final long serialVersionUID = -3939943174392925224L;
+
     /**
-     *
+     * SHORTCUT_FOCUSED_CONDITION
      */
     public static final String SHORTCUT_FOCUSED_CONDITION = "SHORTCUT_FOCUSED_CONDITION";
 
