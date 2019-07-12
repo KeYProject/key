@@ -1174,12 +1174,18 @@ public final class MainWindow extends JFrame {
         getUserInterface().loadProblem(file);
     }
 
-    public void loadProblem(File file, String proofName) {
-        getUserInterface().loadProblem(file, proofName);
+    public void loadProblem(File file, List<File> classPath, File bootClassPath, List<File> includes) {
+        getUserInterface().loadProblem(file, classPath, bootClassPath, includes);
     }
 
-    public void loadProblem(File file, List<File> classPath, File bootClassPath, List<File> includes) {
-        getUserInterface().loadProblem(file, null, classPath, bootClassPath, includes);
+    /**
+     * Loads the proof with the given path from the proof bundle.
+     * @param proofBundle the path of the proof bundle
+     * @param proofPath the path of the proof to load
+     *                  (relative to the root of the bundle -> filename only)
+     */
+    public void loadProofFromBundle(File proofBundle, File proofPath) {
+        getUserInterface().loadProofFromBundle(proofBundle, proofPath);
     }
 
     /*

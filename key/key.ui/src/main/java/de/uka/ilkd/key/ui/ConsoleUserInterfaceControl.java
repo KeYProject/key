@@ -234,14 +234,22 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * @param file the File with the problem description or the proof
      * @param classPath the class path entries to use.
      * @param bootClassPath the boot class path to use.
+     * @param includes the included files to use
      */
     public void loadProblem(File file,
-                            String proofName,
                             List<File> classPath,
                             File bootClassPath,
                             List<File> includes) {
-        ProblemLoader problemLoader = getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
-        problemLoader.setProofPath(proofName);
+        ProblemLoader problemLoader =
+            getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
+        problemLoader.runAsynchronously();
+    }
+
+    @Override
+    public void loadProofFromBundle(File proofBundle, File proofFilename) {
+        ProblemLoader problemLoader =
+            getProblemLoader(proofBundle, null, null, null, getMediator());
+        problemLoader.setProofPath(proofFilename);
         problemLoader.runAsynchronously();
     }
 

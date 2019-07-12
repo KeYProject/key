@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -91,17 +92,16 @@ public class RecentFileMenu {
                 String absPath = getAbsolutePath((JMenuItem) e.getSource());
                 File f = new File(absPath);
 
+                // special case proof bundles -> allow to select the proof to load
                 if (ProofSelectionDialog.isProofBundle(f.toPath())) {
-                    String proofName = ProofSelectionDialog.getProofName(MainWindow.getInstance(),
-                        Paths.get(absPath));
-                    if (proofName == null) {
-                        // canceled by user
+                    Path proofPath = ProofSelectionDialog.chooseProofToLoad(f.toPath());
+                    if (proofPath == null) {
+                        // canceled by user!
                         return;
                     } else {
-                        mediator.getUI().loadProblem(f, proofName);
+                        mediator.getUI().loadProofFromBundle(f, proofPath.toFile());
+                        return;
                     }
-                } else {
-                    mediator.getUI().loadProblem(f);
                 }
             }
         };

@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
@@ -11,111 +9,59 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.Locale;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
 /**
- * When loading a proof bundle, this dialog allows the user to select the proof to load.
+ * This dialog allows the user to select the proof to load from a proof bundle.
  *
  * @author Wolfram Pfeifer
  */
 public final class ProofSelectionDialog extends JDialog {
     /**
-     * The name of the proof to load.
+     * Regex for identifiers (class, method), which catches for example
+     * "java.lang.Object", "SumAndMax", "sort(int[] a)", ...
      */
-    private String proofToLoad;
+    private static final String IDENT = "(.*)";
 
     /**
-     * Creates and shows a new
-     * @param parent the parent of this dialog (blocked until this dialog is closed)
-     * @param bundlePath the path of the proof bundle to load
-     * @throws IOException if the proof bundle can not be read for some reason
+     * Regex for the type of the contract
+     * (catches something like "JML normal_behavior operation contract").
      */
-    private ProofSelectionDialog(Frame parent, Path bundlePath) throws IOException {
-        super(parent, "Choose proof to load", true);
+    private static final String TYPE = "(.*)";
 
-        // read zip
-        ZipFile bundle = new ZipFile(bundlePath.toFile());
+    /**
+     * Regex for the number of the proof.
+     */
+    private static final String NUM = "(\\d+)";
 
-        // create a list of all *.proof files (only top level in bundle)
-        List proofs = bundle.stream()
-                            .filter(e -> !e.isDirectory())
-                            .filter(e -> e.getName().endsWith(".proof"))  // *.key not allowed!
-                            .map(e -> e.getName())
-                            .collect(Collectors.toList());
+    /**
+     * The pattern to match the filename of the proof.
+     */
+    private static final Pattern PROOF_NAME_PATTERN =
+        Pattern.compile(IDENT + "\\(" + IDENT + "__" + IDENT + "\\)\\)\\."
+            + TYPE + "." + NUM + ".proof");
 
-        // show list in a JList
-        DefaultListModel<String> model = new DefaultListModel<>();
-        model.addAll(proofs);
-        JList<String> list = new JList<>(model);
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        list.setSelectedIndex(0);
-        list.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent mouseEvent) {
-                if (mouseEvent.getClickCount() >= 2) {
-                    proofToLoad = list.getSelectedValue();
-                    setVisible(false);
-                    dispose();
-                }
-            }
-        });
-        list.setCellRenderer(new ListCellRenderer<String>() {
-            @Override
-            public Component getListCellRendererComponent(JList<? extends String> jList,
-                                                          String value,
-                                                          int index,
-                                                          boolean isSelected,
-                                                          boolean cellHasFocus) {
-                JLabel label = new JLabel();
-                label.setOpaque(true); // allows for color changes via setSelectionBackground()
-                if (isSelected) {
-                    label.setBackground(list.getSelectionBackground());
-                    label.setForeground(list.getSelectionForeground());
-                } else {
-                    label.setBackground(list.getBackground());
-                    label.setForeground(list.getForeground());
-                }
+    /**
+     * The path of the proof to load (relative to the root of the proof bundle,
+     * so actually just the filename of the proof file inside the bundle).
+     */
+    private Path proofToLoad;
 
-                final String identifier = "[a-zA-Z0-9_.]*";
-                final String paramsRegex = "(\\([^()]*\\))?";       // zero or more parameters
-                final String typeRegex = "[^\\.]*";
-                final String extension = "proof";
+    /**
+     * Creates a new ProofSelectionDialog for the given proof
+     * @param bundlePath the path of the proof bundle to load
+     * @throws IOException if the proof bundle can not be read
+     */
+    private ProofSelectionDialog(Path bundlePath) throws IOException {
+        super(MainWindow.getInstance(), "Choose proof to load", true);
 
-                final String regex = identifier + "\\(" + identifier + "__" + identifier
-                    + "\\(" + paramsRegex + "\\)" + typeRegex + "\\.\\d*\\." + extension;
-
-                if (!Pattern.compile(regex).matcher(value).matches()) {
-                    // fallback: use complete filename as cell text
-                    label.setText(value);
-                    return label;
-                }
-
-                String[] parts = value.split("\\.");
-                if (parts.length < 3) {
-                    return label;
-                }
-
-                // extract relevant parts of the filename, that is
-                // class name, method name, type of the contract, and number
-                int i0 = parts[0].indexOf('(');
-                int i1 = parts[0].indexOf("__") + 2;
-                int i2 = parts[0].indexOf(')', i1) + 1;
-                int i3 = parts[1].indexOf(' ') + 1;
-                int i4 = parts[1].indexOf(' ', i3);
-                i4 = Math.min(i4, parts[1].indexOf('_', i3));
-                String className = parts[0].substring(0, i0);
-                String methodName = parts[0].substring(i1, i2);
-                String type = parts[1].substring(i3, i4);
-                String number = parts[2];
-                String text = className + "::" + methodName + " " + type + " " + number;
-                label.setText(text);
-                return label;
-            }
-        });
+        // create and fill list with proofs available for loading
+        JList<Path> list = createAndFillList(bundlePath);
 
         // create scroll pane with list
         JScrollPane scrollPane = new JScrollPane(list);
@@ -141,7 +87,7 @@ public final class ProofSelectionDialog extends JDialog {
             }
         });
         // disable "Ok" button if no proof was found
-        if (proofs.size() == 0) {
+        if (list.getModel().getSize() == 0) {
             okButton.setEnabled(false);
         }
         buttonPanel.add(okButton);
@@ -164,41 +110,126 @@ public final class ProofSelectionDialog extends JDialog {
     }
 
     /**
-     * Shows the dialog with the given parent and path and returns the name of the proof to load.
-     * @param parent the parent window of the dialog
-     * @param path the file to load
-     * @return the name of the proof to load or null if an exception occured
+     * Creates a JList and fills it with the proofs found in the bundle.
+     * @param bundlePath the path of the proof bundle
+     * @return the created JList
+     * @throws IOException if the proof bundle can not be read
      */
-    public static String showDialog(Frame parent, Path path) {
-        String proofName = null;
-        try {
-            ProofSelectionDialog dialog = new ProofSelectionDialog(parent, path);
-            dialog.setLocationRelativeTo(parent); // center dialog over parent
-            dialog.setVisible(true);
-            proofName = dialog.proofToLoad;
-        } catch (IOException exc) {
-            ExceptionDialog.showDialog(parent, exc);
-        }
-        return proofName;
+    private JList<Path> createAndFillList(Path bundlePath) throws IOException {
+        // read zip
+        ZipFile bundle = new ZipFile(bundlePath.toFile());
+
+        // create a list of all *.proof files (only top level in bundle)
+        List<Path> proofs = bundle.stream()
+            .filter(e -> !e.isDirectory())
+            .filter(e -> e.getName().endsWith(".proof"))
+            .map(e -> Paths.get(e.getName()))
+            .collect(Collectors.toList());
+
+        // show the list in a JList
+        DefaultListModel<Path> model = new DefaultListModel<>();
+        model.addAll(proofs);
+        JList<Path> list = new JList<>(model);
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        list.setSelectedIndex(0);
+        list.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
+                if (mouseEvent.getClickCount() >= 2) {
+                    proofToLoad = list.getSelectedValue();
+                    setVisible(false);
+                    dispose();
+                }
+            }
+        });
+        list.setCellRenderer(new ListCellRenderer<>() {
+            @Override
+            public Component getListCellRendererComponent(JList<? extends Path> jList,
+                                                          Path value,
+                                                          int index,
+                                                          boolean isSelected,
+                                                          boolean cellHasFocus) {
+                JLabel label = new JLabel(abbreviateProofPath(value));
+                label.setOpaque(true); // allows for color changes via setSelectionBackground()
+                if (isSelected) {
+                    label.setBackground(list.getSelectionBackground());
+                    label.setForeground(list.getSelectionForeground());
+                } else {
+                    label.setBackground(list.getBackground());
+                    label.setForeground(list.getForeground());
+                }
+                return label;
+            }
+        });
+        return list;
     }
 
     /**
-     * Auxiliary method that may or may not show the dialog depending on the file extension.
-     * @param parent the parent window of the dialog
-     * @param path the file or directory to load
-     * @return the name of the proof to load or null if path does not denote a proof bundle
+     * Abbreviates the filename of the proof if it matches the usual KeY format.
+     * @param proofPath the path (actually only the filename) of the proof
+     * @return the abbreviated proof name if it matches, the given path as String otherwise
      */
-    public static String getProofName(Frame parent, Path path) {
-        if (isProofBundle(path)) {
-            return showDialog(parent, path);
+    private static String abbreviateProofPath(Path proofPath) {
+
+        final String pathString = proofPath.toString();
+        Matcher m = PROOF_NAME_PATTERN.matcher(pathString);
+        if (m.matches() && m.groupCount() == 5) {
+            String className = m.group(1);
+            String method = m.group(3);
+            String type = m.group(4).toLowerCase();
+            String num = m.group(5);
+
+            // type is either "normal", "exceptional", or empty
+            if (type.contains("normal")) {
+                type = "normal ";
+            } else if (type.contains("exceptional")) {
+                type = "exceptional ";
+            } else {
+                type = "";
+            }
+
+            return className + "::" + method + ") " + type + num;
+        }
+        // fallback: use complete filename
+        return pathString;
+    }
+
+    /**
+     * Shows the dialog with the given path and returns the filename of the proof to load.
+     * @param bundlePath the path of the proof bundle
+     * @return the filename of the proof to load
+     */
+    private static Path showDialog(Path bundlePath) {
+        Path proofPath = null;
+        try {
+            ProofSelectionDialog dialog = new ProofSelectionDialog(bundlePath);
+            dialog.setLocationRelativeTo(MainWindow.getInstance()); // center dialog
+            dialog.setVisible(true);
+            proofPath = dialog.proofToLoad;
+        } catch (IOException exc) {
+            ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
+        }
+        return proofPath;
+    }
+
+    /**
+     * Shows a dialog and allows the user to choose the proof to load from a bundle.
+     * @param bundlePath the path of the proof bundle that is loaded
+     * @return the path of the proof relative to the bundle (proofs are always top level,
+     *      which means the returned path will only contains the filename of the proof file)
+     *      or null if the given path does not denote a bundle
+     */
+    public static Path chooseProofToLoad(Path bundlePath) {
+        if (isProofBundle(bundlePath)) {
+            return showDialog(bundlePath);
         }
         return null;
     }
 
     /**
-     * Helper method to check if a path denotes a proof bundle.
+     * Checks if a path denotes a proof bundle.
      * @param path the path to check
-     * @return true if the path denotes a proof bundle and false if not
+     * @return true iff the path denotes a proof bundle
      */
     public static boolean isProofBundle(Path path) {
         return path.toString().endsWith(".zproof");

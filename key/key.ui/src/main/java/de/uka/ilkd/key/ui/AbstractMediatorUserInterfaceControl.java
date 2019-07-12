@@ -94,25 +94,11 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
    public abstract void loadProblem(File file);
 
     /**
-     * loads the problem or proof from the given file
-     *
-     * @param file the File with the problem description or the proof
-     * @param classPath the class path entries to use.
-     * @param bootClassPath the boot class path to use.
+     * Loads the proof with the given filename from the proof bundle with the given path.
+     * @param proofBundle the File with the problem description or the proof
+     * @param proofFilename the filename of the proof in the bundle
      */
-    public abstract void loadProblem(File file,
-                            String proofName,
-                            List<File> classPath,
-                            File bootClassPath,
-                            List<File> includes);
-
-    /**
-     * loads the problem or proof from the given file
-     * @param file the File with the problem description or the proof
-     */
-    public void loadProblem(File file, String proofName) {
-        loadProblem(file, proofName, null, null, null);
-    }
+    public abstract void loadProofFromBundle(File proofBundle, File proofFilename);
 
    protected ProblemLoader getProblemLoader(File file, List<File> classPath,
                                             File bootClassPath, List<File> includes,KeYMediator mediator) {

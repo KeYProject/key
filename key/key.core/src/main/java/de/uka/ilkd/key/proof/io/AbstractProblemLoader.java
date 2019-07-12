@@ -112,9 +112,9 @@ public abstract class AbstractProblemLoader {
     private final File file;
 
     /**
-     * The name of the proof in the zipped file (null if file is not a proof bundle).
+     * The filename of the proof in the zipped file (null if file is not a proof bundle).
      */
-    private String proofName;
+    private File proofFilename;
 
     /**
      * The optional class path entries to use.
@@ -403,7 +403,7 @@ public abstract class AbstractProblemLoader {
              *  The current implementation allows the user to pick one of the proofs via a dialog.
              *  The user choice is given to the AbstractProblem Loader via the proofName field.
              */
-            if (proofName != null) {         // bundle contains no proof!
+            if (proofFilename != null) {         // bundle contains no proof!
                 // unzip to a temporary directory
                 Path tmpDir = Files.createTempDirectory("KeYunzip");
                 IOUtil.extractZip(file.toPath(), tmpDir);
@@ -415,12 +415,12 @@ public abstract class AbstractProblemLoader {
                 PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.proof");
 
                 // construct the absolute path to the unzipped proof file
-                Path unzippedProof = tmpDir.resolve(Paths.get(proofName));
+                Path unzippedProof = tmpDir.resolve(proofFilename.toPath());
 
                 return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof.toFile(),
                     fileRepo, control, profileOfNewProofs, false);
             } else {
-                throw new IllegalArgumentException("The bundle contains no proof to load!");   // TODO: WP: better exception
+                throw new IOException("The bundle contains no proof to load!");
             }
         } else if (filename.endsWith(".key") || filename.endsWith(".proof")
               || filename.endsWith(".proof.gz")) {
@@ -736,7 +736,7 @@ public abstract class AbstractProblemLoader {
        return result;
     }
 
-    public void setProofPath(String proofName) {
-        this.proofName = proofName;
+    public void setProofPath(File proofFilename) {
+        this.proofFilename = proofFilename;
     }
 }

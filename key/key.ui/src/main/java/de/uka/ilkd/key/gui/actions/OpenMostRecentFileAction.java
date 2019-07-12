@@ -16,10 +16,8 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
-import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.ProofSelectionDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
@@ -55,12 +53,12 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
                 fileChooser.selectFile(file);
 
                 if (ProofSelectionDialog.isProofBundle(file.toPath())) {
-                    String proofName = ProofSelectionDialog.getProofName(mainWindow, file.toPath());
-                    if (proofName == null) {
+                    Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
+                    if (proofPath == null) {
                         // canceled by user
                         return;
                     } else {
-                        mainWindow.loadProblem(file, proofName);
+                        mainWindow.loadProofFromBundle(file, proofPath.toFile());
                     }
                 } else {
                     mainWindow.loadProblem(file);

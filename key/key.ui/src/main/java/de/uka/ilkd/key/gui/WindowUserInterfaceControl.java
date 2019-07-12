@@ -104,19 +104,27 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param bootClassPath the boot class path to use.
      */
     public void loadProblem(File file,
-                            String proofName,
                             List<File> classPath,
                             File bootClassPath,
                             List<File> includes) {
         mainWindow.addRecentFile(file.getAbsolutePath());
-        ProblemLoader problemLoader = getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
-        problemLoader.setProofPath(proofName);
+        ProblemLoader problemLoader =
+            getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
         problemLoader.runAsynchronously();
     }
 
     @Override
     public void loadProblem(File file) {
-        loadProblem(file, null, null, null, null);
+        loadProblem(file, null, null, null);
+    }
+
+    @Override
+    public void loadProofFromBundle(File proofBundle, File proofFilename) {
+        mainWindow.addRecentFile(proofBundle.getAbsolutePath());
+        ProblemLoader problemLoader =
+            getProblemLoader(proofBundle, null, null, null, getMediator());
+        problemLoader.setProofPath(proofFilename);
+        problemLoader.runAsynchronously();
     }
 
     @Override
