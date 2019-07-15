@@ -1,10 +1,15 @@
 package de.uka.ilkd.key.gui.actions;
 
+import java.util.Iterator;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JMenu;
+import javax.swing.KeyStroke;
+
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
-
-import javax.swing.*;
-import java.util.Iterator;
 
 /**
  * @author Alexander Weigl
@@ -34,6 +39,11 @@ public abstract class KeyAction extends AbstractAction {
      * @see KeYGuiExtensionFacade#findMenu(JMenu, Iterator)
      */
     public static final String PATH = "PATH";
+
+    /**
+     * Boolean property set to true if the this action should be displayed with a checkbox.
+     */
+    public static final String CHECKBOX = "CHECKBOX";
 
     /**
      * Key for defining local shortcuts which are prefered

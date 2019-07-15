@@ -1,10 +1,6 @@
 package de.uka.ilkd.key.proof.proverules;
 
-import java.io.IOException;
 import java.util.Collection;
-
-import org.antlr.runtime.RecognitionException;
-
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**

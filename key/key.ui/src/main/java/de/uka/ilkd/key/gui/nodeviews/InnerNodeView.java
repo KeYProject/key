@@ -42,7 +42,10 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
-public class InnerNodeView extends SequentView {
+/**
+ * Sequent view for an inner node.
+ */
+public final class InnerNodeView extends SequentView {
 
     private static final ColorSettings.ColorProperty RULE_APP_HIGHLIGHT_COLOR =
             ColorSettings.define("[innerNodeView]ruleAppHighlight", "",
@@ -59,13 +62,20 @@ public class InnerNodeView extends SequentView {
      *
      */
     private static final long serialVersionUID = -6542881446084654358L;
+
     private InitialPositionTable posTable;
+
+    private InnerNodeViewListener listener;
+
     public final JTextArea tacletInfo;
+
     Node node;
 
     public InnerNodeView(Node node, MainWindow mainWindow) {
         super(mainWindow);
         this.node = node;
+        this.listener = new InnerNodeViewListener(this);
+
         filter = new IdentitySequentPrintFilter();
         getFilter().setSequent(node.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(),
@@ -170,7 +180,7 @@ public class InnerNodeView extends SequentView {
         } else {
             return null;
         }
-        
+
     }
 
     @Override
@@ -180,18 +190,22 @@ public class InnerNodeView extends SequentView {
 
     @Override
     public final synchronized void printSequent() {
+        removeMouseListener(listener);
+
         setLineWidth(computeLineWidth());
         getLogicPrinter().update(getFilter(), getLineWidth());
         setText(getSyntaxHighlighter().process(getLogicPrinter().toString(), node));
         posTable = getLogicPrinter().getInitialPositionTable();
         RuleApp app = node.getAppliedRuleApp();
-        
+
         if (app != null) {
             highlightRuleAppPosition(app);
         }
 
         updateHidingProperty();
         updateHeatMapHighlights();
+
+        addMouseListener(listener);
     }
 
 }

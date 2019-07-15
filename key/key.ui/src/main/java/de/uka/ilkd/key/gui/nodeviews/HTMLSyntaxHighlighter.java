@@ -21,10 +21,10 @@ import static de.uka.ilkd.key.util.UnicodeHelper.*;
  * Performs a simple pattern-based syntax highlighting for KeY sequents by
  * adding styled HTML tags.
  * <p>
- * 
+ *
  * The main method is {@link #process(String, Node)}.
  * <p>
- * 
+ *
  * NOTE: There should be a more elegant and stable way to achieve this, e.g. by
  * creating a specialized LogicPrinter. However, this is a very involved job to
  * do since all kinds of changes would have to performed to other classes, for
@@ -33,7 +33,7 @@ import static de.uka.ilkd.key.util.UnicodeHelper.*;
  * @author Dominic Scheurer
  */
 public class HTMLSyntaxHighlighter {
-    
+
     // The below two constants are thresholds used to decide whether
     // syntax highlighting for program variables should be realized
     // or not (can be very expensive).
@@ -43,12 +43,12 @@ public class HTMLSyntaxHighlighter {
     ///////////////////////////////////////
     ///////// PROPOSITIONAL LOGIC /////////
     ///////////////////////////////////////
-    
+
     // NOTE: Spaces in this definition have been added on purpose.
     private final static String[] PROP_LOGIC_KEYWORDS = { "<->", "->", " & ",
             " | ", "!", "true", "false", "" + EQV, "" + IMP, "" + AND, "" + OR,
             "" + NEG, "" + TOP, "" + BOT };
-    
+
     private final static String PROP_LOGIC_KEYWORDS_REGEX =
             concat("|", Arrays.asList(PROP_LOGIC_KEYWORDS), new StringTransformer() {
                 @Override
@@ -56,23 +56,23 @@ public class HTMLSyntaxHighlighter {
                     return Pattern.quote(toHTML((String) input));
                 }
             });
-    
+
     public final static Pattern PROP_LOGIC_KEYWORDS_PATTERN = Pattern
             .compile(concat("(", PROP_LOGIC_KEYWORDS_REGEX, ")"));
-    
+
     private static final String PROP_LOGIC_KEYWORDS_REPLACEMENT =
             "<span class=\"prop_logic_highlight\">$1</span>";
-    
+
     ///////////////////////////////////////
     /////////    DYNAMIC LOGIC    /////////
     ///////////////////////////////////////
-    
+
     private final static String[] DYNAMIC_LOGIC_KEYWORDS = { "\\forall",
             "\\exists", "TRUE", "FALSE", "\\if", "\\then", "\\else", "\\sum",
             "bsum", "\\in", "exactInstance", "wellFormed", "measuredByEmpty",
             "<created>", "<inv>", "\\cup",
             ""+FORALL, ""+EXISTS, ""+IN, ""+EMPTY};
-    
+
     private final static String DYNAMIC_LOGIC_KEYWORDS_REGEX =
             concat("|", Arrays.asList(DYNAMIC_LOGIC_KEYWORDS), new StringTransformer() {
                 @Override
@@ -80,7 +80,7 @@ public class HTMLSyntaxHighlighter {
                     return Pattern.quote((String) input);
                 }
             });
-    
+
     public final static Pattern DYNAMIC_LOGIC_KEYWORDS_PATTERN = Pattern
             .compile(concat("(", DYNAMIC_LOGIC_KEYWORDS_REGEX, ")"));
 
@@ -90,15 +90,15 @@ public class HTMLSyntaxHighlighter {
     ///////////////////////////////////////
     /////////        JAVA         /////////
     ///////////////////////////////////////
-    
+
     private final static String[] JAVA_KEYWORDS = { "if", "else", "for", "do",
             "while", "return", "break", "switch", "case", "continue", "try",
             "catch", "finally", "assert", "null", "throw", "this", "true",
             "false", "int", "char", "long", "short", "method-frame", "boolean" };
-    
+
     public final static String JAVA_KEYWORDS_REGEX = concat("|",
             Arrays.asList(JAVA_KEYWORDS));
-    
+
     // NOTE: \Q(...)\E escapes the String in (...)
     private final static String DELIMITERS_REGEX = concat(
             "([\\Q{}[]=*/.!,:<>\\E]|",
@@ -112,13 +112,13 @@ public class HTMLSyntaxHighlighter {
             "\\Q<br/>\\E|",  // \n
             "\\Q&lt;\\E|",   // <
             "\\Q&gt;\\E)");  // >
-    
+
     private final static Pattern JAVA_KEYWORDS_PATTERN = Pattern.compile(concat(
             DELIMITERS_REGEX, "(", JAVA_KEYWORDS_REGEX, ")", DELIMITERS_REGEX));
 
     private static final Pattern MODALITY_PATTERN = Pattern
             .compile("\\\\(\\[|&lt;).*?\\\\(\\]|&gt;)");
-    
+
     private static final String JAVA_KEYWORDS_REPLACEMENT =
             "$1<span class=\"java_highlight\">$2</span>$3";
 
@@ -126,7 +126,13 @@ public class HTMLSyntaxHighlighter {
             "$1<span class=\"progvar_highlight\">$2</span>$3";
 
     private static final Pattern SINGLE_LINE_COMMENT_PATTERN = Pattern.compile("(//.*?)<br>");
-    private static final String SINGLE_LINE_COMMENT_REPLACEMENT = "<span class=\"comment_highlight\">$1</span><br>";
+    private static final String SINGLE_LINE_COMMENT_REPLACEMENT =
+            "<span class=\"comment_highlight\">$1</span><br>";
+
+    private static final Pattern SEQUENT_ARROW_PATTERN = Pattern.compile("(==>|⟹)");
+    private static final String SEQUENT_ARROW_REPLACEMENT =
+            "<span class=\"sequent_arrow_highlight\">$1</span>";
+
 
     /**
      * Creates a new {@link HTMLSyntaxHighlighter} for this HTMLDocument.
@@ -144,14 +150,17 @@ public class HTMLSyntaxHighlighter {
                 ".java_highlight { color: #7F0055; font-weight: bold; }";
         final String progVarHighlightRule =
                 ".progvar_highlight { color: #6A3E3E; }";
-        final String commentHighlightRule = 
+        final String commentHighlightRule =
                 ".comment_highlight { color: #3F7F5F; }";
+        final String sequentArrowHighlightRule =
+                ".sequent_arrow_highlight { color: #000000; font-size: 1.7em }";
 
         document.getStyleSheet().addRule(propLogicHighlightRule);
         document.getStyleSheet().addRule(progVarHighlightRule);
         document.getStyleSheet().addRule(javaHighlightRule);
         document.getStyleSheet().addRule(foLogicHighlightRule);
         document.getStyleSheet().addRule(commentHighlightRule);
+        document.getStyleSheet().addRule(sequentArrowHighlightRule);
     }
 
     /**
@@ -167,11 +176,11 @@ public class HTMLSyntaxHighlighter {
      *         highlighting.
      */
     public String process(String plainTextString, Node displayedNode) {
-        
+
         if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUseSyntaxHighlighting()) {
             return toHTML(plainTextString);
         }
-        
+
         try {
             // NOTE: Highlighting program variables is the most expensive operation.
             // There are at least two options to do this:
@@ -186,10 +195,10 @@ public class HTMLSyntaxHighlighter {
             // We therefore turn location variable highlighting off in case that
             // there are a lot of registered globals AND the number of formulae
             // in the sequent is big.
-            
+
             Iterable<? extends IProgramVariable> programVariables;
             final InitConfig initConfig = displayedNode.proof().getInitConfig();
-            
+
             if (displayedNode.getLocalProgVars().size() < NUM_PROGVAR_THRESHOLD) {
                 programVariables = displayedNode.getLocalProgVars();
             } else if (initConfig != null
@@ -200,7 +209,7 @@ public class HTMLSyntaxHighlighter {
             } else {
                 programVariables = new HashSet<ProgramVariable>();
             }
-    
+
             // We use div-s instead of br-s because this preserves the line
             // breaks in JEditorPane's plain text.
             return concat("<div>",
@@ -219,7 +228,7 @@ public class HTMLSyntaxHighlighter {
 
     /**
      * Adds syntax highlighting to the given HTML String.
-     * 
+     *
      * @param htmlString
      *            The HTML String to add syntax highlighting tags to.
      * @param programVariables
@@ -236,6 +245,9 @@ public class HTMLSyntaxHighlighter {
         htmlString =
                 DYNAMIC_LOGIC_KEYWORDS_PATTERN.matcher(htmlString).replaceAll(
                         DYNAMIC_LOGIC_KEYWORDS_REPLACEMENT);
+
+        htmlString =
+                SEQUENT_ARROW_PATTERN.matcher(htmlString).replaceAll(SEQUENT_ARROW_REPLACEMENT);
 
         Matcher modalityMatcher = MODALITY_PATTERN.matcher(htmlString);
         while (modalityMatcher.find()) {
@@ -285,7 +297,7 @@ public class HTMLSyntaxHighlighter {
     private static String toHTML(String plainTextString) {
         return LogicPrinter.escapeHTML(plainTextString, true);
     }
-    
+
     /**
      * Concatenates the given String array where the elements are separated by
      * the given delimiter in the result String.
@@ -331,7 +343,7 @@ public class HTMLSyntaxHighlighter {
         }
         return loopEntered ? sb.substring(0, sb.length() - delim.length()) : "";
     }
-    
+
     /**
      * Concatenates the given Strings using a {@link StringBuilder}.
      *
@@ -347,7 +359,7 @@ public class HTMLSyntaxHighlighter {
             }
         });
     }
-    
+
     /**
      * Simple interface as a replacement for a lambda realizing a String
      * transformation.

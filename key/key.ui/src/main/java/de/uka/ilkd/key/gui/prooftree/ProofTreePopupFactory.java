@@ -1,5 +1,29 @@
 package de.uka.ilkd.key.gui.prooftree;
 
+import static de.uka.ilkd.key.gui.prooftree.ProofTreeView.searchKeyStroke;
+
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Function;
+
+import javax.swing.Action;
+import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
+import javax.swing.JTree;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
@@ -14,20 +38,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import javax.swing.*;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Function;
-
-import static de.uka.ilkd.key.gui.prooftree.ProofTreeView.searchKeyStroke;
 
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
@@ -196,16 +206,18 @@ public class ProofTreePopupFactory {
                 }
 
                 String stats;
-                if (openGoals > 0)
+                if (openGoals > 0) {
                     stats = openGoals + " open goal"
                             + (openGoals > 1 ? "s." : ".");
-                else
+                } else {
                     stats = "Closed.";
+                }
                 stats += "\n\n";
 
                 for (Pair<String, String> x : context.invokedNode.statistics().getSummary()) {
-                    if ("".equals(x.second))
+                    if ("".equals(x.second)) {
                         stats += "\n";
+                    }
                     stats += x.first + ": " + x.second + "\n";
                 }
 
@@ -246,9 +258,10 @@ public class ProofTreePopupFactory {
                 for (int count = context.delegateModel.getChildCount(tmpNode),
                      i = 0; i < count; i++) {
                     Object child = context.delegateModel.getChild(tmpNode, i);
-                    if (!context.delegateModel.isLeaf(child))
+                    if (!context.delegateModel.isLeaf(child)) {
                         ExpansionState.collapseAll(context.delegateView, context.branch
                                 .pathByAddingChild(child));
+                    }
                 }
             }
             Iterator<Goal> it = context.proof.openGoals().iterator();
@@ -256,7 +269,9 @@ public class ProofTreePopupFactory {
             while (it.hasNext()) {
                 n = it.next().node();
                 GUIAbstractTreeNode node = context.delegateModel.getProofTreeNode(n);
-                if (node == null) break;
+                if (node == null) {
+                    break;
+                }
                 TreeNode[] obs = node.getPath();
                 TreePath tp = new TreePath(obs);
                 if (context.branch.isDescendant(tp)) {
@@ -352,9 +367,10 @@ public class ProofTreePopupFactory {
                  i < count; i++) {
                 Object child = context.delegateModel.getChild(node, i);
 
-                if (!context.delegateModel.isLeaf(child))
+                if (!context.delegateModel.isLeaf(child)) {
                     ExpansionState.collapseAll(context.delegateView,
                             context.branch.pathByAddingChild(child));
+                }
             }
         }
     }
@@ -449,9 +465,11 @@ public class ProofTreePopupFactory {
                     null,
                     origNotes);
             if (newNotes != null) {
-                if (newNotes.length() == 0)
+                if (newNotes.length() == 0) {
                     context.invokedNode.getNodeInfo().setNotes(null);
-                else context.invokedNode.getNodeInfo().setNotes(newNotes);
+                } else {
+                    context.invokedNode.getNodeInfo().setNotes(newNotes);
+                }
             }
         }
     }
