@@ -15,6 +15,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
  * @author lanzinger
  */
 public class ToggleOriginHighlightAction extends MainWindowAction {
+    private static final long serialVersionUID = 9018136291828393238L;
 
     /**
      * Create a new action.

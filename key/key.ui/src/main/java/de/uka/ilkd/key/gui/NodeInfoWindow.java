@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.Proof;
  * @author lanzinger
  */
 public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeInfoWindow> {
+    private static final long serialVersionUID = 4205276651552216532L;
 
     /** @see #getInstances(Node) */
     private static Map<Name, Map<Integer, SortedSet<NodeInfoWindow>>> instances = new HashMap<>();

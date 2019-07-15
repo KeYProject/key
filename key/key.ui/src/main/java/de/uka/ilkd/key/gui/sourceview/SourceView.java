@@ -847,6 +847,7 @@ public final class SourceView extends JComponent {
      * @see #tabPane
      */
     private final static class TabbedPane extends JTabbedPane {
+        private static final long serialVersionUID = -5438740208669700183L;
 
         public Tab getSelectedTab() {
             return (Tab) getSelectedComponent();
@@ -860,6 +861,7 @@ public final class SourceView extends JComponent {
      *
      */
     private final class Tab extends JScrollPane {
+        private static final long serialVersionUID = -8964428275919622930L;
 
         /**
          * The file this tab belongs to.

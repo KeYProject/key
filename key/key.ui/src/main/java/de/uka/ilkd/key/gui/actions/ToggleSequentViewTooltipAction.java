@@ -20,6 +20,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
  * @see KeYTooltipExtension
  */
 public class ToggleSequentViewTooltipAction extends MainWindowAction {
+    private static final long serialVersionUID = -3352122484627890921L;
 
     /** This action's name. */
     public static final String NAME = "Show tooltips in sequent view";

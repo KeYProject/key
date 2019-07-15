@@ -32,6 +32,7 @@ import de.uka.ilkd.key.util.KeYConstants;
  * @author bruns
  */
 public final class QuickSaveAction extends MainWindowAction {
+    private static final long serialVersionUID = -7084304175671744403L;
 
     /** The OS's tmp directory. */
     private static final File TMP_DIR = IOUtil.getTempDirectory();

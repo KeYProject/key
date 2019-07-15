@@ -80,6 +80,7 @@ import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
  * @author lanzinger
  */
 public final class OriginTermLabelWindow extends NodeInfoWindow {
+    private static final long serialVersionUID = -2428168815415446459L;
 
     /**
      * The window's initial width.
@@ -145,6 +146,7 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
      * @see #updateNodeLink()
      */
     private Action nodeLinkAction = new AbstractAction() {
+        private static final long serialVersionUID = -5322782759362752086L;
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -673,7 +675,7 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
     }
 
     private class TreeNode extends DefaultMutableTreeNode {
-
+        private static final long serialVersionUID = -406981141537547226L;
         private PosInOccurrence pos;
         private Term term;
 
@@ -688,7 +690,7 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
     }
 
     private class TermView extends SequentView {
-
+        private static final long serialVersionUID = -8328975160581938309L;
         private InitialPositionTable posTable = new InitialPositionTable();
         private Node node;
 

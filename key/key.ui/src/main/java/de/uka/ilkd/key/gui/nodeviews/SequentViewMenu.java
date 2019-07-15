@@ -25,6 +25,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
  * @param <T> a type of {@link SequentView} on which this menu is shown.
  */
 public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
+    private static final long serialVersionUID = -366978815217974621L;
 
     /** @see #addClipboardItem(MenuControl) */
     private static final String COPY_TO_CLIPBOARD = "Copy to clipboard";

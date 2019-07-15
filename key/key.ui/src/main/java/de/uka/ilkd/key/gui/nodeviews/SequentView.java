@@ -76,6 +76,7 @@ import de.uka.ilkd.key.util.Debug;
  * Parent class of CurrentGoalView and InnerNodeView.
  */
 public abstract class SequentView extends JEditorPane {
+    private static final long serialVersionUID = 6867808795064180589L;
 
     public static final Color PERMANENT_HIGHLIGHT_COLOR = new Color(110, 85, 181, 76);
 

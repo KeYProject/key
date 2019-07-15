@@ -7,6 +7,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
  * when the user clicks on an {@link InnerNodeView}.
  */
 public class InnerNodeViewMenu extends SequentViewMenu<InnerNodeView> {
+    private static final long serialVersionUID = 1593837287234052754L;
 
     /**
      * Creates an empty menu.
