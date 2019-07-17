@@ -128,7 +128,9 @@ public final class ProofSelectionDialog extends JDialog {
 
         // show the list in a JList
         DefaultListModel<Path> model = new DefaultListModel<>();
-        model.addAll(proofs);
+        for (Path p : proofs) {
+            model.addElement(p);
+        }
         JList<Path> list = new JList<>(model);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setSelectedIndex(0);
@@ -142,7 +144,7 @@ public final class ProofSelectionDialog extends JDialog {
                 }
             }
         });
-        list.setCellRenderer(new ListCellRenderer<>() {
+        list.setCellRenderer(new ListCellRenderer<Path>() {
             @Override
             public Component getListCellRendererComponent(JList<? extends Path> jList,
                                                           Path value,
