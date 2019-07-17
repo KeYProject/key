@@ -19,11 +19,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+import com.sun.nio.zipfs.ZipFileSystem;
+import com.sun.nio.zipfs.ZipFileSystemProvider;
 import org.antlr.runtime.MismatchedTokenException;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
@@ -42,7 +44,6 @@ import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.SimpleFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -355,22 +356,14 @@ public abstract class AbstractProblemLoader {
      */
     protected FileRepo createFileRepo() throws IOException {
         // create a FileRepo depending on the settings
-        boolean bundle = ProofIndependentSettings.DEFAULT_INSTANCE
-            .getGeneralSettings()
-            .isAllowBundleSaving();
-
         boolean consistent = ProofIndependentSettings.DEFAULT_INSTANCE
-            .getGeneralSettings()
-            .isEnsureSourceConsistency();
+                                                     .getGeneralSettings()
+                                                     .isEnsureSourceConsistency();
 
-        if (bundle) {
-            if (consistent) {
-                return new DiskFileRepo("KeYTmpFileRepo");
-            } else {
-                return new SimpleFileRepo();
-            }
+        if (consistent) {
+            return new DiskFileRepo("KeYTmpFileRepo");
         } else {
-            return new TrivialFileRepo();
+            return new SimpleFileRepo();
         }
     }
 
@@ -403,25 +396,55 @@ public abstract class AbstractProblemLoader {
              *  The current implementation allows the user to pick one of the proofs via a dialog.
              *  The user choice is given to the AbstractProblem Loader via the proofName field.
              */
-            if (proofFilename != null) {         // bundle contains no proof!
-                // unzip to a temporary directory
-                Path tmpDir = Files.createTempDirectory("KeYunzip");
-                IOUtil.extractZip(file.toPath(), tmpDir);
-
-                // point the FileRepo to the temporary directory
-                fileRepo.setBaseDir(tmpDir);
-
-                // create new KeYUserProblemFile pointing to the (unzipped) proof file
-                PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.proof");
-
-                // construct the absolute path to the unzipped proof file
-                Path unzippedProof = tmpDir.resolve(proofFilename.toPath());
-
-                return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof.toFile(),
-                    fileRepo, control, profileOfNewProofs, false);
-            } else {
-                throw new IOException("The bundle contains no proof to load!");
+            if (proofFilename == null) {    // no proof to load given -> try to determine one
+                // create a list of all *.proof files (only top level in bundle)
+                ZipFile bundle = new ZipFile(file);
+                List<Path> proofs = bundle.stream()
+                    .filter(e -> !e.isDirectory())
+                    .filter(e -> e.getName().endsWith(".proof"))
+                    .map(e -> Paths.get(e.getName()))
+                    .collect(Collectors.toList());
+                if (!proofs.isEmpty()) {
+                    // load first proof found in file
+                    proofFilename = proofs.get(0).toFile();
+                } else {
+                    // no proof found in bundle!
+                    throw new IOException("The bundle contains no proof to load!");
+                }
             }
+
+            // we are sure proofFilename is set now:
+            // assert proofFilename != null;
+
+            // unzip to a temporary directory
+            Path tmpDir = Files.createTempDirectory("KeYunzip");
+            IOUtil.extractZip(file.toPath(), tmpDir);
+
+            // hook for deleting tmpDir + content at program exit
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    // delete the temporary directory with all contained files
+                    Files.walk(tmpDir)
+                         .sorted(Comparator.reverseOrder())
+                         .map(Path::toFile)
+                         .forEach(File::delete);
+                } catch (IOException e) {
+                    // this is called at program exist, so we only print a console message
+                    e.printStackTrace();
+                }
+            }));
+
+            // point the FileRepo to the temporary directory
+            fileRepo.setBaseDir(tmpDir);
+
+            // create new KeYUserProblemFile pointing to the (unzipped) proof file
+            PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.proof");
+
+            // construct the absolute path to the unzipped proof file
+            Path unzippedProof = tmpDir.resolve(proofFilename.toPath());
+
+            return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof.toFile(),
+                fileRepo, control, profileOfNewProofs, false);
         } else if (filename.endsWith(".key") || filename.endsWith(".proof")
               || filename.endsWith(".proof.gz")) {
             // KeY problem specification or saved proof

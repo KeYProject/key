@@ -4,6 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,9 +34,6 @@ public class TestProofBundleIO {
     private static Path testDir;
 
     /** to reset the setting after the tests (usually should be false if not in GUI mode) */
-    private static boolean allowBundleSaving = false;
-
-    /** to reset the setting after the tests (usually should be false if not in GUI mode) */
     private static boolean ensureConsistency = false;
 
     /**
@@ -46,17 +44,9 @@ public class TestProofBundleIO {
         testDir = Paths.get(HelperClassForTests.TESTCASE_DIRECTORY.getAbsolutePath(), "proofBundle");
 
         // remember settings to be able to reset after the test
-        allowBundleSaving = ProofIndependentSettings.DEFAULT_INSTANCE
-                                                    .getGeneralSettings()
-                                                    .isAllowBundleSaving();
         ensureConsistency = ProofIndependentSettings.DEFAULT_INSTANCE
                                                     .getGeneralSettings()
                                                     .isEnsureSourceConsistency();
-
-        // ensure that allowBundleSaving is true to enable FileRepos
-        ProofIndependentSettings.DEFAULT_INSTANCE
-                                .getGeneralSettings()
-                                .setAllowBundleSaving(true);
     }
 
     /**
@@ -67,29 +57,8 @@ public class TestProofBundleIO {
         // reset the settings to value before test
         ProofIndependentSettings.DEFAULT_INSTANCE
                                 .getGeneralSettings()
-                                .setAllowBundleSaving(allowBundleSaving);
-        ProofIndependentSettings.DEFAULT_INSTANCE
-                                .getGeneralSettings()
                                 .setEnsureSourceConsistency(ensureConsistency);
     }
-
-// TODO: this test is disabled because it depends on the pre-saved proof file, which means that
-//       it may fail if there are changes in rules
-//    /**
-//     * Tests if:
-//     * <ul>
-//     *  <li> an existing bundle is loadable
-//     *  <li> the containing proof is closed
-//     * </ul>
-//     * @throws Exception on errors (should not happen)
-//     */
-//    @Test
-//    public void testBundleLoading() throws Exception {
-//        // load a bundle and test if proof is closed
-//        Path file = testDir.resolve("bundleLoading").resolve("loadingTest.zproof");
-//        Proof proof = loadBundle(file);
-//        assertTrue(proof.closed());
-//    }
 
     /**
      * Tests loading a *.key file, closing the proof by auto mode, and saving a bundle from it.
@@ -148,10 +117,10 @@ public class TestProofBundleIO {
 
     /**
      * Tests that the SimpleFileRepo is able to save a proof as bundle (without consistency).
-     * @throws Exception
+     * @throws IOException on I/O errors
      */
     @Test
-    public void testSimpleFileRepo() throws Exception {
+    public void testSimpleFileRepo() throws IOException {
         ProofIndependentSettings.DEFAULT_INSTANCE
                                 .getGeneralSettings()
                                 .setEnsureSourceConsistency(false);

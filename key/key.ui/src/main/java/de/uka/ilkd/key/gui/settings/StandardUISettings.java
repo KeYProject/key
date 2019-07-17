@@ -34,7 +34,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     private final JSpinner spAutoSaveProof;
     private final JCheckBox chkMinimizeInteraction;
     private final JComboBox<String> spFontSizeTreeSequent;
-    private final JCheckBox chkAllowProofBundleSaving;
+    private final JCheckBox chkEnsureSourceConsistency;
     private final JTextField txtClutterRules;
     private final JTextField txtClutterRuleSets;
 
@@ -72,7 +72,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         chkConfirmExit = addCheckBox("Confirm program exit", "", false, emptyValidator());
         spAutoSaveProof = addNumberField("Auto save proof", 0, 10000000, 1000, "", emptyValidator());
         chkMinimizeInteraction = addCheckBox("Minimise Interactions", "", false, emptyValidator());
-        chkAllowProofBundleSaving = addCheckBox("Allow Proof Bundle Saving", "", false, emptyValidator());
+        chkEnsureSourceConsistency = addCheckBox("Ensure source consistency", "", true, emptyValidator());
         chkRightClickMacros = addCheckBox("Right click for Macros", "", false, emptyValidator());
     }
 
@@ -99,7 +99,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         chkPrettyPrint.setSelected(vs.isUsePretty());
         chkUseUnicode.setSelected(vs.isUseUnicode());
         chkSyntaxHighlightning.setSelected(vs.isUseSyntaxHighlighting());
-        chkAllowProofBundleSaving.setSelected(generalSettings.isAllowBundleSaving());
+        chkEnsureSourceConsistency.setSelected(generalSettings.isEnsureSourceConsistency());
         chkRightClickMacros.setSelected(generalSettings.isRightClickMacro());
         chkConfirmExit.setSelected(vs.confirmExit());
         spAutoSaveProof.setValue(generalSettings.autoSavePeriod());
@@ -132,7 +132,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         vs.setUsePretty(chkPrettyPrint.isSelected());
         vs.setUseUnicode(chkUseUnicode.isSelected());
         vs.setUseSyntaxHighlighting(chkSyntaxHighlightning.isSelected());
-        gs.setAllowBundleSaving(chkAllowProofBundleSaving.isSelected());
+        gs.setEnsureSourceConsistency(chkEnsureSourceConsistency.isSelected());
         gs.setRightClickMacros(chkRightClickMacros.isSelected());
         vs.setConfirmExit(chkConfirmExit.isSelected());
         gs.setAutoSave((Integer) spAutoSaveProof.getValue());
