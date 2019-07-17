@@ -137,7 +137,13 @@ public abstract class AbstractFileRepo implements FileRepo {
         }
     }
 
-    // TODO: move to IOUtil?
+    /**
+     * Copyies the file at source path to the target path
+     * and creates parent directories if required.
+     * @param source path of the source file
+     * @param target path of the target file
+     * @throws IOException if an I/O error occurs (e.g. user has no permission to write target)
+     */
     protected static void createDirsAndCopy(Path source, Path target) throws IOException {
         Files.createDirectories(target.getParent());
         Files.copy(source, target);
