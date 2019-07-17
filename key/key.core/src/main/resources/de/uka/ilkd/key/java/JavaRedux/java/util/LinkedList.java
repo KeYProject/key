@@ -2,11 +2,8 @@ package java.util;
 
 public final class LinkedList implements java.util.List {
 	
-
 	/*@ public behavior
-	  @ requires true;
-	  @ ensures true;
-      @ assignable \everything;
+	  @ ensures seq == param0.seq;
       @*/
-	public LinkedList(Collection param0);
+	public /*@pure@*/ LinkedList(Collection param0);
 }

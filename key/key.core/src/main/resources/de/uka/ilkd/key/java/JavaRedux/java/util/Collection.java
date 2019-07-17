@@ -5,20 +5,48 @@ package java.util;
 
 public interface Collection extends java.lang.Iterable
 {
+    
+   //@ public instance ghost \seq seq;
 
-   public int size();
-   public boolean isEmpty();
-   public boolean contains(java.lang.Object arg0);
-   public java.util.Iterator iterator();
-   public java.lang.Object[] toArray();
-   public java.lang.Object[] toArray(java.lang.Object[] arg0);
+   /*@ public normal_behavior
+     @ ensures \result == seq.length;
+     @ determines \result \by seq.length;
+     @ */
+   public /*@pure@*/ int size();
+   
+   /*@ public normal_behavior
+     @ ensures \result == (size() == 0);
+     @ determines \result \by seq.length;
+     @*/
+   public /*@pure@*/ boolean isEmpty();
+   
+   /*@ public normal_behavior
+     @ ensures seq == \seq_concat(\old(seq), \seq_singleton(arg0));
+     @ assignable seq;
+     @ determines seq \by seq, arg0;
+     @*/
    public boolean add(java.lang.Object arg0);
+   
    public boolean remove(java.lang.Object arg0);
-   public boolean containsAll(java.util.Collection arg0);
+   
+   /*@ public normal_behavior
+     @ ensures seq == \seq_concat(\old(seq), arg0.seq);
+     @ assignable seq;
+     @ determines seq \by seq, arg0.seq;
+     @*/
    public boolean addAll(java.util.Collection arg0);
    public boolean removeAll(java.util.Collection arg0);
    public boolean retainAll(java.util.Collection arg0);
    public void clear();
-   public boolean equals(java.lang.Object arg0);
-   public int hashCode();
+   
+   /*@ public normal_behavior
+     @ ensures \result == (\exists int i; 0 <= i && i < size(); seq[i] == arg0);
+     @ determines \result \by seq, arg0;
+     @*/
+   public boolean /*@pure@*/ contains(String arg0);
+   public boolean containsAll(java.util.Collection arg0);
+   
+   public java.util.Iterator iterator();
+   public java.lang.Object[] toArray();
+   public java.lang.Object[] toArray(java.lang.Object[] arg0);
 }
