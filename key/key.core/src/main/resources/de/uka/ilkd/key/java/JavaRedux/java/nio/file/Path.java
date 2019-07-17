@@ -1,9 +1,9 @@
-package java.io;
+package java.nio.file;
 
 /**
  * @generated
  */
-public abstract class OutputStream extends java.lang.Object implements java.io.Closeable, java.io.Flushable {
+public interface Path extends java.lang.Comparable, java.lang.Iterable, java.nio.file.Watchable {
    /**
     * @generated
     */
@@ -12,7 +12,7 @@ public abstract class OutputStream extends java.lang.Object implements java.io.C
      @ ensures true;
      @ assignable \everything;
      @*/
-   public void write(byte[] param0, int param1, int param2) throws java.io.IOException;
+   public abstract java.lang.String toString();
 
    /**
     * @generated
@@ -22,5 +22,5 @@ public abstract class OutputStream extends java.lang.Object implements java.io.C
      @ ensures true;
      @ assignable \everything;
      @*/
-   public void close() throws java.io.IOException;
+   public abstract java.nio.file.Path resolve(java.lang.String param0);
 }

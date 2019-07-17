@@ -3,7 +3,7 @@ package java.io;
 /**
  * @generated
  */
-public abstract class InputStream extends java.lang.Object implements java.io.Closeable {
+public class BufferedOutputStream extends java.io.FilterOutputStream {
    /**
     * @generated
     */
@@ -12,5 +12,5 @@ public abstract class InputStream extends java.lang.Object implements java.io.Cl
      @ ensures true;
      @ assignable \everything;
      @*/
-   public int read(byte[] param0) throws java.io.IOException;
+   public BufferedOutputStream(java.io.OutputStream param0);
 }

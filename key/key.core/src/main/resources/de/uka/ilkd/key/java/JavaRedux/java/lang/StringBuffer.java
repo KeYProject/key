@@ -1,6 +1,6 @@
 package java.lang;
 
-public class StringBuffer extends java.lang.Object implements java.io.Serializable
+public class StringBuffer extends java.lang.Object implements java.io.Serializable, java.lang.Appendable
 						    //, CharSequence 
 {
     public StringBuffer();

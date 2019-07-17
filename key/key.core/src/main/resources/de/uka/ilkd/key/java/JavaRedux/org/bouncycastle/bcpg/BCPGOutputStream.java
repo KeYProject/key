@@ -1,9 +1,9 @@
-package java.io;
+package org.bouncycastle.bcpg;
 
 /**
  * @generated
  */
-public abstract class OutputStream extends java.lang.Object implements java.io.Closeable, java.io.Flushable {
+public class BCPGOutputStream extends java.io.OutputStream implements org.bouncycastle.bcpg.PacketTags, org.bouncycastle.bcpg.CompressionAlgorithmTags {
    /**
     * @generated
     */
@@ -12,7 +12,7 @@ public abstract class OutputStream extends java.lang.Object implements java.io.C
      @ ensures true;
      @ assignable \everything;
      @*/
-   public void write(byte[] param0, int param1, int param2) throws java.io.IOException;
+   public BCPGOutputStream(java.io.OutputStream param0);
 
    /**
     * @generated

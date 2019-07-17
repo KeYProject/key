@@ -1,9 +1,9 @@
-package java.io;
+package org.bouncycastle.math.ec;
 
 /**
  * @generated
  */
-public abstract class OutputStream extends java.lang.Object implements java.io.Closeable, java.io.Flushable {
+public abstract class ECPoint extends java.lang.Object {
    /**
     * @generated
     */
@@ -12,7 +12,7 @@ public abstract class OutputStream extends java.lang.Object implements java.io.C
      @ ensures true;
      @ assignable \everything;
      @*/
-   public void write(byte[] param0, int param1, int param2) throws java.io.IOException;
+   public org.bouncycastle.math.ec.ECPoint multiply(java.math.BigInteger param0);
 
    /**
     * @generated
@@ -22,5 +22,5 @@ public abstract class OutputStream extends java.lang.Object implements java.io.C
      @ ensures true;
      @ assignable \everything;
      @*/
-   public void close() throws java.io.IOException;
+   public byte[] getEncoded(boolean param0);
 }

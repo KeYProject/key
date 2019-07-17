@@ -3,7 +3,7 @@ package java.io;
 /**
  * @generated
  */
-public abstract class InputStream extends java.lang.Object implements java.io.Closeable {
+public class FileOutputStream extends java.io.OutputStream {
    /**
     * @generated
     */
@@ -12,5 +12,5 @@ public abstract class InputStream extends java.lang.Object implements java.io.Cl
      @ ensures true;
      @ assignable \everything;
      @*/
-   public int read(byte[] param0) throws java.io.IOException;
+   public FileOutputStream(java.lang.String param0) throws java.io.FileNotFoundException;
 }
