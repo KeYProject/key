@@ -47,6 +47,11 @@ public class TestProofBundleIO {
         ensureConsistency = ProofIndependentSettings.DEFAULT_INSTANCE
                                                     .getGeneralSettings()
                                                     .isEnsureSourceConsistency();
+
+        // we test DiskFileRepo here!
+        ProofIndependentSettings.DEFAULT_INSTANCE
+                                .getGeneralSettings()
+                                .setEnsureSourceConsistency(true);
     }
 
     /**
