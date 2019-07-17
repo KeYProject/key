@@ -1,18 +1,22 @@
 package de.uka.ilkd.key.gui.originlabels;
 
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
+import java.awt.event.ActionEvent;
+
+import javax.swing.Action;
+import javax.swing.JOptionPane;
+
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.gui.actions.QuickLoadAction;
+import de.uka.ilkd.key.gui.actions.QuickSaveAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 
 /**
  * Action to toggle {@link TermLabelSettings#getUseOriginLabels()}.
@@ -20,8 +24,7 @@ import java.awt.event.ActionEvent;
  * @author lanzinger
  */
 public class ToggleTermOriginTrackingAction extends MainWindowAction {
-
-    private static final long serialVersionUID = -1055364184792335945L;
+    private static final long serialVersionUID = -2092724865788720558L;
 
     /**
      * Create a new action.
@@ -32,36 +35,26 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
         super(mainWindow);
 
         setName("Toggle Term Origin Tracking");
-        setTooltip("Toggle term origin tracking");
+        setTooltip("Track where in the JML specification a every term in the sequent originates.");
         setIcon(IconFactory.ORIGIN_LABELS.get(MainWindow.TOOLBAR_ICON_SIZE));
-        setEnabled(getMediator().getSelectedProof() != null);
 
-        getMediator().addKeYSelectionListener(new KeYSelectionListener() {
+        setEnabled(true);
+        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE
+                .getTermLabelSettings().getUseOriginLabels());
 
-            @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
-                setEnabled(getMediator().getSelectedProof() != null);
-
-                handleAction();
-            }
-
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
-                setEnabled(getMediator().getSelectedProof() != null);
-            }
-        });
-
-        setMenuPath("View");
+        setMenuPath("Origin Tracking");
         putValue(Action.LONG_DESCRIPTION, "Toggle Term Origin Tracking");
+        putValue(KeyAction.CHECKBOX, true);
         lookupAcceleratorKey();
     }
 
     private void handleAction() {
         Proof proof = mainWindow.getMediator().getSelectedProof();
+        TermLabelSettings settings =
+                ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings();
 
         if (proof != null) {
             Services services = proof.getServices();
-            TermLabelSettings settings = proof.getSettings().getTermLabelSettings();
 
             if (!settings.getUseOriginLabels()) {
                 for (Proof p : services.getSpecificationRepository().getAllProofs()) {
@@ -80,28 +73,62 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        Proof proof = mainWindow.getMediator().getSelectedProof();
+    public void actionPerformed(ActionEvent event) {
+        TermLabelSettings settings =
+                ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings();
 
-        if (proof != null) {
-            TermLabelSettings settings = proof.getSettings().getTermLabelSettings();
-            settings.setUseOriginLabels(!settings.getUseOriginLabels());
-            handleAction();
+        if (!settings.getUseOriginLabels()) {
+            Object[] options = {
+                "Reload",
+                "Continue without reloading",
+                "Cancel"
+            };
 
-            if (settings.getUseOriginLabels()) {
-                JOptionPane.showMessageDialog(
-                        mainWindow,
-                        "Origin labels will be added when the proof is reloaded.",
-                        "Origin",
-                        JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(
-                        mainWindow,
-                        "Origin labels have been removed from "
-                                + "all open goals and all proof obligations.",
-                        "Origin",
-                        JOptionPane.INFORMATION_MESSAGE);
+            int selection = JOptionPane.showOptionDialog(
+                    mainWindow,
+                    "Origin information will be added to all newly loaded proofs.\n"
+                            + "To see origin information in your current proof, "
+                            + "you need to reload it.",
+                    "Origin",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    options,
+                    options[2]);
+
+            switch (selection) {
+            case 0:
+                QuickSaveAction.quickSave(mainWindow);
+                QuickLoadAction.quickLoad(mainWindow);
+                //fallthrough
+            case 1:
+                settings.setUseOriginLabels(!settings.getUseOriginLabels());
+                handleAction();
+            }
+        } else {
+            Object[] options = {
+                "Remove",
+                "Cancel"
+            };
+
+            int selection = JOptionPane.showOptionDialog(
+                    mainWindow,
+                    "All origin information will be removed from "
+                            + "every open goal and every proof obligation.",
+                    "Origin",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    options,
+                    options[1]);
+
+            if (selection == 0) {
+                settings.setUseOriginLabels(!settings.getUseOriginLabels());
+                handleAction();
             }
         }
+
+        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE
+                .getTermLabelSettings().getUseOriginLabels());
     }
 }

@@ -13,6 +13,56 @@
 
 package de.uka.ilkd.key.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridBagLayout;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.util.Collection;
+import java.util.EventObject;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
+import java.util.stream.Stream;
+
+import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.swing.event.MouseInputAdapter;
+
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.SingleCDockable;
 import bibliothek.gui.dock.common.intern.CDockable;
@@ -30,7 +80,12 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.help.HelpFacade;
 import de.uka.ilkd.key.gui.help.HelpInfo;
-import de.uka.ilkd.key.gui.nodeviews.*;
+import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
+import de.uka.ilkd.key.gui.nodeviews.EmptySequent;
+import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
+import de.uka.ilkd.key.gui.nodeviews.MainFrame;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
+import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
@@ -53,20 +108,11 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
-import de.uka.ilkd.key.util.*;
-
-import javax.swing.*;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import javax.swing.event.MouseInputAdapter;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.util.List;
-import java.util.*;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-import java.util.stream.Stream;
+import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.KeYConstants;
+import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.PreferenceSaver;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 @HelpInfo()
 public final class MainWindow extends JFrame {
@@ -141,6 +187,8 @@ public final class MainWindow extends JFrame {
             new PreferenceSaver(Preferences.userNodeForPackage(MainWindow.class));
     private final HidePackagePrefixToggleAction hidePackagePrefixToggleAction =
             new HidePackagePrefixToggleAction(this);
+    private final ToggleSequentViewTooltipAction toggleSequentViewTooltipAction =
+            new ToggleSequentViewTooltipAction(this);
     private final TermLabelMenu termLabelMenu;
     public boolean frozen = false;
     JCheckBoxMenuItem saveSMTFile;
@@ -206,6 +254,7 @@ public final class MainWindow extends JFrame {
     private ExitMainAction exitMainAction;
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
+
     private SingleCDockable dockProofListView;
     private SingleCDockable dockSourceView;
     private SingleCDockable dockSequent;
@@ -733,6 +782,7 @@ public final class MainWindow extends JFrame {
         view.add(new JCheckBoxMenuItem(new SyntaxHighlightingToggleAction(this)));
         view.add(termLabelMenu);
         view.add(new JCheckBoxMenuItem(hidePackagePrefixToggleAction));
+        view.add(new JCheckBoxMenuItem(toggleSequentViewTooltipAction));
 
         view.addSeparator();
         {

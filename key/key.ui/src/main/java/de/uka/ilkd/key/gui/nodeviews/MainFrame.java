@@ -17,6 +17,9 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -50,7 +53,8 @@ public final class MainFrame extends JScrollPane {
             setViewportView(new SequentViewPanel(sequentView));
             getViewport().setViewPosition(oldSequentViewPosition);
 
-            // Additional option to show taclet info in case of: sequentView instanceof InnerNodeView
+            // Additional option to show taclet info in case of:
+            // sequentView instanceof InnerNodeView
             ProofTreeView ptv = mainWindow.getProofTreeView();
             if (ptv != null) {
                 ptv.tacletInfoToggle.setSequentView(sequentView);
@@ -58,6 +62,11 @@ public final class MainFrame extends JScrollPane {
         } else {
             setViewportView(component);
         }
+
+        if (oldContent instanceof SequentView) {
+            ((SequentView) oldContent).removeUserSelectionHighlight();
+        }
+
         return oldContent;
     }
 
@@ -67,10 +76,26 @@ public final class MainFrame extends JScrollPane {
         getVerticalScrollBar().setUnitIncrement(30);
         getHorizontalScrollBar().setUnitIncrement(30);
 
+        addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (content != null) {
+                    for (MouseListener listener : content.getMouseListeners()) {
+                        if (listener instanceof SequentViewInputListener) {
+                            listener.mouseClicked(e);
+                        }
+                    }
+                }
+            }
+        });
+
         // FIXME put this somewhere descent
         getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-                "copy");
+                KeyStroke.getKeyStroke(
+                        KeyEvent.VK_C,
+                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+                        "copy");
         getActionMap().put("copy", new CopyToClipboardAction(mainWindow));
         setContent(emptySequent);
     }

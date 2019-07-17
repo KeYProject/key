@@ -16,10 +16,6 @@ package de.uka.ilkd.key.gui.settings;
 
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
-import net.miginfocom.layout.AC;
-import net.miginfocom.layout.CC;
-import net.miginfocom.layout.LC;
-import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -43,6 +39,7 @@ import java.text.Format;
  * @author weigl
  */
 public class SimpleSettingsPanel extends JPanel {
+    private static final long serialVersionUID = -6727362750311983463L;
     protected Box pNorth = new Box(BoxLayout.Y_AXIS);
     protected JPanel pCenter = new JPanel();
     protected JLabel lblHead = new JLabel();

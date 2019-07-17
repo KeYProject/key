@@ -1,5 +1,30 @@
 package de.uka.ilkd.key.gui.extension.impl;
 
+import java.awt.Component;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.ToIntFunction;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.swing.Action;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JPopupMenu;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
+
+import org.key_project.util.ServiceLoaderUtil;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
@@ -7,16 +32,6 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
-import org.key_project.util.ServiceLoaderUtil;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
-import java.util.*;
-import java.util.function.ToIntFunction;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Facade for retrieving the GUI extensions.
@@ -30,7 +45,7 @@ public final class KeYGuiExtensionFacade {
     //private static Map<Class<?>, List<Object>> extensionCache = new HashMap<>();
 
     //region panel extension
-    @SuppressWarnings("todo")
+    //@SuppressWarnings("todo")
     public static Stream<TabPanel> getAllPanels(MainWindow window) {
         return getLeftPanel().stream().flatMap(it -> it.getPanels(window, window.getMediator()).stream());
     }
@@ -54,8 +69,11 @@ public final class KeYGuiExtensionFacade {
     public static Stream<Action> getMainMenuActions(MainWindow mainWindow) {
         ToIntFunction<Action> func = (Action a) -> {
             Integer i = (Integer) a.getValue(KeyAction.PRIORITY);
-            if (i == null) return 0;
-            else return i;
+            if (i == null) {
+                return 0;
+            } else {
+                return i;
+            }
         };
 
         return KeYGuiExtensionFacade.getMainMenuExtensions()
@@ -98,21 +116,34 @@ public final class KeYGuiExtensionFacade {
     private static Iterator<String> getMenuPath(Action act) {
         Object path = act.getValue(KeyAction.PATH);
         String spath;
-        if (path == null) spath = "";
-        else spath = path.toString();
+        if (path == null) {
+            spath = "";
+        } else {
+            spath = path.toString();
+        }
         return Pattern.compile(Pattern.quote(".")).splitAsStream(spath).iterator();
     }
 
     private static void sortActionIntoMenu(Action act, JMenu menu) {
         Iterator<String> mpath = getMenuPath(act);
         JMenu a = findMenu(menu, mpath);
-        a.add(act);
+
+        if (Boolean.TRUE.equals(act.getValue(KeyAction.CHECKBOX))) {
+            a.add(new JCheckBoxMenuItem(act));
+        } else {
+            a.add(act);
+        }
     }
 
     private static void sortActionIntoMenu(Action act, JMenuBar menuBar, JMenu defaultMenu) {
         Iterator<String> mpath = getMenuPath(act);
         JMenu a = findMenu(menuBar, mpath, defaultMenu);
-        a.add(act);
+
+        if (Boolean.TRUE.equals(act.getValue(KeyAction.CHECKBOX))) {
+            a.add(new JCheckBoxMenuItem(act));
+        } else {
+            a.add(act);
+        }
     }
 
     private static JMenu findMenu(JMenuBar menuBar, Iterator<String> mpath, JMenu defaultMenu) {
@@ -146,8 +177,9 @@ public final class KeYGuiExtensionFacade {
             m.setName(cur);
             menu.add(m);
             return findMenu(m, mpath);
-        } else
+        } else {
             return menu;
+        }
     }
     //endregion
 
@@ -210,7 +242,6 @@ public final class KeYGuiExtensionFacade {
         return menu;
     }
 
-    @SuppressWarnings("unchecked")
     private static void loadExtensions() {
         extensions = ServiceLoaderUtil.stream(KeYGuiExtension.class)
                 .filter(KeYGuiExtensionFacade::isNotForbidden)
@@ -248,16 +279,18 @@ public final class KeYGuiExtensionFacade {
      * @return
      */
     private static <T> boolean isNotForbidden(Class<T> a) {
-        if (forbiddenPlugins.contains(a.getName()))
+        if (forbiddenPlugins.contains(a.getName())) {
             return false;
+        }
         String sys = System.getProperty(a.getName());
         return sys == null || !sys.equalsIgnoreCase("false");
     }
     //endregion
 
     public static List<Extension> getExtensions() {
-        if (extensions.isEmpty())
+        if (extensions.isEmpty()) {
             loadExtensions();
+        }
         return extensions;
     }
 
@@ -315,6 +348,29 @@ public final class KeYGuiExtensionFacade {
     }
     //endregion
 
+    //region Term tool tip
+
+    /**
+     * Retrieves all known implementations of the {@link KeYStatusBarExtension}.
+     *
+     * @return all known implementations of the {@link KeYStatusBarExtension}.
+     */
+    public static List<KeYGuiExtension.Tooltip> getTooltipExtensions() {
+        return getExtensionInstances(KeYGuiExtension.Tooltip.class);
+    }
+
+    /**
+     *
+     * @param window the main window.
+     * @param pos the position the user selected.
+     * @return every term info string from every loaded extension.
+     */
+    public static List<String> getTooltipStrings(MainWindow window, PosInSequent pos) {
+        return getTooltipExtensions().stream().flatMap(
+                it -> it.getTooltipStrings(window, pos).stream()).collect(Collectors.toList());
+    }
+    //endregion
+
 
     public static Stream<String> getTermInfoStrings(
             MainWindow mainWindow, PosInSequent mousePos) {
@@ -359,8 +415,9 @@ public final class KeYGuiExtensionFacade {
         }
 
         private int getPriority(Action action) {
-            if (action.getValue(KeyAction.PRIORITY) != null)
+            if (action.getValue(KeyAction.PRIORITY) != null) {
                 return (int) action.getValue(KeyAction.PRIORITY);
+            }
             return 0;
         }
     }
