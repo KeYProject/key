@@ -128,7 +128,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
         // currently, we support only two protocols: file and zip/jar
         if (protocol.equals("file")) {
             // url.getPath() may contain escaped characters -> we have to decode it
-            String path = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8);
+            String path = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8.name());
 
             return copyAndOpenInputStream(Paths.get(path));
         } else if (protocol.equals("jar")) {
