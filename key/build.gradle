@@ -97,6 +97,22 @@ subprojects {
             excludeCategories 'org.key_project.util.testcategories.Slow'
             excludeCategories 'org.key_project.util.testcategories.Interactive'
         }
+
+        testLogging {
+            // set options for log level LIFECYCLE
+            events "failed"
+            exceptionFormat "short"
+
+            // set options for log level DEBUG
+            debug {
+                events "started", "skipped", "failed"
+                exceptionFormat "full"
+            }
+
+            // remove standard output/error logging from --info builds
+            // by assigning only 'failed' and 'skipped' events
+            info.events = ["failed", "skipped"]
+        }
     }
 
     /*findbugs { findbugsTest.enabled = false; ignoreFailures = true }
