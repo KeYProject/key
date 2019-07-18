@@ -2,8 +2,12 @@ package de.uka.ilkd.key.gui.originlabels;
 
 import java.awt.event.ActionEvent;
 
+import bibliothek.gui.dock.common.DefaultMultipleCDockable;
+import bibliothek.gui.dock.common.SingleCDockable;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.gui.docking.DockingHelper;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -11,13 +15,13 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
 
 /**
- * Opens a {@link OriginTermLabelWindow} for the selected term.
+ * Opens a {@link OriginTermLabelVisualizer} for the selected term.
  *
  * @author lanzinger
  */
 public class ShowOriginAction extends MainWindowAction {
 
-    private static final long serialVersionUID = -2631175646560838963L;
+    private static DefaultMultipleCDockable dockable;
 
     private PosInSequent pos;
 
@@ -51,9 +55,17 @@ public class ShowOriginAction extends MainWindowAction {
             }
         }
 
-        new OriginTermLabelWindow(
+        if (dockable == null) {
+            dockable = new DefaultMultipleCDockable(null, IconFactory.keyLogo(-1, -1), "Origin");
+        }
+
+        OriginTermLabelVisualizer vis = new OriginTermLabelVisualizer(
                 pio,
                 getMediator().getSelectedNode(),
                 getMediator().getServices());
+
+        SingleCDockable dockable
+            = DockingHelper.createSingleDock(vis.getShortName(), vis, vis.getLongName());
+        mainWindow.getDockControl().addDockable(dockable);
     }
 }

@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.pp.PosInSequent;
 
 /**
- * Extension adapter for {@link OriginTermLabel}s and {@link OriginTermLabelWindow}s.
+ * Extension adapter for {@link OriginTermLabel}s and {@link OriginTermLabelVisualizer}s.
  *
  * @author lanzinger
  */

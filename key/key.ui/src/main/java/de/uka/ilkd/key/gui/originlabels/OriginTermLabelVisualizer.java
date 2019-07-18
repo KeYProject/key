@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -16,11 +15,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -42,8 +37,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.NodeInfoWindow;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.NodeInfoVisualizer;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.IntIterator;
@@ -75,20 +69,19 @@ import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
 /**
- * This window visualizes the {@link OriginTermLabel}s of a term and its sub-terms.
+ * This UI component visualizes the {@link OriginTermLabel}s of a term and its sub-terms.
  *
  * @author lanzinger
  */
-public final class OriginTermLabelWindow extends NodeInfoWindow {
-    private static final long serialVersionUID = -2428168815415446459L;
+public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
     /**
-     * The window's initial width.
+     * The component's preferred width.
      */
     public final static int WIDTH = 1280;
 
     /**
-     * The window's initial height.
+     * The component's preferred height.
      */
     public final static int HEIGHT = 720;
 
@@ -154,7 +147,7 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
 
             if (!mediator.getSelectedProof().equals(getNode().proof())) {
                 int choice = JOptionPane.showOptionDialog(
-                        OriginTermLabelWindow.this,
+                        OriginTermLabelVisualizer.this,
                         "The proof containing this node is not currently selected."
                                 + " Do you want to select it?",
                         "Switch Proof?",
@@ -232,14 +225,14 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
     private Sequent sequent;
 
     /**
-     * Creates a new {@link OriginTermLabelWindow}.
+     * Creates a new {@link OriginTermLabelVisualizer}.
      *
      * @param pos the position of the term whose origin shall be visualized.
      * @param node the node representing the proof state for which the term's origins shall be
      *  visualized.
      * @param services services.
      */
-    public OriginTermLabelWindow(PosInOccurrence pos, Node node, Services services) {
+    public OriginTermLabelVisualizer(PosInOccurrence pos, Node node, Services services) {
         super(node, "Origin for node " + node.serialNr() + ": "
                 + (pos == null
                     ? "whole sequent"
@@ -258,11 +251,9 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
         this.sequent = node.sequent();
 
         setSize(WIDTH, HEIGHT);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setIconImage(IconFactory.keyLogo());
-        setLocationRelativeTo(null);
         setVisible(true);
 
+        /*
         JMenuBar menuBar = new JMenuBar();
         {
             JMenu menu = new JMenu("Origin");
@@ -285,6 +276,7 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
             menuBar.add(menu);
             setJMenuBar(menuBar);
         }
+        */
 
         JPanel headPane = new JPanel();
         {
@@ -306,11 +298,9 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
         bodyPane.setResizeWeight(0.5);
         bodyPane.setOneTouchExpandable(true);
 
-        JPanel contentPane = new JPanel();
-        contentPane.setLayout(new BorderLayout());
-        contentPane.add(headPane, BorderLayout.PAGE_START);
-        contentPane.add(bodyPane, BorderLayout.CENTER);
-        setContentPane(contentPane);
+        setLayout(new BorderLayout());
+        add(headPane, BorderLayout.PAGE_START);
+        add(bodyPane, BorderLayout.CENTER);
 
         String borderTitle;
 
@@ -619,7 +609,7 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
                     tree, value, selected, expanded,
                     leaf, row, hasFocus);
             termTextLabel.setText(getShortTermText(term));
-            termTextLabel.setBackground(OriginTermLabelWindow.this.getBackground());
+            termTextLabel.setBackground(OriginTermLabelVisualizer.this.getBackground());
 
             JLabel originTextLabel = new JLabel();
             Origin origin = OriginTermLabel.getOrigin(pio);
@@ -645,7 +635,7 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
             result.setBackground(Color.WHITE);
 
             if (origin != null) {
-                result.setToolTipText(OriginTermLabelWindow.this.getTooltipText(pio));
+                result.setToolTipText(OriginTermLabelVisualizer.this.getTooltipText(pio));
             }
 
             return result;
@@ -755,7 +745,7 @@ public final class OriginTermLabelWindow extends NodeInfoWindow {
                 return null;
             }
 
-            return OriginTermLabelWindow.this.getTooltipText(convertPio(pis.getPosInOccurrence()));
+            return OriginTermLabelVisualizer.this.getTooltipText(convertPio(pis.getPosInOccurrence()));
         }
 
         @Override
