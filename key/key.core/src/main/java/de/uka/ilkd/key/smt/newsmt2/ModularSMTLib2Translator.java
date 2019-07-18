@@ -174,8 +174,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
                 right = right.sub(0);
             }
             res.add(tb.not(right));
-        } else {
-            res.add(problem);
+        } else { //TODO js make sure this includes all cases
+            res.add(tb.not(problem));
         }
         return res;
     }
