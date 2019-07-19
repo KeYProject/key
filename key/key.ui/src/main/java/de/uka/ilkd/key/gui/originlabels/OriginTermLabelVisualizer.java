@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -34,6 +35,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -165,6 +167,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             }
 
             mediator.getSelectionModel().setSelectedNode(getNode());
+            ((DefaultSingleCDockable) MainWindow.getInstance().getDockSequent()).toFront();
         }
     };
 
@@ -735,6 +738,13 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             } else {
                 setFilter(new IdentitySequentPrintFilter());
             }
+        }
+
+        @Override
+        protected synchronized PosInSequent getPosInSequent(Point p) {
+            PosInSequent pis = super.getPosInSequent(p);
+            PosInOccurrence pio = convertPio(pis == null ? null : pis.getPosInOccurrence());
+            return pio == null ? null : PosInSequent.createCfmaPos(pio);
         }
 
         @Override

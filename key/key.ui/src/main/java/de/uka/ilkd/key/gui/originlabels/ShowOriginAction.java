@@ -2,8 +2,11 @@ package de.uka.ilkd.key.gui.originlabels;
 
 import java.awt.event.ActionEvent;
 
+import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
-import bibliothek.gui.dock.common.SingleCDockable;
+import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import bibliothek.gui.dock.common.event.CVetoClosingEvent;
+import bibliothek.gui.dock.common.event.CVetoClosingListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
@@ -48,7 +51,7 @@ public class ShowOriginAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         PosInOccurrence pio = pos.getPosInOccurrence();
 
-        // TermView can only print sequents or formulas, not terms.
+        // OriginTermLabelVisualizer.TermView can only print sequents or formulas, not terms.
         if (pio != null) {
             while (!pio.subTerm().sort().equals(Sort.FORMULA)) {
                 pio = pio.up();
@@ -56,7 +59,7 @@ public class ShowOriginAction extends MainWindowAction {
         }
 
         if (dockable == null) {
-            dockable = new DefaultMultipleCDockable(null, IconFactory.keyLogo(-1, -1), "Origin");
+            dockable = new DefaultMultipleCDockable(null, IconFactory.ORIGIN_ICON.get(), "Origin");
         }
 
         OriginTermLabelVisualizer vis = new OriginTermLabelVisualizer(
@@ -64,8 +67,26 @@ public class ShowOriginAction extends MainWindowAction {
                 getMediator().getSelectedNode(),
                 getMediator().getServices());
 
-        SingleCDockable dockable
-            = DockingHelper.createSingleDock(vis.getShortName(), vis, vis.getLongName());
-        mainWindow.getDockControl().addDockable(dockable);
+        CControl dockControl = mainWindow.getDockControl();
+        DefaultSingleCDockable dockable
+            = (DefaultSingleCDockable) DockingHelper.createSingleDock(
+                    vis.getShortName(), vis, vis.getLongName());
+
+        dockable.setCloseable(true);
+        dockable.addVetoClosingListener(new CVetoClosingListener() {
+
+            @Override
+            public void closed(CVetoClosingEvent event) {
+                vis.dispose();
+            }
+
+            @Override
+            public void closing(CVetoClosingEvent event) { }
+        });
+
+        dockControl.addDockable(dockable);
+        dockable.setLocationsAside(mainWindow.getDockSequent());
+        dockable.setVisible(true);
+        dockable.toFront();
     }
 }

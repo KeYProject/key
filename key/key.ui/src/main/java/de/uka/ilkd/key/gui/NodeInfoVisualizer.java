@@ -118,8 +118,8 @@ public abstract class NodeInfoVisualizer
         }
     }
 
-    private static void register(NodeInfoVisualizer win) {
-        Node node = win.getNode();
+    private static void register(NodeInfoVisualizer vis) {
+        Node node = vis.getNode();
         int nodeNr = node.serialNr();
         Proof proof = node.proof();
         Name proofName = proof.name();
@@ -128,15 +128,19 @@ public abstract class NodeInfoVisualizer
 
         Map<Integer, SortedSet<NodeInfoVisualizer>> map = instances.get(proofName);
         map.putIfAbsent(nodeNr, new TreeSet<>());
-        map.get(nodeNr).add(win);
+        map.get(nodeNr).add(vis);
 
         synchronized (listeners) {
             for (NodeInfoVisualizerListener listener : listeners) {
-                listener.visualizerRegistered(win);
+                listener.visualizerRegistered(vis);
             }
         }
     }
 
+    /**
+     * Frees any resources belonging to this visualizer and removes it from
+     * {@link #getInstances(Node)}.
+     */
     public void dispose() {
         unregister(this);
         node = null;
