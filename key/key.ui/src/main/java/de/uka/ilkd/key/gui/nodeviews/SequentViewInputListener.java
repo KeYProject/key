@@ -154,6 +154,10 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        if (!sequentView.isMainSequentView()) {
+            return;
+        }
+
         if (SwingUtilities.isMiddleMouseButton(e)
                 || e.isControlDown() && SwingUtilities.isLeftMouseButton(e)) {
             Point point = e.getPoint();
@@ -165,8 +169,6 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
             } else {
                 sequentView.setUserSelectionHighlight(point);
             }
-
-            highlightOriginInSourceView(pis);
         }
     }
 

@@ -65,6 +65,8 @@ import javax.swing.event.MouseInputAdapter;
 
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.SingleCDockable;
+import bibliothek.gui.dock.common.event.CDockableLocationEvent;
+import bibliothek.gui.dock.common.event.CDockableLocationListener;
 import bibliothek.gui.dock.common.intern.CDockable;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
@@ -571,6 +573,16 @@ public final class MainWindow extends JFrame {
 
         dockProofListView.setVisible(true);
         dockSequent.setVisible(true);
+        dockSequent.addCDockableLocationListener(new CDockableLocationListener() {
+
+            @Override
+            public void changed(CDockableLocationEvent event) {
+                if (!event.getNewShowing()) {
+                    mainFrame.hidden();
+                }
+            }
+        });
+
         dockSourceView.setVisible(true);
 
         DockingHelper.restoreFactoryDefault(this);

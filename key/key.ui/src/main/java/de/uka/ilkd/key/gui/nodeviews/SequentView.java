@@ -564,20 +564,37 @@ public abstract class SequentView extends JEditorPane {
         }
     }
 
-    void setUserSelectionHighlight(Point p) {
+    protected void setUserSelectionHighlight(PosInSequent pis) {
         removeUserSelectionHighlight();
 
         try {
-            userSelectionHighlightRange = getHighlightRange(p);
+            userSelectionHighlightRange = new Range(pis.getBounds().start(), pis.getBounds().end());
             userSelectionHighlight = getHighlighter().addHighlight(
                     userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
                     new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+
+            sequentViewInputListener.highlightOriginInSourceView(pis);
         } catch (BadLocationException e) {
             Debug.out("Error while setting permanent highlight", e);
         }
     }
 
-    void removeUserSelectionHighlight() {
+    protected void setUserSelectionHighlight(Point point) {
+        removeUserSelectionHighlight();
+
+        try {
+            userSelectionHighlightRange = getHighlightRange(point);
+            userSelectionHighlight = getHighlighter().addHighlight(
+                    userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
+                    new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+
+            sequentViewInputListener.highlightOriginInSourceView(getPosInSequent(point));
+        } catch (BadLocationException e) {
+            Debug.out("Error while setting permanent highlight", e);
+        }
+    }
+
+    protected void removeUserSelectionHighlight() {
         if (userSelectionHighlight != null) {
             getHighlighter().removeHighlight(userSelectionHighlight);
         }
@@ -588,7 +605,7 @@ public abstract class SequentView extends JEditorPane {
         sequentViewInputListener.highlightOriginInSourceView(null);
     }
 
-    boolean isInUserSelectionHighlight(Point point) {
+    protected boolean isInUserSelectionHighlight(Point point) {
         return point == null && userSelectionHighlightRange == null
                 || point != null && userSelectionHighlightRange != null
                         && Objects.equals(

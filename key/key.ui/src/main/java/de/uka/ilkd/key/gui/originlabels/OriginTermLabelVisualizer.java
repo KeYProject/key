@@ -11,6 +11,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.Objects;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -130,6 +131,9 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
     /** This window tree view. */
     private JTree tree;
+
+    /** The currently highlighted position. */
+    private PosInOccurrence highlight;
 
     /** The button for the {@link #nodeLinkAction} */
 
@@ -324,10 +328,12 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             tree.addTreeSelectionListener(e -> {
                 TreeNode source = (TreeNode) tree.getLastSelectedPathComponent();
 
-                if (source != null) {
-                    ImmutableList<Integer> path = getPosTablePath(source.pos);
-
-                    highlightInView(path);
+                if (source == null || source.pos == null) {
+                    highlight = null;
+                    highlightInView(null);
+                } else {
+                    highlight = source.pos;
+                    highlightInView(source.pos);
                 }
 
                 revalidate();
@@ -362,17 +368,20 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                 public void mouseClicked(MouseEvent e) {
                     PosInSequent pis = view.getLastPosInSequent();
 
-                    if (pis == null) {
-                        return;
+                    if (pis == null || Objects.equals(highlight, pis.getPosInOccurrence())) {
+                        highlight = null;
+                        view.removeUserSelectionHighlight();
+                        highlightInTree(null);
+                    } else {
+                        highlight = pis.getPosInOccurrence();
+
+                        ImmutableList<Integer> path = getPosTablePath(pis.getPosInOccurrence());
+                        highlightInView(pis.getPosInOccurrence());
+                        highlightInTree(getTreePath(path));
+
+                        revalidate();
+                        repaint();
                     }
-
-                    ImmutableList<Integer> path = getPosTablePath(
-                            convertPio(pis.getPosInOccurrence()));
-                    highlightInView(path);
-                    highlightInTree(getTreePath(path));
-
-                    revalidate();
-                    repaint();
                 }
             });
 
@@ -405,6 +414,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             getNode().proof().removeProofDisposedListener(proofDisposedListener);
         }
 
+        view.removeUserSelectionHighlight();
+
         ruleAppListener = null;
         proofTreeListener = null;
         proofDisposedListener = null;
@@ -413,6 +424,13 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         sequent = null;
 
         super.dispose();
+    }
+
+    /**
+     * This method should be called whenever the dockable containing this visualizer is hidden.
+     */
+    public void hidden() {
+        view.removeUserSelectionHighlight();
     }
 
     private void updateNodeLink() {
@@ -510,15 +528,14 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         tree.getSelectionModel().setSelectionPath(path);
     }
 
-    private void highlightInView(ImmutableList<Integer> path) {
-        view.removeHighlight(view.getColorHighlight(HIGHLIGHT_COLOR));
-        view.printSequent();
+    private void highlightInView(PosInOccurrence pio) {
+        if (pio == null) {
+            view.removeUserSelectionHighlight();
+            return;
+        }
 
         try {
-            Range range = view.posTable.rangeForPath(path);
-            range = new Range(range.start() + 1, range.end() + 1);
-
-            view.paintHighlight(range, view.getColorHighlight(HIGHLIGHT_COLOR));
+            view.setUserSelectionHighlight(PosInSequent.createCfmaPos(pio));
         } catch (ArrayIndexOutOfBoundsException e) {
             // The path does not point to a valid sub-term.
             // E.g., this can happen if pretty-printing is activated and the user selects
@@ -755,12 +772,33 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                 return null;
             }
 
-            return OriginTermLabelVisualizer.this.getTooltipText(convertPio(pis.getPosInOccurrence()));
+            return OriginTermLabelVisualizer.this.getTooltipText(pis.getPosInOccurrence());
         }
 
         @Override
         public SequentPrintFilter getFilter() {
             return super.getFilter();
+        }
+
+        @Override
+        public void setUserSelectionHighlight(PosInSequent pis) {
+            ImmutableList<Integer> path = getPosTablePath(
+                    pis == null ? null : pis.getPosInOccurrence());
+            Range range = view.posTable.rangeForPath(path);
+            range = new Range(range.start() + 1, range.end() + 1);
+            pis.setBounds(range);
+
+            super.setUserSelectionHighlight(pis);
+        }
+
+        @Override
+        public void setUserSelectionHighlight(Point point) {
+            super.setUserSelectionHighlight(point);
+        }
+
+        @Override
+        public void removeUserSelectionHighlight() {
+            super.removeUserSelectionHighlight();
         }
 
         @Override

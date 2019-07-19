@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import bibliothek.gui.dock.common.event.CDockableLocationEvent;
+import bibliothek.gui.dock.common.event.CDockableLocationListener;
 import bibliothek.gui.dock.common.event.CVetoClosingEvent;
 import bibliothek.gui.dock.common.event.CVetoClosingListener;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -82,6 +84,15 @@ public class ShowOriginAction extends MainWindowAction {
 
             @Override
             public void closing(CVetoClosingEvent event) { }
+        });
+        dockable.addCDockableLocationListener(new CDockableLocationListener() {
+
+            @Override
+            public void changed(CDockableLocationEvent event) {
+                if (!event.getNewShowing()) {
+                    vis.hidden();
+                }
+            }
         });
 
         dockControl.addDockable(dockable);

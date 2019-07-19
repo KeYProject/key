@@ -70,6 +70,15 @@ public final class MainFrame extends JScrollPane {
         return oldContent;
     }
 
+    /**
+     * This method should be called whenever the docker containing this frame is hidden.
+     */
+    public void hidden() {
+        if (content instanceof SequentView) {
+            ((SequentView) content).removeUserSelectionHighlight();
+        }
+    }
+
     public MainFrame(final MainWindow mainWindow, EmptySequent emptySequent) {
         this.mainWindow = mainWindow;
         setBorder(new EmptyBorder(0, 0, 0, 0));
