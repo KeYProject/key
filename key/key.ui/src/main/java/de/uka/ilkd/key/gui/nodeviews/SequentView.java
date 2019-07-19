@@ -167,7 +167,6 @@ public abstract class SequentView extends JEditorPane {
         setFont();
 
         sequentViewInputListener = new SequentViewInputListener(this);
-        addKeyListener(sequentViewInputListener);
         addMouseMotionListener(sequentViewInputListener);
         addMouseListener(sequentViewInputListener);
 
