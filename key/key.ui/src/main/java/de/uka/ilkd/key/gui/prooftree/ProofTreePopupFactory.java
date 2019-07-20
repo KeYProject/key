@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.function.Function;
 
 import javax.swing.Action;
-import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
@@ -131,13 +130,10 @@ public class ProofTreePopupFactory {
         ProofTreeContext context = createContext(view, selectedPath);
         builders.forEach(it -> menu.add(it.apply(context)));
 
-        List<Action> extensionActions =
-                KeYGuiExtensionFacade.getContextMenuItems(DefaultContextMenuKind.PROOF_TREE,
+        menu.addSeparator();
+        KeYGuiExtensionFacade.addContextMenuItems(DefaultContextMenuKind.PROOF_TREE, menu,
                         context.invokedNode, context.mediator);
-        if (!extensionActions.isEmpty()) {
-            menu.addSeparator();
-            extensionActions.forEach(menu::add);
-        }
+
         return menu;
     }
 
