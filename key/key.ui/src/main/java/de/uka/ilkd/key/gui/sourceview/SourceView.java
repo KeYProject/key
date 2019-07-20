@@ -1,37 +1,34 @@
 package de.uka.ilkd.key.gui.sourceview;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.statement.Else;
+import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.IOUtil.LineInformation;
 
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextPane;
-import javax.swing.JViewport;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -43,38 +40,17 @@ import javax.swing.text.Document;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.SimpleAttributeSet;
-
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.IOUtil.LineInformation;
-
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
-import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
-import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.statement.Else;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.Then;
-import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.NodeInfo;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.Pair;
+import java.awt.Dimension;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.*;
 
 /**
  * This class is responsible for showing the source code and visualizing the symbolic execution
@@ -547,22 +523,39 @@ public final class SourceView extends JComponent {
      * @throws IOException if the file cannot be opened.
      */
     private boolean addFile(String fileName) throws IOException {
-        File file = new File(fileName);
-
         if (tabs.containsKey(fileName)) {
             return false;
         } else {
             // try to load the file via the FileRepo
             Proof proof = mainWindow.getMediator().getSelectedProof();
             FileRepo repo = proof.getInitConfig().getFileRepo();
-            try (InputStream is = repo.getInputStream(file.getAbsoluteFile().toPath())) {
-                if (is != null) {
-                    new Tab(file.getAbsolutePath(), file.getName(), is);
-                    return true;
+
+            /* quick fix:
+             * If fileName contains a valid URL we directly call the url method in FileRepo,
+             * else we call the method for paths. This is necessary because fileName may contain
+             * an URL as generated by recoder (transferred via PositionInfo).
+             * see big #1513
+             */
+            if (fileName.startsWith("URL:")) {
+                String urlString = fileName.substring(4);
+                URL url = new URL(urlString);
+                try (InputStream is = repo.getInputStream(url)) {
+                    if (is != null) {
+                        new Tab(urlString, new File(url.getFile()).getName(), is);
+                        return true;
+                    }
+                }
+            } else {
+                File file = new File(fileName);
+                try (InputStream is = repo.getInputStream(file.toPath())) {
+                    if (is != null) {
+                        new Tab(file.getAbsolutePath(), file.getName(), is);
+                        return true;
+                    }
                 }
             }
         }
-        throw new IOException();
+        throw new IOException("Could not open file: " + fileName);
     }
 
     /**
@@ -740,10 +733,18 @@ public final class SourceView extends JComponent {
                                 @Override
                                 protected void doDefaultAction(SourceElement el) {
                                     if (el instanceof MethodBodyStatement) {
-                                        MethodBodyStatement methodBody = (MethodBodyStatement) el;
-                                        addPosToList(
-                                                methodBody.getBody(services).getPositionInfo(),
-                                                list, node);
+                                        MethodBodyStatement mb = (MethodBodyStatement) el;
+                                        Statement body = mb.getBody(services);
+                                        if (body != null) {
+                                            addPosToList(body.getPositionInfo(), list, node);
+                                        } else {
+                                            // the method is declared without a body
+                                            // -> we try to show the file either way
+                                            IProgramMethod pm = mb.getProgramMethod(services);
+                                            if (pm != null) {
+                                                addPosToList(pm.getPositionInfo(), list, node);
+                                            }
+                                        }
                                     }
                                 }
                             };
@@ -915,23 +916,9 @@ public final class SourceView extends JComponent {
             // Add tab to tab pane.
             tabPane.addTab(simpleFileName, this);
             int index = tabPane.indexOfComponent(this);
-            String tabToolTip = createToolTipText(absoluteFileName);
-            tabPane.setToolTipTextAt(index, tabToolTip);
+            tabPane.setToolTipTextAt(index, absoluteFileName);
 
             resetHighlights();
-        }
-
-        private String createToolTipText(String absoluteFileName) {
-            // TODO: this may display wrong information if the setting with an already loaded proof!
-            String res = "";
-            if (ProofIndependentSettings.DEFAULT_INSTANCE
-                                        .getGeneralSettings()
-                                        .isEnsureSourceConsistency()) {
-                // if the file is cached in a repo, we indicate this in tool tip of tab
-                res = "copy of ";
-            }
-            res += absoluteFileName;
-            return res;
         }
 
         private void initLineInfo() {

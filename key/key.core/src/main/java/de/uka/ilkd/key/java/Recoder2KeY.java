@@ -844,6 +844,11 @@ public class Recoder2KeY implements JavaReader {
         for(recoder.java.CompilationUnit cu : specialClasses) {
             DataLocation dl = cu.getOriginalDataLocation();
             assert dl != null : "DataLocation not set on " + cu.toSource();
+
+            /* TODO: maybe we should keep the DataLocation or pass an URL here instead of
+             *  converting to a string. This would remove the need for parsing the URL from the
+             *  string later on (e.g. in PositionInfo, FileRepo, ...)
+             */
             getConverter().processCompilationUnit(cu, dl.toString());
         }
         
