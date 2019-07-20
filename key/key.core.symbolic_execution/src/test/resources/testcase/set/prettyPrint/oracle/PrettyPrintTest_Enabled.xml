@@ -251,7 +251,7 @@ mod: false" pathCondition="x&lt;&lt;origin(&quot;requires (implicit)&quot;, &quo
                      </variable>
                      <callStackEntry path="/0"/>
                      <methodReturn name="&lt;return of main&gt;" signature="&lt;return of PrettyPrintTest.main(x)&gt;" pathCondition="  x&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; &lt;= -1
-&amp; x_0 = -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -1 as result of main&gt;" signatureIncludingReturnValue="&lt;return -1 as result of PrettyPrintTest.main(x)&gt;" isReturnValueComputed="true" methodReturnCondition="  x&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; &lt;= -1
+&amp; x_0 = -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -1 as result of main&gt;" signatureIncludingReturnValue="&lt;return -1 as result of PrettyPrintTest.main(x)&gt;" isReturnValueComputed="true" methodReturnCondition="  (x&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; &lt;= -1)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;
 &amp; x_0 = -1">
                         <methodReturnValue name="-1" returnValueString="-1" hasCondition="false">
                         </methodReturnValue>

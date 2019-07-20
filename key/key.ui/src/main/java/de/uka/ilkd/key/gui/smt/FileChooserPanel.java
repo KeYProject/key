@@ -100,7 +100,7 @@ public class FileChooserPanel extends JPanel{
             return saveToFileBox;
         }
 
-        private void setActivationMode(boolean selected) {
+        public void setActivationMode(boolean selected) {
               getFolderField().setEnabled(selected);
               getChooseButton().setEnabled(selected);
         }

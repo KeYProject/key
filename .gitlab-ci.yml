@@ -22,16 +22,16 @@ before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
 
 stages:
-  - primary
-  - secondary
-  - ternary
+    - primary
+    - secondary
+    - ternary
 
-  # compile:oraclejdk8:
-  #   stage: primary
-  #   image: key-dev-jdk8
-  #   script:
-  #     - javac -version
-  #     - ant -f key/scripts/build.xml compileAll
+# compile:oraclejdk8:
+#   stage: primary
+#   image: key-dev-jdk8
+#   script:
+#     - javac -version
+#     - ant -f key/scripts/build.xml compileAll
 
 
 compile:classes:
@@ -255,4 +255,4 @@ checkstyle:
     expire_in: 1 year
     when: always
     paths:
-      - report.txt
+    - report.txt

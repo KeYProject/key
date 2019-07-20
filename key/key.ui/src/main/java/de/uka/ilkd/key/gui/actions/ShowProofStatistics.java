@@ -28,7 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 
-import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
@@ -49,6 +49,7 @@ public class ShowProofStatistics extends MainWindowAction {
         setName("Show Proof Statistics");
         setIcon(IconFactory.statistics(16));
         getMediator().enableWhenProofLoaded(this);
+        lookupAcceleratorKey();
     }
 
     @Override

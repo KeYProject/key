@@ -155,7 +155,7 @@ public class GeneralSettings implements Settings, Cloneable {
      * steps in order to change this object in a way that it
      * represents the stored settings
      */
-    public void readSettings(Object sender, Properties props) {
+    public void readSettings(Properties props) {
         String val = props.getProperty(TACLET_FILTER);
         if (val != null) {
             tacletFilter = Boolean.valueOf(val).booleanValue();
@@ -197,7 +197,7 @@ public class GeneralSettings implements Settings, Cloneable {
      * <key> = <value> (,<value>)* are allowed.
      * @param props the Properties object where to write the settings as (key, value) pair
      */
-    public void writeSettings(Object sender, Properties props) {
+    public void writeSettings(Properties props) {
 	props.setProperty(TACLET_FILTER, "" + tacletFilter);
         props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);
         props.setProperty(RIGHT_CLICK_MACROS_KEY, "" + rightClickMacros);

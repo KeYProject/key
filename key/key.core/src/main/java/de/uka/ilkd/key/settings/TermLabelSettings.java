@@ -33,7 +33,7 @@ public class TermLabelSettings implements Settings, Cloneable {
         new LinkedList<SettingsListener>();
 
     @Override
-    public void readSettings(Object sender, Properties props) {
+    public void readSettings(Properties props) {
         String str = props.getProperty(USE_ORIGIN_LABELS);
 
         if (str != null && (str.equals("true") || str.equals("false"))) {
@@ -48,7 +48,7 @@ public class TermLabelSettings implements Settings, Cloneable {
     }
 
     @Override
-    public void writeSettings(Object sender, Properties props) {
+    public void writeSettings(Properties props) {
         props.setProperty(USE_ORIGIN_LABELS, Boolean.toString(useOriginLabels));
     }
 

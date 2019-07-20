@@ -19,13 +19,9 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
-import de.uka.ilkd.key.rule.RuleAbortException;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.LoopSpecImpl;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -41,6 +37,8 @@ public class LoopInvariantRuleCompletion implements
     @Override
     public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
         Services services = goal.proof().getServices();
+        // fixing #1090: Local variables must be accessible
+        services = services.getOverlay(goal.getLocalNamespaces());
 
         LoopInvariantBuiltInRuleApp loopApp =
                 ((LoopInvariantBuiltInRuleApp) app).tryToInstantiate(goal);

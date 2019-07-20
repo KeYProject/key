@@ -103,7 +103,7 @@ public final class UnicodeHelper {
     public static final char TURNSTILE = '\u22A6';
     public static final char MODELS = '\u22A7';
     public static final char PRECEDES = '\u227A';
-
+    public static final char SEQUENT_ARROW = '\u27F9';
 
     // non-logic symbols
     public static final char COPYRIGHT = '\u00A9';
@@ -119,8 +119,9 @@ public final class UnicodeHelper {
      */
     public static String emSpaces (int em) {
         final StringBuffer sb = new StringBuffer();
-        for (int i= 0; i < em; i++)
+        for (int i = 0; i < em; i++) {
             sb.append(EMSPACE);
+        }
         return sb.toString();
     }
 

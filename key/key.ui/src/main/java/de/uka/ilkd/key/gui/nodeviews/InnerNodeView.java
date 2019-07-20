@@ -24,6 +24,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -41,26 +42,47 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
-public class InnerNodeView extends SequentView {
+/**
+ * Sequent view for an inner node.
+ */
+public final class InnerNodeView extends SequentView {
+
+    private static final ColorSettings.ColorProperty RULE_APP_HIGHLIGHT_COLOR =
+            ColorSettings.define("[innerNodeView]ruleAppHighlight", "",
+                    new Color(0.5f, 1.0f, 0.5f, 0.4f));
+
+    private static final ColorSettings.ColorProperty IF_FORMULA_HIGHLIGHT_COLOR =
+            ColorSettings.define("[innerNodeView]ifFormulaHighlight", "",
+                    new Color(0.8f, 1.0f, 0.8f, 0.5f));
+
+    private static final ColorSettings.ColorProperty SELECTION_COLOR =
+            ColorSettings.define("[innerNodeView]selection", "", new Color(10, 180, 50));
 
     /**
      *
      */
     private static final long serialVersionUID = -6542881446084654358L;
+
     private InitialPositionTable posTable;
+
+    private InnerNodeViewListener listener;
+
     public final JTextArea tacletInfo;
+
     Node node;
 
     public InnerNodeView(Node node, MainWindow mainWindow) {
         super(mainWindow);
         this.node = node;
+        this.listener = new InnerNodeViewListener(this);
+
         filter = new IdentitySequentPrintFilter();
         getFilter().setSequent(node.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(),
                         mainWindow.getMediator().getNotationInfo(),
                         mainWindow.getMediator().getServices(),
                         getVisibleTermLabels()));
-        setSelectionColor(new Color(10, 180, 50));
+        setSelectionColor(SELECTION_COLOR.get());
         setBackground(INACTIVE_BACKGROUND_COLOR);
 
         tacletInfo = new JTextArea(TacletDescriber.getTacletDescription(mainWindow.getMediator(), node, getFilter()));
@@ -74,9 +96,10 @@ public class InnerNodeView extends SequentView {
     }
 
     static final HighlightPainter RULEAPP_HIGHLIGHTER
-            = new DefaultHighlighter.DefaultHighlightPainter(new Color(0.5f, 1.0f, 0.5f, 0.4f));
+            = new DefaultHighlighter.DefaultHighlightPainter(RULE_APP_HIGHLIGHT_COLOR.get());
+
     static final HighlightPainter IF_FORMULA_HIGHLIGHTER
-            = new DefaultHighlighter.DefaultHighlightPainter(new Color(0.8f, 1.0f, 0.8f, 0.5f));
+            = new DefaultHighlighter.DefaultHighlightPainter(IF_FORMULA_HIGHLIGHT_COLOR.get());
 
     private void highlightRuleAppPosition(RuleApp app) {
         try {
@@ -157,7 +180,7 @@ public class InnerNodeView extends SequentView {
         } else {
             return null;
         }
-        
+
     }
 
     @Override
@@ -167,18 +190,22 @@ public class InnerNodeView extends SequentView {
 
     @Override
     public final synchronized void printSequent() {
+        removeMouseListener(listener);
+
         setLineWidth(computeLineWidth());
         getLogicPrinter().update(getFilter(), getLineWidth());
         setText(getSyntaxHighlighter().process(getLogicPrinter().toString(), node));
         posTable = getLogicPrinter().getInitialPositionTable();
         RuleApp app = node.getAppliedRuleApp();
-        
+
         if (app != null) {
             highlightRuleAppPosition(app);
         }
 
         updateHidingProperty();
         updateHeatMapHighlights();
+
+        addMouseListener(listener);
     }
 
 }

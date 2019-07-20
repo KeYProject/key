@@ -76,7 +76,7 @@ public class ModelGenerator implements SolverLauncherListener{
 
 		piSettings.setMaxConcurrentProcesses(settings.getNumberOfProcesses());
 		final ProofDependentSMTSettings pdSettings = ProofDependentSMTSettings.getDefaultSettingsData();
-		pdSettings.invariantForall = settings.invaraiantForAll();
+		pdSettings.invariantForall = settings.invariantForAll();
 		// invoke z3 for counterexamples
 		final SMTSettings smtsettings = new SMTSettings(pdSettings,
 				piSettings, null);

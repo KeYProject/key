@@ -177,7 +177,7 @@ public abstract class AbstractTestGenerator {
     piSettings.setMaxConcurrentProcesses(settings.getNumberOfProcesses());
     final ProofDependentSMTSettings pdSettings = proof.getSettings()
           .getSMTSettings().clone();
-    pdSettings.invariantForall = settings.invaraiantForAll();
+    pdSettings.invariantForall = settings.invariantForAll();
     // invoke z3 for counterexamples
     final SMTSettings smtsettings = new SMTSettings(pdSettings,
           piSettings, proof);
