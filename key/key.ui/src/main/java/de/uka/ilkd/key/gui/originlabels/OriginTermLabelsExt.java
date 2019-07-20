@@ -128,8 +128,9 @@ public class OriginTermLabelsExt
         return resultList;
     }
 
-    private static class OpenVisualizerAction extends KeyAction {
+    private static final class OpenVisualizerAction extends KeyAction {
 
+        /** The visualizer shown by this action. */
         private NodeInfoVisualizer vis;
 
         private OpenVisualizerAction(NodeInfoVisualizer vis) {

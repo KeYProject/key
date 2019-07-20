@@ -4,10 +4,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -20,8 +18,6 @@ import de.uka.ilkd.key.settings.TermLabelSettings;
  * @author lanzinger
  */
 public class ShowOriginAction extends MainWindowAction {
-
-    private static DefaultMultipleCDockable dockable;
 
     private PosInSequent pos;
 
@@ -53,10 +49,6 @@ public class ShowOriginAction extends MainWindowAction {
             while (!pio.subTerm().sort().equals(Sort.FORMULA)) {
                 pio = pio.up();
             }
-        }
-
-        if (dockable == null) {
-            dockable = new DefaultMultipleCDockable(null, IconFactory.ORIGIN_ICON.get(), "Origin");
         }
 
         OriginTermLabelVisualizer vis = new OriginTermLabelVisualizer(

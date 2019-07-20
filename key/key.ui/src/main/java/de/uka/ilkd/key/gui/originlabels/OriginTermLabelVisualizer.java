@@ -245,66 +245,12 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         this.sequent = node.sequent();
 
         setVisible(true);
+        setLayout(new BorderLayout());
 
-        /*
-        JMenuBar menuBar = new JMenuBar();
-        {
-            JMenu menu = new JMenu("Origin");
-            menu.setMnemonic(KeyEvent.VK_O);
-
-            JMenuItem gotoNodeItem = new JMenuItem();
-            gotoNodeItem.setAction(nodeLinkAction);
-            gotoNodeItem.setText("Go to node");
-            gotoNodeItem.setToolTipText("Go to the proof node associated with this window");
-            menu.add(gotoNodeItem);
-
-            JMenuItem closeItem = new JMenuItem("Close");
-            closeItem.setIcon(IconFactory.quit(16));
-            closeItem.setToolTipText("Close this window");
-            closeItem.addActionListener(event -> {
-                OriginTermLabelWindow.this.dispose();
-            });
-            menu.add(closeItem);
-
-            menuBar.add(menu);
-            setJMenuBar(menuBar);
-        }
-        */
-
-        JPanel headPane = new JPanel();
-        {
-            headPane.setLayout(new BoxLayout(headPane, BoxLayout.PAGE_AXIS));
-
-            JPanel top = new JPanel();
-            top.setLayout(new BoxLayout(top, BoxLayout.LINE_AXIS));
-            top.add(new JLabel("Node "));
-            nodeLinkButton = new JButton();
-            top.add(nodeLinkButton);
-            headPane.add(top);
-
-            JPanel bot = new JPanel();
-            JLabel label = new JLabel("Proof: \"" + node.proof().name().toString() + "\"");
-            label.setMinimumSize(new Dimension(top.getWidth(), label.getMinimumSize().height));
-            bot.setLayout(new BoxLayout(bot, BoxLayout.LINE_AXIS));
-            bot.add(label);
-            headPane.add(bot);
-
-            nodeLinkButton.setAction(nodeLinkAction);
-            updateNodeLink();
-
-            node.proof().addRuleAppListener(ruleAppListener);
-            node.proof().addProofTreeListener(proofTreeListener);
-            node.proof().addProofDisposedListener(proofDisposedListener);
-        }
+        initHeadPane();
 
         JSplitPane bodyPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-
-        setLayout(new BorderLayout());
-        add(headPane, BorderLayout.PAGE_START);
-        add(bodyPane, BorderLayout.CENTER);
-
         String borderTitle;
-
         if (pos == null) {
             borderTitle = "selected sequent";
         } else if (pos.isInAntec()) {
@@ -312,88 +258,10 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         } else {
             borderTitle = "selected formula in succedent";
         }
+        initTree(bodyPane, borderTitle);
+        initView(bodyPane, borderTitle);
 
-        DefaultTreeModel treeModel = buildModel(pos);
-        {
-            tree = new JTree(treeModel);
-            tree.setCellRenderer(new CellRenderer());
-            ToolTipManager.sharedInstance().registerComponent(tree);
-
-            tree.addTreeSelectionListener(e -> {
-                TreeNode source = (TreeNode) tree.getLastSelectedPathComponent();
-
-                if (source == null || source.pos == null) {
-                    highlight = null;
-                    highlightInView(null);
-                } else {
-                    highlight = source.pos;
-                    highlightInView(source.pos);
-                }
-
-                revalidate();
-                repaint();
-            });
-
-            JScrollPane treeScrollPane = new JScrollPane(tree,
-                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
-            treeScrollPane.setBorder(new TitledBorder(borderTitle + " as tree"));
-
-            bodyPane.add(treeScrollPane);
-
-            treeScrollPane.addComponentListener(new ComponentAdapter() {
-
-                @Override
-                public void componentResized(ComponentEvent e) {
-                    tree.setSize(treeScrollPane.getViewport().getSize());
-                    tree.setUI(new BasicTreeUI());
-                }
-            });
-        }
-
-        {
-            view = new TermView(pos, node, MainWindow.getInstance());
-
-            view.addMouseListener(new MouseAdapter() {
-
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    PosInSequent pis = view.getLastPosInSequent();
-
-                    if (pis == null || Objects.equals(highlight, pis.getPosInOccurrence())) {
-                        highlight = null;
-                        view.removeUserSelectionHighlight();
-                        highlightInTree(null);
-                    } else {
-                        highlight = pis.getPosInOccurrence();
-
-                        ImmutableList<Integer> path = getPosTablePath(pis.getPosInOccurrence());
-                        highlightInView(pis.getPosInOccurrence());
-                        highlightInTree(getTreePath(path));
-
-                        revalidate();
-                        repaint();
-                    }
-                }
-            });
-
-            JScrollPane viewScrollPane = new JScrollPane(view,
-                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            viewScrollPane.setBorder(new TitledBorder(borderTitle));
-
-            view.printSequent();
-
-            bodyPane.add(viewScrollPane);
-
-            viewScrollPane.addComponentListener(new ComponentAdapter() {
-
-                @Override
-                public void componentResized(ComponentEvent e) {
-                    view.printSequent();
-                }
-            });
-        }
+        add(bodyPane, BorderLayout.CENTER);
 
         addAncestorListener(new AncestorListener() {
 
@@ -449,6 +317,118 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         sequent = null;
 
         super.dispose();
+    }
+
+    private void initHeadPane() {
+        Node node = getNode();
+
+        JPanel headPane = new JPanel();
+        headPane.setLayout(new BoxLayout(headPane, BoxLayout.PAGE_AXIS));
+
+        JPanel top = new JPanel();
+        top.setLayout(new BoxLayout(top, BoxLayout.LINE_AXIS));
+        top.add(new JLabel("Node: "));
+        nodeLinkButton = new JButton();
+        top.add(nodeLinkButton);
+        headPane.add(top);
+
+        JPanel bot = new JPanel();
+        JLabel label = new JLabel("Proof: \"" + node.proof().name().toString() + "\"");
+        label.setMinimumSize(new Dimension(top.getWidth(), label.getMinimumSize().height));
+        bot.setLayout(new BoxLayout(bot, BoxLayout.LINE_AXIS));
+        bot.add(label);
+        headPane.add(bot);
+
+        nodeLinkButton.setAction(nodeLinkAction);
+        updateNodeLink();
+
+        node.proof().addRuleAppListener(ruleAppListener);
+        node.proof().addProofTreeListener(proofTreeListener);
+        node.proof().addProofDisposedListener(proofDisposedListener);
+
+        add(headPane, BorderLayout.PAGE_START);
+    }
+
+    private void initTree(JSplitPane bodyPane, String borderTitle) {
+        DefaultTreeModel treeModel = buildModel(termPio);
+        tree = new JTree(treeModel);
+        tree.setCellRenderer(new CellRenderer());
+        ToolTipManager.sharedInstance().registerComponent(tree);
+
+        tree.addTreeSelectionListener(e -> {
+            TreeNode source = (TreeNode) tree.getLastSelectedPathComponent();
+
+            if (source == null || source.pos == null) {
+                highlight = null;
+                highlightInView(null);
+            } else {
+                highlight = source.pos;
+                highlightInView(source.pos);
+            }
+
+            revalidate();
+            repaint();
+        });
+
+        JScrollPane treeScrollPane = new JScrollPane(tree,
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        treeScrollPane.setBorder(new TitledBorder(borderTitle + " as tree"));
+
+        bodyPane.add(treeScrollPane);
+
+        treeScrollPane.addComponentListener(new ComponentAdapter() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                tree.setSize(treeScrollPane.getViewport().getSize());
+                tree.setUI(new BasicTreeUI());
+            }
+        });
+    }
+
+    private void initView(JSplitPane bodyPane, String borderTitle) {
+        view = new TermView(termPio, getNode(), MainWindow.getInstance());
+
+        view.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                PosInSequent pis = view.getLastPosInSequent();
+
+                if (pis == null || Objects.equals(highlight, pis.getPosInOccurrence())) {
+                    highlight = null;
+                    view.removeUserSelectionHighlight();
+                    highlightInTree(null);
+                } else {
+                    highlight = pis.getPosInOccurrence();
+
+                    ImmutableList<Integer> path = getPosTablePath(pis.getPosInOccurrence());
+                    highlightInView(pis.getPosInOccurrence());
+                    highlightInTree(getTreePath(path));
+
+                    revalidate();
+                    repaint();
+                }
+            }
+        });
+
+        JScrollPane viewScrollPane = new JScrollPane(view,
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        viewScrollPane.setBorder(new TitledBorder(borderTitle));
+
+        view.printSequent();
+
+        bodyPane.add(viewScrollPane);
+
+        viewScrollPane.addComponentListener(new ComponentAdapter() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                view.printSequent();
+            }
+        });
     }
 
     private void updateNodeLink() {

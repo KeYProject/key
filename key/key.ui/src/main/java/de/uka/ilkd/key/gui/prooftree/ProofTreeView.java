@@ -144,6 +144,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
     private GUITreeSelectionListener treeSelectionListener;
     private GUIProofTreeGUIListener guiListener;
 
+    /**
+     * Updates relevant nodes in the proof tree whenever a {@link NodeInfoVisualizer}
+     * is opened or closed.
+     */
     private NodeInfoVisualizerListener nodeInfoVisListener = new NodeInfoVisualizerListener() {
 
         @Override

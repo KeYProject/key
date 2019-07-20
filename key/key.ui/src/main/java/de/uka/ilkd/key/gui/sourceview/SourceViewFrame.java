@@ -19,9 +19,16 @@ import de.uka.ilkd.key.gui.utilities.ClosableTabComponent;
  */
 public class SourceViewFrame extends JSplitPane {
 
+    /** The source view contained in this frame. */
     private final SourceView sourceView;
+
+    /** The tabbed pane containing the additional components in this frame. */
     private final JTabbedPane tabbedPane;
+
+    /** The size of the divider between {@link #sourceView} and {@link #tabbedPane}. */
     private final int dividerSize;
+
+    /** Whether {@link #tabbedPane} is currently being shown. */
     private boolean tabbedPaneShown;
 
     /**
@@ -80,7 +87,9 @@ public class SourceViewFrame extends JSplitPane {
      *
      * <p> If this frame does not contain the specified component, this method has no effect. </p>
      *
-     * @param component
+     * @param component the component to select.
+     *
+     * @throws IllegalArgumentException if this frame does not contain the specified component.
      */
     public void toFront(JComponent component) throws IllegalArgumentException {
         tabbedPane.setSelectedComponent(component);

@@ -544,6 +544,9 @@ public abstract class SequentView extends JEditorPane {
         }
     }
 
+    /**
+     * Updates the head map highlights.
+     */
     protected void updateHeatMapHighlights() {
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         int max_age = vs.getMaxAgeForHeatmap();
@@ -564,6 +567,15 @@ public abstract class SequentView extends JEditorPane {
         }
     }
 
+    /**
+     * Highlights the term at the specified position as the user's selection.
+     *
+     * @param pis the term to select.
+     *
+     * @see #setUserSelectionHighlight(Point)
+     * @see #removeUserSelectionHighlight()
+     * @see #isInUserSelectionHighlight(Point)
+     */
     protected void setUserSelectionHighlight(PosInSequent pis) {
         removeUserSelectionHighlight();
 
@@ -579,6 +591,15 @@ public abstract class SequentView extends JEditorPane {
         }
     }
 
+    /**
+     * Highlights the term at the specified point as the user's selection.
+     *
+     * @param point the point to select.
+     *
+     * @see #setUserSelectionHighlight(PosInSequent)
+     * @see #removeUserSelectionHighlight()
+     * @see #isInUserSelectionHighlight(Point)
+     */
     protected void setUserSelectionHighlight(Point point) {
         removeUserSelectionHighlight();
 
@@ -594,6 +615,13 @@ public abstract class SequentView extends JEditorPane {
         }
     }
 
+    /**
+     * Removes the user selection.
+     *
+     * @see #setUserSelectionHighlight(PosInSequent)
+     * @see #setUserSelectionHighlight(Point)
+     * @see #isInUserSelectionHighlight(Point)
+     */
     protected void removeUserSelectionHighlight() {
         if (userSelectionHighlight != null) {
             getHighlighter().removeHighlight(userSelectionHighlight);
@@ -605,6 +633,15 @@ public abstract class SequentView extends JEditorPane {
         sequentViewInputListener.highlightOriginInSourceView(null);
     }
 
+    /**
+     *
+     * @param point a point.
+     * @return {@code true} if and only if the argument points to the user selection.
+     *
+     * @see #setUserSelectionHighlight(PosInSequent)
+     * @see #setUserSelectionHighlight(Point)
+     * @see #removeUserSelectionHighlight()
+     */
     protected boolean isInUserSelectionHighlight(Point point) {
         return point == null && userSelectionHighlightRange == null
                 || point != null && userSelectionHighlightRange != null

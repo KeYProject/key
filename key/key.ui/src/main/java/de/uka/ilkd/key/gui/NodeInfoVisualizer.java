@@ -27,7 +27,8 @@ public abstract class NodeInfoVisualizer
     private static final long serialVersionUID = 4205276651552216532L;
 
     /** @see #getInstances(Node) */
-    private static Map<Name, Map<Integer, SortedSet<NodeInfoVisualizer>>> instances = new HashMap<>();
+    private static Map<Name, Map<Integer, SortedSet<NodeInfoVisualizer>>> instances =
+            new HashMap<>();
 
     /**
      * @see #addListener(NodeInfoVisualizerListener)
