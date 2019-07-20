@@ -16,6 +16,7 @@ import java.util.Objects;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -79,16 +80,6 @@ import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
  * @author lanzinger
  */
 public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
-
-    /**
-     * The component's preferred width.
-     */
-    public final static int WIDTH = 1280;
-
-    /**
-     * The component's preferred height.
-     */
-    public final static int HEIGHT = 720;
 
     /**
      * The background color to use to highlight a sub-term.
@@ -253,21 +244,6 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         this.termPio = pos;
         this.sequent = node.sequent();
 
-        addAncestorListener(new AncestorListener() {
-
-            @Override
-            public void ancestorRemoved(AncestorEvent event) {
-                view.removeUserSelectionHighlight();
-            }
-
-            @Override
-            public void ancestorMoved(AncestorEvent event) { }
-
-            @Override
-            public void ancestorAdded(AncestorEvent event) { }
-        });
-
-        setSize(WIDTH, HEIGHT);
         setVisible(true);
 
         /*
@@ -297,13 +273,23 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
         JPanel headPane = new JPanel();
         {
+            headPane.setLayout(new BoxLayout(headPane, BoxLayout.PAGE_AXIS));
 
-            headPane.add(new JLabel("Showing origin information for "));
+            JPanel top = new JPanel();
+            top.setLayout(new BoxLayout(top, BoxLayout.LINE_AXIS));
+            top.add(new JLabel("Node "));
             nodeLinkButton = new JButton();
-            headPane.add(nodeLinkButton);
-            headPane.add(new JLabel(" in proof \"" + node.proof().name().toString() + "\""));
-            nodeLinkButton.setAction(nodeLinkAction);
+            top.add(nodeLinkButton);
+            headPane.add(top);
 
+            JPanel bot = new JPanel();
+            JLabel label = new JLabel("Proof: \"" + node.proof().name().toString() + "\"");
+            label.setMinimumSize(new Dimension(top.getWidth(), label.getMinimumSize().height));
+            bot.setLayout(new BoxLayout(bot, BoxLayout.LINE_AXIS));
+            bot.add(label);
+            headPane.add(bot);
+
+            nodeLinkButton.setAction(nodeLinkAction);
             updateNodeLink();
 
             node.proof().addRuleAppListener(ruleAppListener);
@@ -312,8 +298,6 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
 
         JSplitPane bodyPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        bodyPane.setResizeWeight(0.5);
-        bodyPane.setOneTouchExpandable(true);
 
         setLayout(new BorderLayout());
         add(headPane, BorderLayout.PAGE_START);
@@ -355,7 +339,6 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
             treeScrollPane.setBorder(new TitledBorder(borderTitle + " as tree"));
 
-            treeScrollPane.setPreferredSize(new Dimension(WIDTH / 2, HEIGHT));
             bodyPane.add(treeScrollPane);
 
             treeScrollPane.addComponentListener(new ComponentAdapter() {
@@ -370,7 +353,6 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
         {
             view = new TermView(pos, node, MainWindow.getInstance());
-            view.setPreferredSize(new Dimension(WIDTH / 2, HEIGHT));
 
             view.addMouseListener(new MouseAdapter() {
 
@@ -413,7 +395,40 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             });
         }
 
-        bodyPane.setDividerLocation(WIDTH / 2);
+        addAncestorListener(new AncestorListener() {
+
+            private boolean setup = false;
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+                view.removeUserSelectionHighlight();
+            }
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) {
+                // Hide source view by default.
+                if (!setup && bodyPane.getSize() != null
+                        && !bodyPane.getSize().equals(new Dimension())) {
+                    setup = true;
+
+                    bodyPane.getLeftComponent().setMinimumSize(new Dimension());
+                    bodyPane.getRightComponent().setMinimumSize(new Dimension());
+
+                    bodyPane.setDividerLocation(1.0);
+                    bodyPane.setResizeWeight(1.0);
+                    bodyPane.setOneTouchExpandable(true);
+                }
+
+                // Repaint tree so that it conforms to the new size.
+                tree.revalidate();
+                tree.repaint();
+            }
+
+            @Override
+            public void ancestorAdded(AncestorEvent event) {
+                ancestorMoved(event);
+            }
+        });
     }
 
     @Override
@@ -631,6 +646,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             JLabel termTextLabel = (JLabel) super.getTreeCellRendererComponent(
                     tree, value, selected, expanded,
                     leaf, row, hasFocus);
+            termTextLabel.setMinimumSize(new Dimension());
             termTextLabel.setText(getShortTermText(term));
             termTextLabel.setBackground(OriginTermLabelVisualizer.this.getBackground());
 
@@ -657,9 +673,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             result.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             result.setBackground(Color.WHITE);
 
-            if (origin != null) {
-                result.setToolTipText(OriginTermLabelVisualizer.this.getTooltipText(pio));
-            }
+            result.setToolTipText(OriginTermLabelVisualizer.this.getTooltipText(pio));
 
             return result;
         }
@@ -682,7 +696,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             if (endIndex != text.length() - 1) {
                 return text.replaceAll("\\s+", " ") + " ...";
             } else {
-                return text.substring(0, text.indexOf("\n")).replaceAll("\\s+", " ");
+                return text.substring(0, endIndex).replaceAll("\\s+", " ");
             }
         }
     }
