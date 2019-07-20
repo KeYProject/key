@@ -47,11 +47,6 @@ public class TestProofBundleIO {
         ensureConsistency = ProofIndependentSettings.DEFAULT_INSTANCE
                                                     .getGeneralSettings()
                                                     .isEnsureSourceConsistency();
-
-        // we test DiskFileRepo here!
-        ProofIndependentSettings.DEFAULT_INSTANCE
-                                .getGeneralSettings()
-                                .setEnsureSourceConsistency(true);
     }
 
     /**
@@ -184,6 +179,11 @@ public class TestProofBundleIO {
      * @throws Exception on errors (should not happen)
      */
     private Path testBundleGeneration(String dirName, long expectedSize) throws Exception {
+        // we test DiskFileRepo here!
+        ProofIndependentSettings.DEFAULT_INSTANCE
+                                .getGeneralSettings()
+                                .setEnsureSourceConsistency(true);
+
         Path path = testDir.resolve(dirName).resolve("test.key");
 
         // load *.key file
