@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;
@@ -179,6 +180,13 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
     private boolean cannotBeOverriden(IProgramMethod method, Services services) {
 
         if (method.isStatic() || method.isPrivate() || method.isFinal()) {
+            return true;
+        }
+
+        // bugfix (contributing to gitlab #1493)
+        // see MethodCall.handleInstanceInvocation(...)
+        if ((method.isImplicit() && method.getName().equals(
+                ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
             return true;
         }
 
