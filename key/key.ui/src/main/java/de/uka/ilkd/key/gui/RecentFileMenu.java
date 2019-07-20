@@ -90,18 +90,20 @@ public class RecentFileMenu {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String absPath = getAbsolutePath((JMenuItem) e.getSource());
-                File f = new File(absPath);
+                File file = new File(absPath);
 
                 // special case proof bundles -> allow to select the proof to load
-                if (ProofSelectionDialog.isProofBundle(f.toPath())) {
-                    Path proofPath = ProofSelectionDialog.chooseProofToLoad(f.toPath());
+                if (ProofSelectionDialog.isProofBundle(file.toPath())) {
+                    Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
                     if (proofPath == null) {
                         // canceled by user!
                         return;
                     } else {
-                        mediator.getUI().loadProofFromBundle(f, proofPath.toFile());
+                        mediator.getUI().loadProofFromBundle(file, proofPath.toFile());
                         return;
                     }
+                } else {
+                    mediator.getUI().loadProblem(file);
                 }
             }
         };
