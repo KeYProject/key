@@ -26,6 +26,8 @@ import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -245,17 +247,25 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                     ? "whole sequent"
                     : LogicPrinter.quickPrintTerm(pos.subTerm(), services)
                         .replaceAll("\\s+", " ")),
-                "Origin for: " + (pos == null
-                    ? "Whole sequent"
-                    : "Formula " + node.sequent()
-                            .formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula())
-                        + (pos.isInAntec() ? " in antecedent" : " in succedent"
-                        + ", Operator: " + pos.subTerm().op().getClass().getSimpleName()
-                        + " (" + pos.subTerm().op() + ")")));
+                "Node " + node.serialNr());
 
         this.services = services;
         this.termPio = pos;
         this.sequent = node.sequent();
+
+        addAncestorListener(new AncestorListener() {
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+                view.removeUserSelectionHighlight();
+            }
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) { }
+
+            @Override
+            public void ancestorAdded(AncestorEvent event) { }
+        });
 
         setSize(WIDTH, HEIGHT);
         setVisible(true);
@@ -424,13 +434,6 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         sequent = null;
 
         super.dispose();
-    }
-
-    /**
-     * This method should be called whenever the dockable containing this visualizer is hidden.
-     */
-    public void hidden() {
-        view.removeUserSelectionHighlight();
     }
 
     private void updateNodeLink() {

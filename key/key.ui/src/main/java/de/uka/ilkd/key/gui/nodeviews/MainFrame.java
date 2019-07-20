@@ -25,6 +25,8 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.CopyToClipboardAction;
@@ -70,15 +72,6 @@ public final class MainFrame extends JScrollPane {
         return oldContent;
     }
 
-    /**
-     * This method should be called whenever the docker containing this frame is hidden.
-     */
-    public void hidden() {
-        if (content instanceof SequentView) {
-            ((SequentView) content).removeUserSelectionHighlight();
-        }
-    }
-
     public MainFrame(final MainWindow mainWindow, EmptySequent emptySequent) {
         this.mainWindow = mainWindow;
         setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -97,6 +90,22 @@ public final class MainFrame extends JScrollPane {
                     }
                 }
             }
+        });
+
+        addAncestorListener(new AncestorListener() {
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+                if (content instanceof SequentView) {
+                    ((SequentView) content).removeUserSelectionHighlight();
+                }
+            }
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) { }
+
+            @Override
+            public void ancestorAdded(AncestorEvent event) { }
         });
 
         // FIXME put this somewhere descent

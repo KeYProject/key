@@ -2,16 +2,11 @@ package de.uka.ilkd.key.gui.originlabels;
 
 import java.awt.event.ActionEvent;
 
-import bibliothek.gui.dock.common.CControl;
+import javax.swing.AbstractAction;
+
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
-import bibliothek.gui.dock.common.DefaultSingleCDockable;
-import bibliothek.gui.dock.common.event.CDockableLocationEvent;
-import bibliothek.gui.dock.common.event.CDockableLocationListener;
-import bibliothek.gui.dock.common.event.CVetoClosingEvent;
-import bibliothek.gui.dock.common.event.CVetoClosingListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -69,35 +64,16 @@ public class ShowOriginAction extends MainWindowAction {
                 getMediator().getSelectedNode(),
                 getMediator().getServices());
 
-        CControl dockControl = mainWindow.getDockControl();
-        DefaultSingleCDockable dockable
-            = (DefaultSingleCDockable) DockingHelper.createSingleDock(
-                    vis.getShortName(), vis, vis.getLongName());
+        mainWindow.getSourceViewFrame().addComponent(
+                vis,
+                vis.getLongName(),
+                new AbstractAction() {
 
-        dockable.setCloseable(true);
-        dockable.addVetoClosingListener(new CVetoClosingListener() {
-
-            @Override
-            public void closed(CVetoClosingEvent event) {
-                vis.dispose();
-            }
-
-            @Override
-            public void closing(CVetoClosingEvent event) { }
-        });
-        dockable.addCDockableLocationListener(new CDockableLocationListener() {
-
-            @Override
-            public void changed(CDockableLocationEvent event) {
-                if (!event.getNewShowing()) {
-                    vis.hidden();
-                }
-            }
-        });
-
-        dockControl.addDockable(dockable);
-        dockable.setLocationsAside(mainWindow.getDockSequent());
-        dockable.setVisible(true);
-        dockable.toFront();
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        mainWindow.getSourceViewFrame().removeComponent(vis);
+                        vis.dispose();
+                    }
+                });
     }
 }

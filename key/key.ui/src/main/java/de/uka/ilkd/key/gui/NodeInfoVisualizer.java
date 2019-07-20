@@ -164,6 +164,11 @@ public abstract class NodeInfoVisualizer
         return longName;
     }
 
+    @Override
+    public String getName() {
+        return shortName;
+    }
+
     /**
      *
      * @return the window's long name

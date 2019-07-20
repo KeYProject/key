@@ -26,12 +26,11 @@ import de.uka.ilkd.key.gui.TaskTree;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.nodeviews.MainFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
-import de.uka.ilkd.key.gui.sourceview.SourceView;
+import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 
 public class DockingHelper {
     public final static List<String> LEFT_TOP_PANEL = new LinkedList<>();
     public final static List<String> RIGHT_PANEL = new LinkedList<>();
-    public final static List<String> RIGHT_BOTTOM_PANEL = new LinkedList<>();
     public final static List<String> LEFT_PANEL = new LinkedList<>();
     public final static List<String> MAIN_PANEL = new LinkedList<>();
 
@@ -45,7 +44,7 @@ public class DockingHelper {
 
         MAIN_PANEL.add(MainFrame.class.getName());
 
-        RIGHT_PANEL.add(SourceView.class.getName());
+        RIGHT_PANEL.add(SourceViewFrame.class.getName());
     }
 
     /**
@@ -69,8 +68,7 @@ public class DockingHelper {
                 leftPanels = new LinkedList<>(),
                 leftTopPanels = new LinkedList<>(),
                 mainPanels = new LinkedList<>(),
-                rightPanels = new LinkedList<>(),
-                rightBottomPanels = new LinkedList<>();
+                rightPanels = new LinkedList<>();
 
         for (int c = mainWindow.getDockControl().getCDockableCount(), i = 0;
              i < c; i++) {
@@ -89,10 +87,6 @@ public class DockingHelper {
                     rightPanels.add(cur);
                     continue;
                 }
-                if (RIGHT_BOTTOM_PANEL.contains(id) || id.startsWith("Origin")) {
-                    rightBottomPanels.add(cur);
-                    continue;
-                }
                 if (LEFT_TOP_PANEL.contains(id)) {
                     leftTopPanels.add(cur);
                     continue;
@@ -106,17 +100,11 @@ public class DockingHelper {
             leftPanels.add(cur);
         }
 
-
         CGrid grid = new CGrid(mainWindow.getDockControl());
         grid.add(0, 0, 1, 1, leftTopPanels.toArray(new CDockable[]{}));
         grid.add(0, 1, 1, 2, leftPanels.toArray(new CDockable[]{}));
         grid.add(1, 0, 2, 3, mainPanels.toArray(new CDockable[]{}));
-        if (rightBottomPanels.isEmpty()) {
-            grid.add(2, 0, 1, 3, rightPanels.toArray(new CDockable[]{}));
-        } else {
-            grid.add(2, 0, 1, 2, rightPanels.toArray(new CDockable[]{}));
-            grid.add(2, 1, 1, 2, rightBottomPanels.toArray(new CDockable[]{}));
-        }
+        grid.add(2, 0, 1, 3, rightPanels.toArray(new CDockable[]{}));
         mainWindow.getDockControl().getContentArea().deploy(grid);
     }
 
