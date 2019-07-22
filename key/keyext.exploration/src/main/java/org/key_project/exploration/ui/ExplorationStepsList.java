@@ -130,7 +130,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             public void valueChanged(ListSelectionEvent e) {
                 if (!e.getValueIsAdjusting()) {
                     final List<Node> selectedValuesList = explorationStepList.getSelectedValuesList();
-                    System.out.println(selectedValuesList);
+                   //TODO
                 }
             }
         });
@@ -138,6 +138,12 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             Node selected = (Node) explorationStepList.getSelectedValue();
             mediator.getSelectionModel().setSelectedNode(selected);
 
+        });
+
+        pruneExploration.addActionListener(actionEvent -> {
+            Node selected = (Node) explorationStepList.getSelectedValue();
+            mediator.getUI().getProofControl().pruneTo(selected);
+            createListModel(mediator.getSelectedProof());
         });
 
         JTree tree = new JTree(dtm);
