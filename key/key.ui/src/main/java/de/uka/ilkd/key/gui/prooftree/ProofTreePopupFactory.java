@@ -121,13 +121,14 @@ public class ProofTreePopupFactory {
     }
 
     public JPopupMenu create(ProofTreeView view, TreePath selectedPath) {
-        String MENU_NAME = "Choose Action";
-        JPopupMenu menu = new JPopupMenu(MENU_NAME);
+        final String menuName = "Choose Action";
+        JPopupMenu menu = new JPopupMenu(menuName);
         ProofTreeContext context = createContext(view, selectedPath);
         builders.forEach(it -> {
             Component entry = it.apply(context);
-            if(entry!=null)
+            if (entry != null) {
                 menu.add(entry);
+            }
         });
 
         List<Action> extensionActions =
