@@ -61,5 +61,5 @@ public class LemmaGenerationBatchModeAction extends MainWindowAction {
         JOptionPane.showMessageDialog(mainWindow, DESCRIPTION,
                                       "Using the Batch Mode for Proving Taclets",
                                       JOptionPane.INFORMATION_MESSAGE);
-        }
+    }
 }
