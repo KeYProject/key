@@ -105,7 +105,7 @@ public final class IconFactory {
     public static final IconProvider PROOF_SEARCH_STRATEGY =
             new IconFontProvider(FontAwesomeSolid.COG);
     public static final IconProvider PROOF_TREE =
-            new IconFontProvider(FontAwesomeSolid.SITEMAP);//OR CODE_BRANCH
+            new IconFontProvider(FontAwesomeSolid.SITEMAP); //OR CODE_BRANCH
     public static final IconProvider INFO_VIEW =
             new IconFontProvider(FontAwesomeSolid.INFO_CIRCLE);
     public static final IconProvider TREE_NODE_EXPANDED =
