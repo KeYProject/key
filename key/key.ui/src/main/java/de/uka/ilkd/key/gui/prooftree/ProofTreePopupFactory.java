@@ -85,7 +85,7 @@ public class ProofTreePopupFactory {
 
         addAction(ctx -> new SequentViewDock.OpenCurrentNodeAction(ctx.window, ctx.invokedNode));
         addAction(ctx
-                -> new ProofDifferenceView.OpenDifferenceWithParent(ctx.window, ctx.invokedNode));
+            -> new ProofDifferenceView.OpenDifferenceWithParent(ctx.window, ctx.invokedNode));
     }
 
     private Component getMacroMenu(ProofTreeContext proofTreeContext) {
@@ -490,7 +490,7 @@ public class ProofTreePopupFactory {
             setIcon(IconFactory.search2(ICON_SIZE));
             setAcceleratorKey(
                     de.uka.ilkd.key.gui.prooftree.ProofTreeView.searchKeyStroke
-                    );
+            );
         }
 
         @Override
