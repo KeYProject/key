@@ -26,7 +26,7 @@ import de.uka.ilkd.key.util.UnicodeHelper;
 
 @SuppressWarnings("serial")
 public class UnicodeToggleAction extends MainWindowAction {
-   public static final String NAME = "Use Unicode symbols";
+   public static final String NAME = "Use Unicode Symbols";
    
    public static final String TOOL_TIP = "If checked formulae are displayed with special Unicode characters" +
                                          " (such as \""+UnicodeHelper.AND+"\") instead of the traditional ASCII ones. \n"+

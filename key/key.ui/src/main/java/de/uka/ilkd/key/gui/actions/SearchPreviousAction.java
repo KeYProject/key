@@ -28,7 +28,7 @@ public class SearchPreviousAction extends MainWindowAction {
 
     public SearchPreviousAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName("Find previous occurence");
+        setName("Find Previous Occurence");
         setIcon(IconFactory.SEARCH_PREV.get(16));
         setTooltip("Find the previous occurence of current search term in sequent.");
         getMediator().enableWhenProofLoaded(this);

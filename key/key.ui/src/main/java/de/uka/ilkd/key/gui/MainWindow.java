@@ -856,9 +856,9 @@ public final class MainWindow extends JFrame {
 
         view.add(createSelectionMenu());
 
-        JMenuItem hmItem = new JMenuItem("Heatmap Options");
-        hmItem.addActionListener(new HeatmapSettingsAction(this));
-        view.add(hmItem);
+        // JMenuItem hmItem = new JMenuItem("Heatmap Options");
+        // hmItem.addActionListener(new HeatmapSettingsAction(this));
+        // view.add(hmItem);
 
         return view;
     }

@@ -33,7 +33,7 @@ public class SearchInSequentAction extends MainWindowAction {
 
     public SearchInSequentAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName("Search in sequent view");
+        setName("Search in Sequent View");
         setIcon(IconFactory.search(16));
         setTooltip("Search for strings in the current sequent.");
         // Key combination for this action: STRG+F.

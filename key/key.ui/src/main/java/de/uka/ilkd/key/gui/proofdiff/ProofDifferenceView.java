@@ -263,7 +263,7 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
 
         public OpenDifferenceWithParent(MainWindow mainWindow, Node node) {
             super(mainWindow);
-            setName("Diff with parent");
+            setName("Diff with Parent");
             setEnabled(node.parent() != null);
             this.left = node;
         }

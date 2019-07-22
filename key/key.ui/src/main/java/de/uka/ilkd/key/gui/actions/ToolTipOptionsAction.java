@@ -27,7 +27,7 @@ public class ToolTipOptionsAction extends MainWindowAction {
 
     public ToolTipOptionsAction(MainWindow mainWindow) {
 	super(mainWindow);
-	setName("ToolTip options");
+	setName("ToolTip Options");
     }
 
     @Override

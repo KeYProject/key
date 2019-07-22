@@ -23,7 +23,7 @@ public class ToggleSequentViewTooltipAction extends MainWindowAction {
     private static final long serialVersionUID = -3352122484627890921L;
 
     /** This action's name. */
-    public static final String NAME = "Show tooltips in sequent view";
+    public static final String NAME = "Show Tooltips in Sequent View";
 
     /** This action's tooltip. */
     public static final String TOOL_TIP = "If ticked, moving the mouse over a term in the"

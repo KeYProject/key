@@ -48,7 +48,7 @@ public class HeatmapExt implements KeYGuiExtension,
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         getActions(mainWindow);//initialize
-        JToolBar tb = new JToolBar("Heatmap");
+        JToolBar tb = new JToolBar("Heatmap Options");
         JToggleButton comp = new JToggleButton(toggleAction);
         comp.setHideActionText(true);
         tb.add(comp);
