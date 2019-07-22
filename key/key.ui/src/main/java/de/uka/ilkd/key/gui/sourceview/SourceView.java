@@ -54,7 +54,6 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
