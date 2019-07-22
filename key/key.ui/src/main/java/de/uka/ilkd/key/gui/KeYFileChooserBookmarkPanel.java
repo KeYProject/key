@@ -30,7 +30,8 @@ import java.util.List;
 public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChangeListener {
     private static final long serialVersionUID = -6498548666886815605L;
     private final @NotNull JFileChooser chooser;
-    private final ViewSettings viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+    private final ViewSettings viewSettings =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
     private final DefaultListModel<File> bookmarks = new DefaultListModel<>();
     private final JList<File> listBookmarks = new JList<>(bookmarks);
     private final KeyAction actionAddBookmark = new AddBookmarkAction();
@@ -75,13 +76,14 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
     }
 
     private void setBookmark() {
-        if (listBookmarks.getSelectedValue() != null)
+        if (listBookmarks.getSelectedValue() != null) {
             chooser.setCurrentDirectory(listBookmarks.getSelectedValue());
+        }
     }
 
     private void loadBookmarks() {
         viewSettings.getBookmarks().forEach(
-                it -> bookmarks.addElement(new File(it))
+            it -> bookmarks.addElement(new File(it))
         );
     }
 
@@ -89,19 +91,21 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
         String prop = e.getPropertyName();
         if (JFileChooser.DIRECTORY_CHANGED_PROPERTY.equals(prop)) {
             File selected = chooser.getCurrentDirectory();
-            listBookmarks.setSelectedValue(selected,true);
+            listBookmarks.setSelectedValue(selected, true);
         }
     }
 
     private void saveBookmarks() {
         List<String> newMarks = new ArrayList<>();
         Enumeration<File> iter = bookmarks.elements();
-        while (iter.hasMoreElements())
+        while (iter.hasMoreElements()) {
             newMarks.add(iter.nextElement().getAbsolutePath());
+        }
         viewSettings.setBookmarks(newMarks);
     }
 
     private class AddBookmarkAction extends KeyAction {
+
         AddBookmarkAction() {
             setIcon(IconFactory.plus(16));
             setTooltip("<html>Adds the current directory to the bookmarks.<br>" +
@@ -135,8 +139,11 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
             }
 
             if (toAdd != null) {
-                int index = bookmarks.indexOf(toAdd);
-                if(index>=0) return; // already in the list
+                final int index = bookmarks.indexOf(toAdd);
+                if(index >= 0) {
+                    // already in the list
+                    return;
+                }
                 bookmarks.addElement(toAdd);
                 saveBookmarks();
             }
@@ -152,7 +159,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
         @Override
         public void actionPerformed(ActionEvent e) {
             int selected = listBookmarks.getSelectedIndex();
-            if(selected>0) {
+            if (selected > 0) {
                 bookmarks.removeElementAt(selected);
                 saveBookmarks();
             }
@@ -175,15 +182,17 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
         }
 
         @Override
-        public Component getListCellRendererComponent(JList<? extends File> list, File value, int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<? extends File> list, File value,
+                                                      int index, boolean isSelected,
+                                                      boolean cellHasFocus) {
             String val;
-            if (value.getAbsolutePath().length() <= LIMIT)
+            if (value.getAbsolutePath().length() <= LIMIT) {
                 val = value.getAbsolutePath();
-            else
+            } else {
                 val = toString(value);
-
+            }
             return renderer.getListCellRendererComponent(list, val, index,
-                    isSelected, cellHasFocus);
+                                                         isSelected, cellHasFocus);
         }
     }
 }
