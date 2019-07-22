@@ -32,7 +32,6 @@ public final class KeYGuiExtensionFacade {
     //region panel extension
     @SuppressWarnings("todo")
     public static Stream<TabPanel> getAllPanels(MainWindow window) {
-        getLeftPanel().stream().forEach(it ->  it.getPanels(window, window.getMediator()).stream().forEach(tabPanel -> System.out.println("tabPanel.getTitle() = " + tabPanel.getTitle())));
         return getLeftPanel().stream().flatMap(it -> it.getPanels(window, window.getMediator()).stream());
     }
 
