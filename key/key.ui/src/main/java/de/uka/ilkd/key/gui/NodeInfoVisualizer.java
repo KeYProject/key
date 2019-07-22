@@ -9,7 +9,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.swing.JFrame;
+import javax.swing.JComponent;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Node;
@@ -17,22 +17,24 @@ import de.uka.ilkd.key.proof.Proof;
 
 /**
  * <p>
- *  A window showing additional information about a {@link Node} in the current {@link Proof}.
+ *  A UI component showing additional information about a {@link Node} in the current {@link Proof}.
  * </p>
  *
  * @author lanzinger
  */
-public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeInfoWindow> {
+public abstract class NodeInfoVisualizer
+        extends JComponent implements Comparable<NodeInfoVisualizer> {
     private static final long serialVersionUID = 4205276651552216532L;
 
     /** @see #getInstances(Node) */
-    private static Map<Name, Map<Integer, SortedSet<NodeInfoWindow>>> instances = new HashMap<>();
+    private static Map<Name, Map<Integer, SortedSet<NodeInfoVisualizer>>> instances =
+            new HashMap<>();
 
     /**
-     * @see #addListener(NodeInfoWindowListener)
-     * @see #removeListener(NodeInfoWindowListener)
+     * @see #addListener(NodeInfoVisualizerListener)
+     * @see #removeListener(NodeInfoVisualizerListener)
      */
-    private static Set<NodeInfoWindowListener> listeners = new HashSet<>();
+    private static Set<NodeInfoVisualizerListener> listeners = new HashSet<>();
 
     /** @see #getNode() */
     private Node node;
@@ -44,18 +46,16 @@ public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeIn
     private String shortName;
 
     /**
-     * Creates a new {@link NodeInfoWindow}.
+     * Creates a new {@link NodeInfoVisualizer}.
      *
-     * @param node the node this window is associated with.
-     * @param longName the window's long name.
-     * @param shortName the window's short name.
+     * @param node the node this visualizer is associated with.
+     * @param longName the visualizer's long name.
+     * @param shortName the visualizer's short name.
      */
-    public NodeInfoWindow(Node node, String longName, String shortName) {
+    public NodeInfoVisualizer(Node node, String longName, String shortName) {
         this.node = node;
         this.longName = longName;
         this.shortName = shortName;
-
-        setTitle(shortName);
 
         register(this);
     }
@@ -78,7 +78,7 @@ public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeIn
      * @param node a node.
      * @return the set of open {@code NodeInfoWindow}s associated with the specified node.
      */
-    public static SortedSet<NodeInfoWindow> getInstances(Node node) {
+    public static SortedSet<NodeInfoVisualizer> getInstances(Node node) {
         return Collections.unmodifiableSortedSet(instances
                 .getOrDefault(node.proof().name(), Collections.emptyMap())
                 .getOrDefault(node.serialNr(), Collections.emptySortedSet()));
@@ -89,7 +89,7 @@ public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeIn
      *
      * @param listener the listener to add.
      */
-    public static void addListener(NodeInfoWindowListener listener) {
+    public static void addListener(NodeInfoVisualizerListener listener) {
         listeners.add(listener);
     }
 
@@ -98,55 +98,57 @@ public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeIn
      *
      * @param listener the listener to remove.
      */
-    public static void removeListener(NodeInfoWindowListener listener) {
+    public static void removeListener(NodeInfoVisualizerListener listener) {
         listeners.remove(listener);
     }
 
     /**
-     * Ensures that the specified window will not be returned by {@link #getInstances(Node)}.
+     * Ensures that the specified visualizer will not be returned by {@link #getInstances(Node)}.
      *
-     * @param win the window to unregister.
+     * @param vis the visualizer to unregister.
      * @see #getInstances(Node)
      */
-    protected static void unregister(NodeInfoWindow win) {
-        Node node = win.getNode();
-        if (instances.get(node.proof().name()).get(node.serialNr()).remove(win)) {
+    protected static void unregister(NodeInfoVisualizer vis) {
+        Node node = vis.getNode();
+        if (instances.get(node.proof().name()).get(node.serialNr()).remove(vis)) {
             synchronized (listeners) {
-                for (NodeInfoWindowListener listener : listeners) {
-                    listener.windowUnregistered(win);
+                for (NodeInfoVisualizerListener listener : listeners) {
+                    listener.visualizerUnregistered(vis);
                 }
             }
         }
     }
 
-    private static void register(NodeInfoWindow win) {
-        Node node = win.getNode();
+    private static void register(NodeInfoVisualizer vis) {
+        Node node = vis.getNode();
         int nodeNr = node.serialNr();
         Proof proof = node.proof();
         Name proofName = proof.name();
 
         instances.putIfAbsent(proofName, new TreeMap<>());
 
-        Map<Integer, SortedSet<NodeInfoWindow>> map = instances.get(proofName);
+        Map<Integer, SortedSet<NodeInfoVisualizer>> map = instances.get(proofName);
         map.putIfAbsent(nodeNr, new TreeSet<>());
-        map.get(nodeNr).add(win);
+        map.get(nodeNr).add(vis);
 
         synchronized (listeners) {
-            for (NodeInfoWindowListener listener : listeners) {
-                listener.windowRegistered(win);
+            for (NodeInfoVisualizerListener listener : listeners) {
+                listener.visualizerRegistered(vis);
             }
         }
     }
 
-    @Override
+    /**
+     * Frees any resources belonging to this visualizer and removes it from
+     * {@link #getInstances(Node)}.
+     */
     public void dispose() {
         unregister(this);
         node = null;
-        super.dispose();
     }
 
     @Override
-    public int compareTo(NodeInfoWindow other) {
+    public int compareTo(NodeInfoVisualizer other) {
         return longName.compareTo(other.longName);
     }
 
@@ -161,6 +163,11 @@ public abstract class NodeInfoWindow extends JFrame implements Comparable<NodeIn
     @Override
     public final String toString() {
         return longName;
+    }
+
+    @Override
+    public String getName() {
+        return shortName;
     }
 
     /**

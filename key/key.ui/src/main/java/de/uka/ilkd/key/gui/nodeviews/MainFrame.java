@@ -21,6 +21,8 @@ import java.awt.event.MouseListener;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.CopyToClipboardAction;
@@ -81,6 +83,22 @@ public final class MainFrame extends JPanel {
                     }
                 }
             }
+        });
+
+        addAncestorListener(new AncestorListener() {
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+                if (content instanceof SequentView) {
+                    ((SequentView) content).removeUserSelectionHighlight();
+                }
+            }
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) { }
+
+            @Override
+            public void ancestorAdded(AncestorEvent event) { }
         });
 
         // FIXME put this somewhere descent

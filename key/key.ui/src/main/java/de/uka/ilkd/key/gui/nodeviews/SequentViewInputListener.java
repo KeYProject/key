@@ -147,8 +147,6 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
             } else {
                 sequentView.setUserSelectionHighlight(point);
             }
-
-            highlightOriginInSourceView(pis);
         }
     }
 
@@ -167,10 +165,6 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
      * @param pos the position of the term whose origin should be highlighted.
      */
     public void highlightOriginInSourceView(PosInSequent pos) {
-        if (!sequentView.isMainSequentView()) {
-            return;
-        }
-
         if (!ProofIndependentSettings
                 .DEFAULT_INSTANCE.getViewSettings().isHighlightOrigin()) {
             // Don't highlight anything and delete existing highlights.
