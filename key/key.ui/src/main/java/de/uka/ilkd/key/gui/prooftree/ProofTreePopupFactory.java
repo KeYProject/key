@@ -1,31 +1,9 @@
 package de.uka.ilkd.key.gui.prooftree;
 
-import static de.uka.ilkd.key.gui.prooftree.ProofTreeView.searchKeyStroke;
-
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Function;
-
-import javax.swing.Action;
-import javax.swing.ButtonGroup;
-import javax.swing.Icon;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JSeparator;
-import javax.swing.JTree;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
@@ -38,31 +16,39 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import javax.swing.*;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Function;
+
+import static de.uka.ilkd.key.gui.prooftree.ProofTreeView.searchKeyStroke;
 
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
-    private final String MENU_NAME = "Choose Action";
     private List<Function<ProofTreeContext, Component>> builders = new ArrayList<>();
 
     protected ProofTreePopupFactory() {
         addAction(RunStrategyOnNode::new);
         addAction(Prune::new);
-        /*ProofMacroMenu macroMenu = new ProofMacroMenu(mediator, null);
-        if (!macroMenu.isEmpty()) {
-            this.add(macroMenu);
-        }
-        */
+        add(this::getMacroMenu);
 
-        //if (context.branch != context.path || Main.isExperimentalMode()) {
-        addAction(DelayedCut::new);
-        //}
+        if (Main.isExperimentalMode()) {
+            addAction(DelayedCut::new);
+        }
 
         addSeparator();
         addAction(Notes::new);
         addSeparator();
         addAction(ExpandAll::new);
         addAction(ExpandAllBelow::new);
-        addAction(ExpandGoals::new);
         addAction(ExpandGoals::new);
         addAction(ExpandGoalsBelow::new);
         addAction(CollapseAll::new);
@@ -92,6 +78,14 @@ public class ProofTreePopupFactory {
 
         addAction(ctx -> new SequentViewDock.OpenCurrentNodeAction(ctx.window, ctx.invokedNode));
         addAction(ctx -> new ProofDifferenceView.OpenDifferenceWithParent(ctx.window, ctx.invokedNode));
+    }
+
+    private Component getMacroMenu(ProofTreeContext proofTreeContext) {
+        ProofMacroMenu macroMenu = new ProofMacroMenu(proofTreeContext.mediator, null);
+        if (!macroMenu.isEmpty()) {
+            return macroMenu;
+        }
+        return null;
     }
 
     public static ProofTreeContext createContext(ProofTreeView view, TreePath selectedPath) {
@@ -127,9 +121,14 @@ public class ProofTreePopupFactory {
     }
 
     public JPopupMenu create(ProofTreeView view, TreePath selectedPath) {
+        String MENU_NAME = "Choose Action";
         JPopupMenu menu = new JPopupMenu(MENU_NAME);
         ProofTreeContext context = createContext(view, selectedPath);
-        builders.forEach(it -> menu.add(it.apply(context)));
+        builders.forEach(it -> {
+            Component entry = it.apply(context);
+            if(entry!=null)
+                menu.add(entry);
+        });
 
         List<Action> extensionActions =
                 KeYGuiExtensionFacade.getContextMenuItems(DefaultContextMenuKind.PROOF_TREE,
