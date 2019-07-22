@@ -34,9 +34,9 @@ public enum FontAwesomeRegular implements IconFont {
     CLONE('\uf24d'),
     CLOSED_CAPTIONING('\uf20a'),
     COMMENT('\uf075'),
-    COMMENTS('\uf086'),
     COMMENT_ALT('\uf27a'),
     COMMENT_DOTS('\uf4ad'),
+    COMMENTS('\uf086'),
     COMPASS('\uf14e'),
     COPY('\uf0c5'),
     COPYRIGHT('\uf1f9'),
@@ -82,18 +82,18 @@ public enum FontAwesomeRegular implements IconFont {
     GRIN_TONGUE_SQUINT('\uf58a'),
     GRIN_TONGUE_WINK('\uf58b'),
     GRIN_WINK('\uf58c'),
-    HANDSHAKE('\uf2b5'),
     HAND_LIZARD('\uf258'),
     HAND_PAPER('\uf256'),
     HAND_PEACE('\uf25b'),
-    HAND_POINTER('\uf25a'),
     HAND_POINT_DOWN('\uf0a7'),
     HAND_POINT_LEFT('\uf0a5'),
     HAND_POINT_RIGHT('\uf0a4'),
     HAND_POINT_UP('\uf0a6'),
+    HAND_POINTER('\uf25a'),
     HAND_ROCK('\uf255'),
     HAND_SCISSORS('\uf257'),
     HAND_SPOCK('\uf259'),
+    HANDSHAKE('\uf2b5'),
     HDD('\uf0a0'),
     HEART('\uf004'),
     HOSPITAL('\uf0f8'),
@@ -168,7 +168,8 @@ public enum FontAwesomeRegular implements IconFont {
     public Font getFont() throws IOException, FontFormatException {
         if (font == null)
             font = Font.createFont(Font.TRUETYPE_FONT,
-                    getClass().getResourceAsStream("/fonts/fa-regular-400.ttf"));
+                    getClass().getResourceAsStream("/fonts/Font Awesome 5 Free-Regular-400.otf"));
+        //getClass().getResourceAsStream("/fonts/fa-regular-400.ttf"));
         return font;
     }
 

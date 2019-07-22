@@ -64,7 +64,7 @@ public final class IconFactory {
     public static IconProvider TREE_NODE_RETRACTED = new IconFontProvider(FontAwesomeSolid.CARET_RIGHT);
     public static IconProvider WARNING_UNSOUND = new IconFontProvider(FontAwesomeSolid.EXCLAMATION_TRIANGLE, ERROR_COLOR);
     public static IconProvider WARNING_INCOMPLETE = new IconFontProvider(FontAwesomeSolid.EXCLAMATION_TRIANGLE, WARNING_COLOR);
-    public static IconProvider SEARCH_REGROUP = new IconFontProvider(FontAwesomeSolid.EMBER);
+    public static IconProvider SEARCH_REGROUP = new IconFontProvider(FontAwesomeRegular.GEM);
     public static IconProvider EXPORT_MU_SCRIPT = new IconFontProvider(FontAwesomeSolid.FILE_EXPORT);
     public static IconProvider EXPORT_MU_SCRIPT_CLIPBOARD = new IconFontProvider(FontAwesomeRegular.COPY);
     public static IconProvider INTERLOG_LOAD = new IconFontProvider(FontAwesomeSolid.TRUCK_LOADING);
