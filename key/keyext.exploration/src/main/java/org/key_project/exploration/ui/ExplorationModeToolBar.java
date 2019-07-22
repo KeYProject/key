@@ -15,13 +15,10 @@ import org.key_project.exploration.ExplorationModeModel;
  *
  * @author Sarah Grebing
  */
+@Deprecated
 public class ExplorationModeToolBar extends JToolBar {
-    private MainWindow mw;
-
     private JToggleButton explorationMode;
-
     private JToggleButton showSecondBranch;
-
     private ExplorationModeModel explorationModeModel;
 
     /**
@@ -39,7 +36,6 @@ public class ExplorationModeToolBar extends JToolBar {
      * @param mw
      */
     public ExplorationModeToolBar(MainWindow mw, ExplorationModeModel explorationModeModel){
-        this.mw = mw;
         this.explorationModeModel = explorationModeModel;
         initialize();
     }
@@ -138,7 +134,6 @@ public class ExplorationModeToolBar extends JToolBar {
             showSecondBranch.setEnabled(false);
         }*/
         this.add(showSecondBranch);
-
         this.setEnabled(true);
     }
 }
