@@ -9,11 +9,8 @@ import de.uka.ilkd.key.proof.*;
 import org.key_project.exploration.ExplorationNodeData;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
+import javax.swing.event.*;
+import javax.swing.tree.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,7 +20,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     private JButton jumpToNode = new JButton("Jump To Node");
     private JButton pruneExploration = new JButton("Prune Selected Exploration Steps");
     private DefaultListModel<Node> listModel = new DefaultListModel<>();
-    private DefaultTreeModel dtm;
+    private DefaultTreeModel dtm = new DefaultTreeModel(null);
     private JPanel buttonPanel = new JPanel();
 
     private KeYMediator mediator;
@@ -50,7 +47,6 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
                 });
             }
         });
-//        window.getMediator().getSelectedProof().addProofTreeListener();
     }
 
 
@@ -60,15 +56,14 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
     private void createListModel(Proof model) {
         listModel.clear();
-
         Node root = model.root();
-
         //build the treemodel
         MyTreeNode rootNode = new MyTreeNode(root);
-        dtm = new DefaultTreeModel(rootNode);
-
+        dtm.setRoot(rootNode);
         List<Node> explorationNodes = collectAllExplorationSteps(root, dtm, rootNode);
         explorationNodes.forEach(node -> listModel.addElement(node));
+
+
     }
 
     public List<Node> collectAllExplorationSteps(Node root, DefaultTreeModel dtm, MyTreeNode rootNode) {
@@ -78,37 +73,38 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     }
 
     private void findExplorationchildren(Node n, ArrayList<Node> list, DefaultTreeModel dtm, MyTreeNode parent) {
+        MyTreeNode currentParent = parent;
+
         if (n.leaf()) {
             try{
                 ExplorationNodeData explorationNodeData = n.getNodeInfo().get(ExplorationNodeData.class);
                 if(explorationNodeData != null && explorationNodeData.getExplorationAction() != null) {
 
                     MyTreeNode newNode = new MyTreeNode(n);
-                    dtm.insertNodeInto(newNode, parent, 0);
+                    dtm.insertNodeInto(newNode, currentParent, 0);
                     list.add(n);
                     return;
                 }
             } catch (IllegalStateException e){
                 return;
             }
-        }
-        try  {
-            ExplorationNodeData explorationNodeData = n.getNodeInfo().get(ExplorationNodeData.class);
-            if(explorationNodeData != null && explorationNodeData.getExplorationAction() != null) {
-             //   n.getNodeInfo().get(ExplorationNodeData.class);
-                MyTreeNode newNode = new MyTreeNode(n);
-                dtm.insertNodeInto(newNode, parent, 0);
-
-                parent = newNode;
-                list.add(n);
+        } else {
+            try {
+                ExplorationNodeData explorationNodeData = n.getNodeInfo().get(ExplorationNodeData.class);
+                if (explorationNodeData != null && explorationNodeData.getExplorationAction() != null) {
+                    MyTreeNode newNode = new MyTreeNode(n);
+                    dtm.insertNodeInto(newNode, parent, 0);
+                    currentParent = newNode;
+                    list.add(n);
+                }
+            } catch (IllegalStateException e) {
+                //Do nothing its intended
             }
-        } catch (IllegalStateException e){
-            //Do nothing its intended
-        }
-        Iterator<Node> nodeIterator = n.childrenIterator();
 
-        while (nodeIterator.hasNext()) {
-            list.addAll(collectAllExplorationSteps(nodeIterator.next(), dtm, parent));
+            Iterator<Node> nodeIterator = n.childrenIterator();
+            while (nodeIterator.hasNext()) {
+                list.addAll(collectAllExplorationSteps(nodeIterator.next(), dtm, currentParent));
+            }
         }
 
     }
@@ -158,7 +154,18 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             }
         });
 
-        JTree tree = new JTree(dtm);
+        JTree tree = new JTree();
+        tree.setModel(dtm);
+        tree.addTreeSelectionListener(new TreeSelectionListener() {
+
+            @Override
+            public void valueChanged(TreeSelectionEvent e) {
+                MyTreeNode selectedNode = (MyTreeNode) tree.getLastSelectedPathComponent();
+                System.out.println("selectedNode = " + selectedNode.getData().serialNr());
+            }
+        });
+        tree.setShowsRootHandles(true);
+
         JScrollPane p1 = new JScrollPane(tree);
         JScrollPane p2 = new JScrollPane(explorationStepList);
         tree.setCellRenderer(new MyTreeCellRenderer());
@@ -198,7 +205,21 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             JLabel listCellRendererComponent = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             MyTreeNode n = (MyTreeNode) value;
-            listCellRendererComponent.setText(n.getData().serialNr() + " " + n.getData().getNodeInfo().get(ExplorationNodeData.class).getExplorationAction());
+            ExplorationNodeData explorationNodeData = n.getData().getNodeInfo().get(ExplorationNodeData.class);
+
+            if(n.isRoot()){
+                if( explorationNodeData != null && explorationNodeData.getExplorationAction() != null) {
+                    listCellRendererComponent.setText("Root Node" + n.getData().serialNr() + " " + explorationNodeData.getExplorationAction());
+                } else {
+                    listCellRendererComponent.setText("Root Node");
+                }
+            } else {
+
+                if(explorationNodeData!= null && explorationNodeData.getExplorationAction() != null) {
+                    listCellRendererComponent.setText(n.getData().serialNr() + " " + explorationNodeData.getExplorationAction());
+                }
+            }
+
             return listCellRendererComponent;
         }
 

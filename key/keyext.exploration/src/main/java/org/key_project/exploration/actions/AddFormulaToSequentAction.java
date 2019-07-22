@@ -67,19 +67,19 @@ public class AddFormulaToSequentAction extends ExplorationAction {
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
         app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), getMediator().getServices(), true);
-         g.node().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
+        ExplorationNodeData explorationNodeData = new ExplorationNodeData();
+        explorationNodeData.setExplorationAction("Add "+t);
+        g.node().getNodeInfo().register(explorationNodeData, ExplorationNodeData.class);
 
-//         g.node().getNodeInfo().setExploration(true);
+         //g.node().getNodeInfo().setExploration(true);
         ImmutableList<Goal> result = g.apply(app);
         //set the actions flag
-         g.node().getNodeInfo().get(ExplorationNodeData.class).setExplorationAction("Add "+t);
 
          result.forEach(goal -> {
           //  goal.node().getNodeInfo().setExploration(true);
              goal.node().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
              String s = goal.node().getNodeInfo().getBranchLabel();
-            goal.node().getNodeInfo().setBranchLabel("ExplorationNode: " + s);
-
+             goal.node().getNodeInfo().setBranchLabel("ExplorationNode: " + s);
         });
 
         assert result.size() == 2;
