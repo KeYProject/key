@@ -45,6 +45,14 @@ public abstract class AbstractPropertiesSettings implements Settings {
         return String.join(SET_DELIMITER, set);
     }
 
+    private static List<String> parseStringList(String s) {
+        return new ArrayList<>(Arrays.asList(s.split(SET_DELIMITER)));
+    }
+
+    private static String stringListToString(List<String> seq) {
+        return String.join(SET_DELIMITER, seq);
+    }
+
     public boolean isInitialized() {
         return properties != null;
     }
@@ -114,6 +122,15 @@ public abstract class AbstractPropertiesSettings implements Settings {
                 parseStringSet(defValue),
                 AbstractPropertiesSettings::parseStringSet,
                 AbstractPropertiesSettings::stringSetToString);
+        propertyEntries.add(pe);
+        return pe;
+    }
+
+    protected PropertyEntry<List<String>> createStringListProperty(String key, String defValue) {
+        PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key,
+                parseStringList(defValue),
+                AbstractPropertiesSettings::parseStringList,
+                AbstractPropertiesSettings::stringListToString);
         propertyEntries.add(pe);
         return pe;
     }

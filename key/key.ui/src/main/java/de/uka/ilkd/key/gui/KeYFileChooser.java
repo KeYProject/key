@@ -257,7 +257,7 @@ public class KeYFileChooser {
             INSTANCE = new KeYFileChooser(initDir);
         }
 
-        KeYFileChooserBookmarkPanel bookmarkPanel = new KeYFileChooserBookmarkPanel(INSTANCE);
+        KeYFileChooserBookmarkPanel bookmarkPanel = new KeYFileChooserBookmarkPanel(INSTANCE.fileChooser);
         INSTANCE.fileChooser.setAccessory(bookmarkPanel);
         INSTANCE.fileChooser.addPropertyChangeListener(bookmarkPanel);
 

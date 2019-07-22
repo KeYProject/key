@@ -1,190 +1,189 @@
 package de.uka.ilkd.key.gui;
 
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JToggleButton;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.filechooser.FileFilter;
+import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
+import org.jetbrains.annotations.NotNull;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import java.awt.*;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
-import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
 
 /**
  * Created by jklamroth on 12/6/18.
- *
+ * <p>
  * This is a Panel used as Accessory for the KeYFileChooser which allows to
  * save Bookmarks which may be used as shortcuts to directories often used.
- *
+ * <p>
  * The bookmarks are stored as preferences.
  *
  * @author Jonas Klamroth
  */
 public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChangeListener {
     private static final long serialVersionUID = -6498548666886815605L;
-    private final KeYFileChooser chooser;
-    private JPanel bookmarkPanel = new JPanel(new GridBagLayout());
-    private List<File> bookmarks = new ArrayList<>();
-    private List<JToggleButton> buttons = new ArrayList<>();
+    private final @NotNull JFileChooser chooser;
+    private final ViewSettings viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+    private final DefaultListModel<File> bookmarks = new DefaultListModel<>();
+    private final JList<File> listBookmarks = new JList<>(bookmarks);
+    private final KeyAction actionAddBookmark = new AddBookmarkAction();
+    private final KeyAction actionRemoveBookmark = new RemoveBookmarkAction();
 
-    public KeYFileChooserBookmarkPanel(KeYFileChooser chooser) {
-        super(new GridBagLayout());
+
+    public KeYFileChooserBookmarkPanel(@NotNull JFileChooser chooser) {
         this.chooser = chooser;
+
+        setLayout(new BorderLayout(5, 5));
+        setBorder(BorderFactory.createTitledBorder("Bookmarks:"));
         createPane();
+        loadBookmarks();
     }
 
     private void createPane() {
-        loadBookmarks();
-        for (File f : bookmarks) {
-            addBookmarkButton(f);
-        }
+        JScrollPane scrollPane = new JScrollPane(listBookmarks);
+        scrollPane.setPreferredSize(new Dimension(250, 250));
+        add(scrollPane);
 
-        JScrollPane scrollPane = new JScrollPane(bookmarkPanel);
-        scrollPane.setPreferredSize(new Dimension(214, 250));
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.gridwidth = 2;
-        c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(0, 10, 0, 0);
-        this.add(scrollPane, c);
-        JButton addButton = new JButton("+");
-        addButton.addActionListener(e -> createBookmark());
-        JButton removeButton = new JButton("-");
-        removeButton.addActionListener(e -> removeCurrentBookmark());
-        c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = this.getComponentCount();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(20, 10, 0, 0);
-        addButton.setPreferredSize(new Dimension(107, 25));
-        this.add(addButton, c);
-        c = new GridBagConstraints();
-        c.gridx = 1;
-        c.gridy = this.getComponentCount() - 1;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(20, 0, 0, 0);
-        removeButton.setPreferredSize(new Dimension(107, 25));
-        this.add(removeButton, c);
-        this.revalidate();
-        this.repaint();
+        listBookmarks.setCellRenderer(new BookmarkRenderer());
+        listBookmarks.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    setBookmark();
+                }
+            }
+        });
+
+        listBookmarks.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    setBookmark();
+                }
+            }
+        });
+
+        JPanel pSouth = new JPanel();
+        pSouth.add(new JButton(actionAddBookmark));
+        pSouth.add(new JButton(actionRemoveBookmark));
+        add(pSouth, BorderLayout.SOUTH);
+    }
+
+    private void setBookmark() {
+        if (listBookmarks.getSelectedValue() != null)
+            chooser.setCurrentDirectory(listBookmarks.getSelectedValue());
     }
 
     private void loadBookmarks() {
-        String saveString = Preferences.userRoot().node(this.getUIClassID()).get("bookmarks", null);
-        if(saveString != null) {
-            String[] bookmarkStrings = saveString.split(";");
-            for(String s : bookmarkStrings) {
-                bookmarks.add(new File(s));
-            }
-        } else {
-            loadDefaultBookmarks();
-        }
-    }
-
-    private void loadDefaultBookmarks() {
-        bookmarks.add(new File(System.getProperty("user.home")));
-    }
-
-    private void createBookmark() {
-        JFileChooser fc = new JFileChooser(chooser.getCurrentDirectory());
-        FileFilter ff = new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.isDirectory();
-            }
-
-            @Override
-            public String getDescription() {
-                return "A directory to add to the bookmarks";
-            }
-        };
-        fc.setFileFilter(ff);
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int res = fc.showOpenDialog(this);
-        if (res == JFileChooser.APPROVE_OPTION) {
-            addBookmark(fc.getSelectedFile());
-        }
-        assert(buttons.size() == bookmarks.size());
-    }
-
-    private void removeCurrentBookmark() {
-        JToggleButton selected = null;
-        for (JToggleButton b : buttons) {
-            if (b.isSelected()) {
-                selected = b;
-                break;
-            }
-        }
-        if (selected != null) {
-            int idx = buttons.indexOf(selected);
-            buttons.remove(selected);
-            bookmarkPanel.remove(selected);
-            bookmarks.remove(idx);
-            saveBookmarks();
-            this.revalidate();
-            this.repaint();
-        }
-        assert(buttons.size() == bookmarks.size());
-    }
-
-    private void addBookmark(File f) {
-        bookmarks.add(f);
-        addBookmarkButton(f);
-    }
-
-    private void addBookmarkButton(File f) {
-        JToggleButton button = new JToggleButton(f.getName());
-        button.setToolTipText(f.getAbsolutePath());
-        button.setForeground(Color.BLUE);
-        button.addActionListener(e -> {
-            chooser.setCurrentDirectory(f);
-        });
-        button.setPreferredSize(new Dimension(200, 25));
-        buttons.add(button);
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 0;
-        c.gridy = bookmarkPanel.getComponentCount();
-        bookmarkPanel.add(button, c);
-        saveBookmarks();
-        this.revalidate();
-        this.repaint();
+        viewSettings.getBookmarks().forEach(
+                it -> bookmarks.addElement(new File(it))
+        );
     }
 
     public void propertyChange(PropertyChangeEvent e) {
         String prop = e.getPropertyName();
         if (JFileChooser.DIRECTORY_CHANGED_PROPERTY.equals(prop)) {
             File selected = chooser.getCurrentDirectory();
-            for (int i = 0; i < buttons.size(); ++i) {
-                if (bookmarks.get(i).equals(selected)) {
-                    buttons.get(i).setSelected(true);
-                } else {
-                    buttons.get(i).setSelected(false);
-                }
-            }
+            listBookmarks.setSelectedValue(selected,true);
         }
-        this.revalidate();
-        this.repaint();
     }
 
     private void saveBookmarks() {
-        String saveString =
-                bookmarks.stream().map(file -> file.getAbsolutePath())
-                                        .collect(Collectors.joining(";"));
-        Preferences.userRoot().node(this.getUIClassID()).put("bookmarks", saveString);
+        List<String> newMarks = new ArrayList<>();
+        Enumeration<File> iter = bookmarks.elements();
+        while (iter.hasMoreElements())
+            newMarks.add(iter.nextElement().getAbsolutePath());
+        viewSettings.setBookmarks(newMarks);
     }
 
+    private class AddBookmarkAction extends KeyAction {
+        AddBookmarkAction() {
+            setIcon(IconFactory.plus(16));
+            setTooltip("<html>Adds the current directory to the bookmarks.<br>" +
+                    "Press ALT to open a new file selection dialog to select a folder.");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            File toAdd = null;
+            if ((e.getModifiers() & InputEvent.ALT_MASK) > 0) {
+                JFileChooser fc = new JFileChooser(chooser.getCurrentDirectory());
+                FileFilter ff = new FileFilter() {
+                    @Override
+                    public boolean accept(File pathname) {
+                        return pathname.isDirectory();
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "A directory to add to the bookmarks";
+                    }
+                };
+                fc.setFileFilter(ff);
+                fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                int res = fc.showOpenDialog(null);
+                if (res == JFileChooser.APPROVE_OPTION) {
+                    toAdd = fc.getSelectedFile();
+                }
+            } else {
+                toAdd = chooser.getCurrentDirectory();
+            }
+
+            if (toAdd != null) {
+                int index = bookmarks.indexOf(toAdd);
+                if(index>=0) return; // already in the list
+                bookmarks.addElement(toAdd);
+                saveBookmarks();
+            }
+        }
+    }
+
+    private class RemoveBookmarkAction extends KeyAction {
+        RemoveBookmarkAction() {
+            setName("");
+            setIcon(IconFactory.minus(16));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int selected = listBookmarks.getSelectedIndex();
+            if(selected>0) {
+                bookmarks.removeElementAt(selected);
+                saveBookmarks();
+            }
+        }
+    }
+
+    private class BookmarkRenderer implements ListCellRenderer<File> {
+        private static final int LIMIT = 25;
+        private DefaultListCellRenderer renderer = new DefaultListCellRenderer();
+
+        public String toString(File file) {
+            StringBuilder sb = new StringBuilder();
+            do {
+                sb.insert(0, file.getName());
+                sb.insert(0, '/');
+                file = file.getParentFile();
+            } while (sb.length() < LIMIT);
+            sb.insert(0, '…');
+            return sb.toString();
+        }
+
+        @Override
+        public Component getListCellRendererComponent(JList<? extends File> list, File value, int index, boolean isSelected, boolean cellHasFocus) {
+            String val;
+            if (value.getAbsolutePath().length() <= LIMIT)
+                val = value.getAbsolutePath();
+            else
+                val = toString(value);
+
+            return renderer.getListCellRendererComponent(list, val, index,
+                    isSelected, cellHasFocus);
+        }
+    }
 }

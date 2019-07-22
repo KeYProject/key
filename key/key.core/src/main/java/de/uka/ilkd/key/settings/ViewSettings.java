@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.settings;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -137,6 +138,10 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     private static final String HEATMAP_MAXAGE = "[View][Heatmap]maxAge";
 
+    /**
+     * Bookmark settings
+     */
+    private static final String BOOKMARKS = "[View]bookmarks";
 
     /**
      * Show Taclet uninstantiated in tooltip -- for learning
@@ -183,6 +188,9 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private PropertyEntry<Set<String>> clutterRuleSets =
             createStringSetProperty(CLUTTER_RULESSETS, CLUTTER_RULESETS_DEFAULT);
+
+    private PropertyEntry<List<String>> bookmarks = createStringListProperty(BOOKMARKS,
+            System.getProperty("user.home"));
 
     /**
      * Clutter rules are rules with less priority in the taclet menu
@@ -478,4 +486,11 @@ public class ViewSettings extends AbstractPropertiesSettings {
         this.uiFontSizeFactor.set(factor);
     }
 
+    public List<String> getBookmarks() {
+        return bookmarks.get();
+    }
+
+    public void setBookmarks(List<String> bm) {
+        bookmarks.set(bm);
+    }
 }

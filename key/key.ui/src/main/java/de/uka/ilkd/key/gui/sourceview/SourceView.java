@@ -87,7 +87,8 @@ import de.uka.ilkd.key.util.Pair;
  * Editing the source code in the tabs is currently not implemented
  * (not supported by {@link JavaDocument}).
  *
- * @author Wolfram Pfeifer, Florian Lanzinger
+ * @author Wolfram Pfeifer
+ * @author lanzinger
  */
 public final class SourceView extends JComponent {
 
@@ -939,7 +940,7 @@ public final class SourceView extends JComponent {
 
             // Add tab to tab pane.
             tabPane.addTab(simpleFileName, this);
-            index = tabPane.indexOfComponent(this);
+            int index = tabPane.indexOfComponent(this);
             tabPane.setToolTipTextAt(index, absoluteFilename);
 
             resetHighlights();
