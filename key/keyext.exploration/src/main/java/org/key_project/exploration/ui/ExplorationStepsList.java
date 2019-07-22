@@ -81,7 +81,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         if (n.leaf()) {
             try{
                 ExplorationNodeData explorationNodeData = n.getNodeInfo().get(ExplorationNodeData.class);
-                if(explorationNodeData != null) {
+                if(explorationNodeData != null && explorationNodeData.getExplorationAction() != null) {
 
                     MyTreeNode newNode = new MyTreeNode(n);
                     dtm.insertNodeInto(newNode, parent, 0);
@@ -94,7 +94,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         }
         try  {
             ExplorationNodeData explorationNodeData = n.getNodeInfo().get(ExplorationNodeData.class);
-            if(explorationNodeData != null) {
+            if(explorationNodeData != null && explorationNodeData.getExplorationAction() != null) {
              //   n.getNodeInfo().get(ExplorationNodeData.class);
                 MyTreeNode newNode = new MyTreeNode(n);
                 dtm.insertNodeInto(newNode, parent, 0);
@@ -130,20 +130,32 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             public void valueChanged(ListSelectionEvent e) {
                 if (!e.getValueIsAdjusting()) {
                     final List<Node> selectedValuesList = explorationStepList.getSelectedValuesList();
-                   //TODO
+
+                    Object selectedValue = explorationStepList.getSelectedValue();
+                    if(selectedValue != null) {
+                        Node selected = (Node) selectedValue;
+                        mediator.getSelectionModel().setSelectedNode(selected);
+                    }
                 }
             }
         });
         jumpToNode.addActionListener(actionEvent -> {
-            Node selected = (Node) explorationStepList.getSelectedValue();
-            mediator.getSelectionModel().setSelectedNode(selected);
+            Object selectedValue = explorationStepList.getSelectedValue();
+            if(selectedValue != null) {
+                Node selected = (Node) selectedValue;
+                mediator.getSelectionModel().setSelectedNode(selected);
+            }
 
         });
 
         pruneExploration.addActionListener(actionEvent -> {
-            Node selected = (Node) explorationStepList.getSelectedValue();
-            mediator.getUI().getProofControl().pruneTo(selected);
-            createListModel(mediator.getSelectedProof());
+
+            Object selectedValue = explorationStepList.getSelectedValue();
+            if(selectedValue != null) {
+                Node selected = (Node) selectedValue;
+                mediator.getUI().getProofControl().pruneTo(selected);
+                createListModel(mediator.getSelectedProof());
+            }
         });
 
         JTree tree = new JTree(dtm);

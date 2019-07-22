@@ -46,10 +46,6 @@ public class EditFormulaAction extends ExplorationAction {
         Term term = pio.subTerm();
         SequentFormula sf = pio.sequentFormula();
         Goal g = getMediator().getSelectedGoal();
-        //g.node().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
-
-//        g.node().getNodeInfo().setExploration(true);
-
         Term newTerm = promptForTerm(mainWindow, term);
         
         if (newTerm.equals(term)) {
@@ -101,15 +97,10 @@ public class EditFormulaAction extends ExplorationAction {
             if (goal.node().getNodeInfo().getBranchLabel().contains(posToWeakening)) {
                 goal.apply(weakening);
                 goal.node().parent().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
-
-//                goal.node().parent().getNodeInfo().setExploration(true);
             } else {
                 goal.setEnabled(false);
             }
         });
-        //}
-
-
     }
 
     private TacletApp soundChange(PosInOccurrence pio, Term term, Term newTerm) {
