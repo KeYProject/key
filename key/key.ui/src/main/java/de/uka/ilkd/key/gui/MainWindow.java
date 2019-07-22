@@ -540,7 +540,7 @@ public final class MainWindow extends JFrame {
         //JPanel rightPane = new JPanel();
         //rightPane.setLayout(new BorderLayout());
         //rightPane.add(mainFrame, BorderLayout.CENTER);
-        //rightPane.add(sequentViewSearchBar, BorderLayout.SOUTH);
+        mainFrame.add(sequentViewSearchBar, BorderLayout.SOUTH);
 
         //JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rightPane, sourceView);
         //pane.setResizeWeight(0.5);

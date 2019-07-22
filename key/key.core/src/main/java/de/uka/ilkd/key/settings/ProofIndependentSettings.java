@@ -76,7 +76,7 @@ public class ProofIndependentSettings {
             File testFile = new File(filename);
             if(testFile.exists()) {
                 if(Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
-                    //System.err.println("The settings in " + filename + " are *not* read.");
+                    System.err.println("The settings in " + filename + " are *not* read.");
                 } else {
                     load(testFile);
                 }
@@ -116,7 +116,6 @@ public class ProofIndependentSettings {
     }
 
     public GeneralSettings getGeneralSettings() {
-        //ensureInitialized();
         return generalSettings;
     }
 
@@ -125,7 +124,6 @@ public class ProofIndependentSettings {
     }
 
     public ViewSettings getViewSettings() {
-        //ensureInitialized();
         return viewSettings;
     }
 
