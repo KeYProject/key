@@ -37,11 +37,11 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
-                createListModel(e.getSource().getSelectedProof());
+                createModel(e.getSource().getSelectedProof());
                 e.getSource().getSelectedProof().addRuleAppListener(new RuleAppListener() {
                     @Override
                     public void ruleApplied(ProofEvent e) {
-                        createListModel(e.getSource());
+                        createModel(e.getSource());
                     }
 
                 });
@@ -51,10 +51,10 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
 
     public void setProof(Proof proof) {
-        createListModel(proof);
+        createModel(proof);
     }
 
-    private void createListModel(Proof model) {
+    private void createModel(Proof model) {
         listModel.clear();
         Node root = model.root();
         //build the treemodel
@@ -150,7 +150,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             if(selectedValue != null) {
                 Node selected = (Node) selectedValue;
                 mediator.getUI().getProofControl().pruneTo(selected);
-                createListModel(mediator.getSelectedProof());
+                createModel(mediator.getSelectedProof());
             }
         });
 
@@ -161,10 +161,13 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             @Override
             public void valueChanged(TreeSelectionEvent e) {
                 MyTreeNode selectedNode = (MyTreeNode) tree.getLastSelectedPathComponent();
-                System.out.println("selectedNode = " + selectedNode.getData().serialNr());
+                if(selectedNode != null){
+                    mediator.getSelectionModel().setSelectedNode(selectedNode.getData());
+                }
             }
         });
         tree.setShowsRootHandles(true);
+
 
         JScrollPane p1 = new JScrollPane(tree);
         JScrollPane p2 = new JScrollPane(explorationStepList);
