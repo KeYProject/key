@@ -46,6 +46,8 @@ public final class IconFactory {
             new IconFontProvider(FontAwesomeSolid.ARROW_LEFT);
     public static final IconFontProvider STOP =
             new IconFontProvider(FontAwesomeSolid.STOP, Color.RED);
+    public static final IconFontProvider CLOSE =
+            new IconFontProvider(FontAwesomeSolid.TIMES); // OR TIMES_CIRCLE
     public static final IconFontProvider CONFIGURE_MENU =
             new IconFontProvider(FontAwesomeSolid.SORT_DOWN);
     public static final IconFontProvider OPEN_MOST_RECENT =
@@ -315,6 +317,11 @@ public final class IconFactory {
     public static Icon stop(int x) {
         return STOP.load(x);
         //return scaleIcon(stop,x,x);
+    }
+
+    public static Icon close(int x) {
+        return CLOSE.load(x);
+        //return scaleIcon(cross,x,x);
     }
 
     public static ImageIcon keyHole(int x, int y) {
