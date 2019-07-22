@@ -341,7 +341,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
      */
     protected void layoutKeYComponent() {
         delegateView.setBackground(Color.white);
-        ProofRenderer renderer = new ProofRenderer();
         delegateView.setCellRenderer(renderer);
         delegateView.putClientProperty("JTree.lineStyle", "Angled");
         delegateView.setVisible(true);
@@ -392,6 +391,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     public boolean selectAbove() {
         return selectRelative(+1);
     }
+
     public boolean selectBelow() {
         return selectRelative(-1);
     }
@@ -399,7 +399,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     private boolean selectRelative(int i) {
         TreePath path = delegateView.getSelectionPath();
         int row = delegateView.getRowForPath(path);
-        TreePath newPath = delegateView.getPathForRow(row-i);
+        TreePath newPath = delegateView.getPathForRow(row - i);
         if (newPath != null) {
             delegateView.setSelectionPath(newPath);
             return true;
@@ -833,9 +833,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
         }
     }
 
-    class ProofRenderer extends DefaultTreeCellRenderer
-            implements TreeCellRenderer,
-            java.io.Serializable {
 
     public class ProofRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
         private List<Styler<GUIAbstractTreeNode>> stylers = new LinkedList<>();
@@ -847,12 +844,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
             stylers.add(this::renderLeaf);
             stylers.add(this::renderNonLeaf);
             stylers.add(this::checkNotes);
+
         }
 
-        public boolean add(Styler<GUIAbstractTreeNode> guiAbstractTreeNodeStyler) {
-            return stylers.add(guiAbstractTreeNodeStyler);
+        public void add(Styler<GUIAbstractTreeNode> guiAbstractTreeNodeStyler) {
+            stylers.add(0, guiAbstractTreeNodeStyler);
         }
-
 
 
         private void closedGoal(Style style, GUIAbstractTreeNode treeNode) {
@@ -987,11 +984,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
                                                       boolean hasFocus) {
             if (proof == null) {
                 // print dummy tree;
-                return super.getTreeCellRendererComponent(tree, value, selected,
+                return super.getTreeCellRendererComponent(tree, value, sel,
                         expanded, leaf, row, hasFocus);
             }
 
-            super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
+            super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
             Style style = new Style();
             style.setForeground(getForeground());
@@ -1005,12 +1002,14 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             setForeground(style.getForeground());
             setBackground(style.getBackground());
-            if(style.getBorder() != null) {
+            if (style.getBorder() != null) {
                 setBorder(BorderFactory.createLineBorder(style.getBorder()));
             } else {
                 //set default
                 setBorder(BorderFactory.createLineBorder(Color.WHITE));
             }
+
+
             setFont(getFont().deriveFont(style.getFontStyle()));
             setToolTipText(style.getTooltip());
             setIcon(style.getIcon());
@@ -1056,6 +1055,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                */
         }
     }
+
 
     public ProofTreePopupFactory getProofTreePopupFactory() {
         return proofTreePopupFactory;

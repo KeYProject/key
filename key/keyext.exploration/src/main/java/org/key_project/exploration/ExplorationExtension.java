@@ -87,7 +87,7 @@ public class ExplorationExtension implements KeYGuiExtension,
         });
 
 
-        window.getProofTreeView().getRenderer().add(new ExplorationRenderer());//TODO put in extension
+        window.getProofTreeView().getRenderer().add(new ExplorationRenderer());
 
     }
 
