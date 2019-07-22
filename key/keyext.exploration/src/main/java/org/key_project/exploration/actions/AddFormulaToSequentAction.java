@@ -72,10 +72,12 @@ public class AddFormulaToSequentAction extends ExplorationAction {
 //         g.node().getNodeInfo().setExploration(true);
         ImmutableList<Goal> result = g.apply(app);
         //set the actions flag
-        result.forEach(goal -> {
+         g.node().getNodeInfo().get(ExplorationNodeData.class).setExplorationAction("Add "+t);
+
+         result.forEach(goal -> {
           //  goal.node().getNodeInfo().setExploration(true);
-            goal.node().getNodeInfo().get(ExplorationNodeData.class).setExplorationAction("Add "+t);
-            String s = goal.node().getNodeInfo().getBranchLabel();
+             goal.node().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
+             String s = goal.node().getNodeInfo().getBranchLabel();
             goal.node().getNodeInfo().setBranchLabel("ExplorationNode: " + s);
 
         });
@@ -85,9 +87,6 @@ public class AddFormulaToSequentAction extends ExplorationAction {
             Goal first = result.head();
             if(first.node().getNodeInfo().getBranchLabel().endsWith("FALSE")){
                 first.setEnabled(false);
-                if(!showSecondBranch) {
-                    //TODO now hide the branch
-                }
             } else {
                 Goal second = result.tail().head();
                 second.setEnabled(false);
@@ -96,9 +95,6 @@ public class AddFormulaToSequentAction extends ExplorationAction {
             Goal first = result.head();
             if(first.node().getNodeInfo().getBranchLabel().endsWith("TRUE")){
                 first.setEnabled(false);
-                if(!showSecondBranch) {
-                    //TODO now hide the branch
-                }
             } else {
                 Goal second = result.tail().head();
                 second.setEnabled(false);

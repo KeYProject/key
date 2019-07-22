@@ -58,6 +58,8 @@ public class DeleteFormulaAction extends ExplorationAction {
         explorationNodeData.setExplorationAction("Hide "+term);
 
         result.forEach(goal -> {
+            goal.node().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
+
             //goal.node().getNodeInfo().setExploration(true);
             //ExplorationNodeData explorationData = new ExplorationNodeData();
             //goal.node().getNodeInfo().register(explorationNodeData, ExplorationNodeData.class);

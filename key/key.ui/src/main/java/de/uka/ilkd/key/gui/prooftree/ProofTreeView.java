@@ -902,7 +902,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             setForeground(style.getForeground());
             setBackground(style.getBackground());
-            setBorder(BorderFactory.createLineBorder(style.getBorder()));
+            if(style.getBorder() != null) {
+                setBorder(BorderFactory.createLineBorder(style.getBorder()));
+            } else {
+                //set default
+                setBorder(BorderFactory.createLineBorder(Color.WHITE));
+            }
             setFont(getFont().deriveFont(style.getFontStyle()));
             setToolTipText(style.getTooltip());
             setIcon(style.getIcon());

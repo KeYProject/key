@@ -1,5 +1,6 @@
 package org.key_project.exploration.ui;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -19,16 +20,19 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ExplorationStepsList extends JPanel implements TabPanel {
-    private JButton cancelButton = new JButton("Cancel");
     private JButton jumpToNode = new JButton("Jump To Node");
     private JButton pruneExploration = new JButton("Prune Selected Exploration Steps");
     private DefaultListModel<Node> listModel = new DefaultListModel<>();
     private DefaultTreeModel dtm;
     private JPanel buttonPanel = new JPanel();
 
+    private KeYMediator mediator;
+
     public ExplorationStepsList(MainWindow window) throws HeadlessException {
+        this.mediator = window.getMediator();
         initialize();
-        window.getMediator().addKeYSelectionListener(new KeYSelectionListener() {
+
+        mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
                 //do nothing because it does not affect this list
@@ -114,12 +118,10 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         BorderLayout manager = new BorderLayout();
         this.setLayout(manager);
 
-
         //ButtonPanel
         this.buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 2, 2));
         this.buttonPanel.add(jumpToNode);
         this.buttonPanel.add(pruneExploration);
-        this.buttonPanel.add(cancelButton);
 
         JList explorationStepList = new JList<>(listModel);
         explorationStepList.setCellRenderer(new MyCellRenderer());
@@ -132,6 +134,11 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
                 }
             }
         });
+        jumpToNode.addActionListener(actionEvent -> {
+            Node selected = (Node) explorationStepList.getSelectedValue();
+            mediator.getSelectionModel().setSelectedNode(selected);
+
+        });
 
         JTree tree = new JTree(dtm);
         JScrollPane p1 = new JScrollPane(tree);
@@ -139,6 +146,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         tree.setCellRenderer(new MyTreeCellRenderer());
         this.add(p1, BorderLayout.CENTER);
         this.add(p2, BorderLayout.NORTH);
+        this.add(buttonPanel, BorderLayout.SOUTH);
         this.setVisible(true);
     }
 
