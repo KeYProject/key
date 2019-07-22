@@ -1,7 +1,13 @@
 package de.uka.ilkd.key.gui;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JToggleButton;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.filechooser.FileFilter;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -22,8 +28,11 @@ import java.util.stream.Collectors;
  * save Bookmarks which may be used as shortcuts to directories often used.
  *
  * The bookmarks are stored as preferences.
+ *
+ * @author Jonas Klamroth
  */
 public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChangeListener {
+    private static final long serialVersionUID = -6498548666886815605L;
     private final KeYFileChooser chooser;
     private JPanel bookmarkPanel = new JPanel(new GridBagLayout());
     private List<File> bookmarks = new ArrayList<>();
@@ -139,7 +148,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
     private void addBookmarkButton(File f) {
         JToggleButton button = new JToggleButton(f.getName());
         button.setToolTipText(f.getAbsolutePath());
-        //button.setForeground(Color.BLUE);
+        button.setForeground(Color.BLUE);
         button.addActionListener(e -> {
             chooser.setCurrentDirectory(f);
         });
@@ -172,7 +181,9 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
     }
 
     private void saveBookmarks() {
-        String saveString = bookmarks.stream().map(file -> file.getAbsolutePath()).collect(Collectors.joining(";"));
+        String saveString =
+                bookmarks.stream().map(file -> file.getAbsolutePath())
+                                        .collect(Collectors.joining(";"));
         Preferences.userRoot().node(this.getUIClassID()).put("bookmarks", saveString);
     }
 
