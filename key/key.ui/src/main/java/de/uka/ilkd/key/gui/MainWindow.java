@@ -63,9 +63,11 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.event.MouseInputAdapter;
 
+import bibliothek.gui.dock.StackDockStation;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.SingleCDockable;
 import bibliothek.gui.dock.common.intern.CDockable;
+import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -552,6 +554,9 @@ public final class MainWindow extends JFrame {
         //splitPane.setOneTouchExpandable(true);
         //splitPane.setName("splitPane");
         //getContentPane().add(splitPane, BorderLayout.CENTER);
+
+        dockControl.putProperty(StackDockStation.TAB_PLACEMENT, TabPlacement.TOP_OF_DOCKABLE);
+
         getContentPane().add(dockControl.getContentArea());
 
         dockProofListView = DockingHelper.createSingleDock("Loaded Proofs", proofListView,
