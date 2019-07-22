@@ -13,17 +13,13 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Component;
-import java.awt.Point;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
@@ -38,12 +34,9 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
  *
  * @author Kai Wallisch
  */
-public final class MainFrame extends JScrollPane {
-
-    private static final long serialVersionUID = 513236416130998762L;
-
+public final class MainFrame extends JPanel {
     private final MainWindow mainWindow;
-
+    private final JScrollPane scrollPane = new JScrollPane();
     private Component content;
 
     public Component setContent(Component component) {
@@ -51,9 +44,9 @@ public final class MainFrame extends JScrollPane {
         content = component;
         if (component instanceof SequentView) {
             SequentView sequentView = (SequentView) component;
-            Point oldSequentViewPosition = getViewport().getViewPosition();
-            setViewportView(new SequentViewPanel(sequentView));
-            getViewport().setViewPosition(oldSequentViewPosition);
+            Point oldSequentViewPosition = scrollPane.getViewport().getViewPosition();
+            scrollPane.setViewportView(new SequentViewPanel(sequentView));
+            scrollPane.getViewport().setViewPosition(oldSequentViewPosition);
 
             // Additional option to show taclet info in case of:
             // sequentView instanceof InnerNodeView
@@ -62,7 +55,7 @@ public final class MainFrame extends JScrollPane {
                 ptv.tacletInfoToggle.setSequentView(sequentView);
             }
         } else {
-            setViewportView(component);
+            scrollPane.setViewportView(component);
         }
 
         if (oldContent instanceof SequentView) {
@@ -75,8 +68,8 @@ public final class MainFrame extends JScrollPane {
     public MainFrame(final MainWindow mainWindow, EmptySequent emptySequent) {
         this.mainWindow = mainWindow;
         setBorder(new EmptyBorder(0, 0, 0, 0));
-        getVerticalScrollBar().setUnitIncrement(30);
-        getHorizontalScrollBar().setUnitIncrement(30);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(30);
+        scrollPane.getHorizontalScrollBar().setUnitIncrement(30);
 
         addMouseListener(new MouseAdapter() {
 
@@ -115,6 +108,8 @@ public final class MainFrame extends JScrollPane {
                         Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
                         "copy");
         getActionMap().put("copy", new CopyToClipboardAction(mainWindow));
+        setLayout(new BorderLayout());
+        add(scrollPane);
         setContent(emptySequent);
     }
 }
