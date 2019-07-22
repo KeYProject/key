@@ -15,9 +15,6 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
 import java.awt.Point;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -51,7 +48,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class SequentViewInputListener implements KeyListener, MouseMotionListener, MouseListener {
+public class SequentViewInputListener implements MouseMotionListener, MouseListener {
 
     /**
      * The color for origin highlights.
@@ -105,22 +102,6 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
-        if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
-            showTermInfo = true;
-            showTermInfo(sequentView.getMousePosition());
-        }
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-        if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) == 0 && showTermInfo) {
-            showTermInfo = false;
-            sequentView.getMainWindow().setStandardStatusLine();
-        }
-    }
-
-    @Override
     public void mouseDragged(MouseEvent me) {
         // This method is required by MouseMotionListener interface.
     }
@@ -148,9 +129,6 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
             highlightOriginInSourceView(null);
         }
     }
-
-    @Override
-    public void keyTyped(KeyEvent e) { }
 
     @Override
     public void mouseClicked(MouseEvent e) {
