@@ -30,3 +30,5 @@ smt-solvers
 # *.orig files are created by git during merges
 *.orig
 key/key.ui/examples/**/**.proof
+
+.gradle

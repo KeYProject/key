@@ -102,7 +102,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
         }
 
 
-        public void readSettings(Object sender, Properties props){
+        public void readSettings(Properties props){
 
                 useExplicitTypeHierarchy = SettingsConverter.read(props,EXPLICIT_TYPE_HIERARCHY,
                                 useExplicitTypeHierarchy);
@@ -125,7 +125,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
      
         }
 
-        public void writeSettings(Object sender, Properties props){
+        public void writeSettings(Properties props){
                 SettingsConverter.store(props,EXPLICIT_TYPE_HIERARCHY,useExplicitTypeHierarchy);
                 SettingsConverter.store(props,INSTANTIATE_NULL_PREDICATES,useNullInstantiation);
                 SettingsConverter.store(props,MAX_GENERIC_SORTS,maxGenericSorts);

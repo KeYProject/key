@@ -12,5 +12,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.removegenerics;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8, JavaSE-10, JavaSE-9
 Bundle-ActivationPolicy: lazy
-Export-Package: de.uka.ilkd.key.util.removegenerics
+Export-Package: org.key_project.removegenerics.test
 Automatic-Module-Name: org.key_project.removegenerics.test

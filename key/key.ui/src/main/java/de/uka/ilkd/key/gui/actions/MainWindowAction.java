@@ -14,7 +14,9 @@ package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
+import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
+
+import javax.swing.*;
 
 public abstract class MainWindowAction extends KeyAction {
     /**
@@ -27,7 +29,16 @@ public abstract class MainWindowAction extends KeyAction {
     protected MainWindowAction(MainWindow mainWindow) {
         assert mainWindow != null;
         this.mainWindow = mainWindow;
-        putValue(ACCELERATOR_KEY, KeyStrokeManager.get(this));
+        putValue(ACCELERATOR_KEY, KeyStrokeManager.get(this, getClass().getName()));
+        KeyStrokeManager.registerAction(this);
+    }
+
+    protected void setAcceleratorLetter(int letter) {
+        setAcceleratorKey(KeyStroke.getKeyStroke(letter, SHORTCUT_KEY_MASK));
+    }
+
+    protected void setAcceleratorKey(KeyStroke keyStroke) {
+        putValue(ACCELERATOR_KEY, keyStroke);
     }
 
     protected KeYMediator getMediator() {

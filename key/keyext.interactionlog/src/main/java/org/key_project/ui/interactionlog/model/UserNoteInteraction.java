@@ -1,6 +1,6 @@
 package org.key_project.ui.interactionlog.model;
 
-import org.key_project.ui.interactionlog.algo.InteractionVisitor;
+import org.key_project.ui.interactionlog.api.Interaction;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -29,11 +29,6 @@ public class UserNoteInteraction extends Interaction {
         this.note = note;
     }
 
-    @Override
-    public <T> T accept(InteractionVisitor<T> visitor) {
-        return visitor.visit(this);
-    }
-
     public String getNote() {
         return note;
     }
@@ -47,4 +42,10 @@ public class UserNoteInteraction extends Interaction {
         return note;
     }
 
+    @Override
+    public String getMarkdown() {
+        return String.format("## Note%n" +
+                "**Date**: %s%n" +
+                "```%n%s%n```", getCreated(), getNote());
+    }
 }

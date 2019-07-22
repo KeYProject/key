@@ -39,7 +39,7 @@ public class ValueInjector {
      * @throws InjectionReflectionException  an access on some reflection methods occurred
      * @throws NoSpecifiedConverterException unknown type for the current converter map
      * @throws ConversionException           an converter could not translate the given value in
-     *                                       {@arguments}
+     *                                       arguments
      */
     public static <T> T injection(ProofScriptCommand<?> command,
                                   T obj,
@@ -99,7 +99,7 @@ public class ValueInjector {
      * @throws InjectionReflectionException  an access on some reflection methods occurred
      * @throws NoSpecifiedConverterException unknown type for the current converter map
      * @throws ConversionException           an converter could not translate the given value
-     *                                       in {@arguments}
+     *                                       in arguments
      * @see Option
      * @see Flag
      */
@@ -137,12 +137,13 @@ public class ValueInjector {
         return obj;
     }
 
+    @SuppressWarnings("unchecked")
     private Map<String, Object> getStringMap(Object obj, ProofScriptArgument<?> vararg)
             throws InjectionReflectionException {
         try {
             Map<String, Object> map = (Map<String, Object>) vararg.getField().get(obj);
             if (map == null) {
-                map = new HashMap<String, Object>();
+                map = new HashMap<>();
                 vararg.getField().set(obj, map);
             }
             return map;

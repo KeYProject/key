@@ -35,6 +35,7 @@ import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
  * <p>
@@ -166,8 +167,8 @@ public interface TermLabel extends Named {
      * @see #isProofRelevant()
      */
     static Term removeIrrelevantLabels(Term term, Services services) {
-        if (services.getProof() != null
-                && !services.getProof().getSettings().getTermLabelSettings().getUseOriginLabels()) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE
+                .getTermLabelSettings().getUseOriginLabels()) {
             return term;
         } else {
             return removeIrrelevantLabels(term, services.getTermFactory());

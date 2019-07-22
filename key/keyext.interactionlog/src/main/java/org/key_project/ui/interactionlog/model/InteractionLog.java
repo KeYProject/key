@@ -1,6 +1,7 @@
 package org.key_project.ui.interactionlog.model;
 
 import de.uka.ilkd.key.proof.Proof;
+import org.key_project.ui.interactionlog.api.Interaction;
 import org.key_project.util.RandomName;
 
 import javax.xml.bind.annotation.*;

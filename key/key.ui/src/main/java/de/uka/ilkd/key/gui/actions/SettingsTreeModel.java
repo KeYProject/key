@@ -56,9 +56,6 @@ public class SettingsTreeModel extends DefaultTreeModel {
         Settings smtSettings = proofSettings.getSMTSettings();
         proofSettingsNode.add(generateTableNode("SMT", smtSettings));
 
-        Settings termLabelSettings = proofSettings.getTermLabelSettings();
-        proofSettingsNode.add(generateTableNode("Term Labels", termLabelSettings));
-
         OptionContentNode independentSettingsNode = generateOptionContentNode("Proof-Independent Settings", "These are the proof independent settings.");
         root.add(independentSettingsNode);
 
@@ -72,7 +69,8 @@ public class SettingsTreeModel extends DefaultTreeModel {
         independentSettingsNode.add(generateTableNode("Testcase Generation", testgenSettings));
         Settings viewSettings =independentSettings.getViewSettings();
         independentSettingsNode.add(generateTableNode("View", viewSettings));
-
+        Settings termLabelSettings = independentSettings.getTermLabelSettings();
+        proofSettingsNode.add(generateTableNode("Term Labels", termLabelSettings));
     }
 
 
@@ -95,7 +93,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
     private OptionContentNode generateTableNode(String title, Settings settings) {
 
         Properties props = new Properties();
-        settings.writeSettings(this, props);
+        settings.writeSettings(props);
 
         return new OptionContentNode(title, generateJTable(props));
 

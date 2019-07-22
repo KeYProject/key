@@ -360,7 +360,8 @@ DECLITERAL
 CHAR_LITERAL:
         '\''
                 (~('\''|'\\') |
-                 ('\\' ('\'' | '\\' | 'n' | 'r' | 't' | 'b' | 'f' | '"' | OCT_CHAR))
+                 ('\\' ('\'' | '\\' | 'n' | 'r' | 't' | 'b' | 'f' | '"' | OCT_CHAR
+                 | 'u' HEXDIGIT HEXDIGIT HEXDIGIT HEXDIGIT )) //add for safety
                  // note: unicode escapes are processed earlier
                 )
       '\''

@@ -29,19 +29,18 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 
 /**
  * This test case captures all functional run-all-proof scenarios.
- *
+ * <p>
  * The test case is controlled by the index file (see {@value #INDEX_FILE}).
- *
+ * <p>
  * If the property "{@value #SKIP_FUNCTIONAL_PROPERTY}" is set to true, then
  * no functional run-all-proof tests will be run.
  *
  * @author M. Ulbrich
- *
  */
 @RunWith(Parameterized.class)
 public class RunAllProofsFunctional extends RunAllProofsTest {
 
-    public static final String SKIP_FUNCTIONAL_PROPERTY = "key.runallproofs.skipFunctional";
+    public static final Boolean SKIP_FUNCTIONAL_PROPERTY = Boolean.getBoolean("key.runallproofs.skipFunctional");
 
     public static final String INDEX_FILE = "index/automaticJAVADL.txt";
 
@@ -53,11 +52,9 @@ public class RunAllProofsFunctional extends RunAllProofsTest {
 
     @Parameters(name = "{0}")
     public static Collection<RunAllProofsTestUnit[]> data() throws IOException, RecognitionException {
-
-        if(Boolean.getBoolean(SKIP_FUNCTIONAL_PROPERTY)) {
+        if (SKIP_FUNCTIONAL_PROPERTY) {
             return Collections.emptyList();
         }
-
         proofCollection = parseIndexFile(INDEX_FILE);
         return data(proofCollection);
     }

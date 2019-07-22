@@ -1,10 +1,6 @@
 package de.uka.ilkd.key.proof.proverules;
 
-import java.io.IOException;
 import java.util.Collection;
-
-import org.antlr.runtime.RecognitionException;
-
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
@@ -13,16 +9,12 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
  * key/scripts/proveRules
  *
  * @author Kai Wallisch
- *
  */
 public class ListProveRulesTestCases {
-
-   public static void main(String[] args) throws IOException,
-         RecognitionException, ProblemLoaderException {
-      Collection<Object[]> units = ProveRulesTest.data();
-      for (Object[] testParams : units) {
-         System.out.println(testParams[0]);
-      }
-   }
-
+    public static void main(String[] args) throws ProblemLoaderException {
+        Collection<Object[]> units = ProveRulesTest.data();
+        for (Object[] testParams : units) {
+            System.out.println(testParams[0]);
+        }
+    }
 }

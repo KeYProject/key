@@ -32,15 +32,15 @@ stages:
 #   script:
 #     - javac -version
 #     - ant -f key/scripts/build.xml compileAll
-    
+
 
 compile:classes:
   stage: primary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache classes
+    - gradle --build-cache classes
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
@@ -50,11 +50,11 @@ compile:classes:
 
 compile:testClasses:
   stage: secondary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --parallel testClasses
+    - gradle --build-cache --parallel testClasses
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull-push
@@ -62,30 +62,21 @@ compile:testClasses:
       - build
       - .gradle
 
-compile:testClassesOracle8:
+compile:testClasses8:
   stage: secondary
-  image: key-dev-jdk8
+  image: wadoon/key-test-docker:jdk8
   script:
     - javac -version
     - cd key
-    - ./gradlew --parallel classes testClasses
+    - gradle --parallel classes testClasses
 
-compile:testClassesJava11:
-  stage: secondary
-  image: key-dev-openjdk11
-  allow_failure: true
-  script:
-    - javac -version
-    - cd key
-    - ./gradlew --parallel classes testClasses
-
-compile:check:key.util:
+compile:testFast:key.util:
   stage: ternary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :key.util:check
+    - gradle --build-cache --continue :key.util:testFast
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -96,15 +87,15 @@ compile:check:key.util:
   artifacts:
     reports:
       junit:
-        - "**/**/build/test-results/test/TEST-*.xml"
+        - "**/**/build/test-results/*/TEST-*.xml"
 
-compile:check:key.core:
+compile:testFast:key.core:
   stage: ternary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :key.core:check
+    - gradle --build-cache --continue :key.core:testFast
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -115,15 +106,15 @@ compile:check:key.core:
   artifacts:
     reports:
       junit:
-        - "**/**/build/test-results/test/TEST-*.xml"
+        - "**/**/build/test-results/*/TEST-*.xml"
 
-compile:check:proofref:
+compile:testFast:proofref:
   stage: ternary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :key.core.proof_references:check
+    - gradle --build-cache --continue :key.core.proof_references:testFast
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -134,15 +125,51 @@ compile:check:proofref:
   artifacts:
     reports:
       junit:
-        - "**/**/build/test-results/test/TEST-*.xml"
+        - "**/**/build/test-results/*/TEST-*.xml"
 
-compile:check:testgen:
+compile:testFast:testgen:
   stage: ternary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :key.core.testgen:check
+    - gradle --build-cache --continue :key.core.testgen:testFast
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/*/TEST-*.xml"
+
+compile:testFast:interactionlog:
+  stage: ternary
+  image: wadoon/key-test-docker:jdk11
+  script:
+    - javac -version
+    - cd key
+    - gradle --build-cache --continue :keyex.interactionlog:testFast
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/*/TEST-*.xml"
+
+compile:testFast:ui:
+  stage: ternary
+  image: wadoon/key-test-docker:jdk11
+  script:
+    - javac -version
+    - cd key
+    - gradle --build-cache --continue :key.ui:testFast
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -153,15 +180,15 @@ compile:check:testgen:
   artifacts:
     reports:
       junit:
-        - "**/**/build/test-results/test/TEST-*.xml"
+        - "**/**/build/test-results/*/TEST-*.xml"
 
-compile:check:ui:
+compile:testFast:removegenerics:
   stage: ternary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
-    - ./gradlew --build-cache --continue :key.ui:check
+    - gradle --build-cache --continue :key.removegenerics:testFast
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -172,71 +199,52 @@ compile:check:ui:
   artifacts:
     reports:
       junit:
-        - "**/**/build/test-results/test/TEST-*.xml"
+        - "**/**/build/test-results/*/TEST-*.xml"
 
-compile:check:removegenerics:
-  stage: ternary
-  image: key-dev-openjdk8
-  script:
-    - javac -version
-    - cd key
-    - ./gradlew --build-cache --continue :key.removegenerics:check
-    - ls
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull
-    paths:
-      - build
-      - .gradle
-  artifacts:
-    reports:
-      junit:
-        - "**/**/build/test-results/test/TEST-*.xml"
-
-
-
-# compile:check:testRunAllProofs:
-#   stage: primary
-#   image: key-dev-openjdk8
-#   script:
-#     - javac -version
-#     - cd key
-#     - ./gradlew --build-cache --continue :key.core:testRunAllProofs
-#     - ls
-#   cache:
-#     key: "$CI_COMMIT_REF_NAME"
-#     policy: pull
-#     paths:
-#       - build
-#       - .gradle
-#   artifacts:
-#     reports:
-#       junit:
-#         - "**/**/build/test-results/test/TEST-*.xml"
-
-
-# compile:check:testProofRules:
-#   stage: primary
-#   image: key-dev-openjdk8
-#   script:
-#     - javac -version
-#     - cd key
-#     - ./gradlew --build-cache --continue :key.core:testProofRules
-#     - ls
-#   cache:
-#     key: "$CI_COMMIT_REF_NAME"
-#     policy: pull
-#     paths:
-#       - build
-#       - .gradle
-#   artifacts:
-#     reports:
-#       junit:
-#         - "**/**/build/test-results/test/TEST-*.xml"
+#
+#
+#compile:testFast:testRunAllProofs:
+#  stage: primary
+#  image: wadoon/key-test-docker:jdk11
+#  script:
+#    - javac -version
+#    - cd key
+#    - gradle --build-cache --continue :key.core:testRunAllProofs
+#    - ls
+#  cache:
+#    key: "$CI_COMMIT_REF_NAME"
+#    policy: pull
+#    paths:
+#      - build
+#      - .gradle
+#  artifacts:
+#    reports:
+#      junit:
+#        - "**/**/build/test-results/*/TEST-*.xml"
+#
+#
+#compile:testFast:testProofRules:
+#  stage: primary
+#  image: wadoon/key-test-docker:jdk11
+#  script:
+#    - javac -version
+#    - cd key
+#    - gradle --build-cache --continue :key.core:testProofRules
+#    - ls
+#  cache:
+#    key: "$CI_COMMIT_REF_NAME"
+#    policy: pull
+#    paths:
+#      - build
+#      - .gradle
+#  artifacts:
+#    reports:
+#      junit:
+#        - "**/**/build/test-results/*/TEST-*.xml"
 
 checkstyle:
   stage: primary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11
   allow_failure: true
   script:
     - echo "**** Check the commit's gitlab page for a readable checkstyle report ****"
