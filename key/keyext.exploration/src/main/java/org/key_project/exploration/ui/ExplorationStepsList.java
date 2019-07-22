@@ -1,9 +1,10 @@
 package org.key_project.exploration.ui;
 
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.*;
 import org.key_project.exploration.ExplorationNodeData;
 
 import javax.swing.*;
@@ -27,7 +28,27 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
     public ExplorationStepsList(MainWindow window) throws HeadlessException {
         initialize();
+        window.getMediator().addKeYSelectionListener(new KeYSelectionListener() {
+            @Override
+            public void selectedNodeChanged(KeYSelectionEvent e) {
+                //do nothing because it does not affect this list
+            }
+
+            @Override
+            public void selectedProofChanged(KeYSelectionEvent e) {
+                createListModel(e.getSource().getSelectedProof());
+                e.getSource().getSelectedProof().addRuleAppListener(new RuleAppListener() {
+                    @Override
+                    public void ruleApplied(ProofEvent e) {
+                        createListModel(e.getSource());
+                    }
+
+                });
+            }
+        });
+//        window.getMediator().getSelectedProof().addProofTreeListener();
     }
+
 
     public void setProof(Proof proof) {
         createListModel(proof);
@@ -44,7 +65,6 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
         List<Node> explorationNodes = collectAllExplorationSteps(root, dtm, rootNode);
         explorationNodes.forEach(node -> listModel.addElement(node));
-        System.out.println("explorationNodes = " + explorationNodes);
     }
 
     public List<Node> collectAllExplorationSteps(Node root, DefaultTreeModel dtm, MyTreeNode rootNode) {
@@ -56,23 +76,28 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     private void findExplorationchildren(Node n, ArrayList<Node> list, DefaultTreeModel dtm, MyTreeNode parent) {
         if (n.leaf()) {
             try{
-                n.getNodeInfo().get(ExplorationNodeData.class);
+                ExplorationNodeData explorationNodeData = n.getNodeInfo().get(ExplorationNodeData.class);
+                if(explorationNodeData != null) {
 
-                MyTreeNode newNode = new MyTreeNode(n);
-                dtm.insertNodeInto(newNode, parent, 0);
-                list.add(n);
-                return;
+                    MyTreeNode newNode = new MyTreeNode(n);
+                    dtm.insertNodeInto(newNode, parent, 0);
+                    list.add(n);
+                    return;
+                }
             } catch (IllegalStateException e){
                 return;
             }
         }
         try  {
-            n.getNodeInfo().get(ExplorationNodeData.class);
-            MyTreeNode newNode = new MyTreeNode(n);
-            dtm.insertNodeInto(newNode, parent, 0);
+            ExplorationNodeData explorationNodeData = n.getNodeInfo().get(ExplorationNodeData.class);
+            if(explorationNodeData != null) {
+             //   n.getNodeInfo().get(ExplorationNodeData.class);
+                MyTreeNode newNode = new MyTreeNode(n);
+                dtm.insertNodeInto(newNode, parent, 0);
 
-            parent = newNode;
-            list.add(n);
+                parent = newNode;
+                list.add(n);
+            }
         } catch (IllegalStateException e){
             //Do nothing its intended
         }
@@ -114,7 +139,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         tree.setCellRenderer(new MyTreeCellRenderer());
         this.add(p1, BorderLayout.CENTER);
         this.add(p2, BorderLayout.NORTH);
-        this.add(buttonPanel, BorderLayout.SOUTH);
+        this.setVisible(true);
     }
 
     @Override
@@ -134,7 +159,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             Node n = (Node) value;
 
             ExplorationNodeData explorationNodeData = n.getNodeInfo().get(ExplorationNodeData.class);
-            if(explorationNodeData != null) {
+            if(explorationNodeData != null && explorationNodeData.getExplorationAction() != null) {
                 listCellRendererComponent.setText(n.serialNr() + " " + explorationNodeData.getExplorationAction());
             }
             return listCellRendererComponent;

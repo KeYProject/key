@@ -48,15 +48,19 @@ public class DeleteFormulaAction extends ExplorationAction {
         Term term = pio.subTerm();
         Goal g = getMediator().getSelectedGoal();
        // g.node().getNodeInfo().get(ExplorationNodeData.class).setExploration(true);
-        g.node().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
+        ExplorationNodeData explorationNodeData = new ExplorationNodeData();
+        g.node().getNodeInfo().register(explorationNodeData, ExplorationNodeData.class);
 
         TacletApp app;
         //boolean isSoundMode = getMediator().getExplorationModeModel().getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.WHOLE_APP;
         app = soundWeakening(pio, term);
         ImmutableList<Goal> result = g.apply(app);
+        explorationNodeData.setExplorationAction("Hide "+term);
+
         result.forEach(goal -> {
             //goal.node().getNodeInfo().setExploration(true);
-            goal.node().getNodeInfo().get(ExplorationNodeData.class).setExplorationAction("Hide "+term);
+            //ExplorationNodeData explorationData = new ExplorationNodeData();
+            //goal.node().getNodeInfo().register(explorationNodeData, ExplorationNodeData.class);
 
         });
     }
