@@ -9,13 +9,13 @@ import de.uka.ilkd.key.settings.ViewSettings;
 import javax.swing.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
  * @version 1 (10.05.19)
  */
 public class StandardUISettings extends SettingsPanel implements SettingsProvider {
+    private static final long serialVersionUID = -7484169054465984605L;
     private static final String INFO_CLUTTER_RULESET =
             "Comma separated list of rule set names, containing clutter rules.";
     private static final String INFO_CLUTTER_RULE = "Comma separated listof clutter rules, \n" +

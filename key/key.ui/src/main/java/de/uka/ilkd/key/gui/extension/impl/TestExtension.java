@@ -31,7 +31,8 @@ import java.util.List;
 @KeYGuiExtension.Info(name = "Test Extension",
         description = "Should only be used for testing of the extension facade",
         priority = 100000,
-        optional = true)
+        optional = true,
+        experimental = true)
 public class TestExtension implements KeYGuiExtension,
         KeYGuiExtension.MainMenu,
         KeYGuiExtension.LeftPanel,
@@ -112,6 +113,8 @@ public class TestExtension implements KeYGuiExtension,
     }
 
     private class TestAction extends KeyAction {
+        private static final long serialVersionUID = -2701623640497343330L;
+
         public TestAction() {
             setName("Test");
             setMenuPath("Test.Test.Test");

@@ -23,7 +23,7 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 
-import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.pp.PosInSequent;
 
 public final class GuiUtilities {
@@ -31,11 +31,11 @@ public final class GuiUtilities {
     private GuiUtilities() {
         throw new Error("Do not instantiate");
     }
-    
-    /** 
+
+    /**
      * paints empty view with white background.
      */
-    public static void paintEmptyViewComponent(JComponent pane, String name) {         
+    public static void paintEmptyViewComponent(JComponent pane, String name) {
         pane.setBorder(new TitledBorder(name));
         pane.setBackground(Color.white);
         if (pane instanceof JScrollPane) {
@@ -44,10 +44,10 @@ public final class GuiUtilities {
         pane.setMinimumSize(new java.awt.Dimension(150,0));
     }
 
-    public static void copyHighlightToClipboard(CurrentGoalView view, PosInSequent pos) {
+    public static void copyHighlightToClipboard(SequentView view, PosInSequent pos) {
         String s = view.getHighlightedText(pos);
         // now CLIPBOARD
-        java.awt.datatransfer.StringSelection ss = 
+        java.awt.datatransfer.StringSelection ss =
             new java.awt.datatransfer.StringSelection(s);
         java.awt.Toolkit toolkit = Toolkit.getDefaultToolkit();
         toolkit.getSystemClipboard().setContents(ss, ss);
@@ -56,7 +56,7 @@ public final class GuiUtilities {
 
     /**
      * Center a component on the screen.
-     * 
+     *
      * @param comp
      *            the component to be centered relative to the screen. It must
      *            already have its final size set.
@@ -66,16 +66,18 @@ public final class GuiUtilities {
     public static void setCenter(Component comp) {
         Dimension screenSize = comp.getToolkit().getScreenSize();
         Dimension frameSize = comp.getSize();
-        if (frameSize.height > screenSize.height)
+        if (frameSize.height > screenSize.height) {
             frameSize.height = screenSize.height;
-        if (frameSize.width > screenSize.width)
+        }
+        if (frameSize.width > screenSize.width) {
             frameSize.width = screenSize.width;
+        }
         comp.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
     }
 
     /**
      * Center a component within a parental component.
-     * 
+     *
      * @param comp
      *            the component to be centered.
      * @param parent
@@ -87,13 +89,14 @@ public final class GuiUtilities {
         if (parent == null) {
             setCenter(comp);
             return;
-        } 
+        }
         Dimension dlgSize = comp.getPreferredSize();
         Dimension frmSize = parent.getSize();
         Point	  loc = parent.getLocation();
-        if (dlgSize.width < frmSize.width && dlgSize.height < frmSize.height)
+        if (dlgSize.width < frmSize.width && dlgSize.height < frmSize.height) {
             comp.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x, (frmSize.height - dlgSize.height) / 2 + loc.y);
-        else
+        } else {
             setCenter(comp);
+        }
     }
 }

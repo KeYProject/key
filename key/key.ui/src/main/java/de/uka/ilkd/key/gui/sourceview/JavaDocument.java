@@ -1,10 +1,8 @@
 package de.uka.ilkd.key.gui.sourceview;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
 
 import java.awt.Color;
-import java.util.EventObject;
 import java.util.HashSet;
 import java.util.Set;
 

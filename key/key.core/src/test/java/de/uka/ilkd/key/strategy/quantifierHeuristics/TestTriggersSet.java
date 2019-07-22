@@ -34,8 +34,6 @@ import de.uka.ilkd.key.proof.TacletAppIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletForTests;
-import junit.framework.TestCase;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;

@@ -16,10 +16,9 @@ package de.uka.ilkd.key.gui.keyshortcuts;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Manager of the configurable {@link KeyStroke}s for proof macros and GUI actions.
@@ -64,7 +63,7 @@ public final class KeyStrokeManager {
      * <p>
      * Needed for dynamical configurability of the {@link KeyStroke} via {@link ShortcutSettings }
      */
-    static final List<WeakReference<Action>> actions = new ArrayList<>(100);
+    static final Map<String, WeakReference<Action>> actions = new HashMap<>(100);
 
     /**
      * Get a {@link KeyStroke} for the given <code>key</code>.
@@ -139,8 +138,15 @@ public final class KeyStrokeManager {
         KeyStroke def = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
         KeyStroke found = get(key, def);
         action.putValue(Action.ACCELERATOR_KEY, found);
-        actions.add(new WeakReference<>(action));
+        registerAction(action);
         return found;
+    }
+
+    /**
+     * Register an action. Helps later to update the keyboard shortcut.
+     */
+    public static void registerAction(Action action) {
+        actions.put(action.getClass().getName(), new WeakReference<>(action));
     }
 
     public static KeyStrokeSettings getSettings() {
@@ -152,10 +158,7 @@ public final class KeyStrokeManager {
      * @return
      */
     static Action findAction(String clazz) {
-        return actions.stream()
-                .map(Reference::get)
-                .filter(it -> it.getClass().getName().equals(clazz))
-                .findAny().orElse(null);
+        return actions.getOrDefault(clazz, new WeakReference<>(null)).get();
     }
 }
 

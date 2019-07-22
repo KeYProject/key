@@ -20,6 +20,8 @@ import java.util.Date;
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class Interaction implements Serializable, Markdownable, Scriptable, Reapplicable {
+    private static final long serialVersionUID = -7031665632460180825L;
+
     @XmlTransient
     protected InteractionGraphicStyle graphicalStyle = new InteractionGraphicStyle();
 

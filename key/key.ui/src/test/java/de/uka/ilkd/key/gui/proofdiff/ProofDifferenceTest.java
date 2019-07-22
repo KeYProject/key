@@ -1,10 +1,8 @@
 package de.uka.ilkd.key.gui.proofdiff;
 
-import de.uka.ilkd.key.util.Pair;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static de.uka.ilkd.key.gui.proofdiff.ProofDifference.Levensthein.calculate;

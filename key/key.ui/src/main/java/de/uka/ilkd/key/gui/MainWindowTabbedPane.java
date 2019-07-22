@@ -9,8 +9,6 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.Collection;
-import java.util.List;
 import java.util.stream.Stream;
 
 /**

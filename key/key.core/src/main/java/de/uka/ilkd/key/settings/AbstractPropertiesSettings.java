@@ -53,8 +53,10 @@ public abstract class AbstractPropertiesSettings implements Settings {
     public void readSettings(Properties props) {
         assert props != null;
         propertyEntries.forEach(it -> {
-            if (props.contains(it.getKey()))
-                properties.setProperty(it.getKey(), props.getProperty(it.getKey()));
+            String value = props.getProperty(it.getKey());
+            if (value != null) {
+                properties.setProperty(it.getKey(), value);
+            }
         });
     }
 

@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -21,6 +22,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
  * Refactoring for {@link OriginTermLabel}s.
@@ -77,7 +79,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             }
         }
 
-        if (!services.getProof().getSettings().getTermLabelSettings().getUseOriginLabels()) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE
+                .getTermLabelSettings().getUseOriginLabels()) {
             if (oldLabel != null) {
                 labels.remove(oldLabel);
             }
@@ -90,10 +93,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
         if (oldLabel != null) {
             labels.remove(oldLabel);
             final Origin oldOrigin = oldLabel.getOrigin();
-            newLabel = new OriginTermLabel(oldOrigin.specType,
-                                           oldOrigin.fileName,
-                                           oldOrigin.line,
-                                           subtermOrigins);
+            newLabel = new OriginTermLabel(oldOrigin, subtermOrigins);
         } else {
             final Origin commonOrigin = OriginTermLabel.computeCommonOrigin(subtermOrigins);
             newLabel = new OriginTermLabel(commonOrigin, subtermOrigins);
@@ -103,6 +103,11 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
                 && (!subtermOrigins.isEmpty()
                         || newLabel.getOrigin().specType != SpecType.NONE)) {
             labels.add(newLabel);
+        }
+
+        if (newLabel.getOrigin() instanceof FileOrigin
+                && goal != null && goal.node() != null) {
+            goal.node().getNodeInfo().addRelevantFile(((FileOrigin) newLabel.getOrigin()).fileName);
         }
     }
 
