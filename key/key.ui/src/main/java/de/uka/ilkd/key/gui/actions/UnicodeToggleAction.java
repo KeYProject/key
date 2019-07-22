@@ -30,7 +30,7 @@ public class UnicodeToggleAction extends MainWindowAction {
 
     public static final String TOOL_TIP =
             "If checked formulae are displayed with special Unicode characters"
-          + " (such as \""+UnicodeHelper.AND+"\") instead of the traditional ASCII ones. \n"
+          + " (such as \"" + UnicodeHelper.AND + "\") instead of the traditional ASCII ones. \n"
           + "Only works in combination with pretty printing (see above).";
    
    /**
