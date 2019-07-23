@@ -39,7 +39,8 @@ public class ShowSecondBranchAction extends KeyAction {
             // No proof loaded, so we cannot register the filter.
             return;
         }
-        model.setShowSecondBranches(model.isShowSecondBranches());
+        boolean showSecondBranches = model.isShowSecondBranches();
+        model.setShowSecondBranches(!showSecondBranches);
         setSelected(model.isShowSecondBranches());
         if (model.isShowSecondBranches()) {
             model.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.WHOLE_APP);
