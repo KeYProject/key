@@ -97,6 +97,8 @@ public class EditFormulaAction extends ExplorationAction {
             if (goal.node().getNodeInfo().getBranchLabel().contains(posToWeakening)) {
                 goal.apply(weakening);
                 goal.node().parent().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
+                getMediator().getSelectionModel().setSelectedNode(goal.node());
+
             } else {
                 goal.setEnabled(false);
             }

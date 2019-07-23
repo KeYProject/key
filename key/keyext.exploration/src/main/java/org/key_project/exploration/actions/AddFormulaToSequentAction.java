@@ -68,7 +68,7 @@ public class AddFormulaToSequentAction extends ExplorationAction {
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
         app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), getMediator().getServices(), true);
         ExplorationNodeData explorationNodeData = new ExplorationNodeData();
-        explorationNodeData.setExplorationAction("Add "+t);
+        explorationNodeData.setExplorationAction("Added "+t);
         g.node().getNodeInfo().register(explorationNodeData, ExplorationNodeData.class);
 
          //g.node().getNodeInfo().setExploration(true);
@@ -87,17 +87,21 @@ public class AddFormulaToSequentAction extends ExplorationAction {
             Goal first = result.head();
             if(first.node().getNodeInfo().getBranchLabel().endsWith("FALSE")){
                 first.setEnabled(false);
+                getMediator().getSelectionModel().setSelectedNode(result.tail().head().node());
             } else {
                 Goal second = result.tail().head();
                 second.setEnabled(false);
+                getMediator().getSelectionModel().setSelectedNode(result.head().node());
             }
         } else {
             Goal first = result.head();
             if(first.node().getNodeInfo().getBranchLabel().endsWith("TRUE")){
                 first.setEnabled(false);
+                getMediator().getSelectionModel().setSelectedNode(result.tail().head().node());
             } else {
                 Goal second = result.tail().head();
                 second.setEnabled(false);
+                getMediator().getSelectionModel().setSelectedNode(result.head().node());
             }
 
         }
