@@ -318,7 +318,7 @@ public final class AuxiliaryContractBuilders {
                 final Label breakOutLabel) {
             return new OuterBreakContinueAndReturnReplacer(block, labels, breakOutLabel,
                     variables.breakFlags, variables.continueFlags, variables.returnFlag,
-                    variables.result, services).replace();
+                    variables.result, variables.exception, services).replace();
         }
 
         /**

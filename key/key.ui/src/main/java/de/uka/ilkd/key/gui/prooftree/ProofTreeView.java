@@ -61,8 +61,8 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindowTabbedPane;
-import de.uka.ilkd.key.gui.NodeInfoWindow;
-import de.uka.ilkd.key.gui.NodeInfoWindowListener;
+import de.uka.ilkd.key.gui.NodeInfoVisualizer;
+import de.uka.ilkd.key.gui.NodeInfoVisualizerListener;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
@@ -144,20 +144,24 @@ public class ProofTreeView extends JPanel implements TabPanel {
     private GUITreeSelectionListener treeSelectionListener;
     private GUIProofTreeGUIListener guiListener;
 
-    private NodeInfoWindowListener nodeInfoWindowListener = new NodeInfoWindowListener() {
+    /**
+     * Updates relevant nodes in the proof tree whenever a {@link NodeInfoVisualizer}
+     * is opened or closed.
+     */
+    private NodeInfoVisualizerListener nodeInfoVisListener = new NodeInfoVisualizerListener() {
 
         @Override
-        public void windowUnregistered(NodeInfoWindow win) {
-            if (win.getNode().proof() != null
-                    && !win.getNode().proof().isDisposed()
-                    && win.getNode().proof() == proof) {
-                delegateModel.updateTree(win.getNode());
+        public void visualizerUnregistered(NodeInfoVisualizer vis) {
+            if (vis.getNode().proof() != null
+                    && !vis.getNode().proof().isDisposed()
+                    && vis.getNode().proof() == proof) {
+                delegateModel.updateTree(vis.getNode());
             }
         }
 
         @Override
-        public void windowRegistered(NodeInfoWindow win) {
-            delegateModel.updateTree(win.getNode());
+        public void visualizerRegistered(NodeInfoVisualizer vis) {
+            delegateModel.updateTree(vis.getNode());
         }
     };
 
@@ -260,7 +264,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         delegateView.addMouseListener(ml);
 
-        NodeInfoWindow.addListener(nodeInfoWindowListener);
+        NodeInfoVisualizer.addListener(nodeInfoVisListener);
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
 
         setProofTreeFont();
@@ -294,7 +298,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     protected void finalize() throws Throwable {
         super.finalize();
         Config.DEFAULT.removeConfigChangeListener(configChangeListener);
-        NodeInfoWindow.removeListener(nodeInfoWindowListener);
+        NodeInfoVisualizer.removeListener(nodeInfoVisListener);
     }
 
     private void setProofTreeFont() {
@@ -932,7 +936,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 }
 
                 Icon defaultIcon;
-                if (NodeInfoWindow.hasInstances(node)) {
+                if (NodeInfoVisualizer.hasInstances(node)) {
                     defaultIcon = IconFactory.WINDOW_ICON.get();
                 } else if (notes != null) {
                     defaultIcon = IconFactory.editFile(16);
