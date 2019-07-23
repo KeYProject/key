@@ -1,5 +1,53 @@
 package de.uka.ilkd.key.gui.sourceview;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextPane;
+import javax.swing.JViewport;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
+import javax.swing.text.Document;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
+import javax.swing.text.SimpleAttributeSet;
+
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.IOUtil.LineInformation;
+
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -10,7 +58,11 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.statement.Else;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
@@ -25,32 +77,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.IOUtil.LineInformation;
-
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
-import javax.swing.text.Document;
-import javax.swing.text.Highlighter;
-import javax.swing.text.Highlighter.HighlightPainter;
-import javax.swing.text.SimpleAttributeSet;
-import java.awt.Dimension;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.*;
 
 /**
  * This class is responsible for showing the source code and visualizing the symbolic execution
@@ -173,7 +199,7 @@ public final class SourceView extends JComponent {
 
                 // Mark tabs that contain highlights.
                 for (Tab tab : tabs.values()) {
-                    tab.mark();
+                    tab.markTabComponent();
                 }
             }
         });
@@ -260,7 +286,7 @@ public final class SourceView extends JComponent {
         Highlight highlight = new Highlight(fileName, line, color, level);
         highlights.add(highlight);
 
-        tab.mark();
+        tab.markTabComponent();
 
         tab.removeHighlights(line);
         tab.applyHighlights(line);
@@ -399,7 +425,7 @@ public final class SourceView extends JComponent {
             }
         }
 
-        tab.mark();
+        tab.markTabComponent();
 
         return result;
     }
@@ -986,7 +1012,7 @@ public final class SourceView extends JComponent {
                 textPane, lineInformation, absoluteFileName));
         }
 
-        private void mark() {
+        private void markTabComponent() {
             if (highlights.isEmpty()) {
                 tabPane.setForegroundAt(
                         tabPane.indexOfComponent(this),
@@ -999,7 +1025,13 @@ public final class SourceView extends JComponent {
                     tabPane.setForegroundAt(
                             tabPane.indexOfComponent(this),
                             TAB_HIGHLIGHT_COLOR.get());
+                    tabPane.setBackgroundAt(
+                            tabPane.indexOfComponent(this),
+                            UIManager.getColor("TabbedPane.background"));
                 } else {
+                    tabPane.setForegroundAt(
+                            tabPane.indexOfComponent(this),
+                            UIManager.getColor("TabbedPane.foreground"));
                     tabPane.setBackgroundAt(
                             tabPane.indexOfComponent(this),
                             TAB_HIGHLIGHT_COLOR.get());
