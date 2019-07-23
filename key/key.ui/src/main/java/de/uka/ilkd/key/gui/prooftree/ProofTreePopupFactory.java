@@ -1,5 +1,23 @@
 package de.uka.ilkd.key.gui.prooftree;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Function;
+
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
+import javax.swing.JTree;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -19,21 +37,10 @@ import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import javax.swing.*;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Function;
-
-import static de.uka.ilkd.key.gui.prooftree.ProofTreeView.searchKeyStroke;
-
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
-    private List<Function<ProofTreeContext, Component>> builders = new ArrayList<>();
+    private List<Function<ProofTreeContext, Component>> builders =
+            new ArrayList<Function<ProofTreeContext, Component>>();
 
     protected ProofTreePopupFactory() {
         addAction(RunStrategyOnNode::new);
@@ -77,7 +84,8 @@ public class ProofTreePopupFactory {
         addAction(SubtreeStatistics::new);
 
         addAction(ctx -> new SequentViewDock.OpenCurrentNodeAction(ctx.window, ctx.invokedNode));
-        addAction(ctx -> new ProofDifferenceView.OpenDifferenceWithParent(ctx.window, ctx.invokedNode));
+        addAction(ctx
+            -> new ProofDifferenceView.OpenDifferenceWithParent(ctx.window, ctx.invokedNode));
     }
 
     private Component getMacroMenu(ProofTreeContext proofTreeContext) {
@@ -94,10 +102,12 @@ public class ProofTreePopupFactory {
         context.path = selectedPath;
         if (selectedPath.getLastPathComponent() instanceof GUIProofTreeNode) {
             context.branch = selectedPath.getParentPath();
-            context.invokedNode = ((GUIProofTreeNode) selectedPath.getLastPathComponent()).getNode();
+            context.invokedNode =
+                    ((GUIProofTreeNode) selectedPath.getLastPathComponent()).getNode();
         } else {
             context.branch = selectedPath;
-            context.invokedNode = ((GUIBranchNode) selectedPath.getLastPathComponent()).getNode();
+            context.invokedNode =
+                    ((GUIBranchNode) selectedPath.getLastPathComponent()).getNode();
         }
 
         context.delegateModel = view.delegateModel;
@@ -131,13 +141,10 @@ public class ProofTreePopupFactory {
             }
         });
 
-        List<Action> extensionActions =
-                KeYGuiExtensionFacade.getContextMenuItems(DefaultContextMenuKind.PROOF_TREE,
-                        context.invokedNode, context.mediator);
-        if (!extensionActions.isEmpty()) {
-            menu.addSeparator();
-            extensionActions.forEach(menu::add);
-        }
+        menu.addSeparator();
+        KeYGuiExtensionFacade.addContextMenuItems(DefaultContextMenuKind.PROOF_TREE, menu,
+                                                  context.invokedNode, context.mediator);
+
         return menu;
     }
 
@@ -259,8 +266,8 @@ public class ProofTreePopupFactory {
                      i = 0; i < count; i++) {
                     Object child = context.delegateModel.getChild(tmpNode, i);
                     if (!context.delegateModel.isLeaf(child)) {
-                        ExpansionState.collapseAll(context.delegateView, context.branch
-                                .pathByAddingChild(child));
+                        ExpansionState.collapseAll(context.delegateView,
+                                                   context.branch.pathByAddingChild(child));
                     }
                 }
             }
@@ -481,7 +488,9 @@ public class ProofTreePopupFactory {
             super(context);
             setName("Search");
             setIcon(IconFactory.search2(ICON_SIZE));
-            setAcceleratorKey(searchKeyStroke);
+            setAcceleratorKey(
+                    de.uka.ilkd.key.gui.prooftree.ProofTreeView.searchKeyStroke
+            );
         }
 
         @Override
@@ -561,7 +570,7 @@ public class ProofTreePopupFactory {
          * All enabled goals below the current node are taken into consideration.
          * <p>
          * CAUTION: If the node itself is a goal then allow applying rules
-         * to it even if it were disabled. Desired behaviour?
+         * to it even if it were disabled. Desired behavior?
          */
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -569,14 +578,19 @@ public class ProofTreePopupFactory {
             KeYMediator r = context.mediator;
             // is the node a goal?
             if (invokedGoal == null) {
-                ImmutableList<Goal> enabledGoals = context.proof.getSubtreeEnabledGoals(context.invokedNode);
-                // This method delegates the request only to the UserInterfaceControl which implements the functionality.
+                ImmutableList<Goal> enabledGoals =
+                        context.proof.getSubtreeEnabledGoals(context.invokedNode);
+                // This method delegates the request only to the UserInterfaceControl
+                // which implements the functionality.
                 // No functionality is allowed in this method body!
                 r.getUI().getProofControl().startAutoMode(r.getSelectedProof(), enabledGoals);
             } else {
-                // This method delegates the request only to the UserInterfaceControl which implements the functionality.
+                // This method delegates the request only to the UserInterfaceControl
+                // which implements the functionality.
                 // No functionality is allowed in this method body!
-                r.getUI().getProofControl().startAutoMode(r.getSelectedProof(), ImmutableSLList.<Goal>nil().prepend(invokedGoal));
+                r.getUI().getProofControl()
+                    .startAutoMode(r.getSelectedProof(),
+                                   ImmutableSLList.<Goal>nil().prepend(invokedGoal));
             }
         }
     }
@@ -597,10 +611,14 @@ public class ProofTreePopupFactory {
             String action = enableGoals ? "Automatic" : "Interactive";
             putValue(NAME, "Set All Goals Below to " + action);
             if (enableGoals) {
-                putValue(SHORT_DESCRIPTION, "Include this node and all goals in the subtree in automatic rule application");
+                putValue(SHORT_DESCRIPTION,
+                         "Include this node and all goals "
+                       + "in the subtree in automatic rule application");
                 putValue(SMALL_ICON, KEY_HOLE_PULL_DOWN_MENU);
             } else {
-                putValue(SHORT_DESCRIPTION, "Exclude this node and all goals in the subtree from automatic rule application");
+                putValue(SHORT_DESCRIPTION,
+                         "Exclude this node and all goals "
+                       + "in the subtree from automatic rule application");
                 putValue(SMALL_ICON, KEY_HOLE_DISABLED_PULL_DOWN_MENU);
             }
         }
