@@ -85,13 +85,16 @@ public class AddFormulaToSequentAction extends ExplorationAction {
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
         app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), getMediator().getServices(), true);
         ExplorationNodeData explorationNodeData = new ExplorationNodeData();
-        explorationNodeData.setExplorationAction("Added "+t);
-        g.node().getNodeInfo().register(explorationNodeData, ExplorationNodeData.class);
+        if(antecedent)
+            explorationNodeData.setExplorationAction("Added "+t+ " ==>");
+        else
+            explorationNodeData.setExplorationAction("Added ==> "+t);
 
-         //g.node().getNodeInfo().setExploration(true);
+         g.node().getNodeInfo().register(explorationNodeData, ExplorationNodeData.class);
+
         ImmutableList<Goal> result = g.apply(app);
-        //set the actions flag
 
+        //set the actions flag
          result.forEach(goal -> {
           //  goal.node().getNodeInfo().setExploration(true);
              goal.node().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
