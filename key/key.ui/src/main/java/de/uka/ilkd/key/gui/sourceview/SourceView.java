@@ -1123,13 +1123,13 @@ public final class SourceView extends JComponent {
                         if (i == 0) {
                             symbExHighlights.add(addHighlight(
                                     absoluteFileName,
-                                    l.second.getStartPosition().getLine() - 1,
+                                    l.second.getStartPosition().getLine(),
                                     MOST_RECENT_HIGHLIGHT_COLOR.get(),
                                     0));
                         } else {
                             symbExHighlights.add(addHighlight(
                                     absoluteFileName,
-                                    l.second.getStartPosition().getLine() - 1,
+                                    l.second.getStartPosition().getLine(),
                                     NORMAL_HIGHLIGHT_COLOR.get(),
                                     0));
                         }
@@ -1374,6 +1374,7 @@ public final class SourceView extends JComponent {
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -1398,6 +1399,7 @@ public final class SourceView extends JComponent {
                         break;
                     }
                 }
+
                 if (n != null) {
                     mainWindow.getMediator().getSelectionModel().setSelectedNode(n);
                 }
