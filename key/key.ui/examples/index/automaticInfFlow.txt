@@ -75,6 +75,16 @@ verboseOutput = true
  */
 # runOnlyOn = group1,group2
 
+
+/*
+ * This test suite relies on method expansion to be always possible.
+ * Hence, it is switched from modular-only to no restriction mode.
+ */
+keySettings = "
+[Choice]DefaultChoices=methodExpansion-methodExpansion\\:noRestriction
+"
+
+
 # # Tests for information flow
 
 group ToyVoting {
