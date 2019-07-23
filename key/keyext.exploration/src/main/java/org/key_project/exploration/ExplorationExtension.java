@@ -30,7 +30,7 @@ import java.util.List;
  * @version 1 (16.04.19)
  */
 @KeYGuiExtension.Info(name = "Exploration",
-        description = "Author: Sarah Grebing <sgrebing@ira.uka.de>, Alexander Weigl <weigl@ira.uka.de>",
+        description = "Author: Sarah Grebing <grebing@ira.uka.de>, Alexander Weigl <weigl@ira.uka.de>",
         experimental = false,
         optional = true,
         priority = 10000)

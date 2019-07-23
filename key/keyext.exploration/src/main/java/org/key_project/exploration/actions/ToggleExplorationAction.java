@@ -16,7 +16,7 @@ public class ToggleExplorationAction extends KeyAction {
     public ToggleExplorationAction(ExplorationModeModel model) {
         this.model = model;
 
-        setName("Exploration Mode");
+        setName("Start/Stop Exploration Mode");
         setTooltip("Choose to start ExplorationMode");
         setIcon(Icons.EXPLORE.get(24f));
         setSelected(model.isExplorationModeSelected());
@@ -27,6 +27,8 @@ public class ToggleExplorationAction extends KeyAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        model.setExplorationModeSelected(model.isExplorationModeSelected());
+
+        boolean explorationModeSelected = model.isExplorationModeSelected();
+        model.setExplorationModeSelected(!explorationModeSelected);
     }
 }

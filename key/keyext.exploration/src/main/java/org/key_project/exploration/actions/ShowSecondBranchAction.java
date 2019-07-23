@@ -16,7 +16,7 @@ public class ShowSecondBranchAction extends KeyAction {
 
     public ShowSecondBranchAction(ExplorationModeModel model) {
         this.model = model;
-        setName("Show Justification Branch");
+        setName("Hide justification branch");
         setSelected(model.isShowSecondBranches());
         setTooltip("Exploration actions are \noften done using a cut. Choose to hide\n " +
                 "the second cut-branches from the view \nto focus on the actions. Uncheck to focus on these branches.");
@@ -24,6 +24,8 @@ public class ShowSecondBranchAction extends KeyAction {
 
         model.addPropertyChangeListener(ExplorationModeModel.PROP_SHOWSECONDBRANCH,
                 e -> setSelected(model.isShowSecondBranches()));
+        model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE, e -> setEnabled(model.isExplorationModeSelected()));
+        setEnabled(model.isExplorationModeSelected());
         setSelected(model.isShowSecondBranches());
     }
 
