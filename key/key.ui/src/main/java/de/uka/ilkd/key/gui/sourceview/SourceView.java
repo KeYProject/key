@@ -762,13 +762,15 @@ public final class SourceView extends JComponent {
                                         MethodBodyStatement mb = (MethodBodyStatement) el;
                                         Statement body = mb.getBody(services);
                                         if (body != null) {
-                                            addPosToList(body.getPositionInfo(), list, node);
+                                            node.getNodeInfo().addRelevantFile(
+                                                    body.getPositionInfo().getFileName());
                                         } else {
                                             // the method is declared without a body
                                             // -> we try to show the file either way
                                             IProgramMethod pm = mb.getProgramMethod(services);
                                             if (pm != null) {
-                                                addPosToList(pm.getPositionInfo(), list, node);
+                                                node.getNodeInfo().addRelevantFile(
+                                                        pm.getPositionInfo().getFileName());
                                             }
                                         }
                                     }
