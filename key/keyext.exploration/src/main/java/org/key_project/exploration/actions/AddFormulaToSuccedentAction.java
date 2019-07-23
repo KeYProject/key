@@ -36,12 +36,14 @@ public class AddFormulaToSuccedentAction extends AddFormulaToSequentAction {
         Term t = promptForTerm(mainWindow, null);
         if (t == null) return;
         ExplorationModeModel model = getMediator().get(ExplorationModeModel.class);
-        if (model.getExplorationTacletAppState()
+        super.soundAddition(t, false);
+
+/*        if (model.getExplorationTacletAppState()
                 == ExplorationModeModel.ExplorationState.SIMPLIFIED_APP) {
             super.soundAddition(t, false, false);
         } else {
             super.soundAddition(t, false, true);
-        }
+        }*/
     }
 
 

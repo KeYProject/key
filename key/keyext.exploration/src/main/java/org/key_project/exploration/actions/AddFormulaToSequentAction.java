@@ -13,7 +13,24 @@ import org.key_project.util.collection.ImmutableList;
 import java.awt.event.ActionEvent;
 
 /**
- * Action to handle proof actions addition of formulas
+ * ExplorationAction that handles the addition of formulas to the sequent.
+ * This action is implemented using the cut rule.
+ *
+ * The branch not corresponding to the desried change is set to interactive. This enables that the automatic strategies
+ * avoid expanding this branch and the user needs to activate the branch by hand.
+ *
+ * Adding formulas to the antecedent:
+ *  '==> p' as goal node and adding q to the antecedent results in two branches:
+ *
+ * 1) q ==> p
+ * 2) ==> p,q <-- this branch is set to interactive such that the automatic strategies do not expand it
+
+ * Adding formulas to the succedent:
+ *  '==> p' as goal node and adding q to the succedent results in two branches:
+ *
+ * 1) q ==> p <-- this branch is set to interactive such that the automatic strategies do not expand it
+ * 2) ==> p,q
+ *
  */
 public class AddFormulaToSequentAction extends ExplorationAction {
     public AddFormulaToSequentAction(MainWindow mainWindow) {
@@ -56,11 +73,11 @@ public class AddFormulaToSequentAction extends ExplorationAction {
     }*/
 
     /**
-     * Create a new Tacletapp that is sound i.e. make a cut
-     * @param t
-     * @param antecedent whether to add to antecedent
+     * Create a new Tacletapp that add a formula to the sequent using the cut rule and disabeling one of the branches
+     * @param t Term to add to teh sequent
+     * @param antecedent whether to add teh term to antecedent
      */
-     void soundAddition(Term t, boolean antecedent, boolean showSecondBranch){
+     void soundAddition(Term t, boolean antecedent){
         Goal g = getMediator().getSelectedGoal();
         Taclet cut = getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
         Semisequent semisequent = new Semisequent(new SequentFormula(t));

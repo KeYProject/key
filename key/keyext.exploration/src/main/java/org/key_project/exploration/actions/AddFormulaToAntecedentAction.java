@@ -27,11 +27,13 @@ public class AddFormulaToAntecedentAction extends AddFormulaToSequentAction {
         Term t = promptForTerm(mainWindow, null);
         if (t == null) return;
         ExplorationModeModel model = getMediator().get(ExplorationModeModel.class);
-        if (model.getExplorationTacletAppState()
+        super.soundAddition(t, true);
+
+/*        if (model.getExplorationTacletAppState()
                 == (ExplorationModeModel.ExplorationState.SIMPLIFIED_APP)) {
             super.soundAddition(t, true, false);
         } else {
             super.soundAddition(t, true, true);
-        }
+        }*/
     }
 }
