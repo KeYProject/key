@@ -45,7 +45,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     private static final IconFontProvider ICON_LOAD = new IconFontProvider(FontAwesomeSolid.TRUCK_LOADING);
     private static final IconFontProvider ICON_ADD_USER_ACTION = new IconFontProvider(FontAwesomeRegular.STICKY_NOTE);
     private static final IconFontProvider ICON_TOGGLE_FAVOURITE = new IconFontProvider(FontAwesomeSolid.HEART, Color.red);
-    private static final IconFontProvider ICON_MARKDOWN = new IconFontProvider(FontAwesomeSolid.MARKDOWN);
+    private static final IconFontProvider ICON_MARKDOWN = new IconFontProvider(FontAwesomeBrands.MARKDOWN);
 
 
     private final InteractionRecorder recorder = new InteractionRecorder();

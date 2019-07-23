@@ -14,10 +14,7 @@ import de.uka.ilkd.key.gui.prooftree.Style;
 import de.uka.ilkd.key.gui.prooftree.Styler;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
-import org.key_project.exploration.actions.AddFormulaToAntecedentAction;
-import org.key_project.exploration.actions.AddFormulaToSuccedentAction;
-import org.key_project.exploration.actions.DeleteFormulaAction;
-import org.key_project.exploration.actions.EditFormulaAction;
+import org.key_project.exploration.actions.*;
 import org.key_project.exploration.ui.ExplorationModeToolBar;
 import org.key_project.exploration.ui.ExplorationStepsList;
 
@@ -42,8 +39,12 @@ public class ExplorationExtension implements KeYGuiExtension,
         KeYGuiExtension.Startup,
         KeYGuiExtension.Toolbar,
         KeYGuiExtension.LeftPanel {
-    private JToolBar explorationToolbar;
     private ExplorationModeModel model = new ExplorationModeModel();
+
+    private JToolBar explorationToolbar;
+
+    private ExplorationStepsList leftPanel;
+
     private ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
         public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, PosInSequent pos) {
@@ -56,7 +57,7 @@ public class ExplorationExtension implements KeYGuiExtension,
             return super.getContextActions(mediator, kind, pos);
         }
     };
-    private ExplorationStepsList leftPanel;
+
 
     @Override
     public List<Action> getContextActions(KeYMediator mediator,
@@ -67,7 +68,9 @@ public class ExplorationExtension implements KeYGuiExtension,
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         if (explorationToolbar == null) {
-            explorationToolbar = new ExplorationModeToolBar(mainWindow, model);
+            explorationToolbar = new JToolBar();
+            explorationToolbar.add(new ToggleExplorationAction(model));
+            explorationToolbar.add(new ShowSecondBranchAction(model));
         }
         return explorationToolbar;
     }
