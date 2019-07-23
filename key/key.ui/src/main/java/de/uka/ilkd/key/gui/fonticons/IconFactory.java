@@ -44,6 +44,8 @@ public final class IconFactory {
             new IconFontProvider(FontAwesomeSolid.ARROW_RIGHT);
     public static final IconFontProvider PREVIOUS =
             new IconFontProvider(FontAwesomeSolid.ARROW_LEFT);
+    public static final IconFontProvider START =
+            new IconFontProvider(FontAwesomeSolid.PLAY, Color.GREEN);
     public static final IconFontProvider STOP =
             new IconFontProvider(FontAwesomeSolid.STOP, Color.RED);
     public static final IconFontProvider CLOSE =
@@ -364,6 +366,10 @@ public final class IconFactory {
     public static Icon autoModeStartLogo(int size) {
         //return scaleIcon(autoModeStart, size, size);
         return AUTO_MODE_START.load(size);
+    }
+
+    public static Icon strategyStartLogo(int size) {
+        return START.load(size);
     }
 
     public static Icon autoModeStopLogo(int size) {
