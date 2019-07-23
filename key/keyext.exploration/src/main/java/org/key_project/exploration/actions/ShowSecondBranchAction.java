@@ -2,9 +2,11 @@ package org.key_project.exploration.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.fonticons.IconProvider;
 import org.key_project.exploration.ExplorationModeModel;
 import org.key_project.exploration.Icons;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 /**
@@ -20,7 +22,9 @@ public class ShowSecondBranchAction extends KeyAction {
         setSelected(model.isShowSecondBranches());
         setTooltip("Exploration actions are \noften done using a cut. Choose to hide\n " +
                 "the second cut-branches from the view \nto focus on the actions. Uncheck to focus on these branches.");
-        setIcon(Icons.SECOND_BRANCH.get(24f));
+        Icon secondBranch = Icons.SECOND_BRANCH.get();
+
+        setIcon(secondBranch);
 
         model.addPropertyChangeListener(ExplorationModeModel.PROP_SHOWSECONDBRANCH,
                 e -> setSelected(model.isShowSecondBranches()));

@@ -1,6 +1,5 @@
 package org.key_project.exploration;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.fonticons.*;
 
 import java.awt.*;
@@ -17,5 +16,5 @@ public class Icons {
             new IconFontProvider(MaterialDesignRegular.EXPLORE);
 
     public static final IconProvider SECOND_BRANCH = new IconFontProvider(
-            FontAwesomeSolid.BALANCE_SCALE);
+            FontAwesomeSolid.SHARE_ALT);
 }
