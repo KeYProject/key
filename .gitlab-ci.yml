@@ -62,14 +62,6 @@ compile:testClasses:
       - build
       - .gradle
 
-compile:testClasses8:
-  stage: secondary
-  image: wadoon/key-test-docker:jdk8
-  script:
-    - javac -version
-    - cd key
-    - gradle --parallel classes testClasses
-
 compile:testFast:key.util:
   stage: ternary
   image: wadoon/key-test-docker:jdk11

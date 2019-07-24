@@ -18,13 +18,13 @@ public class ShowSecondBranchAction extends KeyAction {
 
     public ShowSecondBranchAction(ExplorationModeModel model) {
         this.model = model;
-        setName("Hide justification branch");
+        setName("Toggle second branch");
         setSelected(model.isShowSecondBranches());
         setTooltip("Exploration actions are \noften done using a cut. Choose to hide\n " +
                 "the second cut-branches from the view \nto focus on the actions. Uncheck to focus on these branches.");
-        Icon secondBranch = Icons.SECOND_BRANCH.get();
-
+        Icon secondBranch = Icons.SECOND_BRANCH_HIDE.get(18);
         setIcon(secondBranch);
+
 
         model.addPropertyChangeListener(ExplorationModeModel.PROP_SHOWSECONDBRANCH,
                 e -> setSelected(model.isShowSecondBranches()));
@@ -44,10 +44,11 @@ public class ShowSecondBranchAction extends KeyAction {
         setSelected(model.isShowSecondBranches());
         if (model.isShowSecondBranches()) {
             model.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.WHOLE_APP);
-            this.setIcon(Icons.SECOND_BRANCH.get());
+            Icon icon = Icons.SECOND_BRANCH_HIDE.get(18);
+            this.setIcon(icon);
         } else {
             model.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.SIMPLIFIED_APP);
-            this.setIcon(Icons.SECOND_BRANCH_HIDE.get());
+            this.setIcon(Icons.SECOND_BRANCH);
         }
     }
 }
