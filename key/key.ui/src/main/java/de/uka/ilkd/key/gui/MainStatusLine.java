@@ -15,7 +15,6 @@ package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.util.TipOfTheDay;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -79,7 +78,6 @@ class MainStatusLine extends JPanel {
      */
     public void reset() {
         setProgressPanelVisible(false);
-        setStatusText("Hint: " + TipOfTheDay.get());
     }
 
     /**

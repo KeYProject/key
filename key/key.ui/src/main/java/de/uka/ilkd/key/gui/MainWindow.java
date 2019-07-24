@@ -148,7 +148,7 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.gui.sourceview.SourceView;
+import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
@@ -208,7 +208,7 @@ public final class MainWindow extends JFrame {
     /**
      * the view to show source code and symbolic execution information
      */
-    private final JComponent sourceView;
+    private final SourceViewFrame sourceViewFrame;
     /**
      * Use this SequentView in case no proof is loaded.
      */
@@ -343,7 +343,7 @@ public final class MainWindow extends JFrame {
         autoModeAction = new AutoModeAction(this);
         //mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
         mainFrame = new MainFrame(this, emptySequent);
-        sourceView = SourceView.getSourceView(this);
+        sourceViewFrame = new SourceViewFrame(this);
         proofList = new TaskTree(mediator);
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(mediator);
@@ -562,7 +562,7 @@ public final class MainWindow extends JFrame {
         dockProofListView = DockingHelper.createSingleDock("Loaded Proofs", proofListView,
                 TaskTree.class.getName());
         dockSequent = DockingHelper.createSingleDock("Sequent", mainFrame);
-        dockSourceView = DockingHelper.createSingleDock("Source", sourceView);
+        dockSourceView = DockingHelper.createSingleDock("Source", sourceViewFrame);
 
         Stream<TabPanel> extensionPanels = KeYGuiExtensionFacade.getAllPanels(this);
         Stream<TabPanel> defaultPanels = Stream.of(proofTreeView, infoView,
@@ -576,6 +576,7 @@ public final class MainWindow extends JFrame {
 
         dockProofListView.setVisible(true);
         dockSequent.setVisible(true);
+
         dockSourceView.setVisible(true);
 
         DockingHelper.restoreFactoryDefault(this);
@@ -1325,6 +1326,19 @@ public final class MainWindow extends JFrame {
     public CDockable getDockProofListView() {
         return dockProofListView;
     }
+
+    public SingleCDockable getDockSourceView() {
+        return dockSourceView;
+    }
+
+    public SingleCDockable getDockSequent() {
+        return dockSequent;
+    }
+
+    public SourceViewFrame getSourceViewFrame() {
+        return sourceViewFrame;
+    }
+
     /**
      * Glass pane that only delivers events for the status line (i.e. the abort button)
      * <p>
@@ -1753,14 +1767,4 @@ public final class MainWindow extends JFrame {
         }
 
     }
-
-
-    public SingleCDockable getDockSourceView() {
-        return dockSourceView;
-    }
-
-    public SingleCDockable getDockSequent() {
-        return dockSequent;
-    }
-
 }
