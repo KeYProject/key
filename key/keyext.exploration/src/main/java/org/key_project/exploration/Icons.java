@@ -5,6 +5,8 @@ import de.uka.ilkd.key.gui.fonticons.*;
 import java.awt.*;
 
 /**
+ * Icons of the Exploration Extension
+ *
  * @author Alexander Weigl
  * @version 1 (22.07.19)
  */
@@ -17,6 +19,7 @@ public class Icons {
 
     public static final IconProvider SECOND_BRANCH = new IconFontProvider(
             FontAwesomeSolid.SHARE_ALT);
+
     public static final IconProvider SECOND_BRANCH_HIDE = new IconFontProvider(
             FontAwesomeSolid.ELLIPSIS_V);
 }

@@ -1,5 +1,7 @@
 package org.key_project.exploration;
 
+import java.util.Objects;
+
 /**
  * Information on exploration that is attached to nodes.
  * If such an object is attached to a node, this node will be highlighted in the tree with a border
@@ -23,5 +25,19 @@ public class ExplorationNodeData {
      */
     public void setExplorationAction(String explorationAction) {
         this.explorationAction = explorationAction;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ExplorationNodeData)) return false;
+        ExplorationNodeData that = (ExplorationNodeData) o;
+        return Objects.equals(getExplorationAction(), that.getExplorationAction());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getExplorationAction());
     }
 }

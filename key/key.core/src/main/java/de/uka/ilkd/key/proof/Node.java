@@ -37,7 +37,10 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 
-public class Node {
+/**
+ *
+ */
+public class Node implements Iterable<Node> {
     Node parent = null;
 
     private static final String RULE_WITHOUT_NAME = "rule without name";
