@@ -170,7 +170,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
             createBooleanProperty(SYNTAX_HIGHLIGHTING, true);
     private PropertyEntry<Boolean> hidePackagePrefix =
             createBooleanProperty(HIDE_PACKAGE_PREFIX, false);
-    private PropertyEntry<Boolean> confirmExit = createBooleanProperty(CONFIRM_EXIT, false);
+    private PropertyEntry<Boolean> confirmExit = createBooleanProperty(CONFIRM_EXIT, true);
     private PropertyEntry<Boolean> showWholeTaclet =
             createBooleanProperty(SHOW_WHOLE_TACLET, false);
     private PropertyEntry<Integer> sizeIndex = createIntegerProperty(FONT_INDEX, 2);
