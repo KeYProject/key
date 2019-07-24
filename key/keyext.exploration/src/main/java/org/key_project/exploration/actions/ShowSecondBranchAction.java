@@ -44,8 +44,10 @@ public class ShowSecondBranchAction extends KeyAction {
         setSelected(model.isShowSecondBranches());
         if (model.isShowSecondBranches()) {
             model.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.WHOLE_APP);
+            this.setIcon(Icons.SECOND_BRANCH.get());
         } else {
             model.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.SIMPLIFIED_APP);
+            this.setIcon(Icons.SECOND_BRANCH_HIDE.get());
         }
     }
 }

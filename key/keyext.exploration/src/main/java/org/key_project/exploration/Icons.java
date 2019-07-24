@@ -17,4 +17,6 @@ public class Icons {
 
     public static final IconProvider SECOND_BRANCH = new IconFontProvider(
             FontAwesomeSolid.SHARE_ALT);
+    public static final IconProvider SECOND_BRANCH_HIDE = new IconFontProvider(
+            FontAwesomeSolid.ELLIPSIS_V);
 }

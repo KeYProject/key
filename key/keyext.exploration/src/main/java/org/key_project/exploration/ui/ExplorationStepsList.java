@@ -12,16 +12,16 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
 
 public class ExplorationStepsList extends JPanel implements TabPanel {
-    private JButton jumpToNode = new JButton("Jump To Node");
+    //private JButton jumpToNode = new JButton("Jump To Node");
     private JButton pruneExploration = new JButton("Prune Selected Exploration Steps");
     private DefaultListModel<Node> listModel = new DefaultListModel<>();
     private DefaultTreeModel dtm = new DefaultTreeModel(null);
     private JPanel buttonPanel = new JPanel();
+    private JTree tree;
 
     private KeYMediator mediator;
 
@@ -42,6 +42,9 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
                     @Override
                     public void ruleApplied(ProofEvent e) {
                         createModel(e.getSource());
+                        TreePath selectionPath = tree.getSelectionModel().getSelectionPath();
+                        setTreeExpandedState(tree, true);
+                        tree.setSelectionPath(selectionPath);
                     }
 
                 });
@@ -116,10 +119,13 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
         //ButtonPanel
         this.buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 2, 2));
-        this.buttonPanel.add(jumpToNode);
+        //this.buttonPanel.add(jumpToNode);
         this.buttonPanel.add(pruneExploration);
 
         JList explorationStepList = new JList<>(listModel);
+        tree = new JTree();
+        tree.setModel(dtm);
+
         explorationStepList.setCellRenderer(new MyCellRenderer());
         explorationStepList.addListSelectionListener(new ListSelectionListener() {
             @Override
@@ -130,32 +136,27 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
                     Object selectedValue = explorationStepList.getSelectedValue();
                     if(selectedValue != null) {
                         Node selected = (Node) selectedValue;
+                        TreePath treePath = getTreePath(selected);
+                        if(treePath != null) {
+                            tree.setSelectionPath(treePath);
+                            tree.addSelectionPath(treePath);
+
+                        }
                         mediator.getSelectionModel().setSelectedNode(selected);
+
                     }
                 }
             }
         });
-        jumpToNode.addActionListener(actionEvent -> {
+       /* jumpToNode.addActionListener(actionEvent -> {
             Object selectedValue = explorationStepList.getSelectedValue();
             if(selectedValue != null) {
                 Node selected = (Node) selectedValue;
                 mediator.getSelectionModel().setSelectedNode(selected);
             }
 
-        });
+        });*/
 
-        pruneExploration.addActionListener(actionEvent -> {
-
-            Object selectedValue = explorationStepList.getSelectedValue();
-            if(selectedValue != null) {
-                Node selected = (Node) selectedValue;
-                mediator.getUI().getProofControl().pruneTo(selected);
-                createModel(mediator.getSelectedProof());
-            }
-        });
-
-        JTree tree = new JTree();
-        tree.setModel(dtm);
         tree.addTreeSelectionListener(new TreeSelectionListener() {
 
             @Override
@@ -163,17 +164,51 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
                 MyTreeNode selectedNode = (MyTreeNode) tree.getLastSelectedPathComponent();
                 if(selectedNode != null){
                     mediator.getSelectionModel().setSelectedNode(selectedNode.getData());
+                    int selectionIndex = getSelectionIndex(selectedNode.getData());
+                    if(selectionIndex > -1){
+                        explorationStepList.setSelectedIndex(selectionIndex);
+                    }
                 }
             }
         });
         tree.setShowsRootHandles(true);
+        setTreeExpandedState(tree, true);
+
+        pruneExploration.addActionListener(actionEvent -> {
+
+            Object selectedValue = explorationStepList.getSelectedValue();
+
+            Object lastSelectedPathComponent = tree.getLastSelectedPathComponent();
+
+            if(lastSelectedPathComponent != null){
+                MyTreeNode selectedNode = (MyTreeNode) tree.getLastSelectedPathComponent();
+                mediator.getUI().getProofControl().pruneTo(selectedNode.getData());
+                createModel(mediator.getSelectedProof());
+            }
+            if(selectedValue != null) {
+                Node selected = (Node) selectedValue;
+                mediator.getUI().getProofControl().pruneTo(selected);
+                createModel(mediator.getSelectedProof());
+            }
+        });
 
 
-        JScrollPane p1 = new JScrollPane(tree);
+        JTextArea explaination = new JTextArea("Visualization of performed exploration actions. \n" +
+                "To jump to a node where the action was applied to select the entry in the list or the tree view.\n"+
+                "To prune explroation actions simply select an action and all action below this action (visible in the tree visualization) are removed.");
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.add(explaination, BorderLayout.NORTH);
         JScrollPane p2 = new JScrollPane(explorationStepList);
+        panel.add(p2, BorderLayout.CENTER);
+
+
         tree.setCellRenderer(new MyTreeCellRenderer());
+        JScrollPane p1 = new JScrollPane(tree);
+
         this.add(p1, BorderLayout.CENTER);
-        this.add(p2, BorderLayout.NORTH);
+        this.add(panel, BorderLayout.NORTH);
         this.add(buttonPanel, BorderLayout.SOUTH);
         this.setVisible(true);
     }
@@ -249,5 +284,58 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         public void setData(Node data) {
             this.data = data;
         }
+    }
+
+
+//region:Tree and ListUtils
+
+    private void setTreeExpandedState(JTree tree, boolean expanded) {
+        MyTreeNode node = (MyTreeNode) tree.getModel().getRoot();
+        if(node != null) {
+            setNodeExpanded(tree, node, expanded);
+        }
+    }
+
+    private void setNodeExpanded(JTree tree, MyTreeNode node, boolean expanded) {
+        ArrayList<MyTreeNode> list = new ArrayList<>();
+        if(node.children() != null) {
+            Enumeration<TreeNode> children = node.children();
+            Iterator<TreeNode> treeNodeIterator = children.asIterator();
+            while (treeNodeIterator.hasNext()) {
+                list.add((MyTreeNode) treeNodeIterator.next());
+            }
+            list.forEach(myTreeNode -> setNodeExpanded(tree, myTreeNode, expanded));
+            if (!expanded && node.isRoot()) {
+                return;
+            }
+            TreePath path = new TreePath(node.getPath());
+            if (expanded) {
+                tree.expandPath(path);
+            } else {
+                tree.collapsePath(path);
+            }
+        }
+    }
+
+    private TreePath getTreePath(Node n){
+        MyTreeNode rootNode = (MyTreeNode) dtm.getRoot();
+        Enumeration<TreeNode> treeNodeEnumeration = rootNode.depthFirstEnumeration();
+        while(treeNodeEnumeration.hasMoreElements()){
+            TreeNode treeNode = treeNodeEnumeration.nextElement();
+            if(((MyTreeNode) treeNode).getData().equals(n)){
+                return new TreePath(treeNode);
+            }
+        }
+        return null;
+    }
+
+    private int getSelectionIndex(Node n){
+        for(int i = 0; i< listModel.size(); i++){
+            if(listModel.getElementAt(i).equals(n)){
+                return i;
+            }
+        }
+        return -1;
+
     }
 }
