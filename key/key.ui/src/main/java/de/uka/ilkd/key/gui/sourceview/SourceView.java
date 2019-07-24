@@ -319,10 +319,10 @@ public final class SourceView extends JComponent {
 
         String[] lines = tab.source.split("\\R", -1);
 
+        // If we are in a JML comment, highlight everything until the next semicolon.
+        // Otherwise, just highlight the first line.
         int lastLine = firstLine;
-
         if (lines[firstLine - 1].trim().startsWith("@")) {
-            // If we are in a JML comment, highlight everything until the next semicolon.
             int parens = 0;
 
             outer_loop:
@@ -338,9 +338,6 @@ public final class SourceView extends JComponent {
                     }
                 }
             }
-        } else {
-            // Otherwise only highlight the current line.
-            lastLine = firstLine;
         }
 
         Set<Highlight> result = new HashSet<>();
@@ -567,7 +564,13 @@ public final class SourceView extends JComponent {
                 URL url = new URL(urlString);
                 try (InputStream is = repo.getInputStream(url)) {
                     if (is != null) {
-                        new Tab(urlString, new File(url.getFile()).getName(), is);
+                        Tab tab = new Tab(urlString, new File(url.getFile()).getName(), is);
+
+                        tabs.put(fileName, tab);
+
+                        tabPane.addTab(tab.simpleFileName, tab);
+                        int index = tabPane.indexOfComponent(tab);
+                        tabPane.setToolTipTextAt(index, tab.absoluteFileName);
                         return true;
                     }
                 }
@@ -575,7 +578,13 @@ public final class SourceView extends JComponent {
                 File file = new File(fileName);
                 try (InputStream is = repo.getInputStream(file.toPath())) {
                     if (is != null) {
-                        new Tab(file.getAbsolutePath(), file.getName(), is);
+                        Tab tab = new Tab(file.getAbsolutePath(), file.getName(), is);
+
+                        tabs.put(fileName, tab);
+
+                        tabPane.addTab(tab.simpleFileName, tab);
+                        int index = tabPane.indexOfComponent(tab);
+                        tabPane.setToolTipTextAt(index, tab.absoluteFileName);
                         return true;
                     }
                 }
@@ -870,8 +879,8 @@ public final class SourceView extends JComponent {
     /**
      * Wrapper for all tab-specific data, i.e., all data pertaining to the file shown in the tab.
      *
+     * @author Wolfram Pfeifer
      * @author lanzinger
-     *
      */
     private final class Tab extends JScrollPane {
         private static final long serialVersionUID = -8964428275919622930L;
@@ -915,14 +924,15 @@ public final class SourceView extends JComponent {
             this.absoluteFileName = absoluteFilename;
             this.simpleFileName  = simpleFileName;
 
-            tabs.put(absoluteFileName, this);
-
             try {
                 String text = IOUtil.readFrom(stream);
                 if (text != null && !text.isEmpty()) {
                     source = replaceTabs(text);
+                } else {
+                    source = "[SOURCE COULD NOT BE LOADED]";
                 }
             } catch (IOException e) {
+                source = "[SOURCE COULD NOT BE LOADED]";
                 Debug.out("Unknown IOException!", e);
             }
 
@@ -943,11 +953,6 @@ public final class SourceView extends JComponent {
             //add Line numbers to each Scrollview
             TextLineNumber tln = new TextLineNumber(textPane, 1);
             setRowHeaderView(tln);
-
-            // Add tab to tab pane.
-            tabPane.addTab(simpleFileName, this);
-            int index = tabPane.indexOfComponent(this);
-            tabPane.setToolTipTextAt(index, absoluteFileName);
 
             resetHighlights();
         }
