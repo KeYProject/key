@@ -36,6 +36,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
     private final JList<File> listBookmarks = new JList<>(bookmarks);
     private final KeyAction actionAddBookmark = new AddBookmarkAction();
     private final KeyAction actionRemoveBookmark = new RemoveBookmarkAction();
+    private final KeyAction actionExternalAddBookmark = new AddExternalBookmarkAction();
 
 
     public KeYFileChooserBookmarkPanel(@NotNull JFileChooser chooser) {
@@ -71,6 +72,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
 
         JPanel pSouth = new JPanel();
         pSouth.add(new JButton(actionAddBookmark));
+        pSouth.add(new JButton(actionExternalAddBookmark));
         pSouth.add(new JButton(actionRemoveBookmark));
         add(pSouth, BorderLayout.SOUTH);
     }
@@ -108,36 +110,12 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
 
         AddBookmarkAction() {
             setIcon(IconFactory.plus(16));
-            setTooltip("<html>Adds the current directory to the bookmarks.<br>" +
-                    "Press ALT to open a new file selection dialog to select a folder.");
+            setTooltip("Adds the current directory to the bookmarks.");
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            File toAdd = null;
-            if ((e.getModifiers() & InputEvent.ALT_MASK) > 0) {
-                JFileChooser fc = new JFileChooser(chooser.getCurrentDirectory());
-                FileFilter ff = new FileFilter() {
-                    @Override
-                    public boolean accept(File pathname) {
-                        return pathname.isDirectory();
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return "A directory to add to the bookmarks";
-                    }
-                };
-                fc.setFileFilter(ff);
-                fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                int res = fc.showOpenDialog(null);
-                if (res == JFileChooser.APPROVE_OPTION) {
-                    toAdd = fc.getSelectedFile();
-                }
-            } else {
-                toAdd = chooser.getCurrentDirectory();
-            }
-
+            File toAdd = chooser.getCurrentDirectory();
             if (toAdd != null) {
                 final int index = bookmarks.indexOf(toAdd);
                 if(index >= 0) {
@@ -150,10 +128,50 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
         }
     }
 
+    private class AddExternalBookmarkAction extends KeyAction {
+
+        AddExternalBookmarkAction () {
+            setIcon(IconFactory.PLUS_SQUARED.get(16));
+            setTooltip("<html>Opens a new file selection dialog to select a new bookmark.");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JFileChooser fc = new JFileChooser(chooser.getCurrentDirectory());
+            FileFilter ff = new FileFilter() {
+                @Override
+                public boolean accept(File pathname) {
+                    return pathname.isDirectory();
+                }
+
+                @Override
+                public String getDescription() {
+                    return "A directory to add to the bookmarks";
+                }
+            };
+            fc.setFileFilter(ff);
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            int res = fc.showOpenDialog(null);
+            if (res == JFileChooser.APPROVE_OPTION) {
+                File toAdd = fc.getSelectedFile();
+                final int index = bookmarks.indexOf(toAdd);
+                if(index >= 0) {
+                    // already in the list
+                    return;
+                }
+                bookmarks.addElement(toAdd);
+                saveBookmarks();
+            }
+        }
+    }
+
+
+
     private class RemoveBookmarkAction extends KeyAction {
         RemoveBookmarkAction() {
             setName("");
             setIcon(IconFactory.minus(16));
+            setTooltip("Removes the current selected bookmark from the list.");
         }
 
         @Override

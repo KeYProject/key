@@ -21,6 +21,7 @@ import java.util.HashMap;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.util.Debug;
 
 public final class IconFactory {
@@ -57,6 +58,7 @@ public final class IconFactory {
     public static final IconFontProvider ORIGIN_ICON = new IconFontProvider(FontAwesomeSolid.ROUTE);
     public static final IconFontProvider WINDOW_ICON =
             new IconFontProvider(FontAwesomeSolid.WINDOW_RESTORE);
+    public static final IconProvider PLUS_SQUARED = new IconFontProvider(FontAwesomeSolid.PLUS_SQUARE);
 
     public static float DEFAULT_SIZE = 16;
     public static Color CLOSED_GREEN = DuneColorScheme.green;
