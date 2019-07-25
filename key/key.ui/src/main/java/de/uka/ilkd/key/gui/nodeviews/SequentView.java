@@ -154,6 +154,7 @@ public abstract class SequentView extends JEditorPane {
 
     private Object userSelectionHighlight = null;
     private Range userSelectionHighlightRange = null;
+    private PosInSequent userSelectionHighlightPis = null;
 
     protected SequentView(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
@@ -564,11 +565,41 @@ public abstract class SequentView extends JEditorPane {
         }
     }
 
-    void setUserSelectionHighlight(Point p) {
+    Range getUserSelectionHighlightRange() {
+        return userSelectionHighlightRange;
+    }
+
+    void recalculateUserSelectionRange() {
+        if (userSelectionHighlight == null) {
+            return;
+        }
+
+        InitialPositionTable posTable = printer.getInitialPositionTable();
+        PosInSequent pis = userSelectionHighlightPis;
+        Range range = posTable.rangeForPath(
+                posTable.pathForPosition(pis.getPosInOccurrence(), filter));
+
         removeUserSelectionHighlight();
 
         try {
-            userSelectionHighlightRange = getHighlightRange(p);
+            userSelectionHighlightPis = pis;
+            userSelectionHighlightRange = new Range(range.start() + 1, range.end() + 1);
+            userSelectionHighlight = getHighlighter().addHighlight(
+                    userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
+                    new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+
+            sequentViewInputListener.highlightOriginInSourceView(pis);
+        } catch (BadLocationException e) {
+            Debug.out("Error while setting permanent highlight", e);
+        }
+    }
+
+    void setUserSelectionHighlight(Point point) {
+        removeUserSelectionHighlight();
+
+        try {
+            userSelectionHighlightPis = getPosInSequent(point);
+            userSelectionHighlightRange = getHighlightRange(point);
             userSelectionHighlight = getHighlighter().addHighlight(
                     userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
                     new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
@@ -583,6 +614,7 @@ public abstract class SequentView extends JEditorPane {
         }
 
         userSelectionHighlight = null;
+        userSelectionHighlightPis = null;
         userSelectionHighlightRange = null;
 
         sequentViewInputListener.highlightOriginInSourceView(null);
