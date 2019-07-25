@@ -27,6 +27,7 @@ public class ExplorationModeModel {
 
     /**
      * Mode which rules to use in actions mode
+     * Default: whole application is shown
      */
     private @NotNull ExplorationState explorationTacletAppState = ExplorationState.WHOLE_APP;
 
@@ -36,8 +37,9 @@ public class ExplorationModeModel {
     private boolean explorationModeSelected = false;
     /**
      * Boolean flag whether to show the second branch or not in sound apps
+     * Default: second branch is shown
      */
-    private boolean showSecondBranches;
+    private boolean showSecondBranches = true;
 
     /**
      * Get the state which kind of taclet to use

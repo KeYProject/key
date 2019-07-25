@@ -21,11 +21,17 @@ public class ShowSecondBranchAction extends KeyAction {
         setSelected(model.isShowSecondBranches());
         setTooltip("Exploration actions are \noften done using a cut. Choose to hide\n " +
                 "the second cut-branches from the view \nto focus on the actions. Uncheck to focus on these branches.");
-        Icon secondBranch = Icons.SECOND_BRANCH_HIDE.get(18);
+
+        Icon secondBranch = null;
+        if(model.isShowSecondBranches()) {
+            secondBranch = Icons.SECOND_BRANCH_HIDE.get(18);
+        } else {
+            secondBranch = Icons.SECOND_BRANCH;
+        }
         setIcon(secondBranch);
 
-        model.addPropertyChangeListener(ExplorationModeModel.PROP_SHOW_SECOND_BRANCH,
-                e -> setSelected(model.isShowSecondBranches()));
+       /* model.addPropertyChangeListener(ExplorationModeModel.PROP_SHOW_SECOND_BRANCH,
+                e -> setSelected(model.isShowSecondBranches()));*/
         model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE, e -> setEnabled(model.isExplorationModeSelected()));
         setEnabled(model.isExplorationModeSelected());
         setSelected(model.isShowSecondBranches());

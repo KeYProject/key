@@ -94,7 +94,7 @@ public class ExplorationExtension implements KeYGuiExtension,
                             window.getProofTreeView().getDelegateModel();
 
                     delegateModel.setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS,
-                            model.isShowSecondBranches());
+                            !model.isShowSecondBranches());
                 });
         window.getProofTreeView().getRenderer().add(new ExplorationRenderer());
     }
