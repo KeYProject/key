@@ -108,7 +108,7 @@ public class HelpFacade {
 
         public OpenHelpAction() {
             setName("Open help");
-            setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+            setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F1, KeyEvent.CTRL_DOWN_MASK));
             lookupAcceleratorKey();
         }
 

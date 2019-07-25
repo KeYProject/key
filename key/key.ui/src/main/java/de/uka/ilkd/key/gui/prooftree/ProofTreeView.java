@@ -13,78 +13,24 @@
 
 package de.uka.ilkd.key.gui.prooftree;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.EventObject;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.WeakHashMap;
-
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
-import javax.swing.KeyStroke;
-import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.plaf.TreeUI;
-import javax.swing.plaf.basic.BasicTreeUI;
-import javax.swing.plaf.metal.MetalTreeUI;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.gui.GUIListener;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.MainWindowTabbedPane;
-import de.uka.ilkd.key.gui.ProofMacroMenu;
-import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindowTabbedPane;
-import de.uka.ilkd.key.gui.NodeInfoWindow;
-import de.uka.ilkd.key.gui.NodeInfoWindowListener;
+import de.uka.ilkd.key.gui.NodeInfoVisualizer;
+import de.uka.ilkd.key.gui.NodeInfoVisualizerListener;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
-import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofVisitor;
-import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -99,7 +45,6 @@ import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
-import java.util.*;
 import java.util.*;
 
 public class ProofTreeView extends JPanel implements TabPanel {
@@ -120,7 +65,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
             ColorSettings.define("[proofTree]pink", "", new Color(255, 0, 240));
     public static final ColorSettings.ColorProperty ORANGE_COLOR =
             ColorSettings.define("[proofTree]orange", "", new Color(255, 140, 0));
-
 
     /**
      * KeYStroke for the search panel: STRG+SHIFT+F
@@ -167,20 +111,24 @@ public class ProofTreeView extends JPanel implements TabPanel {
     private GUITreeSelectionListener treeSelectionListener;
     private GUIProofTreeGUIListener guiListener;
 
-    private NodeInfoWindowListener nodeInfoWindowListener = new NodeInfoWindowListener() {
+    /**
+     * Updates relevant nodes in the proof tree whenever a {@link NodeInfoVisualizer}
+     * is opened or closed.
+     */
+    private NodeInfoVisualizerListener nodeInfoVisListener = new NodeInfoVisualizerListener() {
 
         @Override
-        public void windowUnregistered(NodeInfoWindow win) {
-            if (win.getNode().proof() != null
-                    && !win.getNode().proof().isDisposed()
-                    && win.getNode().proof() == proof) {
-                delegateModel.updateTree(win.getNode());
+        public void visualizerUnregistered(NodeInfoVisualizer vis) {
+            if (vis.getNode().proof() != null
+                    && !vis.getNode().proof().isDisposed()
+                    && vis.getNode().proof() == proof) {
+                delegateModel.updateTree(vis.getNode());
             }
         }
 
         @Override
-        public void windowRegistered(NodeInfoWindow win) {
-            delegateModel.updateTree(win.getNode());
+        public void visualizerRegistered(NodeInfoVisualizer vis) {
+            delegateModel.updateTree(vis.getNode());
         }
     };
 
@@ -283,7 +231,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         delegateView.addMouseListener(ml);
 
-        NodeInfoWindow.addListener(nodeInfoWindowListener);
+        NodeInfoVisualizer.addListener(nodeInfoVisListener);
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
 
         setProofTreeFont();
@@ -317,7 +265,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     protected void finalize() throws Throwable {
         super.finalize();
         Config.DEFAULT.removeConfigChangeListener(configChangeListener);
-        NodeInfoWindow.removeListener(nodeInfoWindowListener);
+        NodeInfoVisualizer.removeListener(nodeInfoVisListener);
     }
 
     private void setProofTreeFont() {
@@ -341,6 +289,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
      */
     protected void layoutKeYComponent() {
         delegateView.setBackground(Color.white);
+        ProofRenderer renderer = new ProofRenderer();
         delegateView.setCellRenderer(renderer);
         delegateView.putClientProperty("JTree.lineStyle", "Angled");
         delegateView.setVisible(true);
@@ -391,7 +340,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
     public boolean selectAbove() {
         return selectRelative(+1);
     }
-
     public boolean selectBelow() {
         return selectRelative(-1);
     }
@@ -399,7 +347,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     private boolean selectRelative(int i) {
         TreePath path = delegateView.getSelectionPath();
         int row = delegateView.getRowForPath(path);
-        TreePath newPath = delegateView.getPathForRow(row - i);
+        TreePath newPath = delegateView.getPathForRow(row-i);
         if (newPath != null) {
             delegateView.setSelectionPath(newPath);
             return true;
@@ -834,6 +782,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     }
 
 
+  
     public class ProofRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
         private List<Styler<GUIAbstractTreeNode>> stylers = new LinkedList<>();
         private Icon keyHole20x20 = IconFactory.keyHole(iconHeight, iconHeight);
@@ -932,7 +881,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
 
             Icon defaultIcon;
-            if (notes != null) {
+                if (NodeInfoVisualizer.hasInstances(node)) {
+                    defaultIcon = IconFactory.WINDOW_ICON.get();
+                } else if (notes != null) {
                 defaultIcon = IconFactory.editFile(16);
             } else if (node.getNodeInfo().getInteractiveRuleApplication()) {
                 defaultIcon = IconFactory.interactiveAppLogo(16);

@@ -9,13 +9,11 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
-import de.uka.ilkd.key.gui.prooftree.GUIAbstractTreeNode;
-import de.uka.ilkd.key.gui.prooftree.Style;
-import de.uka.ilkd.key.gui.prooftree.Styler;
+import de.uka.ilkd.key.gui.prooftree.*;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
+import org.jetbrains.annotations.NotNull;
 import org.key_project.exploration.actions.*;
-import org.key_project.exploration.ui.ExplorationModeToolBar;
 import org.key_project.exploration.ui.ExplorationStepsList;
 
 import javax.swing.*;
@@ -39,7 +37,7 @@ public class ExplorationExtension implements KeYGuiExtension,
         KeYGuiExtension.Startup,
         KeYGuiExtension.Toolbar,
         KeYGuiExtension.LeftPanel {
-    private ExplorationModeModel model = new ExplorationModeModel();
+    private final ExplorationModeModel model = new ExplorationModeModel();
 
     private JToolBar explorationToolbar;
 
@@ -60,8 +58,9 @@ public class ExplorationExtension implements KeYGuiExtension,
 
 
     @Override
-    public List<Action> getContextActions(KeYMediator mediator,
-                                          ContextMenuKind kind, Object underlyingObject) {
+    public List<Action> getContextActions(@NotNull KeYMediator mediator,
+                                          @NotNull ContextMenuKind kind,
+                                          @NotNull Object underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
@@ -89,9 +88,15 @@ public class ExplorationExtension implements KeYGuiExtension,
             }
         });
 
+        model.addPropertyChangeListener(ExplorationModeModel.PROP_SHOW_SECOND_BRANCH,
+                e -> {
+                    GUIProofTreeModel delegateModel =
+                            window.getProofTreeView().getDelegateModel();
 
+                    delegateModel.setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS,
+                            model.isShowSecondBranches());
+                });
         window.getProofTreeView().getRenderer().add(new ExplorationRenderer());
-
     }
 
     @Override
@@ -124,7 +129,7 @@ class ExplorationRenderer implements Styler<GUIAbstractTreeNode> {
             } else {
                 style.setBorder(null);
             }
-        } catch (IllegalStateException e){
+        } catch (IllegalStateException e) {
             style.setBorder(null);
         }
     }

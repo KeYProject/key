@@ -2,7 +2,6 @@ package org.key_project.exploration.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.fonticons.IconProvider;
 import org.key_project.exploration.ExplorationModeModel;
 import org.key_project.exploration.Icons;
 
@@ -25,8 +24,7 @@ public class ShowSecondBranchAction extends KeyAction {
         Icon secondBranch = Icons.SECOND_BRANCH_HIDE.get(18);
         setIcon(secondBranch);
 
-
-        model.addPropertyChangeListener(ExplorationModeModel.PROP_SHOWSECONDBRANCH,
+        model.addPropertyChangeListener(ExplorationModeModel.PROP_SHOW_SECOND_BRANCH,
                 e -> setSelected(model.isShowSecondBranches()));
         model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE, e -> setEnabled(model.isExplorationModeSelected()));
         setEnabled(model.isExplorationModeSelected());

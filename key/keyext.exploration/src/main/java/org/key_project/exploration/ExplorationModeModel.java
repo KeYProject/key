@@ -3,12 +3,23 @@ package org.key_project.exploration;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.prooftree.GUIProofTreeModel;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
+import org.jetbrains.annotations.NotNull;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+/**
+ * The central place to store global information for Proof Exploration.
+ * <p>
+ * This class holds the data and the state of proof exploration.
+ * <p>
+ * For every {@link de.uka.ilkd.key.core.KeYMediator} or {@link MainWindow}
+ * should only exists one instance.
+ *
+ * @see ExplorationExtension
+ */
 public class ExplorationModeModel {
-    public static final String PROP_SHOWSECONDBRANCH = "showSecondBranches";
+    public static final String PROP_SHOW_SECOND_BRANCH = "showSecondBranches";
     public static final String PROP_EXPLORE_MODE = "exploreModeSelected";
     public static final String PROP_EXPLORE_TACLET_APP_STATE = "exploreTacletAppState";
 
@@ -17,35 +28,27 @@ public class ExplorationModeModel {
     /**
      * Mode which rules to use in actions mode
      */
-    private ExplorationState explorationTacletAppState = ExplorationState.WHOLE_APP;
+    private @NotNull ExplorationState explorationTacletAppState = ExplorationState.WHOLE_APP;
 
     /**
      * boolean flag indicating whether actions mode is turned on and special rules are shown to the user
      */
     private boolean explorationModeSelected = false;
-
-    /**
-     * State whether whole application (with shown second branch) or
-     * simplified with hidden branch app should be used
-     */
-    public enum ExplorationState{
-        WHOLE_APP, SIMPLIFIED_APP;
-    }
-
     /**
      * Boolean flag whether to show the second branch or not in sound apps
      */
     private boolean showSecondBranches;
+
     /**
      * Get the state which kind of taclet to use
-     * @return
      */
-    public ExplorationState getExplorationTacletAppState() {
+    public @NotNull ExplorationState getExplorationTacletAppState() {
         return explorationTacletAppState;
     }
 
     /**
      * Set the state
+     *
      * @param explorationTacletAppState
      */
     public void setExplorationTacletAppState(ExplorationState explorationTacletAppState) {
@@ -56,6 +59,7 @@ public class ExplorationModeModel {
 
     /**
      * Check whether actions mode is selected
+     *
      * @return
      */
     public boolean isExplorationModeSelected() {
@@ -63,8 +67,10 @@ public class ExplorationModeModel {
     }
 
     /**
-     * Set selection of Exploration mode
-     * @param explorationModeSelected
+     * Set selection of Exploration mode.
+     *
+     * Triggers a property change event.
+     * @see #PROP_EXPLORE_MODE
      */
     public void setExplorationModeSelected(boolean explorationModeSelected) {
         boolean old = this.explorationModeSelected;
@@ -73,26 +79,22 @@ public class ExplorationModeModel {
     }
 
     /**
-     * Request selection
-     * @return
+     * Returns whether the justification branch should be visible.
      */
     public boolean isShowSecondBranches() {
         return showSecondBranches;
     }
 
     /**
-     * Set selection
-     * @param showSecondBranches
+     * Triggers a property change event, and the rerendering of the proof tree.
+     *
+     * @see #PROP_SHOW_SECOND_BRANCH
+     * @see #isShowSecondBranches()
      */
     public void setShowSecondBranches(boolean showSecondBranches) {
         boolean old = this.showSecondBranches;
         this.showSecondBranches = showSecondBranches;
-        changeSupport.firePropertyChange(PROP_SHOWSECONDBRANCH, old, showSecondBranches);
-
-        GUIProofTreeModel delegateModel =
-                MainWindow.getInstance().getProofTreeView().getDelegateModel();
-
-        delegateModel.setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS, showSecondBranches);
+        changeSupport.firePropertyChange(PROP_SHOW_SECOND_BRANCH, old, showSecondBranches);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -109,5 +111,13 @@ public class ExplorationModeModel {
 
     public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         changeSupport.removePropertyChangeListener(propertyName, listener);
+    }
+
+    /**
+     * State whether whole application (with shown second branch) or
+     * simplified with hidden branch app should be used
+     */
+    public enum ExplorationState {
+        WHOLE_APP, SIMPLIFIED_APP;
     }
 }

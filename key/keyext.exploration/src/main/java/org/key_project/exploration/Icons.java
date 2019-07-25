@@ -6,6 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
+ * Icons of the Exploration Extension
+ *
  * @author Alexander Weigl
  * @version 1 (22.07.19)
  */
