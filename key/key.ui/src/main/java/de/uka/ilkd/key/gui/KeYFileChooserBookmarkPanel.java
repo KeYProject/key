@@ -159,7 +159,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
         @Override
         public void actionPerformed(ActionEvent e) {
             int selected = listBookmarks.getSelectedIndex();
-            if (selected > 0) {
+            if (selected >= 0) {
                 bookmarks.removeElementAt(selected);
                 saveBookmarks();
             }
