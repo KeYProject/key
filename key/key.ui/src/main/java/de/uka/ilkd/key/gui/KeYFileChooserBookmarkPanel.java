@@ -82,7 +82,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
     }
 
     private void loadBookmarks() {
-        viewSettings.getBookmarks().forEach(
+        viewSettings.getFolderBookmarks().forEach(
             it -> bookmarks.addElement(new File(it))
         );
     }
@@ -101,7 +101,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
         while (iter.hasMoreElements()) {
             newMarks.add(iter.nextElement().getAbsolutePath());
         }
-        viewSettings.setBookmarks(newMarks);
+        viewSettings.setFolderBookmarks(newMarks);
     }
 
     private class AddBookmarkAction extends KeyAction {

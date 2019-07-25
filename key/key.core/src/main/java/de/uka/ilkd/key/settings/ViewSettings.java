@@ -24,6 +24,7 @@ import java.util.Set;
  * instantiated in the displayed tooltip.
  * 3) whether intermediate proofsteps should be hidden in the proof tree view
  */
+@SuppressWarnings("JavadocReference")
 public class ViewSettings extends AbstractPropertiesSettings {
 
     private static final String CLUTTER_RULES = "[View]clutterRules";
@@ -139,9 +140,10 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private static final String HEATMAP_MAXAGE = "[View][Heatmap]maxAge";
 
     /**
-     * Bookmark settings
+     * A list of bookmark of favourite folders of the user. Can be manipulated with
+     * {@link de.uka.ilkd.key.gui.KeYFileChooserBookmarkPanel}.
      */
-    private static final String BOOKMARKS = "[View]bookmarks";
+    private static final String USER_FOLDER_BOOKMARKS = "[View]folderBookmarks";
 
     /**
      * Show Taclet uninstantiated in tooltip -- for learning
@@ -189,7 +191,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private PropertyEntry<Set<String>> clutterRuleSets =
             createStringSetProperty(CLUTTER_RULESSETS, CLUTTER_RULESETS_DEFAULT);
 
-    private PropertyEntry<List<String>> bookmarks = createStringListProperty(BOOKMARKS,
+    private PropertyEntry<List<String>> folderBookmarks = createStringListProperty(USER_FOLDER_BOOKMARKS,
             System.getProperty("user.home"));
 
     /**
@@ -486,11 +488,11 @@ public class ViewSettings extends AbstractPropertiesSettings {
         this.uiFontSizeFactor.set(factor);
     }
 
-    public List<String> getBookmarks() {
-        return bookmarks.get();
+    public List<String> getFolderBookmarks() {
+        return folderBookmarks.get();
     }
 
-    public void setBookmarks(List<String> bm) {
-        bookmarks.set(bm);
+    public void setFolderBookmarks(List<String> bm) {
+        folderBookmarks.set(bm);
     }
 }
