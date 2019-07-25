@@ -572,6 +572,9 @@ public final class SourceView extends JComponent {
                         tabPane.addTab(tab.simpleFileName, tab);
                         int index = tabPane.indexOfComponent(tab);
                         tabPane.setToolTipTextAt(index, tab.absoluteFileName);
+
+                        tab.resetHighlights();
+
                         return true;
                     }
                 }
@@ -586,6 +589,9 @@ public final class SourceView extends JComponent {
                         tabPane.addTab(tab.simpleFileName, tab);
                         int index = tabPane.indexOfComponent(tab);
                         tabPane.setToolTipTextAt(index, tab.absoluteFileName);
+
+                        tab.resetHighlights();
+
                         return true;
                     }
                 }
@@ -954,8 +960,6 @@ public final class SourceView extends JComponent {
             //add Line numbers to each Scrollview
             TextLineNumber tln = new TextLineNumber(textPane, 1);
             setRowHeaderView(tln);
-
-            resetHighlights();
         }
 
         private void initLineInfo() {
