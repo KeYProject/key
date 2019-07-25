@@ -27,8 +27,6 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     static final String SORT_PREFIX = "sort_";
 
-    private static final String PREAMBLE = readResource("preamble.smt2");
-
     private List<Throwable> exceptions = Collections.emptyList();
 
     private List<Throwable> tacletExceptions = Collections.emptyList();
@@ -46,13 +44,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             return new StringBuffer("error while translating");
         }
 
-        //include axioms and declarations for int and bool types and for the instanceof function
-        master.addFromSnippets("bool");
-        master.addFromSnippets("int");
-        master.addFromSnippets("instanceof");
-
         List<Term> sequentAsserts = smashProblem(problem, services);
-
         List<SExpr> results = new LinkedList<>();
         for (Term t : sequentAsserts) {
             results.add(master.translate(t, Type.BOOL));
@@ -65,10 +57,12 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         StringBuffer sb = new StringBuffer();
 
-        sb.append("; --- Preamble\n\n");
-        sb.append(PREAMBLE);
+        sb.append("; --- Preamble");
+        for (Writable w : master.getOptions()) {
+            w.appendTo(sb);
+        }
 
-        sb.append("; --- Declarations\n\n");
+        sb.append("; --- Declarations");
 
         if (problem.arity() != 0) {
             master.addSort(Sort.ANY);

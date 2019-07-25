@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+    <comment>Snippets for the preamble of the SMT translation</comment>
+
+    <entry key="types.axioms">
+(assert (forall ((t1 T)) (subtype t1 t1)))
+(assert (forall ((t1 T) (t2 T)) (! (=> (and (subtype t1 t2) (subtype t2 t1)) (= t1 t2)) :pattern ((subtype t1 t2) (subtype t2 t1)))))
+(assert (forall ((t1 T) (t2 T) (t3 T)) (! (=> (and (subtype t1 t2) (subtype t2 t3)) (subtype t1 t3)) :pattern ((subtype t1 t2) (subtype t2 t3)))))
+(assert (forall ((x U) (t T)) (! (subtype (typeof (cast x t)) t) :pattern ((cast x t)))))
+(assert (forall ((x U) (t T)) (! (=> (subtype (typeof x) t) (= (cast x t) x)) :pattern ((cast x t)))))
+    </entry>
+
+    <entry key="types.decls">
+(declare-fun subtype (T T) Bool)
+(declare-fun typeof (U) T)
+(declare-fun cast (U T) U)
+    </entry>
+
+    <entry key="null.axioms">
+(assert (= (typeof null) sort_Null))
+    </entry>
+
+    <entry key="null.decls">
+(declare-const null U)
+(declare-const sort_Null T)
+    </entry>
+
+    <entry key="general.decls">
+(declare-sort T 0)
+(declare-sort U 0)
+(declare-const sort_any T)
+    </entry>
+
+    <entry key="opts">
+(set-option :print-success true)
+(set-option :produce-unsat-cores true)
+(set-option :produce-models true)
+(set-logic ALL)
+    </entry>
+
+</properties>
+
+
