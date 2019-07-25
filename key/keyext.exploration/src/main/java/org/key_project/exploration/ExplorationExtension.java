@@ -36,7 +36,7 @@ public class ExplorationExtension implements KeYGuiExtension,
         KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Startup,
         KeYGuiExtension.Toolbar,
-        KeYGuiExtension.LeftPanel {
+        KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine {
     private final ExplorationModeModel model = new ExplorationModeModel();
 
     private JToolBar explorationToolbar;
@@ -68,8 +68,8 @@ public class ExplorationExtension implements KeYGuiExtension,
     public JToolBar getToolbar(MainWindow mainWindow) {
         if (explorationToolbar == null) {
             explorationToolbar = new JToolBar();
-            explorationToolbar.add(new ToggleExplorationAction(model));
-            explorationToolbar.add(new ShowSecondBranchAction(model));
+            explorationToolbar.add(new JToggleButton(new ToggleExplorationAction(model)));
+            explorationToolbar.add(new JToggleButton(new ShowSecondBranchAction(model)));
         }
         return explorationToolbar;
     }
@@ -97,12 +97,20 @@ public class ExplorationExtension implements KeYGuiExtension,
                             !model.isShowSecondBranches());
                 });
         window.getProofTreeView().getRenderer().add(new ExplorationRenderer());
+
+
     }
 
     @Override
     public Collection<TabPanel> getPanels(MainWindow window, KeYMediator mediator) {
         if (leftPanel == null) leftPanel = new ExplorationStepsList(window);
         return Collections.singleton(leftPanel);
+    }
+
+    @Override
+    public List<JComponent> getStatusLineComponents() {
+        if (leftPanel == null) leftPanel = new ExplorationStepsList(MainWindow.getInstance());
+        return Collections.singletonList(leftPanel.getHasExplorationSteps());
     }
 }
 

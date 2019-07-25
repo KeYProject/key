@@ -3,10 +3,14 @@ package org.key_project.exploration;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.prooftree.GUIProofTreeModel;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
+import de.uka.ilkd.key.proof.Proof;
 import org.jetbrains.annotations.NotNull;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The central place to store global information for Proof Exploration.
@@ -23,6 +27,8 @@ public class ExplorationModeModel {
     public static final String PROP_EXPLORE_MODE = "exploreModeSelected";
     public static final String PROP_EXPLORE_TACLET_APP_STATE = "exploreTacletAppState";
 
+    private Map<Proof, AtomicInteger> taintedProofs = new WeakHashMap<>();
+
     private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     /**
@@ -30,6 +36,7 @@ public class ExplorationModeModel {
      * Default: whole application is shown
      */
     private @NotNull ExplorationState explorationTacletAppState = ExplorationState.WHOLE_APP;
+
 
     /**
      * boolean flag indicating whether actions mode is turned on and special rules are shown to the user
@@ -85,6 +92,15 @@ public class ExplorationModeModel {
      */
     public boolean isShowSecondBranches() {
         return showSecondBranches;
+    }
+
+    /**
+     * Return the number of tainted exploration nodes in a Proof
+     * @param p
+     * @return
+     */
+    public AtomicInteger get(Proof p) {
+        return taintedProofs.computeIfAbsent(p, e -> new AtomicInteger(0));
     }
 
     /**

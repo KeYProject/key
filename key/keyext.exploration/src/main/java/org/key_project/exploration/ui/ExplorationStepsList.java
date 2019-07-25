@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.key_project.exploration.ExplorationNodeData;
+import org.key_project.exploration.Icons;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
@@ -32,6 +33,13 @@ import java.util.List;
 public class ExplorationStepsList extends JPanel implements TabPanel {
     //private JButton jumpToNode = new JButton("Jump To Node");
     //TODO weigl: should be given via an action
+
+
+    public JLabel getHasExplorationSteps() {
+        return hasExplorationSteps;
+    }
+
+    private final JLabel hasExplorationSteps = new JLabel();
     private JButton pruneExploration = new JButton("Prune Selected Exploration Steps");
     private DefaultListModel<Node> listModel = new DefaultListModel<>();
     private DefaultTreeModel dtm = new DefaultTreeModel(null);
@@ -76,6 +84,14 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             dtm.setRoot(rootNode);
             List<Node> explorationNodes = collectAllExplorationSteps(root, dtm, rootNode);
             explorationNodes.forEach(node -> listModel.addElement(node));
+        }
+        updateLabel();
+    }
+
+    private void updateLabel() {
+        hasExplorationSteps.setIcon(Icons.EXPLORE.get());
+        if(listModel.isEmpty()){
+            hasExplorationSteps.setIcon(Icons.EXPLORE_DISABLE.get());
         }
     }
 

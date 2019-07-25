@@ -17,24 +17,27 @@ public class ShowSecondBranchAction extends KeyAction {
 
     public ShowSecondBranchAction(ExplorationModeModel model) {
         this.model = model;
-        setName("Toggle second branch");
-        setSelected(model.isShowSecondBranches());
         setTooltip("Exploration actions are \noften done using a cut. Choose to hide\n " +
                 "the second cut-branches from the view \nto focus on the actions. Uncheck to focus on these branches.");
 
+        model.addPropertyChangeListener(ExplorationModeModel.PROP_SHOW_SECOND_BRANCH,
+                e -> updateEnable());
+        model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE, e -> updateEnable());
+        updateEnable();
+    }
+
+    private void updateEnable() {
+        setEnabled(model.isExplorationModeSelected());
+        setSelected(model.isShowSecondBranches());
+        setName(isSelected() ? "Hide justification" : "Show justification");
+
         Icon secondBranch = null;
         if(model.isShowSecondBranches()) {
-            secondBranch = Icons.SECOND_BRANCH_HIDE.get(18);
+            secondBranch = Icons.SECOND_BRANCH_HIDE.get(16);
         } else {
             secondBranch = Icons.SECOND_BRANCH;
         }
         setIcon(secondBranch);
-
-       /* model.addPropertyChangeListener(ExplorationModeModel.PROP_SHOW_SECOND_BRANCH,
-                e -> setSelected(model.isShowSecondBranches()));*/
-        model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE, e -> setEnabled(model.isExplorationModeSelected()));
-        setEnabled(model.isExplorationModeSelected());
-        setSelected(model.isShowSecondBranches());
     }
 
     @Override
@@ -48,11 +51,9 @@ public class ShowSecondBranchAction extends KeyAction {
         setSelected(model.isShowSecondBranches());
         if (model.isShowSecondBranches()) {
             model.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.WHOLE_APP);
-            Icon icon = Icons.SECOND_BRANCH_HIDE.get(18);
-            this.setIcon(icon);
         } else {
             model.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.SIMPLIFIED_APP);
-            this.setIcon(Icons.SECOND_BRANCH);
         }
+        updateEnable();
     }
 }

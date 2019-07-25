@@ -3,6 +3,7 @@ package org.key_project.exploration.actions;
 import java.awt.event.ActionEvent;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Objects;
 
 import javax.swing.JOptionPane;
 
@@ -15,6 +16,7 @@ import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import org.key_project.exploration.ExplorationModeModel;
 
 public class ExplorationAction extends MainWindowAction {
 
@@ -62,6 +64,10 @@ public class ExplorationAction extends MainWindowAction {
         }
         
         return result;
+    }
+
+    public ExplorationModeModel getModel(){
+        return Objects.requireNonNull(getMediator().get(ExplorationModeModel.class));
     }
 
 
