@@ -85,7 +85,8 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
 
     private void loadBookmarks() {
         viewSettings.getFolderBookmarks().forEach(
-            it -> bookmarks.addElement(new File(it))
+                //make absolute? .getAbsoluteFile())
+                it -> bookmarks.addElement(new File(it))
         );
     }
 
@@ -118,7 +119,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
             File toAdd = chooser.getCurrentDirectory();
             if (toAdd != null) {
                 final int index = bookmarks.indexOf(toAdd);
-                if(index >= 0) {
+                if (index >= 0) {
                     // already in the list
                     return;
                 }
@@ -130,7 +131,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
 
     private class AddExternalBookmarkAction extends KeyAction {
 
-        AddExternalBookmarkAction () {
+        AddExternalBookmarkAction() {
             setIcon(IconFactory.PLUS_SQUARED.get(16));
             setTooltip("<html>Opens a new file selection dialog to select a new bookmark.");
         }
@@ -155,7 +156,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
             if (res == JFileChooser.APPROVE_OPTION) {
                 File toAdd = fc.getSelectedFile();
                 final int index = bookmarks.indexOf(toAdd);
-                if(index >= 0) {
+                if (index >= 0) {
                     // already in the list
                     return;
                 }
@@ -164,7 +165,6 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
             }
         }
     }
-
 
 
     private class RemoveBookmarkAction extends KeyAction {
@@ -192,10 +192,10 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
             StringBuilder sb = new StringBuilder();
             do {
                 sb.insert(0, file.getName());
-                sb.insert(0, '/');
                 file = file.getParentFile();
-            } while (sb.length() < LIMIT);
-            sb.insert(0, '…');
+                if (file != null) sb.insert(0, '/');
+            } while (file != null && sb.length() < LIMIT);
+            if (file != null) sb.insert(0, '…');
             return sb.toString();
         }
 
@@ -210,7 +210,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
                 val = toString(value);
             }
             return renderer.getListCellRendererComponent(list, val, index,
-                                                         isSelected, cellHasFocus);
+                    isSelected, cellHasFocus);
         }
     }
 }
