@@ -45,6 +45,7 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.SimpleAttributeSet;
 
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
 
@@ -518,7 +519,7 @@ public final class SourceView extends JComponent {
      * @see NodeInfo#getRelevantFiles()
      */
     private void addFiles() throws IOException {
-        Set<String> files =
+        ImmutableSet<String> files =
                 mainWindow.getMediator().getSelectedNode().getNodeInfo().getRelevantFiles();
 
         Iterator<String> it = tabs.keySet().iterator();
