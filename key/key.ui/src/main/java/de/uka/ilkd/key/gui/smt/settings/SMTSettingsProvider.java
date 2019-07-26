@@ -114,82 +114,34 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
     private JSpinner createLocSetBoundField() {
         return addNumberField("Locset Bound:", 0, Integer.MAX_VALUE, 1, infoBound,
-                e -> {
-                    long value;
-                    try {
-                        value = (long) locsetBoundField.getValue();
-                    } catch (NumberFormatException ex) {
-                        value = settings.locsetBound;
-                    }
-                    settings.locsetBound = value;
-                });
+                e -> settings.locsetBound = e);
     }
 
     private JSpinner createMaxProcesses() {
         return addNumberField("Concurrent Processes:",
                 0, Integer.MAX_VALUE, 1,
                 infoMaxProcesses,
-                e -> {
-                    int value;
-                    try {
-                        value = (int) maxProcesses.getValue();
-                    } catch (NumberFormatException ex) {
-                        value = settings.maxConcurrentProcesses;
-                    }
-                    settings.maxConcurrentProcesses = value;
-                });
+                e -> settings.maxConcurrentProcesses = e);
     }
 
     private JSpinner createTimeoutField() {
         return addNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, infoTimeoutField,
-                e -> {
-                    long value;
-                    try {
-                        value = (long) ((long) timeoutField.getValue() * 1000.0);
-                    } catch (NumberFormatException ex) {
-                        value = settings.timeout;
-                    }
-                    settings.timeout = value;
-                });
+                e -> settings.timeout = e);
     }
 
     private JSpinner createIntBoundField() {
         return addNumberField("Integer Bound:", 0, Integer.MAX_VALUE, 1, infoBound,
-                e -> {
-                    long value;
-                    try {
-                        value = (long) intBoundField.getValue();
-                    } catch (NumberFormatException ex) {
-                        value = settings.intBound;
-                    }
-                    settings.intBound = value;
-                });
+                e -> settings.intBound = e);
     }
 
     private JSpinner createSeqBoundField() {
         return addNumberField("Seq Bound:", 0, Integer.MAX_VALUE, 1, infoBound,
-                e -> {
-                    long value;
-                    try {
-                        value = (long) seqBoundField.getValue();
-                    } catch (NumberFormatException ex) {
-                        value = settings.seqBound;
-                    }
-                    settings.seqBound = value;
-                });
+                e -> settings.seqBound = e);
     }
 
     private JSpinner createObjectBoundField() {
         return addNumberField("Object Bound:", 0, Integer.MAX_VALUE, 1, infoBound,
-                e -> {
-                    long value;
-                    try {
-                        value = (long) objectBoundField.getValue();
-                    } catch (NumberFormatException ex) {
-                        value = settings.objectBound;
-                    }
-                    settings.objectBound = value;
-                });
+                e -> settings.objectBound = e);
     }
 
     private JComboBox<String> getProgressModeBox() {
