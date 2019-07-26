@@ -99,6 +99,22 @@ subprojects {
         }
     }
 
+    // The following two tasks can be used to execute main methods from the project
+    // The main class is set via "gradle -DmainClass=... execute --args ..."
+    // see https://stackoverflow.com/questions/21358466/gradle-to-execute-java-class-without-modifying-build-gradle
+    
+    task execute(type:JavaExec) {
+        group "application"
+        main = System.getProperty('mainClass')
+        classpath = sourceSets.main.runtimeClasspath
+    }
+
+    task executeInTests(type:JavaExec) {
+        group "application"
+        main = System.getProperty('mainClass')
+        classpath = sourceSets.test.runtimeClasspath
+    }
+
     /*findbugs { findbugsTest.enabled = false; ignoreFailures = true }
     pmd { pmdTest.enabled = false; ignoreFailures = true }
     tasks.withType(Checkstyle) {
