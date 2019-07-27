@@ -1129,20 +1129,26 @@ public final class SourceView extends JComponent {
             symbExHighlights.clear();
 
             try {
+                int mostRecentLine = -1;
+
                 for (int i = 0; i < lines.size(); i++) {
                     Pair<Node, PositionInfo> l = lines.get(i);
+
                     if (absoluteFileName.equals(l.second.getFileName())) {
+                        int line = l.second.getStartPosition().getLine();
+
                         // use a different color for most recent
                         if (i == 0) {
+                            mostRecentLine = line;
                             symbExHighlights.add(addHighlight(
                                     absoluteFileName,
-                                    l.second.getStartPosition().getLine(),
+                                    line,
                                     MOST_RECENT_HIGHLIGHT_COLOR.get(),
                                     0));
-                        } else {
+                        } else if (line != mostRecentLine) {
                             symbExHighlights.add(addHighlight(
                                     absoluteFileName,
-                                    l.second.getStartPosition().getLine(),
+                                    line,
                                     NORMAL_HIGHLIGHT_COLOR.get(),
                                     0));
                         }
