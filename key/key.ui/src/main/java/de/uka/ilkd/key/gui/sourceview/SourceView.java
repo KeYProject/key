@@ -739,7 +739,7 @@ public final class SourceView extends JComponent {
         do {
             SourceElement activeStatement = cur.getNodeInfo().getActiveStatement();
             if (activeStatement != null) {
-                addPosToList(joinPositionsRec(activeStatement), list, node);
+                addPosToList(joinPositionsRec(activeStatement), list, cur);
             }
             cur = cur.parent();
 
