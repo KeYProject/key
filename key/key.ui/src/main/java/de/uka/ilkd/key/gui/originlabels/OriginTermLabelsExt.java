@@ -1,23 +1,29 @@
 package de.uka.ilkd.key.gui.originlabels;
 
+import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.Action;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.NodeInfoVisualizer;
+import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Node;
 
 /**
- * Extension adapter for {@link OriginTermLabel}s and {@link OriginTermLabelWindow}s.
+ * Extension adapter for {@link OriginTermLabel}s and {@link OriginTermLabelVisualizer}s.
  *
  * @author lanzinger
  */
@@ -69,10 +75,14 @@ public class OriginTermLabelsExt
             Object underlyingObject) {
         if (kind == DefaultContextMenuKind.SEQUENT_VIEW) {
             return Collections.singletonList(new ShowOriginAction((PosInSequent) underlyingObject));
-        } else if (kind == DefaultContextMenuKind.PROOF_TREE) {
-
+        } else if (kind == DefaultContextMenuKind.PROOF_TREE && underlyingObject instanceof Node) {
+            Node node = (Node) underlyingObject;
+            return NodeInfoVisualizer.getInstances(node).stream()
+                    .map(OpenVisualizerAction::new)
+                    .collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
         }
-        return Collections.emptyList();
     }
 
     @Override
@@ -116,5 +126,24 @@ public class OriginTermLabelsExt
         List<String> resultList = new LinkedList<>();
         resultList.add(result);
         return resultList;
+    }
+
+    private static final class OpenVisualizerAction extends KeyAction {
+
+        /** The visualizer shown by this action. */
+        private NodeInfoVisualizer vis;
+
+        private OpenVisualizerAction(NodeInfoVisualizer vis) {
+            setName(vis.getLongName());
+            setMenuPath("Windows");
+            setIcon(IconFactory.WINDOW_ICON.get());
+
+            this.vis = vis;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            MainWindow.getInstance().getSourceViewFrame().toFront(vis);
+        }
     }
 }

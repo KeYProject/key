@@ -89,11 +89,12 @@ public class ProofDifference {
 
     static List<Matching> findPairs(List<String> left, List<String> right) {
         List<Matching> pairs = new ArrayList<>(left.size() + right.size());
-        PriorityQueue<Triple<Integer, Integer, Integer>> queue = new PriorityQueue<>(left.size() * right.size(),
+        int initCap = Math.max(8, Math.max(left.size() * right.size(), Math.max(left.size(), right.size())));
+        PriorityQueue<Triple<Integer, Integer, Integer>> queue = new PriorityQueue<>(initCap,
                 Comparator.comparingInt((t) -> t.third));
         for (int i = 0; i < left.size(); i++) {
             for (int j = 0; j < right.size(); j++) {
-                queue.add(new Triple<Integer, Integer, Integer>(i, j, Levensthein.calculate(left.get(i), right.get(j))));
+                queue.add(new Triple<>(i, j, Levensthein.calculate(left.get(i), right.get(j))));
             }
         }
 

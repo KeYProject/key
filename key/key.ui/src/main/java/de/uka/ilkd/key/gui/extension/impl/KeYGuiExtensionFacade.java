@@ -135,6 +135,25 @@ public final class KeYGuiExtensionFacade {
         }
     }
 
+    private static void sortActionIntoMenu(Action act, JPopupMenu menu) {
+        Iterator<String> mpath = getMenuPath(act);
+        JMenu a = findMenu(menu, mpath);
+
+        if (Boolean.TRUE.equals(act.getValue(KeyAction.CHECKBOX))) {
+            if (a == null) {
+                menu.add(new JCheckBoxMenuItem(act));
+            } else {
+                a.add(new JCheckBoxMenuItem(act));
+            }
+        } else {
+            if (a == null) {
+                menu.add(act);
+            } else {
+                a.add(act);
+            }
+        }
+    }
+
     private static void sortActionIntoMenu(Action act, JMenuBar menuBar, JMenu defaultMenu) {
         Iterator<String> mpath = getMenuPath(act);
         JMenu a = findMenu(menuBar, mpath, defaultMenu);
@@ -161,6 +180,25 @@ public final class KeYGuiExtensionFacade {
             return findMenu(menu, mpath);
         }
         return defaultMenu;
+    }
+
+    private static JMenu findMenu(JPopupMenu menu, Iterator<String> mpath) {
+        if (mpath.hasNext()) {
+            String cur = mpath.next();
+            Component[] children = menu.getComponents();
+            for (Component child : children) {
+                if (Objects.equals(child.getName(), cur)) {
+                    JMenu sub = (JMenu) child;
+                    return findMenu(sub, mpath);
+                }
+            }
+            JMenu m = new JMenu(cur);
+            m.setName(cur);
+            menu.add(m);
+            return findMenu(m, mpath);
+        } else {
+            return null;
+        }
     }
 
     private static JMenu findMenu(JMenu menu, Iterator<String> mpath) {
@@ -223,6 +261,12 @@ public final class KeYGuiExtensionFacade {
         return menu;
     }
 
+    public static void addContextMenuItems(ContextMenuKind kind, JPopupMenu menu,
+                                               Object underlyingObject,
+                                               KeYMediator mediator) {
+        getContextMenuItems(kind, underlyingObject, mediator)
+                .forEach(it -> sortActionIntoMenu(it, menu));
+    }
 
     public static List<Action> getContextMenuItems(ContextMenuKind kind, Object underlyingObject,
                                                    KeYMediator mediator) {
