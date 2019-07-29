@@ -179,24 +179,26 @@ public final class IconFactory {
     public static final IconFontProvider ORIGIN_LABELS =
             new IconFontProvider(FontAwesomeSolid.ROUTE);
 
-    public static Image keyHole = getImage("images/ekey-mono.gif");
-    public static Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
-    public static Image keyHoleInteractive = getImage("images/keyinteractive.gif");
-    public static Image keyHoleLinked = getImage("images/keylinked.gif");
-    public static Image keyLogo = getImage("images/key-color.gif");
-    public static Image keyLogo22 = getImage("images/key22.gif");
-    public static Image keyLogoSmall = getImage("images/key-color-icon-square.png");
-    public static Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
+    private static Image keyHole = getImage("images/ekey-mono.gif");
+    private static Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
+    private static Image keyHoleInteractive = getImage("images/keyinteractive.gif");
+    private static Image keyHoleLinked = getImage("images/keylinked.gif");
+    private static Image keyLogo = getImage("images/key-color.gif");
+    private static Image keyLogo22 = getImage("images/key22.gif");
+    private static Image keyLogoSmall = getImage("images/key-color-icon-square.png");
+    private static Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
 
-    public static Image junit = getImage("images/toolbar/junit_logo.png");
-    public static Image jml = getImage("images/toolbar/jml.png");
-    public static Image uml = getImage("images/toolbar/uml.png");
-    public static Image expandGoals = getImage("images/toolbar/expandGoals.png");
-    public static Image scriptAppLogo = getImage("images/scriptAppLogo.png");
-    public static Image counterexampleImage = getImage("images/toolbar/ce.png");
-    public static Image testgenerationImage = getImage("images/toolbar/tg.png");
-    public static Image heatmapImage = getImage("images/toolbar/heatmap.png");
-    public static HashMap<String, Icon> cache = new HashMap<String, Icon>();
+    private static Image junit = getImage("images/toolbar/junit_logo.png");
+    private static Image jml = getImage("images/toolbar/jml.png");
+    private static Image uml = getImage("images/toolbar/uml.png");
+
+    // private static Image expandGoals = getImage("images/toolbar/expandGoals.png");
+    // private static Image scriptAppLogo = getImage("images/scriptAppLogo.png");
+    // private static Image counterexampleImage = getImage("images/toolbar/ce.png");
+    // private static Image testgenerationImage = getImage("images/toolbar/tg.png");
+    // private static Image heatmapImage = getImage("images/toolbar/heatmap.png");
+
+    private static HashMap<String, Icon> cache = new HashMap<String, Icon>();
 
     private IconFactory() {
     }
