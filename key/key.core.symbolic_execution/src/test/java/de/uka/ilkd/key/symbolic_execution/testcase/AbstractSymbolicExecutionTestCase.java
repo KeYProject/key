@@ -107,7 +107,6 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Provides the basic functionality of {@link TestCase}s which tests

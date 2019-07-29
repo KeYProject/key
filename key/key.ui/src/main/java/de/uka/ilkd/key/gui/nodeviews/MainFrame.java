@@ -35,6 +35,9 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
  * @author Kai Wallisch
  */
 public final class MainFrame extends JPanel {
+
+    private static final long serialVersionUID = -2412537422601138379L;
+
     private final MainWindow mainWindow;
     private final JScrollPane scrollPane = new JScrollPane();
     private Component content;

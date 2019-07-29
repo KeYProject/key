@@ -1,7 +1,6 @@
 package org.key_project.ui;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.plaf.basic.*;
@@ -26,7 +25,7 @@ public class BoundsPopupMenuListener implements PopupMenuListener
 	private JScrollPane scrollPane;
 
 	/**
-	 *  Convenience constructore to allow the display of a horizontal scrollbar
+	 *  Convenience constructor to allow the display of a horizontal scrollbar
 	 *  when required.
 	 */
 	public BoundsPopupMenuListener()
