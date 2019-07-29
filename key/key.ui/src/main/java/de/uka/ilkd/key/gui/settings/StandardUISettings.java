@@ -45,7 +45,8 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
                 emptyValidator());
         addTitledComponent("Global font factor: ", spFontSizeGlobal, "");
 
-        String[] sizes = Arrays.stream(Config.SIZES).boxed().map(it -> it + " pt").toArray(String[]::new);
+        String[] sizes =
+                Arrays.stream(Config.SIZES).boxed().map(it -> it + " pt").toArray(String[]::new);
         spFontSizeTreeSequent = this.<String>createSelection(sizes, emptyValidator());
         addTitledComponent("Tree&Sequent font factor: ", spFontSizeTreeSequent, "");
 
@@ -56,23 +57,29 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         txtMaxTooltipLines = addNumberField("Maximum line number for tooltips",
                 1, 100, 5, info, emptyValidator());
 
-        chkShowWholeTacletCB = addCheckBox("Show whole taclet", "Pretty-print whole Taclet including \n" +
-                "'name', 'find', 'varCond' and 'heuristics'", false, emptyValidator());
+        chkShowWholeTacletCB =
+                addCheckBox("Show whole taclet", "Pretty-print whole Taclet including \n" +
+                            "'name', 'find', 'varCond' and 'heuristics'", false, emptyValidator());
 
-        chkShowUninstantiatedTaclet = addCheckBox("Show uninstantiated taclet", "recommended for unexperienced users",
-                false, emptyValidator());
+        chkShowUninstantiatedTaclet =
+                addCheckBox("Show uninstantiated taclet", "recommended for unexperienced users",
+                            false, emptyValidator());
 
         txtClutterRules = addTextField("Clutter rules", "", INFO_CLUTTER_RULE, emptyValidator());
-        txtClutterRuleSets = addTextField("Clutter Rulesets", "", INFO_CLUTTER_RULESET, emptyValidator());
+        txtClutterRuleSets =
+                addTextField("Clutter Rulesets", "", INFO_CLUTTER_RULESET, emptyValidator());
 
         chkPrettyPrint = addCheckBox("Pretty print terms", "", false, emptyValidator());
         chkUseUnicode = addCheckBox("Use unicode", "", false, emptyValidator());
-        chkSyntaxHighlightning = addCheckBox("Use syntax highlightning", "", false, emptyValidator());
+        chkSyntaxHighlightning =
+                addCheckBox("Use syntax highlightning", "", false, emptyValidator());
         chkHidePackagePrefix = addCheckBox("Hide package prefix", "", false, emptyValidator());
         chkConfirmExit = addCheckBox("Confirm program exit", "", false, emptyValidator());
-        spAutoSaveProof = addNumberField("Auto save proof", 0, 10000000, 1000, "", emptyValidator());
+        spAutoSaveProof =
+                addNumberField("Auto save proof", 0, 10000000, 1000, "", emptyValidator());
         chkMinimizeInteraction = addCheckBox("Minimise Interactions", "", false, emptyValidator());
-        chkEnsureSourceConsistency = addCheckBox("Ensure source consistency", "", true, emptyValidator());
+        chkEnsureSourceConsistency =
+                addCheckBox("Ensure source consistency", "", true, emptyValidator());
         chkRightClickMacros = addCheckBox("Right click for Macros", "", false, emptyValidator());
     }
 
