@@ -54,7 +54,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * This matcher matches *.java files.
      */
     protected static final PathMatcher JAVA_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.java");
+            FileSystems.getDefault().getPathMatcher("glob:**.{java,jml}");
 
     /**
      * A matcher matches *.key and *.proof files.
