@@ -30,8 +30,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import junit.framework.TestCase;
 
 import org.junit.Assert;
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
@@ -47,6 +49,7 @@ import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -60,6 +63,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
@@ -102,6 +107,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.KeYConstants;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Provides the basic functionality of {@link TestCase}s which tests
@@ -1245,6 +1251,7 @@ public abstract class AbstractSymbolicExecutionTestCase extends TestCase {
       assertTrue(javaFile.exists());
       // Load java file
       KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), javaFile, null, null, null, true);
+      setupTacletOptions(environment);
       // Start proof
       final Contract contract = environment.getServices().getSpecificationRepository().getContractByName(baseContractName);
       assertTrue(contract instanceof FunctionalOperationContract);
@@ -1304,6 +1311,7 @@ public abstract class AbstractSymbolicExecutionTestCase extends TestCase {
       assertTrue(javaFile.exists());
       // Load java file
       KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, null, true);
+      setupTacletOptions(environment);
       // Search method to proof
       IProgramMethod pm = searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
       // Start proof
@@ -1318,6 +1326,18 @@ public abstract class AbstractSymbolicExecutionTestCase extends TestCase {
       builder.analyse();
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
+   }
+
+   private static void setupTacletOptions(KeYEnvironment<?> env) {
+	   // Set Taclet options
+	   ImmutableSet<Choice> choices = env.getInitConfig().getActivatedChoices();
+	   choices = choices.add(new Choice("methodExpansion", "noRestriction"));
+
+	   ProofSettings settings = env.getInitConfig().getSettings();
+	   if (settings==null) {
+		   settings = ProofSettings.DEFAULT_SETTINGS;
+	   }	   
+	   settings.getChoiceSettings().updateWith(choices);
    }
 
    /**
@@ -1357,6 +1377,7 @@ public abstract class AbstractSymbolicExecutionTestCase extends TestCase {
       assertTrue(proofFile.exists());
       // Load java file
       KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), proofFile, null, null, null, SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), null, true);
+      setupTacletOptions(environment);
       Proof proof = environment.getLoadedProof();
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
@@ -1416,6 +1437,7 @@ public abstract class AbstractSymbolicExecutionTestCase extends TestCase {
       assertTrue(javaFile.exists());
       // Load java file
       KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, null, true);
+      setupTacletOptions(environment);
       // Search method to proof
       IProgramMethod pm = searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
       // Start proof
@@ -1859,7 +1881,7 @@ public abstract class AbstractSymbolicExecutionTestCase extends TestCase {
          }
          assertTrue(maximalNumberOfExecutedSetNodes >= 1);
          // Make sure that the correct taclet options are defined.
-         originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, containerTypeName, methodFullName);
+         originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, containerTypeName, methodFullName);         
          setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
          SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
@@ -2050,7 +2072,15 @@ public abstract class AbstractSymbolicExecutionTestCase extends TestCase {
     * @return The original settings which are overwritten.
     */
    public static HashMap<String, String> setDefaultTacletOptions() {
-      return HelperClassForTests.setDefaultTacletOptions();
+	   HashMap<String,String> original = HelperClassForTests.setDefaultTacletOptions();
+	   // set non modular reasoning
+	   System.out.println(ProofSettings.DEFAULT_SETTINGS);
+	   ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+	   System.out.println(choiceSettings);
+	   ImmutableSet<Choice> cs = DefaultImmutableSet.nil();
+	   cs = cs.add(new Choice("noRestriction", "methodExpansion"));
+	   choiceSettings.updateWith(cs);
+	   return original;
    }
 
    /**

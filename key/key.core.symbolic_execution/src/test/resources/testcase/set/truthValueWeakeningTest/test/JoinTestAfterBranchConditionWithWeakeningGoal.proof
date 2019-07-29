@@ -24,7 +24,7 @@
 [Strategy]Timeout=-1
 [Strategy]MaximumNumberOfAutomaticApplications=10000
 [SMTSettings]integersMaximum=2147483645
-[Choice]DefaultChoices=initialisation-initialisation\\:disableStaticInitialisation , wdChecks-wdChecks\\:off , reach-reach\\:on , moreSeqRules-moreSeqRules\\:off , sequences-sequences\\:on , Strings-Strings\\:on , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:on , runtimeExceptions-runtimeExceptions\\:allow , wdOperator-wdOperator\\:L , JavaCard-JavaCard\\:off , integerSimplificationRules-integerSimplificationRules\\:full , permissions-permissions\\:off , modelFields-modelFields\\:showSatisfiability , assertions-assertions\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , bigint-bigint\\:on , programRules-programRules\\:Java
+[Choice]DefaultChoices=methodExpansion-methodExpansion:noRestriction,initialisation-initialisation\\:disableStaticInitialisation , wdChecks-wdChecks\\:off , reach-reach\\:on , moreSeqRules-moreSeqRules\\:off , sequences-sequences\\:on , Strings-Strings\\:on , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:on , runtimeExceptions-runtimeExceptions\\:allow , wdOperator-wdOperator\\:L , JavaCard-JavaCard\\:off , integerSimplificationRules-integerSimplificationRules\\:full , permissions-permissions\\:off , modelFields-modelFields\\:showSatisfiability , assertions-assertions\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , bigint-bigint\\:on , programRules-programRules\\:Java
 [SMTSettings]useConstantsForBigOrSmallIntegers=true
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON

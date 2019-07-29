@@ -25,7 +25,7 @@ public class FailedStaticInit {
     public FailedStaticInit() {
     }
 
-    public void objectMethod() {
+    public final void objectMethod() {
 	this.objectVar = 3;
         FailedStaticInit.ATTR = 0;
     }
