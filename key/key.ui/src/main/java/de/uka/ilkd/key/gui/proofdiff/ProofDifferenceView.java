@@ -281,11 +281,14 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
     }*/
 
     public static class OpenDifferenceWithParent extends MainWindowAction {
+
+        private static final long serialVersionUID = -7820466004457781393L;
+
         private Node left;
 
         public OpenDifferenceWithParent(MainWindow mainWindow, Node node) {
             super(mainWindow);
-            setName("Diff with parent");
+            setName("Diff with Parent");
             setEnabled(node.parent() != null);
             this.left = node;
         }

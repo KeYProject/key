@@ -562,6 +562,7 @@ public class ProofTreePopupFactory {
         protected RunStrategyOnNode(ProofTreeContext context) {
             super(context);
             setName("Apply Strategy");
+            setIcon(IconFactory.strategyStartLogo(ICON_SIZE));
             setEnabled(context.proof != null);
         }
 

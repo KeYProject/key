@@ -28,6 +28,7 @@ import de.uka.ilkd.key.gui.MainWindow;
  * Open the KeY project homepage in the system default browser.
  * May be inactive if Java 6 Desktop system is not supported or
  * internet connection missing.
+ *
  * @author bruns
  *
  */
@@ -38,16 +39,16 @@ public class KeYProjectHomepageAction extends MainWindowAction {
 
     public KeYProjectHomepageAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName("Online help");
+        setName("Online Help");
         setEnabled(desktopEnabled());
         setTooltip("Opens the KeY project homepage in the default browser");
         setIcon(IconFactory.help(16));
     }
-    
+
     private static boolean desktopEnabled() {
         return Main.getKeyDesktop().supportsBrowse();
     }
-    
+
     @SuppressWarnings("finally")
     private static URI getURI() {
         URI res = null;
@@ -70,6 +71,4 @@ public class KeYProjectHomepageAction extends MainWindowAction {
             // todo Auto-generated catch block
         }
     }
-
-
 }

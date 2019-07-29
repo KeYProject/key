@@ -28,7 +28,7 @@ public final class AbandonTaskAction extends MainWindowAction {
 
     public AbandonTaskAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName("Abandon");
+        setName("Abandon Proof");
         setIcon(IconFactory.abandon(16));
         setAcceleratorLetter(KeyEvent.VK_W);
         setTooltip("Drop current proof.");

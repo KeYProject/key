@@ -22,7 +22,7 @@ public class BundleSavingToggleAction extends MainWindowAction {
      */
     public BundleSavingToggleAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName("Allow proof bundle saving");
+        setName("Allow Proof Bundle Saving");
         setTooltip("If ticked, a proofs can be saved as bundles"
                 + " (at the cost of storing copies of loaded files in a temporary directory).");
         setSelected(ProofIndependentSettings.DEFAULT_INSTANCE

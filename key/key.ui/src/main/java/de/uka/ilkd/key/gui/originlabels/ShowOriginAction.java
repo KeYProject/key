@@ -19,6 +19,8 @@ import de.uka.ilkd.key.settings.TermLabelSettings;
  */
 public class ShowOriginAction extends MainWindowAction {
 
+    private static final long serialVersionUID = 4557953425770258852L;
+
     private PosInSequent pos;
 
     /**
@@ -60,6 +62,8 @@ public class ShowOriginAction extends MainWindowAction {
                 vis,
                 vis.getLongName(),
                 new AbstractAction() {
+
+                    private static final long serialVersionUID = 2410334588447893970L;
 
                     @Override
                     public void actionPerformed(ActionEvent e) {

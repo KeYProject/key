@@ -130,6 +130,7 @@ public class OriginTermLabelsExt
 
     private static final class OpenVisualizerAction extends KeyAction {
 
+        private static final long serialVersionUID = -2936000510977056583L;
         /** The visualizer shown by this action. */
         private NodeInfoVisualizer vis;
 
