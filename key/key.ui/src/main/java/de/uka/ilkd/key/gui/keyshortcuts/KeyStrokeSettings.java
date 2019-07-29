@@ -147,7 +147,8 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
 
     public void save() {
         System.out.println("[KeyStrokeSettings] Save keyboard shortcuts to: " + SETTINGS_FILE.getAbsolutePath());
-        try (Writer writer = new FileWriter(SETTINGS_FILE)) {
+        SETTINGS_FILE.getParentFile().mkdirs();
+        try (Writer writer = new FileWriter(SETTINGS_FILE)) {            
             properties.store(writer, "KeY's KeyStrokes");
             writer.flush();
         } catch (IOException ex) {
