@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 /**
  */
@@ -37,6 +38,7 @@ public final class GoalSelectAboveAction extends MainWindowAction {
         super(mainWindow);
         setAcceleratorLetter(KeyEvent.VK_K);
         setName("Select Goal Above");
+        setIcon(IconFactory.selectGoalAbove(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Changes selected goal in the proof-tree to the next item above the current one");
     }
 

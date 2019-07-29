@@ -85,7 +85,6 @@ import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.GoalBackAction;
 import de.uka.ilkd.key.gui.actions.GoalSelectAboveAction;
 import de.uka.ilkd.key.gui.actions.GoalSelectBelowAction;
-import de.uka.ilkd.key.gui.actions.HeatmapSettingsAction;
 import de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction;
 import de.uka.ilkd.key.gui.actions.IncreaseFontSizeAction;
 import de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction;
@@ -857,9 +856,9 @@ public final class MainWindow extends JFrame {
 
         view.add(createSelectionMenu());
 
-        JMenuItem hmItem = new JMenuItem("Heatmap Options");
-        hmItem.addActionListener(new HeatmapSettingsAction(this));
-        view.add(hmItem);
+        // JMenuItem hmItem = new JMenuItem("Heatmap Options");
+        // hmItem.addActionListener(new HeatmapSettingsAction(this));
+        // view.add(hmItem);
 
         return view;
     }

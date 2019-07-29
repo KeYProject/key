@@ -18,6 +18,8 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
  */
 public class ClosableTabComponent extends JPanel {
 
+    private static final long serialVersionUID = -7205139488676599833L;
+
     /**
      * Creates a new {@code ClosableTabComponent}.
      *
