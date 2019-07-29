@@ -130,7 +130,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
                     sb.insert(0, '/');
                 }
             } while (file != null && sb.length() < LIMIT);
-            if (file != null){
+            if (file != null) {
                 sb.insert(0, '…');
             }
             return sb.toString();

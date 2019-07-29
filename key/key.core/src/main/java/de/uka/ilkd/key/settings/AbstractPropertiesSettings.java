@@ -147,7 +147,8 @@ public abstract class AbstractPropertiesSettings implements Settings {
      * @param defValue a default value
      * @return returns a {@link PropertyEntry}
      */
-    protected PropertyEntry<List<String>> createStringListProperty(@NotNull String key, @Nullable String defValue) {
+    protected PropertyEntry<List<String>> createStringListProperty(@NotNull String key,
+                                                                   @Nullable String defValue) {
         PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key,
                 parseStringList(defValue),
                 AbstractPropertiesSettings::parseStringList,
