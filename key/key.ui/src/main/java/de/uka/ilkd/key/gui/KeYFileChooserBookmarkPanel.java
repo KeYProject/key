@@ -99,10 +99,9 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
     }
 
     private void loadBookmarks() {
-        viewSettings.getFolderBookmarks().forEach(
+        viewSettings.getFolderBookmarks().forEach(it ->
                 //make absolute? .getAbsoluteFile())
-                it -> bookmarks.addElement(new File(it))
-        );
+                bookmarks.addElement(new File(it)));
     }
 
     private void saveBookmarks() {
@@ -120,16 +119,20 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
          * values
          */
         private static final int LIMIT = 25;
-        private DefaultListCellRenderer renderer = new DefaultListCellRenderer();
+        private final DefaultListCellRenderer renderer = new DefaultListCellRenderer();
 
         private String toString(File file) {
             StringBuilder sb = new StringBuilder();
             do {
                 sb.insert(0, file.getName());
                 file = file.getParentFile();
-                if (file != null) sb.insert(0, '/');
+                if (file != null) {
+                    sb.insert(0, '/');
+                }
             } while (file != null && sb.length() < LIMIT);
-            if (file != null) sb.insert(0, '…');
+            if (file != null){
+                sb.insert(0, '…');
+            }
             return sb.toString();
         }
 

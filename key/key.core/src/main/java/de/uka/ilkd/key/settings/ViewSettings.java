@@ -23,8 +23,10 @@ import java.util.Set;
  * is allowed to have. If this number is exceeded no SchemaVariables get
  * instantiated in the displayed tooltip.
  * 3) whether intermediate proofsteps should be hidden in the proof tree view
+ *
+ * @author unknown
+ * @author weigl
  */
-@SuppressWarnings("JavadocReference")
 public class ViewSettings extends AbstractPropertiesSettings {
 
     private static final String CLUTTER_RULES = "[View]clutterRules";
@@ -191,8 +193,14 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private PropertyEntry<Set<String>> clutterRuleSets =
             createStringSetProperty(CLUTTER_RULESSETS, CLUTTER_RULESETS_DEFAULT);
 
-    private PropertyEntry<List<String>> folderBookmarks = createStringListProperty(USER_FOLDER_BOOKMARKS,
-            System.getProperty("user.home"));
+    /**
+     * User-definable folder bookmarks.
+     *
+     * @see #getFolderBookmarks()
+     * @see #setFolderBookmarks(List)
+     */
+    private PropertyEntry<List<String>> folderBookmarks
+            = createStringListProperty(USER_FOLDER_BOOKMARKS, System.getProperty("user.home"));
 
     /**
      * Clutter rules are rules with less priority in the taclet menu
@@ -488,10 +496,16 @@ public class ViewSettings extends AbstractPropertiesSettings {
         this.uiFontSizeFactor.set(factor);
     }
 
+    /**
+     * @see #folderBookmarks
+     */
     public List<String> getFolderBookmarks() {
         return folderBookmarks.get();
     }
 
+    /**
+     * @see #folderBookmarks
+     */
     public void setFolderBookmarks(List<String> bm) {
         folderBookmarks.set(bm);
     }

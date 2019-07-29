@@ -95,7 +95,12 @@ public final class IconFactory {
             new IconFontProvider(FontAwesomeSolid.ROUTE);
     public static final IconFontProvider WINDOW_ICON =
             new IconFontProvider(FontAwesomeSolid.WINDOW_RESTORE);
-    public static final IconProvider PLUS_SQUARED = new IconFontProvider(FontAwesomeSolid.PLUS_SQUARE);
+
+    /**
+     * PLUS SQUARED
+     */
+    public static final IconProvider PLUS_SQUARED
+            = new IconFontProvider(FontAwesomeSolid.PLUS_SQUARE);
 
     public static final float DEFAULT_SIZE = 16;
     public static final Color CLOSED_GREEN = DuneColorScheme.green;
