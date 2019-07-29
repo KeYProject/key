@@ -16,7 +16,8 @@ public class AmtoftBanerjee {
         return this.q;
     }
 
-    void setQ(int n) {
+    // final to make method expansion modularly sound
+    final void setQ(int n) {
         this.q = n;
     }
 

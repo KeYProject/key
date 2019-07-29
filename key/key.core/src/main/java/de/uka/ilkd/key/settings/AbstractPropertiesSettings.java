@@ -103,8 +103,8 @@ public abstract class AbstractPropertiesSettings implements Settings {
         return pe;
     }
 
-    protected PropertyEntry<Boolean> createBooleanProperty(String key, boolean b) {
-        PropertyEntry<Boolean> pe = new DefaultPropertyEntry<>(key, b, parseBoolean);
+    protected PropertyEntry<Boolean> createBooleanProperty(String key, boolean defValue) {
+        PropertyEntry<Boolean> pe = new DefaultPropertyEntry<>(key, defValue, parseBoolean);
         propertyEntries.add(pe);
         return pe;
     }

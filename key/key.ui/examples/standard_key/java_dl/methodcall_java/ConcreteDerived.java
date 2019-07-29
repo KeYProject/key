@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 // 
 
-public class ConcreteDerived extends AbstractBase
+public final class ConcreteDerived extends AbstractBase
 {
 
     public int m() {
