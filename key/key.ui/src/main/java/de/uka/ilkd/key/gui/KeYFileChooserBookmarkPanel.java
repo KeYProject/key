@@ -10,37 +10,52 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
 /**
- * Created by jklamroth on 12/6/18.
+ * This is a Panel used as accessory for the JFileChooser.
  * <p>
- * This is a Panel used as Accessory for the KeYFileChooser which allows to
- * save Bookmarks which may be used as shortcuts to directories often used.
+ * This panel allows the user to save, delete and jump to their bookmarked folders.
  * <p>
- * The bookmarks are stored as preferences.
+ * The bookmarks are stored as preferences inside {@link ViewSettings}
  *
  * @author Jonas Klamroth
+ * @author weigl
+ * @see ViewSettings#USER_FOLDER_BOOKMARKS
+ * @see ViewSettings#getFolderBookmarks()
  */
-public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChangeListener {
-    private static final long serialVersionUID = -6498548666886815605L;
+public class KeYFileChooserBookmarkPanel extends JPanel {
     private final @NotNull JFileChooser chooser;
+
     private final ViewSettings viewSettings =
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+
     private final DefaultListModel<File> bookmarks = new DefaultListModel<>();
     private final JList<File> listBookmarks = new JList<>(bookmarks);
+
+
     private final KeyAction actionAddBookmark = new AddBookmarkAction();
     private final KeyAction actionRemoveBookmark = new RemoveBookmarkAction();
     private final KeyAction actionExternalAddBookmark = new AddExternalBookmarkAction();
 
-
+    /**
+     * Creates a bookmark panel and bind it to the given {@code chooser}.
+     *
+     * @param chooser non null {@link JFileChooser}
+     */
     public KeYFileChooserBookmarkPanel(@NotNull JFileChooser chooser) {
         this.chooser = chooser;
+        //register ad the given file chooser
+        chooser.setAccessory(this);
+
+        //listen for current directory of the file chooser
+        chooser.addPropertyChangeListener(JFileChooser.DIRECTORY_CHANGED_PROPERTY, e -> {
+            File selected = chooser.getCurrentDirectory();
+            listBookmarks.setSelectedValue(selected, true);
+        });
 
         setLayout(new BorderLayout(5, 5));
         setBorder(BorderFactory.createTitledBorder("Bookmarks:"));
@@ -90,14 +105,6 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
         );
     }
 
-    public void propertyChange(PropertyChangeEvent e) {
-        String prop = e.getPropertyName();
-        if (JFileChooser.DIRECTORY_CHANGED_PROPERTY.equals(prop)) {
-            File selected = chooser.getCurrentDirectory();
-            listBookmarks.setSelectedValue(selected, true);
-        }
-    }
-
     private void saveBookmarks() {
         List<String> newMarks = new ArrayList<>();
         Enumeration<File> iter = bookmarks.elements();
@@ -107,8 +114,41 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
         viewSettings.setFolderBookmarks(newMarks);
     }
 
-    private class AddBookmarkAction extends KeyAction {
+    private static class BookmarkRenderer implements ListCellRenderer<File> {
+        /**
+         * Character limit for entries. We try to keep folder entries shorter than the defined
+         * values
+         */
+        private static final int LIMIT = 25;
+        private DefaultListCellRenderer renderer = new DefaultListCellRenderer();
 
+        private String toString(File file) {
+            StringBuilder sb = new StringBuilder();
+            do {
+                sb.insert(0, file.getName());
+                file = file.getParentFile();
+                if (file != null) sb.insert(0, '/');
+            } while (file != null && sb.length() < LIMIT);
+            if (file != null) sb.insert(0, '…');
+            return sb.toString();
+        }
+
+        @Override
+        public Component getListCellRendererComponent(JList<? extends File> list, File value,
+                                                      int index, boolean isSelected,
+                                                      boolean cellHasFocus) {
+            String val;
+            if (value.getAbsolutePath().length() <= LIMIT) {
+                val = value.getAbsolutePath();
+            } else {
+                val = toString(value);
+            }
+            return renderer.getListCellRendererComponent(list, val, index,
+                    isSelected, cellHasFocus);
+        }
+    }
+
+    private class AddBookmarkAction extends KeyAction {
         AddBookmarkAction() {
             setIcon(IconFactory.plus(16));
             setTooltip("Adds the current directory to the bookmarks.");
@@ -130,10 +170,9 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
     }
 
     private class AddExternalBookmarkAction extends KeyAction {
-
         AddExternalBookmarkAction() {
             setIcon(IconFactory.PLUS_SQUARED.get(16));
-            setTooltip("<html>Opens a new file selection dialog to select a new bookmark.");
+            setTooltip("Opens a new file selection dialog to select a new bookmark.");
         }
 
         @Override
@@ -166,7 +205,6 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
         }
     }
 
-
     private class RemoveBookmarkAction extends KeyAction {
         RemoveBookmarkAction() {
             setName("");
@@ -181,36 +219,6 @@ public class KeYFileChooserBookmarkPanel extends JPanel implements PropertyChang
                 bookmarks.removeElementAt(selected);
                 saveBookmarks();
             }
-        }
-    }
-
-    private class BookmarkRenderer implements ListCellRenderer<File> {
-        private static final int LIMIT = 25;
-        private DefaultListCellRenderer renderer = new DefaultListCellRenderer();
-
-        public String toString(File file) {
-            StringBuilder sb = new StringBuilder();
-            do {
-                sb.insert(0, file.getName());
-                file = file.getParentFile();
-                if (file != null) sb.insert(0, '/');
-            } while (file != null && sb.length() < LIMIT);
-            if (file != null) sb.insert(0, '…');
-            return sb.toString();
-        }
-
-        @Override
-        public Component getListCellRendererComponent(JList<? extends File> list, File value,
-                                                      int index, boolean isSelected,
-                                                      boolean cellHasFocus) {
-            String val;
-            if (value.getAbsolutePath().length() <= LIMIT) {
-                val = value.getAbsolutePath();
-            } else {
-                val = toString(value);
-            }
-            return renderer.getListCellRendererComponent(list, val, index,
-                    isSelected, cellHasFocus);
         }
     }
 }
