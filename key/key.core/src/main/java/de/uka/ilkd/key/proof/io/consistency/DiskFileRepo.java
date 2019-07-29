@@ -129,7 +129,8 @@ public final class DiskFileRepo extends AbstractFileRepo {
             return getClassFileInputStream(norm);
         }
 
-        throw new IOException("Unsupported file type for " + norm);
+        // Some code relies on this method returning null, not an exception
+        return null;
     }
 
     private InputStream getJavaFileInputStream(Path javaFile) throws IOException {
