@@ -3854,7 +3854,8 @@ varexp[TacletBuilder b]
         | varcond_reference[b, negated]        
         | varcond_referencearray[b, negated]
         | varcond_static[b,negated]
-        | varcond_staticmethod[b,negated]  
+        | varcond_staticmethod[b,negated]
+        | varcond_mayexpandmethod[b,negated]
         | varcond_final[b,negated]
         | varcond_typecheck[b, negated]
         | varcond_constant[b, negated]
@@ -4148,6 +4149,18 @@ varcond_staticmethod [TacletBuilder b, boolean negated]
       b.addVariableCondition(new StaticMethodCondition
          (negated, (SchemaVariable)x, (SchemaVariable)y, (SchemaVariable)z));
    }
+;
+
+varcond_mayexpandmethod [TacletBuilder b, boolean negated]
+:
+   MAXEXPANDMETHOD LPAREN x=varId COMMA y=varId
+   ( COMMA z=varId RPAREN { // with explicit receiver
+      b.addVariableCondition(new MayExpandMethodCondition
+         (negated, (SchemaVariable)x, (SchemaVariable)y, (SchemaVariable)z)); }
+   | RPAREN {  // with implicit "this" receiver
+              b.addVariableCondition(new MayExpandMethodCondition
+                 (negated, null, (SchemaVariable)x, (SchemaVariable)y)); }
+   )
 ;
 
 varcond_referencearray [TacletBuilder b, boolean primitiveElementType]

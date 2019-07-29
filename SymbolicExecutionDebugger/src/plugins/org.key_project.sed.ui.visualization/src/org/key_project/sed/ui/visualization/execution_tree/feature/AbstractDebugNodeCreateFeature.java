@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.ICreateFeature;
-import org.eclipse.graphiti.features.ICustomUndoableFeature;
+import org.eclipse.graphiti.features.ICustomUndoRedoFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.ICreateContext;
@@ -38,7 +38,7 @@ import org.key_project.util.eclipse.WorkbenchUtil;
  * Provides a basic implementation of {@link ICreateFeature} for {@link ISENode}s.
  * @author Martin Hentschel
  */
-public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeature implements ICustomUndoableFeature {
+public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeature implements ICustomUndoRedoFeature {
    /**
     * The created {@link ISENode}.
     */
@@ -147,7 +147,7 @@ public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeatu
     * {@inheritDoc}
     */
    @Override
-   public void undo(IContext context) {
+   public void preUndo(IContext context) {
       try {
          if (isThreadCreation()) {
             if (createdNode.getDebugTarget() instanceof ISEMemoryDebugTarget) {
@@ -174,15 +174,22 @@ public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeatu
     * {@inheritDoc}
     */
    @Override
-   public boolean canRedo(IContext context) {
-      return true;
-   }
+   public void postUndo(IContext context) {}
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public void redo(IContext context) {
+   public boolean canRedo(IContext context) {
+      return true;
+   }
+
+ 
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void preRedo(IContext context) {
       try {
          if (isThreadCreation()) {
             if (createdNode.getDebugTarget() instanceof ISEMemoryDebugTarget) {
@@ -202,4 +209,11 @@ public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeatu
          throw new RuntimeException(e);
       }
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void postRedo(IContext context) {}
+   
 }
