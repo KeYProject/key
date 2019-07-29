@@ -36,6 +36,8 @@ public class LicenseAction extends MainWindowAction {
     public static final String KEY_FALLBACK = (KeYConstants.COPYRIGHT + "\nKeY is protected by the "
             + "GNU General Public License v2");
 
+    private static final long serialVersionUID = 5606343347731759150L;
+
     public LicenseAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("License");
@@ -86,7 +88,7 @@ public class LicenseAction extends MainWindowAction {
         pane.addTab("Third party libraries", createLicenseViewer(readStream(thirdPartyLic, "")));
 
         JButton ok = new JButton("OK");
-        ok.addActionListener(e -> ((JFrame) ((JButton) e.getSource())
+        ok.addActionListener(e -> ((JDialog) ((JButton) e.getSource())
                 .getTopLevelAncestor()).dispose());
         fr.getContentPane().add(ok, BorderLayout.SOUTH);
         fr.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
