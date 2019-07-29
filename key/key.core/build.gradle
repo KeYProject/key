@@ -65,6 +65,7 @@ test {
     }
 }
 
+// Should actually be named "testProveRules" ... as rules are proved, and not ProofRules tested
 task testProofRules(type: Test) {
     group "verification"
     filter { includeTestsMatching "ProveRulesTest" }
