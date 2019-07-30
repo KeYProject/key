@@ -13,20 +13,20 @@
 
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.io.File;
+import java.nio.file.Path;
 
-import javax.swing.JCheckBox;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
+import de.uka.ilkd.key.gui.ProofSelectionDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 public class OpenFileAction extends MainWindowAction {
-    
+
     /**
      * 
      */
@@ -48,13 +48,26 @@ public class OpenFileAction extends MainWindowAction {
 
         if (loaded) {
             File file = keYFileChooser.getSelectedFile();
+
+            // special case proof bundles -> allow to select the proof to load
+            if (ProofSelectionDialog.isProofBundle(file.toPath())) {
+                Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
+                if (proofPath == null) {
+                    // canceled by user!
+                    return;
+                } else {
+                    mainWindow.loadProofFromBundle(file, proofPath.toFile());
+                    return;
+                }
+            }
+
             if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getNotifyLoadBehaviour() &&
                     file.toString().endsWith(".java")) {
                 JCheckBox checkbox = new JCheckBox("Don't show this warning again");
                 Object[] message = { "When you load a Java file, all java files in the current",
                         "directory and all subdirectories will be loaded as well.",
                         checkbox };
-                JOptionPane.showMessageDialog(mainWindow, message, 
+                JOptionPane.showMessageDialog(mainWindow, message,
                         "Please note", JOptionPane.WARNING_MESSAGE);
                 ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                             .setNotifyLoadBehaviour(!checkbox.isSelected());
@@ -62,6 +75,6 @@ public class OpenFileAction extends MainWindowAction {
             }
             mainWindow.loadProblem(file);
         }
-        
+
     }
 }

@@ -47,8 +47,8 @@ public class GeneralSettings implements Settings, Cloneable {
     private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
     private static final String AUTO_SAVE = "[General]AutoSavePeriod";
 
-    /** The key for storing the allowBundleSaving flag in settings */
-    private static final String ALLOW_BUNDLE_SAVING = "[General]AllowBundleSaving";
+    /** The key for storing the ensureSourceConsistency flag in settings */
+    private static final String ENSURE_SOURCE_CONSISTENCY = "[General]EnsureSourceConsistency";
 
     /** minimize interaction is on by default */
     private boolean tacletFilter = true;
@@ -68,10 +68,10 @@ public class GeneralSettings implements Settings, Cloneable {
     private int autoSave = 0;
 
     /**
-     * If disabled, proofs can not be saved as bundle.
-     * Toggles saving of copies of loaded files via a FileRepo.
+     * If enabled, source files are cached at first use to ensure consistency between proof
+     * and source code. Toggles between SimpleFilerepo (false) and DiskFileRepo (true).
      */
-    private boolean allowBundleSaving = false;
+    private boolean ensureSourceConsistency = true;
 
     private LinkedList<SettingsListener> listenerList = 
         new LinkedList<SettingsListener>();
@@ -101,8 +101,8 @@ public class GeneralSettings implements Settings, Cloneable {
         return autoSave;
     }
 
-    public boolean isAllowBundleSaving() {
-        return allowBundleSaving;
+    public boolean isEnsureSourceConsistency() {
+        return ensureSourceConsistency;
     }
 
     // setter
@@ -140,13 +140,13 @@ public class GeneralSettings implements Settings, Cloneable {
     }
 
     /**
-     * Sets the allowBundleSaving flag. This enables/disables the possibility to store proofs as
-     * bundles.
+     * Sets the ensureSourceConsistency flag. This enables/disables caching of source files at first
+     * use via a FileRepo.
      * @param b the new truth value of the flag
      */
-    public void setAllowBundleSaving(boolean b) {
-        if (allowBundleSaving != b) {
-            allowBundleSaving = b;
+    public void setEnsureSourceConsistency(boolean b) {
+        if (ensureSourceConsistency != b) {
+            ensureSourceConsistency = b;
             fireSettingsChanged();
         }
     }
@@ -186,9 +186,9 @@ public class GeneralSettings implements Settings, Cloneable {
             }
         }
 
-        val = props.getProperty(ALLOW_BUNDLE_SAVING);
+        val = props.getProperty(ENSURE_SOURCE_CONSISTENCY);
         if (val != null) {
-            allowBundleSaving = Boolean.valueOf(val).booleanValue();
+            ensureSourceConsistency = Boolean.valueOf(val).booleanValue();
         }
     }
 
@@ -203,7 +203,7 @@ public class GeneralSettings implements Settings, Cloneable {
         props.setProperty(RIGHT_CLICK_MACROS_KEY, "" + rightClickMacros);
         props.setProperty(USE_JML_KEY, "" + useJML);
         props.setProperty(AUTO_SAVE, ""+ autoSave);
-        props.setProperty(ALLOW_BUNDLE_SAVING, "" + allowBundleSaving);
+        props.setProperty(ENSURE_SOURCE_CONSISTENCY, "" + ensureSourceConsistency);
     }
 
     /** sends the message that the state of this setting has been

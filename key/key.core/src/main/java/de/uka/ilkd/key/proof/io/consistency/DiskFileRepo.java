@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,7 +34,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
      * Stores for each requested path the mapping to its concrete path in repo.
      * Key and value paths are absolute, and even more, they are real paths.
      */
-    private HashMap<Path, Path> map = new HashMap<Path, Path>();
+    private HashMap<Path, Path> map = new HashMap<>();
 
     /**
      * Initializes a new empty DiskFileRepo. This creates a new temporary directory.
@@ -45,33 +46,20 @@ public final class DiskFileRepo extends AbstractFileRepo {
         tmpDir = Files.createTempDirectory(proofName);
 
         // hook for deleting tmpDir + content at program exit
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                try {
-                    // delete the temporary directory with all contained files
-                    deleteDiskContent();
-                } catch (IOException e) {
-                    // this is called at program exist, so we only print a console message
-                    e.printStackTrace();
-                }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                // delete the temporary directory with all contained files
+                deleteDiskContent();
+            } catch (IOException e) {
+                // this is called at program exist, so we only print a console message
+                e.printStackTrace();
             }
-        });
+        }));
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////
     //////////////////// methods for loading files and opening streams ////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public InputStream getInputStream(Path path) throws IOException {
-        // wrap path into URL for uniform treatment
-        return getInputStream(path.toUri().toURL());
-    }
-
-    @Override
-    public InputStream getInputStream(RuleSource ruleSource) throws IOException {
-        return getInputStream(ruleSource.url());
-    }
 
     @Override
     public InputStream getInputStream(URL url) throws IOException {
@@ -80,7 +68,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
         // currently, we support only two protocols: file and zip/jar
         if (protocol.equals("file")) {
             // url.getPath() may contain escaped characters -> we have to decode it
-            String path = URLDecoder.decode(url.getPath(), "UTF-8");
+            String path = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8.name());
 
             return copyAndOpenInputStream(Paths.get(path));
         } else if (protocol.equals("jar")) {        // TODO: zip?
@@ -102,7 +90,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
             return entryURL.openStream();
         } else {
-            throw new IllegalArgumentException("This type of RuleSource is not supported!");
+            throw new IllegalArgumentException("This type of URL is not supported!");
         }
     }
 
@@ -140,6 +128,8 @@ public final class DiskFileRepo extends AbstractFileRepo {
             // copy to classpath
             return getClassFileInputStream(norm);
         }
+
+        // Some code relies on this method returning null, not an exception
         return null;
     }
 
@@ -180,7 +170,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
         Path absTarget = tmpDir.resolve(keyFile.getFileName());
 
         // copy the key file to target path
-        // IMPORTANT: Do not call adapteFileRefs here. This should be done when saving a repo.
+        // IMPORTANT: Do not call adaptFileRefs here. This should be done when saving a repo.
         createDirsAndCopy(keyFile, absTarget);
 
         // register in map and list (for lookup and saving)
@@ -245,11 +235,6 @@ public final class DiskFileRepo extends AbstractFileRepo {
         return absTarget;
     }
 
-    // TODO: move to IOUtil?
-    private static void createDirsAndCopy(Path source, Path target) throws IOException {
-        Files.createDirectories(target.getParent());
-        Files.copy(source, target);
-    }
 
     /////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////// methods for saving the repo ////////////////////////////
@@ -260,14 +245,14 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
         if (path.isAbsolute()) {
             // programming error!
-            throw new IllegalArgumentException("The path is not absolute: " + path);
+            throw new IllegalArgumentException("The path is not relative: " + path);
         }
 
         // store the file inside the temporary directory (relative to tmp dir)
         Path absTarget = tmpDir.resolve(path);
 
         // store the path translation in map
-        // -> do not do this, since exists no copy of the file except in repo
+        // -> do not do this, since there exists no copy of the file except in repo
         // Path translation = baseDir.resolve(path);
         // map.put(translation, absTarget);
         addFile(path);

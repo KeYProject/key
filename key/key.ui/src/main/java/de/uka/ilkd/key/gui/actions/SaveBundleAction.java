@@ -57,11 +57,8 @@ public final class SaveBundleAction extends MainWindowAction {
     }
 
     private void updateStatus() {
-        // enable if setting is activated and proof exists
-        setEnabled(ProofIndependentSettings.DEFAULT_INSTANCE
-                                           .getGeneralSettings()
-                                           .isAllowBundleSaving()
-                && mainWindow.getMediator().getSelectedProof() != null);
+        // enable only if there is a proof
+        setEnabled(mainWindow.getMediator().getSelectedProof() != null);
     }
 
     @Override
