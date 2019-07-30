@@ -182,11 +182,9 @@ public class Node {
             ImmutableSet<String> oldRelevantFiles = this.nodeInfo.getRelevantFiles();
 
             this.nodeInfo = new NodeInfo(this);
-            this.nodeInfo.setSequentChangeInfo(oldSeqChangeInfo);
 
-            if (parent != null && parent.getNodeInfo() != null) {
-                this.nodeInfo.addRelevantFiles(oldRelevantFiles);
-            }
+            this.nodeInfo.setSequentChangeInfo(oldSeqChangeInfo);
+            this.nodeInfo.addRelevantFiles(oldRelevantFiles);
         } else {
             this.nodeInfo = new NodeInfo(this);
         }
