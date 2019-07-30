@@ -25,7 +25,7 @@ public class SyntaxHighlightingToggleAction extends MainWindowAction {
 
     public SyntaxHighlightingToggleAction(MainWindow window) {
         super(window);
-        setName("Use syntax highlighting");
+        setName("Use Syntax Highlighting");
         setTooltip("Uses regular expressions-based syntax highlighting. "
                 + "This helps to understand sequents, but may "
                 + "slow down the rendering of longer ones.");

@@ -47,7 +47,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
 
         String[] sizes = Arrays.stream(Config.SIZES).boxed().map(it -> it + " pt").toArray(String[]::new);
         spFontSizeTreeSequent = this.<String>createSelection(sizes, emptyValidator());
-        addTitledComponent("Tree&Sequent font factor: ", spFontSizeTreeSequent, "");
+        addTitledComponent("Tree and sequent font factor: ", spFontSizeTreeSequent, "");
 
 
         String info = "Maximum size (line count) of the tooltips of applicable rules\n"
@@ -71,9 +71,9 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         chkHidePackagePrefix = addCheckBox("Hide package prefix", "", false, emptyValidator());
         chkConfirmExit = addCheckBox("Confirm program exit", "", false, emptyValidator());
         spAutoSaveProof = addNumberField("Auto save proof", 0, 10000000, 1000, "", emptyValidator());
-        chkMinimizeInteraction = addCheckBox("Minimise Interactions", "", false, emptyValidator());
+        chkMinimizeInteraction = addCheckBox("Minimise interactions", "", false, emptyValidator());
         chkEnsureSourceConsistency = addCheckBox("Ensure source consistency", "", true, emptyValidator());
-        chkRightClickMacros = addCheckBox("Right click for Macros", "", false, emptyValidator());
+        chkRightClickMacros = addCheckBox("Right click for proof macros", "", false, emptyValidator());
     }
 
 

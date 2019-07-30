@@ -41,7 +41,8 @@ public class ConditionalConfidentialExample {
     public class User {
         private /*@ spec_public */ int data;
 
-        void setData(int data) {
+        // implemented as final to make method inling sound
+        final void setData(int data) {
             this.data = data;
         }
     }

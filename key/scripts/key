@@ -156,4 +156,4 @@ while [ $# -ne 0 ]; do
 done
 
 export JAVA_OPTS
-$START_SCRIPT $@
+$START_SCRIPT "$@"

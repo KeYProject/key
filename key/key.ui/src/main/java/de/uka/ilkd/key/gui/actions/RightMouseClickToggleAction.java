@@ -27,7 +27,7 @@ public class RightMouseClickToggleAction extends MainWindowAction {
 
     public RightMouseClickToggleAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName("Right click for macros");
+        setName("Right Click for Proof Macros");
         setTooltip("If ticked, a right click on the sequent opens the strategy macro context menu");
         setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isRightClickMacro());
 //        setSelected(ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().isRightClickMacro());

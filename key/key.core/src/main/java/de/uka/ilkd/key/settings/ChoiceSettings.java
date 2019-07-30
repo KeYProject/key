@@ -74,9 +74,12 @@ public class ChoiceSettings implements Settings, Cloneable {
         return (HashMap<String, Set<String>>) category2Choices.clone();
     }
 
-    
-    /** returns a copy of the HashMap that maps categories to 
-     * their default choices. */ 
+
+    /** returns a copy of the HashMap that maps categories to
+     * their currently selected choices.
+     *
+     * The method name is somewhat misleading.
+     */
     @SuppressWarnings("unchecked")
     public HashMap<String,String> getDefaultChoices(){
 	return (HashMap<String,String>) category2Default.clone();

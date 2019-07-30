@@ -105,7 +105,7 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
 
 
     protected JCheckBox createUseExplicitTypeHierachy() {
-        return addCheckBox("Use a explicit type hierarchy.",
+        return addCheckBox("Use an explicit type hierarchy.",
                 infoUseExplicitTypeHierarchy,
                 false,
                 e -> settings.useExplicitTypeHierarchy = useExplicitTypeHierachy.isSelected());
@@ -162,7 +162,7 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
 
     @Override
     public String getDescription() {
-        return "SMT-Translation";
+        return "SMT Translation";
     }
 
     @Override
