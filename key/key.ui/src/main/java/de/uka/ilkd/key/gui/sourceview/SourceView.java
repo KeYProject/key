@@ -1,5 +1,54 @@
 package de.uka.ilkd.key.gui.sourceview;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextPane;
+import javax.swing.JViewport;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
+import javax.swing.text.Document;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
+import javax.swing.text.SimpleAttributeSet;
+
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.IOUtil.LineInformation;
+
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -10,7 +59,11 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.statement.Else;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
@@ -25,32 +78,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.IOUtil.LineInformation;
-
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
-import javax.swing.text.Document;
-import javax.swing.text.Highlighter;
-import javax.swing.text.Highlighter.HighlightPainter;
-import javax.swing.text.SimpleAttributeSet;
-import java.awt.Dimension;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.*;
 
 /**
  * This class is responsible for showing the source code and visualizing the symbolic execution
@@ -172,7 +199,7 @@ public final class SourceView extends JComponent {
 
                 // Mark tabs that contain highlights.
                 for (Tab tab : tabs.values()) {
-                    tab.mark();
+                    tab.markTabComponent();
                 }
             }
         });
@@ -259,7 +286,7 @@ public final class SourceView extends JComponent {
         Highlight highlight = new Highlight(fileName, line, color, level);
         highlights.add(highlight);
 
-        tab.mark();
+        tab.markTabComponent();
 
         tab.removeHighlights(line);
         tab.applyHighlights(line);
@@ -292,10 +319,10 @@ public final class SourceView extends JComponent {
 
         String[] lines = tab.source.split("\\R", -1);
 
+        // If we are in a JML comment, highlight everything until the next semicolon.
+        // Otherwise, just highlight the first line.
         int lastLine = firstLine;
-
         if (lines[firstLine - 1].trim().startsWith("@")) {
-            // If we are in a JML comment, highlight everything until the next semicolon.
             int parens = 0;
 
             outer_loop:
@@ -311,9 +338,6 @@ public final class SourceView extends JComponent {
                     }
                 }
             }
-        } else {
-            // Otherwise only highlight the current line.
-            lastLine = firstLine;
         }
 
         Set<Highlight> result = new HashSet<>();
@@ -398,7 +422,7 @@ public final class SourceView extends JComponent {
             }
         }
 
-        tab.mark();
+        tab.markTabComponent();
 
         return result;
     }
@@ -494,7 +518,7 @@ public final class SourceView extends JComponent {
      * @see NodeInfo#getRelevantFiles()
      */
     private void addFiles() throws IOException {
-        Set<String> files =
+        ImmutableSet<String> files =
                 mainWindow.getMediator().getSelectedNode().getNodeInfo().getRelevantFiles();
 
         Iterator<String> it = tabs.keySet().iterator();
@@ -540,7 +564,16 @@ public final class SourceView extends JComponent {
                 URL url = new URL(urlString);
                 try (InputStream is = repo.getInputStream(url)) {
                     if (is != null) {
-                        new Tab(urlString, new File(url.getFile()).getName(), is);
+                        Tab tab = new Tab(urlString, new File(url.getFile()).getName(), is);
+
+                        tabs.put(fileName, tab);
+
+                        tabPane.addTab(tab.simpleFileName, tab);
+                        int index = tabPane.indexOfComponent(tab);
+                        tabPane.setToolTipTextAt(index, tab.absoluteFileName);
+
+                        tab.resetHighlights();
+
                         return true;
                     }
                 }
@@ -548,7 +581,16 @@ public final class SourceView extends JComponent {
                 File file = new File(fileName);
                 try (InputStream is = repo.getInputStream(file.toPath())) {
                     if (is != null) {
-                        new Tab(file.getAbsolutePath(), file.getName(), is);
+                        Tab tab = new Tab(file.getAbsolutePath(), file.getName(), is);
+
+                        tabs.put(fileName, tab);
+
+                        tabPane.addTab(tab.simpleFileName, tab);
+                        int index = tabPane.indexOfComponent(tab);
+                        tabPane.setToolTipTextAt(index, tab.absoluteFileName);
+
+                        tab.resetHighlights();
+
                         return true;
                     }
                 }
@@ -696,7 +738,7 @@ public final class SourceView extends JComponent {
         do {
             SourceElement activeStatement = cur.getNodeInfo().getActiveStatement();
             if (activeStatement != null) {
-                addPosToList(joinPositionsRec(activeStatement), list, node);
+                addPosToList(joinPositionsRec(activeStatement), list, cur);
             }
             cur = cur.parent();
 
@@ -735,13 +777,15 @@ public final class SourceView extends JComponent {
                                         MethodBodyStatement mb = (MethodBodyStatement) el;
                                         Statement body = mb.getBody(services);
                                         if (body != null) {
-                                            addPosToList(body.getPositionInfo(), list, node);
+                                            node.getNodeInfo().addRelevantFile(
+                                                    body.getPositionInfo().getFileName());
                                         } else {
                                             // the method is declared without a body
                                             // -> we try to show the file either way
                                             IProgramMethod pm = mb.getProgramMethod(services);
                                             if (pm != null) {
-                                                addPosToList(pm.getPositionInfo(), list, node);
+                                                node.getNodeInfo().addRelevantFile(
+                                                        pm.getPositionInfo().getFileName());
                                             }
                                         }
                                     }
@@ -811,7 +855,10 @@ public final class SourceView extends JComponent {
                         || label.startsWith("Post (")               // postcondition of a method
                         || label.contains("Normal Execution")
                         || label.contains("Null Reference")
-                        || label.contains("Index Out of Bounds")) {
+                        || label.contains("Index Out of Bounds")
+                        || label.contains("Validity")
+                        || label.contains("Precondition")
+                        || label.contains("Usage")) {
                     return label;
                 }
             }
@@ -838,8 +885,8 @@ public final class SourceView extends JComponent {
     /**
      * Wrapper for all tab-specific data, i.e., all data pertaining to the file shown in the tab.
      *
+     * @author Wolfram Pfeifer
      * @author lanzinger
-     *
      */
     private final class Tab extends JScrollPane {
         private static final long serialVersionUID = -8964428275919622930L;
@@ -883,14 +930,15 @@ public final class SourceView extends JComponent {
             this.absoluteFileName = absoluteFilename;
             this.simpleFileName  = simpleFileName;
 
-            tabs.put(absoluteFileName, this);
-
             try {
                 String text = IOUtil.readFrom(stream);
                 if (text != null && !text.isEmpty()) {
                     source = replaceTabs(text);
+                } else {
+                    source = "[SOURCE COULD NOT BE LOADED]";
                 }
             } catch (IOException e) {
+                source = "[SOURCE COULD NOT BE LOADED]";
                 Debug.out("Unknown IOException!", e);
             }
 
@@ -911,13 +959,6 @@ public final class SourceView extends JComponent {
             //add Line numbers to each Scrollview
             TextLineNumber tln = new TextLineNumber(textPane, 1);
             setRowHeaderView(tln);
-
-            // Add tab to tab pane.
-            tabPane.addTab(simpleFileName, this);
-            int index = tabPane.indexOfComponent(this);
-            tabPane.setToolTipTextAt(index, absoluteFileName);
-
-            resetHighlights();
         }
 
         private void initLineInfo() {
@@ -985,7 +1026,7 @@ public final class SourceView extends JComponent {
                 textPane, lineInformation, absoluteFileName));
         }
 
-        private void mark() {
+        private void markTabComponent() {
             if (highlights.isEmpty()) {
                 tabPane.setForegroundAt(
                         tabPane.indexOfComponent(this),
@@ -998,7 +1039,13 @@ public final class SourceView extends JComponent {
                     tabPane.setForegroundAt(
                             tabPane.indexOfComponent(this),
                             TAB_HIGHLIGHT_COLOR.get());
+                    tabPane.setBackgroundAt(
+                            tabPane.indexOfComponent(this),
+                            UIManager.getColor("TabbedPane.background"));
                 } else {
+                    tabPane.setForegroundAt(
+                            tabPane.indexOfComponent(this),
+                            UIManager.getColor("TabbedPane.foreground"));
                     tabPane.setBackgroundAt(
                             tabPane.indexOfComponent(this),
                             TAB_HIGHLIGHT_COLOR.get());
@@ -1081,20 +1128,26 @@ public final class SourceView extends JComponent {
             symbExHighlights.clear();
 
             try {
+                int mostRecentLine = -1;
+
                 for (int i = 0; i < lines.size(); i++) {
                     Pair<Node, PositionInfo> l = lines.get(i);
+
                     if (absoluteFileName.equals(l.second.getFileName())) {
+                        int line = l.second.getStartPosition().getLine();
+
                         // use a different color for most recent
                         if (i == 0) {
+                            mostRecentLine = line;
                             symbExHighlights.add(addHighlight(
                                     absoluteFileName,
-                                    l.second.getStartPosition().getLine() - 1,
+                                    line,
                                     MOST_RECENT_HIGHLIGHT_COLOR.get(),
                                     0));
-                        } else {
+                        } else if (line != mostRecentLine) {
                             symbExHighlights.add(addHighlight(
                                     absoluteFileName,
-                                    l.second.getStartPosition().getLine() - 1,
+                                    line,
                                     NORMAL_HIGHLIGHT_COLOR.get(),
                                     0));
                         }
@@ -1339,6 +1392,7 @@ public final class SourceView extends JComponent {
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -1363,6 +1417,7 @@ public final class SourceView extends JComponent {
                         break;
                     }
                 }
+
                 if (n != null) {
                     mainWindow.getMediator().getSelectionModel().setSelectedNode(n);
                 }

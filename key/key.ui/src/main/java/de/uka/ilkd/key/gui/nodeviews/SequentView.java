@@ -154,6 +154,7 @@ public abstract class SequentView extends JEditorPane {
 
     private Object userSelectionHighlight = null;
     private Range userSelectionHighlightRange = null;
+    private PosInSequent userSelectionHighlightPis = null;
 
     protected SequentView(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
@@ -566,6 +567,87 @@ public abstract class SequentView extends JEditorPane {
         }
     }
 
+    Range getUserSelectionHighlightRange() {
+        return userSelectionHighlightRange;
+    }
+
+    void recalculateUserSelectionRange() {
+        if (userSelectionHighlight == null) {
+            return;
+        }
+
+        InitialPositionTable posTable = printer.getInitialPositionTable();
+        PosInSequent pis = userSelectionHighlightPis;
+        Range range = posTable.rangeForPath(
+                posTable.pathForPosition(pis.getPosInOccurrence(), filter));
+
+        removeUserSelectionHighlight();
+
+        try {
+            userSelectionHighlightPis = pis;
+            userSelectionHighlightRange = new Range(range.start() + 1, range.end() + 1);
+            userSelectionHighlight = getHighlighter().addHighlight(
+                    userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
+                    new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+
+            sequentViewInputListener.highlightOriginInSourceView(pis);
+        } catch (BadLocationException e) {
+            Debug.out("Error while setting permanent highlight", e);
+        }
+    }
+
+    protected void setUserSelectionHighlight(Point point) {
+        removeUserSelectionHighlight();
+
+        try {
+            userSelectionHighlightPis = getPosInSequent(point);
+            userSelectionHighlightRange = getHighlightRange(point);
+            userSelectionHighlight = getHighlighter().addHighlight(
+                    userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
+                    new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+
+            sequentViewInputListener.highlightOriginInSourceView(userSelectionHighlightPis);
+        } catch (BadLocationException e) {
+            Debug.out("Error while setting permanent highlight", e);
+        }
+    }
+
+    /**
+     * Removes the user selection.
+     *
+     * @see #setUserSelectionHighlight(PosInSequent)
+     * @see #setUserSelectionHighlight(Point)
+     * @see #isInUserSelectionHighlight(Point)
+     */
+    protected void removeUserSelectionHighlight() {
+        if (userSelectionHighlight != null) {
+            getHighlighter().removeHighlight(userSelectionHighlight);
+        }
+
+        userSelectionHighlight = null;
+        userSelectionHighlightPis = null;
+        userSelectionHighlightRange = null;
+
+        sequentViewInputListener.highlightOriginInSourceView(null);
+    }
+
+    /**
+     *
+     * @param point a point.
+     * @return {@code true} if and only if the argument points to the user selection.
+     *
+     * @see #setUserSelectionHighlight(PosInSequent)
+     * @see #setUserSelectionHighlight(Point)
+     * @see #removeUserSelectionHighlight()
+     */
+    protected boolean isInUserSelectionHighlight(Point point) {
+        return point == null && userSelectionHighlightRange == null
+                || point != null && userSelectionHighlightRange != null
+                        && Objects.equals(
+                                userSelectionHighlightRange,
+                                getHighlightRange(point));
+    }
+
     /**
      * Highlights the term at the specified position as the user's selection.
      *
@@ -590,64 +672,6 @@ public abstract class SequentView extends JEditorPane {
         }
     }
 
-    /**
-     * Highlights the term at the specified point as the user's selection.
-     *
-     * @param point the point to select.
-     *
-     * @see #setUserSelectionHighlight(PosInSequent)
-     * @see #removeUserSelectionHighlight()
-     * @see #isInUserSelectionHighlight(Point)
-     */
-    protected void setUserSelectionHighlight(Point point) {
-        removeUserSelectionHighlight();
-
-        try {
-            userSelectionHighlightRange = getHighlightRange(point);
-            userSelectionHighlight = getHighlighter().addHighlight(
-                    userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
-                    new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
-
-            sequentViewInputListener.highlightOriginInSourceView(getPosInSequent(point));
-        } catch (BadLocationException e) {
-            Debug.out("Error while setting permanent highlight", e);
-        }
-    }
-
-    /**
-     * Removes the user selection.
-     *
-     * @see #setUserSelectionHighlight(PosInSequent)
-     * @see #setUserSelectionHighlight(Point)
-     * @see #isInUserSelectionHighlight(Point)
-     */
-    protected void removeUserSelectionHighlight() {
-        if (userSelectionHighlight != null) {
-            getHighlighter().removeHighlight(userSelectionHighlight);
-        }
-
-        userSelectionHighlight = null;
-        userSelectionHighlightRange = null;
-
-        sequentViewInputListener.highlightOriginInSourceView(null);
-    }
-
-    /**
-     *
-     * @param point a point.
-     * @return {@code true} if and only if the argument points to the user selection.
-     *
-     * @see #setUserSelectionHighlight(PosInSequent)
-     * @see #setUserSelectionHighlight(Point)
-     * @see #removeUserSelectionHighlight()
-     */
-    protected boolean isInUserSelectionHighlight(Point point) {
-        return point == null && userSelectionHighlightRange == null
-                || point != null && userSelectionHighlightRange != null
-                        && Objects.equals(
-                                userSelectionHighlightRange,
-                                getHighlightRange(point));
-    }
 
     public void highlight(Point p) {
         setCurrentHighlight(defaultHighlight);
