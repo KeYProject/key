@@ -44,7 +44,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
     @Override
     public String getName() {
-        return "Finish symbolic execution";
+        return "Finish Symbolic Execution";
     }
 
     @Override

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.settings;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -22,6 +23,9 @@ import java.util.Set;
  * is allowed to have. If this number is exceeded no SchemaVariables get
  * instantiated in the displayed tooltip.
  * 3) whether intermediate proofsteps should be hidden in the proof tree view
+ *
+ * @author unknown
+ * @author weigl
  */
 public class ViewSettings extends AbstractPropertiesSettings {
 
@@ -137,6 +141,11 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     private static final String HEATMAP_MAXAGE = "[View][Heatmap]maxAge";
 
+    /**
+     * A list of bookmark of favourite folders of the user. Can be manipulated with
+     * {@link de.uka.ilkd.key.gui.KeYFileChooserBookmarkPanel}.
+     */
+    private static final String USER_FOLDER_BOOKMARKS = "[View]folderBookmarks";
 
     /**
      * Show Taclet uninstantiated in tooltip -- for learning
@@ -170,7 +179,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
             createBooleanProperty(SYNTAX_HIGHLIGHTING, true);
     private PropertyEntry<Boolean> hidePackagePrefix =
             createBooleanProperty(HIDE_PACKAGE_PREFIX, false);
-    private PropertyEntry<Boolean> confirmExit = createBooleanProperty(CONFIRM_EXIT, false);
+    private PropertyEntry<Boolean> confirmExit = createBooleanProperty(CONFIRM_EXIT, true);
     private PropertyEntry<Boolean> showWholeTaclet =
             createBooleanProperty(SHOW_WHOLE_TACLET, false);
     private PropertyEntry<Integer> sizeIndex = createIntegerProperty(FONT_INDEX, 2);
@@ -183,6 +192,15 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private PropertyEntry<Set<String>> clutterRuleSets =
             createStringSetProperty(CLUTTER_RULESSETS, CLUTTER_RULESETS_DEFAULT);
+
+    /**
+     * User-definable folder bookmarks.
+     *
+     * @see #getFolderBookmarks()
+     * @see #setFolderBookmarks(List)
+     */
+    private PropertyEntry<List<String>> folderBookmarks
+            = createStringListProperty(USER_FOLDER_BOOKMARKS, System.getProperty("user.home"));
 
     /**
      * Clutter rules are rules with less priority in the taclet menu
@@ -478,4 +496,17 @@ public class ViewSettings extends AbstractPropertiesSettings {
         this.uiFontSizeFactor.set(factor);
     }
 
+    /**
+     * @see #folderBookmarks
+     */
+    public List<String> getFolderBookmarks() {
+        return folderBookmarks.get();
+    }
+
+    /**
+     * @see #folderBookmarks
+     */
+    public void setFolderBookmarks(List<String> bm) {
+        folderBookmarks.set(bm);
+    }
 }

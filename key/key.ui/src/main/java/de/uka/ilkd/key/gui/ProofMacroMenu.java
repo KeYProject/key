@@ -87,7 +87,7 @@ public class ProofMacroMenu extends JMenu {
      * available.
      */
     public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc) {
-        super("Strategy macros");
+        super("Strategy Macros");
 
         // Macros are group according to their category.
         // Store the submenus in this map.

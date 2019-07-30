@@ -154,7 +154,7 @@ public class TermLabelMenu extends JMenu {
     }
 
     public class DisplayLabelsCheckBox extends KeYMenuCheckBox {
-        public static final String LABEL = "Display term labels in formulas";
+        public static final String LABEL = "Display Term Labels in Formulas";
         
         public static final String TOOL_TIP = "Use this checkbox to toggle visibility for all term labels.";
 

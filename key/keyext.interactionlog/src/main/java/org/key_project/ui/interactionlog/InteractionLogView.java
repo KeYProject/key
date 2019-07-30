@@ -42,10 +42,12 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     private static final String MENU_ILOG = "Interaction Logging";
     private static final String MENU_ILOG_EXPORT = MENU_ILOG + ".Export";
 
-    private static final IconFontProvider ICON_LOAD = new IconFontProvider(FontAwesomeSolid.TRUCK_LOADING);
-    private static final IconFontProvider ICON_ADD_USER_ACTION = new IconFontProvider(FontAwesomeRegular.STICKY_NOTE);
-    private static final IconFontProvider ICON_TOGGLE_FAVOURITE = new IconFontProvider(FontAwesomeSolid.HEART, Color.red);
-    private static final IconFontProvider ICON_MARKDOWN = new IconFontProvider(FontAwesomeSolid.MARKDOWN);
+    private static final IconFontProvider ICON_LOAD =
+            new IconFontProvider(FontAwesomeSolid.TRUCK_LOADING);
+    private static final IconFontProvider ICON_ADD_USER_ACTION =
+            new IconFontProvider(FontAwesomeRegular.STICKY_NOTE);
+    private static final IconFontProvider ICON_TOGGLE_FAVOURITE =
+            new IconFontProvider(FontAwesomeSolid.HEART);
 
 
     private final InteractionRecorder recorder = new InteractionRecorder();
@@ -61,7 +63,8 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
     private final TryReapplyAction actionTryReapply = new TryReapplyAction();
     private final ExportMarkdownAction actionExportMarkdown = new ExportMarkdownAction();
     private final ShowExtendedActionsAction actionShowExtended = new ShowExtendedActionsAction();
-    private final ExportMUScriptClipboardAction actionMUCopyClipboard = new ExportMUScriptClipboardAction();
+    private final ExportMUScriptClipboardAction actionMUCopyClipboard =
+            new ExportMUScriptClipboardAction();
     private final PauseLoggingAction actionPauseLogging = new PauseLoggingAction();
 
 
@@ -459,8 +462,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         private static final long serialVersionUID = -8405580442311567192L;
 
         ToggleFavouriteAction() {
-            setName("Toggle Fav");
-            setName("Toggle Fav");
+            setName("Toggle Favourite");
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_F);
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_MASK));
             setIcon(ICON_TOGGLE_FAVOURITE.get(SMALL_ICON_SIZE));
@@ -480,7 +482,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         private static final long serialVersionUID = -2750634259700985279L;
 
         JumpIntoTreeAction() {
-            setName("Jump into tree");
+            setName("Jump into Tree");
             putValue(SMALL_ICON, IconFactory.JUMP_INTO_TREE.get());
             setMenuPath(MENU_ILOG);
             lookupAcceleratorKey();
@@ -504,7 +506,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         private static final long serialVersionUID = -5660321248967150793L;
 
         TryReapplyAction() {
-            putValue(NAME, "Re-apply action");
+            putValue(NAME, "Reapply Action");
             putValue(SMALL_ICON, IconFactory.INTERLOG_TRY_APPLY.get());
             setMenuPath(MENU_ILOG);
             lookupAcceleratorKey();
@@ -572,9 +574,9 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
         private static final long serialVersionUID = 1108419704071886953L;
 
         public ExportMarkdownAction() {
-            setName("Export as markdown …");
+            setName("Export as Markdown …");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into a markdown file.");
-            setIcon(ICON_MARKDOWN.get(SMALL_ICON_SIZE));
+            setIcon(IconFactory.INTERLOG_EXPORT_MARKDOWN.get());
             setMenuPath(MENU_ILOG_EXPORT);
             lookupAcceleratorKey();
         }

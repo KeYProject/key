@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 // 
 
-public class A {
+public final class A {
     public int x;
     public boolean b;
 

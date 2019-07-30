@@ -1049,6 +1049,7 @@ public class InvariantConfigurator {
 
         // Create the Dialog
         userPressedCancel = false;
+        // Caution: dialogue made modal in the constructor! (TODO change this)
         InvariantDialog dia = new InvariantDialog();
         dia.dispose();
         if(this.userPressedCancel) {

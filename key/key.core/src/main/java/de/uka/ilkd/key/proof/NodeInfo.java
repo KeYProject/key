@@ -13,13 +13,14 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.JavaSourceElement;
@@ -85,7 +86,7 @@ public class NodeInfo {
     private SequentChangeInfo sequentChangeInfo;
 
     /** @see #getRelevantFiles() */
-    private Set<String> relevantFiles = new HashSet<>();
+    private ImmutableSet<String> relevantFiles = DefaultImmutableSet.nil();
 
     public NodeInfo(Node node) {
         this.node = node;
@@ -402,8 +403,8 @@ public class NodeInfo {
      *
      * @return the set of files relevant to this node.
      */
-    public Set<String> getRelevantFiles() {
-        return Collections.unmodifiableSet(relevantFiles);
+    public ImmutableSet<String> getRelevantFiles() {
+        return relevantFiles;
     }
 
     /**
@@ -412,7 +413,7 @@ public class NodeInfo {
      * @param relevantFile the file to add.
      */
     public void addRelevantFile(String relevantFile) {
-        this.relevantFiles.add(relevantFile);
+        this.relevantFiles = this.relevantFiles.add(relevantFile);
     }
 
     /**
@@ -420,8 +421,12 @@ public class NodeInfo {
      *
      * @param relevantFiles the files to add.
      */
-    public void addRelevantFiles(Set<String> relevantFiles) {
-        this.relevantFiles.addAll(relevantFiles);
+    public void addRelevantFiles(ImmutableSet<String> relevantFiles) {
+        if (this.relevantFiles.isEmpty()) {
+            this.relevantFiles = relevantFiles;
+        } else {
+            this.relevantFiles = this.relevantFiles.union(relevantFiles);
+        }
     }
 
     /** Add user-provided plain-text annotations.

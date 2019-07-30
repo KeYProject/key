@@ -1,6 +1,6 @@
 /* 
 Attention: To generate correct tests (tests that satisfy the precondition)
- for the methods foo1 and foo2, the Integer Bound in Options -> SMT Solvers Options must be
+ for the methods foo1 and foo2, the Integer Bound in Options -> SMT Solver Options must be
  set to at least 6 (the default is 3). 
  
 By default KeY does not know the classes of the standard Java runtime environment,

@@ -69,6 +69,8 @@ provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_loop.key
 provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_external.key
 provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_internal.key
 provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_loop.key
+notprovable ./heap/block_loop_contracts/Finally/block_finally.key
+notprovable ./heap/block_loop_contracts/Finally/loop_finally.key
 
 # Other tests:
 provable: ./heap/fm12_01_LRS/lcp.key

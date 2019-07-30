@@ -55,7 +55,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     
     @Override
     public String getName() {
-        return "Auto pilot (preparation only)";
+        return "Auto Pilot (Preparation Only)";
     }
 
     @Override

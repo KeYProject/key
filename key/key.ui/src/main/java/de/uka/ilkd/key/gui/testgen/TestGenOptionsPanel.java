@@ -135,7 +135,7 @@ public class TestGenOptionsPanel extends SettingsPanel implements SettingsProvid
     }
 
     private JCheckBox getIncludePostCondition() {
-        return addCheckBox("Include Post Condition", infoIncludePostcondition, false, val -> {
+        return addCheckBox("Include post condition", infoIncludePostcondition, false, val -> {
             settings.setIncludePostCondition(val);
             settings.fireSettingsChanged();
         });
