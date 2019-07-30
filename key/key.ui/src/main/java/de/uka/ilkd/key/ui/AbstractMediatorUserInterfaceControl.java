@@ -93,6 +93,13 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
     */
    public abstract void loadProblem(File file);
 
+    /**
+     * Loads the proof with the given filename from the proof bundle with the given path.
+     * @param proofBundle the File with the problem description or the proof
+     * @param proofFilename the filename of the proof in the bundle
+     */
+    public abstract void loadProofFromBundle(File proofBundle, File proofFilename);
+
    protected ProblemLoader getProblemLoader(File file, List<File> classPath,
                                             File bootClassPath, List<File> includes,KeYMediator mediator) {
        final ProblemLoader pl =

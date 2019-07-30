@@ -20,6 +20,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -29,7 +31,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.Debug;
 
@@ -82,11 +86,25 @@ public class RecentFileMenu {
      */
     public RecentFileMenu(final KeYMediator mediator) {
         this.menu = new JMenu("Recent Files");
-
         this.lissy = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mediator.getUI().loadProblem(new File(getAbsolutePath((JMenuItem) e.getSource())));
+                String absPath = getAbsolutePath((JMenuItem) e.getSource());
+                File file = new File(absPath);
+
+                // special case proof bundles -> allow to select the proof to load
+                if (ProofSelectionDialog.isProofBundle(file.toPath())) {
+                    Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
+                    if (proofPath == null) {
+                        // canceled by user!
+                        return;
+                    } else {
+                        mediator.getUI().loadProofFromBundle(file, proofPath.toFile());
+                        return;
+                    }
+                } else {
+                    mediator.getUI().loadProblem(file);
+                }
             }
         };
         this.maxNumberOfEntries = MAX_RECENT_FILES;

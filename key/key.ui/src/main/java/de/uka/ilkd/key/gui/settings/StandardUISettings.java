@@ -34,7 +34,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     private final JSpinner spAutoSaveProof;
     private final JCheckBox chkMinimizeInteraction;
     private final JComboBox<String> spFontSizeTreeSequent;
-    private final JCheckBox chkAllowProofBundleSaving;
+    private final JCheckBox chkEnsureSourceConsistency;
     private final JTextField txtClutterRules;
     private final JTextField txtClutterRuleSets;
 
@@ -47,7 +47,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
 
         String[] sizes = Arrays.stream(Config.SIZES).boxed().map(it -> it + " pt").toArray(String[]::new);
         spFontSizeTreeSequent = this.<String>createSelection(sizes, emptyValidator());
-        addTitledComponent("Tree&Sequent font factor: ", spFontSizeTreeSequent, "");
+        addTitledComponent("Tree and sequent font factor: ", spFontSizeTreeSequent, "");
 
 
         String info = "Maximum size (line count) of the tooltips of applicable rules\n"
@@ -67,13 +67,17 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
 
         chkPrettyPrint = addCheckBox("Pretty print terms", "", false, emptyValidator());
         chkUseUnicode = addCheckBox("Use unicode", "", false, emptyValidator());
-        chkSyntaxHighlightning = addCheckBox("Use syntax highlightning", "", false, emptyValidator());
+        chkSyntaxHighlightning =
+            addCheckBox("Use syntax highlighting", "", false, emptyValidator());
         chkHidePackagePrefix = addCheckBox("Hide package prefix", "", false, emptyValidator());
         chkConfirmExit = addCheckBox("Confirm program exit", "", false, emptyValidator());
-        spAutoSaveProof = addNumberField("Auto save proof", 0, 10000000, 1000, "", emptyValidator());
-        chkMinimizeInteraction = addCheckBox("Minimise Interactions", "", false, emptyValidator());
-        chkAllowProofBundleSaving = addCheckBox("Allow Proof Bundle Saving", "", false, emptyValidator());
-        chkRightClickMacros = addCheckBox("Right click for Macros", "", false, emptyValidator());
+        spAutoSaveProof =
+            addNumberField("Auto save proof", 0, 10000000, 1000, "", emptyValidator());
+        chkMinimizeInteraction = addCheckBox("Minimise interactions", "", false, emptyValidator());
+        chkEnsureSourceConsistency =
+            addCheckBox("Ensure source consistency", "", true, emptyValidator());
+        chkRightClickMacros =
+            addCheckBox("Right click for proof macros", "", false, emptyValidator());
     }
 
 
@@ -99,7 +103,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         chkPrettyPrint.setSelected(vs.isUsePretty());
         chkUseUnicode.setSelected(vs.isUseUnicode());
         chkSyntaxHighlightning.setSelected(vs.isUseSyntaxHighlighting());
-        chkAllowProofBundleSaving.setSelected(generalSettings.isAllowBundleSaving());
+        chkEnsureSourceConsistency.setSelected(generalSettings.isEnsureSourceConsistency());
         chkRightClickMacros.setSelected(generalSettings.isRightClickMacro());
         chkConfirmExit.setSelected(vs.confirmExit());
         spAutoSaveProof.setValue(generalSettings.autoSavePeriod());
@@ -132,7 +136,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         vs.setUsePretty(chkPrettyPrint.isSelected());
         vs.setUseUnicode(chkUseUnicode.isSelected());
         vs.setUseSyntaxHighlighting(chkSyntaxHighlightning.isSelected());
-        gs.setAllowBundleSaving(chkAllowProofBundleSaving.isSelected());
+        gs.setEnsureSourceConsistency(chkEnsureSourceConsistency.isSelected());
         gs.setRightClickMacros(chkRightClickMacros.isSelected());
         vs.setConfirmExit(chkConfirmExit.isSelected());
         gs.setAutoSave((Integer) spAutoSaveProof.getValue());

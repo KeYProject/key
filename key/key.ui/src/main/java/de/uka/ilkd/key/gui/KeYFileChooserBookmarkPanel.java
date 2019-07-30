@@ -28,6 +28,8 @@ import java.util.List;
  * @see ViewSettings#getFolderBookmarks()
  */
 public class KeYFileChooserBookmarkPanel extends JPanel {
+    private static final long serialVersionUID = -6498548666886815605L;
+
     private final @NotNull JFileChooser chooser;
 
     private final ViewSettings viewSettings =
