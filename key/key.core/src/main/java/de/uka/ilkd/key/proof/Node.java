@@ -56,6 +56,7 @@ public class Node {
     /** the proof the node belongs to */
     private final Proof proof;
 
+    /** The parent node. **/
     private Node parent = null;
 
     private Sequent seq = Sequent.EMPTY_SEQUENT;

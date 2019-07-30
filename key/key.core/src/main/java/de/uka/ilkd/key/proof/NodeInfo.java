@@ -419,7 +419,7 @@ public class NodeInfo {
 
         if (oldRelevantFiles != this.relevantFiles) {
             node.childrenIterator().forEachRemaining(
-                    c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
+                c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
         }
     }
 
@@ -439,7 +439,7 @@ public class NodeInfo {
 
         if (oldRelevantFiles != this.relevantFiles) {
             node.childrenIterator().forEachRemaining(
-                    c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
+                c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
         }
     }
 
