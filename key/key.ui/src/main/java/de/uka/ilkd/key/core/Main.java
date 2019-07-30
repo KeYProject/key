@@ -24,6 +24,7 @@ import java.util.Locale;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import de.uka.ilkd.key.logic.sort.GenericSort;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 import org.xml.sax.SAXException;
@@ -73,7 +74,9 @@ public final class Main {
      * This parameter disables the possibility to prune in closed branches. It is meant as a
      * fallback solution if storing all closed goals needs too much memory.
      */
-    private static final String NO_PRUNING_CLOSED = "--no-pruning-closed";
+    // For release KeY 2.8, "NO_PRUNING_CLOSED" has been changed to "ALLOW_PRUNING_CLOSED"
+    // to change default. The reason is #1480.
+    private static final String ALLOW_PRUNING_CLOSED = "--allow-pruning-closed";
     /**
      * If this option is set, the (Disk)FileRepo does not delete its temporary directories
      * (can be used for debugging).
@@ -259,8 +262,8 @@ public final class Main {
         cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
         cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
-        cl.addOption(NO_PRUNING_CLOSED, null,
-                "disables pruning and goal back in closed branches (saves memory)");
+        cl.addOption(ALLOW_PRUNING_CLOSED, null,
+                "enables pruning and goal back in closed branches (experimental)");
         cl.addOption(KEEP_FILEREPOS, null, "disables the automatic deletion of temporary"
                 + "directories of file repos (for debugging)");
         cl.addSection("Batchmode options:");
@@ -292,9 +295,9 @@ public final class Main {
     }
 
     /**
-     * Evaluate the parsed commandline options
+     * Evaluate the commandline options
      *
-     * @param commandline object cl
+     * @param cl parsed command lines, not null
      */
     public static void evaluateOptions(CommandLine cl) {
 
@@ -462,9 +465,7 @@ public final class Main {
                     cl.getString(TACLET_DIR, ""));
         }
 
-        if (cl.isSet(NO_PRUNING_CLOSED)) {
-            GeneralSettings.noPruningClosed = true;
-        }
+        GeneralSettings.noPruningClosed = !cl.isSet(ALLOW_PRUNING_CLOSED);
 
         if (cl.isSet(KEEP_FILEREPOS)) {
             GeneralSettings.keepFileRepos = true;
@@ -528,10 +529,6 @@ public final class Main {
             return new ConsoleUserInterfaceControl(verbosity, loadOnly);
         } else {
             updateSplashScreen();
-
-            /* explicitly enable pruning in closed branches for interactive mode
-             * (if not manually disabled) */
-            GeneralSettings.noPruningClosed = cl.isSet(NO_PRUNING_CLOSED) ? true : false;
 
             MainWindow mainWindow = MainWindow.getInstance();
 
