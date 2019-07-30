@@ -67,13 +67,17 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
 
         chkPrettyPrint = addCheckBox("Pretty print terms", "", false, emptyValidator());
         chkUseUnicode = addCheckBox("Use unicode", "", false, emptyValidator());
-        chkSyntaxHighlightning = addCheckBox("Use syntax highlightning", "", false, emptyValidator());
+        chkSyntaxHighlightning =
+            addCheckBox("Use syntax highlighting", "", false, emptyValidator());
         chkHidePackagePrefix = addCheckBox("Hide package prefix", "", false, emptyValidator());
         chkConfirmExit = addCheckBox("Confirm program exit", "", false, emptyValidator());
-        spAutoSaveProof = addNumberField("Auto save proof", 0, 10000000, 1000, "", emptyValidator());
+        spAutoSaveProof =
+            addNumberField("Auto save proof", 0, 10000000, 1000, "", emptyValidator());
         chkMinimizeInteraction = addCheckBox("Minimise interactions", "", false, emptyValidator());
-        chkEnsureSourceConsistency = addCheckBox("Ensure source consistency", "", true, emptyValidator());
-        chkRightClickMacros = addCheckBox("Right click for proof macros", "", false, emptyValidator());
+        chkEnsureSourceConsistency =
+            addCheckBox("Ensure source consistency", "", true, emptyValidator());
+        chkRightClickMacros =
+            addCheckBox("Right click for proof macros", "", false, emptyValidator());
     }
 
 
