@@ -90,8 +90,7 @@ import de.uka.ilkd.key.util.Pair;
  * Editing the source code in the tabs is currently not implemented
  * (not supported by {@link JavaDocument}).
  *
- * @author Wolfram Pfeifer
- * @author lanzinger
+ * @author Wolfram Pfeifer, lanzinger
  */
 public final class SourceView extends JComponent {
 

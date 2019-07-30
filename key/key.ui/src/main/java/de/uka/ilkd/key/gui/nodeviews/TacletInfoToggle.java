@@ -27,7 +27,7 @@ public class TacletInfoToggle extends JCheckBox {
     private InnerNodeView innerNodeView = null;
 
     public TacletInfoToggle() {
-        setText("Show taclet info (Inner Nodes only)");
+        setText("Show taclet info (inner nodes only)");
         addChangeListener(e -> {
             if (innerNodeView != null) {
                 innerNodeView.tacletInfo.setVisible(isSelected());

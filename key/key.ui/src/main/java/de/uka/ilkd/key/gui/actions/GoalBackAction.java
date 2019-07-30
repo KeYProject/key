@@ -130,7 +130,7 @@ public final class GoalBackAction extends MainWindowAction {
                 }
             }
         }
-        putValue(NAME, "Goal Back" + appliedRule);
+        putValue(NAME, "Undo Last Rule Application" + appliedRule);
     }
 
     @Override
