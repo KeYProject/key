@@ -27,6 +27,7 @@ import java.util.zip.ZipOutputStream;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
@@ -53,7 +54,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * This matcher matches *.java files.
      */
     protected static final PathMatcher JAVA_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.java");
+            FileSystems.getDefault().getPathMatcher("glob:**.{java,jml}");
 
     /**
      * A matcher matches *.key and *.proof files.
@@ -100,7 +101,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * {@link #createOutputStream(Path)} are stored here. These files are stored as relative paths
      * respecting the repo structure, because they have no counterpart outside the repo.
      *
-     * When the method {@link #saveProof(Path, Proof)} is called, all files registered here will
+     * When the method {@link #saveProof(Path)} is called, all files registered here will
      * be saved.
      */
     private Set<Path> files = new HashSet<>();
@@ -134,6 +135,18 @@ public abstract class AbstractFileRepo implements FileRepo {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Copyies the file at source path to the target path
+     * and creates parent directories if required.
+     * @param source path of the source file
+     * @param target path of the target file
+     * @throws IOException if an I/O error occurs (e.g. user has no permission to write target)
+     */
+    protected static void createDirsAndCopy(Path source, Path target) throws IOException {
+        Files.createDirectories(target.getParent());
+        Files.copy(source, target);
     }
 
     /**
@@ -255,6 +268,17 @@ public abstract class AbstractFileRepo implements FileRepo {
      */
     protected abstract Path getSaveName(Path path);
 
+    @Override
+    public InputStream getInputStream(Path path) throws IOException {
+        // wrap path into URL for uniform treatment
+        return getInputStream(path.toUri().toURL());
+    }
+
+    @Override
+    public InputStream getInputStream(RuleSource ruleSource) throws IOException {
+        return getInputStream(ruleSource.url());
+    }
+
     /**
      * Can be used to get a direct InputStream to a file stored in the FileRepo.
      * The concrete implementation depends on the concrete FileRepo.
@@ -306,7 +330,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @return the modified content of the file with inserted "\classpath ..." declarations.
      */
     private String addClasspath(String keyFileContent) {
-        if (classpath.isEmpty()) {
+        if (classpath == null || classpath.isEmpty()) {
             return keyFileContent;
         }
 

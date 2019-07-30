@@ -26,8 +26,8 @@ public class ToolTipOptionsAction extends MainWindowAction {
     private static final long serialVersionUID = -360744615149278733L;
 
     public ToolTipOptionsAction(MainWindow mainWindow) {
-	super(mainWindow);
-	setName("ToolTip options");
+        super(mainWindow);
+        setName("ToolTip Options");
     }
 
     @Override
@@ -35,5 +35,4 @@ public class ToolTipOptionsAction extends MainWindowAction {
 	 ViewSelector vselector = new ViewSelector(mainWindow);
 	 vselector.setVisible(true);
     }
-
 }

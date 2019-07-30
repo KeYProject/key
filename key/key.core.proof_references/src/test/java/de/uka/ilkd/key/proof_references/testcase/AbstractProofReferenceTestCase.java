@@ -21,6 +21,7 @@ import java.util.LinkedHashSet;
 import junit.framework.TestCase;
 
 import org.junit.Assert;
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -30,6 +31,7 @@ import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
@@ -37,7 +39,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -320,6 +324,13 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
          assertTrue(javaFile.exists());
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = HelperClassForTests.setDefaultTacletOptionsForTarget(javaFile, containerTypeName, targetName);
+         if (!useContracts) {
+        	 // set non modular reasoning
+        	 ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+        	 ImmutableSet<Choice> cs = DefaultImmutableSet.nil();
+        	 cs = cs.add(new Choice("noRestriction", "methodExpansion"));
+        	 choiceSettings.updateWith(cs);
+         }
          // Load java file
          environment = KeYEnvironment.load(javaFile, null, null, null);
          // Search type
@@ -387,6 +398,14 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
          assertTrue(javaFile.exists());
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = HelperClassForTests.setDefaultTacletOptions(baseDir, javaPathInBaseDir);
+         
+         if (!useContracts) {
+        	 // set non modular reasoning
+        	 ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+        	 ImmutableSet<Choice> cs = DefaultImmutableSet.nil();
+        	 cs = cs.add(new Choice("noRestriction", "methodExpansion"));
+        	 choiceSettings.updateWith(cs);
+         }
          // Load java file
          environment = KeYEnvironment.load(javaFile, null, null, null);
          // Search method to proof

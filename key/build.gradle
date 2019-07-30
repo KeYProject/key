@@ -6,7 +6,14 @@ plugins {
     id "com.jfrog.bintray" version "1.8.4" apply false
     id "com.github.hierynomus.license-base" version"0.15.0"
     id "com.github.hierynomus.license-report" version"0.15.0"
+
+    //for finding the license of thrid parties
+    //id "com.github.jk1.dependency-license-report" version "1.9"
+
 }
+
+// config of com.github.jk1.dependency-license-report
+//licenseReport { excludeGroups = ['']; configurations = ['ALL'] }
 
 idea {
     module {
@@ -41,6 +48,12 @@ subprojects {
     apply plugin: "idea"
     apply plugin: "eclipse"
     apply plugin: "com.jfrog.bintray"
+
+    //for finding the license of thrid parties
+    //apply plugin: "com.github.jk1.dependency-license-report"
+    //licenseReport { excludeGroups = [''];  configurations = ALL }
+
+
 
     /*
     apply plugin: 'checkstyle'
@@ -97,6 +110,38 @@ subprojects {
             excludeCategories 'org.key_project.util.testcategories.Slow'
             excludeCategories 'org.key_project.util.testcategories.Interactive'
         }
+
+        testLogging {
+            // set options for log level LIFECYCLE
+            events "failed"
+            exceptionFormat "short"
+
+            // set options for log level DEBUG
+            debug {
+                events "started", "skipped", "failed"
+                exceptionFormat "full"
+            }
+
+            // remove standard output/error logging from --info builds
+            // by assigning only 'failed' and 'skipped' events
+            info.events = ["failed", "skipped"]
+        }
+    }
+
+    // The following two tasks can be used to execute main methods from the project
+    // The main class is set via "gradle -DmainClass=... execute --args ..."
+    // see https://stackoverflow.com/questions/21358466/gradle-to-execute-java-class-without-modifying-build-gradle
+    
+    task execute(type:JavaExec) {
+        group "application"
+        main = System.getProperty('mainClass')
+        classpath = sourceSets.main.runtimeClasspath
+    }
+
+    task executeInTests(type:JavaExec) {
+        group "application"
+        main = System.getProperty('mainClass')
+        classpath = sourceSets.test.runtimeClasspath
     }
 
     /*findbugs { findbugsTest.enabled = false; ignoreFailures = true }

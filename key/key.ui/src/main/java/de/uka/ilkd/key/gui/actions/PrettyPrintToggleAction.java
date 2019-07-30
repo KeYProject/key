@@ -24,7 +24,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 
 public class PrettyPrintToggleAction extends MainWindowAction {
-    public static final String NAME = "Use pretty syntax";
+    public static final String NAME = "Use Pretty Syntax";
     
     public static final String TOOL_TIP = "If ticked, infix notations are used.";
     

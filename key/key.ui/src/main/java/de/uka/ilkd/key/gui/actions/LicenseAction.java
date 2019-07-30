@@ -13,32 +13,33 @@
 
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
-public class LicenseAction extends MainWindowAction {
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -5859545563375095225L;
+/**
+ * Shows the license dialog.
+ * <p>
+ * Shows the license of KeY (defined in LICENSE.txt) and of dependencies (THIRD_PARTY_LICENSES.txt).
+ *
+ * @author weigl
+ */
+public class LicenseAction extends MainWindowAction {
+    public static final String KEY_FALLBACK = (KeYConstants.COPYRIGHT + "\nKeY is protected by the "
+            + "GNU General Public License v2");
+
+    private static final long serialVersionUID = 5606343347731759150L;
 
     public LicenseAction(MainWindow mainWindow) {
-	super(mainWindow);
-	setName("License");
+        super(mainWindow);
+        setName("License");
     }
 
     @Override
@@ -46,46 +47,53 @@ public class LicenseAction extends MainWindowAction {
         showLicense();
     }
 
-    public void showLicense() {
-        
-        URL lic = 
-            KeYResourceManager.getManager().getResourceFile(MainWindow.class,
-            "LICENSE.TXT"); 
-        StringBuffer sb=new StringBuffer();
+    private JComponent createLicenseViewer(String s) {
+        JTextArea text = new JTextArea(s, 20, 40);
+        text.setEditable(false);
+        text.setCaretPosition(0);
+        JScrollPane scroll = new JScrollPane(text);
+        return scroll;
+    }
+
+    private String readStream(URL resource, String fallback) {
+        StringBuffer sb = new StringBuffer();
         try {
-            InputStreamReader inp = new InputStreamReader(lic.openStream(), "UTF-8");
+            InputStreamReader inp = new InputStreamReader(resource.openStream(), "UTF-8");
             int c;
-            while ((c=inp.read()) > 0) {
-                sb.append((char)c);
+            char[] buf = new char[1024];
+            while ((c = inp.read(buf)) > 0) {
+                sb.append(buf, 0, c);
             }
             inp.close();
         } catch (IOException ioe) {
-            System.out.println("License file cannot be loaded or is missing: \n"+
-                    KeYConstants.COPYRIGHT+"\nKeY is protected by the "
-                    +"GNU General Public License");
-            sb=new StringBuffer(KeYConstants.COPYRIGHT+"\nKeY is protected by the "
-                    +"GNU General Public License");
+            return fallback;
         }
-        String s=sb.toString();
-        JScrollPane scroll = new JScrollPane();
-        JTextArea text = new JTextArea(s,20,40);
-        text.setEditable(false);
-        text.setCaretPosition(0);
-        scroll.setViewportView(text);
-        JFrame fr = new JFrame("KeY License");
+        return sb.toString();
+    }
+
+    public void showLicense() {
+        URL lic = KeYResourceManager.getManager().getResourceFile(MainWindow.class,
+                "LICENSE.TXT");
+
+        URL thirdPartyLic = KeYResourceManager.getManager().getResourceFile(MainWindow.class,
+                "THIRD_PARTY_LICENSES.txt");
+
+        JDialog fr = new JDialog(mainWindow, "KeY License");
         fr.getContentPane().setLayout(new BorderLayout());
-        fr.getContentPane().add(scroll,BorderLayout.CENTER);
+        JTabbedPane pane = new JTabbedPane();
+        fr.add(pane);
+
+        pane.addTab("KeY License", createLicenseViewer(readStream(lic, KEY_FALLBACK)));
+        pane.addTab("Third party libraries", createLicenseViewer(readStream(thirdPartyLic, "")));
+
         JButton ok = new JButton("OK");
-        ok.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {		   
-                ((JFrame)((JButton)e.getSource())
-                        .getTopLevelAncestor()).dispose();
-            }});
+        ok.addActionListener(e -> ((JDialog) ((JButton) e.getSource())
+                .getTopLevelAncestor()).dispose());
         fr.getContentPane().add(ok, BorderLayout.SOUTH);
-        fr.setSize(600,900);
-        fr.getContentPane().add(scroll);
+        fr.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        fr.setSize(600, 900);
         fr.setLocationRelativeTo(null);
         fr.setVisible(true);
     }
-    
+
 }

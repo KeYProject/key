@@ -63,9 +63,11 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.event.MouseInputAdapter;
 
+import bibliothek.gui.dock.StackDockStation;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.SingleCDockable;
 import bibliothek.gui.dock.common.intern.CDockable;
+import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -75,15 +77,14 @@ import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
 import de.uka.ilkd.key.gui.actions.AboutAction;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.actions.AutoSave;
-import de.uka.ilkd.key.gui.actions.BundleSavingToggleAction;
 import de.uka.ilkd.key.gui.actions.CounterExampleAction;
 import de.uka.ilkd.key.gui.actions.DecreaseFontSizeAction;
 import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
+import de.uka.ilkd.key.gui.actions.EnsureSourceConsistencyToggleAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.GoalBackAction;
 import de.uka.ilkd.key.gui.actions.GoalSelectAboveAction;
 import de.uka.ilkd.key.gui.actions.GoalSelectBelowAction;
-import de.uka.ilkd.key.gui.actions.HeatmapSettingsAction;
 import de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction;
 import de.uka.ilkd.key.gui.actions.IncreaseFontSizeAction;
 import de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction;
@@ -146,7 +147,7 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.gui.sourceview.SourceView;
+import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
@@ -206,7 +207,7 @@ public final class MainWindow extends JFrame {
     /**
      * the view to show source code and symbolic execution information
      */
-    private final JComponent sourceView;
+    private final SourceViewFrame sourceViewFrame;
     /**
      * Use this SequentView in case no proof is loaded.
      */
@@ -341,7 +342,7 @@ public final class MainWindow extends JFrame {
         autoModeAction = new AutoModeAction(this);
         //mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
         mainFrame = new MainFrame(this, emptySequent);
-        sourceView = SourceView.getSourceView(this);
+        sourceViewFrame = new SourceViewFrame(this);
         proofList = new TaskTree(mediator);
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(mediator);
@@ -540,7 +541,7 @@ public final class MainWindow extends JFrame {
         //JPanel rightPane = new JPanel();
         //rightPane.setLayout(new BorderLayout());
         //rightPane.add(mainFrame, BorderLayout.CENTER);
-        //rightPane.add(sequentViewSearchBar, BorderLayout.SOUTH);
+        mainFrame.add(sequentViewSearchBar, BorderLayout.SOUTH);
 
         //JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rightPane, sourceView);
         //pane.setResizeWeight(0.5);
@@ -552,12 +553,15 @@ public final class MainWindow extends JFrame {
         //splitPane.setOneTouchExpandable(true);
         //splitPane.setName("splitPane");
         //getContentPane().add(splitPane, BorderLayout.CENTER);
+
+        dockControl.putProperty(StackDockStation.TAB_PLACEMENT, TabPlacement.TOP_OF_DOCKABLE);
+
         getContentPane().add(dockControl.getContentArea());
 
         dockProofListView = DockingHelper.createSingleDock("Loaded Proofs", proofListView,
                 TaskTree.class.getName());
         dockSequent = DockingHelper.createSingleDock("Sequent", mainFrame);
-        dockSourceView = DockingHelper.createSingleDock("Source", sourceView);
+        dockSourceView = DockingHelper.createSingleDock("Source", sourceViewFrame);
 
         Stream<TabPanel> extensionPanels = KeYGuiExtensionFacade.getAllPanels(this);
         Stream<TabPanel> defaultPanels = Stream.of(proofTreeView, infoView,
@@ -571,6 +575,7 @@ public final class MainWindow extends JFrame {
 
         dockProofListView.setVisible(true);
         dockSequent.setVisible(true);
+
         dockSourceView.setVisible(true);
 
         DockingHelper.restoreFactoryDefault(this);
@@ -851,9 +856,9 @@ public final class MainWindow extends JFrame {
 
         view.add(createSelectionMenu());
 
-        JMenuItem hmItem = new JMenuItem("Heatmap Options");
-        hmItem.addActionListener(new HeatmapSettingsAction(this));
-        view.add(hmItem);
+        // JMenuItem hmItem = new JMenuItem("Heatmap Options");
+        // hmItem.addActionListener(new HeatmapSettingsAction(this));
+        // view.add(hmItem);
 
         return view;
     }
@@ -933,7 +938,7 @@ public final class MainWindow extends JFrame {
         options.add(new JCheckBoxMenuItem(new AutoSave(this)));
         options.add(new MinimizeInteraction(this));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
-        options.add(new JCheckBoxMenuItem(new BundleSavingToggleAction(this)));
+        options.add(new JCheckBoxMenuItem(new EnsureSourceConsistencyToggleAction(this)));
 
         return options;
 
@@ -1279,6 +1284,16 @@ public final class MainWindow extends JFrame {
         getUserInterface().loadProblem(file, classPath, bootClassPath, includes);
     }
 
+    /**
+     * Loads the proof with the given path from the proof bundle.
+     * @param proofBundle the path of the proof bundle
+     * @param proofPath the path of the proof to load
+     *                  (relative to the root of the bundle -> filename only)
+     */
+    public void loadProofFromBundle(File proofBundle, File proofPath) {
+        getUserInterface().loadProofFromBundle(proofBundle, proofPath);
+    }
+
     /*
      * Retrieves supported term label names from profile and returns a sorted
      * list of them.
@@ -1320,6 +1335,19 @@ public final class MainWindow extends JFrame {
     public CDockable getDockProofListView() {
         return dockProofListView;
     }
+
+    public SingleCDockable getDockSourceView() {
+        return dockSourceView;
+    }
+
+    public SingleCDockable getDockSequent() {
+        return dockSequent;
+    }
+
+    public SourceViewFrame getSourceViewFrame() {
+        return sourceViewFrame;
+    }
+
     /**
      * Glass pane that only delivers events for the status line (i.e. the abort button)
      * <p>
@@ -1748,14 +1776,4 @@ public final class MainWindow extends JFrame {
         }
 
     }
-
-
-    public SingleCDockable getDockSourceView() {
-        return dockSourceView;
-    }
-
-    public SingleCDockable getDockSequent() {
-        return dockSequent;
-    }
-
 }

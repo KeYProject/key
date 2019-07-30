@@ -55,8 +55,11 @@ public class PositionInfo {
      * E.g. Input "/A/B/../D" - Output "/A/D"
      * @author gladisch*/
     private static String simplifyPath(String path) {
-        if (path != null && !path.isEmpty()) { 
-            path = new File(path).toURI().normalize().getPath();
+        if (path != null && !path.isEmpty()) {
+            // quick fix (see #1513): do not try to normalize URLs stored in path!
+            if (!path.startsWith("URL:")) {
+                path = new File(path).toURI().normalize().getPath();
+            }
         }
         return path;
     }

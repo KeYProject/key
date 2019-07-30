@@ -58,7 +58,7 @@ public abstract class SearchBar extends JPanel {
     public SearchBar() {
         prev = new JButton(IconFactory.previous(16));
         next = new JButton(IconFactory.next(16));
-        close = new JButton(IconFactory.stop(16));
+        close = new JButton(IconFactory.close(16));
 
         // Initialize the Actionlisteners here:
 

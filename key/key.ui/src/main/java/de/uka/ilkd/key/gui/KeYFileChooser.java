@@ -85,17 +85,17 @@ public class KeYFileChooser {
 
     public void prepare() {
         File selFile = fileChooser.getSelectedFile();
-        
+
         if (selFile == null) {
             if (fileChooser.getCurrentDirectory() == null) {
-                fileChooser.setCurrentDirectory(HOME_DIR);                
-            } 
+                fileChooser.setCurrentDirectory(HOME_DIR);
+            }
         } else if (selFile.isFile()) { // present & not dir.
             String filename = selFile.getAbsolutePath();
             if (!filename.endsWith(".proof"))
                 fileChooser.setSelectedFile(new File(filename+".proof"));
         } else if (selFile.isDirectory()) {
-            fileChooser.setCurrentDirectory(selFile);                            
+            fileChooser.setCurrentDirectory(selFile);
         }
     }
 
@@ -136,31 +136,31 @@ public class KeYFileChooser {
                 selectedFile = selectedFile.getParentFile();
             }
         }
-        
+
         if (extension != null) {
             // the idea is to find the right place where to put a key vs. proof file
             // we should actually have a project file containing that information in a more reliable way
             File dirForExtension = selectedFile;
             if (extension.endsWith(".key")) {
-                // serach for "src" folder; 
+                // serach for "src" folder;
                 while (dirForExtension != null && !"src".equals(dirForExtension.getName())) {
-                    dirForExtension = dirForExtension.getParentFile();                    
+                    dirForExtension = dirForExtension.getParentFile();
                 }
             }
             // project structure for KeY would be the sane thing to do; avoid NPE at any cost
-            
-            resetFile = "src".equals(dirForExtension.getName()) && dirForExtension.getParentFile() != null ? 
+
+            resetFile = "src".equals(dirForExtension.getName()) && dirForExtension.getParentFile() != null ?
                     dirForExtension.getParentFile() : selectedFile;
-            
-            selectedFile = new File(resetFile, extension);             
+
+            selectedFile = new File(resetFile, extension);
         } else {
             resetFile = selectedFile;
         }
-        
-        
+
+
         fileChooser.setSelectedFile(resetFile);
         setSaveDialog(true);
-        
+
         return showSaveDialog(parent, selectedFile);
     }
 
@@ -228,6 +228,10 @@ public class KeYFileChooser {
         fileChooser.setSelectedFile(f);
     }
 
+    public void setCurrentDirectory(File f) {
+        fileChooser.setCurrentDirectory(f);
+    }
+
     private int showOverwriteDialog(File file) {
         return JOptionPane.showOptionDialog(fileChooser, "File " +
                         file.getAbsolutePath() + " already exists. Overwrite?",
@@ -251,6 +255,8 @@ public class KeYFileChooser {
         if (INSTANCE == null) {
             File initDir = Main.getWorkingDir();
             INSTANCE = new KeYFileChooser(initDir);
+            KeYFileChooserBookmarkPanel bookmarkPanel =
+                    new KeYFileChooserBookmarkPanel(INSTANCE.fileChooser);
         }
 
         INSTANCE.setDialogTitle(title);
