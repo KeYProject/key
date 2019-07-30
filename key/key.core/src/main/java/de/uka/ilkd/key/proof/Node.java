@@ -179,11 +179,13 @@ public class Node {
     void clearNodeInfo() {
         if (this.nodeInfo != null) {
             SequentChangeInfo oldSeqChangeInfo = this.nodeInfo.getSequentChangeInfo();
+            ImmutableSet<String> oldRelevantFiles = this.nodeInfo.getRelevantFiles();
+
             this.nodeInfo = new NodeInfo(this);
             this.nodeInfo.setSequentChangeInfo(oldSeqChangeInfo);
 
             if (parent != null && parent.getNodeInfo() != null) {
-                this.nodeInfo.addRelevantFiles(parent.getNodeInfo().getRelevantFiles());
+                this.nodeInfo.addRelevantFiles(oldRelevantFiles);
             }
         } else {
             this.nodeInfo = new NodeInfo(this);
