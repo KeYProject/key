@@ -413,7 +413,14 @@ public class NodeInfo {
      * @param relevantFile the file to add.
      */
     public void addRelevantFile(String relevantFile) {
+        ImmutableSet<String> oldRelevantFiles = this.relevantFiles;
+
         this.relevantFiles = this.relevantFiles.add(relevantFile);
+
+        if (oldRelevantFiles != this.relevantFiles) {
+            node.childrenIterator().forEachRemaining(
+                c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
+        }
     }
 
     /**
@@ -422,10 +429,17 @@ public class NodeInfo {
      * @param relevantFiles the files to add.
      */
     public void addRelevantFiles(ImmutableSet<String> relevantFiles) {
-        if (this.relevantFiles.isEmpty()) {
+        ImmutableSet<String> oldRelevantFiles = this.relevantFiles;
+
+        if (this.relevantFiles.isEmpty() || this.relevantFiles.subset(relevantFiles)) {
             this.relevantFiles = relevantFiles;
         } else {
             this.relevantFiles = this.relevantFiles.union(relevantFiles);
+        }
+
+        if (oldRelevantFiles != this.relevantFiles) {
+            node.childrenIterator().forEachRemaining(
+                c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
         }
     }
 
