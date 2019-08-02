@@ -218,9 +218,9 @@ public class InvariantConfigurator {
              */
             private void initButtonPanel(JPanel buttonPanel) throws RuleAbortException {
                 buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-                JButton applyButton = new JButton("apply");
-                JButton cancelButton = new JButton("cancel");
-                JButton storeButton = new JButton("store");
+                JButton applyButton = new JButton("Apply");
+                JButton cancelButton = new JButton("Cancel");
+                JButton storeButton = new JButton("Store");
 
                 applyButton.addActionListener(new ActionListener() {
 

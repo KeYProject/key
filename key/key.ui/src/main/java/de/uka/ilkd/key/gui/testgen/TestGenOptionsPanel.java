@@ -55,7 +55,7 @@ public class TestGenOptionsPanel extends SettingsPanel implements SettingsProvid
     }
 
     private JSpinner getMaxProcesses() {
-        return addNumberField("Concurrent Processes:", 0, Integer.MAX_VALUE, 1, infoMaxProcesses,
+        return addNumberField("Concurrent processes:", 0, Integer.MAX_VALUE, 1, infoMaxProcesses,
                 obj -> {
                     settings.setConcurrentProcesses(obj);
                     settings.fireSettingsChanged();
@@ -63,7 +63,7 @@ public class TestGenOptionsPanel extends SettingsPanel implements SettingsProvid
     }
 
     private JSpinner getMaxUnwinds() {
-        return addNumberField("Maximal Unwinds:", 0, Integer.MAX_VALUE, 1, infoMaxUnwinds,
+        return addNumberField("Maximal unwinds:", 0, Integer.MAX_VALUE, 1, infoMaxUnwinds,
                 e -> {
                     settings.setMaxUnwinds(e);
                     settings.fireSettingsChanged();
