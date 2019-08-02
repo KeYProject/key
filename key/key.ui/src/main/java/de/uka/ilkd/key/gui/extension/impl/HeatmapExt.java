@@ -185,8 +185,9 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
         for (Map.Entry<HeatmapMode, JRadioButton> entry : map.entrySet()) {
             HeatmapMode mode = entry.getKey();
             if (mode.enableHeatmap == vs.isShowHeatmap() &&
-                    mode.sequent == vs.isHeatmapSF() &&
-                    mode.newest == vs.isHeatmapNewest()) {
+                    (!mode.enableHeatmap
+                            || (mode.sequent == vs.isHeatmapSF() &&
+                            mode.newest == vs.isHeatmapNewest()))) {
                 entry.getValue().setSelected(true);
                 break;
             }
