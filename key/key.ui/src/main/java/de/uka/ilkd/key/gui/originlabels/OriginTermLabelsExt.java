@@ -27,9 +27,9 @@ import de.uka.ilkd.key.proof.Node;
  *
  * @author lanzinger
  */
-@KeYGuiExtension.Info(name = "OriginLabels UI",
+@KeYGuiExtension.Info(name = "Origin Tracking",
         optional = true,
-        description = "UI support for origin labels",
+        description = "UI support for origin tracking",
         experimental = false)
 public class OriginTermLabelsExt
         implements KeYGuiExtension,
