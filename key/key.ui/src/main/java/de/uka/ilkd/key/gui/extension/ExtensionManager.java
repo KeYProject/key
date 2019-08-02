@@ -48,7 +48,8 @@ public class ExtensionManager extends SettingsPanel
 
         keywords += lblSubhead.getText();
 
-        KeYGuiExtensionFacade.getExtensions().forEach(it -> {
+        KeYGuiExtensionFacade.getExtensions().stream()
+            .filter(it -> !it.isDisabled() && it.isOptional()).forEach(it -> {
             JCheckBox box = new JCheckBox();
             box.setText(it.getName());
             box.setSelected(!it.isDisabled());
