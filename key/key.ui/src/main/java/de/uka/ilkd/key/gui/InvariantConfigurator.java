@@ -204,7 +204,7 @@ public class InvariantConfigurator {
                 getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
 
-                setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+                setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
                 parse();
                 this.pack();
