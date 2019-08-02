@@ -8,8 +8,8 @@ import de.uka.ilkd.key.settings.TestGenerationSettings;
 
 import javax.swing.*;
 
-@SuppressWarnings("serial")
 public class TestGenOptionsPanel extends SettingsPanel implements SettingsProvider {
+    private static final long serialVersionUID = -2170118134719823425L;
     private static final String infoApplySymbolicEx = "Performs bounded symbolic execution on the current proof tree. More precisely, the TestGen Macro is executed which the user can also manually execute by right-clicking on the proof tree and selecting Strategy Macros->TestGen.";
     private static final String infoSaveTo = "Choose the folder where the test case files will be written.";
     private static final String infoMaxProcesses = "Maximal number of SMT processes that are allowed to run concurrently.";

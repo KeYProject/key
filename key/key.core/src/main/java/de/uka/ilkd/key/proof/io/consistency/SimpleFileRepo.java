@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.proof.io.consistency;
 
-import de.uka.ilkd.key.proof.io.RuleSource;
-
 import java.io.*;
 import java.net.JarURLConnection;
 import java.net.URL;

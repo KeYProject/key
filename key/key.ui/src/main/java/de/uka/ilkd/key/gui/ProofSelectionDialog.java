@@ -22,6 +22,9 @@ import java.util.zip.ZipFile;
  * @author Wolfram Pfeifer
  */
 public final class ProofSelectionDialog extends JDialog {
+
+    private static final long serialVersionUID = -586107341789859969L;
+
     /**
      * Regex for identifiers (class, method), which catches for example
      * "java.lang.Object", "SumAndMax", "sort(int[] a)", ...

@@ -26,9 +26,8 @@ package de.uka.ilkd.key.logic.label;
  *
  * @author mattias ulbrich
  */
-
-@SuppressWarnings("serial")
 public class TermLabelException extends Exception {
+    private static final long serialVersionUID = -6012867553428479252L;
 
     public TermLabelException() {
         super();

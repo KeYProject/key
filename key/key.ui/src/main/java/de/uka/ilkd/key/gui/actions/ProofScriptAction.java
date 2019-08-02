@@ -25,8 +25,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofScriptWorker;
 import de.uka.ilkd.key.proof.Proof;
 
-@SuppressWarnings("serial")
 public class ProofScriptAction extends AbstractAction {
+    private static final long serialVersionUID = -3181592516055470032L;
 
     private final KeYMediator mediator;
 

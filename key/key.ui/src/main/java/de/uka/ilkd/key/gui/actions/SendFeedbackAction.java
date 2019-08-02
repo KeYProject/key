@@ -52,8 +52,9 @@ import de.uka.ilkd.key.util.KeYConstants;
  * @author Kai Wallisch
  *
  */
-@SuppressWarnings("serial")
 public class SendFeedbackAction extends AbstractAction {
+
+    private static final long serialVersionUID = 8146108238901822515L;
 
     /*
      * This is the email address to which feedback will be sent.
