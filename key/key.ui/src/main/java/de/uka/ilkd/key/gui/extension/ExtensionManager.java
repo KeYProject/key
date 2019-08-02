@@ -59,7 +59,7 @@ public class ExtensionManager extends SettingsPanel
 
         KeYGuiExtensionFacade.getExtensions().stream()
                 .sorted(Comparator.comparingInt(it ->
-                        it.isDisabledByMaintainer()||!it.isOptional()?1:0))
+                        it.isDisabledByMaintainer() || !it.isOptional() ? 1 : 0))
                 .filter(it -> !it.isDisabledByMaintainer()).forEach(it -> {
             JCheckBox box = new JCheckBox();
             box.setText(it.getName());

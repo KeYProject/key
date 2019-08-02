@@ -249,7 +249,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
 
         title.setIcon(IconFactory.TREE_NODE_RETRACTED.get());
         title.addMouseListener(new MouseAdapter() {
-            boolean opened = false;
+            private boolean opened = false;
 
             @Override
             public void mouseClicked(MouseEvent e) {
