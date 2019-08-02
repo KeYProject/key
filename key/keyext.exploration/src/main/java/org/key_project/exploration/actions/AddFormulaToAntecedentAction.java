@@ -26,7 +26,7 @@ public class AddFormulaToAntecedentAction extends AddFormulaToSequentAction {
     public void actionPerformed(ActionEvent e) {
         Term t = promptForTerm(mainWindow, null);
         if (t == null) return;
-        ExplorationModeModel model = getMediator().get(ExplorationModeModel.class);
+        ExplorationModeModel model = getMediator().lookup(ExplorationModeModel.class);
         super.soundAddition(t, true);
 
 /*        if (model.getExplorationTacletAppState()

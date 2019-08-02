@@ -90,14 +90,14 @@ public class AddFormulaToSequentAction extends ExplorationAction {
         else
             explorationNodeData.setExplorationAction("Added ==> "+t);
 
-         g.node().getNodeInfo().register(explorationNodeData, ExplorationNodeData.class);
+         g.node().register(explorationNodeData, ExplorationNodeData.class);
 
         ImmutableList<Goal> result = g.apply(app);
 
         //set the actions flag
          result.forEach(goal -> {
           //  goal.node().getNodeInfo().setExploration(true);
-             goal.node().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
+             goal.node().register(new ExplorationNodeData(), ExplorationNodeData.class);
              String s = goal.node().getNodeInfo().getBranchLabel();
              goal.node().getNodeInfo().setBranchLabel("ExplorationNode: " + s);
         });

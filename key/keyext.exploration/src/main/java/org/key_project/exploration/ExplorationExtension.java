@@ -68,8 +68,10 @@ public class ExplorationExtension implements KeYGuiExtension,
     public JToolBar getToolbar(MainWindow mainWindow) {
         if (explorationToolbar == null) {
             explorationToolbar = new JToolBar();
-            explorationToolbar.add(new JToggleButton(new ToggleExplorationAction(model)));
-            explorationToolbar.add(new JToggleButton(new ShowSecondBranchAction(model)));
+            JPanel p = new JPanel();
+            p.add(new JToggleButton(new ToggleExplorationAction(model)));
+            p.add(new JToggleButton(new ShowSecondBranchAction(model)));
+            explorationToolbar.add(p);
         }
         return explorationToolbar;
     }
@@ -127,7 +129,7 @@ class ExplorationRenderer implements Styler<GUIAbstractTreeNode> {
         Node node = treeNode.getNode();
         ExplorationNodeData data = null;
         try {
-            data = node.getNodeInfo().get(ExplorationNodeData.class);
+            data = node.lookup(ExplorationNodeData.class);
 
             if (data != null) {
                 style.setBorder(DARK_PURPLE_COLOR.get());

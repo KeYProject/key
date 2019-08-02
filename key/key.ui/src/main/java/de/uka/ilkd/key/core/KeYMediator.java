@@ -19,6 +19,7 @@ import java.util.EventObject;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
+import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -603,19 +604,54 @@ public class KeYMediator {
         return inAutoMode;
     }
 
-    private Lookup userData = new Lookup();
+    @Nullable
+    private Lookup userData;
 
-    public <T> Collection<T> lookupAll(Class<T> service) {
-        return userData.lookupAll(service);
+    /**
+     * Retrieves a user-defined data.
+     *
+     * @param service the class for which the data were registered
+     * @param <T>     any class
+     * @return null or the previous data
+     * @see #register(Object, Class)
+     */
+    public <T> @Nullable T lookup(Class<T> service) {
+        try {
+            if(userData==null){
+                return null;
+            }
+            return userData.get(service);
+        } catch (IllegalStateException ignored) {
+            return null;
+        }
     }
 
-    public <T> T get(Class<T> service) {
-        return userData.get(service);
-    }
-
+    /**
+     * Register a user-defined data in this node info.
+     *
+     * @param obj an object to be registered
+     * @param service  the key under it should be registered
+     * @param <T>
+     */
     public <T> void register(T obj, Class<T> service) {
+        if(userData==null){
+            userData = new Lookup();
+        }
         userData.register(obj, service);
     }
+
+    /**
+     * Remove a previous registered user-defined data.
+     * @param obj registered object
+     * @param service the key under which the data was registered
+     * @param <T> arbitray object
+     */
+    public <T> void deregister(T obj, Class<T> service) {
+        if(userData!=null) {
+            userData.deregister(obj, service);
+        }
+    }
+
 
     class KeYMediatorProofTreeListener extends ProofTreeAdapter {
        private boolean pruningInProcess;

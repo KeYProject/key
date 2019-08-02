@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -36,6 +37,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
+import org.key_project.util.lookup.Lookup;
 
 /**
  *
@@ -92,6 +94,10 @@ public class Node implements Iterable<Node> {
     private ImmutableList<RenamingTable> renamings;
 
     private String cachedName = null;
+
+    @Nullable
+    private Lookup userData =null;
+
 
     /**
      * If the rule base has been extended e.g. by loading a new taclet as lemma or
@@ -744,4 +750,48 @@ public class Node implements Iterable<Node> {
         return childrenIterator();
     }
 
+    /**
+     * Retrieves a user-defined data.
+     *
+     * @param service the class for which the data were registered
+     * @param <T>     any class
+     * @return null or the previous data
+     * @see #register(Object, Class)
+     */
+    public <T> @Nullable T lookup(Class<T> service) {
+        try {
+            if(userData==null){
+                return null;
+            }
+            return userData.get(service);
+        } catch (IllegalStateException ignored) {
+            return null;
+        }
+    }
+
+    /**
+     * Register a user-defined data in this node info.
+     *
+     * @param obj an object to be registered
+     * @param service  the key under it should be registered
+     * @param <T>
+     */
+    public <T> void register(T obj, Class<T> service) {
+        if(userData==null){
+            userData = new Lookup();
+        }
+        userData.register(obj, service);
+    }
+
+    /**
+     * Remove a previous registered user-defined data.
+     * @param obj registered object
+     * @param service the key under which the data was registered
+     * @param <T> arbitray object
+     */
+    public <T> void deregister(T obj, Class<T> service) {
+        if(userData!=null) {
+            userData.deregister(obj, service);
+        }
+    }
 }

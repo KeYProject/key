@@ -351,10 +351,13 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String text = ((Interaction) listInteraction.getSelectedValue()).getProofScriptRepresentation();
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            StringSelection contents = new StringSelection(text);
-            clipboard.setContents(contents, contents);
+            Interaction interaction = listInteraction.getSelectedValue();
+            if(interaction!=null) {
+                String text = interaction.getProofScriptRepresentation();
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                StringSelection contents = new StringSelection(text);
+                clipboard.setContents(contents, contents);
+            }
         }
     }
 

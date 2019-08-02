@@ -64,12 +64,12 @@ public class EditFormulaAction extends ExplorationAction {
 
         //}
 
-        g.node().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
-        g.node().getNodeInfo().get(ExplorationNodeData.class).setExplorationAction("Edit " + term + " to " + newTerm);
+        g.node().register(new ExplorationNodeData(), ExplorationNodeData.class);
+        g.node().lookup(ExplorationNodeData.class).setExplorationAction("Edit " + term + " to " + newTerm);
 
         ImmutableList<Goal> result = g.apply(app);
         result.forEach(goal -> {
-            goal.node().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
+            goal.node().register(new ExplorationNodeData(), ExplorationNodeData.class);
             String s = goal.node().getNodeInfo().getBranchLabel();
             goal.node().getNodeInfo().setBranchLabel("ExplorationNode: " + s);
         });
@@ -96,7 +96,7 @@ public class EditFormulaAction extends ExplorationAction {
 
             if (goal.node().getNodeInfo().getBranchLabel().contains(posToWeakening)) {
                 goal.apply(weakening);
-                goal.node().parent().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
+                goal.node().parent().register(new ExplorationNodeData(), ExplorationNodeData.class);
                 getMediator().getSelectionModel().setSelectedNode(goal.node());
 
             } else {

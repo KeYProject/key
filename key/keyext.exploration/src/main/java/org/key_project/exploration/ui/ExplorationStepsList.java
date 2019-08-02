@@ -129,7 +129,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
                                          @NotNull DefaultTreeModel dtm,
                                          @NotNull MyTreeNode parent) {
 
-        ExplorationNodeData explorationNodeData = n.getNodeInfo().get(ExplorationNodeData.class);
+        ExplorationNodeData explorationNodeData = n.lookup(ExplorationNodeData.class);
         if (explorationNodeData != null && explorationNodeData.getExplorationAction() != null) {
             // exporation found
             MyTreeNode newNode = new MyTreeNode(n);
@@ -311,7 +311,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             JLabel lbl = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             Node n = (Node) value;
 
-            ExplorationNodeData expData = n.getNodeInfo().get(ExplorationNodeData.class);
+            ExplorationNodeData expData = n.lookup(ExplorationNodeData.class);
             if (expData != null && expData.getExplorationAction() != null) {
                 lbl.setText(n.serialNr() + " " + expData.getExplorationAction());
             }
@@ -325,7 +325,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             JLabel lbl = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             MyTreeNode n = (MyTreeNode) value;
-            ExplorationNodeData expData = n.getData().getNodeInfo().get(ExplorationNodeData.class);
+            ExplorationNodeData expData = n.getData().lookup(ExplorationNodeData.class);
 
             if (n.isRoot()) {
                 if (expData != null && expData.getExplorationAction() != null) {

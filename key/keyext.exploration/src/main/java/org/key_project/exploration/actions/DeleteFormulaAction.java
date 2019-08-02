@@ -55,11 +55,11 @@ public class DeleteFormulaAction extends ExplorationAction {
         app = soundWeakening(pio, term);
         ExplorationNodeData explorationNodeData = new ExplorationNodeData();
         explorationNodeData.setExplorationAction("Hide "+term);
-        g.node().getNodeInfo().register(explorationNodeData, ExplorationNodeData.class);
+        g.node().register(explorationNodeData, ExplorationNodeData.class);
 
         ImmutableList<Goal> result = g.apply(app);
         result.forEach(goal -> {
-            goal.node().getNodeInfo().register(new ExplorationNodeData(), ExplorationNodeData.class);
+            goal.node().register(new ExplorationNodeData(), ExplorationNodeData.class);
 
             //goal.node().getNodeInfo().setExploration(true);
             //ExplorationNodeData explorationData = new ExplorationNodeData();

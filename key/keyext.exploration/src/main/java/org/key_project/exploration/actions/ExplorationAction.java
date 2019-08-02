@@ -67,8 +67,6 @@ public class ExplorationAction extends MainWindowAction {
     }
 
     public ExplorationModeModel getModel(){
-        return Objects.requireNonNull(getMediator().get(ExplorationModeModel.class));
+        return Objects.requireNonNull(getMediator().lookup(ExplorationModeModel.class));
     }
-
-
 }
