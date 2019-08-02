@@ -74,9 +74,7 @@ public final class Main {
      * This parameter disables the possibility to prune in closed branches. It is meant as a
      * fallback solution if storing all closed goals needs too much memory.
      */
-    // For release KeY 2.8, "NO_PRUNING_CLOSED" has been changed to "ALLOW_PRUNING_CLOSED"
-    // to change default. The reason is #1480.
-    private static final String ALLOW_PRUNING_CLOSED = "--allow-pruning-closed";
+    private static final String NO_PRUNING_CLOSED = "--no-pruning-closed";
     /**
      * If this option is set, the (Disk)FileRepo does not delete its temporary directories
      * (can be used for debugging).
@@ -262,8 +260,8 @@ public final class Main {
         cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
         cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
-        cl.addOption(ALLOW_PRUNING_CLOSED, null,
-                "enables pruning and goal back in closed branches (experimental)");
+        cl.addOption(NO_PRUNING_CLOSED, null,
+                "disables pruning and goal back in closed branches (saves memory)");
         cl.addOption(KEEP_FILEREPOS, null, "disables the automatic deletion of temporary"
                 + "directories of file repos (for debugging)");
         cl.addSection("Batchmode options:");
@@ -465,7 +463,9 @@ public final class Main {
                     cl.getString(TACLET_DIR, ""));
         }
 
-        GeneralSettings.noPruningClosed = !cl.isSet(ALLOW_PRUNING_CLOSED);
+        if (cl.isSet(NO_PRUNING_CLOSED)) {
+            GeneralSettings.noPruningClosed = true;
+        }
 
         if (cl.isSet(KEEP_FILEREPOS)) {
             GeneralSettings.keepFileRepos = true;

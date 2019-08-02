@@ -39,7 +39,7 @@ def gitBranch = gitRevParse('--abbrev-ref HEAD')
 
 group = "org.key_project"
 def build = System.env.BUILD_NUMBER == null ? "" : "-${System.env.BUILD_NUMBER}"
-version = "2.8.0$build"
+version = "2.7$build"
 
 subprojects {
     apply plugin: "java"

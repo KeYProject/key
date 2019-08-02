@@ -1,6 +1,6 @@
 #!/bin/sh -x
 unset DISPLAY
-export KEY_VERSION="2.8.0-$BUILD_NUMBER"
+export KEY_VERSION="2.7.$BUILD_NUMBER"
 export PATH=$PATH:/home/hudson/key/bin/
 export STATISTICS_DIR="$JENKINS_HOME/userContent/statistics-$JOB_NAME"
 
