@@ -21,7 +21,6 @@ import java.util.HashMap;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.util.Debug;
 
 public final class IconFactory {

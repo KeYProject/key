@@ -23,7 +23,7 @@ public class EnsureSourceConsistencyToggleAction extends MainWindowAction {
      */
     public EnsureSourceConsistencyToggleAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName("Ensure source consistency");
+        setName("Ensure Source Consistency");
         setTooltip("If ticked, consistency between source and proof is ensured"
             + " (by caching files at first use in a temporary directory).");
         setSelected(ProofIndependentSettings.DEFAULT_INSTANCE

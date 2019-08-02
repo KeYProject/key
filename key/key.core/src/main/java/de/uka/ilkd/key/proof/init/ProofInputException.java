@@ -17,10 +17,9 @@ import org.antlr.runtime.RecognitionException;
 /**
  * Reading prover input failed
  */
-@SuppressWarnings("serial")
 public class ProofInputException extends RecognitionException {
-
-   private final String message;
+    private static final long serialVersionUID = 1028674319098864943L;
+    private final String message;
 
    public ProofInputException(Exception e) {
       this(e.getMessage(), e);

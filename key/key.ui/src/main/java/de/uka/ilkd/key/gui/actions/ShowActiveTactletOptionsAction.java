@@ -67,7 +67,7 @@ public class ShowActiveTactletOptionsAction extends MainWindowAction {
 					"These options can be changed in Options->Taclet Options"
 			};
 			JOptionPane.showMessageDialog(mainWindow, toDisplay,
-					"Taclet Options used in the current proof",
+                    "Taclet options used in the current proof",
 					JOptionPane.INFORMATION_MESSAGE);
 		}
     }

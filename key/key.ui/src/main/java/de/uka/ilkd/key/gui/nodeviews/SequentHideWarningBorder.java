@@ -21,8 +21,8 @@ import javax.swing.border.TitledBorder;
  *
  * @author Mattias Ulbrich
  */
-@SuppressWarnings("serial")
 public class SequentHideWarningBorder extends TitledBorder {
+    private static final long serialVersionUID = 5688994897006894795L;
 
     /** The constant color is used as background for the window. */
     private static final ColorSettings.ColorProperty ALERT_COLOR =

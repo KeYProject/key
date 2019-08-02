@@ -51,7 +51,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
                 getMediator().getSelectedProof().getSettings();
         SettingsTreeModel model = new SettingsTreeModel(settings, ProofIndependentSettings.DEFAULT_INSTANCE);
         ViewSettingsDialog dialog = new ViewSettingsDialog(model, model.getStartComponent());
-        dialog.setTitle("All Active Settings");
+        dialog.setTitle("All active settings");
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }

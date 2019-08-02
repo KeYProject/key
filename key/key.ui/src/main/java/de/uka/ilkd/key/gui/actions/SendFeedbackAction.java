@@ -52,8 +52,9 @@ import de.uka.ilkd.key.util.KeYConstants;
  * @author Kai Wallisch
  *
  */
-@SuppressWarnings("serial")
 public class SendFeedbackAction extends AbstractAction {
+
+    private static final long serialVersionUID = 8146108238901822515L;
 
     /*
      * This is the email address to which feedback will be sent.
@@ -129,7 +130,7 @@ public class SendFeedbackAction extends AbstractAction {
     private static class LastLoadedProblemItem extends SendFeedbackFileItem {
 
         LastLoadedProblemItem() {
-            super("Send Last Loaded Problem", "lastLoadedProblem.key");
+            super("Send last loaded problem", "lastLoadedProblem.key");
         }
 
         @Override
@@ -158,7 +159,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     private static class VersionItem extends SendFeedbackFileItem {
         VersionItem() {
-            super("Send KeY Version", "keyVersion.txt");
+            super("Send KeY version", "keyVersion.txt");
         }
 
         @Override
@@ -169,7 +170,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     private static class SystemPropertiesItem extends SendFeedbackFileItem {
         SystemPropertiesItem() {
-            super("Send System Properties", "systemProperties.txt");
+            super("Send system properties", "systemProperties.txt");
         }
 
         @Override
@@ -185,7 +186,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     private class OpenGoalItem extends SendFeedbackFileItem {
         OpenGoalItem() {
-            super("Send Open Goal", "openGoal.txt");
+            super("Send open proof goal", "openGoal.txt");
         }
 
         @Override
@@ -208,7 +209,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     private class OpenProofItem extends SendFeedbackFileItem {
         OpenProofItem() {
-            super("Send Open Proof", "openProof.proof");
+            super("Send open proof", "openProof.proof");
         }
 
         @Override
@@ -235,7 +236,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     private static class SettingsItem extends SendFeedbackFileItem {
         SettingsItem() {
-            super("Send KeY Settings", "keySettings.txt");
+            super("Send KeY settings", "keySettings.txt");
         }
 
         @Override
@@ -246,7 +247,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     private class StacktraceItem extends SendFeedbackFileItem {
         StacktraceItem() {
-            super("Send Stacktrace", "stacktrace.txt");
+            super("Send stacktrace", "stacktrace.txt");
         }
 
         @Override
@@ -262,7 +263,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     private class FaultyFileItem extends SendFeedbackFileItem {
         FaultyFileItem() {
-            super("Send File Exception points to", "exceptionSourceFile.txt");
+            super("Send file referenced by exception", "exceptionSourceFile.txt");
         }
 
         @Override
@@ -285,7 +286,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     private static class JavaSourceItem extends SendFeedbackItem {
         public JavaSourceItem() {
-            super("Send Java Source");
+            super("Send Java source");
         }
 
         @Override
@@ -430,7 +431,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     private JDialog makeDialog() {
 
-        final JDialog dialog = new JDialog(parent, "Report an Error to KeY Developers",
+        final JDialog dialog = new JDialog(parent, "Report an error to KeY developers",
                 Dialog.ModalityType.DOCUMENT_MODAL);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 

@@ -12,9 +12,8 @@ import recoder.parser.ParseException;
  * @author mulbrich
  *
  */
- @SuppressWarnings("serial")
 public class ParseExceptionInFile extends ParseException {
-
+    private static final long serialVersionUID = -4228093987853508329L;
     private final String filename;
 
     public ParseExceptionInFile(String filename, String message, Throwable cause) {

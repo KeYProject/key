@@ -10,14 +10,11 @@ import java.io.OutputStream;
 import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
-import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
 /**
