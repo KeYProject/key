@@ -4,8 +4,8 @@ plugins {
     id("idea")
     id("eclipse")
     id "com.jfrog.bintray" version "1.8.4" apply false
-    id "com.github.hierynomus.license-base" version"0.15.0"
-    id "com.github.hierynomus.license-report" version"0.15.0"
+    id "com.github.hierynomus.license-base" version "0.15.0"
+    id "com.github.hierynomus.license-report" version "0.15.0"
 
     //for finding the license of thrid parties
     //id "com.github.jk1.dependency-license-report" version "1.9"
@@ -13,7 +13,7 @@ plugins {
 }
 
 // config of com.github.jk1.dependency-license-report
-//licenseReport { excludeGroups = ['']; configurations = ['ALL'] }
+// licenseReport { excludeGroups = ['']; configurations = ['ALL'] }
 
 idea {
     module {
@@ -38,7 +38,7 @@ def gitRevision = gitRevParse('--short HEAD')
 def gitBranch = gitRevParse('--abbrev-ref HEAD')
 
 group = "org.key_project"
-def build = "${System.env.BUILD_NUMBER}" ? "" : "-${System.env.BUILD_NUMBER}"
+def build = System.env.BUILD_NUMBER == null ? "" : "-${System.env.BUILD_NUMBER}"
 version = "2.7$build"
 
 subprojects {
@@ -53,18 +53,14 @@ subprojects {
     //apply plugin: "com.github.jk1.dependency-license-report"
     //licenseReport { excludeGroups = [''];  configurations = ALL }
 
-
-
     /*
     apply plugin: 'checkstyle'
     apply plugin: 'pmd'
     apply plugin: 'findbugs'
     */
 
-    group = "org.key_project"
-    build = "${System.env.BUILD_NUMBER}" ? "" : "-${System.env.BUILD_NUMBER}"
-    version = "2.7$build"
-
+    group = rootProject.group
+    version = rootProject.version
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"

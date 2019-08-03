@@ -42,7 +42,10 @@ import java.util.stream.Collectors;
  * @author Alexander Weigl
  * @version 1 (28.05.19)
  */
-@KeYGuiExtension.Info()
+@KeYGuiExtension.Info(name = "Keyboard Taclet Control",
+        description = "This extension control over the application of taclets via the keyboard.",
+        optional = true
+)
 public class KeyboardTacletExtension implements KeYGuiExtension,
         KeYGuiExtension.LeftPanel {
     private KeyboardTacletPanel panel;
@@ -297,7 +300,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
                         filter, pos.getPosInOccurrence(), services
                 );
                 t.forEach(taclets::add);
-            }catch(NullPointerException e) {
+            } catch (NullPointerException e) {
                 //	at de.uka.ilkd.key.proof.TacletAppIndex.getIndex(TacletAppIndex.java:215)
                 e.printStackTrace();
             }

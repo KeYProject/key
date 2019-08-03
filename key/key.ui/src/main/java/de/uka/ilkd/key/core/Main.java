@@ -24,6 +24,7 @@ import java.util.Locale;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import de.uka.ilkd.key.logic.sort.GenericSort;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 import org.xml.sax.SAXException;
@@ -292,9 +293,9 @@ public final class Main {
     }
 
     /**
-     * Evaluate the parsed commandline options
+     * Evaluate the commandline options
      *
-     * @param commandline object cl
+     * @param cl parsed command lines, not null
      */
     public static void evaluateOptions(CommandLine cl) {
 
@@ -528,10 +529,6 @@ public final class Main {
             return new ConsoleUserInterfaceControl(verbosity, loadOnly);
         } else {
             updateSplashScreen();
-
-            /* explicitly enable pruning in closed branches for interactive mode
-             * (if not manually disabled) */
-            GeneralSettings.noPruningClosed = cl.isSet(NO_PRUNING_CLOSED) ? true : false;
 
             MainWindow mainWindow = MainWindow.getInstance();
 
