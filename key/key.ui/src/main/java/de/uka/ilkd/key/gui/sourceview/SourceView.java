@@ -581,7 +581,15 @@ public final class SourceView extends JComponent {
                 File file = new File(fileName);
                 try (InputStream is = repo.getInputStream(file.toPath())) {
                     if (is != null) {
-                        Tab tab = new Tab(file.getAbsolutePath(), file.getName(), is);
+                        // fileName and file.getAbsolutePath() should be equal here,
+                        // but because of a bug somewhere in Recoder2KeY, on Windows, fileName
+                        // is of the (illegal!) form "/C:/path/to/file/" which the File constructor
+                        // silently converts to the correct form "C:\path\to\file".
+                        // Using file.getAbsolutePath() instead of fileName makes the SourceView
+                        // behave weirdly on Windows systems.
+
+                        //Tab tab = new Tab(file.getAbsolutePath(), file.getName(), is);
+                        Tab tab = new Tab(fileName, file.getName(), is);
 
                         tabs.put(fileName, tab);
 
