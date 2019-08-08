@@ -68,10 +68,8 @@ public class ExplorationExtension implements KeYGuiExtension,
     public JToolBar getToolbar(MainWindow mainWindow) {
         if (explorationToolbar == null) {
             explorationToolbar = new JToolBar();
-            JPanel p = new JPanel();
-            p.add(new JToggleButton(new ToggleExplorationAction(model)));
-            p.add(new JToggleButton(new ShowSecondBranchAction(model)));
-            explorationToolbar.add(p);
+            explorationToolbar.add(new JToggleButton(new ToggleExplorationAction(model)));
+            explorationToolbar.add(new JToggleButton(new ShowSecondBranchAction(model)));
         }
         return explorationToolbar;
     }
