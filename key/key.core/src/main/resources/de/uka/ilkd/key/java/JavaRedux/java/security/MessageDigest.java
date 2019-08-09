@@ -4,7 +4,7 @@ public abstract class MessageDigest extends java.security.MessageDigestSpi {
 
    /*@ public normal_behavior
      @ assignable \nothing;
-     @ determines \result \by \param0;
+     @ determines \result \by param0;
      @*/
    public static java.security.MessageDigest getInstance(java.lang.String param0) throws java.security.NoSuchAlgorithmException;
 
