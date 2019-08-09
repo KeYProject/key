@@ -1,46 +1,29 @@
 package java.security;
 
-/**
- * @generated
- */
 public abstract class MessageDigest extends java.security.MessageDigestSpi {
-   /**
-    * @generated
-    */
-   /*@ public behavior
-     @ requires true;
-     @ ensures true;
-     @ assignable \everything;
+
+   /*@ public normal_behavior
+     @ assignable \nothing;
+     @ determines \result \by \param0;
      @*/
    public static java.security.MessageDigest getInstance(java.lang.String param0) throws java.security.NoSuchAlgorithmException;
 
-   /**
-    * @generated
-    */
-   /*@ public behavior
-     @ requires true;
-     @ ensures true;
-     @ assignable \everything;
+   /*@ public normal_behavior
+     @ assignable \nothing;
+     @ determines \result \by \nothing;
      @*/
    public byte[] digest(byte[] param0);
 
-   /**
-    * @generated
-    */
-   /*@ public behavior
+   /*@ public normal_behavior
      @ requires true;
      @ ensures true;
-     @ assignable \everything;
+     @ assignable \nothing;
      @*/
    public void update(byte[] param0);
 
-   /**
-    * @generated
-    */
-   /*@ public behavior
-     @ requires true;
-     @ ensures true;
-     @ assignable \everything;
+   /*@ public normal_behavior
+     @ assignable \nothing;
+     @ determines \result \by \nothing;
      @*/
    public byte[] digest();
 }

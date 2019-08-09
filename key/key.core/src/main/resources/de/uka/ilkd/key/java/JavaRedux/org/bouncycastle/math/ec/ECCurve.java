@@ -1,22 +1,17 @@
 package org.bouncycastle.math.ec;
 
-/**
- * @generated
- */
 public abstract class ECCurve extends java.lang.Object {
-   /**
-    * @generated
-    */
-   /*@ public behavior
+   
+   public final java.math.BigInteger order;
+	
+   /*@ public normal_behavior
      @ requires true;
-     @ ensures true;
-     @ assignable \everything;
+     @ ensures \result == order;
+     @ assignable \nothing;
+     @ determines \result \by order;
      @*/
    public java.math.BigInteger getOrder();
 
-   /**
-    * @generated
-    */
    public static abstract class AbstractFp extends org.bouncycastle.math.ec.ECCurve {
    }
 }

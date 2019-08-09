@@ -1,26 +1,22 @@
 package org.bouncycastle.math.ec;
 
-/**
- * @generated
- */
 public abstract class ECPoint extends java.lang.Object {
-   /**
-    * @generated
-    */
-   /*@ public behavior
+   
+   public final int value;
+	
+   /*@ public normal_behavior
      @ requires true;
      @ ensures true;
-     @ assignable \everything;
+     @ assignable \nothing;
+     @ determines \result.value \by this.value, param0.value;
      @*/
    public org.bouncycastle.math.ec.ECPoint multiply(java.math.BigInteger param0);
 
-   /**
-    * @generated
-    */
-   /*@ public behavior
+   /*@ public normal_behavior
      @ requires true;
      @ ensures true;
-     @ assignable \everything;
+     @ assignable \nothing;
+     @ determines \result, result[*] \by value, param0;
      @*/
    public byte[] getEncoded(boolean param0);
 }
