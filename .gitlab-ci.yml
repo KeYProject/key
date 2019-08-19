@@ -161,7 +161,7 @@ compile:testFast:ui:
   script:
     - javac -version
     - cd key
-    - gradle --build-cache --continue :key.ui:testFast
+    - gradle --build-cache --continue :key.ui:testFast :keyext.interactionlog:testFast :keyext.exploration:testFast
     - ls
   cache:
     key: "$CI_COMMIT_REF_NAME"
