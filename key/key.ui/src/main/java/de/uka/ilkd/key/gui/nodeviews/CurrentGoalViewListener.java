@@ -80,10 +80,10 @@ final class CurrentGoalViewListener
                         ProofMacroMenu macroMenu = new ProofMacroMenu(mediator,
                                 mousePos.getPosInOccurrence());
                         if (macroMenu.isEmpty()) {
-                            macroMenu.add(new JLabel("no strategies available"));
+                            macroMenu.add(new JLabel("No strategies available"));
                         }
                         JPopupMenu popupMenu = macroMenu.getPopupMenu();
-                        popupMenu.setLabel("Strategy macros");
+                        popupMenu.setLabel("Strategy Macros");
                         popupMenu.show(getSequentView(), me.getX() - 5, me.getY() - 5);
                     } else if (!me.isControlDown() && SwingUtilities.isLeftMouseButton(me)) {
                         //done before collecting the taclets because initialising

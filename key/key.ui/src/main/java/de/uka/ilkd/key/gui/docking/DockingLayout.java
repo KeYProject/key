@@ -10,6 +10,7 @@ import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeRegular;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.settings.PathConfig;
@@ -43,8 +44,8 @@ public final class DockingLayout
     public static float SIZE_ICON_DOCK = 12f;
     public static final File LAYOUT_FILE = new File(PathConfig.getKeyConfigDir(), "layout.xml");
 
-    public static final String[] LAYOUT_NAMES = new String[]{"default", "slot 1", "slot 2"};
-    public static final int[] LAYOUT_KEYS = new int[]{KeyEvent.VK_F11, KeyEvent.VK_F12};
+    public static final String[] LAYOUT_NAMES = new String[] { "Default", "Slot 1", "Slot 2" };
+    public static final int[] LAYOUT_KEYS = new int[] { KeyEvent.VK_F11, KeyEvent.VK_F12 };
 
     private List<Action> actions = new LinkedList<>();
     private MainWindow window;
@@ -141,8 +142,8 @@ public final class DockingLayout
 
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
-        JToolBar toolBar = new JToolBar("Layout");
-        JComboBox<String> comboLayouts = new JComboBox<>();
+        JToolBar toolBar = new JToolBar("Docking Layout");
+        JComboBox<String> comboLayouts = new JComboBox<String>();
 
         class SaveAction extends MainWindowAction {
             private static final long serialVersionUID = -2688272657370615595L;
@@ -198,7 +199,8 @@ class SaveLayoutAction extends MainWindowAction {
     public SaveLayoutAction(MainWindow mainWindow, String name, Integer key) {
         super(mainWindow);
         this.layoutName = name;
-        setName("Save Layout: " + name);
+        setName("Save as " + name);
+        setIcon(IconFactory.saveFile(MainWindow.TOOLBAR_ICON_SIZE));
         setMenuPath("View.Layout.Save");
         if (key != null) {
             setAcceleratorKey(KeyStroke.getKeyStroke(key,
@@ -222,7 +224,8 @@ class LoadLayoutAction extends MainWindowAction {
     public LoadLayoutAction(MainWindow mainWindow, String name, Integer key) {
         super(mainWindow);
         this.layoutName = name;
-        setName("Load Layout: " + name);
+        setName("Load " + name);
+        setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
         if (key != null) {
             setAcceleratorKey(KeyStroke.getKeyStroke(key, InputEvent.CTRL_DOWN_MASK));
         }

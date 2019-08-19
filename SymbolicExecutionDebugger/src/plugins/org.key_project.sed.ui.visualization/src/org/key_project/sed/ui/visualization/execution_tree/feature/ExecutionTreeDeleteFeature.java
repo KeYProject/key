@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.graphiti.features.ICustomUndoableFeature;
+import org.eclipse.graphiti.features.ICustomUndoRedoFeature;
 import org.eclipse.graphiti.features.IDeleteFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IContext;
@@ -50,7 +50,7 @@ import org.key_project.sed.ui.visualization.util.EditableMultiDeleteInfo;
  * </p>
  * @author Martin Hentschel
  */
-public class ExecutionTreeDeleteFeature extends DefaultDeleteFeature implements ICustomUndoableFeature {
+public class ExecutionTreeDeleteFeature extends DefaultDeleteFeature implements ICustomUndoRedoFeature {
    /**
     * Contains information for undo/redo provided by this {@link ICustomUndoableFeature}.
     */
@@ -172,13 +172,19 @@ public class ExecutionTreeDeleteFeature extends DefaultDeleteFeature implements 
     * {@inheritDoc}
     */
    @Override
-   public void undo(IContext context) {
+   public void preUndo(IContext context) {
       // Restore the whole sub tree in the business model.
       for (DeleteUndoRedoContext undoRedoContext : undoRedoContexts) {
          addToParent(undoRedoContext);
       }
    }
-   
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void postUndo(IContext context) {}
+
    /**
     * Adds the node defined by the given {@link DeleteUndoRedoContext}
     * back to the business model.
@@ -218,13 +224,19 @@ public class ExecutionTreeDeleteFeature extends DefaultDeleteFeature implements 
     * {@inheritDoc}
     */
    @Override
-   public void redo(IContext context) {
+   public void preRedo(IContext context) {
       // Delete the whole sub tree in the business model.
       for (DeleteUndoRedoContext undoRedoContext : undoRedoContexts) {
          removeFromParent(undoRedoContext);
       }
    }
-   
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void postRedo(IContext context) {
+   }
    /**
     * Utiltiy class to store information required for undo/redo
     * of a deletion in the business model.

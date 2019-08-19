@@ -43,8 +43,6 @@ import org.key_project.util.lookup.Lookup;
  *
  */
 public class Node implements Iterable<Node> {
-    Node parent = null;
-
     private static final String RULE_WITHOUT_NAME = "rule without name";
 
     private static final String RULE_APPLICATION_WITHOUT_RULE = "rule application without rule";
@@ -61,6 +59,9 @@ public class Node implements Iterable<Node> {
 
     /** the proof the node belongs to */
     private final Proof proof;
+
+    /** The parent node. **/
+    private Node parent = null;
 
     private Sequent seq = Sequent.EMPTY_SEQUENT;
 

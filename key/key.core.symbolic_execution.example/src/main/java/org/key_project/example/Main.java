@@ -56,6 +56,7 @@ public class Main {
          HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
          HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
          newSettings.putAll(MiscTools.getDefaultTacletOptions());
+         newSettings.put("methodExpansion", "methodExpansion:noRestriction");
          choiceSettings.setDefaultChoices(newSettings);
          // Load source code
          KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location, classPaths, bootClassPath, includes, true); // env.getLoadedProof() returns performed proof if a *.proof file is loaded

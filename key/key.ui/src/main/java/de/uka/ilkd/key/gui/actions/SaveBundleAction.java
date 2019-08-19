@@ -29,9 +29,8 @@ public final class SaveBundleAction extends MainWindowAction {
     public SaveBundleAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Save Proof as Bundle");
-        // TODO: add own icon
-        setIcon(IconFactory.saveFile(MainWindow.TOOLBAR_ICON_SIZE));
-        setTooltip("Save current proof as a bundle containing all files to successfully reload"
+        setIcon(IconFactory.saveBundle(MainWindow.TOOLBAR_ICON_SIZE));
+        setTooltip("Save current proof as a bundle containing all files to successfully reload "
                  + "the proof (disabled when option \"Allow proof bundle saving\" is set).");
 
         // react to setting changes
@@ -58,11 +57,8 @@ public final class SaveBundleAction extends MainWindowAction {
     }
 
     private void updateStatus() {
-        // enable if setting is activated and proof exists
-        setEnabled(ProofIndependentSettings.DEFAULT_INSTANCE
-                                           .getGeneralSettings()
-                                           .isAllowBundleSaving()
-                && mainWindow.getMediator().getSelectedProof() != null);
+        // enable only if there is a proof
+        setEnabled(mainWindow.getMediator().getSelectedProof() != null);
     }
 
     @Override

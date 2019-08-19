@@ -77,15 +77,14 @@ import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
 import de.uka.ilkd.key.gui.actions.AboutAction;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.actions.AutoSave;
-import de.uka.ilkd.key.gui.actions.BundleSavingToggleAction;
 import de.uka.ilkd.key.gui.actions.CounterExampleAction;
 import de.uka.ilkd.key.gui.actions.DecreaseFontSizeAction;
 import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
+import de.uka.ilkd.key.gui.actions.EnsureSourceConsistencyToggleAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.GoalBackAction;
 import de.uka.ilkd.key.gui.actions.GoalSelectAboveAction;
 import de.uka.ilkd.key.gui.actions.GoalSelectBelowAction;
-import de.uka.ilkd.key.gui.actions.HeatmapSettingsAction;
 import de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction;
 import de.uka.ilkd.key.gui.actions.IncreaseFontSizeAction;
 import de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction;
@@ -857,9 +856,9 @@ public final class MainWindow extends JFrame {
 
         view.add(createSelectionMenu());
 
-        JMenuItem hmItem = new JMenuItem("Heatmap Options");
-        hmItem.addActionListener(new HeatmapSettingsAction(this));
-        view.add(hmItem);
+        // JMenuItem hmItem = new JMenuItem("Heatmap Options");
+        // hmItem.addActionListener(new HeatmapSettingsAction(this));
+        // view.add(hmItem);
 
         return view;
     }
@@ -939,7 +938,7 @@ public final class MainWindow extends JFrame {
         options.add(new JCheckBoxMenuItem(new AutoSave(this)));
         options.add(new MinimizeInteraction(this));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
-        options.add(new JCheckBoxMenuItem(new BundleSavingToggleAction(this)));
+        options.add(new JCheckBoxMenuItem(new EnsureSourceConsistencyToggleAction(this)));
 
         return options;
 
@@ -1283,6 +1282,16 @@ public final class MainWindow extends JFrame {
 
     public void loadProblem(File file, List<File> classPath, File bootClassPath, List<File> includes) {
         getUserInterface().loadProblem(file, classPath, bootClassPath, includes);
+    }
+
+    /**
+     * Loads the proof with the given path from the proof bundle.
+     * @param proofBundle the path of the proof bundle
+     * @param proofPath the path of the proof to load
+     *                  (relative to the root of the bundle -> filename only)
+     */
+    public void loadProofFromBundle(File proofBundle, File proofPath) {
+        getUserInterface().loadProofFromBundle(proofBundle, proofPath);
     }
 
     /*

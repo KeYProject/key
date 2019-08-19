@@ -1,7 +1,6 @@
 package org.key_project.ui;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.plaf.basic.*;
@@ -17,18 +16,17 @@ import javax.swing.plaf.basic.*;
  *
  * @see <https://tips4java.wordpress.com/2010/11/28/combo-box-popup/>
  */
-public class BoundsPopupMenuListener implements PopupMenuListener
-{
-	private boolean scrollBarRequired = true;
-	private boolean popupWider;
-	private int maximumWidth = -1;
-	private boolean popupAbove;
-	private JScrollPane scrollPane;
+public class BoundsPopupMenuListener implements PopupMenuListener {
+    private boolean scrollBarRequired = true;
+    private boolean popupWider;
+    private int maximumWidth = -1;
+    private boolean popupAbove;
+    private JScrollPane scrollPane;
 
-	/**
-	 *  Convenience constructore to allow the display of a horizontal scrollbar
-	 *  when required.
-	 */
+    /**
+     *  Convenience constructor to allow the display of a horizontal scrollbar
+     *  when required.
+     */
 	public BoundsPopupMenuListener()
 	{
 		this(true, false, -1, false);
