@@ -3,6 +3,10 @@ plugins {
     id("antlr")
 }
 
+repositories { jcenter() }
+
+configurations { antlr4 }
+
 
 dependencies {
     compile project(":key.util")
@@ -13,10 +17,16 @@ dependencies {
     compile "org.antlr:antlr-runtime:3.5.2"
     compile group: 'antlr', name: 'antlr', version: '2.7.7'
 
+    compile "org.jtwig:jtwig-core:5.87.0.RELEASE"
+
     //antlr name: 'antlr'
     //javacc name: 'javacc'
     javacc 'net.java.dev.javacc:javacc:4.0'
     antlr "org.antlr:antlr:3.5.2"   // use ANTLR version 3
+
+    antlr4 "org.antlr:antlr4:4.7.1"
+    compile "org.antlr:antlr4:4.7.1"
+    // compile "org.antlr:antlr4-runtime:4.7.1"
 }
 
 def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
@@ -60,8 +70,8 @@ test {
         excludeTestsMatching "TestCvc4"
     }
     useJUnit {
-            excludeCategories 'org.key_project.util.testcategories.Performance'
-            excludeCategories 'org.key_project.util.testcategories.Interactive'
+        excludeCategories 'org.key_project.util.testcategories.Performance'
+        excludeCategories 'org.key_project.util.testcategories.Interactive'
     }
 }
 
@@ -73,7 +83,7 @@ task testProofRules(type: Test) {
 
 task testRunAllProofs(type: Test) {
     group "verification"
-    filter { 
+    filter {
         includeTestsMatching "RunAllProofsTestSuite"
         includeTestsMatching "RunAllProofsInfFlow"
         includeTestsMatching "RunAllProofsFunctional"
@@ -99,4 +109,25 @@ task generateVersionFiles() {
 }
 processResources.dependsOn generateVersionFiles
 
+def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
+task runAntlr4(type: JavaExec) {
+    //see incremental task api, prevents rerun if nothing has changed.
+    inputs.dir "src/main/antlr4/"
+    outputs.dir "$projectDir/build/generated/antlr4/main/"
+    classpath = configurations.antlr4
+    main = "org.antlr.v4.Tool"
+    args = ["-visitor",
+            "-Xexact-output-dir", "-o", antlr4Output,
+            "-package", "de.uka.ilkd.key.nparser",
+            "src/main/antlr4/KeYLexer.g4", "src/main/antlr4/KeYParser.g4"]
+    doFirst {
+        file(antlr4Output).mkdirs()
+        println("create $antlr4Output")
+    }
+}
+sourceSets.main.java.srcDir("$projectDir/build/generated-src/antlr4/main/")
+compileJava.dependsOn runAntlr4
+
+
 //check.dependsOn << testProofRules << testRunAllProofs
+

@@ -3745,6 +3745,33 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
     RBRACE
     ;
 
+tacletgen[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
+@init{
+    TacletBuilder b = null;
+    choices_ = choices;
+    switchToNormalMode();
+    ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.<TacletAnnotation>nil();
+}
+    :
+      /* (LEMMA {tacletAnnotations = tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);})? */
+      name=IDENT (choices_=option_list[choices_])?
+      LBRACE
+        ( VARCOND LPAREN varexplist[b] RPAREN ) ?
+        goalspecs[b, find != null]
+        modifiers[b]
+        {
+            b.setChoices(choices_);
+            b.setAnnotations(tacletAnnotations);
+            r = b.getTaclet();
+            taclet2Builder.put(r,b);
+            // dump local schema var decls
+            schemaVariablesNamespace = schemaVariables().parent();
+        }
+        (TEMPLATE)
+        RBRACE
+    ;
+
+
 modifiers[TacletBuilder b]
 : 
         ( rs = rulesets {
