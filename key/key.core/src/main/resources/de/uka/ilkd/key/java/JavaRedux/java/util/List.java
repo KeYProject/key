@@ -5,7 +5,14 @@ package java.util;
 
 public interface List extends java.util.Collection
 {
+   /*@ public normal_behavior
+     @ requires arg0 == 0;
+     @ ensures seq == \seq_concat(\seq_singleton(arg0), \old(seq));
+     @ assignable seq;
+     @ determines seq \by seq, arg0;
+     @*/
    public void add(int arg0, java.lang.Object arg1);
+   
    public boolean addAll(int arg0, java.util.Collection arg1);
    
    public java.lang.Object get(int arg0);

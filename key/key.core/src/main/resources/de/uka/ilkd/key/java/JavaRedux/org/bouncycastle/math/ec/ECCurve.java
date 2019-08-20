@@ -2,13 +2,13 @@ package org.bouncycastle.math.ec;
 
 public abstract class ECCurve extends java.lang.Object {
    
-   public final java.math.BigInteger order;
+   //@ public final ghost \bigint order;
 	
    /*@ public normal_behavior
      @ requires true;
-     @ ensures \result == order;
-     @ assignable \nothing;
-     @ determines \result \by order;
+     @ ensures \result.value == order;
+     @ assignable \strictly_nothing;
+     @ determines \result.value \by order;
      @*/
    public java.math.BigInteger getOrder();
 

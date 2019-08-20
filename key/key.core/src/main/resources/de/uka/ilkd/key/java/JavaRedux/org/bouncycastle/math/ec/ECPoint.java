@@ -1,12 +1,12 @@
 package org.bouncycastle.math.ec;
 
-public abstract class ECPoint extends java.lang.Object {
-   
-   public final int value;
+public final class ECPoint extends java.lang.Object {
+
+   //@ public final ghost \bigint value;
 	
    /*@ public normal_behavior
      @ requires true;
-     @ ensures true;
+     @ ensures \invariant_for(result);
      @ assignable \nothing;
      @ determines \result.value \by this.value, param0.value;
      @*/

@@ -1,6 +1,6 @@
 package java.security;
 
-public abstract class MessageDigest extends java.security.MessageDigestSpi {
+public final class MessageDigest extends java.security.MessageDigestSpi {
 
    /*@ public normal_behavior
      @ assignable \nothing;

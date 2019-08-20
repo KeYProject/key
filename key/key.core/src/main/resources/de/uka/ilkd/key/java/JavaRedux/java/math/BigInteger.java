@@ -1,13 +1,18 @@
 package java.math;
 
-public class BigInteger extends java.lang.Number implements java.lang.Comparable {
+public final class BigInteger extends java.lang.Number implements java.lang.Comparable {
 
-   public final int value;
+   //@ public final ghost \bigint value;
+    
+   //@ public static invariant java.math.BigInteger.ZERO.value == (\bigint) 0;
 
-   //@ public static invariant ZERO.value == 0;
-   public static final java.math.BigInteger ZERO;
+   public static final java.math.BigInteger ZERO = new java.math.BigInteger(0);
+   
+   public BigInteger(int v) {
+       //@ set value = (\bigint) v;
+   }
 
-   /*@ public behavior
+   /*@ public normal_behavior
      @ requires true;
      @ ensures (\result <= 0) <==> (this.value - param0.value <= 0);
      @ ensures (\result >= 0) <==> (this.value - param0.value >= 0);
@@ -16,9 +21,10 @@ public class BigInteger extends java.lang.Number implements java.lang.Comparable
      @*/
    public int compareTo(java.math.BigInteger param0);
 
-   /*@ public behavior
+   /*@ public normal_behavior
      @ requires true;
      @ ensures \result.value == this.value % param0.value;
+     @ ensures \invariant_for(result);
      @ assignable \nothing;
      @ determines \result.value \by this.value, param0.value;
      @*/

@@ -1,4 +1,4 @@
 package org.bouncycastle.jce.spec;
 
-public class ECNamedCurveParameterSpec extends org.bouncycastle.jce.spec.ECParameterSpec {
+public final class ECNamedCurveParameterSpec extends org.bouncycastle.jce.spec.ECParameterSpec {
 }
