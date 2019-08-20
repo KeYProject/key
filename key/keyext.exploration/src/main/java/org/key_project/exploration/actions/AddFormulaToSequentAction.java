@@ -85,10 +85,11 @@ public class AddFormulaToSequentAction extends ExplorationAction {
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
         app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), getMediator().getServices(), true);
         ExplorationNodeData explorationNodeData = new ExplorationNodeData();
-        if(antecedent)
-            explorationNodeData.setExplorationAction("Added "+t+ " ==>");
-        else
-            explorationNodeData.setExplorationAction("Added ==> "+t);
+        if(antecedent) {
+            explorationNodeData.setExplorationAction("Added " + t + " ==>");
+        } else {
+            explorationNodeData.setExplorationAction("Added ==> " + t);
+        }
 
          g.node().register(explorationNodeData, ExplorationNodeData.class);
 
