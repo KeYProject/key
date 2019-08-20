@@ -14,7 +14,7 @@ dependencies {
     //compile name: 'javacc'
     //compile name: 'antlr'
     compile 'net.java.dev.javacc:javacc:4.0'
-    compile "org.antlr:antlr-runtime:3.5.2"
+    //compile "org.antlr:antlr-runtime:3.5.2"
     compile group: 'antlr', name: 'antlr', version: '2.7.7'
 
     compile "org.jtwig:jtwig-core:5.87.0.RELEASE"
@@ -25,13 +25,13 @@ dependencies {
     antlr "org.antlr:antlr:3.5.2"   // use ANTLR version 3
 
     antlr4 "org.antlr:antlr4:4.7.1"
-    compile "org.antlr:antlr4:4.7.1"
-    // compile "org.antlr:antlr4-runtime:4.7.1"
+    compile "org.antlr:antlr4-runtime:4.7.1"
 }
 
 def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
 def javaCCOutputDirMain = file("$javaCCOutputDir/main")
-sourceSets.main.java.srcDirs(javaCCOutputDirMain)
+sourceSets.main.java.srcDirs(javaCCOutputDirMain, "$projectDir/build/generated-src/antlr4/main/")
+
 
 generateGrammarSource {
     maxHeapSize = "64m"
@@ -125,7 +125,6 @@ task runAntlr4(type: JavaExec) {
         println("create $antlr4Output")
     }
 }
-sourceSets.main.java.srcDir("$projectDir/build/generated-src/antlr4/main/")
 compileJava.dependsOn runAntlr4
 
 
