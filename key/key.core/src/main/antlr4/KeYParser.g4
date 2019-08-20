@@ -1,4 +1,3 @@
-
 // This file is part of KeY - Integrated Deductive Software Design
 // Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
@@ -18,6 +17,11 @@
 //
 
 parser grammar KeYParser;
+
+@members {
+private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
+}
 
 file: decls EOF;
 

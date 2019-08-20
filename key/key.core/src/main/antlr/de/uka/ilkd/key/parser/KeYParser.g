@@ -3718,13 +3718,13 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
         }
         ( SCHEMAVAR one_schema_var_decl ) *
         ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
-        ( FIND LPAREN find = termorseq RPAREN 
+        ( FIND LPAREN find=termorseq RPAREN
             (   SAMEUPDATELEVEL { applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL; }
               | INSEQUENTSTATE { applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE; }
               | ANTECEDENTPOLARITY { applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY; }
               | SUCCEDENTPOLARITY { applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY; }
             )*
-        ) ?
+        )?
         { 
             b = createTacletBuilderFor(find, applicationRestriction);
             b.setName(new Name(name.getText()));
@@ -3745,7 +3745,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
     RBRACE
     ;
 
-tacletgen[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
+/*tacletgen[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
 @init{
     TacletBuilder b = null;
     choices_ = choices;
@@ -3753,7 +3753,7 @@ tacletgen[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
     ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.<TacletAnnotation>nil();
 }
     :
-      /* (LEMMA {tacletAnnotations = tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);})? */
+      /* (LEMMA {tacletAnnotations = tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);})?
       name=IDENT (choices_=option_list[choices_])?
       LBRACE
         ( VARCOND LPAREN varexplist[b] RPAREN ) ?
@@ -3770,7 +3770,7 @@ tacletgen[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
         (TEMPLATE)
         RBRACE
     ;
-
+*/
 
 modifiers[TacletBuilder b]
 : 
