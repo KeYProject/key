@@ -42,8 +42,8 @@ import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.counterexample.AbstractCounterExampleGenerator;
 import de.uka.ilkd.key.smt.counterexample.AbstractSideProofCounterExampleGenerator;
 
-@SuppressWarnings("serial")
 public class CounterExampleAction extends MainWindowAction {
+    private static final long serialVersionUID = -1931682474791981751L;
 
     private static final String NAME = "Generate Counterexample";
     private static final String TOOLTIP = "Search for a counterexample for the selected goal";

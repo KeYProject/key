@@ -126,7 +126,7 @@ public class FileChooser extends JPanel{
                 
                 private JButton getChooseFileButton() {
                         if(chooseFileButton == null){
-                                chooseFileButton = new JButton("choose");
+                                chooseFileButton = new JButton("Choose");
                                 setMaximumWidth(chooseFileButton,getRemoveAxiomFileButton().getPreferredSize().width);
                                 chooseFileButton.addActionListener(new ActionListener() {
                                         
@@ -370,7 +370,7 @@ public class FileChooser extends JPanel{
         
         private JButton getAddAxiomFileButton() {
                 if(addAxiomFileButton == null){
-                    addAxiomFileButton = new JButton("add"); 
+                    addAxiomFileButton = new JButton("Add");
                     
                     setMaximumWidth(addAxiomFileButton,getRemoveAxiomFileButton().getPreferredSize().width);
                     addAxiomFileButton.addActionListener(new ActionListener() {
@@ -403,7 +403,7 @@ public class FileChooser extends JPanel{
 
         private JButton getRemoveAxiomFileButton() {
                 if(removeAxiomFileButton == null){
-                        removeAxiomFileButton = new JButton("remove");
+                        removeAxiomFileButton = new JButton("Remove");
                         removeAxiomFileButton.addActionListener(new ActionListener() {
                                 
                                 @Override

@@ -24,8 +24,9 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
-@SuppressWarnings("serial")
 public class UnicodeToggleAction extends MainWindowAction {
+    private static final long serialVersionUID = 6078839876754730405L;
+
     public static final String NAME = "Use Unicode Symbols";
 
     public static final String TOOL_TIP =

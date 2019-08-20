@@ -18,8 +18,9 @@ package de.uka.ilkd.key.util;
  *
  * @see CommandLine
  */
-@SuppressWarnings("serial")
 public class CommandLineException extends Exception {
+
+    private static final long serialVersionUID = 3286607114115333522L;
 
     /**
      * Instantiates a new command line exception without message.

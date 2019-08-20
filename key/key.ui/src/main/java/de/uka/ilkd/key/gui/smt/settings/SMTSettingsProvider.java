@@ -113,12 +113,12 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     }
 
     private JSpinner createLocSetBoundField() {
-        return addNumberField("Locset Bound:", 0, Integer.MAX_VALUE, 1, infoBound,
+        return addNumberField("Locset bound:", 0, Integer.MAX_VALUE, 1, infoBound,
                 e -> settings.locsetBound = e);
     }
 
     private JSpinner createMaxProcesses() {
-        return addNumberField("Concurrent Processes:",
+        return addNumberField("Concurrent processes:",
                 0, Integer.MAX_VALUE, 1,
                 infoMaxProcesses,
                 e -> settings.maxConcurrentProcesses = e);
@@ -130,17 +130,17 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     }
 
     private JSpinner createIntBoundField() {
-        return addNumberField("Integer Bound:", 0, Integer.MAX_VALUE, 1, infoBound,
+        return addNumberField("Integer bound:", 0, Integer.MAX_VALUE, 1, infoBound,
                 e -> settings.intBound = e);
     }
 
     private JSpinner createSeqBoundField() {
-        return addNumberField("Seq Bound:", 0, Integer.MAX_VALUE, 1, infoBound,
+        return addNumberField("Seq bound:", 0, Integer.MAX_VALUE, 1, infoBound,
                 e -> settings.seqBound = e);
     }
 
     private JSpinner createObjectBoundField() {
-        return addNumberField("Object Bound:", 0, Integer.MAX_VALUE, 1, infoBound,
+        return addNumberField("Object bound:", 0, Integer.MAX_VALUE, 1, infoBound,
                 e -> settings.objectBound = e);
     }
 

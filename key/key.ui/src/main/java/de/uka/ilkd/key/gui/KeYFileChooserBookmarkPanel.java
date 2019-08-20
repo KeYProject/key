@@ -154,6 +154,9 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
     }
 
     private class AddBookmarkAction extends KeyAction {
+
+        private static final long serialVersionUID = 3800814610168973715L;
+
         AddBookmarkAction() {
             setIcon(IconFactory.plus(16));
             setTooltip("Adds the current directory to the bookmarks.");
@@ -175,6 +178,9 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
     }
 
     private class AddExternalBookmarkAction extends KeyAction {
+
+        private static final long serialVersionUID = 6594623530260257684L;
+
         AddExternalBookmarkAction() {
             setIcon(IconFactory.PLUS_SQUARED.get(16));
             setTooltip("Opens a new file selection dialog to select a new bookmark.");
@@ -211,6 +217,9 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
     }
 
     private class RemoveBookmarkAction extends KeyAction {
+
+        private static final long serialVersionUID = -728674460657577694L;
+
         RemoveBookmarkAction() {
             setName("");
             setIcon(IconFactory.minus(16));
