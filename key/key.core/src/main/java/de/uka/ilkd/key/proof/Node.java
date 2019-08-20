@@ -40,9 +40,6 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import org.key_project.util.lookup.Lookup;
 
 public class Node implements Iterable<Node> {
-    Node parent = null;
-
-
     private static final String RULE_WITHOUT_NAME = "rule without name";
 
     private static final String RULE_APPLICATION_WITHOUT_RULE = "rule application without rule";

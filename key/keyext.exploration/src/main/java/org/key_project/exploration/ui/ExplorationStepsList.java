@@ -219,16 +219,16 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         });
 
 
-        JTextArea explaination = new JTextArea("Visualization of performed exploration actions. \n" +
+        /*JTextArea explaination = new JTextArea("Visualization of performed exploration actions. \n" +
                 "To jump to a node where the action was applied to select the entry in the list or the tree view.\n" +
                 "To prune exploration actions simply select an action and all action below this action " +
                 "(visible in the tree visualization) are removed.");
-        explaination.setEditable(false);
+        explaination.setEditable(false);*/
 
 
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        panel.add(explaination, BorderLayout.NORTH);
+        //panel.add(explaination, BorderLayout.NORTH);
         JScrollPane p2 = new JScrollPane(explorationStepList);
         panel.add(p2, BorderLayout.CENTER);
 

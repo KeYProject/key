@@ -118,6 +118,21 @@ public class HelpFacade {
         return btn;
     }
 
+    public static KeyAction createHelpAction(String path) {
+        class HelpAction extends KeyAction {
+            private HelpAction() {
+                setName("");
+                setIcon(IconFactory.HELP.get());
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openHelp(path);
+            }
+        }
+        return new HelpAction();
+    }
+
     private static class OpenHelpAction extends KeyAction {
         private static final long serialVersionUID = 85722762932429493L;
 
