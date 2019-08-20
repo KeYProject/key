@@ -39,10 +39,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import org.key_project.util.lookup.Lookup;
 
-/**
- *
- */
 public class Node implements Iterable<Node> {
+    Node parent = null;
+
 
     private static final String RULE_WITHOUT_NAME = "rule without name";
 
@@ -183,8 +182,7 @@ public class Node implements Iterable<Node> {
 
     /**
      * When pruning, data referring to future nodes has to be cleared; however, the
-     * sequent change info and the relevant files are related to the parent node,
-     * and have to be preserved.
+     * sequent change info is related to the parent node, it has to be preserved.
      */
     void clearNodeInfo() {
         if (this.nodeInfo != null) {

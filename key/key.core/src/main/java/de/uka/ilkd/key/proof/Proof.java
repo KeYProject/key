@@ -20,6 +20,8 @@ import java.util.function.Predicate;
 
 import javax.swing.SwingUtilities;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
