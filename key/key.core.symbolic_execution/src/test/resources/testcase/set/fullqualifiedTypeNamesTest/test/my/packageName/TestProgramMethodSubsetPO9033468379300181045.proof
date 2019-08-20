@@ -13,7 +13,7 @@
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
-[Choice]DefaultChoices=JavaCard-JavaCard\\:on , assertions-assertions\\:on , programRules-programRules\\:Java , intRules-intRules\\:arithmeticSemanticsIgnoringOF , initialisation-initialisation\\:disableStaticInitialisation , runtimeExceptions-runtimeExceptions\\:allow
+[Choice]DefaultChoices=methodExpansion-methodExpansion:noRestriction,JavaCard-JavaCard\\:on , assertions-assertions\\:on , programRules-programRules\\:Java , intRules-intRules\\:arithmeticSemanticsIgnoringOF , initialisation-initialisation\\:disableStaticInitialisation , runtimeExceptions-runtimeExceptions\\:allow
 [StrategyProperty]METHOD_OPTIONS_KEY=METHOD_NONE
 [View]HideIntermediateProofsteps=true
 [View]HideClosedSubtrees=false

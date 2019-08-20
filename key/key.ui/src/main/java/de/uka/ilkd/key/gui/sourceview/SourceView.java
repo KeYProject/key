@@ -10,10 +10,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,6 +45,7 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.SimpleAttributeSet;
 
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
 
@@ -59,20 +59,23 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
-import de.uka.ilkd.key.java.JavaReduxFileCollection;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.statement.Else;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 
@@ -87,16 +90,9 @@ import de.uka.ilkd.key.util.Pair;
  * Editing the source code in the tabs is currently not implemented
  * (not supported by {@link JavaDocument}).
  *
- * @author Wolfram Pfeifer
- * @author lanzinger
+ * @author Wolfram Pfeifer, lanzinger
  */
 public final class SourceView extends JComponent {
-
-    /* TODO: make proof independent, move sources and hashes to proof.services.JavaModel or similar
-     * There is still a consistency problem here if the proof is change: In that case the code is
-     * silently reloaded from the (possibly changed) file. This will be solved in future work.
-     * Corresponding feature request:
-     */
 
     private static final long serialVersionUID = -94424677425561025L;
 
@@ -203,7 +199,7 @@ public final class SourceView extends JComponent {
 
                 // Mark tabs that contain highlights.
                 for (Tab tab : tabs.values()) {
-                    tab.mark();
+                    tab.markTabComponent();
                 }
             }
         });
@@ -290,7 +286,7 @@ public final class SourceView extends JComponent {
         Highlight highlight = new Highlight(fileName, line, color, level);
         highlights.add(highlight);
 
-        tab.mark();
+        tab.markTabComponent();
 
         tab.removeHighlights(line);
         tab.applyHighlights(line);
@@ -323,10 +319,10 @@ public final class SourceView extends JComponent {
 
         String[] lines = tab.source.split("\\R", -1);
 
+        // If we are in a JML comment, highlight everything until the next semicolon.
+        // Otherwise, just highlight the first line.
         int lastLine = firstLine;
-
         if (lines[firstLine - 1].trim().startsWith("@")) {
-            // If we are in a JML comment, highlight everything until the next semicolon.
             int parens = 0;
 
             outer_loop:
@@ -342,9 +338,6 @@ public final class SourceView extends JComponent {
                     }
                 }
             }
-        } else {
-            // Otherwise only highlight the current line.
-            lastLine = firstLine;
         }
 
         Set<Highlight> result = new HashSet<>();
@@ -363,10 +356,9 @@ public final class SourceView extends JComponent {
      * @param newLine the line to move the highlight to.
      *
      * @throws BadLocationException if the line number is invalid.
-     * @throws IOException if the file cannot be read.
      */
     public void changeHighlight(Highlight highlight, int newLine)
-            throws BadLocationException, IOException {
+            throws BadLocationException {
         String fileName = highlight.getFileName();
         int oldLine = highlight.getLine();
 
@@ -423,14 +415,14 @@ public final class SourceView extends JComponent {
         } else {
             try {
                 tab.applyHighlights(highlight.getLine());
-            } catch (BadLocationException | IOException e) {
+            } catch (BadLocationException e) {
                 // The locations of the highlights have already been checked
                 // in addHighlight & changeHighlight, so no error can occur here.
                 throw new AssertionError();
             }
         }
 
-        tab.mark();
+        tab.markTabComponent();
 
         return result;
     }
@@ -526,7 +518,7 @@ public final class SourceView extends JComponent {
      * @see NodeInfo#getRelevantFiles()
      */
     private void addFiles() throws IOException {
-        Set<String> files =
+        ImmutableSet<String> files =
                 mainWindow.getMediator().getSelectedNode().getNodeInfo().getRelevantFiles();
 
         Iterator<String> it = tabs.keySet().iterator();
@@ -541,8 +533,7 @@ public final class SourceView extends JComponent {
             }
         }
 
-        for (String fileName
-                : files) {
+        for (String fileName : files) {
             addFile(fileName);
         }
     }
@@ -550,35 +541,70 @@ public final class SourceView extends JComponent {
     /**
      * Adds a file to this source view.
      *
-     * @param filename the name of the file to add.
+     * @param fileName the name of the file to add.
      * @return {@code true} if this source view did not already contain the file.
      * @throws IOException if the file cannot be opened.
      */
     private boolean addFile(String fileName) throws IOException {
-        File file = new File(fileName);
-
         if (tabs.containsKey(fileName)) {
             return false;
-        } else if (file.exists()) {
-            // File exists in working directory.
-            new Tab(file);
-            return true;
         } else {
-            // File does not exist in working directory. Search for it in Java Redux instead.
-            int idx = fileName.indexOf("JavaRedux");
+            // try to load the file via the FileRepo
+            Proof proof = mainWindow.getMediator().getSelectedProof();
+            FileRepo repo = proof.getInitConfig().getFileRepo();
 
-            if (idx >= 0) {
-                InputStream stream = JavaReduxFileCollection.class.getResourceAsStream(
-                        fileName.substring(idx));
+            /* quick fix:
+             * If fileName contains a valid URL we directly call the url method in FileRepo,
+             * else we call the method for paths. This is necessary because fileName may contain
+             * an URL as generated by recoder (transferred via PositionInfo).
+             * see big #1513
+             */
+            if (fileName.startsWith("URL:")) {
+                String urlString = fileName.substring(4);
+                URL url = new URL(urlString);
+                try (InputStream is = repo.getInputStream(url)) {
+                    if (is != null) {
+                        Tab tab = new Tab(urlString, new File(url.getFile()).getName(), is);
 
-                if (stream != null) {
-                    new Tab(file.getAbsolutePath(), file.getName(), stream);
-                    return true;
+                        tabs.put(fileName, tab);
+
+                        tabPane.addTab(tab.simpleFileName, tab);
+                        int index = tabPane.indexOfComponent(tab);
+                        tabPane.setToolTipTextAt(index, tab.absoluteFileName);
+
+                        tab.resetHighlights();
+
+                        return true;
+                    }
+                }
+            } else {
+                File file = new File(fileName);
+                try (InputStream is = repo.getInputStream(file.toPath())) {
+                    if (is != null) {
+                        // fileName and file.getAbsolutePath() should be equal here,
+                        // but because of a bug somewhere in Recoder2KeY, on Windows, fileName
+                        // is of the (illegal!) form "/C:/path/to/file/" which the File constructor
+                        // silently converts to the correct form "C:\path\to\file".
+                        // Using file.getAbsolutePath() instead of fileName makes the SourceView
+                        // behave weirdly on Windows systems.
+
+                        //Tab tab = new Tab(file.getAbsolutePath(), file.getName(), is);
+                        Tab tab = new Tab(fileName, file.getName(), is);
+
+                        tabs.put(fileName, tab);
+
+                        tabPane.addTab(tab.simpleFileName, tab);
+                        int index = tabPane.indexOfComponent(tab);
+                        tabPane.setToolTipTextAt(index, tab.absoluteFileName);
+
+                        tab.resetHighlights();
+
+                        return true;
+                    }
                 }
             }
         }
-
-        throw new IOException();
+        throw new IOException("Could not open file: " + fileName);
     }
 
     /**
@@ -659,11 +685,11 @@ public final class SourceView extends JComponent {
     }
 
     /**
-     * Looks for a nested JTextPane in the component of the JTabbedPane.
+     * Looks for a nested JTextPane in the component of the Tab.
      * If it exists, JTextPane is scrolled to the given line.
      * @param comp the component of a JTabbedPane
      * @param line the line to scroll to
-     * @param f the file of the JTextPane
+     * @param t the tab to scroll
      */
     private void scrollNestedTextPaneToLine(Component comp, int line, Tab t) {
         if (comp instanceof JScrollPane) {
@@ -675,11 +701,10 @@ public final class SourceView extends JComponent {
                     if (panel.getComponent(0) instanceof JTextPane) {
                         JTextPane tp = (JTextPane)panel.getComponent(0);
                         try {
-                            String source = t.source;  // replace all tabs by spaces
+                            String source = t.source;
 
                             /* use input stream here to compute line information of the string with
-                             * replaced tabs
-                             */
+                             * replaced tabs */
                             InputStream inStream = new ByteArrayInputStream(source.getBytes());
                             LineInformation[] li = IOUtil.computeLineInformation(inStream);
                             int offs = li[line].getOffset();
@@ -698,7 +723,7 @@ public final class SourceView extends JComponent {
         if (pos != null
                 && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
                 && pos.getFileName() != null) {
-            list.addLast(new Pair<Node, PositionInfo>(node, pos));
+            list.addLast(new Pair<>(node, pos));
             node.getNodeInfo().addRelevantFile(pos.getFileName());
         }
     }
@@ -710,7 +735,7 @@ public final class SourceView extends JComponent {
      * positions for the highlighting and Nodes.
      */
     private LinkedList<Pair<Node, PositionInfo>> constructLinesSet(Node node) {
-        LinkedList<Pair<Node, PositionInfo>> list = new LinkedList<Pair<Node, PositionInfo>>();
+        LinkedList<Pair<Node, PositionInfo>> list = new LinkedList<>();
 
         if (node == null) {
             return null;
@@ -721,9 +746,7 @@ public final class SourceView extends JComponent {
         do {
             SourceElement activeStatement = cur.getNodeInfo().getActiveStatement();
             if (activeStatement != null) {
-                if (activeStatement instanceof SourceElement) {
-                    addPosToList(joinPositionsRec(activeStatement), list, node);
-                }
+                addPosToList(joinPositionsRec(activeStatement), list, cur);
             }
             cur = cur.parent();
 
@@ -759,10 +782,20 @@ public final class SourceView extends JComponent {
                                 @Override
                                 protected void doDefaultAction(SourceElement el) {
                                     if (el instanceof MethodBodyStatement) {
-                                        MethodBodyStatement methodBody = (MethodBodyStatement) el;
-                                        addPosToList(
-                                                methodBody.getBody(services).getPositionInfo(),
-                                                list, node);
+                                        MethodBodyStatement mb = (MethodBodyStatement) el;
+                                        Statement body = mb.getBody(services);
+                                        if (body != null) {
+                                            node.getNodeInfo().addRelevantFile(
+                                                    body.getPositionInfo().getFileName());
+                                        } else {
+                                            // the method is declared without a body
+                                            // -> we try to show the file either way
+                                            IProgramMethod pm = mb.getProgramMethod(services);
+                                            if (pm != null) {
+                                                node.getNodeInfo().addRelevantFile(
+                                                        pm.getPositionInfo().getFileName());
+                                            }
+                                        }
                                     }
                                 }
                             };
@@ -830,7 +863,10 @@ public final class SourceView extends JComponent {
                         || label.startsWith("Post (")               // postcondition of a method
                         || label.contains("Normal Execution")
                         || label.contains("Null Reference")
-                        || label.contains("Index Out of Bounds")) {
+                        || label.contains("Index Out of Bounds")
+                        || label.contains("Validity")
+                        || label.contains("Precondition")
+                        || label.contains("Usage")) {
                     return label;
                 }
             }
@@ -852,13 +888,13 @@ public final class SourceView extends JComponent {
         public Tab getSelectedTab() {
             return (Tab) getSelectedComponent();
         }
-    };
+    }
 
     /**
      * Wrapper for all tab-specific data, i.e., all data pertaining to the file shown in the tab.
      *
+     * @author Wolfram Pfeifer
      * @author lanzinger
-     *
      */
     private final class Tab extends JScrollPane {
         private static final long serialVersionUID = -8964428275919622930L;
@@ -884,16 +920,9 @@ public final class SourceView extends JComponent {
         private LineInformation[] lineInformation;
 
         /**
-         * The file's content.
+         * The file's content with tabs replaced by spaces.
          */
         private String source;
-
-        /**
-         * This tab's index.
-         *
-         * @see JTabbedPane#getTabComponentAt(int)
-         */
-        private int index;
 
         /**
          * The highlight for the user's selection.
@@ -909,14 +938,15 @@ public final class SourceView extends JComponent {
             this.absoluteFileName = absoluteFilename;
             this.simpleFileName  = simpleFileName;
 
-            tabs.put(absoluteFileName, this);
-
             try {
                 String text = IOUtil.readFrom(stream);
                 if (text != null && !text.isEmpty()) {
                     source = replaceTabs(text);
+                } else {
+                    source = "[SOURCE COULD NOT BE LOADED]";
                 }
             } catch (IOException e) {
+                source = "[SOURCE COULD NOT BE LOADED]";
                 Debug.out("Unknown IOException!", e);
             }
 
@@ -937,17 +967,6 @@ public final class SourceView extends JComponent {
             //add Line numbers to each Scrollview
             TextLineNumber tln = new TextLineNumber(textPane, 1);
             setRowHeaderView(tln);
-
-            // Add tab to tab pane.
-            tabPane.addTab(simpleFileName, this);
-            int index = tabPane.indexOfComponent(this);
-            tabPane.setToolTipTextAt(index, absoluteFilename);
-
-            resetHighlights();
-        }
-
-        private Tab(File file) throws FileNotFoundException {
-            this(file.getAbsolutePath(), file.getName(), new FileInputStream(file));
         }
 
         private void initLineInfo() {
@@ -1015,7 +1034,7 @@ public final class SourceView extends JComponent {
                 textPane, lineInformation, absoluteFileName));
         }
 
-        private void mark() {
+        private void markTabComponent() {
             if (highlights.isEmpty()) {
                 tabPane.setForegroundAt(
                         tabPane.indexOfComponent(this),
@@ -1028,7 +1047,13 @@ public final class SourceView extends JComponent {
                     tabPane.setForegroundAt(
                             tabPane.indexOfComponent(this),
                             TAB_HIGHLIGHT_COLOR.get());
+                    tabPane.setBackgroundAt(
+                            tabPane.indexOfComponent(this),
+                            UIManager.getColor("TabbedPane.background"));
                 } else {
+                    tabPane.setForegroundAt(
+                            tabPane.indexOfComponent(this),
+                            UIManager.getColor("TabbedPane.foreground"));
                     tabPane.setBackgroundAt(
                             tabPane.indexOfComponent(this),
                             TAB_HIGHLIGHT_COLOR.get());
@@ -1072,7 +1097,7 @@ public final class SourceView extends JComponent {
         }
 
         private void applyHighlights(int line)
-                throws BadLocationException, IOException {
+                throws BadLocationException {
             SortedSet<Highlight> set = highlights.get(line);
 
             if (set != null && !set.isEmpty()) {
@@ -1101,7 +1126,7 @@ public final class SourceView extends JComponent {
          * Paints the highlights for symbolically executed lines. The most recently executed line is
          * highlighted with a different color.
          *
-         * @throws IOException
+         * @throws IOException if a file can not be read
          */
         private void calculateSymbExHighlights() throws IOException {
             for (Highlight hl : symbExHighlights) {
@@ -1111,20 +1136,26 @@ public final class SourceView extends JComponent {
             symbExHighlights.clear();
 
             try {
+                int mostRecentLine = -1;
+
                 for (int i = 0; i < lines.size(); i++) {
                     Pair<Node, PositionInfo> l = lines.get(i);
+
                     if (absoluteFileName.equals(l.second.getFileName())) {
+                        int line = l.second.getStartPosition().getLine();
+
                         // use a different color for most recent
                         if (i == 0) {
+                            mostRecentLine = line;
                             symbExHighlights.add(addHighlight(
                                     absoluteFileName,
-                                    l.second.getStartPosition().getLine() - 1,
+                                    line,
                                     MOST_RECENT_HIGHLIGHT_COLOR.get(),
                                     0));
-                        } else {
+                        } else if (line != mostRecentLine) {
                             symbExHighlights.add(addHighlight(
                                     absoluteFileName,
-                                    l.second.getStartPosition().getLine() - 1,
+                                    line,
                                     NORMAL_HIGHLIGHT_COLOR.get(),
                                     0));
                         }
@@ -1141,17 +1172,14 @@ public final class SourceView extends JComponent {
 
         /**
          * Paints the highlight for the line where the mouse pointer currently points to.
-         * @param textPane the textPane to highlight lines
          * @param p the current position of the mouse pointer
          * @param highlight the highlight to change
-         *
-         * @throws IOException
          */
         private void paintSelectionHighlight(Point p, Highlight highlight) {
             try {
                 int line = posToLine(textPane.viewToModel(p));
                 changeHighlight(highlight, line);
-            } catch (BadLocationException | IOException e) {
+            } catch (BadLocationException e) {
                 Debug.out(e);
             }
         }
@@ -1350,7 +1378,7 @@ public final class SourceView extends JComponent {
          */
         final String filename;
 
-        public TextPaneMouseAdapter(JTextPane textPane, LineInformation[] li,
+        private TextPaneMouseAdapter(JTextPane textPane, LineInformation[] li,
                 String filename) {
             this.textPane = textPane;
             this.li = li;
@@ -1372,6 +1400,7 @@ public final class SourceView extends JComponent {
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -1396,6 +1425,7 @@ public final class SourceView extends JComponent {
                         break;
                     }
                 }
+
                 if (n != null) {
                     mainWindow.getMediator().getSelectionModel().setSelectedNode(n);
                 }

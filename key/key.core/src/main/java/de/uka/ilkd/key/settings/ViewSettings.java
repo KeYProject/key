@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.settings;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -22,6 +23,9 @@ import java.util.Set;
  * is allowed to have. If this number is exceeded no SchemaVariables get
  * instantiated in the displayed tooltip.
  * 3) whether intermediate proofsteps should be hidden in the proof tree view
+ *
+ * @author unknown
+ * @author weigl
  */
 public class ViewSettings extends AbstractPropertiesSettings {
 
@@ -138,6 +142,11 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private static final String HEATMAP_MAXAGE = "[View][Heatmap]maxAge";
     private static final String HIDE_INTERACTIVE_GOALS = "[View]hideInteractiveGoals";
 
+    /**
+     * A list of bookmark of favourite folders of the user. Can be manipulated with
+     * {@link de.uka.ilkd.key.gui.KeYFileChooserBookmarkPanel}.
+     */
+    private static final String USER_FOLDER_BOOKMARKS = "[View]folderBookmarks";
 
     /**
      * Show Taclet uninstantiated in tooltip -- for learning
@@ -184,7 +193,17 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private PropertyEntry<Set<String>> clutterRuleSets =
             createStringSetProperty(CLUTTER_RULESSETS, CLUTTER_RULESETS_DEFAULT);
+
     private PropertyEntry<Boolean> hideInteractiveGoals = createBooleanProperty(HIDE_INTERACTIVE_GOALS, false);
+
+    /**
+     * User-definable folder bookmarks.
+     *
+     * @see #getFolderBookmarks()
+     * @see #setFolderBookmarks(List)
+     */
+    private PropertyEntry<List<String>> folderBookmarks
+            = createStringListProperty(USER_FOLDER_BOOKMARKS, System.getProperty("user.home"));
 
     /**
      * Clutter rules are rules with less priority in the taclet menu
@@ -480,6 +499,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
         this.uiFontSizeFactor.set(factor);
     }
 
+
     public boolean getHideInteractiveGoals() {
         return hideInteractiveGoals.get();
     }
@@ -488,4 +508,17 @@ public class ViewSettings extends AbstractPropertiesSettings {
         hideInteractiveGoals.set(active);
     }
 
+    /**
+     * @see #folderBookmarks
+     */
+    public List<String> getFolderBookmarks() {
+        return folderBookmarks.get();
+    }
+
+    /**
+     * @see #folderBookmarks
+     */
+    public void setFolderBookmarks(List<String> bm) {
+        folderBookmarks.set(bm);
+    }
 }

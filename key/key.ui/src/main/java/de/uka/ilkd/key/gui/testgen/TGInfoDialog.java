@@ -18,9 +18,9 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.smt.testgen.TestGenerationLog;
 
-@SuppressWarnings("serial")
 public class TGInfoDialog extends JDialog implements TestGenerationLog {
-	private final JTextArea textArea;
+    private static final long serialVersionUID = -7297570900812140309L;
+    private final JTextArea textArea;
 	private final JButton stopButton;
 	private final JButton exitButton;
 	private final JButton startButton;
@@ -42,7 +42,9 @@ public class TGInfoDialog extends JDialog implements TestGenerationLog {
 		
 		
 		stopButton = new JButton(new AbstractAction("Stop") {
-			@Override
+            private static final long serialVersionUID = 2374810292274685770L;
+
+            @Override
 			public void actionPerformed(ActionEvent e) {
 				// This method delegates the request only to the UserInterfaceControl which implements the functionality.
             // No functionality is allowed in this method body!
@@ -51,13 +53,17 @@ public class TGInfoDialog extends JDialog implements TestGenerationLog {
 			}
 		});
 		exitButton = new JButton(new AbstractAction("Exit") {
-			@Override
+            private static final long serialVersionUID = 2972672986682347454L;
+
+            @Override
 			public void actionPerformed(ActionEvent e) {
 				TGInfoDialog.this.dispose();
 			}
 		});
 		startButton = new JButton(new AbstractAction("Start") {
-			@Override
+            private static final long serialVersionUID = -2844335064450426763L;
+
+            @Override
 			public void actionPerformed(ActionEvent e) {
 				KeYMediator mediator = MainWindow.getInstance().getMediator();
 				mediator.stopInterface(true);

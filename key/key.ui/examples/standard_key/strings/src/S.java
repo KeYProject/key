@@ -1,4 +1,4 @@
-public class S {
+public final class S {
 
     public final static String ONE = "ONE";
     public final static String TWO = "TWO";

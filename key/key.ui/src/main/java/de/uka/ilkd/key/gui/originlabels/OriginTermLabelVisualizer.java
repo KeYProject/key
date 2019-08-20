@@ -81,6 +81,8 @@ import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
  */
 public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
+    private static final long serialVersionUID = -9190616436091589798L;
+
     /**
      * The background color to use to highlight a sub-term.
      */

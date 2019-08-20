@@ -29,7 +29,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
  * Every extension should implement this interface and should be registered in a service loader file
  * <code>META-INF/services/KeYGuiExtension</code>.
  * <p>
- * This interface comes works in combination with the annotation {@see KeYGuiExtension#Info}
+ * This interface comes in combination with the annotation {@see KeYGuiExtension#Info}
  * <p>
  * Your extension should then implement the extension service interfaces.
  * </p>

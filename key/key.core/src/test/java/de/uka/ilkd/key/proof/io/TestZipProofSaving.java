@@ -45,8 +45,12 @@ public class TestZipProofSaving extends TestCase {
                 read = is.read(buffer);
             }
         } finally {
-            is.close();
-            os.close();
+            if (is != null) {
+                is.close();
+            }
+            if (os != null) {
+                os.close();
+            }
         }
     }
 

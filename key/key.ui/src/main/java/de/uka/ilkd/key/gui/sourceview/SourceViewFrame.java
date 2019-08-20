@@ -19,6 +19,8 @@ import de.uka.ilkd.key.gui.utilities.ClosableTabComponent;
  */
 public class SourceViewFrame extends JSplitPane {
 
+    private static final long serialVersionUID = 382427737154314400L;
+
     /** The source view contained in this frame. */
     private final SourceView sourceView;
 
@@ -74,6 +76,8 @@ public class SourceViewFrame extends JSplitPane {
      */
     public void addComponent(JComponent component) {
         addComponent(component, null, new AbstractAction() {
+
+            private static final long serialVersionUID = -3905660332423077705L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
