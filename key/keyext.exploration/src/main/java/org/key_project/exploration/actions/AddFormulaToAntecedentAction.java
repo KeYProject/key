@@ -3,6 +3,7 @@ package org.key_project.exploration.actions;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Term;
 import org.key_project.exploration.ExplorationModeModel;
+import org.key_project.exploration.ProofExplorationService;
 
 import java.awt.event.ActionEvent;
 
@@ -11,8 +12,7 @@ import java.awt.event.ActionEvent;
  * @author Sarah Grebing
  * @version 1 (24.05.18)
  */
-public class AddFormulaToAntecedentAction extends AddFormulaToSequentAction {
-
+public class AddFormulaToAntecedentAction extends ExplorationAction {
     public AddFormulaToAntecedentAction() {
         this(MainWindow.getInstance());
     }
@@ -26,14 +26,8 @@ public class AddFormulaToAntecedentAction extends AddFormulaToSequentAction {
     public void actionPerformed(ActionEvent e) {
         Term t = promptForTerm(mainWindow, null);
         if (t == null) return;
-        ExplorationModeModel model = getMediator().lookup(ExplorationModeModel.class);
-        super.soundAddition(t, true);
-
-/*        if (model.getExplorationTacletAppState()
-                == (ExplorationModeModel.ExplorationState.SIMPLIFIED_APP)) {
-            super.soundAddition(t, true, false);
-        } else {
-            super.soundAddition(t, true, true);
-        }*/
+        ProofExplorationService service = ProofExplorationService.get(getMediator());
+        var toBeSelected = service.soundAddition(getMediator().getSelectedGoal(), t, true);
+        getMediator().getSelectionModel().setSelectedNode(toBeSelected);
     }
 }

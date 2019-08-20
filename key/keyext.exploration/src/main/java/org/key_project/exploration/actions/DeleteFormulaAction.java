@@ -1,17 +1,11 @@
 package org.key_project.exploration.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.TacletApp;
-import org.key_project.exploration.ExplorationNodeData;
-import org.key_project.util.collection.ImmutableList;
+import org.key_project.exploration.ProofExplorationService;
 
 import java.awt.event.ActionEvent;
 
@@ -31,7 +25,7 @@ public class DeleteFormulaAction extends ExplorationAction {
         setName("Delete formula");
         this.posInSeq = pis;
         //only enable if position is in sequent and a toplevel formula
-        if(pis.getPosInOccurrence() != null) {
+        if (pis.getPosInOccurrence() != null) {
             setEnabled(!pis.isSequent() & pis.getPosInOccurrence().isTopLevel());
         } else {
             setEnabled(false);
@@ -41,45 +35,15 @@ public class DeleteFormulaAction extends ExplorationAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (posInSeq.isSequent() || (posInSeq.getPosInOccurrence() != null && !posInSeq.getPosInOccurrence().isTopLevel())) return;
-
+        if (posInSeq.isSequent()
+                || (posInSeq.getPosInOccurrence() != null && !posInSeq.getPosInOccurrence().isTopLevel()))
+            return;
 
         PosInOccurrence pio = posInSeq.getPosInOccurrence();
+        if (pio == null) return;
         Term term = pio.subTerm();
         Goal g = getMediator().getSelectedGoal();
-       // g.node().getNodeInfo().get(ExplorationNodeData.class).setExploration(true);
-
-
-        TacletApp app;
-        //boolean isSoundMode = getMediator().getExplorationModeModel().getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.WHOLE_APP;
-        app = soundWeakening(pio, term);
-        ExplorationNodeData explorationNodeData = new ExplorationNodeData();
-        explorationNodeData.setExplorationAction("Hide "+term);
-        g.node().register(explorationNodeData, ExplorationNodeData.class);
-
-        ImmutableList<Goal> result = g.apply(app);
-        result.forEach(goal -> {
-            goal.node().register(new ExplorationNodeData(), ExplorationNodeData.class);
-
-            //goal.node().getNodeInfo().setExploration(true);
-            //ExplorationNodeData explorationData = new ExplorationNodeData();
-            //goal.node().getNodeInfo().register(explorationNodeData, ExplorationNodeData.class);
-
-        });
+        ProofExplorationService service = ProofExplorationService.get(getMediator());
+        service.soundHide(g, pio, term);
     }
-
-    private TacletApp soundWeakening(PosInOccurrence pio, Term term) {
-        FindTaclet tap;
-        if(posInSeq.getPosInOccurrence().isInAntec()){
-            tap = (FindTaclet) getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("hide_left"));
-        } else {
-            tap = (FindTaclet) getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("hide_right"));
-        }
-
-        TacletApp weakening = PosTacletApp.createPosTacletApp(tap, tap.getMatcher().matchFind(pio.subTerm(),
-                MatchConditions.EMPTY_MATCHCONDITIONS,
-                null), pio, getMediator().getServices());
-        return weakening;
-    }
-
 }
