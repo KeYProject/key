@@ -2,11 +2,12 @@ package org.key_project.exploration.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.*;
 import org.key_project.exploration.ExplorationNodeData;
+import org.key_project.exploration.ProofExplorationService;
 import org.key_project.util.collection.ImmutableList;
 
 import java.awt.event.ActionEvent;
@@ -52,71 +53,10 @@ public class EditFormulaAction extends ExplorationAction {
             return;
         }
 
-        TacletApp app;
-        //  boolean isSoundMode = getMediator().getExplorationModeModel().getExplorationTacletAppState() == ExplorationModeModel.ExplorationState.SOUND_APPS;
-        //if(isSoundMode){
-
-        app = soundChange(pio, sf.formula(), tb.replace(sf.formula(), pio.posInTerm(), newTerm));
-
-
-        //} else {
-        //   app = changeFormula(pio, newTerm);
-
-        //}
-
-        g.node().register(new ExplorationNodeData(), ExplorationNodeData.class);
-        g.node().lookup(ExplorationNodeData.class).setExplorationAction("Edit " + term + " to " + newTerm);
-
-        ImmutableList<Goal> result = g.apply(app);
-        result.forEach(goal -> {
-            goal.node().register(new ExplorationNodeData(), ExplorationNodeData.class);
-            String s = goal.node().getNodeInfo().getBranchLabel();
-            goal.node().getNodeInfo().setBranchLabel("ExplorationNode: " + s);
-        });
-
-        //apply the weakening
-        //if(isSoundMode){
-        FindTaclet tap;
-
-        boolean inAntec = posInSeq.getPosInOccurrence().isInAntec();
-        if (inAntec) {
-            tap = (FindTaclet) getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("hide_left"));
-        } else {
-            tap = (FindTaclet) getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("hide_right"));
-        }
-
-
-        TacletApp weakening = PosTacletApp.createPosTacletApp(tap, tap.getMatcher().matchFind(pio.subTerm(),
-                MatchConditions.EMPTY_MATCHCONDITIONS,
-                null), pio, getMediator().getServices());
-
-        String posToWeakening = inAntec? "TRUE" : "FALSE";
-
-        result.forEach(goal -> {
-
-            if (goal.node().getNodeInfo().getBranchLabel().contains(posToWeakening)) {
-                goal.apply(weakening);
-                goal.node().parent().register(new ExplorationNodeData(), ExplorationNodeData.class);
-                getMediator().getSelectionModel().setSelectedNode(goal.node());
-
-            } else {
-                goal.setEnabled(false);
-            }
-        });
-    }
-
-    private TacletApp soundChange(PosInOccurrence pio, Term term, Term newTerm) {
-        Taclet cut = getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
-        getMediator().getServices().getTermBuilder().equals(term, newTerm);
-        Semisequent semisequent = new Semisequent(new SequentFormula(newTerm));
-
-        TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
-
-        SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-
-        app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), getMediator().getServices(), true);
-
-        return app;
+        ProofExplorationService api = ProofExplorationService.get(getMediator());
+        Node toBeSelected = api.applyChangeFormula(g, pio, sf.formula(),
+                tb.replace(sf.formula(), pio.posInTerm(), newTerm));
+        getMediator().getSelectionModel().setSelectedNode(toBeSelected);
     }
 
     /*public TacletApp changeFormula(PosInOccurrence pos, Term replaceWith) {

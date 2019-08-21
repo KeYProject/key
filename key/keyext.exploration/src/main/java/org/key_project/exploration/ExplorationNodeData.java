@@ -1,5 +1,8 @@
 package org.key_project.exploration;
 
+import de.uka.ilkd.key.proof.Node;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
 /**
@@ -10,6 +13,15 @@ import java.util.Objects;
 public class ExplorationNodeData {
 
     private  String explorationAction;
+
+    public static @NotNull ExplorationNodeData get(@NotNull Node node) {
+        var data = node.lookup(ExplorationNodeData.class);
+        if(data == null) {
+            data = new ExplorationNodeData();
+            node.register(data, ExplorationNodeData.class);
+        }
+        return data;
+    }
 
     /**
      * Return the String of the Exploration action that was applied to the node
