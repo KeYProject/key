@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.key_project.exploration.ExplorationModeModel;
 import org.key_project.exploration.ExplorationNodeData;
 import org.key_project.exploration.Icons;
 
@@ -131,7 +132,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
         ExplorationNodeData explorationNodeData = n.lookup(ExplorationNodeData.class);
         if (explorationNodeData != null && explorationNodeData.getExplorationAction() != null) {
-            // exporation found
+            // exploration found
             MyTreeNode newNode = new MyTreeNode(n);
             dtm.insertNodeInto(newNode, parent, 0);
             parent = newNode;
@@ -203,32 +204,45 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         pruneExploration.addActionListener(actionEvent -> {
 
             Object selectedValue = explorationStepList.getSelectedValue();
-
             Object lastSelectedPathComponent = tree.getLastSelectedPathComponent();
-
+            Node explorationNode = null;
             if (lastSelectedPathComponent != null) {
                 MyTreeNode selectedNode = (MyTreeNode) tree.getLastSelectedPathComponent();
                 mediator.getUI().getProofControl().pruneTo(selectedNode.getData());
-                createModel(mediator.getSelectedProof());
+                explorationNode = selectedNode.getData();
+                //update tree with current proof
+
             }
             if (selectedValue != null) {
                 Node selected = (Node) selectedValue;
                 mediator.getUI().getProofControl().pruneTo(selected);
-                createModel(mediator.getSelectedProof());
+                if(explorationNode == null) {
+                    explorationNode = selected;
+                }
+
             }
+
+            ExplorationNodeData lookup = explorationNode.lookup(ExplorationNodeData.class);
+            explorationNode.deregister(lookup, ExplorationNodeData.class);
+            //update list and tree with current proof
+
+            createModel(mediator.getSelectedProof());
+
+
+
         });
 
 
-        /*JTextArea explaination = new JTextArea("Visualization of performed exploration actions. \n" +
+        JTextArea explaination = new JTextArea("Visualization of performed exploration actions. \n" +
                 "To jump to a node where the action was applied to select the entry in the list or the tree view.\n" +
                 "To prune exploration actions simply select an action and all action below this action " +
                 "(visible in the tree visualization) are removed.");
-        explaination.setEditable(false);*/
+        explaination.setEditable(false);
 
 
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        //panel.add(explaination, BorderLayout.NORTH);
+        panel.add(explaination, BorderLayout.NORTH);
         JScrollPane p2 = new JScrollPane(explorationStepList);
         panel.add(p2, BorderLayout.CENTER);
 
