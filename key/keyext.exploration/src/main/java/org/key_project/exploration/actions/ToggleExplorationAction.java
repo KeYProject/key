@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
  * @version 1 (22.07.19)
  */
 public class ToggleExplorationAction extends KeyAction {
+    public static final String MENU_PATH = "View.Exploration";
     private final ExplorationModeModel model;
 
     public ToggleExplorationAction(ExplorationModeModel model) {
@@ -20,7 +21,8 @@ public class ToggleExplorationAction extends KeyAction {
         setTooltip("Choose to start ExplorationMode");
         setIcon(Icons.EXPLORE.get());
         setSelected(model.isExplorationModeSelected());
-
+        setMenuPath(MENU_PATH);
+        putValue(CHECKBOX, true);
         model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE,
                 e -> setSelected(model.isExplorationModeSelected()));
     }
