@@ -1347,10 +1347,7 @@ public class Proof implements Named {
      * @param <T>
      */
     public <T> void register(T obj, Class<T> service) {
-        if(userData==null){
-            userData = new Lookup();
-        }
-        userData.register(obj, service);
+        getUserData().register(obj, service);
     }
 
     /**
@@ -1360,8 +1357,18 @@ public class Proof implements Named {
      * @param <T> arbitray object
      */
     public <T> void deregister(T obj, Class<T> service) {
-        if(userData!=null) {
+        if (userData != null) {
             userData.deregister(obj, service);
         }
+    }
+
+    /**
+     * Get the assocated lookup of user-defined data.
+     *
+     * @return
+     */
+    public @NotNull Lookup getUserData() {
+        if(userData == null) userData = new Lookup();
+        return userData;
     }
 }

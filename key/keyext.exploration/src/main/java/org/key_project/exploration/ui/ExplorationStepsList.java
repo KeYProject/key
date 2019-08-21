@@ -333,19 +333,28 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         }
 
         public void actionPerformed(ActionEvent e) {
-            Object selectedValue = listExplorations.getSelectedValue();
+            Node selectedValue = listExplorations.getSelectedValue();
             Object lastSelectedPathComponent = treeExploration.getLastSelectedPathComponent();
-
+            Node explorationNode = null;
             if (lastSelectedPathComponent != null) {
-                MyTreeNode selectedNode = (MyTreeNode) treeExploration.getLastSelectedPathComponent();
+                MyTreeNode selectedNode = (MyTreeNode) lastSelectedPathComponent;
                 mediator.getUI().getProofControl().pruneTo(selectedNode.getData());
-                createModel(mediator.getSelectedProof());
+                explorationNode = selectedNode.getData();
+                //update tree with current proof
             }
             if (selectedValue != null) {
-                Node selected = (Node) selectedValue;
-                mediator.getUI().getProofControl().pruneTo(selected);
-                createModel(mediator.getSelectedProof());
+                mediator.getUI().getProofControl().pruneTo(selectedValue);
+                if(explorationNode == null) {
+                    explorationNode = selectedValue;
+                }
             }
+
+            if(explorationNode!=null) {
+                ExplorationNodeData lookup = explorationNode.lookup(ExplorationNodeData.class);
+                explorationNode.deregister(lookup, ExplorationNodeData.class);
+                //update list and tree with current proof
+            }
+            createModel(mediator.getSelectedProof());
         }
     }
 
