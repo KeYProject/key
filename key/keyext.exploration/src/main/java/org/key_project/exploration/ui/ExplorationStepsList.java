@@ -192,7 +192,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
     private JPanel createBottomPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 2));
-        buttonPanel.add(new JButton(actionJumpToNode));
+       // buttonPanel.add(new JButton(actionJumpToNode));
         buttonPanel.add(new JButton(actionPruneExploration));
         return buttonPanel;
     }
