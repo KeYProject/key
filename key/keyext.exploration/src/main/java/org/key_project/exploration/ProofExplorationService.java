@@ -4,6 +4,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -166,7 +167,7 @@ public class ProofExplorationService {
 
         //taint goal with exploration
         var data = ExplorationNodeData.get(g.node());
-        data.setExplorationAction("Edit " + term + " to " + newTerm);
+        data.setExplorationAction("Edit " + LogicPrinter.quickPrintTerm(term, services) + " to " + LogicPrinter.quickPrintTerm(newTerm, services));
 
         //apply cut
         ImmutableList<Goal> result = g.apply(app);
