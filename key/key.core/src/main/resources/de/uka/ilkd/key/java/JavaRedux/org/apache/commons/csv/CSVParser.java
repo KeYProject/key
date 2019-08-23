@@ -8,7 +8,7 @@ public final class CSVParser extends java.lang.Object implements java.lang.Itera
    public java.util.Map getHeaderMap();
 
    /*@ public normal_behavior
-     @ assignable \nothing;
+     @ assignable \strictly_nothing;
      @*/
    public long getCurrentLineNumber();
 }

@@ -46,7 +46,16 @@ public interface Collection extends java.lang.Iterable
    public boolean /*@pure@*/ contains(String arg0);
    public boolean containsAll(java.util.Collection arg0);
    
-   public java.util.Iterator iterator();
+   /*@ public normal_behavior
+     @ ensures \result.index == 0;
+     @ ensures \result.seq == seq;
+     @ determines \result.seq \by seq;
+     @ determines \result.index \by \nothing;
+     @*/
+   public CollectionIterator /*@pure@*/ iterator();
+   
+   public final class CollectionIterator implements Iterator { }
+   
    public java.lang.Object[] toArray();
    public java.lang.Object[] toArray(java.lang.Object[] arg0);
 }

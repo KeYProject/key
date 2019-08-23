@@ -16,6 +16,8 @@ public final class System {
 	public static void arraycopy(java.lang.Object src, int srcPos, java.lang.Object dest, int destPos, int length);
 	
 	/*@ public behavior
+	  @ ensures false;
+	  @ signals_only \nothing;
       @ diverges true;
       @*/
 	public static void exit(int code);
