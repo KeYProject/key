@@ -791,11 +791,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
         private Icon keyHole20x20 = IconFactory.keyHole(iconHeight, iconHeight);
 
         public ProofRenderer() {
+            stylers.add(this::checkNotes);
             stylers.add(this::closedGoal);
             stylers.add(this::oneStepSimplification);
-            stylers.add(this::renderLeaf);
             stylers.add(this::renderNonLeaf);
-            stylers.add(this::checkNotes);
+            stylers.add(this::renderLeaf);
 
         }
 
@@ -849,7 +849,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 Node leaf = node.getNode();
                 Goal goal = proof.getGoal(leaf);
                 if (goal == null || leaf.isClosed()) {
-                    style.setForeground(DARK_GREEN_COLOR.get());
+                    style.setForeground(DARK_GREEN_COLOR.get(), true);
                     style.setIcon(IconFactory.keyHoleClosed(iconHeight));
                     ProofTreeView.this.setToolTipText("Closed Goal");
                     style.setTooltip("A closed goal");
@@ -864,7 +864,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                     ProofTreeView.this.setToolTipText("Disabled Goal");
                     style.setTooltip("Interactive goal - no automatic rule application");
                 } else {
-                    style.setForeground(DARK_RED_COLOR.get());
+                    style.setForeground(DARK_RED_COLOR.get(), true);
                     style.setIcon(keyHole20x20);
                     ProofTreeView.this.setToolTipText("Open Goal");
                     style.setTooltip("An open goal");
