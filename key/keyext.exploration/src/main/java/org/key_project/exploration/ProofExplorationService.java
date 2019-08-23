@@ -205,10 +205,8 @@ public class ProofExplorationService {
      * @param newTerm
      * @return
      */
-    public TacletApp soundChange(@NotNull PosInOccurrence pio, @NotNull Term term, @NotNull Term newTerm) {
+    private TacletApp soundChange(@NotNull PosInOccurrence pio, @NotNull Term term, @NotNull Term newTerm) {
         Taclet cut = getCutTaclet();
-        //weigl: hä?
-        //services.getTermBuilder().equals(term, newTerm);
         Semisequent semisequent = new Semisequent(new SequentFormula(newTerm));
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
