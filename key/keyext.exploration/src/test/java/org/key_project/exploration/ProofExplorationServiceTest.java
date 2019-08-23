@@ -84,22 +84,73 @@ public class ProofExplorationServiceTest {
             justification = first;
         }
 
-        testAddition(withAddedTerm, justification, p);
+        testAddition(withAddedTerm, justification, p, true);
         Assert.assertFalse(checkNodeForExplorationDataAndAction(withAddedTerm.node()));
         Assert.assertFalse(checkNodeForExplorationDataAndAction(justification.node()));
 
     }
 
-    private void testAddition(Goal withAddedTerm, Goal justification, Term added){
-        Semisequent antecedent = withAddedTerm.sequent().antecedent();
-        Assert.assertTrue(antecedent.size() == 1);
-        Assert.assertTrue(withAddedTerm.sequent().succedent().size() == 1);
-        Assert.assertEquals("Added Term is indeed added", antecedent.get(0).formula(), added);
+    /**
+     * Test tests that the added term is added correctly and that meta data was added as well
+     * @throws IOException
+     * @throws RecognitionException
+     */
+    @org.junit.Test
+    public void testAdditionSucc() throws IOException, RecognitionException {
+        Term added = parseTerm("q");
+        expService.soundAddition(currentProof.getGoal(currentProof.root()), added, false);
+        ImmutableList<Goal> goals = currentProof.openGoals();
+
+        Assert.assertTrue("Two new goals created", goals.size() ==2);
+
+        Goal first = goals.head();
+        Goal second = goals.tail().head();
+
+        ExplorationNodeData lookup = first.node().lookup(ExplorationNodeData.class);
+        Assert.assertNotNull("First goal is marked as exploration node", lookup);
+
+        ExplorationNodeData lookup2 = second.node().lookup(ExplorationNodeData.class);
+        Assert.assertNotNull("Second goal is marked as exploration node", lookup2);
+
+        Goal withAddedTerm = null;
+        Goal justification = null;
+
+        if(!first.node().sequent().antecedent().isEmpty()){
+            withAddedTerm = second;
+            justification = first;
+
+        } else {
+            withAddedTerm = first;
+            justification = second;
+        }
+
+        testAddition(withAddedTerm, justification, added, false);
+        Assert.assertFalse(checkNodeForExplorationDataAndAction(withAddedTerm.node()));
+        Assert.assertFalse(checkNodeForExplorationDataAndAction(justification.node()));
+
+    }
+
+    private void testAddition(Goal withAddedTerm, Goal justification, Term added, boolean antec){
+        Semisequent semiSeqAdded =  antec? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
+        Semisequent parentSemiSeqOfAdded = antec? withAddedTerm.node().parent().sequent().antecedent(): withAddedTerm.node().parent().sequent().succedent();
+
+        Semisequent semiSeqUntouched =  !antec? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
+        Semisequent parentSemiSeqOfUntouched = !antec? withAddedTerm.node().parent().sequent().antecedent(): withAddedTerm.node().parent().sequent().succedent();
+
+
+        Assert.assertTrue("The size of the added semisequent has changed", semiSeqAdded.size() == parentSemiSeqOfAdded.size() + 1);
+        Assert.assertEquals("Added Term is indeed added", semiSeqAdded.get(0).formula(), added);
         Assert.assertFalse("Justification branch is marked as interactive", justification.isAutomatic());
+
+        Assert.assertTrue("The size if untouched semiseuqents is the same", semiSeqUntouched.size() == parentSemiSeqOfUntouched.size());
+        Assert.assertEquals("The  untouched semiseuqents are equal", semiSeqUntouched, parentSemiSeqOfUntouched);
+
         Node parent = withAddedTerm.node().parent();
         Assert.assertEquals("Both nodes have the same parent", parent, justification.node().parent());
         Assert.assertEquals("The addition was inserted using the cut rule", new Name("cut"), parent.getAppliedRuleApp().rule().name());
         Assert.assertTrue("Parent is marked as ExplorationNode and data contains Exploration Action", checkNodeForExplorationDataAndAction(parent));
+
+
     }
 
     private boolean checkNodeForExplorationDataAndAction(Node parent) {
