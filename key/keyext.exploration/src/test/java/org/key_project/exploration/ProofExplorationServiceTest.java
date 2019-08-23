@@ -2,17 +2,20 @@ package org.key_project.exploration;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import org.antlr.runtime.RecognitionException;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
+import org.key_project.util.collection.ImmutableList;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +41,7 @@ public class ProofExplorationServiceTest {
         expService = new ProofExplorationService(currentProof, env.getServices());
     }
 
+    //p -> q -> !q -> !p
     @After
     public void tearDown(){
         env = null;
@@ -46,14 +50,74 @@ public class ProofExplorationServiceTest {
         currentProof = null;
     }
 
+    /**
+     * Test tests that the added term is added correctly and that meta data was added as well
+     * @throws IOException
+     * @throws RecognitionException
+     */
     @org.junit.Test
-    public void testAddition() {
+    public void testAdditionAntec() throws IOException, RecognitionException {
+        Term p = parseTerm("p");
+        expService.soundAddition(currentProof.getGoal(currentProof.root()), p, true);
+        ImmutableList<Goal> goals = currentProof.openGoals();
 
+        Assert.assertTrue("Two new goals created", goals.size() ==2);
 
+        Goal first = goals.head();
+        Goal second = goals.tail().head();
 
-//        expService.soundAddition(currentProof.getGoal(currentProof.root()))
+        ExplorationNodeData lookup = first.node().lookup(ExplorationNodeData.class);
+        Assert.assertNotNull("First goal is marked as exploration node", lookup);
+
+        ExplorationNodeData lookup2 = second.node().lookup(ExplorationNodeData.class);
+        Assert.assertNotNull("Second goal is marked as exploration node", lookup2);
+
+        Goal withAddedTerm = null;
+        Goal justification = null;
+
+        if(!first.node().sequent().antecedent().isEmpty()){
+           withAddedTerm = first;
+           justification = second;
+
+        } else {
+            withAddedTerm = second;
+            justification = first;
+        }
+
+        testAddition(withAddedTerm, justification, p);
+        Assert.assertFalse(checkNodeForExplorationDataAndAction(withAddedTerm.node()));
+        Assert.assertFalse(checkNodeForExplorationDataAndAction(justification.node()));
+
     }
 
+    private void testAddition(Goal withAddedTerm, Goal justification, Term added){
+        Semisequent antecedent = withAddedTerm.sequent().antecedent();
+        Assert.assertTrue(antecedent.size() == 1);
+        Assert.assertTrue(withAddedTerm.sequent().succedent().size() == 1);
+        Assert.assertEquals("Added Term is indeed added", antecedent.get(0).formula(), added);
+        Assert.assertFalse("Justification branch is marked as interactive", justification.isAutomatic());
+        Node parent = withAddedTerm.node().parent();
+        Assert.assertEquals("Both nodes have the same parent", parent, justification.node().parent());
+        Assert.assertEquals("The addition was inserted using the cut rule", new Name("cut"), parent.getAppliedRuleApp().rule().name());
+        Assert.assertTrue("Parent is marked as ExplorationNode and data contains Exploration Action", checkNodeForExplorationDataAndAction(parent));
+    }
+
+    private boolean checkNodeForExplorationDataAndAction(Node parent) {
+        boolean foundExploration = false;
+        boolean foundExplorationAction = false;
+
+        ExplorationNodeData lookup = parent.lookup(ExplorationNodeData.class);
+        if(lookup != null){
+            foundExploration = true;
+            String explorationAction = lookup.getExplorationAction();
+            if (explorationAction != null){
+                foundExplorationAction = true;
+            }
+        }
+
+        return foundExploration & foundExplorationAction;
+
+    }
 
     private Term parseTerm(String term)  throws IOException, RecognitionException{
         StringReader br = null;
