@@ -36,6 +36,7 @@ public class ExplorationExtension implements KeYGuiExtension,
         KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Startup,
         KeYGuiExtension.Toolbar,
+        KeYGuiExtension.MainMenu,
         KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine {
     private final ExplorationModeModel model = new ExplorationModeModel();
 
@@ -111,6 +112,13 @@ public class ExplorationExtension implements KeYGuiExtension,
     public List<JComponent> getStatusLineComponents() {
         if (leftPanel == null) leftPanel = new ExplorationStepsList(MainWindow.getInstance());
         return Collections.singletonList(leftPanel.getHasExplorationSteps());
+    }
+
+    @Override
+    public @NotNull List<Action> getMainMenuActions(@NotNull MainWindow mainWindow) {
+        return Arrays.asList(
+                new ToggleExplorationAction(model),
+                new ShowSecondBranchAction(model));
     }
 }
 

@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -760,7 +761,7 @@ public class Node implements Iterable<Node> {
      */
     public <T> @Nullable T lookup(Class<T> service) {
         try {
-            if(userData==null){
+            if (userData == null) {
                 return null;
             }
             return userData.get(service);
@@ -777,10 +778,7 @@ public class Node implements Iterable<Node> {
      * @param <T>
      */
     public <T> void register(T obj, Class<T> service) {
-        if(userData==null){
-            userData = new Lookup();
-        }
-        userData.register(obj, service);
+        getUserData().register(obj, service);
     }
 
     /**
@@ -790,8 +788,18 @@ public class Node implements Iterable<Node> {
      * @param <T> arbitray object
      */
     public <T> void deregister(T obj, Class<T> service) {
-        if(userData!=null) {
+        if (userData != null) {
             userData.deregister(obj, service);
         }
+    }
+
+    /**
+     * Get the assocated lookup of user-defined data.
+     *
+     * @return
+     */
+    public @NotNull Lookup getUserData() {
+        if(userData == null) userData = new Lookup();
+        return userData;
     }
 }

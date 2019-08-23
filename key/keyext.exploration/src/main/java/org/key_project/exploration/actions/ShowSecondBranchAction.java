@@ -19,6 +19,8 @@ public class ShowSecondBranchAction extends KeyAction {
         this.model = model;
         setTooltip("Exploration actions are \noften done using a cut. Choose to hide\n " +
                 "the second cut-branches from the view \nto focus on the actions. Uncheck to focus on these branches.");
+        setMenuPath(ToggleExplorationAction.MENU_PATH);
+        putValue(CHECKBOX, true);
 
         model.addPropertyChangeListener(ExplorationModeModel.PROP_SHOW_SECOND_BRANCH,
                 e -> updateEnable());

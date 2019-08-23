@@ -19,6 +19,7 @@ import java.util.EventObject;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
@@ -634,10 +635,7 @@ public class KeYMediator {
      * @param <T>
      */
     public <T> void register(T obj, Class<T> service) {
-        if(userData==null){
-            userData = new Lookup();
-        }
-        userData.register(obj, service);
+        getUserData().register(obj, service);
     }
 
     /**
@@ -647,9 +645,19 @@ public class KeYMediator {
      * @param <T> arbitray object
      */
     public <T> void deregister(T obj, Class<T> service) {
-        if(userData!=null) {
+        if (userData != null) {
             userData.deregister(obj, service);
         }
+    }
+
+    /**
+     * Get the assocated lookup of user-defined data.
+     *
+     * @return
+     */
+    public @NotNull Lookup getUserData() {
+        if(userData == null) userData = new Lookup();
+        return userData;
     }
 
 
