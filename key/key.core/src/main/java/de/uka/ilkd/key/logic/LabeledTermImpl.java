@@ -136,7 +136,7 @@ class LabeledTermImpl extends TermImpl {
         StringBuilder result = new StringBuilder(super.toString());
 
         String labelsStr = labels.stream()
-                //.filter(TermLabel::isProofRelevant)
+                .filter(TermLabel::isProofRelevant)
                 .map(TermLabel::toString)
                 .collect(Collectors.joining(", "));
 
