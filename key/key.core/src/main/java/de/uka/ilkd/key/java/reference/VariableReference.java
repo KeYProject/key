@@ -30,17 +30,17 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 
 public class VariableReference extends JavaNonTerminalProgramElement
-                               implements  NameReference, Expression, 
+                               implements  NameReference, Expression,
                                ReferencePrefix {
 
     protected final ProgramVariable variable;
-    
+
     protected VariableReference() {
         variable = null;
     }
 
     public VariableReference(ExtList children) {
-	super(children);	
+	super(children);
 	variable=children.get(ProgramVariable.class);
     }
 
@@ -55,6 +55,10 @@ public class VariableReference extends JavaNonTerminalProgramElement
 
 
     public ProgramElementName getProgramElementName(){
+        if (variable == null) {
+            System.out.println();
+        }
+
 	return (ProgramElementName) variable.name();
     }
 
@@ -72,7 +76,9 @@ public class VariableReference extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (variable != null) {
-            if (index == 0) return variable;
+            if (index == 0) {
+                return variable;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -81,7 +87,7 @@ public class VariableReference extends JavaNonTerminalProgramElement
 	return (ProgramElementName) variable.name();
     }
 
-    
+
     public final String getName() {
         return (variable == null) ? null : variable.toString();
     }
@@ -99,7 +105,7 @@ public class VariableReference extends JavaNonTerminalProgramElement
 	variable.prettyPrint(p);
     }
 
-    /** 
+    /**
      * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
      * @param v the Visitor
@@ -121,7 +127,7 @@ public class VariableReference extends JavaNonTerminalProgramElement
 	return this;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, 
+    public KeYJavaType getKeYJavaType(Services javaServ,
 				      ExecutionContext ec) {
 	return getKeYJavaType();
     }

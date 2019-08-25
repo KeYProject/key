@@ -33,7 +33,13 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public void getBytes(int arg0, int arg1, byte[] arg2, int arg3);
 // public byte[] getBytes(java.lang.String arg0) throws java.io.UnsupportedEncodingException;
 // public byte[] getBytes(java.nio.charset.Charset arg0);
+   
+   /*@ public normal_behavior
+     @ assignable \nothing;
+     @ determines \result[*] \by this;
+     @*/
    public byte[] getBytes();
+   
    public boolean equals(java.lang.Object arg0);
 // public boolean contentEquals(java.lang.StringBuffer arg0);
 // public boolean contentEquals(java.lang.CharSequence arg0);
@@ -67,8 +73,18 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public java.lang.String[] split(java.lang.String arg0, int arg1);
    public java.lang.String[] split(java.lang.String arg0);
 // public java.lang.String toLowerCase(java.util.Locale arg0);
+   
+   /*@ public normal_behavior
+     @ assignable \nothing;
+     @ determines \result \by this;
+     @*/
    public java.lang.String toLowerCase();
 // public java.lang.String toUpperCase(java.util.Locale arg0);
+   
+   /*@ public normal_behavior
+     @ assignable \nothing;
+     @ determines \result \by this;
+     @*/
    public java.lang.String toUpperCase();
    public java.lang.String trim();
    public java.lang.String toString();
