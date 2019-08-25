@@ -58,7 +58,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
        }
        return super.applyTo(uic, proof, goals, posInOcc, listener);
     }
-    
+
     protected void addInvariantFormula(Goal goal) {
        Sort nullSort = goal.proof().getServices().getTypeConverter().getHeapLDT().getNull().sort();
 
@@ -78,14 +78,14 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                goal.addFormula(sf, true, true);
            }
        }
-    }    
+    }
 
     @Override
     protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
         return new SemanticsBlastingStrategy();
     }
-    
-    private boolean containsSubTypes(Sort s, Set<Sort> sorts){      
+
+    private boolean containsSubTypes(Sort s, Set<Sort> sorts){
         for(Sort st : sorts){
             if( st.extendsTrans(s)){
                 return true;
@@ -115,12 +115,12 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                 continue;
             }
 
-            if(!(kjt.getJavaType() instanceof ClassDeclaration 
-                    || kjt.getJavaType() instanceof InterfaceDeclaration || kjt.getJavaType() instanceof ArrayDeclaration) 
+            if(!(kjt.getJavaType() instanceof ClassDeclaration
+                    || kjt.getJavaType() instanceof InterfaceDeclaration || kjt.getJavaType() instanceof ArrayDeclaration)
                     )  {
                 continue;
             }
-            
+
             //System.err.println("Sort: "+sort);
 
 
@@ -134,7 +134,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
                     try{
 
-                        Term t = ra.getAxiom(h, o, services);
+                        Term t = ra.getAxiom(h, ra.getTarget().isStatic() ? null : o, services);
                         //System.err.println(c.getName());
                         if(t.op().equals(Equality.EQV)){
 
@@ -158,7 +158,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
                                 exactInstanceEquiv = tb.all(h, tb.all(o, exactInstanceEquiv));
                                 instanceImpl = tb.all(h, tb.all(o, instanceImpl));
-                                
+
                                 result.add(new SequentFormula(exactInstanceEquiv));
 
                                 if(!right.equals(tb.tt())){
@@ -183,16 +183,16 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                             }
                             else{
                                 Term f = t;
-                                f = tb.all(h, tb.all(o, f));                            
+                                f = tb.all(h, tb.all(o, f));
                                 result.add(new SequentFormula(f));
                             }
                         }
                         else{
                             Term f = t;
-                            f = tb.all(h, tb.all(o, f));                            
+                            f = tb.all(h, tb.all(o, f));
                             result.add(new SequentFormula(f));
                         }
-                        
+
                     }catch(Exception e){
 
                         //System.err.println(e.getMessage());
@@ -227,7 +227,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
             //          }
             else if(getSemanticsRuleFilter().filter(app.rule())){
                 return NumberRuleAppCost.create(1);
-            }           
+            }
             else if(getEqualityRuleFilter().filter(app.rule())){
                 return NumberRuleAppCost.create(10);
             }
@@ -263,9 +263,9 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
             //System.out.println(rule.name());
 
-            return name.equals("pullOut") 
+            return name.equals("pullOut")
                     //||name.startsWith("applyEq")
-                    || getSemanticsRuleFilter().filter(rule) 
+                    || getSemanticsRuleFilter().filter(rule)
                     || getEqualityRuleFilter().filter(rule);
 
         }
