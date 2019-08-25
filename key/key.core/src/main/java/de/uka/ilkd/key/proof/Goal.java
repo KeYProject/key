@@ -13,35 +13,16 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
@@ -50,6 +31,13 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A proof is represented as a tree of nodes containing sequents. The initial
@@ -187,9 +175,8 @@ public final class Goal {
      * goal
      */
     public Strategy getGoalStrategy() {
-        if (goalStrategy == null) {
+        if (goalStrategy == null)
             goalStrategy = proof().getActiveStrategy();
-        }
         return goalStrategy;
     }
 
@@ -697,10 +684,9 @@ public final class Goal {
             } else {
                 proof.replace(this, goalList);
                 if (ruleApp instanceof TacletApp &&
-                        ((TacletApp) ruleApp).taclet().closeGoal()) {
+                        ((TacletApp) ruleApp).taclet().closeGoal())
                     // the first new goal is the one to be closed
                     proof.closeGoal(goalList.head());
-                }
             }
         }
 
@@ -744,11 +730,10 @@ public final class Goal {
     }
 
     public String toString() {
-        SequentViewLogicPrinter lp = (new SequentViewLogicPrinter
+        de.uka.ilkd.key.pp.LogicPrinter lp = (new de.uka.ilkd.key.pp.LogicPrinter
                 (new de.uka.ilkd.key.pp.ProgramPrinter(null),
                         new NotationInfo(),
-                        proof().getServices(),
-                        new TermLabelVisibilityManager()));
+                        proof().getServices()));
         lp.printSequent(node.sequent());
         return lp.toString();
     }
