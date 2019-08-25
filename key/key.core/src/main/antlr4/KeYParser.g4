@@ -76,20 +76,14 @@ sort_decls
 ;
 
 one_sort_decl
- :
-        (
-         GENERIC  sortIds = simple_ident_comma_list
-            ( ONEOF sortOneOf = oneof_sorts )?
-            ( EXTENDS sortExt = extends_sorts )?
-        | PROXY  sortIds = simple_ident_comma_list
-            ( EXTENDS sortExt = extends_sorts )?
-        | (ABSTRACT )?
-          firstSort = simple_ident_dots
-          (
-              (EXTENDS sortExt = extends_sorts )
-            | ((COMMA) sortIds = simple_ident_comma_list  )
-          )?
-        ) SEMI
+:
+      GENERIC  sortIds=simple_ident_comma_list
+        (ONEOF sortOneOf = oneof_sorts)?
+        ( EXTENDS sortExt = extends_sorts )? SEMI                                        #one_sort_decl_generic
+    | PROXY  sortIds = simple_ident_comma_list (EXTENDS sortExt=extends_sorts)? SEMI     #one_sort_decl_proxy
+    | ABSTRACT?
+      firstSort=simple_ident_dots
+      (EXTENDS sortExt=extends_sorts | COMMA sortIds=simple_ident_comma_list)?  SEMI     #one_sort_decl_default
 ;
 
 simple_ident_dots
@@ -100,11 +94,9 @@ simple_ident_dots
  	)*
  ;
 
-extends_sorts:
-    s = any_sortId_check
-    (
-        COMMA s = any_sortId_check
-    ) *
+extends_sorts
+:
+    any_sortId_check (COMMA any_sortId_check)*
 ;
 
 oneof_sorts
@@ -285,23 +277,18 @@ func_decls
 
 // like arg_sorts but admits also the keyword "\formula"
 arg_sorts_or_formula
+:
+    ( LPAREN
+      arg_sorts_or_formula_helper
+      (COMMA arg_sorts_or_formula_helper)*
+      RPAREN
+    )?
+;
 
-    :
-        (
-            LPAREN
-
-            ( s = sortId_check 
-            | FORMULA  )
-
-            (
-                COMMA ( s = sortId_check 
-                      | FORMULA  )
-            ) *
-            RPAREN
-        ) ?
-        
-    ;
-
+arg_sorts_or_formula_helper
+:
+    sortId_check | FORMULA
+;
 
 transform_decl
     :
@@ -352,15 +339,8 @@ where_to_bind
 
     :
         LBRACE
-        (
-            TRUE  | FALSE 
-        )
-        (
-           COMMA
-           (
-               TRUE  | FALSE 
-           )
-        )*
+        b+=(TRUE | FALSE)
+        (COMMA b+=(TRUE | FALSE) )*
         RBRACE
         
    ;
@@ -369,18 +349,14 @@ ruleset_decls
     :
         HEURISTICSDECL
         LBRACE
-        (
-            id = simple_ident SEMI
-           
-        ) *
+        (id = simple_ident SEMI)*
         RBRACE
     ;
 
 sortId
-
-    :
-        s = sortId_check
-    ;
+:
+    s = sortId_check
+;
 
 // Non-generic sorts, array sorts allowed
 sortId_check 
@@ -548,14 +524,14 @@ logicTermReEntry
 :
    a = weak_arith_op_term (op=relation_op a1=weak_arith_op_term)?
 ;
- 
+
 
 
 weak_arith_op_term
 :
    a = strong_arith_op_term (op = weak_arith_op a1=strong_arith_op_term )*
 ;
- 
+
 
 strong_arith_op_term
 :
@@ -584,7 +560,7 @@ static_attribute_suffix
 :
   attributeName = staticAttributeOrQueryReference
 ;
- 
+
 
 attribute_or_query_suffix
 :
@@ -626,12 +602,12 @@ accessterm
     // at most one heap selection suffix
     ( heap_selection_suffix )? // resets globalSelectNestingDepth to zero
 ;
- 
 
-heap_selection_suffix 
+
+heap_selection_suffix
     :
     AT heap=accessterm
-    
+
     ;
 
 accessterm_bracket_suffix
