@@ -3,7 +3,7 @@ package java.lang;
 public class StringBuffer extends java.lang.Object implements java.io.Serializable, java.lang.Appendable
 						    //, CharSequence 
 {
-    public StringBuffer();
+    public StringBuffer() {}
     public StringBuffer(int n);
     public StringBuffer(java.lang.String s);
 

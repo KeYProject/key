@@ -1,36 +1,19 @@
 package java.io;
 
-/**
- * @generated
- */
 public class BufferedInputStream extends java.io.FilterInputStream {
-   /**
-    * @generated
-    */
-   /*@ public behavior
-     @ requires true;
-     @ ensures true;
-     @ assignable \everything;
+
+   /*@ public normal_behavior
+     @ assignable \nothing;
      @*/
    public BufferedInputStream(java.io.InputStream param0);
 
-   /**
-    * @generated
-    */
-   /*@ public behavior
-     @ requires true;
-     @ ensures true;
-     @ assignable \everything;
+   /*@ public normal_behavior
+     @ assignable \nothing;
      @*/
    public int read() throws java.io.IOException;
 
-   /**
-    * @generated
-    */
-   /*@ public behavior
-     @ requires true;
-     @ ensures true;
-     @ assignable \everything;
+   /*@ public normal_behavior
+     @ assignable \nothing;
      @*/
    public void close() throws java.io.IOException;
 }

@@ -15,6 +15,12 @@ public interface List extends java.util.Collection
    
    public boolean addAll(int arg0, java.util.Collection arg1);
    
+   /*@ public normal_behavior
+     @ requires 0 <= arg0 && arg0 < seq.length;
+     @ ensures ((Object)seq[arg0]) == \result;
+     @ assignable \nothing;
+     @ determines \result \by seq, arg0;
+     @*/
    public java.lang.Object get(int arg0);
    public java.lang.Object set(int arg0, java.lang.Object arg1);
    

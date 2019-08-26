@@ -2,31 +2,27 @@ package java.util;
 
 public final class Arrays {
 
-	/*@ public behavior
-	  @ requires true;
-	  @ ensures true;
-      @ assignable \everything;
+	/*@ public normal_behavior
+	  @ ensures \invariant_for(\result);
+      @ assignable \nothing;
       @*/
-	public static java.util.List asList(int[] arr);
+	public static java.util.ArrayList asList(int[] arr);
 
-	/*@ public behavior
-	  @ requires true;
-	  @ ensures true;
-      @ assignable \everything;
+	/*@ public normal_behavior
+      @ ensures \invariant_for(\result);
+      @ assignable \nothing;
       @*/
-	public static java.util.List asList(char[] arr);
+	public static java.util.ArrayList asList(char[] arr);
 	
-	/*@ public behavior
-	  @ requires true;
-	  @ ensures true;
-      @ assignable \everything;
+	/*@ public normal_behavior
+      @ ensures \invariant_for(\result);
+      @ assignable \nothing;
       @*/
-	public static java.util.List asList(java.lang.String str);
+	public static java.util.ArrayList asList(java.lang.String str);
 
-	/*@ public behavior
-	  @ requires true;
-	  @ ensures true;
-      @ assignable \everything;
+	/*@ public normal_behavior
+      @ ensures \invariant_for(\result);
+      @ assignable \nothing;
       @*/
-	public static java.util.List asList(java.lang.String[] arr);
+	public static java.util.ArrayList asList(java.lang.String[] arr);
 }
