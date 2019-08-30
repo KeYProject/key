@@ -249,6 +249,18 @@ public final class SourceView extends JComponent {
     }
 
     /**
+     * Returns the singleton instance of the SourceView.
+     * @param mainWindow KeY's main window
+     * @return the component responsible for showing source code and symbolic execution information
+     */
+    public static SourceView getSourceView(MainWindow mainWindow) {
+        if (instance == null) {
+            instance = new SourceView(mainWindow);
+        }
+        return instance;
+    }
+
+    /**
      * <p> Creates a new highlight. </p>
      *
      * <p> If the are multiple highlights for a given line, they are drawn on top of each other,
@@ -463,38 +475,6 @@ public final class SourceView extends JComponent {
     }
 
     /**
-     * Calculates the range of actual text (not whitespace) in the line containing the given
-     * position.
-     * @param textPane the JTextPane with the text
-     * @param pos the position to check
-     * @return the range of text (may be empty if there is just whitespace in the line)
-     */
-    private static Range calculateLineRange(JTextPane textPane, int pos) {
-        Document doc = textPane.getDocument();
-        String text = "";
-        try {
-            text = doc.getText(0, doc.getLength());
-        } catch (BadLocationException e) {
-            Debug.out(e);
-        }
-
-        // find line end
-        int end = text.indexOf('\n', pos);
-        end = end == -1 ? text.length() : end;      // last line?
-
-        // find line start
-        int start = text.lastIndexOf('\n', pos - 1);          // TODO: different line endings?
-        start = start == -1 ? 0 : start;            // first line?
-
-        // ignore whitespace at the beginning of the line
-        while (start < text.length() && start < end && Character.isWhitespace(text.charAt(start))) {
-            start++;
-        }
-
-        return new Range(start, end);
-    }
-
-    /**
      * Replaces each tab in the given String by TAB_SIZE spaces.
      * @param s the String to replace
      * @return the resulting String (without tabs)
@@ -607,18 +587,6 @@ public final class SourceView extends JComponent {
         throw new IOException("Could not open file: " + fileName);
     }
 
-    /**
-     * Returns the singleton instance of the SourceView.
-     * @param mainWindow KeY's main window
-     * @return the component responsible for showing source code and symbolic execution information
-     */
-    public static SourceView getSourceView(MainWindow mainWindow) {
-        if (instance == null) {
-            instance = new SourceView(mainWindow);
-        }
-        return instance;
-    }
-
     private void clear() {
         lines = null;
         tabs.clear();
@@ -670,7 +638,7 @@ public final class SourceView extends JComponent {
 
                             // scroll to most recent highlight
                             int line = lines.getFirst().second.getEndPosition().getLine();
-                            scrollNestedTextPaneToLine(tabPane.getComponent(i), line, t);
+                            t.scrollToLine(line);
                         }
                     }
                 }
@@ -681,40 +649,6 @@ public final class SourceView extends JComponent {
         } else {
             tabPane.setBorder(new TitledBorder(NO_SOURCE));
             sourceStatusBar.setText(NO_SOURCE);
-        }
-    }
-
-    /**
-     * Looks for a nested JTextPane in the component of the Tab.
-     * If it exists, JTextPane is scrolled to the given line.
-     * @param comp the component of a JTabbedPane
-     * @param line the line to scroll to
-     * @param t the tab to scroll
-     */
-    private void scrollNestedTextPaneToLine(Component comp, int line, Tab t) {
-        if (comp instanceof JScrollPane) {
-            JScrollPane sp = (JScrollPane)comp;
-            if (sp.getComponent(0) instanceof JViewport) {
-                JViewport vp = (JViewport)sp.getComponent(0);
-                if (vp.getComponent(0) instanceof JPanel) {
-                    JPanel panel = (JPanel)vp.getComponent(0);
-                    if (panel.getComponent(0) instanceof JTextPane) {
-                        JTextPane tp = (JTextPane)panel.getComponent(0);
-                        try {
-                            String source = t.source;
-
-                            /* use input stream here to compute line information of the string with
-                             * replaced tabs */
-                            InputStream inStream = new ByteArrayInputStream(source.getBytes());
-                            LineInformation[] li = IOUtil.computeLineInformation(inStream);
-                            int offs = li[line].getOffset();
-                            tp.setCaretPosition(offs);
-                        } catch (IOException e) {
-                            Debug.out(e);
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -1123,6 +1057,38 @@ public final class SourceView extends JComponent {
         }
 
         /**
+         * Calculates the range of actual text (not whitespace) in the line containing the given
+         * position.
+         * @param textPane the JTextPane with the text
+         * @param pos the position to check
+         * @return the range of text (may be empty if there is just whitespace in the line)
+         */
+        private Range calculateLineRange(JTextPane textPane, int pos) {
+            Document doc = textPane.getDocument();
+            String text = "";
+            try {
+                text = doc.getText(0, doc.getLength());
+            } catch (BadLocationException e) {
+                Debug.out(e);
+            }
+
+            // find line end
+            int end = text.indexOf('\n', pos);
+            end = end == -1 ? text.length() : end;      // last line?
+
+            // find line start
+            int start = text.lastIndexOf('\n', pos - 1);          // TODO: different line endings?
+            start = start == -1 ? 0 : start;            // first line?
+
+            // ignore whitespace at the beginning of the line
+            while (start < text.length() && start < end && Character.isWhitespace(text.charAt(start))) {
+                start++;
+            }
+
+            return new Range(start, end);
+        }
+
+        /**
          * Paints the highlights for symbolically executed lines. The most recently executed line is
          * highlighted with a different color.
          *
@@ -1182,6 +1148,11 @@ public final class SourceView extends JComponent {
             } catch (BadLocationException e) {
                 Debug.out(e);
             }
+        }
+
+        private void scrollToLine(int line) {
+            int offs = lineInformation[line].getOffset();
+            textPane.setCaretPosition(offs);
         }
     }
 
