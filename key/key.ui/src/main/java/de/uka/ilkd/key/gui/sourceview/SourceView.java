@@ -546,7 +546,8 @@ public final class SourceView extends JComponent {
      * @throws IOException if the file cannot be opened.
      */
     private boolean addFile(String fileName) throws IOException {
-        if (tabs.containsKey(fileName)) {
+        // quick fix: fileName could be null (see bug #1520)
+        if (fileName == null || tabs.containsKey(fileName)) {
             return false;
         } else {
             // try to load the file via the FileRepo
