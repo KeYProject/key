@@ -85,24 +85,29 @@ public class PositionInfo {
         this.fileURI = fileURI.normalize();
     }
 
-    public Position getRelativePosition() {
-        return relPos;
-    }
-
-    public Position getStartPosition() {
-        return startPos;
-    }
-
-    public Position getEndPosition() {
-        return endPos;
+    /** this violates immutability, but the method is only called
+     * right after the object is created...
+     * @param parent the parent class of this PositionInfo
+     */
+    void setParentClass(URI parent) {
+        parentClass = (parent == null ? null : parent.normalize());
     }
 
     /**
-     * Returns the resource identifier of the resource this PositionInfo refers to.
-     * @return the URI of the resource
+     * Returns the path of the parent file the PositionInfo refers to
+     * (the class the statement originates from).
+     * @deprecated This method should no longer be used, as PositionInfo can now be used with
+     *          resources other than files. Use {@link #getParentURI()} instead.
+     * @return the filename as a string if parentClass uses the "file" protocol or null otherwise
      */
-    public URI getURI() {
-        return fileURI;
+    @Deprecated         // only kept for compatibility reasons
+    public String getParentClass() {
+        if (parentClass != null && parentClass != UNKNOWN_URI) {
+            if (parentClass.getScheme().equals("file")) {
+                return parentClass.getPath();
+            }
+        }
+        return null;
     }
 
     /**
@@ -119,6 +124,26 @@ public class PositionInfo {
             }
         }
         return null;
+    }
+
+    public URI getParentURI() {
+        return parentClass;
+    }
+
+    public URI getURI() {
+        return fileURI;
+    }
+
+    public Position getRelativePosition() {
+        return relPos;
+    }
+
+    public Position getStartPosition() {
+        return startPos;
+    }
+
+    public Position getEndPosition() {
+        return endPos;
     }
 
     /**
@@ -171,39 +196,6 @@ public class PositionInfo {
     public boolean startEndValid() {
         return startPos != Position.UNDEFINED && !startPos.isNegative()
                 && endPos != Position.UNDEFINED && !endPos.isNegative();
-    }
-
-    /** this violates immutability, but the method is only called
-      * right after the object is created...
-      * @param parent the parent class of this PositionInfo
-      */
-    void setParentClass(URI parent) {
-        parentClass = (parent == null ? null : parent.normalize());
-    }
-
-    /**
-     * Returns the path of the parent file the PositionInfo refers to
-     * (the class the statement originates from).
-     * @deprecated This method should no longer be used, as PositionInfo can now be used with
-     *          resources other than files. Use {@link #getParentURI()} instead.
-     * @return the filename as a string if parentClass uses the "file" protocol or null otherwise
-     */
-    @Deprecated         // only kept for compatibility reasons
-    public String getParentClass() {
-        if (parentClass != null && parentClass != UNKNOWN_URI) {
-            if (parentClass.getScheme().equals("file")) {
-                return parentClass.getPath();
-            }
-        }
-        return null;
-    }
-    /**
-     * Returns the resource identifier of the resource this PositionInfo refers to
-     * (the class the statement originates from).
-     * @return the URI of the resource
-     */
-    public URI getParentURI() {
-        return parentClass;
     }
 
     @Override
