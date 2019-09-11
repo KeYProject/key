@@ -83,7 +83,11 @@ public class PositionInfo {
         this.relPos = relPos;
         this.startPos = startPos;
         this.endPos = endPos;
-        this.fileURI = fileURI.normalize();
+        if (fileURI == null) {
+            this.fileURI = UNKNOWN_URI;
+        } else {
+            this.fileURI = fileURI.normalize();
+        }
     }
 
     /** this violates immutability, but the method is only called
