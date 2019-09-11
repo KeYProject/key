@@ -49,12 +49,15 @@ public interface Collection extends java.lang.Iterable
    /*@ public normal_behavior
      @ ensures \result.index == 0;
      @ ensures \result.seq == seq;
+     @ ensures \fresh(result);
+     @ ensures \fresh(result.*);
+     @ assignable \nothing;
      @ determines \result.seq \by seq;
      @ determines \result.index \by \nothing;
      @*/
    public CollectionIterator /*@pure@*/ iterator();
    
-   public final class CollectionIterator implements Iterator { }
+   public final class CollectionIterator implements Iterator {}
    
    public java.lang.Object[] toArray();
    public java.lang.Object[] toArray(java.lang.Object[] arg0);

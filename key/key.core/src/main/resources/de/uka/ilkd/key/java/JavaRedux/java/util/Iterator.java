@@ -6,12 +6,12 @@ package java.util;
 public interface Iterator
 {
    //@ public instance ghost \seq seq;
-   public int index;
+   //@ public instance ghost \bigint index;
    
    //@ public instance invariant 0 <= index && index <= seq.length;
 
    /*@ public normal_behavior
-     @ ensures \result == true <==> index == seq.length;
+     @ ensures \result == true <==> index < seq.length;
      @ assignable \strictly_nothing;
      @ determines \result \by seq.length, index;
      @*/
