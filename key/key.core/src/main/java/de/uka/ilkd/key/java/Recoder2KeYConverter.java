@@ -238,9 +238,9 @@ public class Recoder2KeYConverter {
 
     public CompilationUnit processCompilationUnit(
             recoder.java.CompilationUnit cu, DataLocation context) {
-        currentClass = extractURI(context);
+        currentClassURI = extractURI(context);
         Object result = process(cu);
-        currentClass = null;
+        currentClassURI = null;
 
         assert result instanceof CompilationUnit : "a compilation unit must result in a compilation unit!";
 
@@ -292,9 +292,9 @@ public class Recoder2KeYConverter {
     protected HashMap<?, ?> locClass2finalVar = null;
 
     /**
-     * stores the class that is currently processed
+     * stores the URI of the class that is currently processed
      */
-    private URI currentClass;
+    private URI currentClassURI;
 
     /**
      * flag which is true if currently in a for initialiser or update
@@ -439,9 +439,9 @@ public class Recoder2KeYConverter {
         }
 
         // set the parental class attribute if available
-        if ((currentClass != null) && (result instanceof Statement)
+        if ((currentClassURI != null) && (result instanceof Statement)
                 && !(result instanceof SchemaVariable)) {
-            ((JavaProgramElement) result).setParentClass(currentClass);
+            ((JavaProgramElement) result).setParentClass(currentClassURI);
         }
 
         Debug.assertTrue(result instanceof ProgramElement || result == null,
@@ -554,7 +554,7 @@ public class Recoder2KeYConverter {
         Position endPos = new Position(se.getEndPosition().getLine(), se
                 .getEndPosition().getColumn());
         if ((!inLoopInit))
-            return new PositionInfo(relPos, startPos, endPos, currentClass);
+            return new PositionInfo(relPos, startPos, endPos, currentClassURI);
         else
             return new PositionInfo(relPos, startPos, endPos);
 
@@ -1675,7 +1675,7 @@ public class Recoder2KeYConverter {
             if (method instanceof recoder.java.declaration.MethodDeclaration) {
                 // method reference before method decl, also recursive calls.
                 // do not use:
-                final URI oldCurrent = currentClass;
+                final URI oldCurrent = currentClassURI;
 
                 recoder.io.DataLocation loc = null;
                 TypeDeclaration td = ((recoder.java.declaration.MethodDeclaration) method).getMemberParent();
@@ -1685,10 +1685,10 @@ public class Recoder2KeYConverter {
                 }
                 loc = tdc instanceof recoder.java.CompilationUnit ? ((recoder.java.CompilationUnit)tdc).getOriginalDataLocation() : null;
 
-                currentClass = extractURI(loc);
+                currentClassURI = extractURI(loc);
                 pm = convert((recoder.java.declaration.MethodDeclaration) method);
                 // because of cycles when reading recursive programs
-                currentClass = oldCurrent;
+                currentClassURI = oldCurrent;
             } else {
                 // bytecode currently we do nothing
                 pm = null;
