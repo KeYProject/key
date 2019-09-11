@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.java;
 
 import java.net.URI;
+import java.io.File;
 
 /**
  * represents a group of three Positions: relativePosition,
@@ -102,10 +103,9 @@ public class PositionInfo {
      */
     @Deprecated         // only kept for compatibility reasons
     public String getParentClass() {
-        if (parentClass != null && parentClass != UNKNOWN_URI) {
-            if (parentClass.getScheme().equals("file")) {
-                return parentClass.getPath();
-            }
+        if (parentClass != null && parentClass.getScheme().equals("file")) {
+            // TODO @Wolfram: Check if getPath is right method here.
+            return new File(parentClass).getPath();
         }
         return null;
     }
@@ -118,10 +118,9 @@ public class PositionInfo {
      */
     @Deprecated         // only kept for compatibility reasons
     public String getFileName() {
-        if (fileURI != UNKNOWN_URI) {
-            if (fileURI.getScheme().equals("file")) {
-                return fileURI.getPath();
-            }
+        if (fileURI.getScheme().equals("file")) {
+            // TODO @Wolfram. see above
+            return fileURI.getPath();
         }
         return null;
     }
