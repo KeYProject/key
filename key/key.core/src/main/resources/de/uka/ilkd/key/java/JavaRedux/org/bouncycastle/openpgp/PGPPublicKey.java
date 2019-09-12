@@ -34,13 +34,8 @@ public class PGPPublicKey extends java.lang.Object implements org.bouncycastle.b
      @*/
    public void encode(java.io.OutputStream param0) throws java.io.IOException;
 
-   /**
-    * @generated
-    */
-   /*@ public behavior
-     @ requires true;
-     @ ensures true;
-     @ assignable \everything;
+   /*@ public normal_behavior
+     @ assignable \nothing;
      @*/
    public boolean isEncryptionKey();
 }

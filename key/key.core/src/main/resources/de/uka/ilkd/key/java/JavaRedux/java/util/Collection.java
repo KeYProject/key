@@ -49,8 +49,6 @@ public interface Collection extends java.lang.Iterable
    /*@ public normal_behavior
      @ ensures \result.index == 0;
      @ ensures \result.seq == seq;
-     @ ensures \fresh(result);
-     @ ensures \fresh(result.*);
      @ assignable \nothing;
      @ determines \result.seq \by seq;
      @ determines \result.index \by \nothing;
