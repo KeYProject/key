@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+    <comment>These are the preamble snippets needed for handling the seq sort</comment>
+
+
+    <entry key="seqGet.decls">(declare-fun seqGet (U U) U)</entry>
+    <entry key="seqLen.decls">(declare-fun seqLen (U) Int)</entry>
+    <entry key="seqConcat.decls">(declare-fun seqConcat (U U) U)</entry>
+    <entry key="seqDef.decls">(declare-fun seqDef (U Int Int U) U)</entry>
+    <entry key="seqEmpty.decls">(declare-fun seqEmpty (U) U)</entry>
+    <entry key="seqSingleton.decls">(declare-fun seqSingleton (U) U)</entry>
+    <entry key="seqSUBST.decls">(declare-fun TODO_substitute (U U U) U)</entry>
+    <entry key="seqError.decls">(declare-const seqError U)</entry>
+
+    <entry key="seqGet.axioms">
+(assert (forall ((i Int) (v U) (l Int) (r Int) (t U)) (= (seqGet (i seqDef(v l r t))) (ite (or (&lt;= 0 i) (&gt;= i (- r l))) (seqError) (TODO_substitute v (+ l i) t)))))
+    </entry>
+
+    <entry key="seqLen.axioms">
+(assert (forall ((v U) (l Int) (r Int) (t U)) (= (seqLen (seqDef v l r t)) (ite (&lt;= l r) (- r l) 0))))
+    </entry>
+
+    <entry key="seqConcat.axioms">
+(assert (forall ((s1 U) (s2 U)) (= (seqLen (seqConcat s1 s2)) (+ (seqLen s1) (seqLen s2)))))
+    </entry>
+
+    <entry key="seqDef.axioms">
+
+    </entry>
+
+    <entry key="seqEmpty.axioms">
+
+    </entry>
+
+    <entry key="seqSingleton.axioms">
+
+    </entry>
+
+    <entry key="seqGet.deps">seqDef, seqError, seqSUBST</entry>
+    <entry key="seqLen.deps">seqDef, seqError</entry>
+    <entry key="seqConcat.deps">seqLen</entry>
+
+</properties>
