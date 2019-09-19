@@ -87,6 +87,10 @@ public class SolverListener implements SolverLauncherListener {
                 final SMTSolver solver;
                 final SMTProblem problem;
                 final LinkedList<Information> information = new LinkedList<Information>();
+            private boolean stopped = false;
+            private boolean running = false;
+
+            private long timeToSolve;
 
                 public InternSMTProblem(int problemIndex, int solverIndex,
                                 SMTProblem problem, SMTSolver solver) {
@@ -170,6 +174,27 @@ public class SolverListener implements SolverLauncherListener {
                         return solver.name() +" applied on "+problem.getName();
                 }
 
+            String getTimeInSecAsString() {
+                long intPart = timeToSolve / 1000;
+                long decPart = timeToSolve % 1000;
+                String decString = decPart >= 100 ? Long.toString(decPart) :
+                        decPart >= 10 ? "0" + decPart : "00" + decPart;
+                return intPart + "." + decString + "s";
+            }
+
+            void startTime() {
+                if (!running) {
+                    timeToSolve = System.currentTimeMillis();
+                    running = true;
+                }
+            }
+
+            void stopTime() {
+                if (!stopped) {
+                    timeToSolve = System.currentTimeMillis() - timeToSolve;
+                    stopped = true;
+                }
+            }
         }
         
 
@@ -407,6 +432,7 @@ public class SolverListener implements SolverLauncherListener {
         }
 
         private void running(InternSMTProblem problem) {
+            problem.startTime();
                 long progress = calculateProgress(problem);
                 progressModel.setProgress((int)progress, problem.getSolverIndex(),problem.getProblemIndex());
                 float remainingTime = calculateRemainingTime(problem);
@@ -426,6 +452,8 @@ public class SolverListener implements SolverLauncherListener {
         }
 
         private void stopped(InternSMTProblem problem) {
+            problem.stopTime();
+
                 int x = problem.getSolverIndex();
                 int y = problem.getProblemIndex();
                 
@@ -483,31 +511,31 @@ public class SolverListener implements SolverLauncherListener {
         }
 
         private void successfullyStopped(InternSMTProblem problem, int x, int y) {
-                
-        		
-        	
+                String timeInfo = " (" + problem.getTimeInSecAsString() + ")";
+
                 progressModel.setProgress(0,x,y);
                 progressModel.setTextColor(GREEN.get(),x,y);
                 if(problem.solver.getType()==SolverType.Z3_CE_SOLVER){
-                	progressModel.setText("No Counterexample.",x,y);           
+                	progressModel.setText("No Counterexample.",x,y);
         		}
                 else{
-                	progressModel.setText("Valid.",x,y);
+                	progressModel.setText("Valid" + timeInfo ,x,y);
                 }
-                
-               
+
+
         }
 
         private void unsuccessfullyStopped(InternSMTProblem problem, int x, int y) {
+                String timeInfo = " (" + problem.getTimeInSecAsString() + ")";
             if(problem.solver.getType()==SolverType.Z3_CE_SOLVER){
                 progressModel.setProgress(0,x,y);
                 progressModel.setTextColor(RED.get(),x,y);
-                progressModel.setText("Counter Example.",x,y);
+                progressModel.setText("Counter Example" + timeInfo,x,y);
             } else {
                 progressModel.setProgress(0, x, y);
                 Color c = new Color(200, 150, 0);
                 progressModel.setTextColor(c, x, y);
-                progressModel.setText("Possible Counter Example.", x, y);
+                progressModel.setText("Possible Counter Example" + timeInfo, x, y);
             }
         }
 
