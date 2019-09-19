@@ -10,7 +10,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SeqHandler implements SMTHandler {
@@ -25,6 +27,8 @@ public class SeqHandler implements SMTHandler {
     private SeqLDT seqLDT;
 
     private Map<Operator, String> supportedOperators;
+
+    private static int numOfSeqVars = 0;
 
     @Override
     public void init(Services services) throws IOException {
@@ -49,7 +53,23 @@ public class SeqHandler implements SMTHandler {
         Operator op = term.op();
 
         if (op == seqLDT.getSeqLen()) {
+            trans.addFromSnippets(SEQ_LEN);
             return new SExpr(SEQ_LEN, SExpr.Type.INT, trans.translate(term.subs()));
+        }
+
+        if (op == seqLDT.getSeqDef()) { // TODO substituting the sequence variable in the function
+//            trans.addFromSnippets(SEQ_DEF);
+//            List<SExpr> children = new ArrayList<>();
+//            String sv = "seqVar_" + numOfSeqVars;
+//            SExpr seqVar = new SExpr(sv);
+//            trans.addKnownSymbol(sv);
+//            trans.addDeclaration(new SExpr("declare-fun", SExpr.Type.UNIVERSE, new SExpr(sv), new SExpr(""), new SExpr("U")));
+//            children.add(seqVar);
+//            numOfSeqVars++;
+//            children.add(trans.translate(term.sub(0), SExpr.Type.INT));
+//            children.add(trans.translate(term.sub(1), SExpr.Type.INT));
+//            children.add(trans.translate(term.sub(2), SExpr.Type.UNIVERSE));
+//            return new SExpr(SEQ_DEF, SExpr.Type.UNIVERSE, children);
         }
 
         if (supportedOperators.containsKey(op)) {
