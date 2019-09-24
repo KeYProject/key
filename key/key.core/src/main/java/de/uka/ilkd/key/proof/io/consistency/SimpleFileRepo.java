@@ -2,6 +2,7 @@ package de.uka.ilkd.key.proof.io.consistency;
 
 import java.io.*;
 import java.net.JarURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -126,9 +127,15 @@ public class SimpleFileRepo extends AbstractFileRepo {
         // currently, we support only two protocols: file and zip/jar
         if (protocol.equals("file")) {
             // url.getPath() may contain escaped characters -> we have to decode it
-            String path = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8.name());
+            //String path = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8.name());
 
-            return copyAndOpenInputStream(Paths.get(path));
+            try {
+                Path path = Paths.get(url.toURI());
+                return copyAndOpenInputStream(path);
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException("The given URL is invalid!");
+            }
+
         } else if (protocol.equals("jar")) {
             JarURLConnection juc = (JarURLConnection) url.openConnection();
             Path jarPath = Paths.get(juc.getJarFile().getName());
@@ -140,7 +147,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
     }
 
     private InputStream copyAndOpenInputStream(Path path) throws IOException {
-        // this method assumes that the path exists and is a valid (w/o protocol part as in URL!)
+        // this method assumes that the path exists and is a valid path (w/o protocol part as in URL!)
 
         final Path norm = path.toAbsolutePath().normalize();
 
