@@ -23,11 +23,11 @@ import java.io.File;
  * 2019-09-10 Wolfram Pfeifer: work with URIs instead of Strings -> more robust, more general
  */
 public class PositionInfo {
-    /** PositionInfo with undefined positions. */
-    public static final PositionInfo UNDEFINED = new PositionInfo();
-
     /** Unknown URI (enables us to always have a non-null value for fileURI) */
     public static final URI UNKNOWN_URI = URI.create("UNKNOWN://unknown");
+
+    /** PositionInfo with undefined positions. */
+    public static final PositionInfo UNDEFINED = new PositionInfo();
 
     /**
      * TODO: What is the purpose of this? To which position is this one relative?
