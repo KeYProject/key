@@ -133,7 +133,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
                 Path path = Paths.get(url.toURI());
                 return copyAndOpenInputStream(path);
             } catch (URISyntaxException e) {
-                throw new IllegalArgumentException("The given URL is invalid!");
+                throw new IOException("The given URL is invalid!", e);
             }
 
         } else if (protocol.equals("jar")) {
@@ -142,12 +142,13 @@ public class SimpleFileRepo extends AbstractFileRepo {
             addFile(jarPath);
             return url.openStream();
         } else {
-            throw new IllegalArgumentException("This type of URL is not supported!");
+            throw new IOException("This type of URL is not supported!");
         }
     }
 
     private InputStream copyAndOpenInputStream(Path path) throws IOException {
-        // this method assumes that the path exists and is a valid path (w/o protocol part as in URL!)
+        // this method assumes that the path exists and is a valid path
+        // (w/o protocol part as in URL!)
 
         final Path norm = path.toAbsolutePath().normalize();
 
