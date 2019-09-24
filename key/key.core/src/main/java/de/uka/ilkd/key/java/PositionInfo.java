@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.java;
 
 import java.net.URI;
-import java.io.File;
+import java.nio.file.Paths;
 
 /**
  * represents a group of three Positions: relativePosition,
@@ -50,7 +50,7 @@ public class PositionInfo {
      * The URI of the parent class of this location (the class the statement originates from).
      * May be null.
      */
-    private URI parentClass;
+    private URI parentClassURI;
 
     private PositionInfo() {
         this.relPos = Position.UNDEFINED;
@@ -94,22 +94,21 @@ public class PositionInfo {
      * right after the object is created...
      * @param parent the parent class of this PositionInfo
      */
-    void setParentClass(URI parent) {
-        parentClass = (parent == null ? null : parent.normalize());
+    void setParentClassURI(URI parent) {
+        parentClassURI = (parent == null ? null : parent.normalize());
     }
 
     /**
      * Returns the path of the parent file the PositionInfo refers to
      * (the class the statement originates from).
      * @deprecated This method should no longer be used, as PositionInfo can now be used with
-     *          resources other than files. Use {@link #getParentURI()} instead.
+     *          resources other than files. Use {@link #getParentClassURI()} instead.
      * @return the filename as a string if parentClass uses the "file" protocol or null otherwise
      */
     @Deprecated         // only kept for compatibility reasons
     public String getParentClass() {
-        if (parentClass != null && parentClass.getScheme().equals("file")) {
-            // TODO @Wolfram: Check if getPath is right method here.
-            return new File(parentClass).getPath();
+        if (parentClassURI != null && parentClassURI.getScheme().equals("file")) {
+            return Paths.get(parentClassURI).toString();
         }
         return null;
     }
@@ -123,14 +122,13 @@ public class PositionInfo {
     @Deprecated         // only kept for compatibility reasons
     public String getFileName() {
         if (fileURI.getScheme().equals("file")) {
-            // TODO @Wolfram. see above
-            return fileURI.getPath();
+            return Paths.get(fileURI).toString();
         }
         return null;
     }
 
-    public URI getParentURI() {
-        return parentClass;
+    public URI getParentClassURI() {
+        return parentClassURI;
     }
 
     public URI getURI() {

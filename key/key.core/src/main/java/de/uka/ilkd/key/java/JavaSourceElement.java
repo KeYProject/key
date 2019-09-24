@@ -197,7 +197,7 @@ public abstract class JavaSourceElement implements SourceElement {
       * right after the object is created...
       */
     protected void setParentClass(URI s) {
-        posInfo.setParentClass(s);
+        posInfo.setParentClassURI(s);
     }
     
     /** get the class the statement originates from */
