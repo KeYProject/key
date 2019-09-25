@@ -91,6 +91,7 @@ public class EditSourceFileAction extends AbstractAction {
 
          JTextArea parserMessage = new JTextArea();
          String message = exception.getMessage();
+         message = message == null ? "" : message;
          parserMessage.setText(message);
          parserMessage.setEditable(false);
          parserMessage.setColumns(columnNumber);
