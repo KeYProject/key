@@ -1,16 +1,9 @@
 package java.io;
 
-/**
- * @generated
- */
-public class FileInputStream extends java.io.InputStream {
-   /**
-    * @generated
-    */
-   /*@ public behavior
-     @ requires true;
-     @ ensures true;
-     @ assignable \everything;
-     @*/
+public final class FileInputStream extends java.io.InputStream {
+   
+    /*@ public normal_behavior
+      @ assignable \nothing;
+      @*/
    public FileInputStream(java.lang.String param0) throws java.io.FileNotFoundException;
 }

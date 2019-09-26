@@ -10,10 +10,10 @@ public final class CSVRecord extends java.lang.Object implements java.io.Seriali
     //@ public instance invariant (\forall int i; 0 <= i && i < value_seq.length; ((String)value_seq[i]) != null);
 
     /*@ public normal_behavior
-      @ requires  (\exists int i; 0 <= i && i < key_seq.length; ((String)key_seq[i]) == param0);
-      @ ensures   (\exists int i; 0 <= i && i < key_seq.length; ((String)key_seq[i]) == param0 && ((String)value_seq[i]) == \result);
+      @ requires  (\exists \bigint i; 0 <= i && i < key_seq.length; ((String)key_seq[i]) == param0);
+      @ ensures   (\exists \bigint i; 0 <= i && i < key_seq.length; ((String)key_seq[i]) == param0 && ((String)value_seq[i]) == \result);
       @ assignable \strictly_nothing;
       @ determines \result \by param0;
       @*/
-    public /*@nullable@*/ java.lang.String get(java.lang.String param0);
+    public java.lang.String get(java.lang.String param0);
 }

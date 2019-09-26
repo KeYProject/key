@@ -10,8 +10,8 @@ public interface Map
     //@ public instance ghost \seq value_seq;
     
     //@ public instance invariant key_seq.length == value_seq.length;
-    //@ public instance invariant (\forall int i; 0 <= i && i < key_seq.length; ((Object)key_seq[i]) != null);
-    //@ public instance invariant (\forall int i; 0 <= i && i < value_seq.length; ((Object)value_seq[i]) != null);
+    //@ public instance invariant (\forall \bigint i; 0 <= i && i < key_seq.length; ((Object)key_seq[i]) != null);
+    //@ public instance invariant (\forall \bigint i; 0 <= i && i < value_seq.length; ((Object)value_seq[i]) != null);
     
     /*@ public normal_behavior
       @ ensures \result.seq == key_seq;

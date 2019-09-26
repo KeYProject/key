@@ -1,6 +1,6 @@
 package java.io;
 
-public class BufferedInputStream extends java.io.FilterInputStream {
+public final class BufferedInputStream extends java.io.FilterInputStream {
 
    /*@ public normal_behavior
      @ assignable \nothing;

@@ -40,7 +40,7 @@ public interface Collection extends java.lang.Iterable
    public void clear();
    
    /*@ public normal_behavior
-     @ ensures \result == (\exists int i; 0 <= i && i < seq.length; ((String)seq[i]) == arg0);
+     @ ensures \result == (\exists \bigint i; 0 <= i && i < seq.length; ((String)seq[i]) == arg0);
      @ determines \result \by seq, arg0;
      @*/
    public boolean /*@pure@*/ contains(String arg0);
@@ -49,6 +49,7 @@ public interface Collection extends java.lang.Iterable
    /*@ public normal_behavior
      @ ensures \result.index == 0;
      @ ensures \result.seq == seq;
+     @ ensures \fresh(\result) && \fresh(\result.*);
      @ assignable \nothing;
      @ determines \result.seq \by seq;
      @ determines \result.index \by \nothing;
