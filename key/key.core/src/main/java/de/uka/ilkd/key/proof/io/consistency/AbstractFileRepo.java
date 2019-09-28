@@ -408,10 +408,12 @@ public abstract class AbstractFileRepo implements FileRepo {
     public void setBaseDir(Path path) {
         /* Path can be a file or a directory. In case of a file the complete containing directory
          * is read in. */
+        // solves #1524: make paths absolute first to avoid NPE
+        Path absolute = path.toAbsolutePath();
         if (Files.isDirectory(path)) {
-            baseDir = path.toAbsolutePath().normalize();
+            baseDir = absolute.normalize();
         } else {
-            baseDir = path.getParent().toAbsolutePath().normalize();
+            baseDir = absolute.getParent().normalize();
         }
     }
 
