@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 public class AutoSuite extends Suite {
 
@@ -64,23 +65,21 @@ public class AutoSuite extends Suite {
             }
         } else {
             if(file.getName().endsWith(".class")) {
-                result.addAll(findClass(file.getName(), packagePrefix));
+                findClass(file.getName(), packagePrefix).ifPresent(result::add);
             }
         }
 
         return result;
     }
 
-    private static List<Class<?>> findClass(String fileName, final String packagePrefix) {
-        List<Class<?>> result = new ArrayList<>();
-
+    private static Optional<Class<?>> findClass(String fileName, final String packagePrefix) {
         // TDOO
         int end = fileName.lastIndexOf('.');
         int start = fileName.lastIndexOf('.', end - 1);
         String className = fileName.substring(start + 1, end);
 
         if (className.equals("TestCore")) { // prevent TestCore test suite from containing itself
-            return  result;
+            return Optional.empty();
         }
 
         String qualifiedClassName = packagePrefix + (packagePrefix.isEmpty() ? "" : ".") + className;
@@ -92,8 +91,8 @@ public class AutoSuite extends Suite {
             Class<?> clss = Class.forName(qualifiedClassName, false, AutoSuite.class.getClassLoader());
             // include class if it is a test suite
             if (clss.getAnnotation(RunWith.class) != null) {
-                result.add(clss);
                 System.out.println("found (is test suite)!");
+                return Optional.of(clss); // return here to prevent double inclusion of suite classes with test methods
             }
 
             // include class if it contains test methods
@@ -101,15 +100,13 @@ public class AutoSuite extends Suite {
             for (Method m : clss.getDeclaredMethods()) {
                 System.out.println("    method " + m.getName());
                 if (m.getAnnotation(Test.class) != null) {
-                    result.add(clss);
                     System.out.println("found (contains test method)!");
-                    break;          // already found a test -> we can skip the rest
+                    return Optional.of(clss);          // already found a test -> we can skip the rest
                 }
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-
-        return result;
+        return Optional.empty();
     }
 }
