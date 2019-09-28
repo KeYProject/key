@@ -16,7 +16,6 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,6 +28,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.util.KeYResourceManager;
+import org.key_project.util.java.IOUtil;
+import sun.misc.IOUtils;
 
 /**
  * Abstract repo implementation to perform tasks independent from the concrete way the files are
@@ -234,10 +235,8 @@ public abstract class AbstractFileRepo implements FileRepo {
 
         // write files to ZIP
         ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(savePath));
-        Iterator<Path> it = files.iterator();
 
-        while (it.hasNext()) {
-            Path p = it.next();
+        for (Path p : files) {
             // use the correct name for saving!
             zos.putNextEntry(new ZipEntry(getSaveName(p).toString()));
 
@@ -307,10 +306,10 @@ public abstract class AbstractFileRepo implements FileRepo {
             // create an in-memory copy of the file, modify it, prepend the classpath,
             // and return an InputStream
             String rep = lines                       // remove all classpath declarations
-                              .filter(l -> !l.matches(".*\\\\classpath \\\".*\\\";.*"))
-                              .map(l -> l.replaceAll("\\\\javaSource \\\".*\\\";",
+                              .filter(l -> !l.matches(".*\\\\classpath \".*\";.*"))
+                              .map(l -> l.replaceAll("\\\\javaSource \".*\";",
                                                      "\\\\javaSource \"src\";"))
-                              .map(l -> l.replaceAll("\\\\bootclasspath \\\".*\\\";",
+                              .map(l -> l.replaceAll("\\\\bootclasspath \".*\";",
                                                      "\\\\bootclasspath \"bootclasspath\";"))
                               .collect(Collectors.joining(System.lineSeparator()));
 
@@ -348,7 +347,10 @@ public abstract class AbstractFileRepo implements FileRepo {
                 cp = Paths.get("classpath").resolve(t.getFileName());
             }
 
-            sb.append(cp);
+            // replace separator by '/' to avoid problems on Windows
+            String replaced = cp.toString().replace(FileSystems.getDefault().getSeparator(), "/");
+
+            sb.append(replaced);
             sb.append("\";");
             sb.append(System.lineSeparator());
         }
