@@ -1,21 +1,29 @@
 package de.uka.ilkd.key;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerBuilder;
+import org.key_project.util.testcategories.Interactive;
+import org.key_project.util.testcategories.Performance;
 
 import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 public class AutoSuite extends Suite {
+    /** test categories to be excluded */
+    private static final List<Class> EXCLUDE_CATEGORIES =
+        Arrays.asList(new Class[] { Interactive.class,
+                                    Performance.class });
 
     /** comparator for ascending lexicographic ordering */
     private static final Comparator<? super Class<?>> LEXICOGRAPHIC_ASC
@@ -40,8 +48,12 @@ public class AutoSuite extends Suite {
 
     private static Class<?>[] findTestClasses(Class<?> klass) throws InitializationError {
 
-        // TODO NPE and others
-        String path = klass.getAnnotation(AutoSuitePath.class).value();
+        AutoSuitePath suitePath = klass.getAnnotation(AutoSuitePath.class);
+        if (suitePath == null) {
+            throw new InitializationError("Root class is not annotated with AutoSuitePath: "
+                + klass);
+        }
+        String path = suitePath.value();
 
         List<Class<?>> result = findTestClasses(new File(path), "");
         result.sort(LEXICOGRAPHIC_ASC);
@@ -105,6 +117,16 @@ public class AutoSuite extends Suite {
                 Class.forName(qualifiedClassName, false, AutoSuite.class.getClassLoader());
 
             // TODO: should we manually filter for test category here?
+            Category category = clss.getAnnotation(Category.class);
+            if (category != null) {
+                Class[] categories = category.value();
+                for (Class c : categories) {
+                    // do not add tests in categories "Slow" or "Performance"
+                    if (EXCLUDE_CATEGORIES.contains(c)) {
+                        return Optional.empty();
+                    }
+                }
+            }
 
             // include class if it is a test suite
             if (clss.getAnnotation(RunWith.class) != null) {
