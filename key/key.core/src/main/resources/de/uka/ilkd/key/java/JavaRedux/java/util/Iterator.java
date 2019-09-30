@@ -18,7 +18,8 @@ public interface Iterator
    public boolean hasNext();
    
    /*@ public normal_behavior
-     @ ensures \old(index) < seq.length ==> \result == (Object)seq[\old(index)];
+     @ ensures \old(index) < seq.length ==> \result == ((Object)seq[\old(index)]);
+     @ ensures \old(index) < seq.length ==> \result != null;
      @ ensures \old(index) < seq.length ==> index == \old(index) + 1;
      @ ensures \old(index) == seq.length ==> \result == null;
      @ ensures \old(index) == seq.length ==> index == \old(index);

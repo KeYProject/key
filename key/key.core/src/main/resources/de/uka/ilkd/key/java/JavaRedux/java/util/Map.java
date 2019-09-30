@@ -15,6 +15,7 @@ public interface Map
     
     /*@ public normal_behavior
       @ ensures \result.seq == key_seq;
+      @ ensures \fresh(\result);
       @ assignable \nothing;
       @*/
     public java.util.Set keySet();

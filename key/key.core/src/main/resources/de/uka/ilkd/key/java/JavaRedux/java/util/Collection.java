@@ -10,15 +10,17 @@ public interface Collection extends java.lang.Iterable
 
    /*@ public normal_behavior
      @ ensures \result == seq.length;
+     @ assignable \nothing;
      @ determines \result \by seq.length;
      @ */
-   public /*@pure@*/ int size();
+   public int size();
    
    /*@ public normal_behavior
      @ ensures \result == (size() == 0);
+     @ assignable \nothing;
      @ determines \result \by seq.length;
      @*/
-   public /*@pure@*/ boolean isEmpty();
+   public boolean isEmpty();
    
    /*@ public normal_behavior
      @ ensures seq == \seq_concat(\old(seq), \seq_singleton(arg0));
@@ -41,9 +43,10 @@ public interface Collection extends java.lang.Iterable
    
    /*@ public normal_behavior
      @ ensures \result == (\exists \bigint i; 0 <= i && i < seq.length; ((String)seq[i]) == arg0);
+     @ assignable \nothing;
      @ determines \result \by seq, arg0;
      @*/
-   public boolean /*@pure@*/ contains(String arg0);
+   public boolean contains(String arg0);
    public boolean containsAll(java.util.Collection arg0);
    
    /*@ public normal_behavior
@@ -54,7 +57,7 @@ public interface Collection extends java.lang.Iterable
      @ determines \result.seq \by seq;
      @ determines \result.index \by \nothing;
      @*/
-   public CollectionIterator /*@pure@*/ iterator();
+   public CollectionIterator iterator();
    
    public final class CollectionIterator implements Iterator {}
    
