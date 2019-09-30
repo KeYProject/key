@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -326,6 +327,11 @@ public class OriginTermLabel implements TermLabel {
             } else if (commonLine != origin.line) {
                 return new Origin(SpecType.NONE);
             }
+        }
+
+        if (commonFileName == null) {
+            Debug.out("commonFileName is null!");
+            return new Origin(SpecType.NONE);
         }
 
         return new FileOrigin(commonSpecType, commonFileName.getPath(), commonLine);
