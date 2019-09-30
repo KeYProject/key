@@ -17,7 +17,9 @@ import java.util.Optional;
 
 public class AutoSuite extends Suite {
 
-    private static final Comparator<? super Class<?>> LEXICOGRAPHIC_ASC = Comparator.comparing(Class::getName);
+    /** comparator for ascending lexicographic ordering */
+    private static final Comparator<? super Class<?>> LEXICOGRAPHIC_ASC
+        = Comparator.comparing(Class::getName);
 
     @Retention(RetentionPolicy.RUNTIME)      // ensures that annotation is available via reflection
     @interface AutoSuitePath {
@@ -30,12 +32,13 @@ public class AutoSuite extends Suite {
      *
      * @param klass the root class
      * @param builder builds runners for classes in the suite
+     * @throws InitializationError if initialization fails
      */
     public AutoSuite(Class<?> klass, RunnerBuilder builder) throws InitializationError {
         super(builder, klass, findTestClasses(klass));
     }
 
-    private static Class<?>[] findTestClasses(Class<?> klass) {
+    private static Class<?>[] findTestClasses(Class<?> klass) throws InitializationError {
 
         // TODO NPE and others
         String path = klass.getAnnotation(AutoSuitePath.class).value();
@@ -51,17 +54,23 @@ public class AutoSuite extends Suite {
         return result.toArray(new Class[0]);
     }
 
-    private static List<Class<?>> findTestClasses(File file, final String packagePrefix) {
+    private static List<Class<?>> findTestClasses(File file, final String packagePrefix)
+        throws InitializationError {
 
         List<Class<?>> result = new ArrayList<>();
-        if(file.isDirectory()) {
+        if (file.isDirectory()) {
             File[] files = file.listFiles();
-            for (File f : files) {
-                String prefix = packagePrefix;
-                if (f.isDirectory()) {
-                     prefix += (packagePrefix.isEmpty() ? "" : ".") + f.getName();
+            if (files != null) {
+                for (File f : files) {
+                    String prefix = packagePrefix;
+                    if (f.isDirectory()) {
+                        prefix += (packagePrefix.isEmpty() ? "" : ".") + f.getName();
+                    }
+                    result.addAll(findTestClasses(f, prefix));
                 }
-                result.addAll(findTestClasses(f, prefix));
+            } else {
+                throw new InitializationError("Error! The given path does not denote" +
+                    "a directory: " + file);
             }
         } else {
             if(file.getName().endsWith(".class")) {
@@ -72,27 +81,36 @@ public class AutoSuite extends Suite {
         return result;
     }
 
-    private static Optional<Class<?>> findClass(String fileName, final String packagePrefix) {
-        // TDOO
+    private static Optional<Class<?>> findClass(String fileName, final String packagePrefix)
+        throws InitializationError {
+        // extract actual class name
         int end = fileName.lastIndexOf('.');
         int start = fileName.lastIndexOf('.', end - 1);
         String className = fileName.substring(start + 1, end);
 
-        if (className.equals("TestCore")) { // prevent TestCore test suite from containing itself
+        // prevent TestCore test suite from containing itself
+        if (className.equals("TestCore")) {
             return Optional.empty();
         }
 
-        String qualifiedClassName = packagePrefix + (packagePrefix.isEmpty() ? "" : ".") + className;
+        String qualifiedClassName = packagePrefix
+                                  + (packagePrefix.isEmpty() ? "" : ".")
+                                  + className;
         try {
             System.out.println("Searching for class " + qualifiedClassName);
 
             // initialization of ProofJavaParser fails somehow (why?)
             // -> disable initialization of classes
-            Class<?> clss = Class.forName(qualifiedClassName, false, AutoSuite.class.getClassLoader());
+            Class<?> clss =
+                Class.forName(qualifiedClassName, false, AutoSuite.class.getClassLoader());
+
+            // TODO: should we manually filter for test category here?
+
             // include class if it is a test suite
             if (clss.getAnnotation(RunWith.class) != null) {
                 System.out.println("found (is test suite)!");
-                return Optional.of(clss); // return here to prevent double inclusion of suite classes with test methods
+                // return here to prevent double inclusion of suite classes with test methods
+                return Optional.of(clss);
             }
 
             // include class if it contains test methods
@@ -101,11 +119,11 @@ public class AutoSuite extends Suite {
                 System.out.println("    method " + m.getName());
                 if (m.getAnnotation(Test.class) != null) {
                     System.out.println("found (contains test method)!");
-                    return Optional.of(clss);          // already found a test -> we can skip the rest
+                    return Optional.of(clss);        // already found a test -> we can skip the rest
                 }
             }
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            throw new InitializationError(e);
         }
         return Optional.empty();
     }
