@@ -28,8 +28,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.util.KeYResourceManager;
-import org.key_project.util.java.IOUtil;
-import sun.misc.IOUtils;
 
 /**
  * Abstract repo implementation to perform tasks independent from the concrete way the files are
