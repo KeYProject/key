@@ -22,10 +22,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RuleKey;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
@@ -33,6 +30,7 @@ import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+import org.antlr.runtime.NoViableAltException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.*;
 
@@ -43,6 +41,7 @@ import java.util.stream.Collectors;
 
 import static de.uka.ilkd.key.proof.io.IProofFileParser.ProofElementID;
 
+@SuppressWarnings("unchecked")
 public class Builder extends KeYParserBaseVisitor<Object> {
     //region
 
@@ -1131,6 +1130,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                             getSourceName(), getLine(), getColumn()));
         }
         //TODO
+
     }
 
     private void addGoalTemplate(TacletBuilder b,
@@ -2489,78 +2489,170 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Term visitSubstitutionterm(KeYParser.SubstitutiontermContext ctx) {
-        return super.visitSubstitutionterm(ctx);
+        Term result = null;
+        SubstOp op = WarySubstOp.SUBST;
+        Namespace<QuantifiableVariable> orig = variables();
+        AbstractSortedOperator v = (AbstractSortedOperator) ctx.v.accept(this);
+        if (!isGlobalDeclTermParser()) {
+            unbindVars(orig);
+            if (v instanceof LogicVariable)
+                bindVar((LogicVariable) v);
+            else
+                bindVar();
+        }
+
+        Term a1 = (Term) ctx.a1.accept(this);
+        Term a2 = (Term) ctx.a2.accept(this);
+        result = getServices().getTermBuilder().subst(op, v, a1, a2);
+        if (!isGlobalDeclTermParser()) unbindVars(orig);
+        return result;
     }
 
     @Override
     public Term visitUpdateterm(KeYParser.UpdatetermContext ctx) {
-        return super.visitUpdateterm(ctx);
+        Term u = (Term) ctx.u.accept(this);
+        Term a2 = (Term) oneOf(ctx.term110(), ctx.unary_formula());
+        return getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, a2);
+    }
+
+    public List<QuantifiableVariable> visitBound_variables(KeYParser.Bound_variablesContext ctx) {
+        List<QuantifiableVariable> seq = ctx.one_bound_variable().stream()
+                .map(it -> (QuantifiableVariable) it.accept(this))
+                .collect(Collectors.toList());
+        return seq;
     }
 
     @Override
-    public Term visitBound_variables(KeYParser.Bound_variablesContext ctx) {
-        return super.visitBound_variables(ctx);
-    }
-
-    @Override
-    public Object visitOne_bound_variable(KeYParser.One_bound_variableContext ctx) {
-        return super.visitOne_bound_variable(ctx);
+    public QuantifiableVariable visitOne_bound_variable(KeYParser.One_bound_variableContext ctx) {
+        return oneOf(ctx.one_logic_bound_variable_nosort(), ctx.one_schema_bound_variable(),
+                ctx.one_logic_bound_variable());
     }
 
     @Override
     public Object visitOne_schema_bound_variable(KeYParser.One_schema_bound_variableContext ctx) {
-        return super.visitOne_schema_bound_variable(ctx);
+        id = simple_ident {
+            ts = schemaVariables().lookup(new Name(id));
+            if (!(ts instanceof VariableSV)) {
+                semanticError(ts + " is not allowed in a quantifier. Note, that you can't "
+                        + "use the normal syntax for quantifiers of the form \"\\exists int i;\""
+                        + " in taclets. You have to define the variable as a schema variable"
+                        + " and use the syntax \"\\exists i;\" instead.");
+            }
+            v = (QuantifiableVariable) ts;
+            bindVar();
+        }
     }
 
     @Override
     public Object visitOne_logic_bound_variable(KeYParser.One_logic_bound_variableContext ctx) {
-        return super.visitOne_logic_bound_variable(ctx);
+        return bindVar(ctx.id.getText(), (Sort) ctx.s.accept(this));
     }
 
     @Override
-    public Object visitOne_logic_bound_variable_nosort(KeYParser.One_logic_bound_variable_nosortContext ctx) {
-        return super.visitOne_logic_bound_variable_nosort(ctx);
+    public LogicVariable visitOne_logic_bound_variable_nosort(KeYParser.One_logic_bound_variable_nosortContext ctx) {
+        return (LogicVariable) variables().lookup(new Name(ctx.id.getText()));
     }
 
     @Override
     public Object visitModality_dl_term(KeYParser.Modality_dl_termContext ctx) {
-        return super.visitModality_dl_term(ctx);
+        Term _modality_dl_term = null;
+        Operator op = null;
+        Term a = null;
+        PairOfStringAndJavaBlock sjb = getJavaBlock(ctx.modality);
+        Debug.out("op: ", sjb.opName);
+        Debug.out("program: ", sjb.javaBlock);
+        if (sjb.opName.charAt(0) == '#') {
+            if (!inSchemaMode()) {
+                semanticError
+                        ("No schema elements allowed outside taclet declarations (" + sjb.opName + ")");
+            }
+            op = schemaVariables().lookup(new Name(sjb.opName));
+        } else {
+            op = Modality.getModality(sjb.opName);
+        }
+        if (op == null) {
+            semanticError("Unknown modal operator: " + sjb.opName);
+        }
+        // CAREFUL here, op can be null during guessing stage (use lazy &&)
+        //({op != null && op.arity() == 1} ?
+        Term a1 = (Term) ctx.a1.accept(this);
+        return getTermFactory().createTerm(op, new Term[]{a1}, null, sjb.javaBlock);
     }
 
     @Override
-    public Object visitArgument_list(KeYParser.Argument_listContext ctx) {
-        return super.visitArgument_list(ctx);
+    public List<Term> visitArgument_list(KeYParser.Argument_listContext ctx) {
+        return allOf(ctx.argument());
+    }
+
+    private static <T> List<T> allOf(Collection<? extends ParserRuleContext> argument) {
+        return argument.stream().map(it -> (T) it.accept(this)).collect(Collectors.toList());
     }
 
     @Override
-    public Object visitFuncpredvarterm(KeYParser.FuncpredvartermContext ctx) {
-        return super.visitFuncpredvarterm(ctx);
+    public Term visitFuncpredvarterm(KeYParser.FuncpredvartermContext ctx) {
+        //TODO
+        return null;
     }
 
     @Override
-    public Object visitSpecialTerm(KeYParser.SpecialTermContext ctx) {
-        return super.visitSpecialTerm(ctx);
+    public Term visitSpecialTerm(KeYParser.SpecialTermContext ctx) {
+        return (Term) ctx.result.accept(this);
     }
 
     @Override
-    public Object visitArith_op(KeYParser.Arith_opContext ctx) {
-        return super.visitArith_op(ctx);
+    public String visitArith_op(KeYParser.Arith_opContext ctx) {
+        /*    PERCENT {op = "\%";}
+  | STAR {op = "*";}
+  | MINUS {op = "-";}
+  | SLASH {op = "/";}
+  | PLUS { op = "+";}*/
+        return ctx.getText();
     }
 
     @Override
     public Object visitVarId(KeYParser.VarIdContext ctx) {
-        return super.visitVarId(ctx);
+        var id = ctx.id.getText();
+        var v = variables().lookup(new Name(ctx.id.getText()));
+        if (v == null) {
+            return schemaVariables().lookup(new Name(id));
+        }
+        if (v == null) {
+            throwEx(new NotDeclException(input, "variable", id));
+        }
+        return v;
     }
+
 
     @Override
     public Object visitVarIds(KeYParser.VarIdsContext ctx) {
-        return super.visitVarIds(ctx);
+        Collection<String> ids = (Collection<String>) ctx.simple_ident_comma_list().accept(this);
+        List<ParsableVariable> list = new ArrayList<>(ids.size());
+        for (String id : ids) {
+            var v = (ParsableVariable) variables().lookup(new Name(id));
+            if (v == null) {
+                v = schemaVariables().lookup(new Name(id));
+            }
+            if (v == null) {
+                semanticError("Variable " + id + " not declared.");
+            }
+            list.add(v);
+        }
+        return list;
     }
 
     @Override
-    public Object visitTriggers(KeYParser.TriggersContext ctx) {
-        return super.visitTriggers(ctx);
+    public TacletBuilder visitTriggers(KeYParser.TriggersContext ctx) {
+        String id = (String) ctx.id.accept(this);
+        SchemaVariable triggerVar  = schemaVariables().lookup(new Name(id));
+        if (triggerVar == null) {
+            semanticError("Undeclared schemavariable: " + id);
+        }
+        Term t = ctx.t.accept(this());
+        List<Term> avoidConditions = new ArrayList<>(ctx.term().size());//TODO avoidCond.
+        //b.setTrigger(new Trigger(triggerVar, t, avoidConditions));
+        return null;
     }
+
 
     @Override
     public Object visitTaclet(KeYParser.TacletContext ctx) {
