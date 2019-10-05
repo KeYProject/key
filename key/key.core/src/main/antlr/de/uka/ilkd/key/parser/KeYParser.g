@@ -1662,7 +1662,7 @@ activated_choice @init{
 option_decls
 :
         OPTIONSDECL LBRACE (choice SEMI)* RBRACE 
-    ;
+;
 
 choice @init{
     String cat=null;
@@ -1998,7 +1998,7 @@ one_schema_var_decl
  ;
 
 schema_modifiers[SchemaVariableModifierSet mods]
-    :
+:
         LBRACKET
         opts = simple_ident_comma_list         
         RBRACKET
@@ -2216,9 +2216,8 @@ arg_sorts_or_formula[boolean checkSort] returns [Sort[\] argSorts = null]
 @init{
     List args = new LinkedList();
 }
-    :
-        (
-            LPAREN
+:
+    ( LPAREN
 
             ( s = sortId_check[checkSort] { args.add(s); }
             | FORMULA {args.add(Sort.FORMULA);} )
