@@ -1,18 +1,18 @@
 package de.uka.ilkd.key.nparser;
 
 import antlr.RecognitionException;
-import antlr.Token;
-import antlr.TokenStream;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.VariableDeclaration;
+import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.visitor.DeclarationProgramVariableCollector;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.parser.*;
@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.conditions.*;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
@@ -32,6 +33,8 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import org.antlr.runtime.NoViableAltException;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
+import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.*;
 
 import java.io.File;
@@ -45,14 +48,12 @@ import static de.uka.ilkd.key.proof.io.IProofFileParser.ProofElementID;
 public class Builder extends KeYParserBaseVisitor<Object> {
     //region
 
-    private static final Sort[] AN_ARRAY_OF_SORTS = new Sort[0];
-    private static final Term[] AN_ARRAY_OF_TERMS = new Term[0];
-
+    // This is used for testing in TestTermParserHeap.java
+    public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE
+            = "Expecting select term before '@', not: ";
     private static final int NORMAL_NONRIGID = 0;
     private static final int LOCATION_MODIFIER = 1;
-
     private static final String LIMIT_SUFFIX = "$lmtd";
-
     static HashMap<String, IProofFileParser.ProofElementID> prooflabel2tag = new LinkedHashMap<>(15);
 
     static {
@@ -86,18 +87,31 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         prooflabel2tag.put("opengoal", IProofFileParser.ProofElementID.OPEN_GOAL);
     }
 
+    /*
+     counter variable for parser rules accessterm and heap_selection suffix:
+     - stores nesting depth of alpha::select(heap,o,f)-terms created via pretty syntax	(i.e. terms of the form: o.f)
+     - rule accessterm increases the counter
+     - rule heap_selection_suffix calls method heapSelectionSuffix(), which resets
+       the counter
+     - In case a term similar to o.f1.f2.f3.f4 would occur, this variable should have a value of 4.
+       The non-pretty syntax of this term would look similar to the following:
+           T::select(h, T::select(h, T::select(h, T::select(h, o, f1) , f2) , f3), f4)
+    */
+    protected int globalSelectNestingDepth = 0;
+    TacletBuilder b;
+    boolean ldt = false;
+    String currentChoiceCategory;
+    boolean ruleWithFind;
+    boolean negated;
     private NamespaceSet nss;
     private Namespace<SchemaVariable> schemaVariablesNamespace;
     private HashMap<String, String> category2Default = new LinkedHashMap<>();
     private boolean onlyWith = false;
-    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
+    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.nil();
     private HashSet usedChoiceCategories = new LinkedHashSet();
     private HashMap taclet2Builder;
     private AbbrevMap scm;
-
-
     private String filename;
-
     // these variables are set if a file is read in step by
     // step. This used when reading in LDTs because of cyclic
     // dependencies.
@@ -110,75 +124,40 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     private boolean skip_taclets;
     private boolean parse_includes = false;
     private Includes includes = new Includes();
-
     private boolean schemaMode = false;
     private ParserMode parserMode;
-
     private String chooseContract = null;
     private String proofObligation = null;
     private String problemHeader = null;
-
-    private int savedGuessing = -1;
-
-    /*
-     counter variable for parser rules accessterm and heap_selection suffix:
-     - stores nesting depth of alpha::select(heap,o,f)-terms created via pretty syntax	(i.e. terms of the form: o.f)
-     - rule accessterm increases the counter
-     - rule heap_selection_suffix calls method heapSelectionSuffix(), which resets
-       the counter
-     - In case a term similar to o.f1.f2.f3.f4 would occur, this variable should have a value of 4.
-       The non-pretty syntax of this term would look similar to the following:
-           T::select(h, T::select(h, T::select(h, T::select(h, o, f1) , f2) , f3), f4)
-    */
-    protected int globalSelectNestingDepth = 0;
-
+    //private int savedGuessing = -1;
     private int lineOffset = 0;
     private int colOffset = 0;
-    private int stringLiteralLine = 0; // HACK!
-
+    //private int stringLiteralLine = 0; // HACK!
     private Services services;
     private JavaReader javaReader;
-
     // if this is used then we can capture parts of the input for later use
     private IProgramMethod pm = null;
-
     private LinkedHashMap<RuleKey, Taclet> taclets = new LinkedHashMap<RuleKey, Taclet>();
-
     private ImmutableList<Contract> contracts = ImmutableSLList.nil();
-    private ImmutableSet<ClassInvariant> invs = DefaultImmutableSet.<ClassInvariant>nil();
-
+    private ImmutableSet<ClassInvariant> invs = DefaultImmutableSet.nil();
     private ParserConfig schemaConfig;
     private ParserConfig normalConfig;
-
     // the current active config
     private ParserConfig parserConfig;
-
     private Term quantifiedArrayGuard = null;
-
     private String profileName;
-
-    private TokenStream lexer;
     private org.antlr.runtime.TokenStream input = null;
     private ParsableVariable selfVar;
     private boolean checkSort;
     private SchemaVariableModifierSet mods;
-
-    /**
-     * Although the parser mode can be deduced from the particular constructor
-     * used we still require the caller to provide the parser mode explicitly,
-     * so that the code is readable.
-     */
-
-    public Builder(ParserMode mode, TokenStream lexer, Services services) {
-        this(mode, lexer);
-    }
+    private boolean primitiveElementType;
+    private boolean isPrimitive;
+    private boolean axiomMode;
 
     /* Most general constructor, should only be used internally */
-    private Builder(TokenStream lexer,
-                    Services services,
+    private Builder(Services services,
                     NamespaceSet nss,
                     ParserMode mode) {
-        this.lexer = lexer;
         this.parserMode = mode;
         this.services = services;
         this.nss = nss;
@@ -195,16 +174,14 @@ public class Builder extends KeYParserBaseVisitor<Object> {
      * and formulae.
      */
     public Builder(ParserMode mode,
-                   TokenStream lexer,
                    JavaReader jr,
                    Services services,
                    NamespaceSet nss,
                    AbbrevMap scm) {
-        this(lexer, services, nss, mode);
+        this(services, nss, mode);
         this.javaReader = jr;
         this.scm = scm;
     }
-
 
     /**
      * ONLY FOR TEST CASES.
@@ -215,44 +192,39 @@ public class Builder extends KeYParserBaseVisitor<Object> {
      * will represent bound variables.
      */
     public Builder(ParserMode mode,
-                   TokenStream lexer,
                    Services services,
                    NamespaceSet nss) {
         this(mode,
-                lexer,
                 new SchemaRecoder2KeY(services, nss),
                 services,
                 nss,
-                new LinkedHashMap());
+                new AbbrevMap());
     }
 
     /**
      * Used to construct Taclet parser
      */
     public Builder(ParserMode mode,
-                   TokenStream lexer,
                    SchemaJavaReader jr,
                    Services services,
                    NamespaceSet nss,
                    HashMap taclet2Builder) {
-        this(lexer, services, nss, mode);
+        this(services, nss, mode);
         switchToSchemaMode();
         this.scm = new AbbrevMap();
         this.javaReader = jr;
         this.taclet2Builder = taclet2Builder;
     }
 
-
     /**
      * Used to construct Problem parser
      */
     public Builder(ParserMode mode,
-                   TokenStream lexer,
                    ParserConfig schemaConfig,
                    ParserConfig normalConfig,
                    HashMap taclet2Builder,
                    ImmutableList<Taclet> taclets) {
-        this(lexer, null, null, mode);
+        this(null, null, mode);
         if (normalConfig != null)
             scm = new AbbrevMap();
         this.schemaConfig = schemaConfig;
@@ -268,14 +240,21 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     }
 
-    public Builder(ParserMode mode, TokenStream lexer) {
-        this(lexer, null, null, mode);
-        scm = new AbbrevMap();
-        this.schemaConfig = null;
-        this.normalConfig = null;
-        switchToNormalMode();
-        this.taclet2Builder = null;
-        this.taclets = new LinkedHashMap<RuleKey, Taclet>();
+    private static boolean isSelectTerm(Term term) {
+        return term.op().name().toString().endsWith("::select") && term.arity() == 3;
+    }
+
+    private <T> T oneOf(ParserRuleContext... ctxs) {
+        for (ParserRuleContext ctx : ctxs) {
+            if (ctx != null) {
+                return (T) ctx.accept(this);
+            }
+        }
+        return null;
+    }
+
+    private <T> List<T> allOf(Collection<? extends ParserRuleContext> argument) {
+        return argument.stream().map(it -> (T) it.accept(this)).collect(Collectors.toList());
     }
 
     public String getSourceName() {
@@ -396,7 +375,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     }
 
     public ImmutableList<Taclet> getTaclets() {
-        ImmutableList<Taclet> result = ImmutableSLList.<Taclet>nil();
+        ImmutableList<Taclet> result = ImmutableSLList.nil();
 
         /* maintain correct order for taclet lemma proofs */
         for (Taclet t : taclets.values()) {
@@ -579,35 +558,48 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         }
     }
 
-    private Term toZNotation(String number, Namespace<Function> functions) {
-        String s = number;
-        final boolean negative = (s.charAt(0) == '-');
+    private Term toZNotation(String literal, Namespace<Function> functions) {
+        literal = literal.replace("_", "");
+        final boolean negative = (literal.charAt(0) == '-');
         if (negative) {
-            s = number.substring(1, s.length());
+            literal = literal.substring(1);
         }
-        if (s.startsWith("0x")) {
-            try {
-                BigInteger bi = new BigInteger(s.substring(2), 16);
-                s = bi.toString();
-            } catch (NumberFormatException nfe) {
-                Debug.fail("Not a hexadecimal constant (BTW, this should not have happened).");
-            }
-        }
-        Term result = getTermFactory().createTerm((Function) functions.lookup(new Name("#")));
+        int base = 10;
 
-        for (int i = 0; i < s.length(); i++) {
-            result = getTermFactory().createTerm((Function) functions.lookup(new Name(s.substring(i, i + 1))), result);
+        if (literal.startsWith("0x")) {
+            literal = literal.substring(2);
+            base = 16;
         }
 
-        if (negative) {
-            result = getTermFactory().createTerm((Function) functions.lookup(new Name("neglit")), result);
+        if (literal.startsWith("0b")) {
+            literal = literal.substring(2);
+            base = 8;
         }
-        return getTermFactory().createTerm
-                ((Function) functions.lookup(new Name("Z")), result);
+
+        BigInteger bi = new BigInteger(literal, base);
+        return toZNotation(bi, functions);
+    }
+
+    private Term toZNotation(BigInteger bi, Namespace<Function> functions) {
+        boolean negative = bi.signum() < 0;
+        String s = bi.abs().toString();
+        Term result = getTermFactory().createTerm(
+                functions.lookup(new Name("#")));
+
+        for (int i = 0; i < s.length(); i++)
+            result = getTermFactory().createTerm(
+                    functions.lookup(new Name(s.substring(i, i + 1))), result);
+
+        if (negative) {
+            result = getTermFactory().createTerm(
+                    functions.lookup(new Name("neglit")), result);
+        }
+        return getTermFactory().createTerm(
+                functions.lookup(new Name("Z")), result);
     }
 
     private String getTypeList(ImmutableList<ProgramVariable> vars) {
-        StringBuffer result = new StringBuffer("");
+        StringBuffer result = new StringBuffer();
         final Iterator<ProgramVariable> it = vars.iterator();
         while (it.hasNext()) {
             result.append(it.next().getContainerType().getFullName());
@@ -679,7 +671,6 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         }
         return result;
     }
-
 
     public Term createAttributeTerm(Term prefix,
                                     Operator attribute) throws RecognitionException/*SemanticException*/ {
@@ -784,7 +775,6 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         namespaces().setVariables(orig);
     }
 
-
     private Set progVars(JavaBlock jb) {
         if (isGlobalDeclTermParser()) {
             ProgramVariableCollector pvc
@@ -828,7 +818,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         return null;
     }
 
-    private PairOfStringAndJavaBlock getJavaBlock(Token t) throws RecognitionException/*SemanticException*/ {
+    private PairOfStringAndJavaBlock getJavaBlock(Token t) {
         PairOfStringAndJavaBlock sjb = new PairOfStringAndJavaBlock();
         String s = t.getText();
         int index = s.indexOf("\n");
@@ -860,7 +850,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         } catch (de.uka.ilkd.key.java.PosConvertException e) {
             lineOffset = e.getLine() - 1;
             colOffset = e.getColumn() + 1;
-            throw new RecognitionException(input);
+            throwEx(new RecognitionException(input));
             //throw new JavaParserException(e.getMessage(), t.getText(),
             //    getSourceName(), t.getLine(), t.getCharPositionInLine(), lineOffset, colOffset);
         } catch (de.uka.ilkd.key.java.ConvertException e) {
@@ -871,7 +861,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                 colOffset = e.parseException().currentToken.next.beginColumn;
                 e.parseException().currentToken.next.beginLine = getLine() - 1;
                 e.parseException().currentToken.next.beginColumn = getColumn();
-                throw new RecognitionException(input);
+                throwEx(new RecognitionException(input));
                 //throw new JavaParserException(e.getMessage(), t.getText(), getSourceName(), t.getLine(), t.getCharPositionInLine(), -1, -1);  // row/columns already in text
             }
             if (e.proofJavaException() != null
@@ -881,11 +871,11 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                 colOffset = e.proofJavaException().currentToken.next.beginColumn;
                 e.proofJavaException().currentToken.next.beginLine = getLine();
                 e.proofJavaException().currentToken.next.beginColumn = getColumn();
-                throw new RecognitionException(input);
+                throwEx(new RecognitionException(input));
                 //throw  new JavaParserException(e.getMessage(), t.getText(), getSourceName(), t.getLine(), t.getCharPositionInLine(), lineOffset, colOffset);
 
             }
-            throw new RecognitionException(input);
+            throwEx(new RecognitionException(input));
             //throw new JavaParserException(e.getMessage(), t.getText(), getSourceName(), t.getLine(), t.getCharPositionInLine());
         }
         return sjb;
@@ -897,11 +887,11 @@ public class Builder extends KeYParserBaseVisitor<Object> {
      * and the look up restarts
      */
     private Sort lookupSort(String name) {
-        Sort result = (Sort) sorts().lookup(new Name(name));
+        Sort result = sorts().lookup(new Name(name));
         if (result == null) {
             if (name.equals(NullSort.NAME.toString())) {
                 Sort objectSort
-                        = (Sort) sorts().lookup(new Name("java.lang.Object"));
+                        = sorts().lookup(new Name("java.lang.Object"));
                 if (objectSort == null) {
                     semanticError("Null sort cannot be used before "
                             + "java.lang.Object is declared");
@@ -909,12 +899,11 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                 result = new NullSort(objectSort);
                 sorts().add(result);
             } else {
-                result = (Sort) sorts().lookup(new Name("java.lang." + name));
+                result = sorts().lookup(new Name("java.lang." + name));
             }
         }
         return result;
     }
-
 
     /**
      * looks up a function, (program) variable or static query of the
@@ -942,14 +931,14 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         }
 
         // case 2: program variable
-        v = (Operator) programVariables().lookup
+        v = programVariables().lookup
                 (new ProgramElementName(varfunc_name));
         if (v != null && args == null) {
             return v;
         }
 
         // case 3: function
-        v = (Operator) functions().lookup(new Name(varfunc_name));
+        v = functions().lookup(new Name(varfunc_name));
         if (v != null) { // we allow both args==null (e.g. `c')
             // and args.length=0 (e.g. 'c())' here
             return v;
@@ -1031,11 +1020,9 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     }
 
     private boolean isTermTransformer() /*throws TokenStreamException*/ {
-        if ((input.LA(1) == KeYLexer.IDENT &&
+        return (input.LA(1) == KeYLexer.IDENT &&
                 AbstractTermTransformer.name2metaop(input.LT(1).getText()) != null)
-                || input.LA(1) == KeYLexer.IN_TYPE)
-            return true;
-        return false;
+                || input.LA(1) == KeYLexer.IN_TYPE;
     }
 
     private boolean isStaticQuery() throws RecognitionException/*KeYSemanticException*/ {
@@ -1069,10 +1056,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         return result;
     }
 
-
-    private TacletBuilder createTacletBuilderFor
-            (Object find, int applicationRestriction)
-            throws RecognitionException/*InvalidFindException*/ {
+    private TacletBuilder createTacletBuilderFor(Object find, int applicationRestriction) {
         if (applicationRestriction != RewriteTaclet.NONE &&
                 applicationRestriction != RewriteTaclet.IN_SEQUENT_STATE &&
                 !(find instanceof Term)) {
@@ -1130,7 +1114,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                             getSourceName(), getLine(), getColumn()));
         }
         //TODO
-
+        return b;
     }
 
     private void addGoalTemplate(TacletBuilder b,
@@ -1139,8 +1123,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                                  Sequent addSeq,
                                  ImmutableList<Taclet> addRList,
                                  ImmutableSet<SchemaVariable> pvs,
-                                 ImmutableSet<Choice> soc)
-            throws RecognitionException, UnfittingReplacewithException/*SemanticException*/ {
+                                 ImmutableSet<Choice> soc) {
         TacletGoalTemplate gt = null;
         if (rwObj == null) {
             // there is no replacewith, so we take
@@ -1150,7 +1133,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         } else {
             if (b instanceof NoFindTacletBuilder) {
                 // there is a replacewith without a find.
-                throw new RecognitionException("");
+                throwEx(new RecognitionException(""));
                 //new UnfittingReplacewithException
                 //("Replacewith without find", getSourceName(),
                 // getLine(), getColumn());
@@ -1162,10 +1145,10 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                             (Sequent) rwObj,
                             pvs);
                 } else {
-                    throw new UnfittingReplacewithException
+                    throwEx(new UnfittingReplacewithException
                             ("Replacewith in a Antec-or SuccTaclet has " +
                                     "to contain a sequent (not a term)",
-                                    getSourceName(), getLine(), getColumn());
+                                    getSourceName(), getLine(), getColumn()));
                 }
             } else if (b instanceof RewriteTacletBuilder) {
                 if (rwObj instanceof Term) {
@@ -1174,10 +1157,10 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                             (Term) rwObj,
                             pvs);
                 } else {
-                    throw new UnfittingReplacewithException
+                    throwEx(new UnfittingReplacewithException
                             ("Replacewith in a RewriteTaclet has " +
                                     "to contain a term (not a sequent)",
-                                    getSourceName(), getLine(), getColumn());
+                                    getSourceName(), getLine(), getColumn()));
                 }
             }
         }
@@ -1191,9 +1174,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         if (!l1.equals(l2)) {
             semanticError("Expecting '" + l1 + "', found '" + l2 + "'.");
         }
-        ;
     }
-
 
     /**
      * returns the ProgramMethod parsed in the jml_specifications section.
@@ -1206,8 +1187,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         functions().add(f);
     }
 
-    private ImmutableSet<Modality> lookupOperatorSV(String opName, ImmutableSet<Modality> modalities)
-            throws RecognitionException/*KeYSemanticException*/ {
+    private ImmutableSet<Modality> lookupOperatorSV(String opName, ImmutableSet<Modality> modalities) {
         SchemaVariable sv = schemaVariables().lookup(new Name(opName));
         if (sv == null || !(sv instanceof ModalOperatorSV)) {
             semanticError("Schema variable " + opName + " not defined.");
@@ -1217,9 +1197,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         return modalities;
     }
 
-    private ImmutableSet<Modality> opSVHelper(String opName,
-                                              ImmutableSet<Modality> modalities)
-            throws RecognitionException/*KeYSemanticException*/ {
+    private ImmutableSet<Modality> opSVHelper(String opName, ImmutableSet<Modality> modalities) {
         if (opName.charAt(0) == '#') {
             return lookupOperatorSV(opName, modalities);
         } else {
@@ -1238,22 +1216,9 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         throwEx(new KeYSemanticException(input, getSourceName(), message));
     }
 
-    private static class PairOfStringAndJavaBlock {
-        String opName;
-        JavaBlock javaBlock;
-    }
-
-    private static boolean isSelectTerm(Term term) {
-        return term.op().name().toString().endsWith("::select") && term.arity() == 3;
-    }
-
     private boolean isImplicitHeap(Term t) {
         return getServices().getTermBuilder().getBaseHeap().equals(t);
     }
-
-    // This is used for testing in TestTermParserHeap.java
-    public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE
-            = "Expecting select term before '@', not: ";
 
     private Term replaceHeap(Term term, Term heap, int depth) throws RecognitionException, KeYSemanticException {
         if (depth > 0) {
@@ -1346,15 +1311,25 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitFile(KeYParser.FileContext ctx) {
-        return super.visitFile(ctx);
+        return accept(ctx.decls());
     }
 
     @Override
     public Object visitDecls(KeYParser.DeclsContext ctx) {
-        return super.visitDecls(ctx);
+        if (parse_includes)
+            allOf(ctx.one_include_statement());
+        activatedChoices = DefaultImmutableSet.nil();
+        accept(ctx.options_choice());
+        allOf(ctx.option_decls());
+        allOf(ctx.sort_decls());
+        allOf(ctx.prog_var_decls());
+        allOf(ctx.schema_var_decls());
+        allOf(ctx.pred_decls());
+        allOf(ctx.func_decls());
+        allOf(ctx.transform_decls());
+        allOf(ctx.ruleset_decls());
+        return null;
     }
-
-    boolean ldt = false;
 
     @Override
     public Object visitOne_include_statement(KeYParser.One_include_statementContext ctx) {
@@ -1379,7 +1354,8 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitOptions_choice(KeYParser.Options_choiceContext ctx) {
-        return super.visitOptions_choice(ctx);
+        allOf(ctx.activated_choice());
+        return null;
     }
 
     @Override
@@ -1402,9 +1378,8 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitOption_decls(KeYParser.Option_declsContext ctx) {
-        return super.visitOption_decls(ctx);
+        return allOf(ctx.choice());
     }
-
 
     @Override
     public Object visitChoice(KeYParser.ChoiceContext ctx) {
@@ -1430,7 +1405,16 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitChoice_option(KeYParser.Choice_optionContext ctx) {
-        return super.visitChoice_option(ctx);
+        String name = currentChoiceCategory + ":" + ctx.choice_.getText();
+        Choice c = choices().lookup(new Name(name));
+        if (c == null) {
+            c = new Choice(ctx.choice_.getText(), currentChoiceCategory);
+            choices().add(c);
+        }
+        if (!category2Default.containsKey(currentChoiceCategory)) {
+            category2Default.put(currentChoiceCategory, name);
+        }
+        return c;
     }
 
     @Override
@@ -1456,6 +1440,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                         ? (Sort[]) ctx.sortExt.accept(this)
                         : new Sort[0];
         //TODO
+        return null;
     }
 
     @Override
@@ -1467,6 +1452,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                         ? (Sort[]) ctx.sortExt.accept(this)
                         : new Sort[0];
         //TODO
+        return null;
     }
 
     @Override
@@ -1495,8 +1481,8 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                     Sort s = null;
                     if (isGenericSort) {
                         int i;
-                        ImmutableSet<Sort> ext = DefaultImmutableSet.<Sort>nil();
-                        ImmutableSet<Sort> oneOf = DefaultImmutableSet.<Sort>nil();
+                        ImmutableSet<Sort> ext = DefaultImmutableSet.nil();
+                        ImmutableSet<Sort> oneOf = DefaultImmutableSet.nil();
 
                         for (i = 0; i != sortExt.length; ++i)
                             ext = ext.add(sortExt[i]);
@@ -1513,7 +1499,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                     } else if (new Name("any").equals(sort_name)) {
                         s = Sort.ANY;
                     } else {
-                        ImmutableSet<Sort> ext = DefaultImmutableSet.<Sort>nil();
+                        ImmutableSet<Sort> ext = DefaultImmutableSet.nil();
 
                         for (int i = 0; i != sortExt.length; ++i) {
                             ext = ext.add(sortExt[i]);
@@ -1635,10 +1621,13 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public String visitString_literal(KeYParser.String_literalContext ctx) {
-        var lit = unescapeString(ctx.id.getText());
-        lit = lit.substring(1, lit.length() - 1);
-        return lit;
+    public Term visitString_literal(KeYParser.String_literalContext ctx) {
+        String s = unescapeString(ctx.id.getText());
+        return getServices().getTypeConverter()
+                .convertToLogicElement(new StringLiteral(s));
+        //var lit = unescapeString(ctx.id.getText());
+        //lit = lit.substring(1, lit.length() - 1);
+        //return lit;
     }
 
     @Override
@@ -1653,86 +1642,90 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitSchema_var_decls(KeYParser.Schema_var_declsContext ctx) {
-        return super.visitSchema_var_decls(ctx);
+        switchToSchemaMode();
+        List<SchemaVariable> seq = allOf(ctx.one_schema_var_decl());
+        switchToNormalMode();
+        return seq;
     }
 
     @Override
     public Object visitOne_schema_var_decl(KeYParser.One_schema_var_declContext ctx) {
         //TODO
-        /*
-          boolean makeVariableSV  = false;
-    boolean makeSkolemTermSV = false;
-    boolean makeTermLabelSV  = false;
-    SchemaVariableModifierSet mods = null;
-} :
-   (MODALOPERATOR one_schema_modal_op_decl SEMI)
- |
-  (
-   (
-    PROGRAM
-    { mods = new SchemaVariableModifierSet.ProgramSV (); }
-    ( schema_modifiers[mods] ) ?
-    id = simple_ident ( LBRACKET nameString = simple_ident EQUALS parameter = simple_ident_dots RBRACKET )? {
-       if(nameString != null && !"name".equals(nameString)) {
-         semanticError("Unrecognized token '"+nameString+"', expected 'name'");
-       }
-       ProgramSVSort psv = ProgramSVSort.name2sort().get(new Name(id));
-       s = (Sort) (parameter != null ? psv.createInstance(parameter) : psv);
-       if (s == null) {
-         semanticError
-           ("Program SchemaVariable of type "+id+" not found.");
-       }
-    }
-    ids = simple_ident_comma_list
-  | FORMULA
-    { mods = new SchemaVariableModifierSet.FormulaSV (); }
-    ( schema_modifiers[mods] ) ?
-    {s = Sort.FORMULA;}
-    ids = simple_ident_comma_list
-  | TERMLABEL
-    { makeTermLabelSV = true; }
-    { mods = new SchemaVariableModifierSet.TermLabelSV (); }
-    ( schema_modifiers[mods] ) ?
-    ids = simple_ident_comma_list
-  | UPDATE
-    { mods = new SchemaVariableModifierSet.FormulaSV (); }
-    ( schema_modifiers[mods] ) ?
-    {s = Sort.UPDATE;}
-    ids = simple_ident_comma_list
-  | SKOLEMFORMULA
-    { makeSkolemTermSV = true; }
-    { mods = new SchemaVariableModifierSet.FormulaSV (); }
-    ( schema_modifiers[mods] ) ?
-    {s = Sort.FORMULA;}
-    ids = simple_ident_comma_list
-  | (    TERM
-         { mods = new SchemaVariableModifierSet.TermSV (); }
-         ( schema_modifiers[mods] ) ?
-      | ( (VARIABLES | VARIABLE)
-         { makeVariableSV = true; }
-         { mods = new SchemaVariableModifierSet.VariableSV (); }
-         ( schema_modifiers[mods] ) ?)
-      | (SKOLEMTERM
-         { makeSkolemTermSV = true; }
-         { mods = new SchemaVariableModifierSet.SkolemTermSV (); }
-         ( schema_modifiers[mods] ) ?)
-    )
-    s = any_sortId_check[true]
-    ids = simple_ident_comma_list
-  ) SEMI
-   {
-     Iterator<String> it = ids.iterator();
-     while(it.hasNext())
-       schema_var_decl(it.next(),
-                       s,
-                       makeVariableSV,
-                       makeSkolemTermSV,
-                       makeTermLabelSV,
-		       mods);
-   }
- )
-         */
-        return super.visitOne_schema_var_decl(ctx);
+        boolean makeVariableSV = false;
+        boolean makeSkolemTermSV = false;
+        boolean makeTermLabelSV = false;
+        SchemaVariableModifierSet mods = null;
+        accept(ctx.one_schema_modal_op_decl());
+        Sort s = null;
+        List<String> ids = accept(ctx.simple_ident_comma_list());
+        if (ctx.PROGRAM() != null) {
+            mods = new SchemaVariableModifierSet.ProgramSV();
+            accept(ctx.schema_modifiers());
+            String id = accept(ctx.id);
+            String nameString = accept(ctx.nameString);
+            String parameter = accept(ctx.simple_ident_dots());
+            if (nameString != null && !"name".equals(nameString)) {
+                semanticError("Unrecognized token '" + nameString + "', expected 'name'");
+            }
+            ProgramSVSort psv = ProgramSVSort.name2sort().get(new Name(id));
+            s = parameter != null ? psv.createInstance(parameter) : psv;
+            if (s == null) {
+                semanticError
+                        ("Program SchemaVariable of type " + id + " not found.");
+            }
+            //List<String> ids = accept(ctx.simple_ident_comma_list());
+            //TODO
+        }
+        if (ctx.FORMULA() != null) {
+            mods = new SchemaVariableModifierSet.FormulaSV();
+            accept(ctx.schema_modifiers());
+            s = Sort.FORMULA;
+        }
+        if (ctx.TERMLABEL() != null) {
+            makeTermLabelSV = true;
+            mods = new SchemaVariableModifierSet.TermLabelSV();
+            accept(ctx.schema_modifiers());
+        }
+        if (ctx.UPDATE() != null) {
+            mods = new SchemaVariableModifierSet.FormulaSV();
+            accept(ctx.schema_modifiers());
+            s = Sort.UPDATE;
+        }
+        if (ctx.SKOLEMFORMULA() != null) {
+            makeSkolemTermSV = true;
+            mods = new SchemaVariableModifierSet.FormulaSV();
+            accept(ctx.schema_modifiers());
+            s = Sort.FORMULA;
+        }
+        if (ctx.TERM() != null) {
+            mods = new SchemaVariableModifierSet.TermSV();
+            accept(ctx.schema_modifiers());
+        }
+        if (ctx.VARIABLE() != null || ctx.VARIABLES() != null) {
+            makeVariableSV = true;
+            mods = new SchemaVariableModifierSet.VariableSV();
+            accept(ctx.schema_modifiers());
+        }
+        if (ctx.SKOLEMTERM() != null) {
+            makeSkolemTermSV = true;
+            mods = new SchemaVariableModifierSet.SkolemTermSV();
+            accept(ctx.schema_modifiers());
+        }
+        s = accept(ctx.any_sortId_check());
+
+        try {
+            for (String id : ids) {
+                schema_var_decl(id,
+                        s,
+                        makeVariableSV,
+                        makeSkolemTermSV,
+                        makeTermLabelSV,
+                        mods);
+            }
+        } catch (AmbigiousDeclException e) {
+            throwEx(e);
+        }
+        return null;
     }
 
     @Override
@@ -1748,104 +1741,87 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitOne_schema_modal_op_decl(KeYParser.One_schema_modal_op_declContext ctx) {
-        //TODO
-        /*
-              (LPAREN sort = any_sortId_check[true] {
-           if (sort != Sort.FORMULA) {
-               semanticError("Modal operator SV must be a FORMULA, not " + sort);
-           }
-         } RPAREN)?
-        LBRACE ids = simple_ident_comma_list RBRACE id = simple_ident
-	{   if (skip_schemavariables) {
-	       return;
-	    }
-            Iterator<String> it1 = ids.iterator();
-            while(it1.hasNext()) {
-  	      modalities = opSVHelper(it1.next(), modalities);
-  	    }
-            SchemaVariable osv = schemaVariables().lookup(new Name(id));
-            if(osv != null)
-              semanticError("Schema variable "+id+" already defined.");
-
-            osv = SchemaVariableFactory.createModalOperatorSV(new Name(id),
-                        sort, modalities);
-
-            if (inSchemaMode()) {
-                schemaVariables().add(osv);
-                //functions().add(osv);
-            }
+        ImmutableSet<Modality> modalities = DefaultImmutableSet.nil();
+        Sort sort = accept(ctx.any_sortId_check());
+        if (sort != Sort.FORMULA) {
+            semanticError("Modal operator SV must be a FORMULA, not " + sort);
         }
-         */
-        return super.visitOne_schema_modal_op_decl(ctx);
+        List<String> ids = accept(ctx.simple_ident_comma_list());
+        String id = accept(ctx.simple_ident());
+
+        if (skip_schemavariables) {
+            return null;
+        }
+
+        for (String s : ids) {
+            modalities = opSVHelper(s, modalities);
+        }
+        SchemaVariable osv = schemaVariables().lookup(new Name(id));
+        if (osv != null)
+            semanticError("Schema variable " + id + " already defined.");
+
+        osv = SchemaVariableFactory.createModalOperatorSV(new Name(id), sort, modalities);
+
+        if (inSchemaMode()) {
+            schemaVariables().add(osv);
+            //functions().add(osv);
+        }
+        return null;
     }
 
     @Override
     public Object visitPred_decl(KeYParser.Pred_declContext ctx) {
-        //TODO
-        /*
-           pred_name = funcpred_name
+        String pred_name = accept(ctx.funcpred_name());
+        List<Boolean> whereToBind = accept(ctx.where_to_bind());
+        List<Sort> argSorts = accept(ctx.arg_sorts());
+        if (!skip_predicates) {
+            if (whereToBind != null && whereToBind.size() != argSorts.size()) {
+                semanticError("Where-to-bind list must have same length "
+                        + "as argument list");
+            }
 
-        (
-	    whereToBind = where_to_bind
-	)?
+            Function p = null;
 
-
-        argSorts = arg_sorts[!skip_predicates]
-        {
-            if (!skip_predicates) {
-
-                if(whereToBind != null
-	 	   && whereToBind.length != argSorts.length) {
-                    semanticError("Where-to-bind list must have same length "
-                                  + "as argument list");
-                }
-
-                Function p = null;
-
-            	int separatorIndex = pred_name.indexOf("::");
-	        if (separatorIndex > 0) {
-	            String sortName = pred_name.substring(0, separatorIndex);
-	            String baseName = pred_name.substring(separatorIndex + 2);
-		    Sort genSort = lookupSort(sortName);
-
-		    if(genSort instanceof GenericSort) {
-		    	p = SortDependingFunction.createFirstInstance(
-		    	    		(GenericSort)genSort,
-		    	    		new Name(baseName),
-		    	    		Sort.FORMULA,
-		    	    		argSorts,
-		    	    		false);
-		    }
-	        }
-
-                if(p == null) {
-                    p = new Function(new Name(pred_name),
-                    		     Sort.FORMULA,
-                    		     argSorts,
-                    		     whereToBind,
-                    		     false);
-                }
-		if (lookup(p.name()) != null) {
-		    if(!isProblemParser()) {
-		        throw new AmbigiousDeclException(p.name().toString(),
-		                                         getSourceName(),
-		                                         getLine(),
-		                                         getColumn());
-
-		    }
-		}else{
-                  addFunction(p);
+            int separatorIndex = pred_name.indexOf("::");
+            if (separatorIndex > 0) {
+                String sortName = pred_name.substring(0, separatorIndex);
+                String baseName = pred_name.substring(separatorIndex + 2);
+                Sort genSort = lookupSort(sortName);
+                if (genSort instanceof GenericSort) {
+                    p = SortDependingFunction.createFirstInstance(
+                            (GenericSort) genSort,
+                            new Name(baseName),
+                            Sort.FORMULA,
+                            (Sort[]) argSorts.toArray(),
+                            false);
                 }
             }
+
+            if (p == null) {
+                p = new Function(new Name(pred_name),
+                        Sort.FORMULA,
+                        (Sort[]) argSorts.toArray(),
+                        (Boolean[]) whereToBind.toArray(),
+                        false);
+            }
+            if (lookup(p.name()) != null) {
+                if (!isProblemParser()) {
+                    throwEx(new AmbigiousDeclException(p.name().toString(),
+                            getSourceName(),
+                            getLine(),
+                            getColumn()));
+
+                }
+            } else {
+                addFunction(p);
+            }
         }
-        SEMI
-         */
-        return super.visitPred_decl(ctx);
+        return null;
     }
 
     @Override
     public Object visitPred_decls(KeYParser.Pred_declsContext ctx) {
-        return super.visitPred_decls(ctx);
+        return allOf(ctx.pred_decl());
     }
 
     @Override
@@ -1862,82 +1838,57 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitFunc_decl(KeYParser.Func_declContext ctx) {
-        //TODO
-        /*
-        func_decl
-@init{
-    boolean unique = false;
-}
-    :
-        (
-            UNIQUE {unique=true;}
-        )?
-
-        retSort = any_sortId_check[!skip_functions]
-
-        func_name = funcpred_name
-
-	(
-	    whereToBind = where_to_bind
-	)?
-
-        argSorts = arg_sorts[!skip_functions]
-
-        {
-            if (!skip_functions) {
-
-	 	if(whereToBind != null
-	 	   && whereToBind.length != argSorts.length) {
-                    semanticError("Where-to-bind list must have same length "
-                                  + "as argument list");
-                }
-
-                Function f = null;
-
-	        int separatorIndex = func_name.indexOf("::");
-	        if (separatorIndex > 0) {
-	            String sortName = func_name.substring(0, separatorIndex);
-	            String baseName = func_name.substring(separatorIndex + 2);
-		    Sort genSort = lookupSort(sortName);
-
-		    if(genSort instanceof GenericSort) {
-		    	f = SortDependingFunction.createFirstInstance(
-		    	    		(GenericSort)genSort,
-		    	    		new Name(baseName),
-		    	    		retSort,
-		    	    		argSorts,
-		    	    		unique);
-		    }
-	        }
-
-	        if(f == null) {
-	            f = new Function(new Name(func_name),
-	                             retSort,
-	                             argSorts,
-	                             whereToBind,
-	                             unique);
-	        }
-		if (lookup(f.name()) != null) {
-		    if(!isProblemParser()) {
-		      throw new AmbigiousDeclException(f.name().toString(),
-		                                     getSourceName(),
-		                                     getLine(),
-		                                     getColumn());
-		    }
-		}else{
-	    	    addFunction(f);
-	        }
+        boolean unique = ctx.UNIQUE() != null;
+        Sort retSort = accept(ctx.any_sortId_check());
+        String func_name = accept(ctx.funcpred_name());
+        List<Boolean[]> whereToBind = accept(ctx.where_to_bind());
+        List<Sort> argSorts = accept(ctx.arg_sorts());
+        if (!skip_functions) {
+            if (whereToBind != null && whereToBind.size() != argSorts.size()) {
+                semanticError("Where-to-bind list must have same length "
+                        + "as argument list");
             }
+
+            Function f = null;
+            int separatorIndex = func_name.indexOf("::");
+            if (separatorIndex > 0) {
+                String sortName = func_name.substring(0, separatorIndex);
+                String baseName = func_name.substring(separatorIndex + 2);
+                Sort genSort = lookupSort(sortName);
+                if (genSort instanceof GenericSort) {
+                    f = SortDependingFunction.createFirstInstance(
+                            (GenericSort) genSort,
+                            new Name(baseName),
+                            retSort,
+                            (Sort[]) argSorts.toArray(),
+                            unique);
+                }
+            }
+
+            if (f == null) {
+                f = new Function(new Name(func_name),
+                        retSort,
+                        (Sort[]) argSorts.toArray(),
+                        (Boolean[]) whereToBind.toArray(),
+                        unique);
+            }
+
+            if (lookup(f.name()) != null) {
+                if (!isProblemParser()) {
+                    throwEx(new AmbigiousDeclException(f.name().toString(),
+                            getSourceName(), getLine(), getColumn()));
+                }
+            } else {
+                addFunction(f);
+            }
+            return f;
         }
-        SEMI
-    ;
-         */
-        return super.visitFunc_decl(ctx);
+        return null;
     }
 
     @Override
     public Object visitFunc_decls(KeYParser.Func_declsContext ctx) {
-        return super.visitFunc_decls(ctx);
+        return allOf(ctx.func_decl());
     }
 
     @Override
@@ -1979,7 +1930,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitTransform_decls(KeYParser.Transform_declsContext ctx) {
-        return super.visitTransform_decls(ctx);
+        return allOf(ctx.transform_decl());
     }
 
     @Override
@@ -2009,7 +1960,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                 }
             }
         }
-        return super.visitRuleset_decls(ctx);
+        return null;
     }
 
     @Override
@@ -2146,7 +2097,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Term visitFormula(KeYParser.FormulaContext ctx) {
-        Term a = (Term) visit(ctx.term());
+        Term a = accept(ctx.term());
         if (a != null && a.sort() != Sort.FORMULA) {
             semanticError("Just Parsed a Term where a Formula was expected.");
         }
@@ -2162,13 +2113,16 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Term visitTermEOF(KeYParser.TermEOFContext ctx) {
-        return (Term) visit(ctx.term());
+        return accept(ctx.term());
     }
 
     @Override
     public Term visitElementary_update_term(KeYParser.Elementary_update_termContext ctx) {
         List<Term> terms = mapOf(ctx.equivalence_term());
-        return getServices().getTermBuilder().elementary(terms);
+        if (terms.size() == 1)
+            return terms.get(0);
+        else
+            return getServices().getTermBuilder().elementary(terms.get(0), terms.get(1));
     }
 
     @Override
@@ -2179,8 +2133,9 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Term visitImplication_term(KeYParser.Implication_termContext ctx) {
-        var a = (Term) visit(ctx.a);
-        var a1 = (Term) visit(ctx.a1);
+        Term a = accept(ctx.a);
+        Term a1 = accept(ctx.a1);
+        if (a1 == null) return a;
         return getTermFactory().createTerm(Junctor.IMP, a, a1);
     }
 
@@ -2198,27 +2153,27 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Term visitTerm60(KeYParser.Term60Context ctx) {
-        return (Term) super.visitTerm60(ctx);
+        return (Term) oneOf(ctx.unary_formula(), ctx.equality_term());
     }
 
     @Override
     public Term visitUnary_formula(KeYParser.Unary_formulaContext ctx) {
         if (ctx.NOT() != null) {
             return getTermFactory().createTerm(Junctor.NOT, new Term[]{
-                    (Term) visit(ctx.term60())});
+                    accept(ctx.term60())});
         }
-        return (Term) super.visitUnary_formula(ctx);
+        return null;
     }
 
     @Override
     public Object visitEquality_term(KeYParser.Equality_termContext ctx) {
-        Term a = (Term) visit(ctx.a);
+        Term a = accept(ctx.a);
         if (ctx.EQUALS() == null && null == ctx.NOT_EQUALS()) {
             return a;
         }
 
         boolean negated = ctx.NOT_EQUALS() != null;
-        Term b = (Term) visit(ctx.a1);
+        Term b = accept(ctx.a1);
         if (a.sort() == Sort.FORMULA || b.sort() == Sort.FORMULA) {
             String errorMessage =
                     "The term equality \'=\'/\'!=\' is not " +
@@ -2295,37 +2250,34 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitLogicTermReEntry(KeYParser.LogicTermReEntryContext ctx) {
-        Term a = (Term) visit(ctx.a);
+        Term a = accept(ctx.a);
         if (ctx.op == null) return a;
         Function op = (Function) visit(ctx.op);
-        Term a1 = (Term) visit(ctx.a1);
+        Term a1 = accept(ctx.a1);
         return getTermFactory().createTerm(op, a, a1);
     }
 
     @Override
     public Object visitWeak_arith_op_term(KeYParser.Weak_arith_op_termContext ctx) {
-        Term a = (Term) visit(ctx.a);
+        Term a = accept(ctx.a);
         if (ctx.op == null) return a;
         Function op = (Function) visit(ctx.op);
-        Term a1 = (Term) visit(ctx.a1);
+        Term a1 = accept(ctx.a1);
         return getTermFactory().createTerm(op, a, a1);
     }
 
     @Override
     public Object visitStrong_arith_op_term(KeYParser.Strong_arith_op_termContext ctx) {
-        Term a = (Term) visit(ctx.a);
+        Term a = accept(ctx.a);
         if (ctx.op == null) return a;
         Function op = (Function) visit(ctx.op);
-        Term a1 = (Term) visit(ctx.a1);
+        Term a1 = accept(ctx.a1);
         return getTermFactory().createTerm(op, a, a1);
     }
 
     @Override
-    public Object visitTerm110(KeYParser.Term110Context ctx) {
-        if (ctx.braces_term() != null)
-            return visit(ctx.braces_term());
-        else
-            return visit(ctx.accessterm());
+    public Term visitTerm110(KeYParser.Term110Context ctx) {
+        return (Term) oneOf(ctx.braces_term(), ctx.accessterm());
     }
 
     @Override
@@ -2355,7 +2307,47 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitAccessterm(KeYParser.AccesstermContext ctx) {
-        return super.visitAccessterm(ctx);
+        int selectNestingDepth = globalSelectNestingDepth;
+        final Sort objectSort = getServices().getJavaInfo().objectSort();
+
+        Term result = null;
+        if (ctx.MINUS() != null) {
+            result = accept(ctx.term110());
+            if (result.sort() != Sort.FORMULA) {
+                return getTermFactory().createTerm(
+                        functions().lookup(new Name("neg")), result);
+            } else {
+                semanticError("Formula cannot be prefixed with '-'");
+            }
+        }
+
+        if (ctx.any_sortId_check() != null) {
+            Sort s = accept(ctx.any_sortId_check());
+            if (s == null) {
+                semanticError("Tried to cast to unknown type.");
+            } else if (objectSort != null
+                    && !s.extendsTrans(objectSort)
+                    && result.sort().extendsTrans(objectSort)) {
+                semanticError("Illegal cast from " + result.sort() +
+                        " to sort " + s +
+                        ". Casts between primitive and reference types are not allowed. ");
+            }
+            return getTermFactory().createTerm(
+                    s.getCastSymbol(getServices()), result);
+        }
+
+        var a = oneOf(ctx.static_query(),
+                ctx.static_attribute_suffix(),
+                ctx.atom());
+
+        //TODO losing order
+        var suffix = allOf(ctx.accessterm_bracket_suffix());
+        var attr = allOf(ctx.attribute_or_query_suffix());
+
+        if (ctx.heap_selection_suffix() != null) {
+            accept(ctx.heap_selection_suffix());
+        }
+        return a;
     }
 
     @Override
@@ -2389,18 +2381,63 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
+    public Object visitBoolean_constant(KeYParser.Boolean_constantContext ctx) {
+        if (ctx.TRUE() != null)
+            return getTermFactory().createTerm(Junctor.TRUE);
+        else
+            return getTermFactory().createTerm(Junctor.FALSE);
+    }
+
+    @Override
     public Object visitAtom(KeYParser.AtomContext ctx) {
-        return super.visitAtom(ctx);
+        Term a = oneOf(ctx.specialTerm(), ctx.funcpredvarterm(),
+                ctx.term(), ctx.boolean_constant(), ctx.ifExThenElseTerm(),
+                ctx.ifThenElseTerm(), ctx.string_literal());
+        if (ctx.LGUILLEMETS() != null) {
+            ImmutableArray<TermLabel> labels = accept(ctx.label());
+            if (labels.size() > 0) {
+                a = getServices().getTermBuilder().addLabel(a, labels);
+            }
+        }
+        return a;
     }
 
     @Override
-    public Object visitLabel(KeYParser.LabelContext ctx) {
-        return super.visitLabel(ctx);
+    public ImmutableArray<TermLabel> visitLabel(KeYParser.LabelContext ctx) {
+        List<TermLabel> labels = allOf(ctx.single_label());
+        return new ImmutableArray(labels);
     }
 
     @Override
-    public Object visitSingle_label(KeYParser.Single_labelContext ctx) {
-        return super.visitSingle_label(ctx);
+    public TermLabel visitSingle_label(KeYParser.Single_labelContext ctx) {
+        String labelName = "";
+        TermLabel left = null;
+        TermLabel right = null;
+
+        if (ctx.IDENT() != null)
+            labelName = ctx.IDENT().getText();
+        if (ctx.STAR() != null)
+            labelName = ctx.STAR().getText();
+
+        TermLabel label = null;
+        List<String> parameters = allOf(ctx.string_value());
+        try {
+            if (inSchemaMode()) {
+                SchemaVariable var = schemaVariables().lookup(
+                        new Name(labelName));
+                if (var instanceof TermLabel) {
+                    label = (TermLabel) var;
+                }
+            }
+            if (label == null) {
+                label = getServices().getProfile()
+                        .getTermLabelManager()
+                        .parseLabel(labelName, parameters, getServices());
+            }
+        } catch (Exception ex) {
+            throwEx(new KeYSemanticException(input, getSourceName(), ex));
+        }
+        return label;
     }
 
     @Override
@@ -2417,24 +2454,36 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         }
         var thenT = (Term) ctx.thenT.accept(this);
         var elseT = (Term) ctx.elseT.accept(this);
-        return getTermFactory().createTerm(IfThenElse.IF_THEN_ELSE, new Term[]{condF, thenT, elseT});
+        return getTermFactory().createTerm(IfThenElse.IF_THEN_ELSE, condF, thenT, elseT);
+    }
+
+    /**
+     * Helper function for avoiding cast.
+     *
+     * @param ctx
+     * @param <T>
+     * @return
+     */
+    public <T> @Nullable T accept(@Nullable ParserRuleContext ctx) {
+        if (ctx == null) {
+            return null;
+        }
+        return (T) ctx.accept(this);
     }
 
     @Override
     public Object visitIfExThenElseTerm(KeYParser.IfExThenElseTermContext ctx) {
         Namespace<QuantifiableVariable> orig = variables();
-        var exVars = visit(ctx.bound_variables());
-        var condF = (Term) visit(ctx.condF);
+        List<QuantifiableVariable> exVars = accept(ctx.bound_variables());
+        Term condF = accept(ctx.condF);
         if (condF.sort() != Sort.FORMULA) {
-            semanticError
-                    ("Condition of an \\ifEx-then-else term has to be a formula.");
+            semanticError("Condition of an \\ifEx-then-else term has to be a formula.");
         }
 
-        var thenT = (Term) visit(ctx.thenT);
-        var elseT = (Term) visit(ctx.elseT);
+        Term thenT = accept(ctx.thenT);
+        Term elseT = accept(ctx.elseT);
         ImmutableArray<QuantifiableVariable> exVarsArray
-                = new ImmutableArray<QuantifiableVariable>(
-                exVars.toArray(new QuantifiableVariable[exVars.size()]));
+                = new ImmutableArray<>(exVars);
         var result = getTermFactory().createTerm(IfExThenElse.IF_EX_THEN_ELSE,
                 new Term[]{condF, thenT, elseT},
                 exVarsArray,
@@ -2458,11 +2507,11 @@ public class Builder extends KeYParserBaseVisitor<Object> {
             op = Quantifier.ALL;
         if (ctx.EXISTS() != null)
             op = Quantifier.EX;
-        var vs = visit(ctx.bound_variables());
-        var a1 = (Term) visit(ctx.term60());
-        var a = getTermFactory().createTerm((Quantifier) op,
+        List<QuantifiableVariable> vs = (List<QuantifiableVariable>) visit(ctx.bound_variables());
+        Term a1 = accept(ctx.term60());
+        var a = getTermFactory().createTerm(op,
                 new ImmutableArray<Term>(a1),
-                new ImmutableArray<QuantifiableVariable>(vs.toArray(new QuantifiableVariable[vs.size()])),
+                new ImmutableArray<>(vs.toArray(new QuantifiableVariable[0])),
                 null);
         if (!isGlobalDeclTermParser())
             unbindVars(orig);
@@ -2482,17 +2531,16 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitLocation_term(KeYParser.Location_termContext ctx) {
-        var obj = (Term) visit(ctx.obj);
-        var field = (Term) visit(ctx.field);
+        Term obj = accept(ctx.obj);
+        Term field = accept(ctx.field);
         return getServices().getTermBuilder().singleton(obj, field);
     }
 
     @Override
     public Term visitSubstitutionterm(KeYParser.SubstitutiontermContext ctx) {
-        Term result = null;
         SubstOp op = WarySubstOp.SUBST;
         Namespace<QuantifiableVariable> orig = variables();
-        AbstractSortedOperator v = (AbstractSortedOperator) ctx.v.accept(this);
+        AbstractSortedOperator v = accept(ctx.v);
         if (!isGlobalDeclTermParser()) {
             unbindVars(orig);
             if (v instanceof LogicVariable)
@@ -2501,17 +2549,17 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                 bindVar();
         }
 
-        Term a1 = (Term) ctx.a1.accept(this);
-        Term a2 = (Term) ctx.a2.accept(this);
-        result = getServices().getTermBuilder().subst(op, v, a1, a2);
+        Term a1 = accept(ctx.a1);
+        Term a2 = accept(ctx.a2);
+        Term result = getServices().getTermBuilder().subst(op, (QuantifiableVariable) v, a1, a2);
         if (!isGlobalDeclTermParser()) unbindVars(orig);
         return result;
     }
 
     @Override
     public Term visitUpdateterm(KeYParser.UpdatetermContext ctx) {
-        Term u = (Term) ctx.u.accept(this);
-        Term a2 = (Term) oneOf(ctx.term110(), ctx.unary_formula());
+        Term u = accept(ctx.u);
+        Term a2 = oneOf(ctx.term110(), ctx.unary_formula());
         return getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, a2);
     }
 
@@ -2530,17 +2578,18 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitOne_schema_bound_variable(KeYParser.One_schema_bound_variableContext ctx) {
-        id = simple_ident {
-            ts = schemaVariables().lookup(new Name(id));
-            if (!(ts instanceof VariableSV)) {
-                semanticError(ts + " is not allowed in a quantifier. Note, that you can't "
-                        + "use the normal syntax for quantifiers of the form \"\\exists int i;\""
-                        + " in taclets. You have to define the variable as a schema variable"
-                        + " and use the syntax \"\\exists i;\" instead.");
-            }
-            v = (QuantifiableVariable) ts;
-            bindVar();
+        String id = accept(ctx.simple_ident());
+        var ts = schemaVariables().lookup(new Name(id));
+        if (!(ts instanceof VariableSV)) {
+            semanticError(ts + " is not allowed in a quantifier. Note, that you can't "
+                    + "use the normal syntax for quantifiers of the form \"\\exists int i;\""
+                    + " in taclets. You have to define the variable as a schema variable"
+                    + " and use the syntax \"\\exists i;\" instead.");
         }
+        QuantifiableVariable v = (QuantifiableVariable) ts;
+        bindVar();
+        //TODO?
+        return v;
     }
 
     @Override
@@ -2584,14 +2633,98 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         return allOf(ctx.argument());
     }
 
-    private static <T> List<T> allOf(Collection<? extends ParserRuleContext> argument) {
-        return argument.stream().map(it -> (T) it.accept(this)).collect(Collectors.toList());
+    @Override
+    public Object visitChar_literal(KeYParser.Char_literalContext ctx) {
+        String s = ctx.CHAR_LITERAL().getText();
+        int intVal = 0;
+        if (s.length() == 3) {
+            intVal = s.charAt(1);
+        } else {
+            try {
+                intVal = Integer.parseInt(s.substring(3, s.length() - 1), 16);
+            } catch (NumberFormatException ex) {
+                semanticError("'" + s + "' is not a valid character.");
+            }
+        }
+        return getTermFactory().createTerm(
+                functions().lookup(new Name("C")),
+                toZNotation("" + intVal, functions()).sub(0));
     }
 
     @Override
     public Term visitFuncpredvarterm(KeYParser.FuncpredvartermContext ctx) {
-        //TODO
-        return null;
+        Term _func_pred_var_term = null;
+        String neg = "";
+        boolean opSV = false;
+        Namespace<QuantifiableVariable> orig = variables();
+        boolean limited = false;
+
+        if (ctx.char_literal() != null) return accept(ctx.char_literal());
+        if (ctx.number() != null) return accept(ctx.number());
+        if (ctx.AT() != null) return accept(ctx.abbreviation());
+
+        String varfuncid = accept(ctx.funcpred_name());
+        List<QuantifiableVariable> boundVars = accept(ctx.bound_variables());
+        Term[] args = accept(ctx.argument_list());
+        Term a = null;
+        try {
+            if (varfuncid.equals("skip") && args == null) {
+                a = getTermFactory().createTerm(UpdateJunctor.SKIP);
+            } else {
+                Operator op;
+                if (varfuncid.endsWith(LIMIT_SUFFIX)) {
+                    varfuncid = varfuncid.substring(0, varfuncid.length() - 5);
+                    op = lookupVarfuncId(varfuncid, args);
+                    if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
+                        op = getServices().getSpecificationRepository()
+                                .limitObs((ObserverFunction) op).first;
+                    } else {
+                        semanticError("Cannot can be limited: " + op);
+                    }
+                } else {
+                    op = lookupVarfuncId(varfuncid, args);
+                }
+
+                if (op instanceof ParsableVariable) {
+                    a = termForParsedVariable((ParsableVariable) op);
+                } else {
+                    if (args == null) {
+                        args = new Term[0];
+                    }
+
+                    if (boundVars == null) {
+                        a = getTermFactory().createTerm(op, args);
+                    } else {
+                        //sanity check
+                        assert op instanceof Function;
+                        for (int i = 0; i < args.length; i++) {
+                            if (i < op.arity() && !op.bindVarsAt(i)) {
+                                for (QuantifiableVariable qv : args[i].freeVars()) {
+                                    if (boundVars.contains(qv)) {
+                                        semanticError("Building function term " + op + " with bound variables failed: "
+                                                + "Variable " + qv + " must not occur free in subterm " + args[i]);
+                                    }
+                                }
+                            }
+                        }
+
+                        //create term
+                        a = getTermFactory().createTerm(op, args, new ImmutableArray<QuantifiableVariable>(boundVars.toArray(new QuantifiableVariable[boundVars.size()])), null);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throwEx(e);
+        }
+        if (boundVars != null) {
+            unbindVars(orig);
+        }
+        return a;
+    }
+
+    @Override
+    public Object visitNumber(KeYParser.NumberContext ctx) {
+        return toZNotation(ctx.getText(), functions());
     }
 
     @Override
@@ -2622,7 +2755,6 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         return v;
     }
 
-
     @Override
     public Object visitVarIds(KeYParser.VarIdsContext ctx) {
         Collection<String> ids = (Collection<String>) ctx.simple_ident_comma_list().accept(this);
@@ -2643,303 +2775,679 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     @Override
     public TacletBuilder visitTriggers(KeYParser.TriggersContext ctx) {
         String id = (String) ctx.id.accept(this);
-        SchemaVariable triggerVar  = schemaVariables().lookup(new Name(id));
+        SchemaVariable triggerVar = schemaVariables().lookup(new Name(id));
         if (triggerVar == null) {
             semanticError("Undeclared schemavariable: " + id);
         }
-        Term t = ctx.t.accept(this());
+        Term t = accept(ctx.t);
         List<Term> avoidConditions = new ArrayList<>(ctx.term().size());//TODO avoidCond.
         //b.setTrigger(new Trigger(triggerVar, t, avoidConditions));
         return null;
     }
 
-
     @Override
-    public Object visitTaclet(KeYParser.TacletContext ctx) {
-        return super.visitTaclet(ctx);
-    }
+    public Taclet visitTaclet(KeYParser.TacletContext ctx) {
+        var ifSeq = Sequent.EMPTY_SEQUENT;
+        b = null;
+        int applicationRestriction = RewriteTaclet.NONE;
 
-    @Override
-    public Object visitTacletgen(KeYParser.TacletgenContext ctx) {
-        return super.visitTacletgen(ctx);
+        switchToNormalMode();
+        ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.nil();
+
+        if(ctx.LEMMA()!=null) {
+            tacletAnnotations = tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);
+        }
+        var name=ctx.name.getText();
+        ImmutableSet<Choice> choices_ =
+                DefaultImmutableSet.fromSet(accept(ctx.option_list()));
+
+        Term form = accept(ctx.form);
+        if(form!=null){
+            if(!axiomMode) {
+                semanticError("formula rules are only permitted for \\axioms");
+            }
+            b = createTacletBuilderFor(null, RewriteTaclet.NONE);
+            SequentFormula sform = new SequentFormula(form);
+            Semisequent semi = new Semisequent(sform);
+            Sequent addSeq = Sequent.createAnteSequent(semi);
+            ImmutableList<Taclet> noTaclets = ImmutableSLList.nil();
+            DefaultImmutableSet<SchemaVariable> noSV = DefaultImmutableSet.nil();
+            addGoalTemplate(b, null, null, addSeq, noTaclets, noSV, null);
+            b.setName(new Name(name));
+            b.setChoices(choices_);
+            b.setAnnotations(tacletAnnotations);
+            Taclet r = b.getTaclet();
+            taclet2Builder.put(r,b);
+            return r;
+        }
+
+        switchToSchemaMode();
+        //  schema var decls
+        schemaVariablesNamespace = new Namespace(schemaVariables());
+        allOf(ctx.one_schema_var_decl());
+        accept(ctx.ifSeq);
+
+        if(null!=ctx.SAMEUPDATELEVEL()) { applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL; }
+        if(null!=ctx.INSEQUENTSTATE()) { applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE; }
+        if(null!=ctx.ANTECEDENTPOLARITY()) { applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY; }
+        if(null!=ctx.SUCCEDENTPOLARITY()) { applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY; }
+        var find = accept(ctx.find);
+        b = createTacletBuilderFor(find, applicationRestriction);
+        b.setIfSequent(accept(ctx.ifSeq));
+        b.setName(new Name(name));
+        accept(ctx.varexplist());
+        accept(ctx.goalspecs());
+        accept(ctx.modifiers());
+        b.setChoices(choices_);
+        b.setAnnotations(tacletAnnotations);
+        Taclet r = b.getTaclet();
+        taclet2Builder.put(r,b);
+        // dump local schema var decls
+        schemaVariablesNamespace = schemaVariables().parent();
+        return r;
     }
 
     @Override
     public Object visitModifiers(KeYParser.ModifiersContext ctx) {
-        return super.visitModifiers(ctx);
+        if (ctx.rs != null) {
+            List<RuleSet> it = accept(ctx.rs);
+            it.forEach(a -> b.addRuleSet(a));
+        }
+
+        if (ctx.NONINTERACTIVE() != null) {
+            b.addRuleSet(ruleSets().lookup(new Name("notHumanReadable")));
+        }
+
+        if (ctx.DISPLAYNAME() != null) {
+            b.setDisplayName(accept(ctx.dname));
+        }
+
+        if (ctx.HELPTEXT() != null) {
+            b.setHelpText(accept(ctx.htext));
+        }
+
+        allOf(ctx.triggers());
+        return null;
     }
 
     @Override
-    public Object visitSeq(KeYParser.SeqContext ctx) {
-        return super.visitSeq(ctx);
+    public Sequent visitSeq(KeYParser.SeqContext ctx) {
+        Semisequent ant = accept(ctx.ant);
+        Semisequent suc = accept(ctx.suc);
+        return Sequent.createSequent(ant, suc);
     }
 
     @Override
     public Object visitSeqEOF(KeYParser.SeqEOFContext ctx) {
-        return super.visitSeqEOF(ctx);
+        return accept(ctx.seq());
     }
 
     @Override
     public Object visitTermorseq(KeYParser.TermorseqContext ctx) {
-        return super.visitTermorseq(ctx);
+        Term head = accept(ctx.head);
+        Sequent s = accept(ctx.s);
+        Semisequent ss = accept(ctx.ss);
+        if (head != null && s == null && ss == null) {
+            return head;
+        }
+        if (head != null && ss != null) {
+            // A sequent with only head in the antecedent.
+            Semisequent ant = Semisequent.EMPTY_SEMISEQUENT;
+            ant = ant.insertFirst(
+                    new SequentFormula(head)).semisequent();
+            return Sequent.createSequent(ant, ss);
+        }
+        if (head != null && s != null) {
+            // A sequent.  Prepend head to the antecedent.
+            Semisequent newAnt = s.antecedent();
+            newAnt = newAnt.insertFirst(
+                    new SequentFormula(head)).semisequent();
+            return Sequent.createSequent(newAnt, s.succedent());
+        }
+        if (ss != null) {
+            return Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, ss);
+        }
+        assert (false);
+        return null;
     }
 
     @Override
     public Object visitSemisequent(KeYParser.SemisequentContext ctx) {
-        return super.visitSemisequent(ctx);
+        Semisequent ss = accept(ctx.ss);
+        if (ss == null)
+            ss = Semisequent.EMPTY_SEMISEQUENT;
+        Term head = accept(ctx.term());
+        if (head != null)
+            ss = ss.insertFirst(new SequentFormula(head)).semisequent();
+        return ss;
     }
 
     @Override
     public Object visitVarexplist(KeYParser.VarexplistContext ctx) {
-        return super.visitVarexplist(ctx);
+        return allOf(ctx.varexp());
     }
 
     @Override
     public Object visitVarexp(KeYParser.VarexpContext ctx) {
+        negated = ctx.NOT_() != null;
         return super.visitVarexp(ctx);
+        /*ctx.varcond_applyUpdateOnRigid()
+                , ctx.varcond_dropEffectlessElementaries()
+                , ctx.varcond_dropEffectlessStores()
+                , ctx.varcond_enum_const()
+                , ctx.varcond_free()
+                , ctx.varcond_hassort()
+                , ctx.varcond_fieldtype()
+                , ctx.varcond_equalUnique()
+                , ctx.varcond_new()
+                , ctx.varcond_newlabel()
+                , ctx.varcond_observer()
+                , ctx.varcond_different()
+                , ctx.varcond_metadisjoint()
+                , ctx.varcond_simplifyIfThenElseUpdate()
+                , ctx.varcond_differentFields()
+                , ctx.varcond_sameObserver()
+                , ctx.varcond_abstractOrInterface()
+                , ctx.varcond_array()
+                , ctx.varcond_array_length()
+                , ctx.varcond_enumtype()
+                , ctx.varcond_freeLabelIn()
+                , ctx.varcond_localvariable()
+                , ctx.varcond_thisreference()
+                , ctx.varcond_reference()
+                , ctx.varcond_referencearray()
+                , ctx.varcond_static()
+                , ctx.varcond_staticmethod()
+                , ctx.varcond_mayexpandmethod()
+                , ctx.varcond_final()
+                , ctx.varcond_typecheck()
+                , ctx.varcond_constant()
+                , ctx.varcond_label()
+                , ctx.varcond_static_field()
+                , ctx.varcond_subFormulas()
+                , ctx.varcond_containsAssignment());
+    */
     }
 
     @Override
     public Object visitVarcond_sameObserver(KeYParser.Varcond_sameObserverContext ctx) {
-        return super.visitVarcond_sameObserver(ctx);
+        ParsableVariable t1 = accept(ctx.t1);
+        ParsableVariable t2 = accept(ctx.t2);
+        b.addVariableCondition(new SameObserverCondition(t1, t2));
+        return null;
     }
 
     @Override
     public Object visitVarcond_applyUpdateOnRigid(KeYParser.Varcond_applyUpdateOnRigidContext ctx) {
-        return super.visitVarcond_applyUpdateOnRigid(ctx);
+        var u = accept(ctx.u);
+        var x = accept(ctx.x);
+        var x2 = accept(ctx.x2);
+        b.addVariableCondition(new ApplyUpdateOnRigidCondition((UpdateSV) u,
+                (SchemaVariable) x,
+                (SchemaVariable) x2));
+        return null;
     }
 
     @Override
     public Object visitVarcond_dropEffectlessElementaries(KeYParser.Varcond_dropEffectlessElementariesContext ctx) {
-        return super.visitVarcond_dropEffectlessElementaries(ctx);
+        UpdateSV u = accept(ctx.u);
+        SchemaVariable x = accept(ctx.x);
+        SchemaVariable  result = accept(ctx.result);
+        b.addVariableCondition(new DropEffectlessElementariesCondition(
+                u, x, result));
+        return null;
     }
 
     @Override
     public Object visitVarcond_dropEffectlessStores(KeYParser.Varcond_dropEffectlessStoresContext ctx) {
-        return super.visitVarcond_dropEffectlessStores(ctx);
+        var h = accept(ctx.h);
+        var o = accept(ctx.o);
+        var f = accept(ctx.f);
+        var x = accept(ctx.x);
+        var result = accept(ctx.result);
+        b.addVariableCondition(new DropEffectlessStoresCondition((TermSV) h,
+                (TermSV) o,
+                (TermSV) f,
+                (TermSV) x,
+                (TermSV) result));
+        return null;
     }
 
     @Override
     public Object visitVarcond_differentFields(KeYParser.Varcond_differentFieldsContext ctx) {
-        return super.visitVarcond_differentFields(ctx);
+        var x = accept(ctx.x);
+        var y = accept(ctx.y);
+        b.addVariableCondition(new DifferentFields((SchemaVariable) x, (SchemaVariable) y));
+        return null;
     }
 
     @Override
     public Object visitVarcond_simplifyIfThenElseUpdate(KeYParser.Varcond_simplifyIfThenElseUpdateContext ctx) {
-        return super.visitVarcond_simplifyIfThenElseUpdate(ctx);
+        FormulaSV phi = accept(ctx.phi);
+        UpdateSV u1 = accept(ctx.u1);
+        UpdateSV u2 = accept(ctx.u2);
+        FormulaSV commonFormula = accept(ctx.commonFormula);
+        SchemaVariable result = accept(ctx.result);
+        b.addVariableCondition(new SimplifyIfThenElseUpdateCondition(phi,
+                u1,
+                u2,
+                commonFormula,
+                result));
+        return null;
     }
 
     @Override
     public Object visitType_resolver(KeYParser.Type_resolverContext ctx) {
-        return super.visitType_resolver(ctx);
+        Sort s = accept(ctx.any_sortId_check());
+        var y = accept(ctx.y);
+        if (s != null) {
+            if (s instanceof GenericSort) {
+                return TypeResolver.createGenericSortResolver((GenericSort) s);
+            } else {
+                return TypeResolver.createNonGenericSortResolver(s);
+            }
+        }
+        if (ctx.TYPEOF() != null) {
+            return TypeResolver.createElementTypeResolver((SchemaVariable) y);
+        }
+        if (ctx.CONTAINERTYPE() != null) {
+            return TypeResolver.createContainerTypeResolver((SchemaVariable) y);
+        }
+        return null;
     }
 
     @Override
     public Object visitVarcond_new(KeYParser.Varcond_newContext ctx) {
-        return super.visitVarcond_new(ctx);
+        var x = accept(ctx.x);
+        var y = accept(ctx.y);
+        if (ctx.TYPEOF() != null) {
+            b.addVarsNew((SchemaVariable) x, (SchemaVariable) y);
+        }
+
+        if (ctx.DEPENDINGON() != null) {
+            b.addVarsNewDependingOn((SchemaVariable) x, (SchemaVariable) y);
+        }
+
+        if (ctx.kjt != null) {
+            KeYJavaType kjt = accept(ctx.kjt);
+            b.addVarsNew((SchemaVariable) x, kjt.getJavaType());
+        }
+        return null;
     }
 
     @Override
     public Object visitVarcond_newlabel(KeYParser.Varcond_newlabelContext ctx) {
-        return super.visitVarcond_newlabel(ctx);
+        var x = accept(ctx.x);
+        b.addVariableCondition(new NewJumpLabelCondition((SchemaVariable) x));
+        return null;
     }
 
     @Override
     public Object visitVarcond_typecheck(KeYParser.Varcond_typecheckContext ctx) {
-        return super.visitVarcond_typecheck(ctx);
+        TypeComparisonCondition.Mode mode = null;
+        if (ctx.SAME() != null) {
+            mode = negated
+                    ? TypeComparisonCondition.Mode.NOT_SAME
+                    : TypeComparisonCondition.Mode.SAME;
+        }
+        if (ctx.ISSUBTYPE() != null) {
+            mode = negated
+                    ? TypeComparisonCondition.Mode.NOT_IS_SUBTYPE
+                    : TypeComparisonCondition.Mode.IS_SUBTYPE;
+        }
+        if (ctx.STRICT() != null) {
+            if (negated)
+                semanticError("A negated strict subtype check does not make sense.");
+            mode = TypeComparisonCondition.Mode.STRICT_SUBTYPE;
+        }
+        if (ctx.DISJOINTMODULONULL() != null) {
+            if (negated)
+                semanticError("Negation not supported");
+            mode = TypeComparisonCondition.Mode.DISJOINTMODULONULL;
+        }
+
+        TypeResolver fst = accept(ctx.fst);
+        TypeResolver snd = accept(ctx.snd);
+        b.addVariableCondition(new TypeComparisonCondition(fst, snd, mode));
+        return null;
     }
 
     @Override
     public Object visitVarcond_free(KeYParser.Varcond_freeContext ctx) {
-        return super.visitVarcond_free(ctx);
+        SchemaVariable x = accept(ctx.x);
+        List<SchemaVariable> ys = accept(ctx.varIds());
+        ys.forEach(it -> b.addVarsNotFreeIn(x, it));
+        return null;
     }
 
     @Override
     public Object visitVarcond_hassort(KeYParser.Varcond_hassortContext ctx) {
-        return super.visitVarcond_hassort(ctx);
+        var x = accept(ctx.x);
+        var elemSort = ctx.ELEMSORT() != null;
+        Sort s = accept(ctx.any_sortId_check());
+        if (!(s instanceof GenericSort)) {
+            throwEx(new GenericSortException("sort",
+                    "Generic sort expected",
+                    s,
+                    getSourceName(),
+                    getLine(),
+                    getColumn()));
+        } else if (!JavaTypeToSortCondition.checkSortedSV((SchemaVariable) x)) {
+            semanticError("Expected schema variable of kind EXPRESSION or TYPE, "
+                    + "but is " + x);
+        } else {
+            b.addVariableCondition(new JavaTypeToSortCondition((SchemaVariable) x,
+                    (GenericSort) s,
+                    elemSort));
+        }
+        return null;
     }
 
     @Override
     public Object visitVarcond_fieldtype(KeYParser.Varcond_fieldtypeContext ctx) {
-        return super.visitVarcond_fieldtype(ctx);
+        var x = accept(ctx.x);
+        Sort s = accept(ctx.any_sortId_check());
+
+        if (!(s instanceof GenericSort)) {
+            throwEx(new GenericSortException("sort",
+                    "Generic sort expected",
+                    s,
+                    getSourceName(),
+                    getLine(),
+                    getColumn()));
+        } else if (!FieldTypeToSortCondition.checkSortedSV((SchemaVariable) x)) {
+            semanticError("Expected schema variable of kind EXPRESSION or TYPE, "
+                    + "but is " + x);
+        } else {
+            b.addVariableCondition(new FieldTypeToSortCondition((SchemaVariable) x,
+                    (GenericSort) s));
+        }
+        return null;
     }
 
     @Override
     public Object visitVarcond_containsAssignment(KeYParser.Varcond_containsAssignmentContext ctx) {
-        return super.visitVarcond_containsAssignment(ctx);
+        var x = accept(ctx.x);
+        b.addVariableCondition(new ContainsAssignmentCondition((SchemaVariable) x, negated));
+        return null;
     }
 
     @Override
     public Object visitVarcond_enumtype(KeYParser.Varcond_enumtypeContext ctx) {
-        return super.visitVarcond_enumtype(ctx);
+        TypeResolver tr = accept(ctx.tr);
+        b.addVariableCondition(new EnumTypeCondition(tr, negated));
+        return null;
     }
 
     @Override
     public Object visitVarcond_reference(KeYParser.Varcond_referenceContext ctx) {
-        return super.visitVarcond_reference(ctx);
+        boolean nonNull = false;
+        String id = accept(ctx.id);
+        if ("non_null".equals(id)) {
+            nonNull = true;
+        } else {
+            semanticError(id +
+                    " is not an allowed modifier for the \\isReference variable condition.");
+        }
+        TypeResolver tr = accept(ctx.tr);
+        b.addVariableCondition(new TypeCondition(tr, !isPrimitive, nonNull));
+        return null;
     }
 
     @Override
     public Object visitVarcond_thisreference(KeYParser.Varcond_thisreferenceContext ctx) {
-        return super.visitVarcond_thisreference(ctx);
+        String id = null;
+        boolean nonNull = false;
+        ParsableVariable x = accept(ctx.x);
+        b.addVariableCondition(new IsThisReference(x, negated));
+        return null;
     }
 
     @Override
     public Object visitVarcond_staticmethod(KeYParser.Varcond_staticmethodContext ctx) {
-        return super.visitVarcond_staticmethod(ctx);
+        var x = accept(ctx.x);
+        var y = accept(ctx.y);
+        var z = accept(ctx.z);
+        b.addVariableCondition(new StaticMethodCondition
+                (negated, (SchemaVariable) x, (SchemaVariable) y, (SchemaVariable) z));
+        return null;
     }
 
     @Override
     public Object visitVarcond_mayexpandmethod(KeYParser.Varcond_mayexpandmethodContext ctx) {
-        return super.visitVarcond_mayexpandmethod(ctx);
+        SchemaVariable x = accept(ctx.x);
+        SchemaVariable y = accept(ctx.y);
+        SchemaVariable z = accept(ctx.z);
+        if (z != null)
+            b.addVariableCondition(new MayExpandMethodCondition(
+                    negated, x, y, z));
+        else
+            b.addVariableCondition(new MayExpandMethodCondition(
+                    negated, null, x, y));
+        return null;
     }
 
     @Override
     public Object visitVarcond_referencearray(KeYParser.Varcond_referencearrayContext ctx) {
-        return super.visitVarcond_referencearray(ctx);
+        SchemaVariable x = accept(ctx.x);
+        b.addVariableCondition(new ArrayComponentTypeCondition(
+                x, !primitiveElementType));
+        return null;
     }
 
     @Override
     public Object visitVarcond_array(KeYParser.Varcond_arrayContext ctx) {
-        return super.visitVarcond_array(ctx);
+        SchemaVariable x = accept(ctx.x);
+        b.addVariableCondition(new ArrayTypeCondition(
+                x, negated));
+        return null;
     }
 
     @Override
     public Object visitVarcond_array_length(KeYParser.Varcond_array_lengthContext ctx) {
-        return super.visitVarcond_array_length(ctx);
+        SchemaVariable x = accept(ctx.x);
+        b.addVariableCondition(new ArrayLengthCondition(
+                x, negated));
+        return null;
     }
 
     @Override
     public Object visitVarcond_abstractOrInterface(KeYParser.Varcond_abstractOrInterfaceContext ctx) {
-        return super.visitVarcond_abstractOrInterface(ctx);
+        TypeResolver tr = accept(ctx.tr);
+        b.addVariableCondition(new AbstractOrInterfaceType(tr, negated));
+        return null;
     }
 
     @Override
     public Object visitVarcond_enum_const(KeYParser.Varcond_enum_constContext ctx) {
-        return super.visitVarcond_enum_const(ctx);
+        SchemaVariable x = accept(ctx.x);
+        b.addVariableCondition(new EnumConstantCondition(
+                x));
+        return null;
     }
 
     @Override
     public Object visitVarcond_final(KeYParser.Varcond_finalContext ctx) {
-        return super.visitVarcond_final(ctx);
+        SchemaVariable x = accept(ctx.x);
+        b.addVariableCondition(new FinalReferenceCondition(
+                x, negated));
+        return null;
     }
 
     @Override
     public Object visitVarcond_static(KeYParser.Varcond_staticContext ctx) {
-        return super.visitVarcond_static(ctx);
+        SchemaVariable x = accept(ctx.x);
+        b.addVariableCondition(new StaticReferenceCondition(
+                x, negated));
+        return null;
     }
 
     @Override
     public Object visitVarcond_localvariable(KeYParser.Varcond_localvariableContext ctx) {
-        return super.visitVarcond_localvariable(ctx);
+        SchemaVariable x = accept(ctx.x);
+        b.addVariableCondition(new LocalVariableCondition(x, negated));
+        return null;
     }
 
     @Override
     public Object visitVarcond_observer(KeYParser.Varcond_observerContext ctx) {
-        return super.visitVarcond_observer(ctx);
+        TermSV obs = accept(ctx.obs);
+        TermSV heap = accept(ctx.heap);
+
+        b.addVariableCondition(new ObserverCondition(obs,
+                heap));
+        return null;
     }
 
     @Override
     public Object visitVarcond_different(KeYParser.Varcond_differentContext ctx) {
-        return super.visitVarcond_different(ctx);
+        SchemaVariable var1 = accept(ctx.var1);
+        SchemaVariable var2 = accept(ctx.var2);
+        b.addVariableCondition(new DifferentInstantiationCondition(
+                var1,
+                var2));
+        return null;
     }
 
     @Override
     public Object visitVarcond_metadisjoint(KeYParser.Varcond_metadisjointContext ctx) {
-        return super.visitVarcond_metadisjoint(ctx);
+        var var1 = accept(ctx.var1);
+        var var2 = accept(ctx.var2);
+        b.addVariableCondition(new MetaDisjointCondition(
+                (TermSV) var1,
+                (TermSV) var2));
+        return null;
     }
 
     @Override
     public Object visitVarcond_equalUnique(KeYParser.Varcond_equalUniqueContext ctx) {
-        return super.visitVarcond_equalUnique(ctx);
+        var t = accept(ctx.t);
+        var t2 = accept(ctx.t2);
+        var phi = accept(ctx.phi);
+        b.addVariableCondition(new EqualUniqueCondition((TermSV) t,
+                (TermSV) t2,
+                (FormulaSV) phi));
+        return null;
     }
 
     @Override
     public Object visitVarcond_freeLabelIn(KeYParser.Varcond_freeLabelInContext ctx) {
-        return super.visitVarcond_freeLabelIn(ctx);
+        var l = accept(ctx.l);
+        var statement = accept(ctx.statement);
+        b.addVariableCondition(new FreeLabelInVariableCondition((SchemaVariable) l,
+                (SchemaVariable) statement, negated));
+        return null;
     }
 
     @Override
     public Object visitVarcond_constant(KeYParser.Varcond_constantContext ctx) {
-        return super.visitVarcond_constant(ctx);
+        var x = accept(ctx.varId());
+        if (x instanceof TermSV) {
+            b.addVariableCondition(new ConstantCondition((TermSV) x, negated));
+        } else {
+            assert x instanceof FormulaSV;
+            b.addVariableCondition(new ConstantCondition((FormulaSV) x, negated));
+        }
+        return null;
     }
 
     @Override
     public Object visitVarcond_label(KeYParser.Varcond_labelContext ctx) {
-        return super.visitVarcond_label(ctx);
+        TermLabelSV l = accept(ctx.varId());
+        String name = accept(ctx.simple_ident());
+        b.addVariableCondition(new TermLabelCondition(l, name, negated));
+        return null;
     }
 
     @Override
     public Object visitVarcond_static_field(KeYParser.Varcond_static_fieldContext ctx) {
-        return super.visitVarcond_static_field(ctx);
+        var field = accept(ctx.varId());
+        b.addVariableCondition(new StaticFieldCondition((SchemaVariable) field, negated));
+        return null;
     }
 
     @Override
     public Object visitVarcond_subFormulas(KeYParser.Varcond_subFormulasContext ctx) {
-        return super.visitVarcond_subFormulas(ctx);
+        FormulaSV x = accept(ctx.varId());
+        b.addVariableCondition(new SubFormulaCondition(x, negated));
+        return null;
     }
 
     @Override
     public Object visitGoalspecs(KeYParser.GoalspecsContext ctx) {
-        return super.visitGoalspecs(ctx);
+        return allOf(ctx.goalspecwithoption());
     }
 
     @Override
     public Object visitGoalspecwithoption(KeYParser.GoalspecwithoptionContext ctx) {
-        return super.visitGoalspecwithoption(ctx);
+        //TODO
+        var soc = accept(ctx.option_list());
+        accept(ctx.goalspec());
+        return null;
     }
 
     @Override
     public Object visitOption(KeYParser.OptionContext ctx) {
-        return super.visitOption(ctx);
+        String cat = ctx.cat.toString();
+        String name = ctx.choice_.toString();
+        var c = choices().lookup(new Name(cat + ":" + name));
+        if (c == null) {
+            throwEx(new NotDeclException(input, "Option", name));
+        }
+        return c;
     }
 
     @Override
-    public Object visitOption_list(KeYParser.Option_listContext ctx) {
-        return super.visitOption_list(ctx);
+    public List<Choice> visitOption_list(KeYParser.Option_listContext ctx) {
+        return allOf(ctx.option());
     }
 
     @Override
     public Object visitGoalspec(KeYParser.GoalspecContext ctx) {
-        return super.visitGoalspec(ctx);
+        ImmutableSet<Choice> soc = null;
+        boolean ruleWithFind;
+        var addSeq = Sequent.EMPTY_SEQUENT;
+        var addRList = ImmutableSLList.<Taclet>nil();
+        var addpv = DefaultImmutableSet.<SchemaVariable>nil();
+
+        String name = accept(ctx.string_value());
+
+        var rwObj = accept(ctx.replacewith());
+        addSeq = accept(ctx.add());
+        addRList = accept(ctx.addrules());
+        addpv = accept(ctx.addprogvar());
+        addGoalTemplate(b, name, rwObj, addSeq, addRList, addpv, soc);
+        return null;
     }
 
     @Override
     public Object visitReplacewith(KeYParser.ReplacewithContext ctx) {
-        return super.visitReplacewith(ctx);
+        return accept(ctx.o);
     }
 
     @Override
     public Object visitAdd(KeYParser.AddContext ctx) {
-        return super.visitAdd(ctx);
+        return accept(ctx.s);
     }
 
     @Override
     public Object visitAddrules(KeYParser.AddrulesContext ctx) {
-        return super.visitAddrules(ctx);
+        return accept(ctx.lor);
     }
 
     @Override
-    public Object visitAddprogvar(KeYParser.AddprogvarContext ctx) {
-        return super.visitAddprogvar(ctx);
+    public ImmutableSet<SchemaVariable> visitAddprogvar(KeYParser.AddprogvarContext ctx) {
+        return accept(ctx.pvs);
     }
 
     @Override
-    public Object visitTacletlist(KeYParser.TacletlistContext ctx) {
-        lor = ImmutableSLList.<Taclet>nil();
-        head = taclet[DefaultImmutableSet.<Choice>nil(), false]
-        ( /*empty*/ | COMMA lor = tacletlist){
-            lor = lor.prepend(head);
-        }
+    public List<Taclet> visitTacletlist(KeYParser.TacletlistContext ctx) {
+        return allOf(ctx.taclet());
     }
 
     @Override
-    public Object visitPvset(KeYParser.PvsetContext ctx) {
-        pvs = DefaultImmutableSet.<SchemaVariable>nil();
-        pv = varId
-                ( /*empty*/ | COMMA pvs = pvset)
-        pvs = pvs.add
-                ((SchemaVariable) pv);
+    public List<String> visitPvset(KeYParser.PvsetContext ctx) {
+        return allOf(ctx.varId());
     }
 
     @Override
@@ -2950,7 +3458,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     @Override
     public Object visitRuleset(KeYParser.RulesetContext ctx) {
         String id = (String) ctx.IDENT().accept(this);
-        RuleSet h = (RuleSet) ruleSets().lookup(new Name(id));
+        RuleSet h = ruleSets().lookup(new Name(id));
         if (h == null) {
             throwEx(new NotDeclException(input, "ruleset", id));
         }
@@ -2967,27 +3475,16 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitMetaTerm(KeYParser.MetaTermContext ctx) {
-        (vf = metaId
-                (LPAREN
-                        t = term
-        {
-            al.add(t);
-        }
-        (COMMA
-        t = term
-        {
-            al.add(t);
-        }
-        )*RPAREN)?
-        {
-            result = getTermFactory().createTerm(vf, (Term[]) al.toArray(AN_ARRAY_OF_TERMS));
-        }
-        )}
+    public Term visitMetaTerm(KeYParser.MetaTermContext ctx) {
+        Operator metaId = accept(ctx.metaId());
+        List<Term> t = allOf(ctx.term());
+        return getTermFactory().createTerm(metaId, t);
+    }
 
     @Override
     public Object visitContracts(KeYParser.ContractsContext ctx) {
-        return super.visitContracts(ctx);
+        switchToNormalMode();
+        return allOf(ctx.one_contract());
     }
 
     @Override
@@ -3019,7 +3516,6 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         return null;
     }
 
-
     @Override
     public Object visitOne_invariant(KeYParser.One_invariantContext ctx) {
         String invName = visitSimple_ident(ctx.simple_ident());
@@ -3038,93 +3534,34 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitSkipBracedBlock(KeYParser.SkipBracedBlockContext ctx) {
-        LBRACE
-        {
-            int nestingLevel = 1;
-            recLoop:
-            while (true) {
-                switch (input.LA(1)) {
-                    case LBRACE:
-                        nestingLevel++;
-                        break;
+    public Term visitProblem(KeYParser.ProblemContext ctx) {
+        boolean axiomMode = false;
+        int beginPos = 0;
+        DefaultImmutableSet<Choice> choices
+                = DefaultImmutableSet.nil();
+        chooseContract = this.chooseContract;
+        proofObligation = this.proofObligation;
 
-                    case RBRACE:
-                        nestingLevel--;
-                        if (nestingLevel == 0) break recLoop;
-                        break;
-                }
-                input.consume();
-            }
-        }
-        RBRACE
-    }
+        var profile = accept(ctx.profile());
+        var pref = accept(ctx.preferences());
+        String bootClassPath = accept(ctx.bootClassPath());
+        String classPath = accept(ctx.classPaths());
+        String javaSource = accept(ctx.javaSource());
 
-    @Override
-    public Object visitProblem(KeYParser.ProblemContext ctx) {
-        problem returns[ Term _problem = null]
-        @init {
-            boolean axiomMode = false;
-            int beginPos = 0;
-            choices = DefaultImmutableSet.<Choice>nil();
-            chooseContract = this.chooseContract;
-            proofObligation = this.proofObligation;
-        }
-        @after {
-            _problem = a;
-            this.chooseContract = chooseContract;
-            this.proofObligation = proofObligation;
-        }
-        :
+        allOf(ctx.contracts());
+        allOf(ctx.invariants());
 
-        profile
-
-                (pref = preferences)
-        {
-            beginPos = input.index();
-        }
-
-        string = bootClassPath
-        // the result is of no importance here (strange enough)
-
-        stlist = classPaths
-        string = javaSource
-
-        decls
-        {
-            if (parse_includes || onlyWith) return null;
-            switchToNormalMode();
-        }
-
-        // WATCHOUT: choices is always going to be an empty set here,
-        // isn't it?
-        (contracts) *
-                (invariants) *
-                ((RULES {
+        if (ctx.RULES() != null)
             axiomMode = false;
-        }
-        |AXIOMS {
+        if (ctx.AXIOMS() != null)
             axiomMode = true;
-        }
-        )
 
-        (choices = option_list[choices]) ?
-                (
-                        // #MT-1185: KeY parses the same file several times.
-                        // During problem parsing, some aspects of taclets
-                        // can not be reparsed. Hence, in the problem walkthrough
-                        // crudely overread the taclet setcion altogether.
-                        {skip_taclets} ? = >
-                        skipBracedBlock
-                        |
-                        LBRACE
-        {
-            switchToSchemaMode();
-        }
-        (
-                s = taclet[choices, axiomMode]SEMI
-        {
-            if (!skip_taclets) {
+        List<Choice> seqChoices = allOf(ctx.option_list());
+
+        List<Taclet> seq = allOf(ctx.taclet());
+        Map<RuleKey, Taclet> taclets = new HashMap<>();
+        if (!skip_taclets) {
+            for (Taclet s : seq) {
                 final RuleKey key = new RuleKey(s);
                 if (taclets.containsKey(key)) {
                     semanticError
@@ -3137,48 +3574,27 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                 }
             }
         }
-        )*
-        RBRACE {
-            choices = DefaultImmutableSet.<Choice>nil();
-        }
-        )
-        )*
+        choices = DefaultImmutableSet.nil();
 
-        {
-            if (input.index() == 0) {
-                problemHeader = "";
-            } else {
-                problemHeader = lexer.toString(beginPos, input.index() - 1);
-            }
-        }
-
-        ((PROBLEM LBRACE
-        {
+        Term a = null;
+        if (ctx.PROBLEM() != null) {
             switchToNormalMode();
+            a = accept(ctx.formula());
         }
-        a = formula
-        RBRACE)
-        |
-        CHOOSECONTRACT(chooseContract = string_literal SEMI) ?
-                {
-        if (chooseContract == null) {
-            chooseContract = "";
-        }
-        }
-        |
-        PROOFOBLIGATION(proofObligation = string_literal SEMI) ?
-                {
-        if (proofObligation == null) {
-            proofObligation = "";
-        }
-        }
-        )?
-        ;
+
+        chooseContract = "";
+        if (ctx.CHOOSECONTRACT() != null)
+            chooseContract = accept(ctx.chooseContract);
+
+        proofObligation = "";
+        if (ctx.PROOFOBLIGATION() != null)
+            proofObligation = accept(ctx.proofObligation);
+        return a;
     }
 
     @Override
     public String visitBootClassPath(KeYParser.BootClassPathContext ctx) {
-        return ctx.string_literal() != null ? ctx.string_literal().getText() : null;
+        return accept(ctx.string_value());
     }
 
     @Override
@@ -3203,7 +3619,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitProfile(KeYParser.ProfileContext ctx) {
-        profileName = (String) visit(ctx.profileName);
+        profileName = (String) visit(ctx.name);
         return null;
     }
 
@@ -3219,32 +3635,41 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         // +1 for removing the leading "
         int col = ctx.ps.getCharPositionInLine() + 2;
         String content = ctx.ps.getText().substring(1, ctx.ps.getText().length() - 1);
-        return new Triple<String, Integer, Integer>(content, line, col);
+        return new Triple<>(content, line, col);
+    }
+
+    @Override
+    public String visitString_value(KeYParser.String_valueContext ctx) {
+        return ctx.getText().substring(1, ctx.getText().length() - 1);
     }
 
     /*
-    @Override
-    public Object visitProof(KeYParser.ProofContext ctx) {
-        return super.visitProof(ctx);
-    }
+        @Override
+        public Object visitProof(KeYParser.ProofContext ctx) {
+            return super.visitProof(ctx);
+        }
 
-    @Override
-    public Object visitProofBody(KeYParser.ProofBodyContext ctx) {
-        return super.visitProofBody(ctx);
-    }
+        @Override
+        public Object visitProofBody(KeYParser.ProofBodyContext ctx) {
+            return super.visitProofBody(ctx);
+        }
 
-    @Override
-    public Object visitPseudosexpr(KeYParser.PseudosexprContext ctx) {
-        proofElementId=expreid
-                (str = string_literal )?
-                { prl.beginExpr(proofElementId,str); }
-        ( pseudosexpr[prl] )* )
-        { prl.endExpr(proofElementId, stringLiteralLine); }
-        return null;
-    }
+        @Override
+        public Object visitPseudosexpr(KeYParser.PseudosexprContext ctx) {
+            proofElementId=expreid
+                    (str = string_literal )?
+                    { prl.beginExpr(proofElementId,str); }
+            ( pseudosexpr[prl] )* )
+            { prl.endExpr(proofElementId, stringLiteralLine); }
+            return null;
+        }
 
-    @Override
-    public IProofFileParser.ProofElementID visitExpreid(KeYParser.ExpreidContext ctx) {
-        return prooflabel2tag.get(visitSimple_ident(ctx.simple_ident()));
-    }*/
+        @Override
+        public IProofFileParser.ProofElementID visitExpreid(KeYParser.ExpreidContext ctx) {
+            return prooflabel2tag.get(visitSimple_ident(ctx.simple_ident()));
+        }*/
+    private static class PairOfStringAndJavaBlock {
+        String opName;
+        JavaBlock javaBlock;
+    }
 }

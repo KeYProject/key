@@ -27,14 +27,14 @@ public abstract class ParsingFacade {
         return ctx;
     }
 
-    public static KeYParser.FormulaContext parseExpression(CharStream stream) {
+    public static KeYParser.TermContext parseExpression(CharStream stream) {
         var p = createParser(stream);
-        return p.formula();
+        return p.term();
     }
 
     private static KeYParser createParser(CharStream stream) {
         var p = new KeYParser(new CommonTokenStream(lex(stream)));
-        p.removeErrorListeners();
+        //p.removeErrorListeners();
         //TODO exception throwingp.addErrorListener();
         return p;
     }

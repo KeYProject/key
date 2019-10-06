@@ -23,6 +23,9 @@ private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
 public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 }
 
+options { tokenVocab=KeYLexer; } // use tokens from STLexer.g4
+
+
 file: decls EOF;
 
 decls
@@ -131,10 +134,11 @@ prog_var_decls
         RBRACE
     ;
 
-string_literal
-   :
-     id=STRING_LITERAL 
-     ;
+//this rule produces a StringLiteral
+string_literal: id=STRING_LITERAL;
+
+//this rule produces a String
+string_value: STRING_LITERAL;
 
 simple_ident
    :
@@ -494,8 +498,8 @@ unary_formula
 equality_term
 :
   a=logicTermReEntry
-  (EQUALS | NOT_EQUALS )
-	a1 = logicTermReEntry
+  ((EQUALS | NOT_EQUALS)
+	  a1 = logicTermReEntry)?
 ;
  
 
@@ -600,7 +604,7 @@ accessterm
         static_attribute_suffix
       | atom
     )
-    ( abs = accessterm_bracket_suffix
+    ( accessterm_bracket_suffix
     | attribute_or_query_suffix
     )*
     // at most one heap selection suffix
@@ -658,16 +662,17 @@ accesstermlist  :
      (t=accessterm  ( COMMA t=accessterm )* )? ;
 */
 
+boolean_constant: FALSE | TRUE;
+
 atom
 :
     ( specialTerm
     | funcpredvarterm
     | LPAREN term RPAREN
-    | TRUE
-    | FALSE
+    | boolean_constant
     | ifThenElseTerm
     | ifExThenElseTerm
-    | literal=STRING_LITERAL
+    | string_literal
     )
     (LGUILLEMETS labels = label RGUILLEMETS)?
 ;
@@ -680,8 +685,16 @@ label
 
 single_label
 :
-  (name=IDENT  | star=STAR  ) (LPAREN param1=STRING_LITERAL  (COMMA param2=STRING_LITERAL )* RPAREN)?
-  ;
+  (name=IDENT
+  | star=STAR  )
+
+  (LPAREN
+    (string_value
+      (COMMA string_value )*
+    )?
+    RPAREN
+  )?
+;
 
 
 abbreviation
@@ -828,12 +841,18 @@ argument_list
 
     ;
 
+number:
+  (MINUS )?
+  ( NUM_LITERAL | HEX_LITERAL | BIN_LITERAL)
+;
+
+char_literal:
+    CHAR_LITERAL;
+
 funcpredvarterm
-
-
-    :
-      ch=CHAR_LITERAL
-    | (MINUS )? number=NUM_LITERAL
+:
+     char_literal
+    | number
     | AT a = abbreviation
     | varfuncid = funcpred_name
       ((
@@ -894,14 +913,14 @@ taclet
       |
         ( SCHEMAVAR one_schema_var_decl ) *
         ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
-        ( FIND LPAREN find = termorseq RPAREN
-            (   SAMEUPDATELEVEL 
-              | INSEQUENTSTATE 
-              | ANTECEDENTPOLARITY 
-              | SUCCEDENTPOLARITY 
+        ( FIND LPAREN find=termorseq RPAREN
+            (   SAMEUPDATELEVEL
+              | INSEQUENTSTATE
+              | ANTECEDENTPOLARITY
+              | SUCCEDENTPOLARITY
             )*
-        ) ?
-        
+        )?
+
         ( VARCOND LPAREN varexplist RPAREN ) ?
         goalspecs
         modifiers
@@ -911,28 +930,24 @@ taclet
     ;
 
 tacletgen
-
-    :
-      /* (LEMMA )? */
-      name=IDENT (choices_=option_list)?
-      LBRACE
-        ( VARCOND LPAREN varexplist RPAREN ) ?
-        goalspecs
-        modifiers
-        
-        (TEMPLATE)
-        RBRACE
-    ;
+:
+  /* (LEMMA )? */
+  name=IDENT (choices_=option_list)?
+  LBRACE
+  (VARCOND LPAREN varexplist RPAREN)?
+  goalspecs
+  modifiers
+  (TEMPLATE)
+  RBRACE
+;
 
 
 modifiers
 :
         ( rs = rulesets 
         | NONINTERACTIVE 
-        | DISPLAYNAME dname = string_literal
-            
-        | HELPTEXT htext = string_literal
-            
+        | DISPLAYNAME dname = string_value
+        | HELPTEXT htext = string_value
         | triggers
         ) *
     ;
@@ -942,10 +957,7 @@ seq
   ant=semisequent SEQARROW suc=semisequent
 ;
 
-seqEOF  :
-         ss=seq EOF
-         
-     ;
+seqEOF: seq EOF;
 
 termorseq
 :
@@ -955,8 +967,8 @@ termorseq
 
 semisequent
 :
-        /* empty */ |
-        head=term ( COMMA ss=semisequent) ?
+    /* empty */
+  | head=term ( COMMA ss=semisequent) ?
 ;
 
 varexplist : varexp ( COMMA varexp ) * ;
@@ -1126,7 +1138,7 @@ varcond_enumtype
 varcond_reference 
 
 :
-   ISREFERENCE (LBRACKET RBRACKET)?
+   ISREFERENCE (LBRACKET  id=simple_ident RBRACKET)?
    LPAREN
         tr = type_resolver
    RPAREN
@@ -1286,9 +1298,8 @@ RPAREN
 ;
 
 goalspec
-
     :
-        (name = string_literal COLON)?
+        (name=string_value COLON)?
         (   ( rwObj = replacewith
                 (addSeq=add)?
                 (addRList=addrules)?
@@ -1321,37 +1332,22 @@ addprogvar
 :
         ADDPROGVARS LPAREN pvs=pvset RPAREN;
 
-tacletlist
+tacletlist: taclet (COMMA taclet)*;
+pvset: varId (COMMA varId)*;
 
-
-    :
-        head=taclet
-        ( /*empty*/ | COMMA lor=tacletlist) 
-    ;
-
-pvset
-
-
-    :
-        pv=varId
-        ( /*empty*/ | COMMA pvs=pvset) ;
-
-rulesets  :
-        HEURISTICS LPAREN ruleset ( COMMA ruleset ) * RPAREN ;
+rulesets:
+        HEURISTICS LPAREN ruleset
+        ( COMMA ruleset ) * RPAREN
+;
 
 ruleset
 :
         id=IDENT
 ;
 
-metaId
-:
-  id = simple_ident 
-;
+metaId:  id=simple_ident ;
 
-metaTerm
-
-    :
+metaTerm:
         (vf = metaId
            ( LPAREN
             t = term
@@ -1396,20 +1392,8 @@ one_invariant
 :
      invName = simple_ident LBRACE
      fma = formula
-     (DISPLAYNAME displayName = string_literal)?
+     (DISPLAYNAME displayName=string_value)?
      RBRACE SEMI
-;
-
-/*
- * Read over a sequence of tokens that form a block in braces.
- * Braces can be nested like
- *     }
- *
- * This can be done to overread entire blocks.
- */
-skipBracedBlock
-:
-  LBRACE RBRACE
 ;
 
 problem
@@ -1424,6 +1408,7 @@ problem
 
         decls
 
+        //TODO weigl: rework into a seperate rule
         // WATCHOUT: choices is always going to be an empty set here,
       	// isn't it?
         ( contracts )*
@@ -1434,32 +1419,26 @@ problem
 
                  ( choices = option_list )?
            (
-              // #MT-1185: KeY parses the same file several times.
-              // During problem parsing, some aspects of taclets
-              // can not be reparsed. Hence, in the problem walkthrough
-              // crudely overread the taclet setcion altogether.
-              skipBracedBlock
-           |
             LBRACE
             (s=taclet SEMI)*
             RBRACE 
            )
         )*
         (  PROBLEM LBRACE a = formula RBRACE
-         | CHOOSECONTRACT (chooseContract=string_literal SEMI)?
-         | PROOFOBLIGATION  (proofObligation=string_literal SEMI)?
+         | CHOOSECONTRACT (chooseContract=string_value SEMI)?
+         | PROOFOBLIGATION  (proofObligation=string_value SEMI)?
         )?
    ;
 
 bootClassPath
 :
-  (BOOTCLASSPATH id=string_literal SEMI)?
+  (BOOTCLASSPATH id=string_value SEMI)?
 ;
 
 classPaths
 :
-  ( (CLASSPATH s=string_literal
-    (COMMA s=string_literal)*
+  ( (CLASSPATH s=string_value
+    (COMMA s=string_value)*
     SEMI)
   | (NODEFAULTCLASSES SEMI)
   )*
@@ -1473,7 +1452,7 @@ javaSource
 
 oneJavaSource
 :
-  ( string_literal
+  ( string_value
   | SLASH
   | COLON
   | BACKSLASH
@@ -1482,45 +1461,43 @@ oneJavaSource
 
 
 profile:
-        (PROFILE profileName=string_literal  SEMI)?
+        (PROFILE name=string_value SEMI)?
 ;
 
 preferences
 :
-	( KEYSETTINGS LBRACE
-		(s = string_literal)?
-		RBRACE )?
-	;
+	( KEYSETTINGS
+    LBRACE
+      (s=string_value)?
+    RBRACE
+  )?
+;
 
 // delivers: <Script, start line no, start column no>
 proofScript
 :
-    PROOFSCRIPT ps = STRING_LITERAL
-      
-    ;
-
-proof  :
-        ( PROOF proofBody )?
-    ;
-
-
-proofBody  :
-        LBRACE
-            ( pseudosexpr )+
-        RBRACE
-    ;
-
-
-pseudosexpr   :
-        LPAREN (proofElementId=expreid
-            (str = string_literal )?
-               
-            ( pseudosexpr )* ) ?
-               
-        RPAREN   
-    ;
-
-expreid 
-:
-   id = simple_ident 
+  PROOFSCRIPT ps = STRING_LITERAL
 ;
+
+proof: (PROOF proofBody)?;
+
+
+proofBody
+:
+  LBRACE
+      ( pseudosexpr )+
+  RBRACE
+;
+
+
+pseudosexpr
+:
+  LPAREN
+    (proofElementId=expreid
+      (str=string_literal)?
+      (pseudosexpr)*
+    )?
+  RPAREN
+;
+
+expreid: id=simple_ident;

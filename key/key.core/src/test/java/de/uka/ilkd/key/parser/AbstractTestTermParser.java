@@ -34,22 +34,22 @@ public class AbstractTestTermParser {
     protected final NamespaceSet nss;
     protected final Services services;
 
-    AbstractTestTermParser() {
+    public AbstractTestTermParser() {
         services = getServices();
         tb = services.getTermBuilder();
         tf = tb.tf();
         nss = services.getNamespaces();
     }
 
-    Sort lookup_sort(String name) {
+    protected Sort lookup_sort(String name) {
         return nss.sorts().lookup(new Name(name));
     }
 
-    Function lookup_func(String name) {
+    protected Function lookup_func(String name) {
         return nss.functions().lookup(new Name(name));
     }
 
-    LogicVariable declareVar(String name, Sort sort) {
+    protected LogicVariable declareVar(String name, Sort sort) {
         LogicVariable v = new LogicVariable(new Name(name), sort);
         nss.variables().add(v);
         return v;

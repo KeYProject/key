@@ -401,7 +401,10 @@ SL_COMMENT
 
 ML_COMMENT: '/*' -> more, mode(COMMENT);
 
-HEX_LITERAL: '0' 'x' (DIGIT | 'a'..'f' | 'A'..'F')+;
+
+BIN_LITERAL: '0' 'b' ('0' | '1' | '_')+ ('l'|'L')?;
+
+HEX_LITERAL: '0' 'x' (DIGIT | 'a'..'f' | 'A'..'F' | '_')+ ('l'|'L')?;
 fragment DIGIT:	'0'..'9';
 fragment HEX
 :	('a'..'f'|'A'..'F'|DIGIT )
@@ -416,7 +419,7 @@ fragment IDCHAR: LETTER | DIGIT | '_' | '#' | '$';
 IDENT:  ( (LETTER | '_' | '#' | '$') (IDCHAR)*);
 
 NUM_LITERAL:
-    (DIGIT)+
+    (DIGIT | '_')+ ('l'|'L')?
 ;
 
 /**
@@ -427,6 +430,8 @@ NUM_LITERAL:
 MODALITYD:	'\\<' -> pushMode(modDiamond);
 MODALITYB:	'\\[' -> pushMode(modBox);
 MODALITYBB:	'\\[[' -> pushMode(modBoxBox);
+
+ERROR_CHAR: .;
 
 mode modDiamond;
 MODALITYD_END: '\\\\>' -> type(MODALITY), popMode;
