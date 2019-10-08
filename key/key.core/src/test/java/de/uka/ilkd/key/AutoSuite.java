@@ -1,5 +1,7 @@
 package de.uka.ilkd.key;
 
+import de.uka.ilkd.key.macros.scripts.meta.Option;
+import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -10,29 +12,47 @@ import org.key_project.util.testcategories.Interactive;
 import org.key_project.util.testcategories.Performance;
 
 import java.io.File;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 public class AutoSuite extends Suite {
+
+    private static final boolean DEBUG_OUTPUT =
+            Boolean.getBoolean("key.test.autosuite.debug");
+
     /** test categories to be excluded */
-    private static final List<Class> EXCLUDE_CATEGORIES =
+/*    private static final List<Class> EXCLUDE_CATEGORIES =
         Arrays.asList(new Class[] { Interactive.class,
-                                    Performance.class });
+                                    Performance.class }); */
+
+    private static List<Class<?>> excludedCategories = Collections.emptyList();
+    private static List<Class<?>> excludedClasses = Collections.emptyList();
 
     /** comparator for ascending lexicographic ordering */
     private static final Comparator<? super Class<?>> LEXICOGRAPHIC_ASC
         = Comparator.comparing(Class::getName);
 
     @Retention(RetentionPolicy.RUNTIME)      // ensures that annotation is available via reflection
+    @Target({ElementType.TYPE})
     @interface AutoSuitePath {
         /** @return the path of the AutoSuite */
         String value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.TYPE})
+    @interface AutoSuiteExclude {
+        Class[] categories() default {};
+        Class[] classes() default {};
     }
 
     /**
@@ -53,17 +73,39 @@ public class AutoSuite extends Suite {
             throw new InitializationError("Root class is not annotated with AutoSuitePath: "
                 + klass);
         }
+
+        parseExclusions(klass);
+
         String path = suitePath.value();
 
         List<Class<?>> result = findTestClasses(new File(path), "");
+
+        // remove the suite class itself from the suite ...
+        // if it happens to be included.
+        result.remove(klass);
+
         result.sort(LEXICOGRAPHIC_ASC);
 
-        System.out.println("AutoTestSuite: ");
+        debug("AutoTestSuite: ");
         for (Class<?> c : result) {
-            System.out.println("    " + c.getName());
+            debug("    " + c.getName());
         }
 
-        return result.toArray(new Class[0]);
+        return result.toArray(new Class[result.size()]);
+    }
+
+    /**
+     * Go and look for a {@link AutoSuiteExclude} annotation and store its values (if present)
+     * into the files
+     *
+     * @param klass The @AutoSuite annotated test suite class
+     */
+    private static void parseExclusions(Class<?> klass) {
+        AutoSuiteExclude exclude = klass.getAnnotation(AutoSuiteExclude.class);
+        if (exclude != null) {
+            excludedCategories = Arrays.asList(exclude.categories());
+            excludedClasses = Arrays.asList(exclude.classes());
+        }
     }
 
     private static List<Class<?>> findTestClasses(File file, final String packagePrefix)
@@ -81,11 +123,12 @@ public class AutoSuite extends Suite {
                     result.addAll(findTestClasses(f, prefix));
                 }
             } else {
-                throw new InitializationError("Error! The given path does not denote" +
+                // REVIEW MU: This is within a "if(file.isDirectory())". How can this be reached at all?
+                throw new InitializationError("Error! The given path does not denote " +
                     "a directory: " + file);
             }
         } else {
-            if(file.getName().endsWith(".class")) {
+            if (file.getName().endsWith(".class")) {
                 findClass(file.getName(), packagePrefix).ifPresent(result::add);
             }
         }
@@ -101,7 +144,13 @@ public class AutoSuite extends Suite {
         String className = fileName.substring(start + 1, end);
 
         // prevent TestCore test suite from containing itself
-        if (className.equals("TestCore")) {
+        // REVIEW: Bad idea to hard code this!
+//        if (className.equals("TestCore")) {
+//            return Optional.empty();
+//        }
+
+        // ignore inner and anonymous classes
+        if (className.contains("$")) {
             return Optional.empty();
         }
 
@@ -109,12 +158,21 @@ public class AutoSuite extends Suite {
                                   + (packagePrefix.isEmpty() ? "" : ".")
                                   + className;
         try {
-            System.out.println("Searching for class " + qualifiedClassName);
+            debug("Searching for class " + qualifiedClassName);
 
             // initialization of ProofJavaParser fails somehow (why?)
             // -> disable initialization of classes
             Class<?> clss =
                 Class.forName(qualifiedClassName, false, AutoSuite.class.getClassLoader());
+
+            if (excludedClasses.contains(clss)) {
+                // This class has been excluded explicitly!
+                return Optional.empty();
+            }
+
+            if (!isTestClass(clss)) {
+                return Optional.empty();
+            }
 
             // TODO: should we manually filter for test category here?
             Category category = clss.getAnnotation(Category.class);
@@ -122,31 +180,55 @@ public class AutoSuite extends Suite {
                 Class[] categories = category.value();
                 for (Class c : categories) {
                     // do not add tests in categories "Slow" or "Performance"
-                    if (EXCLUDE_CATEGORIES.contains(c)) {
+                    if (excludedCategories.contains(c)) {
                         return Optional.empty();
                     }
                 }
             }
 
-            // include class if it is a test suite
-            if (clss.getAnnotation(RunWith.class) != null) {
-                System.out.println("found (is test suite)!");
-                // return here to prevent double inclusion of suite classes with test methods
-                return Optional.of(clss);
-            }
+            return Optional.of(clss);
 
-            // include class if it contains test methods
-            // iterate methods and check for @Test.class
-            for (Method m : clss.getDeclaredMethods()) {
-                System.out.println("    method " + m.getName());
-                if (m.getAnnotation(Test.class) != null) {
-                    System.out.println("found (contains test method)!");
-                    return Optional.of(clss);        // already found a test -> we can skip the rest
-                }
-            }
         } catch (ClassNotFoundException e) {
             throw new InitializationError(e);
         }
-        return Optional.empty();
+    }
+
+    private static boolean isTestClass(Class<?> clss) {
+
+        // Instances of TestClass are also test classes.
+        if(TestCase.class.isAssignableFrom(clss)) {
+            debug("    found (is legacy test class)!");
+            return true;
+        }
+
+        // include class if it is a test suite
+        if (clss.getAnnotation(RunWith.class) != null) {
+            debug("    found (is test suite)!");
+            // return here to prevent double inclusion of suite classes with test methods
+            return true;
+        }
+
+        // include class if it contains test methods
+        // iterate methods and check for @Test.class
+        for (Method m : clss.getDeclaredMethods()) {
+            debug("    method " + m.getName());
+            if (m.getAnnotation(Test.class) != null) {
+                debug("    found (contains test method)!");
+                return true;
+            }
+        }
+
+        Class<?> superClass = clss.getSuperclass();
+        if (superClass != null) {
+            return isTestClass(superClass);
+        }
+
+        return false;
+    }
+
+    private static void debug(String msg) {
+        if (DEBUG_OUTPUT) {
+            System.err.println(msg);
+        }
     }
 }
