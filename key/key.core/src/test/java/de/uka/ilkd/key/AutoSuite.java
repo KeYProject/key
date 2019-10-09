@@ -44,7 +44,7 @@ public class AutoSuite extends Suite {
 
     @Retention(RetentionPolicy.RUNTIME)      // ensures that annotation is available via reflection
     @Target({ElementType.TYPE})
-    @interface AutoSuitePath {
+    public @interface AutoSuitePath {
         /** @return the path of the AutoSuite */
         String value();
     }
@@ -199,6 +199,19 @@ public class AutoSuite extends Suite {
         }
     }
 
+    /**
+     * See also https://docs.gradle.org/current/userguide/java_testing.html#sec:test_detection
+     * <p>
+     * For JUnit, Gradle scans for both JUnit 3 and 4 test classes. A class is considered to
+     * be a JUnit test if it:
+     * <ol><li> Ultimately inherits from TestCase or GroovyTestCase
+     * <li> Is annotated with @RunWith
+     * <li> Contains a method annotated with @Test or a super class does
+     * </ol>
+     *
+     * @param clss
+     * @return
+     */
     private static boolean isTestClass(Class<?> clss) {        
         // Instances of TestClass are also test classes.
         if(TestCase.class.isAssignableFrom(clss)) {
@@ -207,7 +220,15 @@ public class AutoSuite extends Suite {
         }
 
         // include class if it is a test suite
-        if (clss.getAnnotation(RunWith.class) != null) {
+        RunWith annotation = clss.getAnnotation(RunWith.class);
+        if (annotation != null) {
+            if(annotation.value() == AutoSuite.class) {
+                // We do not want to nest auto suites! Hence
+                // any auto suite is not considered a test case for us.
+                // Hence, one can keep several auto suites in one directory
+                // w/o that they include each other
+                return false;
+            }
             debug("    found (is test suite)!");
             // return here to prevent double inclusion of suite classes with test methods
             return true;

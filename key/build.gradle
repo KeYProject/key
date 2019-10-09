@@ -91,16 +91,11 @@ subprojects {
     }
 
     test {
+        // TODO consider moving this to key.core where it is repeated ...
         useJUnit {
             excludeCategories 'org.key_project.util.testcategories.Interactive', 'org.key_project.util.testcategories.Performance'
         }
-        filter {
-            // To make test cases deterministic there is only one class per
-            // project called "Tests" that programmatically collects
-            // all test cases.
-            // See these classes for configuring the test runs!
-            includeTestsMatching "*.Tests"
-        }
+
         afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
         beforeTest { desc -> logger.error "> ${desc.className}#${desc.name}" }
     }
@@ -108,6 +103,8 @@ subprojects {
     task testFast(type: Test) {
         group "verification"
         useJUnit {
+            // CAUTION! These settings do not affect :key.core since the
+            // detection mechanism is different there.
             excludeCategories 'org.key_project.util.testcategories.Slow'
             excludeCategories 'org.key_project.util.testcategories.Interactive'
         }

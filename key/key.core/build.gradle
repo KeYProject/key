@@ -49,7 +49,7 @@ compileJavacc {
 }
 
 test {
-    filter {
+    /*filter {
         // use testProofRules or testRunAllProofs, avoid double execution on jenkins
         excludeTestsMatching "ProveRulesTest"
         excludeTestsMatching "RunAllProofsTestSuite"
@@ -58,10 +58,31 @@ test {
         excludeTestsMatching "RunAllProofsFunctional"
         excludeTestsMatching "TestParallelParsing"
         excludeTestsMatching "TestCvc4"
+    }*/
+    filter {
+        // To make test cases deterministic there is only one class per
+        // project called "Tests" that programmatically collects
+        // all test cases.
+        // See these classes for configuring the test runs!
+        // CAUTION! "excludeCategories" more filters are to be defined in the class!
+        includeTestsMatching "de.uka.ilkd.key.Tests"
     }
-    useJUnit {
-            excludeCategories 'org.key_project.util.testcategories.Performance'
-            excludeCategories 'org.key_project.util.testcategories.Interactive'
+
+    // TODO. That is already in key/build.gradle. Here or there?
+    // useJUnit {
+    //         excludeCategories 'org.key_project.util.testcategories.Performance'
+    //         excludeCategories 'org.key_project.util.testcategories.Interactive'
+    // }
+}
+
+testFast {
+    filter {
+        // To make test cases deterministic there is only one class per
+        // project called "Tests" that programmatically collects
+        // all test cases.
+        // See these classes for configuring the test runs!
+        // CAUTION! "excludeCategories" more filters are to be defined in the class!
+        includeTestsMatching "de.uka.ilkd.key.FastTests"
     }
 }
 
