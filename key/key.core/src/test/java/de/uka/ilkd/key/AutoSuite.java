@@ -168,6 +168,11 @@ public class AutoSuite extends Suite {
             if (excludedClasses.contains(clss)) {
                 // This class has been excluded explicitly!
                 return Optional.empty();
+            }            
+
+            if(Modifier.isAbstract(clss.getModifiers())) {
+                // An abstract class is not a test class
+                return Optional.empty();
             }
 
             if (!isTestClass(clss)) {
@@ -193,8 +198,7 @@ public class AutoSuite extends Suite {
         }
     }
 
-    private static boolean isTestClass(Class<?> clss) {
-
+    private static boolean isTestClass(Class<?> clss) {        
         // Instances of TestClass are also test classes.
         if(TestCase.class.isAssignableFrom(clss)) {
             debug("    found (is legacy test class)!");
