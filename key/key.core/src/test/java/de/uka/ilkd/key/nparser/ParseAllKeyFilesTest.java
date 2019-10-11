@@ -4,6 +4,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -45,7 +46,8 @@ public class ParseAllKeyFilesTest {
 
     @Test
     public void parse() throws IOException {
-        ParsingFacade.parseFile(file);
+        var ctx = ParsingFacade.parseFile(file);
+        Assert.assertNull(ctx.exception);
     }
 
 
@@ -55,8 +57,9 @@ public class ParseAllKeyFilesTest {
         Token t;
         do {
             t = toks.nextToken();
-            System.out.format("%20s:%-50s\n",
+            System.out.format("%20s %d:%-50s\n",
                     toks.getVocabulary().getSymbolicName(t.getType()),
+                    toks._mode,
                     t.getText().replace("\n", "\\n"));
             if(t.getType() == KeYLexer.ERROR_CHAR) Assert.fail();
         } while (t.getType() != CommonToken.EOF);

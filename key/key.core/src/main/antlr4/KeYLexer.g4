@@ -399,7 +399,7 @@ SL_COMMENT
 	(~('\n' | '\uFFFF'))* ('\n' | '\uFFFF' | EOF) -> channel(HIDDEN)
 ;
 
-ML_COMMENT: '/*' -> more, mode(COMMENT);
+ML_COMMENT: '/*' -> more, pushMode(COMMENT);
 
 
 BIN_LITERAL: '0' 'b' ('0' | '1' | '_')+ ('l'|'L')?;
@@ -434,10 +434,11 @@ MODALITYBB:	'\\[[' -> pushMode(modBoxBox);
 ERROR_CHAR: .;
 
 mode modDiamond;
-MODALITYD_END: '\\\\>' -> type(MODALITY), popMode;
+MODALITYD_END: '\\>' -> type(MODALITY), popMode;
 MODALITYD_STRING : '"' -> more, pushMode(modString);
 MODALITYD_CHAR : '\'' -> more, pushMode(modChar);
 MODALITYD_COMMENT : [\\] [*] -> more, pushMode(modComment);
+MODALITYD_ANY : . -> more;
 
 mode modBox;
 MODALITYB_END: '\\\\]' -> type(MODALITY), popMode;

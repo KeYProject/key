@@ -98,11 +98,11 @@ public class Builder extends KeYParserBaseVisitor<Object> {
            T::select(h, T::select(h, T::select(h, T::select(h, o, f1) , f2) , f3), f4)
     */
     protected int globalSelectNestingDepth = 0;
-    TacletBuilder b;
-    boolean ldt = false;
-    String currentChoiceCategory;
-    boolean ruleWithFind;
-    boolean negated;
+    private TacletBuilder b;
+    private boolean ldt = false;
+    private String currentChoiceCategory;
+    private boolean ruleWithFind;
+    private boolean negated;
     private NamespaceSet nss;
     private Namespace<SchemaVariable> schemaVariablesNamespace;
     private HashMap<String, String> category2Default = new LinkedHashMap<>();
@@ -146,13 +146,14 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     private ParserConfig parserConfig;
     private Term quantifiedArrayGuard = null;
     private String profileName;
-    private org.antlr.runtime.TokenStream input = null;
     private ParsableVariable selfVar;
     private boolean checkSort;
     private SchemaVariableModifierSet mods;
     private boolean primitiveElementType;
     private boolean isPrimitive;
     private boolean axiomMode;
+    //region stack handling
+    private Stack<Object> parameters = new Stack<>();
 
     /* Most general constructor, should only be used internally */
     private Builder(Services services,
@@ -608,8 +609,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         return result.toString();
     }
 
-    private Operator getAttributeInPrefixSort(Sort prefixSort, String attributeName)
-            throws RecognitionException, NotDeclException/*SemanticException*/ {
+    private Operator getAttributeInPrefixSort(Sort prefixSort, String attributeName) {
         final JavaInfo javaInfo = getJavaInfo();
 
         Operator result = null;
@@ -630,7 +630,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                 try {
                     result = javaInfo.getArrayLength();
                 } catch (Exception ex) {
-                    throwEx(new KeYSemanticException(input, getSourceName(), ex));
+                    throwEx(new KeYSemanticException(null, getSourceName(), ex));
                 }
             } else if (attributeName.equals("<inv>")) {
                 // The invariant observer "<inv>" is implicit and
@@ -667,13 +667,12 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         }
 
         if (result == null && !("length".equals(attributeName))) {
-            throw new NotDeclException(input, "Attribute ", attributeName);
+            throwEx(new NotDeclException(null, "Attribute ", attributeName));
         }
         return result;
     }
 
-    public Term createAttributeTerm(Term prefix,
-                                    Operator attribute) throws RecognitionException/*SemanticException*/ {
+    public Term createAttributeTerm(Term prefix, Operator attribute) {
         Term result = prefix;
 
         if (attribute instanceof SchemaVariable) {
@@ -734,8 +733,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         namespaces().setVariables(new Namespace(variables()));
     }
 
-    private KeYJavaType getTypeByClassName(String s)
-            throws RecognitionException/*KeYSemanticException*/ {
+    private KeYJavaType getTypeByClassName(String s) {
         KeYJavaType kjt = null;
         try {
             kjt = getJavaInfo().getTypeByClassName(s, null);
@@ -967,21 +965,23 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
         if (args == null) {
             throw new NotDeclException
-                    (input, "(program) variable or constant", varfunc_name);
+                    (null, "(program) variable or constant", varfunc_name);
         } else {
             throw new NotDeclException
-                    (input, "function or static query", varfunc_name);
+                    (null, "function or static query", varfunc_name);
         }
     }
 
-    private boolean isStaticAttribute() throws RecognitionException/*KeYSemanticException*/ {
+    private boolean isStaticAttribute() {
+        //TODO reimplement without lexer `input`
         if (inSchemaMode()) return false;
         final JavaInfo javaInfo = getJavaInfo();
         KeYJavaType kjt = null;
         boolean result = false;
 //        try {
         int n = 1;
-        StringBuffer className = new StringBuffer(input.LT(n).getText());
+        StringBuffer className = new StringBuffer();
+        /*StringBuffer className = new StringBuffer(input.LT(n).getText());
         while (isPackage(className.toString()) || input.LA(n + 2) == KeYLexer.NUM_LITERAL ||
                 (input.LT(n + 2) != null && input.LT(n + 2).getText() != null &&
                         input.LT(n + 2).getText().length() > 0 && input.LT(n + 2).getText().charAt(0) <= 'Z' && input.LT(n + 2).getText().charAt(0) >= 'A' &&
@@ -1003,29 +1003,29 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         while (input.LA(n + 1) == KeYLexer.EMPTYBRACKETS) {
             className.append("[]");
             n++;
-        }
+        }*/
         kjt = getTypeByClassName(className.toString());
 
         if (kjt != null) {
             // works as we do not have inner classes
-            if (input.LA(n + 1) == KeYLexer.DOT) {
+            /*if (input.LA(n + 1) == KeYLexer.DOT) {
                 final ProgramVariable pv =
                         javaInfo.getAttribute(input.LT(n + 2).getText(), kjt);
                 result = (pv != null && pv.isStatic());
-            }
+            }*/
         } else {
             result = false;
         }
         return result;
     }
 
-    private boolean isTermTransformer() /*throws TokenStreamException*/ {
+    /*private boolean isTermTransformer()  {
         return (input.LA(1) == KeYLexer.IDENT &&
                 AbstractTermTransformer.name2metaop(input.LT(1).getText()) != null)
                 || input.LA(1) == KeYLexer.IN_TYPE;
     }
 
-    private boolean isStaticQuery() throws RecognitionException/*KeYSemanticException*/ {
+    private boolean isStaticQuery() {
         if (inSchemaMode()) return false;
         final JavaInfo javaInfo = getJavaInfo();
         boolean result = false;
@@ -1055,7 +1055,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         }
         return result;
     }
-
+*/
     private TacletBuilder createTacletBuilderFor(Object find, int applicationRestriction) {
         if (applicationRestriction != RewriteTaclet.NONE &&
                 applicationRestriction != RewriteTaclet.IN_SEQUENT_STATE &&
@@ -1213,14 +1213,14 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     }
 
     protected void semanticError(String message) {
-        throwEx(new KeYSemanticException(input, getSourceName(), message));
+        throwEx(new KeYSemanticException(null, getSourceName(), message));
     }
 
     private boolean isImplicitHeap(Term t) {
         return getServices().getTermBuilder().getBaseHeap().equals(t);
     }
 
-    private Term replaceHeap(Term term, Term heap, int depth) throws RecognitionException, KeYSemanticException {
+    private Term replaceHeap(Term term, Term heap, int depth) {
         if (depth > 0) {
 
             if (isSelectTerm(term)) {
@@ -1248,29 +1248,25 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
             } else {
                 semanticError(NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE + term);
-                throw new RecognitionException();
+                throwEx(new RecognitionException());
             }
 
-        } else {
-            return term;
         }
+        return term;
     }
 
     /*
      * Replace standard heap by another heap in an observer function.
      */
-    protected Term heapSelectionSuffix(Term term, Term heap) throws RecognitionException, KeYSemanticException {
+    protected Term heapSelectionSuffix(Term term, Term heap) {
 
         if (!isHeapTerm(heap)) {
             semanticError("Expecting term of type Heap but sort is " + heap.sort()
                     + " for term: " + term);
         }
-
         Term result = replaceHeap(term, heap, globalSelectNestingDepth);
-
         // reset globalSelectNestingDepth
         globalSelectNestingDepth = 0;
-
         return result;
     }
 
@@ -1369,7 +1365,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         var name = cat + ":" + ch;
         var c = (Choice) choices().lookup(new Name(name));
         if (c == null) {
-            throwEx(new NotDeclException(input, "Option", ch));
+            throwEx(new NotDeclException(null, "Option", ch));
         } else {
             activatedChoices = activatedChoices.add(c);
         }
@@ -2033,7 +2029,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         if (checkSort) {
             s = lookupSort(name);
             if (s == null) {
-                throwEx(new NotDeclException(input, "sort", name));
+                throwEx(new NotDeclException(null, "sort", name));
             }
         }
         return new Pair<Sort, Type>(s, t);
@@ -2282,27 +2278,140 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitStaticAttributeOrQueryReference(KeYParser.StaticAttributeOrQueryReferenceContext ctx) {
-        return super.visitStaticAttributeOrQueryReference(ctx);
+        //TODO weigl: this rule is a total grammar blower.
+        String attrReference = ctx.id.getText();
+        for (int i = 0; i < ctx.EMPTYBRACKETS().size(); i++) {
+            attrReference += "[]";
+        }
+
+        /*KeYJavaType kjt = null;
+        kjt = getTypeByClassName(attrReference);
+        if (kjt == null) {
+            throwEx(new NotDeclException(input, "Class", attrReference));
+        }
+        attrReference = kjt.getSort().name().toString();
+        match(input, DOT, null);
+            attrReference += "::" + input.LT(1).getText();
+            match(input, IDENT, null);
+            if(savedGuessing > -1) {
+                state.backtracking = savedGuessing;
+                savedGuessing = -1;
+            }*/
+        return attrReference;
     }
 
     @Override
-    public Object visitStatic_attribute_suffix(KeYParser.Static_attribute_suffixContext ctx) {
-        return super.visitStatic_attribute_suffix(ctx);
+    public Term visitStatic_attribute_suffix(KeYParser.Static_attribute_suffixContext ctx) {
+        Operator v = null;
+        String attributeName = accept(ctx.staticAttributeOrQueryReference());
+        String className;
+        if (attributeName.indexOf(':') != -1) {
+            className =
+                    attributeName.substring(0, attributeName.indexOf(':'));
+        } else {
+            className =
+                    attributeName.substring(0, attributeName.lastIndexOf("."));
+        }
+        v = getAttributeInPrefixSort(getTypeByClassName(className).getSort(), attributeName);
+        return createAttributeTerm(null, v);
+    }
+
+    private <T> T pop() {
+        return (T) parameters.pop();
+    }
+
+    public <T> @Nullable T accept(@Nullable ParserRuleContext ctx, Object... args) {
+        int stackSize = parameters.size();
+        for (Object a : args) parameters.push(a);
+        T t = accept(ctx);
+        //Stack hygiene
+        while (parameters.size() > stackSize) {
+            parameters.pop();
+        }
+        return t;
+    }
+    //endregion
+
+    /**
+     * stack parameter: (prefix : Term)
+     *
+     * @param ctx
+     * @return
+     */
+    @Override
+    public Term visitAttribute_or_query_suffix(KeYParser.Attribute_or_query_suffixContext ctx) {
+        Term prefix = pop();
+        Term result = null;
+        if (ctx.STAR() != null) {
+            return services.getTermBuilder().allFields(prefix);
+        }
+
+        String memberName = accept(ctx.memberName);
+        if (ctx.query_suffix() != null) {
+            result = accept(ctx.query_suffix());
+            assert result != null;
+        }
+
+        if (result == null) {
+            if (prefix.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
+                if ("length".equals(memberName)) {
+                    result = getServices().getTermBuilder().seqLen(prefix);
+                } else {
+                    semanticError("There is no attribute '" + memberName +
+                            "' for sequences (Seq), only 'length' is supported.");
+                }
+            } else {
+                Operator v = getAttributeInPrefixSort(prefix.sort(), memberName);
+                result = createAttributeTerm(prefix, v);
+            }
+        }
+        return result;
     }
 
     @Override
-    public Object visitAttribute_or_query_suffix(KeYParser.Attribute_or_query_suffixContext ctx) {
-        return super.visitAttribute_or_query_suffix(ctx);
+    public String visitAttrid(KeYParser.AttridContext ctx) {
+        return ctx.getText();
+        /*if(ctx.LPAREN()!=null){
+           STring clss = accept(ctx.sort_name());
+            id2 = simple_ident RPAREN
+            return clss + "::" + id2;;
+        }
+
+        return  accept(ctx.simple_ident());
+        */
     }
 
-    @Override
-    public Object visitAttrid(KeYParser.AttridContext ctx) {
-        return super.visitAttrid(ctx);
-    }
-
+    /**
+     * stack parameters: (prefix : Term, memberName : String)
+     *
+     * @param ctx
+     * @return
+     */
     @Override
     public Object visitQuery_suffix(KeYParser.Query_suffixContext ctx) {
-        return super.visitQuery_suffix(ctx);
+        Term prefix = pop();
+        String memberName = pop();
+        String classRef, name;
+        boolean brackets = false;
+        List<Term> args = accept(ctx.argument_list());
+        // true in case class name is not explicitly mentioned as part of memberName
+        boolean implicitClassName = memberName.indexOf("::") == -1;
+
+        if (implicitClassName) {
+            classRef = prefix.sort().name().toString();
+            name = memberName;
+        } else {
+            String[] parts = memberName.split("::", 2);
+            classRef = parts[0];
+            name = parts[1];
+        }
+        KeYJavaType kjt = getTypeByClassName(classRef);
+        if (kjt == null)
+            throwEx(new NotDeclException(null, "Class", classRef));
+        classRef = kjt.getFullName();
+
+        return getServices().getJavaInfo().getProgramMethodTerm(prefix, name,
+                (Term[]) args.toArray(), classRef, implicitClassName);
     }
 
     @Override
@@ -2350,34 +2459,120 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         return a;
     }
 
+    /**
+     * stack parameter: (term : Term)
+     *
+     * @param ctx
+     * @return
+     */
     @Override
-    public Object visitHeap_selection_suffix(KeYParser.Heap_selection_suffixContext ctx) {
-        return super.visitHeap_selection_suffix(ctx);
+    public Term visitHeap_selection_suffix(KeYParser.Heap_selection_suffixContext ctx) {
+        return heapSelectionSuffix(pop(), accept(ctx.heap));
     }
 
     @Override
     public Object visitAccessterm_bracket_suffix(KeYParser.Accessterm_bracket_suffixContext ctx) {
-        return super.visitAccessterm_bracket_suffix(ctx);
+        //Todo this rule is context-sensitive
+        Term reference = pop();
+
+/*        isHeapTerm(reference) }? tmp = heap_update_suffix[reference] { $result = tmp; }
+    | { isSequenceTerm(reference) }? tmp = seq_get_suffix[reference] { $result = tmp; }
+    | tmp = array_access_suffix[reference] { $result = tmp; $increaseHeapSuffixCounter = true; }*/
+        return reference;
     }
+
 
     @Override
     public Object visitSeq_get_suffix(KeYParser.Seq_get_suffixContext ctx) {
-        return super.visitSeq_get_suffix(ctx);
+        Term reference=pop();
+        Term indexTerm = accept(ctx.logicTermReEntry());
+        if (!isIntTerm(indexTerm))
+            semanticError("Expecting term of sort " + IntegerLDT.NAME + " as index of sequence " + reference + ", but found: " + indexTerm);
+        return getServices().getTermBuilder().seqGet(Sort.ANY, reference, indexTerm);
     }
 
     @Override
     public Object visitStatic_query(KeYParser.Static_queryContext ctx) {
-        return super.visitStatic_query(ctx);
+        String queryRef = accept(ctx.staticAttributeOrQueryReference());
+        List<Term> args = accept(ctx.argument_list());
+        int index = queryRef.indexOf(':');
+        String className = queryRef.substring(0, index);
+        String qname = queryRef.substring(index + 2);
+        Term result = getServices().getJavaInfo().getStaticProgramMethodTerm(qname, (Term[])args.toArray(), className);
+        if (result == null && isTermParser()) {
+            final Sort sort = lookupSort(className);
+            if (sort == null) {
+                semanticError("Could not find matching sort for " + className);
+            }
+            KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
+            if (kjt == null) {
+                semanticError("Found logic sort for " + className +
+                        " but no corresponding java type!");
+            }
+        }
+        return result;
     }
 
     @Override
     public Object visitHeap_update_suffix(KeYParser.Heap_update_suffixContext ctx) {
-        return super.visitHeap_update_suffix(ctx);
+        Term heap = pop();
+        // XXX find the right kind of non-terminal for "o.f" and "a[i]"
+        // and do not resign to parsing an arbitrary term
+        if (ctx.ASSIGN() != null) {
+            Term target = accept(ctx.target);
+            Term val = accept(ctx.val);
+            Term objectTerm = target.sub(1);
+            Term fieldTerm = target.sub(2);
+            return getServices().getTermBuilder().store(heap, objectTerm, fieldTerm, val);
+        } else {
+            String id = accept(ctx.simple_ident());
+            List<Term> args = accept(ctx.args);
+            Function f = functions().lookup(new Name(id));
+            if (f == null) {
+                semanticError("Unknown heap constructor " + id);
+            }
+            Term[] augmentedArgs = new Term[args.size() + 1];
+            System.arraycopy(args, 0, augmentedArgs, 1, args.size());
+            augmentedArgs[0] = heap;
+            Term result = getTermFactory().createTerm(f, augmentedArgs);
+            if (!result.sort().name().toString().equals("Heap")) {
+                semanticError(id + " is not a heap constructor ");
+            }
+            return result;
+        }
     }
 
     @Override
     public Object visitArray_access_suffix(KeYParser.Array_access_suffixContext ctx) {
-        return super.visitArray_access_suffix(ctx);
+        Term indexTerm = null, rangeFrom = null, rangeTo = null;
+        Term result = pop();
+
+        if (ctx.STAR() != null) {
+            rangeFrom = toZNotation("0", functions());
+            Term lt = getServices().getTermBuilder().dotLength(result);
+            Term one = toZNotation("1", functions());
+            rangeTo = getTermFactory().createTerm
+                    (functions().lookup(new Name("sub")), lt, one);
+        } else {
+            indexTerm = accept(ctx.indexTerm);
+            rangeFrom = accept(ctx.rangeTo);
+        }
+        if (rangeTo != null) {
+            if (quantifiedArrayGuard == null) {
+                semanticError(
+                        "Quantified array expressions are only allowed in locations.");
+            }
+            LogicVariable indexVar = new LogicVariable(new Name("i"),
+                    sorts().lookup(new Name("int")));
+            indexTerm = getTermFactory().createTerm(indexVar);
+
+            Function leq = functions().lookup(new Name("leq"));
+            Term fromTerm = getTermFactory().createTerm(leq, rangeFrom, indexTerm);
+            Term toTerm = getTermFactory().createTerm(leq, indexTerm, rangeTo);
+            Term guardTerm = getTermFactory().createTerm(Junctor.AND, fromTerm, toTerm);
+            quantifiedArrayGuard = getTermFactory().createTerm(Junctor.AND, quantifiedArrayGuard, guardTerm);
+        }
+        return getServices().getTermBuilder().dotArr(result, indexTerm);
     }
 
     @Override
@@ -2435,14 +2630,19 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                         .parseLabel(labelName, parameters, getServices());
             }
         } catch (Exception ex) {
-            throwEx(new KeYSemanticException(input, getSourceName(), ex));
+            throwEx(new KeYSemanticException(null, getSourceName(), ex));
         }
         return label;
     }
 
     @Override
     public Object visitAbbreviation(KeYParser.AbbreviationContext ctx) {
-        return super.visitAbbreviation(ctx);
+        String sc = accept(ctx.sc);
+        Term a = scm.getTerm(sc);
+        if (a == null) {
+            throwEx(new NotDeclException(null, "abbreviation", sc));
+        }
+        return a;
     }
 
     @Override
@@ -2496,7 +2696,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Term visitArgument(KeYParser.ArgumentContext ctx) {
-        return (Term) super.visitArgument(ctx);
+        return (Term) oneOf(ctx.term(), ctx.term60());
     }
 
     @Override
@@ -2520,7 +2720,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Term visitBraces_term(KeYParser.Braces_termContext ctx) {
-        return (Term) super.visitBraces_term(ctx);
+        return (Term) oneOf(ctx.substitutionterm(), ctx.locset_term(), ctx.updateterm());
     }
 
     @Override
@@ -2750,7 +2950,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
             return schemaVariables().lookup(new Name(id));
         }
         if (v == null) {
-            throwEx(new NotDeclException(input, "variable", id));
+            throwEx(new NotDeclException(null, "variable", id));
         }
         return v;
     }
@@ -2794,16 +2994,16 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         switchToNormalMode();
         ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.nil();
 
-        if(ctx.LEMMA()!=null) {
+        if (ctx.LEMMA() != null) {
             tacletAnnotations = tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);
         }
-        var name=ctx.name.getText();
+        var name = ctx.name.getText();
         ImmutableSet<Choice> choices_ =
                 DefaultImmutableSet.fromSet(accept(ctx.option_list()));
 
         Term form = accept(ctx.form);
-        if(form!=null){
-            if(!axiomMode) {
+        if (form != null) {
+            if (!axiomMode) {
                 semanticError("formula rules are only permitted for \\axioms");
             }
             b = createTacletBuilderFor(null, RewriteTaclet.NONE);
@@ -2817,7 +3017,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
             b.setChoices(choices_);
             b.setAnnotations(tacletAnnotations);
             Taclet r = b.getTaclet();
-            taclet2Builder.put(r,b);
+            taclet2Builder.put(r, b);
             return r;
         }
 
@@ -2827,10 +3027,18 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         allOf(ctx.one_schema_var_decl());
         accept(ctx.ifSeq);
 
-        if(null!=ctx.SAMEUPDATELEVEL()) { applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL; }
-        if(null!=ctx.INSEQUENTSTATE()) { applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE; }
-        if(null!=ctx.ANTECEDENTPOLARITY()) { applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY; }
-        if(null!=ctx.SUCCEDENTPOLARITY()) { applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY; }
+        if (null != ctx.SAMEUPDATELEVEL()) {
+            applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL;
+        }
+        if (null != ctx.INSEQUENTSTATE()) {
+            applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE;
+        }
+        if (null != ctx.ANTECEDENTPOLARITY()) {
+            applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY;
+        }
+        if (null != ctx.SUCCEDENTPOLARITY()) {
+            applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY;
+        }
         var find = accept(ctx.find);
         b = createTacletBuilderFor(find, applicationRestriction);
         b.setIfSequent(accept(ctx.ifSeq));
@@ -2841,7 +3049,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         b.setChoices(choices_);
         b.setAnnotations(tacletAnnotations);
         Taclet r = b.getTaclet();
-        taclet2Builder.put(r,b);
+        taclet2Builder.put(r, b);
         // dump local schema var decls
         schemaVariablesNamespace = schemaVariables().parent();
         return r;
@@ -2992,7 +3200,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     public Object visitVarcond_dropEffectlessElementaries(KeYParser.Varcond_dropEffectlessElementariesContext ctx) {
         UpdateSV u = accept(ctx.u);
         SchemaVariable x = accept(ctx.x);
-        SchemaVariable  result = accept(ctx.result);
+        SchemaVariable result = accept(ctx.result);
         b.addVariableCondition(new DropEffectlessElementariesCondition(
                 u, x, result));
         return null;
@@ -3392,7 +3600,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         String name = ctx.choice_.toString();
         var c = choices().lookup(new Name(cat + ":" + name));
         if (c == null) {
-            throwEx(new NotDeclException(input, "Option", name));
+            throwEx(new NotDeclException(null, "Option", name));
         }
         return c;
     }
@@ -3460,7 +3668,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         String id = (String) ctx.IDENT().accept(this);
         RuleSet h = ruleSets().lookup(new Name(id));
         if (h == null) {
-            throwEx(new NotDeclException(input, "ruleset", id));
+            throwEx(new NotDeclException(null, "ruleset", id));
         }
         return h;
     }
@@ -3602,7 +3810,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         if (ctx.NODEFAULTCLASSES() != null) {
             throwEx(new NoViableAltException(
                     "\\noDefaultClasses is no longer supported. " +
-                            "Use \\bootclasspath. See docs/README.classpath", -1, -1, input));
+                            "Use \\bootclasspath. See docs/README.classpath", -1, -1, null));
         }
         return ctx.getText();
     }

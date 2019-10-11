@@ -2876,7 +2876,8 @@ attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix 
     :
     DOT ( STAR { result = services.getTermBuilder().allFields(prefix); }
     | ( memberName = attrid
-    (result = query_suffix[prefix, memberName] {assert result != null;})?
+    (result = query_suffix[prefix, memberName]
+    {assert result != null;})?
     {
         if(result == null)  {
             if(prefix.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {

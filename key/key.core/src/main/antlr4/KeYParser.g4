@@ -651,7 +651,7 @@ array_access_suffix
 :
   LBRACKET
 	( STAR
-  | indexTerm = logicTermReEntry (DOTRANGE rangeTo = logicTermReEntry)?
+  | indexTerm=logicTermReEntry (DOTRANGE rangeTo=logicTermReEntry)?
   )
   RBRACKET
 ;
