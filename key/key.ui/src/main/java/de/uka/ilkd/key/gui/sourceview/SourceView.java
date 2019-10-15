@@ -521,8 +521,9 @@ public final class SourceView extends JComponent {
      * @return {@code true} if this source view did not already contain the file.
      * @throws IOException if the file cannot be opened.
      */
-    private boolean addFile(URI fileURI) throws IOException {
-        if (tabs.containsKey(fileURI)) {
+    private boolean addFile(URI fileURI) throws IOException {    
+        // quick fix: fileName could be null (see bug #1520)
+        if (fileName == null || tabs.containsKey(fileName)) {
             return false;
         } else {
             // try to load the file via the FileRepo

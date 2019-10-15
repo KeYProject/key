@@ -301,8 +301,9 @@ public class OutputStreamProofSaver {
                     final String absPath = tmp.substring(k, j);
                     final String relPath = tryToMakeFilenameRelative(absPath,
                         basePath);
+                    final String correctedRelPath = relPath.equals("") ? "." : relPath;
                     relPathString = relPathString + " \""
-                            + escapeCharacters(relPath) + "\"";
+                            + escapeCharacters(correctedRelPath) + "\"";
                     i = j + 1;
                 }
                 tmp2 = tmp2 + s + relPathString + ";";
