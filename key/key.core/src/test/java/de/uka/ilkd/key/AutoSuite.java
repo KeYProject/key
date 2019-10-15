@@ -1,6 +1,5 @@
 package de.uka.ilkd.key;
 
-import de.uka.ilkd.key.macros.scripts.meta.Option;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -8,8 +7,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerBuilder;
-import org.key_project.util.testcategories.Interactive;
-import org.key_project.util.testcategories.Performance;
 
 import java.io.File;
 import java.lang.annotation.ElementType;
@@ -27,16 +24,15 @@ import java.util.Optional;
 
 public class AutoSuite extends Suite {
 
+    /** System property that can be set to true if debug output is needed. */
     private static final boolean DEBUG_OUTPUT =
             Boolean.getBoolean("key.test.autosuite.debug");
 
     /** test categories to be excluded */
-/*    private static final List<Class> EXCLUDE_CATEGORIES =
-        Arrays.asList(new Class[] { Interactive.class,
-                                    Performance.class }); */
+    private static List excludedCategories = Collections.emptyList();
 
-    private static List<Class<?>> excludedCategories = Collections.emptyList();
-    private static List<Class<?>> excludedClasses = Collections.emptyList();
+    /** test classes to be excluded */
+    private static List excludedClasses = Collections.emptyList();
 
     /** comparator for ascending lexicographic ordering */
     private static final Comparator<? super Class<?>> LEXICOGRAPHIC_ASC
@@ -52,7 +48,9 @@ public class AutoSuite extends Suite {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.TYPE})
     @interface AutoSuiteExclude {
+        /** @return the categories to exclude completely */
         Class[] categories() default {};
+        /** @return the classes that are excluded explicitly */
         Class[] classes() default {};
     }
 
@@ -92,7 +90,7 @@ public class AutoSuite extends Suite {
             debug("    " + c.getName());
         }
 
-        return result.toArray(new Class[result.size()]);
+        return result.toArray(new Class[0]);
     }
 
     /**
@@ -123,10 +121,6 @@ public class AutoSuite extends Suite {
                     }
                     result.addAll(findTestClasses(f, prefix));
                 }
-            } else {
-                // REVIEW MU: This is within a "if(file.isDirectory())". How can this be reached at all?
-                throw new InitializationError("Error! The given path does not denote " +
-                    "a directory: " + file);
             }
         } else {
             if (file.getName().endsWith(".class")) {
@@ -143,12 +137,6 @@ public class AutoSuite extends Suite {
         int end = fileName.lastIndexOf('.');
         int start = fileName.lastIndexOf('.', end - 1);
         String className = fileName.substring(start + 1, end);
-
-        // prevent TestCore test suite from containing itself
-        // REVIEW: Bad idea to hard code this!
-//        if (className.equals("TestCore")) {
-//            return Optional.empty();
-//        }
 
         // ignore inner and anonymous classes
         if (className.contains("$")) {
@@ -169,9 +157,9 @@ public class AutoSuite extends Suite {
             if (excludedClasses.contains(clss)) {
                 // This class has been excluded explicitly!
                 return Optional.empty();
-            }            
+            }
 
-            if(Modifier.isAbstract(clss.getModifiers())) {
+            if (Modifier.isAbstract(clss.getModifiers())) {
                 // An abstract class is not a test class
                 return Optional.empty();
             }
@@ -180,12 +168,11 @@ public class AutoSuite extends Suite {
                 return Optional.empty();
             }
 
-            // TODO: should we manually filter for test category here?
             Category category = clss.getAnnotation(Category.class);
             if (category != null) {
                 Class[] categories = category.value();
                 for (Class c : categories) {
-                    // do not add tests in categories "Slow" or "Performance"
+                    // completely exclude specific categories
                     if (excludedCategories.contains(c)) {
                         return Optional.empty();
                     }
@@ -209,10 +196,10 @@ public class AutoSuite extends Suite {
      * <li> Contains a method annotated with @Test or a super class does
      * </ol>
      *
-     * @param clss
-     * @return
+     * @param clss the class to check
+     * @return true iff the given class is considered to be a JUnit test
      */
-    private static boolean isTestClass(Class<?> clss) {        
+    private static boolean isTestClass(Class<?> clss) {
         // Instances of TestClass are also test classes.
         if(TestCase.class.isAssignableFrom(clss)) {
             debug("    found (is legacy test class)!");
@@ -234,7 +221,7 @@ public class AutoSuite extends Suite {
             return true;
         }
 
-        // include class if it contains test methods
+        // include class if it contains test methods:
         // iterate methods and check for @Test.class
         for (Method m : clss.getDeclaredMethods()) {
             debug("    method " + m.getName());
@@ -244,6 +231,7 @@ public class AutoSuite extends Suite {
             }
         }
 
+        // the class is considered to be a test if it is subclass of a test class
         Class<?> superClass = clss.getSuperclass();
         if (superClass != null) {
             return isTestClass(superClass);

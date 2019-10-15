@@ -67,6 +67,8 @@ test {
         // CAUTION! "excludeCategories" more filters are to be defined in the class!
         includeTestsMatching "de.uka.ilkd.key.Tests"
     }
+    // pass debug flag from command line:
+    systemProperty "key.test.autosuite.debug", System.getProperty("key.test.autosuite.debug")
 
     // TODO. That is already in key/build.gradle. Here or there?
     // useJUnit {
