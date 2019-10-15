@@ -2,11 +2,10 @@ package de.uka.ilkd.key.logic.label;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -121,7 +120,7 @@ public class OriginTermLabel implements TermLabel {
      * The origins of the term's sub-terms and former sub-terms.
      * @see #getSubtermOrigins()
      */
-    private Set<Origin> subtermOrigins;
+    private final Set<Origin> subtermOrigins;
 
     /**
      * Creates a new {@link OriginTermLabel}.
@@ -130,7 +129,7 @@ public class OriginTermLabel implements TermLabel {
      */
     public OriginTermLabel(Origin origin) {
         this.origin = origin;
-        this.subtermOrigins = new HashSet<>();
+        this.subtermOrigins = new LinkedHashSet<>();
     }
 
     /**
@@ -142,8 +141,9 @@ public class OriginTermLabel implements TermLabel {
     public OriginTermLabel(Origin origin, Set<Origin> subtermOrigins) {
         this(origin);
         this.subtermOrigins.addAll(subtermOrigins);
-        this.subtermOrigins = this.subtermOrigins.stream()
-                .filter(o -> o.specType != SpecType.NONE).collect(Collectors.toSet());
+        this.subtermOrigins.removeIf(o -> o.specType == SpecType.NONE);
+        // this.subtermOrigins = this.subtermOrigins.stream()
+        //        .filter(o -> o.specType != SpecType.NONE).collect(Collectors.toSet());
     }
 
     /**
@@ -153,10 +153,10 @@ public class OriginTermLabel implements TermLabel {
      */
     public OriginTermLabel(Set<Origin> subtermOrigins) {
         this.origin = new Origin(SpecType.NONE);
-        this.subtermOrigins = new HashSet<>();
-        this.subtermOrigins.addAll(subtermOrigins);
-        this.subtermOrigins = this.subtermOrigins.stream()
-                .filter(o -> o.specType != SpecType.NONE).collect(Collectors.toSet());
+        this.subtermOrigins = new LinkedHashSet<>(subtermOrigins);
+        this.subtermOrigins.removeIf(o -> o.specType == SpecType.NONE);
+        // this.subtermOrigins = this.subtermOrigins.stream()
+        //         .filter(o -> o.specType != SpecType.NONE).collect(Collectors.toSet());
     }
 
     @Override
@@ -516,7 +516,7 @@ public class OriginTermLabel implements TermLabel {
     private static SubTermOriginData getSubTermOriginData(final ImmutableArray<Term> subs,
                                                           final Services services) {
         Term[] newSubs = new Term[subs.size()];
-        Set<Origin> origins = new HashSet<>();
+        Set<Origin> origins = new LinkedHashSet<>();
 
         for (int i = 0; i < newSubs.length; ++i) {
             newSubs[i] = collectSubtermOrigins(subs.get(i), services);
