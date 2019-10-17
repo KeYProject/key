@@ -523,7 +523,7 @@ public final class SourceView extends JComponent {
      */
     private boolean addFile(URI fileURI) throws IOException {    
         // quick fix: fileName could be null (see bug #1520)
-        if (fileName == null || tabs.containsKey(fileName)) {
+        if (fileURI == null || tabs.containsKey(fileURI)) {
             return false;
         } else {
             // try to load the file via the FileRepo
