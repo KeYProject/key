@@ -427,9 +427,9 @@ NUM_LITERAL:
   * and make the decision our selves as to what to do with it
   * (i.e. is it a modality, keyword, or possibly something else)
   */
-MODALITYD:	'\\<' -> pushMode(modDiamond);
-MODALITYB:	'\\[' -> pushMode(modBox);
-MODALITYBB:	'\\[[' -> pushMode(modBoxBox);
+MODALITYD:	'\\<' -> more, pushMode(modDiamond);
+MODALITYB:	'\\[' -> more, pushMode(modBox);
+MODALITYBB:	'\\[[' -> more, pushMode(modBoxBox);
 
 ERROR_CHAR: .;
 
@@ -445,12 +445,14 @@ MODALITYB_END: '\\\\]' -> type(MODALITY), popMode;
 MODALITYB_STRING : '"' -> more, pushMode(modString);
 MODALITYB_CHAR : '\'' -> more, pushMode(modChar);
 MODALITYB_COMMENT : [\\] [*] -> more, pushMode(modComment);
+MODALITYB_ANY : . -> more;
 
 mode modBoxBox;
 MODALITYBB_END: '\\\\]]' -> type(MODALITY), popMode;
 MODALITYBB_STRING : '"' -> more, pushMode(modString);
 MODALITYBB_CHAR : '\'' -> more, pushMode(modChar);
 MODALITYBB_COMMENT : [\\] [*] -> more, pushMode(modComment);
+MODALITYBB_ANY : . -> more;
 
 mode modString;
 MOD_STRING_END: '"' -> more,popMode;

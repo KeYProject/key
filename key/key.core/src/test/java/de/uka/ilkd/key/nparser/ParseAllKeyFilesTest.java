@@ -50,10 +50,7 @@ public class ParseAllKeyFilesTest {
         Assert.assertNull(ctx.exception);
     }
 
-
-    @Test
-    public void lex() throws IOException {
-        var toks = ParsingFacade.lex(file);
+    public static void debugLexer(KeYLexer toks){
         Token t;
         do {
             t = toks.nextToken();
@@ -63,5 +60,11 @@ public class ParseAllKeyFilesTest {
                     t.getText().replace("\n", "\\n"));
             if(t.getType() == KeYLexer.ERROR_CHAR) Assert.fail();
         } while (t.getType() != CommonToken.EOF);
+    }
+
+    @Test
+    public void lex() throws IOException {
+        var toks = ParsingFacade.lex(file);
+        debugLexer(toks);
     }
 }

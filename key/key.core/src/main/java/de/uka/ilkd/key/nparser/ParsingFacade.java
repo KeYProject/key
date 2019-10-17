@@ -9,6 +9,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
+ * This facade provides low-level access to the ANTLR4 Parser and Lexer.
+ * <p>
+ * You should only use it if you need access to the parse trees instead of terms or taclet structure.
+ *
  * @author Alexander Weigl
  * @version 1 (19.08.19)
  */

@@ -666,7 +666,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
             }
         }
 
-        if (result == null && !("length".equals(attributeName))) {
+        if (result == null && !("length" .equals(attributeName))) {
             throwEx(new NotDeclException(null, "Attribute ", attributeName));
         }
         return result;
@@ -819,9 +819,9 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     private PairOfStringAndJavaBlock getJavaBlock(Token t) {
         PairOfStringAndJavaBlock sjb = new PairOfStringAndJavaBlock();
         String s = t.getText();
-        int index = s.indexOf("\n");
-        sjb.opName = s.substring(0, index);
-        s = s.substring(index + 1);
+        //int index = s.indexOf("\n");
+        //sjb.opName = s.substring(0, index);
+        //s = s.substring(index + 1);
         Debug.out("Modal operator name passed to getJavaBlock: ", sjb.opName);
         Debug.out("Java block passed to getJavaBlock: ", s);
 
@@ -1213,7 +1213,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     }
 
     protected void semanticError(String message) {
-        throwEx(new KeYSemanticException(null, getSourceName(), message));
+        throw new RuntimeException(message);
     }
 
     private boolean isImplicitHeap(Term t) {
@@ -1307,7 +1307,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitFile(KeYParser.FileContext ctx) {
-        return accept(ctx.decls());
+        return oneOf(ctx.decls(), ctx.problem(), ctx.proof());
     }
 
     @Override
@@ -1660,7 +1660,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
             String id = accept(ctx.id);
             String nameString = accept(ctx.nameString);
             String parameter = accept(ctx.simple_ident_dots());
-            if (nameString != null && !"name".equals(nameString)) {
+            if (nameString != null && !"name" .equals(nameString)) {
                 semanticError("Unrecognized token '" + nameString + "', expected 'name'");
             }
             ProgramSVSort psv = ProgramSVSort.name2sort().get(new Name(id));
@@ -1823,9 +1823,9 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     @Override
     public Integer visitLocation_ident(KeYParser.Location_identContext ctx) {
         var id = visit(ctx.simple_ident());
-        if ("Location".equals(id)) {
+        if ("Location" .equals(id)) {
             return LOCATION_MODIFIER;
-        } else if (!"Location".equals(id)) {
+        } else if (!"Location" .equals(id)) {
             semanticError(
                     id + ": Attribute of a Non Rigid Function can only be 'Location'");
         }
@@ -2155,10 +2155,9 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     @Override
     public Term visitUnary_formula(KeYParser.Unary_formulaContext ctx) {
         if (ctx.NOT() != null) {
-            return getTermFactory().createTerm(Junctor.NOT, new Term[]{
-                    accept(ctx.term60())});
+            return getTermFactory().createTerm(Junctor.NOT, (Term) accept(ctx.term60()));
         }
-        return null;
+        return oneOf(ctx.modality_dl_term(), ctx.quantifierterm());
     }
 
     @Override
@@ -2354,7 +2353,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
         if (result == null) {
             if (prefix.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
-                if ("length".equals(memberName)) {
+                if ("length" .equals(memberName)) {
                     result = getServices().getTermBuilder().seqLen(prefix);
                 } else {
                     semanticError("There is no attribute '" + memberName +
@@ -2484,7 +2483,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitSeq_get_suffix(KeYParser.Seq_get_suffixContext ctx) {
-        Term reference=pop();
+        Term reference = pop();
         Term indexTerm = accept(ctx.logicTermReEntry());
         if (!isIntTerm(indexTerm))
             semanticError("Expecting term of sort " + IntegerLDT.NAME + " as index of sequence " + reference + ", but found: " + indexTerm);
@@ -2498,7 +2497,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         int index = queryRef.indexOf(':');
         String className = queryRef.substring(0, index);
         String qname = queryRef.substring(index + 2);
-        Term result = getServices().getJavaInfo().getStaticProgramMethodTerm(qname, (Term[])args.toArray(), className);
+        Term result = getServices().getJavaInfo().getStaticProgramMethodTerm(qname, (Term[]) args.toArray(), className);
         if (result == null && isTermParser()) {
             final Sort sort = lookupSort(className);
             if (sort == null) {
@@ -2807,13 +2806,12 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         Term _modality_dl_term = null;
         Operator op = null;
         Term a = null;
-        PairOfStringAndJavaBlock sjb = getJavaBlock(ctx.modality);
-        Debug.out("op: ", sjb.opName);
-        Debug.out("program: ", sjb.javaBlock);
-        if (sjb.opName.charAt(0) == '#') {
+        PairOfStringAndJavaBlock sjb = null; //TODO getJavaBlock(ctx.modality);
+        //Debug.out("op: ", sjb.opName);
+        //Debug.out("program: ", sjb.javaBlock);
+        if (false && sjb.opName.charAt(0) == '#') {
             if (!inSchemaMode()) {
-                semanticError
-                        ("No schema elements allowed outside taclet declarations (" + sjb.opName + ")");
+                semanticError("No schema elements allowed outside taclet declarations (" + sjb.opName + ")");
             }
             op = schemaVariables().lookup(new Name(sjb.opName));
         } else {
@@ -3391,7 +3389,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     public Object visitVarcond_reference(KeYParser.Varcond_referenceContext ctx) {
         boolean nonNull = false;
         String id = accept(ctx.id);
-        if ("non_null".equals(id)) {
+        if ("non_null" .equals(id)) {
             nonNull = true;
         } else {
             semanticError(id +

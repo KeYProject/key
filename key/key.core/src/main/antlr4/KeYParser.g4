@@ -26,7 +26,7 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 options { tokenVocab=KeYLexer; } // use tokens from STLexer.g4
 
 
-file: decls EOF;
+file: (decls | problem | proof) EOF;
 
 decls
 :
