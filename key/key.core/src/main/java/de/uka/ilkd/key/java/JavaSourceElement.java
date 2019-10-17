@@ -194,6 +194,7 @@ public abstract class JavaSourceElement implements SourceElement {
     
     /** this violates immutability, but the method is only called
       * right after the object is created...
+      * @param s the path of the parent class as String
       */
     protected void setParentClass(String s) {
         posInfo.setParentClass(s);

@@ -1,9 +1,16 @@
 dependencies {
     compile project(":key.core")
+    testCompile project(":key.core").sourceSets.test.output
 }
 
-/*test {
-    systemProperty "testcases", "src/test/resources/testcase"
+test {
     maxHeapSize = "4g"
-    filter { includeTestsMatching "AllSymbolicExecutionTests" }
-}*/
+    filter {
+        // To make test cases deterministic there is only one class per
+        // project called "Tests" that programmatically collects
+        // all test cases.
+        // See these classes for configuring the test runs!
+        // CAUTION! "excludeCategories" more filters are to be defined in the class!
+        includeTestsMatching "de.uka.ilkd.key.symbolic_execution.testcase.Tests"
+    }
+}

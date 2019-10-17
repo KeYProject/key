@@ -7,7 +7,6 @@ repositories { jcenter() }
 
 configurations { antlr4 }
 
-
 dependencies {
     compile project(":key.util")
     compile name: 'recoderKey'
@@ -16,14 +15,12 @@ dependencies {
     compile 'net.java.dev.javacc:javacc:4.0'
     //compile "org.antlr:antlr-runtime:3.5.2"
     compile group: 'antlr', name: 'antlr', version: '2.7.7'
-
     compile "org.jtwig:jtwig-core:5.87.0.RELEASE"
 
     //antlr name: 'antlr'
     //javacc name: 'javacc'
     javacc 'net.java.dev.javacc:javacc:4.0'
     antlr "org.antlr:antlr:3.5.2"   // use ANTLR version 3
-
     antlr4 "org.antlr:antlr4:4.7.1"
     compile "org.antlr:antlr4-runtime:4.7.1"
 }
@@ -31,7 +28,6 @@ dependencies {
 def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
 def javaCCOutputDirMain = file("$javaCCOutputDir/main")
 sourceSets.main.java.srcDirs(javaCCOutputDirMain, "$projectDir/build/generated-src/antlr4/main/")
-
 
 generateGrammarSource {
     maxHeapSize = "64m"
@@ -59,7 +55,7 @@ compileJavacc {
 }
 
 test {
-    filter {
+    /*filter {
         // use testProofRules or testRunAllProofs, avoid double execution on jenkins
         excludeTestsMatching "ProveRulesTest"
         excludeTestsMatching "RunAllProofsTestSuite"
@@ -68,10 +64,33 @@ test {
         excludeTestsMatching "RunAllProofsFunctional"
         excludeTestsMatching "TestParallelParsing"
         excludeTestsMatching "TestCvc4"
+    }*/
+    filter {
+        // To make test cases deterministic there is only one class per
+        // project called "Tests" that programmatically collects
+        // all test cases.
+        // See these classes for configuring the test runs!
+        // CAUTION! "excludeCategories" more filters are to be defined in the class!
+        includeTestsMatching "de.uka.ilkd.key.Tests"
     }
-    useJUnit {
-        excludeCategories 'org.key_project.util.testcategories.Performance'
-        excludeCategories 'org.key_project.util.testcategories.Interactive'
+    // pass debug flag from command line:
+    systemProperty "key.test.autosuite.debug", System.getProperty("key.test.autosuite.debug")
+
+    // TODO. That is already in key/build.gradle. Here or there?
+    // useJUnit {
+    //         excludeCategories 'org.key_project.util.testcategories.Performance'
+    //         excludeCategories 'org.key_project.util.testcategories.Interactive'
+    // }
+}
+
+testFast {
+    filter {
+        // To make test cases deterministic there is only one class per
+        // project called "Tests" that programmatically collects
+        // all test cases.
+        // See these classes for configuring the test runs!
+        // CAUTION! "excludeCategories" more filters are to be defined in the class!
+        includeTestsMatching "de.uka.ilkd.key.FastTests"
     }
 }
 
@@ -83,7 +102,7 @@ task testProofRules(type: Test) {
 
 task testRunAllProofs(type: Test) {
     group "verification"
-    filter {
+    filter { 
         includeTestsMatching "RunAllProofsTestSuite"
         includeTestsMatching "RunAllProofsInfFlow"
         includeTestsMatching "RunAllProofsFunctional"
@@ -108,7 +127,6 @@ task generateVersionFiles() {
     }
 }
 processResources.dependsOn generateVersionFiles
-
 def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
 task runAntlr4(type: JavaExec) {
     //see incremental task api, prevents rerun if nothing has changed.
@@ -127,6 +145,4 @@ task runAntlr4(type: JavaExec) {
 }
 compileJava.dependsOn runAntlr4
 
-
 //check.dependsOn << testProofRules << testRunAllProofs
-

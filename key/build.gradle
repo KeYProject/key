@@ -83,7 +83,6 @@ subprojects {
         systemProperty "EXAMPLES_DIR", file("$rootProject/key.ui/examples")
         systemProperty "RUNALLPROOFS_DIR", "$buildDir/report/runallproves"
 
-
         systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
 
@@ -92,17 +91,20 @@ subprojects {
     }
 
     test {
+        // TODO consider moving this to key.core where it is repeated ...
         useJUnit {
             excludeCategories 'org.key_project.util.testcategories.Interactive', 'org.key_project.util.testcategories.Performance'
         }
+
         afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
         beforeTest { desc -> logger.error "> ${desc.className}#${desc.name}" }
-
     }
 
     task testFast(type: Test) {
         group "verification"
         useJUnit {
+            // CAUTION! These settings do not affect :key.core since the
+            // detection mechanism is different there.
             excludeCategories 'org.key_project.util.testcategories.Slow'
             excludeCategories 'org.key_project.util.testcategories.Interactive'
         }

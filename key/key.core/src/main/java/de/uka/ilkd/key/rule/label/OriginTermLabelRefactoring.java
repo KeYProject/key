@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.rule.label;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -89,7 +89,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             return;
         }
 
-        Set<Origin> subtermOrigins = collectSubtermOrigins(term.subs(), new HashSet<>());
+        Set<Origin> subtermOrigins = collectSubtermOrigins(term.subs(), new LinkedHashSet<>());
 
         OriginTermLabel newLabel = null;
         if (oldLabel != null) {
@@ -117,7 +117,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     }
 
     private Set<Origin> collectSubtermOrigins(ImmutableArray<Term> terms,
-            HashSet<Origin> result) {
+            Set<Origin> result) {
         for (Term term : terms) {
             collectSubtermOrigins(term, result);
         }
