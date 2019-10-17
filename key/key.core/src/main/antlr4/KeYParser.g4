@@ -26,7 +26,7 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 options { tokenVocab=KeYLexer; } // use tokens from STLexer.g4
 
 
-file: (decls | problem | proof) EOF;
+file: (decls | problem proof?) EOF;
 
 decls
 :
@@ -937,7 +937,6 @@ tacletgen
   (VARCOND LPAREN varexplist RPAREN)?
   goalspecs
   modifiers
-  (TEMPLATE)
   RBRACE
 ;
 
@@ -1398,13 +1397,13 @@ one_invariant
 
 problem
 :
-        profile
-        (pref = preferences)
-        bootClassPath
+        profile?
+        pref=preferences?
+        bootClassPath?
         // the result is of no importance here (strange enough)
 
-        stlist = classPaths
-        string = javaSource
+        stlist=classPaths?
+        string=javaSource?
 
         decls
 
@@ -1432,21 +1431,17 @@ problem
 
 bootClassPath
 :
-  (BOOTCLASSPATH id=string_value SEMI)?
+  BOOTCLASSPATH id=string_value SEMI
 ;
 
 classPaths
 :
-  ( (CLASSPATH s=string_value
-    (COMMA s=string_value)*
-    SEMI)
-  | (NODEFAULTCLASSES SEMI)
-  )*
+  CLASSPATH s=string_value (COMMA s=string_value)* SEMI
 ;
 
 javaSource
 :
-   (JAVASOURCE result = oneJavaSource SEMI)?
+   JAVASOURCE result = oneJavaSource SEMI
 ;
 
 
@@ -1460,17 +1455,11 @@ oneJavaSource
 ;
 
 
-profile:
-        (PROFILE name=string_value SEMI)?
-;
+profile: PROFILE name=string_value SEMI;
 
 preferences
 :
-	( KEYSETTINGS
-    LBRACE
-      (s=string_value)?
-    RBRACE
-  )?
+	KEYSETTINGS LBRACE (s=string_value)? RBRACE
 ;
 
 // delivers: <Script, start line no, start column no>
@@ -1480,7 +1469,6 @@ proofScript
 ;
 
 proof: (PROOF proofBody)?;
-
 
 proofBody
 :

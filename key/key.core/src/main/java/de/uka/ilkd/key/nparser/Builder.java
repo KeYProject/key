@@ -31,7 +31,6 @@ import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
-import org.antlr.runtime.NoViableAltException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.Nullable;
@@ -818,39 +817,36 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     private PairOfStringAndJavaBlock getJavaBlock(Token t) {
         PairOfStringAndJavaBlock sjb = new PairOfStringAndJavaBlock();
-        String s = t.getText();
-        //int index = s.indexOf("\n");
-        //sjb.opName = s.substring(0, index);
-        //s = s.substring(index + 1);
+        String s = t.getText().trim();
+        String cleanJava = s.substring(2, s.length() - 2);
+
+        if (s.startsWith("\\<")) sjb.opName = "diamond";
+        else if (s.startsWith("\\[")) sjb.opName = "box";
+        else sjb.opName = "unknown";
+
         Debug.out("Modal operator name passed to getJavaBlock: ", sjb.opName);
         Debug.out("Java block passed to getJavaBlock: ", s);
 
         JavaReader jr = javaReader;
-        String input = "";
+        String input = cleanJava;
 
         try {
             if (inSchemaMode()) {
-                if (isProblemParser()) // Alt jr==null;
-                    jr = new SchemaRecoder2KeY(parserConfig.services(),
-                            parserConfig.namespaces());
+                jr = new SchemaRecoder2KeY(parserConfig.services(), parserConfig.namespaces());
                 ((SchemaJavaReader) jr).setSVNamespace(schemaVariables());
             } else {
-                if (isProblemParser()) // Alt jr==null;
-                    jr = new Recoder2KeY(parserConfig.services(),
-                            parserConfig.namespaces());
+                jr = new Recoder2KeY(parserConfig.services(), parserConfig.namespaces());
             }
 
             if (inSchemaMode() || isGlobalDeclTermParser()) {
-                sjb.javaBlock = jr.readBlockWithEmptyContext(s);
+                //TODO sjb.javaBlock = jr.readBlockWithEmptyContext(s);
             } else {
-                sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), s);
+                //TODO sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), s);
             }
         } catch (de.uka.ilkd.key.java.PosConvertException e) {
             lineOffset = e.getLine() - 1;
             colOffset = e.getColumn() + 1;
             throwEx(new RecognitionException(input));
-            //throw new JavaParserException(e.getMessage(), t.getText(),
-            //    getSourceName(), t.getLine(), t.getCharPositionInLine(), lineOffset, colOffset);
         } catch (de.uka.ilkd.key.java.ConvertException e) {
             if (e.parseException() != null
                     && e.parseException().currentToken != null
@@ -1355,7 +1351,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitActivated_choice(KeYParser.Activated_choiceContext ctx) {
+    public Choice visitActivated_choice(KeYParser.Activated_choiceContext ctx) {
         var cat = ctx.cat.getText();
         var ch = ctx.choice_.getText();
         if (usedChoiceCategories.contains(cat)) {
@@ -1369,7 +1365,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         } else {
             activatedChoices = activatedChoices.add(c);
         }
-        return null;
+        return c;
     }
 
     @Override
@@ -1592,8 +1588,8 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         String var_name;
 
         for (int i = 0; i < ctx.simple_ident_comma_list().size(); i++) {
-            var var_names = (List<String>) visit(ctx.simple_ident_comma_list(i));
-            var kjt = (KeYJavaType) visit(ctx.keyjavatype(i));
+            var var_names = (List<String>) accept(ctx.simple_ident_comma_list(i));
+            var kjt = (KeYJavaType) accept(ctx.keyjavatype(i));
             for (String varName : var_names) {
                 var_name = varName;
                 ProgramElementName pvName = new ProgramElementName(var_name);
@@ -1822,7 +1818,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Integer visitLocation_ident(KeYParser.Location_identContext ctx) {
-        var id = visit(ctx.simple_ident());
+        var id = accept(ctx.simple_ident());
         if ("Location" .equals(id)) {
             return LOCATION_MODIFIER;
         } else if (!"Location" .equals(id)) {
@@ -1897,14 +1893,14 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         if (ctx.FORMULA() != null)
             return Sort.FORMULA;
         else
-            return (Sort) visit(ctx.sortId_check());
+            return (Sort) accept(ctx.sortId_check());
     }
 
     @Override
     public Object visitTransform_decl(KeYParser.Transform_declContext ctx) {
-        var retSort = (Sort) (ctx.FORMULA() != null ? Sort.FORMULA : visit(ctx.any_sortId_check()));
-        var trans_name = (String) visit(ctx.funcpred_name());
-        var argSorts = (List<Sort>) visit(ctx.arg_sorts_or_formula());
+        var retSort = (Sort) (ctx.FORMULA() != null ? Sort.FORMULA : accept(ctx.any_sortId_check()));
+        var trans_name = (String) accept(ctx.funcpred_name());
+        var argSorts = (List<Sort>) accept(ctx.arg_sorts_or_formula());
         if (!skip_transformers) {
             Transformer t =
                     new Transformer(new Name(trans_name),
@@ -1931,7 +1927,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public KeYJavaType visitArrayopid(KeYParser.ArrayopidContext ctx) {
-        return (KeYJavaType) visit(ctx.keyjavatype());
+        return (KeYJavaType) accept(ctx.keyjavatype());
     }
 
     @Override
@@ -1966,19 +1962,19 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Sort visitSortId_check(KeYParser.SortId_checkContext ctx) {
-        var p = visit(ctx.sortId_check_help());
-        return (Sort) visit(ctx.array_decls());
+        var p = accept(ctx.sortId_check_help());
+        return (Sort) accept(ctx.array_decls());
     }
 
     @Override
     public Sort visitAny_sortId_check(KeYParser.Any_sortId_checkContext ctx) {
-        var p = visit(ctx.any_sortId_check_help());
-        return (Sort) visit(ctx.array_decls());
+        var p = accept(ctx.any_sortId_check_help());
+        return (Sort) accept(ctx.array_decls());
     }
 
     @Override
     public Pair<Sort, Type> visitSortId_check_help(KeYParser.SortId_check_helpContext ctx) {
-        Pair<Sort, Type> result = (Pair<Sort, Type>) visit(ctx.any_sortId_check_help());
+        Pair<Sort, Type> result = accept(ctx.any_sortId_check_help());
         // don't allow generic sorts or collection sorts of
         // generic sorts at this point
         Sort s = result.first;
@@ -1997,7 +1993,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Pair<Sort, Type> visitAny_sortId_check_help(KeYParser.Any_sortId_check_helpContext ctx) {
-        var name = (String) visit(ctx.simple_sort_name());
+        var name = (String) accept(ctx.simple_sort_name());
         //Special handling for byte, char, short, long:
         //these are *not* sorts, but they are nevertheless valid
         //prefixes for array sorts such as byte[], char[][][].
@@ -2064,27 +2060,27 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public IdDeclaration visitId_declaration(KeYParser.Id_declarationContext ctx) {
-        var id = (String) visit(ctx.IDENT());
-        var s = (Sort) (ctx.sortId_check() != null ? visit(ctx.sortId_check()) : null);
+        var id = (String) ctx.IDENT().getText();
+        var s = (Sort) (ctx.sortId_check() != null ? accept(ctx.sortId_check()) : null);
         return new IdDeclaration(id, s);
     }
 
     @Override
     public String visitFuncpred_name(KeYParser.Funcpred_nameContext ctx) {
         if (ctx.DOUBLECOLON() != null) {
-            return visit(ctx.sort_name()) + "::" + visit(ctx.name);
+            return accept(ctx.sort_name()) + "::" + accept(ctx.name);
         }
-        return (String) visit(ctx.simple_ident());
+        return (String) accept(ctx.simple_ident());
     }
 
     @Override
     public String visitSimple_sort_name(KeYParser.Simple_sort_nameContext ctx) {
-        return (String) visit(ctx.simple_ident_dots());
+        return (String) accept(ctx.simple_ident_dots());
     }
 
     @Override
     public String visitSort_name(KeYParser.Sort_nameContext ctx) {
-        String name = (String) visit(ctx.simple_sort_name());
+        String name = accept(ctx.simple_sort_name());
         for (int i = 0; i < ctx.EMPTYBRACKETS().size(); i++) {
             name += "[]";
         }
@@ -2247,7 +2243,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     public Object visitLogicTermReEntry(KeYParser.LogicTermReEntryContext ctx) {
         Term a = accept(ctx.a);
         if (ctx.op == null) return a;
-        Function op = (Function) visit(ctx.op);
+        Function op = accept(ctx.op);
         Term a1 = accept(ctx.a1);
         return getTermFactory().createTerm(op, a, a1);
     }
@@ -2256,7 +2252,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     public Object visitWeak_arith_op_term(KeYParser.Weak_arith_op_termContext ctx) {
         Term a = accept(ctx.a);
         if (ctx.op == null) return a;
-        Function op = (Function) visit(ctx.op);
+        Function op = accept(ctx.op);
         Term a1 = accept(ctx.a1);
         return getTermFactory().createTerm(op, a, a1);
     }
@@ -2265,7 +2261,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     public Object visitStrong_arith_op_term(KeYParser.Strong_arith_op_termContext ctx) {
         Term a = accept(ctx.a);
         if (ctx.op == null) return a;
-        Function op = (Function) visit(ctx.op);
+        Function op = accept(ctx.op);
         Term a1 = accept(ctx.a1);
         return getTermFactory().createTerm(op, a, a1);
     }
@@ -2706,7 +2702,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
             op = Quantifier.ALL;
         if (ctx.EXISTS() != null)
             op = Quantifier.EX;
-        List<QuantifiableVariable> vs = (List<QuantifiableVariable>) visit(ctx.bound_variables());
+        List<QuantifiableVariable> vs = accept(ctx.bound_variables());
         Term a1 = accept(ctx.term60());
         var a = getTermFactory().createTerm(op,
                 new ImmutableArray<Term>(a1),
@@ -2803,13 +2799,11 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitModality_dl_term(KeYParser.Modality_dl_termContext ctx) {
-        Term _modality_dl_term = null;
-        Operator op = null;
-        Term a = null;
-        PairOfStringAndJavaBlock sjb = null; //TODO getJavaBlock(ctx.modality);
+        PairOfStringAndJavaBlock sjb = getJavaBlock(ctx.modality);
         //Debug.out("op: ", sjb.opName);
         //Debug.out("program: ", sjb.javaBlock);
-        if (false && sjb.opName.charAt(0) == '#') {
+        Operator op;
+        if (sjb.opName.charAt(0) == '#') {
             if (!inSchemaMode()) {
                 semanticError("No schema elements allowed outside taclet declarations (" + sjb.opName + ")");
             }
@@ -2996,8 +2990,8 @@ public class Builder extends KeYParserBaseVisitor<Object> {
             tacletAnnotations = tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);
         }
         var name = ctx.name.getText();
-        ImmutableSet<Choice> choices_ =
-                DefaultImmutableSet.fromSet(accept(ctx.option_list()));
+        List<Choice> ch = accept(ctx.option_list());
+        ImmutableSet<Choice> choices_ = DefaultImmutableSet.fromCollection(ch);
 
         Term form = accept(ctx.form);
         if (form != null) {
@@ -3751,7 +3745,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         var profile = accept(ctx.profile());
         var pref = accept(ctx.preferences());
         String bootClassPath = accept(ctx.bootClassPath());
-        String classPath = accept(ctx.classPaths());
+        List<String> classPath = accept(ctx.classPaths());
         String javaSource = accept(ctx.javaSource());
 
         allOf(ctx.contracts());
@@ -3804,18 +3798,13 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public String visitClassPaths(KeYParser.ClassPathsContext ctx) {
-        if (ctx.NODEFAULTCLASSES() != null) {
-            throwEx(new NoViableAltException(
-                    "\\noDefaultClasses is no longer supported. " +
-                            "Use \\bootclasspath. See docs/README.classpath", -1, -1, null));
-        }
-        return ctx.getText();
+    public List<String> visitClassPaths(KeYParser.ClassPathsContext ctx) {
+        return mapOf(ctx.string_value());
     }
 
     @Override
     public String visitJavaSource(KeYParser.JavaSourceContext ctx) {
-        return ctx.oneJavaSource() != null ? (String) visit(ctx.oneJavaSource()) : null;
+        return ctx.oneJavaSource() != null ? (String) accept(ctx.oneJavaSource()) : null;
     }
 
     @Override
@@ -3825,13 +3814,13 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitProfile(KeYParser.ProfileContext ctx) {
-        profileName = (String) visit(ctx.name);
+        profileName = accept(ctx.name);
         return null;
     }
 
     @Override
     public String visitPreferences(KeYParser.PreferencesContext ctx) {
-        return ctx.s != null ? (String) visit(ctx.s) : null;
+        return ctx.s != null ? (String) accept(ctx.s) : null;
     }
 
     @Override

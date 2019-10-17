@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.nparser;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
@@ -48,6 +50,10 @@ public class ParseAllKeyFilesTest {
     public void parse() throws IOException {
         var ctx = ParsingFacade.parseFile(file);
         Assert.assertNull(ctx.exception);
+
+        Services services = new Services(new JavaProfile());
+        Builder b = new Builder(null, services, services.getNamespaces());
+        ctx.accept(b);
     }
 
     public static void debugLexer(KeYLexer toks){

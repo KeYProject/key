@@ -40,7 +40,7 @@ public abstract class ParsingFacade {
         var p = new KeYParser(new CommonTokenStream(lex(stream)));
         //p.removeErrorListeners();
         //TODO exception throwing
-        // p.addErrorListener();
+        p.addErrorListener(p.getErrorReporter());
         return p;
     }
 
