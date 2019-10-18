@@ -2,9 +2,13 @@ package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableArray;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -60,4 +64,13 @@ public class NamespaceBuilder {
         return nss.sorts().lookup(group);
     }
 
+    public NamespaceBuilder addVariable(String name, String sort) {
+        nss.variables().add(new LogicVariable(new Name(name), getOrCreateSort(sort)));
+        return this;
+    }
+
+    public NamespaceBuilder addPredicate(String s) {
+        s = "bool " + s;
+        return addFunction(s);
+    }
 }

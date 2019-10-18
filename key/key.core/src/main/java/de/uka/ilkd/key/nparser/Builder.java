@@ -791,8 +791,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         return null;
     }
 
-    private Term termForParsedVariable(ParsableVariable v)
-            throws RecognitionException/*SemanticException*/ {
+    private Term termForParsedVariable(ParsableVariable v) {
         if (v instanceof LogicVariable || v instanceof ProgramVariable) {
             return getTermFactory().createTerm(v);
         } else {
@@ -830,6 +829,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         JavaReader jr = javaReader;
         String input = cleanJava;
 
+        /*
         try {
             if (inSchemaMode()) {
                 jr = new SchemaRecoder2KeY(parserConfig.services(), parserConfig.namespaces());
@@ -872,6 +872,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
             throwEx(new RecognitionException(input));
             //throw new JavaParserException(e.getMessage(), t.getText(), getSourceName(), t.getLine(), t.getCharPositionInLine());
         }
+         */
         return sjb;
     }
 
@@ -909,8 +910,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
      *                     and is an array of size zero, if an empty argument list was given,
      *                     for instance `f()'.
      */
-    private Operator lookupVarfuncId(String varfunc_name, Term[] args)
-            throws RecognitionException, NotDeclException/*NotDeclException, SemanticException*/ {
+    private Operator lookupVarfuncId(String varfunc_name, Term[] args) {
 
         // case 1a: variable
         // case 1b: schema variable
@@ -959,13 +959,20 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
         // not found
 
-        if (args == null) {
-            throw new NotDeclException
-                    (null, "(program) variable or constant", varfunc_name);
-        } else {
-            throw new NotDeclException
-                    (null, "function or static query", varfunc_name);
+        // case 5: function
+        v = variables().lookup(new Name(varfunc_name));
+        if (v != null) { // we allow both args==null (e.g. `c')
+            // and args.length=0 (e.g. 'c())' here
+            return v;
         }
+
+        if (args == null) {
+            throwEx(new RuntimeException(
+                    "(program) variable or constant " + varfunc_name));
+        } else {
+            throwEx(new RuntimeException("function or static query "+ varfunc_name));
+        }
+        return null;
     }
 
     private boolean isStaticAttribute() {
@@ -1376,11 +1383,11 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     @Override
     public Object visitChoice(KeYParser.ChoiceContext ctx) {
         String cat = ctx.category.getText();
-        for (KeYParser.Choice_optionContext catctx : ctx.choice_option()) {
-            var name = cat + ":" + catctx.choice_.getText();
+        for (Token catctx : ctx.choice_option) {
+            var name = cat + ":" + catctx.getText();
             Choice c = choices().lookup(new Name(name));
             if (c == null) {
-                c = new Choice(catctx.choice_.getText(), cat);
+                c = new Choice(catctx.getText(), cat);
                 choices().add(c);
             }
             if (!category2Default.containsKey(cat)) {
@@ -1395,7 +1402,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         return null;
     }
 
-    @Override
+    /*@Override
     public Object visitChoice_option(KeYParser.Choice_optionContext ctx) {
         String name = currentChoiceCategory + ":" + ctx.choice_.getText();
         Choice c = choices().lookup(new Name(name));
@@ -1407,7 +1414,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
             category2Default.put(currentChoiceCategory, name);
         }
         return c;
-    }
+    }*/
 
     @Override
     public Object visitSort_decls(KeYParser.Sort_declsContext ctx) {
@@ -1962,14 +1969,14 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Sort visitSortId_check(KeYParser.SortId_checkContext ctx) {
-        var p = accept(ctx.sortId_check_help());
-        return (Sort) accept(ctx.array_decls());
+        Pair<Sort, Type> p = accept(ctx.sortId_check_help());
+        return toArraySort(p, ctx.EMPTYBRACKETS().size());
     }
 
     @Override
     public Sort visitAny_sortId_check(KeYParser.Any_sortId_checkContext ctx) {
-        var p = accept(ctx.any_sortId_check_help());
-        return (Sort) accept(ctx.array_decls());
+        Pair<Sort, Type> p = accept(ctx.any_sortId_check_help());
+        return toArraySort(p, ctx.EMPTYBRACKETS().size());
     }
 
     @Override
@@ -2021,41 +2028,31 @@ public class Builder extends KeYParserBaseVisitor<Object> {
             name = PrimitiveType.JAVA_BIGINT.getName();
         }
 
-        Sort s = null;
-        if (checkSort) {
-            s = lookupSort(name);
-            if (s == null) {
-                throwEx(new NotDeclException(null, "sort", name));
-            }
+        Sort s = lookupSort(name);
+        if (s == null) {
+            throwEx(new NotDeclException(null, "sort", name));
         }
-        return new Pair<Sort, Type>(s, t);
+        return new Pair<>(s, t);
     }
 
-    public Sort visitArray_decls(Pair<Sort, Type> p, KeYParser.Array_declsContext ctx) {
-        Sort s = null;
-        int n = ctx.EMPTYBRACKETS().size();
-
-        if (!checkSort)
-            return s;
-        if (n != 0) {
+    public Sort toArraySort(Pair<Sort, Type> p, int numOfDimensions) {
+        if (numOfDimensions != 0) {
             final JavaInfo ji = getJavaInfo();
-            s = ArraySort.getArraySortForDim(p.first,
+            Sort s = ArraySort.getArraySortForDim(p.first,
                     p.second,
-                    n,
+                    numOfDimensions,
                     ji.objectSort(),
                     ji.cloneableSort(),
                     ji.serializableSort());
-
-            Sort last = s;
             do {
-                final ArraySort as = (ArraySort) last;
+                final ArraySort as = (ArraySort) s;
                 sorts().add(as);
-                last = as.elementSort();
-            } while (last instanceof ArraySort && sorts().lookup(last.name()) == null);
+                s = as.elementSort();
+            } while (s instanceof ArraySort && sorts().lookup(s.name()) == null);
+            return s;
         } else {
-            s = p.first;
+            return p.first;
         }
-        return s;
     }
 
     @Override
@@ -2440,16 +2437,14 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                     s.getCastSymbol(getServices()), result);
         }
 
-        var a = oneOf(ctx.static_query(),
-                ctx.static_attribute_suffix(),
-                ctx.atom());
+        Term a = accept(ctx.atom());
 
-        //TODO losing order
-        var suffix = allOf(ctx.accessterm_bracket_suffix());
-        var attr = allOf(ctx.attribute_or_query_suffix());
+        for (var c : ctx.atom_suffix()) {
+            a = accept(c, a);
+        }
 
         if (ctx.heap_selection_suffix() != null) {
-            accept(ctx.heap_selection_suffix());
+            a = accept(ctx.heap_selection_suffix(), a);
         }
         return a;
     }
@@ -2580,7 +2575,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitAtom(KeYParser.AtomContext ctx) {
-        Term a = oneOf(ctx.specialTerm(), ctx.funcpredvarterm(),
+        Term a = oneOf(ctx.funcpredvarterm(),
                 ctx.term(), ctx.boolean_constant(), ctx.ifExThenElseTerm(),
                 ctx.ifThenElseTerm(), ctx.string_literal());
         if (ctx.LGUILLEMETS() != null) {
@@ -2845,11 +2840,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Term visitFuncpredvarterm(KeYParser.FuncpredvartermContext ctx) {
-        Term _func_pred_var_term = null;
-        String neg = "";
-        boolean opSV = false;
         Namespace<QuantifiableVariable> orig = variables();
-        boolean limited = false;
 
         if (ctx.char_literal() != null) return accept(ctx.char_literal());
         if (ctx.number() != null) return accept(ctx.number());
@@ -2857,56 +2848,55 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
         String varfuncid = accept(ctx.funcpred_name());
         List<QuantifiableVariable> boundVars = accept(ctx.bound_variables());
-        Term[] args = accept(ctx.argument_list());
+        List<Term> arguments = accept(ctx.argument_list());
+
+        Term[] args = arguments == null ? new Term[0] : arguments.toArray(new Term[0]);
+
         Term a = null;
-        try {
-            if (varfuncid.equals("skip") && args == null) {
-                a = getTermFactory().createTerm(UpdateJunctor.SKIP);
-            } else {
-                Operator op;
-                if (varfuncid.endsWith(LIMIT_SUFFIX)) {
-                    varfuncid = varfuncid.substring(0, varfuncid.length() - 5);
-                    op = lookupVarfuncId(varfuncid, args);
-                    if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
-                        op = getServices().getSpecificationRepository()
-                                .limitObs((ObserverFunction) op).first;
-                    } else {
-                        semanticError("Cannot can be limited: " + op);
-                    }
+        if (varfuncid.equals("skip") && arguments == null) {
+            a = getTermFactory().createTerm(UpdateJunctor.SKIP);
+        } else {
+            Operator op;
+            if (varfuncid.endsWith(LIMIT_SUFFIX)) {
+                varfuncid = varfuncid.substring(0, varfuncid.length() - 5);
+                op = lookupVarfuncId(varfuncid, args);
+                if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
+                    op = getServices().getSpecificationRepository()
+                            .limitObs((ObserverFunction) op).first;
                 } else {
-                    op = lookupVarfuncId(varfuncid, args);
+                    semanticError("Cannot can be limited: " + op);
+                }
+            } else {
+                op = lookupVarfuncId(varfuncid, args);
+            }
+
+            if (op instanceof ParsableVariable) {
+                a = termForParsedVariable((ParsableVariable) op);
+            } else {
+                if (args == null) {
+                    args = new Term[0];
                 }
 
-                if (op instanceof ParsableVariable) {
-                    a = termForParsedVariable((ParsableVariable) op);
+                if (boundVars == null) {
+                    a = getTermFactory().createTerm(op, args);
                 } else {
-                    if (args == null) {
-                        args = new Term[0];
-                    }
-
-                    if (boundVars == null) {
-                        a = getTermFactory().createTerm(op, args);
-                    } else {
-                        //sanity check
-                        assert op instanceof Function;
-                        for (int i = 0; i < args.length; i++) {
-                            if (i < op.arity() && !op.bindVarsAt(i)) {
-                                for (QuantifiableVariable qv : args[i].freeVars()) {
-                                    if (boundVars.contains(qv)) {
-                                        semanticError("Building function term " + op + " with bound variables failed: "
-                                                + "Variable " + qv + " must not occur free in subterm " + args[i]);
-                                    }
+                    //sanity check
+                    assert op instanceof Function;
+                    for (int i = 0; i < args.length; i++) {
+                        if (i < op.arity() && !op.bindVarsAt(i)) {
+                            for (QuantifiableVariable qv : args[i].freeVars()) {
+                                if (boundVars.contains(qv)) {
+                                    semanticError("Building function term " + op + " with bound variables failed: "
+                                            + "Variable " + qv + " must not occur free in subterm " + args[i]);
                                 }
                             }
                         }
-
-                        //create term
-                        a = getTermFactory().createTerm(op, args, new ImmutableArray<QuantifiableVariable>(boundVars.toArray(new QuantifiableVariable[boundVars.size()])), null);
                     }
+
+                    //create term
+                    a = getTermFactory().createTerm(op, args, new ImmutableArray<QuantifiableVariable>(boundVars.toArray(new QuantifiableVariable[boundVars.size()])), null);
                 }
             }
-        } catch (Exception e) {
-            throwEx(e);
         }
         if (boundVars != null) {
             unbindVars(orig);

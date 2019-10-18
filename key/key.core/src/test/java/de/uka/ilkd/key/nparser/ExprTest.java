@@ -75,6 +75,15 @@ public class ExprTest {
                 .addFunction("int div(int, int)")
                 .addFunction("int mod(int, int)")
                 .addFunction("int pow(int, int)");
+        nssb.addPredicate("leq(int, int)")
+                .addPredicate("lt(int, int)")
+                .addPredicate("geq(int, int)")
+                .addPredicate("gt(int, int)");
+        ;
+
+        nssb.addVariable("aa", "int")
+                .addVariable("bb", "int")
+                .addVariable("cc", "int");
 
         KeyIO io = new KeyIO(services, nss);
         return io;
