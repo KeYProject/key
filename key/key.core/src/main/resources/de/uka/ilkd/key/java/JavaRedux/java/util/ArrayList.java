@@ -4,12 +4,14 @@ public final class ArrayList implements java.util.List {
 
     /*@ public normal_behavior
       @ ensures seq.length == 0;
+      @ ensures \fresh(this) && \fresh(this.*);
       @ determines this, seq \by \nothing;
       @*/
     public /*@pure@*/ ArrayList();
 
     /*@ public normal_behavior
       @ ensures seq == c.seq;
+      @ ensures \fresh(this) && \fresh(this.*);
       @ determines this, seq \by c.seq;
       @*/
     public /*@pure@*/ ArrayList(Collection c);
