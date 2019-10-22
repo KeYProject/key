@@ -151,7 +151,6 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     private boolean primitiveElementType;
     private boolean isPrimitive;
     private boolean axiomMode;
-    //region stack handling
     private Stack<Object> parameters = new Stack<>();
 
     /* Most general constructor, should only be used internally */
@@ -830,7 +829,10 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         JavaReader jr = javaReader;
         String input = cleanJava;
 
-        try {
+        return sjb;
+        //TODO
+
+        /*try {
             if (inSchemaMode()) {
                 jr = new SchemaRecoder2KeY(parserConfig.services(), parserConfig.namespaces());
                 ((SchemaJavaReader) jr).setSVNamespace(schemaVariables());
@@ -873,6 +875,7 @@ public class Builder extends KeYParserBaseVisitor<Object> {
             //throw new JavaParserException(e.getMessage(), t.getText(), getSourceName(), t.getLine(), t.getCharPositionInLine());
         }
         return sjb;
+         */
     }
 
     /**
@@ -1975,8 +1978,6 @@ public class Builder extends KeYParserBaseVisitor<Object> {
     @Override
     public Pair<Sort, Type> visitSortId_check_help(KeYParser.SortId_check_helpContext ctx) {
         Pair<Sort, Type> result = accept(ctx.any_sortId_check_help());
-        // don't allow generic sorts or collection sorts of
-        // generic sorts at this point
         Sort s = result.first;
         while (s instanceof ArraySort) {
             s = ((ArraySort) s).elementSort();
@@ -1987,7 +1988,6 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                     "Non-generic sort expected", s,
                     getSourceName(), getLine(), getColumn()));
         }
-
         return result;
     }
 
@@ -2271,46 +2271,8 @@ public class Builder extends KeYParserBaseVisitor<Object> {
         return (Term) oneOf(ctx.braces_term(), ctx.accessterm());
     }
 
-    @Override
-    public Object visitStaticAttributeOrQueryReference(KeYParser.StaticAttributeOrQueryReferenceContext ctx) {
-        //TODO weigl: this rule is a total grammar blower.
-        String attrReference = ctx.id.getText();
-        for (int i = 0; i < ctx.EMPTYBRACKETS().size(); i++) {
-            attrReference += "[]";
-        }
 
-        /*KeYJavaType kjt = null;
-        kjt = getTypeByClassName(attrReference);
-        if (kjt == null) {
-            throwEx(new NotDeclException(input, "Class", attrReference));
-        }
-        attrReference = kjt.getSort().name().toString();
-        match(input, DOT, null);
-            attrReference += "::" + input.LT(1).getText();
-            match(input, IDENT, null);
-            if(savedGuessing > -1) {
-                state.backtracking = savedGuessing;
-                savedGuessing = -1;
-            }*/
-        return attrReference;
-    }
-
-    @Override
-    public Term visitStatic_attribute_suffix(KeYParser.Static_attribute_suffixContext ctx) {
-        Operator v = null;
-        String attributeName = accept(ctx.staticAttributeOrQueryReference());
-        String className;
-        if (attributeName.indexOf(':') != -1) {
-            className =
-                    attributeName.substring(0, attributeName.indexOf(':'));
-        } else {
-            className =
-                    attributeName.substring(0, attributeName.lastIndexOf("."));
-        }
-        v = getAttributeInPrefixSort(getTypeByClassName(className).getSort(), attributeName);
-        return createAttributeTerm(null, v);
-    }
-
+    //region stack handling
     private <T> T pop() {
         return (T) parameters.pop();
     }
@@ -2440,18 +2402,26 @@ public class Builder extends KeYParserBaseVisitor<Object> {
                     s.getCastSymbol(getServices()), result);
         }
 
-        var a = oneOf(ctx.static_query(),
-                ctx.static_attribute_suffix(),
-                ctx.atom());
-
-        //TODO losing order
-        var suffix = allOf(ctx.accessterm_bracket_suffix());
-        var attr = allOf(ctx.attribute_or_query_suffix());
-
+        var a = accept(ctx.atom());
+        push(a);
+        for (ParserRuleContext c: ctx.attribute_suffix()) {
+            push(a);
+            a = accept(c);
+        }
         if (ctx.heap_selection_suffix() != null) {
-            accept(ctx.heap_selection_suffix());
+            a = accept(ctx.heap_selection_suffix(), a);
         }
         return a;
+    }
+
+    private void push(Object... args) {
+        for (Object a : args)
+            parameters.push(a);
+    }
+
+    @Override
+    public Object visitAttribute_suffix(KeYParser.Attribute_suffixContext ctx) {
+        return oneOf(ctx.accessterm_bracket_suffix(), ctx.attribute_or_query_suffix());
     }
 
     /**
@@ -2467,29 +2437,31 @@ public class Builder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitAccessterm_bracket_suffix(KeYParser.Accessterm_bracket_suffixContext ctx) {
-        //Todo this rule is context-sensitive
-        Term reference = pop();
-
-/*        isHeapTerm(reference) }? tmp = heap_update_suffix[reference] { $result = tmp; }
-    | { isSequenceTerm(reference) }? tmp = seq_get_suffix[reference] { $result = tmp; }
-    | tmp = array_access_suffix[reference] { $result = tmp; $increaseHeapSuffixCounter = true; }*/
-        return reference;
+        if (ctx.seqget != null) {
+            Term reference = pop();
+            Term indexTerm = accept(ctx.seqget);
+            if (!isIntTerm(indexTerm))
+                semanticError("Expecting term of sort " + IntegerLDT.NAME + " as index of sequence " + reference + ", but found: " + indexTerm);
+            return getServices().getTermBuilder().seqGet(Sort.ANY, reference, indexTerm);
+        } else {
+            return oneOf(ctx.heap, ctx.array);
+        }
     }
 
-
-    @Override
-    public Object visitSeq_get_suffix(KeYParser.Seq_get_suffixContext ctx) {
-        Term reference = pop();
-        Term indexTerm = accept(ctx.logicTermReEntry());
-        if (!isIntTerm(indexTerm))
-            semanticError("Expecting term of sort " + IntegerLDT.NAME + " as index of sequence " + reference + ", but found: " + indexTerm);
-        return getServices().getTermBuilder().seqGet(Sort.ANY, reference, indexTerm);
-    }
 
     @Override
     public Object visitStatic_query(KeYParser.Static_queryContext ctx) {
-        String queryRef = accept(ctx.staticAttributeOrQueryReference());
+        String query = accept(ctx.id);
+        for (int i = 0; i < ctx.EMPTYBRACKETS().size(); i++)
+            query += "[]";
+
+        /*String className;
+        Sort sort = Objects.requireNonNull(getTypeByClassName(className)).getSort();
+        Operator v = getAttributeInPrefixSort(sort, attributeName);
+        return createAttributeTerm(pop(), v);
+
         List<Term> args = accept(ctx.argument_list());
+        assert queryRef != null;
         int index = queryRef.indexOf(':');
         String className = queryRef.substring(0, index);
         String qname = queryRef.substring(index + 2);
@@ -2506,6 +2478,9 @@ public class Builder extends KeYParserBaseVisitor<Object> {
             }
         }
         return result;
+
+         */
+        return null;
     }
 
     @Override

@@ -558,18 +558,6 @@ term110
     braces_term |  accessterm
 ;
 
-staticAttributeOrQueryReference
-:
-  id=IDENT
-  (EMPTYBRACKETS )*
-;
-
-static_attribute_suffix
-:
-  attributeName = staticAttributeOrQueryReference
-;
-
-
 attribute_or_query_suffix
 :
     DOT ( STAR 
@@ -591,69 +579,49 @@ query_suffix
 :
     args = argument_list
 ;
- 
 
 //term120
 accessterm
 :
     MINUS result = term110
   | LPAREN s = any_sortId_check RPAREN result=term110
-  | ( // look for package1.package2.Class.query(
-        static_query
-      | // look for package1.package2.Class.attr
-        static_attribute_suffix
-      | atom
-    )
-    ( accessterm_bracket_suffix
-    | attribute_or_query_suffix
-    )*
-    // at most one heap selection suffix
-    ( heap_selection_suffix )? // resets globalSelectNestingDepth to zero
+  | atom
+    attribute_suffix*
+    heap_selection_suffix?
 ;
 
+attribute_suffix: accessterm_bracket_suffix | attribute_or_query_suffix;
 
-heap_selection_suffix
-    :
-    AT heap=accessterm
-
-    ;
+heap_selection_suffix: AT heap=accessterm;
 
 accessterm_bracket_suffix
 :
-    heap_update_suffix
-  | seq_get_suffix
-  | array_access_suffix
+  LBRACKET
+  ( heap=heap_update_suffix
+  | seqget=logicTermReEntry
+  | array=array_access_suffix
+  )
+  RBRACKET
 ;
 
-seq_get_suffix
+heap_update_suffix 
 :
-  LBRACKET logicTermReEntry RBRACKET
+    ( target=equivalence_term ASSIGN val=equivalence_term
+    | id=simple_ident args=argument_list
+    )
+;
+
+array_access_suffix
+:
+	( STAR
+  | indexTerm=logicTermReEntry (DOTRANGE rangeTo=logicTermReEntry)?
+  )
 ;
 
 static_query
 :
-    queryRef=staticAttributeOrQueryReference
-    args=argument_list
-;
-
-heap_update_suffix 
-    : // TODO find the right kind of non-terminal for "o.f" and "a"
-      // and do not resign to parsing an arbitrary term
-    LBRACKET
-    ( target=equivalence_term ASSIGN val=equivalence_term
-    | id=simple_ident args=argument_list
-    )
-    RBRACKET
-;
- 
-
-array_access_suffix 
-:
-  LBRACKET
-	( STAR
-  | indexTerm=logicTermReEntry (DOTRANGE rangeTo=logicTermReEntry)?
-  )
-  RBRACKET
+  id=simple_ident_dots (EMPTYBRACKETS)*
+  args=argument_list?
 ;
 
 /*
@@ -673,6 +641,7 @@ atom
     | ifThenElseTerm
     | ifExThenElseTerm
     | string_literal
+    | static_query
     )
     (LGUILLEMETS labels = label RGUILLEMETS)?
 ;
@@ -824,26 +793,19 @@ modality_dl_term
      // so that it is consistent with pretty printer that prints (1).
      // A term "(post)" seems to be parsed as "post" anyway
 ;
- 
-
 
 argument_list
-
-
-    :
-        LPAREN
-        (p1 = argument 
-
-            (COMMA p2 = argument  )* )?
-
-        RPAREN
-        
-
-    ;
+:
+  LPAREN
+  ( p1=argument
+      (COMMA p2=argument)*
+  )?
+  RPAREN
+;
 
 number:
-  (MINUS )?
-  ( NUM_LITERAL | HEX_LITERAL | BIN_LITERAL)
+  (MINUS)?
+  (NUM_LITERAL | HEX_LITERAL | BIN_LITERAL)
 ;
 
 char_literal:

@@ -16,3 +16,5 @@ aa%bb*cc < -123
 \forall int j; {globalIntPV:=j} globalIntPV = j
 \exists elem x; \forall list ys; \forall list xs; ( xs = cons(x,ys))
 \<{ int x = 1; {int s = 2;} }\> x=x
+({i:=0} {*:=*1} {j:=1} (i=j)) <-> (({*:=*1}i) = (jint)1)
+({ \for A o; o.a := f(o) } (obj.a = f(obj)) ) <-> ( f(obj) = f(obj) )

@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nparser;
 
+import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -62,6 +63,7 @@ public class ExprTest {
         NamespaceSet nss = services.getNamespaces();
         NamespaceBuilder nssb = new NamespaceBuilder(nss);
         nssb.addSort("numbers").addSort("int");
+        //.addSort("boolean");
         for (int i = 0; i < 9; i++) {
             nssb.addFunction("numbers "+i+"(numbers)");
         }
@@ -72,9 +74,12 @@ public class ExprTest {
                 .addFunction("int neg(int)")
                 .addFunction("int sub(int, int)")
                 .addFunction("int mul(int, int)")
-                .addFunction("int div(int, int)")
+                .addFunction("int div(ints, int)")
                 .addFunction("int mod(int, int)")
                 .addFunction("int pow(int, int)");
+
+        Recoder2KeY r2k = new Recoder2KeY(services, nss);
+        r2k.readCompilationUnit("public class T0 extends java.lang.Object{ }");
 
         KeyIO io = new KeyIO(services, nss);
         return io;
