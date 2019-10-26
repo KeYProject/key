@@ -16,6 +16,11 @@ public final class StringBuilder implements java.io.Serializable, java.lang.Appe
       @*/
     public java.lang.StringBuilder append(char param0);
     
+    /*@ public normal_behavior
+      @ ensures \result == string;
+      @ assignable \nothing;
+      @ determines \result \by string;
+      @*/
     public String toString() {
         return string;
     }

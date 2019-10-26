@@ -88,6 +88,13 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public java.lang.String toUpperCase();
    public java.lang.String trim();
    public java.lang.String toString();
+   
+   /*@ public normal_behavior
+     @ ensures \result.length == \dl_strContent(this).length;
+     @ ensures (\forall \bigint i; 0 <= i && i < \result.length; \dl_inChar(\result[i]));
+     @ assignable \nothing;
+     @ determines \result[*] \by this;
+     @*/
    public char[] toCharArray();
    public static java.lang.String format(java.lang.String arg0, java.lang.Object[] arg1);
 // public static java.lang.String format(java.util.Locale arg0, java.lang.String arg1, java.lang.Object[] arg2);
