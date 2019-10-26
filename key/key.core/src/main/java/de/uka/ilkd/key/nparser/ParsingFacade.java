@@ -1,12 +1,21 @@
 package de.uka.ilkd.key.nparser;
 
+import de.uka.ilkd.key.proof.init.Includes;
+import de.uka.ilkd.key.proof.io.RuleSource;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.CodingErrorAction;
 import java.nio.file.Path;
+import java.util.*;
 
 /**
  * This facade provides low-level access to the ANTLR4 Parser and Lexer.
@@ -17,6 +26,48 @@ import java.nio.file.Path;
  * @version 1 (19.08.19)
  */
 public abstract class ParsingFacade {
+    static List<KeYParser.FileContext> parseFiles(URL url) throws IOException {
+        List<KeYParser.FileContext> ctxs = new LinkedList<>();
+        Stack<URL> queue = new Stack<>();
+        queue.add(url);
+        Set<URL> reached = new HashSet<>();
+
+        while (!queue.isEmpty()) {
+            url = queue.pop();
+            reached.add(url);
+            var ctx = parseFile(url);
+            ctxs.add(ctx);
+            var includes = getIncludes(url, ctx).getRuleSets();
+            for (RuleSource u : includes) {
+                if (!reached.contains(u.url())) {
+                    queue.add(u.url());
+                }
+            }
+        }
+        return ctxs;
+    }
+
+    public static Includes getIncludes(URL base, KeYParser.FileContext ctx) {
+        List<URL> res = new LinkedList<>();
+        var finder = new IncludeFinder(base);
+        ctx.accept(finder);
+        return finder.getIncludes();
+    }
+
+    static KeYParser.FileContext parseFile(URL url) throws IOException {
+        try (BufferedInputStream is = new BufferedInputStream(url.openStream());
+             ReadableByteChannel channel = Channels.newChannel(is)) {
+            var stream = CharStreams.fromChannel(
+                    channel,
+                    Charset.defaultCharset(),
+                    4096,
+                    CodingErrorAction.REPLACE,
+                    url.toString(),
+                    -1);
+            return parseFile(stream);
+        }
+    }
+
     static KeYParser.FileContext parseFile(Path file) throws IOException {
         return parseFile(CharStreams.fromPath(file));
     }

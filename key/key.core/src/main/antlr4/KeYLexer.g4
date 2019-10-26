@@ -376,7 +376,7 @@ STRING_LITERAL:'"' ('\\' . | ~( '"' | '\\') )* '"' ;
 LESS: '<';
 LESSEQUAL: '<' '=' | '\u2264';
 LGUILLEMETS: '<' '<';
-IMPLICIT_IDENT: '<' (LETTER)+ '>';
+IMPLICIT_IDENT: '<' (LETTER)+ '>' -> type(IDENT);
 
 EQV:	'<->' | '\u2194';
 PRIMES:	('\'')+;

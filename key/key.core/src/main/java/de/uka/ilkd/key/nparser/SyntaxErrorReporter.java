@@ -33,7 +33,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
                 msg, tok.getTokenSource().getSourceName(), stack);
 
         if (isPrint) {
-            System.err.printf("[syntax-error] %s:%d:%d: %s (%s)%n", se.source, line, charPositionInLine, msg, stack);
+            System.err.printf("[syntax-error] %s:%d:%d: %s %s (%s)%n", se.source, line, charPositionInLine, msg, tok, stack);
         }
         errors.add(se);
     }

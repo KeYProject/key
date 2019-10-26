@@ -25,26 +25,50 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 
 options { tokenVocab=KeYLexer; } // use tokens from STLexer.g4
 
-file: (decls | problem proof?) EOF;
+file: (decls problem proof?) EOF;
 
 decls
 :
-    (one_include_statement)*
-    (options_choice)?
-    ( option_decls | sort_decls | prog_var_decls
-    | schema_var_decls | pred_decls | func_decls
-    | transform_decls  | ruleset_decls) *
+    ( profile                // for problems
+    | pref=preferences       // for problems
+    | bootClassPath          // for problems
+    | stlist=classPaths      // for problems
+    | string=javaSource      // for problems
+    | one_include_statement
+    | options_choice
+    | option_decls
+    | sort_decls
+    | prog_var_decls
+    | schema_var_decls
+    | pred_decls
+    | func_decls
+    | transform_decls
+    | ruleset_decls
+    | contracts             // for problems
+    | invariants            // for problems
+    | rulesOrAxioms         // for problems
+    )*
 ;
+
+problem
+:
+    (  PROBLEM LBRACE a = formula RBRACE
+     | CHOOSECONTRACT (chooseContract=string_value SEMI)?
+     | PROOFOBLIGATION  (proofObligation=string_value SEMI)?
+    )?
+;
+
+
 
 one_include_statement
 :
-    (INCLUDE | (INCLUDELDTS ))
+    (INCLUDE | INCLUDELDTS)
     one_include (COMMA one_include)* SEMI
 ;
 
 one_include 
 :
-    absfile=IDENT | relfile=string_literal
+    absfile=IDENT | relfile=string_value
 ;
 
 options_choice
@@ -74,19 +98,23 @@ sort_decls
 
 one_sort_decl
 :
-      GENERIC  sortIds=simple_ident_comma_list
+      GENERIC  sortIds=simple_ident_dots_comma_list
         (ONEOF sortOneOf = oneof_sorts)?
-        ( EXTENDS sortExt = extends_sorts )? SEMI                                        #one_sort_decl_generic
-    | PROXY  sortIds = simple_ident_comma_list (EXTENDS sortExt=extends_sorts)? SEMI     #one_sort_decl_proxy
-    | ABSTRACT?
-      firstSort=simple_ident_dots
-      (EXTENDS sortExt=extends_sorts | COMMA sortIds=simple_ident_comma_list)?  SEMI     #one_sort_decl_default
+        (EXTENDS sortExt = extends_sorts)? SEMI
+    | PROXY  sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)? SEMI
+    | ABSTRACT? sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)?  SEMI
 ;
 
 simple_ident_dots
 :
-  simple_ident (DOT (simple_ident | num=NUM_LITERAL ) )*
+  simple_ident (DOT simple_ident )* | | NUM_LITERAL
 ;
+
+simple_ident_dots_comma_list
+:
+  simple_ident_dots (COMMA simple_ident_dots)*
+;
+
 
 extends_sorts
 :
@@ -130,8 +158,7 @@ simple_ident
 
 simple_ident_comma_list
 :
-    id = simple_ident
-    (COMMA id = simple_ident )*
+    id = simple_ident (COMMA id = simple_ident )*
 ;
 
 
@@ -388,6 +415,7 @@ funcpred_name
 :
     sort_name DOUBLECOLON name = simple_ident
   | simple_ident
+  | NUM_LITERAL
 ;
 
 
@@ -589,42 +617,21 @@ heap_selection_suffix
 
     ;
 
-accessterm_bracket_suffix
-:
-    heap_update_suffix
-  | seq_get_suffix
-  | array_access_suffix
-;
-
-seq_get_suffix
-:
-  LBRACKET logicTermReEntry RBRACKET
-;
-
 static_query
 :
     queryRef=staticAttributeOrQueryReference
     args=argument_list
 ;
 
-heap_update_suffix 
-    : // TODO find the right kind of non-terminal for "o.f" and "a"
-      // and do not resign to parsing an arbitrary term
+accessterm_bracket_suffix
+:
     LBRACKET
-    ( target=equivalence_term ASSIGN val=equivalence_term
-    | id=simple_ident args=argument_list
+    ( target=equivalence_term ASSIGN val=equivalence_term // heap assignment
+    | id=simple_ident args=argument_list // for heap terms, this could be ambigous with logicTermReEntry
+    | STAR
+    | indexTerm=logicTermReEntry (DOTRANGE rangeTo=logicTermReEntry)? //array or sequence access
     )
     RBRACKET
-;
- 
-
-array_access_suffix 
-:
-  LBRACKET
-	( STAR
-  | indexTerm=logicTermReEntry (DOTRANGE rangeTo=logicTermReEntry)?
-  )
-  RBRACKET
 ;
 
 /*
@@ -799,18 +806,11 @@ modality_dl_term
 
 
 argument_list
-
-
-    :
-        LPAREN
-        (p1 = argument 
-
-            (COMMA p2 = argument  )* )?
-
-        RPAREN
-        
-
-    ;
+:
+    LPAREN
+    (argument (COMMA argument)*)?
+    RPAREN
+;
 
 number:
   (MINUS )?
@@ -876,41 +876,29 @@ triggers
 ;
 
 taclet
-    :
-      (LEMMA )?
-      name=IDENT (choices_=option_list)?
-      LBRACE
-      ( form=formula
-      |
-        ( SCHEMAVAR one_schema_var_decl ) *
-        ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
-        ( FIND LPAREN find=termorseq RPAREN
-            (   SAMEUPDATELEVEL
-              | INSEQUENTSTATE
-              | ANTECEDENTPOLARITY
-              | SUCCEDENTPOLARITY
-            )*
-        )?
-
-        ( VARCOND LPAREN varexplist RPAREN ) ?
-        goalspecs
-        modifiers
-        
-    )
-    RBRACE
-    ;
-
-tacletgen
 :
-  /* (LEMMA )? */
+  (LEMMA )?
   name=IDENT (choices_=option_list)?
   LBRACE
-  (VARCOND LPAREN varexplist RPAREN)?
-  goalspecs
-  modifiers
-  RBRACE
-;
+  ( form=formula
+  |
+    ( SCHEMAVAR one_schema_var_decl ) *
+    ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
+    ( FIND LPAREN find=termorseq RPAREN
+        (   SAMEUPDATELEVEL
+          | INSEQUENTSTATE
+          | ANTECEDENTPOLARITY
+          | SUCCEDENTPOLARITY
+        )*
+    )?
 
+    ( VARCOND LPAREN varexplist RPAREN ) ?
+    goalspecs
+    modifiers
+
+)
+RBRACE
+;
 
 modifiers
 :
@@ -1287,22 +1275,11 @@ replacewith
 :
         REPLACEWITH LPAREN o=termorseq RPAREN;
 
-add
-
-:
-        ADD LPAREN s=seq RPAREN;
-
-addrules
-
-:
-        ADDRULES LPAREN lor=tacletlist RPAREN;
-
-addprogvar
-
-:
-        ADDPROGVARS LPAREN pvs=pvset RPAREN;
-
+add: ADD LPAREN s=seq RPAREN;
+addrules:   ADDRULES LPAREN lor=tacletlist RPAREN;
+addprogvar: ADDPROGVARS LPAREN pvs=pvset RPAREN;
 tacletlist: taclet (COMMA taclet)*;
+
 pvset: varId (COMMA varId)*;
 
 rulesets:
@@ -1357,39 +1334,12 @@ one_invariant
      RBRACE SEMI
 ;
 
-problem
-:
-        profile?
-        pref=preferences?
-        bootClassPath?
-        // the result is of no importance here (strange enough)
 
-        stlist=classPaths?
-        string=javaSource?
-
-        decls
-
-        //TODO weigl: rework into a seperate rule
-        // WATCHOUT: choices is always going to be an empty set here,
-      	// isn't it?
-        ( contracts )*
-        ( invariants )*
-              (  ( RULES
-                 | AXIOMS
-                 )
-
-                 ( choices = option_list )?
-           (
-            LBRACE
-            (s=taclet SEMI)*
-            RBRACE 
-           )
-        )*
-        (  PROBLEM LBRACE a = formula RBRACE
-         | CHOOSECONTRACT (chooseContract=string_value SEMI)?
-         | PROOFOBLIGATION  (proofObligation=string_value SEMI)?
-        )?
-   ;
+rulesOrAxioms:
+    (RULES|AXIOMS)
+    (choices = option_list)?
+    (LBRACE (s=taclet SEMI)* RBRACE)
+;
 
 bootClassPath
 :

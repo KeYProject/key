@@ -3,17 +3,19 @@ package de.uka.ilkd.key.nparser;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 
-import static de.uka.ilkd.key.nparser.ParsingFacade.parseFile;
+import static de.uka.ilkd.key.nparser.ParsingFacade.parseFiles;
 
 /**
  * This facade provides high level access to parse and
@@ -26,36 +28,55 @@ public class KeyIO {
     private final Services services;
     private final NamespaceSet nss;
 
-    @Contract(pure = true)
     public KeyIO(Services services, NamespaceSet nss) {
         this.services = services;
         this.nss = nss;
     }
 
-    public Object parseFileAndVisit(CharStream stream) {
+    public KeyIO(Services services) {
+        this(services, services.getNamespaces());
+    }
+
+    public KeyIO() {
+        this(new Services(new JavaProfile()));
+    }
+
+
+    public ParsedKeyFile parseProblemFile(CharStream stream) {
         var ctx = ParsingFacade.parseFile(stream);
-        return visit(ctx);
+        return (ParsedKeyFile) visit(ctx);
     }
 
-    public Term parseTermAndVisit(CharStream stream) {
-        var ctx = ParsingFacade.parseExpression(stream);
-        return (Term) visit(ctx);
+    private <T> T visit(@NotNull ParserRuleContext ctx) {
+        FileVisitor b = new FileVisitor(services, nss, new ParsedKeyFile());
+        return (T) ctx.accept(b);
     }
 
-    private Object visit(@NotNull ParserRuleContext ctx) {
-        Builder b = new Builder(null, services, nss);
-        return ctx.accept(b);
+    public ParsedKeyFile parseProblemFile(@NotNull URL file) throws IOException {
+        var seq = new ArrayList<>(parseFiles(file));
+        Collections.reverse(seq);
+        ParsedKeyFile pkf = new ParsedKeyFile();
+        FileVisitor fv = new FileVisitor(services, nss, pkf);
+        for (var mode : FileVisitor.Mode.values()) {
+            for (var s : seq) {
+                fv.setMode(mode);
+                s.accept(fv);
+            }
+        }
+        return pkf;
     }
 
-    public Object parseProblemFile(@NotNull File file) throws IOException {
-        return parseFile(file.toPath());
+    public ParsedKeyFile parseProblemFile(@NotNull Path file) throws IOException {
+        return parseProblemFile(CharStreams.fromPath(file));
     }
 
-    public Object parseProblemFile(@NotNull Path file) throws IOException {
-        return parseFileAndVisit(CharStreams.fromPath(file));
-    }
 
     public @NotNull Term parseExpression(@NotNull String expr) {
-        return parseTermAndVisit(CharStreams.fromString(expr));
+        return parseExpression(CharStreams.fromString(expr));
+    }
+
+    public Term parseExpression(CharStream stream) {
+        var ctx = ParsingFacade.parseExpression(stream);
+        return (Term) visit(ctx);
     }
 }

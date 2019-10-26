@@ -41,7 +41,8 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
                 (set, el) -> set.add(el),
                 (set1, set2) -> {
                     set1.addAll(set2);
-                    return set1; },
+                    return set1;
+                },
                 ImmutableSet::<T>fromSet,
                 Characteristics.UNORDERED);
     }
@@ -65,9 +66,13 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
     /**
      * Builds a single set with the given obj.
      */
-    static <T>  @NotNull ImmutableSet<T> singleton(T obj) {
+    static <T> @NotNull ImmutableSet<T> singleton(T obj) {
         ImmutableSet<T> result = DefaultImmutableSet.nil();
         return result.add(obj);
+    }
+
+    static <T> ImmutableSet<T> empty() {
+        return DefaultImmutableSet.nil();
     }
 
     /**
@@ -77,21 +82,30 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
 
     /**
      * Adds an element
+     *
      * @return a set containing all elements of this one and the specified element.
      */
     ImmutableSet<T> add(T element);
 
-    /** @return union of this set with set */
+    /**
+     * @return union of this set with set
+     */
     ImmutableSet<T> union(ImmutableSet<? extends T> set);
 
-    /** @return intersection of this set with set */
+    /**
+     * @return intersection of this set with set
+     */
     ImmutableSet<T> intersect(ImmutableSet<? extends T> set);
 
-    /** @return Iterator<T> of the set */
+    /**
+     * @return Iterator<T> of the set
+     */
     @Override
     Iterator<T> iterator();
 
-    /** @return Stream<T> of the set */
+    /**
+     * @return Stream<T> of the set
+     */
     Stream<T> stream();
 
     /**
@@ -102,19 +116,29 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
      */
     boolean exists(Predicate<T> predicate);
 
-    /** @return true iff obj in set */
+    /**
+     * @return true iff obj in set
+     */
     boolean contains(T obj);
 
-    /** @return true iff this set is subset of set s */
+    /**
+     * @return true iff this set is subset of set s
+     */
     boolean subset(ImmutableSet<T> s);
 
-    /** @return int the cardinality of the set */
+    /**
+     * @return int the cardinality of the set
+     */
     int size();
 
-    /** @return true iff the set is empty */
+    /**
+     * @return true iff the set is empty
+     */
     boolean isEmpty();
 
-    /** @return set without element */
+    /**
+     * @return set without element
+     */
     ImmutableSet<T> remove(T element);
 
     /**

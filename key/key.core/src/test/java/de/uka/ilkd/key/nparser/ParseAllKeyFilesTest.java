@@ -6,7 +6,6 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -52,7 +51,7 @@ public class ParseAllKeyFilesTest {
         Assert.assertNull(ctx.exception);
 
         Services services = new Services(new JavaProfile());
-        Builder b = new Builder(null, services, services.getNamespaces());
+        FileVisitor b = new FileVisitor(services, services.getNamespaces(), new ParsedKeyFile());
         ctx.accept(b);
     }
 
@@ -60,7 +59,8 @@ public class ParseAllKeyFilesTest {
         Token t;
         do {
             t = toks.nextToken();
-            System.out.format("%20s %d:%-50s\n",
+            System.out.format("%02d %20s %d:%-50s\n",
+                    toks.getLine(),
                     toks.getVocabulary().getSymbolicName(t.getType()),
                     toks._mode,
                     t.getText().replace("\n", "\\n"));

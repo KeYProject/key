@@ -55,9 +55,11 @@ public abstract class LDT implements Named {
     
     protected LDT(Name name, TermServices services) {
         sort = (Sort) services.getNamespaces().sorts().lookup(name);
-	    if (sort == null)
-	        throw new RuntimeException("LDT "+name+" not found.\n"+
-	                "It seems that there are definitions missing from the .key files.");
+	    if (sort == null) {
+            /*throw new RuntimeException*/
+            System.err.format("LDT %s not found.\n" +
+                    "It seems that there are definitions missing from the .key files.\n", name);
+        }
         this.name = name;
     }
 
@@ -91,9 +93,12 @@ public abstract class LDT implements Named {
     protected final Function addFunction(TermServices services, String funcName) {
 	final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name(funcName));
-        if (f == null)
-        	throw new RuntimeException("LDT: Function " + funcName + " not found.\n" +
-        			"It seems that there are definitions missing from the .key files.");
+        if (f == null) {
+            /*throw new RuntimeException*/
+            System.err.format("LDT: Function %s not found.\n" +
+                    "It seems that there are definitions missing from the .key files.\n", funcName);
+            return null;
+        }
         return addFunction(f);
     }
     

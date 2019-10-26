@@ -62,9 +62,12 @@ public class ExprTest {
         NamespaceSet nss = services.getNamespaces();
         NamespaceBuilder nssb = new NamespaceBuilder(nss);
         nssb.addSort("numbers").addSort("int");
+        nssb.addSort("java.lang.Object").addSort("java.lang.Serializable").addSort("java.lang.Cloneable");
         for (int i = 0; i < 9; i++) {
             nssb.addFunction("numbers "+i+"(numbers)");
         }
+        nssb.addProgramVariable("Heap", "heap");
+        nssb.addFunction("Field arr(int)");
         nssb.addFunction("numbers #()")
                 .addFunction("int Z(numbers)")
                 .addFunction("numbers neglit(numbers)")
@@ -85,6 +88,7 @@ public class ExprTest {
                 .addVariable("bb", "int")
                 .addVariable("cc", "int");
 
+        //services.getTypeConverter().init();
         KeyIO io = new KeyIO(services, nss);
         return io;
     }
