@@ -170,55 +170,35 @@ schema_var_decls :
 
 one_schema_var_decl
 :
-   (MODALOPERATOR one_schema_modal_op_decl SEMI)
- |
-  (
-   (
-    PROGRAM
-    
-    ( schema_modifiers ) ?
-    id = simple_ident ( LBRACKET nameString = simple_ident EQUALS parameter = simple_ident_dots RBRACKET )? 
-    ids = simple_ident_comma_list
-  | FORMULA
-    
-    ( schema_modifiers ) ?
-    
-    ids = simple_ident_comma_list
-  | TERMLABEL
-    
-    
-    ( schema_modifiers ) ?
-    ids = simple_ident_comma_list
-  | UPDATE
-    
-    ( schema_modifiers ) ?
-    
-    ids = simple_ident_comma_list
-  | SKOLEMFORMULA
-    
-    
-    ( schema_modifiers ) ?
-    
-    ids = simple_ident_comma_list
-  | (    TERM
-         
-         ( schema_modifiers ) ?
-      | ( (VARIABLES | VARIABLE)
-         
-         
-         ( schema_modifiers ) ?)
-      | (SKOLEMTERM
-         
-         
-         ( schema_modifiers ) ?)
+    (
+           MODALOPERATOR one_schema_modal_op_decl
+         | PROGRAM
+            (schema_modifiers)?
+            id = simple_ident
+            (LBRACKET nameString=simple_ident EQUALS parameter=simple_ident_dots RBRACKET)?
+            ids=simple_ident_comma_list
+         | FORMULA
+           (schema_modifiers)?
+            ids = simple_ident_comma_list
+         | TERMLABEL
+           (schema_modifiers)?
+           ids=simple_ident_comma_list
+         | UPDATE
+           (schema_modifiers)?
+           ids=simple_ident_comma_list
+         | SKOLEMFORMULA
+           (schema_modifiers)?
+           ids=simple_ident_comma_list
+         | ( TERM
+           | (VARIABLES | VARIABLE)
+           | SKOLEMTERM
+           )
+           (schema_modifiers)?
+           s=any_sortId_check
+           ids=simple_ident_comma_list
     )
-    s = any_sortId_check
-    ids = simple_ident_comma_list
-  ) SEMI
-   
- )
-
- ;
+    SEMI
+;
 
 schema_modifiers
     :
@@ -691,9 +671,7 @@ ifThenElseTerm
 
 
 ifExThenElseTerm
-
-
-    :
+:
         IFEX exVars = bound_variables
         LPAREN condF = term RPAREN
         THEN LPAREN thenT = term RPAREN
@@ -711,7 +689,7 @@ argument
 
 quantifierterm
 :
-  (   FORALL  | EXISTS  )
+  (FORALL | EXISTS)
   bound_variables term60
 ;
 
@@ -734,25 +712,19 @@ locset_term
 ;
 
 location_term
-    :
+:
     LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN
-            
-    ;
+;
 
 substitutionterm
-
-
 :
    LBRACE SUBST
-     v = one_bound_variable SEMI
-     
-     a1=logicTermReEntry
-     
+   v=one_bound_variable
+   SEMI
+   a1=logicTermReEntry
    RBRACE
-   ( a2 = term110 | unary_formula )
+   (a2=term110 | unary_formula)
 ;
- 
-
 
 updateterm
 :
@@ -763,11 +735,7 @@ updateterm
 
 bound_variables
 :
-      var = one_bound_variable 
-      (
-          COMMA var = one_bound_variable 
-      )*
-      SEMI
+    var=one_bound_variable (COMMA var=one_bound_variable)* SEMI
 ;
 
 one_bound_variable

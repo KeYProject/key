@@ -65,6 +65,10 @@ test {
         excludeTestsMatching "TestParallelParsing"
         excludeTestsMatching "TestCvc4"
     }*/
+
+    jvmArgs << "-XX:+UnlockCommercialFeatures" << "-XX:+FlightRecorder" <<
+            "-XX:FlightRecorderOptions=defaultrecording=true"
+
     filter {
         // To make test cases deterministic there is only one class per
         // project called "Tests" that programmatically collects
@@ -102,7 +106,7 @@ task testProofRules(type: Test) {
 
 task testRunAllProofs(type: Test) {
     group "verification"
-    filter { 
+    filter {
         includeTestsMatching "RunAllProofsTestSuite"
         includeTestsMatching "RunAllProofsInfFlow"
         includeTestsMatching "RunAllProofsFunctional"

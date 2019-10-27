@@ -55,6 +55,7 @@ public abstract class ParsingFacade {
     }
 
     static KeYParser.FileContext parseFile(URL url) throws IOException {
+        long start =System.currentTimeMillis();
         try (BufferedInputStream is = new BufferedInputStream(url.openStream());
              ReadableByteChannel channel = Channels.newChannel(is)) {
             var stream = CharStreams.fromChannel(
@@ -65,6 +66,9 @@ public abstract class ParsingFacade {
                     url.toString(),
                     -1);
             return parseFile(stream);
+        }finally {
+            long stop =System.currentTimeMillis();
+            System.err.printf("PARSING %s took %d ms\n", url, stop-start);
         }
     }
 

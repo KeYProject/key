@@ -1,42 +1,12 @@
 package de.uka.ilkd.key.nparser;
 
-import antlr.RecognitionException;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.JavaReader;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.VariableDeclaration;
-import de.uka.ilkd.key.java.expression.literal.StringLiteral;
-import de.uka.ilkd.key.java.visitor.DeclarationProgramVariableCollector;
-import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.parser.*;
-import de.uka.ilkd.key.proof.io.RuleSource;
-import de.uka.ilkd.key.proof.io.RuleSourceFactory;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.tacletbuilder.*;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.Nullable;
-import org.key_project.util.collection.*;
 
-import java.io.File;
-import java.math.BigInteger;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
@@ -59,6 +29,10 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
 
     void each(RuleContext... ctx) {
         for (RuleContext c : ctx) accept(c);
+    }
+
+    protected <T> T peek() {
+        return (T) (parameters.size() == 0 ? null : parameters.peek());
     }
 
 

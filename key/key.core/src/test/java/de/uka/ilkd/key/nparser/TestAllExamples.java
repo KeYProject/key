@@ -30,6 +30,12 @@ public class TestAllExamples {
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> getFiles() throws IOException {
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         List<Object[]> seq = new LinkedList<>();
         File examples = FindResources.findFolder("key.ui/examples", "../key.ui/examples");
         Assume.assumeTrue(examples != null);
@@ -43,7 +49,7 @@ public class TestAllExamples {
                         return super.visitFile(file, attrs);
                     }
                 });
-        return seq;
+        return seq.subList(0,50);
     }
 
     @Test
@@ -56,8 +62,9 @@ public class TestAllExamples {
 
     private KeyIO getIo() throws IOException {
         KeyIO io = new KeyIO();
-        URL u = getClass().getResource("/de/uka/ilkd/key/proof/rules/ldt.key");
+        URL u = getClass().getResource("/de/uka/ilkd/key/proof/rules/standardRules.key");
         ParsedKeyFile pkf = io.parseProblemFile(u);
+        io.getServices().getTypeConverter().init();
         return io;
     }
 }

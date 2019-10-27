@@ -57,13 +57,15 @@ lexer grammar KeYLexer;
       modNames.put("\\throughout_transaction","throughout_transaction");
 
       modPairs.put("\\<","\\>");
+      modPairs.put("\\[","\\]");
+
+      //modPairs.put("\\[[","\\]]");
+
       modPairs.put("\\modality","\\endmodality");
       modPairs.put("\\diamond","\\endmodality");
       modPairs.put("\\diamond_transaction","\\endmodality");
-      modPairs.put("\\[","\\]");
       modPairs.put("\\box","\\endmodality");
       modPairs.put("\\box_transaction","\\endmodality");
-      modPairs.put("\\[[","\\]]");
       modPairs.put("\\throughout","\\endmodality");
       modPairs.put("\\throughout_transaction","\\endmodality");
    }
@@ -430,28 +432,38 @@ NUM_LITERAL:
 MODALITYD:	'\\<' -> more, pushMode(modDiamond);
 MODALITYB:	'\\[' -> more, pushMode(modBox);
 MODALITYBB:	'\\[[' -> more, pushMode(modBoxBox);
-
+MODAILITYGENERIC:
+      ('\\modality' | '\\diamond' | '\\diamond_transaction'
+      '\\box' | '\\box_transaction' | '\\throughout' | '\\throughout_transaction')
+      -> more, pushMode(modGeneric);
 ERROR_CHAR: .;
 
 mode modDiamond;
 MODALITYD_END: '\\>' -> type(MODALITY), popMode;
-MODALITYD_STRING : '"' -> more, pushMode(modString);
-MODALITYD_CHAR : '\'' -> more, pushMode(modChar);
-MODALITYD_COMMENT : [\\] [*] -> more, pushMode(modComment);
+//MODALITYD_STRING : '"' -> more, pushMode(modString);
+//MODALITYD_CHAR : '\'' -> more, pushMode(modChar);
+//MODALITYD_COMMENT : [\\] [*] -> more, pushMode(modComment);
 MODALITYD_ANY : . -> more;
 
+mode modGeneric;
+MODALITYG_END: '\\endmodality' -> type(MODALITY), popMode;
+//MODALITYG_STRING : '"' -> more, pushMode(modString);
+//MODALITYG_CHAR : '\'' -> more, pushMode(modChar);
+//MODALITYG_COMMENT : [\\] [*] -> more, pushMode(modComment);
+MODALITYG_ANY : . -> more;
+
 mode modBox;
-MODALITYB_END: '\\\\]' -> type(MODALITY), popMode;
-MODALITYB_STRING : '"' -> more, pushMode(modString);
-MODALITYB_CHAR : '\'' -> more, pushMode(modChar);
-MODALITYB_COMMENT : [\\] [*] -> more, pushMode(modComment);
+MODALITYB_END: '\\]' -> type(MODALITY), popMode;
+//MODALITYB_STRING : '"' -> more, pushMode(modString);
+//MODALITYB_CHAR : '\'' -> more, pushMode(modChar);
+//MODALITYB_COMMENT : [\\] [*] -> more, pushMode(modComment);
 MODALITYB_ANY : . -> more;
 
 mode modBoxBox;
-MODALITYBB_END: '\\\\]]' -> type(MODALITY), popMode;
-MODALITYBB_STRING : '"' -> more, pushMode(modString);
-MODALITYBB_CHAR : '\'' -> more, pushMode(modChar);
-MODALITYBB_COMMENT : [\\] [*] -> more, pushMode(modComment);
+MODALITYBB_END: '\\]]' -> type(MODALITY), popMode;
+//MODALITYBB_STRING : '"' -> more, pushMode(modString);
+//MODALITYBB_CHAR : '\'' -> more, pushMode(modChar);
+//MODALITYBB_COMMENT : [\\] [*] -> more, pushMode(modComment);
 MODALITYBB_ANY : . -> more;
 
 mode modString;

@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nparser;
 
 import antlr.RecognitionException;
+import com.google.common.base.CharMatcher;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -90,7 +91,6 @@ public class FileVisitor extends AbstractBuilder<Object> {
            T::select(h, T::select(h, T::select(h, T::select(h, o, f1) , f2) , f3), f4)
     */
     protected int globalSelectNestingDepth = 0;
-    private TacletBuilder b;
     private String currentChoiceCategory;
     private boolean ruleWithFind;
     private boolean negated;
@@ -289,7 +289,10 @@ public class FileVisitor extends AbstractBuilder<Object> {
             }
 
             if (schemaVariables().lookup(v.name()) != null) {
-                semanticError("Schema variables clashes with previous declared schema variable: %s.", v.name());
+                var old = schemaVariables().lookup(v.name());
+                //if(!old.sort().equals(v.sort()))
+                //    semanticError("Schema variables clashes with previous declared schema variable: %s.", v.name());
+                System.err.format("Override: %s %s%n", old, v);
             }
             schemaVariables().add(v);
         }
@@ -523,16 +526,52 @@ public class FileVisitor extends AbstractBuilder<Object> {
         return null;
     }
 
+    public static String trimJavaBlock(String raw) {
+        if (raw.startsWith("\\<")) {
+            return CharMatcher.anyOf("\\<>").trimFrom(raw);
+        }
+        if (raw.startsWith("\\[")) {
+            return CharMatcher.anyOf("\\[]").trimFrom(raw);
+        }
+        int end = raw.length() - (raw.endsWith("\\endmodality") ? "\\endmodality".length() : 0);
+        int start = 0;
+        if (raw.startsWith("\\throughout_transaction")) start = "\\throughout_transaction".length();
+        else if (raw.startsWith("\\diamond_transaction")) start = "\\diamond_transaction".length();
+        else if (raw.startsWith("\\diamond")) start = "\\diamond".length();
+        else if (raw.startsWith("\\box_transaction")) start = "\\box_transaction".length();
+        else if (raw.startsWith("\\box")) start = "\\box".length();
+        else if (raw.startsWith("\\throughout")) start = "\\throughout".length();
+        else if (raw.startsWith("\\modality")) start = raw.indexOf("}") + 1;
+        return raw.substring(start, end);
+    }
+
+    public static String operatorOfJavaBlock(String raw) {
+        if (raw.startsWith("\\<")) {
+            return "diamond";
+        }
+        if (raw.startsWith("\\[")) {
+            return "box";
+        }
+        if (raw.startsWith("\\diamond_transaction")) return "diamond_transaction";
+        if (raw.startsWith("\\box_transaction")) return "box_transaction";
+        if (raw.startsWith("\\diamond")) return "diamond";
+        if (raw.startsWith("\\box")) return "box";
+        if (raw.startsWith("\\throughout_transaction")) return "throughout_transaction";
+        if (raw.startsWith("\\throughout")) return "throughout";
+        if (raw.startsWith("\\modality")) {
+            int start = raw.indexOf('{') + 1;
+            int end = raw.indexOf('}');
+            return raw.substring(start, end);
+        }
+        return "n/a";
+    }
+
+
     private PairOfStringAndJavaBlock getJavaBlock(Token t) {
         PairOfStringAndJavaBlock sjb = new PairOfStringAndJavaBlock();
         String s = t.getText().trim();
-        String cleanJava = s.substring(2, s.length() - 2);
-
-        if (s.startsWith("\\<")) sjb.opName = "diamond";
-        else if (s.startsWith("\\[")) sjb.opName = "box";
-        else sjb.opName = "unknown";
-
-
+        String cleanJava = trimJavaBlock(s);
+        sjb.opName = operatorOfJavaBlock(s);
         boolean schemaMode = true;
 
         Debug.out("Modal operator name passed to getJavaBlock: ", sjb.opName);
@@ -609,27 +648,28 @@ public class FileVisitor extends AbstractBuilder<Object> {
         // case 1a: variable
         // case 1b: schema variable
         Name name = new Name(varfunc_name);
-        Operator v = variables().lookup(name);
-        if (v == null) {
-            v = schemaVariables().lookup(name);
+        Operator[] operators = new Operator[]{
+                schemaVariables().lookup(new Name(varfunc_name)),
+                variables().lookup(name),
+                programVariables().lookup(new ProgramElementName(varfunc_name)),
+                functions().lookup(new Name(varfunc_name)),
+                AbstractTermTransformer.name2metaop(varfunc_name)
+        };
+
+        for (var op : operators) {
+            if (op != null) {
+                return op;
+            }
         }
 
-        if (v != null && (args == null || (inSchemaMode() && v instanceof ModalOperatorSV))) {
+        /*if (v != null && (args == null || (inSchemaMode() && v instanceof ModalOperatorSV))) {
             return v;
-        }
+        }*/
 
         // case 2: program variable
-        v = programVariables().lookup(new ProgramElementName(varfunc_name));
-        if (v != null && (args == null || args.length == 0)) {
+        /*if (v != null && (args == null || args.length == 0)) {
             return v;
-        }
-
-        // case 3: function
-        v = functions().lookup(new Name(varfunc_name));
-        if (v != null) {
-            return v;
-        }
-
+        }*/
 
         // case 4: instantiation of sort depending function
         int separatorIndex = varfunc_name.indexOf("::");
@@ -642,26 +682,12 @@ public class FileVisitor extends AbstractBuilder<Object> {
                     getServices());
 
             if (sort != null && firstInstance != null) {
-                v = firstInstance.getInstanceFor(sort, getServices());
+                var v = firstInstance.getInstanceFor(sort, getServices());
                 if (v != null) {
                     return v;
                 }
             }
         }
-
-        // not found
-
-        // case 5: variable
-        v = variables().lookup(new Name(varfunc_name));
-        if (v != null) {
-            return v;
-        }
-
-        v = schemaVariables().lookup(new Name(varfunc_name));
-        if (v != null) {
-            return v;
-        }
-
 
         if (args == null) {
             semanticError(ctx, "(program) variable or constant %s", varfunc_name);
@@ -807,8 +833,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
                     ("Unknown find class type: " + find.getClass().getName(),
                             getSourceName(), getLine(), getColumn()));
         }
-        //TODO
-        return b;
+        return null;
     }
 
     private void addGoalTemplate(TacletBuilder b,
@@ -1061,7 +1086,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitFile(KeYParser.FileContext ctx) {
         accept(ctx.decls());
-        if(mode == Mode.PROBLEM)
+        if (mode == Mode.PROBLEM)
             each(ctx.problem(), ctx.proof());
         return parsedKeyFile;
     }
@@ -1111,6 +1136,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
         return null;
     }
 
+
     @Override
     public Choice visitActivated_choice(KeYParser.Activated_choiceContext ctx) {
         var cat = ctx.cat.getText();
@@ -1137,6 +1163,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitChoice(KeYParser.ChoiceContext ctx) {
         String cat = ctx.category.getText();
+        System.out.println("choice: " + cat);
         for (Token catctx : ctx.choice_option) {
             var name = cat + ":" + catctx.getText();
             Choice c = choices().lookup(new Name(name));
@@ -1366,7 +1393,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
         List<String> ids = accept(ctx.simple_ident_comma_list());
         if (ctx.PROGRAM() != null) {
             mods = new SchemaVariableModifierSet.ProgramSV();
-            accept(ctx.schema_modifiers());
+            accept(ctx.schema_modifiers(), mods);
             String id = accept(ctx.id);
             String nameString = accept(ctx.nameString);
             String parameter = accept(ctx.simple_ident_dots());
@@ -1382,7 +1409,6 @@ public class FileVisitor extends AbstractBuilder<Object> {
             //List<String> ids = accept(ctx.simple_ident_comma_list());
             //TODO
         }
-
         if (ctx.FORMULA() != null) {
             mods = new SchemaVariableModifierSet.FormulaSV();
             accept(ctx.schema_modifiers(), mods);
@@ -1418,6 +1444,12 @@ public class FileVisitor extends AbstractBuilder<Object> {
             mods = new SchemaVariableModifierSet.SkolemTermSV();
             accept(ctx.schema_modifiers(), mods);
         }
+
+        if (ctx.MODALOPERATOR() != null) {
+            accept(ctx.one_schema_modal_op_decl());
+            return null;
+        }
+
         if (ctx.any_sortId_check() != null)
             s = accept(ctx.any_sortId_check());
 
@@ -1455,7 +1487,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     public Object visitOne_schema_modal_op_decl(KeYParser.One_schema_modal_op_declContext ctx) {
         ImmutableSet<Modality> modalities = DefaultImmutableSet.nil();
         Sort sort = accept(ctx.any_sortId_check());
-        if (sort != Sort.FORMULA) {
+        if (sort != null && sort != Sort.FORMULA) {
             semanticError("Modal operator SV must be a FORMULA, not " + sort);
         }
         List<String> ids = accept(ctx.simple_ident_comma_list());
@@ -1469,8 +1501,10 @@ public class FileVisitor extends AbstractBuilder<Object> {
             modalities = opSVHelper(s, modalities);
         }
         SchemaVariable osv = schemaVariables().lookup(new Name(id));
-        if (osv != null)
-            semanticError("Schema variable " + id + " already defined.");
+        if (osv != null) {
+            //semanticError("Schema variable " + id + " already defined.");
+            System.err.format("Clash with %s\n", osv);
+        }
 
         osv = SchemaVariableFactory.createModalOperatorSV(new Name(id), sort, modalities);
 
@@ -2406,10 +2440,15 @@ public class FileVisitor extends AbstractBuilder<Object> {
             bindVar();
 
         Term a1 = accept(ctx.a1);
-        Term a2 = accept(ctx.a2);
-        Term result = getServices().getTermBuilder().subst(op, (QuantifiableVariable) v, a1, a2);
-        unbindVars(orig);
-        return result;
+        Term a2 = oneOf(ctx.a2, ctx.unary_formula());
+        try {
+            Term result = getServices().getTermBuilder().subst(op, (QuantifiableVariable) v, a1, a2);
+            return result;
+        } catch (Exception e) {
+            throw new BuildingException(ctx, e);
+        } finally {
+            unbindVars(orig);
+        }
     }
 
     @Override
@@ -2472,7 +2511,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
             op = Modality.getModality(sjb.opName);
         }
         if (op == null) {
-            semanticError("Unknown modal operator: " + sjb.opName);
+            semanticError(ctx, "Unknown modal operator: " + sjb.opName);
         }
 
         Term a1 = accept(ctx.a1);
@@ -2542,7 +2581,11 @@ public class FileVisitor extends AbstractBuilder<Object> {
                 }
 
                 if (boundVars == null) {
-                    a = getTermFactory().createTerm(op, args);
+                    try {
+                        a = getTermFactory().createTerm(op, args);
+                    } catch (Exception e) {
+                        throw new BuildingException(ctx, e);
+                    }
                 } else {
                     //sanity check
                     assert op instanceof Function;
@@ -2558,7 +2601,12 @@ public class FileVisitor extends AbstractBuilder<Object> {
                     }
 
                     //create term
-                    a = getTermFactory().createTerm(op, args, new ImmutableArray<QuantifiableVariable>(boundVars.toArray(new QuantifiableVariable[boundVars.size()])), null);
+                    try {
+                        a = getTermFactory().createTerm(op, args,
+                                new ImmutableArray<QuantifiableVariable>(boundVars.toArray(new QuantifiableVariable[boundVars.size()])), null);
+                    } catch (TermCreationException e) {
+                        throw new BuildingException(ctx, e);
+                    }
                 }
             }
         }
@@ -2634,11 +2682,8 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Taclet visitTaclet(KeYParser.TacletContext ctx) {
         var ifSeq = Sequent.EMPTY_SEQUENT;
-        b = null;
-
         switchToNormalMode();
         ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.nil();
-
         if (ctx.LEMMA() != null) {
             tacletAnnotations = tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);
         }
@@ -2651,7 +2696,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
             if (!axiomMode) {
                 semanticError("formula rules are only permitted for \\axioms");
             }
-            b = createTacletBuilderFor(null, RewriteTaclet.NONE);
+            TacletBuilder<?> b = createTacletBuilderFor(null, RewriteTaclet.NONE);
             SequentFormula sform = new SequentFormula(form);
             Semisequent semi = new Semisequent(sform);
             Sequent addSeq = Sequent.createAnteSequent(semi);
@@ -2662,7 +2707,6 @@ public class FileVisitor extends AbstractBuilder<Object> {
             b.setChoices(choices_);
             b.setAnnotations(tacletAnnotations);
             Taclet r = b.getTaclet();
-            //taclet2Builder.put(r, b);
             announceTaclet(ctx, r);
             return r;
         }
@@ -2688,32 +2732,38 @@ public class FileVisitor extends AbstractBuilder<Object> {
             applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY;
         }
         var find = accept(ctx.find);
-        b = createTacletBuilderFor(find, applicationRestriction);
-
+        TacletBuilder b = createTacletBuilderFor(find, applicationRestriction);
         b.setIfSequent(ifSeq);
         b.setName(new Name(name));
-        accept(ctx.varexplist());
-        accept(ctx.goalspecs());
-        accept(ctx.modifiers());
+        accept(ctx.goalspecs(), b);
+        accept(ctx.varexplist(), b);
+        accept(ctx.modifiers(), b);
         b.setChoices(choices_);
         b.setAnnotations(tacletAnnotations);
         Taclet r = b.getTaclet();
         announceTaclet(ctx, r);
-        // dump local schema var decls
         schemaVariablesNamespace = schemaVariables().parent();
         return r;
     }
 
     private void announceTaclet(ParserRuleContext ctx, Taclet taclet) {
         RuleKey key = new RuleKey(taclet);
-        if (parsedKeyFile.getTaclets().containsKey(key)) {
-            semanticError(ctx, "A taclet with name %s was already ");
+        TacletBuilder b = peek();
+        if (b != null) {
+            return;
         }
+
+        if (parsedKeyFile.getTaclets().containsKey(key)) {
+            //semanticError(ctx, "A taclet with name %s was already defined", key);
+            System.err.format("Taclet clash with %s%n", key);
+        }
+        System.out.format("ANNOUNCE: %s @ %s:%d%n", key, ctx.start.getTokenSource().getSourceName(), ctx.start.getLine());
         parsedKeyFile.getTaclets().put(key, taclet);
     }
 
     @Override
     public Object visitModifiers(KeYParser.ModifiersContext ctx) {
+        TacletBuilder b = peek();
         if (ctx.rs != null) {
             List<RuleSet> it = accept(ctx.rs);
             it.forEach(a -> b.addRuleSet(a));
@@ -2838,15 +2888,18 @@ public class FileVisitor extends AbstractBuilder<Object> {
     public Object visitVarcond_sameObserver(KeYParser.Varcond_sameObserverContext ctx) {
         ParsableVariable t1 = accept(ctx.t1);
         ParsableVariable t2 = accept(ctx.t2);
+        TacletBuilder b = peek();
         b.addVariableCondition(new SameObserverCondition(t1, t2));
         return null;
     }
+
 
     @Override
     public Object visitVarcond_applyUpdateOnRigid(KeYParser.Varcond_applyUpdateOnRigidContext ctx) {
         var u = accept(ctx.u);
         var x = accept(ctx.x);
         var x2 = accept(ctx.x2);
+        TacletBuilder b = peek();
         b.addVariableCondition(new ApplyUpdateOnRigidCondition((UpdateSV) u,
                 (SchemaVariable) x,
                 (SchemaVariable) x2));
@@ -2858,6 +2911,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
         UpdateSV u = accept(ctx.u);
         SchemaVariable x = accept(ctx.x);
         SchemaVariable result = accept(ctx.result);
+        TacletBuilder b = peek();
         b.addVariableCondition(new DropEffectlessElementariesCondition(
                 u, x, result));
         return null;
@@ -2870,6 +2924,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
         var f = accept(ctx.f);
         var x = accept(ctx.x);
         var result = accept(ctx.result);
+        TacletBuilder b = peek();
         b.addVariableCondition(new DropEffectlessStoresCondition((TermSV) h,
                 (TermSV) o,
                 (TermSV) f,
@@ -2882,6 +2937,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     public Object visitVarcond_differentFields(KeYParser.Varcond_differentFieldsContext ctx) {
         var x = accept(ctx.x);
         var y = accept(ctx.y);
+        TacletBuilder b = peek();
         b.addVariableCondition(new DifferentFields((SchemaVariable) x, (SchemaVariable) y));
         return null;
     }
@@ -2893,6 +2949,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
         UpdateSV u2 = accept(ctx.u2);
         FormulaSV commonFormula = accept(ctx.commonFormula);
         SchemaVariable result = accept(ctx.result);
+        TacletBuilder b = peek();
         b.addVariableCondition(new SimplifyIfThenElseUpdateCondition(phi,
                 u1,
                 u2,
@@ -2925,6 +2982,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     public Object visitVarcond_new(KeYParser.Varcond_newContext ctx) {
         var x = accept(ctx.x);
         var y = accept(ctx.y);
+        TacletBuilder b = peek();
         if (ctx.TYPEOF() != null) {
             b.addVarsNew((SchemaVariable) x, (SchemaVariable) y);
         }
@@ -2943,6 +3001,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitVarcond_newlabel(KeYParser.Varcond_newlabelContext ctx) {
         var x = accept(ctx.x);
+        TacletBuilder b = peek();
         b.addVariableCondition(new NewJumpLabelCondition((SchemaVariable) x));
         return null;
     }
@@ -2973,6 +3032,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
 
         TypeResolver fst = accept(ctx.fst);
         TypeResolver snd = accept(ctx.snd);
+        TacletBuilder b = peek();
         b.addVariableCondition(new TypeComparisonCondition(fst, snd, mode));
         return null;
     }
@@ -2981,6 +3041,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     public Object visitVarcond_free(KeYParser.Varcond_freeContext ctx) {
         SchemaVariable x = accept(ctx.x);
         List<SchemaVariable> ys = accept(ctx.varIds());
+        TacletBuilder b = peek();
         ys.forEach(it -> b.addVarsNotFreeIn(x, it));
         return null;
     }
@@ -3001,6 +3062,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
             semanticError("Expected schema variable of kind EXPRESSION or TYPE, "
                     + "but is " + x);
         } else {
+            TacletBuilder b = peek();
             b.addVariableCondition(new JavaTypeToSortCondition((SchemaVariable) x,
                     (GenericSort) s,
                     elemSort));
@@ -3024,6 +3086,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
             semanticError("Expected schema variable of kind EXPRESSION or TYPE, "
                     + "but is " + x);
         } else {
+            TacletBuilder b = peek();
             b.addVariableCondition(new FieldTypeToSortCondition((SchemaVariable) x,
                     (GenericSort) s));
         }
@@ -3033,6 +3096,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitVarcond_containsAssignment(KeYParser.Varcond_containsAssignmentContext ctx) {
         var x = accept(ctx.x);
+        TacletBuilder b = peek();
         b.addVariableCondition(new ContainsAssignmentCondition((SchemaVariable) x, negated));
         return null;
     }
@@ -3040,6 +3104,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitVarcond_enumtype(KeYParser.Varcond_enumtypeContext ctx) {
         TypeResolver tr = accept(ctx.tr);
+        TacletBuilder b = peek();
         b.addVariableCondition(new EnumTypeCondition(tr, negated));
         return null;
     }
@@ -3047,14 +3112,14 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitVarcond_reference(KeYParser.Varcond_referenceContext ctx) {
         boolean nonNull = false;
-        String id = accept(ctx.id);
-        if ("non_null".equals(id)) {
+        if (ctx.id != null && "non_null".equals(ctx.id.getText())) {
             nonNull = true;
         } else {
-            semanticError(id +
-                    " is not an allowed modifier for the \\isReference variable condition.");
+            semanticError(ctx,
+                    "%s is not an allowed modifier for the \\isReference variable condition.", ctx.id);
         }
         TypeResolver tr = accept(ctx.tr);
+        TacletBuilder b = peek();
         b.addVariableCondition(new TypeCondition(tr, !isPrimitive, nonNull));
         return null;
     }
@@ -3064,6 +3129,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
         String id = null;
         boolean nonNull = false;
         ParsableVariable x = accept(ctx.x);
+        TacletBuilder b = peek();
         b.addVariableCondition(new IsThisReference(x, negated));
         return null;
     }
@@ -3073,6 +3139,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
         var x = accept(ctx.x);
         var y = accept(ctx.y);
         var z = accept(ctx.z);
+        TacletBuilder b = peek();
         b.addVariableCondition(new StaticMethodCondition
                 (negated, (SchemaVariable) x, (SchemaVariable) y, (SchemaVariable) z));
         return null;
@@ -3083,6 +3150,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
         SchemaVariable x = accept(ctx.x);
         SchemaVariable y = accept(ctx.y);
         SchemaVariable z = accept(ctx.z);
+        TacletBuilder b = peek();
         if (z != null)
             b.addVariableCondition(new MayExpandMethodCondition(
                     negated, x, y, z));
@@ -3095,6 +3163,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitVarcond_referencearray(KeYParser.Varcond_referencearrayContext ctx) {
         SchemaVariable x = accept(ctx.x);
+        TacletBuilder b = peek();
         b.addVariableCondition(new ArrayComponentTypeCondition(
                 x, !primitiveElementType));
         return null;
@@ -3103,6 +3172,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitVarcond_array(KeYParser.Varcond_arrayContext ctx) {
         SchemaVariable x = accept(ctx.x);
+        TacletBuilder b = peek();
         b.addVariableCondition(new ArrayTypeCondition(
                 x, negated));
         return null;
@@ -3111,6 +3181,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitVarcond_array_length(KeYParser.Varcond_array_lengthContext ctx) {
         SchemaVariable x = accept(ctx.x);
+        TacletBuilder b = peek();
         b.addVariableCondition(new ArrayLengthCondition(
                 x, negated));
         return null;
@@ -3119,6 +3190,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitVarcond_abstractOrInterface(KeYParser.Varcond_abstractOrInterfaceContext ctx) {
         TypeResolver tr = accept(ctx.tr);
+        TacletBuilder b = peek();
         b.addVariableCondition(new AbstractOrInterfaceType(tr, negated));
         return null;
     }
@@ -3126,6 +3198,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitVarcond_enum_const(KeYParser.Varcond_enum_constContext ctx) {
         SchemaVariable x = accept(ctx.x);
+        TacletBuilder b = peek();
         b.addVariableCondition(new EnumConstantCondition(
                 x));
         return null;
@@ -3134,6 +3207,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitVarcond_final(KeYParser.Varcond_finalContext ctx) {
         SchemaVariable x = accept(ctx.x);
+        TacletBuilder b = peek();
         b.addVariableCondition(new FinalReferenceCondition(
                 x, negated));
         return null;
@@ -3142,6 +3216,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitVarcond_static(KeYParser.Varcond_staticContext ctx) {
         SchemaVariable x = accept(ctx.x);
+        TacletBuilder b = peek();
         b.addVariableCondition(new StaticReferenceCondition(
                 x, negated));
         return null;
@@ -3150,6 +3225,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitVarcond_localvariable(KeYParser.Varcond_localvariableContext ctx) {
         SchemaVariable x = accept(ctx.x);
+        TacletBuilder b = peek();
         b.addVariableCondition(new LocalVariableCondition(x, negated));
         return null;
     }
@@ -3159,6 +3235,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
         TermSV obs = accept(ctx.obs);
         TermSV heap = accept(ctx.heap);
 
+        TacletBuilder b = peek();
         b.addVariableCondition(new ObserverCondition(obs,
                 heap));
         return null;
@@ -3168,6 +3245,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     public Object visitVarcond_different(KeYParser.Varcond_differentContext ctx) {
         SchemaVariable var1 = accept(ctx.var1);
         SchemaVariable var2 = accept(ctx.var2);
+        TacletBuilder b = peek();
         b.addVariableCondition(new DifferentInstantiationCondition(
                 var1,
                 var2));
@@ -3178,6 +3256,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     public Object visitVarcond_metadisjoint(KeYParser.Varcond_metadisjointContext ctx) {
         var var1 = accept(ctx.var1);
         var var2 = accept(ctx.var2);
+        TacletBuilder b = peek();
         b.addVariableCondition(new MetaDisjointCondition(
                 (TermSV) var1,
                 (TermSV) var2));
@@ -3189,6 +3268,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
         var t = accept(ctx.t);
         var t2 = accept(ctx.t2);
         var phi = accept(ctx.phi);
+        TacletBuilder b = peek();
         b.addVariableCondition(new EqualUniqueCondition((TermSV) t,
                 (TermSV) t2,
                 (FormulaSV) phi));
@@ -3199,6 +3279,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     public Object visitVarcond_freeLabelIn(KeYParser.Varcond_freeLabelInContext ctx) {
         var l = accept(ctx.l);
         var statement = accept(ctx.statement);
+        TacletBuilder b = peek();
         b.addVariableCondition(new FreeLabelInVariableCondition((SchemaVariable) l,
                 (SchemaVariable) statement, negated));
         return null;
@@ -3207,6 +3288,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitVarcond_constant(KeYParser.Varcond_constantContext ctx) {
         var x = accept(ctx.varId());
+        TacletBuilder b = peek();
         if (x instanceof TermSV) {
             b.addVariableCondition(new ConstantCondition((TermSV) x, negated));
         } else {
@@ -3220,6 +3302,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     public Object visitVarcond_label(KeYParser.Varcond_labelContext ctx) {
         TermLabelSV l = accept(ctx.varId());
         String name = accept(ctx.simple_ident());
+        TacletBuilder b = peek();
         b.addVariableCondition(new TermLabelCondition(l, name, negated));
         return null;
     }
@@ -3227,6 +3310,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitVarcond_static_field(KeYParser.Varcond_static_fieldContext ctx) {
         var field = accept(ctx.varId());
+        TacletBuilder b = peek();
         b.addVariableCondition(new StaticFieldCondition((SchemaVariable) field, negated));
         return null;
     }
@@ -3234,6 +3318,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitVarcond_subFormulas(KeYParser.Varcond_subFormulasContext ctx) {
         FormulaSV x = accept(ctx.varId());
+        TacletBuilder b = peek();
         b.addVariableCondition(new SubFormulaCondition(x, negated));
         return null;
     }
@@ -3253,11 +3338,10 @@ public class FileVisitor extends AbstractBuilder<Object> {
 
     @Override
     public Object visitOption(KeYParser.OptionContext ctx) {
-        String cat = ctx.cat.toString();
-        String name = ctx.choice_.toString();
-        var c = choices().lookup(new Name(cat + ":" + name));
+        String choice = ctx.getText();
+        var c = choices().lookup(choice);
         if (c == null) {
-            throwEx(new NotDeclException(null, "Option", name));
+            semanticError(ctx, "Could not find choice: %s", choice);
         }
         return c;
     }
@@ -3281,6 +3365,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
         if (ctx.add() != null) addSeq = accept(ctx.add());
         if (ctx.addrules() != null) addRList = accept(ctx.addrules());
         if (ctx.addprogvar() != null) addpv = accept(ctx.addprogvar());
+        TacletBuilder b = peek();
         addGoalTemplate(b, name, rwObj, addSeq, addRList, addpv, soc);
         return null;
     }
@@ -3302,12 +3387,13 @@ public class FileVisitor extends AbstractBuilder<Object> {
 
     @Override
     public ImmutableSet<SchemaVariable> visitAddprogvar(KeYParser.AddprogvarContext ctx) {
-        return accept(ctx.pvs);
+        return ImmutableSet.fromSet(new HashSet<>(accept(ctx.pvs)));
     }
 
     @Override
-    public List<Taclet> visitTacletlist(KeYParser.TacletlistContext ctx) {
-        return allOf(ctx.taclet());
+    public ImmutableList<Taclet> visitTacletlist(KeYParser.TacletlistContext ctx) {
+        List<Taclet> taclets = allOf(ctx.taclet());
+        return ImmutableList.fromList(taclets);
     }
 
     @Override
@@ -3426,14 +3512,14 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Term visitProblem(KeYParser.ProblemContext ctx) {
         DefaultImmutableSet<Choice> choices = DefaultImmutableSet.nil();
-        if(ctx.CHOOSECONTRACT() != null) {
-            if(ctx.chooseContract!=null)
+        if (ctx.CHOOSECONTRACT() != null) {
+            if (ctx.chooseContract != null)
                 parsedKeyFile.setChooseContract(accept(ctx.chooseContract));
             else
                 parsedKeyFile.setChooseContract("");
         }
-        if(ctx.PROOFOBLIGATION()!=null) {
-            if(ctx.proofObligation!= null)
+        if (ctx.PROOFOBLIGATION() != null) {
+            if (ctx.proofObligation != null)
                 parsedKeyFile.setProofObligation(accept(ctx.proofObligation));
             else
                 parsedKeyFile.setProofObligation("");

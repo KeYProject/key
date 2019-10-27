@@ -14,6 +14,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 import static de.uka.ilkd.key.nparser.ParsingFacade.parseFiles;
 
@@ -54,15 +55,25 @@ public class KeyIO {
     }
 
     public ParsedKeyFile parseProblemFile(@NotNull URL file) throws IOException {
+        long start =System.currentTimeMillis();
         var seq = new ArrayList<>(parseFiles(file));
-        Collections.reverse(seq);
+        long stop =System.currentTimeMillis();
+        System.err.format("MODE: %s took %d%n", "PARSING", stop-start);
+
         ParsedKeyFile pkf = new ParsedKeyFile();
-        FileVisitor fv = new FileVisitor(services, nss, pkf);
+        var parsers = seq.stream().map(it -> new FileVisitor(services, nss, pkf))
+                .collect(Collectors.toList());
+        Collections.reverse(seq);
         for (var mode : FileVisitor.Mode.values()) {
-            for (var s : seq) {
-                fv.setMode(mode);
-                s.accept(fv);
+            start =System.currentTimeMillis();
+            for (int i = 0; i < seq.size(); i++) {
+                KeYParser.FileContext s = seq.get(i);
+                var p = parsers.get(i);
+                p.setMode(mode);
+                s.accept(p);
             }
+            stop=System.currentTimeMillis();
+            System.err.format("MODE: %s took %d%n", mode, stop-start);
         }
         return pkf;
     }
@@ -79,5 +90,9 @@ public class KeyIO {
     public Term parseExpression(CharStream stream) {
         var ctx = ParsingFacade.parseExpression(stream);
         return (Term) visit(ctx);
+    }
+
+    public Services getServices() {
+        return services;
     }
 }
