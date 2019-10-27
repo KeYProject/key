@@ -793,14 +793,8 @@ one_logic_bound_variable_nosort
 ;
 
 modality_dl_term
-   :
-   modality = MODALITY
-   // CAREFUL here, op can be null during guessing stage (use lazy &&)
-   a1=term60
-     // This here will accept both (1) \modality...\endmodality post and
-     // (2) \modality...\endmodality(post)
-     // so that it is consistent with pretty printer that prints (1).
-     // A term "(post)" seems to be parsed as "post" anyway
+:
+   modality=MODALITY a1=term60
 ;
  
 

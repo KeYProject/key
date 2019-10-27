@@ -42,10 +42,11 @@ public class KeyIO {
     }
 
 
+    /* base path needed
     public ParsedKeyFile parseProblemFile(CharStream stream) {
         var ctx = ParsingFacade.parseFile(stream);
         return (ParsedKeyFile) visit(ctx);
-    }
+    }*/
 
     private <T> T visit(@NotNull ParserRuleContext ctx) {
         FileVisitor b = new FileVisitor(services, nss, new ParsedKeyFile());
@@ -67,7 +68,7 @@ public class KeyIO {
     }
 
     public ParsedKeyFile parseProblemFile(@NotNull Path file) throws IOException {
-        return parseProblemFile(CharStreams.fromPath(file));
+        return parseProblemFile(file.toUri().toURL());
     }
 
 

@@ -538,16 +538,9 @@ public class FileVisitor extends AbstractBuilder<Object> {
         Debug.out("Modal operator name passed to getJavaBlock: ", sjb.opName);
         Debug.out("Java block passed to getJavaBlock: ", s);
 
-        JavaReader jr = javaReader;
-
         try {
-            if (schemaMode) {
-                jr = new SchemaRecoder2KeY(services, nss);
-                ((SchemaJavaReader) jr).setSVNamespace(schemaVariables());
-            } else {
-                jr = new Recoder2KeY(services, nss);
-            }
-
+            SchemaJavaReader jr = new SchemaRecoder2KeY(services, nss);
+            jr.setSVNamespace(schemaVariables());
             try {
                 sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), cleanJava);
             } catch (Exception e) {
@@ -573,7 +566,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
                 throwEx(new RecognitionException(cleanJava));
                 //throw  new JavaParserException(e.getMessage(), t.getText(), getSourceName(), t.getLine(), t.getCharPositionInLine(), lineOffset, colOffset);
             }
-            throw new BuildingException(t, "Could not parse java: '"+cleanJava+"'", e);
+            throw new BuildingException(t, "Could not parse java: '" + cleanJava + "'", e);
         }
         return sjb;
     }
@@ -1067,7 +1060,9 @@ public class FileVisitor extends AbstractBuilder<Object> {
 
     @Override
     public Object visitFile(KeYParser.FileContext ctx) {
-        each(ctx.decls(), ctx.problem(), ctx.proof());
+        accept(ctx.decls());
+        if(mode == Mode.PROBLEM)
+            each(ctx.problem(), ctx.proof());
         return parsedKeyFile;
     }
 
@@ -2107,21 +2102,22 @@ public class FileVisitor extends AbstractBuilder<Object> {
             } else {
                 semanticError("Formula cannot be prefixed with '-'");
             }
-        }
-
-        if (ctx.any_sortId_check() != null) {
-            Sort s = accept(ctx.any_sortId_check());
-            if (s == null) {
-                semanticError("Tried to cast to unknown type.");
-            } else if (objectSort != null
-                    && !s.extendsTrans(objectSort)
-                    && result.sort().extendsTrans(objectSort)) {
-                semanticError("Illegal cast from " + result.sort() +
-                        " to sort " + s +
-                        ". Casts between primitive and reference types are not allowed. ");
+        } else if (ctx.LPAREN() != null) {
+            result = accept(ctx.term110());
+            if (ctx.any_sortId_check() != null) {
+                Sort s = accept(ctx.any_sortId_check());
+                if (s == null) {
+                    semanticError("Tried to cast to unknown type.");
+                } else if (objectSort != null
+                        && !s.extendsTrans(objectSort)
+                        && result.sort().extendsTrans(objectSort)) {
+                    semanticError("Illegal cast from " + result.sort() +
+                            " to sort " + s +
+                            ". Casts between primitive and reference types are not allowed. ");
+                }
+                return getTermFactory().createTerm(
+                        s.getCastSymbol(getServices()), result);
             }
-            return getTermFactory().createTerm(
-                    s.getCastSymbol(getServices()), result);
         }
 
         Term a = accept(ctx.atom());
@@ -2465,8 +2461,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitModality_dl_term(KeYParser.Modality_dl_termContext ctx) {
         PairOfStringAndJavaBlock sjb = getJavaBlock(ctx.modality);
-        //Debug.out("op: ", sjb.opName);
-        //Debug.out("program: ", sjb.javaBlock);
+
         Operator op;
         if (sjb.opName.charAt(0) == '#') {
             if (!inSchemaMode()) {
@@ -2479,8 +2474,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
         if (op == null) {
             semanticError("Unknown modal operator: " + sjb.opName);
         }
-        // CAREFUL here, op can be null during guessing stage (use lazy &&)
-        //({op != null && op.arity() == 1} ?
+
         Term a1 = accept(ctx.a1);
         return getTermFactory().createTerm(op, new Term[]{a1}, null, sjb.javaBlock);
     }
@@ -3432,8 +3426,18 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Term visitProblem(KeYParser.ProblemContext ctx) {
         DefaultImmutableSet<Choice> choices = DefaultImmutableSet.nil();
-        parsedKeyFile.setChooseContract(accept(ctx.chooseContract));
-        parsedKeyFile.setProofObligation(accept(ctx.proofObligation));
+        if(ctx.CHOOSECONTRACT() != null) {
+            if(ctx.chooseContract!=null)
+                parsedKeyFile.setChooseContract(accept(ctx.chooseContract));
+            else
+                parsedKeyFile.setChooseContract("");
+        }
+        if(ctx.PROOFOBLIGATION()!=null) {
+            if(ctx.proofObligation!= null)
+                parsedKeyFile.setProofObligation(accept(ctx.proofObligation));
+            else
+                parsedKeyFile.setProofObligation("");
+        }
         if (ctx.PROBLEM() != null) {
             parsedKeyFile.problemTerm = accept(ctx.formula());
         }
