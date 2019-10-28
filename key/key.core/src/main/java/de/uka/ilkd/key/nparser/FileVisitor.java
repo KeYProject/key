@@ -2484,7 +2484,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
             return (QuantifiableVariable) ts;
         }
 
-        if (sort == null && id != null) {
+        if (sort != null && id != null) {
             return bindVar(id, sort);
         }
         return doLookup(new Name(ctx.id.getText()), schemaVariables(), variables());

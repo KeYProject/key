@@ -43,7 +43,9 @@ public class TestAllExamples {
                 new SimpleFileVisitor<>() {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                        if (attrs.isRegularFile() && file.toString().endsWith(".key")) {
+                        if (attrs.isRegularFile() && file.toString().endsWith(".key")
+//                        && file.toString().contains("Agatha")
+                        ) {
                             seq.add(new Object[]{file});
                         }
                         return super.visitFile(file, attrs);

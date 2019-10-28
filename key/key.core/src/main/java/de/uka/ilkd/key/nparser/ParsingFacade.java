@@ -48,10 +48,15 @@ public abstract class ParsingFacade {
     }
 
     public static Includes getIncludes(URL base, KeYParser.FileContext ctx) {
-        List<URL> res = new LinkedList<>();
         var finder = new IncludeFinder(base);
         ctx.accept(finder);
         return finder.getIncludes();
+    }
+
+    public static Map<String, Set<String>> getChoices(List<KeYParser.FileContext> ctxs) {
+        var finder = new ChoiceFinder();
+        ctxs.forEach(it->it.accept(finder));
+        return finder.getChoices();
     }
 
     static KeYParser.FileContext parseFile(URL url) throws IOException {
