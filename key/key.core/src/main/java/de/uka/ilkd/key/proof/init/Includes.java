@@ -14,10 +14,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import de.uka.ilkd.key.proof.io.RuleSource;
 
@@ -29,7 +26,6 @@ import de.uka.ilkd.key.proof.io.RuleSource;
  * RuleSources.
  */
 public class Includes {
-
     /** a list containing the "normal" includes, represented as Strings */
     private final List<String> includes;
     /** a list containing the LDT includes, represented as Strings */
@@ -69,7 +65,7 @@ public class Includes {
     public RuleSource get(String name){
 	return name2Source.get(name);
     }
-    
+
     public List<File> getFiles() {
     	return files;
     }
@@ -100,5 +96,9 @@ public class Includes {
 	includes.addAll(in.includes);
 	ldtIncludes.addAll(in.ldtIncludes);
 	name2Source.putAll(in.name2Source);
+    }
+
+    public Collection<RuleSource> getRuleSets() {
+        return name2Source.values();
     }
 }

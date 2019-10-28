@@ -25,32 +25,55 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 
 options { tokenVocab=KeYLexer; } // use tokens from STLexer.g4
 
-
-file: (decls | problem proof?) EOF;
+file: (decls problem? proof?) EOF;
 
 decls
 :
-    (one_include_statement)*
-    (options_choice)?
-    ( option_decls | sort_decls | prog_var_decls
-    | schema_var_decls | pred_decls | func_decls
-    | transform_decls  | ruleset_decls) *
+    ( profile                // for problems
+    | pref=preferences       // for problems
+    | bootClassPath          // for problems
+    | stlist=classPaths      // for problems
+    | string=javaSource      // for problems
+    | one_include_statement
+    | options_choice
+    | option_decls
+    | sort_decls
+    | prog_var_decls
+    | schema_var_decls
+    | pred_decls
+    | func_decls
+    | transform_decls
+    | ruleset_decls
+    | contracts             // for problems
+    | invariants            // for problems
+    | rulesOrAxioms         // for problems
+    )*
 ;
+
+problem
+:
+    (  PROBLEM LBRACE a = formula RBRACE
+     | CHOOSECONTRACT (chooseContract=string_value SEMI)?
+     | PROOFOBLIGATION  (proofObligation=string_value SEMI)?
+    )
+;
+
+
 
 one_include_statement
 :
-    (INCLUDE | (INCLUDELDTS ))
+    (INCLUDE | INCLUDELDTS)
     one_include (COMMA one_include)* SEMI
 ;
 
 one_include 
 :
-    (absfile=IDENT | relfile=string_literal)
+    absfile=IDENT | relfile=string_value
 ;
 
 options_choice
 :
-  (WITHOPTIONS activated_choice (COMMA activated_choice)* SEMI)
+  WITHOPTIONS activated_choice (COMMA activated_choice)* SEMI
 ;
 
 activated_choice
@@ -65,41 +88,33 @@ option_decls
 
 choice
 :
-  category=IDENT  (COLON LBRACE choice_option (COMMA choice_option)* RBRACE)?
+  category=IDENT  (COLON LBRACE choice_option+=IDENT (COMMA choice_option+=IDENT)* RBRACE)?
 ;
 
-choice_option:
-  choice_=IDENT
-;
-
-/* TODO: Why is the result of one_sort_decl stored in the local variables?
- * It does not seem to be employed at all ?! (MU)
- */
 sort_decls
-
-: SORTS LBRACE
-       ( multipleSorts = one_sort_decl )*
-  RBRACE
+:
+ SORTS LBRACE (one_sort_decl)* RBRACE
 ;
 
 one_sort_decl
 :
-      GENERIC  sortIds=simple_ident_comma_list
+      GENERIC  sortIds=simple_ident_dots_comma_list
         (ONEOF sortOneOf = oneof_sorts)?
-        ( EXTENDS sortExt = extends_sorts )? SEMI                                        #one_sort_decl_generic
-    | PROXY  sortIds = simple_ident_comma_list (EXTENDS sortExt=extends_sorts)? SEMI     #one_sort_decl_proxy
-    | ABSTRACT?
-      firstSort=simple_ident_dots
-      (EXTENDS sortExt=extends_sorts | COMMA sortIds=simple_ident_comma_list)?  SEMI     #one_sort_decl_default
+        (EXTENDS sortExt = extends_sorts)? SEMI
+    | PROXY  sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)? SEMI
+    | ABSTRACT? sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)?  SEMI
 ;
 
 simple_ident_dots
 :
-  id = simple_ident
-    (DOT
- 	(id = simple_ident | num=NUM_LITERAL )
- 	)*
- ;
+  simple_ident (DOT simple_ident )* | NUM_LITERAL
+;
+
+simple_ident_dots_comma_list
+:
+  simple_ident_dots (COMMA simple_ident_dots)*
+;
+
 
 extends_sorts
 :
@@ -107,14 +122,11 @@ extends_sorts
 ;
 
 oneof_sorts
-
-    : LBRACE
-        s = sortId_check
-        (
-            COMMA s = sortId_check
-        ) *
-      RBRACE 
-    ;
+:
+    LBRACE
+    s = sortId_check (COMMA s = sortId_check) *
+    RBRACE
+;
 
 keyjavatype
 :
@@ -123,16 +135,15 @@ keyjavatype
 
 prog_var_decls
 :
-        
-        PROGRAMVARIABLES
-        LBRACE
-        (
-            kjt = keyjavatype
-            var_names = simple_ident_comma_list            
-            SEMI
-        )*
-        RBRACE
-    ;
+    PROGRAMVARIABLES
+    LBRACE
+    (
+        kjt = keyjavatype
+        var_names = simple_ident_comma_list
+        SEMI
+    )*
+    RBRACE
+;
 
 //this rule produces a StringLiteral
 string_literal: id=STRING_LITERAL;
@@ -141,74 +152,53 @@ string_literal: id=STRING_LITERAL;
 string_value: STRING_LITERAL;
 
 simple_ident
-   :
-     id=IDENT 
-   ;
+:
+    id=IDENT
+;
 
 simple_ident_comma_list
-   :
-   id = simple_ident 
-   (COMMA id = simple_ident )*
- ;
+:
+    id = simple_ident (COMMA id = simple_ident )*
+;
 
 
 schema_var_decls :
-        SCHEMAVARIABLES LBRACE  
-  	  ( one_schema_var_decl )*
-        RBRACE 
-    ;
+    SCHEMAVARIABLES LBRACE
+    ( one_schema_var_decl )*
+    RBRACE
+;
 
 one_schema_var_decl
- :
-   (MODALOPERATOR one_schema_modal_op_decl SEMI)
- |
-  (
-   (
-    PROGRAM
-    
-    ( schema_modifiers ) ?
-    id = simple_ident ( LBRACKET nameString = simple_ident EQUALS parameter = simple_ident_dots RBRACKET )? 
-    ids = simple_ident_comma_list
-  | FORMULA
-    
-    ( schema_modifiers ) ?
-    
-    ids = simple_ident_comma_list
-  | TERMLABEL
-    
-    
-    ( schema_modifiers ) ?
-    ids = simple_ident_comma_list
-  | UPDATE
-    
-    ( schema_modifiers ) ?
-    
-    ids = simple_ident_comma_list
-  | SKOLEMFORMULA
-    
-    
-    ( schema_modifiers ) ?
-    
-    ids = simple_ident_comma_list
-  | (    TERM
-         
-         ( schema_modifiers ) ?
-      | ( (VARIABLES | VARIABLE)
-         
-         
-         ( schema_modifiers ) ?)
-      | (SKOLEMTERM
-         
-         
-         ( schema_modifiers ) ?)
+:
+    (
+           MODALOPERATOR one_schema_modal_op_decl
+         | PROGRAM
+            (schema_modifiers)?
+            id = simple_ident
+            (LBRACKET nameString=simple_ident EQUALS parameter=simple_ident_dots RBRACKET)?
+            ids=simple_ident_comma_list
+         | FORMULA
+           (schema_modifiers)?
+            ids = simple_ident_comma_list
+         | TERMLABEL
+           (schema_modifiers)?
+           ids=simple_ident_comma_list
+         | UPDATE
+           (schema_modifiers)?
+           ids=simple_ident_comma_list
+         | SKOLEMFORMULA
+           (schema_modifiers)?
+           ids=simple_ident_comma_list
+         | ( TERM
+           | (VARIABLES | VARIABLE)
+           | SKOLEMTERM
+           )
+           (schema_modifiers)?
+           s=any_sortId_check
+           ids=simple_ident_comma_list
     )
-    s = any_sortId_check
-    ids = simple_ident_comma_list
-  ) SEMI
-   
- )
-
- ;
+    SEMI
+;
 
 schema_modifiers
     :
@@ -368,42 +358,31 @@ sortId
 
 // Non-generic sorts, array sorts allowed
 sortId_check 
-
-    :
-        p = sortId_check_help
-        s = array_decls
-    ;
+:
+    p = sortId_check_help
+    (EMPTYBRACKETS)*
+;
 
 // Generic and non-generic sorts, array sorts allowed
 any_sortId_check 
-
-    :
-        p = any_sortId_check_help
-        s = array_decls
-    ;
+:
+    p=any_sortId_check_help (EMPTYBRACKETS)*
+;
 
 
 // Non-generic sorts
 sortId_check_help 
-
-    :
-        result = any_sortId_check_help
-    ;
+:
+    result=any_sortId_check_help
+;
 
 
 // Generic and non-generic sorts
 any_sortId_check_help 
-    :
-        name = simple_sort_name
-     
-    ;
+:
+    name=simple_sort_name
+;
 
-
-array_decls
-
-    :
-     (EMPTYBRACKETS )*
-    ;
 
 id_declaration
     :
@@ -414,8 +393,8 @@ id_declaration
 
 funcpred_name
 :
-    sort_name DOUBLECOLON name = simple_ident
-  | simple_ident
+    (sort_name DOUBLECOLON)? name=simple_ident
+  | NUM_LITERAL
 ;
 
 
@@ -558,6 +537,18 @@ term110
     braces_term |  accessterm
 ;
 
+staticAttributeOrQueryReference
+:
+  id=IDENT
+  (EMPTYBRACKETS )*
+;
+
+static_attribute_suffix
+:
+  attributeName = staticAttributeOrQueryReference
+;
+
+
 attribute_or_query_suffix
 :
     DOT ( STAR 
@@ -579,49 +570,47 @@ query_suffix
 :
     args = argument_list
 ;
+ 
 
 //term120
 accessterm
 :
     MINUS result = term110
   | LPAREN s = any_sortId_check RPAREN result=term110
-  | atom
-    attribute_suffix*
-    heap_selection_suffix?
+  |  atom
+    atom_suffix*
+    // at most one heap selection suffix
+    ( heap_selection_suffix )? // resets globalSelectNestingDepth to zero
 ;
 
-attribute_suffix: accessterm_bracket_suffix | attribute_or_query_suffix;
-
-heap_selection_suffix: AT heap=accessterm;
-
-accessterm_bracket_suffix
+atom_suffix
 :
-  LBRACKET
-  ( heap=heap_update_suffix
-  | seqget=logicTermReEntry
-  | array=array_access_suffix
-  )
-  RBRACKET
+      accessterm_bracket_suffix
+    | attribute_or_query_suffix
 ;
 
-heap_update_suffix 
-:
-    ( target=equivalence_term ASSIGN val=equivalence_term
-    | id=simple_ident args=argument_list
-    )
-;
 
-array_access_suffix
-:
-	( STAR
-  | indexTerm=logicTermReEntry (DOTRANGE rangeTo=logicTermReEntry)?
-  )
-;
+heap_selection_suffix
+    :
+    AT heap=accessterm
+
+    ;
 
 static_query
 :
-  id=simple_ident_dots (EMPTYBRACKETS)*
-  args=argument_list?
+    queryRef=staticAttributeOrQueryReference
+    args=argument_list
+;
+
+accessterm_bracket_suffix
+:
+    LBRACKET
+    ( target=equivalence_term ASSIGN val=equivalence_term // heap assignment
+    | id=simple_ident args=argument_list // for heap terms, this could be ambigous with logicTermReEntry
+    | STAR
+    | indexTerm=logicTermReEntry (DOTRANGE rangeTo=logicTermReEntry)? //array or sequence access
+    )
+    RBRACKET
 ;
 
 /*
@@ -634,14 +623,13 @@ boolean_constant: FALSE | TRUE;
 
 atom
 :
-    ( specialTerm
-    | funcpredvarterm
+    ( //specialTerm |
+     funcpredvarterm
     | LPAREN term RPAREN
     | boolean_constant
     | ifThenElseTerm
     | ifExThenElseTerm
     | string_literal
-    | static_query
     )
     (LGUILLEMETS labels = label RGUILLEMETS)?
 ;
@@ -682,9 +670,7 @@ ifThenElseTerm
 
 
 ifExThenElseTerm
-
-
-    :
+:
         IFEX exVars = bound_variables
         LPAREN condF = term RPAREN
         THEN LPAREN thenT = term RPAREN
@@ -695,14 +681,13 @@ ifExThenElseTerm
 
 argument
 :
-   // WATCHOUT Woj: can (should) this be unified to term60?
-  term | term60
+  term /*| term60*/
 ;
 
 
 quantifierterm
 :
-  (   FORALL  | EXISTS  )
+  (FORALL | EXISTS)
   bound_variables term60
 ;
 
@@ -725,25 +710,19 @@ locset_term
 ;
 
 location_term
-    :
+:
     LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN
-            
-    ;
+;
 
 substitutionterm
-
-
 :
    LBRACE SUBST
-     v = one_bound_variable SEMI
-     
-     a1=logicTermReEntry
-     
+   v=one_bound_variable
+   SEMI
+   a1=logicTermReEntry
    RBRACE
-   ( a2 = term110 | unary_formula )
+   (a2=term110 | unary_formula)
 ;
- 
-
 
 updateterm
 :
@@ -754,58 +733,32 @@ updateterm
 
 bound_variables
 :
-      var = one_bound_variable 
-      (
-          COMMA var = one_bound_variable 
-      )*
-      SEMI
+    var=one_bound_variable (COMMA var=one_bound_variable)* SEMI
 ;
 
-one_bound_variable
+one_bound_variable 
 :
-   one_logic_bound_variable_nosort
- | one_schema_bound_variable
- | one_logic_bound_variable
+  s=sortId? id=simple_ident
 ;
 
-one_schema_bound_variable
-:
-   id = simple_ident 
-;
-
-one_logic_bound_variable
-:
-  s=sortId id=simple_ident 
-;
-
-one_logic_bound_variable_nosort
-:
-  id=simple_ident 
-;
 
 modality_dl_term
-   :
-   modality = MODALITY
-   // CAREFUL here, op can be null during guessing stage (use lazy &&)
-   a1=term60
-     // This here will accept both (1) \modality...\endmodality post and
-     // (2) \modality...\endmodality(post)
-     // so that it is consistent with pretty printer that prints (1).
-     // A term "(post)" seems to be parsed as "post" anyway
+:
+   modality=MODALITY a1=term60
 ;
+ 
+
 
 argument_list
 :
-  LPAREN
-  ( p1=argument
-      (COMMA p2=argument)*
-  )?
-  RPAREN
+    LPAREN
+    (argument (COMMA argument)*)?
+    RPAREN
 ;
 
 number:
-  (MINUS)?
-  (NUM_LITERAL | HEX_LITERAL | BIN_LITERAL)
+  (MINUS )?
+  ( NUM_LITERAL | HEX_LITERAL | BIN_LITERAL)
 ;
 
 char_literal:
@@ -816,7 +769,7 @@ funcpredvarterm
      char_literal
     | number
     | AT a = abbreviation
-    | varfuncid = funcpred_name
+    | varfuncid=funcpred_name
       ((
          LBRACE
          boundVars = bound_variables
@@ -827,13 +780,13 @@ funcpredvarterm
         //args==null indicates no argument list
         //args.size()==0 indicates open-close-parens ()
 ;
- 
+
 
 specialTerm
 :
-       result = metaTerm
+       result=metaTerm
 ;
- 
+
 
 arith_op
 :
@@ -867,41 +820,29 @@ triggers
 ;
 
 taclet
-    :
-      (LEMMA )?
-      name=IDENT (choices_=option_list)?
-      LBRACE
-      ( form=formula
-      |
-        ( SCHEMAVAR one_schema_var_decl ) *
-        ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
-        ( FIND LPAREN find=termorseq RPAREN
-            (   SAMEUPDATELEVEL
-              | INSEQUENTSTATE
-              | ANTECEDENTPOLARITY
-              | SUCCEDENTPOLARITY
-            )*
-        )?
-
-        ( VARCOND LPAREN varexplist RPAREN ) ?
-        goalspecs
-        modifiers
-        
-    )
-    RBRACE
-    ;
-
-tacletgen
 :
-  /* (LEMMA )? */
+  (LEMMA )?
   name=IDENT (choices_=option_list)?
   LBRACE
-  (VARCOND LPAREN varexplist RPAREN)?
-  goalspecs
-  modifiers
-  RBRACE
-;
+  ( form=formula
+  |
+    ( SCHEMAVAR one_schema_var_decl ) *
+    ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
+    ( FIND LPAREN find=termorseq RPAREN
+        (   SAMEUPDATELEVEL
+          | INSEQUENTSTATE
+          | ANTECEDENTPOLARITY
+          | SUCCEDENTPOLARITY
+        )*
+    )?
 
+    ( VARCOND LPAREN varexplist RPAREN ) ?
+    goalspecs
+    modifiers
+
+)
+RBRACE
+;
 
 modifiers
 :
@@ -1278,22 +1219,11 @@ replacewith
 :
         REPLACEWITH LPAREN o=termorseq RPAREN;
 
-add
-
-:
-        ADD LPAREN s=seq RPAREN;
-
-addrules
-
-:
-        ADDRULES LPAREN lor=tacletlist RPAREN;
-
-addprogvar
-
-:
-        ADDPROGVARS LPAREN pvs=pvset RPAREN;
-
+add: ADD LPAREN s=seq RPAREN;
+addrules:   ADDRULES LPAREN lor=tacletlist RPAREN;
+addprogvar: ADDPROGVARS LPAREN pvs=pvset RPAREN;
 tacletlist: taclet (COMMA taclet)*;
+
 pvset: varId (COMMA varId)*;
 
 rulesets:
@@ -1309,18 +1239,9 @@ ruleset
 metaId:  id=simple_ident ;
 
 metaTerm:
-        (vf = metaId
-           ( LPAREN
-            t = term
-            
-            ( COMMA
-                t = term
-                
-            )* RPAREN )?
-            
-        )
- ;
-      
+    vf=metaId (LPAREN t+=term (COMMA t+=term)* RPAREN)?
+;
+
 
 contracts
 :
@@ -1333,7 +1254,7 @@ contracts
 invariants
 
 :
-   INVARIANTS LPAREN selfVar=one_logic_bound_variable RPAREN
+   INVARIANTS LPAREN selfVar=one_bound_variable RPAREN
        LBRACE 
        ( one_invariant )*
        RBRACE  
@@ -1357,39 +1278,12 @@ one_invariant
      RBRACE SEMI
 ;
 
-problem
-:
-        profile?
-        pref=preferences?
-        bootClassPath?
-        // the result is of no importance here (strange enough)
 
-        stlist=classPaths?
-        string=javaSource?
-
-        decls
-
-        //TODO weigl: rework into a seperate rule
-        // WATCHOUT: choices is always going to be an empty set here,
-      	// isn't it?
-        ( contracts )*
-        ( invariants )*
-              (  ( RULES
-                 | AXIOMS
-                 )
-
-                 ( choices = option_list )?
-           (
-            LBRACE
-            (s=taclet SEMI)*
-            RBRACE 
-           )
-        )*
-        (  PROBLEM LBRACE a = formula RBRACE
-         | CHOOSECONTRACT (chooseContract=string_value SEMI)?
-         | PROOFOBLIGATION  (proofObligation=string_value SEMI)?
-        )?
-   ;
+rulesOrAxioms:
+    (RULES|AXIOMS)
+    (choices = option_list)?
+    (LBRACE (s=taclet SEMI)* RBRACE)
+;
 
 bootClassPath
 :
@@ -1430,7 +1324,7 @@ proofScript
   PROOFSCRIPT ps = STRING_LITERAL
 ;
 
-proof: (PROOF proofBody)?;
+proof: PROOF proofBody;
 
 proofBody
 :
@@ -1451,3 +1345,82 @@ pseudosexpr
 ;
 
 expreid: id=simple_ident;
+
+/*
+
+formula
+    :
+      NOT formula  #negatedFormula
+    | programFml   #programFormula
+    | LBRACE SUBST logicalVariableDeclaration SEMI replacement=term RBRACE in=formula  #substitutionFormula
+    | LBRACE parallelUpdate RBRACE formula                                             #updateFormula
+    | IF LPAREN condition=formula RPAREN THEN LPAREN thenFml=formula RPAREN ELSE LPAREN elseFml=formula RPAREN #ifThenElseFormula
+    | quantifier=(FORALL | EXISTS) logicalVariableDeclaration SEMI formula #quantifiedFormula
+    | formula AND formula  #conjunctiveFormula
+    | formula OR formula   #disjunctiveFormula
+    |<assoc=right> formula IMP formula  #implicationFormula
+    | formula EQV formula  #equivalenceFormula
+    | term op=(LESS | LESSEQUAL | EQUALS | NOT_EQUALS | GREATER | GREATEREQUAL) term #comparisonFormula
+    | sym=funcpred_name arguments? #predicateFormula
+    | LPAREN formula RPAREN        #parenthesizedFormula
+    ;
+
+programFml
+   :
+       BOX_BEGIN BOX_END formula
+     | DIAMOND_BEGIN  DIAMOND_END formula
+     | MODALITY_BEGIN MODALITY_END formula
+   ;
+
+logicalVariableDeclaration
+    :
+    sort_name simple_ident
+    ;
+
+term
+    :
+      MINUS term  #unaryMinusTerm
+    | LBRACE SUBST logicalVariableDeclaration SEMI replacement=term RBRACE in=term                       #substitutionTerm
+    | LBRACE parallelUpdate RBRACE term                                                                  #updateTerm
+    | IF LPAREN condition=formula RPAREN THEN LPAREN thenTrm=term RPAREN ELSE LPAREN elseTrm=term RPAREN #ifThenElseTerm
+    | term op=(STAR | SLASH) term   #mulDivTerm
+    | term op=(PLUS | MINUS) term   #addSubTerm
+    | literal=digit                 #numberLiteralTerm
+    | sym=funcpred_name arguments?  #functionTerm
+    | funcpred_name (DOT funcpred_name)+ (AT funcpred_name)?   #attributeTerm
+    | funcpred_name (LBRACKET elementaryUpdate RBRACKET)+      #heapStoreTerm
+    | LPAREN term RPAREN                                       #parenthesizedTerm
+    ;
+
+arguments
+    :
+      LPAREN argumentList? RPAREN
+    ;
+
+argumentList
+   :
+     term (COMMA term)*
+   ;
+
+parallelUpdate
+   :
+     update (PARALLEL parallelUpdate)*
+   ;
+
+update
+   :
+     elementaryUpdate
+   | updateOnUpdateApplication
+   | LPAREN parallelUpdate RPAREN
+   ;
+
+elementaryUpdate
+   :
+     loc=simple_ident ASSIGN value=term
+   ;
+
+updateOnUpdateApplication
+   :
+    LBRACE update RBRACE update
+   ;
+ */

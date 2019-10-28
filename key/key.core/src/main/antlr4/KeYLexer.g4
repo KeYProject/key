@@ -18,12 +18,6 @@
 
 lexer grammar KeYLexer;
 
-//options {
-//    k=2;
-//}
-
-/* -*-Antlr-*- */
-
 @header {
     import java.io.InputStream;
     import de.uka.ilkd.key.util.*;
@@ -57,16 +51,32 @@ lexer grammar KeYLexer;
       modNames.put("\\throughout_transaction","throughout_transaction");
 
       modPairs.put("\\<","\\>");
+      modPairs.put("\\[","\\]");
+
+      //modPairs.put("\\[[","\\]]");
+
       modPairs.put("\\modality","\\endmodality");
       modPairs.put("\\diamond","\\endmodality");
       modPairs.put("\\diamond_transaction","\\endmodality");
-      modPairs.put("\\[","\\]");
       modPairs.put("\\box","\\endmodality");
       modPairs.put("\\box_transaction","\\endmodality");
-      modPairs.put("\\[[","\\]]");
       modPairs.put("\\throughout","\\endmodality");
       modPairs.put("\\throughout_transaction","\\endmodality");
    }
+
+    @Override
+    public void emit(Token token) {
+       int MAX_K = 10;
+       if (token.getType() == NUM_LITERAL) {//rewrite NUM_LITERALs to identifier when preceeded by an '('
+           for (int k = 1; k <= MAX_K; k++) {
+               int codePoint = _input.LA(k);
+               if (Character.isWhitespace(codePoint)) continue;
+               if (codePoint == '(') ((org.antlr.v4.runtime.CommonToken) token).setType(IDENT);
+               break;
+           }
+       }
+       super.emit(token);
+    }
 }
 
 tokens {MODALITY}
@@ -376,7 +386,7 @@ STRING_LITERAL:'"' ('\\' . | ~( '"' | '\\') )* '"' ;
 LESS: '<';
 LESSEQUAL: '<' '=' | '\u2264';
 LGUILLEMETS: '<' '<';
-IMPLICIT_IDENT: '<' (LETTER)+ '>';
+IMPLICIT_IDENT: '<' (LETTER)+ '>' -> type(IDENT);
 
 EQV:	'<->' | '\u2194';
 PRIMES:	('\'')+;
@@ -416,6 +426,7 @@ fragment HEX
 fragment LETTER:	'a'..'z'|'A'..'Z';
 fragment IDCHAR: LETTER | DIGIT | '_' | '#' | '$';
 
+
 IDENT:  ( (LETTER | '_' | '#' | '$') (IDCHAR)*);
 
 NUM_LITERAL:
@@ -430,28 +441,38 @@ NUM_LITERAL:
 MODALITYD:	'\\<' -> more, pushMode(modDiamond);
 MODALITYB:	'\\[' -> more, pushMode(modBox);
 MODALITYBB:	'\\[[' -> more, pushMode(modBoxBox);
-
+MODAILITYGENERIC:
+      ('\\modality' | '\\diamond' | '\\diamond_transaction'
+      '\\box' | '\\box_transaction' | '\\throughout' | '\\throughout_transaction')
+      -> more, pushMode(modGeneric);
 ERROR_CHAR: .;
 
 mode modDiamond;
 MODALITYD_END: '\\>' -> type(MODALITY), popMode;
-MODALITYD_STRING : '"' -> more, pushMode(modString);
-MODALITYD_CHAR : '\'' -> more, pushMode(modChar);
-MODALITYD_COMMENT : [\\] [*] -> more, pushMode(modComment);
+//MODALITYD_STRING : '"' -> more, pushMode(modString);
+//MODALITYD_CHAR : '\'' -> more, pushMode(modChar);
+//MODALITYD_COMMENT : [\\] [*] -> more, pushMode(modComment);
 MODALITYD_ANY : . -> more;
 
+mode modGeneric;
+MODALITYG_END: '\\endmodality' -> type(MODALITY), popMode;
+//MODALITYG_STRING : '"' -> more, pushMode(modString);
+//MODALITYG_CHAR : '\'' -> more, pushMode(modChar);
+//MODALITYG_COMMENT : [\\] [*] -> more, pushMode(modComment);
+MODALITYG_ANY : . -> more;
+
 mode modBox;
-MODALITYB_END: '\\\\]' -> type(MODALITY), popMode;
-MODALITYB_STRING : '"' -> more, pushMode(modString);
-MODALITYB_CHAR : '\'' -> more, pushMode(modChar);
-MODALITYB_COMMENT : [\\] [*] -> more, pushMode(modComment);
+MODALITYB_END: '\\]' -> type(MODALITY), popMode;
+//MODALITYB_STRING : '"' -> more, pushMode(modString);
+//MODALITYB_CHAR : '\'' -> more, pushMode(modChar);
+//MODALITYB_COMMENT : [\\] [*] -> more, pushMode(modComment);
 MODALITYB_ANY : . -> more;
 
 mode modBoxBox;
-MODALITYBB_END: '\\\\]]' -> type(MODALITY), popMode;
-MODALITYBB_STRING : '"' -> more, pushMode(modString);
-MODALITYBB_CHAR : '\'' -> more, pushMode(modChar);
-MODALITYBB_COMMENT : [\\] [*] -> more, pushMode(modComment);
+MODALITYBB_END: '\\]]' -> type(MODALITY), popMode;
+//MODALITYBB_STRING : '"' -> more, pushMode(modString);
+//MODALITYBB_CHAR : '\'' -> more, pushMode(modChar);
+//MODALITYBB_COMMENT : [\\] [*] -> more, pushMode(modComment);
 MODALITYBB_ANY : . -> more;
 
 mode modString;

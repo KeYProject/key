@@ -35,18 +35,18 @@ public abstract class AbstractSortedOperator extends AbstractOperator
     private final ImmutableArray<Sort> argSorts;
 
 
-    protected AbstractSortedOperator(Name name,
-	    			     ImmutableArray<Sort> argSorts,
-	    		             Sort sort,
-	    		             ImmutableArray<Boolean> whereToBind,
-	    		             boolean isRigid) {
-	super(name, 
-	      argSorts == null ? 0 : argSorts.size(), 
-              whereToBind, 
-              isRigid);
-	assert sort != null;
-	this.argSorts = argSorts == null ? EMPTY_SORT_LIST : argSorts;
-	this.sort = sort;
+	protected AbstractSortedOperator(Name name,
+									 ImmutableArray<Sort> argSorts,
+									 Sort sort,
+									 ImmutableArray<Boolean> whereToBind,
+									 boolean isRigid) {
+		super(name,
+				argSorts == null ? 0 : argSorts.size(),
+				whereToBind,
+				isRigid);
+		if(sort == null) throw new NullPointerException("Given sort is null");
+		this.argSorts = argSorts == null ? EMPTY_SORT_LIST : argSorts;
+		this.sort = sort;
     }
     
     

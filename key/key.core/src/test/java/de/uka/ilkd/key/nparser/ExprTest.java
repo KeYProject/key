@@ -1,23 +1,19 @@
 package de.uka.ilkd.key.nparser;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.parser.AbstractTestTermParser;
+import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.parser.TestParser;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,25 +44,27 @@ public class ExprTest {
     }
 
     @Test
-    public void parseAndVisit() {
+    public void parseAndVisit() throws IOException {
         KeyIO io = getIo();
         var actual = io.parseExpression(expr);
-        if(actual==null){
+        if (actual == null) {
             ParseAllKeyFilesTest.debugLexer(ParsingFacade.lex(CharStreams.fromString(expr)));
         }
         Assert.assertNotNull(actual);
         System.out.println(actual);
     }
 
-    private KeyIO getIo() {
+    private KeyIO getIo() throws IOException {
         Services services = new Services(new JavaProfile());
-        NamespaceSet nss = services.getNamespaces();
+        /*NamespaceSet nss = services.getNamespaces();
         NamespaceBuilder nssb = new NamespaceBuilder(nss);
         nssb.addSort("numbers").addSort("int");
-        //.addSort("boolean");
+        nssb.addSort("java.lang.Object").addSort("java.lang.Serializable").addSort("java.lang.Cloneable");
         for (int i = 0; i < 9; i++) {
             nssb.addFunction("numbers "+i+"(numbers)");
         }
+        nssb.addProgramVariable("Heap", "heap");
+        nssb.addFunction("Field arr(int)");
         nssb.addFunction("numbers #()")
                 .addFunction("int Z(numbers)")
                 .addFunction("numbers neglit(numbers)")
@@ -74,14 +72,41 @@ public class ExprTest {
                 .addFunction("int neg(int)")
                 .addFunction("int sub(int, int)")
                 .addFunction("int mul(int, int)")
-                .addFunction("int div(ints, int)")
+                .addFunction("int div(int, int)")
                 .addFunction("int mod(int, int)")
                 .addFunction("int pow(int, int)");
+        nssb.addPredicate("leq(int, int)")
+                .addPredicate("lt(int, int)")
+                .addPredicate("geq(int, int)")
+                .addPredicate("gt(int, int)");
+        ;
 
-        Recoder2KeY r2k = new Recoder2KeY(services, nss);
-        r2k.readCompilationUnit("public class T0 extends java.lang.Object{ }");
+        nssb.addVariable("aa", "int")
+                .addVariable("bb", "int")
+                .addVariable("cc", "int");
+         */
 
-        KeyIO io = new KeyIO(services, nss);
+        //services.getTypeConverter().init();
+        KeyIO io = new KeyIO(services);
+        var p = "/de/uka/ilkd/key/proof/rules/ldt.key";
+        var url = getClass().getResource(p);
+        Assume.assumeNotNull(url);
+        var pkf = io.parseProblemFile(url);
+
+        NamespaceBuilder nssb = new NamespaceBuilder(services.getNamespaces());
+        nssb.addVariable("aa", "int")
+                .addVariable("bb", "int")
+                .addVariable("cc", "int");
         return io;
     }
+
+
+/*    public static class Abc extends AbstractTestTermParser {
+        @Test
+        public void ttttt() throws ParserException {
+            DefaultTermParser dtp = new DefaultTermParser();
+            var term = dtp.parse(new StringReader("\\<{ byte a; }\\> (lt(a,150))"), null, services, nss, null);
+            System.out.println(term);
+        }
+    }*/
 }

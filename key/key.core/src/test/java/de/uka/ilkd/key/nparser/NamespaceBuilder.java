@@ -2,9 +2,13 @@ package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
+import org.key_project.util.collection.ImmutableArray;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,7 +32,7 @@ public class NamespaceBuilder {
     }
 
     public NamespaceBuilder addSort(String name) {
-        nss.sorts().add(new GenericSort(new Name(name)));
+        nss.sorts().add(new SortImpl(new Name(name)));
         return this;
     }
 
@@ -60,4 +64,20 @@ public class NamespaceBuilder {
         return nss.sorts().lookup(group);
     }
 
+    public NamespaceBuilder addVariable(String name, String sort) {
+        nss.variables().add(new LogicVariable(new Name(name), getOrCreateSort(sort)));
+        return this;
+    }
+
+    public NamespaceBuilder addPredicate(String s) {
+        s = "bool " + s;
+        return addFunction(s);
+    }
+
+    public NamespaceBuilder addProgramVariable(String sort, String varName) {
+        Sort s = getOrCreateSort(sort);
+        ProgramVariable pv = new LocationVariable(new ProgramElementName(varName), s);
+        nss.programVariables().add(pv);
+        return this;
+    }
 }

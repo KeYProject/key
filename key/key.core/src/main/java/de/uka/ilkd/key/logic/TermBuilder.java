@@ -1615,7 +1615,8 @@ public class TermBuilder {
     }
 
     public Term getBaseHeap() {
-        return var(services.getTypeConverter().getHeapLDT().getHeap());
+        return var((ProgramVariable) services.getNamespaces().programVariables().lookup(HeapLDT.BASE_HEAP_NAME));
+        //return var(services.getTypeConverter().getHeapLDT().getHeap());
     }
 
     public Term dot(Sort asSort, Term o, Function f) {
@@ -1643,7 +1644,8 @@ public class TermBuilder {
     }
 
     public Term arr(Term idx) {
-        return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
+        return func(services.getNamespaces().functions().lookup("arr"), idx);
+        //return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
     }
 
     /**

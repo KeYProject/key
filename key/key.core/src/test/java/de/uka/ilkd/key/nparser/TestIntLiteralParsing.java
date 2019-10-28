@@ -1,11 +1,9 @@
 package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
 import de.uka.ilkd.key.parser.ParserMode;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -180,7 +178,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
     }
 
     public Term parseTerm(String s) {
-        Builder b = new Builder(ParserMode.TERM, services, nss);
+        FileVisitor b = new FileVisitor(services, nss, new ParsedKeyFile());
         var ctx = ParsingFacade.parseExpression(CharStreams.fromString(s));
         return (Term) ctx.accept(b);
     }

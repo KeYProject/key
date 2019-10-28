@@ -1,16 +1,15 @@
 package de.uka.ilkd.key.nparser;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.util.HelperClassForTests;
-import org.antlr.v4.runtime.CommonToken;
-import org.antlr.v4.runtime.Token;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.key_project.util.helper.FindResources;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,14 +24,22 @@ import java.util.List;
  * @version 1 (13.09.19)
  */
 @RunWith(Parameterized.class)
-public class ParseAllKeyFilesTest {
+public class TestAllExamples {
     @Parameterized.Parameter
     public Path file;
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> getFiles() throws IOException {
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         List<Object[]> seq = new LinkedList<>();
-        Files.walkFileTree(HelperClassForTests.TESTCASE_DIRECTORY.toPath(),
+        File examples = FindResources.findFolder("key.ui/examples", "../key.ui/examples");
+        Assume.assumeTrue(examples != null);
+        Files.walkFileTree(examples.toPath(),
                 new SimpleFileVisitor<>() {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -42,34 +49,23 @@ public class ParseAllKeyFilesTest {
                         return super.visitFile(file, attrs);
                     }
                 });
-        return seq;
+        return seq;//return seq.subList(0,50);
     }
 
     @Test
     public void parse() throws IOException {
-        var ctx = ParsingFacade.parseFile(file);
-        Assert.assertNull(ctx.exception);
-        Services services = new Services(new JavaProfile());
-        FileVisitor b = new FileVisitor(services, services.getNamespaces(), new ParsedKeyFile());
-        ctx.accept(b);
+        KeyIO io = getIo();
+        ParsedKeyFile pkf = io.parseProblemFile(file);
+        System.out.println(pkf);
+        Assert.assertTrue(pkf.problemTerm != null || pkf.getChooseContract() != null || pkf.getProofObligation() != null);
     }
 
-    public static void debugLexer(KeYLexer toks){
-        Token t;
-        do {
-            t = toks.nextToken();
-            System.out.format("%02d %20s %d:%-50s\n",
-                    toks.getLine(),
-                    toks.getVocabulary().getSymbolicName(t.getType()),
-                    toks._mode,
-                    t.getText().replace("\n", "\\n"));
-            if(t.getType() == KeYLexer.ERROR_CHAR) Assert.fail();
-        } while (t.getType() != CommonToken.EOF);
-    }
-
-    @Test
-    public void lex() throws IOException {
-        var toks = ParsingFacade.lex(file);
-        debugLexer(toks);
+    private KeyIO getIo() throws IOException {
+        KeyIO io = new KeyIO();
+        URL u = getClass().getResource("/de/uka/ilkd/key/proof/rules/standardRules.key");
+        ParsedKeyFile pkf = io.parseProblemFile(u);
+        io.getServices().getTypeConverter().init();
+        return io;
     }
 }
+

@@ -71,7 +71,7 @@ public final class TermFactory {
 	    		   JavaBlock javaBlock,
 			   ImmutableArray<TermLabel> labels) {
         if(op == null) {
-            throw new TermCreationException("null-Operator at TermFactory");
+            throw new TermCreationException("Given operator is null.");
         }
 
         if (subs == null || subs.isEmpty()) {
