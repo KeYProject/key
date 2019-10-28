@@ -456,8 +456,9 @@ public class FileVisitor extends AbstractBuilder<Object> {
         return v;
     }
 
-    private void bindVar(LogicVariable v) {
+    private LogicVariable bindVar(LogicVariable v) {
         namespaces().setVariables(variables().extended(v));
+        return v;
     }
 
     private void bindVar() {
@@ -2389,7 +2390,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
 
     @Override
     public Term visitArgument(KeYParser.ArgumentContext ctx) {
-        return (Term) oneOf(ctx.term(), ctx.term60());
+        return (Term) oneOf(ctx.term());//, ctx.term60());
     }
 
     @Override
@@ -2403,7 +2404,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
         List<QuantifiableVariable> vs = accept(ctx.bound_variables());
         Term a1 = accept(ctx.term60());
         var a = getTermFactory().createTerm(op,
-                new ImmutableArray<Term>(a1),
+                new ImmutableArray<>(a1),
                 new ImmutableArray<>(vs.toArray(new QuantifiableVariable[0])),
                 null);
         unbindVars(orig);
@@ -2467,33 +2468,25 @@ public class FileVisitor extends AbstractBuilder<Object> {
 
     @Override
     public QuantifiableVariable visitOne_bound_variable(KeYParser.One_bound_variableContext ctx) {
-        return oneOf(ctx.one_logic_bound_variable_nosort(), ctx.one_schema_bound_variable(),
-                ctx.one_logic_bound_variable());
-    }
-
-    @Override
-    public Object visitOne_schema_bound_variable(KeYParser.One_schema_bound_variableContext ctx) {
+        //public Object visitOne_schema_bound_variable(KeYParser.One_schema_bound_variableContext ctx) {
         String id = accept(ctx.simple_ident());
-        var ts = schemaVariables().lookup(new Name(id));
-        if (!(ts instanceof VariableSV)) {
-            semanticError(ts + " is not allowed in a quantifier. Note, that you can't "
-                    + "use the normal syntax for quantifiers of the form \"\\exists int i;\""
-                    + " in taclets. You have to define the variable as a schema variable"
-                    + " and use the syntax \"\\exists i;\" instead.");
+        Sort sort = accept(ctx.sortId());
+
+        SchemaVariable ts = schemaVariables().lookup(new Name(id));
+        if (ts != null) {
+            if (!(ts instanceof VariableSV)) {
+                semanticError(ts + " is not allowed in a quantifier. Note, that you can't "
+                        + "use the normal syntax for quantifiers of the form \"\\exists int i;\""
+                        + " in taclets. You have to define the variable as a schema variable"
+                        + " and use the syntax \"\\exists i;\" instead.");
+            }
+            bindVar();
+            return (QuantifiableVariable) ts;
         }
-        QuantifiableVariable v = (QuantifiableVariable) ts;
-        bindVar();
-        //TODO?
-        return v;
-    }
 
-    @Override
-    public Object visitOne_logic_bound_variable(KeYParser.One_logic_bound_variableContext ctx) {
-        return bindVar(ctx.id.getText(), (Sort) ctx.s.accept(this));
-    }
-
-    @Override
-    public QuantifiableVariable visitOne_logic_bound_variable_nosort(KeYParser.One_logic_bound_variable_nosortContext ctx) {
+        if (sort == null && id != null) {
+            return bindVar(id, sort);
+        }
         return doLookup(new Name(ctx.id.getText()), schemaVariables(), variables());
     }
 
@@ -2555,7 +2548,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
 
         Term[] args = arguments == null ? new Term[0] : arguments.toArray(new Term[0]);
 
-        Term a = null;
+        Term a;
         if (varfuncid.equals("skip") && arguments == null) {
             a = getTermFactory().createTerm(UpdateJunctor.SKIP);
         } else {
@@ -2757,7 +2750,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
             //semanticError(ctx, "A taclet with name %s was already defined", key);
             System.err.format("Taclet clash with %s%n", key);
         }
-        System.out.format("ANNOUNCE: %s @ %s:%d%n", key, ctx.start.getTokenSource().getSourceName(), ctx.start.getLine());
+        //System.out.format("ANNOUNCE: %s @ %s:%d%n", key, ctx.start.getTokenSource().getSourceName(), ctx.start.getLine());
         parsedKeyFile.getTaclets().put(key, taclet);
     }
 
@@ -3443,7 +3436,7 @@ public class FileVisitor extends AbstractBuilder<Object> {
     @Override
     public Object visitInvariants(KeYParser.InvariantsContext ctx) {
         Namespace<QuantifiableVariable> orig = variables();
-        selfVar = (ParsableVariable) ctx.one_logic_bound_variable().accept(this);
+        selfVar = (ParsableVariable) ctx.selfVar.accept(this);
         ctx.one_invariant().forEach(it -> it.accept(this));
         unbindVars(orig);
         return null;

@@ -18,12 +18,6 @@
 
 lexer grammar KeYLexer;
 
-//options {
-//    k=2;
-//}
-
-/* -*-Antlr-*- */
-
 @header {
     import java.io.InputStream;
     import de.uka.ilkd.key.util.*;
@@ -69,6 +63,20 @@ lexer grammar KeYLexer;
       modPairs.put("\\throughout","\\endmodality");
       modPairs.put("\\throughout_transaction","\\endmodality");
    }
+
+    @Override
+    public void emit(Token token) {
+       int MAX_K = 10;
+       if (token.getType() == NUM_LITERAL) {//rewrite NUM_LITERALs to identifier when preceeded by an '('
+           for (int k = 1; k <= MAX_K; k++) {
+               int codePoint = _input.LA(k);
+               if (Character.isWhitespace(codePoint)) continue;
+               if (codePoint == '(') ((org.antlr.v4.runtime.CommonToken) token).setType(IDENT);
+               break;
+           }
+       }
+       super.emit(token);
+    }
 }
 
 tokens {MODALITY}
@@ -417,6 +425,7 @@ fragment HEX
 
 fragment LETTER:	'a'..'z'|'A'..'Z';
 fragment IDCHAR: LETTER | DIGIT | '_' | '#' | '$';
+
 
 IDENT:  ( (LETTER | '_' | '#' | '$') (IDCHAR)*);
 

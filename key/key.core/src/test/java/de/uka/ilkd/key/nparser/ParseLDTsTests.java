@@ -36,6 +36,12 @@ public class ParseLDTsTests {
         io.parseProblemFile(Paths.get("C:/Users/weigl/IdeaProjects/key/key/key.core/out/production/resources/de/uka/ilkd/key/proof/rules/integerHeader.key"));
     }
 
+    @Test
+    public void testlex1() throws IOException {
+        KeYLexer lex = ParsingFacade.lex(CharStreams.fromString("numbers 0 (numbers)"));
+        ParseAllKeyFilesTest.debugLexer(lex);
+    }
+
     private ParsedKeyFile load(Services services, String... resources) throws IOException {
         ParsedKeyFile f = null;
         KeyIO io = new KeyIO(services);

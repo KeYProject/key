@@ -25,7 +25,7 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 
 options { tokenVocab=KeYLexer; } // use tokens from STLexer.g4
 
-file: (decls problem proof?) EOF;
+file: (decls problem? proof?) EOF;
 
 decls
 :
@@ -55,7 +55,7 @@ problem
     (  PROBLEM LBRACE a = formula RBRACE
      | CHOOSECONTRACT (chooseContract=string_value SEMI)?
      | PROOFOBLIGATION  (proofObligation=string_value SEMI)?
-    )?
+    )
 ;
 
 
@@ -107,7 +107,7 @@ one_sort_decl
 
 simple_ident_dots
 :
-  simple_ident (DOT simple_ident )* | | NUM_LITERAL
+  simple_ident (DOT simple_ident )* | NUM_LITERAL
 ;
 
 simple_ident_dots_comma_list
@@ -393,8 +393,7 @@ id_declaration
 
 funcpred_name
 :
-    sort_name DOUBLECOLON name = simple_ident
-  | simple_ident
+    (sort_name DOUBLECOLON)? name=simple_ident
   | NUM_LITERAL
 ;
 
@@ -682,8 +681,7 @@ ifExThenElseTerm
 
 argument
 :
-   // WATCHOUT Woj: can (should) this be unified to term60?
-  term | term60
+  term /*| term60*/
 ;
 
 
@@ -738,27 +736,11 @@ bound_variables
     var=one_bound_variable (COMMA var=one_bound_variable)* SEMI
 ;
 
-one_bound_variable
+one_bound_variable 
 :
-   one_logic_bound_variable_nosort
- | one_schema_bound_variable
- | one_logic_bound_variable
+  s=sortId? id=simple_ident
 ;
 
-one_schema_bound_variable
-:
-   id = simple_ident 
-;
-
-one_logic_bound_variable
-:
-  s=sortId id=simple_ident 
-;
-
-one_logic_bound_variable_nosort
-:
-  id=simple_ident 
-;
 
 modality_dl_term
 :
@@ -787,7 +769,7 @@ funcpredvarterm
      char_literal
     | number
     | AT a = abbreviation
-    | varfuncid = funcpred_name
+    | varfuncid=funcpred_name
       ((
          LBRACE
          boundVars = bound_variables
@@ -1272,7 +1254,7 @@ contracts
 invariants
 
 :
-   INVARIANTS LPAREN selfVar=one_logic_bound_variable RPAREN
+   INVARIANTS LPAREN selfVar=one_bound_variable RPAREN
        LBRACE 
        ( one_invariant )*
        RBRACE  
@@ -1342,7 +1324,7 @@ proofScript
   PROOFSCRIPT ps = STRING_LITERAL
 ;
 
-proof: (PROOF proofBody)?;
+proof: PROOF proofBody;
 
 proofBody
 :

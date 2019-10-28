@@ -49,7 +49,7 @@ public class TestAllExamples {
                         return super.visitFile(file, attrs);
                     }
                 });
-        return seq.subList(0,50);
+        return seq;//return seq.subList(0,50);
     }
 
     @Test
