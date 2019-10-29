@@ -3,7 +3,6 @@ package de.uka.ilkd.key.nparser;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
-import de.uka.ilkd.key.parser.ParserMode;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -171,16 +170,15 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
         System.out.println(toks);
         assertEquals(1, toks.size());
         var t = toks.get(0).getType();
-        assertTrue("Wrong literal type",KeYLexer.NUM_LITERAL == t ||
+        assertTrue("Wrong literal type", KeYLexer.NUM_LITERAL == t ||
                 KeYLexer.HEX_LITERAL == t ||
-                KeYLexer.BIN_LITERAL == t||
+                KeYLexer.BIN_LITERAL == t ||
                 KeYLexer.CHAR_LITERAL == t);
     }
 
     public Term parseTerm(String s) {
-        FileVisitor b = new FileVisitor(services, nss, new ParsedKeyFile());
         var ctx = ParsingFacade.parseExpression(CharStreams.fromString(s));
-        return (Term) ctx.accept(b);
+        return (Term) ctx.accept(new ExpressionBuilder(services, nss));
     }
 
     @Test

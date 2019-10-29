@@ -1,14 +1,18 @@
 package de.uka.ilkd.key.nparser;
 
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     //region stack handling
     private Stack<Object> parameters = new Stack<>();
@@ -35,6 +39,10 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
         return (T) (parameters.size() == 0 ? null : parameters.peek());
     }
 
+    protected <T> T acceptFirst(Collection<? extends RuleContext> seq) {
+        if (seq.isEmpty()) return null;
+        return accept(seq.iterator().next());
+    }
 
     protected <T> T pop() {
         return (T) parameters.pop();
@@ -74,4 +82,20 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
                 .collect(Collectors.toList());
     }
 
+
+    protected void semanticError(ParserRuleContext ctx, String format, Object... args) {
+        throw new BuildingException(ctx, String.format(format, args));
+    }
+
+    protected <T2> List<T2> allOf(List<? extends RuleContext>... ctxss) {
+        return Arrays.stream(ctxss)
+                .flatMap(it -> it.stream().map(a -> (T2) accept(a)))
+                .collect(Collectors.toList());
+    }
+
+
+
+    protected void throwEx(Throwable e) {
+        throw new RuntimeException(e);
+    }
 }

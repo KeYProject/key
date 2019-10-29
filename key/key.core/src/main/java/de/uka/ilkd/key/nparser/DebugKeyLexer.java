@@ -1,0 +1,69 @@
+package de.uka.ilkd.key.nparser;
+
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.Token;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class DebugKeyLexer {
+    private static final String DEFAULT_FORMAT = "%02d %20s %d:%-50s\n";
+    private final PrintStream stream;
+    private final String format;
+    private final Collection<KeYLexer> lexer;
+
+    public DebugKeyLexer(PrintStream stream, String format, Collection<KeYLexer> lexer) {
+        this.stream = stream;
+        this.format = format;
+        this.lexer = lexer;
+    }
+
+    public DebugKeyLexer(List<File> files) {
+        stream = System.out;
+        lexer = files.stream().map(it -> {
+            try {
+                return ParsingFacade.lex(it.toPath());
+            } catch (IOException e) {
+                e.printStackTrace(stream);
+            }
+            return null;
+        }).filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        format = DEFAULT_FORMAT;
+    }
+
+    public static void main(String[] args) {
+        new DebugKeyLexer(
+                Arrays.stream(args).map(File::new).collect(Collectors.toList())).run();
+    }
+
+    public void debug(String content) {
+        debug(ParsingFacade.lex(CharStreams.fromString(content)));
+    }
+
+    public void debug(KeYLexer lexer) {
+        DebugKeyLexer dkl = new DebugKeyLexer(System.out, DEFAULT_FORMAT, Collections.singleton(lexer));
+    }
+
+    public void run() {
+        for (KeYLexer l : lexer)
+            run(l);
+    }
+
+    private void run(KeYLexer toks) {
+        Token t;
+        do {
+            t = toks.nextToken();
+            stream.format(format,
+                    toks.getLine(),
+                    toks.getVocabulary().getSymbolicName(t.getType()),
+                    toks._mode,
+                    t.getText().replace("\n", "\\n"));
+            if (t.getType() == KeYLexer.ERROR_CHAR) stream.println("!!ERROR!!");
+        } while (t.getType() != CommonToken.EOF);
+    }
+}

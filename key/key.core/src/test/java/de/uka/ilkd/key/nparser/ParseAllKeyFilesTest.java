@@ -50,8 +50,8 @@ public class ParseAllKeyFilesTest {
         var ctx = ParsingFacade.parseFile(file);
         Assert.assertNull(ctx.exception);
         Services services = new Services(new JavaProfile());
-        FileVisitor b = new FileVisitor(services, services.getNamespaces(), new ParsedKeyFile());
-        ctx.accept(b);
+        //ProblemFinder b = new ProblemFinder(services, services.getNamespaces(), new ParsedKeyFile());
+        //ctx.accept(b);
     }
 
     public static void debugLexer(KeYLexer toks){

@@ -44,7 +44,7 @@ public class TestAllExamples {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                         if (attrs.isRegularFile() && file.toString().endsWith(".key")
-//                        && file.toString().contains("Agatha")
+                        && file.toString().contains("wellformed1.key")
                         ) {
                             seq.add(new Object[]{file});
                         }
@@ -57,15 +57,14 @@ public class TestAllExamples {
     @Test
     public void parse() throws IOException {
         KeyIO io = getIo();
-        ParsedKeyFile pkf = io.parseProblemFile(file);
-        System.out.println(pkf);
-        Assert.assertTrue(pkf.problemTerm != null || pkf.getChooseContract() != null || pkf.getProofObligation() != null);
+        var o = io.load(file).loadCompleteProblem();
+        System.out.println(o);
+        //Assert.assertTrue(pkf.problemTerm != null || pkf.getChooseContract() != null || pkf.getProofObligation() != null);
     }
 
     private KeyIO getIo() throws IOException {
-        KeyIO io = new KeyIO();
         URL u = getClass().getResource("/de/uka/ilkd/key/proof/rules/standardRules.key");
-        ParsedKeyFile pkf = io.parseProblemFile(u);
+        KeyIO io = new KeyIO(u);
         io.getServices().getTypeConverter().init();
         return io;
     }

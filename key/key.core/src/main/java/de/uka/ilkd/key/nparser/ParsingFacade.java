@@ -26,7 +26,7 @@ import java.util.*;
  * @version 1 (19.08.19)
  */
 public abstract class ParsingFacade {
-    static List<KeYParser.FileContext> parseFiles(URL url) throws IOException {
+    public static List<KeYParser.FileContext> parseFiles(URL url) throws IOException {
         List<KeYParser.FileContext> ctxs = new LinkedList<>();
         Stack<URL> queue = new Stack<>();
         queue.add(url);
@@ -55,12 +55,18 @@ public abstract class ParsingFacade {
 
     public static Map<String, Set<String>> getChoices(List<KeYParser.FileContext> ctxs) {
         var finder = new ChoiceFinder();
-        ctxs.forEach(it->it.accept(finder));
+        ctxs.forEach(it -> it.accept(finder));
         return finder.getChoices();
     }
 
-    static KeYParser.FileContext parseFile(URL url) throws IOException {
-        long start =System.currentTimeMillis();
+    public static ProblemInformation getProblemInformation(KeYParser.FileContext ctx) {
+        FindProblemInformation fpi = new FindProblemInformation();
+        ctx.accept(fpi);
+        return fpi.getProblemInformation();
+    }
+
+    public static KeYParser.FileContext parseFile(URL url) throws IOException {
+        long start = System.currentTimeMillis();
         try (BufferedInputStream is = new BufferedInputStream(url.openStream());
              ReadableByteChannel channel = Channels.newChannel(is)) {
             var stream = CharStreams.fromChannel(
@@ -71,27 +77,27 @@ public abstract class ParsingFacade {
                     url.toString(),
                     -1);
             return parseFile(stream);
-        }finally {
-            long stop =System.currentTimeMillis();
-            System.err.printf("PARSING %s took %d ms\n", url, stop-start);
+        } finally {
+            long stop = System.currentTimeMillis();
+            System.err.printf("PARSING %s took %d ms\n", url, stop - start);
         }
     }
 
-    static KeYParser.FileContext parseFile(Path file) throws IOException {
+    public static KeYParser.FileContext parseFile(Path file) throws IOException {
         return parseFile(CharStreams.fromPath(file));
     }
 
-    static KeYParser.FileContext parseFile(File file) throws IOException {
+    public static KeYParser.FileContext parseFile(File file) throws IOException {
         return parseFile(file.toPath());
     }
 
-    static KeYParser.FileContext parseFile(CharStream stream) {
+    public static KeYParser.FileContext parseFile(CharStream stream) {
         var p = createParser(stream);
         KeYParser.FileContext ctx = p.file();
         return ctx;
     }
 
-    static KeYParser.TermContext parseExpression(CharStream stream) {
+    public static KeYParser.TermContext parseExpression(CharStream stream) {
         var p = createParser(stream);
         return p.term();
     }

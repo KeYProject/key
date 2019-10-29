@@ -12,8 +12,8 @@ import java.net.URL;
 class IncludeFinder extends AbstractBuilder<Void> {
     private final URL base;
     private final Includes includes = new Includes();
-    private boolean ldt = false;
     private final String basePath;
+    private boolean ldt = false;
 
     IncludeFinder(URL base) {
         this.base = base;

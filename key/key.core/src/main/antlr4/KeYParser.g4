@@ -88,7 +88,8 @@ option_decls
 
 choice
 :
-  category=IDENT  (COLON LBRACE choice_option+=IDENT (COMMA choice_option+=IDENT)* RBRACE)?
+  category=IDENT
+  (COLON LBRACE doc+=DOC_COMMENT? choice_option+=IDENT (COMMA doc+=DOC_COMMENT? choice_option+=IDENT)* RBRACE)?
 ;
 
 sort_decls
@@ -384,12 +385,13 @@ any_sortId_check_help
 ;
 
 
-id_declaration
+/*id_declaration
     :
         id=IDENT
         ( COLON s = sortId_check ) ?
         
     ;
+*/
 
 funcpred_name
 :

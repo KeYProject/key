@@ -19,7 +19,10 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.op.Function;
 import org.key_project.util.collection.ImmutableSet;
+
+import javax.annotation.Nullable;
 
 /**
  * A Namespace keeps track of already used {@link Name}s and the objects
@@ -80,6 +83,9 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * This is not threadsafe.
      */
     public void add(E sym) {
+
+        //debug
+        //if(sym instanceof Function && ((Function) sym).name().toString().equals("Test::$x")) throw new RuntimeException();
 
         if(sealed) {
             System.err.println("SEALED");
@@ -178,7 +184,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     * @return Object with name "name" or null if no such an object
     * has been found
     */
-    public E lookup(Name name) {
+    public @Nullable E lookup(Name name) {
         E symbol = lookupLocally(name);
         if (symbol != null) {
             return symbol;

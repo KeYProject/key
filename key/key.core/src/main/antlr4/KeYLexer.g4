@@ -409,6 +409,7 @@ SL_COMMENT
 	(~('\n' | '\uFFFF'))* ('\n' | '\uFFFF' | EOF) -> channel(HIDDEN)
 ;
 
+DOC_COMMENT: '/**' -> more, pushMode(docComment);
 ML_COMMENT: '/*' -> more, pushMode(COMMENT);
 
 
@@ -449,31 +450,32 @@ ERROR_CHAR: .;
 
 mode modDiamond;
 MODALITYD_END: '\\>' -> type(MODALITY), popMode;
-//MODALITYD_STRING : '"' -> more, pushMode(modString);
-//MODALITYD_CHAR : '\'' -> more, pushMode(modChar);
-//MODALITYD_COMMENT : [\\] [*] -> more, pushMode(modComment);
+MODALITYD_STRING : '"' -> more, pushMode(modString);
+MODALITYD_CHAR : '\'' -> more, pushMode(modChar);
+MODALITYD_COMMENT : [\\] [*] -> more, pushMode(modComment);
 MODALITYD_ANY : . -> more;
 
 mode modGeneric;
 MODALITYG_END: '\\endmodality' -> type(MODALITY), popMode;
-//MODALITYG_STRING : '"' -> more, pushMode(modString);
-//MODALITYG_CHAR : '\'' -> more, pushMode(modChar);
-//MODALITYG_COMMENT : [\\] [*] -> more, pushMode(modComment);
+MODALITYG_STRING : '"' -> more, pushMode(modString);
+MODALITYG_CHAR : '\'' -> more, pushMode(modChar);
+MODALITYG_COMMENT : [\\] [*] -> more, pushMode(modComment);
 MODALITYG_ANY : . -> more;
 
 mode modBox;
 MODALITYB_END: '\\]' -> type(MODALITY), popMode;
-//MODALITYB_STRING : '"' -> more, pushMode(modString);
-//MODALITYB_CHAR : '\'' -> more, pushMode(modChar);
-//MODALITYB_COMMENT : [\\] [*] -> more, pushMode(modComment);
+MODALITYB_STRING : '"' -> more, pushMode(modString);
+MODALITYB_CHAR : '\'' -> more, pushMode(modChar);
+MODALITYB_COMMENT : [\\] [*] -> more, pushMode(modComment);
 MODALITYB_ANY : . -> more;
 
 mode modBoxBox;
 MODALITYBB_END: '\\]]' -> type(MODALITY), popMode;
-//MODALITYBB_STRING : '"' -> more, pushMode(modString);
-//MODALITYBB_CHAR : '\'' -> more, pushMode(modChar);
-//MODALITYBB_COMMENT : [\\] [*] -> more, pushMode(modComment);
+MODALITYBB_STRING : '"' -> more, pushMode(modString);
+MODALITYBB_CHAR : '\'' -> more, pushMode(modChar);
+MODALITYBB_COMMENT : [\\] [*] -> more, pushMode(modComment);
 MODALITYBB_ANY : . -> more;
+
 
 mode modString;
 MOD_STRING_END: '"' -> more,popMode;
@@ -490,3 +492,7 @@ MOD_COMMENT_ANY: . -> more;
 mode COMMENT;
 COMMENT_END: '*/' -> channel(HIDDEN), popMode;
 COMMENT_ANY_CHAR: . -> more;
+
+mode docComment;
+DOC_COMMENT_END: '*/' -> type(DOC_COMMENT), popMode;
+DOC_COMMENT_ANY_CHAR: . -> more;

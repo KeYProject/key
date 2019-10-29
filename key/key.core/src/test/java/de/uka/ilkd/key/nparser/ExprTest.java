@@ -1,10 +1,6 @@
 package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.parser.AbstractTestTermParser;
-import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.parser.TestParser;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.Assert;
@@ -13,7 +9,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -87,12 +86,11 @@ public class ExprTest {
          */
 
         //services.getTypeConverter().init();
-        KeyIO io = new KeyIO(services);
         var p = "/de/uka/ilkd/key/proof/rules/ldt.key";
         var url = getClass().getResource(p);
         Assume.assumeNotNull(url);
-        var pkf = io.parseProblemFile(url);
-
+        KeyIO io = new KeyIO(url, services);
+        io.loadComplete();
         NamespaceBuilder nssb = new NamespaceBuilder(services.getNamespaces());
         nssb.addVariable("aa", "int")
                 .addVariable("bb", "int")
