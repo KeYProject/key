@@ -939,11 +939,11 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Override
-    public Object visitVarId(KeYParser.VarIdContext ctx) {
+    public Operator visitVarId(KeYParser.VarIdContext ctx) {
         var id = ctx.id.getText();
-        var v = variables().lookup(new Name(ctx.id.getText()));
+        Operator v = variables().lookup(new Name(ctx.id.getText()));
         if (v == null) {
-            v = (QuantifiableVariable) schemaVariables().lookup(new Name(id));
+            v = schemaVariables().lookup(new Name(id));
         }
         if (v == null) {
             semanticError(ctx, "variable %s", id);

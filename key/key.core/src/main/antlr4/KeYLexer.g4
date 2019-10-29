@@ -409,7 +409,7 @@ SL_COMMENT
 	(~('\n' | '\uFFFF'))* ('\n' | '\uFFFF' | EOF) -> channel(HIDDEN)
 ;
 
-DOC_COMMENT: '/**' -> more, pushMode(docComment);
+DOC_COMMENT: '/*!' -> more, pushMode(docComment);
 ML_COMMENT: '/*' -> more, pushMode(COMMENT);
 
 

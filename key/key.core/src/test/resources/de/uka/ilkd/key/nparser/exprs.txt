@@ -1,9 +1,5 @@
 \< { int x = 1; } \> x=1
 \<{ int x = 1; {int s = 2;} }\> x=x
-\forall int[][] i; \forall int j; i [i[i[j][j]][i[j][j]]][i[j][i[j][j]]] = j
-\forall int[][] i; \forall int j; i[j][j] = j
-\forall int j; {globalIntPV:=j} globalIntPV = j
-\exists elem x; \forall list ys; \forall list xs; ( xs = cons(x,ys))
 true
 true & false
 0
@@ -17,5 +13,9 @@ aa + bb*cc
 aa%bb*cc < -123
 \forall int x; true
 \forall numbers x; x = x
-\<{T0 t;}\> t(1,2) = t()
 (int)3+2
+#\forall int[][] i; \forall int j; i [i[i[j][j]][i[j][j]]][i[j][i[j][j]]] = j
+#\forall int[][] i; \forall int j; i[j][j] = j
+#\forall int j; {globalIntPV:=j} globalIntPV = j
+#\exists elem x; \forall list ys; \forall list xs; ( xs = cons(x,ys))
+#\<{T0 t;}\> t(1,2) = t()

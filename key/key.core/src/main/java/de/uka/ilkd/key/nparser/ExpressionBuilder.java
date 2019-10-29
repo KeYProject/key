@@ -1149,10 +1149,10 @@ public class ExpressionBuilder extends DefaultBuilder {
         return toZNotation(ctx.getText(), functions());
     }
 
-    @Override
-    public Term visitSpecialTerm(KeYParser.SpecialTermContext ctx) {
-        return (Term) ctx.result.accept(this);
-    }
+//    @Override
+//    public Term visitSpecialTerm(KeYParser.SpecialTermContext ctx) {
+//        return (Term) ctx.result.accept(this);
+//    }
 
     private Term termForParsedVariable(ParsableVariable v) {
         if (v instanceof LogicVariable || v instanceof ProgramVariable) {

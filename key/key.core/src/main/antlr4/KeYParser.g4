@@ -396,7 +396,6 @@ any_sortId_check_help
 funcpred_name
 :
     (sort_name DOUBLECOLON)? name=simple_ident
-  | NUM_LITERAL
 ;
 
 
@@ -527,13 +526,6 @@ strong_arith_op_term
    a = term110 (op = strong_arith_op a1=term110 )*
 ;
 
-
-/**
- * helps to better distinguish if formulas are allowed or only term are
- * accepted
- * WATCHOUT: Woj: the check for Sort.FORMULA had to be removed to allow
- * infix operators and the whole bunch of grammar rules above.
- */
 term110
 :
     braces_term |  accessterm
@@ -656,11 +648,7 @@ single_label
 ;
 
 
-abbreviation
-:
-  sc = simple_ident
-;
-
+abbreviation: sc=simple_ident;
 
 ifThenElseTerm
 :
@@ -678,8 +666,6 @@ ifExThenElseTerm
         THEN LPAREN thenT = term RPAREN
         ELSE LPAREN elseT = term RPAREN
  ;
- 
-
 
 argument
 :
@@ -784,10 +770,10 @@ funcpredvarterm
 ;
 
 
-specialTerm
+/*specialTerm
 :
        result=metaTerm
-;
+;*/
 
 
 arith_op
@@ -800,25 +786,13 @@ arith_op
 ;
 
 
-varId
-:
-  id=IDENT
-;
-
-varIds
-:
-  ids=simple_ident_comma_list
-;
+varId: id=IDENT;
+varIds: ids=simple_ident_comma_list;
 
 triggers
 :
-   TRIGGER
-     LBRACE id = simple_ident
-     	
-       RBRACE
-     t=term (AVOID avoidCond=term 
-      (COMMA avoidCond=term )*)? SEMI
-   
+  TRIGGER LBRACE id=simple_ident RBRACE
+  t=term (AVOID avoidCond=term (COMMA avoidCond=term )*)? SEMI
 ;
 
 taclet
@@ -841,31 +815,27 @@ taclet
     ( VARCOND LPAREN varexplist RPAREN ) ?
     goalspecs
     modifiers
-
-)
-RBRACE
+  )
+  RBRACE
 ;
 
 modifiers
 :
-        ( rs = rulesets 
-        | NONINTERACTIVE 
-        | DISPLAYNAME dname = string_value
-        | HELPTEXT htext = string_value
-        | triggers
-        ) *
-    ;
-
-seq
-:
-  ant=semisequent SEQARROW suc=semisequent
+  ( rs = rulesets
+  | NONINTERACTIVE
+  | DISPLAYNAME dname = string_value
+  | HELPTEXT htext = string_value
+  | triggers
+  ) *
 ;
+
+seq: ant=semisequent SEQARROW suc=semisequent;
 
 seqEOF: seq EOF;
 
 termorseq
 :
-      head=term ( COMMA s=seq | SEQARROW ss=semisequent ) ?
+      head=term (COMMA s=seq | SEQARROW ss=semisequent) ?
     | SEQARROW ss=semisequent
 ;
 
@@ -875,10 +845,9 @@ semisequent
   | head=term ( COMMA ss=semisequent) ?
 ;
 
-varexplist : varexp ( COMMA varexp ) * ;
+varexplist : varexp (COMMA varexp)* ;
 
 varexp
-
 :
   ( varcond_applyUpdateOnRigid
     | varcond_dropEffectlessElementaries
@@ -922,321 +891,146 @@ varexp
   )
 ;
 
-varcond_sameObserver
-:
+varcond_sameObserver:
   SAME_OBSERVER LPAREN t1=varId COMMA t2=varId RPAREN
-  
-  ;
+;
 
-
-varcond_applyUpdateOnRigid 
-:
+varcond_applyUpdateOnRigid :
    APPLY_UPDATE_ON_RIGID LPAREN u=varId COMMA x=varId COMMA x2=varId RPAREN
-   
 ;
 
-varcond_dropEffectlessElementaries
-:
+varcond_dropEffectlessElementaries:
    DROP_EFFECTLESS_ELEMENTARIES LPAREN u=varId COMMA x=varId COMMA result=varId RPAREN
-   
 ;
 
-varcond_dropEffectlessStores
-:
+varcond_dropEffectlessStores:
    DROP_EFFECTLESS_STORES LPAREN h=varId COMMA o=varId COMMA f=varId COMMA x=varId COMMA result=varId RPAREN
-   
 ;
 
-varcond_differentFields 
-:
-   DIFFERENTFIELDS
-   LPAREN
-     x = varId COMMA y = varId
-   RPAREN
-   
-;
+varcond_differentFields: DIFFERENTFIELDS LPAREN x = varId COMMA y = varId RPAREN;
 
 
 varcond_simplifyIfThenElseUpdate
 :
-   SIMPLIFY_IF_THEN_ELSE_UPDATE LPAREN phi=varId COMMA u1=varId COMMA u2=varId COMMA commonFormula=varId COMMA result=varId RPAREN
-   
+   SIMPLIFY_IF_THEN_ELSE_UPDATE LPAREN phi=varId COMMA u1=varId COMMA u2=varId COMMA
+   commonFormula=varId COMMA result=varId RPAREN
 ;
 
 type_resolver
 :
-      (s = any_sortId_check)
-    | (TYPEOF LPAREN y = varId RPAREN)
-    | (CONTAINERTYPE LPAREN y = varId RPAREN)
+    (s = any_sortId_check)
+  | (TYPEOF LPAREN y = varId RPAREN)
+  | (CONTAINERTYPE LPAREN y = varId RPAREN)
 ;
 
-varcond_new 
-:
-   NEW LPAREN x=varId COMMA
-      (
-          TYPEOF LPAREN y=varId RPAREN 
-      |
-         DEPENDINGON LPAREN y=varId RPAREN 
-      | kjt=keyjavatype 
-      )
-   RPAREN
-
-;
-
-varcond_newlabel 
-:
-  NEWLABEL LPAREN x=varId RPAREN 
-;
-varcond_typecheck 
-
-:
-   (  SAME
-    | ISSUBTYPE
-    | STRICT ISSUBTYPE
-    | DISJOINTMODULONULL
-   )
-   LPAREN fst = type_resolver COMMA snd = type_resolver RPAREN
+varcond_new:
+  NEW LPAREN x=varId COMMA
+  ( TYPEOF LPAREN y=varId RPAREN
+  | DEPENDINGON LPAREN y=varId RPAREN
+  | kjt=keyjavatype
+  )
+  RPAREN
 ;
 
 
-varcond_free 
-:
-   NOTFREEIN LPAREN x=varId COMMA ys=varIds RPAREN 
+varcond_typecheck:
+  (  SAME
+  | ISSUBTYPE
+  | STRICT ISSUBTYPE
+  | DISJOINTMODULONULL
+  )
+  LPAREN fst = type_resolver COMMA snd = type_resolver RPAREN
 ;
 
 
-varcond_hassort 
+varcond_free: NOTFREEIN LPAREN x=varId COMMA ys=varIds RPAREN;
+varcond_hassort: HASSORT LPAREN (x=varId | ELEMSORT LPAREN x=varId RPAREN ) COMMA s=any_sortId_check RPAREN;
+varcond_newlabel: NEWLABEL LPAREN x=varId RPAREN;
 
-:
-   HASSORT
-   LPAREN
-   (x=varId | ELEMSORT LPAREN x=varId RPAREN )
-   COMMA
-   s=any_sortId_check
-   RPAREN
+varcond_reference:
+  ISREFERENCE (LBRACKET  id=simple_ident RBRACKET)?
+  LPAREN tr = type_resolver RPAREN
 ;
 
-varcond_fieldtype 
-:
-    FIELDTYPE
-    LPAREN
-    x=varId
-    COMMA
-    s=any_sortId_check
-    RPAREN
-;
-
-varcond_containsAssignment
-:
-   CONTAINS_ASSIGNMENT LPAREN x=varId RPAREN
-   
-;
-
-varcond_enumtype 
-:
-   ISENUMTYPE LPAREN tr = type_resolver RPAREN
-      
-;
-
-
-varcond_reference 
-
-:
-   ISREFERENCE (LBRACKET  id=simple_ident RBRACKET)?
-   LPAREN
-        tr = type_resolver
-   RPAREN
-;
-
-varcond_thisreference 
-:
-   ISTHISREFERENCE
-   LPAREN
-     x = varId
-   RPAREN
-   
-;
-
-
-varcond_staticmethod 
-:
-   STATICMETHODREFERENCE LPAREN x=varId COMMA y=varId COMMA z=varId RPAREN 
-;
-
-varcond_mayexpandmethod 
-:
+varcond_mayexpandmethod:
    MAXEXPANDMETHOD LPAREN x=varId COMMA y=varId
    ( COMMA z=varId RPAREN 
    | RPAREN 
    )
 ;
 
-varcond_referencearray 
-:
-   ISREFERENCEARRAY LPAREN x=varId RPAREN 
+varcond_fieldtype: FIELDTYPE LPAREN x=varId COMMA s=any_sortId_check RPAREN;
+varcond_containsAssignment: CONTAINS_ASSIGNMENT LPAREN x=varId RPAREN;
+varcond_enumtype: ISENUMTYPE LPAREN tr = type_resolver RPAREN;
+varcond_thisreference: ISTHISREFERENCE LPAREN x = varId RPAREN;
+varcond_staticmethod: STATICMETHODREFERENCE LPAREN x=varId COMMA y=varId COMMA z=varId RPAREN;
+varcond_referencearray: ISREFERENCEARRAY LPAREN x=varId RPAREN;
+varcond_array: ISARRAY LPAREN x=varId RPAREN;
+varcond_array_length: ISARRAYLENGTH LPAREN x=varId RPAREN;
+varcond_abstractOrInterface: IS_ABSTRACT_OR_INTERFACE LPAREN tr=type_resolver RPAREN;
+varcond_enum_const: ENUM_CONST LPAREN x=varId RPAREN;
+varcond_final: FINAL LPAREN x=varId RPAREN;
+varcond_static: STATIC LPAREN x=varId RPAREN;
+varcond_localvariable: ISLOCALVARIABLE LPAREN x=varId RPAREN;
+varcond_observer: ISOBSERVER LPAREN obs=varId COMMA heap=varId  RPAREN;
+varcond_different: DIFFERENT LPAREN var1=varId COMMA var2=varId RPAREN;
+varcond_metadisjoint: METADISJOINT LPAREN var1=varId COMMA var2=varId RPAREN;
+varcond_equalUnique: EQUAL_UNIQUE LPAREN t=varId COMMA t2=varId COMMA phi=varId RPAREN ;
+varcond_freeLabelIn: FREELABELIN LPAREN l=varId COMMA statement=varId RPAREN ;
+varcond_constant: ISCONSTANT LPAREN x=varId RPAREN;
+varcond_label: HASLABEL LPAREN l=varId COMMA name=simple_ident RPAREN;
+varcond_static_field: ISSTATICFIELD LPAREN field=varId RPAREN;
+varcond_subFormulas: HASSUBFORMULAS LPAREN x=varId RPAREN;
+
+goalspecs:
+      CLOSEGOAL
+    | goalspecwithoption (SEMI goalspecwithoption)*
 ;
-
-varcond_array 
-:
-   ISARRAY LPAREN x=varId RPAREN 
-;
-
-varcond_array_length 
-:
-   ISARRAYLENGTH LPAREN x=varId RPAREN 
-;
-
-
-varcond_abstractOrInterface 
-:
-   IS_ABSTRACT_OR_INTERFACE LPAREN tr=type_resolver RPAREN 
-;
-
-varcond_enum_const 
-:
-   ENUM_CONST LPAREN x=varId RPAREN 
-;
-
-varcond_final 
-:
-   FINAL LPAREN x=varId RPAREN 
-;
-
-varcond_static 
-:
-   STATIC LPAREN x=varId RPAREN 
-;
-
-varcond_localvariable 
-:
-   ISLOCALVARIABLE
-	LPAREN x=varId RPAREN 
-;
-
-
-varcond_observer 
-:
-   ISOBSERVER
-	LPAREN obs=varId COMMA heap=varId  RPAREN 
-;
-
-
-varcond_different 
-:
-   DIFFERENT
-	LPAREN var1=varId COMMA var2=varId RPAREN 
-;
-
-
-varcond_metadisjoint 
-:
-   METADISJOINT
-	LPAREN var1=varId COMMA var2=varId RPAREN 
-;
-
-
-
-varcond_equalUnique 
-:
-   EQUAL_UNIQUE
-	LPAREN t=varId COMMA t2=varId COMMA phi=varId RPAREN 
-;
-
-
-varcond_freeLabelIn 
-:
-
- FREELABELIN
-    LPAREN l=varId COMMA statement=varId RPAREN 
-;
-
-varcond_constant 
-:
-   ISCONSTANT LPAREN x=varId RPAREN
-;
-
-varcond_label 
-:
-   HASLABEL
-        LPAREN l=varId COMMA name=simple_ident RPAREN 
-;
-
-varcond_static_field 
-:
-   ISSTATICFIELD
-        LPAREN field=varId RPAREN 
-;
-
-varcond_subFormulas 
-:
-   HASSUBFORMULAS
-        LPAREN x=varId RPAREN 
-;
-
-goalspecs :
-        CLOSEGOAL
-    | goalspecwithoption ( SEMI goalspecwithoption )* ;
 
 goalspecwithoption
  :
-        (( soc = option_list
-                LBRACE
-                goalspec
-                RBRACE)
-        |
-            goalspec
-        )
-    ;
+    soc=option_list LBRACE goalspec RBRACE
+  | goalspec
+;
 
 option
 :
-        cat=IDENT COLON choice_=IDENT
+  cat=IDENT COLON value=IDENT
 ;
 
 option_list
 :
-LPAREN 
-  c = option 
-  (COMMA c = option )*
-RPAREN
+  LPAREN
+    option (COMMA option)*
+  RPAREN
 ;
 
 goalspec
-    :
-        (name=string_value COLON)?
-        (   ( rwObj = replacewith
-                (addSeq=add)?
-                (addRList=addrules)?
-                (addpv=addprogvar)?
-            )
-        | ( addSeq=add (addRList=addrules)? )
-        | ( addRList=addrules )
-        )
-        
-
-    ;
-
-replacewith
-
 :
-        REPLACEWITH LPAREN o=termorseq RPAREN;
+  (name=string_value COLON)?
+  ( rwObj = replacewith
+    addSeq=add?
+    addRList=addrules?
+    addpv=addprogvar?
+  | addSeq=add (addRList=addrules)?
+  | addRList=addrules
+  )
+;
 
-add: ADD LPAREN s=seq RPAREN;
-addrules:   ADDRULES LPAREN lor=tacletlist RPAREN;
-addprogvar: ADDPROGVARS LPAREN pvs=pvset RPAREN;
-tacletlist: taclet (COMMA taclet)*;
+replacewith:  REPLACEWITH LPAREN o=termorseq RPAREN;
+add:          ADD LPAREN s=seq RPAREN;
+addrules:     ADDRULES LPAREN lor=tacletlist RPAREN;
+addprogvar:   ADDPROGVARS LPAREN pvs=pvset RPAREN;
+tacletlist:   taclet (COMMA taclet)*;
 
 pvset: varId (COMMA varId)*;
 
 rulesets:
-        HEURISTICS LPAREN ruleset
-        ( COMMA ruleset ) * RPAREN
+  HEURISTICS LPAREN ruleset
+  (COMMA ruleset) * RPAREN
 ;
 
-ruleset
-:
-        id=IDENT
-;
+ruleset: id=IDENT;
 
 metaId:  id=simple_ident ;
 
@@ -1248,25 +1042,22 @@ metaTerm:
 contracts
 :
    CONTRACTS
-       LBRACE 
-       ( one_contract )*
-       RBRACE
+   LBRACE
+   (one_contract)*
+   RBRACE
 ;
 
 invariants
-
 :
    INVARIANTS LPAREN selfVar=one_bound_variable RPAREN
-       LBRACE 
-       ( one_invariant )*
-       RBRACE  
+   LBRACE
+   (one_invariant)*
+   RBRACE
 ;
-
 
 one_contract
 :
    contractName = simple_ident LBRACE
-
    (prog_var_decls)?
    fma = formula MODIFIES modifiesClause = term
    RBRACE SEMI
@@ -1279,7 +1070,6 @@ one_invariant
      (DISPLAYNAME displayName=string_value)?
      RBRACE SEMI
 ;
-
 
 rulesOrAxioms:
     (RULES|AXIOMS)
@@ -1297,11 +1087,7 @@ classPaths
   CLASSPATH s=string_value (COMMA s=string_value)* SEMI
 ;
 
-javaSource
-:
-   JAVASOURCE result = oneJavaSource SEMI
-;
-
+javaSource: JAVASOURCE result=oneJavaSource SEMI;
 
 oneJavaSource
 :
@@ -1312,7 +1098,6 @@ oneJavaSource
   )+ 
 ;
 
-
 profile: PROFILE name=string_value SEMI;
 
 preferences
@@ -1320,7 +1105,6 @@ preferences
 	KEYSETTINGS LBRACE (s=string_value)? RBRACE
 ;
 
-// delivers: <Script, start line no, start column no>
 proofScript
 :
   PROOFSCRIPT ps = STRING_LITERAL
@@ -1334,7 +1118,6 @@ proofBody
       ( pseudosexpr )+
   RBRACE
 ;
-
 
 pseudosexpr
 :

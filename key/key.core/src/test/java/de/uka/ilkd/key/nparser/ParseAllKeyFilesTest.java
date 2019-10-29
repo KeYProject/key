@@ -7,8 +7,10 @@ import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.key_project.util.testcategories.Interactive;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -25,6 +27,7 @@ import java.util.List;
  * @version 1 (13.09.19)
  */
 @RunWith(Parameterized.class)
+@Category(Interactive.class)
 public class ParseAllKeyFilesTest {
     @Parameterized.Parameter
     public Path file;
@@ -54,7 +57,7 @@ public class ParseAllKeyFilesTest {
         //ctx.accept(b);
     }
 
-    public static void debugLexer(KeYLexer toks){
+    public static void debugLexer(KeYLexer toks) {
         Token t;
         do {
             t = toks.nextToken();
@@ -63,7 +66,7 @@ public class ParseAllKeyFilesTest {
                     toks.getVocabulary().getSymbolicName(t.getType()),
                     toks._mode,
                     t.getText().replace("\n", "\\n"));
-            if(t.getType() == KeYLexer.ERROR_CHAR) Assert.fail();
+            if (t.getType() == KeYLexer.ERROR_CHAR) Assert.fail();
         } while (t.getType() != CommonToken.EOF);
     }
 

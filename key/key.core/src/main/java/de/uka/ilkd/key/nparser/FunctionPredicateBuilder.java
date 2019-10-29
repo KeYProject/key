@@ -118,6 +118,8 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         return allOf(ctx.func_decl());
     }
 
+
+
     @Override
     public Object visitTransform_decl(KeYParser.Transform_declContext ctx) {
         var retSort = (Sort) (ctx.FORMULA() != null ? Sort.FORMULA : accept(ctx.any_sortId_check()));
@@ -126,8 +128,8 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         Transformer t = new Transformer(new Name(trans_name),
                 retSort,
                 new ImmutableArray<>(argSorts));
-        if (lookup(t.name()) != null) {
-            //weigl: do something?
+        if (lookup(t.name()) == null) {
+            functions().add(t);
         }
         return null;
     }

@@ -36,8 +36,8 @@ public class ParseLDTsTests {
     private ParsedKeyFile load(Services services, String resources) throws IOException {
         var url = getClass().getResource(resources);
         Assume.assumeNotNull(url, services);
-        KeyIO io = new KeyIO(url, services);
-        io.loadComplete();
+        KeyIO io = new KeyIO(services);
+        io.load(url).loadComplete();
         return null;
     }
 

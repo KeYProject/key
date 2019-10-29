@@ -50,6 +50,29 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
 
     @Override
+    public List<String> visitPvset(KeYParser.PvsetContext ctx) {
+        return allOf(ctx.varId());
+    }
+
+    @Override
+    public List<RuleSet> visitRulesets(KeYParser.RulesetsContext ctx) {
+        return mapOf(ctx.ruleset());
+    }
+
+    @Override
+    public RuleSet visitRuleset(KeYParser.RulesetContext ctx) {
+        String id = (String) ctx.IDENT().accept(this);
+        RuleSet h = ruleSets().lookup(new Name(id));
+        if (h == null) {
+            //TODO
+            h = new RuleSet(new Name(id));
+            //semanticError(ctx, "Rule set %s was not previous defined.", ctx.getText());
+        }
+        return h;
+    }
+
+
+    @Override
     public String visitSimple_ident_dots(KeYParser.Simple_ident_dotsContext ctx) {
         return ctx.getText();
     }
@@ -513,8 +536,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         if (ctx.DOUBLECOLON() != null) {
             return accept(ctx.sort_name()) + "::" + accept(ctx.name);
         }
-        if (ctx.NUM_LITERAL() != null)
-            return ctx.NUM_LITERAL().getText();
+        //if (ctx.NUM_LITERAL() != null)
+        //    return ctx.NUM_LITERAL().getText();
         return (String) accept(ctx.simple_ident());
     }
 }

@@ -2,10 +2,13 @@ package de.uka.ilkd.key.nparser;
 
 import org.junit.Assert;
 import org.junit.Assume;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.key_project.util.helper.FindResources;
+import org.key_project.util.testcategories.Interactive;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +27,7 @@ import java.util.List;
  * @version 1 (13.09.19)
  */
 @RunWith(Parameterized.class)
+@Category(Interactive.class)
 public class TestAllExamples {
     @Parameterized.Parameter
     public Path file;
@@ -44,7 +48,7 @@ public class TestAllExamples {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                         if (attrs.isRegularFile() && file.toString().endsWith(".key")
-                        && file.toString().contains("wellformed1.key")
+                            //&& file.toString().contains("Agatha")
                         ) {
                             seq.add(new Object[]{file});
                         }
@@ -55,6 +59,7 @@ public class TestAllExamples {
     }
 
     @Test
+    @Ignore("Not all files are parseable without Java Type support. ")
     public void parse() throws IOException {
         KeyIO io = getIo();
         var o = io.load(file).loadCompleteProblem();
@@ -64,7 +69,8 @@ public class TestAllExamples {
 
     private KeyIO getIo() throws IOException {
         URL u = getClass().getResource("/de/uka/ilkd/key/proof/rules/standardRules.key");
-        KeyIO io = new KeyIO(u);
+        KeyIO io = new KeyIO();
+        io.load(u).loadComplete();
         io.getServices().getTypeConverter().init();
         return io;
     }

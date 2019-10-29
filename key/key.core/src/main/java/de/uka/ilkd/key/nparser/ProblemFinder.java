@@ -174,28 +174,6 @@ public class ProblemFinder extends ExpressionBuilder {
 
 
     @Override
-    public List<String> visitPvset(KeYParser.PvsetContext ctx) {
-        return allOf(ctx.varId());
-    }
-
-    @Override
-    public List<RuleSet> visitRulesets(KeYParser.RulesetsContext ctx) {
-        return mapOf(ctx.ruleset());
-    }
-
-    @Override
-    public RuleSet visitRuleset(KeYParser.RulesetContext ctx) {
-        String id = (String) ctx.IDENT().accept(this);
-        RuleSet h = ruleSets().lookup(new Name(id));
-        if (h == null) {
-            //TODO
-            h = new RuleSet(new Name(id));
-            //semanticError(ctx, "Rule set %s was not previous defined.", ctx.getText());
-        }
-        return h;
-    }
-
-    @Override
     public Object visitContracts(KeYParser.ContractsContext ctx) {
         return allOf(ctx.one_contract());
     }

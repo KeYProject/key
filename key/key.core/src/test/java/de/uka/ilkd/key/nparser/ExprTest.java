@@ -6,8 +6,10 @@ import org.antlr.v4.runtime.CharStreams;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.key_project.util.testcategories.Interactive;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -89,12 +91,13 @@ public class ExprTest {
         var p = "/de/uka/ilkd/key/proof/rules/ldt.key";
         var url = getClass().getResource(p);
         Assume.assumeNotNull(url);
-        KeyIO io = new KeyIO(url, services);
-        io.loadComplete();
+        KeyIO io = new KeyIO(services);
+        io.load(url).loadComplete();
         NamespaceBuilder nssb = new NamespaceBuilder(services.getNamespaces());
         nssb.addVariable("aa", "int")
                 .addVariable("bb", "int")
-                .addVariable("cc", "int");
+                .addVariable("cc", "int")
+                .addProgramVariable("int", "x");
         return io;
     }
 
