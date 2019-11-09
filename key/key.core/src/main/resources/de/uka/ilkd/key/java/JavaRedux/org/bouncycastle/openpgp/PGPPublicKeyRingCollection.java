@@ -11,5 +11,5 @@ public class PGPPublicKeyRingCollection extends java.lang.Object implements org.
      @ ensures \result.index == 0;
      @ assignable \nothing;
      @*/
-   public java.util.Collection.CollectionIterator getKeyRings();
+   public java.util.CollectionIterator getKeyRings();
 }

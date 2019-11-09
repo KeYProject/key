@@ -63,10 +63,10 @@ java.io.ByteArrayInputStream
 java.math.BigInteger
 java.util.ArrayList
 java.util.Arrays
+java.util.CollectionIterator
 java.util.Date
 java.util.LinkedHashMap
 java.util.LinkedList
-java.util.Iterator
 java.text.SimpleDateFormat
 java.text.DateFormat
 java.text.Format

@@ -16,7 +16,7 @@ public final class ECPoint extends java.lang.Object {
      @ requires true;
      @ ensures true;
      @ assignable \nothing;
-     @ determines \result, result[*] \by value, param0;
+     @ determines result[*] \by value, param0;
      @*/
    public byte[] getEncoded(boolean param0);
 }

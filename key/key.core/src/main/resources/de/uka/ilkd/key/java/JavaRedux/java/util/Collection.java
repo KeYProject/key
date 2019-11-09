@@ -57,9 +57,7 @@ public interface Collection extends java.lang.Iterable
      @ determines \result.seq \by seq;
      @ determines \result.index \by \nothing;
      @*/
-   public CollectionIterator iterator();
-   
-   public final class CollectionIterator implements Iterator {}
+   public java.util.CollectionIterator iterator();
    
    public java.lang.Object[] toArray();
    public java.lang.Object[] toArray(java.lang.Object[] arg0);

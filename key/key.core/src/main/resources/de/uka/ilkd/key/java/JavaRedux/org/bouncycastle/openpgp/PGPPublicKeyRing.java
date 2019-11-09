@@ -9,5 +9,5 @@ public class PGPPublicKeyRing extends org.bouncycastle.openpgp.PGPKeyRing implem
       @ ensures \result.index == 0;
       @ assignable \nothing;
       @*/
-    public java.util.Collection.CollectionIterator getPublicKeys();
+    public java.util.CollectionIterator getPublicKeys();
 }
