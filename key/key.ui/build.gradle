@@ -49,6 +49,7 @@ application {
 
 run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
+    jvmArgs = ['-Xms1g', '-Xmx8g']
     // args "--experimental"
 }
 
