@@ -25,6 +25,7 @@ public interface Iterator
      @ ensures \old(index) == seq.length ==> index == \old(index);
      @ assignable index;
      @ determines \result \by seq, index;
+     @ determines index \by seq.length, index;
      @*/
    public /*@nullable@*/ java.lang.Object next();
    

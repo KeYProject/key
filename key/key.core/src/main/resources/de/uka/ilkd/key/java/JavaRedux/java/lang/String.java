@@ -36,6 +36,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    
    /*@ public normal_behavior
      @ assignable \nothing;
+     @ determines \result \by \nothing;
      @ determines \result[*] \by \dl_strContent(this);
      @*/
    public byte[] getBytes();
@@ -76,6 +77,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    
    /*@ public normal_behavior
      @ assignable \nothing;
+     @ determines \result \by \nothing;
      @ determines \dl_strContent(\result) \by \dl_strContent(this);
      @*/
    public java.lang.String toLowerCase();
@@ -83,6 +85,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    
    /*@ public normal_behavior
      @ assignable \nothing;
+     @ determines \result \by \nothing;
      @ determines \dl_strContent(\result) \by \dl_strContent(this);
      @*/
    public java.lang.String toUpperCase();
@@ -93,6 +96,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
      @ ensures \result.length == \dl_strContent(this).length;
      @ ensures (\forall \bigint i; 0 <= i && i < \result.length; \dl_inChar(\result[i]));
      @ assignable \nothing;
+     @ determines \result \by \nothing;
      @ determines \result[*] \by \dl_strContent(this);
      @*/
    public char[] toCharArray();
