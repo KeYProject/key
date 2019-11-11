@@ -13,7 +13,7 @@ public final class CSVRecord extends java.lang.Object implements java.io.Seriali
       @ requires  (\exists \bigint i; 0 <= i && i < key_seq.length; ((String)key_seq[i]) == param0);
       @ ensures   (\exists \bigint i; 0 <= i && i < key_seq.length; ((String)key_seq[i]) == param0 && ((String)value_seq[i]) == \result);
       @ assignable \strictly_nothing;
-      @ determines \result \by param0;
+      @ determines \result \by key_seq, value_seq, \dl_strContent(param0);
       @*/
     public java.lang.String get(java.lang.String param0);
 }
