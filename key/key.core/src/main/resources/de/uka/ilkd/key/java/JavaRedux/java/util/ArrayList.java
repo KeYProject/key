@@ -5,14 +5,14 @@ public final class ArrayList implements java.util.List {
     /*@ public normal_behavior
       @ ensures seq.length == 0;
       @ ensures \fresh(this) && \fresh(this.*);
-      @ determines this, seq \by \nothing;
+      @ determines this, seq \by \nothing \new_objects this, seq;
       @*/
     public /*@pure@*/ ArrayList();
 
     /*@ public normal_behavior
       @ ensures seq == c.seq;
       @ ensures \fresh(this) && \fresh(this.*);
-      @ determines this, seq \by c.seq;
+      @ determines this, seq \by c.seq \new_objects this, seq;
       @*/
     public /*@pure@*/ ArrayList(Collection c);
 }
