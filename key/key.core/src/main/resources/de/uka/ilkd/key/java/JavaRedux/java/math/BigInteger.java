@@ -26,6 +26,7 @@ public final class BigInteger extends java.lang.Number implements java.lang.Comp
      @ ensures \result.value == this.value % param0.value;
      @ ensures \invariant_for(result);
      @ assignable \nothing;
+     @ determines \result \by \nothing;
      @ determines \result.value \by this.value, param0.value;
      @*/
    public java.math.BigInteger mod(java.math.BigInteger param0);

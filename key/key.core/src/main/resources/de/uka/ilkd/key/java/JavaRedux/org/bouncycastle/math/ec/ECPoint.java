@@ -8,6 +8,7 @@ public final class ECPoint extends java.lang.Object {
      @ requires true;
      @ ensures \invariant_for(result);
      @ assignable \nothing;
+     @ determines \result \by \nothing;
      @ determines \result.value \by this.value, param0.value;
      @*/
    public org.bouncycastle.math.ec.ECPoint multiply(java.math.BigInteger param0);
@@ -16,6 +17,7 @@ public final class ECPoint extends java.lang.Object {
      @ requires true;
      @ ensures true;
      @ assignable \nothing;
+     @ determines \result \by \nothing;
      @ determines result[*] \by value, param0;
      @*/
    public byte[] getEncoded(boolean param0);

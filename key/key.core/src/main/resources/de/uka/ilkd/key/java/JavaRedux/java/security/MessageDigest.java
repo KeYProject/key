@@ -4,13 +4,13 @@ public final class MessageDigest extends java.security.MessageDigestSpi {
 
    /*@ public normal_behavior
      @ assignable \nothing;
-     @ determines \result \by param0;
+     @ determines \result \by \dl_strContent(param0);
      @*/
    public static java.security.MessageDigest getInstance(java.lang.String param0) throws java.security.NoSuchAlgorithmException;
 
    /*@ public normal_behavior
      @ assignable \nothing;
-     @ determines \result \by \nothing;
+     @ determines \result, \result[*] \by \nothing;
      @*/
    public byte[] digest(byte[] param0);
 
@@ -23,7 +23,7 @@ public final class MessageDigest extends java.security.MessageDigestSpi {
 
    /*@ public normal_behavior
      @ assignable \nothing;
-     @ determines \result \by \nothing;
+     @ determines \result, \result[*] \by \nothing;
      @*/
    public byte[] digest();
 }
