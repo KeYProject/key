@@ -5,46 +5,246 @@
 # Jenkins runs are triggered from somewhere else.
 #
 
+cache:
+  policy: pull-push
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+  untracked: true
+  key: ${CI_COMMIT_REF_SLUG}
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+before_script:
+  #  - echo `pwd` # debug
+  #  - echo "$CI_BUILD_NAME, $CI_BUILD_REF_NAME $CI_BUILD_STAGE" # debug
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
 stages:
     - primary
     - secondary
+    - ternary
 
-compile:oraclejdk8:
-  stage: primary
-  image: key-dev-jdk8
-  script:
-    - javac -version
-    - ant -f key/scripts/build.xml compileAll
-    
-compile:openjdk8:
-  stage: primary
-  image: key-dev-openjdk8
-  script:
-    - javac -version
-    - ant -f key/scripts/build.xml compileAll
+# compile:oraclejdk8:
+#   stage: primary
+#   image: key-dev-jdk8
+#   script:
+#     - javac -version
+#     - ant -f key/scripts/build.xml compileAll
 
-compile:openjdk11:
-  stage: primary
-  image: key-dev-openjdk11
-  allow_failure: true
-  script:
-    - javac -version
-    - ant -f key/scripts/build.xml compileAll
 
-fatJar:oraclejdk8:
-  stage: secondary
-  image: key-dev-jdk8
+compile:classes:
+  stage: primary
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
-    - ant -f key/scripts/build.xml fatJar
-  artifacts:
+    - cd key
+    - gradle --build-cache classes
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
     paths:
-      - key/deployment/*.jar
-    expire_in: 1 week
+      - build
+      - .gradle
+
+compile:testClasses:
+  stage: secondary
+  image: wadoon/key-test-docker:jdk11
+  script:
+    - javac -version
+    - cd key
+    - gradle --build-cache --parallel testClasses
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull-push
+    paths:
+      - build
+      - .gradle
+
+compile:testClasses8:
+  stage: secondary
+  image: wadoon/key-test-docker:jdk8
+  script:
+    - javac -version
+    - cd key
+    - gradle --parallel classes testClasses
+
+compile:testFast:key.util:
+  stage: ternary
+  image: wadoon/key-test-docker:jdk11
+  script:
+    - javac -version
+    - cd key
+    - gradle --build-cache --continue :key.util:testFast
+    - ls
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/*/TEST-*.xml"
+
+compile:testFast:key.core:
+  stage: ternary
+  image: wadoon/key-test-docker:jdk11
+  script:
+    - javac -version
+    - cd key
+    - gradle --build-cache --continue :key.core:testFast
+    - ls
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/*/TEST-*.xml"
+
+compile:testFast:proofref:
+  stage: ternary
+  image: wadoon/key-test-docker:jdk11
+  script:
+    - javac -version
+    - cd key
+    - gradle --build-cache --continue :key.core.proof_references:testFast
+    - ls
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/*/TEST-*.xml"
+
+compile:testFast:testgen:
+  stage: ternary
+  image: wadoon/key-test-docker:jdk11
+  script:
+    - javac -version
+    - cd key
+    - gradle --build-cache --continue :key.core.testgen:testFast
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/*/TEST-*.xml"
+
+compile:testFast:interactionlog:
+  stage: ternary
+  image: wadoon/key-test-docker:jdk11
+  script:
+    - javac -version
+    - cd key
+    - gradle --build-cache --continue :keyex.interactionlog:testFast
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/*/TEST-*.xml"
+
+compile:testFast:ui:
+  stage: ternary
+  image: wadoon/key-test-docker:jdk11
+  script:
+    - javac -version
+    - cd key
+    - gradle --build-cache --continue :key.ui:testFast
+    - ls
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/*/TEST-*.xml"
+
+compile:testFast:removegenerics:
+  stage: ternary
+  image: wadoon/key-test-docker:jdk11
+  script:
+    - javac -version
+    - cd key
+    - gradle --build-cache --continue :key.removegenerics:testFast
+    - ls
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/*/TEST-*.xml"
+
+#
+#
+#compile:testFast:testRunAllProofs:
+#  stage: primary
+#  image: wadoon/key-test-docker:jdk11
+#  script:
+#    - javac -version
+#    - cd key
+#    - gradle --build-cache --continue :key.core:testRunAllProofs
+#    - ls
+#  cache:
+#    key: "$CI_COMMIT_REF_NAME"
+#    policy: pull
+#    paths:
+#      - build
+#      - .gradle
+#  artifacts:
+#    reports:
+#      junit:
+#        - "**/**/build/test-results/*/TEST-*.xml"
+#
+#
+#compile:testFast:testProofRules:
+#  stage: primary
+#  image: wadoon/key-test-docker:jdk11
+#  script:
+#    - javac -version
+#    - cd key
+#    - gradle --build-cache --continue :key.core:testProofRules
+#    - ls
+#  cache:
+#    key: "$CI_COMMIT_REF_NAME"
+#    policy: pull
+#    paths:
+#      - build
+#      - .gradle
+#  artifacts:
+#    reports:
+#      junit:
+#        - "**/**/build/test-results/*/TEST-*.xml"
 
 checkstyle:
   stage: primary
-  image: key-dev-openjdk8
+  image: wadoon/key-test-docker:jdk11
   allow_failure: true
   script:
     - echo "**** Check the commit's gitlab page for a readable checkstyle report ****"
@@ -52,7 +252,7 @@ checkstyle:
     - key/scripts/tools/checkstyle/publishAudit.py report.txt
   artifacts:
     name: "checkstyle-report-$CI_JOB_ID"
-    expire_in: 1 week
+    expire_in: 1 year
     when: always
     paths:
     - report.txt

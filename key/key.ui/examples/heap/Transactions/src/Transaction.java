@@ -19,7 +19,7 @@ final class Transaction {
     */
     
     /*@ public invariant 
-          \subset(footprint, \infinite_union(Transaction t; t.*));
+          \subset(footprint, (\infinite_union Transaction t; t.*));
     */
 
     //@ invariant id >= 0;

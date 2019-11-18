@@ -15,7 +15,6 @@ package org.key_project.util.test.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.key_project.util.suite.AllUtilsTests;
 import org.key_project.util.test.testcase.AbstractBeanViewPartTest;
 import org.key_project.util.test.testcase.AbstractRunnableWithProgressAndResultTest;
 import org.key_project.util.test.testcase.AbstractRunnableWithResultTest;
@@ -38,7 +37,7 @@ import org.key_project.util.test.testcase.WorkbenchUtilTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    AllUtilsTests.class,
+   // AllUtilsTests.class,
     AbstractBeanViewPartTest.class,
     AbstractRunnableWithResultTest.class,
     AbstractRunnableWithProgressAndResultTest.class,

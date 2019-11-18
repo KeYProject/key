@@ -25,13 +25,14 @@ public class AmtoftBanerjee2 {
 
     // The accessible clause can be proved automatically, if the query treatment
     // is set to "off" and expand local queries is set to "on".
+    // Note: This method is final to allow for modularly sound method expansion
     //@ normal_behavior
     //@ ensures \result == expensive(z);
     //@ assignable \strictly_nothing;
     //@ accessible \nothing;
     //@ determines z, \result \by \itself;
     //@ helper
-    int expensive(int z) {
+    final int expensive(int z) {
         return z;
     }
 }

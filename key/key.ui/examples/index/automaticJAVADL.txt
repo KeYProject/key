@@ -52,7 +52,7 @@ tempDir = ../../key.core.test/runallproofs_tmp
  * 
  * Timeout per subprocess in seconds
  */
-forkTimeout = 1000
+forkTimeout = 2000
 
 /*
  * If the fork mode is not set to noFork, the launched subprocesses 
@@ -189,7 +189,7 @@ group applicationRestrictions {
    notprovable ./heap/polarity_tests/wellformed11.key
 }
 
-# Tests for block contracts:
+# Tests for block & loop contracts:
 group blockContracts {
    provable ./heap/block_contracts/Simple__add.key
    provable ./heap/block_contracts/Simple__addAbsoluteValues.key
@@ -203,6 +203,14 @@ group blockContracts {
 # the following test has a reload problem probably caused by the one-step-simplifier
 # provable: ./heap/block_contracts/GreatestCommonDivisor.key
    provable ./standard_key/java_dl/jml-assert/assert.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_external.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_internal.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onBlock_loop.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_external.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_internal.key
+   provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_loop.key
+   notprovable ./heap/block_loop_contracts/Finally/block_finally.key
+   notprovable ./heap/block_loop_contracts/Finally/loop_finally.key
 }
 
 # Tests for Java Card (should also include the API, pending fix to bug #1475)
@@ -217,6 +225,7 @@ group javaCard {
 
 # Other tests:
    provable ./heap/coincidence_count/project.key
+   provable ./heap/verifyThis11_1_Maximum/project.key
    provable ./heap/fm12_01_LRS/lcp.key
    provable ./heap/SemanticSlicing/project.key
    provable ./heap/information_flow/ArrayList_contains.key
@@ -357,6 +366,8 @@ group simpleTests {
    provable ./heap/strictly_pure/useStrictlyPureMethod.key
    provable ./heap/Wellfounded/ackermann.key
    provable ./standard_key/unicode_test.key
+   provable ./heap/strictlyModular/mayExpand.key
+   notprovable ./heap/strictlyModular/modularOnly.key
 }
 
 group SmansEtAl {
@@ -575,7 +586,8 @@ group javadl {
    provable ./standard_key/java_dl/methodCall.key
    provable ./standard_key/java_dl/methodCall1.key
    provable ./standard_key/java_dl/methodCall1box.key
-   provable ./standard_key/java_dl/methodCall2.key
+## Commented out as this can not be proved modularly sound (See !183 which is related)
+#  provable ./standard_key/java_dl/methodCall2.key
    provable ./standard_key/java_dl/methodCall3.key
    provable ./standard_key/java_dl/polishFlagSort.key
    provable ./standard_key/java_dl/postConditionTaclets1.key
@@ -598,7 +610,7 @@ group javadl {
    provable ./standard_key/staticInitialisation/objectOfErroneousClass.key
    provable ./standard_key/staticInitialisation/staticInitialisersAreNonSimple.key
    provable ./standard_key/types/disjoint.key
-   provable ../../key.core.test/resources/testcase/classpath/classpath.key
+   provable ../../key.core/src/test/resources/testcase/classpath/classpath.key
    notprovable ./heap/inconsistent_represents/MyClass_m.key
    notprovable ./heap/inconsistent_represents/MyClass_n.key
 }
@@ -919,6 +931,9 @@ group permissionHeap {
 group reload_examples {
    provable ./firstTouch/05-ReverseArray/reverseArray.key
 
+   # This is a reload regression test. Since it is the only one
+   # it goes here with the sibling reload tests
+   loadable ./standard_key/arith/saveProofTest.key.proof
    loadable ./heap/permutedSum/perm.proof
    loadable ./firstTouch/05-ReverseArray/reverseArray.proof
    loadable ./heap/verifyThis15_1_RelaxedPrefix/relax.proof

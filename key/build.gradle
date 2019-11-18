@@ -1,0 +1,337 @@
+//TODO figure out why javacc is always executed
+
+plugins {
+    id("idea")
+    id("eclipse")
+    id "com.jfrog.bintray" version "1.8.4" apply false
+    id "com.github.hierynomus.license-base" version "0.15.0"
+    id "com.github.hierynomus.license-report" version "0.15.0"
+
+    //for finding the license of thrid parties
+    //id "com.github.jk1.dependency-license-report" version "1.9"
+
+}
+
+// config of com.github.jk1.dependency-license-report
+// licenseReport { excludeGroups = ['']; configurations = ['ALL'] }
+
+idea {
+    module {
+        downloadJavadoc = false
+        downloadSources = true
+    }
+}
+
+static def gitRevParse(String args) {
+    try {
+        return "git rev-parse $args".execute().text.trim()
+    } catch (Exception e) {
+        return ""
+    }
+}
+
+static def getDate() {
+    return new Date().format('yyyyMMdd')
+}
+
+def gitRevision = gitRevParse('--short HEAD')
+def gitBranch = gitRevParse('--abbrev-ref HEAD')
+
+group = "org.key_project"
+def build = System.env.BUILD_NUMBER == null ? "" : "-${System.env.BUILD_NUMBER}"
+version = "2.7$build"
+
+subprojects {
+    apply plugin: "java"
+    apply plugin: "java-library"
+    apply plugin: "maven-publish"
+    apply plugin: "idea"
+    apply plugin: "eclipse"
+    apply plugin: "com.jfrog.bintray"
+
+    //for finding the license of thrid parties
+    //apply plugin: "com.github.jk1.dependency-license-report"
+    //licenseReport { excludeGroups = [''];  configurations = ALL }
+
+    /*
+    apply plugin: 'checkstyle'
+    apply plugin: 'pmd'
+    apply plugin: 'findbugs'
+    */
+
+    group = rootProject.group
+    version = rootProject.version
+
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
+
+    tasks.withType(Javadoc) {
+        failOnError = false
+        options.addBooleanOption 'Xdoclint:none', true
+        //options.verbose()
+        options.encoding = 'UTF-8'
+        if (JavaVersion.current().isJava9Compatible()) {
+            //options.addBooleanOption('html5', true)
+        }
+    }
+
+    tasks.withType(Test) {//Configure all tests
+        systemProperty "test-resources", "src/test/resources"
+        systemProperty "testcases", "src/test/resources/testcase"
+        systemProperty "TACLET_PROOFS", "tacletProofs"
+        systemProperty "EXAMPLES_DIR", file("$rootProject/key.ui/examples")
+        systemProperty "RUNALLPROOFS_DIR", "$buildDir/report/runallproves"
+
+        systemProperty "key.disregardSettings", "true"
+        maxHeapSize = "4g"
+
+        forkEvery = 0 //default
+        maxParallelForks = 1 // weigl: test on master
+    }
+
+    test {
+        // TODO consider moving this to key.core where it is repeated ...
+        useJUnit {
+            excludeCategories 'org.key_project.util.testcategories.Interactive', 'org.key_project.util.testcategories.Performance'
+        }
+
+        afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
+        beforeTest { desc -> logger.error "> ${desc.className}#${desc.name}" }
+    }
+
+    task testFast(type: Test) {
+        group "verification"
+        useJUnit {
+            // CAUTION! These settings do not affect :key.core since the
+            // detection mechanism is different there.
+            excludeCategories 'org.key_project.util.testcategories.Slow'
+            excludeCategories 'org.key_project.util.testcategories.Interactive'
+        }
+
+        testLogging {
+            // set options for log level LIFECYCLE
+            events "failed"
+            exceptionFormat "short"
+
+            // set options for log level DEBUG
+            debug {
+                events "started", "skipped", "failed"
+                exceptionFormat "full"
+            }
+
+            // remove standard output/error logging from --info builds
+            // by assigning only 'failed' and 'skipped' events
+            info.events = ["failed", "skipped"]
+        }
+    }
+
+    // The following two tasks can be used to execute main methods from the project
+    // The main class is set via "gradle -DmainClass=... execute --args ..."
+    // see https://stackoverflow.com/questions/21358466/gradle-to-execute-java-class-without-modifying-build-gradle
+    
+    task execute(type:JavaExec) {
+        group "application"
+        main = System.getProperty('mainClass')
+        classpath = sourceSets.main.runtimeClasspath
+    }
+
+    task executeInTests(type:JavaExec) {
+        group "application"
+        main = System.getProperty('mainClass')
+        classpath = sourceSets.test.runtimeClasspath
+    }
+
+    /*findbugs { findbugsTest.enabled = false; ignoreFailures = true }
+    pmd { pmdTest.enabled = false; ignoreFailures = true }
+    tasks.withType(Checkstyle) {
+        configFile file("$rootDir/scripts/tools/checkstyle/key_checks.xml")
+    }
+    tasks.withType(FindBugs) {
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
+    }
+    tasks.withType(Pmd) {
+        reports {
+            xml.enabled = true
+            html.enabled = true
+        }
+    }*/
+
+    repositories {
+        mavenCentral()
+        flatDir { dirs "lib", "$rootDir/key.core/lib" }
+    }
+
+    dependencies {
+        testCompile("junit:junit:4.12")
+        compile 'org.jetbrains:annotations:17.0.0'
+        //testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+        //testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+        //testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.3.1'
+        testCompile project(":key.util")
+    }
+
+
+    task sourcesJar(type: Jar) {
+        from sourceSets.main.allJava
+        archiveClassifier = 'sources'
+    }
+
+    task javadocJar(type: Jar) {
+        from javadoc
+        archiveClassifier = 'javadoc'
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                artifact sourcesJar
+                artifact javadocJar
+                pom {
+                    name = projects.name
+                    description = project.description
+                    url = 'http://key-project.org/'
+
+                    licenses {
+                        license {
+                            name = "GNU General Public License (GPL), Version 2"
+                            url = "http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'key'
+                            name = 'KeY Developers'
+                            email = 'support@key-project.org'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:git://git.key-project.org/key/key.git'
+                        developerConnection = 'scm:git:git://git.key-project.org/key/key.git'
+                        url = 'https://git.key-project.org/'
+                    }
+                }
+            }
+        }
+        repositories {
+            maven {
+                name = "bintray-snapshots"
+                url = "https://dl.bintray.com/key/stable-snapshots"
+            }
+        }
+    }
+
+    bintray {
+        user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+        key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+        publications = ['mavenJava']
+
+        dryRun = false //[Default: false] Whether to run this as dry-run, without deploying
+        publish = true //[Default: false] Whether version should be auto published after an upload
+        override = false //[Default: false] Whether to override version artifacts already published
+
+        pkg {
+            userOrg = "key"
+            repo = 'stable-snapshots'
+            name = "key"
+            licenses = ['GPL-2.0']
+            vcsUrl = 'https://git.key-project.org/key/key.git'
+        }
+    }
+
+    license {
+        header = file("$rootDir/gradle/header")
+
+        mapping {
+            //find styles here:
+            // http://code.mycila.com/license-maven-plugin/#supported-comment-types
+            java="SLASHSTAR_STYLE" // DOUBLESLASH_STYLE
+            javascript="SLASHSTAR_STYLE"
+        }
+        mapping("key", "SLASHSTAR_STYLE")
+    }
+
+    eclipse {
+        classpath {
+            file {
+                whenMerged {
+                    entries.findAll { it.path.endsWith('src/test/antlr') }.each { it.excludes = ["**/*.java"] }
+                    entries.findAll { it.path.endsWith('/resources') }.each { it.excludes = ["**/*.java"] }
+                }
+            }
+        }
+    }
+}
+
+
+task start {
+    doFirst {
+        println "Use :key.ui:run instead"
+    }
+}
+
+
+task alldoc(type: Javadoc) {
+    group "documentation"
+    def projects = subprojects
+    //key.ui javadoc is broken
+    source projects.collect { it.sourceSets.main.allJava }
+    classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
+    destinationDir = file("${buildDir}/docs/javadoc")
+
+    if (JavaVersion.current().isJava9Compatible()) {
+        //notworking on jenkins    options.addBooleanOption('html5', true)
+    }
+
+    configure(options) {
+        //showFromPrivate()
+        encoding = 'UTF-8'
+        addBooleanOption 'Xdoclint:none', true
+        // overview = new File( projectDir, 'src/javadoc/package.html' )
+        //stylesheetFile = new File( projectDir, 'src/javadoc/stylesheet.css' )
+        windowTitle = 'KeY API Documentation'
+        docTitle = "KeY JavaDoc ($project.version) -- ${getDate()}"
+        bottom = "Copyright &copy; 2003-2019 <a href=\"http://key-project.org\">The KeY-Project</a>."
+        use = true
+        links += 'http://download.oracle.com/javase/8/docs/api/'
+        links += "http://www.antlr2.org/javadoc/"
+        links += "http://www.antlr3.org/api/Java/"
+        links += "http://recoder.sourceforge.net/doc/api/"
+    }
+}
+
+task alldocJar(type: Zip) {
+    dependsOn alldoc
+    from alldoc
+    archiveFileName = "key-api-doc-${project.version}.zip"
+    destinationDirectory = file("$buildDir/distribution")
+}
+
+/*task fatJar(type: Jar) {
+    dependsOn project(":key.ui").jar
+    dependsOn project(":keyext.interactionlog").jar
+    //dependsOn project(":keyext.script.ui").jar
+
+    def jarFiles = //[project(":key.ui").jar.archivePath] +
+            project(":key.ui").configurations.runtimeClasspath
+    def names = jarFiles.collect { "./${it.name}" }.join(", ")
+
+    manifest {
+        attributes 'Main-Class': "de.uka.ilkd.key.core.Main",
+                "Manifest-Version": "1.0",
+                "Permissions": "all-permissions",
+                "Codebase": "formal.iti.kit.edu",
+                "Application-Name": "KeY",
+                "Class-Path": names
+    }
+
+    archiveName = "key-${project.version}-exec.jar"
+    destinationDir(buildDir)
+    from jarFiles
+    with project(":key.ui").jar
+    from "$rootDir/LICENSE.TXT"
+}*/

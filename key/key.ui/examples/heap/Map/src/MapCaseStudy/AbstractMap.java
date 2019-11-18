@@ -24,7 +24,7 @@ public abstract class AbstractMap implements MapInterface {
     @ public invariant \typeof(entries) == \type(MapEntry[]);
     @
     @ public invariant footprint ==
-    @      \set_union(\infinite_union(int i; 0 <= i && i < entries.length;
+    @      \set_union((\infinite_union int i; 0 <= i && i < entries.length;
     @                          entries[i].*), this.*, entries.*);
     @
     @ public invariant (\forall int i; 0 <= i && i < entries.length; entries[i].key != null);

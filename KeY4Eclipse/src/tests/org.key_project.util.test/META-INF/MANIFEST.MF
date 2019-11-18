@@ -24,9 +24,7 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8, JavaSE-10, JavaSE-9
 Bundle-Vendor: KeY Project
-Export-Package: org.key_project.util.helper,
- org.key_project.util.model,
- org.key_project.util.suite,
+Export-Package: 
  org.key_project.util.test,
  org.key_project.util.test.editor,
  org.key_project.util.test.perspective,
@@ -36,7 +34,4 @@ Export-Package: org.key_project.util.helper,
  org.key_project.util.test.testcase.swtbot,
  org.key_project.util.test.util,
  org.key_project.util.test.util.internal,
- org.key_project.util.test.view,
- org.key_project.util.testcase.collection,
- org.key_project.util.testcase.java
-Automatic-Module-Name: org.key_project.util.test
+ org.key_project.util.test.view
