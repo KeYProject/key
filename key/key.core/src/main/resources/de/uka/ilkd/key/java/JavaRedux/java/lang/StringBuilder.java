@@ -2,11 +2,21 @@ package java.lang;
 
 public final class StringBuilder implements java.io.Serializable, java.lang.Appendable {
     
-    public String str = "";
+    public String str;
     
-	public StringBuilder() { }
+    /*@ public normal_behavior
+      @ ensures \fresh(this) && \fresh(this.*);
+      @ determines str \by \nothing;
+      @ determines \dl_strContent(str) \by \nothing;
+      @*/
+	public /*@pure@*/ StringBuilder();
 	
-    public StringBuilder(int param0) { }
+	/*@ public normal_behavior
+      @ ensures \fresh(this) && \fresh(this.*);
+      @ determines str \by \nothing;
+      @ determines \dl_strContent(str) \by \nothing;
+      @*/
+    public /*@pure@*/ StringBuilder(int param0) { }
    
     /*@ public normal_behavior
       @ ensures \fresh(str) && str != null;
