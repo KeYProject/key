@@ -1,20 +1,23 @@
-//TODO figure out why javacc is always executed
+// TODO figure out why javacc is always executed
 
 plugins {
+    // TODO can we say a word what these are for?
     id("idea")
     id("eclipse")
     id "com.jfrog.bintray" version "1.8.4" apply false
     id "com.github.hierynomus.license-base" version "0.15.0"
     id "com.github.hierynomus.license-report" version "0.15.0"
 
-    //for finding the license of thrid parties
-    //id "com.github.jk1.dependency-license-report" version "1.9"
+    // for finding the license of third parties
+    // id "com.github.jk1.dependency-license-report" version "1.9"
 
 }
 
+// for finding the license of third parties
 // config of com.github.jk1.dependency-license-report
 // licenseReport { excludeGroups = ['']; configurations = ['ALL'] }
 
+// TODO @AW: Say a word what this for
 idea {
     module {
         downloadJavadoc = false
@@ -22,6 +25,8 @@ idea {
     }
 }
 
+// Helper function that calls "git rev-parse" to
+// find names/SHAs for commits
 static def gitRevParse(String args) {
     try {
         return "git rev-parse $args".execute().text.trim()
@@ -34,11 +39,19 @@ static def getDate() {
     return new Date().format('yyyyMMdd')
 }
 
+// TODO @AW: Are these ever used? There is a redefinition in key.core
+
+/* Holds a shortened (10 characters) commit SHA of the 
+ * current git revision or "" if git not installed
+ * or not a git repository etc.
+ */ 
 def gitRevision = gitRevParse('--short HEAD')
 def gitBranch = gitRevParse('--abbrev-ref HEAD')
 
-group = "org.key_project"
+// TODO @AW: Where does BUILD_NUMBER come from?
 def build = System.env.BUILD_NUMBER == null ? "" : "-${System.env.BUILD_NUMBER}"
+
+group = "org.key_project"
 version = "2.7$build"
 
 subprojects {
@@ -49,19 +62,30 @@ subprojects {
     apply plugin: "eclipse"
     apply plugin: "com.jfrog.bintray"
 
-    //for finding the license of thrid parties
-    //apply plugin: "com.github.jk1.dependency-license-report"
-    //licenseReport { excludeGroups = [''];  configurations = ALL }
+    // for finding the license of third parties
+    // apply plugin: "com.github.jk1.dependency-license-report"
+    // licenseReport { excludeGroups = [''];  configurations = ALL }
 
-    /*
-    apply plugin: 'checkstyle'
-    apply plugin: 'pmd'
-    apply plugin: 'findbugs'
-    */
+    
+    // apply plugin: 'checkstyle'
+    // apply plugin: 'pmd'
+    // apply plugin: 'findbugs'    
 
     group = rootProject.group
     version = rootProject.version
 
+    repositories {
+        mavenCentral()
+        flatDir { dirs "lib", "$rootDir/key.core/lib" }
+    }
+
+    dependencies {
+        compile     'org.jetbrains:annotations:17.0.0'
+        testCompile 'junit:junit:4.12'
+        testCompile project(':key.util')
+    }
+
+    // TODO @AW: What does it do?
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
     }
@@ -131,56 +155,45 @@ subprojects {
     // see https://stackoverflow.com/questions/21358466/gradle-to-execute-java-class-without-modifying-build-gradle
     
     task execute(type:JavaExec) {
+        description 'Execute main method from the project. Set main class via "gradle -DmainClass=... execute --args ..."'
         group "application"
         main = System.getProperty('mainClass')
         classpath = sourceSets.main.runtimeClasspath
     }
 
     task executeInTests(type:JavaExec) {
+        description 'Execute main method from the project (tests loaded). Set main class via "gradle -DmainClass=... execute --args ..."'
         group "application"
         main = System.getProperty('mainClass')
         classpath = sourceSets.test.runtimeClasspath
     }
 
-    /*findbugs { findbugsTest.enabled = false; ignoreFailures = true }
-    pmd { pmdTest.enabled = false; ignoreFailures = true }
-    tasks.withType(Checkstyle) {
-        configFile file("$rootDir/scripts/tools/checkstyle/key_checks.xml")
-    }
-    tasks.withType(FindBugs) {
-        reports {
-            xml.enabled = false
-            html.enabled = true
-        }
-    }
-    tasks.withType(Pmd) {
-        reports {
-            xml.enabled = true
-            html.enabled = true
-        }
-    }*/
-
-    repositories {
-        mavenCentral()
-        flatDir { dirs "lib", "$rootDir/key.core/lib" }
-    }
-
-    dependencies {
-        testCompile("junit:junit:4.12")
-        compile 'org.jetbrains:annotations:17.0.0'
-        //testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
-        //testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
-        //testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.3.1'
-        testCompile project(":key.util")
-    }
-
-
+    // findbugs { findbugsTest.enabled = false; ignoreFailures = true }
+    // pmd { pmdTest.enabled = false; ignoreFailures = true }
+    // tasks.withType(Checkstyle) {
+    //     configFile file("$rootDir/scripts/tools/checkstyle/key_checks.xml")
+    // }
+    // tasks.withType(FindBugs) {
+    //     reports {
+    //         xml.enabled = false
+    //         html.enabled = true
+    //     }
+    // }
+    // tasks.withType(Pmd) {
+    //     reports {
+    //         xml.enabled = true
+    //         html.enabled = true
+    //     }
+    // }
+    
     task sourcesJar(type: Jar) {
+        description = 'Create a jar file with the sources from this project'
         from sourceSets.main.allJava
         archiveClassifier = 'sources'
     }
 
     task javadocJar(type: Jar) {
+        description = 'Create a jar file with the javadocs from this project'
         from javadoc
         archiveClassifier = 'javadoc'
     }
@@ -225,6 +238,8 @@ subprojects {
         }
     }
 
+    // TODO @ AW: What does this do?
+    // TODO Where are the credentials?
     bintray {
         user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
         key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
@@ -269,14 +284,16 @@ subprojects {
 
 
 task start {
+    description "Use :key.ui:run instead"
     doFirst {
         println "Use :key.ui:run instead"
     }
 }
 
 
+// TODO @AW: What does it do?
 task alldoc(type: Javadoc) {
-    group "documentation"
+    group "documentation"    
     def projects = subprojects
     //key.ui javadoc is broken
     source projects.collect { it.sourceSets.main.allJava }
@@ -304,34 +321,10 @@ task alldoc(type: Javadoc) {
     }
 }
 
+// TODO @AW: What does it do?
 task alldocJar(type: Zip) {
     dependsOn alldoc
     from alldoc
     archiveFileName = "key-api-doc-${project.version}.zip"
     destinationDirectory = file("$buildDir/distribution")
 }
-
-/*task fatJar(type: Jar) {
-    dependsOn project(":key.ui").jar
-    dependsOn project(":keyext.interactionlog").jar
-    //dependsOn project(":keyext.script.ui").jar
-
-    def jarFiles = //[project(":key.ui").jar.archivePath] +
-            project(":key.ui").configurations.runtimeClasspath
-    def names = jarFiles.collect { "./${it.name}" }.join(", ")
-
-    manifest {
-        attributes 'Main-Class': "de.uka.ilkd.key.core.Main",
-                "Manifest-Version": "1.0",
-                "Permissions": "all-permissions",
-                "Codebase": "formal.iti.kit.edu",
-                "Application-Name": "KeY",
-                "Class-Path": names
-    }
-
-    archiveName = "key-${project.version}-exec.jar"
-    destinationDir(buildDir)
-    from jarFiles
-    with project(":key.ui").jar
-    from "$rootDir/LICENSE.TXT"
-}*/

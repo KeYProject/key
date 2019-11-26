@@ -1,5 +1,8 @@
 plugins {
-    id("application")
+    id 'application'
+    
+    // Used to create a single executable jar file with all dependencies
+    // see task "shadowJar" below
     id 'com.github.johnrengelman.shadow' version "5.0.0"
 }
 
@@ -20,10 +23,12 @@ dependencies {
     runtimeOnly project(":keyext.interactionlog")
     //runtimeOnly project(":keyext.script.ui")
 
+    // TODO @AW: Is this not already in key-main?
     compile 'org.jetbrains:annotations:17.0.0'
 }
 
 task createExamplesZip(type: Zip) {
+    description 'Create "examples.zip" containing all KeY examples'
     destinationDirectory = file("$buildDir/resources/main/")
     archiveFileName = "examples.zip"
     from 'examples'
@@ -43,7 +48,8 @@ distZip {
 }
 
 application {
-    //dependsOn(createExamplesZip)
+    // TODO Remove this or enable it?
+    // dependsOn(createExamplesZip)
     mainClassName = "de.uka.ilkd.key.core.Main"
 }
 
