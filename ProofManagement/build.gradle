@@ -15,17 +15,18 @@ repositories {
     // You can declare any Maven/Ivy/file repository here.
     //jcenter()
     mavenCentral()
+    mavenLocal()
 }
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
     //implementation ':key.util'
-    implementation ':key.core'
+    implementation 'org.key_project:key.core:2.7'
 
 }
 
 task classesTask {
     //dependsOn gradle.includedBuild('key.util').task(':classes')
-    dependsOn gradle.includedBuild('key.core').task('classes')
+    //dependsOn gradle.includedBuild('key').task(':key.core:run')
 }
 
