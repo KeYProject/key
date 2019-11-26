@@ -17,7 +17,7 @@ repositories {
     //jcenter()
     mavenCentral()
     mavenLocal()
-    // flatDir { dirs "../key/key.core/lib" }
+    flatDir { dirs file("$rootDir/../key/key.core/lib") }
 }
 
 // In this section you declare the dependencies for your production and test code
