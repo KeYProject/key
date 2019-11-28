@@ -3,6 +3,7 @@ plugins {
     
     // Used to create a single executable jar file with all dependencies
     // see task "shadowJar" below
+    // https://imperceptiblethoughts.com/shadow/
     id 'com.github.johnrengelman.shadow' version "5.0.0"
 }
 
@@ -22,9 +23,6 @@ dependencies {
 
     runtimeOnly project(":keyext.interactionlog")
     //runtimeOnly project(":keyext.script.ui")
-
-    // TODO @AW: Is this not already in key-main?
-    compile 'org.jetbrains:annotations:17.0.0'
 }
 
 task createExamplesZip(type: Zip) {
@@ -48,13 +46,10 @@ distZip {
 }
 
 application {
-    // TODO Remove this or enable it?
-    // dependsOn(createExamplesZip)
     mainClassName = "de.uka.ilkd.key.core.Main"
 }
 
 run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
-    // args "--experimental"
 }
 

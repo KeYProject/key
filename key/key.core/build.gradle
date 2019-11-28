@@ -111,7 +111,7 @@ task testRunAllProofs(type: Test) {
     }
 }
 
-// TODO @AW What does it do?
+//Generation of the three version files within the resources by executing `git'.
 task generateVersionFiles() {
     def outputFolder = file("build/resources/main/de/uka/ilkd/key/util")
     def sha1 = new File(outputFolder, "sha1")
@@ -130,8 +130,8 @@ task generateVersionFiles() {
     }
 }
 
-// @AW: Say something here.
+// @AW: Say something here. From POV this explain by itself.
 processResources.dependsOn generateVersionFiles
 
-// @AW: Delete?
+// @AW: Delete? weigl: depends: If want that gradle check validates everything then not.
 // check.dependsOn << testProofRules << testRunAllProofs

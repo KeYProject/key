@@ -1,4 +1,2 @@
 dependencies{
-    // TODO @AW: Already in key-main?
-    compile 'org.jetbrains:annotations:17.0.0'
 }
