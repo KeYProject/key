@@ -1,4 +1,4 @@
-package consistencyChecking;
+package proofmanagement.consistencyChecking;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -8,8 +8,8 @@ import java.util.Properties;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import consistencyChecking.dependency.DependencyGraph;
-import consistencyChecking.dependency.DependencyGraphBuilder;
+import proofmanagement.consistencyChecking.dependency.DependencyGraph;
+import proofmanagement.consistencyChecking.dependency.DependencyGraphBuilder;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
@@ -41,20 +41,21 @@ public class DependencyChecker implements Checker {
     public boolean check(ImmutableList<Path> proofFiles) {
         ImmutableList<Pair<String, BranchNodeIntermediate>> contractProofPairs = ImmutableSLList.nil();
         try {
-            // for each proof: construct AST
+            // for each proof: parse and construct intermediate AST
             for (Path proofPath : proofFiles) {
                 Pair<String, BranchNodeIntermediate> currentContractAndProof = loadProof(proofPath);
                 contractProofPairs = contractProofPairs.prepend(currentContractAndProof);
             }
             // construct dependency graph from proofs
             // WARNING: the analysis as is currently implemented asserts there is exactly one proof for each contract!!!
-        	DependencyGraph dependencyGraph = DependencyGraphBuilder.buildGraph(specRepo, contractProofPairs);
+            DependencyGraph dependencyGraph = DependencyGraphBuilder.buildGraph(specRepo, contractProofPairs);
             // check if graph contains illegal structures,
             //			e.g. cycles, unproven dependencies, ...
-            if(!dependencyGraph.isLegal()) {
-            	// if graph illegal, report problem(s)
-            	// TODO: what exactly are the problems
-            	//			and how can they be extracted?
+            if (!dependencyGraph.isLegal()) {
+                // if graph illegal, report problem(s)
+                // TODO: what exactly are the problems
+                // and how can they be extracted?
+                return false;
             }
         } catch (IOException e) {
             // TODO:

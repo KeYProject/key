@@ -1,4 +1,4 @@
-package io;
+package proofmanagement.io;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -16,6 +16,11 @@ import org.key_project.util.java.IOUtil;
 import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
+/**
+ * This class serves as an extractor to get the paths of specific files inside a proof bundle
+ * (a zip containing possibly multiple *.proof/*.key files and corresponding source/classpath
+ * files in a well defined directory structure).
+ */
 public class PackageHandler {
     /**
      * A matcher matches *.proof files.
@@ -49,9 +54,13 @@ public class PackageHandler {
 
     private Path zipPath;
     private boolean isInitialized = false;
-    private FileRepo fileRepo;
+    //private FileRepo fileRepo;
     private Path tmpDir;
 
+    /**
+     * Creates a new PackageHandler for the specified proof bundle.
+     * @param zipPath the path of the proof bundle (zip file)
+     */
     public PackageHandler(Path zipPath) {
         this.zipPath = zipPath;
     }
@@ -61,10 +70,11 @@ public class PackageHandler {
             tmpDir = Files.createTempDirectory("KeYunzip");
             IOUtil.extractZip(zipPath, tmpDir);
 
-            fileRepo = new DiskFileRepo("HacKeYrepo");
+            //fileRepo = new DiskFileRepo("HacKeYrepo");
 
             // point the FileRepo to the temporary directory
-            fileRepo.setBaseDir(tmpDir);
+            //fileRepo.setBaseDir(tmpDir);
+
             isInitialized = true;
         }
     }
@@ -73,7 +83,7 @@ public class PackageHandler {
         ImmutableList<Path> files = ImmutableSLList.nil();
         if (Files.isDirectory(dir)) {
             files = files.append(Files.list(dir)
-                    .filter(name -> matcher.matches(name))
+                    .filter(matcher::matches)
                     .collect(Collectors.toList()));
         }
         return files;
@@ -122,9 +132,11 @@ public class PackageHandler {
         return getFiles(bootclasspathPath, BOOTCLASSPATH_MATCHER);
     }
 
+    /*
     public FileRepo getFileRepo() {
         return fileRepo;
     }
+    */
 
     public Path getDir() {
         return tmpDir;

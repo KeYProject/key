@@ -16,7 +16,7 @@ repositories {
     // You can declare any Maven/Ivy/file repository here.
     //jcenter()
     mavenCentral()
-    mavenLocal()
+    //mavenLocal()
     flatDir { dirs file("$rootDir/../key/key.core/lib") }
 }
 
@@ -27,5 +27,10 @@ dependencies {
 }
 
 application {
-    mainClassName = "Main"
+    mainClassName = "proofmanagement.Main"
+}
+
+run {
+    //dependsOn(classes) // implicit!
+    args('check', 'C:\\Users\\Banach\\Desktop\\acyclic.zproof')
 }

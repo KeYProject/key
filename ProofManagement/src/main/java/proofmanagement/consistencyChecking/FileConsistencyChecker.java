@@ -1,24 +1,27 @@
-package consistencyChecking;
+package proofmanagement.consistencyChecking;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.IOUtil;
 
-import io.PackageHandler;
+import proofmanagement.io.PackageHandler;
 
+/**
+ * This class tests if all given proof is consistent w.r.t. the files contained.
+ */
 public class FileConsistencyChecker {
     
     public static Path merge(ImmutableList<Path> paths, Path newZProofDir) {
+        // TODO: individual checkers should not depend on each other
         if (new SettingsChecker().check(paths) && listOfPathsConsistent(paths)) {
 
             // only add source files from first package
@@ -77,19 +80,20 @@ public class FileConsistencyChecker {
             e1.printStackTrace();
         }
         
-        HashMap<Path, byte[]> mapA= new HashMap<Path, byte[]>();
-        HashMap<Path, byte[]> mapB= new HashMap<Path, byte[]>();
+        HashMap<Path, byte[]> mapA = new HashMap<>();
+        HashMap<Path, byte[]> mapB = new HashMap<>();
         try {
             for (Path p : classpathFilesA) {
-                mapA.put(p, createChecksum(p.getFileName().toString()));
+                mapA.put(p, createMd5Checksum(p));
             }
             for (Path p : classpathFilesB) {
-                mapB.put(p, createChecksum(p.getFileName().toString()));
+                mapB.put(p, createMd5Checksum(p));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
+        // check if all files
         for (Path p : mapA.keySet()) {
             if (!mapB.containsKey(p) || !(Arrays.equals(mapA.get(p), mapB.get(p)))) {
                 return false;
@@ -97,9 +101,16 @@ public class FileConsistencyChecker {
         }
         return true;
     }
-    
-    public static byte[] createChecksum(String filename) throws Exception {
-        InputStream fis =  new FileInputStream(filename);
+
+    /**
+     * Reads the file with the given path and computes the md5 checksum of it.
+     * @param path path of the file
+     * @return md5 checksum of the file
+     * @throws NoSuchAlgorithmException if the MD5 checksum is not available for some reason
+     * @throws IOException if the file with the given path does not exist or can not be read
+     */
+    public static byte[] createMd5Checksum(Path path) throws NoSuchAlgorithmException, IOException {
+        InputStream fis = new FileInputStream(path.toFile());
 
         byte[] buffer = new byte[1024];
         MessageDigest complete = MessageDigest.getInstance("MD5");

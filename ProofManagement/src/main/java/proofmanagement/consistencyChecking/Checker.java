@@ -1,4 +1,4 @@
-package consistencyChecking;
+package proofmanagement.consistencyChecking;
 
 import java.nio.file.Path;
 import org.key_project.util.collection.ImmutableList;

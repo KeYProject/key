@@ -1,4 +1,4 @@
-package consistencyChecking;
+package proofmanagement.consistencyChecking;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -19,12 +19,16 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 //TODO: precise user feedback
+
+/**
+ * This class checks if the settings of the given proof bundles are consistent.
+ */
 public class SettingsChecker implements Checker{
 
     //TODO: maybe make something Java 8 compatible here
     //TODO: it is not checked that this is a equivalence relation, but thats probably okay.
     // Setting not explicitly listed here are assumed to be compatible iff equal
-    private static final Map<String, Set<Set<String>>> choiceCompatibilityClasses = new HashMap<String, Set<Set<String>>>(); 
+    private static final Map<String, Set<Set<String>>> choiceCompatibilityClasses = new HashMap<String, Set<Set<String>>>();
 //            Map.ofEntries(
 //            Map.entry("moreSeqRules", Set.of(Set.of("moreSeqRules:off", "moreSeqRules:on")))
 //            );
@@ -49,8 +53,7 @@ public class SettingsChecker implements Checker{
         for (KeYUserProblemFile f : problemFiles) {
             try {
                 proofSettings = proofSettings.append(f.readPreferences());
-            }
-            catch (ProofInputException e) {
+            } catch (ProofInputException e) {
                 e.printStackTrace();
             }
         }
