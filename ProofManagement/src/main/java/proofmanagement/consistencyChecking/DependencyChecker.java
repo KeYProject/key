@@ -3,6 +3,7 @@ package proofmanagement.consistencyChecking;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Properties;
 
 import org.key_project.util.collection.ImmutableList;
@@ -38,7 +39,7 @@ public class DependencyChecker implements Checker {
     private SpecificationRepository specRepo = null;
 
     @Override
-    public boolean check(ImmutableList<Path> proofFiles) {
+    public CheckResult check(List<Path> proofFiles) {
         ImmutableList<Pair<String, BranchNodeIntermediate>> contractProofPairs = ImmutableSLList.nil();
         try {
             // for each proof: parse and construct intermediate AST
@@ -55,14 +56,19 @@ public class DependencyChecker implements Checker {
                 // if graph illegal, report problem(s)
                 // TODO: what exactly are the problems
                 // and how can they be extracted?
-                return false;
+                CheckResult result = new CheckResult(false);
+                result.addMessage("[ERROR] Found a cycle in dependency graph: " + dependencyGraph);
+                // TODO: messages
+                return result;
             }
         } catch (IOException e) {
             // TODO:
         } catch (ProofInputException e) {
             // TODO:
         }
-        return true;
+        CheckResult result = new CheckResult(true);
+        result.addMessage("[INFO] No cyclic dependency detected!");
+        return result;
     }
 
     /**

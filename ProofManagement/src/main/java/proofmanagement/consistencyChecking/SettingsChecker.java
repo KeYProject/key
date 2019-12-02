@@ -1,12 +1,7 @@
 package proofmanagement.consistencyChecking;
 
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import java.util.*;
 
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
@@ -38,43 +33,46 @@ public class SettingsChecker implements Checker{
     //TODO: Carry file info with the data to allow for good user feedback
     //TODO: Consistency Checker should work on a higher abstraction level and not handle files, do file handling separately (we'll also need to reuse that)
     @Override
-    public boolean check(ImmutableList<Path> proofFiles) {
+    public CheckResult check(List<Path> proofFiles) {
 
-        ImmutableList<KeYUserProblemFile> problemFiles = ImmutableSLList.nil();
+        List<KeYUserProblemFile> problemFiles = new ArrayList<>();
 
         for (Path p : proofFiles) {
-            problemFiles = problemFiles.append(new KeYUserProblemFile(p.toString(), p.toFile(),
+            problemFiles.add(new KeYUserProblemFile(p.toString(), p.toFile(),
                     new TrivialFileRepo(), ProgressMonitor.Empty.getInstance(), AbstractProfile.getDefaultProfile(), false));
         }
 
 
-        ImmutableList<ProofSettings> proofSettings = ImmutableSLList.nil();
+        List<ProofSettings> proofSettings = new ArrayList<>();
 
         for (KeYUserProblemFile f : problemFiles) {
             try {
-                proofSettings = proofSettings.append(f.readPreferences());
+                proofSettings.add(f.readPreferences());
             } catch (ProofInputException e) {
                 e.printStackTrace();
             }
         }
 
-        return consistent(proofSettings);
+        // TODO: messages
+        CheckResult result = new CheckResult(consistent(proofSettings));
+        return result;
     }
 
     //TODO: SMT settings ignored for now! (strategy settings should be irrelevant)
-    public static boolean consistent(ImmutableList<ProofSettings> proofSettings) {
-        ImmutableList<ChoiceSettings> choiceSettings = ImmutableSLList.nil();
+    public static boolean consistent(List<ProofSettings> proofSettings) {
+        List<ChoiceSettings> choiceSettings = new ArrayList<>();
         for (ProofSettings settings : proofSettings) {
-            choiceSettings = choiceSettings.append(settings.getChoiceSettings());
+            choiceSettings.add(settings.getChoiceSettings());
         }
 
         return choiceConsistent(choiceSettings);
     }
 
-    private static boolean choiceConsistent(ImmutableList<ChoiceSettings> choiceSettings) {
+    private static boolean choiceConsistent(List<ChoiceSettings> choiceSettings) {
         //TODO this does not yet work as intended
-        ChoiceSettings reference = choiceSettings.head();
-        for (ChoiceSettings cs: choiceSettings.tail()) {
+        ChoiceSettings reference = choiceSettings.get(0);
+        for (int i = 1; i < choiceSettings.size(); i++) {
+            ChoiceSettings cs = choiceSettings.get(i);
             if (!cs.getDefaultChoices().keySet().equals(reference.getDefaultChoices().keySet())) {
                 return false;
             }

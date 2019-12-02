@@ -1,7 +1,6 @@
 package proofmanagement.consistencyChecking;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -10,22 +9,21 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
-
-import org.key_project.util.collection.ImmutableList;
+import java.util.List;
 
 import proofmanagement.io.PackageHandler;
 
 /**
  * This class tests if all given proof is consistent w.r.t. the files contained.
  */
-public class FileConsistencyChecker {
+public class FileConsistencyChecker implements Checker {
     
-    public static Path merge(ImmutableList<Path> paths, Path newZProofDir) {
+    public static Path merge(List<Path> paths, Path newZProofDir) {
         // TODO: individual checkers should not depend on each other
-        if (new SettingsChecker().check(paths) && listOfPathsConsistent(paths)) {
+        if (new SettingsChecker().check(paths).isConsistent() && listOfPathsConsistent(paths)) {
 
             // only add source files from first package
-            PackageHandler referencePh = new PackageHandler(paths.head());
+            PackageHandler referencePh = new PackageHandler(paths.get(0));
 
             try {
                 for (Path sourceFile : referencePh.getClasspathFiles()) {
@@ -56,10 +54,11 @@ public class FileConsistencyChecker {
         return newZProofDir;
     }
     
-    private static boolean listOfPathsConsistent(ImmutableList<Path> paths) {
+    private static boolean listOfPathsConsistent(List<Path> paths) {
         boolean res = true;
-        Path reference = paths.head();
-        for (Path p : paths.tail()) {
+        Path reference = paths.get(0);
+        for (int i = 1; i < paths.size(); i++) {
+            Path p = paths.get(i);
             res &= classpathsConsistent(p,  reference);
         }
         return res;
@@ -68,8 +67,8 @@ public class FileConsistencyChecker {
     private static boolean classpathsConsistent(Path pathA, Path pathB) {
         PackageHandler pa = new PackageHandler(pathA);
         PackageHandler pb = new PackageHandler(pathB);
-        ImmutableList<Path> classpathFilesA = null;
-        ImmutableList<Path> classpathFilesB = null;
+        List<Path> classpathFilesA = null;
+        List<Path> classpathFilesB = null;
         try {
             classpathFilesA = pa.getClasspathFiles();
             classpathFilesB = pb.getClasspathFiles();
@@ -127,4 +126,9 @@ public class FileConsistencyChecker {
         return complete.digest();
     }
 
+    @Override
+    public CheckResult check(List<Path> proofFiles) {
+        // TODO:
+        return null;
+    }
 }

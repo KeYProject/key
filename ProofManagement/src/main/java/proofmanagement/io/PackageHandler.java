@@ -6,15 +6,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.ZipException;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.IOUtil;
 
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
 /**
  * This class serves as an extractor to get the paths of specific files inside a proof bundle
@@ -79,10 +77,10 @@ public class PackageHandler {
         }
     }
 
-    private ImmutableList<Path> getFiles(Path dir, PathMatcher matcher) throws IOException {
-        ImmutableList<Path> files = ImmutableSLList.nil();
+    private List<Path> getFiles(Path dir, PathMatcher matcher) throws IOException {
+        List<Path> files = new ArrayList<>();
         if (Files.isDirectory(dir)) {
-            files = files.append(Files.list(dir)
+            files.addAll(Files.list(dir)
                     .filter(matcher::matches)
                     .collect(Collectors.toList()));
         }
@@ -90,7 +88,7 @@ public class PackageHandler {
     }
 
     // *.proof
-    public ImmutableList<Path> getProofFiles() throws ZipException, IOException {
+    public List<Path> getProofFiles() throws ZipException, IOException {
         // ensure the zip is extracted
         load();
 
@@ -98,7 +96,7 @@ public class PackageHandler {
     }
 
     // *.key
-    public ImmutableList<Path> getKeYFiles() throws ZipException, IOException {
+    public List<Path> getKeYFiles() throws ZipException, IOException {
         // ensure the zip is extracted
         load();
 
@@ -106,7 +104,7 @@ public class PackageHandler {
     }
 
     // *.java
-    public ImmutableList<Path> getSourceFiles() throws ZipException, IOException {
+    public List<Path> getSourceFiles() throws ZipException, IOException {
         // ensure the zip is extracted
         load();
 
@@ -115,7 +113,7 @@ public class PackageHandler {
     }
 
     // *.java, *.class, *.zip, *.jar
-    public ImmutableList<Path> getClasspathFiles() throws ZipException, IOException {
+    public List<Path> getClasspathFiles() throws ZipException, IOException {
         // ensure the zip is extracted
         load();
 
@@ -124,7 +122,7 @@ public class PackageHandler {
     }
 
     // *.java
-    public ImmutableList<Path> getBootclasspathFiles() throws ZipException, IOException {
+    public List<Path> getBootclasspathFiles() throws ZipException, IOException {
         // ensure the zip is extracted
         load();
 
