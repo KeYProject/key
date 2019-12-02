@@ -15,6 +15,7 @@ package de.uka.ilkd.key.logic.op;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -94,6 +95,11 @@ public final class SortDependingFunction extends Function {
     //public interface
     //-------------------------------------------------------------------------
 
+    @Override
+    public int hashCode() {
+        return name().hashCode();
+    }
+
     public static SortDependingFunction createFirstInstance(
             GenericSort sortDependingOn,
             Name kind,
@@ -131,10 +137,15 @@ public final class SortDependingFunction extends Function {
             return this;
         }
 
+        SortDependingFunction n = (SortDependingFunction) services.getNamespaces().lookup(instantiateName(getKind(), sort));
+
+        if (instantiateName(getKind(), sort).toString().contains("String") && instantiateName(getKind(), sort).toString().contains("seqGet")
+                && (n == null || sort instanceof GenericSort && n.getSortDependingOn() != sort)) {
+            System.out.println();
+        }
+
         assert !(sort instanceof ProgramSVSort);
         assert sort != AbstractTermTransformer.METASORT;
-
-
 
         final NamespaceSet namespaces = services.getNamespaces();
         Namespace<Function> functions = namespaces.functions();
@@ -151,6 +162,10 @@ public final class SortDependingFunction extends Function {
                 result = new SortDependingFunction(template, sort);
                 synchronized(functions) {
                     functions.add(result);
+                    if (instantiateName(getKind(), sort).toString().contains("String") && instantiateName(getKind(), sort).toString().contains("seqGet")
+                            && (n == null || sort instanceof GenericSort && n.getSortDependingOn() != sort)) {
+                        System.out.println(result.hashCode());
+                    }
                 }
             } else if(result == null) {
                 result = new SortDependingFunction(template, sort);
@@ -163,6 +178,10 @@ public final class SortDependingFunction extends Function {
                     }
                     synchronized(functions) {
                         functions.addSafely(result);
+                        if (instantiateName(getKind(), sort).toString().contains("String") && instantiateName(getKind(), sort).toString().contains("seqGet")
+                                && (n == null || sort instanceof GenericSort && n.getSortDependingOn() != sort)) {
+                            System.out.println(result.hashCode());
+                        }
                     }
                 }
             }

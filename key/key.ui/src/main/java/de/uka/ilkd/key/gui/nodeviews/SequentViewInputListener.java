@@ -81,7 +81,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
     private final SequentView sequentView;
 
     /** Whether term info should be shown in the status line. */
-    private boolean showTermInfo = false;
+    private boolean showTermInfo = true;
 
     /** @see #isRefresh() */
     private static boolean refresh = true;
@@ -145,6 +145,15 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
                     || sequentView.isInUserSelectionHighlight(point)) {
                 sequentView.removeUserSelectionHighlight();
             } else {
+                Term t = pis.getPosInOccurrence().subTerm();
+                System.out.println();
+                System.out.println(t.op() + ": " + t.op().hashCode());
+                System.out.println(t.boundVars() + ": " + t.boundVars().hashCode());
+                System.out.println(t.javaBlock() + ": " + t.javaBlock().hashCode());
+                t.getLabels().forEach(label -> {
+                    System.out.println(label + ": " + label.hashCode());
+                });
+
                 sequentView.setUserSelectionHighlight(point);
             }
         }

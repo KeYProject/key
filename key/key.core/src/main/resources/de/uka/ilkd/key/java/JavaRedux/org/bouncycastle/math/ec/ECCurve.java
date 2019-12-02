@@ -8,7 +8,7 @@ public abstract class ECCurve extends java.lang.Object {
      @ requires true;
      @ ensures \result.value == order;
      @ assignable \nothing;
-     @ determines \result \by \nothing;
+     @ determines \result \by \nothing \new_objects \result;
      @ determines \result.value \by order;
      @*/
    public java.math.BigInteger getOrder();

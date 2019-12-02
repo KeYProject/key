@@ -33,7 +33,7 @@ public class Function extends AbstractSortedOperator {
 
     //-------------------------------------------------------------------------
     //constructors
-    //-------------------------------------------------------------------------     
+    //-------------------------------------------------------------------------
 
     Function(Name name,
              Sort sort,
@@ -43,6 +43,7 @@ public class Function extends AbstractSortedOperator {
              boolean isRigid,
              boolean isSkolemConstant) {
 	super(name, argSorts, sort, whereToBind, isRigid);
+
 	this.unique = unique;
 	skolemConstant = isSkolemConstant;
 	assert sort != Sort.UPDATE;
@@ -121,7 +122,7 @@ public class Function extends AbstractSortedOperator {
 
     //-------------------------------------------------------------------------
     //public interface
-    //-------------------------------------------------------------------------     
+    //-------------------------------------------------------------------------
 
     /**
      * Indicates whether the function or predicate symbol has the "uniqueness"
@@ -157,7 +158,9 @@ public class Function extends AbstractSortedOperator {
           int i = 0;
           s+="(";
           while (i<arity()) {
-             if (i>0) s+=",";
+             if (i>0) {
+                s+=",";
+            }
              s+=argSort(i);
              i++;
           }
