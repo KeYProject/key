@@ -46,6 +46,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     private final String baseName;
     private final String name;
     private final Term origPre;
+    private final Term origFreePre;
     private final Term origMby;
     private final Term origMod;
     private final Modality modality;
@@ -77,6 +78,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                           KeYJavaType specifiedIn,
                                           Modality modality,
                                           Term pre,
+                                          Term freePre,
                                           Term mby,
                                           Term mod,
                                           boolean hasRealMod,
@@ -94,6 +96,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         assert pm != null;
         assert modality != null;
         assert pre != null;
+        assert freePre != null;
         assert mod != null;
         assert (self == null) == pm.isStatic();
         assert params != null;
@@ -119,6 +122,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         this.pm = pm;
         this.specifiedIn = specifiedIn;
         this.origPre = pre;
+        this.origFreePre = freePre;
         this.origMby = mby;
         this.origMod = mod;
         this.origSelf = self;
@@ -141,6 +145,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                        KeYJavaType specifiedIn,
                                        Modality modality,
                                        Term pre,
+                                       Term freePre,
                                        Term mby,
                                        Term mod,
                                        boolean hasRealMod,
@@ -152,7 +157,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                        Term dep,
                                        ImmutableList<InfFlowSpec> infFlowSpecs,
                                        boolean toBeSaved) {
-        this(baseName, null, forClass, pm, specifiedIn, modality, pre, mby, mod,
+        this(baseName, null, forClass, pm, specifiedIn, modality, pre, freePre, mby, mod,
              hasRealMod, self, params, result, exc, heapAtPre, dep, infFlowSpecs,
              toBeSaved, INVALID_ID);
     }
@@ -165,7 +170,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     public InformationFlowContract map(UnaryOperator<Term> op, Services services) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
-                                               op.apply(origPre), op.apply(origMby),
+                                               op.apply(origPre), op.apply(origFreePre),
+                                               op.apply(origMby),
                                                op.apply(origMod), hasRealModifiesClause, origSelf,
                                                origParams.stream().map(op)
                                                .collect(ImmutableList.collector()),
@@ -215,6 +221,12 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     public Term getPre() {
         return origPre;
+    }
+
+
+    @Override
+    public Term getFreePre() {
+        return origFreePre;
     }
 
 
@@ -307,6 +319,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         return "<html>"
                + getHTMLSignature()
                + getHTMLFor(origPre, "pre", services)
+               + getHTMLFor(origFreePre, "free_pre", services)
                + getHTMLFor(origMod, "mod", services)
                + (hasRealModifiesClause ? "" : "<b>, creates no new objects</b>")
                + getHTMLFor(origMby, "measured-by", services)
@@ -418,7 +431,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public String toString() {
         // TODO: all fields should be printed!!
         return name + ":: kjt: " + forClass + "; pm: " + pm + "; modality: "
-               + modality + "; pre: " + origPre + "; mby: " + origMby
+               + modality + "; pre: " + origPre + "; origFreePre: " + origFreePre
+               + "; mby: " + origMby
                + "; mod: " + origMod + "; selfVar: " + origSelf
                + "; paramVars: " + origParams + "; id:" + id;
     }
@@ -484,7 +498,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     public InformationFlowContract setID(int newId) {
         return new InformationFlowContractImpl(baseName, null, forClass, pm,
-                                               specifiedIn, modality, origPre,
+                                               specifiedIn, modality, origPre, origFreePre,
                                                origMby, origMod,
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
@@ -499,7 +513,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         assert newPM instanceof IProgramMethod;
         return new InformationFlowContractImpl(baseName, null, newKJT,
                                                (IProgramMethod)newPM,
-                                               specifiedIn, modality, origPre,
+                                               specifiedIn, modality, origPre, origFreePre,
                                                origMby, origMod,
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
@@ -511,7 +525,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     public InformationFlowContract setName(String name) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm,
-                                               specifiedIn, modality, origPre,
+                                               specifiedIn, modality, origPre, origFreePre,
                                                origMby, origMod,
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
@@ -523,7 +537,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     public InformationFlowContract setModality(Modality modality) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm,
-                                               specifiedIn, modality, origPre,
+                                               specifiedIn, modality, origPre, origFreePre,
                                                origMby, origMod,
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
@@ -535,7 +549,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     public InformationFlowContract setModifies(Term modifies) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm,
-                                               specifiedIn, modality, origPre,
+                                               specifiedIn, modality, origPre, origFreePre,
                                                origMby, modifies,
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
@@ -566,6 +580,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         assert pm != null;
         assert modality != null;
         assert origPre != null;
+        assert origFreePre != null;
         assert origMod != null;
         assert origParams != null;
         assert origDep != null;
@@ -576,6 +591,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                && pm.equals(ifc.getTarget())
                && modality.equals(ifc.getModality())
                && origPre.equals(ifc.getPre())
+               && origFreePre.equals(ifc.getFreePre())
                && (origMby != null
                    ? origMby.equals(ifc.getMby())
                    : ifc.getMby() == null)

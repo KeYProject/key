@@ -55,6 +55,12 @@ public interface InformationFlowContract extends Contract {
 
 
     /**
+     * Returns the original free precondition of the contract.
+     */
+    Term getFreePre();
+
+
+    /**
      * Returns the original modifies clause of the contract.
      */
     Term getMod();
