@@ -136,7 +136,7 @@ public class LDTInput implements EnvInput {
 		listener.reportStatus("Reading " + keyFiles[i].name(),
 				   keyFiles[i].getNumberOfChars());
 	    }
-	    keyFiles[i].readRulesAndProblem();
+	    keyFiles[i].readRules();
 	}
 
         //create LDT objects
@@ -190,7 +190,7 @@ public class LDTInput implements EnvInput {
     public Profile getProfile() {
         return profile;
     }
-    
+
     @Override
     public File getInitialFile() {
        return null;

@@ -97,9 +97,9 @@ public abstract class ParsingFacade {
         return ctx;
     }
 
-    public static KeYParser.TermContext parseExpression(CharStream stream) {
+    public static KeYParser.TermEOFContext parseExpression(CharStream stream) {
         var p = createParser(stream);
-        return p.term();
+        return p.termEOF();
     }
 
     private static KeYParser createParser(CharStream stream) {
@@ -116,5 +116,19 @@ public abstract class ParsingFacade {
 
     public static KeYLexer lex(CharStream stream) {
         return new KeYLexer(stream);
+    }
+
+    public static KeYParser.SeqEOFContext parseSequent(CharStream stream) {
+        var p = createParser(stream);
+        return p.seqEOF();
+    }
+
+    static String getValue(KeYParser.String_valueContext ctx) {
+        return ctx.getText().substring(1, ctx.getText().length() - 1);
+    }
+
+    public static KeYParser.Id_declarationContext parseIdDeclaration(CharStream stream) {
+        var p = createParser(stream);
+        return p.id_declaration();
     }
 }

@@ -1,15 +1,19 @@
 package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Position;
+import de.uka.ilkd.key.util.Triple;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.key_project.util.collection.ImmutableSet;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -30,6 +34,7 @@ import static de.uka.ilkd.key.nparser.ParsingFacade.parseFiles;
 public class KeyIO {
     private final Services services;
     private final NamespaceSet nss;
+
     public KeyIO(Services services, NamespaceSet nss) {
         this.services = services;
         this.nss = nss;
@@ -44,6 +49,45 @@ public class KeyIO {
         this(new Services(new JavaProfile()));
     }
 
+    public static @Nullable String findJavaPath(KeYParser.FileContext ctx) {
+        final String[] javaPath = {null};
+        ctx.accept(new AbstractBuilder<Void>() {
+            @Override
+            public Void visitOneJavaSource(KeYParser.OneJavaSourceContext ctx) {
+                javaPath[0] = ctx.getText();
+                return null;
+            }
+        });
+        return javaPath[0];
+    }
+
+
+    public static ProofSettings findProofSettings(ParserRuleContext ctx) {
+        ProofSettingsFinder psf = new ProofSettingsFinder();
+        ctx.accept(psf);
+        return psf.getProofSettings();
+    }
+
+    public static @Nullable String findBootClassPath(KeYParser.FileContext ctx) {
+        BootClasspathFinder psf = new BootClasspathFinder();
+        ctx.accept(psf);
+        return psf.getBootClasspath();
+    }
+
+    public static Triple<String, Integer, Integer> findProofScript(KeYParser.FileContext ctx) {
+        if (ctx.problem() != null && ctx.problem().proofScript() != null) {
+            var pctx = ctx.problem().proofScript();
+            return new Triple<>(pctx.ps.getText(), pctx.ps.getLine(), pctx.ps.getCharPositionInLine());
+        }
+        return null;
+    }
+
+    public static ImmutableSet<Choice> findActivatedChoices(KeYParser.FileContext ctx, Namespace<Choice> ns) {
+        ChoiceFinder cf = new ChoiceFinder(ns);
+        ctx.accept(cf);
+        return cf.getActivatedChoices();
+    }
+
     public @NotNull Term parseExpression(@NotNull String expr) {
         return parseExpression(CharStreams.fromString(expr));
     }
@@ -51,6 +95,16 @@ public class KeyIO {
     public Term parseExpression(CharStream stream) {
         var ctx = ParsingFacade.parseExpression(stream);
         return (Term) ctx.accept(new ExpressionBuilder(services, nss));
+    }
+
+    public Sequent parseSequence(CharStream stream) {
+        var ctx = ParsingFacade.parseSequent(stream);
+        ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
+        var seq = (Sequent) ctx.accept(visitor);
+        if (visitor.getErrors().isEmpty()) {
+            return seq;
+        }
+        throw new BuildingExceptions(visitor.getErrors());
     }
 
     public Services getServices() {
@@ -67,6 +121,30 @@ public class KeyIO {
 
     public Loader load(URL u) {
         return new Loader(u);
+    }
+
+    public List<Taclet> findTaclets(KeYParser.FileContext ctx) {
+        var visitor = new TacletPBuilder(services, nss);
+        int size = ctx.decls().rulesOrAxioms().size();
+        ctx.accept(visitor);
+        return visitor.getTaclets();
+    }
+
+    /*
+    public List<Contract> findContracts(KeYParser.FileContext ctx) {
+        ProblemFinder pf = new ProblemFinder(services, nss);
+        ctx.accept(pf);
+        return pf.getContracts();
+    }*/
+
+    public void evalDeclarations(KeYParser.FileContext ctx) {
+        var declBuilder = new DeclarationBuilder(services, nss);
+        ctx.accept(declBuilder);
+    }
+
+    public void evalFuncAndPred(KeYParser.FileContext ctx) {
+        var visitor = new FunctionPredicateBuilder(services, nss);
+        ctx.accept(visitor);
     }
 
     public class Loader {
@@ -171,5 +249,13 @@ public class KeyIO {
             return taclets;
         }
 
+        public ProofSettings loadProofSettings() {
+            if (ctx.isEmpty()) throw new IllegalStateException();
+            return findProofSettings(ctx.get(0));
+        }
     }
 }
+
+//Caused by: java.lang.ClassCastException: class de.uka.ilkd.key.logic.ProgramElementName cannot be cast to class
+// de.uka.ilkd.key.logic.op.SchemaVariable (de.uka.ilkd.key.logic.ProgramElementName
+// and de.uka.ilkd.key.logic.op.SchemaVariable are in unnamed module of loader 'app')

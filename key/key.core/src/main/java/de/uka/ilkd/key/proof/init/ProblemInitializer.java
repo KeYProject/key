@@ -15,11 +15,7 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -510,12 +506,16 @@ public final class ProblemInitializer {
                currentBaseConfig = new InitConfig(services);
                RuleSource tacletBase = profile.getStandardRules().getTacletBase();
                if(tacletBase != null) {
-                   KeYFile tacletBaseFile
-                   = new KeYFile("taclet base",
-                                 profile.getStandardRules().getTacletBase(),
-                                 progMon,
-                                 profile);
-                   readEnvInput(tacletBaseFile, currentBaseConfig);
+                   KeYFile tacletBaseFile  = new KeYFile("taclet base",
+                           profile.getStandardRules().getTacletBase(),
+                           progMon,
+                           profile);
+                   //readEnvInput(tacletBaseFile, currentBaseConfig);
+                   List<KeYFile> exploredFiles = explore(tacletBaseFile);
+
+
+
+
                }
                // remove traces of the generic sorts within the base configuration
                cleanupNamespaces(currentBaseConfig);
@@ -523,6 +523,22 @@ public final class ProblemInitializer {
            }
            return prepare(envInput, currentBaseConfig);
        }
+    }
+
+    private HashMap<KeYFile,Integer> explore(KeYFile file) throws ProofInputException {
+        Queue<KeYFile> queue = new LinkedList<>();
+        queue.add(file);
+        HashSet<KeYFile> reached = new HashSet<>();
+        HashMap<KeYFile, Integer> map = new HashMap<>();
+        while(!queue.isEmpty()) {
+            var kf = queue.poll();
+            reached.add(kf);
+            var includes = file.readIncludes();
+            for (var inc : includes.getRuleSets()) {
+
+            }
+        }
+        return map;
     }
 
     private InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)throws ProofInputException{

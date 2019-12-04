@@ -1,72 +1,34 @@
 package de.uka.ilkd.key.nparser;
 
-import antlr.RecognitionException;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.JavaReader;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.parser.AmbigiousDeclException;
-import de.uka.ilkd.key.parser.NotDeclException;
-import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 @SuppressWarnings("unchecked")
 public class ProblemFinder extends ExpressionBuilder {
     private Term problemTerm;
-    private IProgramMethod pm = null;
-    private List<Contract> contracts = new ArrayList<>();
-    private ImmutableSet<ClassInvariant> invs = DefaultImmutableSet.nil();
-    private ParsableVariable selfVar;
-    private JavaReader javaReader;
-    private List<Object> invariants;
-    private List<Object> seqChoices;
+    private String choosedContract;
+    private String proofObligation;
 
     public ProblemFinder(Services services, NamespaceSet nss) {
         super(services, nss);
     }
 
-    public List<Contract> getContracts() {
-        return contracts;
-    }
-
-    public ImmutableSet<ClassInvariant> getInvariants() {
-        return invs;
-    }
-
-
+    /*
     private Set<LocationVariable> progVars(JavaBlock jb) {
         ProgramVariableCollector pvc = new ProgramVariableCollector(jb.program(), getServices());
         pvc.start();
         return pvc.result();
     }
-
-
-    /**
-     * returns the ProgramMethod parsed in the jml_specifications section.
      */
-    public IProgramMethod getProgramMethod() {
-        return pm;
-    }
-
-
 
 
     private List<Sort> createSort(boolean isAbstractSort, boolean isGenericSort, boolean isProxySort,
@@ -123,42 +85,6 @@ public class ProblemFinder extends ExpressionBuilder {
     }
 
     @Override
-    public Object visitDecls(KeYParser.DeclsContext ctx) {
-        activatedChoices = DefaultImmutableSet.nil();
-        allOf(ctx.one_include_statement(), ctx.one_include_statement());
-/*
-        allOf(ctx.options_choice(), ctx.option_decls(), ctx.sort_decls(),
-                ctx.prog_var_decls(), ctx.schema_var_decls(), ctx.ruleset_decls());
-        allOf(ctx.pred_decls(), ctx.func_decls(), ctx.transform_decls());
-        allOf(ctx.rulesOrAxioms());
-                */
-        contracts = allOf(ctx.contracts());
-        invariants = allOf(ctx.invariants());
-        seqChoices = allOf(ctx.options_choice());
-        return null;
-    }
-
-    /*@Override
-    public Choice visitActivated_choice(KeYParser.Activated_choiceContext ctx) {
-        var cat = ctx.cat.getText();
-        var ch = ctx.choice_.getText();
-        if (usedChoiceCategories.contains(cat)) {
-            throw new IllegalArgumentException("You have already chosen a different option for " + cat);
-        }
-        usedChoiceCategories.add(cat);
-        var name = cat + ":" + ch;
-        var c = (Choice) choices().lookup(new Name(name));
-        if (c == null) {
-            throwEx(new NotDeclException(null, "Option", ch));
-        } else {
-            activatedChoices = activatedChoices.add(c);
-        }
-        return c;
-    }*/
-
-
-
-    @Override
     public KeYJavaType visitArrayopid(KeYParser.ArrayopidContext ctx) {
         return (KeYJavaType) accept(ctx.keyjavatype());
     }
@@ -172,74 +98,31 @@ public class ProblemFinder extends ExpressionBuilder {
     }
     */
 
-
-    @Override
-    public Object visitContracts(KeYParser.ContractsContext ctx) {
-        return allOf(ctx.one_contract());
-    }
-
-    @Override
-    public Object visitInvariants(KeYParser.InvariantsContext ctx) {
-        Namespace<QuantifiableVariable> orig = variables();
-        selfVar = (ParsableVariable) ctx.selfVar.accept(this);
-        ctx.one_invariant().forEach(it -> it.accept(this));
-        unbindVars(orig);
-        return null;
-    }
-
-    @Override
-    public Object visitOne_contract(KeYParser.One_contractContext ctx) {
-        String contractName = visitSimple_ident(ctx.contractName);
-        //for program variable declarations
-        namespaces().setProgramVariables(new Namespace(programVariables()));
-        var fma = visitFormula(ctx.formula());
-        var modifiesClause = visitTerm(ctx.modifiesClause);
-        DLSpecFactory dsf = new DLSpecFactory(getServices());
-        try {
-            contracts.add(dsf.createDLOperationContract(contractName, fma, modifiesClause));
-        } catch (ProofInputException e) {
-            semanticError(ctx, e.getMessage());
-        }
-        //dump local program variable declarations
-        namespaces().setProgramVariables(programVariables().parent());
-        return null;
-    }
-
-    @Override
-    public Object visitOne_invariant(KeYParser.One_invariantContext ctx) {
-        String invName = visitSimple_ident(ctx.simple_ident());
-        Term fma = accept(ctx.formula());
-        var displayName = ctx.displayName != null ? ctx.displayName.getText() : null;
-        DLSpecFactory dsf = new DLSpecFactory(getServices());
-        try {
-            invs = invs.add(dsf.createDLClassInvariant(invName,
-                    displayName,
-                    selfVar,
-                    fma));
-        } catch (ProofInputException e) {
-            semanticError(ctx, e.getMessage());
-        }
-        return null;
-    }
-
     @Override
     public Term visitProblem(KeYParser.ProblemContext ctx) {
-        /*DefaultImmutableSet<Choice> choices = DefaultImmutableSet.nil();
         if (ctx.CHOOSECONTRACT() != null) {
             if (ctx.chooseContract != null)
-                parsedKeyFile.setChooseContract(accept(ctx.chooseContract));
-            else
-                parsedKeyFile.setChooseContract("");
+                choosedContract = accept(ctx.chooseContract);
         }
         if (ctx.PROOFOBLIGATION() != null) {
             if (ctx.proofObligation != null)
-                parsedKeyFile.setProofObligation(accept(ctx.proofObligation));
-            else
-                parsedKeyFile.setProofObligation("");
-        }*/
+                proofObligation = accept(ctx.proofObligation);
+        }
         if (ctx.PROBLEM() != null) {
             problemTerm = accept(ctx.formula());
         }
         return null;
+    }
+
+    public String getChoosedContract() {
+        return choosedContract;
+    }
+
+    public String getProofObligation() {
+        return proofObligation;
+    }
+
+    public Term getProblemTerm() {
+        return problemTerm;
     }
 }

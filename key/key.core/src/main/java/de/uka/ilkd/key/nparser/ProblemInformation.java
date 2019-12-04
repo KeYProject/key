@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nparser;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class ProblemInformation {
@@ -8,7 +9,7 @@ public class ProblemInformation {
     private String profile;
     private String preferences;
     private String bootClassPath, javaSource;
-    private List<String> classpath;
+    private List<String> classpath = new LinkedList<>();
 
     public ProblemInformation() {
     }

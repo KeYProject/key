@@ -2,29 +2,34 @@ package de.uka.ilkd.key.nparser;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jetbrains.annotations.Nullable;
 
 public class BuildingException extends RuntimeException {
-    private final ParserRuleContext nodeOfFailure;
+    private int lineNumber = -1, posInLine = -1, startOffset = -1, endOffset = -1;
 
     public BuildingException(ParserRuleContext node) {
-        super(getPosition(node));
-        nodeOfFailure = node;
+        super("");
+        setPosition(node);
     }
 
     public BuildingException(ParserRuleContext node, String message) {
         super(message + getPosition(node));
-        nodeOfFailure = node;
+        setPosition(node);
     }
 
-    public BuildingException(Token t, String message, Throwable cause) {
+    public BuildingException(@Nullable Token t, String message, Throwable cause) {
         super(message + getPosition(t), cause);
-        nodeOfFailure = null;
-
+        if (t != null) {
+            lineNumber = t.getLine();
+            posInLine = t.getCharPositionInLine();
+            startOffset = t.getStartIndex();
+            endOffset = t.getStopIndex();
+        }
     }
 
     public BuildingException(ParserRuleContext node, String message, Throwable cause) {
         super(message + getPosition(node), cause);
-        nodeOfFailure = node;
+        setPosition(node);
     }
 
     public BuildingException(ParserRuleContext node, Throwable cause) {
@@ -32,11 +37,10 @@ public class BuildingException extends RuntimeException {
     }
 
     public BuildingException() {
-        this((ParserRuleContext) null);
     }
 
     public BuildingException(String message) {
-        this(null, message);
+        super(message);
     }
 
     public BuildingException(String message, Throwable cause) {
@@ -56,7 +60,28 @@ public class BuildingException extends RuntimeException {
         return String.format(" %s:%d#%d", t.getInputStream().getSourceName(), t.getLine(), t.getCharPositionInLine());
     }
 
-    public ParserRuleContext getNodeOfFailure() {
-        return nodeOfFailure;
+    private void setPosition(ParserRuleContext node) {
+        if (node != null) {
+            lineNumber = node.start.getLine();
+            posInLine = node.start.getCharPositionInLine();
+            startOffset = node.start.getStartIndex();
+            endOffset = node.stop.getStopIndex();
+        }
+    }
+
+    public int getLineNumber() {
+        return lineNumber;
+    }
+
+    public int getPosInLine() {
+        return posInLine;
+    }
+
+    public int getStartOffset() {
+        return startOffset;
+    }
+
+    public int getEndOffset() {
+        return endOffset;
     }
 }

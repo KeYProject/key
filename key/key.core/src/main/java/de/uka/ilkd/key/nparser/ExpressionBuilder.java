@@ -34,7 +34,6 @@ public class ExpressionBuilder extends DefaultBuilder {
     private AbbrevMap scm;
 
     static HashMap<String, IProofFileParser.ProofElementID> prooflabel2tag = new LinkedHashMap<>(15);
-
     static {
         prooflabel2tag.put("branch", IProofFileParser.ProofElementID.BRANCH);
         prooflabel2tag.put("rule", IProofFileParser.ProofElementID.RULE);
@@ -65,7 +64,6 @@ public class ExpressionBuilder extends DefaultBuilder {
         prooflabel2tag.put("userChoices", IProofFileParser.ProofElementID.MERGE_USER_CHOICES);
         prooflabel2tag.put("opengoal", IProofFileParser.ProofElementID.OPEN_GOAL);
     }
-
     private Term quantifiedArrayGuard;
 
     public ExpressionBuilder(Services services, NamespaceSet nss) {

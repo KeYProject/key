@@ -1,10 +1,5 @@
 package de.uka.ilkd.key.nparser;
 
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.jetbrains.annotations.Nullable;
@@ -31,9 +26,6 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
         return (T) ctx.accept(this);
     }
 
-    void each(RuleContext... ctx) {
-        for (RuleContext c : ctx) accept(c);
-    }
 
     protected <T> T peek() {
         return (T) (parameters.size() == 0 ? null : parameters.peek());
@@ -92,10 +84,34 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
                 .flatMap(it -> it.stream().map(a -> (T2) accept(a)))
                 .collect(Collectors.toList());
     }
+    //endregion
 
+    //region error handling
+    protected List<BuildingException> errors = new LinkedList<>();
 
+    public List<BuildingException> getErrors() {
+        return errors;
+    }
+
+    protected BuildingException addError(ParserRuleContext node, String description) {
+        var be = new BuildingException(node, description);
+        errors.add(be);
+        return be;
+    }
+
+    protected BuildingException addError(String description) {
+        var be = new BuildingException(description);
+        errors.add(be);
+        return be;
+    }
 
     protected void throwEx(Throwable e) {
         throw new RuntimeException(e);
     }
+    //endregion
+
+    void each(RuleContext... ctx) {
+        for (RuleContext c : ctx) accept(c);
+    }
+
 }

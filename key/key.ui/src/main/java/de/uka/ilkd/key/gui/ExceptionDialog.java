@@ -52,6 +52,9 @@ public class ExceptionDialog extends JDialog {
 
     public static void showDialog(Window parent, Throwable exception) {
         ExceptionDialog dlg = new ExceptionDialog(parent, exception);
+        if(parent!=null) {
+            dlg.setLocationRelativeTo(parent);
+        }
             dlg.setVisible(true);
             dlg.dispose();
         }

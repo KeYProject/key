@@ -17,6 +17,7 @@ import java.util.Iterator;
 
 import javax.swing.DefaultComboBoxModel;
 
+import de.uka.ilkd.key.nparser.KeyIO;
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.ImmutableList;
 
@@ -28,8 +29,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
-import de.uka.ilkd.key.parser.KeYLexerF;
-import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
@@ -108,16 +107,6 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
     }
 
     /**
-     * creates a new Termparser that parses the given string
-     *
-     * @param s the String to parse
-     */
-    private KeYParserF stringParser(String s) {
-        return new KeYParserF(ParserMode.TERM, new KeYLexerF(s, ""), new Recoder2KeY(services, nss),
-                services, nss, scm);
-    }
-
-    /**
      * parses and returns the term encoded as string 's'
      *
      * @param s the String to parse
@@ -125,8 +114,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
      * @throws RecognitionException In case an exception occurs during parse.
      */
     public Term parseFormula(String s) throws RecognitionException {
-        KeYParserF p = stringParser(s);
-        return p.formula();
+        return new KeyIO(services).parseExpression(s);
     }
 
     /**

@@ -52,10 +52,11 @@ decls
 
 problem
 :
-    (  PROBLEM LBRACE a = formula RBRACE
-     | CHOOSECONTRACT (chooseContract=string_value SEMI)?
-     | PROOFOBLIGATION  (proofObligation=string_value SEMI)?
-    )
+  ( PROBLEM LBRACE a = formula RBRACE
+  | CHOOSECONTRACT (chooseContract=string_value SEMI)?
+  | PROOFOBLIGATION  (proofObligation=string_value SEMI)?
+  )
+  proofScript?
 ;
 
 
@@ -385,13 +386,10 @@ any_sortId_check_help
 ;
 
 
-/*id_declaration
-    :
-        id=IDENT
-        ( COLON s = sortId_check ) ?
-        
-    ;
-*/
+id_declaration
+:
+  id=IDENT ( COLON s = sortId_check ) ?
+;
 
 funcpred_name
 :
