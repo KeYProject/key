@@ -21,6 +21,7 @@ public final class StringBuilder implements java.io.Serializable, java.lang.Appe
     /*@ public normal_behavior
       @ ensures \fresh(str) && str != null;
       @ ensures \result == this;
+      @ ensures \fresh(str);
       @ assignable str;
       @ determines str \by \nothing \new_objects str;
       @ determines \dl_strContent(str) \by \dl_strContent(str), param0;

@@ -95,6 +95,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    /*@ public normal_behavior
      @ ensures \result.length == \dl_strContent(this).length;
      @ ensures (\forall \bigint i; 0 <= i && i < \result.length; \dl_inChar(\result[i]));
+     @ ensures \fresh(\result);
      @ assignable \nothing;
      @ determines \result \by \nothing \new_objects \result;
      @ determines \result[*] \by \dl_strContent(this);

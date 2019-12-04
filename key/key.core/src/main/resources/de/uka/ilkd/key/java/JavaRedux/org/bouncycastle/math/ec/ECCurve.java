@@ -7,6 +7,7 @@ public abstract class ECCurve extends java.lang.Object {
    /*@ public normal_behavior
      @ requires true;
      @ ensures \result.value == order;
+     @ ensures \fresh(\result) && \fresh(\result.*);
      @ assignable \nothing;
      @ determines \result \by \nothing \new_objects \result;
      @ determines \result.value \by order;
