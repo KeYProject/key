@@ -235,6 +235,7 @@ subprojects {
     bintray { //configures the bintray plugin.
 
         //credentials are either defined in the  project or by preferable as environment variables
+        //ask @weigl if you need the username and password.
         user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
         key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
         publications = ['mavenJava']
@@ -264,7 +265,7 @@ subprojects {
         mapping("key", "SLASHSTAR_STYLE")
     }
 
-    eclipse {//configures the generated .project and .classpath files.
+    eclipse { //configures the generated .project and .classpath files.
         classpath {
             file {
                 whenMerged { // This adds the exclude entry for every resource and antlr folder.
@@ -286,7 +287,8 @@ task start {
 
 // Generation of a JavaDoc across sub projects.
 task alldoc(type: Javadoc) {
-    group "documentation"    
+    group "documentation"
+    description "Generate a JavaDoc across sub projects"
     def projects = subprojects
     //key.ui javadoc is broken
     source projects.collect { it.sourceSets.main.allJava }
@@ -315,9 +317,10 @@ task alldoc(type: Javadoc) {
     }
 }
 
-//Creates a jar file with the javadoc over all sub projects.
+// Creates a jar file with the javadoc over all sub projects.
 task alldocJar(type: Zip) {
     dependsOn alldoc
+    description 'Create a jar file with the javadoc over all sub projects'
     from alldoc
     archiveFileName = "key-api-doc-${project.version}.zip"
     destinationDirectory = file("$buildDir/distribution")

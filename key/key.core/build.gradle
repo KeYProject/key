@@ -90,7 +90,7 @@ testFast {
 }
 
 // Should actually be named "testProveRules" ... as rules are proved, and not ProofRules tested
-task testProofRules(type: Test) {
+task testProofRules {
     dependsOn "testProveRules"
     doFirst { println('Replace "testProofRules" by "testProveRules". This task will removed in the future') }
 }
