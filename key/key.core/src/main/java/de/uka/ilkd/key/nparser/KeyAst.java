@@ -4,6 +4,7 @@ import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Triple;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.jetbrains.annotations.NotNull;
 
@@ -68,6 +69,13 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             FindProblemInformation fpi = new FindProblemInformation();
             ctx.accept(fpi);
             return fpi.getProblemInformation();
+        }
+
+        public Token findProof() {
+            var a = ctx.proof();
+            if(a!=null)
+                return a.PROOF().getSymbol();
+            return null;
         }
     }
 

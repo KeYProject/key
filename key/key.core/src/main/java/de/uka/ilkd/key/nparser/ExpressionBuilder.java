@@ -32,38 +32,6 @@ import java.util.stream.Collectors;
 
 public class ExpressionBuilder extends DefaultBuilder {
     public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE = "Expecting select term before '@', not: ";
-    static HashMap<String, IProofFileParser.ProofElementID> prooflabel2tag = new LinkedHashMap<>(15);
-
-    static {
-        prooflabel2tag.put("branch", IProofFileParser.ProofElementID.BRANCH);
-        prooflabel2tag.put("rule", IProofFileParser.ProofElementID.RULE);
-        prooflabel2tag.put("term", IProofFileParser.ProofElementID.TERM);
-        prooflabel2tag.put("formula", IProofFileParser.ProofElementID.FORMULA);
-        prooflabel2tag.put("inst", IProofFileParser.ProofElementID.INSTANTIATION);
-        prooflabel2tag.put("ifseqformula", IProofFileParser.ProofElementID.ASSUMES_FORMULA_IN_SEQUENT);
-        prooflabel2tag.put("ifdirectformula", IProofFileParser.ProofElementID.ASSUMES_FORMULA_DIRECT);
-        prooflabel2tag.put("heur", IProofFileParser.ProofElementID.RULESET);
-        prooflabel2tag.put("builtin", IProofFileParser.ProofElementID.BUILT_IN_RULE);
-        prooflabel2tag.put("keyLog", IProofFileParser.ProofElementID.KeY_LOG);
-        prooflabel2tag.put("keyUser", IProofFileParser.ProofElementID.KeY_USER);
-        prooflabel2tag.put("keyVersion", IProofFileParser.ProofElementID.KeY_VERSION);
-        prooflabel2tag.put("keySettings", IProofFileParser.ProofElementID.KeY_SETTINGS);
-        prooflabel2tag.put("contract", IProofFileParser.ProofElementID.CONTRACT);
-        prooflabel2tag.put("ifInst", IProofFileParser.ProofElementID.ASSUMES_INST_BUILT_IN);
-        prooflabel2tag.put("userinteraction", IProofFileParser.ProofElementID.USER_INTERACTION);
-        prooflabel2tag.put("proofscript", IProofFileParser.ProofElementID.PROOF_SCRIPT);
-        prooflabel2tag.put("newnames", IProofFileParser.ProofElementID.NEW_NAMES);
-        prooflabel2tag.put("autoModeTime", IProofFileParser.ProofElementID.AUTOMODE_TIME);
-        prooflabel2tag.put("mergeProc", IProofFileParser.ProofElementID.MERGE_PROCEDURE);
-        prooflabel2tag.put("abstractionPredicates", IProofFileParser.ProofElementID.MERGE_ABSTRACTION_PREDICATES);
-        prooflabel2tag.put("latticeType", IProofFileParser.ProofElementID.MERGE_PREDICATE_ABSTRACTION_LATTICE_TYPE);
-        prooflabel2tag.put("nrMergePartners", IProofFileParser.ProofElementID.NUMBER_MERGE_PARTNERS);
-        prooflabel2tag.put("distFormula", IProofFileParser.ProofElementID.MERGE_DIST_FORMULA);
-        prooflabel2tag.put("mergeNode", IProofFileParser.ProofElementID.MERGE_NODE);
-        prooflabel2tag.put("mergeId", IProofFileParser.ProofElementID.MERGE_ID);
-        prooflabel2tag.put("userChoices", IProofFileParser.ProofElementID.MERGE_USER_CHOICES);
-        prooflabel2tag.put("opengoal", IProofFileParser.ProofElementID.OPEN_GOAL);
-    }
 
     private AbbrevMap scm;
     private Term quantifiedArrayGuard;

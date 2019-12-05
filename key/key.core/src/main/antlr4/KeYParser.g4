@@ -1112,9 +1112,11 @@ proofScript
   PROOFSCRIPT ps = STRING_LITERAL
 ;
 
-proof: PROOF proofBody;
+proof: PROOF EOF;
+// Parsing ends at PROOF token, rest is handled on the lexer level
+//proofBody;
 
-proofBody
+/*proofBody
 :
   LBRACE
       ( pseudosexpr )+

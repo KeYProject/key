@@ -594,6 +594,8 @@ public final class ProblemInitializer {
         try {
             kupf.readProof(pfp);
             setProgress(kupf.getNumberOfChars() / 2);
+        } catch (IOException e) {
+            throw new ProofInputException(e);
         } finally {
             kupf.close();
             setProgress(kupf.getNumberOfChars());

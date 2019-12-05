@@ -64,6 +64,7 @@ lexer grammar KeYLexer;
       modPairs.put("\\throughout_transaction","\\endmodality");
    }
 
+    private Token tokenBackStorage = null;
     @Override
     public void emit(Token token) {
        int MAX_K = 10;
@@ -75,8 +76,23 @@ lexer grammar KeYLexer;
                break;
            }
        }
+       if(token.getType() == PROOF) {
+          tokenBackStorage = super.emitEOF();
+          //will later be overwritten the EOF token
+       }
        super.emit(token);
     }
+
+    @Override
+    public Token nextToken() {
+        if(tokenBackStorage!=null) {
+          Token t = tokenBackStorage;
+          tokenBackStorage = null;
+          return t;
+        }
+        return super.nextToken();
+    }
+
 }
 
 tokens {MODALITY}

@@ -13,11 +13,6 @@ public class ProofFinder extends DefaultBuilder {
         return super.visitProof(ctx);
     }
 
-    @Override
-    public Object visitProofBody(KeYParser.ProofBodyContext ctx) {
-        return super.visitProofBody(ctx);
-    }
-
         /*
         @Override
         public Object visitProof(KeYParser.ProofContext ctx) {
