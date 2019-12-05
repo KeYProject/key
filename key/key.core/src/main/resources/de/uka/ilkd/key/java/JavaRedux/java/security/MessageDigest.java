@@ -10,7 +10,7 @@ public final class MessageDigest extends java.security.MessageDigestSpi {
 
    /*@ public normal_behavior
      @ assignable \nothing;
-     @ ensures \fresh(\result);
+     @ ensures \fresh(\result) && \typeof(\result) == \type(byte[]);
      @ determines \result \by \nothing \new_objects \result;
      @ determines \result[*] \by \nothing;
      @*/
@@ -25,7 +25,7 @@ public final class MessageDigest extends java.security.MessageDigestSpi {
 
    /*@ public normal_behavior
      @ assignable \nothing;
-     @ ensures \fresh(\result);
+     @ ensures \fresh(\result) && \typeof(\result) == \type(byte[]);
      @ determines \result \by \nothing \new_objects \result;
      @ determines \result[*] \by \nothing;
      @*/

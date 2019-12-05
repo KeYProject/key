@@ -7,7 +7,7 @@ public final class ECPoint extends java.lang.Object {
    /*@ public normal_behavior
      @ requires true;
      @ ensures \invariant_for(result);
-     @ ensures \fresh(\result) && \fresh(\result.*);
+     @ ensures \fresh(\result) && \fresh(\result.*) && \typeof(\result) == \type(ECPoint);
      @ assignable \nothing;
      @ determines \result \by \nothing \new_objects \result;
      @ determines \result.value \by this.value, param0.value;
@@ -16,7 +16,7 @@ public final class ECPoint extends java.lang.Object {
 
    /*@ public normal_behavior
      @ requires true;
-     @ ensures \fresh(\result);
+     @ ensures \fresh(\result) && \typeof(\result) == \type(byte[]);
      @ assignable \nothing;
      @ determines \result \by \nothing \new_objects \result;
      @ determines result[*] \by value, param0;

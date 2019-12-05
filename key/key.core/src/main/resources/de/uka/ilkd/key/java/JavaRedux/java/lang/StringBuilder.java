@@ -5,21 +5,21 @@ public final class StringBuilder implements java.io.Serializable, java.lang.Appe
     public String str;
     
     /*@ public normal_behavior
-      @ ensures \fresh(this) && \fresh(this.*);
+      @ ensures \fresh(this) && \fresh(str) && \typeof(this) == \type(StringBuilder) && \typeof(str) == \type(String);
       @ determines str \by \nothing \new_objects str;
       @ determines \dl_strContent(str) \by \nothing;
       @*/
 	public /*@pure@*/ StringBuilder();
 	
 	/*@ public normal_behavior
-      @ ensures \fresh(this) && \fresh(this.*);
+      @ ensures \fresh(this) && \fresh(str) && \typeof(this) == \type(StringBuilder) && \typeof(str) == \type(String);
       @ determines str \by \nothing \new_objects str;
       @ determines \dl_strContent(str) \by \nothing;
       @*/
     public /*@pure@*/ StringBuilder(int param0);
    
     /*@ public normal_behavior
-      @ ensures \fresh(str) && str != null;
+      @ ensures \fresh(str) && str != null && \typeof(str) == \type(String);
       @ ensures \result == this;
       @ ensures \fresh(str);
       @ assignable str;

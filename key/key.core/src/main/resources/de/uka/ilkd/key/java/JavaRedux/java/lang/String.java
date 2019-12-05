@@ -35,6 +35,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
 // public byte[] getBytes(java.nio.charset.Charset arg0);
    
    /*@ public normal_behavior
+     @ ensures \fresh(\result) && \typeof(\result) == \type(byte[]);
      @ assignable \nothing;
      @ determines \result \by \nothing \new_objects \result;
      @ determines \result[*] \by \dl_strContent(this);
@@ -76,6 +77,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
 // public java.lang.String toLowerCase(java.util.Locale arg0);
    
    /*@ public normal_behavior
+     @ ensures \fresh(\result) && \typeof(\result) == \type(String);
      @ assignable \nothing;
      @ determines \result \by \nothing \new_objects \result;
      @ determines \dl_strContent(\result) \by \dl_strContent(this);
@@ -84,6 +86,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
 // public java.lang.String toUpperCase(java.util.Locale arg0);
    
    /*@ public normal_behavior
+     @ ensures \fresh(\result) && \typeof(\result) == \type(String);
      @ assignable \nothing;
      @ determines \result \by \nothing \new_objects \result;
      @ determines \dl_strContent(\result) \by \dl_strContent(this);
@@ -95,7 +98,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    /*@ public normal_behavior
      @ ensures \result.length == \dl_strContent(this).length;
      @ ensures (\forall \bigint i; 0 <= i && i < \result.length; \dl_inChar(\result[i]));
-     @ ensures \fresh(\result);
+     @ ensures \fresh(\result) && \typeof(\result) == \type(char[]);
      @ assignable \nothing;
      @ determines \result \by \nothing \new_objects \result;
      @ determines \result[*] \by \dl_strContent(this);
