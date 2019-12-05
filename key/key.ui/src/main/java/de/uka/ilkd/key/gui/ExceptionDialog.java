@@ -55,9 +55,9 @@ public class ExceptionDialog extends JDialog {
         if(parent!=null) {
             dlg.setLocationRelativeTo(parent);
         }
-            dlg.setVisible(true);
-            dlg.dispose();
-        }
+        dlg.setVisible(true);
+        dlg.dispose();
+    }
 
     private ExceptionDialog(Window parent, Throwable exception) {
         super(parent, "Parser Messages", Dialog.ModalityType.DOCUMENT_MODAL);
