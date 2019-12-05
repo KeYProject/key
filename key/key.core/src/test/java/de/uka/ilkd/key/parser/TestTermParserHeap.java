@@ -2,6 +2,7 @@ package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.nparser.ExpressionBuilder;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +18,7 @@ import static org.junit.Assert.*;
  */
 public class TestTermParserHeap extends AbstractTestTermParser {
     @Before
-    public void setUp() throws RecognitionException {
+    public void setUp() throws IOException {
         parseDecls("\\programVariables {Heap h, h2;}");
         parseDecls("\\programVariables {int i;}");
         parseDecls("\\programVariables {testTermParserHeap.A a;}");
@@ -165,10 +166,10 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     public void testVerifyExceptionIfAtOperatorNotPreceededBySelectTerm() {
         try {
-            getParser("(a.f + a.f)@h2").term();
+            io.parseExpression("(a.f + a.f)@h2");
             fail();
         } catch (Exception e) {
-            assertTrue(e.getMessage().contains(NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE));
+            assertTrue(e.getMessage().contains(ExpressionBuilder.NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE));
         }
     }
 

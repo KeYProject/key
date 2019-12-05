@@ -13,10 +13,6 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.io.StringReader;
-import java.util.LinkedList;
-import java.util.List;
-
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -24,17 +20,19 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
-import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class InspectorForDecisionPredicates implements CheckedUserInputInspector{
 
     private final Services services;
     private final Node node;
     private final int  cutMode;
-    private final List<ApplicationCheck> additionalChecks = new LinkedList<ApplicationCheck>();
+    private final List<ApplicationCheck> additionalChecks = new LinkedList<>();
     
     
     
@@ -85,7 +83,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
     
     public static Term translate(Services services, String toBeChecked){
         try {
-            return new KeyIO(services).parseExpression(toBeChecked);
+            return new KeyIO(services).parseExpression((String) toBeChecked);
         } catch (Throwable e) {
             return null;
         }

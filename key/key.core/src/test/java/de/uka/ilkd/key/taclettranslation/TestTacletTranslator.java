@@ -16,6 +16,7 @@ package de.uka.ilkd.key.taclettranslation;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import de.uka.ilkd.key.nparser.KeyIO;
 import junit.framework.TestCase;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -26,8 +27,6 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.parser.KeYLexerF;
-import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.Taclet;
@@ -37,6 +36,7 @@ public class TestTacletTranslator extends TestCase {
     private NamespaceSet nss;
     private Namespace<SchemaVariable> schemaVariableNS;
     private Services services;
+    private KeyIO io;
 
 
     public TestTacletTranslator(String name) {
@@ -48,7 +48,7 @@ public class TestTacletTranslator extends TestCase {
     protected void setUp() throws Exception {
         nss = new NamespaceSet();
         services = new Services(AbstractProfile.getDefaultProfile());
-
+        io = new KeyIO(services, nss);
         parseDecls("\\sorts { S; }\n" +
                 "\\functions {\n" +
                 "  S const1;\n" +
@@ -62,77 +62,24 @@ public class TestTacletTranslator extends TestCase {
         System.out.println();
     }
 
-    //
-    // Utility Methods for test cases.
-    //
-    private KeYParserF stringTacletParser(String s) {
-	KeYParserF p = new KeYParserF(ParserMode.TACLET,
-		new KeYLexerF(s,
-			"No file. parser/TestTacletParser.stringTacletParser(" + s + ")"),
-		services, nss);
-        p.setSchemaVariablesNamespace(schemaVariableNS);
-        return p;
-    }
-
     private void parseDecls(String s) {
-        try {
-	    KeYParserF p = new KeYParserF(ParserMode.DECLARATION,
-		    new KeYLexerF(s,
-			    "No file. parser/TestTacletParser.stringDeclParser(" + s + ")"),
-		   services, nss);
-            p.decls();
-            schemaVariableNS = p.schemaVariables();
-        } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            throw new RuntimeException("Exc while Parsing:\n" + sw);
-        }
+        io.load(s).loadDeclarations().loadSndDegreeDeclarations();
     }
 
     private Term parseTerm(String s) {
-        try {
-            KeYParserF p = stringTacletParser(s);
-            p.setSchemaVariablesNamespace(schemaVariableNS);
-            return p.term();
-        } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            throw new RuntimeException("Exc while Parsing:\n" + sw);
-        }
+        return io.parseExpression(s);
     }
 
     private Term parseFma(String s) {
-        try {
-            KeYParserF p = stringTacletParser(s);
-            p.setSchemaVariablesNamespace(schemaVariableNS);
-
-            return p.formula();
-        } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            throw new RuntimeException("Exc while Parsing:\n" + sw);
-        }
+        return parseTerm(s);
+        //p.setSchemaVariablesNamespace(schemaVariableNS);
     }
 
     private Taclet parseTaclet(String s) {
-        try {
-            KeYParserF p = stringTacletParser(s);
-            p.setSchemaVariablesNamespace(schemaVariableNS);
-
-            return p.taclet(DefaultImmutableSet.<Choice> nil());
-        } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            throw new RuntimeException("Exc while Parsing:\n" + sw);
-        }
+        return io.load(s).loadTaclets().get(0);
     }
 
     private void testTaclet(String tacletString, String termString) throws Exception {
-
         Taclet taclet = parseTaclet(tacletString);
         Term expected = parseTerm(termString);
         Term translation = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet, services);

@@ -27,8 +27,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.KeYLexerF;
-import de.uka.ilkd.key.parser.KeYParserF;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -196,15 +195,9 @@ public class TacletForTests {
 
 	StringReader br = null;
 	try {
-	    br   = new StringReader(termstr);
-	    KeYParserF parser = new KeYParserF(ParserMode.TERM,
-		    new KeYLexerF(br,
-			    "No file. TacletForTests.parseTerm(" + termstr + ")"),
-		    new Recoder2KeY(services, nss),
-		    services,
-		    nss,
-		    TacletForTests.getAbbrevs());
-	    return parser.term();
+        KeyIO io = new KeyIO(services, nss);
+        //TacletForTests.getAbbrevs()
+        return io.parseExpression(termstr);
 	} catch (Exception e) {
 	    e.printStackTrace();
         Assert.fail("Exception occurred while parsing of " + termstr);
@@ -216,26 +209,8 @@ public class TacletForTests {
     }
 
     public static Term parseTerm(String termstr, NamespaceSet set) {
-	if (termstr.equals("")) return null;
-	StringReader br = null;
-	try {
-	    br = new StringReader(termstr);
-	    KeYParserF parser = new KeYParserF(ParserMode.TERM,
-		    new KeYLexerF(br,
-			    "No file. TacletForTests.parseTerm(" + termstr + ")"),
-		    new Recoder2KeY(services(), set),
-		    services(),
-		    set,
-		    new AbbrevMap());
-	    return parser.term();
-	} catch (Exception e) {
-	    System.err.println("Exception during parsing!");
-	    e.printStackTrace();
-	    return null;
-	} finally {
-	    if (br != null) br.close();
-	}
-
+        if (termstr.equals("")) return null;
+        return new KeyIO(services(), set).parseExpression(termstr);
     }
 
     public static Term parseTerm(String termstr) {

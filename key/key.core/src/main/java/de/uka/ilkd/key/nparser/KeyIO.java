@@ -127,6 +127,10 @@ public class KeyIO {
         ctx.accept(visitor);
     }
 
+    public Loader load(String content) {
+        return null;
+    }
+
     public class Loader {
         private final URL resource;
         private List<KeyAst.File> ctx = new LinkedList<>();
@@ -150,11 +154,12 @@ public class KeyIO {
             return loadProblem();
         }
 
-        public void parseFile() throws IOException {
+        public Loader parseFile() throws IOException {
             long start = System.currentTimeMillis();
             ctx = parseFiles(resource);
             long stop = System.currentTimeMillis();
             System.err.format("Parsing took %d%n", stop - start);
+            return this;
         }
 
         public ProblemInformation getProblemInformation() {
@@ -171,7 +176,7 @@ public class KeyIO {
             return ParsingFacade.getChoices(ctx);
         }
 
-        public void loadDeclarations() {
+        public Loader loadDeclarations() {
             var declBuilder = new DeclarationBuilder(services, nss);
             long start = System.currentTimeMillis();
             for (int i = ctx.size() - 1; i >= 0; i--) { // process backwards
@@ -181,9 +186,10 @@ public class KeyIO {
             }
             long stop = System.currentTimeMillis();
             System.err.format("MODE: %s took %d%n", "declarations", stop - start);
+            return this;
         }
 
-        public void loadSndDegreeDeclarations() {
+        public Loader loadSndDegreeDeclarations() {
             var visitor = new FunctionPredicateBuilder(services, nss);
             long start = System.currentTimeMillis();
             for (int i = ctx.size() - 1; i >= 0; --i) {
@@ -192,6 +198,7 @@ public class KeyIO {
             }
             long stop = System.currentTimeMillis();
             System.err.format("MODE: %s took %d%n", "2nd degree decls", stop - start);
+            return this;
         }
 
         public Pair<String, Position> getProofScript() {
@@ -224,6 +231,11 @@ public class KeyIO {
             long stop = System.currentTimeMillis();
             System.err.format("MODE: %s took %d%n", "taclets", stop - start);
             return taclets;
+        }
+
+        public Term getProblem() {
+            //TODO
+            return null;
         }
     }
 }

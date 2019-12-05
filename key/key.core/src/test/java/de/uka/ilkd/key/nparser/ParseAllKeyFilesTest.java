@@ -6,6 +6,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -28,6 +29,7 @@ import java.util.List;
  */
 @RunWith(Parameterized.class)
 @Category(Interactive.class)
+@Ignore
 public class ParseAllKeyFilesTest {
     @Parameterized.Parameter
     public Path file;
@@ -51,7 +53,7 @@ public class ParseAllKeyFilesTest {
     @Test
     public void parse() throws IOException {
         var ctx = ParsingFacade.parseFile(file);
-        Assert.assertNull(ctx.exception);
+        Assert.assertNull(ctx.ctx.exception);
         Services services = new Services(new JavaProfile());
         //ProblemFinder b = new ProblemFinder(services, services.getNamespaces(), new ParsedKeyFile());
         //ctx.accept(b);

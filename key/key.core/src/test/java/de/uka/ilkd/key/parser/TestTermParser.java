@@ -33,6 +33,9 @@ import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.TacletForTests;
+
+import java.io.IOException;
+
 import static org.junit.Assert.*;
 
 public class TestTermParser extends AbstractTestTermParser {
@@ -59,7 +62,7 @@ public class TestTermParser extends AbstractTestTermParser {
     }
 
     @Before
-    public void setUp() throws RecognitionException {	
+    public void setUp() throws RecognitionException, IOException {
         
         /*
          * Setting up only static variables here. It needs to be called only once.
@@ -131,14 +134,6 @@ public class TestTermParser extends AbstractTestTermParser {
 	t_nil = tf.createTerm(nil);
     }
     
-    @Override
-    protected KeYParserF getParser(String s) {
-        return new KeYParserF(ParserMode.TERM,getLexer(s),
-                r2k,
-                services,
-                nss,
-                new AbbrevMap());
-    }
 
     @Test
     public void test1() throws Exception {
@@ -166,7 +161,7 @@ public class TestTermParser extends AbstractTestTermParser {
     }
 
     @Test
-    public void test5() {
+    public void test5() throws Exception {
 	Term t = tf.createTerm(Equality.EQUALS,
 	    tf.createTerm
 	     (head,
@@ -182,7 +177,7 @@ public class TestTermParser extends AbstractTestTermParser {
     }
 
     @Test
-    public void testNotEqual() {
+    public void testNotEqual() throws Exception {
 	Term t = tf.createTerm(Junctor.NOT,
 	    tf.createTerm(Equality.EQUALS,
 	    tf.createTerm
@@ -197,7 +192,7 @@ public class TestTermParser extends AbstractTestTermParser {
     }
 
 	@Test
-    public void test6() {
+    public void test6() throws Exception {
 	Term t = tf.createTerm
 	    (Equality.EQV,
 	     new Term[]{tf.createTerm(Junctor.IMP,
@@ -216,7 +211,7 @@ public class TestTermParser extends AbstractTestTermParser {
     }
 
 	@Test
-    public void test7() {
+    public void test7() throws Exception {
 	/** Bound variables are newly created by the parser,
 	 * so we have to parse first, then extract the used variables,
 	 * then build the formulae. */
@@ -269,7 +264,7 @@ public class TestTermParser extends AbstractTestTermParser {
     }
 
 	@Test
-    public void test9() {
+    public void test9() throws Exception {
 	/* Try something with a prediate */
 	
 	String s = "\\exists list x; !isempty(x)";

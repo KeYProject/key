@@ -2,13 +2,10 @@ package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import org.antlr.v4.runtime.CharStreams;
-import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 
 public class ParseLDTsTests {
     @Test

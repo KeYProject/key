@@ -15,15 +15,15 @@ package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.Key;
 
+import de.uka.ilkd.key.nparser.KeyIO;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.parser.KeYLexerF;
-import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -62,6 +62,8 @@ public class KeYFileForTests extends KeYFile {
 	    final ParserConfig pc =
 		new ParserConfig(initConfig.getServices(),
 				 initConfig.namespaces());
+		KeyIO io = new KeyIO(initConfig.getServices());
+		/*
 	    KeYParserF problemParser = new KeYParserF
 		(ParserMode.PROBLEM,new KeYLexerF(cinp, file.toString()), pc, pc,initConfig.
 		 getTaclet2Builder(), initConfig.getTaclets());
@@ -69,6 +71,7 @@ public class KeYFileForTests extends KeYFile {
 	    initConfig.setTaclets(problemParser.getTaclets());
 	    variables = problemParser.namespaces().variables().copy();
 	    schemaVariables = problemParser.schemaVariables().copy();
+	    */
 	    return DefaultImmutableSet.nil();
 	} catch (Exception e) {
 	    throw new ProofInputException(e);

@@ -28,6 +28,7 @@ import java.util.List;
  */
 @RunWith(Parameterized.class)
 @Category(Interactive.class)
+@Ignore
 public class TestAllExamples {
     @Parameterized.Parameter
     public Path file;

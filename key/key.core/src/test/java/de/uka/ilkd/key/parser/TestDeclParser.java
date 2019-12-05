@@ -15,7 +15,9 @@ package de.uka.ilkd.key.parser;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.security.Key;
 
+import de.uka.ilkd.key.nparser.KeyIO;
 import junit.framework.TestCase;
 
 import org.antlr.runtime.RecognitionException;
@@ -49,36 +51,22 @@ public class TestDeclParser extends TestCase {
     }
 
     public void setUp() {
-	serv = new Services(AbstractProfile.getDefaultProfile());
-	nss = serv.getNamespaces();
+		serv = new Services(AbstractProfile.getDefaultProfile());
+		nss = serv.getNamespaces();
 	
-	String sorts = "\\sorts{boolean;int;LocSet;}";
-	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION,
-		new KeYLexerF(sorts,
-			"No file. Call of parser from logic/TestClashFreeSubst.java"),
-		serv, nss);
-	try {
-	    basicSortsParser.parseSorts();
-	} catch(Exception e) {
-	    throw new RuntimeException(e);
-	}	
-	
-	Recoder2KeY r2k = new Recoder2KeY(serv, nss);
-	r2k.parseSpecialClasses();
-    }
-
-    private KeYParserF stringParser(String s) {
-	return new KeYParserF(ParserMode.DECLARATION,
-		new KeYLexerF(s,
-			"No file. Call of parser from parser/TestDeclParser.java"),
-		serv, nss);
+		String sorts = "\\sorts{boolean;int;LocSet;}";
+		new KeyIO(serv,nss).load(sorts)
+				.loadDeclarations();
+		Recoder2KeY r2k = new Recoder2KeY(serv, nss);
+		r2k.parseSpecialClasses();
     }
 
     private void parseDecls(String s) {
 	try {
-	    KeYParserF p = stringParser(s);
-	    p.decls();
-	    this.parsedSchemaVars = p.schemaVariables();
+		new KeyIO(serv, nss).load(s)
+				.loadDeclarations()
+				.loadSndDegreeDeclarations();
+	    //this.parsedSchemaVars = p.schemaVariables();
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
 	    PrintWriter pw = new PrintWriter(sw);
@@ -218,9 +206,7 @@ public class TestDeclParser extends TestCase {
 	nss = new NamespaceSet ();
 	String str = "\\sorts { \\generic G; \\generic H \\oneof {G}; }";
 	try {
-	    KeYParserF p = stringParser(str);
-	    p.decls();
-
+	    new KeyIO(serv, nss).load(str).loadDeclarations();
 	    fail ( "Expected an GenericSortException" );
 	} catch ( Exception e ) {
 	    assertTrue ( "Expected a GenericSortException",
@@ -442,7 +428,7 @@ public class TestDeclParser extends TestCase {
 
     public void testAmbigiousDecls() {
 	try {
-	    stringParser
+	    parseDecls
 		("\\sorts { elem; list; }\n" +
 		 "\\functions {" + 
 		 "elem x;"+
@@ -459,21 +445,15 @@ public class TestDeclParser extends TestCase {
 		 "  \\term elem x,y ;\n" +
 		 "  \\variables list lv ;\n" +
 		 "  \\formula b;\n" +
-		 "}\n").decls();
+		 "}\n");
 	  fail("Parsed in ambigious declaration");
 	} catch(RuntimeException e){
 	    if(!(e.getCause() instanceof AmbigiousDeclException)){
 	        e.printStackTrace();
 		fail("Unexpected excpetion. Testcase failed." +e);
 	    }
-	} catch(RecognitionException re) {
-	    if(!(re instanceof AmbigiousDeclException)) {
-	        re.printStackTrace();
-	        fail("Unexpected recognition excpetion. Testcase failed." + re);
-	    }
-	} 
-	
-    }
+	}
+	}
 
 
     public void testHeurDecl() {
