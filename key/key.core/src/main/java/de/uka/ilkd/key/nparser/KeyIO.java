@@ -128,15 +128,21 @@ public class KeyIO {
     }
 
     public Loader load(String content) {
-        return null;
+        return new Loader(content, null);
     }
 
     public class Loader {
         private final URL resource;
+        private final String content;
         private List<KeyAst.File> ctx = new LinkedList<>();
 
         Loader(URL resource) {
-            this.resource = resource;
+            this(null, resource);
+        }
+
+        public Loader(String content, URL url) {
+            resource = url;
+            this.content = content;
         }
 
         public List<Taclet> loadComplete() throws IOException {
@@ -155,10 +161,15 @@ public class KeyIO {
         }
 
         public Loader parseFile() throws IOException {
-            long start = System.currentTimeMillis();
-            ctx = parseFiles(resource);
-            long stop = System.currentTimeMillis();
-            System.err.format("Parsing took %d%n", stop - start);
+            //long start = System.currentTimeMillis();
+            if(resource!=null)
+                ctx = parseFiles(resource);
+            else{
+                var c = ParsingFacade.parseFile(CharStreams.fromString(content));
+                ctx.add(c);
+            }
+            //long stop = System.currentTimeMillis();
+            //System.err.format("Parsing took %d%n", stop - start);
             return this;
         }
 

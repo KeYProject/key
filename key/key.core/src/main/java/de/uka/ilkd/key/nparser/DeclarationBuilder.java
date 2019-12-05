@@ -61,7 +61,7 @@ public class DeclarationBuilder extends DefaultBuilder {
     @Override
     public Object visitChoice(KeYParser.ChoiceContext ctx) {
         String cat = ctx.category.getText();
-        System.out.println("choice: " + cat);
+        //System.out.println("choice: " + cat);
         for (Token catctx : ctx.choice_option) {
             var name = cat + ":" + catctx.getText();
             Choice c = choices().lookup(new Name(name));

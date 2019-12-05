@@ -30,7 +30,7 @@ public class AbstractTestTermParser {
     protected final TermBuilder tb;
     protected final NamespaceSet nss;
     protected final Services services;
-    protected final KeyIO io;
+    protected KeyIO io;
 
     public AbstractTestTermParser() {
         services = getServices();

@@ -66,8 +66,8 @@ test {
         excludeTestsMatching "TestCvc4"
     }*/
 
-    jvmArgs << "-XX:+UnlockCommercialFeatures" << "-XX:+FlightRecorder" <<
-            "-XX:FlightRecorderOptions=defaultrecording=true"
+    //jvmArgs << "-XX:+UnlockCommercialFeatures" << "-XX:+FlightRecorder" <<
+    //        "-XX:FlightRecorderOptions=defaultrecording=true"
 
     filter {
         // To make test cases deterministic there is only one class per

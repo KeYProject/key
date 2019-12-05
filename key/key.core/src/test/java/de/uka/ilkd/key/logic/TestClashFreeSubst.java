@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
@@ -52,7 +53,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 	services = new Services(AbstractProfile.getDefaultProfile());
 	nss = services.getNamespaces();
 	tf = services.getTermFactory();
-
+		io = new KeyIO(services, nss);
 	String sorts = "\\sorts{boolean;int;LocSet;}";
 	parseDecls(sorts);
 	Recoder2KeY r2k = new Recoder2KeY(services, nss);

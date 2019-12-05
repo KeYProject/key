@@ -1,17 +1,13 @@
-package de.uka.ilkd.key.nparser;
+package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.parser.AbstractTestTermParser;
-import org.antlr.v4.runtime.CharStreams;
-import org.junit.Ignore;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -19,11 +15,35 @@ import static org.junit.Assert.*;
  * This class provides tests for parsing int, long, and char literals.
  *
  * @author Wolfram Pfeifer
- * @author weigl
  */
-@RunWith(Parameterized.class)
-@Ignore
 public class TestIntLiteralParsing extends AbstractTestTermParser {
+    /**
+     * Some Strings representing valid int values and the expected terms created by parsing them.
+     */
+    static final String[] CHARSTRINGS = {
+            //  input          ,       expected output
+            "'a'", "C(7(9(#)))",
+            "'z'", "C(2(2(1(#))))",
+            "'A'", "C(5(6(#)))",
+            "'Z'", "C(0(9(#)))",
+            "' '", "C(2(3(#)))",
+            "'\\b'", "C(8(#))",
+            "'\\t'", "C(9(#))",
+            "'\\n'", "C(0(1(#)))",
+            "'\\f'", "C(2(1(#)))",
+            "'\\r'", "C(3(1(#)))",
+            "'\\\"'", "C(4(3(#)))",
+            "'\\\''", "C(9(3(#)))",
+            "'\\\\'", "C(2(9(#)))",
+            "'0'", "C(8(4(#)))",
+            "'9'", "C(7(5(#)))",
+            "'\\u0000'", "C(0(#))",
+            "'\\uffff'", "C(5(3(5(5(6(#))))))",
+        "'\u0000'"         ,       "C(0(#))",
+        "'\u0394'"         ,       "C(6(1(9(#))))",        // greek uppercase delta
+        "'\uffff'"         ,       "C(5(3(5(5(6(#))))))"
+    };
+
     /**
      * Some Strings representing valid int values and the expected terms created by parsing them.
      */
@@ -46,6 +66,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
             "0b1000_0000_0000_0000_0000_0000_0000_0000", "Z(neglit(8(4(6(3(8(4(7(4(1(2(#))))))))))))",
             "0b0100100100011101", "Z(7(1(7(8(1(#))))))"
     };
+
     /**
      * Some Strings representing valid long values and the expected terms created by parsing them.
      */
@@ -87,32 +108,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
             "Z(7(0(8(5(7(7(4(5(8(6(3(0(2(7(3(3(2(2(9(#))))))))))))))))))))"
 
     };
-    /**
-     * Some Strings representing valid int values and the expected terms created by parsing them.
-     */
-    private static final String[] CHARSTRINGS = {
-            //  input          ,       expected output
-            "'a'", "C(7(9(#)))",
-            "'z'", "C(2(2(1(#))))",
-            "'A'", "C(5(6(#)))",
-            "'Z'", "C(0(9(#)))",
-            "' '", "C(2(3(#)))",
-            "'\\b'", "C(8(#))",
-            "'\\t'", "C(9(#))",
-            "'\\n'", "C(0(1(#)))",
-            "'\\f'", "C(2(1(#)))",
-            "'\\r'", "C(3(1(#)))",
-            "'\\\"'", "C(4(3(#)))",
-            "'\\\''", "C(9(3(#)))",
-            "'\\\\'", "C(2(9(#)))",
-            "'0'", "C(8(4(#)))",
-            "'9'", "C(7(5(#)))",
-            "'\\u0000'", "C(0(#))",
-            "'\\uffff'", "C(5(3(5(5(6(#))))))",
-            "'\u0000'", "C(0(#))",
-            "'\u0394'", "C(6(1(9(#))))",        // greek uppercase delta
-            "'\uffff'", "C(5(3(5(5(6(#))))))"
-    };
+
     /**
      * These Strings represent numbers that are out of range of the int type.
      */
@@ -135,64 +131,77 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
             "020_0000_0000_0000_0000_0000L"                                               // 2^64
     };
 
-    public static int PARSEABLE = 1, ERROR = -1;
-    @Parameterized.Parameter(0)
-    public int type;
-    @Parameterized.Parameter(2)
-    public String expected;
-    @Parameterized.Parameter(1)
-    public String input;
-
-    @Parameterized.Parameters(name = "{1}")
-    public static Collection<Object[]> data() {
-        List<Object[]> seq = new LinkedList<>();
-        add(seq, PARSEABLE, INTSTRINGS);
-        add(seq, PARSEABLE, LONGSTRINGS);
-        add(seq, PARSEABLE, CHARSTRINGS);
-        add(seq, ERROR, INTRANGESTRINGS);
-        add(seq, ERROR, LONGRANGESTRINGS);
-        return seq;
+    @Override
+    public Term parseTerm(String s) throws RecognitionException {
+        PositionedString p = new PositionedString(s);
+        /* containerType and self variable are not relevant for the tests
+         * currently and can be changed if needed.
+         */
+        KeYJavaType containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
+        ProgramVariable self =
+                services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
+        KeYJMLParser parser = new KeYJMLParser(p, getServices(), containerType, self,
+                null, null, null, null);
+        return parser.termexpression();
     }
 
-    private static void add(List<Object[]> seq, int type, String[] cases) {
-        if (type == ERROR) {
-            for (String aCase : cases) seq.add(new Object[]{type, aCase, ""});
-        } else {
-            for (int i = 0; i < cases.length; i += 2)
-                seq.add(new Object[]{type, cases[i], cases[i + 1]});
+    public void createTestCases(String[] testData) throws RecognitionException {
+        for (int i = 0; i < testData.length / 2; i++) {
+            String input = testData[i * 2];
+            String expected = testData[i * 2 + 1];
+            String actual = parseTerm(input).toString();
+            assertEquals(expected, actual);
         }
     }
 
-    private Services services = getServices();
-
     @Test
-    public void testLex() {
-        var lexer = ParsingFacade.lex(CharStreams.fromString(input));
-        var toks = lexer.getAllTokens();
-        System.out.println(toks);
-        assertEquals(1, toks.size());
-        var t = toks.get(0).getType();
-        assertTrue("Wrong literal type", KeYLexer.NUM_LITERAL == t ||
-                KeYLexer.HEX_LITERAL == t ||
-                KeYLexer.BIN_LITERAL == t ||
-                KeYLexer.CHAR_LITERAL == t);
-    }
-
-    public Term parseTerm(String s) {
-        var ctx = ParsingFacade.parseExpression(CharStreams.fromString(s));
-        return (Term) ctx.accept(new ExpressionBuilder(services, nss));
+    public void testCharLiteralParsing() throws RecognitionException {
+        createTestCases(CHARSTRINGS);
     }
 
     @Test
-    public void testParse() {
-        try {
-            var actual = parseTerm(input);
-            if (type == ERROR) fail();
-            else assertEquals(expected, actual.toString());
-        } catch (Exception e) {
-            if (type == ERROR)
-                assertTrue("Wrong exception", e.getMessage().startsWith("Number constant out of bounds"));
-            else throw e;
+    public void testIntLiteralParsing() throws RecognitionException {
+        createTestCases(INTSTRINGS);
+    }
+
+    @Test
+    public void testLongLiteralParsing() throws RecognitionException {
+        createTestCases(LONGSTRINGS);
+    }
+
+    /**
+     * This method tests if meaningful ("out of bounds") error messages get printed for int literals
+     * which are just outside the range of int.
+     *
+     * @throws RecognitionException if a parsing error occurs
+     */
+    @Test
+    public void testIntRange() throws RecognitionException {
+        for (String it : INTRANGESTRINGS) {
+            try {
+                parseTerm(it);
+                fail();
+            } catch (SLTranslationException e) {
+                assertTrue(e.getMessage().startsWith("Number constant out of bounds"));
+            }
+        }
+    }
+
+    /**
+     * This method tests if meaningful ("out of bounds") error messages get printed for long
+     * literals which are just outside the range of long.
+     *
+     * @throws RecognitionException if a parsing error occurs
+     */
+    @Test
+    public void testLongRange() throws RecognitionException {
+        for (String it : LONGRANGESTRINGS) {
+            try {
+                parseTerm(it);
+                fail();
+            } catch (SLTranslationException e) {
+                assertTrue(e.getMessage().startsWith("Number constant out of bounds"));
+            }
         }
     }
 }
