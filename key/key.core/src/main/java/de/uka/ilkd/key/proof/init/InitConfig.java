@@ -13,11 +13,9 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
+import de.uka.ilkd.key.rule.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -40,11 +38,6 @@ import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationByAddRules;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
 
@@ -64,7 +57,9 @@ public class InitConfig {
     private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
 
 
-    private ImmutableList<Taclet> taclets = ImmutableSLList.<Taclet>nil();
+    private Map<Name, Taclet> taclets = new TreeMap<>();
+
+    //private ImmutableList<Taclet> taclets = ImmutableSLList.<Taclet>nil();
 
     /**
      * maps categories to their default choice (both represented as Strings),
@@ -223,14 +218,33 @@ public class InitConfig {
     }
 
 
-    public void setTaclets(ImmutableList<Taclet> taclets){
-        this.taclets = taclets;
+    public void addTaclets(Collection<Taclet> taclets) {
+        for (var t :taclets) {
+            this.taclets.put(t.name(), t);
+        }
+        this.activatedTacletCache = null;
+    }
+
+    public void setTaclets(ImmutableList<Taclet> taclets) {
+        this.taclets.clear();
+        taclets.forEach(it -> this.taclets.put(it.name(), it));
+        // invalidate active taclet cache
+        this.activatedTacletCache = null;
+    }
+
+    public void setTaclets(Collection<Taclet> taclets){
+        this.taclets.clear();
+        addTaclets(taclets);
         // invalidate active taclet cache
         this.activatedTacletCache = null;
     }
 
 
     public ImmutableList<Taclet> getTaclets(){
+        return ImmutableList.fromList(taclets.values());
+    }
+
+    public Map<Name, Taclet> getTacletsMap(){
         return taclets;
     }
 
@@ -261,7 +275,7 @@ public class InitConfig {
           return;
        }
        final LinkedHashMap<Name,Taclet> tacletCache = new LinkedHashMap<Name, Taclet>();
-       for (Taclet t : taclets) {
+       for (Taclet t : taclets.values()) {
           TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);
           
           if(t.getChoices().subset(activatedChoices)){
@@ -432,7 +446,7 @@ public class InitConfig {
         ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
         ic.setTaclet2Builder(
                 (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
-        ic.setTaclets(taclets);
+        ic.taclets = taclets;
         ic.originalKeYFileName = originalKeYFileName;
         ic.justifInfo = justifInfo.copy();
         ic.fileRepo = fileRepo;     // TODO: copy instead? delete via dispose method?
@@ -457,4 +471,6 @@ public class InitConfig {
     public void setFileRepo(FileRepo fileRepo) {
         this.fileRepo = fileRepo;
     }
+
+
 }

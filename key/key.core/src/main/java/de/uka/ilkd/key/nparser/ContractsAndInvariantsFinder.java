@@ -20,14 +20,15 @@ import java.util.List;
  * @version 1 (12/4/19)
  */
 public class ContractsAndInvariantsFinder extends ExpressionBuilder {
+    private final DeclarationBuilder declarationBuilder;
     private List<Contract> contracts = new ArrayList<>();
     private List<ClassInvariant> invariants = new ArrayList<>();
     private ParsableVariable selfVar;
 
     public ContractsAndInvariantsFinder(Services services, NamespaceSet nss) {
         super(services, nss);
+        declarationBuilder = new DeclarationBuilder(services, nss);
     }
-
 
     public List<Contract> getContracts() {
         return contracts;
@@ -50,19 +51,12 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     }
 
     @Override
-    public Object visitInvariants(KeYParser.InvariantsContext ctx) {
-        Namespace<QuantifiableVariable> orig = variables();
-        selfVar = (ParsableVariable) ctx.selfVar.accept(this);
-        ctx.one_invariant().forEach(it -> it.accept(this));
-        unbindVars(orig);
-        return null;
-    }
-
-    @Override
     public Object visitOne_contract(KeYParser.One_contractContext ctx) {
         String contractName = visitSimple_ident(ctx.contractName);
         //for program variable declarations
-        namespaces().setProgramVariables(new Namespace<>(programVariables()));
+        var oldProgVars = namespaces().programVariables();
+        namespaces().setProgramVariables(new Namespace<>(oldProgVars));
+        declarationBuilder.visitProg_var_decls(ctx.prog_var_decls());
         Term fma = visitFormula(ctx.formula());
         Term modifiesClause = visitTerm(ctx.modifiesClause);
         DLSpecFactory dsf = new DLSpecFactory(getServices());
@@ -74,7 +68,17 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
             semanticError(ctx, e.getMessage());
         }
         //dump local program variable declarations
-        namespaces().setProgramVariables(programVariables().parent());
+        namespaces().setProgramVariables(oldProgVars);
+        return null;
+    }
+
+
+    @Override
+    public Object visitInvariants(KeYParser.InvariantsContext ctx) {
+        Namespace<QuantifiableVariable> orig = variables();
+        selfVar = (ParsableVariable) ctx.selfVar.accept(this);
+        ctx.one_invariant().forEach(it -> it.accept(this));
+        unbindVars(orig);
         return null;
     }
 

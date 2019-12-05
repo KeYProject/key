@@ -22,6 +22,7 @@ import org.key_project.util.collection.ImmutableSet;
 import java.util.*;
 
 public class TacletPBuilder extends ExpressionBuilder {
+    private HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new HashMap<>();
     private boolean axiomMode;
     private boolean negated = false;
     private boolean isPrimitive;
@@ -30,6 +31,18 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     public TacletPBuilder(Services services, NamespaceSet nss) {
         super(services, nss);
+    }
+
+    public TacletPBuilder(Services services, NamespaceSet namespaces, HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder) {
+        this(services, namespaces);
+        this.taclet2Builder = taclet2Builder;
+    }
+
+    @Override
+    public Object visitDecls(KeYParser.DeclsContext ctx) {
+        allOf(ctx.schema_var_decls());
+        allOf(ctx.rulesOrAxioms());
+        return null;
     }
 
     @Override
@@ -119,7 +132,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             Taclet r = b.getTaclet();
             r.setTacletOptions(activatedChoices);
             r.setOrigin(ctx.name.getTokenSource().getSourceName() + ":" + ctx.name.getLine());
-            announceTaclet(ctx, r);
+            announceTaclet(ctx, r, b);
             return r;
         }
 
@@ -154,18 +167,19 @@ public class TacletPBuilder extends ExpressionBuilder {
         Taclet r = b.getTaclet();
         r.setTacletOptions(activatedChoices);
         r.setOrigin(ctx.name.getTokenSource().getSourceName() + ":" + ctx.name.getLine());
-        announceTaclet(ctx, r);
+        announceTaclet(ctx, r, b);
         schemaVariablesNamespace = schemaVariables().parent();
         return r;
     }
 
-    private void announceTaclet(ParserRuleContext ctx, Taclet taclet) {
+    private void announceTaclet(ParserRuleContext ctx, Taclet taclet, TacletBuilder tb) {
         RuleKey key = new RuleKey(taclet);
         TacletBuilder b = peek();
         if (b != null) {
             return;
         }
         taclets.add(taclet);
+        taclet2Builder.put(taclet, tb);
         /*if (parsedKeyFile.getTaclets().containsKey(key)) {
             //semanticError(ctx, "A taclet with name %s was already defined", key);
             System.err.format("Taclet clash with %s%n", key);
@@ -196,58 +210,6 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         allOf(ctx.triggers());
         return null;
-    }
-
-    @Override
-    public Sequent visitSeq(KeYParser.SeqContext ctx) {
-        Semisequent ant = accept(ctx.ant);
-        Semisequent suc = accept(ctx.suc);
-        return Sequent.createSequent(ant, suc);
-    }
-
-    @Override
-    public Object visitSeqEOF(KeYParser.SeqEOFContext ctx) {
-        return accept(ctx.seq());
-    }
-
-    @Override
-    public Object visitTermorseq(KeYParser.TermorseqContext ctx) {
-        Term head = accept(ctx.head);
-        Sequent s = accept(ctx.s);
-        Semisequent ss = accept(ctx.ss);
-        if (head != null && s == null && ss == null) {
-            return head;
-        }
-        if (head != null && ss != null) {
-            // A sequent with only head in the antecedent.
-            Semisequent ant = Semisequent.EMPTY_SEMISEQUENT;
-            ant = ant.insertFirst(
-                    new SequentFormula(head)).semisequent();
-            return Sequent.createSequent(ant, ss);
-        }
-        if (head != null && s != null) {
-            // A sequent.  Prepend head to the antecedent.
-            Semisequent newAnt = s.antecedent();
-            newAnt = newAnt.insertFirst(
-                    new SequentFormula(head)).semisequent();
-            return Sequent.createSequent(newAnt, s.succedent());
-        }
-        if (ss != null) {
-            return Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, ss);
-        }
-        assert (false);
-        return null;
-    }
-
-    @Override
-    public Object visitSemisequent(KeYParser.SemisequentContext ctx) {
-        Semisequent ss = accept(ctx.ss);
-        if (ss == null)
-            ss = Semisequent.EMPTY_SEMISEQUENT;
-        Term head = accept(ctx.term());
-        if (head != null)
-            ss = ss.insertFirst(new SequentFormula(head)).semisequent();
-        return ss;
     }
 
     @Override

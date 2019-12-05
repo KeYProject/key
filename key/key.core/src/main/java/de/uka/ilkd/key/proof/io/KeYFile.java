@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof.io;
 
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -20,6 +21,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
@@ -27,7 +29,6 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.io.File;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -53,18 +55,14 @@ public class KeYFile implements EnvInput {
     private final String name;
     private final Profile profile;
     protected InitConfig initConfig;
-
-    @Nullable
-    private KeYParser.FileContext ctx = null;
-
-    @Nullable
-    private ProblemFinder problemFinder = null;
-
-    @Nullable
-    private ProblemInformation problemInformation = null;
-
     protected String chooseContract = null;
     protected String proofObligation = null;
+    @Nullable
+    private KeYParser.FileContext ctx = null;
+    @Nullable
+    private ProblemFinder problemFinder = null;
+    @Nullable
+    private ProblemInformation problemInformation = null;
     private Includes includes;
 
     /**
@@ -191,7 +189,6 @@ public class KeYFile implements EnvInput {
                 input = file.getNewStream();
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return input;
@@ -327,31 +324,26 @@ public class KeYFile implements EnvInput {
 
     @Override
     public ImmutableSet<PositionedString> read() throws ProofInputException {
+        ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
         if (initConfig == null) {
             throw new IllegalStateException("KeYFile: InitConfig not set.");
         }
 
         //read .key file
         Debug.out("Reading KeY file", file);
-        //var ctx = getParseContext();
-        //var pf = getProblemFinder();
         //TODO initConfig.addCategory2DefaultChoices(problemParser.getCategory2Default());
 
-        var io = new KeyIO(initConfig.getServices());
-        //var taclets = io.findTaclets(ctx);
-        //initConfig.setTaclets(ImmutableList.fromList(taclets));
-
+        readSorts();
+        readFuncAndPred();
+        readRules();
         SpecificationRepository specRepos
                 = initConfig.getServices().getSpecificationRepository();
-        /*
-        TODO
         var cinvs = new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
         getParseContext().accept(cinvs);
         specRepos.addContracts(ImmutableSet.fromCollection(cinvs.getContracts()));
         specRepos.addClassInvariants(ImmutableSet.fromCollection(cinvs.getInvariants()));
-         */
         Debug.out("Read KeY file   ", file);
-        return DefaultImmutableSet.nil();
+        return warnings;
     }
 
     @NotNull
@@ -397,9 +389,17 @@ public class KeYFile implements EnvInput {
     public void readRules() throws ProofInputException {
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         var ctx = getParseContext();
-        var taclets = io.findTaclets(ctx);
+        var visitor = new TacletPBuilder(initConfig.getServices(), initConfig.namespaces(),
+                initConfig.getTaclet2Builder());
+        ctx.accept(visitor);
+        var taclets = visitor.getTaclets();
         System.out.format("Found taclets (%s): %d%n", file, taclets.size());
-        initConfig.setTaclets(ImmutableList.fromList(taclets));
+        Map<Name, Taclet> map = initConfig.getTacletsMap();
+        for (var t : taclets) {
+            if (!map.containsKey(t.name())) {
+                map.put(t.name(), t);
+            }
+        }
     }
 
 

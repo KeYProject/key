@@ -125,7 +125,6 @@ public class KeyIO {
 
     public List<Taclet> findTaclets(KeYParser.FileContext ctx) {
         var visitor = new TacletPBuilder(services, nss);
-        int size = ctx.decls().rulesOrAxioms().size();
         ctx.accept(visitor);
         return visitor.getTaclets();
     }
