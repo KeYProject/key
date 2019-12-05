@@ -15,7 +15,6 @@ package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
@@ -112,8 +111,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         }
         ProofSettings settings = getPreferences();
         initConfig.setSettings(settings);
-        var activatedChoices = KeyIO.findActivatedChoices(getParseContext(), initConfig.namespaces().choices());
-        settings.getChoiceSettings().updateWith(activatedChoices);
+        var ci = getParseContext().getChoices();
+        settings.getChoiceSettings().updateWith(ci.getActivatedChoices());
         initConfig.setActivatedChoices(settings.getChoiceSettings()
                 .getDefaultChoicesAsSet());
 
@@ -142,32 +141,36 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             throw new IllegalStateException("KeYUserProblemFile: InitConfig not set.");
         }
 
-        //TODO This is a hack. I am not sure, way readSorts & co are not called.
         readSorts();
         readFuncAndPred();
         readRules();
 
 
         try {
-            var pf = getProblemFinder();
-            chooseContract = pf.getChoosedContract();
-            proofObligation = pf.getProofObligation();
-
-            if (pf.getProblemTerm() == null) {
-                boolean chooseDLContract = pf.getChoosedContract() != null;
-                boolean proofObligation = pf.getProofObligation() != null;
+            problemTerm = getProblemFinder().getProblemTerm();
+            if (problemTerm == null) {
+                boolean chooseDLContract = chooseContract() != null;
+                boolean proofObligation = getProofObligation() != null;
                 if (!chooseDLContract && !proofObligation) {
                     throw new ProofInputException(
                             "No \\problem or \\chooseContract or \\proofObligation in the input file!");
                 }
-            }else{
-                problemTerm = pf.getProblemTerm();
             }
         } catch (Exception e) {
             throw new ProofInputException(e);
         }
     }
 
+
+    @Override
+    public String chooseContract() {
+        return getProblemFinder().getChoosedContract();
+    }
+
+    @Override
+    public String getProofObligation() {
+        return getProblemFinder().getProofObligation();
+    }
 
     @Override
     public ProofAggregate getPO() throws ProofInputException {
@@ -191,19 +194,18 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
 
     public boolean hasProofScript() {
-        var ctx = getParseContext();
-        return ctx.problem() != null && ctx.problem().proofScript() != null;
+        return getParseContext().findProofScript() != null;
     }
 
     public Triple<String, Integer, Integer> readProofScript() throws ProofInputException {
-        return KeyIO.findProofScript(getParseContext());
+        return getParseContext().findProofScript();
     }
 
     /**
      * Reads a saved proof of a .key file.
      */
     public void readProof(IProofFileParser prl) throws ProofInputException {
-        //TODO lastParser.proof(prl);
+        //TODO weigl lastParser.proof(prl);
     }
 
 

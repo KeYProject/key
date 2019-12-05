@@ -17,6 +17,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 
+import javax.annotation.Nullable;
+
 /**
  * Buit-in rule interface.
  * As applications of this rule kind may
@@ -36,4 +38,10 @@ public interface BuiltInRule extends Rule {
     boolean isApplicableOnSubTerms();
 
     IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services);
+
+    @Nullable
+    @Override
+    default String getOrigin() {
+        return "defined in Java: " + getClass().getName();
+    }
 }

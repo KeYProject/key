@@ -3,8 +3,7 @@ package de.uka.ilkd.key.nparser;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -13,16 +12,19 @@ import java.util.*;
  * @version 1 (28.10.19)
  */
 public class ChoiceFinder extends AbstractBuilder<Object> {
-    private final Map<String, Set<String>> seq = new HashMap<>();
-    private final HashSet<String> activatedChoicesCategories = new LinkedHashSet<>();
-    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.nil();
-    private Namespace<Choice> choices = new Namespace<>();
+    @NotNull
+    private final ChoiceInformation choiceInformation;
 
     public ChoiceFinder() {
+        choiceInformation = new ChoiceInformation();
+    }
+
+    public ChoiceFinder(@NotNull ChoiceInformation choiceInformation) {
+        this.choiceInformation = choiceInformation;
     }
 
     public ChoiceFinder(Namespace<Choice> choices) {
-        this.choices = choices;
+        choiceInformation = new ChoiceInformation(choices);
     }
 
     @Override
@@ -35,12 +37,20 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
     @Override
     public Object visitChoice(KeYParser.ChoiceContext ctx) {
         String category = ctx.category.getText();
-        Set<String> options = new HashSet<>(ctx.choice_option.size());
+        List<String> options = new ArrayList<>(ctx.choice_option.size());
         ctx.choice_option.forEach(it -> {
             options.add(it.getText());
-            choices.add(new Choice(it.getText(), category));
         });
-        seq.put(category, options);
+        if (options.isEmpty()) {
+            options.add("on");
+            options.add("off");
+        }
+
+        seq().put(category, new HashSet<>(options));
+        choiceInformation.setDefaultOption(category, options.get(0));
+        options.forEach(it ->
+                choices().add(new Choice(it, category))
+        );
         return null;
     }
 
@@ -48,26 +58,44 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
     public Choice visitActivated_choice(KeYParser.Activated_choiceContext ctx) {
         var cat = ctx.cat.getText();
         var ch = ctx.choice_.getText();
-        if (activatedChoicesCategories.contains(cat)) {
+        if (activatedChoicesCategories().contains(cat)) {
             throw new IllegalArgumentException("You have already chosen a different option for " + cat);
         }
-        activatedChoicesCategories.add(cat);
+        activatedChoicesCategories().add(cat);
         var name = cat + ":" + ch;
-        var c = (Choice) choices.lookup(new Name(name));
+        var c = (Choice) choices().lookup(new Name(name));
         if (c == null) {
             semanticError(ctx, "Choice %s not previously declared", name);
         } else {
-            activatedChoices = activatedChoices.add(c);
+            activatedChoices().add(c);
         }
         return c;
     }
 
-
-    public Map<String, Set<String>> getChoices() {
-        return seq;
+    @NotNull
+    public ChoiceInformation getChoiceInformation() {
+        return choiceInformation;
     }
 
-    public ImmutableSet<Choice> getActivatedChoices() {
-        return activatedChoices;
+    //region access functions
+    private Set<Choice> activatedChoices() {
+        return choiceInformation.getActivatedChoices();
     }
+
+    private HashSet<String> activatedChoicesCategories() {
+        return choiceInformation.getActivatedChoicesCategories();
+    }
+
+    private HashSet<String> options() {
+        return choiceInformation.getActivatedChoicesCategories();
+    }
+
+    private Namespace<Choice> choices() {
+        return choiceInformation.getChoices();
+    }
+
+    private Map<String, Set<String>> seq() {
+        return choiceInformation.getFoundChoicesAndOptions();
+    }
+    //endregion
 }

@@ -2,13 +2,29 @@ package de.uka.ilkd.key.nparser;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * This class brings some nice features to the visitors of key's ast.
+ *
+ * <ul>
+ * <li>It makes casting implicit by using {{@link #accept(RuleContext)}}
+ * <li>It allows to pass arguments by an explicit stack.
+ * <li>It brings handling of errors and warnings.
+ * </ul>
+ *
+ * @param <T> return type
+ * @author Alexander Weigl
+ */
 @SuppressWarnings("unchecked")
 abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
+    //region handling of warnings
+    @Nullable
+    protected List<BuildingException> warnings = null;
     //region stack handling
     private Stack<Object> parameters = new Stack<>();
 
@@ -26,7 +42,10 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
         return (T) ctx.accept(this);
     }
 
-
+    /**
+     * @param <T>
+     * @return
+     */
     protected <T> T peek() {
         return (T) (parameters.size() == 0 ? null : parameters.peek());
     }
@@ -55,7 +74,6 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
         return t;
     }
 
-
     protected <T> T oneOf(ParserRuleContext... ctxs) {
         for (ParserRuleContext ctx : ctxs) {
             if (ctx != null) {
@@ -65,53 +83,63 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
         return null;
     }
 
-    protected <T> List<T> allOf(Collection<? extends ParserRuleContext> argument) {
+    protected <T> List<T> mapOf(Collection<? extends ParserRuleContext> argument) {
         return argument.stream().map(it -> (T) it.accept(this)).collect(Collectors.toList());
     }
 
-    public <T> List<T> mapOf(List<? extends ParserRuleContext> seq) {
-        return seq.stream().map(it -> (T) it.accept(this))
-                .collect(Collectors.toList());
+    protected void each(RuleContext... ctx) {
+        for (RuleContext c : ctx) accept(c);
     }
 
-
-    protected void semanticError(ParserRuleContext ctx, String format, Object... args) {
-        throw new BuildingException(ctx, String.format(format, args));
+    protected void each(Collection<? extends ParserRuleContext> argument) {
+        for (RuleContext c : argument) accept(c);
     }
+    //endregion
 
-    protected <T2> List<T2> allOf(List<? extends RuleContext>... ctxss) {
+    protected <T2> List<T2> mapMapOf(List<? extends RuleContext>... ctxss) {
         return Arrays.stream(ctxss)
                 .flatMap(it -> it.stream().map(a -> (T2) accept(a)))
                 .collect(Collectors.toList());
     }
+
+    public @NotNull List<BuildingException> getWarnings() {
+        if (warnings == null) warnings = new LinkedList<>();
+        return warnings;
+    }
+
+    protected BuildingException addWarning(ParserRuleContext node, String description) {
+        var be = new BuildingException(node, description);
+        getWarnings().add(be);
+        return be;
+    }
+
+    protected BuildingException addWarning(String description) {
+        var be = new BuildingException(description);
+        getWarnings().add(be);
+        return be;
+    }
     //endregion
 
     //region error handling
-    protected List<BuildingException> errors = new LinkedList<>();
 
-    public List<BuildingException> getErrors() {
-        return errors;
+    /**
+     * Throws a semanticError for the given ast node and message.
+     *
+     * @param ctx
+     * @param format
+     * @param args
+     */
+    protected void semanticError(ParserRuleContext ctx, String format, Object... args) {
+        throw new BuildingException(ctx, String.format(format, args));
     }
 
-    protected BuildingException addError(ParserRuleContext node, String description) {
-        var be = new BuildingException(node, description);
-        errors.add(be);
-        return be;
-    }
-
-    protected BuildingException addError(String description) {
-        var be = new BuildingException(description);
-        errors.add(be);
-        return be;
-    }
-
+    /**
+     * Wraps an exception into a {@link BuildingException}
+     *
+     * @param e
+     */
     protected void throwEx(Throwable e) {
-        throw new RuntimeException(e);
+        throw new BuildingException(e);
     }
     //endregion
-
-    void each(RuleContext... ctx) {
-        for (RuleContext c : ctx) accept(c);
-    }
-
 }

@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.nparser;
 
+import com.google.common.base.CharMatcher;
+
 import java.util.List;
 
 public class FindProblemInformation extends AbstractBuilder<Object> {
@@ -57,7 +59,11 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
 
     @Override
     public String visitOneJavaSource(KeYParser.OneJavaSourceContext ctx) {
-        return ctx.getText();
+        return trim(ctx.getText(), '"');
+    }
+
+    private String trim(String text, char c) {
+        return CharMatcher.is(c).trimFrom(text);
     }
 
     @Override

@@ -24,7 +24,7 @@ class IncludeFinder extends AbstractBuilder<Void> {
     @Override
     public Void visitOne_include_statement(KeYParser.One_include_statementContext ctx) {
         ldt = ctx.INCLUDELDTS() != null;
-        allOf(ctx.one_include());
+        mapOf(ctx.one_include());
         return null;
     }
 

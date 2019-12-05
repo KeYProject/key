@@ -22,12 +22,13 @@ import org.key_project.util.collection.ImmutableSet;
 import java.util.*;
 
 public class TacletPBuilder extends ExpressionBuilder {
+    private final Stack<TacletBuilder> currentTBuilder = new Stack<>();
     private HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new HashMap<>();
     private boolean axiomMode;
     private boolean negated = false;
-    private boolean isPrimitive;
     private List<Taclet> taclets = new ArrayList<>(2048);
-    private boolean primitiveElementType;
+    private ImmutableSet<Choice> requiredChoices = DefaultImmutableSet.nil();
+    private ImmutableSet<Choice> goalChoice = DefaultImmutableSet.nil();
 
     public TacletPBuilder(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -40,8 +41,8 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Object visitDecls(KeYParser.DeclsContext ctx) {
-        allOf(ctx.schema_var_decls());
-        allOf(ctx.rulesOrAxioms());
+        mapOf(ctx.schema_var_decls());
+        mapOf(ctx.rulesOrAxioms());
         return null;
     }
 
@@ -49,7 +50,13 @@ public class TacletPBuilder extends ExpressionBuilder {
     public Object visitRulesOrAxioms(KeYParser.RulesOrAxiomsContext ctx) {
         if (ctx.RULES() != null) axiomMode = false;
         if (ctx.AXIOMS() != null) axiomMode = true;
-        List<Taclet> seq = allOf(ctx.taclet());
+        List<Choice> choices = accept(ctx.choices);
+        if (choices != null) {
+            this.requiredChoices = ImmutableSet.fromCollection(choices);
+        } else {
+            this.requiredChoices = DefaultImmutableSet.nil();
+        }
+        List<Taclet> seq = mapOf(ctx.taclet());
         Map<RuleKey, Taclet> taclets = new HashMap<>();
         for (Taclet s : seq) {
             final RuleKey key = new RuleKey(s);
@@ -64,7 +71,6 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
         return null;
     }
-
 
     @Override
     public Object visitOne_schema_modal_op_decl(KeYParser.One_schema_modal_op_declContext ctx) {
@@ -97,9 +103,10 @@ public class TacletPBuilder extends ExpressionBuilder {
         if (triggerVar == null) {
             semanticError(ctx, "Undeclared schemavariable: " + id);
         }
+        TacletBuilder b = peekTBuilder();
         Term t = accept(ctx.t);
-        List<Term> avoidConditions = new ArrayList<>(ctx.term().size());//TODO avoidCond.
-        //b.setTrigger(new Trigger(triggerVar, t, avoidConditions));
+        List<Term> avoidConditions = mapOf(ctx.avoidCond);
+        b.setTrigger(new Trigger(triggerVar, t, ImmutableList.fromList(avoidConditions)));
         return null;
     }
 
@@ -112,74 +119,78 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
         var name = ctx.name.getText();
         List<Choice> ch = accept(ctx.option_list());
-        ImmutableSet<Choice> choices_ = ch == null ? ImmutableSet.empty() : DefaultImmutableSet.fromCollection(ch);
+        var choices = requiredChoices;
+        if (ch != null) {
+            choices = choices.add(ch);
+        }
 
         Term form = accept(ctx.form);
         if (form != null) {
             if (!axiomMode) {
                 semanticError(ctx, "formula rules are only permitted for \\axioms");
             }
-            TacletBuilder<?> b = createTacletBuilderFor(null, RewriteTaclet.NONE, ctx);
+            var b = createTacletBuilderFor(null, RewriteTaclet.NONE, ctx);
+            currentTBuilder.push(b);
             SequentFormula sform = new SequentFormula(form);
             Semisequent semi = new Semisequent(sform);
             Sequent addSeq = Sequent.createAnteSequent(semi);
             ImmutableList<Taclet> noTaclets = ImmutableSLList.nil();
             DefaultImmutableSet<SchemaVariable> noSV = DefaultImmutableSet.nil();
-            addGoalTemplate(b, null, null, addSeq, noTaclets, noSV, null, ctx);
+            addGoalTemplate(null, null, addSeq, noTaclets, noSV, null, ctx);
             b.setName(new Name(name));
-            b.setChoices(choices_);
+            b.setChoices(choices);
             b.setAnnotations(tacletAnnotations);
+            b.setOrigin(BuildingException.getPosition(ctx));
             Taclet r = b.getTaclet();
-            r.setTacletOptions(activatedChoices);
-            r.setOrigin(ctx.name.getTokenSource().getSourceName() + ":" + ctx.name.getLine());
-            announceTaclet(ctx, r, b);
+            announceTaclet(ctx, r);
+            currentTBuilder.pop();
             return r;
         }
 
         //  schema var decls
-        schemaVariablesNamespace = new Namespace(schemaVariables());
-        allOf(ctx.one_schema_var_decl());
+        schemaVariablesNamespace = new Namespace<>(schemaVariables());
+        mapOf(ctx.one_schema_var_decl());
 
         if (ctx.ifSeq != null) ifSeq = accept(ctx.ifSeq);
 
         int applicationRestriction = RewriteTaclet.NONE;
-        if (null != ctx.SAMEUPDATELEVEL()) {
+        if (!ctx.SAMEUPDATELEVEL().isEmpty()) {
             applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL;
         }
-        if (null != ctx.INSEQUENTSTATE()) {
+        if (!ctx.INSEQUENTSTATE().isEmpty()) {
             applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE;
         }
-        if (null != ctx.ANTECEDENTPOLARITY()) {
+        if (!ctx.ANTECEDENTPOLARITY().isEmpty()) {
             applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY;
         }
-        if (null != ctx.SUCCEDENTPOLARITY()) {
+        if (!ctx.SUCCEDENTPOLARITY().isEmpty()) {
             applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY;
         }
         var find = accept(ctx.find);
-        TacletBuilder b = createTacletBuilderFor(find, applicationRestriction, ctx);
+        var b = createTacletBuilderFor(find, applicationRestriction, ctx);
+        currentTBuilder.push(b);
         b.setIfSequent(ifSeq);
         b.setName(new Name(name));
-        accept(ctx.goalspecs(), b);
-        accept(ctx.varexplist(), b);
-        accept(ctx.modifiers(), b);
-        b.setChoices(choices_);
+        accept(ctx.goalspecs());
+        accept(ctx.varexplist());
+        accept(ctx.modifiers());
+        b.setChoices(choices);
         b.setAnnotations(tacletAnnotations);
-        Taclet r = b.getTaclet();
-        r.setTacletOptions(activatedChoices);
-        r.setOrigin(ctx.name.getTokenSource().getSourceName() + ":" + ctx.name.getLine());
-        announceTaclet(ctx, r, b);
+        b.setOrigin(BuildingException.getPosition(ctx));
+        Taclet r = peekTBuilder().getTaclet();
+        announceTaclet(ctx, r);
         schemaVariablesNamespace = schemaVariables().parent();
+        currentTBuilder.pop();
         return r;
     }
 
-    private void announceTaclet(ParserRuleContext ctx, Taclet taclet, TacletBuilder tb) {
+    private void announceTaclet(ParserRuleContext ctx, Taclet taclet) {
         RuleKey key = new RuleKey(taclet);
-        TacletBuilder b = peek();
-        if (b != null) {
+        if (currentTBuilder.size() > 1) {//toplevel taclet
             return;
         }
         taclets.add(taclet);
-        taclet2Builder.put(taclet, tb);
+        taclet2Builder.put(taclet, peekTBuilder());
         /*if (parsedKeyFile.getTaclets().containsKey(key)) {
             //semanticError(ctx, "A taclet with name %s was already defined", key);
             System.err.format("Taclet clash with %s%n", key);
@@ -188,33 +199,37 @@ public class TacletPBuilder extends ExpressionBuilder {
         //parsedKeyFile.getTaclets().put(key, taclet);
     }
 
+    private TacletBuilder<?> peekTBuilder() {
+        return currentTBuilder.peek();
+    }
+
     @Override
     public Object visitModifiers(KeYParser.ModifiersContext ctx) {
-        TacletBuilder b = peek();
-        if (ctx.rs != null) {
-            List<RuleSet> it = accept(ctx.rs);
-            it.forEach(a -> b.addRuleSet(a));
-        }
-
-        if (ctx.NONINTERACTIVE() != null) {
+        TacletBuilder b = peekTBuilder();
+        List<RuleSet> rs = accept(ctx.rs);
+        if (!ctx.NONINTERACTIVE().isEmpty()) {
             b.addRuleSet(ruleSets().lookup(new Name("notHumanReadable")));
         }
 
-        if (ctx.DISPLAYNAME() != null) {
+        if (rs != null) {
+            rs.forEach(b::addRuleSet);
+        }
+
+        if (ctx.DISPLAYNAME() != null) {//last entry
             b.setDisplayName(accept(ctx.dname));
         }
 
-        if (ctx.HELPTEXT() != null) {
+        if (ctx.HELPTEXT() != null) { //last entry
             b.setHelpText(accept(ctx.htext));
         }
 
-        allOf(ctx.triggers());
+        mapOf(ctx.triggers());
         return null;
     }
 
     @Override
     public Object visitVarexplist(KeYParser.VarexplistContext ctx) {
-        return allOf(ctx.varexp());
+        return mapOf(ctx.varexp());
     }
 
     @Override
@@ -263,19 +278,17 @@ public class TacletPBuilder extends ExpressionBuilder {
     public Object visitVarcond_sameObserver(KeYParser.Varcond_sameObserverContext ctx) {
         ParsableVariable t1 = accept(ctx.t1);
         ParsableVariable t2 = accept(ctx.t2);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new SameObserverCondition(t1, t2));
+        peekTBuilder().addVariableCondition(new SameObserverCondition(t1, t2));
         return null;
     }
-
 
     @Override
     public Object visitVarcond_applyUpdateOnRigid(KeYParser.Varcond_applyUpdateOnRigidContext ctx) {
         var u = accept(ctx.u);
         var x = accept(ctx.x);
         var x2 = accept(ctx.x2);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new ApplyUpdateOnRigidCondition((UpdateSV) u,
+
+        peekTBuilder().addVariableCondition(new ApplyUpdateOnRigidCondition((UpdateSV) u,
                 (SchemaVariable) x,
                 (SchemaVariable) x2));
         return null;
@@ -286,8 +299,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         UpdateSV u = accept(ctx.u);
         SchemaVariable x = accept(ctx.x);
         SchemaVariable result = accept(ctx.result);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new DropEffectlessElementariesCondition(
+
+        peekTBuilder().addVariableCondition(new DropEffectlessElementariesCondition(
                 u, x, result));
         return null;
     }
@@ -299,8 +312,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         var f = accept(ctx.f);
         var x = accept(ctx.x);
         var result = accept(ctx.result);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new DropEffectlessStoresCondition((TermSV) h,
+
+        peekTBuilder().addVariableCondition(new DropEffectlessStoresCondition((TermSV) h,
                 (TermSV) o,
                 (TermSV) f,
                 (TermSV) x,
@@ -312,8 +325,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     public Object visitVarcond_differentFields(KeYParser.Varcond_differentFieldsContext ctx) {
         var x = accept(ctx.x);
         var y = accept(ctx.y);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new DifferentFields((SchemaVariable) x, (SchemaVariable) y));
+
+        peekTBuilder().addVariableCondition(new DifferentFields((SchemaVariable) x, (SchemaVariable) y));
         return null;
     }
 
@@ -324,8 +337,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         UpdateSV u2 = accept(ctx.u2);
         FormulaSV commonFormula = accept(ctx.commonFormula);
         SchemaVariable result = accept(ctx.result);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new SimplifyIfThenElseUpdateCondition(phi,
+
+        peekTBuilder().addVariableCondition(new SimplifyIfThenElseUpdateCondition(phi,
                 u1,
                 u2,
                 commonFormula,
@@ -357,18 +370,18 @@ public class TacletPBuilder extends ExpressionBuilder {
     public Object visitVarcond_new(KeYParser.Varcond_newContext ctx) {
         var x = accept(ctx.x);
         var y = accept(ctx.y);
-        TacletBuilder b = peek();
+
         if (ctx.TYPEOF() != null) {
-            b.addVarsNew((SchemaVariable) x, (SchemaVariable) y);
+            peekTBuilder().addVarsNew((SchemaVariable) x, (SchemaVariable) y);
         }
 
         if (ctx.DEPENDINGON() != null) {
-            b.addVarsNewDependingOn((SchemaVariable) x, (SchemaVariable) y);
+            peekTBuilder().addVarsNewDependingOn((SchemaVariable) x, (SchemaVariable) y);
         }
 
         if (ctx.kjt != null) {
             KeYJavaType kjt = accept(ctx.kjt);
-            b.addVarsNew((SchemaVariable) x, kjt.getJavaType());
+            peekTBuilder().addVarsNew((SchemaVariable) x, kjt.getJavaType());
         }
         return null;
     }
@@ -376,8 +389,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitVarcond_newlabel(KeYParser.Varcond_newlabelContext ctx) {
         var x = accept(ctx.x);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new NewJumpLabelCondition((SchemaVariable) x));
+
+        peekTBuilder().addVariableCondition(new NewJumpLabelCondition((SchemaVariable) x));
         return null;
     }
 
@@ -407,8 +420,8 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         TypeResolver fst = accept(ctx.fst);
         TypeResolver snd = accept(ctx.snd);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new TypeComparisonCondition(fst, snd, mode));
+
+        peekTBuilder().addVariableCondition(new TypeComparisonCondition(fst, snd, mode));
         return null;
     }
 
@@ -416,8 +429,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     public Object visitVarcond_free(KeYParser.Varcond_freeContext ctx) {
         SchemaVariable x = accept(ctx.x);
         List<SchemaVariable> ys = accept(ctx.varIds());
-        TacletBuilder b = peek();
-        ys.forEach(it -> b.addVarsNotFreeIn(x, it));
+
+        ys.forEach(it -> peekTBuilder().addVarsNotFreeIn(x, it));
         return null;
     }
 
@@ -431,8 +444,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         } else if (!JavaTypeToSortCondition.checkSortedSV((SchemaVariable) x)) {
             semanticError(ctx, "Expected schema variable of kind EXPRESSION or TYPE, but is " + x);
         } else {
-            TacletBuilder b = peek();
-            b.addVariableCondition(new JavaTypeToSortCondition((SchemaVariable) x,
+
+            peekTBuilder().addVariableCondition(new JavaTypeToSortCondition((SchemaVariable) x,
                     (GenericSort) s,
                     elemSort));
         }
@@ -450,8 +463,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             semanticError(ctx, "Expected schema variable of kind EXPRESSION or TYPE, "
                     + "but is " + x);
         } else {
-            TacletBuilder b = peek();
-            b.addVariableCondition(new FieldTypeToSortCondition((SchemaVariable) x,
+
+            peekTBuilder().addVariableCondition(new FieldTypeToSortCondition((SchemaVariable) x,
                     (GenericSort) s));
         }
         return null;
@@ -460,16 +473,16 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitVarcond_containsAssignment(KeYParser.Varcond_containsAssignmentContext ctx) {
         var x = accept(ctx.x);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new ContainsAssignmentCondition((SchemaVariable) x, negated));
+
+        peekTBuilder().addVariableCondition(new ContainsAssignmentCondition((SchemaVariable) x, negated));
         return null;
     }
 
     @Override
     public Object visitVarcond_enumtype(KeYParser.Varcond_enumtypeContext ctx) {
         TypeResolver tr = accept(ctx.tr);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new EnumTypeCondition(tr, negated));
+
+        peekTBuilder().addVariableCondition(new EnumTypeCondition(tr, negated));
         return null;
     }
 
@@ -483,8 +496,9 @@ public class TacletPBuilder extends ExpressionBuilder {
                     "%s is not an allowed modifier for the \\isReference variable condition.", ctx.id);
         }
         TypeResolver tr = accept(ctx.tr);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new TypeCondition(tr, !isPrimitive, nonNull));
+
+        boolean isPrimitive = false;//TODO check
+        peekTBuilder().addVariableCondition(new TypeCondition(tr, !isPrimitive, nonNull));
         return null;
     }
 
@@ -493,8 +507,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         String id = null;
         boolean nonNull = false;
         ParsableVariable x = accept(ctx.x);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new IsThisReference(x, negated));
+
+        peekTBuilder().addVariableCondition(new IsThisReference(x, negated));
         return null;
     }
 
@@ -503,8 +517,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         var x = accept(ctx.x);
         var y = accept(ctx.y);
         var z = accept(ctx.z);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new StaticMethodCondition
+
+        peekTBuilder().addVariableCondition(new StaticMethodCondition
                 (negated, (SchemaVariable) x, (SchemaVariable) y, (SchemaVariable) z));
         return null;
     }
@@ -514,12 +528,12 @@ public class TacletPBuilder extends ExpressionBuilder {
         SchemaVariable x = accept(ctx.x);
         SchemaVariable y = accept(ctx.y);
         SchemaVariable z = accept(ctx.z);
-        TacletBuilder b = peek();
+
         if (z != null)
-            b.addVariableCondition(new MayExpandMethodCondition(
+            peekTBuilder().addVariableCondition(new MayExpandMethodCondition(
                     negated, x, y, z));
         else
-            b.addVariableCondition(new MayExpandMethodCondition(
+            peekTBuilder().addVariableCondition(new MayExpandMethodCondition(
                     negated, null, x, y));
         return null;
     }
@@ -527,8 +541,9 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitVarcond_referencearray(KeYParser.Varcond_referencearrayContext ctx) {
         SchemaVariable x = accept(ctx.x);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new ArrayComponentTypeCondition(
+
+        boolean primitiveElementType = false;//TODO check
+        peekTBuilder().addVariableCondition(new ArrayComponentTypeCondition(
                 x, !primitiveElementType));
         return null;
     }
@@ -536,8 +551,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitVarcond_array(KeYParser.Varcond_arrayContext ctx) {
         SchemaVariable x = accept(ctx.x);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new ArrayTypeCondition(
+
+        peekTBuilder().addVariableCondition(new ArrayTypeCondition(
                 x, negated));
         return null;
     }
@@ -545,8 +560,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitVarcond_array_length(KeYParser.Varcond_array_lengthContext ctx) {
         SchemaVariable x = accept(ctx.x);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new ArrayLengthCondition(
+
+        peekTBuilder().addVariableCondition(new ArrayLengthCondition(
                 x, negated));
         return null;
     }
@@ -554,16 +569,16 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitVarcond_abstractOrInterface(KeYParser.Varcond_abstractOrInterfaceContext ctx) {
         TypeResolver tr = accept(ctx.tr);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new AbstractOrInterfaceType(tr, negated));
+
+        peekTBuilder().addVariableCondition(new AbstractOrInterfaceType(tr, negated));
         return null;
     }
 
     @Override
     public Object visitVarcond_enum_const(KeYParser.Varcond_enum_constContext ctx) {
         SchemaVariable x = accept(ctx.x);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new EnumConstantCondition(
+
+        peekTBuilder().addVariableCondition(new EnumConstantCondition(
                 x));
         return null;
     }
@@ -571,8 +586,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitVarcond_final(KeYParser.Varcond_finalContext ctx) {
         SchemaVariable x = accept(ctx.x);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new FinalReferenceCondition(
+
+        peekTBuilder().addVariableCondition(new FinalReferenceCondition(
                 x, negated));
         return null;
     }
@@ -580,8 +595,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitVarcond_static(KeYParser.Varcond_staticContext ctx) {
         SchemaVariable x = accept(ctx.x);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new StaticReferenceCondition(
+
+        peekTBuilder().addVariableCondition(new StaticReferenceCondition(
                 x, negated));
         return null;
     }
@@ -589,8 +604,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitVarcond_localvariable(KeYParser.Varcond_localvariableContext ctx) {
         SchemaVariable x = accept(ctx.x);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new LocalVariableCondition(x, negated));
+
+        peekTBuilder().addVariableCondition(new LocalVariableCondition(x, negated));
         return null;
     }
 
@@ -599,8 +614,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         TermSV obs = accept(ctx.obs);
         TermSV heap = accept(ctx.heap);
 
-        TacletBuilder b = peek();
-        b.addVariableCondition(new ObserverCondition(obs,
+
+        peekTBuilder().addVariableCondition(new ObserverCondition(obs,
                 heap));
         return null;
     }
@@ -609,8 +624,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     public Object visitVarcond_different(KeYParser.Varcond_differentContext ctx) {
         SchemaVariable var1 = accept(ctx.var1);
         SchemaVariable var2 = accept(ctx.var2);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new DifferentInstantiationCondition(
+
+        peekTBuilder().addVariableCondition(new DifferentInstantiationCondition(
                 var1,
                 var2));
         return null;
@@ -620,8 +635,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     public Object visitVarcond_metadisjoint(KeYParser.Varcond_metadisjointContext ctx) {
         var var1 = accept(ctx.var1);
         var var2 = accept(ctx.var2);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new MetaDisjointCondition(
+
+        peekTBuilder().addVariableCondition(new MetaDisjointCondition(
                 (TermSV) var1,
                 (TermSV) var2));
         return null;
@@ -632,8 +647,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         var t = accept(ctx.t);
         var t2 = accept(ctx.t2);
         var phi = accept(ctx.phi);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new EqualUniqueCondition((TermSV) t,
+
+        peekTBuilder().addVariableCondition(new EqualUniqueCondition((TermSV) t,
                 (TermSV) t2,
                 (FormulaSV) phi));
         return null;
@@ -643,8 +658,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     public Object visitVarcond_freeLabelIn(KeYParser.Varcond_freeLabelInContext ctx) {
         var l = accept(ctx.l);
         var statement = accept(ctx.statement);
-        TacletBuilder b = peek();
-        b.addVariableCondition(new FreeLabelInVariableCondition((SchemaVariable) l,
+
+        peekTBuilder().addVariableCondition(new FreeLabelInVariableCondition((SchemaVariable) l,
                 (SchemaVariable) statement, negated));
         return null;
     }
@@ -652,12 +667,12 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitVarcond_constant(KeYParser.Varcond_constantContext ctx) {
         var x = accept(ctx.varId());
-        TacletBuilder b = peek();
+
         if (x instanceof TermSV) {
-            b.addVariableCondition(new ConstantCondition((TermSV) x, negated));
+            peekTBuilder().addVariableCondition(new ConstantCondition((TermSV) x, negated));
         } else {
             assert x instanceof FormulaSV;
-            b.addVariableCondition(new ConstantCondition((FormulaSV) x, negated));
+            peekTBuilder().addVariableCondition(new ConstantCondition((FormulaSV) x, negated));
         }
         return null;
     }
@@ -666,42 +681,42 @@ public class TacletPBuilder extends ExpressionBuilder {
     public Object visitVarcond_label(KeYParser.Varcond_labelContext ctx) {
         TermLabelSV l = accept(ctx.varId());
         String name = accept(ctx.simple_ident());
-        TacletBuilder b = peek();
-        b.addVariableCondition(new TermLabelCondition(l, name, negated));
+
+        peekTBuilder().addVariableCondition(new TermLabelCondition(l, name, negated));
         return null;
     }
 
     @Override
     public Object visitVarcond_static_field(KeYParser.Varcond_static_fieldContext ctx) {
         var field = accept(ctx.varId());
-        TacletBuilder b = peek();
-        b.addVariableCondition(new StaticFieldCondition((SchemaVariable) field, negated));
+
+        peekTBuilder().addVariableCondition(new StaticFieldCondition((SchemaVariable) field, negated));
         return null;
     }
 
     @Override
     public Object visitVarcond_subFormulas(KeYParser.Varcond_subFormulasContext ctx) {
         FormulaSV x = accept(ctx.varId());
-        TacletBuilder b = peek();
-        b.addVariableCondition(new SubFormulaCondition(x, negated));
+
+        peekTBuilder().addVariableCondition(new SubFormulaCondition(x, negated));
         return null;
     }
 
     @Override
     public Object visitGoalspecs(KeYParser.GoalspecsContext ctx) {
-        return allOf(ctx.goalspecwithoption());
+        return mapOf(ctx.goalspecwithoption());
     }
 
     @Override
     public Object visitGoalspecwithoption(KeYParser.GoalspecwithoptionContext ctx) {
-        //TODO
-        var soc = accept(ctx.option_list());
+        List<Choice> s = accept(ctx.option_list());
+        goalChoice = s == null ? DefaultImmutableSet.nil() : ImmutableSet.fromCollection(s);
         accept(ctx.goalspec());
         return null;
     }
 
     @Override
-    public Object visitOption(KeYParser.OptionContext ctx) {
+    public Choice visitOption(KeYParser.OptionContext ctx) {
         String choice = ctx.getText();
         var c = choices().lookup(choice);
         if (c == null) {
@@ -712,13 +727,11 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public List<Choice> visitOption_list(KeYParser.Option_listContext ctx) {
-        return allOf(ctx.option());
+        return mapOf(ctx.option());
     }
 
     @Override
     public Object visitGoalspec(KeYParser.GoalspecContext ctx) {
-        ImmutableSet<Choice> soc = ImmutableSet.empty();
-        boolean ruleWithFind;
         var addSeq = Sequent.EMPTY_SEQUENT;
         var addRList = ImmutableSLList.<Taclet>nil();
         var addpv = DefaultImmutableSet.<SchemaVariable>nil();
@@ -729,8 +742,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         if (ctx.add() != null) addSeq = accept(ctx.add());
         if (ctx.addrules() != null) addRList = accept(ctx.addrules());
         if (ctx.addprogvar() != null) addpv = accept(ctx.addprogvar());
-        TacletBuilder b = peek();
-        addGoalTemplate(b, name, rwObj, addSeq, addRList, addpv, soc, ctx);
+        addGoalTemplate(name, rwObj, addSeq, addRList, addpv, goalChoice, ctx);
         return null;
     }
 
@@ -756,7 +768,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public ImmutableList<Taclet> visitTacletlist(KeYParser.TacletlistContext ctx) {
-        List<Taclet> taclets = allOf(ctx.taclet());
+        List<Taclet> taclets = mapOf(ctx.taclet());
         return ImmutableList.fromList(taclets);
     }
 
@@ -850,13 +862,13 @@ public class TacletPBuilder extends ExpressionBuilder {
         return null;
     }
 
-    private void addGoalTemplate(TacletBuilder b,
-                                 String id,
+    private void addGoalTemplate(String id,
                                  Object rwObj,
                                  Sequent addSeq,
                                  ImmutableList<Taclet> addRList,
                                  ImmutableSet<SchemaVariable> pvs,
                                  ImmutableSet<Choice> soc, ParserRuleContext ctx) {
+        var b = peekTBuilder();
         TacletGoalTemplate gt = null;
         if (rwObj == null) {
             // there is no replacewith, so we take
@@ -867,9 +879,6 @@ public class TacletPBuilder extends ExpressionBuilder {
             if (b instanceof NoFindTacletBuilder) {
                 // there is a replacewith without a find.
                 throwEx(new RecognitionException(""));
-                //new UnfittingReplacewithException
-                //("Replacewith without find", getSourceName(),
-                // getLine(), getColumn());
             } else if (b instanceof SuccTacletBuilder
                     || b instanceof AntecTacletBuilder) {
                 if (rwObj instanceof Sequent) {
@@ -894,7 +903,8 @@ public class TacletPBuilder extends ExpressionBuilder {
                 }
             }
         }
-        assert gt != null;
+        if (gt == null)
+            throw new NullPointerException("Could not find a suitable goal template builder for: " + b.getClass());
         gt.setName(id);
         b.addTacletGoalTemplate(gt);
         if (soc != null) b.addGoal2ChoicesMapping(gt, soc);
@@ -1012,7 +1022,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Object visitSchema_var_decls(KeYParser.Schema_var_declsContext ctx) {
-        List<SchemaVariable> seq = allOf(ctx.one_schema_var_decl());
+        List<SchemaVariable> seq = mapOf(ctx.one_schema_var_decl());
         return seq;
     }
 

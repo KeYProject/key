@@ -16,6 +16,7 @@ package de.uka.ilkd.key.proof.init;
 import java.util.*;
 
 import de.uka.ilkd.key.rule.*;
+import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -57,7 +58,7 @@ public class InitConfig {
     private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
 
 
-    private Map<Name, Taclet> taclets = new TreeMap<>();
+    private List<Taclet> taclets = new ArrayList<>();
 
     //private ImmutableList<Taclet> taclets = ImmutableSLList.<Taclet>nil();
 
@@ -75,15 +76,14 @@ public class InitConfig {
      * GoalTemplates whose options are activated and those who don't belong
      * to any specific option.
      */
-    private HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder =
-        new LinkedHashMap<Taclet, TacletBuilder<? extends Taclet>>();
+    private HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new LinkedHashMap<>();
 
     /**
      * Set of the rule options activated for the current proof. The rule options
      * ({@link Choice}s) allow to use different ruleset modelling or skipping
      * certain features (e.g. nullpointer checks when resolving references)
      */
-    private ImmutableSet<Choice> activatedChoices 
+    private ImmutableSet<Choice> activatedChoices
     	= DefaultImmutableSet.<Choice>nil();
 
     /** HashMap for quick lookups taclet name->taclet */
@@ -91,10 +91,10 @@ public class InitConfig {
 
     /** the fileRepo which is responsible for consistency between source code and proof */
     private FileRepo fileRepo;
-    
+
     private String originalKeYFileName;
-    
-    private ProofSettings settings;    
+
+    private ProofSettings settings;
 
 
 
@@ -104,19 +104,19 @@ public class InitConfig {
 
     public InitConfig(Services services) {
        this.services  = services;
-       
+
        category2DefaultChoice = ProofSettings.DEFAULT_SETTINGS
              .getChoiceSettings()
              .getDefaultChoices();
     }
 
-           
+
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
-    
-    
-    
+
+
+
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
@@ -137,22 +137,33 @@ public class InitConfig {
 
 
     /**
-     * adds entries to the HashMap that maps categories to their
-     * default choices.
-     * Only entries of <code>init</init> with keys not already contained in
-     * category2DefaultChoice are added.
+     * Adds a default option for a category.
+     * It does override previous default choices.
+     *
+     * @return true if the default was successfully set
      */
-    public void addCategory2DefaultChoices(HashMap<String,String> init) {
-        boolean changed = false;
+    public boolean addCategoryDefaultChoice(@NotNull String category, @NotNull String choice) {
+        if(!category2DefaultChoice.containsKey(category)) {
+            category2DefaultChoice.put(category, choice);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Adds default choices given in {@code init}.
+     * Not overriding previous default choices.
+     */
+    public void addCategory2DefaultChoices(@NotNull Map<String,String> init) {
+        boolean changed =false;
         for (final Map.Entry<String, String> entry : init.entrySet()) {
-            if(!category2DefaultChoice.containsKey(entry.getKey())) {
-                changed=true;
-                category2DefaultChoice.put(entry.getKey(), entry.getValue());
-            }
+            changed = changed || addCategoryDefaultChoice(entry.getKey(), entry.getValue());
         }
         if(changed) {
+            //FIXME weigl: I do not understand why the default choices are back progragated!
+            // For me this is a design flaw.
             @SuppressWarnings("unchecked")
-            HashMap<String, String> clone = (HashMap<String, String>)category2DefaultChoice.clone();            
+            HashMap<String, String> clone = (HashMap<String, String>)category2DefaultChoice.clone();
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
             // invalidate active taclet cache
             activatedTacletCache = null;
@@ -184,11 +195,9 @@ public class InitConfig {
      */
     public void setActivatedChoices(ImmutableSet<Choice> activatedChoices) {
         category2DefaultChoice =
-	    ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().
-	    getDefaultChoices();
+                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
 
         @SuppressWarnings("unchecked")
-        
         HashMap<String, String> c2DC = (HashMap<String,String>)category2DefaultChoice.clone();
         for (final Choice c : activatedChoices) {
             c2DC.remove(c.category());
@@ -218,41 +227,35 @@ public class InitConfig {
     }
 
 
-    public void addTaclets(Collection<Taclet> taclets) {
-        for (var t :taclets) {
-            this.taclets.put(t.name(), t);
+    public void addTaclets(Collection<Taclet> tacs) {
+        this.taclets.addAll(tacs);
+        this.activatedTacletCache = null;
+    }
+
+    public void setTaclets(ImmutableList<Taclet> tacs) {
+        this.taclets.clear();
+        for (Taclet t : tacs) {
+            this.taclets.add(t);
         }
-        this.activatedTacletCache = null;
-    }
-
-    public void setTaclets(ImmutableList<Taclet> taclets) {
-        this.taclets.clear();
-        taclets.forEach(it -> this.taclets.put(it.name(), it));
         // invalidate active taclet cache
         this.activatedTacletCache = null;
     }
 
-    public void setTaclets(Collection<Taclet> taclets){
+    public void setTaclets(Collection<Taclet> tacs){
         this.taclets.clear();
-        addTaclets(taclets);
+        addTaclets(tacs);
         // invalidate active taclet cache
         this.activatedTacletCache = null;
     }
-
 
     public ImmutableList<Taclet> getTaclets(){
-        return ImmutableList.fromList(taclets.values());
+        return ImmutableList.fromList(taclets);
     }
-
-    public Map<Name, Taclet> getTacletsMap(){
-        return taclets;
-    }
-
 
     public Taclet lookupActiveTaclet(Name name) {
        if (activatedTacletCache == null) {
           fillActiveTacletCache();
-       }       
+       }
        return activatedTacletCache.get(name);
     }
 
@@ -275,9 +278,9 @@ public class InitConfig {
           return;
        }
        final LinkedHashMap<Name,Taclet> tacletCache = new LinkedHashMap<Name, Taclet>();
-       for (Taclet t : taclets.values()) {
+       for (Taclet t : taclets) {
           TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);
-          
+
           if(t.getChoices().subset(activatedChoices)){
              if (b != null && b.getGoal2Choices() != null){
                 t = b.getTacletWithoutInactiveGoalTemplates(activatedChoices);
@@ -285,7 +288,10 @@ public class InitConfig {
 
              if (t != null) {
                 tacletCache.put(t.name(), t);
+                 System.out.format("Activate taclet: %s\n", t.name());
              }
+          }else{
+              System.out.format("deactivate taclet: %s, %s\n", t.name(), t.getChoices());
           }
        }
        activatedTacletCache = Collections.unmodifiableMap(tacletCache);
@@ -300,37 +306,37 @@ public class InitConfig {
         	? ImmutableSLList.<BuiltInRule>nil()
         	: profile.getStandardRules().getStandardBuiltInRules());
     }
-    
-    
+
+
     /** registers a rule with the given justification at the
      * justification managing {@link RuleJustification} object of this
-     * environment. 
+     * environment.
      */
     public void registerRule(Rule r, RuleJustification j) {
    justifInfo.addJustification(r, j);
     }
 
-    public void registerRuleIntroducedAtNode(RuleApp r, 
-                                             Node node, 
+    public void registerRuleIntroducedAtNode(RuleApp r,
+                                             Node node,
                                              boolean isAxiom) {
-        justifInfo.addJustification(r.rule(), 
-                                    new RuleJustificationByAddRules(node, 
+        justifInfo.addJustification(r.rule(),
+                                    new RuleJustificationByAddRules(node,
                                                                     isAxiom));
     }
 
     /** registers a list of rules with the given justification at the
      * justification managing {@link RuleJustification} object of this
      * environment. All rules of the list are given the same
-     * justification. 
+     * justification.
      */
     public void registerRules(Iterable<? extends Rule> s, RuleJustification j) {
        for (Rule r : s) {
-          registerRule(r, j);          
+          registerRule(r, j);
        }
     }
 
     /** returns the object managing the rules in this environment and
-     * their justifications. The object is unique to this environment. 
+     * their justifications. The object is unique to this environment.
      */
     public RuleJustificationInfo getJustifInfo() {
        return justifInfo;
@@ -404,12 +410,12 @@ public class InitConfig {
         return namespaces().choices();
     }
 
-    
+
     public void setSettings(ProofSettings newSettings) {
         this.settings = newSettings;
     }
-    
-    
+
+
     public ProofSettings getSettings() {
         return settings;
     }
@@ -431,7 +437,7 @@ public class InitConfig {
        return copyWithServices(services.copy(false));
     }
 
-    
+
     /** returns a copy of this initial configuration copying the namespaces,
      * the contained JavaInfo while using the immutable set of taclets in the
      * copy
@@ -452,8 +458,8 @@ public class InitConfig {
         ic.fileRepo = fileRepo;     // TODO: copy instead? delete via dispose method?
         return ic;
     }
-    
-    
+
+
 
     @Override
     public String toString() {

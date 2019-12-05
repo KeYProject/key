@@ -91,18 +91,20 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet>{
 
 	prefixBuilder.build();
 
-	return new AntecTaclet(name, 
-			     new TacletApplPart(ifseq,
+		AntecTaclet t = new AntecTaclet(name,
+				new TacletApplPart(ifseq,
 						varsNew,
 						varsNotFreeIn,
 						varsNewDependingOn,
 						variableConditions),
-			     goals, ruleSets,
-			     attrs,
-			     find,
-                             ignoreTopLevelUpdates,
-			     prefixBuilder.getPrefixMap(),
-			     choices, tacletAnnotations);
+				goals, ruleSets,
+				attrs,
+				find,
+				ignoreTopLevelUpdates,
+				prefixBuilder.getPrefixMap(),
+				choices, tacletAnnotations);
+		t.setOrigin(origin);
+		return t;
     }
 
     public void setIgnoreTopLevelUpdates(boolean ignore) {

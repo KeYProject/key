@@ -4,16 +4,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Position;
-import de.uka.ilkd.key.util.Triple;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.key_project.util.collection.ImmutableSet;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -49,7 +45,7 @@ public class KeyIO {
         this(new Services(new JavaProfile()));
     }
 
-    public static @Nullable String findJavaPath(KeYParser.FileContext ctx) {
+    public static @Nullable String findJavaPath(KeyAst.File ctx) {
         final String[] javaPath = {null};
         ctx.accept(new AbstractBuilder<Void>() {
             @Override
@@ -61,31 +57,16 @@ public class KeyIO {
         return javaPath[0];
     }
 
-
-    public static ProofSettings findProofSettings(ParserRuleContext ctx) {
-        ProofSettingsFinder psf = new ProofSettingsFinder();
-        ctx.accept(psf);
-        return psf.getProofSettings();
-    }
-
-    public static @Nullable String findBootClassPath(KeYParser.FileContext ctx) {
+    public static @Nullable String findBootClassPath(KeyAst.File ctx) {
         BootClasspathFinder psf = new BootClasspathFinder();
         ctx.accept(psf);
         return psf.getBootClasspath();
     }
 
-    public static Triple<String, Integer, Integer> findProofScript(KeYParser.FileContext ctx) {
-        if (ctx.problem() != null && ctx.problem().proofScript() != null) {
-            var pctx = ctx.problem().proofScript();
-            return new Triple<>(pctx.ps.getText(), pctx.ps.getLine(), pctx.ps.getCharPositionInLine());
-        }
-        return null;
-    }
-
-    public static ImmutableSet<Choice> findActivatedChoices(KeYParser.FileContext ctx, Namespace<Choice> ns) {
+    public static Set<Choice> findActivatedChoices(KeyAst.File ctx, Namespace<Choice> ns) {
         ChoiceFinder cf = new ChoiceFinder(ns);
         ctx.accept(cf);
-        return cf.getActivatedChoices();
+        return cf.getChoiceInformation().getActivatedChoices();
     }
 
     public @NotNull Term parseExpression(@NotNull String expr) {
@@ -101,10 +82,10 @@ public class KeyIO {
         var ctx = ParsingFacade.parseSequent(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         var seq = (Sequent) ctx.accept(visitor);
-        if (visitor.getErrors().isEmpty()) {
+        if (visitor.getWarnings().isEmpty()) {
             return seq;
         }
-        throw new BuildingExceptions(visitor.getErrors());
+        throw new BuildingExceptions(visitor.getWarnings());
     }
 
     public Services getServices() {
@@ -123,37 +104,36 @@ public class KeyIO {
         return new Loader(u);
     }
 
-    public List<Taclet> findTaclets(KeYParser.FileContext ctx) {
+    public List<Taclet> findTaclets(KeyAst.File ctx) {
         var visitor = new TacletPBuilder(services, nss);
         ctx.accept(visitor);
         return visitor.getTaclets();
     }
 
     /*
-    public List<Contract> findContracts(KeYParser.FileContext ctx) {
+    public List<Contract> findContracts(KeyAst.File ctx) {
         ProblemFinder pf = new ProblemFinder(services, nss);
         ctx.accept(pf);
         return pf.getContracts();
     }*/
 
-    public void evalDeclarations(KeYParser.FileContext ctx) {
+    public void evalDeclarations(KeyAst.File ctx) {
         var declBuilder = new DeclarationBuilder(services, nss);
         ctx.accept(declBuilder);
     }
 
-    public void evalFuncAndPred(KeYParser.FileContext ctx) {
+    public void evalFuncAndPred(KeyAst.File ctx) {
         var visitor = new FunctionPredicateBuilder(services, nss);
         ctx.accept(visitor);
     }
 
     public class Loader {
         private final URL resource;
-        private List<KeYParser.FileContext> ctx = new LinkedList<>();
+        private List<KeyAst.File> ctx = new LinkedList<>();
 
         Loader(URL resource) {
             this.resource = resource;
         }
-
 
         public List<Taclet> loadComplete() throws IOException {
             if (ctx.isEmpty()) parseFile();
@@ -162,7 +142,6 @@ public class KeyIO {
             return loadTaclets();
         }
 
-
         public ProblemFinder loadCompleteProblem() throws IOException {
             if (ctx.isEmpty()) parseFile();
             loadDeclarations();
@@ -170,7 +149,6 @@ public class KeyIO {
             loadTaclets();
             return loadProblem();
         }
-
 
         public void parseFile() throws IOException {
             long start = System.currentTimeMillis();
@@ -183,10 +161,10 @@ public class KeyIO {
             if (ctx.isEmpty()) {
                 throw new IllegalStateException("No files loaded.");
             }
-            return ParsingFacade.getProblemInformation(ctx.get(0));
+            return ctx.get(0).getProblemInformation();
         }
 
-        public Map<String, Set<String>> loadChoices() {
+        public ChoiceInformation loadChoices() {
             if (ctx.isEmpty()) {
                 throw new IllegalStateException("No files loaded.");
             }
@@ -197,7 +175,7 @@ public class KeyIO {
             var declBuilder = new DeclarationBuilder(services, nss);
             long start = System.currentTimeMillis();
             for (int i = ctx.size() - 1; i >= 0; i--) { // process backwards
-                KeYParser.FileContext s = ctx.get(i);
+                KeyAst.File s = ctx.get(i);
                 //var p = parsers.get(i);
                 s.accept(declBuilder);
             }
@@ -209,7 +187,7 @@ public class KeyIO {
             var visitor = new FunctionPredicateBuilder(services, nss);
             long start = System.currentTimeMillis();
             for (int i = ctx.size() - 1; i >= 0; --i) {
-                KeYParser.FileContext s = ctx.get(i);
+                KeyAst.File s = ctx.get(i);
                 s.accept(visitor);
             }
             long stop = System.currentTimeMillis();
@@ -238,7 +216,7 @@ public class KeyIO {
             long start = System.currentTimeMillis();
             List<Taclet> taclets = new ArrayList<>(2048);
             for (int i = 0; i < ctx.size(); i++) {
-                KeYParser.FileContext s = ctx.get(i);
+                KeyAst.File s = ctx.get(i);
                 var p = parsers.get(i);
                 s.accept(p);
                 taclets.addAll(p.getTaclets());
@@ -247,14 +225,5 @@ public class KeyIO {
             System.err.format("MODE: %s took %d%n", "taclets", stop - start);
             return taclets;
         }
-
-        public ProofSettings loadProofSettings() {
-            if (ctx.isEmpty()) throw new IllegalStateException();
-            return findProofSettings(ctx.get(0));
-        }
     }
 }
-
-//Caused by: java.lang.ClassCastException: class de.uka.ilkd.key.logic.ProgramElementName cannot be cast to class
-// de.uka.ilkd.key.logic.op.SchemaVariable (de.uka.ilkd.key.logic.ProgramElementName
-// and de.uka.ilkd.key.logic.op.SchemaVariable are in unnamed module of loader 'app')

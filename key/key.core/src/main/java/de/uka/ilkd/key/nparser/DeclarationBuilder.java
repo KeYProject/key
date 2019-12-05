@@ -23,7 +23,7 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitDecls(KeYParser.DeclsContext ctx) {
-        allOf(ctx.options_choice(), ctx.option_decls(), ctx.sort_decls(),
+        mapMapOf(ctx.options_choice(), ctx.option_decls(), ctx.sort_decls(),
                 ctx.prog_var_decls(), ctx.schema_var_decls(), ctx.ruleset_decls());
         return null;
     }
@@ -154,7 +154,7 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitOption_decls(KeYParser.Option_declsContext ctx) {
-        return allOf(ctx.choice());
+        return mapOf(ctx.choice());
     }
 
     @Override
@@ -182,10 +182,8 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitOptions_choice(KeYParser.Options_choiceContext ctx) {
-        //TODO ctx.WITHOPTIONS()?s
-        allOf(ctx.activated_choice());
+        //mapOf(ctx.activated_choice());
         return null;
     }
-
 
 }

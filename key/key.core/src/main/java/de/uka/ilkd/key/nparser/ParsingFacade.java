@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.nparser;
 
-import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -26,8 +27,21 @@ import java.util.*;
  * @version 1 (19.08.19)
  */
 public abstract class ParsingFacade {
-    public static List<KeYParser.FileContext> parseFiles(URL url) throws IOException {
-        List<KeYParser.FileContext> ctxs = new LinkedList<>();
+    /**
+     * Use this function to retrieve the {@link ParserRuleContext} inside and {@link KeyAst} object.
+     * <b>The use of this is discourage and should be avoided in all high level scenarios.</b>
+     *
+     * @param ast
+     * @param <T>
+     * @return
+     * @see KeyIO
+     */
+    public static <T extends ParserRuleContext> @NotNull T getParseRuleContext(@NotNull KeyAst<T> ast) {
+        return ast.ctx;
+    }
+
+    public static List<KeyAst.File> parseFiles(URL url) throws IOException {
+        List<KeyAst.File> ctxs = new LinkedList<>();
         Stack<URL> queue = new Stack<>();
         queue.add(url);
         Set<URL> reached = new HashSet<>();
@@ -37,7 +51,7 @@ public abstract class ParsingFacade {
             reached.add(url);
             var ctx = parseFile(url);
             ctxs.add(ctx);
-            var includes = getIncludes(url, ctx).getRuleSets();
+            var includes = ctx.getIncludes(url).getRuleSets();
             for (RuleSource u : includes) {
                 if (!reached.contains(u.url())) {
                     queue.add(u.url());
@@ -47,59 +61,11 @@ public abstract class ParsingFacade {
         return ctxs;
     }
 
-    public static Includes getIncludes(URL base, KeYParser.FileContext ctx) {
-        var finder = new IncludeFinder(base);
-        ctx.accept(finder);
-        return finder.getIncludes();
-    }
-
-    public static Map<String, Set<String>> getChoices(List<KeYParser.FileContext> ctxs) {
-        var finder = new ChoiceFinder();
+    public static ChoiceInformation getChoices(List<KeyAst.File> ctxs) {
+        ChoiceInformation ci = new ChoiceInformation();
+        var finder = new ChoiceFinder(ci);
         ctxs.forEach(it -> it.accept(finder));
-        return finder.getChoices();
-    }
-
-    public static ProblemInformation getProblemInformation(KeYParser.FileContext ctx) {
-        FindProblemInformation fpi = new FindProblemInformation();
-        ctx.accept(fpi);
-        return fpi.getProblemInformation();
-    }
-
-    public static KeYParser.FileContext parseFile(URL url) throws IOException {
-        long start = System.currentTimeMillis();
-        try (BufferedInputStream is = new BufferedInputStream(url.openStream());
-             ReadableByteChannel channel = Channels.newChannel(is)) {
-            var stream = CharStreams.fromChannel(
-                    channel,
-                    Charset.defaultCharset(),
-                    4096,
-                    CodingErrorAction.REPLACE,
-                    url.toString(),
-                    -1);
-            return parseFile(stream);
-        } finally {
-            long stop = System.currentTimeMillis();
-            System.err.printf("PARSING %s took %d ms\n", url, stop - start);
-        }
-    }
-
-    public static KeYParser.FileContext parseFile(Path file) throws IOException {
-        return parseFile(CharStreams.fromPath(file));
-    }
-
-    public static KeYParser.FileContext parseFile(File file) throws IOException {
-        return parseFile(file.toPath());
-    }
-
-    public static KeYParser.FileContext parseFile(CharStream stream) {
-        var p = createParser(stream);
-        KeYParser.FileContext ctx = p.file();
-        return ctx;
-    }
-
-    public static KeYParser.TermEOFContext parseExpression(CharStream stream) {
-        var p = createParser(stream);
-        return p.termEOF();
+        return ci;
     }
 
     private static KeYParser createParser(CharStream stream) {
@@ -118,9 +84,46 @@ public abstract class ParsingFacade {
         return new KeYLexer(stream);
     }
 
-    public static KeYParser.SeqEOFContext parseSequent(CharStream stream) {
+    public static KeyAst.File parseFile(URL url) throws IOException {
+        long start = System.currentTimeMillis();
+        try (BufferedInputStream is = new BufferedInputStream(url.openStream());
+             ReadableByteChannel channel = Channels.newChannel(is)) {
+            var stream = CharStreams.fromChannel(
+                    channel,
+                    Charset.defaultCharset(),
+                    4096,
+                    CodingErrorAction.REPLACE,
+                    url.toString(),
+                    -1);
+            return parseFile(stream);
+        } finally {
+            long stop = System.currentTimeMillis();
+            System.err.printf("PARSING %s took %d ms\n", url, stop - start);
+        }
+    }
+
+    public static KeyAst.File parseFile(Path file) throws IOException {
+        return parseFile(CharStreams.fromPath(file));
+    }
+
+    public static KeyAst.File parseFile(File file) throws IOException {
+        return parseFile(file.toPath());
+    }
+
+    public static KeyAst.File parseFile(CharStream stream) {
         var p = createParser(stream);
-        return p.seqEOF();
+        KeYParser.FileContext ctx = p.file();
+        return new KeyAst.File(ctx);
+    }
+
+    public static KeyAst.Term parseExpression(CharStream stream) {
+        var p = createParser(stream);
+        return new KeyAst.Term(p.termEOF().term());
+    }
+
+    public static KeyAst.Seq parseSequent(CharStream stream) {
+        var p = createParser(stream);
+        return new KeyAst.Seq(p.seqEOF().seq());
     }
 
     static String getValue(KeYParser.String_valueContext ctx) {

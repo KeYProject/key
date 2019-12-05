@@ -68,6 +68,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected HashMap<TacletGoalTemplate, ImmutableSet<Choice>> goal2Choices          = null;
     protected ImmutableSet<Choice> choices           = DefaultImmutableSet.<Choice>nil();
     protected ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.<TacletAnnotation>nil();
+    protected String origin;
 
     public void setAnnotations(ImmutableSet<TacletAnnotation> tacletAnnotations) {
        this.tacletAnnotations = tacletAnnotations;
@@ -335,6 +336,10 @@ public abstract class TacletBuilder<T extends Taclet> {
           goals = oldGoals;
           return result;
        }
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
     }
 
     public static class TacletBuilderException extends IllegalArgumentException {

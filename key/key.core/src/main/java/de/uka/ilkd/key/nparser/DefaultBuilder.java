@@ -24,15 +24,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     public static final int NORMAL_NONRIGID = 0;
     public static final int LOCATION_MODIFIER = 1;
     public static final String LIMIT_SUFFIX = "$lmtd";
-    protected Namespace<SchemaVariable> schemaVariablesNamespace = new Namespace<>();
-
-    protected HashMap<String, String> category2Default = new LinkedHashMap<>();
-    private HashSet usedChoiceCategories = new LinkedHashSet();
-
     protected final Services services;
     protected final NamespaceSet nss;
+    protected Namespace<SchemaVariable> schemaVariablesNamespace = new Namespace<>();
+    protected HashMap<String, String> category2Default = new LinkedHashMap<>();
     protected HashSet<String> activatedChoicesCategories = new LinkedHashSet<>();
     protected ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.nil();
+    private HashSet usedChoiceCategories = new LinkedHashSet();
 
     public DefaultBuilder(Services services, NamespaceSet nss) {
         this.services = services;
@@ -51,7 +49,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     @Override
     public List<String> visitPvset(KeYParser.PvsetContext ctx) {
-        return allOf(ctx.varId());
+        return mapOf(ctx.varId());
     }
 
     @Override
@@ -61,12 +59,12 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     @Override
     public RuleSet visitRuleset(KeYParser.RulesetContext ctx) {
-        String id = (String) ctx.IDENT().accept(this);
+        String id = ctx.IDENT().getText();
         RuleSet h = ruleSets().lookup(new Name(id));
         if (h == null) {
-            //TODO
             h = new RuleSet(new Name(id));
-            //semanticError(ctx, "Rule set %s was not previous defined.", ctx.getText());
+            ruleSets().add(h);
+            addWarning(ctx, String.format("Rule set %s was not previous defined.", ctx.getText()));
         }
         return h;
     }
@@ -438,7 +436,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     @Override
     public Object visitSimple_ident_dots_comma_list(KeYParser.Simple_ident_dots_comma_listContext ctx) {
-        return allOf(ctx.simple_ident_dots());
+        return mapOf(ctx.simple_ident_dots());
     }
 
     @Override

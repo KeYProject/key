@@ -24,7 +24,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
     @Override
     public Object visitDecls(KeYParser.DeclsContext ctx) {
-        allOf(ctx.pred_decls(), ctx.func_decls(), ctx.transform_decls());
+        mapMapOf(ctx.pred_decls(), ctx.func_decls(), ctx.transform_decls());
         return null;
     }
 
@@ -115,7 +115,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
     @Override
     public Object visitFunc_decls(KeYParser.Func_declsContext ctx) {
-        return allOf(ctx.func_decl());
+        return mapOf(ctx.func_decl());
     }
 
 
@@ -137,12 +137,12 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
     @Override
     public Object visitTransform_decls(KeYParser.Transform_declsContext ctx) {
-        return allOf(ctx.transform_decl());
+        return mapOf(ctx.transform_decl());
     }
 
 
     @Override
     public Object visitPred_decls(KeYParser.Pred_declsContext ctx) {
-        return allOf(ctx.pred_decl());
+        return mapOf(ctx.pred_decl());
     }
 }

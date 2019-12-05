@@ -103,10 +103,14 @@ public class ProblemFinder extends ExpressionBuilder {
         if (ctx.CHOOSECONTRACT() != null) {
             if (ctx.chooseContract != null)
                 choosedContract = accept(ctx.chooseContract);
+            else
+                choosedContract = "";
         }
         if (ctx.PROOFOBLIGATION() != null) {
             if (ctx.proofObligation != null)
                 proofObligation = accept(ctx.proofObligation);
+            else
+                proofObligation = "";
         }
         if (ctx.PROBLEM() != null) {
             problemTerm = accept(ctx.formula());

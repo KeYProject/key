@@ -51,12 +51,12 @@ public class BuildingException extends RuntimeException {
         this((ParserRuleContext) null, cause);
     }
 
-    private static String getPosition(ParserRuleContext node) {
+    static String getPosition(ParserRuleContext node) {
         if (node == null) return " pos n/a";
         return getPosition(node.start);
     }
 
-    private static String getPosition(Token t) {
+    static String getPosition(Token t) {
         return String.format(" %s:%d#%d", t.getInputStream().getSourceName(), t.getLine(), t.getCharPositionInLine());
     }
 

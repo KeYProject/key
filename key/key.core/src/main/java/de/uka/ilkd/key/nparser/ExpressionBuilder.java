@@ -501,7 +501,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Term visitMetaTerm(KeYParser.MetaTermContext ctx) {
         Operator metaId = accept(ctx.metaId());
-        List<Term> t = allOf(ctx.term());
+        List<Term> t = mapOf(ctx.term());
         return capsulateTf(ctx, () -> getTermFactory().createTerm(metaId, t));
     }
 
@@ -905,7 +905,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public ImmutableArray<TermLabel> visitLabel(KeYParser.LabelContext ctx) {
-        List<TermLabel> labels = allOf(ctx.single_label());
+        List<TermLabel> labels = mapOf(ctx.single_label());
         return new ImmutableArray(labels);
     }
 
@@ -921,7 +921,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             labelName = ctx.STAR().getText();
 
         TermLabel label = null;
-        List<String> parameters = allOf(ctx.string_value());
+        List<String> parameters = mapOf(ctx.string_value());
         try {
             SchemaVariable var = schemaVariables().lookup(new Name(labelName));
             if (var instanceof TermLabel) {
@@ -1110,7 +1110,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public List<Term> visitArgument_list(KeYParser.Argument_listContext ctx) {
-        return allOf(ctx.argument());
+        return mapOf(ctx.argument());
     }
 
     @Override

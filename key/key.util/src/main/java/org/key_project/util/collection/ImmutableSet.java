@@ -166,4 +166,11 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
      */
     <S> S[] toArray(S[] array);
 
+    default ImmutableSet<T> add(Iterable<T> seq) {
+        var cur = this;
+        for (T item : seq) {
+            cur = cur.add(item);
+        }
+        return cur;
+    }
 }

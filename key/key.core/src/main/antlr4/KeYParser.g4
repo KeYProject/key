@@ -789,8 +789,12 @@ varIds: ids=simple_ident_comma_list;
 
 triggers
 :
-  TRIGGER LBRACE id=simple_ident RBRACE
-  t=term (AVOID avoidCond=term (COMMA avoidCond=term )*)? SEMI
+  TRIGGER
+  LBRACE id=simple_ident RBRACE
+  t=term
+    (AVOID avoidCond+=term
+      (COMMA avoidCond+=term )*)?
+  SEMI
 ;
 
 taclet

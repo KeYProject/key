@@ -55,10 +55,7 @@ public class KeYFile implements EnvInput {
     private final String name;
     private final Profile profile;
     protected InitConfig initConfig;
-    protected String chooseContract = null;
-    protected String proofObligation = null;
-    @Nullable
-    private KeYParser.FileContext ctx = null;
+    private KeyAst.File ctx = null;
     @Nullable
     private ProblemFinder problemFinder = null;
     @Nullable
@@ -194,7 +191,7 @@ public class KeYFile implements EnvInput {
         return input;
     }
 
-    protected KeYParser.FileContext getParseContext() {
+    protected KeyAst.File getParseContext() {
         if (ctx == null) {
             try {
                 ctx = ParsingFacade.parseFile(file.getCharStream());
@@ -219,7 +216,7 @@ public class KeYFile implements EnvInput {
         }
         var ctx = getParseContext();
         try {
-            return KeyIO.findProofSettings(ctx);
+            return ctx.findProofSettings();
         } catch (de.uka.ilkd.key.util.ExceptionHandlerException ehe) {
             throw new ProofInputException(ehe.getCause().getMessage());
         }
@@ -248,7 +245,7 @@ public class KeYFile implements EnvInput {
         if (includes == null) {
             try {
                 var ctx = getParseContext();
-                includes = ParsingFacade.getIncludes(file.file().getParentFile().toURI().toURL(), ctx);
+                includes = ctx.getIncludes(file.file().getParentFile().toURI().toURL());
             } catch (Exception e) {
                 throw new ProofInputException(e);
             }
@@ -275,7 +272,7 @@ public class KeYFile implements EnvInput {
     protected @NotNull ProblemInformation getProblemInformation() {
         if (problemInformation == null) {
             var ctx = getParseContext();
-            problemInformation = ParsingFacade.getProblemInformation(ctx);
+            problemInformation = ctx.getProblemInformation();
         }
         return problemInformation;
     }
@@ -331,7 +328,8 @@ public class KeYFile implements EnvInput {
 
         //read .key file
         Debug.out("Reading KeY file", file);
-        //TODO initConfig.addCategory2DefaultChoices(problemParser.getCategory2Default());
+        var ci = getParseContext().getChoices();
+        initConfig.addCategory2DefaultChoices(ci.getDefaultOptions());
 
         readSorts();
         readFuncAndPred();
@@ -394,12 +392,7 @@ public class KeYFile implements EnvInput {
         ctx.accept(visitor);
         var taclets = visitor.getTaclets();
         System.out.format("Found taclets (%s): %d%n", file, taclets.size());
-        Map<Name, Taclet> map = initConfig.getTacletsMap();
-        for (var t : taclets) {
-            if (!map.containsKey(t.name())) {
-                map.put(t.name(), t);
-            }
-        }
+        initConfig.addTaclets(taclets);
     }
 
 
@@ -411,12 +404,10 @@ public class KeYFile implements EnvInput {
 
 
     public String chooseContract() {
-        return chooseContract;
+        return null;
     }
-
-
     public String getProofObligation() {
-        return proofObligation;
+        return null;
     }
 
 

@@ -934,7 +934,7 @@ public abstract class Taclet implements Rule, Named {
      * This field is set by the parser with [url]:[lineNumber]
      */
     private @Nullable String origin;
-    @Nullable public String getOrigin() { return origin; }
+    @Override @Nullable public String getOrigin() { return origin; }
     public void setOrigin(@Nullable String origin) { this.origin = origin; }
 }
 

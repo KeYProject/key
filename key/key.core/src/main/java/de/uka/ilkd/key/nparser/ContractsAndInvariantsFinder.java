@@ -40,14 +40,14 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
 
     @Override
     public Object visitDecls(KeYParser.DeclsContext ctx) {
-        allOf(ctx.contracts());
-        allOf(ctx.invariants());
+        mapOf(ctx.contracts());
+        mapOf(ctx.invariants());
         return null;
     }
 
     @Override
     public Object visitContracts(KeYParser.ContractsContext ctx) {
-        return allOf(ctx.one_contract());
+        return mapOf(ctx.one_contract());
     }
 
     @Override
