@@ -491,19 +491,8 @@ relation_op
  ) 
 ;
 
-weak_arith_op
-:
- (PLUS |  MINUS)
-;
-
-strong_arith_op
-:
- (
-    STAR         
- |  SLASH        
- |  PERCENT      
- ) 
-;
+weak_arith_op:   PLUS | MINUS;
+strong_arith_op: STAR | SLASH |  PERCENT;
 
 // term80
 logicTermReEntry
@@ -512,16 +501,15 @@ logicTermReEntry
 ;
 
 
-
 weak_arith_op_term
 :
-   a = strong_arith_op_term (op = weak_arith_op a1=strong_arith_op_term )*
+   a = strong_arith_op_term (op += weak_arith_op a1+=strong_arith_op_term)*
 ;
 
 
-strong_arith_op_term
+strong_arith_op_term //FIXME weigl: This rule is wrong, *,% are left associative but / is right associative
 :
-   a = term110 (op = strong_arith_op a1=term110 )*
+   a = term110 (op+=strong_arith_op a1+=term110)*
 ;
 
 term110
@@ -1094,9 +1082,7 @@ javaSource: JAVASOURCE result=oneJavaSource SEMI;
 oneJavaSource
 :
   ( string_value
-  | SLASH
   | COLON
-  | BACKSLASH
   )+ 
 ;
 

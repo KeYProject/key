@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nparser;
 
+import com.google.common.base.CharMatcher;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Triple;
@@ -48,7 +49,8 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         public Triple<String, Integer, Integer> findProofScript() {
             if (ctx.problem() != null && ctx.problem().proofScript() != null) {
                 var pctx = ctx.problem().proofScript();
-                return new Triple<>(pctx.ps.getText(), pctx.ps.getLine(), pctx.ps.getCharPositionInLine());
+                var text = pctx.ps.getText();
+                return new Triple<>(CharMatcher.is('"').trimFrom(text), pctx.ps.getLine(), pctx.ps.getCharPositionInLine());
             }
             return null;
         }

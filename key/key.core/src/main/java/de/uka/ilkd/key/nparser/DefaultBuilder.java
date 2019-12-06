@@ -9,9 +9,10 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.parser.AmbigiousDeclException;
-import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
+import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -24,28 +25,20 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     public static final int NORMAL_NONRIGID = 0;
     public static final int LOCATION_MODIFIER = 1;
     public static final String LIMIT_SUFFIX = "$lmtd";
+
     protected final Services services;
     protected final NamespaceSet nss;
-    protected Namespace<SchemaVariable> schemaVariablesNamespace = new Namespace<>();
     protected HashMap<String, String> category2Default = new LinkedHashMap<>();
-    protected HashSet<String> activatedChoicesCategories = new LinkedHashSet<>();
-    protected ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.nil();
+    private HashSet<String> activatedChoicesCategories = new LinkedHashSet<>();
+    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.nil();
     private HashSet usedChoiceCategories = new LinkedHashSet();
+    private Namespace<SchemaVariable> schemaVariablesNamespace = new Namespace<>();
+
 
     public DefaultBuilder(Services services, NamespaceSet nss) {
         this.services = services;
         this.nss = nss;
     }
-
-
-    public Namespace<SchemaVariable> schemaVariables() {
-        return schemaVariablesNamespace;
-    }
-
-    public void setSchemaVariablesNamespace(Namespace<SchemaVariable> ns) {
-        this.schemaVariablesNamespace = ns;
-    }
-
 
     @Override
     public List<String> visitPvset(KeYParser.PvsetContext ctx) {
@@ -69,18 +62,14 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return h;
     }
 
-
     @Override
     public String visitSimple_ident_dots(KeYParser.Simple_ident_dotsContext ctx) {
         return ctx.getText();
     }
 
-
     protected Named lookup(Name n) {
         final Namespace[] lookups = {
-                programVariables(), variables(),
-                functions(), schemaVariables(),
-        };
+                programVariables(), variables(), schemaVariables(), functions()};
         return doLookup(n, lookups);
     }
 
@@ -95,55 +84,6 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             }
         }
         return null;
-    }
-
-    protected void schema_var_decl(String name,
-                                   Sort s,
-                                   boolean makeVariableSV,
-                                   boolean makeSkolemTermSV,
-                                   boolean makeTermLabelSV,
-                                   SchemaVariableModifierSet mods)
-            throws AmbigiousDeclException {
-        SchemaVariable v;
-        if (s == Sort.FORMULA && !makeSkolemTermSV) {
-            v = SchemaVariableFactory.createFormulaSV(new Name(name),
-                    mods.rigid());
-        } else if (s == Sort.UPDATE) {
-            v = SchemaVariableFactory.createUpdateSV(new Name(name));
-        } else if (s instanceof ProgramSVSort) {
-            v = SchemaVariableFactory.createProgramSV(
-                    new ProgramElementName(name),
-                    (ProgramSVSort) s,
-                    mods.list());
-        } else {
-            if (makeVariableSV) {
-                v = SchemaVariableFactory.createVariableSV
-                        (new Name(name), s);
-            } else if (makeSkolemTermSV) {
-                v = SchemaVariableFactory.createSkolemTermSV(new Name(name),
-                        s);
-            } else if (makeTermLabelSV) {
-                v = SchemaVariableFactory.createTermLabelSV(new Name(name));
-            } else {
-                v = SchemaVariableFactory.createTermSV(
-                        new Name(name),
-                        s,
-                        mods.rigid(),
-                        mods.strict());
-            }
-        }
-
-        if (variables().lookup(v.name()) != null) {
-            semanticError(null, "Schema variables shadows previous declared variable: %s.", v.name());
-        }
-
-        if (schemaVariables().lookup(v.name()) != null) {
-            var old = schemaVariables().lookup(v.name());
-            //if(!old.sort().equals(v.sort()))
-            //    semanticError("Schema variables clashes with previous declared schema variable: %s.", v.name());
-            System.err.format("Override: %s %s%n", old, v);
-        }
-        schemaVariables().add(v);
     }
 
     protected void unbindVars(Namespace<QuantifiableVariable> orig) {
@@ -171,7 +111,6 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     public HashMap<String, String> getCategory2Default() {
         return category2Default;
     }
-
 
     @Override
     public Integer visitLocation_ident(KeYParser.Location_identContext ctx) {
@@ -251,21 +190,21 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      * given name varfunc_id and the argument terms args in the namespaces
      * and java info.
      *
-     * @param varfunc_name the String with the symbols name
+     * @param varfuncName the String with the symbols name
      * @param args         is null iff no argument list is given, for instance `f',
      *                     and is an array of size zero, if an empty argument list was given,
      *                     for instance `f()'.
      */
-    protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfunc_name, Term[] args) {
+    protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, Term[] args) {
         // case 1a: variable
         // case 1b: schema variable
-        Name name = new Name(varfunc_name);
+        Name name = new Name(varfuncName);
         Operator[] operators = new Operator[]{
-                schemaVariables().lookup(new Name(varfunc_name)),
+                schemaVariables().lookup(name),
                 variables().lookup(name),
-                programVariables().lookup(new ProgramElementName(varfunc_name)),
-                functions().lookup(new Name(varfunc_name)),
-                AbstractTermTransformer.name2metaop(varfunc_name)
+                programVariables().lookup(new ProgramElementName(varfuncName)),
+                functions().lookup(name),
+                AbstractTermTransformer.name2metaop(varfuncName)
         };
 
         for (var op : operators) {
@@ -284,10 +223,10 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         }*/
 
         // case 4: instantiation of sort depending function
-        int separatorIndex = varfunc_name.indexOf("::");
+        int separatorIndex = varfuncName.indexOf("::");
         if (separatorIndex > 0) {
-            String sortName = varfunc_name.substring(0, separatorIndex);
-            String baseName = varfunc_name.substring(separatorIndex + 2);
+            String sortName = varfuncName.substring(0, separatorIndex);
+            String baseName = varfuncName.substring(separatorIndex + 2);
             Sort sort = lookupSort(sortName);
             SortDependingFunction firstInstance
                     = SortDependingFunction.getFirstInstance(new Name(baseName),
@@ -302,13 +241,12 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         }
 
         if (args == null) {
-            semanticError(ctx, "(program) variable or constant %s", varfunc_name);
+            semanticError(ctx, "(program) variable or constant %s", varfuncName);
         } else {
-            semanticError(ctx, "function or static query %s", varfunc_name);
+            semanticError(ctx, "function or static query %s", varfuncName);
         }
         return null;
     }
-
 
     public Sort toArraySort(Pair<Sort, Type> p, int numOfDimensions) {
         if (numOfDimensions != 0) {
@@ -330,7 +268,6 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             return p.first;
         }
     }
-
 
     /**
      * looks up and returns the sort of the given name or null if none has been found.
@@ -354,7 +291,6 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         }
         return result;
     }
-
 
     public NamespaceSet namespaces() {
         return nss;
@@ -407,7 +343,6 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return getServices().getJavaInfo();
     }
 
-
     public Services getServices() {
         return services;
     }
@@ -416,15 +351,20 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return activatedChoices;
     }
 
+    public Namespace<SchemaVariable> schemaVariables() {
+        return schemaVariablesNamespace;
+    }
+
+    public void setSchemaVariables(Namespace<SchemaVariable> ns) {
+        this.schemaVariablesNamespace = ns;
+    }
+
     @Override
     public Object visitVarIds(KeYParser.VarIdsContext ctx) {
         Collection<String> ids = accept(ctx.simple_ident_comma_list());
         List<ParsableVariable> list = new ArrayList<>(ids.size());
         for (String id : ids) {
-            var v = (ParsableVariable) doLookup(new Name(id), variables(), schemaVariables());
-            if (v == null) {
-                v = schemaVariables().lookup(new Name(id));
-            }
+            var v = (ParsableVariable) lookup(new Name(id));
             if (v == null) {
                 semanticError(ctx, "Variable " + id + " not declared.");
             }

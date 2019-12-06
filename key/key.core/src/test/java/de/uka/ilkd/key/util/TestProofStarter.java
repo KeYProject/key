@@ -8,6 +8,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
+import org.junit.Ignore;
 
 /**
  * Tests for {@link ProofStarter}.

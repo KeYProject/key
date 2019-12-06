@@ -61,7 +61,7 @@ public class TestParser {
 
 
     @Test
-    public void testGenericSort() throws RecognitionException {
+    public void testGenericSort() throws RecognitionException, IOException {
         String content = "\\sorts { \\generic gen; } \n\n" +
                 "\\rules { SomeRule { \\find(gen::instance(0)) \\replacewith(false) }; }\n" +
                 "\\problem { true }";
@@ -69,8 +69,7 @@ public class TestParser {
         Services services = TacletForTests.services();
         KeyIO io = new KeyIO(services);
         var loader = io.load(content);
-        loader.loadDeclarations();
-        loader.loadTaclets();
+        loader.parseFile().loadComplete();
         loader.loadProblem();
     }
 }

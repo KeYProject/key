@@ -14,7 +14,6 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.NotDeclException;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.util.Debug;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -23,9 +22,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -37,12 +34,12 @@ public class ExpressionBuilder extends DefaultBuilder {
     private Term quantifiedArrayGuard;
 
     public ExpressionBuilder(Services services, NamespaceSet nss) {
-        super(services, nss);
+        this(services, nss, new Namespace<>());
     }
 
     public ExpressionBuilder(Services services, NamespaceSet nss, Namespace<SchemaVariable> schemaNamespace) {
         super(services, nss);
-        schemaVariablesNamespace = schemaNamespace;
+        setSchemaVariables(schemaNamespace);
     }
 
 
@@ -261,20 +258,38 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Term visitWeak_arith_op_term(KeYParser.Weak_arith_op_termContext ctx) {
-        Term a = accept(ctx.a);
-        if (ctx.op == null) return a;
-        Function op = accept(ctx.op);
-        Term a1 = accept(ctx.a1);
-        return capsulateTf(ctx, () -> getTermFactory().createTerm(op, a, a1));
+        Term current = accept(ctx.a);
+        if (ctx.op.isEmpty())
+            return current;
+
+        List<Function> op = mapOf(ctx.op);
+        List<Term> terms = mapOf(ctx.a1);
+        try {
+            for (int i = 0; i < ctx.op.size(); i++) {
+                current = getTermFactory().createTerm(op.get(i), current, terms.get(i));
+            }
+        } catch (TermCreationException e) {
+            throw new BuildingException(ctx, e);
+        }
+        return current;
     }
 
     @Override
     public Term visitStrong_arith_op_term(KeYParser.Strong_arith_op_termContext ctx) {
-        Term a = accept(ctx.a);
-        if (ctx.op == null) return a;
-        Function op = accept(ctx.op);
-        Term a1 = accept(ctx.a1);
-        return capsulateTf(ctx, () -> getTermFactory().createTerm(op, a, a1));
+        Term current = accept(ctx.a);
+        if (ctx.op.isEmpty())
+            return current;
+
+        List<Function> op = mapOf(ctx.op);
+        List<Term> terms = mapOf(ctx.a1);
+        try {
+            for (int i = 0; i < ctx.op.size(); i++) {
+                current = getTermFactory().createTerm(op.get(i), current, terms.get(i));
+            }
+        } catch (TermCreationException e) {
+            throw new BuildingException(ctx, e);
+        }
+        return current;
     }
 
     @Override
@@ -448,6 +463,9 @@ public class ExpressionBuilder extends DefaultBuilder {
                     sjb.javaBlock = jr.readBlockWithEmptyContext(cleanJava);
                 }
             } catch (Exception e) {
+                if (cleanJava.startsWith("{..")) {// do not fallback
+                    throw e;
+                }
                 JavaReader jr = new Recoder2KeY(services, nss);
                 try {
                     sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), cleanJava);
@@ -536,7 +554,8 @@ public class ExpressionBuilder extends DefaultBuilder {
             } else if (attribute instanceof ProgramConstant) {
                 result = capsulateTf(ctx, () -> getTermFactory().createTerm(attribute));
             } else if (attribute == getServices().getJavaInfo().getArrayLength()) {
-                result = getServices().getTermBuilder().dotLength(result);
+                Term finalResult = result;
+                result = capsulateTf(ctx, () ->getServices().getTermBuilder().dotLength(finalResult));
             } else {
                 ProgramVariable pv = (ProgramVariable) attribute;
                 Function fieldSymbol
@@ -691,7 +710,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
         KeYJavaType kjt = getTypeByClassName(classRef);
         if (kjt == null)
-            throwEx(new NotDeclException(null, "Class", classRef));
+            semanticError(ctx, "Could not find java type for %s", classRef);
         classRef = kjt.getFullName();
 
         return getServices().getJavaInfo().getProgramMethodTerm(prefix, name,
@@ -754,8 +773,9 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Term visitAccessterm_bracket_suffix(KeYParser.Accessterm_bracket_suffixContext ctx) {
         Term reference = pop();
-        boolean sequenceAccess = reference.sort().name().toString().equals("seq");
-        boolean heapUpdate = reference.sort().name().toString().equals("Heap");
+        //FIXME This is ugly as hell. How to a have a better check than just a name?
+        boolean sequenceAccess = reference.sort().name().toString().equalsIgnoreCase("seq");
+        boolean heapUpdate = reference.sort().name().toString().equalsIgnoreCase("Heap");
 
         if (sequenceAccess) {
             if (ctx.rangeTo != null) {
@@ -1138,12 +1158,11 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
 
             if (op instanceof ParsableVariable) {
+                if (ctx.argument_list() != null) {
+                    semanticError(ctx, "You used a variable like a predicate or function.");
+                }
                 a = termForParsedVariable((ParsableVariable) op, ctx);
             } else {
-                if (args == null) {
-                    args = new Term[0];
-                }
-
                 if (boundVars == null) {
                     try {
                         Operator finalOp = op;
@@ -1344,31 +1363,30 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private Term replaceHeap(Term term, Term heap, int depth, ParserRuleContext ctx) {
-        if (depth > 0) {
-            if (isSelectTerm(term)) {
-                if (!isImplicitHeap(term.sub(0))) {
-                    semanticError(null, "Expecting program variable heap as first argument of: %s", term);
-                }
-                Term[] params = new Term[]{heap, replaceHeap(term.sub(1), heap, depth - 1, ctx), term.sub(2)};
-                return capsulateTf(ctx, () -> getServices().getTermFactory().createTerm(term.op(), params));
-            } else if (term.op() instanceof ObserverFunction) {
-                if (!isImplicitHeap(term.sub(0))) {
-                    semanticError(null, "Expecting program variable heap as first argument of: %s", term);
-                }
-
-                Term[] params = new Term[term.arity()];
-                params[0] = heap;
-                params[1] = replaceHeap(term.sub(1), heap, depth - 1, ctx);
-                for (int i = 2; i < params.length; i++) {
-                    params[i] = term.sub(i);
-                }
-
-                return capsulateTf(ctx, () -> getServices().getTermFactory().createTerm(term.op(), params));
-
-            } else {
-                semanticError(null, NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE, term);
-                throwEx(new RecognitionException());
+        if (depth < 0) return term;
+        if (isSelectTerm(term)) {
+            if (!isImplicitHeap(term.sub(0))) {
+                semanticError(null, "Expecting program variable heap as first argument of: %s", term);
             }
+            Term[] params = new Term[]{heap, replaceHeap(term.sub(1), heap, depth - 1, ctx), term.sub(2)};
+            return capsulateTf(ctx, () -> getServices().getTermFactory().createTerm(term.op(), params));
+        } else if (term.op() instanceof ObserverFunction) {
+            if (!isImplicitHeap(term.sub(0))) {
+                semanticError(null, "Expecting program variable heap as first argument of: %s", term);
+            }
+
+            Term[] params = new Term[term.arity()];
+            params[0] = heap;
+            params[1] = replaceHeap(term.sub(1), heap, depth - 1, ctx);
+            for (int i = 2; i < params.length; i++) {
+                params[i] = term.sub(i);
+            }
+
+            return capsulateTf(ctx, () -> getServices().getTermFactory().createTerm(term.op(), params));
+
+        } else {
+            semanticError(null, NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE, term);
+            throwEx(new RecognitionException());
         }
         return term;
     }

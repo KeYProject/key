@@ -267,13 +267,7 @@ SLASH
 :	'/'
     ;
 
-BACKSLASH
-:	'\\'
-    ;
-
-COLON
-:    ':'
-    ;
+COLON:    ':';
 
 DOUBLECOLON
 :    '::'
@@ -451,17 +445,29 @@ NUM_LITERAL:
 ;
 
 /**
-  * Here we have to accept all strings of kind \\[a-z_]
+  * Here we have to accept all strings of ki01           ERROR_CHAR 0:\                                                 nd \\[a-z_]
   * and make the decision our selves as to what to do with it
   * (i.e. is it a modality, keyword, or possibly something else)
   */
 MODALITYD:	'\\<' -> more, pushMode(modDiamond);
 MODALITYB:	'\\[' -> more, pushMode(modBox);
 MODALITYBB:	'\\[[' -> more, pushMode(modBoxBox);
+
+MODAILITYGENERIC1: '\\box'                    -> more, pushMode(modGeneric);
+MODAILITYGENERIC2: '\\diamond'                -> more, pushMode(modGeneric);
+MODAILITYGENERIC3: '\\diamond_transaction'    -> more, pushMode(modGeneric);
+MODAILITYGENERIC4: '\\modality'               -> more, pushMode(modGeneric);
+MODAILITYGENERIC5: '\\box_transaction'        -> more, pushMode(modGeneric);
+MODAILITYGENERIC6: '\\throughout'             -> more, pushMode(modGeneric);
+MODAILITYGENERIC7: '\\throughout_transaction' -> more, pushMode(modGeneric);
+
+/* weigl: not working
 MODAILITYGENERIC:
       ('\\modality' | '\\diamond' | '\\diamond_transaction'
       '\\box' | '\\box_transaction' | '\\throughout' | '\\throughout_transaction')
       -> more, pushMode(modGeneric);
+*/
+//BACKSLASH:  '\\';
 ERROR_CHAR: .;
 
 mode modDiamond;

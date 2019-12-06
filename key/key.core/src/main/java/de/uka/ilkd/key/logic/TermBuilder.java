@@ -1804,9 +1804,10 @@ public class TermBuilder {
         if (ref.sort() instanceof ArraySort) {
             elementSort = ((ArraySort) ref.sort()).elementSort();
         } else {
-            throw new TermCreationException("Tried to build an array access "
-                    + "on an inacceptable sort: " + ref.sort().getClass() + "\n"
-                    + "(" + ref + "[" + idx + "])");
+            throw new TermCreationException(
+                    String.format("Tried to build an array access on an inacceptable sort: " +
+                            "Sort: %s : %s with %s[%s] ",
+                            ref.sort(), ref.sort().getClass().getSimpleName(), ref, idx));
         }
 
         return select(elementSort, getBaseHeap(), ref, arr(idx));

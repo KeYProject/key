@@ -4,7 +4,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.nparser.ExpressionBuilder;
 import org.antlr.runtime.RecognitionException;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -24,6 +26,12 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         parseDecls("\\programVariables {testTermParserHeap.A a;}");
         parseDecls("\\programVariables {testTermParserHeap.A1 a1;}");
         parseDecls("\\programVariables {testTermParserHeap.A[] array;}");
+
+        Assert.assertNotNull(nss.programVariables().lookup("a"));
+        Assert.assertNotNull(nss.programVariables().lookup("a1"));
+        Assert.assertNotNull(nss.programVariables().lookup("array"));
+        Assert.assertNotNull(nss.programVariables().lookup("h"));
+        Assert.assertNotNull(nss.programVariables().lookup("h2"));
     }
 
     private Term getSelectTerm(String sort, Term heap, Term object, Term field) {

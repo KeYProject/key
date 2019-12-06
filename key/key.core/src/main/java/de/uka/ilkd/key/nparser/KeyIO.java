@@ -1,7 +1,10 @@
 package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.Taclet;
@@ -19,7 +22,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static de.uka.ilkd.key.nparser.ParsingFacade.parseFiles;
@@ -34,12 +36,12 @@ import static de.uka.ilkd.key.nparser.ParsingFacade.parseFiles;
 public class KeyIO {
     private final Services services;
     private final NamespaceSet nss;
+    private @Nullable Namespace<SchemaVariable> schemaNamespace;
 
-    public KeyIO(Services services, NamespaceSet nss) {
+    public KeyIO(@NotNull Services services, @NotNull NamespaceSet nss) {
         this.services = services;
         this.nss = nss;
     }
-
 
     public KeyIO(Services services) {
         this(services, services.getNamespaces());
@@ -49,42 +51,23 @@ public class KeyIO {
         this(new Services(new JavaProfile()));
     }
 
-    public static @Nullable String findJavaPath(KeyAst.File ctx) {
-        final String[] javaPath = {null};
-        ctx.accept(new AbstractBuilder<Void>() {
-            @Override
-            public Void visitOneJavaSource(KeYParser.OneJavaSourceContext ctx) {
-                javaPath[0] = ctx.getText();
-                return null;
-            }
-        });
-        return javaPath[0];
-    }
-
-    public static @Nullable String findBootClassPath(KeyAst.File ctx) {
-        BootClasspathFinder psf = new BootClasspathFinder();
-        ctx.accept(psf);
-        return psf.getBootClasspath();
-    }
-
-    public static Set<Choice> findActivatedChoices(KeyAst.File ctx, Namespace<Choice> ns) {
-        ChoiceFinder cf = new ChoiceFinder(ns);
-        ctx.accept(cf);
-        return cf.getChoiceInformation().getActivatedChoices();
-    }
-
     public @NotNull Term parseExpression(@NotNull String expr) {
         return parseExpression(CharStreams.fromString(expr));
     }
 
     public Term parseExpression(CharStream stream) {
         var ctx = ParsingFacade.parseExpression(stream);
-        return (Term) ctx.accept(new ExpressionBuilder(services, nss));
+        ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
+        if (schemaNamespace != null)
+            visitor.setSchemaVariables(schemaNamespace);
+        return (Term) ctx.accept(visitor);
     }
 
     public Sequent parseSequence(CharStream stream) {
         var ctx = ParsingFacade.parseSequent(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
+        if (schemaNamespace != null)
+            visitor.setSchemaVariables(schemaNamespace);
         var seq = (Sequent) ctx.accept(visitor);
         if (visitor.getWarnings().isEmpty()) {
             return seq;
@@ -137,6 +120,10 @@ public class KeyIO {
 
     public Loader load(String content) {
         return load(CharStreams.fromString(content));
+    }
+
+    public void setSchemaNamespace(Namespace<SchemaVariable> ns) {
+        schemaNamespace = ns;
     }
 
     public class Loader {
@@ -242,7 +229,7 @@ public class KeyIO {
         }
 
         public List<Taclet> loadTaclets() {
-            if(ctx.isEmpty()) throw new IllegalStateException();
+            if (ctx.isEmpty()) throw new IllegalStateException();
             var parsers = ctx.stream().map(it -> new TacletPBuilder(services, nss))
                     .collect(Collectors.toList());
             //Collections.reverse(parsers);
@@ -251,6 +238,9 @@ public class KeyIO {
             for (int i = 0; i < ctx.size(); i++) {
                 KeyAst.File s = ctx.get(i);
                 var p = parsers.get(i);
+                if (KeyIO.this.schemaNamespace != null) {
+                    p.setSchemaVariables(new Namespace<>(KeyIO.this.schemaNamespace));
+                }
                 s.accept(p);
                 taclets.addAll(p.getTaclets());
                 schemaNamespace = p.schemaVariables();

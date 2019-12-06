@@ -95,11 +95,11 @@ public class AbstractTestTermParser {
      * Remove whitespaces before executing
      * {@link junit.framework.TestCase#assertEquals(java.lang.String, java.lang.String)}.
      */
-    protected void assertEqualsIgnoreWhitespaces(String expected, String actual) {
+    protected static void  assertEqualsIgnoreWhitespaces(String expected, String actual) {
         assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
     }
 
-    protected void assertEqualsIgnoreWhitespaces(String message, String expected, String actual) {
+    protected static void assertEqualsIgnoreWhitespaces(String message, String expected, String actual) {
         assertEquals(message, expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
     }
 

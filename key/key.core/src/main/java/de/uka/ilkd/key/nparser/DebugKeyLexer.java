@@ -4,9 +4,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,16 +35,27 @@ public class DebugKeyLexer {
     }
 
     public static void main(String[] args) {
-        new DebugKeyLexer(
-                Arrays.stream(args).map(File::new).collect(Collectors.toList())).run();
+        if (args.length > 0) {
+            new DebugKeyLexer(
+                    Arrays.stream(args).map(File::new).collect(Collectors.toList())).run();
+        } else {
+            try (BufferedReader input = new BufferedReader(new InputStreamReader(System.in))) {
+                String tmp;
+                while ((tmp = input.readLine()) != null)
+                    debug(tmp);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    public void debug(String content) {
+    public static void debug(String content) {
         debug(ParsingFacade.lex(CharStreams.fromString(content)));
     }
 
-    public void debug(KeYLexer lexer) {
+    public static void debug(KeYLexer lexer) {
         DebugKeyLexer dkl = new DebugKeyLexer(System.out, DEFAULT_FORMAT, Collections.singleton(lexer));
+        dkl.run();
     }
 
     public void run() {

@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.AmbigiousDeclException;
 import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.conditions.*;
@@ -148,7 +147,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
 
         //  schema var decls
-        schemaVariablesNamespace = new Namespace<>(schemaVariables());
+        setSchemaVariables(new Namespace<>(schemaVariables()));
         mapOf(ctx.one_schema_var_decl());
 
         if (ctx.ifSeq != null) ifSeq = accept(ctx.ifSeq);
@@ -179,7 +178,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         b.setOrigin(BuildingException.getPosition(ctx));
         Taclet r = peekTBuilder().getTaclet();
         announceTaclet(ctx, r);
-        schemaVariablesNamespace = schemaVariables().parent();
+        setSchemaVariables(schemaVariables().parent());
         currentTBuilder.pop();
         return r;
     }
@@ -772,7 +771,6 @@ public class TacletPBuilder extends ExpressionBuilder {
         return ImmutableList.fromList(taclets);
     }
 
-
     /*private boolean isTermTransformer()  {
         return (input.LA(1) == KeYLexer.IDENT &&
                 AbstractTermTransformer.name2metaop(input.LT(1).getText()) != null)
@@ -923,7 +921,6 @@ public class TacletPBuilder extends ExpressionBuilder {
         return v;
     }
 
-
     @Override
     public Object visitOne_schema_var_decl(KeYParser.One_schema_var_declContext ctx) {
         boolean makeVariableSV = false;
@@ -994,17 +991,10 @@ public class TacletPBuilder extends ExpressionBuilder {
         if (ctx.any_sortId_check() != null)
             s = accept(ctx.any_sortId_check());
 
-        try {
-            for (String id : ids) {
-                schema_var_decl(id,
-                        s,
-                        makeVariableSV,
-                        makeSkolemTermSV,
-                        makeTermLabelSV,
-                        mods);
-            }
-        } catch (AmbigiousDeclException e) {
-            throwEx(e);
+        for (String id : ids) {
+            declareSchemaVariable(ctx, id,
+                    s, makeVariableSV, makeSkolemTermSV,
+                    makeTermLabelSV, mods);
         }
         return null;
     }
@@ -1024,6 +1014,52 @@ public class TacletPBuilder extends ExpressionBuilder {
     public Object visitSchema_var_decls(KeYParser.Schema_var_declsContext ctx) {
         List<SchemaVariable> seq = mapOf(ctx.one_schema_var_decl());
         return seq;
+    }
+
+    protected void declareSchemaVariable(
+            ParserRuleContext ctx,
+            String name, Sort s,
+            boolean makeVariableSV, boolean makeSkolemTermSV, boolean makeTermLabelSV,
+            SchemaVariableModifierSet mods) {
+        SchemaVariable v;
+        if (s == Sort.FORMULA && !makeSkolemTermSV) {
+            v = SchemaVariableFactory.createFormulaSV(new Name(name),
+                    mods.rigid());
+        } else if (s == Sort.UPDATE) {
+            v = SchemaVariableFactory.createUpdateSV(new Name(name));
+        } else if (s instanceof ProgramSVSort) {
+            v = SchemaVariableFactory.createProgramSV(
+                    new ProgramElementName(name),
+                    (ProgramSVSort) s,
+                    mods.list());
+        } else {
+            if (makeVariableSV) {
+                v = SchemaVariableFactory.createVariableSV
+                        (new Name(name), s);
+            } else if (makeSkolemTermSV) {
+                v = SchemaVariableFactory.createSkolemTermSV(new Name(name),
+                        s);
+            } else if (makeTermLabelSV) {
+                v = SchemaVariableFactory.createTermLabelSV(new Name(name));
+            } else {
+                v = SchemaVariableFactory.createTermSV(
+                        new Name(name),
+                        s, mods.rigid(), mods.strict());
+            }
+        }
+
+        if (variables().lookup(v.name()) != null) {
+            semanticError(null, "Schema variables shadows previous declared variable: %s.", v.name());
+        }
+
+        if (schemaVariables().lookup(v.name()) != null) {
+            var old = schemaVariables().lookup(v.name());
+            if (!old.sort().equals(v.sort()))
+                semanticError(null,
+                        "Schema variables clashes with previous declared schema variable: %s.", v.name());
+            System.err.format("Override: %s %s%n", old, v);
+        }
+        schemaVariables().add(v);
     }
 
     public List<Taclet> getTaclets() {

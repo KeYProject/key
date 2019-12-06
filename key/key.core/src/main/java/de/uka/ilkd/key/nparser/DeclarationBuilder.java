@@ -31,7 +31,6 @@ public class DeclarationBuilder extends DefaultBuilder {
     @Override
     public Object visitProg_var_decls(KeYParser.Prog_var_declsContext ctx) {
         String var_name;
-
         for (int i = 0; i < ctx.simple_ident_comma_list().size(); i++) {
             var var_names = (List<String>) accept(ctx.simple_ident_comma_list(i));
             var kjt = (KeYJavaType) accept(ctx.keyjavatype(i));
@@ -45,12 +44,12 @@ public class DeclarationBuilder extends DefaultBuilder {
                     //  	(var_name, getSourceName(), getLine(), getColumn());
                     if (!(name instanceof ProgramVariable) || (name instanceof ProgramVariable &&
                             !((ProgramVariable) name).getKeYJavaType().equals(kjt))) {
-                        namespaces().programVariables().add(new LocationVariable
+                        programVariables().add(new LocationVariable
                                 (pvName, kjt));
                     }
                 } else {
-                    namespaces().programVariables().add(new LocationVariable
-                            (pvName, kjt));
+                    programVariables()
+                            .add(new LocationVariable(pvName, kjt));
                 }
             }
         }

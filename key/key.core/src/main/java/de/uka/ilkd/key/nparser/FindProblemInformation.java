@@ -3,6 +3,7 @@ package de.uka.ilkd.key.nparser;
 import com.google.common.base.CharMatcher;
 
 import java.util.List;
+import java.util.Objects;
 
 public class FindProblemInformation extends AbstractBuilder<Object> {
     private ProblemInformation information = new ProblemInformation();
@@ -18,8 +19,8 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
         information.setProfile(acceptFirst(ctx.profile()));
         information.setPreferences(acceptFirst(ctx.preferences()));
         information.setBootClassPath(acceptFirst(ctx.bootClassPath()));
-        information.setClasspath(acceptFirst(ctx.classPaths()));
-        information.setJavaSource(acceptFirst(ctx.javaSource()));
+        ctx.classPaths().forEach(it ->
+                information.getClasspath().addAll(Objects.requireNonNull(accept(it))));
         information.setJavaSource(acceptFirst(ctx.javaSource()));
         return null;
     }
@@ -51,6 +52,10 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
     public List<String> visitClassPaths(KeYParser.ClassPathsContext ctx) {
         return mapOf(ctx.string_value());
     }
+
+    @Override public String visitString_value(KeYParser.String_valueContext ctx) {
+        return ParsingFacade.getValue(ctx); }
+
 
     @Override
     public String visitJavaSource(KeYParser.JavaSourceContext ctx) {
