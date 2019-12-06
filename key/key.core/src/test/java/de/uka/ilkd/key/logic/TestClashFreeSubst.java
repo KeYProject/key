@@ -21,6 +21,7 @@ import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.key_project.util.collection.ImmutableSLList;
@@ -49,15 +50,17 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
     ProgramVariable pv0;
 
     @Before
-    public void setUp() throws IOException {
-	services = new Services(AbstractProfile.getDefaultProfile());
-	nss = services.getNamespaces();
-	tf = services.getTermFactory();
+	public void setUp() throws IOException {
+		services = new Services(AbstractProfile.getDefaultProfile());
+		nss = services.getNamespaces();
+		tf = services.getTermFactory();
 		io = new KeyIO(services, nss);
-	String sorts = "\\sorts{boolean;int;LocSet;}";
-	parseDecls(sorts);
-	Recoder2KeY r2k = new Recoder2KeY(services, nss);
-	r2k.parseSpecialClasses();
+		String sorts = "\\sorts{boolean;int;LocSet;}";
+		parseDecls(sorts);
+		Assert.assertNotNull(nss.sorts().lookup("boolean"));
+
+		Recoder2KeY r2k = new Recoder2KeY(services, nss);
+		r2k.parseSpecialClasses();
 
 	parseDecls("\\sorts { srt; }\n" +
 		   "\\functions {\n" +

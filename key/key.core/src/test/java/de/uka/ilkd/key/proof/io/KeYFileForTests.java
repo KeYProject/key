@@ -63,15 +63,13 @@ public class KeYFileForTests extends KeYFile {
 		new ParserConfig(initConfig.getServices(),
 				 initConfig.namespaces());
 		KeyIO io = new KeyIO(initConfig.getServices());
-		/*
-	    KeYParserF problemParser = new KeYParserF
-		(ParserMode.PROBLEM,new KeYLexerF(cinp, file.toString()), pc, pc,initConfig.
-		 getTaclet2Builder(), initConfig.getTaclets());
-            problemParser.problem();
-	    initConfig.setTaclets(problemParser.getTaclets());
-	    variables = problemParser.namespaces().variables().copy();
-	    schemaVariables = problemParser.schemaVariables().copy();
-	    */
+        var l = io.load(file.getCharStream());
+        var taclets = l.loadComplete();
+        initConfig.addTaclets(taclets);
+
+        variables = new Namespace<>(); //problemParser.namespaces().variables().copy();
+        schemaVariables = l.getSchemaNamespace();
+
 	    return DefaultImmutableSet.nil();
 	} catch (Exception e) {
 	    throw new ProofInputException(e);

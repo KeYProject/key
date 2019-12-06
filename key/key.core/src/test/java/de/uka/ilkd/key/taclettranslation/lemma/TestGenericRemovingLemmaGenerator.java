@@ -13,10 +13,6 @@
 
 package de.uka.ilkd.key.taclettranslation.lemma;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -27,13 +23,19 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
+import org.junit.Test;
 
-public class TestGenericRemovingLemmaGenerator extends TestCase {
+import java.util.HashSet;
+import java.util.Set;
 
+import static org.junit.Assert.*;
+
+public class TestGenericRemovingLemmaGenerator {
+    @Test
     public void testRemovingGenericSorts() {
-
         TacletForTests.parse();
         NoPosTacletApp app = TacletForTests.getRules().lookup(new Name("TestRemovingGenericSorts"));
+        assertNotNull(app);
 
         GenericRemovingLemmaGenerator g = new GenericRemovingLemmaGenerator();
         TacletFormula result = g.translate(app.taclet(), TacletForTests.services());
@@ -46,7 +48,7 @@ public class TestGenericRemovingLemmaGenerator extends TestCase {
         for (Sort sort : sorts) {
             assertFalse("No generic sorts must survive", sort instanceof GenericSort);
 
-            if(!found && sort instanceof ProxySort && sort.name().equals(nameG)) {
+            if (!found && sort instanceof ProxySort && sort.name().equals(nameG)) {
                 found = true;
             }
         }
@@ -60,7 +62,7 @@ public class TestGenericRemovingLemmaGenerator extends TestCase {
 
         sorts.add(term.sort());
 
-        if (term.op() instanceof SortDependingFunction){
+        if (term.op() instanceof SortDependingFunction) {
             SortDependingFunction sdf = (SortDependingFunction) term.op();
             sorts.add(sdf.getSortDependingOn());
         }

@@ -13,30 +13,28 @@
 
 package de.uka.ilkd.key.taclettranslation;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import de.uka.ilkd.key.nparser.KeyIO;
-import junit.framework.TestCase;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.nparser.ExpressionBuilder;
+import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.Taclet;
+import junit.framework.TestCase;
+import org.antlr.v4.runtime.CharStreams;
+
+import java.io.IOException;
+import java.util.List;
 
 public class TestTacletTranslator extends TestCase {
 
     private NamespaceSet nss;
-    private Namespace<SchemaVariable> schemaVariableNS;
     private Services services;
     private KeyIO io;
+    private Namespace<SchemaVariable> lastSchemaNamespace;
 
 
     public TestTacletTranslator(String name) {
@@ -45,41 +43,44 @@ public class TestTacletTranslator extends TestCase {
 
     // some methods essentially "stolen" from TestTacletParser
 
+    private final static String DECLS =
+            "\\sorts { S; }\n" +
+                    "\\functions {\n" +
+                    "  S const1;\n" +
+                    "  S const2;\n" +
+                    "}\n"+
+                    "\\schemaVariables {\n" +
+                    "  \\formula phi, psi, tau, assume_left, assume_right, add_left, add_right;\n" +
+                    "  \\term S x;\n" +
+                    "  \\variables S z;\n}\n";
+
+
     protected void setUp() throws Exception {
         nss = new NamespaceSet();
         services = new Services(AbstractProfile.getDefaultProfile());
         io = new KeyIO(services, nss);
-        parseDecls("\\sorts { S; }\n" +
-                "\\functions {\n" +
-                "  S const1;\n" +
-                "  S const2;\n" +
-                "}\n" +
-                "\\schemaVariables {\n" +
-                "  \\formula phi, psi, tau, assume_left, assume_right, add_left, add_right;\n" +
-                "  \\term S x;\n" +
-                "  \\variables S z;\n" +
-                "}\n");
-        System.out.println();
-    }
-
-    private void parseDecls(String s) {
-        io.load(s).loadDeclarations().loadSndDegreeDeclarations();
     }
 
     private Term parseTerm(String s) {
-        return io.parseExpression(s);
-    }
-
-    private Term parseFma(String s) {
-        return parseTerm(s);
-        //p.setSchemaVariablesNamespace(schemaVariableNS);
+        var ctx = ParsingFacade.parseExpression(CharStreams.fromString(s));
+        return (Term) ctx.accept(new ExpressionBuilder(services, nss, lastSchemaNamespace));
     }
 
     private Taclet parseTaclet(String s) {
-        return io.load(s).loadTaclets().get(0);
+        try{
+            KeyIO.Loader load = io.load(s);
+            List<Taclet> taclets = load.parseFile().loadComplete();
+            lastSchemaNamespace = load.getSchemaNamespace();
+            return taclets.get(0);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("No Taclet in '" + s + "'", e);
+        }
     }
 
     private void testTaclet(String tacletString, String termString) throws Exception {
+        tacletString = DECLS + "\n\\rules { " + tacletString + "; }";
+
         Taclet taclet = parseTaclet(tacletString);
         Term expected = parseTerm(termString);
         Term translation = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet, services);
@@ -94,88 +95,88 @@ public class TestTacletTranslator extends TestCase {
 
     public void testPropositional1() throws Exception {
         testTaclet("propositional1 { \n" +
-                "\\assumes( assume_left ==> assume_right ) \n" +
-                "\\find( const1 ) \n" +
-                "\\replacewith( const2 ) \n" +
-                "\\add( add_left ==> add_right ) \n" +
-                "; \n" +
-                "\\add( psi ==> ) }",
+                        "\\assumes( assume_left ==> assume_right ) \n" +
+                        "\\find( const1 ) \n" +
+                        "\\replacewith( const2 ) \n" +
+                        "\\add( add_left ==> add_right ) \n" +
+                        "; \n" +
+                        "\\add( psi ==> ) }",
 
                 // second case first. no replace means const1=const1
 
                 "  ((const1 = const1 -> (!psi))" +
-                " & (const1 = const2 -> (add_left -> add_right))) " +
-                " -> (assume_left -> assume_right)");
+                        " & (const1 = const2 -> (add_left -> add_right))) " +
+                        " -> (assume_left -> assume_right)");
     }
 
     public void testPropositional2() throws Exception {
         testTaclet("propositionalLeft { \n" +
-                "\\assumes( assume_left ==> assume_right ) \n" +
-                "\\find( phi ==> ) \n" +
-                "\\replacewith( psi ==> ) \n" +
-                "\\add( add_left ==> add_right ) \n" +
-                "; \n" +
-                "\\add( tau ==> ) \n" +
-                "; \n" +
-                "\\replacewith( ==> psi )}", 
+                        "\\assumes( assume_left ==> assume_right ) \n" +
+                        "\\find( phi ==> ) \n" +
+                        "\\replacewith( psi ==> ) \n" +
+                        "\\add( add_left ==> add_right ) \n" +
+                        "; \n" +
+                        "\\add( tau ==> ) \n" +
+                        "; \n" +
+                        "\\replacewith( ==> psi )}",
 
                 // last case first. 
 
                 "  (psi" +
-                " & !tau " +
-                " & (!psi | (add_left -> add_right))) " +
-                " -> (!phi | (assume_left -> assume_right))");
+                        " & !tau " +
+                        " & (!psi | (add_left -> add_right))) " +
+                        " -> (!phi | (assume_left -> assume_right))");
     }
-    
+
     public void testNoPolarity() throws Exception {
         testTaclet("noPolarity { \n" +
-                "\\assumes( assume_left ==> assume_right ) \n" +
-                "\\find( phi  ) \n" +
-                "\\replacewith( psi ); \n" +
-                "\\replacewith( tau )}", 
+                        "\\assumes( assume_left ==> assume_right ) \n" +
+                        "\\find( phi  ) \n" +
+                        "\\replacewith( psi ); \n" +
+                        "\\replacewith( tau )}",
 
                 // last case first. 
 
                 "  (!(phi <-> tau)" +
-                " & !(phi <-> psi)) " +
-                " -> (assume_left -> assume_right)");
+                        " & !(phi <-> psi)) " +
+                        " -> (assume_left -> assume_right)");
     }
-    
+
     public void testPositivePolarity() throws Exception {
         testTaclet("positivePolarity { \n" +
-                "\\assumes( assume_left ==> assume_right ) \n" +
-                "\\find( phi  ) \n" +
-                "\\succedentPolarity \n" +
-                "\\replacewith( psi ); \n" +
-                "\\replacewith( tau )}", 
+                        "\\assumes( assume_left ==> assume_right ) \n" +
+                        "\\find( phi  ) \n" +
+                        "\\succedentPolarity \n" +
+                        "\\replacewith( psi ); \n" +
+                        "\\replacewith( tau )}",
 
                 // last case first.
                 // for positive polarity w/o assumption,
                 // this is equivalent to (tau -> phi) | (psi -> phi)
 
                 "  (!(tau -> phi)" +
-                " & !(psi -> phi)) " +
-                " -> (assume_left -> assume_right)");
+                        " & !(psi -> phi)) " +
+                        " -> (assume_left -> assume_right)");
     }
-    
+
     public void testNegativePolarity() throws Exception {
         testTaclet("negativePolarity { \n" +
-                "\\assumes( assume_left ==> assume_right ) \n" +
-                "\\find( phi  ) \n" +
-                "\\antecedentPolarity \n" +
-                "\\replacewith( psi ); \n" +
-                "\\replacewith( tau )}", 
+                        "\\assumes( assume_left ==> assume_right ) \n" +
+                        "\\find( phi  ) \n" +
+                        "\\antecedentPolarity \n" +
+                        "\\replacewith( psi ); \n" +
+                        "\\replacewith( tau )}",
 
                 // last case first.
                 // for negative polarity w/o assumption,
                 // this is equivalent to (tau <- phi) | (psi <- phi)
 
                 "  (!(phi -> tau)" +
-                " & !(phi -> psi)) " +
-                " -> (assume_left -> assume_right)");
+                        " & !(phi -> psi)) " +
+                        " -> (assume_left -> assume_right)");
     }
 
     // TODO check refusal of varconds
     // TODO check skolem generation etc ...
-    
+
 }

@@ -303,7 +303,7 @@ public class KeYFile implements EnvInput {
     public String readJavaPath() throws ProofInputException {
         var pi = getProblemInformation();
         String javaPath = pi.getJavaSource();
-        if (javaPath != null && !javaPath.isBlank()) {
+        if (javaPath != null) {
             File absFile = new File(javaPath);
             if (!absFile.isAbsolute()) {
                 // convert to absolute by resolving against the parent path of the parsed file

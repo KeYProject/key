@@ -2,6 +2,7 @@ package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Pair;
@@ -15,7 +16,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static de.uka.ilkd.key.nparser.ParsingFacade.parseFiles;
@@ -127,22 +131,31 @@ public class KeyIO {
         ctx.accept(visitor);
     }
 
-    public Loader load(String content) {
+    public Loader load(CharStream content) {
         return new Loader(content, null);
+    }
+
+    public Loader load(String content) {
+        return load(CharStreams.fromString(content));
     }
 
     public class Loader {
         private final URL resource;
-        private final String content;
+        private final CharStream content;
         private List<KeyAst.File> ctx = new LinkedList<>();
+        private Namespace<SchemaVariable> schemaNamespace;
 
         Loader(URL resource) {
             this(null, resource);
         }
 
-        public Loader(String content, URL url) {
+        Loader(CharStream content, URL url) {
             resource = url;
             this.content = content;
+        }
+
+        public Namespace<SchemaVariable> getSchemaNamespace() {
+            return schemaNamespace;
         }
 
         public List<Taclet> loadComplete() throws IOException {
@@ -161,11 +174,12 @@ public class KeyIO {
         }
 
         public Loader parseFile() throws IOException {
+            if (!ctx.isEmpty()) return this;
             //long start = System.currentTimeMillis();
-            if(resource!=null)
+            if (resource != null)
                 ctx = parseFiles(resource);
-            else{
-                var c = ParsingFacade.parseFile(CharStreams.fromString(content));
+            else {
+                var c = ParsingFacade.parseFile(content);
                 ctx.add(c);
             }
             //long stop = System.currentTimeMillis();
@@ -228,6 +242,7 @@ public class KeyIO {
         }
 
         public List<Taclet> loadTaclets() {
+            if(ctx.isEmpty()) throw new IllegalStateException();
             var parsers = ctx.stream().map(it -> new TacletPBuilder(services, nss))
                     .collect(Collectors.toList());
             //Collections.reverse(parsers);
@@ -238,6 +253,7 @@ public class KeyIO {
                 var p = parsers.get(i);
                 s.accept(p);
                 taclets.addAll(p.getTaclets());
+                schemaNamespace = p.schemaVariables();
             }
             long stop = System.currentTimeMillis();
             System.err.format("MODE: %s took %d%n", "taclets", stop - start);

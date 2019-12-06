@@ -78,7 +78,7 @@ public class TestTacletParser {
 						"\\functions {\n" +
 						"  s f(s);\n" +
 						"}\n" +
-						"\\schemaVariables {\n" +
+						"\\schemaVangiables {\n" +
 						"  \\formula b,b0,post;\n" +
 						"  \\program Statement #p1, #s ; \n" +
 						"  \\program Expression #e2, #e ; \n" +

@@ -55,7 +55,6 @@ public class AbstractTestTermParser {
     }
 
     public void parseDecls(String content) throws IOException {
-        KeyIO io = new KeyIO(services, nss);
         io.load(content).parseFile()
                 .loadDeclarations()
                 .loadSndDegreeDeclarations();
@@ -73,7 +72,7 @@ public class AbstractTestTermParser {
     }
 
     public Term parseTerm(String s) throws Exception {
-        return new KeyIO(services, nss).parseExpression(s);
+        return io.parseExpression(s);
     }
 
     public Term parseFormula(String s) throws Exception {

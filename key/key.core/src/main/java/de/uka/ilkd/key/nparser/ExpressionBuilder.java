@@ -40,6 +40,11 @@ public class ExpressionBuilder extends DefaultBuilder {
         super(services, nss);
     }
 
+    public ExpressionBuilder(Services services, NamespaceSet nss, Namespace<SchemaVariable> schemaNamespace) {
+        super(services, nss);
+        schemaVariablesNamespace = schemaNamespace;
+    }
+
 
     public static String trimJavaBlock(String raw) {
         if (raw.startsWith("\\<")) {
@@ -777,8 +782,9 @@ public class ExpressionBuilder extends DefaultBuilder {
                 if (f == null) {
                     semanticError(ctx, "Unknown heap constructor " + id);
                 }
+                Term[] arguments = args.toArray(new Term[0]);
                 Term[] augmentedArgs = new Term[args.size() + 1];
-                System.arraycopy(args, 0, augmentedArgs, 1, args.size());
+                System.arraycopy(arguments, 0, augmentedArgs, 1, arguments.length);
                 augmentedArgs[0] = heap;
                 Term result = capsulateTf(ctx, () -> getTermFactory().createTerm(f, augmentedArgs));
                 if (!result.sort().name().toString().equals("Heap")) {
