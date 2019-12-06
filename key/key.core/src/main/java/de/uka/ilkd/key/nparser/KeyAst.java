@@ -73,9 +73,19 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
         public Token findProof() {
             var a = ctx.proof();
-            if(a!=null)
+            if (a != null)
                 return a.PROOF().getSymbol();
             return null;
+        }
+
+        /**
+         * Extracts the decls and taclets into a string.
+         * This method is required for saving and loading proofs.
+         * 
+         * @return
+         */
+        public String getProblemHeader() {
+            return ctx.decls().getText();
         }
     }
 

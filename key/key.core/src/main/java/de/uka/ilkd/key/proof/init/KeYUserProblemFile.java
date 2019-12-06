@@ -39,10 +39,7 @@ import java.io.IOException;
  * as well as a proof obligation.
  */
 public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
-
     private Term problemTerm = null;
-    private String problemHeader = "";
-
 
     //-------------------------------------------------------------------------
     //constructors
@@ -183,7 +180,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         return ProofAggregate.createProofAggregate(
                 new Proof(name,
                         problemTerm,
-                        problemHeader,
+                        getParseContext().getProblemHeader()+"\n",
                         initConfig),
                 name);
     }
