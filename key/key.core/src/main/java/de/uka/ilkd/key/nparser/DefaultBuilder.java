@@ -196,8 +196,6 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      *                     for instance `f()'.
      */
     protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, Term[] args) {
-        // case 1a: variable
-        // case 1b: schema variable
         Name name = new Name(varfuncName);
         Operator[] operators = new Operator[]{
                 schemaVariables().lookup(name),
@@ -213,16 +211,6 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             }
         }
 
-        /*if (v != null && (args == null || (inSchemaMode() && v instanceof ModalOperatorSV))) {
-            return v;
-        }*/
-
-        // case 2: program variable
-        /*if (v != null && (args == null || args.length == 0)) {
-            return v;
-        }*/
-
-        // case 4: instantiation of sort depending function
         int separatorIndex = varfuncName.indexOf("::");
         if (separatorIndex > 0) {
             String sortName = varfuncName.substring(0, separatorIndex);

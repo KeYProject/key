@@ -524,6 +524,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                             "There is no attribute '%s'for sequences (Seq), only 'length' is supported.", memberName);
                 }
             } else {
+                memberName = CharMatcher.anyOf("()").trimFrom(memberName);
                 Operator v = getAttributeInPrefixSort(prefix.sort(), memberName);
                 return createAttributeTerm(prefix, v, ctx);
             }
@@ -698,7 +699,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         boolean brackets = false;
         List<Term> args = accept(ctx.argument_list());
         // true in case class name is not explicitly mentioned as part of memberName
-        boolean implicitClassName = memberName.indexOf("::") == -1;
+        memberName = CharMatcher.anyOf("()").trimFrom(memberName);
+        boolean implicitClassName =memberName.indexOf("::") == -1;
 
         if (implicitClassName) {
             classRef = prefix.sort().name().toString();

@@ -147,6 +147,9 @@ public class DeclarationBuilder extends DefaultBuilder {
                 sorts().add(s);
                 createdSorts.add(s);
             }
+            else{
+                addWarning(ctx, "Sort declaration is ignored, due to collision.");
+            }
         }
         return createdSorts;
     }
