@@ -557,8 +557,7 @@ accessterm
 :
     MINUS result = term110
   | LPAREN s = any_sortId_check RPAREN result=term110
-  |  atom
-    atom_suffix*
+  |  atom atom_suffix*
     // at most one heap selection suffix
     ( heap_selection_suffix )? // resets globalSelectNestingDepth to zero
 ;

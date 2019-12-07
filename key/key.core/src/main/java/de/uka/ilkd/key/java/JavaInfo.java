@@ -722,7 +722,7 @@ public final class JavaInfo {
         return getTermFromProgramMethod(pm, methodName, className, args, prefix);
     }
 
-    private Term getTermFromProgramMethod(IProgramMethod pm, String methodName, String className, Term[] args, Term prefix) throws IllegalArgumentException {
+    public Term getTermFromProgramMethod(IProgramMethod pm, String methodName, String className, Term[] args, Term prefix) throws IllegalArgumentException {
         if (pm == null) {
             throw new IllegalArgumentException("Program method " + methodName
                     + " in " + className + " not found.");

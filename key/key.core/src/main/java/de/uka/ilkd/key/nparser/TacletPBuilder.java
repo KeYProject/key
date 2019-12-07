@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nparser;
 
 import antlr.RecognitionException;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
@@ -776,38 +777,10 @@ public class TacletPBuilder extends ExpressionBuilder {
                 AbstractTermTransformer.name2metaop(input.LT(1).getText()) != null)
                 || input.LA(1) == KeYLexer.IN_TYPE;
     }
+    */
 
-    private boolean isStaticQuery() {
-        if (inSchemaMode()) return false;
-        final JavaInfo javaInfo = getJavaInfo();
-        boolean result = false;
-//    try {
-        int n = 1;
-        KeYJavaType kjt = null;
-        StringBuffer className = new StringBuffer(input.LT(n).getText());
-        while (isPackage(className.toString())) {
-            if (input.LA(n + 1) != KeYLexer.DOT) return false;
-            className.append(".");
-            className.append(input.LT(n + 2).getText());
-            n += 2;
-        }
-        kjt = getTypeByClassName(className.toString());
-        if (kjt != null) {
-            if (input.LA(n + 1) == KeYLexer.DOT && input.LA(n + 3) == KeYLexer.LPAREN) {
-                Iterator<IProgramMethod> it = javaInfo.getAllProgramMethods(kjt).iterator();
-                while (it.hasNext()) {
-                    final IProgramMethod pm = it.next();
-                    final String name = kjt.getFullName() + "::" + input.LT(n + 2).getText();
-                    if (pm != null && pm.isStatic() && pm.name().toString().equals(name)) {
-                        result = true;
-                        break;
-                    }
-                }
-            }
-        }
-        return result;
-    }
-*/
+
+
     private TacletBuilder createTacletBuilderFor(Object find, int applicationRestriction, ParserRuleContext ctx) {
         if (applicationRestriction != RewriteTaclet.NONE &&
                 applicationRestriction != RewriteTaclet.IN_SEQUENT_STATE &&

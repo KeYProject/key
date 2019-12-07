@@ -22,6 +22,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
@@ -556,7 +557,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 result = capsulateTf(ctx, () -> getTermFactory().createTerm(attribute));
             } else if (attribute == getServices().getJavaInfo().getArrayLength()) {
                 Term finalResult = result;
-                result = capsulateTf(ctx, () ->getServices().getTermBuilder().dotLength(finalResult));
+                result = capsulateTf(ctx, () -> getServices().getTermBuilder().dotLength(finalResult));
             } else {
                 ProgramVariable pv = (ProgramVariable) attribute;
                 Function fieldSymbol
@@ -700,7 +701,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         List<Term> args = accept(ctx.argument_list());
         // true in case class name is not explicitly mentioned as part of memberName
         memberName = CharMatcher.anyOf("()").trimFrom(memberName);
-        boolean implicitClassName =memberName.indexOf("::") == -1;
+        boolean implicitClassName = memberName.indexOf("::") == -1;
 
         if (implicitClassName) {
             classRef = prefix.sort().name().toString();
@@ -722,10 +723,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Term visitAccessterm(KeYParser.AccesstermContext ctx) {
         final Sort objectSort = getServices().getJavaInfo().objectSort();
-
-        Term result = null;
         if (ctx.MINUS() != null) {
-            result = accept(ctx.term110());
+            Term result = accept(ctx.term110());
             if (result.sort() != Sort.FORMULA) {
                 return getTermFactory().createTerm(
                         functions().lookup(new Name("neg")), result);
@@ -733,7 +732,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "Formula cannot be prefixed with '-'");
             }
         } else if (ctx.LPAREN() != null) {
-            result = accept(ctx.term110());
+            Term result = accept(ctx.term110());
             if (ctx.any_sortId_check() != null) {
                 Sort s = accept(ctx.any_sortId_check());
                 if (s == null) {
@@ -750,6 +749,13 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         }
 
+        //FIXME weigl: this is a hack!
+        if (getTypeByClassName(ctx.atom().getText()) != null) {
+            var t = createStaticAttributeOrMethod(ctx);
+            if (t != null) return t;
+        }
+
+
         Term a = accept(ctx.atom());
         for (var c : ctx.atom_suffix()) {
             a = accept(c, a);
@@ -759,6 +765,32 @@ public class ExpressionBuilder extends DefaultBuilder {
             a = accept(ctx.heap_selection_suffix(), a);
         }
         return a;
+    }
+
+    private Term createStaticAttributeOrMethod(KeYParser.AccesstermContext ctx) {
+        var kjt = getTypeByClassName(ctx.atom().getText());
+        Term current = null;
+        for (var suffix : ctx.atom_suffix()) {
+            if (suffix.attribute_or_query_suffix() != null) {
+                String mn = suffix.attribute_or_query_suffix().memberName.getText();
+                ProgramVariable maybeAttr = getJavaInfo().getAttribute(mn, kjt);
+                if (maybeAttr != null) {
+                    var op = getAttributeInPrefixSort(kjt.getSort(), mn);
+                    current = createAttributeTerm(null, op, ctx);
+                    continue;
+                }
+                for (IProgramMethod pm : getJavaInfo().getAllProgramMethods(kjt)) {
+                    if (pm != null && pm.isStatic() && pm.name().toString().equals(kjt.getName() + "::" + mn)) {
+                        List<Term> arguments = mapOf(suffix.attribute_or_query_suffix().result.args.argument());
+                        Term[] args = arguments.toArray(new Term[0]);
+                        current = getJavaInfo().getStaticProgramMethodTerm(mn, args, kjt.getName());
+                        //(pm, mn, kjt.getName(), args, current);
+                        break;
+                    }
+                }
+            }
+        }
+        return current;
     }
 
     /**
@@ -1143,57 +1175,57 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         Term a;
         if (varfuncid.equals("skip") && arguments == null) {
-            a = capsulateTf(ctx, () -> getTermFactory().createTerm(UpdateJunctor.SKIP));
-        } else {
-            Operator op;
-            if (varfuncid.endsWith(LIMIT_SUFFIX)) {
-                varfuncid = varfuncid.substring(0, varfuncid.length() - 5);
-                op = lookupVarfuncId(ctx, varfuncid, args);
-                if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
-                    op = getServices().getSpecificationRepository()
-                            .limitObs((ObserverFunction) op).first;
-                } else {
-                    semanticError(ctx, "Cannot can be limited: " + op);
-                }
-            } else {
-                op = lookupVarfuncId(ctx, varfuncid, args);
-            }
+            return capsulateTf(ctx, () -> getTermFactory().createTerm(UpdateJunctor.SKIP));
+        }
 
-            if (op instanceof ParsableVariable) {
-                if (ctx.argument_list() != null) {
-                    semanticError(ctx, "You used a variable like a predicate or function.");
-                }
-                a = termForParsedVariable((ParsableVariable) op, ctx);
+        Operator op;
+        if (varfuncid.endsWith(LIMIT_SUFFIX)) {
+            varfuncid = varfuncid.substring(0, varfuncid.length() - 5);
+            op = lookupVarfuncId(ctx, varfuncid, args);
+            if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
+                op = getServices().getSpecificationRepository()
+                        .limitObs((ObserverFunction) op).first;
             } else {
-                if (boundVars == null) {
-                    try {
-                        Operator finalOp = op;
-                        Term[] finalArgs = args;
-                        a = capsulateTf(ctx, () -> getTermFactory().createTerm(finalOp, finalArgs));
-                    } catch (Exception e) {
-                        throw new BuildingException(ctx, e);
-                    }
-                } else {
-                    //sanity check
-                    assert op instanceof Function;
-                    for (int i = 0; i < args.length; i++) {
-                        if (i < op.arity() && !op.bindVarsAt(i)) {
-                            for (QuantifiableVariable qv : args[i].freeVars()) {
-                                if (boundVars.contains(qv)) {
-                                    semanticError(ctx, "Building function term " + op + " with bound variables failed: "
-                                            + "Variable " + qv + " must not occur free in subterm " + args[i]);
-                                }
+                semanticError(ctx, "Cannot can be limited: " + op);
+            }
+        }  else {
+            op = lookupVarfuncId(ctx, varfuncid, args);
+        }
+
+        if (op instanceof ParsableVariable) {
+            if (ctx.argument_list() != null) {
+                semanticError(ctx, "You used a variable like a predicate or function.");
+            }
+            a = termForParsedVariable((ParsableVariable) op, ctx);
+        } else {
+            if (boundVars == null) {
+                try {
+                    Operator finalOp = op;
+                    Term[] finalArgs = args;
+                    a = capsulateTf(ctx, () -> getTermFactory().createTerm(finalOp, finalArgs));
+                } catch (Exception e) {
+                    throw new BuildingException(ctx, e);
+                }
+            } else {
+                //sanity check
+                assert op instanceof Function;
+                for (int i = 0; i < args.length; i++) {
+                    if (i < op.arity() && !op.bindVarsAt(i)) {
+                        for (QuantifiableVariable qv : args[i].freeVars()) {
+                            if (boundVars.contains(qv)) {
+                                semanticError(ctx, "Building function term " + op + " with bound variables failed: "
+                                        + "Variable " + qv + " must not occur free in subterm " + args[i]);
                             }
                         }
                     }
+                }
 
-                    //create term
-                    try {
-                        a = getTermFactory().createTerm(op, args,
-                                new ImmutableArray<QuantifiableVariable>(boundVars.toArray(new QuantifiableVariable[boundVars.size()])), null);
-                    } catch (TermCreationException e) {
-                        throw new BuildingException(ctx, e);
-                    }
+                //create term
+                try {
+                    a = getTermFactory().createTerm(op, args,
+                            new ImmutableArray<QuantifiableVariable>(boundVars.toArray(new QuantifiableVariable[boundVars.size()])), null);
+                } catch (TermCreationException e) {
+                    throw new BuildingException(ctx, e);
                 }
             }
         }
@@ -1314,52 +1346,6 @@ public class ExpressionBuilder extends DefaultBuilder {
         return modalities;
     }
 
-    private boolean isStaticAttribute() {
-        final JavaInfo javaInfo = getJavaInfo();
-        KeYJavaType kjt = null;
-        boolean result = false;
-//        try {
-        int n = 1;
-        StringBuffer className = new StringBuffer();
-        /*StringBuffer className = new StringBuffer(input.LT(n).getText());
-        while (isPackage(className.toString()) || input.LA(n + 2) == KeYLexer.NUM_LITERAL ||
-                (input.LT(n + 2) != null && input.LT(n + 2).getText() != null &&
-                        input.LT(n + 2).getText().length() > 0 && input.LT(n + 2).getText().charAt(0) <= 'Z' && input.LT(n + 2).getText().charAt(0) >= 'A' &&
-                        (input.LT(n + 2).getText().length() == 1 ||
-                                input.LT(n + 2).getText().charAt(1) <= 'z' && input.LT(n + 2).getText().charAt(1) >= 'a'))) {
-            if (input.LA(n + 1) != KeYLexer.DOT && input.LA(n + 1) != KeYLexer.EMPTYBRACKETS) return false;
-            // maybe still an attribute starting with an uppercase letter followed by a lowercase letter
-            if (getTypeByClassName(className.toString()) != null) {
-                ProgramVariable maybeAttr =
-                        javaInfo.getAttribute(input.LT(n + 2).getText(), getTypeByClassName(className.toString()));
-                if (maybeAttr != null) {
-                    return true;
-                }
-            }
-            className.append(".");
-            className.append(input.LT(n + 2).getText());
-            n += 2;
-        }
-        while (input.LA(n + 1) == KeYLexer.EMPTYBRACKETS) {
-            className.append("[]");
-            n++;
-        }*/
-        kjt = getTypeByClassName(className.toString());
-
-        if (kjt != null) {
-            // works as we do not have inner classes
-            /*if (input.LA(n + 1) == KeYLexer.DOT) {
-                final ProgramVariable pv =
-                        javaInfo.getAttribute(input.LT(n + 2).getText(), kjt);
-                result = (pv != null && pv.isStatic());
-            }*/
-        } else {
-            result = false;
-        }
-        return result;
-    }
-
-
     private boolean isImplicitHeap(Term t) {
         return getServices().getTermBuilder().getBaseHeap().equals(t);
     }
@@ -1407,6 +1393,65 @@ public class ExpressionBuilder extends DefaultBuilder {
     private static class PairOfStringAndJavaBlock {
         String opName;
         JavaBlock javaBlock;
+    }
+
+
+    private boolean isStaticQuery(String className, String methodName) {
+        final JavaInfo javaInfo = getJavaInfo();
+        KeYJavaType kjt = getTypeByClassName(className);
+        if (kjt != null) {
+            final String name = kjt.getFullName() + "::" + methodName;
+            for (IProgramMethod pm : javaInfo.getAllProgramMethods(kjt)) {
+                if (pm != null && pm.isStatic() && pm.name().toString().equals(name)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private String[] splitJava(String dotName) {
+        String[] parts = dotName.split("[.]");
+        String packageName = null;
+        String className = null;
+        String attributeName = null;
+        int i = 0;
+        for (; i < parts.length; i++) {
+            String test = Arrays.stream(parts).limit(i).collect(Collectors.joining("."));
+            if (isPackage(test)) {
+                packageName = test;
+            } else if (packageName != null) {
+                break;
+            }
+        }
+
+        int j = i;
+        for (; j < parts.length; j++) {
+            String test = Arrays.stream(parts)
+                    .limit(i)
+                    .skip(j)
+                    .collect(Collectors.joining("."));
+            if (getTypeByClassName(test) != null) {
+                className = test;
+            } else if (className != null) {
+                break;
+            }
+        }
+        attributeName = Arrays.stream(parts).skip(j + 1).collect(Collectors.joining());
+        return new String[]{packageName, className, attributeName};
+    }
+
+    private boolean isStaticAttribute(String dotName) {
+        final JavaInfo javaInfo = getJavaInfo();
+        String[] javaParts = splitJava(dotName);
+        KeYJavaType kjt = getTypeByClassName(javaParts[1]);
+        if (kjt != null) {
+            ProgramVariable maybeAttr = javaInfo.getAttribute(javaParts[2], kjt);
+            if (maybeAttr != null) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 

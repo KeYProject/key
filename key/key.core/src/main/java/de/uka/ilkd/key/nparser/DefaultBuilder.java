@@ -231,7 +231,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         if (args == null) {
             semanticError(ctx, "(program) variable or constant %s", varfuncName);
         } else {
-            semanticError(ctx, "function or static query %s", varfuncName);
+            semanticError(ctx, "function or static query %s in %s", varfuncName, ctx.parent.parent.getText());
         }
         return null;
     }
