@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.nparser;
 
-import antlr.RecognitionException;
 import com.google.common.base.CharMatcher;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -24,6 +23,7 @@ import org.key_project.util.collection.ImmutableSet;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -763,8 +763,17 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         if (ctx.heap_selection_suffix() != null) {
             a = accept(ctx.heap_selection_suffix(), a);
+            markHeapAsExplicit(a);
         }
         return a;
+    }
+
+    private List<Term> explicitHeap = new LinkedList<>();
+    private void markHeapAsExplicit(Term a) {
+        if (isSelectTerm(a)) {
+            explicitHeap.add(a);
+            a.subs().forEach(this::markHeapAsExplicit);
+        }
     }
 
     private Term createStaticAttributeOrMethod(KeYParser.AccesstermContext ctx) {
@@ -1188,7 +1197,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             } else {
                 semanticError(ctx, "Cannot can be limited: " + op);
             }
-        }  else {
+        } else {
             op = lookupVarfuncId(ctx, varfuncid, args);
         }
 
@@ -1350,13 +1359,14 @@ public class ExpressionBuilder extends DefaultBuilder {
         return getServices().getTermBuilder().getBaseHeap().equals(t);
     }
 
-    private Term replaceHeap(Term term, Term heap, int depth, ParserRuleContext ctx) {
-        if (depth < 0) return term;
+    private Term replaceHeap(Term term, Term heap, ParserRuleContext ctx) {
+        if(explicitHeap.contains(term)) return term;
         if (isSelectTerm(term)) {
             if (!isImplicitHeap(term.sub(0))) {
-                semanticError(null, "Expecting program variable heap as first argument of: %s", term);
+                //semanticError(null, "Expecting program variable heap as first argument of: %s", term);
+                return term;
             }
-            Term[] params = new Term[]{heap, replaceHeap(term.sub(1), heap, depth - 1, ctx), term.sub(2)};
+            Term[] params = new Term[]{heap, replaceHeap(term.sub(1), heap, ctx), term.sub(2)};
             return capsulateTf(ctx, () -> getServices().getTermFactory().createTerm(term.op(), params));
         } else if (term.op() instanceof ObserverFunction) {
             if (!isImplicitHeap(term.sub(0))) {
@@ -1365,16 +1375,13 @@ public class ExpressionBuilder extends DefaultBuilder {
 
             Term[] params = new Term[term.arity()];
             params[0] = heap;
-            params[1] = replaceHeap(term.sub(1), heap, depth - 1, ctx);
+            params[1] = replaceHeap(term.sub(1), heap, ctx);
             for (int i = 2; i < params.length; i++) {
                 params[i] = term.sub(i);
             }
 
             return capsulateTf(ctx, () -> getServices().getTermFactory().createTerm(term.op(), params));
 
-        } else {
-            semanticError(null, NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE, term);
-            throwEx(new RecognitionException());
         }
         return term;
     }
@@ -1386,7 +1393,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (!isHeapTerm(heap)) {
             semanticError(null, "Expecting term of type Heap but sort is %s for term %s", heap.sort(), term);
         }
-        Term result = replaceHeap(term, heap, 0, ctx);
+        Term result = replaceHeap(term, heap, ctx);
         return result;
     }
 
