@@ -20,7 +20,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.BuildingException;
 import de.uka.ilkd.key.rule.TacletForTests;
-import org.antlr.runtime.RecognitionException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -52,21 +51,21 @@ public class TestTermParser extends AbstractTestTermParser {
     @Before
     public void setUp() throws IOException {
         parseDecls("\\sorts { boolean; elem; list; int; int_sort; numbers;  }\n" +
-                        "\\functions {\n" +
-                        "  elem head(list);\n" +
-                        "  list tail(list);\n" +
-                        "  list nil;\n" +
-                        "  list cons(elem,list);\n" +
-                        "int aa ;\n" +
-                        "int bb ;\n" +
-                        "int cc ;\n" +
-                        "int dd ;\n" +
-                        "int ee ;\n" +
-                        "}\n" +
-                        "\\predicates {\n" +
-                        "  isempty(list);\n" +
-                        "}\n" +
-                        "\\programVariables {int globalIntPV;}"
+                "\\functions {\n" +
+                "  elem head(list);\n" +
+                "  list tail(list);\n" +
+                "  list nil;\n" +
+                "  list cons(elem,list);\n" +
+                "int aa ;\n" +
+                "int bb ;\n" +
+                "int cc ;\n" +
+                "int dd ;\n" +
+                "int ee ;\n" +
+                "}\n" +
+                "\\predicates {\n" +
+                "  isempty(list);\n" +
+                "}\n" +
+                "\\programVariables {int globalIntPV;}"
 
         );
 
@@ -96,12 +95,12 @@ public class TestTermParser extends AbstractTestTermParser {
         t_tailys = tf.createTerm(tail, new Term[]{t_ys}, null, null);
         t_nil = tf.createTerm(nil);
 
-		Assert.assertNotNull(head);
-		Assert.assertNotNull(elem);
-		Assert.assertNotNull(tail);
-		Assert.assertNotNull(nil);
-		Assert.assertNotNull(cons);
-		Assert.assertNotNull(isempty);
+        Assert.assertNotNull(head);
+        Assert.assertNotNull(elem);
+        Assert.assertNotNull(tail);
+        Assert.assertNotNull(nil);
+        Assert.assertNotNull(cons);
+        Assert.assertNotNull(isempty);
     }
 
 
@@ -208,24 +207,20 @@ public class TestTermParser extends AbstractTestTermParser {
     @Test
     public void test8() throws Exception {
         /* A bit like test7, but for a substitution term */
-        String s = "{\\subst elem xs; head(xs)} cons(xs,ys)";
+        //String s = "{\\subst elem xs; head(xs)} cons(xs,ys)"; weigl: not well-typed
+        String s = "{\\subst list y; tail(y)} head(xs)";
         Term t = parseTerm(s);
+        Term xs = parseTerm("xs");
 
-        LogicVariable thisxs = (LogicVariable) t.varsBoundHere(1)
-                .get(0);
+        LogicVariable thisxs = (LogicVariable) t.varsBoundHere(1).get(0);
 
-        Term t1 = tf.createTerm
-                (WarySubstOp.SUBST,
-                        new Term[]{t_headxs, tf.createTerm
-                                (cons,
-                                        new Term[]{tf.createTerm(thisxs), t_ys},
-                                        null,
-                                        null)},
-                        new ImmutableArray<QuantifiableVariable>(thisxs),
-                        null);
+        Term inner = tf.createTerm(head, xs); //head(xs)
+        Term replacement = tf.createTerm(tail, tf.createTerm(thisxs)); //tail(xs)
+        Term subst = tf.createTerm(WarySubstOp.SUBST, new Term[]{replacement, inner},
+                new ImmutableArray<>(thisxs), null);
 
-        assertNotSame("new variable in subst term", thisxs, xs);
-        assertEquals("parse {xs:elem head(xs)} cons(xs,ys)", t1, t);
+        assertNotSame(thisxs, xs);
+        assertEquals(subst, t);
     }
 
     @Test
@@ -242,7 +237,7 @@ public class TestTermParser extends AbstractTestTermParser {
                         (Junctor.NOT,
                                 tf.createTerm(isempty, new Term[]{tf.createTerm(thisx)}, null, null)));
 
-		assertNotSame("new variable in quantifier", thisx, x);
+        assertNotSame("new variable in quantifier", thisx, x);
         assertEquals("parse \\forall list x; \\forall list l1; ! x = l1", t1, t);
 
     }
@@ -351,9 +346,9 @@ public class TestTermParser extends AbstractTestTermParser {
         try {
             parseProblem(s);
         } catch (Exception re) {
-			fail("Fixed bug 216 occured again. The original bug " +
-					"was due to ambigious rules using semantic " +
-					"predicates in a 'wrong' way");
+            fail("Fixed bug 216 occured again. The original bug " +
+                    "was due to ambigious rules using semantic " +
+                    "predicates in a 'wrong' way");
         }
     }
 

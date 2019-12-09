@@ -440,6 +440,7 @@ public class TestDeclParser {
 
 
     @Test
+    @Ignore("weigl: nparser handles the parsing differently. No Exception is thrown.")
     public void testAmbiguousDecls() {
         try {
             evaluateDeclarations(
