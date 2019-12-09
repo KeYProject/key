@@ -1016,6 +1016,8 @@ public class TestApplyTaclet extends TestCase{
                         "int i=17; } catch (Exception e) { return null;}}");
 
         ProgramElement is = goals.head().sequent().getFormulabyNr(1).formula().javaBlock().program();
+        //FIXME weigl: This test case is spurious:
+		// actual.toString() == expected.toString() but internally there is a difference.
         assertTrue("Expected:"+expected+"\n but was:"+is, expected.equalsModRenaming(is, new NameAbstractionTable()));
     }
 
