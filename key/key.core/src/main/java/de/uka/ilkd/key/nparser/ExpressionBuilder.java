@@ -21,10 +21,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -33,16 +30,17 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     private AbbrevMap scm;
     private Term quantifiedArrayGuard;
+    private List<Term> explicitHeap = new LinkedList<>();
 
     public ExpressionBuilder(Services services, NamespaceSet nss) {
         this(services, nss, new Namespace<>());
     }
 
+
     public ExpressionBuilder(Services services, NamespaceSet nss, Namespace<SchemaVariable> schemaNamespace) {
         super(services, nss);
         setSchemaVariables(schemaNamespace);
     }
-
 
     public static String trimJavaBlock(String raw) {
         if (raw.startsWith("\\<")) {
@@ -480,7 +478,6 @@ public class ExpressionBuilder extends DefaultBuilder {
         return sjb;
     }
 
-
     @Override
     public Object visitMetaId(KeYParser.MetaIdContext ctx) {
         var id = visitSimple_ident(ctx.simple_ident());
@@ -575,7 +572,6 @@ public class ExpressionBuilder extends DefaultBuilder {
         return result;
     }
 
-
     private Operator getAttributeInPrefixSort(Sort prefixSort, String attributeName) {
         final JavaInfo javaInfo = getJavaInfo();
 
@@ -626,7 +622,6 @@ public class ExpressionBuilder extends DefaultBuilder {
         return result;
     }
 
-
     @Override
     public String visitAttrid(KeYParser.AttridContext ctx) {
         return ctx.getText();
@@ -639,7 +634,6 @@ public class ExpressionBuilder extends DefaultBuilder {
         return  accept(ctx.simple_ident());
         */
     }
-
 
     private String unescapeString(String string) {
         char[] chars = string.toCharArray();
@@ -750,9 +744,19 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
 
         //FIXME weigl: this is a hack!
-        if (getTypeByClassName(ctx.atom().getText()) != null) {
-            var t = createStaticAttributeOrMethod(ctx);
-            if (t != null) return t;
+        try {
+            String[] s = new String[1 + ctx.atom_suffix().size()];
+            s[0] = ctx.atom().getText();
+            for (int i = 0; i < ctx.atom_suffix().size(); i++) {
+                s[i + 1] = ctx.atom_suffix(i).attribute_or_query_suffix().memberName.getText();
+            }
+            var splittedJava = splitJava(s);
+            if (splittedJava.isPresent()) {
+                var t = createStaticAttributeOrMethod(splittedJava.get(), ctx);
+                if (t != null) return t;
+            }
+        } catch (NullPointerException ignore) {
+            // due to access on attribute_or_query_suffix().memberName.getText()
         }
 
 
@@ -768,7 +772,6 @@ public class ExpressionBuilder extends DefaultBuilder {
         return a;
     }
 
-    private List<Term> explicitHeap = new LinkedList<>();
     private void markHeapAsExplicit(Term a) {
         if (isSelectTerm(a)) {
             explicitHeap.add(a);
@@ -776,30 +779,27 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
     }
 
-    private Term createStaticAttributeOrMethod(KeYParser.AccesstermContext ctx) {
-        var kjt = getTypeByClassName(ctx.atom().getText());
-        Term current = null;
-        for (var suffix : ctx.atom_suffix()) {
-            if (suffix.attribute_or_query_suffix() != null) {
-                String mn = suffix.attribute_or_query_suffix().memberName.getText();
-                ProgramVariable maybeAttr = getJavaInfo().getAttribute(mn, kjt);
-                if (maybeAttr != null) {
-                    var op = getAttributeInPrefixSort(kjt.getSort(), mn);
-                    current = createAttributeTerm(null, op, ctx);
-                    continue;
-                }
-                for (IProgramMethod pm : getJavaInfo().getAllProgramMethods(kjt)) {
-                    if (pm != null && pm.isStatic() && pm.name().toString().equals(kjt.getName() + "::" + mn)) {
-                        List<Term> arguments = mapOf(suffix.attribute_or_query_suffix().result.args.argument());
-                        Term[] args = arguments.toArray(new Term[0]);
-                        current = getJavaInfo().getStaticProgramMethodTerm(mn, args, kjt.getName());
-                        //(pm, mn, kjt.getName(), args, current);
-                        break;
-                    }
+    private Term createStaticAttributeOrMethod(JavaQuery jq, KeYParser.AccesstermContext ctx) {
+        final var kjt = jq.kjt;
+        String mn = jq.attributeName;
+        if (jq.maybeAttr != null) {
+            ProgramVariable maybeAttr = getJavaInfo().getAttribute(mn, kjt);
+            if (maybeAttr != null) {
+                var op = getAttributeInPrefixSort(kjt.getSort(), mn);
+                return createAttributeTerm(null, op, ctx);
+            }
+        } else {
+            var suffix = ctx.atom_suffix(ctx.atom_suffix().size() - 1);
+            for (IProgramMethod pm : getJavaInfo().getAllProgramMethods(kjt)) {
+                if (pm != null && pm.isStatic() && pm.name().toString().equals(kjt.getFullName() + "::" + mn)) {
+                    List<Term> arguments = mapOf(suffix.attribute_or_query_suffix().result.args.argument());
+                    Term[] args = arguments.toArray(new Term[0]);
+                    return getJavaInfo().getStaticProgramMethodTerm(mn, args, kjt.getFullName());
                 }
             }
         }
-        return current;
+        assert false;
+        return null;
     }
 
     /**
@@ -1360,7 +1360,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private Term replaceHeap(Term term, Term heap, ParserRuleContext ctx) {
-        if(explicitHeap.contains(term)) return term;
+        if (explicitHeap.contains(term)) return term;
         if (isSelectTerm(term)) {
             if (!isImplicitHeap(term.sub(0))) {
                 //semanticError(null, "Expecting program variable heap as first argument of: %s", term);
@@ -1397,12 +1397,6 @@ public class ExpressionBuilder extends DefaultBuilder {
         return result;
     }
 
-    private static class PairOfStringAndJavaBlock {
-        String opName;
-        JavaBlock javaBlock;
-    }
-
-
     private boolean isStaticQuery(String className, String methodName) {
         final JavaInfo javaInfo = getJavaInfo();
         KeYJavaType kjt = getTypeByClassName(className);
@@ -1417,8 +1411,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return false;
     }
 
-    private String[] splitJava(String dotName) {
-        String[] parts = dotName.split("[.]");
+    private Optional<JavaQuery> splitJava(String[] parts) {
         String packageName = null;
         String className = null;
         String attributeName = null;
@@ -1432,23 +1425,37 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         }
 
-        int j = i;
-        for (; j < parts.length; j++) {
+        KeYJavaType kjt = null;
+        final int packageEnd = i - 1;
+        for (i = 0; i < parts.length; i++) {
             String test = Arrays.stream(parts)
-                    .limit(i)
-                    .skip(j)
+                    //.skip(packageEnd)
+                    .limit(i + packageEnd)
                     .collect(Collectors.joining("."));
-            if (getTypeByClassName(test) != null) {
+            kjt = getTypeByClassName(test);
+            if (kjt != null) {
                 className = test;
             } else if (className != null) {
+                kjt = getTypeByClassName(className);
                 break;
             }
         }
-        attributeName = Arrays.stream(parts).skip(j + 1).collect(Collectors.joining());
-        return new String[]{packageName, className, attributeName};
+        final var classEnd = i;
+        attributeName = Arrays.stream(parts).skip(classEnd).collect(Collectors.joining("."));
+
+        if (kjt != null) {
+            ProgramVariable maybeAttr = getJavaInfo().getAttribute(attributeName, kjt);
+            return Optional.of(new JavaQuery(packageName, className, attributeName, kjt, maybeAttr));
+        } else
+            return Optional.empty();
     }
 
-    private boolean isStaticAttribute(String dotName) {
+    private static class PairOfStringAndJavaBlock {
+        String opName;
+        JavaBlock javaBlock;
+    }
+
+    /*private boolean isStaticAttribute(String dotName) {
         final JavaInfo javaInfo = getJavaInfo();
         String[] javaParts = splitJava(dotName);
         KeYJavaType kjt = getTypeByClassName(javaParts[1]);
@@ -1459,6 +1466,20 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         }
         return false;
-    }
+    }*/
 }
 
+
+class JavaQuery {
+    final String packageName, className, attributeName;
+    final KeYJavaType kjt;
+    final ProgramVariable maybeAttr;
+
+    JavaQuery(String packageName, String className, String attributeName, KeYJavaType kjt, ProgramVariable maybeAttr) {
+        this.packageName = packageName;
+        this.className = className;
+        this.attributeName = attributeName;
+        this.kjt = kjt;
+        this.maybeAttr = maybeAttr;
+    }
+}
