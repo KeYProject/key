@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.nparser;
 
 import antlr.RecognitionException;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
@@ -9,6 +8,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.varexp.ConditionBuilder;
 import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.conditions.*;
@@ -22,6 +22,8 @@ import org.key_project.util.collection.ImmutableSet;
 import java.util.*;
 
 public class TacletPBuilder extends ExpressionBuilder {
+    private final List<ConditionBuilder> conditionBuilder = new LinkedList<>();
+
     private final Stack<TacletBuilder> currentTBuilder = new Stack<>();
     private HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new HashMap<>();
     private boolean axiomMode;
