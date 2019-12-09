@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nparser;
+package de.uka.ilkd.key.nparser.builder;
 
 import antlr.RecognitionException;
 import de.uka.ilkd.key.java.Services;
@@ -8,6 +8,8 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.BuildingException;
+import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.varexp.ConditionBuilder;
 import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
 import de.uka.ilkd.key.rule.*;
@@ -142,7 +144,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             b.setName(new Name(name));
             b.setChoices(choices);
             b.setAnnotations(tacletAnnotations);
-            b.setOrigin(BuildingException.getPosition(ctx));
+            b.setOrigin(BuilderHelpers.getPosition(ctx));
             Taclet r = b.getTaclet();
             announceTaclet(ctx, r);
             currentTBuilder.pop();
@@ -178,7 +180,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         accept(ctx.modifiers());
         b.setChoices(choices);
         b.setAnnotations(tacletAnnotations);
-        b.setOrigin(BuildingException.getPosition(ctx));
+        b.setOrigin(BuilderHelpers.getPosition(ctx));
         Taclet r = peekTBuilder().getTaclet();
         announceTaclet(ctx, r);
         setSchemaVariables(schemaVariables().parent());

@@ -4,19 +4,30 @@ import de.uka.ilkd.key.proof.io.IProofFileParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Stack;
 
 /**
+ * A short little hack, but completely working, for replaying proofs inside KeY files.
+ * <p>
+ * This class avoids using the {@link KeYParser} and building a parse tree. It uses only the {@link KeYLexer}
+ * to analyze the sexpr which described the applied taclet application.
+ *
  * @author Alexander Weigl
  * @version 1 (12/5/19)
+ * @see #run(Token, CharStream, IProofFileParser)
  */
 public class ProofReplayer {
-    static HashMap<String, IProofFileParser.ProofElementID> prooflabel2tag = new LinkedHashMap<>(32);
+    /**
+     * This map is for the translation between symbols in the sexpr and the corresponding proof tag.
+     */
+    private static final Map<String, IProofFileParser.ProofElementID> proofSymbolElementId = new LinkedHashMap<>(32);
 
     static {
+        /*Old style copied from the parser.
         prooflabel2tag.put("branch", IProofFileParser.ProofElementID.BRANCH);
         prooflabel2tag.put("rule", IProofFileParser.ProofElementID.RULE);
         prooflabel2tag.put("term", IProofFileParser.ProofElementID.TERM);
@@ -45,11 +56,38 @@ public class ProofReplayer {
         prooflabel2tag.put("mergeId", IProofFileParser.ProofElementID.MERGE_ID);
         prooflabel2tag.put("userChoices", IProofFileParser.ProofElementID.MERGE_USER_CHOICES);
         prooflabel2tag.put("opengoal", IProofFileParser.ProofElementID.OPEN_GOAL);
+         */
+
+        for (IProofFileParser.ProofElementID id : IProofFileParser.ProofElementID.values()) {
+            proofSymbolElementId.put(id.getRawName(), id);
+        }
     }
 
 
-    public static void run(Token token, CharStream input, IProofFileParser prl) {
+    /**
+     * Replays the proof represented by the expression given in the {@link CharStream} after the position of the
+     * {@code token}.
+     *
+     * @param token the "\proof" with in the input stream
+     * @param input a valid input stream
+     * @param prl   the proof replayer instance
+     * @see #run(CharStream, IProofFileParser, int)
+     */
+    public static void run(@NotNull Token token, CharStream input, IProofFileParser prl) {
         input.seek(1 + token.getStopIndex()); // ends now on \proof|
+        run(input, prl, token.getLine());
+    }
+
+    /**
+     * Replays the proof behind the given {@code input}.
+     * This method uses the {@link KeYLexer} to lex input stream, and run manually via the tokens --
+     * signaling the {@code prl} to start or end an expr.
+     *
+     * @param input     a valid input stream
+     * @param prl       the proof replayer interface
+     * @param startLine the starting of the sexpr needed for {@code prl}
+     */
+    public static void run(CharStream input, IProofFileParser prl, final int startLine) {
         KeYLexer lexer = ParsingFacade.lex(input);
         CommonTokenStream stream = new CommonTokenStream(lexer);
         Stack<IProofFileParser.ProofElementID> stack = new Stack<>();
@@ -60,11 +98,11 @@ public class ProofReplayer {
                 case KeYLexer.LPAREN:
                     stream.consume();
                     Token idToken = stream.LT(1);
-                    IProofFileParser.ProofElementID cur = prooflabel2tag.get(idToken.getText());
+                    IProofFileParser.ProofElementID cur = proofSymbolElementId.get(idToken.getText());
                     stream.consume();
 
                     String arg = null;
-                    int pos = idToken.getLine() + token.getLine();
+                    int pos = idToken.getLine() + startLine;
                     if (stream.LA(1) == KeYLexer.STRING_LITERAL) {
                         arg = stream.LT(1).getText();
                         stream.consume();//throw string away
@@ -72,7 +110,7 @@ public class ProofReplayer {
                     }
 
                     prl.beginExpr(cur, arg);
-                    System.out.format("Emit: %s %s%n", cur, arg);
+                    //System.out.format("Emit: %s %s%n", cur, arg);
                     stack.push(cur);
                     posStack.push(pos);
                     break;

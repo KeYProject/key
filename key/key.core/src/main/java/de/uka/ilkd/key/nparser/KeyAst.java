@@ -1,6 +1,10 @@
 package de.uka.ilkd.key.nparser;
 
 import com.google.common.base.CharMatcher;
+import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
+import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
+import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
+import de.uka.ilkd.key.nparser.builder.IncludeFinder;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Triple;
@@ -8,6 +12,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.net.URL;
 
@@ -40,13 +45,16 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             super(ctx);
         }
 
-        public ProofSettings findProofSettings() {
-            ProofSettingsFinder psf = new ProofSettingsFinder();
-            ctx.accept(psf);
-            return psf.getProofSettings();
+        public @Nullable ProofSettings findProofSettings() {
+            ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
+            if (ctx.decls() != null && ctx.decls().pref != null) {
+                var text = BuilderHelpers.trim(ctx.decls().pref.getText(), '"');
+                settings.loadSettingsFromString(text);
+            }
+            return settings;
         }
 
-        public Triple<String, Integer, Integer> findProofScript() {
+        public @Nullable Triple<String, Integer, Integer> findProofScript() {
             if (ctx.problem() != null && ctx.problem().proofScript() != null) {
                 var pctx = ctx.problem().proofScript();
                 var text = pctx.ps.getText();
@@ -83,7 +91,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         /**
          * Extracts the decls and taclets into a string.
          * This method is required for saving and loading proofs.
-         * 
+         *
          * @return
          */
         public String getProblemHeader() {

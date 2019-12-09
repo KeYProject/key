@@ -2,18 +2,44 @@ package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 /**
+ * A POJO representing the information on choices in ASTs.
+ * <p>
+ * Notion: A choice, e.g. {@code permission:on} contains a category  {@code permission}
+ * and an option {@code on}.
+ *
  * @author Alexander Weigl
  * @version 1 (12/5/19)
  */
 public class ChoiceInformation {
-    private final Map<String, Set<String>> foundChoicesAndOptions = new HashMap<>();
+    /**
+     * A map from a found category to a set of possible (defined) options.
+     */
+    private final Map<@NotNull String, @NotNull Set<String>> foundChoicesAndOptions = new HashMap<>();
+
+    /**
+     * This set contains categories were an options was activated.
+     * Helps to prevent double activation of contradictory options.
+     */
     private final HashSet<String> activatedChoicesCategories = new LinkedHashSet<>();
+
+    /**
+     * This set contains the activated choices.
+     */
     private final Set<Choice> activatedChoices = new HashSet<>();
+
+    /**
+     * This namespace contains all found choices.
+     */
     private final Namespace<Choice> choices;
+
+    /**
+     * This map contains the default option for every category.
+     */
     private final Map<String, String> defaultOptions = new TreeMap<>();
 
     public ChoiceInformation() {
@@ -24,7 +50,7 @@ public class ChoiceInformation {
         this.choices = choices;
     }
 
-    public Map<String, Set<String>> getFoundChoicesAndOptions() {
+    public Map<@NotNull String, @NotNull Set<String>> getFoundChoicesAndOptions() {
         return foundChoicesAndOptions;
     }
 

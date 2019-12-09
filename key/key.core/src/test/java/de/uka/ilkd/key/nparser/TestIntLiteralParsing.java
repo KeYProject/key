@@ -2,6 +2,7 @@ package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.Ignore;

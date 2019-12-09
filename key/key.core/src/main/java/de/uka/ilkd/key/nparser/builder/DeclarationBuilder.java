@@ -1,13 +1,16 @@
-package de.uka.ilkd.key.nparser;
+package de.uka.ilkd.key.nparser.builder;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.rule.RuleSet;
-import org.antlr.v4.runtime.Token;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -16,6 +19,23 @@ import org.key_project.util.collection.ImmutableSet;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This visitor evaluates all basic (level 0) declarations.
+ * This includes:
+ * <ul>
+ *     <li>Option Declarations</li>
+ *     <li>Sorts</li>
+ *     <li>Program variables</li>
+ *     <li>Schema variables</li>
+ *     <li>Rulesets</li>
+ * </ul>
+ * <p>
+ * These information are registered into the given {@link NamespaceSet}.
+ *
+ * @author Alexander Weigl
+ * @version 1 (12/4/19)
+ * @see de.uka.ilkd.key.nparser.FunctionPredicateBuilder for level-1 declarations
+ */
 public class DeclarationBuilder extends DefaultBuilder {
     public DeclarationBuilder(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -23,8 +43,9 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitDecls(KeYParser.DeclsContext ctx) {
-        mapMapOf(ctx.options_choice(), ctx.option_decls(), ctx.sort_decls(),
-                ctx.prog_var_decls(), ctx.schema_var_decls(), ctx.ruleset_decls());
+        mapMapOf(ctx.option_decls(), ctx.options_choice(),
+                ctx.ruleset_decls(), ctx.sort_decls(),
+                ctx.prog_var_decls(), ctx.schema_var_decls());
         return null;
     }
 
@@ -34,6 +55,7 @@ public class DeclarationBuilder extends DefaultBuilder {
         for (int i = 0; i < ctx.simple_ident_comma_list().size(); i++) {
             var var_names = (List<String>) accept(ctx.simple_ident_comma_list(i));
             var kjt = (KeYJavaType) accept(ctx.keyjavatype(i));
+            assert var_names != null;
             for (String varName : var_names) {
                 var_name = varName;
                 ProgramElementName pvName = new ProgramElementName(var_name);
@@ -57,6 +79,7 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
 
+    /*
     @Override
     public Object visitChoice(KeYParser.ChoiceContext ctx) {
         String cat = ctx.category.getText();
@@ -146,8 +169,7 @@ public class DeclarationBuilder extends DefaultBuilder {
                 assert s != null;
                 sorts().add(s);
                 createdSorts.add(s);
-            }
-            else{
+            } else {
                 addWarning(ctx, "Sort declaration is ignored, due to collision.");
             }
         }
@@ -187,5 +209,6 @@ public class DeclarationBuilder extends DefaultBuilder {
         //mapOf(ctx.activated_choice());
         return null;
     }
+
 
 }

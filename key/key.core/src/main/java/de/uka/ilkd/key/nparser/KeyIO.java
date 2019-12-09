@@ -6,10 +6,12 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.nparser.builder.DeclarationBuilder;
+import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
+import de.uka.ilkd.key.nparser.builder.ProblemFinder;
+import de.uka.ilkd.key.nparser.builder.TacletPBuilder;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Position;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +31,8 @@ import static de.uka.ilkd.key.nparser.ParsingFacade.parseFiles;
 /**
  * This facade provides high level access to parse and
  * interpret key files (declarations, proof, problem) or input string like terms.
+ * <p>
+ * This classes encapsulates the {@link Services}, {@link NamespaceSet} for {@link SchemaVariable}s.
  *
  * @author Alexander Weigl
  * @version 1 (17.10.19)
@@ -37,6 +41,7 @@ public class KeyIO {
     private final Services services;
     private final NamespaceSet nss;
     private @Nullable Namespace<SchemaVariable> schemaNamespace;
+    private @Nullable List<BuildingException> warnings;
 
     public KeyIO(@NotNull Services services, @NotNull NamespaceSet nss) {
         this.services = services;
@@ -51,34 +56,63 @@ public class KeyIO {
         this(new Services(new JavaProfile()));
     }
 
+
+    /**
+     * Given an input string, this function returns a term if parsable.
+     *
+     * @param expr a valid stream
+     * @return a valid term
+     * @throws BuildingException if an unrecoverable error during construction or parsing happened
+     */
     public @NotNull Term parseExpression(@NotNull String expr) {
         return parseExpression(CharStreams.fromString(expr));
     }
 
-    public Term parseExpression(CharStream stream) {
+    /**
+     * Given an input stream, this function returns an term if parsable.
+     *
+     * @param stream a valid stream
+     * @return a valid term
+     * @throws BuildingException if an unrecoverable error during construction or parsing happened
+     */
+    public @NotNull Term parseExpression(@NotNull CharStream stream) {
         var ctx = ParsingFacade.parseExpression(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         if (schemaNamespace != null)
             visitor.setSchemaVariables(schemaNamespace);
-        return (Term) ctx.accept(visitor);
+        var t = (Term) ctx.accept(visitor);
+        warnings = visitor.getWarnings();
+        return t;
     }
 
-    public Sequent parseSequence(CharStream stream) {
+
+    /**
+     * Given an input stream, this function returns a sequent if parsable.
+     *
+     * @param stream a valid stream
+     * @return a valid sequent
+     * @throws BuildingException if an unrecoverable error during construction or parsing happened
+     */
+    public @NotNull Sequent parseSequence(@NotNull CharStream stream) {
         var ctx = ParsingFacade.parseSequent(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         if (schemaNamespace != null)
             visitor.setSchemaVariables(schemaNamespace);
         var seq = (Sequent) ctx.accept(visitor);
-        if (visitor.getWarnings().isEmpty()) {
-            return seq;
-        }
-        throw new BuildingExceptions(visitor.getWarnings());
+        warnings = visitor.getWarnings();
+        return seq;
     }
 
     public Services getServices() {
         return services;
     }
 
+    /**
+     * Create a loader instance for the given path.
+     *
+     * @param file
+     * @return
+     */
     public Loader load(Path file) {
         try {
             return new Loader(file.toUri().toURL());
@@ -87,32 +121,6 @@ public class KeyIO {
         }
     }
 
-    public Loader load(URL u) {
-        return new Loader(u);
-    }
-
-    public List<Taclet> findTaclets(KeyAst.File ctx) {
-        var visitor = new TacletPBuilder(services, nss);
-        ctx.accept(visitor);
-        return visitor.getTaclets();
-    }
-
-    /*
-    public List<Contract> findContracts(KeyAst.File ctx) {
-        ProblemFinder pf = new ProblemFinder(services, nss);
-        ctx.accept(pf);
-        return pf.getContracts();
-    }*/
-
-    public void evalDeclarations(KeyAst.File ctx) {
-        var declBuilder = new DeclarationBuilder(services, nss);
-        ctx.accept(declBuilder);
-    }
-
-    public void evalFuncAndPred(KeyAst.File ctx) {
-        var visitor = new FunctionPredicateBuilder(services, nss);
-        ctx.accept(visitor);
-    }
 
     public Loader load(CharStream content) {
         return new Loader(content, null);
@@ -121,6 +129,45 @@ public class KeyIO {
     public Loader load(String content) {
         return load(CharStreams.fromString(content));
     }
+
+
+    /**
+     * Create a loader instance for the given path.
+     *
+     * @param u
+     * @return
+     */
+    public Loader load(URL u) {
+        return new Loader(u);
+    }
+
+
+    /**
+     * @param ctx
+     * @return
+     */
+    public List<Taclet> findTaclets(KeyAst.File ctx) {
+        var visitor = new TacletPBuilder(services, nss);
+        ctx.accept(visitor);
+        return visitor.getTaclets();
+    }
+
+    /**
+     * @param ctx
+     */
+    public void evalDeclarations(KeyAst.File ctx) {
+        var declBuilder = new DeclarationBuilder(services, nss);
+        ctx.accept(declBuilder);
+    }
+
+    /**
+     * @param ctx
+     */
+    public void evalFuncAndPred(KeyAst.File ctx) {
+        var visitor = new FunctionPredicateBuilder(services, nss);
+        ctx.accept(visitor);
+    }
+
 
     public void setSchemaNamespace(Namespace<SchemaVariable> ns) {
         schemaNamespace = ns;
@@ -211,14 +258,6 @@ public class KeyIO {
             long stop = System.currentTimeMillis();
             System.err.format("MODE: %s took %d%n", "2nd degree decls", stop - start);
             return this;
-        }
-
-        public Pair<String, Position> getProofScript() {
-            if (ctx.isEmpty()) {
-                throw new IllegalStateException("No files loaded.");
-            }
-            ProofScriptFinder psf = new ProofScriptFinder();
-            return new Pair<>(psf.getProofScript(), psf.getPosition());
         }
 
         public ProblemFinder loadProblem() {

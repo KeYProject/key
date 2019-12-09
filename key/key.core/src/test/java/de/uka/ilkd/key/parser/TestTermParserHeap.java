@@ -2,11 +2,9 @@ package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.nparser.ExpressionBuilder;
-import org.antlr.runtime.RecognitionException;
+import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;

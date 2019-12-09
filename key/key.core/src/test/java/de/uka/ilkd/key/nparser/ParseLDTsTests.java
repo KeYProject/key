@@ -11,8 +11,7 @@ public class ParseLDTsTests {
     @Test
     public void testLDT() throws IOException {
         var services = new Services(new JavaProfile());
-        var f = load(services, "/de/uka/ilkd/key/proof/rules/ldt.key");
-        System.out.println(f);
+        load(services, "/de/uka/ilkd/key/proof/rules/ldt.key");
     }
 
     /*
@@ -30,12 +29,11 @@ public class ParseLDTsTests {
         ParseAllKeyFilesTest.debugLexer(lex);
     }
 */
-    private ParsedKeyFile load(Services services, String resources) throws IOException {
+    private void load(Services services, String resources) throws IOException {
         var url = getClass().getResource(resources);
         Assume.assumeNotNull(url, services);
         KeyIO io = new KeyIO(services);
         io.load(url).loadComplete();
-        return null;
     }
 
 }

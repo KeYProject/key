@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.nparser.ExpressionBuilder;
+import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -26,7 +26,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import junit.framework.TestCase;
 import org.antlr.v4.runtime.CharStreams;
 
-import java.io.IOException;
 import java.util.List;
 
 public class TestTacletTranslator extends TestCase {

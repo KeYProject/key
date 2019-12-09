@@ -8,6 +8,21 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * This program is a little for debugging KeY Lexer.
+ * <p>
+ * You can start this problem via gradle:
+ * <code>
+ * <pre>
+ * gradle debugLexer
+ * </pre>
+ * </code>
+ * <p>
+ * This program ask for input, lexes it and shows the found token.
+ *
+ * @author weigl
+ * @version 2019-12-09
+ */
 public class DebugKeyLexer {
     private static final String DEFAULT_FORMAT = "%02d %20s %d:%-50s\n";
     private final PrintStream stream;
@@ -41,8 +56,16 @@ public class DebugKeyLexer {
         } else {
             try (BufferedReader input = new BufferedReader(new InputStreamReader(System.in))) {
                 String tmp;
-                while ((tmp = input.readLine()) != null)
-                    debug(tmp);
+                do {
+                    System.out.print(">>> ");
+                    tmp = input.readLine();
+                    if (tmp != null) {
+                        debug(tmp);
+                    } else {
+                        break;
+                    }
+                }
+                while (true);
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -13,15 +13,19 @@
 
 package de.uka.ilkd.key.proof.io;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.nparser.*;
+import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.nparser.ProblemInformation;
+import de.uka.ilkd.key.nparser.builder.ContractsAndInvariantsFinder;
+import de.uka.ilkd.key.nparser.builder.ProblemFinder;
+import de.uka.ilkd.key.nparser.builder.TacletPBuilder;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
@@ -37,7 +41,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -215,11 +218,7 @@ public class KeYFile implements EnvInput {
             return null;
         }
         var ctx = getParseContext();
-        try {
-            return ctx.findProofSettings();
-        } catch (de.uka.ilkd.key.util.ExceptionHandlerException ehe) {
-            throw new ProofInputException(ehe.getCause().getMessage());
-        }
+        return ctx.findProofSettings();
     }
 
     @Override
@@ -407,6 +406,7 @@ public class KeYFile implements EnvInput {
     public String chooseContract() {
         return null;
     }
+
     public String getProofObligation() {
         return null;
     }

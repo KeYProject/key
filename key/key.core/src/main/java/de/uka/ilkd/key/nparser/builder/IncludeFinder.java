@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.nparser;
+package de.uka.ilkd.key.nparser.builder;
 
 import com.google.common.base.CharMatcher;
+import de.uka.ilkd.key.nparser.BuildingException;
+import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
@@ -9,13 +11,19 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-class IncludeFinder extends AbstractBuilder<Void> {
+/**
+ * This visitor finds all includes in the given ASTs.
+ *
+ * @author weigl
+ * @see #getIncludes()
+ */
+public class IncludeFinder extends AbstractBuilder<Void> {
     private final URL base;
     private final Includes includes = new Includes();
     private final String basePath;
     private boolean ldt = false;
 
-    IncludeFinder(URL base) {
+    public IncludeFinder(URL base) {
         this.base = base;
         var a = base.getPath();
         basePath = a.substring(0, a.lastIndexOf('/'));

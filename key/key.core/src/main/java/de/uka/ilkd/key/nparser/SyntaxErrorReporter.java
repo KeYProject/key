@@ -11,12 +11,17 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
+ * An ANTLR4 error listener that stores the errors internally.
+ * You can disable the additional  printing of message on the console {@link #print} flag.
+ * <p>
+ * It supports beautiful error message via {@link SyntaxError#getBeatifulErrorMessage(String[])}.
+ *
  * @author Alexander Weigl
  * @version 1 (13.09.19)
  */
 public class SyntaxErrorReporter extends BaseErrorListener {
     private final List<SyntaxError> errors = new ArrayList<SyntaxError>();
-    private boolean isPrint = true;
+    private boolean print = true;
 
     @Override
     public void syntaxError(@Nullable Recognizer<?, ?> recognizer, @Nullable Object offendingSymbol,
@@ -32,21 +37,37 @@ public class SyntaxErrorReporter extends BaseErrorListener {
                 charPositionInLine,
                 msg, tok.getTokenSource().getSourceName(), stack);
 
-        if (isPrint) {
+        if (print) {
             System.err.printf("[syntax-error] %s:%d:%d: %s %s (%s)%n", se.source, line, charPositionInLine, msg, tok, stack);
         }
         errors.add(se);
     }
 
-    public Boolean hasErrors() {
+    /**
+     * Returns true, iff syntax errors were discovered by this listener.
+     */
+    public boolean hasErrors() {
         return !errors.isEmpty();
     }
 
+    /**
+     * Throws an exception if an error has occured.
+     *
+     * @throws de.uka.ilkd.key.parser.proofjava.ParseException
+     * @see #hasErrors()
+     */
     public void throwException() {
         if (hasErrors()) throw new ParserException("", errors);
     }
 
 
+    /**
+     * Throws an exception if an error has occured, like {@link #throwException()},
+     * but with an beautiful exception message based on input {@code lines}.
+     *
+     * @throws de.uka.ilkd.key.parser.proofjava.ParseException
+     * @see #hasErrors()
+     */
     public void throwException(String[] lines) {
         if (hasErrors()) {
             var msg = errors.stream().map(it -> it.getBeatifulErrorMessage(lines))
@@ -55,12 +76,23 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         }
     }
 
+    /**
+     * Throws an exception if an error has occured, like {@link #throwException()},
+     * but with an beautiful exception message based on input {@code lines}.
+     *
+     * @throws de.uka.ilkd.key.parser.proofjava.ParseException
+     * @see #hasErrors()
+     */
     public void throwException(Supplier<String[]> lines) {
         if (hasErrors()) {
             throwException(lines.get());
         }
     }
 
+    /**
+     * This class represents an ANTLR4 error message. It captures every information needed to identify
+     * the erroneous position in the input and parser (grammar rule stack). Also supports a human-readable printing.
+     */
     public static class SyntaxError {
         final Recognizer<?, ?> recognizer;
         final int line;
@@ -101,11 +133,10 @@ public class SyntaxErrorReporter extends BaseErrorListener {
     }
 
     public static class ParserException extends RuntimeException {
-        private final String msg;
         private final List<SyntaxError> errors;
 
         public ParserException(String msg, List<SyntaxError> errors) {
-            this.msg = msg;
+            super(msg);
             this.errors = errors;
         }
 

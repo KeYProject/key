@@ -1,12 +1,23 @@
-package de.uka.ilkd.key.nparser;
+package de.uka.ilkd.key.nparser.builder;
 
-import com.google.common.base.CharMatcher;
+import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.nparser.ProblemInformation;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
 
+import static de.uka.ilkd.key.nparser.builder.BuilderHelpers.trim;
+
+/**
+ * The visitor for extracting the {@link ProblemInformation}.
+ *
+ * @author weigl
+ * @see #getProblemInformation()
+ */
 public class FindProblemInformation extends AbstractBuilder<Object> {
-    private ProblemInformation information = new ProblemInformation();
+    private final @NotNull ProblemInformation information = new ProblemInformation();
 
     @Override
     public Object visitFile(KeYParser.FileContext ctx) {
@@ -39,6 +50,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
             else
                 information.setProofObligation("");
         }
+        information.setHasProblemTerm(ctx.PROBLEM() != null);
         return null;
     }
 
@@ -53,8 +65,10 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
         return mapOf(ctx.string_value());
     }
 
-    @Override public String visitString_value(KeYParser.String_valueContext ctx) {
-        return ParsingFacade.getValue(ctx); }
+    @Override
+    public String visitString_value(KeYParser.String_valueContext ctx) {
+        return ParsingFacade.getValue(ctx);
+    }
 
 
     @Override
@@ -67,10 +81,6 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
         return trim(ctx.getText(), '"');
     }
 
-    private String trim(String text, char c) {
-        return CharMatcher.is(c).trimFrom(text);
-    }
-
     @Override
     public Object visitProfile(KeYParser.ProfileContext ctx) {
         return accept(ctx.name);
@@ -81,7 +91,10 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
         return ctx.s != null ? (String) accept(ctx.s) : null;
     }
 
-    public ProblemInformation getProblemInformation() {
+    /**
+     * The found problem information.
+     */
+    public @NotNull ProblemInformation getProblemInformation() {
         return information;
     }
 }

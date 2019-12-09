@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nparser;
 
+import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -126,12 +127,20 @@ public abstract class ParsingFacade {
         return new KeyAst.Seq(p.seqEOF().seq());
     }
 
-    static String getValue(KeYParser.String_valueContext ctx) {
+    public static String getValue(KeYParser.String_valueContext ctx) {
         return ctx.getText().substring(1, ctx.getText().length() - 1);
     }
 
     public static KeYParser.Id_declarationContext parseIdDeclaration(CharStream stream) {
         var p = createParser(stream);
         return p.id_declaration();
+        /*
+    @Override
+    public IdDeclaration visitId_declaration(KeYParser.Id_declarationContext ctx) {
+        var id = (String) ctx.IDENT().getText();
+        var s = (Sort) (ctx.sortId_check() != null ? accept(ctx.sortId_check()) : null);
+        return new IdDeclaration(id, s);
+    }
+    */
     }
 }

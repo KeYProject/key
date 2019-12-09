@@ -4,6 +4,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.Nullable;
 
+import static de.uka.ilkd.key.nparser.builder.BuilderHelpers.getPosition;
+
 public class BuildingException extends RuntimeException {
     private int lineNumber = -1, posInLine = -1, startOffset = -1, endOffset = -1;
 
@@ -49,15 +51,6 @@ public class BuildingException extends RuntimeException {
 
     public BuildingException(Throwable cause) {
         this((ParserRuleContext) null, cause);
-    }
-
-    static String getPosition(ParserRuleContext node) {
-        if (node == null) return " pos n/a";
-        return getPosition(node.start);
-    }
-
-    static String getPosition(Token t) {
-        return String.format(" %s:%d#%d", t.getInputStream().getSourceName(), t.getLine(), t.getCharPositionInLine());
     }
 
     private void setPosition(ParserRuleContext node) {

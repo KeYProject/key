@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nparser;
+package de.uka.ilkd.key.nparser.builder;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
@@ -6,23 +6,30 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * This visitor finds all contracts and invariant clauses in {@link KeyAst}.
+ *
  * @author Alexander Weigl
  * @version 1 (12/4/19)
  */
 public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     private final DeclarationBuilder declarationBuilder;
-    private List<Contract> contracts = new ArrayList<>();
-    private List<ClassInvariant> invariants = new ArrayList<>();
+    private final List<@NotNull Contract> contracts = new ArrayList<>();
+    private final List<@NotNull ClassInvariant> invariants = new ArrayList<>();
+
+
     private ParsableVariable selfVar;
 
     public ContractsAndInvariantsFinder(Services services, NamespaceSet nss) {
@@ -30,11 +37,11 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
         declarationBuilder = new DeclarationBuilder(services, nss);
     }
 
-    public List<Contract> getContracts() {
+    public @NotNull List<@NotNull Contract> getContracts() {
         return contracts;
     }
 
-    public List<ClassInvariant> getInvariants() {
+    public @NotNull List<@NotNull ClassInvariant> getInvariants() {
         return invariants;
     }
 

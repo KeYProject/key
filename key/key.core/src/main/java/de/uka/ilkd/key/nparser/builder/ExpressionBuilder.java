@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nparser;
+package de.uka.ilkd.key.nparser.builder;
 
 import com.google.common.base.CharMatcher;
 import de.uka.ilkd.key.java.*;
@@ -11,6 +11,8 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.BuildingException;
+import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.parser.NotDeclException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.util.Debug;
@@ -25,11 +27,29 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+/**
+ * This visitor creates expression from {@link de.uka.ilkd.key.nparser.KeyAst.Term}.
+ * You should use the facade {@link de.uka.ilkd.key.nparser.KeyIO#parseExpression(String)}
+ * for term parsing.
+ *
+ * @author weigl
+ */
 public class ExpressionBuilder extends DefaultBuilder {
     public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE = "Expecting select term before '@', not: ";
 
+    /**
+     * TODO Support for abbreviation maps.
+     */
     private AbbrevMap scm;
+
+    /**
+     * Altlast.
+     */
     private Term quantifiedArrayGuard;
+
+    /**
+     * A list of terms, that are marked for having an already set heap.
+     */
     private List<Term> explicitHeap = new LinkedList<>();
 
     public ExpressionBuilder(Services services, NamespaceSet nss) {
@@ -42,6 +62,12 @@ public class ExpressionBuilder extends DefaultBuilder {
         setSchemaVariables(schemaNamespace);
     }
 
+    /**
+     * Given a raw modality string, this function trims the modality information.
+     *
+     * @param raw non-null string
+     * @return non-null string
+     */
     public static String trimJavaBlock(String raw) {
         if (raw.startsWith("\\<")) {
             return CharMatcher.anyOf("\\<>").trimFrom(raw);
@@ -61,6 +87,12 @@ public class ExpressionBuilder extends DefaultBuilder {
         return raw.substring(start, end);
     }
 
+    /**
+     * Given a raw modality string, this method determines the operator name.
+     *
+     * @param raw
+     * @return
+     */
     public static String operatorOfJavaBlock(String raw) {
         if (raw.startsWith("\\<")) {
             return "diamond";
@@ -755,6 +787,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 var t = createStaticAttributeOrMethod(splittedJava.get(), ctx);
                 if (t != null) return t;
             }
+
         } catch (NullPointerException ignore) {
             // due to access on attribute_or_query_suffix().memberName.getText()
         }

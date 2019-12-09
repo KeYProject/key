@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nparser;
+package de.uka.ilkd.key.nparser.builder;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -13,27 +13,34 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
+/**
+ * Helper class for are visitor that requires a namespaces and services.
+ * Also it provides the evaluation of some basic {@link ParserRuleContext}s.
+ * This builder provides lookup functions for the namespace set and also namespace for {@link SchemaVariable}.
+ * But it does not evaluate schemaVariables, or other declarations.
+ *
+ * @author weigl
+ * @version 1
+ */
 public class DefaultBuilder extends AbstractBuilder<Object> {
+    //weigl: This is rubbish from the migration. We should get rid of this.
     public static final int NORMAL_NONRIGID = 0;
     public static final int LOCATION_MODIFIER = 1;
     public static final String LIMIT_SUFFIX = "$lmtd";
 
     protected final Services services;
     protected final NamespaceSet nss;
-    protected HashMap<String, String> category2Default = new LinkedHashMap<>();
-    private HashSet<String> activatedChoicesCategories = new LinkedHashSet<>();
-    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.nil();
-    private HashSet usedChoiceCategories = new LinkedHashSet();
-    private Namespace<SchemaVariable> schemaVariablesNamespace = new Namespace<>();
 
+    private Namespace<SchemaVariable> schemaVariablesNamespace = new Namespace<>();
 
     public DefaultBuilder(Services services, NamespaceSet nss) {
         this.services = services;
@@ -88,28 +95,6 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     protected void unbindVars(Namespace<QuantifiableVariable> orig) {
         namespaces().setVariables(orig);
-    }
-
-    @Override
-    public Choice visitActivated_choice(KeYParser.Activated_choiceContext ctx) {
-        var cat = ctx.cat.getText();
-        var ch = ctx.choice_.getText();
-        if (activatedChoicesCategories.contains(cat)) {
-            throw new IllegalArgumentException("You have already chosen a different option for " + cat);
-        }
-        activatedChoicesCategories.add(cat);
-        var name = cat + ":" + ch;
-        var c = (Choice) choices().lookup(new Name(name));
-        if (c == null) {
-            semanticError(ctx, "Choice %s not previously declared", name);
-        } else {
-            activatedChoices = activatedChoices.add(c);
-        }
-        return c;
-    }
-
-    public HashMap<String, String> getCategory2Default() {
-        return category2Default;
     }
 
     @Override
@@ -191,9 +176,9 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      * and java info.
      *
      * @param varfuncName the String with the symbols name
-     * @param args         is null iff no argument list is given, for instance `f',
-     *                     and is an array of size zero, if an empty argument list was given,
-     *                     for instance `f()'.
+     * @param args        is null iff no argument list is given, for instance `f',
+     *                    and is an array of size zero, if an empty argument list was given,
+     *                    for instance `f()'.
      */
     protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, Term[] args) {
         Name name = new Name(varfuncName);
@@ -333,10 +318,6 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     public Services getServices() {
         return services;
-    }
-
-    public ImmutableSet<Choice> getActivatedChoices() {
-        return activatedChoices;
     }
 
     public Namespace<SchemaVariable> schemaVariables() {

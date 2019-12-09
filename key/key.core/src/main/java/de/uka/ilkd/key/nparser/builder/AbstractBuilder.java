@@ -1,5 +1,7 @@
-package de.uka.ilkd.key.nparser;
+package de.uka.ilkd.key.nparser.builder;
 
+import de.uka.ilkd.key.nparser.BuildingException;
+import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.jetbrains.annotations.NotNull;

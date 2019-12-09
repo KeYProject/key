@@ -8,10 +8,26 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.builder.DefaultBuilder;
 import org.key_project.util.collection.ImmutableArray;
 
 import java.util.List;
 
+
+/**
+ * This visitor evaluates all secondary (level 1) declarations.
+ * This includes:
+ * <ul>
+ *     <li>Predicates</li>
+ *     <li>Functions</li>
+ *     <li>Transformers</li>
+ * </ul>
+ * <p>
+ * These information are registered into the given {@link NamespaceSet}.
+ *
+ * @author Alexander Weigl
+ * @version 1
+ */
 public class FunctionPredicateBuilder extends DefaultBuilder {
     public FunctionPredicateBuilder(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -117,7 +133,6 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
     public Object visitFunc_decls(KeYParser.Func_declsContext ctx) {
         return mapOf(ctx.func_decl());
     }
-
 
 
     @Override

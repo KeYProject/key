@@ -1,15 +1,21 @@
-package de.uka.ilkd.key.nparser;
+package de.uka.ilkd.key.nparser.builder;
 
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.nparser.ChoiceInformation;
+import de.uka.ilkd.key.nparser.KeYParser;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 /**
+ * This visitor gathers the choice information in {@link de.uka.ilkd.key.nparser.KeyAst.File}
+ * and provide {@link ChoiceInformation}.
+ *
  * @author Alexander Weigl
  * @version 1 (28.10.19)
+ * @see ChoiceInformation
  */
 public class ChoiceFinder extends AbstractBuilder<Object> {
     @NotNull

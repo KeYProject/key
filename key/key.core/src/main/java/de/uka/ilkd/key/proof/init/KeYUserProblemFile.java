@@ -163,7 +163,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
     @Override
     public String chooseContract() {
-        return getProblemFinder().getChoosedContract();
+        return getProblemFinder().getChooseContract();
     }
 
     @Override
