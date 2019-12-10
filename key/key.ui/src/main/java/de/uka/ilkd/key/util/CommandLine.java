@@ -15,11 +15,7 @@ package de.uka.ilkd.key.util;
 
 import java.io.File;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import de.uka.ilkd.key.core.Main;
 
@@ -202,6 +198,32 @@ public final class CommandLine {
     public CommandLine() {
     }
 
+    private String usedSubCommand = "";
+
+    private Map<String, CommandLine> subcommands = new HashMap<>();
+
+    public void addSubCommand(String name) {
+        // TODO: test if valid name
+        // TODO: test if already exists
+        subcommands.put(name, new CommandLine());
+    }
+
+    public CommandLine getSubCommandLine(String name) {
+        CommandLine scli = subcommands.get(name);
+        if (scli == null) {
+            throw new IllegalArgumentException("No subcommand with name '" + name + "' exists.");
+        }
+        return scli;
+    }
+
+    public String getUsedSubCommand() {
+        return usedSubCommand;
+    }
+
+    public boolean subCommandUsed(String image) {
+        return image.equals(usedSubCommand);
+    }
+
     /**
      * Adds a command line option to this handler.
      *
@@ -285,6 +307,21 @@ public final class CommandLine {
      */
     public void parse(String[] args) throws CommandLineException {
         int cnt = 0;
+
+        // assumption: only single subcommand, only at first position
+        if (!args[cnt].startsWith(MINUS)) {
+            // test for subcommand:
+            CommandLine subcli = getSubCommandLine(args[cnt]);
+            if (subcli != null) {
+                // parse options for subcommand
+                usedSubCommand = args[cnt];
+                subcli.parse(Arrays.copyOfRange(args, cnt + 1, args.length));
+            } /* else {
+                // continue without subcommand
+            }
+            */
+        }
+
         while (cnt < args.length && args[cnt].startsWith(MINUS)) {
 
             if("--".equals(args[cnt])) {
@@ -317,6 +354,10 @@ public final class CommandLine {
             arguments.add(args[cnt]);
             cnt ++;
         }
+    }
+
+    public List<String> getArguments() {
+        return arguments;
     }
 
     /**

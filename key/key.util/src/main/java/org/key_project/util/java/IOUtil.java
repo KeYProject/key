@@ -853,7 +853,7 @@ public final class IOUtil {
                    /* we use createDirectories instead of createDirectory in case the parent
                     * directory does not exist */
                    Files.createDirectories(targetDir.resolve(entry.getName()));
-        } else {
+               } else {
                    // create nonexistent parent directories and then extract the file
                    Files.createDirectories(targetDir.resolve(entry.getName()).getParent());
                    Files.copy(zipFile.getInputStream(entry), targetDir.resolve(entry.getName()));
