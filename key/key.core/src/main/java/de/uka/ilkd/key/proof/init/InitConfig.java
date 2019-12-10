@@ -157,7 +157,7 @@ public class InitConfig {
     public void addCategory2DefaultChoices(@NotNull Map<String,String> init) {
         boolean changed =false;
         for (final Map.Entry<String, String> entry : init.entrySet()) {
-            changed = changed || addCategoryDefaultChoice(entry.getKey(), entry.getValue());
+            changed = addCategoryDefaultChoice(entry.getKey(), entry.getValue()) || changed;
         }
         if(changed) {
             //FIXME weigl: I do not understand why the default choices are back progragated!

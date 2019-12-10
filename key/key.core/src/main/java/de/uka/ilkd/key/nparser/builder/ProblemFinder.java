@@ -37,13 +37,15 @@ public class ProblemFinder extends ExpressionBuilder {
     public Term visitProblem(KeYParser.ProblemContext ctx) {
         if (ctx.CHOOSECONTRACT() != null) {
             if (ctx.chooseContract != null)
-                chooseContract = accept(ctx.chooseContract);
+                chooseContract = ((String) accept(ctx.chooseContract))
+                        .replace("\\\\:", ":");
             else
                 chooseContract = "";
         }
         if (ctx.PROOFOBLIGATION() != null) {
             if (ctx.proofObligation != null)
-                proofObligation = accept(ctx.proofObligation);
+                proofObligation = ((String) accept(ctx.proofObligation))
+                        .replace("\\\\:", ":");
             else
                 proofObligation = "";
         }

@@ -69,7 +69,7 @@ public interface EnvInput {
      * gets the boot classpath element, null if none set.
      * @throws  
      */
-    File readBootClassPath() throws IOException;
+    File readBootClassPath();
     
     /**
      * Reads the input using the given modification strategy, i.e.,

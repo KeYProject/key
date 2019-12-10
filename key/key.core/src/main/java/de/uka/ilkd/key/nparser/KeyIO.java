@@ -6,10 +6,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.nparser.builder.DeclarationBuilder;
-import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
-import de.uka.ilkd.key.nparser.builder.ProblemFinder;
-import de.uka.ilkd.key.nparser.builder.TacletPBuilder;
+import de.uka.ilkd.key.nparser.builder.*;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.Taclet;
 import org.antlr.v4.runtime.CharStream;
@@ -236,11 +233,13 @@ public class KeyIO {
         }
 
         public Loader loadDeclarations() {
+            //var choiceFinder = new ChoiceFinder(nss.choices());
             var declBuilder = new DeclarationBuilder(services, nss);
             long start = System.currentTimeMillis();
             for (int i = ctx.size() - 1; i >= 0; i--) { // process backwards
                 KeyAst.File s = ctx.get(i);
                 //var p = parsers.get(i);
+                //s.accept(choiceFinder);
                 s.accept(declBuilder);
             }
             long stop = System.currentTimeMillis();

@@ -172,7 +172,8 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     public void testVerifyExceptionIfAtOperatorNotPreceededBySelectTerm() {
         try {
-            io.parseExpression("(a.f + a.f)@h2");
+            var t = io.parseExpression("(a.f + a.f)@h2");
+            System.out.println(t);
             fail();
         } catch (Exception e) {
             assertTrue(e.getMessage().contains(ExpressionBuilder.NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE));

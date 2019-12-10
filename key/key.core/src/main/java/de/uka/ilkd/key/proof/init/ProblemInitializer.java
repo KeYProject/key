@@ -253,13 +253,7 @@ public final class ProblemInitializer {
         envInput.setInitConfig(initConfig);
         final String javaPath = envInput.readJavaPath();
         final List<File> classPath = envInput.readClassPath();
-        final File bootClassPath;
-        try {
-            bootClassPath = envInput.readBootClassPath();
-        } catch (IOException ioe) {
-            throw new ProofInputException(ioe);
-        }
-
+        final File bootClassPath = envInput.readBootClassPath();
         final Includes includes = envInput.readIncludes();
 
         if (fileRepo != null) {

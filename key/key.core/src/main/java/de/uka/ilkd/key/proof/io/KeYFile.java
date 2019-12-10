@@ -254,7 +254,7 @@ public class KeYFile implements EnvInput {
 
 
     @Override
-    public File readBootClassPath() throws IOException {
+    public File readBootClassPath() {
         var pi = getProblemInformation();
         String bootClassPath = pi.getBootClassPath();
         if (bootClassPath == null) return null;
@@ -283,17 +283,15 @@ public class KeYFile implements EnvInput {
         var pi = getProblemInformation();
         String parentDirectory = file.file().getParent();
         List<File> fileList = new ArrayList<>();
-        if (pi.getClasspath() != null) {
-            for (String cp : pi.getClasspath()) {
-                if (cp == null) {
-                    fileList.add(null);
-                } else {
-                    File f = new File(cp);
-                    if (!f.isAbsolute()) {
-                        f = new File(parentDirectory, cp);
-                    }
-                    fileList.add(f);
+        for (String cp : pi.getClasspath()) {
+            if (cp == null) {
+                fileList.add(null);
+            } else {
+                File f = new File(cp);
+                if (!f.isAbsolute()) {
+                    f = new File(parentDirectory, cp);
                 }
+                fileList.add(f);
             }
         }
         return fileList;
@@ -313,7 +311,7 @@ public class KeYFile implements EnvInput {
             if (!absFile.exists()) {
                 throw new ProofInputException(String.format("Declared Java source %s not found.", javaPath));
             }
-            return absFile.getPath();
+            return absFile.getAbsolutePath();
         }
         return javaPath;
     }
@@ -361,9 +359,11 @@ public class KeYFile implements EnvInput {
      */
     public void readSorts() throws ProofInputException {
         var ctx = getParseContext();
-        //TODO initConfig.addCategory2DefaultChoices(p.getCategory2Default());
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         io.evalDeclarations(ctx);
+        var choice = getParseContext().getChoices();
+        //we ignore the namespace of choice finder.
+        initConfig.addCategory2DefaultChoices(choice.getDefaultOptions());
     }
 
 

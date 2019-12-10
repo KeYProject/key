@@ -2,22 +2,22 @@ package de.uka.ilkd.key.nparser.builder;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.rule.RuleSet;
+import org.antlr.v4.runtime.Token;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This visitor evaluates all basic (level 0) declarations.
@@ -37,6 +37,8 @@ import java.util.List;
  * @see de.uka.ilkd.key.nparser.FunctionPredicateBuilder for level-1 declarations
  */
 public class DeclarationBuilder extends DefaultBuilder {
+    private Map<String, String> category2Default = new HashMap<>();
+
     public DeclarationBuilder(Services services, NamespaceSet nss) {
         super(services, nss);
     }
@@ -79,7 +81,6 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
 
-    /*
     @Override
     public Object visitChoice(KeYParser.ChoiceContext ctx) {
         String cat = ctx.category.getText();

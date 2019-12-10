@@ -48,7 +48,8 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         public @Nullable ProofSettings findProofSettings() {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
             if (ctx.decls() != null && ctx.decls().pref != null) {
-                var text = BuilderHelpers.trim(ctx.decls().pref.getText(), '"');
+                var text = BuilderHelpers.trim(ctx.decls().pref.getText(), '"')
+                        .replace("\\\\:", ":");
                 settings.loadSettingsFromString(text);
             }
             return settings;
