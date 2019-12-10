@@ -1,4 +1,4 @@
-package proofmanagement.consistencyChecking;
+package org.key_project.proofmanagement.check;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -9,8 +9,8 @@ import java.util.Properties;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import proofmanagement.consistencyChecking.dependency.DependencyGraph;
-import proofmanagement.consistencyChecking.dependency.DependencyGraphBuilder;
+import org.key_project.proofmanagement.check.dependency.DependencyGraph;
+import org.key_project.proofmanagement.check.dependency.DependencyGraphBuilder;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;

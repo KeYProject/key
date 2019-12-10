@@ -1,4 +1,4 @@
-package proofmanagement.consistencyChecking.dependency;
+package org.key_project.proofmanagement.check.dependency;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,4 +1,4 @@
-package proofmanagement.io;
+package org.key_project.proofmanagement.io;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;

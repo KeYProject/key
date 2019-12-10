@@ -1,9 +1,11 @@
+package org.key_project.proofmanagement;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import proofmanagement.consistencyChecking.DependencyChecker;
+import org.key_project.proofmanagement.check.DependencyChecker;
 
 public class Testing {
 

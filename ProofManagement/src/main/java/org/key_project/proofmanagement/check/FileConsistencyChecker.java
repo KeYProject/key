@@ -1,4 +1,4 @@
-package proofmanagement.consistencyChecking;
+package org.key_project.proofmanagement.check;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import proofmanagement.io.PackageHandler;
+import org.key_project.proofmanagement.io.PackageHandler;
 
 /**
  * This class tests if all given proof is consistent w.r.t. the files contained.

@@ -1,4 +1,4 @@
-package proofmanagement.consistencyChecking;
+package org.key_project.proofmanagement.check;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -18,7 +18,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 /**
  * This class checks if the settings of the given proof bundles are consistent.
  */
-public class SettingsChecker implements Checker{
+public class SettingsChecker implements Checker {
 
     //TODO: maybe make something Java 8 compatible here
     //TODO: it is not checked that this is a equivalence relation, but thats probably okay.

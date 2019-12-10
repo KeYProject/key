@@ -1,4 +1,4 @@
-package proofmanagement;
+package org.key_project.proofmanagement;
     // TODO: the checkstyle regex for package name does neither allow proof_management nor proofManagement
     // Is this intended?
 
@@ -9,13 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipException;
 
-import de.uka.ilkd.key.java.abstraction.Package;
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
-import proofmanagement.consistencyChecking.DependencyChecker;
-import proofmanagement.consistencyChecking.FileConsistencyChecker;
-import proofmanagement.consistencyChecking.SettingsChecker;
-import proofmanagement.io.PackageHandler;
+import org.key_project.proofmanagement.check.DependencyChecker;
+import org.key_project.proofmanagement.check.FileConsistencyChecker;
+import org.key_project.proofmanagement.check.SettingsChecker;
+import org.key_project.proofmanagement.io.PackageHandler;
 
 public class Main {
 

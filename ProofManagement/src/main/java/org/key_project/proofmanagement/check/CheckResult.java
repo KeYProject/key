@@ -1,4 +1,4 @@
-package proofmanagement.consistencyChecking;
+package org.key_project.proofmanagement.check;
 
 import java.util.ArrayList;
 import java.util.List;

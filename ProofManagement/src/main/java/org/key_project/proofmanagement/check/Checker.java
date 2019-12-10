@@ -1,4 +1,4 @@
-package proofmanagement.consistencyChecking;
+package org.key_project.proofmanagement.check;
 
 import java.nio.file.Path;
 import java.util.List;
