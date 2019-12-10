@@ -2,20 +2,24 @@ package de.uka.ilkd.key.nparser.builder;
 
 import antlr.RecognitionException;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.nparser.BuildingException;
 import de.uka.ilkd.key.nparser.KeYParser;
-import de.uka.ilkd.key.nparser.varexp.ConditionBuilder;
+import de.uka.ilkd.key.nparser.varexp.ArgumentType;
+import de.uka.ilkd.key.nparser.varexp.TacletBuilderCommand;
+import de.uka.ilkd.key.nparser.varexp.TacletBuilderManipulators;
 import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.conditions.*;
+import de.uka.ilkd.key.rule.conditions.TypeResolver;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -24,7 +28,7 @@ import org.key_project.util.collection.ImmutableSet;
 import java.util.*;
 
 public class TacletPBuilder extends ExpressionBuilder {
-    private final List<ConditionBuilder> conditionBuilder = new LinkedList<>();
+    private final List<TacletBuilderCommand> conditionBuilder = new LinkedList<>();
 
     private final Stack<TacletBuilder> currentTBuilder = new Stack<>();
     private HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new HashMap<>();
@@ -207,6 +211,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         return currentTBuilder.peek();
     }
 
+
     @Override
     public Object visitModifiers(KeYParser.ModifiersContext ctx) {
         TacletBuilder b = peekTBuilder();
@@ -239,45 +244,97 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitVarexp(KeYParser.VarexpContext ctx) {
         negated = ctx.NOT_() != null;
-        return super.visitVarexp(ctx);
-        /*ctx.varcond_applyUpdateOnRigid()
-                , ctx.varcond_dropEffectlessElementaries()
-                , ctx.varcond_dropEffectlessStores()
-                , ctx.varcond_enum_const()
-                , ctx.varcond_free()
-                , ctx.varcond_hassort()
-                , ctx.varcond_fieldtype()
-                , ctx.varcond_equalUnique()
-                , ctx.varcond_new()
-                , ctx.varcond_newlabel()
-                , ctx.varcond_observer()
-                , ctx.varcond_different()
-                , ctx.varcond_metadisjoint()
-                , ctx.varcond_simplifyIfThenElseUpdate()
-                , ctx.varcond_differentFields()
-                , ctx.varcond_sameObserver()
-                , ctx.varcond_abstractOrInterface()
-                , ctx.varcond_array()
-                , ctx.varcond_array_length()
-                , ctx.varcond_enumtype()
-                , ctx.varcond_freeLabelIn()
-                , ctx.varcond_localvariable()
-                , ctx.varcond_thisreference()
-                , ctx.varcond_reference()
-                , ctx.varcond_referencearray()
-                , ctx.varcond_static()
-                , ctx.varcond_staticmethod()
-                , ctx.varcond_mayexpandmethod()
-                , ctx.varcond_final()
-                , ctx.varcond_typecheck()
-                , ctx.varcond_constant()
-                , ctx.varcond_label()
-                , ctx.varcond_static_field()
-                , ctx.varcond_subFormulas()
-                , ctx.varcond_containsAssignment());
-    */
+        var tb = peekTBuilder();
+        String name = ctx.varexpId().getText();
+        var arguments = ctx.varexp_argument();
+        var suitableManipulators = TacletBuilderManipulators.getConditionBuildersFor(name);
+        boolean applied = false;
+        Object[] argCache = new Object[arguments.size()];
+        for (TacletBuilderCommand manipulator : suitableManipulators) {
+            if (applyManipulator(negated, argCache, manipulator, arguments)) {
+                applied = true;
+                break;
+            }
+        }
+        if (!applied) {
+            suitableManipulators.forEach(
+                    it -> System.err.println(Arrays.toString(it.getArgumentTypes())));
+            semanticError(ctx, "Could not apply the given variable condition: %s", name);
+        }
+        return null;
     }
 
+    private boolean applyManipulator(
+            boolean negated,
+            Object[] args,
+            TacletBuilderCommand manipulator,
+            List<KeYParser.Varexp_argumentContext> arguments) {
+        assert args.length == arguments.size();
+        var types = manipulator.getArgumentTypes();
+
+        if (types.length != arguments.size())
+            return false;
+
+        for (int i = 0; i < arguments.size(); i++) {
+            args[i] = evaluateVarcondArgument(types[i], args[i], arguments.get(i));
+        }
+
+        try {
+            manipulator.build(peekTBuilder(), args, negated);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
+    private Object evaluateVarcondArgument(
+            ArgumentType expectedType,
+            Object prevValue,
+            KeYParser.Varexp_argumentContext ctx) {
+        if (prevValue != null && expectedType.clazz.isAssignableFrom(prevValue.getClass())) {
+            return prevValue; //previous value is of suitable type, we do not re-evaluate
+        }
+
+        switch (expectedType) {
+            case TYPE_RESOLVER:
+                return buildTypeResolver(ctx);
+            case SORT:
+                return accept(ctx.any_sortId_check());
+            case JAVA_TYPE:
+                return getJavaInfo().getKeYJavaType(ctx.any_sortId_check().getText());
+            case VARIABLE:
+                return varId(ctx, ctx.getText());
+            case STRING:
+                return ctx.getText();
+        }
+
+        return null;
+    }
+
+
+    public Object buildTypeResolver(KeYParser.Varexp_argumentContext ctx) {
+        SchemaVariable y = accept(ctx.varId());
+        if (ctx.TYPEOF() != null) {
+            return TypeResolver.createElementTypeResolver(y);
+        }
+        if (ctx.CONTAINERTYPE() != null) {
+            return TypeResolver.createContainerTypeResolver(y);
+        }
+
+        Sort s = accept(ctx.any_sortId_check());
+        if (s != null) {
+            if (s instanceof GenericSort) {
+                return TypeResolver.createGenericSortResolver((GenericSort) s);
+            } else {
+                return TypeResolver.createNonGenericSortResolver(s);
+            }
+        }
+        return null;
+    }
+
+    /*
     @Override
     public Object visitVarcond_sameObserver(KeYParser.Varcond_sameObserverContext ctx) {
         ParsableVariable t1 = accept(ctx.t1);
@@ -350,25 +407,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         return null;
     }
 
-    @Override
-    public Object visitType_resolver(KeYParser.Type_resolverContext ctx) {
-        Sort s = accept(ctx.any_sortId_check());
-        var y = accept(ctx.y);
-        if (s != null) {
-            if (s instanceof GenericSort) {
-                return TypeResolver.createGenericSortResolver((GenericSort) s);
-            } else {
-                return TypeResolver.createNonGenericSortResolver(s);
-            }
-        }
-        if (ctx.TYPEOF() != null) {
-            return TypeResolver.createElementTypeResolver((SchemaVariable) y);
-        }
-        if (ctx.CONTAINERTYPE() != null) {
-            return TypeResolver.createContainerTypeResolver((SchemaVariable) y);
-        }
-        return null;
-    }
+
 
     @Override
     public Object visitVarcond_new(KeYParser.Varcond_newContext ctx) {
@@ -681,6 +720,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         return null;
     }
 
+
+    /*
     @Override
     public Object visitVarcond_label(KeYParser.Varcond_labelContext ctx) {
         TermLabelSV l = accept(ctx.varId());
@@ -701,10 +742,10 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitVarcond_subFormulas(KeYParser.Varcond_subFormulasContext ctx) {
         FormulaSV x = accept(ctx.varId());
-
         peekTBuilder().addVariableCondition(new SubFormulaCondition(x, negated));
         return null;
     }
+    */
 
     @Override
     public Object visitGoalspecs(KeYParser.GoalspecsContext ctx) {
@@ -782,7 +823,6 @@ public class TacletPBuilder extends ExpressionBuilder {
                 || input.LA(1) == KeYLexer.IN_TYPE;
     }
     */
-
 
 
     private TacletBuilder createTacletBuilderFor(Object find, int applicationRestriction, ParserRuleContext ctx) {
@@ -888,12 +928,19 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Operator visitVarId(KeYParser.VarIdContext ctx) {
         var id = ctx.id.getText();
-        Operator v = variables().lookup(new Name(ctx.id.getText()));
+        Operator v = varId(ctx, id);
+        return v;
+    }
+
+    @Nullable
+    private Operator varId(ParserRuleContext ctx, String id) {
+        final var name = new Name(id);
+        Operator v = variables().lookup(name);
         if (v == null) {
-            v = schemaVariables().lookup(new Name(id));
+            v = schemaVariables().lookup(name);
         }
         if (v == null) {
-            semanticError(ctx, "variable %s", id);
+            semanticError(ctx, "Could not find Variable %s", id);
         }
         return v;
     }

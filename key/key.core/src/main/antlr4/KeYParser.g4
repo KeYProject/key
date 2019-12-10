@@ -558,7 +558,6 @@ accessterm
     MINUS result = term110
   | LPAREN s = any_sortId_check RPAREN result=term110
   |  atom atom_suffix*
-    // at most one heap selection suffix
     ( heap_selection_suffix )? // resets globalSelectNestingDepth to zero
 ;
 
@@ -592,18 +591,11 @@ accessterm_bracket_suffix
     RBRACKET
 ;
 
-/*
-// This would require repeated 
-accesstermlist  :
-     (t=accessterm  ( COMMA t=accessterm )* )? ;
-*/
-
 boolean_constant: FALSE | TRUE;
 
 atom
 :
-    ( //specialTerm |
-     funcpredvarterm
+    ( funcpredvarterm
     | LPAREN term RPAREN
     | boolean_constant
     | ifThenElseTerm
@@ -836,140 +828,64 @@ semisequent
 
 varexplist : varexp (COMMA varexp)* ;
 
-varexp
-:
-  ( varcond_applyUpdateOnRigid
-    | varcond_dropEffectlessElementaries
-    | varcond_dropEffectlessStores
-    | varcond_enum_const
-    | varcond_free
-    | varcond_hassort
-    | varcond_fieldtype
-    | varcond_equalUnique
-    | varcond_new
-    | varcond_newlabel
-    | varcond_observer
-    | varcond_different
-    | varcond_metadisjoint
-    | varcond_simplifyIfThenElseUpdate
-    | varcond_differentFields
-    | varcond_sameObserver
-  )
-  |
-  ( (NOT_  )?
-    (   varcond_abstractOrInterface
-	    | varcond_array
-        | varcond_array_length
-        | varcond_enumtype
-        | varcond_freeLabelIn
-        | varcond_localvariable
-        | varcond_thisreference
-        | varcond_reference
-        | varcond_referencearray
-        | varcond_static
-        | varcond_staticmethod
-        | varcond_mayexpandmethod
-        | varcond_final
-        | varcond_typecheck
-        | varcond_constant
-        | varcond_label
-        | varcond_static_field
-        | varcond_subFormulas
-        | varcond_containsAssignment
-      )
-  )
-;
-
-varcond_sameObserver:
-  SAME_OBSERVER LPAREN t1=varId COMMA t2=varId RPAREN
-;
-
-varcond_applyUpdateOnRigid :
-   APPLY_UPDATE_ON_RIGID LPAREN u=varId COMMA x=varId COMMA x2=varId RPAREN
-;
-
-varcond_dropEffectlessElementaries:
-   DROP_EFFECTLESS_ELEMENTARIES LPAREN u=varId COMMA x=varId COMMA result=varId RPAREN
-;
-
-varcond_dropEffectlessStores:
-   DROP_EFFECTLESS_STORES LPAREN h=varId COMMA o=varId COMMA f=varId COMMA x=varId COMMA result=varId RPAREN
-;
-
-varcond_differentFields: DIFFERENTFIELDS LPAREN x = varId COMMA y = varId RPAREN;
-
-
-varcond_simplifyIfThenElseUpdate
-:
-   SIMPLIFY_IF_THEN_ELSE_UPDATE LPAREN phi=varId COMMA u1=varId COMMA u2=varId COMMA
-   commonFormula=varId COMMA result=varId RPAREN
-;
-
-type_resolver
-:
-    (s = any_sortId_check)
-  | (TYPEOF LPAREN y = varId RPAREN)
-  | (CONTAINERTYPE LPAREN y = varId RPAREN)
-;
-
-varcond_new:
-  NEW LPAREN x=varId COMMA
-  ( TYPEOF LPAREN y=varId RPAREN
-  | DEPENDINGON LPAREN y=varId RPAREN
-  | kjt=keyjavatype
-  )
-  RPAREN
-;
-
-
-varcond_typecheck:
-  (  SAME
+varexpId:
+    APPLY_UPDATE_ON_RIGID
+  | SAME_OBSERVER
+  | DROP_EFFECTLESS_ELEMENTARIES
+  | DROP_EFFECTLESS_STORES
+  | DIFFERENTFIELDS
+  | SIMPLIFY_IF_THEN_ELSE_UPDATE
+  | CONTAINS_ASSIGNMENT
+  | ISENUMTYPE
+  | ISTHISREFERENCE
+  | STATICMETHODREFERENCE
+  | ISREFERENCEARRAY
+  | ISARRAY
+  | ISARRAYLENGTH
+  | IS_ABSTRACT_OR_INTERFACE
+  | ENUM_CONST
+  | FINAL
+  | STATIC
+  | ISLOCALVARIABLE
+  | ISOBSERVER
+  | DIFFERENT
+  | METADISJOINT
+  | EQUAL_UNIQUE
+  | FREELABELIN
+  | ISCONSTANT
+  | HASLABEL
+  | ISSTATICFIELD
+  | HASSUBFORMULAS
+  | FIELDTYPE
+  | NEW
+  | SAME
   | ISSUBTYPE
   | STRICT ISSUBTYPE
   | DISJOINTMODULONULL
-  )
-  LPAREN fst = type_resolver COMMA snd = type_resolver RPAREN
+  | NOTFREEIN
+  | HASSORT
+  | NEWLABEL
+  | ISREFERENCE
+  | MAXEXPANDMETHOD
 ;
 
 
-varcond_free: NOTFREEIN LPAREN x=varId COMMA ys=varIds RPAREN;
-varcond_hassort: HASSORT LPAREN (x=varId | ELEMSORT LPAREN x=varId RPAREN ) COMMA s=any_sortId_check RPAREN;
-varcond_newlabel: NEWLABEL LPAREN x=varId RPAREN;
+// ELEMSORT flag for hassort
 
-varcond_reference:
-  ISREFERENCE (LBRACKET  id=simple_ident RBRACKET)?
-  LPAREN tr = type_resolver RPAREN
+varexp_argument
+:
+    any_sortId_check //also covers possible varId
+  | TYPEOF LPAREN y=varId RPAREN
+  | CONTAINERTYPE LPAREN y=varId RPAREN
+  | DEPENDINGON LPAREN y=varId RPAREN
 ;
 
-varcond_mayexpandmethod:
-   MAXEXPANDMETHOD LPAREN x=varId COMMA y=varId
-   ( COMMA z=varId RPAREN 
-   | RPAREN 
-   )
+varexp
+:
+  negate=NOT_?
+  varexpId
+  LPAREN varexp_argument (COMMA varexp_argument)* RPAREN
 ;
-
-varcond_fieldtype: FIELDTYPE LPAREN x=varId COMMA s=any_sortId_check RPAREN;
-varcond_containsAssignment: CONTAINS_ASSIGNMENT LPAREN x=varId RPAREN;
-varcond_enumtype: ISENUMTYPE LPAREN tr = type_resolver RPAREN;
-varcond_thisreference: ISTHISREFERENCE LPAREN x = varId RPAREN;
-varcond_staticmethod: STATICMETHODREFERENCE LPAREN x=varId COMMA y=varId COMMA z=varId RPAREN;
-varcond_referencearray: ISREFERENCEARRAY LPAREN x=varId RPAREN;
-varcond_array: ISARRAY LPAREN x=varId RPAREN;
-varcond_array_length: ISARRAYLENGTH LPAREN x=varId RPAREN;
-varcond_abstractOrInterface: IS_ABSTRACT_OR_INTERFACE LPAREN tr=type_resolver RPAREN;
-varcond_enum_const: ENUM_CONST LPAREN x=varId RPAREN;
-varcond_final: FINAL LPAREN x=varId RPAREN;
-varcond_static: STATIC LPAREN x=varId RPAREN;
-varcond_localvariable: ISLOCALVARIABLE LPAREN x=varId RPAREN;
-varcond_observer: ISOBSERVER LPAREN obs=varId COMMA heap=varId  RPAREN;
-varcond_different: DIFFERENT LPAREN var1=varId COMMA var2=varId RPAREN;
-varcond_metadisjoint: METADISJOINT LPAREN var1=varId COMMA var2=varId RPAREN;
-varcond_equalUnique: EQUAL_UNIQUE LPAREN t=varId COMMA t2=varId COMMA phi=varId RPAREN ;
-varcond_freeLabelIn: FREELABELIN LPAREN l=varId COMMA statement=varId RPAREN ;
-varcond_constant: ISCONSTANT LPAREN x=varId RPAREN;
-varcond_label: HASLABEL LPAREN l=varId COMMA name=simple_ident RPAREN;
-varcond_static_field: ISSTATICFIELD LPAREN field=varId RPAREN;
-varcond_subFormulas: HASSUBFORMULAS LPAREN x=varId RPAREN;
 
 goalspecs:
       CLOSEGOAL
