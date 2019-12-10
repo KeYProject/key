@@ -247,7 +247,7 @@ public class TestTacletParser {
         builder.setName(new Name("all_right"));
         Taclet allright = builder.getSuccTaclet();
         String allrightString =
-                "all_right{\\find (==> \\forall z; b) \\varcond ( \\new(sk,\\dependingOn(b)) ) \\replacewith (==> {\\subst z; sk}b)}";
+                "all_right{\\find (==> \\forall z; b) \\varcond ( \\newDependingOn(sk, b) ) \\replacewith (==> {\\subst z; sk}b)}";
         assertEquals("all-right", allright, parseTaclet(allrightString));
     }
 
@@ -367,7 +367,7 @@ public class TestTacletParser {
         FindTaclet taclet =
                 (FindTaclet) parseTaclet("xy{ \\find (true) \\varcond(\\new(#boolv,long)) \\replacewith(true)}");
 
-        taclet = (FindTaclet) parseTaclet("xy{ \\find (true) \\varcond (\\new(#v0, \\typeof(#e2))) \\replacewith(true)}");
+        taclet = (FindTaclet) parseTaclet("xy{ \\find (true) \\varcond (\\newTypeOf(#v0, #e2)) \\replacewith(true)}");
 
     }
 
@@ -417,8 +417,8 @@ public class TestTacletParser {
         FindTaclet taclet =
                 (FindTaclet) parseTaclet("eval_order_array_access_right{" +
                         " \\find(\\<{..#v=#ar[#e];...}\\>post)" +
-                        "\\varcond(\\new(#ar1,\\typeof(#ar))," +
-                        "\\new(#v0,\\typeof(#e)), \\new(#k, \\typeof(#e)))" +
+                        "\\varcond(\\newTypeOf(#ar1, #ar)," +
+                        "\\newTypeOf(#v0, #e), \\newTypeOf(#k, #e))" +
                         "\\replacewith(\\<{..for(#k=0;#k<#length-reference(#ar);#k++){" +
                         "#ar1[#k]=#ar[#k];}" +
                         "#v0=#e; #v=#ar1[#v0];...}\\>post)" +

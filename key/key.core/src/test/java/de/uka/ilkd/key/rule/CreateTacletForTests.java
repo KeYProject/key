@@ -102,7 +102,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 	contradiction = (RewriteTaclet) parseTaclet
 	    ("contracdiction{\\find(b->b0) \\replacewith(!b0 -> !b)}");
 	allright = (SuccTaclet) parseTaclet
-	    ("all_right{\\find (==> \\forall z; b) \\varcond ( \\new(x,\\dependingOn(b)) ) \\replacewith (==> {\\subst z; x}b)}");
+	    ("all_right{\\find (==> \\forall z; b) \\varcond ( \\newDependingOn(x, b) ) \\replacewith (==> {\\subst z; x}b)}");
 	allleft = (AntecTaclet) parseTaclet
 	    ("all_left{\\find(\\forall z; b==>) \\add({\\subst z; x}b==>)}");
 

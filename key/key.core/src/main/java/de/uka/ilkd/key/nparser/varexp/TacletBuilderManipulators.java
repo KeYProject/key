@@ -39,7 +39,7 @@ public class TacletBuilderManipulators {
      *
      */
     public static final AbstractConditionBuilder ABSTRACT_OR_INTERFACE
-            = new ConstructorBasedBuilder("enumConst", AbstractOrInterfaceType.class, TR);
+            = new ConstructorBasedBuilder("isAbstractOrInterface", AbstractOrInterfaceType.class, TR);
 
     /**
      *
@@ -104,7 +104,7 @@ public class TacletBuilderManipulators {
     /**
      *
      */
-    public static final AbstractTacletBuilderCommand NEW_JAVATYPE = new AbstractTacletBuilderCommand("newJava", TR, KJT) {
+    public static final AbstractTacletBuilderCommand NEW_JAVATYPE = new AbstractTacletBuilderCommand("new", SV, KJT) {
         @Override
         public void build(TacletBuilder tacletBuilder, Object[] arguments, boolean negated) {
             if (negated) throw new IllegalArgumentException("Negation is not supported");
@@ -140,7 +140,7 @@ public class TacletBuilderManipulators {
         @Override
         public void build(TacletBuilder tacletBuilder, Object[] arguments, boolean negated) {
             if (negated) throw new IllegalArgumentException("Negation is not supported");
-            tacletBuilder.addVarsNewDependingOn((SchemaVariable) arguments[0], (SchemaVariable) arguments[1]);
+            tacletBuilder.addVarsNew((SchemaVariable) arguments[0], (SchemaVariable) arguments[1]);
 
         }
     };
@@ -155,31 +155,36 @@ public class TacletBuilderManipulators {
     };
 
     public static final AbstractConditionBuilder FREE_LABEL_IN_VARIABLE
-            = new ConstructorBasedBuilder("freeLabelInVariable", FreeLabelInVariableCondition.class, SV, SV);
+            = new ConstructorBasedBuilder("freeLabelIn", FreeLabelInVariableCondition.class, SV, SV);
     public static final AbstractConditionBuilder DIFFERENT
             = new ConstructorBasedBuilder("different", DifferentInstantiationCondition.class, SV, SV);
     public static final AbstractConditionBuilder FINAL
             = new ConstructorBasedBuilder("final", FinalReferenceCondition.class, SV);
     public static final AbstractConditionBuilder ENUM_CONST
-            = new ConstructorBasedBuilder("enumConst", EnumConstantCondition.class, SV);
+            = new ConstructorBasedBuilder("isEnumConst", EnumConstantCondition.class, SV);
     public static final AbstractConditionBuilder LOCAL_VARIABLE
-            = new ConstructorBasedBuilder("localVariable", LocalVariableCondition.class, SV);
+            = new ConstructorBasedBuilder("isLocalVariable", LocalVariableCondition.class, SV);
     public static final AbstractConditionBuilder ARRAY_LENGTH
-            = new ConstructorBasedBuilder("arrayLength", ArrayLengthCondition.class, SV);
+            = new ConstructorBasedBuilder("isArrayLength", ArrayLengthCondition.class, SV);
     public static final AbstractConditionBuilder ARRAY
-            = new ConstructorBasedBuilder("array", ArrayTypeCondition.class, SV);
+            = new ConstructorBasedBuilder("isArray", ArrayTypeCondition.class, SV);
     public static final AbstractConditionBuilder REFERENCE_ARRAY
-            = new ConstructorBasedBuilder("referenceArray", ArrayComponentTypeCondition.class, SV);
+            = new ConstructorBasedBuilder("isReferenceArray", ArrayComponentTypeCondition.class, SV);
     public static final AbstractConditionBuilder MAY_EXPAND_METHOD_2
             = new ConstructorBasedBuilder("mayExpandMethod", MayExpandMethodCondition.class, SV, SV);
     public static final AbstractConditionBuilder MAY_EXPAND_METHOD_3
             = new ConstructorBasedBuilder("mayExpandMethod", MayExpandMethodCondition.class, SV, SV, SV);
     public static final AbstractConditionBuilder STATIC_METHOD
-            = new ConstructorBasedBuilder("staticMethod", StaticMethodCondition.class, SV, SV, SV);
+            = new ConstructorBasedBuilder("staticMethodReference", StaticMethodCondition.class, SV, SV, SV);
     public static final AbstractConditionBuilder THIS_REFERENCE
-            = new ConstructorBasedBuilder("thisReference", IsThisReference.class, SV, SV, SV);
+            = new ConstructorBasedBuilder("isThisReference", IsThisReference.class, SV);
     public static final AbstractConditionBuilder REFERENCE
-            = new ConstructorBasedBuilder("reference", TypeCondition.class, SV, SV, SV);
+            = new AbstractConditionBuilder("isReference", TR) {
+        @Override
+        public VariableCondition build(Object[] arguments, boolean negated) {
+            return new TypeCondition((TypeResolver) arguments[0], true, false /*todo*/);
+        }
+    };
     public static final AbstractConditionBuilder ENUM_TYPE
             = new ConstructorBasedBuilder("reference", EnumTypeCondition.class, SV, SV, SV);
     public static final AbstractConditionBuilder CONTAINS_ASSIGNMENT
@@ -187,7 +192,7 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder FIELD_TYPE
             = new ConstructorBasedBuilder("fieldType", FieldTypeToSortCondition.class, SV, SORT);
     public static final AbstractConditionBuilder STATIC_REFERENCE
-            = new ConstructorBasedBuilder("staticReference", StaticReferenceCondition.class, SV);
+            = new ConstructorBasedBuilder("static", StaticReferenceCondition.class, SV);
     public static final TacletBuilderCommand DIFFERENT_FIELDS
             = new ConstructorBasedBuilder("differentFields", DifferentFields.class, SV, SV);
     public static final AbstractConditionBuilder SAME_OBSERVER
@@ -203,9 +208,9 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder SUBFORMULAS
             = new ConstructorBasedBuilder("subFormulas", SubFormulaCondition.class, FSV);
     public static final AbstractConditionBuilder STATIC_FIELD
-            = new ConstructorBasedBuilder("staticField", StaticFieldCondition.class, FSV);
+            = new ConstructorBasedBuilder("isStaticField", StaticFieldCondition.class, FSV);
     public static final AbstractConditionBuilder SUBFORMULA
-            = new ConstructorBasedBuilder("subFormula", SubFormulaCondition.class, FSV);
+            = new ConstructorBasedBuilder("hasSubFormulas", SubFormulaCondition.class, FSV);
     public static final TacletBuilderCommand DROP_EFFECTLESS_STORES
             = new ConstructorBasedBuilder("dropEffectlessStores", DropEffectlessStoresCondition.class, TSV, TSV, TSV, TSV, TSV);
     public static final AbstractConditionBuilder EQUAL_UNIQUE
@@ -214,7 +219,7 @@ public class TacletBuilderManipulators {
             = new ConstructorBasedBuilder("metaDisjoint", MetaDisjointCondition.class, TSV, TSV);
     public static final AbstractConditionBuilder IS_OBSERVER
             = new ConstructorBasedBuilder("isObserver", ObserverCondition.class, TSV, TSV);
-    public static final AbstractConditionBuilder CONSTANT = new ConstructorBasedBuilder("constant", ConstantCondition.class, ASV);
+    public static final AbstractConditionBuilder CONSTANT = new ConstructorBasedBuilder("isConstant", ConstantCondition.class, ASV);
 
     static class JavaTypeToSortConditionBuilder extends AbstractConditionBuilder {
         private final boolean elmen;
@@ -242,7 +247,7 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder HAS_ELEM_SORT = new JavaTypeToSortConditionBuilder("hasElementarySort",true);
 
     public static final AbstractConditionBuilder LABEL
-            = new ConstructorBasedBuilder("label", TermLabelCondition.class, S, TLSV);
+            = new ConstructorBasedBuilder("hasLabel", TermLabelCondition.class, TSV, S);
 
     static {
         register(SAME_OBSERVER, SIMPLIFY_ITE_UPDATE,

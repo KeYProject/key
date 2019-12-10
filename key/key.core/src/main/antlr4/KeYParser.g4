@@ -858,6 +858,9 @@ varexpId:
   | HASSUBFORMULAS
   | FIELDTYPE
   | NEW
+  | NEW_TYPE_OF
+  | NEW_DEPENDING_ON
+  | HAS_ELEMENTARY_SORT
   | SAME
   | ISSUBTYPE
   | STRICT ISSUBTYPE
@@ -884,6 +887,7 @@ varexp
 :
   negate=NOT_?
   varexpId
+  (LBRACKET IDENT RBRACKET)?
   LPAREN varexp_argument (COMMA varexp_argument)* RPAREN
 ;
 

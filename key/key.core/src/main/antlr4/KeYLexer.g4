@@ -158,6 +158,9 @@ ISSTATICFIELD : '\\isStaticField';
 ISSUBTYPE : '\\sub';
 EQUAL_UNIQUE : '\\equalUnique';
 NEW : '\\new';
+NEW_TYPE_OF: '\\newTypeOf';
+NEW_DEPENDING_ON: '\\newDependingOn';
+HAS_ELEMENTARY_SORT:'\\hasElementarySort';
 NEWLABEL : '\\newLabel';
 CONTAINS_ASSIGNMENT : '\\containsAssignment';
 // label occurs again for character `!'

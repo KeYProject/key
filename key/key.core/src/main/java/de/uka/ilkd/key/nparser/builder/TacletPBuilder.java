@@ -257,8 +257,10 @@ public class TacletPBuilder extends ExpressionBuilder {
             }
         }
         if (!applied) {
+            System.err.println("Found name-matching conditions with following type signature:");
             suitableManipulators.forEach(
                     it -> System.err.println(Arrays.toString(it.getArgumentTypes())));
+            System.err.format("But you gave %d\n", arguments.size());
             semanticError(ctx, "Could not apply the given variable condition: %s", name);
         }
         return null;

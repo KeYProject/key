@@ -34,6 +34,7 @@ public final class TypeCondition extends VariableConditionAdapter {
     private final boolean nonNull;
     private final boolean isReference;
 
+
     /**
      * create a type condition     
      * @param tr the TypeResolver for the type to be checked
