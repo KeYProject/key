@@ -128,7 +128,6 @@ public class FileConsistencyChecker implements Checker {
 
     @Override
     public CheckResult check(List<Path> proofFiles) {
-        // TODO:
-        return null;
+        return new CheckResult(listOfPathsConsistent(proofFiles));
     }
 }

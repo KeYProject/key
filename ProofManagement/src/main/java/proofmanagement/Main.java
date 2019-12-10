@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipException;
 
+import de.uka.ilkd.key.java.abstraction.Package;
+import de.uka.ilkd.key.util.CommandLine;
+import de.uka.ilkd.key.util.CommandLineException;
 import proofmanagement.consistencyChecking.DependencyChecker;
 import proofmanagement.consistencyChecking.FileConsistencyChecker;
 import proofmanagement.consistencyChecking.SettingsChecker;
@@ -48,99 +51,81 @@ public class Main {
         "pm merge [-f|--force] [-n|--no-check] <bundle1> <bundle2> ... <output>"
             + System.lineSeparator();
 
+    private static CommandLine setUpCL() {
+        CommandLine cl = new CommandLine();
+        cl.addSubCommand("check");
+        CommandLine check = cl.getSubCommandLine("check");
+        check.addOption("--settings", null, "Enables check for consistent proof settings");
+        check.addOption("--dependency", null, "Enables check for cyclic dependencies");
+        check.addOption("--files", null, "Enables check for compatible files");
+        check.addOption("--report", "out_path", "Writes the report to a HTML file at the given path");
+
+        cl.addSubCommand("merge");
+        CommandLine merge = cl.getSubCommandLine("merge");
+        return cl;
+    }
+
     public static void main(String[] args) {
         System.out.println("Proof management is running ...");
-        if (args.length != 0) {
 
-            if (args[0].equals("check")) {              // check single bundle for consistency
-                if (args.length != 2) {
-                    check(args);
-                } else {
-                    System.out.println(USAGE_CHECK);
-                }
-            } else if (args[0].equals("merge")) {       // merge at least two bundles
-                if (args.length > 2) {
-                    merge(args);
-                } else {
-                    System.out.println(USAGE_MERGE);
-                }
-            } else {
-                System.out.println(USAGE);
+        try {
+            CommandLine cl = setUpCL();
+            cl.parse(args);
+            if (cl.subCommandUsed("check")) {
+                check(cl.getSubCommandLine("check"));
+            } else if (cl.subCommandUsed("merge")) {
+                merge(cl.getSubCommandLine("merge"));
             }
+        } catch (CommandLineException e) {
+            e.printStackTrace();
         }
     }
 
     // check [-s|--settings] [-d|--dependency] [-f|--files] [-r|--report <out_path>] <bundle_path>
-    private static void check(String[] args) {
-        boolean settingsCheck = false;
-        boolean dependencyCheck = false;
-        boolean filesCheck = false;
-        Path reportPath = null;
-        Path bundlePath = null;
+    private static void check(CommandLine commandLine) {
 
-        for (int i = 1; i < args.length; i++) {         // i == 0 is "check"!
-            switch (args[i]) {
-            case "-s":
-            case "--settings":
-                settingsCheck = true;
-                break;
-            case "-d":
-            case "--dependency":
-                dependencyCheck = true;
-                break;
-            case "-f":
-            case "--files":
-                filesCheck = true;
-                break;
-            case "-r":
-            case "--report":
-                if (args.length > i + 1) {
-                    reportPath = Paths.get(args[i + 1]);
-                    i++; // argument for output -> skip next token
-                } else {
-                    System.out.println(USAGE_CHECK);
-                    return;
-                }
-                break;
-            default:
-                if (bundlePath == null) {
-                    bundlePath = Paths.get(args[i]);
-                } else {
-                    System.out.println(USAGE_CHECK);
-                    return;
-                }
-            }
+        List<String> arguments = commandLine.getArguments();
+        if (arguments.size() != 1) {
+            System.out.println("Error! Single file needed: <bundle_path>");
         }
 
-        if (bundlePath == null) {                                           // no bundle given
-            System.out.println(USAGE_CHECK);
-            return;
-        }
-        if (!settingsCheck && !dependencyCheck && !filesCheck) {            // no check defined
-            System.out.println(USAGE_CHECK);
-            return;
-        }
-
+        Path bundlePath = Paths.get(arguments.get(0));
         PackageHandler ph = new PackageHandler(bundlePath);
+
         List<Path> proofFiles = new ArrayList<>();
         try {
-            proofFiles.addAll(ph.getProofFiles());
+            for (String s : arguments) {
+                proofFiles.addAll(ph.getProofFiles());
+            }
         } catch (ZipException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        if (new SettingsChecker().check(proofFiles).isConsistent()) {
-            if (new DependencyChecker().check(proofFiles).isConsistent()) {
-                System.out.println("Consistent! Settings consistent and no cycles found!");
+
+        if (commandLine.isSet("--settings")) {
+            if (new SettingsChecker().check(proofFiles).isConsistent()) {
+                System.out.println("    Consistent! Settings consistent!");
             } else {
-                System.out.println("Inconsistent! Cyclic dependencies detected!");
+                System.out.println("    Inconsistent! Settings do not match!");
             }
-        } else {
-            // TODO: print more information
-            System.out.println("Inconsistent! Settings do not match!");
+        }
+        if (commandLine.isSet("--dependency")) {
+            if (new DependencyChecker().check(proofFiles).isConsistent()) {
+                System.out.println("    Consistent! No cycles found!");
+            } else {
+                System.out.println("    Inconsistent! Cyclic dependency found!");
+            }
+        }
+        if (commandLine.isSet("--files")) {
+            if (new FileConsistencyChecker().check(List.of(bundlePath)).isConsistent()) {
+                System.out.println("    Consistent! Files consistent!");
+            } else {
+                System.out.println("    Inconsistent! Different files found in bundles!");
+            }
+        }
+        if (commandLine.isSet("--report")) {
+
         }
     }
 
@@ -152,5 +137,13 @@ public class Main {
         zproofs.add(proofA);
         zproofs.add(proofB);
         FileConsistencyChecker.merge(zproofs, newBaseDir);
+    }
+
+    private static void merge(CommandLine commandLine) {
+        if (commandLine.isSet("--force")) {
+
+        }
+        // ...
+        // TODO
     }
 }
