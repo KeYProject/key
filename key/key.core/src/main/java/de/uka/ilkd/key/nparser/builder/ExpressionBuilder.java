@@ -1473,7 +1473,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 break;
             }
         }
-        final var classEnd = i;
+        final var classEnd = i - 1;
         attributeName = Arrays.stream(parts).skip(classEnd).collect(Collectors.joining("."));
 
         if (kjt != null) {
