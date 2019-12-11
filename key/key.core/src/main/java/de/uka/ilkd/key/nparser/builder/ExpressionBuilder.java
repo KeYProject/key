@@ -119,19 +119,10 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Term visitFormula(KeYParser.FormulaContext ctx) {
-        Term a = accept(ctx.term());
-        if (a != null && a.sort() != Sort.FORMULA) {
-            semanticError(ctx, "Just Parsed a Term where a Formula was expected.");
-        }
-        return a;
-    }
-
-    @Override
-    public Term visitTerm(KeYParser.TermContext ctx) {
-        var terms = this.<Term>mapOf(ctx.elementary_update_term());
-        var result = getTermFactory().createTerm(UpdateJunctor.PARALLEL_UPDATE, terms);
-        return result;
+    public Term visitParallel(KeYParser.ParallelContext ctx) {
+        Term termL = accept(ctx.term(0));
+        Term termR = accept(ctx.term(1));
+        return getTermFactory().createTerm(UpdateJunctor.PARALLEL_UPDATE, termL, termR);
     }
 
     @Override
@@ -141,62 +132,73 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Term visitElementary_update_term(KeYParser.Elementary_update_termContext ctx) {
-        List<Term> terms = mapOf(ctx.equivalence_term());
-        if (terms.size() == 1)
-            return terms.get(0);
-        else
-            return getServices().getTermBuilder().elementary(terms.get(0), terms.get(1));
+        Term termL = accept(ctx.term(0));
+        Term termR = accept(ctx.term(1));
+        return getServices().getTermBuilder().elementary(termL, termR);
     }
 
     @Override
     public Term visitEquivalence_term(KeYParser.Equivalence_termContext ctx) {
-        List<Term> terms = mapOf(ctx.implication_term());
-        return getTermFactory().createTerm(Equality.EQV, terms);
+        Term termL = accept(ctx.term(0));
+        Term termR = accept(ctx.term(1));
+        return getTermFactory().createTerm(Equality.EQV, termL, termR);
     }
 
     @Override
     public Term visitImplication_term(KeYParser.Implication_termContext ctx) {
-        Term a = accept(ctx.a);
-        Term a1 = accept(ctx.a1);
-        if (a1 == null) return a;
-        return getTermFactory().createTerm(Junctor.IMP, a, a1);
+        Term termL = accept(ctx.term(0));
+        Term termR = accept(ctx.term(1));
+        return getTermFactory().createTerm(Junctor.IMP, termL, termR);
     }
 
     @Override
     public Term visitDisjunction_term(KeYParser.Disjunction_termContext ctx) {
-        List<Term> terms = mapOf(ctx.conjunction_term());
-        return getTermFactory().createTerm(Junctor.OR, terms);
+        Term termL = accept(ctx.term(0));
+        Term termR = accept(ctx.term(1));
+        return getTermFactory().createTerm(Junctor.OR, termL, termR);
     }
 
     @Override
     public Term visitConjunction_term(KeYParser.Conjunction_termContext ctx) {
-        List<Term> terms = mapOf(ctx.term60());
-        return getTermFactory().createTerm(Junctor.AND, terms);
+        Term termL = accept(ctx.term(0));
+        Term termR = accept(ctx.term(1));
+        return getTermFactory().createTerm(Junctor.AND, termL, termR);
     }
 
     @Override
-    public Term visitTerm60(KeYParser.Term60Context ctx) {
-        return (Term) oneOf(ctx.unary_formula(), ctx.equality_term());
-    }
-
-    @Override
-    public Term visitUnary_formula(KeYParser.Unary_formulaContext ctx) {
-        if (ctx.NOT() != null) {
-            return getTermFactory().createTerm(Junctor.NOT, (Term) accept(ctx.term60()));
+    public Object visitUnaryMinus(KeYParser.UnaryMinusContext ctx) {
+        Term result = accept(ctx.term());
+        if (result.sort() != Sort.FORMULA) {
+            return getTermFactory().createTerm(
+                    functions().lookup(new Name("neg")), result);
+        } else {
+            semanticError(ctx, "Formula cannot be prefixed with '-'");
         }
-        return oneOf(ctx.modality_dl_term(), ctx.quantifierterm());
+        return result;
     }
 
     @Override
-    public Term visitEquality_term(KeYParser.Equality_termContext ctx) {
-        Term a = accept(ctx.a);
-        if (ctx.EQUALS() == null && null == ctx.NOT_EQUALS()) {
-            return a;
-        }
+    public Object visitNegation(KeYParser.NegationContext ctx) {
+        Term termL = accept(ctx.term());
+        return getTermFactory().createTerm(Junctor.NOT, termL);
+    }
 
-        boolean negated = ctx.NOT_EQUALS() != null;
-        Term b = accept(ctx.a1);
-        if (a.sort() == Sort.FORMULA || b.sort() == Sort.FORMULA) {
+    @Override
+    public Object visitTermEquals(KeYParser.TermEqualsContext ctx) {
+        Term termL = accept(ctx.term(0));
+        Term termR = accept(ctx.term(1));
+        return getTermFactory().createTerm(Junctor.NOT, termL, termR);
+    }
+
+    @Override
+    public Object visitTermNotEquals(KeYParser.TermNotEqualsContext ctx) {
+        Term termL = accept(ctx.term(0));
+        Term termR = accept(ctx.term(1));
+        return getTermFactory().createTerm(Junctor.NOT,
+                getTermFactory().createTerm(Equality.EQUALS, termL, termR));
+
+        /*
+                Term b = accept(ctx.a1); if (a.sort() == Sort.FORMULA || b.sort() == Sort.FORMULA) {
             String errorMessage =
                     "The term equality \'=\'/\'!=\' is not " +
                             "allowed between formulas.\n Please use \'" + Equality.EQV +
@@ -209,16 +211,11 @@ public class ExpressionBuilder extends DefaultBuilder {
                                 "with the formulas \'true\'/\'false\'.";
             }
             semanticError(ctx, errorMessage);
-        }
-        a = getTermFactory().createTerm(Equality.EQUALS, a, b);
-        if (negated) {
-            a = getTermFactory().createTerm(Junctor.NOT, a);
-        }
-        return a;
+        }*/
     }
 
     @Override
-    public Function visitRelation_op(KeYParser.Relation_opContext ctx) {
+    public Object visitTermCompare(KeYParser.TermCompareContext ctx) {
         String op_name = "";
         if (ctx.LESS() != null)
             op_name = "lt";
@@ -236,7 +233,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Function visitWeak_arith_op(KeYParser.Weak_arith_opContext ctx) {
+    public Object visitTermWeakArith(KeYParser.TermWeakArithContext ctx) {
         String op_name = "";
         if (ctx.PLUS() != null) {
             op_name = "add";
@@ -252,11 +249,21 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Function visitStrong_arith_op(KeYParser.Strong_arith_opContext ctx) {
-        String op_name = "";
-        if (ctx.STAR() != null) {
-            op_name = "mul";
+    public Object visitTermMult(KeYParser.TermMultContext ctx) {
+        Term termL = accept(ctx.term(0));
+        Term termR = accept(ctx.term(1));
+        var op = (Function) functions().lookup(new Name("mul"));
+        if (op == null) {
+            semanticError(ctx, "Function symbol 'mul' not found.");
         }
+        return capsulateTf(ctx, () -> getTermFactory().createTerm(op, termL, termR));
+    }
+
+    @Override
+    public Term visitTermDivisionModulo(KeYParser.TermDivisionModuloContext ctx) {
+        Term termL = accept(ctx.term(0));
+        Term termR = accept(ctx.term(1));
+        String op_name = "";
         if (ctx.SLASH() != null) {
             op_name = "div";
         }
@@ -267,16 +274,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (op == null) {
             semanticError(ctx, "Function symbol '" + op_name + "' not found.");
         }
-        return op;
-    }
-
-    @Override
-    public Term visitLogicTermReEntry(KeYParser.LogicTermReEntryContext ctx) {
-        Term a = accept(ctx.a);
-        if (ctx.op == null) return a;
-        Function op = accept(ctx.op);
-        Term a1 = accept(ctx.a1);
-        return capsulateTf(ctx, () -> getTermFactory().createTerm(op, a, a1));
+        return capsulateTf(ctx, () -> getTermFactory().createTerm(op, termL, termR));
     }
 
     protected Term capsulateTf(ParserRuleContext ctx, Supplier<Term> termSupplier) {
@@ -285,47 +283,6 @@ public class ExpressionBuilder extends DefaultBuilder {
         } catch (TermCreationException e) {
             throw new BuildingException(ctx, String.format("Could not build term on: %s", ctx.getText()), e);
         }
-    }
-
-    @Override
-    public Term visitWeak_arith_op_term(KeYParser.Weak_arith_op_termContext ctx) {
-        Term current = accept(ctx.a);
-        if (ctx.op.isEmpty())
-            return current;
-
-        List<Function> op = mapOf(ctx.op);
-        List<Term> terms = mapOf(ctx.a1);
-        try {
-            for (int i = 0; i < ctx.op.size(); i++) {
-                current = getTermFactory().createTerm(op.get(i), current, terms.get(i));
-            }
-        } catch (TermCreationException e) {
-            throw new BuildingException(ctx, e);
-        }
-        return current;
-    }
-
-    @Override
-    public Term visitStrong_arith_op_term(KeYParser.Strong_arith_op_termContext ctx) {
-        Term current = accept(ctx.a);
-        if (ctx.op.isEmpty())
-            return current;
-
-        List<Function> op = mapOf(ctx.op);
-        List<Term> terms = mapOf(ctx.a1);
-        try {
-            for (int i = 0; i < ctx.op.size(); i++) {
-                current = getTermFactory().createTerm(op.get(i), current, terms.get(i));
-            }
-        } catch (TermCreationException e) {
-            throw new BuildingException(ctx, e);
-        }
-        return current;
-    }
-
-    @Override
-    public Term visitTerm110(KeYParser.Term110Context ctx) {
-        return (Term) oneOf(ctx.braces_term(), ctx.accessterm());
     }
 
     @Override
@@ -747,34 +704,25 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Term visitAccessterm(KeYParser.AccesstermContext ctx) {
+    public Term visitCast(KeYParser.CastContext ctx) {
         final Sort objectSort = getServices().getJavaInfo().objectSort();
-        if (ctx.MINUS() != null) {
-            Term result = accept(ctx.term110());
-            if (result.sort() != Sort.FORMULA) {
-                return getTermFactory().createTerm(
-                        functions().lookup(new Name("neg")), result);
-            } else {
-                semanticError(ctx, "Formula cannot be prefixed with '-'");
-            }
-        } else if (ctx.LPAREN() != null) {
-            Term result = accept(ctx.term110());
-            if (ctx.any_sortId_check() != null) {
-                Sort s = accept(ctx.any_sortId_check());
-                if (s == null) {
-                    semanticError(ctx, "Tried to cast to unknown type.");
-                } else if (objectSort != null
-                        && !s.extendsTrans(objectSort)
-                        && result.sort().extendsTrans(objectSort)) {
-                    semanticError(ctx, "Illegal cast from " + result.sort() +
-                            " to sort " + s +
-                            ". Casts between primitive and reference types are not allowed. ");
-                }
-                return getTermFactory().createTerm(
-                        s.getCastSymbol(getServices()), result);
-            }
+        Term result = accept(ctx.term());
+        Sort s = accept(ctx.sortId());
+        if (s == null) {
+            semanticError(ctx, "Tried to cast to unknown type.");
+        } else if (objectSort != null
+                && !s.extendsTrans(objectSort)
+                && result.sort().extendsTrans(objectSort)) {
+            semanticError(ctx, "Illegal cast from " + result.sort() +
+                    " to sort " + s +
+                    ". Casts between primitive and reference types are not allowed. ");
         }
+        return getTermFactory().createTerm(
+                s.getCastSymbol(getServices()), result);
+    }
 
+    @Override
+    public Term visitAccessterm(KeYParser.AccesstermContext ctx) {
         //FIXME weigl: this is a hack!
         try {
             String[] s = new String[1 + ctx.atom_suffix().size()];
@@ -833,17 +781,6 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
         assert false;
         return null;
-    }
-
-    /**
-     * stack parameter: (term : Term)
-     *
-     * @param ctx
-     * @return
-     */
-    @Override
-    public Term visitHeap_selection_suffix(KeYParser.Heap_selection_suffixContext ctx) {
-        return heapSelectionSuffix(pop(), accept(ctx.heap), ctx);
     }
 
     @Override
@@ -928,7 +865,6 @@ public class ExpressionBuilder extends DefaultBuilder {
         return null;
     }
 
-
     @Override
     public Object visitStatic_query(KeYParser.Static_queryContext ctx) {
         String queryRef = accept(ctx.staticAttributeOrQueryReference());
@@ -952,7 +888,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitBoolean_constant(KeYParser.Boolean_constantContext ctx) {
+    public Object visitBoolean_literal(KeYParser.Boolean_literalContext ctx) {
         if (ctx.TRUE() != null)
             return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.TRUE));
         else
@@ -960,17 +896,15 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitAtom(KeYParser.AtomContext ctx) {
-        Term a = oneOf(ctx.funcpredvarterm(),
-                ctx.term(), ctx.boolean_constant(), ctx.ifExThenElseTerm(),
-                ctx.ifThenElseTerm(), ctx.string_literal());
+    public Object visitTermLabeled(KeYParser.TermLabeledContext ctx) {
+        Term t = accept(ctx.term());
         if (ctx.LGUILLEMETS() != null) {
             ImmutableArray<TermLabel> labels = accept(ctx.label());
             if (labels.size() > 0) {
-                a = getServices().getTermBuilder().addLabel(a, labels);
+                t = getServices().getTermBuilder().addLabel(t, labels);
             }
         }
-        return a;
+        return t;
     }
 
     @Override
@@ -1010,7 +944,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitAbbreviation(KeYParser.AbbreviationContext ctx) {
-        String sc = accept(ctx.sc);
+        String sc = accept(ctx.name);
         Term a = scm.getTerm(sc);
         if (a == null) {
             throwEx(new NotDeclException(null, "abbreviation", sc));
@@ -1056,11 +990,6 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Term visitArgument(KeYParser.ArgumentContext ctx) {
-        return (Term) oneOf(ctx.term());//, ctx.term60());
-    }
-
-    @Override
     public Term visitQuantifierterm(KeYParser.QuantifiertermContext ctx) {
         Operator op = null;
         Namespace<QuantifiableVariable> orig = variables();
@@ -1069,18 +998,13 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ctx.EXISTS() != null)
             op = Quantifier.EX;
         List<QuantifiableVariable> vs = accept(ctx.bound_variables());
-        Term a1 = accept(ctx.term60());
+        Term a1 = accept(ctx.term());
         var a = getTermFactory().createTerm(op,
                 new ImmutableArray<>(a1),
                 new ImmutableArray<>(vs.toArray(new QuantifiableVariable[0])),
                 null);
         unbindVars(orig);
         return a;
-    }
-
-    @Override
-    public Term visitBraces_term(KeYParser.Braces_termContext ctx) {
-        return (Term) oneOf(ctx.substitutionterm(), ctx.locset_term(), ctx.updateterm());
     }
 
     @Override
@@ -1100,15 +1024,15 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Term visitSubstitutionterm(KeYParser.SubstitutiontermContext ctx) {
         SubstOp op = WarySubstOp.SUBST;
         Namespace<QuantifiableVariable> orig = variables();
-        AbstractSortedOperator v = accept(ctx.v);
+        AbstractSortedOperator v = accept(ctx.bv);
         unbindVars(orig);
         if (v instanceof LogicVariable)
             bindVar((LogicVariable) v);
         else
             bindVar();
 
-        Term a1 = accept(ctx.a1);
-        Term a2 = oneOf(ctx.a2, ctx.unary_formula());
+        Term a1 = accept(ctx.replacement);
+        Term a2 = accept(ctx.haystack);
         try {
             Term result = getServices().getTermBuilder().subst(op, (QuantifiableVariable) v, a1, a2);
             return result;
@@ -1121,8 +1045,8 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Term visitUpdateterm(KeYParser.UpdatetermContext ctx) {
-        Term u = accept(ctx.u);
-        Term a2 = oneOf(ctx.term110(), ctx.unary_formula());
+        Term u = accept(ctx.term(0));
+        Term a2 = accept(ctx.term(1));
         return capsulateTf(ctx, () -> getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, a2));
     }
 
@@ -1157,9 +1081,10 @@ public class ExpressionBuilder extends DefaultBuilder {
         return doLookup(new Name(ctx.id.getText()), schemaVariables(), variables());
     }
 
+
     @Override
-    public Object visitModality_dl_term(KeYParser.Modality_dl_termContext ctx) {
-        PairOfStringAndJavaBlock sjb = getJavaBlock(ctx.modality);
+    public Object visitTermModality(KeYParser.TermModalityContext ctx) {
+        PairOfStringAndJavaBlock sjb = getJavaBlock(ctx.MODALITY().getSymbol());
 
         Operator op;
         if (sjb.opName.charAt(0) == '#') {
@@ -1174,13 +1099,13 @@ public class ExpressionBuilder extends DefaultBuilder {
             semanticError(ctx, "Unknown modal operator: " + sjb.opName);
         }
 
-        Term a1 = accept(ctx.a1);
+        Term a1 = accept(ctx.term());
         return capsulateTf(ctx, () -> getTermFactory().createTerm(op, new Term[]{a1}, null, sjb.javaBlock));
     }
 
     @Override
     public List<Term> visitArgument_list(KeYParser.Argument_listContext ctx) {
-        return mapOf(ctx.argument());
+        return mapOf(ctx.term());
     }
 
     @Override
@@ -1204,11 +1129,6 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Term visitFuncpredvarterm(KeYParser.FuncpredvartermContext ctx) {
         Namespace<QuantifiableVariable> orig = variables();
-
-        if (ctx.char_literal() != null) return accept(ctx.char_literal());
-        if (ctx.number() != null) return accept(ctx.number());
-        if (ctx.AT() != null) return accept(ctx.abbreviation());
-
         String varfuncid = accept(ctx.funcpred_name());
         List<QuantifiableVariable> boundVars = accept(ctx.bound_variables());
         List<Term> arguments = accept(ctx.argument_list());
@@ -1282,11 +1202,6 @@ public class ExpressionBuilder extends DefaultBuilder {
         return toZNotation(ctx.getText(), functions());
     }
 
-//    @Override
-//    public Term visitSpecialTerm(KeYParser.SpecialTermContext ctx) {
-//        return (Term) ctx.result.accept(this);
-//    }
-
     private Term termForParsedVariable(ParsableVariable v, ParserRuleContext ctx) {
         if (v instanceof LogicVariable || v instanceof ProgramVariable) {
             return capsulateTf(ctx, () -> getTermFactory().createTerm(v));
@@ -1304,16 +1219,6 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         }
         return null;
-    }
-
-    @Override
-    public String visitArith_op(KeYParser.Arith_opContext ctx) {
-        /*    PERCENT {op = "\%";}
-  | STAR {op = "*";}
-  | MINUS {op = "-";}
-  | SLASH {op = "/";}
-  | PLUS { op = "+";}*/
-        return ctx.getText();
     }
 
     public TermFactory getTermFactory() {
