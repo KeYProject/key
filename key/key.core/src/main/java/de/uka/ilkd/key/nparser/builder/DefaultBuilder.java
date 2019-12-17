@@ -10,7 +10,6 @@ import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeYParser;
@@ -97,7 +96,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         namespaces().setVariables(orig);
     }
 
-    @Override
+    /*@Override
     public Integer visitLocation_ident(KeYParser.Location_identContext ctx) {
         var id = accept(ctx.simple_ident());
         if ("Location".equals(id)) {
@@ -106,7 +105,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             semanticError(ctx, "%s Attribute of a Non Rigid Function can only be 'Location'", id);
         }
         return NORMAL_NONRIGID;
-    }
+    }*/
 
     @Override
     public List<Sort> visitArg_sorts_or_formula(KeYParser.Arg_sorts_or_formulaContext ctx) {
@@ -118,57 +117,14 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         if (ctx.FORMULA() != null)
             return Sort.FORMULA;
         else
-            return (Sort) accept(ctx.sortId_check());
+            return (Sort) accept(ctx.sortId());
     }
 
-    @Override
-    public Sort visitSortId_check(KeYParser.SortId_checkContext ctx) {
-        Pair<Sort, Type> p = accept(ctx.sortId_check_help());
+    /*@Override
+    public Sort visitAny_sortId(KeYParser.Any_sortIdContext ctx) {
+        Pair<Sort, Type> p = accept(ctx.any_sortId_help());
         return toArraySort(p, ctx.EMPTYBRACKETS().size());
-    }
-
-    @Override
-    public Sort visitAny_sortId_check(KeYParser.Any_sortId_checkContext ctx) {
-        Pair<Sort, Type> p = accept(ctx.any_sortId_check_help());
-        return toArraySort(p, ctx.EMPTYBRACKETS().size());
-    }
-
-    @Override
-    public Pair<Sort, Type> visitAny_sortId_check_help(KeYParser.Any_sortId_check_helpContext ctx) {
-        var name = (String) accept(ctx.simple_sort_name());
-        //Special handling for byte, char, short, long:
-        //these are *not* sorts, but they are nevertheless valid
-        //prefixes for array sorts such as byte[], char[][][].
-        //Thus, we consider them aliases for the "int" sort, and remember
-        //the corresponding Java type for the case that an array sort
-        //is being declared.
-        Type t = null;
-        if (name.equals(PrimitiveType.JAVA_BYTE.getName())) {
-            t = PrimitiveType.JAVA_BYTE;
-            name = PrimitiveType.JAVA_INT.getName();
-        } else if (name.equals(PrimitiveType.JAVA_CHAR.getName())) {
-            t = PrimitiveType.JAVA_CHAR;
-            name = PrimitiveType.JAVA_INT.getName();
-        } else if (name.equals(PrimitiveType.JAVA_SHORT.getName())) {
-            t = PrimitiveType.JAVA_SHORT;
-            name = PrimitiveType.JAVA_INT.getName();
-        } else if (name.equals(PrimitiveType.JAVA_INT.getName())) {
-            t = PrimitiveType.JAVA_INT;
-            name = PrimitiveType.JAVA_INT.getName();
-        } else if (name.equals(PrimitiveType.JAVA_LONG.getName())) {
-            t = PrimitiveType.JAVA_LONG;
-            name = PrimitiveType.JAVA_INT.getName();
-        } else if (name.equals(PrimitiveType.JAVA_BIGINT.getName())) {
-            t = PrimitiveType.JAVA_BIGINT;
-            name = PrimitiveType.JAVA_BIGINT.getName();
-        }
-
-        Sort s = lookupSort(name);
-        if (s == null) {
-            semanticError(ctx, "Could not find sort: %s", ctx.getText());
-        }
-        return new Pair<>(s, t);
-    }
+    }*/
 
     /**
      * looks up a function, (program) variable or static query of the
@@ -176,11 +132,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      * and java info.
      *
      * @param varfuncName the String with the symbols name
-     * @param args        is null iff no argument list is given, for instance `f',
-     *                    and is an array of size zero, if an empty argument list was given,
-     *                    for instance `f()'.
      */
-    protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, Term[] args) {
+    protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, Sort sort) {
         Name name = new Name(varfuncName);
         Operator[] operators = new Operator[]{
                 schemaVariables().lookup(name),
@@ -196,28 +149,18 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             }
         }
 
-        int separatorIndex = varfuncName.indexOf("::");
-        if (separatorIndex > 0) {
-            String sortName = varfuncName.substring(0, separatorIndex);
-            String baseName = varfuncName.substring(separatorIndex + 2);
-            Sort sort = lookupSort(sortName);
+        if (sort != null) {
             SortDependingFunction firstInstance
-                    = SortDependingFunction.getFirstInstance(new Name(baseName),
+                    = SortDependingFunction.getFirstInstance(new Name(varfuncName),
                     getServices());
-
-            if (sort != null && firstInstance != null) {
+            if (firstInstance != null) {
                 var v = firstInstance.getInstanceFor(sort, getServices());
                 if (v != null) {
                     return v;
                 }
             }
         }
-
-        if (args == null) {
-            semanticError(ctx, "(program) variable or constant %s", varfuncName);
-        } else {
-            semanticError(ctx, "function or static query %s in %s", varfuncName, ctx.parent.parent.getText());
-        }
+        semanticError(ctx, "(program) variable or constant %s", varfuncName);
         return null;
     }
 
@@ -294,20 +237,6 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     @Override
-    public String visitSimple_sort_name(KeYParser.Simple_sort_nameContext ctx) {
-        return (String) accept(ctx.simple_ident_dots());
-    }
-
-    @Override
-    public String visitSort_name(KeYParser.Sort_nameContext ctx) {
-        String name = accept(ctx.simple_sort_name());
-        for (int i = 0; i < ctx.EMPTYBRACKETS().size(); i++) {
-            name += "[]";
-        }
-        return name;
-    }
-
-    @Override
     public String visitString_value(KeYParser.String_valueContext ctx) {
         return ctx.getText().substring(1, ctx.getText().length() - 1);
     }
@@ -367,28 +296,47 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     @Override
     public List<Sort> visitArg_sorts(KeYParser.Arg_sortsContext ctx) {
-        return mapOf(ctx.sortId_check());
+        return mapOf(ctx.sortId());
     }
 
     @Override
     public Sort visitSortId(KeYParser.SortIdContext ctx) {
-        return (Sort) ctx.sortId_check().accept(this);
-    }
-
-    @Override
-    public Pair<Sort, Type> visitSortId_check_help(KeYParser.SortId_check_helpContext ctx) {
-        Pair<Sort, Type> result = accept(ctx.any_sortId_check_help());
-        // don't allow generic sorts or collection sorts of
-        // generic sorts at this point
-        Sort s = result.first;
-        while (s instanceof ArraySort) {
-            s = ((ArraySort) s).elementSort();
+        var primitiveName = ctx.id.getText();
+        //Special handling for byte, char, short, long:
+        //these are *not* sorts, but they are nevertheless valid
+        //prefixes for array sorts such as byte[], char[][][].
+        //Thus, we consider them aliases for the "int" sort, and remember
+        //the corresponding Java type for the case that an array sort
+        //is being declared.
+        Type t = null;
+        if (primitiveName.equals(PrimitiveType.JAVA_BYTE.getName())) {
+            t = PrimitiveType.JAVA_BYTE;
+            primitiveName = PrimitiveType.JAVA_INT.getName();
+        } else if (primitiveName.equals(PrimitiveType.JAVA_CHAR.getName())) {
+            t = PrimitiveType.JAVA_CHAR;
+            primitiveName = PrimitiveType.JAVA_INT.getName();
+        } else if (primitiveName.equals(PrimitiveType.JAVA_SHORT.getName())) {
+            t = PrimitiveType.JAVA_SHORT;
+            primitiveName = PrimitiveType.JAVA_INT.getName();
+        } else if (primitiveName.equals(PrimitiveType.JAVA_INT.getName())) {
+            t = PrimitiveType.JAVA_INT;
+            primitiveName = PrimitiveType.JAVA_INT.getName();
+        } else if (primitiveName.equals(PrimitiveType.JAVA_LONG.getName())) {
+            t = PrimitiveType.JAVA_LONG;
+            primitiveName = PrimitiveType.JAVA_INT.getName();
+        } else if (primitiveName.equals(PrimitiveType.JAVA_BIGINT.getName())) {
+            t = PrimitiveType.JAVA_BIGINT;
+            primitiveName = PrimitiveType.JAVA_BIGINT.getName();
+        }
+        Sort s = lookupSort(primitiveName);
+        if (s == null) {
+            semanticError(ctx, "Could not find sort: %s", ctx.getText());
         }
 
-        if (s instanceof GenericSort) {
-            semanticError(ctx, "Non-generic sort expected was expected. But got " + s);
+        if (!ctx.EMPTYBRACKETS().isEmpty()) {
+            return toArraySort(new Pair<>(s, t), ctx.EMPTYBRACKETS().size());
         }
-        return result;
+        return s;
     }
 
     @Override
@@ -439,12 +387,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     @Override
-    public String visitFuncpred_name(KeYParser.Funcpred_nameContext ctx) {
-        if (ctx.DOUBLECOLON() != null) {
-            return accept(ctx.sort_name()) + "::" + accept(ctx.name);
-        }
-        //if (ctx.NUM_LITERAL() != null)
-        //    return ctx.NUM_LITERAL().getText();
-        return (String) accept(ctx.simple_ident());
+    public Object visitFuncpred_name(KeYParser.Funcpred_nameContext ctx) {
+        return ctx.getText();
     }
 }

@@ -83,7 +83,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitOne_schema_modal_op_decl(KeYParser.One_schema_modal_op_declContext ctx) {
         ImmutableSet<Modality> modalities = DefaultImmutableSet.nil();
-        Sort sort = accept(ctx.any_sortId_check());
+        Sort sort = accept(ctx.sort);
         if (sort != null && sort != Sort.FORMULA) {
             semanticError(ctx, "Modal operator SV must be a FORMULA, not " + sort);
         }
@@ -303,9 +303,9 @@ public class TacletPBuilder extends ExpressionBuilder {
             case TYPE_RESOLVER:
                 return buildTypeResolver(ctx);
             case SORT:
-                return accept(ctx.any_sortId_check());
+                return accept(ctx.sortId());
             case JAVA_TYPE:
-                return getJavaInfo().getKeYJavaType(ctx.any_sortId_check().getText());
+                return getJavaInfo().getKeYJavaType(ctx.sortId().getText());
             case VARIABLE:
                 return varId(ctx, ctx.getText());
             case STRING:
@@ -325,7 +325,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             return TypeResolver.createContainerTypeResolver(y);
         }
 
-        Sort s = accept(ctx.any_sortId_check());
+        Sort s = accept(ctx.sortId());
         if (s != null) {
             if (s instanceof GenericSort) {
                 return TypeResolver.createGenericSortResolver((GenericSort) s);
@@ -1014,8 +1014,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             return null;
         }
 
-        if (ctx.any_sortId_check() != null)
-            s = accept(ctx.any_sortId_check());
+        if (ctx.sortId() != null)
+            s = accept(ctx.sortId());
 
         for (String id : ids) {
             declareSchemaVariable(ctx, id,

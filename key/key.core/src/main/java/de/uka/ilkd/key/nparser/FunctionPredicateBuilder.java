@@ -87,7 +87,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
     @Override
     public Object visitFunc_decl(KeYParser.Func_declContext ctx) {
         boolean unique = ctx.UNIQUE() != null;
-        Sort retSort = accept(ctx.any_sortId_check());
+        Sort retSort = accept(ctx.sortId());
         String func_name = accept(ctx.funcpred_name());
         List<Boolean[]> whereToBind = accept(ctx.where_to_bind());
         List<Sort> argSorts = accept(ctx.arg_sorts());
@@ -137,7 +137,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
     @Override
     public Object visitTransform_decl(KeYParser.Transform_declContext ctx) {
-        var retSort = (Sort) (ctx.FORMULA() != null ? Sort.FORMULA : accept(ctx.any_sortId_check()));
+        var retSort = (Sort) (ctx.FORMULA() != null ? Sort.FORMULA : accept(ctx.sortId()));
         var trans_name = (String) accept(ctx.funcpred_name());
         var argSorts = (List<Sort>) accept(ctx.arg_sorts_or_formula());
         Transformer t = new Transformer(new Name(trans_name),

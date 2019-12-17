@@ -184,12 +184,12 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public List<Sort> visitExtends_sorts(KeYParser.Extends_sortsContext ctx) {
-        return mapOf(ctx.any_sortId_check());
+        return mapOf(ctx.sortId());
     }
 
     @Override
     public List<Sort> visitOneof_sorts(KeYParser.Oneof_sortsContext ctx) {
-        return mapOf(ctx.sortId_check());
+        return mapOf(ctx.sortId());
     }
 
 

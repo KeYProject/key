@@ -64,8 +64,8 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
         var oldProgVars = namespaces().programVariables();
         namespaces().setProgramVariables(new Namespace<>(oldProgVars));
         declarationBuilder.visitProg_var_decls(ctx.prog_var_decls());
-        Term fma = visitFormula(ctx.formula());
-        Term modifiesClause = visitTerm(ctx.modifiesClause);
+        Term fma = accept(ctx.fma);
+        Term modifiesClause = accept(ctx.modifiesClause);
         DLSpecFactory dsf = new DLSpecFactory(getServices());
         try {
             FunctionalOperationContract dlOperationContract =
@@ -92,7 +92,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     @Override
     public Object visitOne_invariant(KeYParser.One_invariantContext ctx) {
         String invName = visitSimple_ident(ctx.simple_ident());
-        Term fma = accept(ctx.formula());
+        Term fma = accept(ctx.fma);
         var displayName = ctx.displayName != null ? ctx.displayName.getText() : null;
         DLSpecFactory dsf = new DLSpecFactory(getServices());
         try {

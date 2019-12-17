@@ -109,7 +109,7 @@ one_sort_decl
 
 simple_ident_dots
 :
-  simple_ident (DOT simple_ident )* | NUM_LITERAL
+  simple_ident (DOT simple_ident)* | NUM_LITERAL
 ;
 
 simple_ident_dots_comma_list
@@ -166,40 +166,38 @@ simple_ident_comma_list
 
 schema_var_decls :
     SCHEMAVARIABLES LBRACE
-    ( one_schema_var_decl )*
+    ( one_schema_var_decl SEMI)*
     RBRACE
 ;
 
+//TODO Split
 one_schema_var_decl
 :
-    (
-           MODALOPERATOR one_schema_modal_op_decl
-         | PROGRAM
-            (schema_modifiers)?
-            id = simple_ident
-            (LBRACKET nameString=simple_ident EQUALS parameter=simple_ident_dots RBRACKET)?
-            ids=simple_ident_comma_list
-         | FORMULA
-           (schema_modifiers)?
-            ids = simple_ident_comma_list
-         | TERMLABEL
-           (schema_modifiers)?
-           ids=simple_ident_comma_list
-         | UPDATE
-           (schema_modifiers)?
-           ids=simple_ident_comma_list
-         | SKOLEMFORMULA
-           (schema_modifiers)?
-           ids=simple_ident_comma_list
-         | ( TERM
-           | (VARIABLES | VARIABLE)
-           | SKOLEMTERM
-           )
-           (schema_modifiers)?
-           s=sortId
-           ids=simple_ident_comma_list
-    )
-    SEMI
+     MODALOPERATOR one_schema_modal_op_decl
+   | PROGRAM
+      (schema_modifiers)?
+      id = simple_ident
+      (LBRACKET nameString=simple_ident EQUALS parameter=simple_ident_dots RBRACKET)?
+      ids=simple_ident_comma_list
+   | FORMULA
+     (schema_modifiers)?
+      ids = simple_ident_comma_list
+   | TERMLABEL
+     (schema_modifiers)?
+     ids=simple_ident_comma_list
+   | UPDATE
+     (schema_modifiers)?
+     ids=simple_ident_comma_list
+   | SKOLEMFORMULA
+     (schema_modifiers)?
+     ids=simple_ident_comma_list
+   | ( TERM
+     | (VARIABLES | VARIABLE)
+     | SKOLEMTERM
+     )
+     (schema_modifiers)?
+     s=sortId
+     ids=simple_ident_comma_list
 ;
 
 schema_modifiers
@@ -217,52 +215,27 @@ one_schema_modal_op_decl
 ;
 
 pred_decl
-    :
-        pred_name = funcpred_name
-
-        (
-	    whereToBind = where_to_bind
-	)?
-     argSorts = arg_sorts
-        SEMI
-    ;
+:
+  pred_name = funcpred_name
+  (whereToBind=where_to_bind)?
+  argSorts=arg_sorts
+  SEMI
+;
 
 pred_decls
-    :
-        PREDICATES
-        LBRACE
-        (
-            pred_decl
-        ) *
-        RBRACE
-    ;
-
-
-location_ident
-    :
-        id = simple_ident
-   
-    ;
-
-
+:
+  PREDICATES LBRACE (pred_decl)* RBRACE
+;
 
 func_decl
-
-    :
-        (
-            UNIQUE 
-        )?
-
-        retSort = sortId
-
-        func_name = funcpred_name
-
-	(
-	    whereToBind = where_to_bind
-	)?
-        argSorts = arg_sorts
-        SEMI
-    ;
+:
+  (UNIQUE)?
+  retSort = sortId
+  func_name = funcpred_name
+	whereToBind=where_to_bind?
+  argSorts = arg_sorts
+  SEMI
+;
 
 func_decls
     :
@@ -390,8 +363,16 @@ literals:
 
 term
 :
-  literals                    #termLiterals
-  | accessterm                #termAccess
+    literals                  #termLiterals
+  | accessterm                #termAccess  //also handles function calls
+  | term DOT attrid           #termAttribute //this is ambigous
+  | term AT term              #termHeap
+  | term argument_list        #termCall
+  | term DOT STAR             #dotAll
+  | term LBRACKET target=term ASSIGN val=term  RBRACKET       #bracket_access_heap_upate
+  | term LBRACKET id=simple_ident args=argument_list RBRACKET #bracket_access_heap_term
+  | term LBRACKET STAR RBRACKET                               #bracket_access_star
+  | term LBRACKET indexTerm=term (DOTRANGE rangeTo=term)? RBRACKET #bracket_access_indexrange
   | AT name=simple_ident      #abbreviation
   | LPAREN term RPAREN        #termParen
   | ifThenElseTerm            #termIfThenElse
@@ -402,7 +383,6 @@ term
   | location_term             #termLocation
   | substitutionterm          #termSubstitution
   | updateterm                #termUpdate
-  | MODALITY term             #termModality
   |<assoc=right>
     term (SLASH | PERCENT) term #termDivisionModulo
   |	term STAR term            #termMult
@@ -415,47 +395,24 @@ term
   | term IMP term             #implication_term
   | term EQV term             #equivalence_term
   | term ASSIGN term          #elementary_update_term
+  | quantifierterm            #termQuantifier
+  | locset_term               #termLocset
+  | MODALITY term             #termModality
   | term PARALLEL term        #parallel
   | term (LGUILLEMETS labels = label RGUILLEMETS)
                               #termLabeled
 ;
 
+/**
+ * Access: a.b.c@f, T.staticQ()
+ */
 accessterm
 :
   varfuncid=funcpred_name
   ( (LBRACE boundVars=bound_variables RBRACE)?
     args=argument_list
   )?
-  atom_suffix*
-  heap_suffix?
 ;
-
-heap_suffix: AT term;
-
-atom_suffix
-:
-      accessterm_bracket_suffix
-    | attribute_or_query_suffix
-;
-
-accessterm_bracket_suffix
-:
-    LBRACKET
-    ( target=term ASSIGN val=term // heap assignment
-    | id=simple_ident args=argument_list // for heap terms, this could be ambigous with logicTermReEntry
-    | STAR
-    | indexTerm=term (DOTRANGE rangeTo=term)? //array or sequence access
-    )
-    RBRACKET
-;
-
-
-static_query
-:
-    queryRef=staticAttributeOrQueryReference
-    args=argument_list
-;
-
 
 label
 :
@@ -502,34 +459,14 @@ staticAttributeOrQueryReference
   (EMPTYBRACKETS )*
 ;
 
-static_attribute_suffix
-:
-  attributeName = staticAttributeOrQueryReference
-;
-
-
-attribute_or_query_suffix
-:
-    DOT ( STAR 
-        | ( memberName=attrid
-            (result=query_suffix )?
-          ) 
-        )
-;
- 
+/**
+  instead, one can write o.(packagename.Classname::f)
+*/
 attrid
 :
-// the o.f@(packagename.Classname) syntax has been dropped.
-// instead, one can write o.(packagename.Classname::f)
     id = simple_ident
   | LPAREN clss = sortId DOUBLECOLON id2 = simple_ident RPAREN
 ;
-
-query_suffix 
-:
-    args = argument_list
-;
- 
 
 
 ifThenElseTerm
@@ -610,7 +547,7 @@ taclet
   LBRACE
   ( form=term
   |
-    ( SCHEMAVAR one_schema_var_decl ) *
+    ( SCHEMAVAR one_schema_var_decl SEMI) *
     ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
     ( FIND LPAREN find=termorseq RPAREN
         (   SAMEUPDATELEVEL

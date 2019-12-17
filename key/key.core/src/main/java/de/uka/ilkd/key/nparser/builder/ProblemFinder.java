@@ -50,7 +50,7 @@ public class ProblemFinder extends ExpressionBuilder {
                 proofObligation = "";
         }
         if (ctx.PROBLEM() != null) {
-            problemTerm = accept(ctx.formula());
+            problemTerm = accept(ctx.term());
         }
         return null;
     }

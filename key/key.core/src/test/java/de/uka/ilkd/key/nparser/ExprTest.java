@@ -92,7 +92,10 @@ public class ExprTest {
         var url = getClass().getResource(p);
         Assume.assumeNotNull(url);
         KeyIO io = new KeyIO(services);
-        io.load(url).loadComplete();
+        io.load(url).parseFile()
+                .loadDeclarations()
+                .loadSndDegreeDeclarations();
+
         NamespaceBuilder nssb = new NamespaceBuilder(services.getNamespaces());
         nssb.addVariable("aa", "int")
                 .addVariable("bb", "int")
