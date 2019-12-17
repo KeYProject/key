@@ -29,10 +29,19 @@ dependencies {
 }
 
 application {
-    mainClassName = "proofmanagement.Main"
+    mainClassName = "org.key_project.proofmanagement.Main"
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs "src/main/template"
+        }
+    }
 }
 
 run {
     //dependsOn(classes) // implicit!
-    args('check', '--dependency', '--settings', '--files', '../../../cyclic.zproof')
+    //args('check', '--settings', '--files', '--report', 'testReport.html', '../../../cyclic.zproof')
+    args('merge', '--check', '"--settings --dependency"', '../../../cyclic1.zproof', '../../../cyclic2.zproof', '../../../cyclic_result.zproof')
 }

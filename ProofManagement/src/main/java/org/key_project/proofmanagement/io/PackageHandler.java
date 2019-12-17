@@ -88,7 +88,7 @@ public class PackageHandler {
     }
 
     // *.proof
-    public List<Path> getProofFiles() throws ZipException, IOException {
+    public List<Path> getProofFiles() throws IOException {
         // ensure the zip is extracted
         load();
 
@@ -96,7 +96,7 @@ public class PackageHandler {
     }
 
     // *.key
-    public List<Path> getKeYFiles() throws ZipException, IOException {
+    public List<Path> getKeYFiles() throws IOException {
         // ensure the zip is extracted
         load();
 
@@ -104,7 +104,7 @@ public class PackageHandler {
     }
 
     // *.java
-    public List<Path> getSourceFiles() throws ZipException, IOException {
+    public List<Path> getSourceFiles() throws IOException {
         // ensure the zip is extracted
         load();
 
@@ -113,7 +113,7 @@ public class PackageHandler {
     }
 
     // *.java, *.class, *.zip, *.jar
-    public List<Path> getClasspathFiles() throws ZipException, IOException {
+    public List<Path> getClasspathFiles() throws IOException {
         // ensure the zip is extracted
         load();
 
@@ -122,7 +122,7 @@ public class PackageHandler {
     }
 
     // *.java
-    public List<Path> getBootclasspathFiles() throws ZipException, IOException {
+    public List<Path> getBootclasspathFiles() throws IOException {
         // ensure the zip is extracted
         load();
 

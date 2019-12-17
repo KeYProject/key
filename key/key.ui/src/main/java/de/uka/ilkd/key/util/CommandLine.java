@@ -211,7 +211,10 @@ public final class CommandLine {
     public CommandLine getSubCommandLine(String name) {
         CommandLine scli = subcommands.get(name);
         if (scli == null) {
-            throw new IllegalArgumentException("No subcommand with name '" + name + "' exists.");
+            // TODO: problem when no option at all is specified,
+            //  e.g. "pm merge p1.zproof p2.zproof result.zproof"
+            //throw new IllegalArgumentException("No subcommand with name '" + name + "' exists.");
+            return null;
         }
         return scli;
     }
@@ -309,7 +312,7 @@ public final class CommandLine {
         int cnt = 0;
 
         // assumption: only single subcommand, only at first position
-        if (!args[cnt].startsWith(MINUS)) {
+        if (args.length > 0 && !args[cnt].startsWith(MINUS)) {
             // test for subcommand:
             CommandLine subcli = getSubCommandLine(args[cnt]);
             if (subcli != null) {
