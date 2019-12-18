@@ -162,8 +162,12 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Term visitConjunction_term(KeYParser.Conjunction_termContext ctx) {
+        if (accept(ctx.term(0)) == null) {
+            System.out.println("sss");
+        }
         Term termL = accept(ctx.term(0));
         Term termR = accept(ctx.term(1));
+
         return getTermFactory().createTerm(Junctor.AND, termL, termR);
     }
 
@@ -191,6 +195,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term termR = accept(ctx.term(1));
         return capsulateTf(ctx, () -> getTermFactory().createTerm(Equality.EQUALS, termL, termR));
     }
+
 
     @Override
     public Term visitTermNotEquals(KeYParser.TermNotEqualsContext ctx) {

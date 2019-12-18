@@ -44,6 +44,12 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
         return (T) ctx.accept(this);
     }
 
+    @Override
+    protected T aggregateResult(T aggregate, T nextResult) {
+        if(nextResult!=null) return nextResult;
+        return aggregate;
+    }
+
     /**
      * @param <T>
      * @return
