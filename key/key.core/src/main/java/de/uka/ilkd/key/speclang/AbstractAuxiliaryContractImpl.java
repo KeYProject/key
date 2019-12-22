@@ -1193,6 +1193,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 final Map<LocationVariable, Term> assignables,
                 final Map<LocationVariable, Boolean> hasMod, final Services services) {
             super(services.getTermFactory(), services);
+            System.out.println(infFlowSpecs);
             this.baseName = baseName;
             this.block = block;
             this.labels = labels;

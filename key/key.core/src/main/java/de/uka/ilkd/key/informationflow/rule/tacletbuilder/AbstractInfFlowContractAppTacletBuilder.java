@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -73,18 +74,19 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     }
 
 
-    public Taclet buildTaclet() {
+    public Taclet buildTaclet(Goal goal) {
         ProofObligationVars appData = poVars;
-        return genInfFlowContractApplTaclet(appData, services);
+        return genInfFlowContractApplTaclet(goal, appData, services);
     }
 
 
     abstract Name generateName();
 
-    private static Name checkName(Name name) {
+    private static Name checkName(Name name, Goal goal) {
         int i = 0;
         final String s = name.toString();
-        while (InfFlowContractAppTaclet.registered(name)) {
+        name = new Name(s + "_" + goal.node().getUniqueTacletId());
+        while (goal.getLocalNamespaces().lookup(name) != null) {
             name = new Name(s + "_" + i++);
         }
         InfFlowContractAppTaclet.register(name);
@@ -175,9 +177,9 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     }
 
 
-    private Taclet genInfFlowContractApplTaclet(ProofObligationVars appData,
+    private Taclet genInfFlowContractApplTaclet(Goal goal, ProofObligationVars appData,
                                                 Services services) {
-        Name tacletName = checkName(generateName());
+        Name tacletName = checkName(generateName(), goal);
             // generate schemaFind and schemaAssumes terms
             ProofObligationVars schemaDataFind =
                     generateApplicationDataSVs("find_", appData, services);
