@@ -72,49 +72,44 @@ ul, #fileTree {
 	display: block;
 }
 
+table {
+    border-collapse: collapse;
+}
+
+tr:hover {
+    background-color:#f5f5f5;
+}
+
 </style>
 </head>
 
 <body>
 
 <div class="tab">
-    <button class="tablinks" onclick="openTab(event, 'files')" id="defaultOpen">files</button>
-    <button class="tablinks" onclick="openTab(event, 'contracts')">contracts</button>
+    <button class="tablinks" onclick="openTab(event, 'overview')" id="defaultOpen">overview</button>
+    <button class="tablinks" onclick="openTab(event, 'files')">files</button>
+	<button class="tablinks" onclick="openTab(event, 'contracts')">contracts</button>
+	<button class="tablinks" onclick="openTab(event, 'dependencies')">dependencies</button>
+</div>
+
+<div id="overview" class="tabcontent">
+	<h3>Overview:</h3>
+	<!-- TODO -->
 </div>
 
 <div id="files" class="tabcontent">
-    <h3>File contained in proof bundle:</h3>
-    <p>This tab contains the filetree</p>
-	<ul id="fileTree">
-		<li><span class="caret">\$bundleFileName</span>
-			<ul class="nested">
-				<li><span class="caret">src</span>
-					<ul class="nested">
-						<li>...</li>
-					</ul>
-				</li>
-				<li><span class="caret">cp</span>
-					<ul class="nested">
-						<li>...</li>
-					</ul>
-				</li>
-				<li><span class="caret">bcp</span>
-					<ul class="nested">
-						<li>...</li>
-					</ul>
-				</li>
-				<li>p1.proof</li>
-				<li>p2.proof</li>
-				<li>problem.key</li>
-				<li>projekt.kproj</li>
-			</ul>
-		</li>
-	</ul>
+    <h3>Files found inside proof bundle:</h3>
+	$/tree/tree(node=treeRoot)$
 </div>
 
 <div id="contracts" class="tabcontent">
-    <h3>File contained in proof bundle:</h3>
-    <p>This tab contains the contracts</p>
+    <h3>Contracts found inside proof bundle:</h3>
+    $/lines/lines(contracts=lines)$
+</div>
+
+<div id="dependencies" class="tabcontent">
+    <h3>Dependencies between contracts:</h3>
+    $/dependency/dependencies(graph=graph)$
 </div>
 
 <script type="text/javascript">

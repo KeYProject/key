@@ -17,6 +17,6 @@ public class Testing {
         List<Path> proofFiles = new ArrayList<>();
         proofFiles.add(proof1);
         proofFiles.add(proof2);
-        myDependencyChecker.check(proofFiles);
+        //myDependencyChecker.check(proofFiles, );
     }
 }

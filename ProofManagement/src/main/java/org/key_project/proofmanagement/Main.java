@@ -13,33 +13,37 @@ import java.util.zip.ZipException;
 
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
-import org.key_project.proofmanagement.check.CheckResult;
+import org.key_project.proofmanagement.check.CheckerData;
 import org.key_project.proofmanagement.check.DependencyChecker;
-import org.key_project.proofmanagement.merge.FilesChecker;
+import org.key_project.proofmanagement.check.MissingProofsChecker;
 import org.key_project.proofmanagement.check.SettingsChecker;
-import org.key_project.proofmanagement.io.PackageHandler;
+import org.key_project.proofmanagement.io.ProofBundleHandler;
 import org.key_project.proofmanagement.io.report.Report;
 import org.key_project.proofmanagement.merge.ProofBundleMerger;
 
 public class Main {
 
     /* CLI commands:
-     *  check [-s|--settings] [-d|--dependency] [-f|--files] [-r|--report <out_path>] <bundle_path>
+     *  check [-s|--settings] [-d|--dependency] [-r|--report <out_path>] <bundle_path>
      *    options:
      *        -s --settings settings check
      *        -d --dependency dependency check
-     *        -f --files files check
      *        -a --auto try to use automode to close open proofs
      *        -e --explicit (implies a) stores automatically found proofs explicitly as files
      *        -r --report generate html report + API
+     *        -c --completion check for completion state (have all POs been proven?)
      *    checks that are always enabled:
      *        - check for duplicate proofs of the same contracts
-     *        - check for completion state (all POs proven)
      *    individually and independently trigger different checks
      *  merge [-f|--force] [-n|--no-check] <bundle1> <bundle2> ... <output>
      *    options:
      *        -f --force merge the bundles even when the consistency check failed
-     *        -n --no-check merge without even performing a check
+     *        -c --check "<check_options>" passes the given options to the check command and
+     *                  executes it
+     *  bundle [-c|--check]
+     *    options:
+     *        -c --check "<check_options>" passes the given options to the check command and
+     *                  executes it
      */
 
     private static final String USAGE = "Usage: pm <command>" + System.lineSeparator()
@@ -62,6 +66,10 @@ public class Main {
         check.addOption("--settings", null, "Enables check for consistent proof settings");
         check.addOption("--dependency", null, "Enables check for cyclic dependencies");
         check.addOption("--files", null, "Enables check for compatible files");
+        check.addOption("--missing", null, "Enables check whether there are unproven contracts.");
+        check.addOption("--replay", null, "Enables check whether all saved proofs can be replayed successfully.");
+        check.addOption("--auto", null, "Tries to run automatic proof search for all unproven contracts.");
+        check.addOption("--explicit", null, "Makes automatically found proofs explicit (implies --auto).");
         check.addOption("--report", "out_path", "Writes the report to a HTML file at the given path");
 
         cl.addSubCommand("merge");
@@ -77,6 +85,9 @@ public class Main {
         merge_check.addOption("--files", null, "Enables check for compatible files");
         merge_check.addOption("--report", "out_path", "Writes the report to a HTML file at the given path");
 
+        // TODO: bundle subcommand
+        cl.addSubCommand("bundle");
+
         return cl;
     }
 
@@ -90,9 +101,21 @@ public class Main {
                 check(cl.getSubCommandLine("check"));
             } else if (cl.subCommandUsed("merge")) {
                 merge(cl.getSubCommandLine("merge"));
+            } else if (cl.subCommandUsed("bundle")) {
+                bundle(cl.getSubCommandLine("bundle"));
             }
         } catch (CommandLineException e) {
             e.printStackTrace();
+        }
+    }
+
+    // bundle [-c|--check "check_options"] <root_dir> <bundle_path>
+    private static void bundle(CommandLine commandLine) {
+        // TODO: bundle subcommand
+
+        List<String> arguments = commandLine.getArguments();
+        if (arguments.size() != 2) {
+            commandLine.printUsage(System.out);
         }
     }
 
@@ -101,17 +124,15 @@ public class Main {
 
         List<String> arguments = commandLine.getArguments();
         if (arguments.size() != 1) {
-            System.out.println("Error! Single file needed: <bundle_path>");
+            commandLine.printUsage(System.out);
         }
 
         Path bundlePath = Paths.get(arguments.get(0));
-        PackageHandler ph = new PackageHandler(bundlePath);
+        ProofBundleHandler pbh = new ProofBundleHandler(bundlePath);
 
         List<Path> proofFiles = new ArrayList<>();
         try {
-            //for (String s : arguments) {
-                proofFiles.addAll(ph.getProofFiles());
-            //}
+            proofFiles.addAll(pbh.getProofFiles());
         } catch (ZipException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -119,11 +140,20 @@ public class Main {
         }
 
         // we accumulate results in this variable
-        CheckResult globalResult = new CheckResult(true);
+        CheckerData globalResult = new CheckerData(true, pbh);
+        try {
+            // add file tree to result
+            globalResult = globalResult.join(new CheckerData(pbh, pbh.getFileTree()));
+
+            // completeness check
+            globalResult = globalResult.join(new MissingProofsChecker().check(proofFiles, globalResult));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         if (commandLine.isSet("--settings")) {
-            CheckResult result = new SettingsChecker().check(proofFiles);
-            globalResult.join(result);
+            CheckerData result = new SettingsChecker().check(proofFiles, globalResult);
+            globalResult = globalResult.join(result);
             if (result.isConsistent()) {
                 System.out.println("    Consistent! Settings consistent!");
             } else {
@@ -131,8 +161,8 @@ public class Main {
             }
         }
         if (commandLine.isSet("--dependency")) {
-            CheckResult result = new DependencyChecker().check(proofFiles);
-            globalResult.join(result);
+            CheckerData result = new DependencyChecker().check(proofFiles, globalResult);
+            globalResult = globalResult.join(result);
             if (result.isConsistent()) {
                 System.out.println("    Consistent! No cycles found!");
             } else {
@@ -145,7 +175,7 @@ public class Main {
             List<Path> list = new ArrayList<>();
             list.add(bundlePath);
             CheckResult result = new FilesChecker().check(list);
-            globalResult.join(result);
+            globalResult = globalResult.join(result);
             if (result.isConsistent()) {
                 System.out.println("    Consistent! Files consistent!");
             } else {
@@ -153,6 +183,8 @@ public class Main {
             }
         }
         */
+        pbh.dispose();
+
         if (commandLine.isSet("--report")) {
             String outFileName = commandLine.getString("--report", "");
             Path output = Paths.get(outFileName).toAbsolutePath();
@@ -174,8 +206,7 @@ public class Main {
 
         // at least three files!
         if (arguments.size() < 3) {
-            System.out.println("Error! Specify at least two input files and one output file:");
-            System.out.println(USAGE_MERGE);
+            commandLine.printUsage(System.out);
         }
 
         // convert Strings to Paths (for input and output)
