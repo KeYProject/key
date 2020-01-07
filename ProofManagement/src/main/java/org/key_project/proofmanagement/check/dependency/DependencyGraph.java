@@ -1,26 +1,24 @@
 package org.key_project.proofmanagement.check.dependency;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class DependencyGraph {
 
-    private Set<DependencyNode> myNodes;
-
-    public DependencyGraph(Set<DependencyNode> nodes) {
-        myNodes = nodes;
-    }
-
-    public DependencyGraph() {
-        this(new HashSet<>());
-    }
+    private final Map<DependencyNode, DependencyNode> nodes = new HashMap<>();
 
     public void addNode(DependencyNode node) {
-        myNodes.add(node);
+        nodes.put(node, node);
+    }
+
+    public Map<DependencyNode, DependencyNode> getNodes() {
+        return nodes;
     }
 
     public boolean isLegal() {
-        for(DependencyNode currentNode : myNodes) {
+        for(DependencyNode currentNode : nodes.keySet()) {
             if(!currentNode.isLegal()) {
                 return false;
             }
@@ -31,7 +29,7 @@ public class DependencyGraph {
     @Override
     public String toString() {
         String result = "";
-        for(DependencyNode currentNode : myNodes) {
+        for(DependencyNode currentNode : nodes.keySet()) {
             result = result + currentNode + "\n";
         }
         return result;

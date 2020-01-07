@@ -3,7 +3,6 @@ package org.key_project.proofmanagement.merge;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -12,8 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import de.uka.ilkd.key.logic.op.Function;
-import org.key_project.proofmanagement.io.PackageHandler;
+import org.key_project.proofmanagement.io.ProofBundleHandler;
 
 // IMPORTANT: difference from other checkers: works with multiple packages instead of a single
 //          bundle!
@@ -40,23 +38,23 @@ public class FilesChecker {
     }
 
     private static boolean sourcesConsistent(Path a, Path b) {
-        return pathsConsistent(a, b, PackageHandler::getSourceFiles);
+        return pathsConsistent(a, b, ProofBundleHandler::getSourceFiles);
     }
 
     private static boolean classpathsConsistent(Path a, Path b) {
-        return pathsConsistent(a, b, PackageHandler::getClasspathFiles);
+        return pathsConsistent(a, b, ProofBundleHandler::getClasspathFiles);
     }
 
     private static boolean bootclasspathsConsistent(Path a, Path b) {
-        return pathsConsistent(a, b, PackageHandler::getBootclasspathFiles);
+        return pathsConsistent(a, b, ProofBundleHandler::getBootclasspathFiles);
     }
 
     // two paths are considered consistent if all files (recursively) inside pathA have a
     // counterpart in b (with same location and same content!)
     // However, both paths may contain additional unique files.
-    private static boolean pathsConsistent(Path a, Path b, CheckedFunction<PackageHandler, List<Path>> f) {
-        PackageHandler pha = new PackageHandler(a);
-        PackageHandler phb = new PackageHandler(b);
+    private static boolean pathsConsistent(Path a, Path b, CheckedFunction<ProofBundleHandler, List<Path>> f) {
+        ProofBundleHandler pha = new ProofBundleHandler(a);
+        ProofBundleHandler phb = new ProofBundleHandler(b);
         List<Path> filesA = new ArrayList<>();
         List<Path> filesB = new ArrayList<>();
         try {
@@ -70,7 +68,6 @@ public class FilesChecker {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-
         HashMap<Path, byte[]> mapA = new HashMap<>();
         HashMap<Path, byte[]> mapB = new HashMap<>();
         try {
@@ -90,6 +87,11 @@ public class FilesChecker {
                 return false;
             }
         }
+
+        // TODO: organize try-catch-finally blocks
+        pha.dispose();
+        phb.dispose();
+
         return true;
     }
 

@@ -1,21 +1,19 @@
 package org.key_project.proofmanagement.io.report;
 
-import org.key_project.proofmanagement.check.CheckResult;
+import org.key_project.proofmanagement.check.CheckerData;
+import org.key_project.proofmanagement.check.PathNode;
 import org.stringtemplate.v4.*;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Report {
-    private final CheckResult result;
+    private final CheckerData result;
 
     private Path outPath;
 
@@ -23,7 +21,7 @@ public class Report {
         this.outPath = outPath;
     }
 
-    public Report(CheckResult result) {
+    public Report(CheckerData result) {
         this.result = result;
     }
 
@@ -40,12 +38,17 @@ public class Report {
 
         st.add("title", "test report 2.0");
 
-        st.add("text", "an arbitrary short text for testing purposes");
+        PathNode fileTree = result.getFileTree();
 
-        String result = st.render();
-        printToOutputFile(result);
+        st.add("bundleFileName", fileTree == null ? null : fileTree.content);
+        st.add("treeRoot", fileTree == null ? null : fileTree);
+        st.add("lines", result.getProofLines());
+        st.add("graph", result.getDependencyGraph());
 
-        return result;
+        String output = st.render();
+        printToOutputFile(output);
+
+        return output;
     }
 
     private void printToOutputFile(String str) throws IOException {

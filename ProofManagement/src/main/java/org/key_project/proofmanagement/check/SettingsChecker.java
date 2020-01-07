@@ -33,7 +33,7 @@ public class SettingsChecker implements Checker {
     //TODO: Carry file info with the data to allow for good user feedback
     //TODO: Consistency Checker should work on a higher abstraction level and not handle files, do file handling separately (we'll also need to reuse that)
     @Override
-    public CheckResult check(List<Path> proofFiles) {
+    public CheckerData check(List<Path> proofFiles, CheckerData currentRes) {
 
         List<KeYUserProblemFile> problemFiles = new ArrayList<>();
 
@@ -54,7 +54,7 @@ public class SettingsChecker implements Checker {
         }
 
         // TODO: messages
-        CheckResult result = new CheckResult(consistent(proofSettings));
+        CheckerData result = new CheckerData(consistent(proofSettings), currentRes.getPbh());
         return result;
     }
 

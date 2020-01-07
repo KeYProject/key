@@ -1,6 +1,8 @@
 package org.key_project.proofmanagement.check.dependency;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -16,7 +18,7 @@ public class DependencyNode {
 
     private SpecificationRepository specRepo;
     private FunctionalOperationContract contract;
-    private ImmutableSet<DependencyNode> dependencies;
+    private Map<DependencyNode, DependencyNode> dependencies;
 
     // TODO: check if these are all problems that can arise
     // and track details about the respective errors for outputting
@@ -29,7 +31,7 @@ public class DependencyNode {
     private ImmutableSet<FunctionalOperationContract> modalityClashes              = DefaultImmutableSet.nil();
     private ImmutableSet<ImmutableList<FunctionalOperationContract>> illegalCycles = DefaultImmutableSet.nil();
 
-    public DependencyNode(FunctionalOperationContract contract, ImmutableSet<DependencyNode> dependencies, SpecificationRepository specRepo) {
+    public DependencyNode(FunctionalOperationContract contract, Map<DependencyNode, DependencyNode> dependencies, SpecificationRepository specRepo) {
         this.specRepo = specRepo;
         this.contract = contract;
         this.dependencies = dependencies;
@@ -37,11 +39,23 @@ public class DependencyNode {
     }
 
     public DependencyNode(FunctionalOperationContract contract, SpecificationRepository specRepo) {
-        this(contract, DefaultImmutableSet.<DependencyNode>nil(), specRepo);
+        this(contract, new HashMap<>(), specRepo);
     }
 
     public void addDependency(DependencyNode dependentNode) {
-        dependencies = dependencies.add(dependentNode);
+        dependencies.put(dependentNode, dependentNode);
+    }
+
+    public FunctionalOperationContract getContract() {
+        return contract;
+    }
+
+    public  Map<DependencyNode, DependencyNode> getDependencies() {
+        return dependencies;
+    }
+
+    public SpecificationRepository getSpecRepo() {
+        return specRepo;
     }
 
     public Status getStatus() {
@@ -62,7 +76,7 @@ public class DependencyNode {
     // adapted from the classes: UseOperationContractRule and ProofCorrectnessMgt
     public boolean isLegal() {
         // are proofs of method contracts missing that are used in the current proof?
-        for (DependencyNode currentNode : dependencies) {
+        for (DependencyNode currentNode : dependencies.keySet()) {
             if (currentNode == null) {
                 status = Status.MISSING_PROOFS;
                 return false;
@@ -72,14 +86,14 @@ public class DependencyNode {
         if (contract.getModality() == Modality.DIA) {
             // are there some modalities that do not match?
             // this check should be unnecessary
-            for (DependencyNode currentNode : dependencies) {
+            for (DependencyNode currentNode : dependencies.keySet()) {
                 if(currentNode.contract.getModality() == Modality.BOX) {
                     status = Status.MODALITY_CLASH;
                     return false;
                 }
             }
             // do the proofs form an illegal cycle?
-            for (DependencyNode currentNode : dependencies) {
+            for (DependencyNode currentNode : dependencies.keySet()) {
                 // TODO: implement ProofCorrectnessMgt.isContractApplicable() here
                 if (!isApplicable(currentNode)) {
                     status = Status.ILLEGAL_CYCLES;
@@ -116,8 +130,8 @@ public class DependencyNode {
                 } else {
                     // This needs to be edited if we want to allow multiple proofs for the same contract
                     //   i.e. grapped in a loop over all proofs
-                    ImmutableSet<DependencyNode> currentDependencies = end.dependencies;
-                    for (DependencyNode currentDependency : currentDependencies) {
+                    Map<DependencyNode, DependencyNode> currentDependencies = end.dependencies;
+                    for (DependencyNode currentDependency : currentDependencies.keySet()) {
                         if (!path.contains(currentDependency)) {
                             final ImmutableList<DependencyNode> extendedPath = path.prepend(currentDependency);
                             paths = paths.add(extendedPath);
@@ -153,7 +167,7 @@ public class DependencyNode {
         String result = "";
         result = result + contract.getName() + " -> (";
         boolean first = true;
-        for(DependencyNode currentNode : dependencies) {
+        for(DependencyNode currentNode : dependencies.keySet()) {
             if (!first) result = result + " ";
             result = result + currentNode.contract.getName();
             first = false;

@@ -1,16 +1,15 @@
 package org.key_project.proofmanagement.io;
 
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.zip.ZipException;
+import java.util.stream.Stream;
 
+import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.util.java.IOUtil;
 
 
@@ -19,7 +18,7 @@ import org.key_project.util.java.IOUtil;
  * (a zip containing possibly multiple *.proof/*.key files and corresponding source/classpath
  * files in a well defined directory structure).
  */
-public class PackageHandler {
+public class ProofBundleHandler {
     /**
      * A matcher matches *.proof files.
      */
@@ -52,37 +51,36 @@ public class PackageHandler {
 
     private Path zipPath;
     private boolean isInitialized = false;
-    //private FileRepo fileRepo;
     private Path tmpDir;
 
     /**
      * Creates a new PackageHandler for the specified proof bundle.
      * @param zipPath the path of the proof bundle (zip file)
      */
-    public PackageHandler(Path zipPath) {
+    public ProofBundleHandler(Path zipPath) {
         this.zipPath = zipPath;
     }
 
-    private void load() throws ZipException, IOException {
+    private void load() throws IOException {
         if (!isInitialized) {
-            tmpDir = Files.createTempDirectory("KeYunzip");
+            tmpDir = Files.createTempDirectory("KeY_PM_unzip");
             IOUtil.extractZip(zipPath, tmpDir);
-
-            //fileRepo = new DiskFileRepo("HacKeYrepo");
-
-            // point the FileRepo to the temporary directory
-            //fileRepo.setBaseDir(tmpDir);
 
             isInitialized = true;
         }
     }
 
+    // IMPORTANT: get... methods return paths to unzipped files!
+
     private List<Path> getFiles(Path dir, PathMatcher matcher) throws IOException {
         List<Path> files = new ArrayList<>();
         if (Files.isDirectory(dir)) {
-            files.addAll(Files.list(dir)
-                    .filter(matcher::matches)
-                    .collect(Collectors.toList()));
+            // IMPORTANT: use try-with-resources here to ensure the stream is closed and does not
+            //  prevent the files from deletion on Windows!
+            try (Stream<Path> stream = Files.list(dir)) {
+                files.addAll(stream.filter(matcher::matches)
+                                   .collect(Collectors.toList()));
+            }
         }
         return files;
     }
@@ -130,15 +128,69 @@ public class PackageHandler {
         return getFiles(bootclasspathPath, BOOTCLASSPATH_MATCHER);
     }
 
-    /*
-    public FileRepo getFileRepo() {
-        return fileRepo;
-    }
-    */
-
     public Path getDir() {
         return tmpDir;
     }
 
+    /**
+     * Deletes temporary content from disk.
+     */
+    public void dispose() {
+        try {
+            Files.walk(tmpDir)
+                    .sorted(Comparator.reverseOrder())
+                    .forEach(
+                        p -> {
+                            try {
+                                Files.delete(p);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    private static class TreeFileVisitor extends SimpleFileVisitor<Path> {
+
+        PathNode start;
+        PathNode current;
+
+        public TreeFileVisitor(PathNode start) {
+            this.start = start;
+            this.current = start;
+        }
+
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            PathNode node = new PathNode(current, dir);
+            current.addChild(node);
+            current = node;
+            return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            PathNode node = new PathNode(current, file);
+            current.addChild(node);
+            return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+            current = current.getParent();
+            return FileVisitResult.CONTINUE;
+        }
+    }
+
+    public PathNode getFileTree() throws IOException {
+        load();
+
+        PathNode root = new PathNode(null, tmpDir);
+        Files.walkFileTree(tmpDir, new TreeFileVisitor(root));
+        // prevent double inclusion of root directory itself
+        // TODO: check why this is necessary
+        return (PathNode) root.getChildren().first();
+    }
 }

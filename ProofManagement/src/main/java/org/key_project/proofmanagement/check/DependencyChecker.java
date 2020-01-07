@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 
+import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -25,7 +26,6 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.IntermediatePresentationProofFileParser;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -39,8 +39,9 @@ public class DependencyChecker implements Checker {
     private SpecificationRepository specRepo = null;
 
     @Override
-    public CheckResult check(List<Path> proofFiles) {
+    public CheckerData check(List<Path> proofFiles, CheckerData currentRes) {
         ImmutableList<Pair<String, BranchNodeIntermediate>> contractProofPairs = ImmutableSLList.nil();
+        CheckerData result = new CheckerData(true, currentRes.getPbh());
         try {
             // for each proof: parse and construct intermediate AST
             for (Path proofPath : proofFiles) {
@@ -50,13 +51,13 @@ public class DependencyChecker implements Checker {
             // construct dependency graph from proofs
             // WARNING: the analysis as is currently implemented asserts there is exactly one proof for each contract!!!
             DependencyGraph dependencyGraph = DependencyGraphBuilder.buildGraph(specRepo, contractProofPairs);
-            // check if graph contains illegal structures,
-            //			e.g. cycles, unproven dependencies, ...
+
+            result = new CheckerData(currentRes.getPbh(), dependencyGraph);
+
+            // check if graph contains illegal structures, e.g. cycles, unproven dependencies, ...
             if (!dependencyGraph.isLegal()) {
-                // if graph illegal, report problem(s)
                 // TODO: what exactly are the problems
-                // and how can they be extracted?
-                CheckResult result = new CheckResult(false);
+                //  and how can they be extracted?
                 result.addMessage("[ERROR] Found a cycle in dependency graph: " + dependencyGraph);
                 // TODO: messages
                 return result;
@@ -66,7 +67,6 @@ public class DependencyChecker implements Checker {
         } catch (ProofInputException e) {
             // TODO:
         }
-        CheckResult result = new CheckResult(true);
         result.addMessage("[INFO] No cyclic dependency detected!");
         return result;
     }
@@ -81,7 +81,8 @@ public class DependencyChecker implements Checker {
      */
     public Pair<String, BranchNodeIntermediate> loadProof(Path path) throws IOException, ProofInputException {
         Profile profile = AbstractProfile.getDefaultProfile();
-        FileRepo fileRepo = new DiskFileRepo("testProof");
+
+        FileRepo fileRepo = new TrivialFileRepo();
         fileRepo.setBaseDir(path);
 
         ProgressMonitor control = ProgressMonitor.Empty.getInstance();
