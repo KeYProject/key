@@ -1141,6 +1141,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         ImmutableArray<QuantifiableVariable> bv = boundVars != null
                 ? new ImmutableArray<>(boundVars.toArray(new QuantifiableVariable[0]))
                 : null;
+
         List<Term> arguments = accept(ctx.argument_list());
         Term[] args = arguments == null ? new Term[0] : arguments.toArray(new Term[0]);
 

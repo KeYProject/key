@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.BuildingException;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.varexp.ArgumentType;
 import de.uka.ilkd.key.nparser.varexp.TacletBuilderCommand;
@@ -185,11 +186,15 @@ public class TacletPBuilder extends ExpressionBuilder {
         b.setChoices(choices);
         b.setAnnotations(tacletAnnotations);
         b.setOrigin(BuilderHelpers.getPosition(ctx));
-        Taclet r = peekTBuilder().getTaclet();
-        announceTaclet(ctx, r);
-        setSchemaVariables(schemaVariables().parent());
-        currentTBuilder.pop();
-        return r;
+        try {
+            Taclet r = peekTBuilder().getTaclet();
+            announceTaclet(ctx, r);
+            setSchemaVariables(schemaVariables().parent());
+            currentTBuilder.pop();
+            return r;
+        } catch (RuntimeException e) {
+            throw new BuildingException(ctx, e);
+        }
     }
 
     private void announceTaclet(ParserRuleContext ctx, Taclet taclet) {
