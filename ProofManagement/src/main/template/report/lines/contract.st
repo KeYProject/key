@@ -3,9 +3,7 @@
     <td>$data.sourceFile$</td>
     <td>$data.contract.name$</td>
     <td>$data.proofFile$</td>
-    <!-- TODO
-    <td>$data.proof.settings.choiceSettings.category2Choices.keys:{c | $data.proof.settings.choiceSettings.category2Choices.(c)$<br>}$</td>
-    -->
+    <td>$data.proof.settings.choiceSettings.choices.keys$ $!:{c | $c$<br>}!$</td>
     <td></td>
     <td>TODO</td>
     <td>Nodes: $data.proof.statistics.nodes$ <br>
