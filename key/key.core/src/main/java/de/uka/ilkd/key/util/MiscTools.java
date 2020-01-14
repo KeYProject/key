@@ -706,30 +706,31 @@ public final class MiscTools {
 
         try {
             switch (loc.getType()) {
-                case "URL":
-                    return ((URLDataLocation)loc).getUrl().toURI();
-                case "ARCHIVE":
-                    // format: "ARCHIVE:<filename>?<itemname>"
-                    String urlString = ((ArchiveDataLocation) loc).toString();
-                    // cut prefix
-                    urlString = urlString.substring(8);
-                    // extract filename and itemname
-                    int index = urlString.indexOf('?');
-                    String fileName = urlString.substring(0, index);
-                    String itemName = urlString.substring(index + 1);
-                    // construct URI
-                    return new URI("jar:file:/" + fileName + "!/" + itemName);
-                case "FILE":
-                    // format: "FILE:<path>"
-                    return ((DataFileLocation)loc).getFile().toURI();
-                default:
-                    // format "<type>://<location>"
-                    return new URI(loc.toString());
+            case "URL":
+                return ((URLDataLocation)loc).getUrl().toURI();
+            case "ARCHIVE":
+                // format: "ARCHIVE:<filename>?<itemname>"
+                String urlString = ((ArchiveDataLocation) loc).toString();
+                // cut prefix
+                urlString = urlString.substring(8);
+                // extract filename and itemname
+                int index = urlString.indexOf('?');
+                String fileName = urlString.substring(0, index);
+                String itemName = urlString.substring(index + 1);
+                // construct URI
+                return new URI("jar:file:/" + fileName + "!/" + itemName);
+            case "FILE":
+                // format: "FILE:<path>"
+                return ((DataFileLocation)loc).getFile().toURI();
+            default:
+                // format "<type>://<location>"
+                return new URI(loc.toString());
             }
         } catch (URISyntaxException e) {
             // should not happen -> programming error!
             e.printStackTrace();
         }
-        throw new IllegalArgumentException("The given DataLocation can not be converted to a valid URI: " + loc);
+        throw new IllegalArgumentException("The given DataLocation can not be converted" +
+                "into a valid URI: " + loc);
     }
 }

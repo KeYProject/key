@@ -161,9 +161,11 @@ public class ExceptionDialog extends JDialog {
                 && !"no file".equals(loc.getFilename())) {
             try {
                 // read the content via URLs openStream() method
-                BufferedReader br = new BufferedReader(new InputStreamReader(loc.getFileURL().openStream()));
+                BufferedReader br = new BufferedReader(new InputStreamReader(
+                        loc.getFileURL().openStream()));
                 List<String> list = br.lines()
-                                      .limit(loc.getLine())     // optimization: read only as far as necessary
+                                      // optimization: read only as far as necessary
+                                      .limit(loc.getLine())
                                       .collect(Collectors.toList());
                 String line = list.get(loc.getLine() - 1);
                 String pointLine = StringUtil.createLine(" ", loc.getColumn() - 1) + "^";
