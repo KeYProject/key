@@ -58,7 +58,7 @@ public final class Location {
         if (filename != null) {
             // catch-rethrow to avoid to change the interface too much
             try {
-                url = new URL("file:/" + filename);
+                url = new URL("file://" + filename);
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
