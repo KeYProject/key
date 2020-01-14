@@ -128,6 +128,6 @@ public class DependencyChecker implements Checker {
         String contractString = proof.name().toString();
 
         BranchNodeIntermediate proofTree = parser.getParsedResult();
-        return new Pair<String, BranchNodeIntermediate>(contractString, proofTree);
+        return new Pair<>(contractString, proofTree);
     }
 }

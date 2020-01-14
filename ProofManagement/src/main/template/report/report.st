@@ -36,7 +36,7 @@ body, html {
     padding: 6px 12px;
     border: 1px solid #ccc;
     border-top: none;
-    height: 80%;
+    height: 100%;
 }
 
 ul, #fileTree {
@@ -73,7 +73,8 @@ ul, #fileTree {
 }
 
 table {
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 15px 15px;
 }
 
 tr:hover {
@@ -95,6 +96,7 @@ tr:hover {
 <div id="overview" class="tabcontent">
 	<h3>Overview:</h3>
 	<!-- TODO -->
+    $/overview/overview(tree=treeRoot)$
 </div>
 
 <div id="files" class="tabcontent">
@@ -109,7 +111,11 @@ tr:hover {
 
 <div id="dependencies" class="tabcontent">
     <h3>Dependencies between contracts:</h3>
-    $/dependency/dependencies(graph=graph)$
+    $if(graph)$
+        $/dependency/dependencies(graph=graph)$
+    $else$
+        Dependency check has not been enabled. Use <code>--dependency</code> flag to enable it.
+    $endif$
 </div>
 
 <script type="text/javascript">

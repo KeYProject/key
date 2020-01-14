@@ -1,10 +1,13 @@
 package org.key_project.proofmanagement.check;
 
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.speclang.Contract;
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +32,12 @@ public class CheckerData {
 
     public static class ProofLine {
         public Proof proof;
+        public EnvInput envInput;
+        public ProblemInitializer problemInitializer;
         public Path proofFile;
         public Contract contract;
-        public Path sourceFile;
+        public URL sourceFile;
+        public String shortSrc;
     }
 
     public PathNode getFileTree() {

@@ -26,6 +26,7 @@ public class ContractMap {
             // TODO: find and parse file with respective contract
             Contract contract = specRepo.getContractByName(contractName);
 
+            // TODO: assertion not valid for some contracts (related to dependency contracts and/or inv)
             assert contract instanceof FunctionalOperationContract;
 
             myContractMap.put(contractName, (FunctionalOperationContract) contract);

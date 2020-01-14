@@ -33,6 +33,8 @@ public abstract class DependencyGraphBuilder {
             graph.addNode(currentDependencyNode);
         }
 
+        // TODO: NPE when building the graph (from here downwards)
+
         // add dependencies between nodes
         for (Pair<String, BranchNodeIntermediate> currentContractProofPair : contractProofPairs) {
             // get current node and root of proof

@@ -44,10 +44,13 @@ run {
     //dependsOn(classes) // implicit!
     //args('check', '--settings', '--files', '--report', 'testReport.html', '../../../cyclic.zproof')
     //args('merge', '--check', '"--settings --dependency --report ../../../testReport.html"', '../../../cyclic1.zproof', '../../../cyclic2.zproof', '../../../cyclic_result.zproof')
-    args('check', '--settings', '--report', '../../../testReport.html', '--dependency', '../../../cyclic_result.zproof')
+    //args('check', '--settings', '--report', '../../../testReport.html', '--dependency', '../../../cyclic_result.zproof')
+    args('check', '--settings', '--report', '../../../testReport.html', '--dependency', '../../../ba_functional.zproof')
     doFirst {
-        exec {
-            executable "pwd"
+        if (!System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+            exec {
+                executable "pwd"
+            }
         }
     }
 }

@@ -39,9 +39,9 @@ public class SettingsChecker implements Checker {
 
         for (Path p : proofFiles) {
             problemFiles.add(new KeYUserProblemFile(p.toString(), p.toFile(),
-                    new TrivialFileRepo(), ProgressMonitor.Empty.getInstance(), AbstractProfile.getDefaultProfile(), false));
+                new TrivialFileRepo(), ProgressMonitor.Empty.getInstance(),
+                AbstractProfile.getDefaultProfile(), false));
         }
-
 
         List<ProofSettings> proofSettings = new ArrayList<>();
 
@@ -54,8 +54,7 @@ public class SettingsChecker implements Checker {
         }
 
         // TODO: messages
-        CheckerData result = new CheckerData(consistent(proofSettings), currentRes.getPbh());
-        return result;
+        return new CheckerData(consistent(proofSettings), currentRes.getPbh());
     }
 
     //TODO: SMT settings ignored for now! (strategy settings should be irrelevant)

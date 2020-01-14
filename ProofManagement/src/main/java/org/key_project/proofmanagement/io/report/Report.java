@@ -1,5 +1,9 @@
 package org.key_project.proofmanagement.io.report;
 
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import org.key_project.proofmanagement.check.CheckerData;
 import org.key_project.proofmanagement.check.PathNode;
 import org.stringtemplate.v4.*;
@@ -43,14 +47,11 @@ public class Report {
                 Method m = tryGetMethod(o.getClass(), propertyName);
                 if (m != null) {
                     try {
-                        Object resilt = m.invoke(o);
-                        System.out.println(resilt);
-                        return resilt;
+                        return m.invoke(o);
                     } catch (Exception e) {
                         throwNoSuchProperty(o.getClass(), propertyName, e);
                     }
                 }
-
                 return super.getProperty(interp, self, o, property, propertyName);
             }
         });
@@ -85,7 +86,7 @@ public class Report {
         PathNode fileTree = result.getFileTree();
 
         st.add("bundleFileName", fileTree == null ? null : fileTree.content);
-        st.add("treeRoot", fileTree == null ? null : fileTree);
+        st.add("treeRoot", fileTree);
         st.add("lines", result.getProofLines());
         st.add("graph", result.getDependencyGraph());
 

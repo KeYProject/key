@@ -502,7 +502,7 @@ public class IntermediatePresentationProofFileParser
      *
      * @author Dominic Scheurer
      */
-    static class Result {
+    public static class Result {
         private List<Throwable> errors;
         private String status;
         private BranchNodeIntermediate parsedResult = null;

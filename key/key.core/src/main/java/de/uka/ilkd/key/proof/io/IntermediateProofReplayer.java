@@ -1103,7 +1103,7 @@ public class IntermediateProofReplayer {
      *
      * @author Dominic Scheurer
      */
-    static class Result {
+    public static class Result {
         private String status;
         private List<Throwable> errors;
         private Goal lastSelectedGoal = null;
