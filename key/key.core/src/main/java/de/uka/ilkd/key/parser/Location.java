@@ -44,8 +44,9 @@ public final class Location {
     private final int column;
 
     /**
-     * Legacy constructor for creating a new Location from a String denoting the file path and line and column number.
-     * Tries to convert the path given as String into a URL. If this fails, a RuntimeException is thrown.
+     * Legacy constructor for creating a new Location from a String denoting the file path and line
+     * and column number. Tries to convert the path given as String into a URL. If this fails,
+     * a RuntimeException is thrown.
      * @param filename path to the resource of the Location (null is allowed)
      * @param line line of the Location
      * @param column column of the Location
