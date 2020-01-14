@@ -15,6 +15,9 @@ package de.uka.ilkd.key.parser;
 
 import org.antlr.runtime.RecognitionException;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 
 /** 
  * This class represents a location in a file.  It consists of a
@@ -32,11 +35,27 @@ public final class Location {
 
     /* --- constructors --- */
 
+
     /**
      * @param filename the filename may be null.
      */
+    @Deprecated
     public Location(String filename, int line, int column) {
-        this.filename = filename;
+        // catch-rethrow to avoid to change the interface too much
+        URL url = null;
+        try {
+            url = new URL(filename);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        this.filename = url;
+
+        this.line = line;
+        this.column = column;
+    }
+
+    public Location(URL url, int line, int column) {
+        this.filename = url;
         this.line = line;
         this.column = column;
     }
@@ -50,7 +69,12 @@ public final class Location {
     /* --- methods --- */
 
     /** @return the filename may be null */
+    @Deprecated
     public String getFilename() {
+        return filename.getPath();
+    }
+
+    public URL getFileURL() {
         return filename;
     }
 
@@ -71,7 +95,7 @@ public final class Location {
 
     /* --- fields --- */
 
-    private final String filename;
+    private final URL filename;
 
     private final int line;
 

@@ -15,8 +15,11 @@ package de.uka.ilkd.key.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
+import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.*;
@@ -46,6 +49,9 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import recoder.io.ArchiveDataLocation;
+import recoder.io.DataFileLocation;
+import recoder.io.DataLocation;
 
 /**
  * Collection of some common, stateless functionality. Stolen from the weissInvariants side branch.
@@ -686,5 +692,44 @@ public final class MiscTools {
             result = result.substring("FILE:".length());
         }
         return result;
+    }
+
+    /**
+     * Tries to extract a valid URI from the given DataLocation.
+     * @param loc the given DataLocation
+     * @return an URI identifying the resource of the DataLocation or null if loc is null
+     */
+    public static URI extractURI(DataLocation loc) {
+        if (loc == null) {
+            throw new IllegalArgumentException("The given DataLocation is null!");
+        }
+
+        try {
+            switch (loc.getType()) {
+                case "URL":
+                    return ((URLDataLocation)loc).getUrl().toURI();
+                case "ARCHIVE":
+                    // format: "ARCHIVE:<filename>?<itemname>"
+                    String urlString = ((ArchiveDataLocation) loc).toString();
+                    // cut prefix
+                    urlString = urlString.substring(8);
+                    // extract filename and itemname
+                    int index = urlString.indexOf('?');
+                    String fileName = urlString.substring(0, index);
+                    String itemName = urlString.substring(index + 1);
+                    // construct URI
+                    return new URI("jar:file:/" + fileName + "!/" + itemName);
+                case "FILE":
+                    // format: "FILE:<path>"
+                    return ((DataFileLocation)loc).getFile().toURI();
+                default:
+                    // format "<type>://<location>"
+                    return new URI(loc.toString());
+            }
+        } catch (URISyntaxException e) {
+            // should not happen -> programming error!
+            e.printStackTrace();
+        }
+        throw new IllegalArgumentException("The given DataLocation can not be converted to a valid URI: " + loc);
     }
 }

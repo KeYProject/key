@@ -17,12 +17,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.java.recoderext.URLDataLocation;
+import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -191,8 +190,6 @@ import de.uka.ilkd.key.util.Debug;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
-import recoder.io.ArchiveDataLocation;
-import recoder.io.DataFileLocation;
 import recoder.io.DataLocation;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.declaration.TypeDeclaration;
@@ -238,7 +235,7 @@ public class Recoder2KeYConverter {
 
     public CompilationUnit processCompilationUnit(
             recoder.java.CompilationUnit cu, DataLocation context) {
-        currentClassURI = extractURI(context);
+        currentClassURI = MiscTools.extractURI(context);
         Object result = process(cu);
         currentClassURI = null;
 
@@ -1618,45 +1615,6 @@ public class Recoder2KeYConverter {
     }
 
     /**
-     * Tries to constract a valid URI from the given DataLocation.
-     * @param loc the given DataLocation
-     * @return an URI identifying the resource of the DataLocation or null if loc is null
-     */
-    private URI extractURI(DataLocation loc) {
-        if (loc == null) {
-            return null;
-        }
-
-        try {
-            switch (loc.getType()) {
-            case "URL":
-                return ((URLDataLocation)loc).getUrl().toURI();
-            case "ARCHIVE":
-                // format: "ARCHIVE:<filename>?<itemname>"
-                String urlString = ((ArchiveDataLocation) loc).toString();
-                // cut prefix
-                urlString = urlString.substring(8);
-                // extract filename and itemname
-                int index = urlString.indexOf('?');
-                String fileName = urlString.substring(0, index);
-                String itemName = urlString.substring(index + 1);
-                // construct URI
-                return new URI("jar:file:/" + fileName + "!/" + itemName);
-            case "FILE":
-                // format: "FILE:<path>"
-                return ((DataFileLocation)loc).getFile().toURI();
-            default: //
-                // format "<type>://<location>"
-                return new URI(loc.toString());
-            }
-        } catch (URISyntaxException e) {
-            // should not happen -> programming error!
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
      * converts a recoder method reference. A
      * de.uka.ilkd.key.logic.op.ProgramMethod is created replacing the method
      * reference.
@@ -1685,7 +1643,7 @@ public class Recoder2KeYConverter {
                 }
                 loc = tdc instanceof recoder.java.CompilationUnit ? ((recoder.java.CompilationUnit)tdc).getOriginalDataLocation() : null;
 
-                currentClassURI = extractURI(loc);
+                currentClassURI = MiscTools.extractURI(loc);
                 pm = convert((recoder.java.declaration.MethodDeclaration) method);
                 // because of cycles when reading recursive programs
                 currentClassURI = oldCurrent;

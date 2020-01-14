@@ -84,7 +84,7 @@ public class PositionInfo {
         this.startPos = startPos;
         this.endPos = endPos;
         if (fileURI == null) {
-            this.fileURI = UNKNOWN_URI;
+            this.fileURI = UNKNOWN_URI;     // fileURI must not be null!
         } else {
             this.fileURI = fileURI.normalize();
         }
