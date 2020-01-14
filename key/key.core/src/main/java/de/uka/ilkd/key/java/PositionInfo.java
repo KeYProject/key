@@ -13,71 +13,138 @@
 
 package de.uka.ilkd.key.java;
 
-import java.io.File;
+import java.net.URI;
+import java.nio.file.Paths;
 
 /**
  * represents a group of three Positions: relativePosition,
  * startPosition, endPosition
+ *
+ * 2019-09-10 Wolfram Pfeifer: work with URIs instead of Strings -> more robust, more general
  */
 public class PositionInfo {
+    /** Unknown URI (enables us to always have a non-null value for fileURI) */
+    public static final URI UNKNOWN_URI = URI.create("UNKNOWN://unknown");
 
-    final Position relPos;
-    final Position startPos;
-    final Position endPos;
+    /** PositionInfo with undefined positions. */
+    public static final PositionInfo UNDEFINED = new PositionInfo();
 
-    String fileName=null;
-    protected String parentClass;
+    /**
+     * TODO: What is the purpose of this? To which position is this one relative?
+     */
+    private final Position relPos;
 
-    public final static PositionInfo UNDEFINED=new PositionInfo();
+    /** The start position. */
+    private final Position startPos;
+
+    /** The end position. */
+    private final Position endPos;
+
+    /**
+     * The URI of the resource this location refers to.
+     * Either a meaningful value or {@link #UNKNOWN_URI}, but never null.
+     */
+    private final URI fileURI;
+
+    /**
+     * The URI of the parent class of this location (the class the statement originates from).
+     * May be null.
+     */
+    private URI parentClassURI;
 
     private PositionInfo() {
-	this.relPos=Position.UNDEFINED;
-	this.startPos=Position.UNDEFINED;
-	this.endPos=Position.UNDEFINED;
+        this.relPos = Position.UNDEFINED;
+        this.startPos = Position.UNDEFINED;
+        this.endPos = Position.UNDEFINED;
+        fileURI = UNKNOWN_URI;
     }
 
+    /**
+     * Creates a new PositionInfo without resource information but only with positions.
+     * @param relPos the relative position
+     * @param startPos the start position
+     * @param endPos the end position
+     */
     public PositionInfo(Position relPos, Position startPos, Position endPos) {
-	this.relPos=relPos;
-	this.startPos=startPos;
-	this.endPos=endPos;
+        this.relPos = relPos;
+        this.startPos = startPos;
+        this.endPos = endPos;
+        fileURI = UNKNOWN_URI;
     }
-    
-    public PositionInfo(Position relPos, Position startPos, Position endPos, String fileName) {
-        this.relPos=relPos;
-        this.startPos=startPos;
-        this.endPos=endPos;
-        this.fileName=simplifyPath(fileName);//bugfix:2009.09.17
-    }
-    
-    /** If the path contains the substring "/../", then this method tries to 
-     * simplify the path by removing this substring and the preceeding directory name
-     * to that substring. Otherwise java.io.FileReader would have a problem.
-     * E.g. Input "/A/B/../D" - Output "/A/D"
-     * @author gladisch*/
-    private static String simplifyPath(String path) {
-        if (path != null && !path.isEmpty()) {
-            // quick fix (see #1513): do not try to normalize URLs stored in path!
-            if (!path.startsWith("URL:")) {
-                path = new File(path).toURI().normalize().getPath();
-            }
+
+    /**
+     * Creates a new PositionInfo without the given resource information.
+     * @param relPos the relative position
+     * @param startPos the start position
+     * @param endPos the end position
+     * @param fileURI the resource the PositionInfo refers to
+     */
+    public PositionInfo(Position relPos, Position startPos, Position endPos, URI fileURI) {
+        this.relPos = relPos;
+        this.startPos = startPos;
+        this.endPos = endPos;
+        if (fileURI == null) {
+            this.fileURI = UNKNOWN_URI;     // fileURI must not be null!
+        } else {
+            this.fileURI = fileURI.normalize();
         }
-        return path;
+    }
+
+    /** this violates immutability, but the method is only called
+     * right after the object is created...
+     * @param parent the parent class of this PositionInfo
+     */
+    void setParentClassURI(URI parent) {
+        parentClassURI = (parent == null ? null : parent.normalize());
+    }
+
+    /**
+     * Returns the path of the parent file the PositionInfo refers to
+     * (the class the statement originates from).
+     * @deprecated This method should no longer be used, as PositionInfo can now be used with
+     *          resources other than files. Use {@link #getParentClassURI()} instead.
+     * @return the filename as a string if parentClass uses the "file" protocol or null otherwise
+     */
+    @Deprecated         // only kept for compatibility reasons
+    public String getParentClass() {
+        if (parentClassURI != null && parentClassURI.getScheme().equals("file")) {
+            return Paths.get(parentClassURI).toString();
+        }
+        return null;
+    }
+
+    /**
+     * Returns the path of the file the PositionInfo refers to.
+     * @deprecated This method should no longer be used, as PositionInfo can now be used with
+     * resources other than files. Use {@link #getURI()} instead.
+     * @return the filename as a string if fileURI uses the "file" protocol or null otherwise
+     */
+    @Deprecated         // only kept for compatibility reasons
+    public String getFileName() {
+        if (fileURI.getScheme().equals("file")) {
+            return Paths.get(fileURI).toString();
+        }
+        return null;
+    }
+
+    public URI getParentClassURI() {
+        return parentClassURI;
+    }
+
+    public URI getURI() {
+        return fileURI;
     }
 
     public Position getRelativePosition() {
-	return relPos;
+        return relPos;
     }
 
     public Position getStartPosition() {
-	return startPos;
+        return startPos;
     }
 
     public Position getEndPosition() {
-	return endPos;
-    }
-
-    public String getFileName(){
-	return fileName;
+        return endPos;
     }
 
     /**
@@ -120,8 +187,7 @@ public class PositionInfo {
             end = p2.endPos;
         }
         // TODO: join relative position as well
-        PositionInfo pi = new PositionInfo(Position.UNDEFINED, start, end, p1.getFileName());
-        return pi;
+        return new PositionInfo(Position.UNDEFINED, start, end, p1.getURI());
     }
 
     /**
@@ -133,23 +199,14 @@ public class PositionInfo {
                 && endPos != Position.UNDEFINED && !endPos.isNegative();
     }
 
-    /** this violates immutability, but the method is only called
-      * right after the object is created...
-      */
-    protected void setParentClass(String s) {
-        parentClass = s;
-    }
-    
-    /** get the class the statement originates from */
-    public String getParentClass() {
-        return parentClass;
-    }
-
-    public String toString(){
-	if (this==PositionInfo.UNDEFINED) 
+    @Override
+    public String toString() {
+        if (this == PositionInfo.UNDEFINED) {
             return "UNDEFINED";
-	else return (fileName+" rel. Pos: "+relPos+" start Pos: "+
-                    startPos+" end Pos: "+endPos);
+        } else {
+            return ((fileURI == UNKNOWN_URI ? "" : fileURI) + " rel. Pos: " + relPos
+                + " start Pos: " + startPos + " end Pos: " + endPos);
+        }
     }
 
 }

@@ -366,7 +366,8 @@ public class Recoder2KeY implements JavaReader {
         for (int i = 0, sz = cUnits.size(); i < sz; i++) {
             Debug.out("converting now " + cUnitStrings[i]);
             try {
-                result[i] = getConverter().processCompilationUnit(cUnits.get(i), cUnitStrings[i]);
+                recoder.java.CompilationUnit cu = cUnits.get(i);
+                result[i] = getConverter().processCompilationUnit(cu, cu.getDataLocation());
             } catch (Exception e) {
                 throw new ParseExceptionInFile(cUnitStrings[i], e);
             }
@@ -849,7 +850,7 @@ public class Recoder2KeY implements JavaReader {
              *  converting to a string. This would remove the need for parsing the URL from the
              *  string later on (e.g. in PositionInfo, FileRepo, ...)
              */
-            getConverter().processCompilationUnit(cu, dl.toString());
+            getConverter().processCompilationUnit(cu, dl);
         }
         
         // Ensure that rec2key is complete (at least the NullType needs to be available!)

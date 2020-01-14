@@ -1,12 +1,15 @@
 package de.uka.ilkd.key.logic.label;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -303,7 +306,7 @@ public class OriginTermLabel implements TermLabel {
         }
 
         SpecType commonSpecType = null;
-        String commonFileName = null;
+        URI commonFileName = null;
         int commonLine = -1;
 
         for (FileOrigin origin : origins) {
@@ -326,7 +329,12 @@ public class OriginTermLabel implements TermLabel {
             }
         }
 
-        return new FileOrigin(commonSpecType, commonFileName, commonLine);
+        if (commonFileName == null) {
+            Debug.out("commonFileName is null!");
+            return new Origin(SpecType.NONE);
+        }
+
+        return new FileOrigin(commonSpecType, commonFileName.getPath(), commonLine);
     }
 
     /**
@@ -686,7 +694,7 @@ public class OriginTermLabel implements TermLabel {
         /**
          * The file the term originates from.
          */
-        public final String fileName;
+        public final URI fileName;
 
         /**
          * The line in the file the term originates from.
@@ -703,11 +711,15 @@ public class OriginTermLabel implements TermLabel {
         public FileOrigin(SpecType specType, String fileName, int line) {
             super(specType);
 
-
             assert fileName != null;
             assert line >= 0;
 
-            this.fileName = fileName;
+            // wrap fileName into URI
+            if (fileName.equals("no file")) {
+                this.fileName = null;
+            } else {
+                this.fileName = new File(fileName).toURI();
+            }
             this.line = line;
         }
 
