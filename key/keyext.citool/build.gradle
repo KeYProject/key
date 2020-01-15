@@ -1,0 +1,8 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.3.61"
+}
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation project(":key.core")
+    implementation "com.github.ajalt:clikt:2.3.0"
+}
