@@ -24,29 +24,36 @@ import kotlin.system.exitProcess
  * @version 1 (21.11.19)
  */
 class Checker : CliktCommand() {
-    val includes by option("").multiple()
-    val verbose by option().flag("--no-verbose")
-    val dryRun by option("--dry-run").flag()
+    val includes by option(
+            help="defines additional key files to be included"
+    ).multiple()
+    val verbose by option(help="verbose output, currently unused").flag("--no-verbose")
+    val dryRun by option("--dry-run", help="skipping the proof reloading, scripts execution and auto mode." +
+            " Useful for finding the contract names").flag()
 
-    val classpath by option("--classpath", "-cp").multiple()
+    val classpath by option("--classpath", "-cp",
+            help="additional classpaths").multiple()
 
-    val bootClassPath by option("--bootClassPath", "-bcp")
+    val bootClassPath by option("--bootClassPath", "-bcp",
+            help="set the bootclasspath")
 
     val onlyContracts by option("--contract",
-            help = "")
+            help = "whitelist contracts by their names")
             .multiple()
 
     val forbidContracts by option("--forbid-contact",
-            help = "")
+            help = "forbid contracts by their name")
             .multiple()
 
-    val inputFile by argument("INPUT",
-            help = "")
+    val inputFile by argument("JAVA-KEY-FILE",
+            help = "key, java or a folder")
             .multiple(true)
 
-    val proofPath by option("--proof-path").multiple()
+    val proofPath by option("--proof-path",
+            help = "folders to look for proofs and script files")
+            .multiple()
 
-    val tacletChoices by option("-T").multiple()
+    //val tacletChoices by option("-T").multiple()
 
     private var choiceSettings: ChoiceSettings? = null
 
