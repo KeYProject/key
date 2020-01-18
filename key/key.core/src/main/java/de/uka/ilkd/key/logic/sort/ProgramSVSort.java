@@ -400,10 +400,6 @@ public abstract class ProgramSVSort extends AbstractSort {
         if (pe instanceof FieldReference){
         FieldReference fr = (FieldReference)pe;
 
-        if (fr == null || fr.getProgramVariable() == null) {
-            System.out.println();
-        }
-
         // we allow only static field references with a
         // sequence of PVs or TypeRef
         ReferencePrefix rp = fr.getReferencePrefix();

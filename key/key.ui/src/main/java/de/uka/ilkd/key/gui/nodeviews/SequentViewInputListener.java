@@ -145,15 +145,6 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
                     || sequentView.isInUserSelectionHighlight(point)) {
                 sequentView.removeUserSelectionHighlight();
             } else {
-                Term t = pis.getPosInOccurrence().subTerm();
-                System.out.println();
-                System.out.println(t.op() + ": " + t.op().hashCode());
-                System.out.println(t.boundVars() + ": " + t.boundVars().hashCode());
-                System.out.println(t.javaBlock() + ": " + t.javaBlock().hashCode());
-                t.getLabels().forEach(label -> {
-                    System.out.println(label + ": " + label.hashCode());
-                });
-
                 sequentView.setUserSelectionHighlight(point);
             }
         }

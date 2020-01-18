@@ -55,10 +55,6 @@ public class VariableReference extends JavaNonTerminalProgramElement
 
 
     public ProgramElementName getProgramElementName(){
-        if (variable == null) {
-            System.out.println();
-        }
-
 	return (ProgramElementName) variable.name();
     }
 

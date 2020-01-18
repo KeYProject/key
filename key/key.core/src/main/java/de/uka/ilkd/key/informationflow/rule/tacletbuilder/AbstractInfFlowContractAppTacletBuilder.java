@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -82,15 +83,45 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
     abstract Name generateName();
 
-    private static Name checkName(Name name, Goal goal) {
+    private static Name makeUnique(Name name, Goal goal) {
         int i = 0;
         final String s = name.toString();
-        name = new Name(s + "_" + goal.node().getUniqueTacletId());
-        while (goal.getLocalNamespaces().lookup(name) != null) {
+        name = new Name(s + "_" + getBranchUID(goal.node()));
+        while (InfFlowContractAppTaclet.registered(name)) {
             name = new Name(s + "_" + i++);
         }
         InfFlowContractAppTaclet.register(name);
         return name;
+    }
+
+    /**
+     *
+     * @param node a node.
+     * @return a string which uniquely identifies the smallest branch of the proof tree
+     *  containing the specified node.
+     */
+    private static String getBranchUID(Node node) {
+        int base = 5;
+        long mult = 1;
+        long path = 0;
+
+        while(!node.root() && node.parent().childrenCount() <= 1) {
+            node = node.parent();
+        }
+
+        while(!node.root()) {
+            path += mult * node.siblingNr();
+            mult *= base;
+            node = node.parent();
+
+            while(!node.root() && node.parent().childrenCount() <= 1) {
+                node = node.parent();
+            }
+        }
+
+        path += mult;
+
+        return Long.toString(path, 36);
     }
 
     abstract Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes,
@@ -179,7 +210,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
     private Taclet genInfFlowContractApplTaclet(Goal goal, ProofObligationVars appData,
                                                 Services services) {
-        Name tacletName = checkName(generateName(), goal);
+        Name tacletName = makeUnique(generateName(), goal);
             // generate schemaFind and schemaAssumes terms
             ProofObligationVars schemaDataFind =
                     generateApplicationDataSVs("find_", appData, services);
