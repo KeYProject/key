@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.runtime.RecognitionException;
 
 import java.net.MalformedURLException;
