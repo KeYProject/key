@@ -178,10 +178,6 @@ public final class SortDependingFunction extends Function {
                     }
                     synchronized(functions) {
                         functions.addSafely(result);
-                        if (instantiateName(getKind(), sort).toString().contains("String") && instantiateName(getKind(), sort).toString().contains("seqGet")
-                                && (n == null || sort instanceof GenericSort && n.getSortDependingOn() != sort)) {
-                            System.out.println(result.hashCode());
-                        }
                     }
                 }
             }
