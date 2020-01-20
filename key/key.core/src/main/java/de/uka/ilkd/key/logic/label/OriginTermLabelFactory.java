@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.logic.label;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -49,7 +49,7 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
                     + "delimited by \"[\" and \"]\"");
         }
 
-        Set<Origin> result = new HashSet<>();
+        Set<Origin> result = new LinkedHashSet<>();
 
         for (String s : str.substring(1, str.length() - 1).split("\\s*,\\s*")) {
             if (s.isEmpty()) {
