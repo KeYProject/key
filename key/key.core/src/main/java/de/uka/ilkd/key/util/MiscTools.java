@@ -15,9 +15,14 @@ package de.uka.ilkd.key.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import org.key_project.util.Filenames;
@@ -710,15 +715,18 @@ public final class MiscTools {
                 return ((URLDataLocation)loc).getUrl().toURI();
             case "ARCHIVE":
                 // format: "ARCHIVE:<filename>?<itemname>"
-                String urlString = ((ArchiveDataLocation) loc).toString();
-                // cut prefix
-                urlString = urlString.substring(8);
-                // extract filename and itemname
-                int index = urlString.indexOf('?');
-                String fileName = urlString.substring(0, index);
-                String itemName = urlString.substring(index + 1);
+                ArchiveDataLocation adl = (ArchiveDataLocation) loc;
+
+                // extract item name and adapt path separators
+                int qmindex = adl.toString().lastIndexOf('?');
+                String itemName = adl.toString().substring(qmindex + 1).replace('\\', '/');
+
+                // extract archive path (using toUri() ensures that path separators are correct)
+                ZipFile zf = adl.getFile();
+                URI zipURI = Paths.get(zf.getName()).toUri();
+
                 // construct URI
-                return new URI("jar:file:/" + fileName + "!/" + itemName);
+                return new URI("jar:" + zipURI.toString() + "!/" + itemName);
             case "FILE":
                 // format: "FILE:<path>"
                 return ((DataFileLocation)loc).getFile().toURI();
