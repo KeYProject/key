@@ -2,6 +2,7 @@ package org.key_project.proofmanagement.check;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.speclang.Contract;
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
@@ -19,16 +20,16 @@ import java.util.List;
  *      - information about the proofs (basically a table)
  *      - the dependency graph
  *      - additional raw text messages
+ *
+ * Note: This is a mutable data container!
  */
 public class CheckerData {
     // TODO: default value
     private boolean consistent = false;
-
-    private final ProofBundleHandler pbh;
-    private final PathNode fileTree;
-    private final List<ProofLine> proofLines;
-    private final DependencyGraph dependencyGraph;
-    private List<String> messages = new ArrayList<>();
+    private ProofBundleHandler pbh;
+    private PathNode fileTree;
+    private List<ProofLine> proofLines;
+    private DependencyGraph dependencyGraph;
 
     public static class ProofLine {
         public Proof proof;
@@ -38,6 +39,7 @@ public class CheckerData {
         public Contract contract;
         public URL sourceFile;
         public String shortSrc;
+        public AbstractProblemLoader.ReplayResult replayResult;
     }
 
     public PathNode getFileTree() {
@@ -56,84 +58,27 @@ public class CheckerData {
         return pbh;
     }
 
-
-    // TODO: Is there a better way to ensure that at most one of the "data fields" is set for a
-    //  newly created CheckResult (e.g. setters with exceptions)?
-    public CheckerData(ProofBundleHandler pbh, PathNode fileTree) {
-        this(false, pbh, fileTree, null, null);
-    }
-
-    public CheckerData(ProofBundleHandler pbh, DependencyGraph dependencyGraph) {
-        this(false, pbh, null, null, dependencyGraph);
-    }
-    public CheckerData(ProofBundleHandler pbh, List<ProofLine> proofLines) {
-        this(false, pbh, null, proofLines, null);
-    }
-
-    public CheckerData(boolean consistent, ProofBundleHandler pbh) {
-        this(consistent, pbh, null, null, null);
-    }
-
-    public CheckerData(boolean consistent, ProofBundleHandler pbh, PathNode fileTree,
-                       List<ProofLine> proofLines, DependencyGraph dependencyGraph) {
-        this.consistent = consistent;
-        this.pbh = pbh;
-        this.fileTree = fileTree;
-        this.proofLines = proofLines;
-        this.dependencyGraph = dependencyGraph;
-    }
-
-    public void addMessage(String message) {
-        messages.add(message);
-    }
-
-    public void addMessages(List<String> otherMessages) {
-        messages.addAll(otherMessages);
-    }
-
     public boolean isConsistent() {
         return consistent;
     }
 
-    public List<String> getMessages() {
-        return messages;
+    public void setConsistent(boolean consistent) {
+        this.consistent = consistent;
     }
 
-    public CheckerData join(CheckerData other) {
-        boolean consistent = other.isConsistent() && isConsistent();
-        // assert other.pbh == this.pbh;
-        PathNode fileTree = join(other.fileTree);
-        List<ProofLine> proofLines = join(other.proofLines);
-        DependencyGraph dependencyGraph = join(other.dependencyGraph);
-
-        CheckerData res = new CheckerData(consistent, pbh, fileTree, proofLines, dependencyGraph);
-        res.addMessages(this.getMessages());
-        res.addMessages(other.getMessages());
-        return res;
+    public void setPbh(ProofBundleHandler pbh) {
+        this.pbh = pbh;
     }
 
-    private PathNode join(PathNode other) {
-        if (fileTree != null && other != null) {
-            throw new IllegalArgumentException("Error! Both file trees are non-null!");
-        }
-        return firstNonNull(fileTree, other);
+    public void setFileTree(PathNode fileTree) {
+        this.fileTree = fileTree;
     }
 
-    private List<ProofLine> join(List<ProofLine> other) {
-        if (proofLines != null && other != null) {
-            throw new IllegalArgumentException("Error! Both proof tables are non-null!");
-        }
-        return firstNonNull(proofLines, other);
+    public void setProofLines(List<ProofLine> proofLines) {
+        this.proofLines = proofLines;
     }
 
-    private DependencyGraph join(DependencyGraph other) {
-        if (dependencyGraph != null && other != null) {
-            throw new IllegalArgumentException("Error! Both dependency graphs are non-null!");
-        }
-        return firstNonNull(dependencyGraph, other);
-    }
-
-    public static <T> T firstNonNull(T a, T b) {
-        return a != null ? a : b;
+    public void setDependencyGraph(DependencyGraph dependencyGraph) {
+        this.dependencyGraph = dependencyGraph;
     }
 }

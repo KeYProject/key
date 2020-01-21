@@ -20,28 +20,29 @@ import java.util.List;
 public class ReplayChecker implements Checker {
 
     @Override
-    public CheckerData check(List<Path> proofFiles, CheckerData currentRes) {
+    public CheckerData check(List<Path> proofFiles, CheckerData data) {
 
         // TODO: iterate
-        Proof proof = currentRes.getProofLines().get(0).proof;
-        EnvInput envInput = currentRes.getProofLines().get(0).envInput;
-        ProblemInitializer problemInitializer = currentRes.getProofLines().get(0).problemInitializer;
+        for (CheckerData.ProofLine line : data.getProofLines()) {
 
-        AbstractProblemLoader.ReplayResult result;
+            Proof proof = line.proof;
+            EnvInput envInput = line.envInput;
+            ProblemInitializer problemInitializer = line.problemInitializer;
 
-        if (proof != null) {
-            OneStepSimplifier.refreshOSS(proof);
-            try {
-                result = replayProof(proof, envInput, problemInitializer);
-                // TODO: store result in CheckerData
-            } catch (ProofInputException e) {
-                e.printStackTrace();
-            } catch (ProblemLoaderException e) {
-                e.printStackTrace();
+            if (proof != null) {
+                OneStepSimplifier.refreshOSS(proof);
+                try {
+                    // store result in CheckerData
+                    line.replayResult = replayProof(proof, envInput, problemInitializer);
+                } catch (ProofInputException e) {
+                    e.printStackTrace();
+                } catch (ProblemLoaderException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
-        return null;
+        return data;
     }
 
     private AbstractProblemLoader.ReplayResult replayProof(Proof proof, EnvInput envInput, ProblemInitializer problemInitializer) throws ProofInputException, ProblemLoaderException {

@@ -40,10 +40,12 @@ public abstract class DependencyGraphBuilder {
             // get current node and root of proof
             DependencyNode currentDependencyNode = dependencyNodes.get(currentContractProofPair.first);
             BranchNodeIntermediate currentIntermediateNode = currentContractProofPair.second;
+
             // collect all contracts referenced to in current proof
             ContractApplicationCollector contractApplicationCollector = new ContractApplicationCollector(currentIntermediateNode);
             contractApplicationCollector.start();
             Set<String> dependentContractsAsStrings = contractApplicationCollector.getResult();
+
             // add dependencies between nodes
             for (String currentDependentContractString : dependentContractsAsStrings) {
                 DependencyNode dependentNode = dependencyNodes.get(currentDependentContractString);

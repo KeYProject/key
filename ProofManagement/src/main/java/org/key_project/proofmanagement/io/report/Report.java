@@ -1,16 +1,11 @@
 package org.key_project.proofmanagement.io.report;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import org.key_project.proofmanagement.check.CheckerData;
 import org.key_project.proofmanagement.check.PathNode;
 import org.stringtemplate.v4.*;
 import org.stringtemplate.v4.misc.ObjectModelAdaptor;
 import org.stringtemplate.v4.misc.STMessage;
 import org.stringtemplate.v4.misc.STNoSuchPropertyException;
-import sun.util.resources.cldr.zh.CalendarData_zh_Hans_HK;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -20,11 +15,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
 
 public class Report {
-    private final CheckerData result;
-
+    private final CheckerDataView dataView;
     private Path outPath;
 
     public void setOutPath(Path outPath) {
@@ -32,7 +25,7 @@ public class Report {
     }
 
     public Report(CheckerData result) {
-        this.result = result;
+        this.dataView = new CheckerDataView(result);
     }
 
     public String printReport() throws IOException, URISyntaxException {
@@ -41,6 +34,8 @@ public class Report {
         Path resPath = Paths.get(url.toURI());
 
         STGroup group = new STRawGroupDir(resPath.toString(), '$', '$');
+
+        // provide access to getter methods with a name equal to the property (without "get")
         group.registerModelAdaptor(Object.class, new ObjectModelAdaptor() {
             @Override
             public synchronized Object getProperty(Interpreter interp, ST self, Object o, Object property, String propertyName) throws STNoSuchPropertyException {
@@ -56,9 +51,7 @@ public class Report {
             }
         });
 
-        // STGroupFile groupFile = new STGroupFile(resPath.toString());
-        //ST st = groupFile.getInstanceOf("document");
-        ST st = group.getInstanceOf("report");
+        // register listeners to get error output on console
         group.setListener(new STErrorListener() {
             @Override
             public void compileTimeError(STMessage msg) {
@@ -81,14 +74,15 @@ public class Report {
             }
         });
 
+        ST st = group.getInstanceOf("report");
         st.add("title", "test report 2.0");
 
-        PathNode fileTree = result.getFileTree();
+        PathNode fileTree = dataView.getFileTree();
 
         st.add("bundleFileName", fileTree == null ? null : fileTree.content);
         st.add("treeRoot", fileTree);
-        st.add("lines", result.getProofLines());
-        st.add("graph", result.getDependencyGraph());
+        st.add("lines", dataView.getProofLines());
+        st.add("graph", dataView.getDependencyGraph());
 
         String output = st.render();
         printToOutputFile(output);
@@ -98,10 +92,8 @@ public class Report {
 
     private void printToOutputFile(String str) throws IOException {
         if (outPath == null) {
-            // nothing to do
-            return;
+            return;     // nothing to do
         }
-
         Files.write(outPath, str.getBytes(StandardCharsets.UTF_8));
     }
 }

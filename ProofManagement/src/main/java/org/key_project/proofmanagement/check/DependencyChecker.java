@@ -39,9 +39,8 @@ public class DependencyChecker implements Checker {
     private SpecificationRepository specRepo = null;
 
     @Override
-    public CheckerData check(List<Path> proofFiles, CheckerData currentRes) {
+    public CheckerData check(List<Path> proofFiles, CheckerData data) {
         ImmutableList<Pair<String, BranchNodeIntermediate>> contractProofPairs = ImmutableSLList.nil();
-        CheckerData result = new CheckerData(true, currentRes.getPbh());
         try {
             // for each proof: parse and construct intermediate AST
             for (Path proofPath : proofFiles) {
@@ -52,23 +51,20 @@ public class DependencyChecker implements Checker {
             // WARNING: the analysis as is currently implemented asserts there is exactly one proof for each contract!!!
             DependencyGraph dependencyGraph = DependencyGraphBuilder.buildGraph(specRepo, contractProofPairs);
 
-            result = new CheckerData(currentRes.getPbh(), dependencyGraph);
+            data.setDependencyGraph(dependencyGraph);
 
             // check if graph contains illegal structures, e.g. cycles, unproven dependencies, ...
             if (!dependencyGraph.isLegal()) {
                 // TODO: what exactly are the problems
                 //  and how can they be extracted?
-                result.addMessage("[ERROR] Found a cycle in dependency graph: " + dependencyGraph);
-                // TODO: messages
-                return result;
+                data.setConsistent(false);
             }
         } catch (IOException e) {
             // TODO:
         } catch (ProofInputException e) {
             // TODO:
         }
-        result.addMessage("[INFO] No cyclic dependency detected!");
-        return result;
+        return data;
     }
 
     /**

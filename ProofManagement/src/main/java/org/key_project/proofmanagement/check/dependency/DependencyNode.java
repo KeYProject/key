@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.uka.ilkd.key.speclang.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -11,8 +12,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 public class DependencyNode {
 
@@ -27,7 +26,6 @@ public class DependencyNode {
     }
 
     private Status status;
-    private ImmutableSet<FunctionalOperationContract> missingProofs                = DefaultImmutableSet.nil();
     private ImmutableSet<FunctionalOperationContract> modalityClashes              = DefaultImmutableSet.nil();
     private ImmutableSet<ImmutableList<FunctionalOperationContract>> illegalCycles = DefaultImmutableSet.nil();
 
@@ -60,10 +58,6 @@ public class DependencyNode {
 
     public Status getStatus() {
         return status;
-    }
-
-    public ImmutableSet<FunctionalOperationContract> getMissingProofs() {
-        return missingProofs;
     }
 
     public ImmutableSet<FunctionalOperationContract> getModalityClashes() {

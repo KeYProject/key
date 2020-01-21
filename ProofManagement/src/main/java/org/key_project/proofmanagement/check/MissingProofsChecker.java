@@ -3,7 +3,6 @@ package org.key_project.proofmanagement.check;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -25,7 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Checks that there is <b>exactly</b> one proof for every contract.
+ * Checks that there exists a proof for every contract.
  * Has to be combined with other checkers to ensure that the proofs are actually consistent
  * as well as correct.
  */
@@ -34,20 +33,20 @@ public class MissingProofsChecker implements Checker {
     private ProofBundleHandler pbh;
 
     @Override
-    public CheckerData check(List<Path> proofFiles, CheckerData currentRes) {
+    public CheckerData check(List<Path> proofFiles, CheckerData data) {
 
         try {
             // TODO: implement case with no proof file
 
             // load all contracts from source files
-            //Path base = proofFiles.get(0).getParent();
-            //File src = base.resolve(Paths.get("src")).toFile();
-            pbh = currentRes.getPbh();
+            pbh = data.getPbh();
             Path base = pbh.getDir();
             File src = base.resolve(Paths.get("src")).toFile();
             List<File> cp = null;
             if (!pbh.getClasspathFiles().isEmpty()) {
-                cp = pbh.getClasspathFiles().stream().map(Path::toFile).collect(Collectors.toList());
+                cp = pbh.getClasspathFiles().stream()
+                                            .map(Path::toFile)
+                                            .collect(Collectors.toList());
             }
             File bcp = null;
             if (!pbh.getBootclasspathFiles().isEmpty()) {
@@ -92,7 +91,8 @@ public class MissingProofsChecker implements Checker {
                             CheckerData.ProofLine line = new CheckerData.ProofLine();
                             line.contract = contr;
                             line.proof = p;
-                            line.proofFile = p.getServices().getJavaModel().getInitialFile().toPath();
+                            line.proofFile = p.getProofFile().toPath();
+                            lines.add(line);
                             // TODO: how to get source file?
                             Type type = contr.getTarget().getContainerType().getJavaType();
                             if (type instanceof JavaSourceElement) {
@@ -101,8 +101,6 @@ public class MissingProofsChecker implements Checker {
                                 String str = line.sourceFile.toString();
                                 line.shortSrc = str.substring(str.lastIndexOf('/') + 1);
                             }
-
-                            lines.add(line);
                             break;
                         }
                     }
@@ -117,11 +115,10 @@ public class MissingProofsChecker implements Checker {
                 // TODO: currently contracts from inside java.* package are filtered/ignored
                 if (!c.getName().startsWith("java.")) {
                     System.out.println("Error! Missing proof for contract " + c.getName());
-                    consistent = false; // at least one contract is left unproven!
+                    data.setConsistent(false); // at least one contract is left unproven!
                 }
             }
-            //return new CheckResult(consistent, pbh);
-            return new CheckerData(consistent, pbh, null, lines, null);
+            data.setProofLines(lines);
 
         } catch (ProofInputException e) {
             e.printStackTrace();
@@ -129,10 +126,8 @@ public class MissingProofsChecker implements Checker {
             e.printStackTrace();
         }
 
-        return null;
+        return data;
     }
-
-    // TODO: check exactly one proof
 
     public Set<Proof> loadProofs(List<Path> proofFiles) throws ProofInputException, IOException {
         Set<Proof> allProofs = new HashSet<>();
@@ -172,7 +167,6 @@ public class MissingProofsChecker implements Checker {
         properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
         properties.setProperty(IPersistablePO.PROPERTY_FILENAME, path.toString());
 
-        // TODO: currently does not work for taclet proofs!
         IPersistablePO.LoadedPOContainer poContainer = FunctionalOperationContractPO.loadFrom(initConfig, properties);
 
         ProofAggregate proofList = pi.startProver(initConfig, poContainer.getProofOblInput());

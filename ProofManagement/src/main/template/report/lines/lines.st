@@ -3,6 +3,7 @@
     <tr>
         <th>Contract</th>
         <th>Source File</th>
+        $! <th>Proof Obligation</th> !$
         <th colspan="4" style="text-align:center;">Proof</th>
     </tr>
     <tr>

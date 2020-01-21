@@ -13,10 +13,7 @@ import java.util.zip.ZipException;
 
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
-import org.key_project.proofmanagement.check.CheckerData;
-import org.key_project.proofmanagement.check.DependencyChecker;
-import org.key_project.proofmanagement.check.MissingProofsChecker;
-import org.key_project.proofmanagement.check.SettingsChecker;
+import org.key_project.proofmanagement.check.*;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 import org.key_project.proofmanagement.io.report.Report;
 import org.key_project.proofmanagement.merge.ProofBundleMerger;
@@ -140,49 +137,29 @@ public class Main {
         }
 
         // we accumulate results in this variable
-        CheckerData globalResult = new CheckerData(true, pbh);
+        CheckerData globalResult = new CheckerData();
+        globalResult.setConsistent(true);   // should be implicit
+        globalResult.setPbh(pbh);
+
         try {
             // add file tree to result
-            globalResult = globalResult.join(new CheckerData(pbh, pbh.getFileTree()));
+            globalResult.setFileTree(pbh.getFileTree());
 
             // completeness check
-            globalResult = globalResult.join(new MissingProofsChecker().check(proofFiles, globalResult));
+            globalResult = new MissingProofsChecker().check(proofFiles, globalResult);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         if (commandLine.isSet("--settings")) {
-            CheckerData result = new SettingsChecker().check(proofFiles, globalResult);
-            globalResult = globalResult.join(result);
-            if (result.isConsistent()) {
-                System.out.println("    Consistent! Settings consistent!");
-            } else {
-                System.out.println("    Inconsistent! Settings do not match!");
-            }
+            globalResult = new SettingsChecker().check(proofFiles, globalResult);
         }
         if (commandLine.isSet("--dependency")) {
-            CheckerData result = new DependencyChecker().check(proofFiles, globalResult);
-            globalResult = globalResult.join(result);
-            if (result.isConsistent()) {
-                System.out.println("    Consistent! No cycles found!");
-            } else {
-                System.out.println("    Inconsistent! Cyclic dependency found!");
-            }
+            globalResult = new DependencyChecker().check(proofFiles, globalResult);
         }
-        // TODO: it is not clear what a file checker could do for only a single bundle ...
-        /*
-        if (commandLine.isSet("--files")) {
-            List<Path> list = new ArrayList<>();
-            list.add(bundlePath);
-            CheckResult result = new FilesChecker().check(list);
-            globalResult = globalResult.join(result);
-            if (result.isConsistent()) {
-                System.out.println("    Consistent! Files consistent!");
-            } else {
-                System.out.println("    Inconsistent! Different files found in bundles!");
-            }
+        if (commandLine.isSet("--replay")) {
+            globalResult = new ReplayChecker().check(proofFiles, globalResult);
         }
-        */
         pbh.dispose();
 
         if (commandLine.isSet("--report")) {

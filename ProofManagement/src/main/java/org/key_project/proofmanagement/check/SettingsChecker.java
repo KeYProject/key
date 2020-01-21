@@ -33,7 +33,7 @@ public class SettingsChecker implements Checker {
     //TODO: Carry file info with the data to allow for good user feedback
     //TODO: Consistency Checker should work on a higher abstraction level and not handle files, do file handling separately (we'll also need to reuse that)
     @Override
-    public CheckerData check(List<Path> proofFiles, CheckerData currentRes) {
+    public CheckerData check(List<Path> proofFiles, CheckerData data) {
 
         List<KeYUserProblemFile> problemFiles = new ArrayList<>();
 
@@ -53,8 +53,11 @@ public class SettingsChecker implements Checker {
             }
         }
 
-        // TODO: messages
-        return new CheckerData(consistent(proofSettings), currentRes.getPbh());
+        if (!consistent(proofSettings)) {
+            data.setConsistent(false);
+        }
+
+        return data;
     }
 
     //TODO: SMT settings ignored for now! (strategy settings should be irrelevant)

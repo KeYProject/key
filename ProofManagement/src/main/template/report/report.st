@@ -1,14 +1,12 @@
 <head>
 <style type="text/css">
 body, html {
-    height: 100%;
     margin: 0;
     font-family: Arial;
 }
 
 .tab {
     overflow: hidden;
-    border: 1px solid #ccc;
     background-color: #f1f1f1;
 }
 
@@ -34,9 +32,7 @@ body, html {
 .tabcontent {
     display: none;
     padding: 6px 12px;
-    border: 1px solid #ccc;
-    border-top: none;
-    height: 100%;
+
 }
 
 ul, #fileTree {
@@ -79,6 +75,11 @@ table {
 
 tr:hover {
     background-color:#f5f5f5;
+}
+
+td, th {
+    vertical-align: top;
+    text-align: left;
 }
 
 </style>
