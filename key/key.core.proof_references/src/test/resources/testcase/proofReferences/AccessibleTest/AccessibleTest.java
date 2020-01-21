@@ -1,6 +1,6 @@
 package test;
 
-public class AccessibleTest {
+public final class AccessibleTest {
 	private int x;
 	
 	public AccessibleTest(int x) {
