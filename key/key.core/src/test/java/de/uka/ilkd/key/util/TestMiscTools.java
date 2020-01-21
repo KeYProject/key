@@ -18,8 +18,20 @@ import static de.uka.ilkd.key.util.MiscTools.containsWholeWord;
 import static de.uka.ilkd.key.util.MiscTools.isJMLComment;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
+import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import junit.framework.TestCase;
+import recoder.io.ArchiveDataLocation;
+import recoder.io.DataFileLocation;
+import recoder.io.DataLocation;
 
 public class TestMiscTools extends TestCase {
 
@@ -115,5 +127,51 @@ public class TestMiscTools extends TestCase {
         assertFalse(isJMLComment("// @"));
         assertFalse(isJMLComment("/*"));
         assertFalse(isJMLComment("/**"));
+    }
+
+    /**
+     * This is a test for the method {@link MiscTools#extractURI(DataLocation)}.
+     * It tests URI extraction all four known kinds of DataLocations:<ul>
+     *     <li>URLDataLocations</li>
+     *     <li>ArchiveDataLocations</li>
+     *     <li>SpecDataLocations</li>
+     *     <li>DataFileLocations</li>
+     * </ul>
+     * Note: This test creates two temporary files.
+     */
+    public void testExtractURI() {
+        try {
+            Path tmp = Files.createTempFile("test", ".txt");
+            URI tmpURI = tmp.toUri();
+            DataLocation urlDataLoc = new URLDataLocation(tmpURI.toURL());
+            assertEquals(tmpURI, MiscTools.extractURI(urlDataLoc));
+
+            Path zipP = Files.createTempFile("test", ".zip");
+            FileOutputStream fos = new FileOutputStream(zipP.toFile());
+            ZipOutputStream zos = new ZipOutputStream(fos);
+            zos.putNextEntry(new ZipEntry("entry0.txt"));
+            zos.write("test content".getBytes());
+            zos.close();
+            fos.close();
+
+            ZipFile zf = new ZipFile(zipP.toFile());
+            DataLocation archiveDataLoc = new ArchiveDataLocation(zf, "entry0.txt");
+            zf.close();
+            URI tmpZipURI = zipP.toUri();
+            assertEquals("jar:" + tmpZipURI + "!/" + "entry0.txt",
+                    MiscTools.extractURI(archiveDataLoc).toString());
+
+            DataLocation specDataLoc = new SpecDataLocation("UNKNOWN", "unknown");
+            assertEquals("UNKNOWN://unknown", MiscTools.extractURI(specDataLoc).toString());
+
+            DataLocation fileDataLoc = new DataFileLocation(tmp.toFile());
+            assertEquals(tmpURI, MiscTools.extractURI(fileDataLoc));
+
+            // clean up temporary files
+            Files.deleteIfExists(tmp);
+            Files.deleteIfExists(zipP);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

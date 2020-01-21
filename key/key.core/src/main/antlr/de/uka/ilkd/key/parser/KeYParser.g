@@ -1053,7 +1053,7 @@ options {
         } catch (de.uka.ilkd.key.java.PosConvertException e) {
             lineOffset=e.getLine()-1;
             colOffset=e.getColumn()+1;
-            throw new RecognitionException(input);
+            throwRecognitionException(input, e);
             //throw new JavaParserException(e.getMessage(), t.getText(), 
             //    getSourceName(), t.getLine(), t.getCharPositionInLine(), lineOffset, colOffset);
         } catch (de.uka.ilkd.key.java.ConvertException e) { 
@@ -1064,7 +1064,7 @@ options {
                 colOffset=e.parseException().currentToken.next.beginColumn;
                 e.parseException().currentToken.next.beginLine=getLine()-1;
                 e.parseException().currentToken.next.beginColumn=getColumn();
-                throw new RecognitionException(input);
+                throwRecognitionException(input, e);
                 //throw new JavaParserException(e.getMessage(), t.getText(), getSourceName(), t.getLine(), t.getCharPositionInLine(), -1, -1);  // row/columns already in text
             }       
             if (e.proofJavaException()!=null
@@ -1074,14 +1074,20 @@ options {
                 colOffset=e.proofJavaException().currentToken.next.beginColumn;
                 e.proofJavaException().currentToken.next.beginLine=getLine();
                 e.proofJavaException().currentToken.next.beginColumn =getColumn();
-                 throw new RecognitionException(input);
+                 throwRecognitionException(input, e);
                  //throw  new JavaParserException(e.getMessage(), t.getText(), getSourceName(), t.getLine(), t.getCharPositionInLine(), lineOffset, colOffset); 
                             
-            }   
-            throw new RecognitionException(input);
+            }
+            throwRecognitionException(input, e);
             //throw new JavaParserException(e.getMessage(), t.getText(), getSourceName(), t.getLine(), t.getCharPositionInLine());
         } 
         return sjb;
+    }
+
+    private static void throwRecognitionException(IntStream input, Throwable cause) throws RecognitionException {
+        RecognitionException re = new RecognitionException(input);
+        re.initCause(cause);
+        throw re;
     }
 
     /**

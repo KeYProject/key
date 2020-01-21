@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
 import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * This class uses a temporary directory as a store for the proof-relevant files.
@@ -91,7 +92,9 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
             return entryURL.openStream();
         } else {
-            throw new IllegalArgumentException("This type of URL is not supported!");
+            Debug.out("This type of URL is not supported by the FileRepo!" +
+                " Resource will not be copied to FileRepo!");
+            return url.openStream();    // fallback without a copy
         }
     }
 
