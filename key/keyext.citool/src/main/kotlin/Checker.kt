@@ -3,9 +3,11 @@ package de.uka.ilkd.key
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
+import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.int
 import de.uka.ilkd.key.api.KeYApi
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl
 import de.uka.ilkd.key.control.KeYEnvironment
@@ -25,17 +27,20 @@ import kotlin.system.exitProcess
  */
 class Checker : CliktCommand() {
     val includes by option(
-            help="defines additional key files to be included"
+            help = "defines additional key files to be included"
     ).multiple()
-    val verbose by option(help="verbose output, currently unused").flag("--no-verbose")
-    val dryRun by option("--dry-run", help="skipping the proof reloading, scripts execution and auto mode." +
+    val autoModeStep by option("--auto-mode-max-step", metavar = "INT",
+            help = "maximal amount of steps in auto-mode [default:10000]")
+            .int().default(10000)
+    val verbose by option(help = "verbose output, currently unused").flag("--no-verbose")
+    val dryRun by option("--dry-run", help = "skipping the proof reloading, scripts execution and auto mode." +
             " Useful for finding the contract names").flag()
 
     val classpath by option("--classpath", "-cp",
-            help="additional classpaths").multiple()
+            help = "additional classpaths").multiple()
 
     val bootClassPath by option("--bootClassPath", "-bcp",
-            help="set the bootclasspath")
+            help = "set the bootclasspath")
 
     val onlyContracts by option("--contract",
             help = "whitelist contracts by their names")
@@ -87,12 +92,16 @@ class Checker : CliktCommand() {
             print("  * ${c.name}")
 
             if (c.name in forbidContracts) {
-                println(" ... excluded (--forbid-contract)")
+                println(" ... excluded (--forbid-contract) ")
             } else {
                 if (dryRun) {
-                    println(" ... skipped (--dry-run).")
+                    println(" ... skipped (--dry-run). ")
                 } else {
                     val proofApi = pm.startProof(c)
+                    val proof = proofApi.proof
+                    require(proof != null)
+                    proof?.settings?.strategySettings?.maxSteps = autoModeStep
+                    ProofSettings.DEFAULT_SETTINGS.strategySettings.maxSteps = autoModeStep
 
                     val proofFile = findProofFile(c)
                     val scriptFile = findScriptFile(c)
@@ -100,12 +109,12 @@ class Checker : CliktCommand() {
                     var autoMode = true
                     if (proofFile != null) {
                         println()
-                        print("    * Proof found: $proofFile. Try loading.")
+                        print("    * Proof found: $proofFile. Try loading. ")
                         autoMode = false
                     }
                     if (scriptFile != null) {
                         println()
-                        print("    * Script found: $scriptFile. Try proofing.")
+                        print("    * Script found: $scriptFile. Try proofing. ")
                         autoMode = false
 
                         val script = File(scriptFile).readText()
@@ -115,17 +124,23 @@ class Checker : CliktCommand() {
                         engine.execute(
                                 proofApi.env.ui as AbstractUserInterfaceControl, proofApi.proof)
                         val endTime = System.currentTimeMillis()
-                        print("... script took ${endTime - startTime}...")
+                        print(" ... script took ${endTime - startTime} ms... ")
                     }
 
                     if (autoMode) {
                         val startTime = System.currentTimeMillis()
-                        proofApi.env.proofControl.startAutoMode(proofApi.proof)
+                        proofApi.env.proofControl.startAndWaitForAutoMode(proof)
                         val endTime = System.currentTimeMillis()
-                        print("... auto-mode took ${endTime - startTime}...")
+                        print("... auto-mode took ${endTime - startTime} ms... ")
                     }
 
-                    if (proofApi.proof.closed()) println("proof closed!") else println("proof remains open")
+                    if (proof.closed()) {
+                        println("PROOF CLOSED! Rule apps: ${proof.statistics.totalRuleApps}")
+                    } else {
+                        println("${proof.openGoals().size()} remains open")
+                        errorlevel = 1
+                    }
+                    proof.dispose()
                 }
             }
         }
