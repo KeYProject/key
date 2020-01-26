@@ -770,7 +770,7 @@ public final class MiscTools {
             int sep = ssp.indexOf("!/");
             int rsep = rssp.indexOf("!/");
             String zip = ssp.substring(0, sep);
-            String entry = rssp.substring(rsep+2, rssp.length());
+            String entry = rssp.substring(rsep + 2);
             uri = URI.create(uri.getScheme() + ":" + zip + "!/" + entry);
 
             return uri;

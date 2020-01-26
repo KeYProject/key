@@ -156,21 +156,22 @@ public class TestMiscTools extends TestCase {
             // test for ArchiveDataLocation
             Path zipP = Files.createTempFile("test with whitespace", ".zip");
             try (FileOutputStream fos = new FileOutputStream(zipP.toFile());
-                ZipOutputStream zos = new ZipOutputStream(fos);
-                 ZipFile zf = new ZipFile(zipP.toFile())) {
+                ZipOutputStream zos = new ZipOutputStream(fos)) {
                 zos.putNextEntry(new ZipEntry("entry.txt"));
                 zos.write("test content".getBytes());
                 zos.putNextEntry(new ZipEntry("entry with whitespace.txt"));
                 zos.write("another test content".getBytes());
+            }
 
+            try (ZipFile zf = new ZipFile(zipP.toFile())) {
                 DataLocation entry0 = new ArchiveDataLocation(zf, "entry.txt");
                 DataLocation entry1 = new ArchiveDataLocation(zf, "entry with whitespace.txt");
 
                 URI tmpZipURI = zipP.toUri();
                 assertEquals("jar:" + tmpZipURI + "!/" + "entry.txt",
-                    MiscTools.extractURI(entry0).toString());
+                        MiscTools.extractURI(entry0).toString());
                 assertEquals("jar:" + tmpZipURI + "!/" + "entry%20with%20whitespace.txt",
-                    MiscTools.extractURI(entry1).toString());
+                        MiscTools.extractURI(entry1).toString());
             }
 
             // test for SpecDataLocation
