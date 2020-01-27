@@ -81,7 +81,7 @@ public class SpecDataLocation implements DataLocation {
     }
 
     public String toString() {
-        return type + "://" + location;
+        return type + ":" + location;
     }
 
 }
