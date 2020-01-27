@@ -1,6 +1,6 @@
 package org.bouncycastle.jce.spec;
 
-public class ECParameterSpec extends java.lang.Object implements java.security.spec.AlgorithmParameterSpec {
+public final class ECParameterSpec extends java.lang.Object implements java.security.spec.AlgorithmParameterSpec {
    
    public final org.bouncycastle.math.ec.ECPoint generator;
 
