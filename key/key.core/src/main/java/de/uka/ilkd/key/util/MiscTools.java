@@ -737,11 +737,10 @@ public final class MiscTools {
                 return new URI("urn", loc.toString(), null);
             }
         } catch (URISyntaxException | IOException e) {
-            // should not happen -> programming error!
             e.printStackTrace();
         }
         throw new IllegalArgumentException("The given DataLocation can not be converted" +
-                "into a valid URI: " + loc);
+                " into a valid URI: " + loc);
     }
 
     /**
@@ -765,14 +764,28 @@ public final class MiscTools {
             // where special characters such as spaces in URI get double encoded.
             // see https://bugs.java.com/bugdatabase/view_bug.do?bug_id=8131067
             // To make it even worse, this happens only in the part before "!/".
-            String ssp = uri.getSchemeSpecificPart();
-            String rssp = uri.getRawSchemeSpecificPart();
-            int sep = ssp.indexOf("!/");
-            int rsep = rssp.indexOf("!/");
-            String zip = ssp.substring(0, sep);
-            String entry = rssp.substring(rsep + 2);
-            uri = URI.create(uri.getScheme() + ":" + zip + "!/" + entry);
+            // We need a solution working for java before and after 9b80:
+            String version = System.getProperty("java.runtime.version");
+            if (version.startsWith("1.") || version.startsWith("9")) {
 
+                // special handling for Java 9 prior to b80
+                if (version.startsWith("9")) {
+                    int plusIndex = version.indexOf('+');
+                    String bugfix = plusIndex < 0 ? "0" : version.substring(plusIndex + 1);
+                    int bVersion = Integer.parseInt(bugfix);
+                    if (bVersion > 80) {
+                        return uri;
+                    } // else: we continue with our fix
+                }
+
+                String ssp = uri.getSchemeSpecificPart();
+                String rssp = uri.getRawSchemeSpecificPart();
+                int sep = ssp.indexOf("!/");
+                int rsep = rssp.indexOf("!/");
+                String zip = ssp.substring(0, sep);
+                String entry = rssp.substring(rsep + 2);
+                uri = URI.create(uri.getScheme() + ":" + zip + "!/" + entry);
+            } // else: newer java versions do not need our fix
             return uri;
         }
     }
