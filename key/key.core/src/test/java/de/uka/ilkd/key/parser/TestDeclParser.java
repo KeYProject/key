@@ -50,7 +50,10 @@ public class TestDeclParser extends TestCase {
 	serv = new Services(AbstractProfile.getDefaultProfile());
 	nss = serv.getNamespaces();
 
+    // This must contain all basic sorts used in the JavaRedux libraries
+    // and the files for these test cases.
 	String sorts = "\\sorts{boolean;int;LocSet;Seq;}";
+
 	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION,
 		new KeYLexerF(sorts,
 			"No file. Call of parser from logic/TestClashFreeSubst.java"),

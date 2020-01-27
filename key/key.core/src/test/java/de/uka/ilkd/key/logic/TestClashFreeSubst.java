@@ -65,7 +65,10 @@ public class TestClashFreeSubst extends TestCase {
 	nss = services.getNamespaces();
 	tf = services.getTermFactory();
 
+	// This must contain all basic sorts used in the JavaRedux libraries
+	// and the files for these test cases.
 	String sorts = "\\sorts{boolean;int;LocSet;Seq;}";
+
 	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION,
 		new KeYLexerF(sorts,
 			"No file. Call of parser from logic/TestClashFreeSubst.java"),
