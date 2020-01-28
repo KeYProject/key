@@ -23,12 +23,6 @@ public class ContractMap {
 
     public FunctionalOperationContract lookup(String contractName) {
         if(!myContractMap.containsKey(contractName)) {
-            // TODO: quick fix: some BuiltinRule nodes have RuleJustification (?) part after '#'
-            int index = contractName.indexOf('#');
-            if (index >= 0) {
-                contractName = contractName.substring(0, index);
-            }
-
             // TODO: find and parse file with respective contract
             Contract contract = specRepo.getContractByName(contractName);
 

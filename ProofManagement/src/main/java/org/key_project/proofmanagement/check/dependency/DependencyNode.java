@@ -16,7 +16,7 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 public class DependencyNode {
 
     private SpecificationRepository specRepo;
-    private FunctionalOperationContract contract;
+    private Contract contract;
     private Map<DependencyNode, DependencyNode> dependencies;
 
     // TODO: check if these are all problems that can arise
@@ -27,16 +27,16 @@ public class DependencyNode {
 
     private Status status;
     private ImmutableSet<FunctionalOperationContract> modalityClashes              = DefaultImmutableSet.nil();
-    private ImmutableSet<ImmutableList<FunctionalOperationContract>> illegalCycles = DefaultImmutableSet.nil();
+    private ImmutableSet<ImmutableList<Contract>> illegalCycles = DefaultImmutableSet.nil();
 
-    public DependencyNode(FunctionalOperationContract contract, Map<DependencyNode, DependencyNode> dependencies, SpecificationRepository specRepo) {
+    public DependencyNode(Contract contract, Map<DependencyNode, DependencyNode> dependencies, SpecificationRepository specRepo) {
         this.specRepo = specRepo;
         this.contract = contract;
         this.dependencies = dependencies;
         status = Status.UNKNOWN;
     }
 
-    public DependencyNode(FunctionalOperationContract contract, SpecificationRepository specRepo) {
+    public DependencyNode(Contract contract, SpecificationRepository specRepo) {
         this(contract, new HashMap<>(), specRepo);
     }
 
@@ -44,7 +44,7 @@ public class DependencyNode {
         dependencies.put(dependentNode, dependentNode);
     }
 
-    public FunctionalOperationContract getContract() {
+    public Contract getContract() {
         return contract;
     }
 
@@ -63,7 +63,7 @@ public class DependencyNode {
     public ImmutableSet<FunctionalOperationContract> getModalityClashes() {
         return modalityClashes;
     }
-    public ImmutableSet<ImmutableList<FunctionalOperationContract>> getIllegalCycles() {
+    public ImmutableSet<ImmutableList<Contract>> getIllegalCycles() {
         return illegalCycles;
     }
 
@@ -76,22 +76,32 @@ public class DependencyNode {
                 return false;
             }
         }
-        // is the current method contract concerned with termination?
-        if (contract.getModality() == Modality.DIA) {
-            // are there some modalities that do not match?
-            // this check should be unnecessary
-            for (DependencyNode currentNode : dependencies.keySet()) {
-                if(currentNode.contract.getModality() == Modality.BOX) {
-                    status = Status.MODALITY_CLASH;
-                    return false;
+
+        // TODO: better solution with inheritance
+        if (contract instanceof FunctionalOperationContract) {
+
+            FunctionalOperationContract functionalContr = (FunctionalOperationContract)contract;
+
+            // is the current method contract concerned with termination?
+            if (functionalContr.getModality() == Modality.DIA) {
+                // are there some modalities that do not match?
+                // this check should be unnecessary
+                for (DependencyNode currentNode : dependencies.keySet()) {
+                    if (currentNode.contract instanceof FunctionalOperationContract) {
+                        FunctionalOperationContract foc = (FunctionalOperationContract)(currentNode.contract);
+                        if (foc.getModality() == Modality.BOX) {
+                            status = Status.MODALITY_CLASH;
+                            return false;
+                        }
+                    }
                 }
-            }
-            // do the proofs form an illegal cycle?
-            for (DependencyNode currentNode : dependencies.keySet()) {
-                // TODO: implement ProofCorrectnessMgt.isContractApplicable() here
-                if (!isApplicable(currentNode)) {
-                    status = Status.ILLEGAL_CYCLES;
-                    return false;
+                // do the proofs form an illegal cycle?
+                for (DependencyNode currentNode : dependencies.keySet()) {
+                    // TODO: implement ProofCorrectnessMgt.isContractApplicable() here
+                    if (!isApplicable(currentNode)) {
+                        status = Status.ILLEGAL_CYCLES;
+                        return false;
+                    }
                 }
             }
         }

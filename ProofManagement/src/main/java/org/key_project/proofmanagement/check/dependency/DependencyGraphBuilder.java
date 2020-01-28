@@ -1,9 +1,11 @@
 package org.key_project.proofmanagement.check.dependency;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.uka.ilkd.key.speclang.Contract;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
@@ -13,7 +15,7 @@ import de.uka.ilkd.key.util.Pair;
 
 public abstract class DependencyGraphBuilder {
 
-    public static DependencyGraph buildGraph(SpecificationRepository specRepo, ImmutableList<Pair<String, BranchNodeIntermediate>> contractProofPairs) {
+    public static DependencyGraph buildGraph(SpecificationRepository specRepo, List<Pair<String, BranchNodeIntermediate>> contractProofPairs) {
         // create contract map to look up contracts from their strings
         ContractMap contractMap = new ContractMap(specRepo);
 
@@ -23,14 +25,15 @@ public abstract class DependencyGraphBuilder {
         Map<String, DependencyNode> dependencyNodes = new HashMap<>();
 
         for (Pair<String, BranchNodeIntermediate> currentContractProofPair : contractProofPairs) {
-            String currentContractString = currentContractProofPair.first;
-            FunctionalOperationContract currentContract = contractMap.lookup(currentContractString);
+            String c = currentContractProofPair.first;
+
+            FunctionalOperationContract contract = contractMap.lookup(c);
             // create fresh node for current contract
-            DependencyNode currentDependencyNode = new DependencyNode(currentContract, specRepo);
+            DependencyNode node = new DependencyNode(contract, specRepo);
             // add node to graph
-            dependencyNodes.put(currentContractString, currentDependencyNode);
+            dependencyNodes.put(c, node);
             // and the node map for later reference
-            graph.addNode(currentDependencyNode);
+            graph.addNode(node);
         }
 
         // TODO: NPE when building the graph (from here downwards)
@@ -49,6 +52,14 @@ public abstract class DependencyGraphBuilder {
             // add dependencies between nodes
             for (String currentDependentContractString : dependentContractsAsStrings) {
                 DependencyNode dependentNode = dependencyNodes.get(currentDependentContractString);
+
+                // TODO: should these missing dependency nodes be created earlier (to ensure that their dependencies
+                //  are collected as well)?
+                if (dependentNode == null) {
+                    Contract contract = specRepo.getContractByName(currentDependentContractString);
+                    dependentNode = new DependencyNode(contract, specRepo);
+                }
+
                 currentDependencyNode.addDependency(dependentNode);
             }
             // add the freshly created node to the graph

@@ -1,5 +1,6 @@
 package org.key_project.proofmanagement.check.dependency;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,14 +12,14 @@ import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediateWalker;
 
 public class ContractApplicationCollector extends NodeIntermediateWalker {
 
-    private Set<String> myResult = new HashSet<>();
+    private Set<String> result = new HashSet<>();
 
     public ContractApplicationCollector(NodeIntermediate root) {
         super(root);
     }
 
     public Set<String> getResult() {
-        return myResult;
+        return result;
     }
 
     @Override
@@ -39,8 +40,12 @@ public class ContractApplicationCollector extends NodeIntermediateWalker {
 
             if (appName.equals("Use Operation Contract") || appName.equals("Use Dependency Contract")) {
                 BuiltInAppIntermediate biApp = (BuiltInAppIntermediate) appIntermediate;
-                String contract = biApp.getContract();
-                myResult.add(contract);
+
+                // The string may still contain multiple contracts, syntax: contract1#contract2#...
+                // split and add all
+                String combinedContracts = biApp.getContract();
+                String[] contracts = combinedContracts.split("#");
+                Collections.addAll(result, contracts);
             }
         }
     }

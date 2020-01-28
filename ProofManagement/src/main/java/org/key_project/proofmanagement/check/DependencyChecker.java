@@ -3,6 +3,7 @@ package org.key_project.proofmanagement.check;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -40,12 +41,22 @@ public class DependencyChecker implements Checker {
 
     @Override
     public CheckerData check(List<Path> proofFiles, CheckerData data) {
-        ImmutableList<Pair<String, BranchNodeIntermediate>> contractProofPairs = ImmutableSLList.nil();
+        List<Pair<String, BranchNodeIntermediate>> contractProofPairs = new ArrayList<>();
         try {
             // for each proof: parse and construct intermediate AST
             for (Path proofPath : proofFiles) {
-                Pair<String, BranchNodeIntermediate> currentContractAndProof = loadProof(proofPath);
-                contractProofPairs = contractProofPairs.prepend(currentContractAndProof);
+                CheckerData.ProofLine line = null;
+                for (CheckerData.ProofLine l : data.getProofLines()) {
+                    if (l.proofFile.equals(proofPath)) {
+                        line = l;
+                        break;
+                    }
+                }
+                if (line == null) {
+                    throw new RuntimeException("No matching proof line found!");
+                }
+                Pair<String, BranchNodeIntermediate> currentContractAndProof = loadProof(proofPath, line);
+                contractProofPairs.add(currentContractAndProof);
             }
             // construct dependency graph from proofs
             // WARNING: the analysis as is currently implemented asserts there is exactly one proof for each contract!!!
@@ -75,7 +86,7 @@ public class DependencyChecker implements Checker {
      * @throws IOException
      * @throws ProofInputException
      */
-    public Pair<String, BranchNodeIntermediate> loadProof(Path path) throws IOException, ProofInputException {
+    public Pair<String, BranchNodeIntermediate> loadProof(Path path, CheckerData.ProofLine line) throws IOException, ProofInputException {
         Profile profile = AbstractProfile.getDefaultProfile();
 
         FileRepo fileRepo = new TrivialFileRepo();
@@ -85,10 +96,12 @@ public class DependencyChecker implements Checker {
 
         KeYUserProblemFile keyFile = new KeYUserProblemFile(path.getFileName().toString(),
                 path.toFile(), fileRepo, control, profile, false);
+        line.envInput = keyFile;    // store in CheckerData for later use (e.g. in ReplayChecker)
 
         ProblemInitializer pi = new ProblemInitializer(control, new Services(profile),
                 new DefaultUserInterfaceControl());
         pi.setFileRepo(fileRepo);
+        line.problemInitializer = pi;
 
         InitConfig initConfig = pi.prepare(keyFile);
         initConfig.setFileRepo(fileRepo);

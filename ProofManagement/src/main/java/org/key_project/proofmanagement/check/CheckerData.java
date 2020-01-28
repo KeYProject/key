@@ -23,7 +23,7 @@ import java.util.List;
  *
  * Note: This is a mutable data container!
  */
-public class CheckerData {
+public final class CheckerData {
     // TODO: default value
     private boolean consistent = false;
     private ProofBundleHandler pbh;
