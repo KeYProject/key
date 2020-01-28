@@ -126,7 +126,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
     private JSpinner createTimeoutField() {
         return addNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, infoTimeoutField,
-                e -> settings.timeout = e);
+                e -> settings.timeout = e * 1000);
     }
 
     private JSpinner createIntBoundField() {
