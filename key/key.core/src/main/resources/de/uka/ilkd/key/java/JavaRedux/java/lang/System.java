@@ -1,13 +1,11 @@
 package java.lang;
 
-/**
- * @generated
- */
 public final class System {
 
-   /**
-    * @generated
-    */
+    public static final java.io.InputStream in;
+    public static final java.io.PrintStream out;
+    public static final java.io.PrintStream err;
+
    /*@ public behavior
      @ requires true;
      @ ensures true;
