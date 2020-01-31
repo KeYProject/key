@@ -24,7 +24,6 @@ public final class BigInteger extends java.lang.Number implements java.lang.Comp
    /*@ public normal_behavior
      @ requires true;
      @ ensures \result.value == this.value % param0.value;
-     @ ensures \invariant_for(result);
      @ ensures \fresh(\result) && \fresh(\result.*) && \typeof(\result) == \type(BigInteger);
      @ assignable \nothing;
      @ determines \result \by \nothing \new_objects \result;
