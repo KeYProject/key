@@ -16,6 +16,7 @@ import de.uka.ilkd.key.parser.Location
 import de.uka.ilkd.key.settings.ChoiceSettings
 import de.uka.ilkd.key.settings.ProofSettings
 import de.uka.ilkd.key.speclang.Contract
+import de.uka.ilkd.key.util.MiscTools
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -90,6 +91,7 @@ class Checker : CliktCommand() {
 
         for (c in contracts) {
             print("  * ${c.name}")
+            val filename = MiscTools.toValidFileName(c.name);
 
             if (c.name in forbidContracts) {
                 println(" ... excluded (--forbid-contract) ")
@@ -103,8 +105,8 @@ class Checker : CliktCommand() {
                     proof?.settings?.strategySettings?.maxSteps = autoModeStep
                     ProofSettings.DEFAULT_SETTINGS.strategySettings.maxSteps = autoModeStep
 
-                    val proofFile = findProofFile(c)
-                    val scriptFile = findScriptFile(c)
+                    val proofFile = findProofFile(filename)
+                    val scriptFile = findScriptFile(filename)
 
                     var autoMode = true
                     if (proofFile != null) {
@@ -152,9 +154,9 @@ class Checker : CliktCommand() {
         candidates
     }
 
-    private fun findProofFile(c: Contract): String? = proofFileCandidates.find { it.startsWith(c.displayName) && (it.endsWith(".proof") || it.endsWith(".proof.gz")) }
+    private fun findProofFile(filename: String): String? = proofFileCandidates.find { it.startsWith(filename) && (it.endsWith(".proof") || it.endsWith(".proof.gz")) }
 
-    private fun findScriptFile(c: Contract): String? = proofFileCandidates.find { it.startsWith(c.displayName) && (it.endsWith(".txt") || it.endsWith(".pscript")) }
+    private fun findScriptFile(filename: String): String? = proofFileCandidates.find { it.startsWith(filename) && (it.endsWith(".txt") || it.endsWith(".pscript")) }
 
 }
 
