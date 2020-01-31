@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.util.KeYConstants;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.List;
@@ -30,7 +32,6 @@ public abstract class KeYApi {
     }
 
     /**
-     *
      * @return
      */
     public static String getVersion() {
