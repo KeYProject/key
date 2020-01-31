@@ -100,7 +100,7 @@ class Checker : CliktCommand() {
                     println(" ... skipped (--dry-run). ")
                 } else {
                     val proofApi = pm.startProof(c)
-                    val proof = proofApi.proof
+                    var proof = proofApi.proof
                     require(proof != null)
                     proof?.settings?.strategySettings?.maxSteps = autoModeStep
                     ProofSettings.DEFAULT_SETTINGS.strategySettings.maxSteps = autoModeStep
@@ -112,11 +112,19 @@ class Checker : CliktCommand() {
                     if (proofFile != null) {
                         println()
                         print("    * Proof found: $proofFile. Try loading. ")
+
+                        val loaded = KeYApi.loadProof(File(proofFile),
+                                classpath.map { File(it) },
+                                bootClassPath?.let { File(it) },
+                                includes.map { File(it) })
+
+                        proof = loaded.loadedProof.proof
                         autoMode = false
                     }
+                    
                     if (scriptFile != null) {
                         println()
-                        print("    * Script found: $scriptFile. Try proofing. ")
+                        print("    * Script found: $scriptFile. Try proving. ")
                         autoMode = false
 
                         val script = File(scriptFile).readText()
