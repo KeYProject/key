@@ -1,8 +1,5 @@
 package org.bouncycastle.openpgp;
 
-/**
- * @generated
- */
 public class PGPUtil extends java.lang.Object implements org.bouncycastle.bcpg.HashAlgorithmTags {
     
    /*@ public normal_behavior

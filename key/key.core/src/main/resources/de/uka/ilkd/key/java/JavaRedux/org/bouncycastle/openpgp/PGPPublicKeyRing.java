@@ -1,8 +1,5 @@
 package org.bouncycastle.openpgp;
 
-/**
- * @generated
- */
 public class PGPPublicKeyRing extends org.bouncycastle.openpgp.PGPKeyRing implements org.bouncycastle.util.Iterable {
 
     /*@ public normal_behavior
