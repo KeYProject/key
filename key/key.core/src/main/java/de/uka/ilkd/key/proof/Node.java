@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -180,7 +181,7 @@ public class Node {
     void clearNodeInfo() {
         if (this.nodeInfo != null) {
             SequentChangeInfo oldSeqChangeInfo = this.nodeInfo.getSequentChangeInfo();
-            ImmutableSet<String> oldRelevantFiles = this.nodeInfo.getRelevantFiles();
+            ImmutableSet<URI> oldRelevantFiles = this.nodeInfo.getRelevantFiles();
 
             this.nodeInfo = new NodeInfo(this);
 

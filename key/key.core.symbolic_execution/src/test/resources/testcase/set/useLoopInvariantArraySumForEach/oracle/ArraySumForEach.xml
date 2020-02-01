@@ -7,7 +7,8 @@
             <callStackEntry path="/0"/>
             <loopInvariant name="invariant: (  (idx &gt;= 0
  &amp; idx &lt;= array.length)&lt;&lt;SC&gt;&gt;
- &amp; result_1 = javaCastInt(bsum{int j;}(0, idx, array[j])))&lt;&lt;SC&gt;&gt;;
+ &amp;   result_1
+   = javaCastInt(bsum{int j;}(0, idx, array[j])))&lt;&lt;SC&gt;&gt;;
 variant: javaSubInt(array.length, idx)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
