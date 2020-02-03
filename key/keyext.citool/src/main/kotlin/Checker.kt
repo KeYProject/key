@@ -13,17 +13,25 @@ import de.uka.ilkd.key.api.ProofManagementApi
 import de.uka.ilkd.key.control.AbstractProofControl
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl
 import de.uka.ilkd.key.control.KeYEnvironment
+import de.uka.ilkd.key.control.UserInterfaceControl
+import de.uka.ilkd.key.logic.PosInOccurrence
+import de.uka.ilkd.key.macros.*
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine
 import de.uka.ilkd.key.parser.Location
+import de.uka.ilkd.key.proof.Goal
+import de.uka.ilkd.key.proof.Node
 import de.uka.ilkd.key.proof.Proof
+import de.uka.ilkd.key.prover.ProverTaskListener
 import de.uka.ilkd.key.settings.ChoiceSettings
 import de.uka.ilkd.key.settings.ProofSettings
 import de.uka.ilkd.key.speclang.Contract
 import de.uka.ilkd.key.util.KeYConstants
 import de.uka.ilkd.key.util.MiscTools
+import org.key_project.util.collection.ImmutableList
 import java.io.File
 import kotlin.system.exitProcess
 import kotlin.system.measureTimeMillis
+
 
 const val ESC = 27.toChar()
 const val RED = 31;
@@ -40,13 +48,17 @@ fun color(s: Any, c: Int) = "${ESC}[${c}m$s${ESC}[0m"
  * @version 1 (21.11.19)
  */
 class Checker : CliktCommand() {
+
+    val enableMeasuring: Boolean by option("--measuring",
+            help = "try to measure proof coverage").flag()
+
     val includes by option(
             help = "defines additional key files to be included"
     ).multiple()
     val autoModeStep by option("--auto-mode-max-step", metavar = "INT",
             help = "maximal amount of steps in auto-mode [default:10000]")
             .int().default(10000)
-    val verbose by option(help = "verbose output, currently unused").flag("--no-verbose")
+    val verbose by option("-v", "--verbose", help = "verbose output, currently unused").flag("--no-verbose")
     val dryRun by option("--dry-run", help = "skipping the proof reloading, scripts execution and auto mode." +
             " Useful for finding the contract names").flag()
 
@@ -195,7 +207,15 @@ class Checker : CliktCommand() {
 
     private fun runAutoMode(proofControl: AbstractProofControl, proof: Proof): Boolean {
         val time = measureTimeMillis {
-            proofControl.startAndWaitForAutoMode(proof)
+            if (enableMeasuring) {
+                val mm = MeasuringMacro()
+                proofControl.runMacro(proof.root(), mm, null)
+                proofControl.waitWhileAutoMode()
+                printm("[INFO] Proof has open/closed before: ${mm.before}")
+                printm("[INFO] Proof has open/closed after: ${mm.after}")
+            } else {
+                proofControl.startAndWaitForAutoMode(proof)
+            }
         }
         if (verbose) {
             printm("[FINE] Auto-mode took ${time / 1000.0} seconds.")
@@ -239,6 +259,19 @@ class Checker : CliktCommand() {
         if (verbose) {
             proof.statistics.summary.forEach { p -> printm("[FINE] ${p.first} = ${p.second}") }
         }
+        if (enableMeasuring) {
+            val closedGoals = proof.getClosedSubtreeGoals(proof.root())
+            val visitLineOnClosedGoals = HashSet<Pair<String, Int>>()
+            closedGoals.forEach {
+                it.pathToRoot.forEach {
+                    val p = it.nodeInfo.activeStatement?.positionInfo
+                    if (p != null) {
+                        visitLineOnClosedGoals.add(p.fileName to p.startPosition.line)
+                    }
+                }
+            }
+            printm("Visited lines:\n${visitLineOnClosedGoals.joinToString("\n")}")
+        }
     }
 
     val proofFileCandidates by lazy {
@@ -247,10 +280,59 @@ class Checker : CliktCommand() {
         candidates
     }
 
-
     private fun findProofFile(filename: String): String? = proofFileCandidates.find { it.startsWith(filename) && (it.endsWith(".proof") || it.endsWith(".proof.gz")) }
 
     private fun findScriptFile(filename: String): String? = proofFileCandidates.find { it.startsWith(filename) && (it.endsWith(".txt") || it.endsWith(".pscript")) }
 }
 
 fun main(args: Array<String>) = Checker().main(args)
+
+private val Goal.pathToRoot: Sequence<Node>
+    get() {
+        return generateSequence(node()) { it.parent() }
+    }
+
+
+//region Measuring
+
+class MeasuringMacro : SequentialProofMacro() {
+    val before = Stats()
+    val after = Stats()
+
+    override fun getName() = "MeasuringMacro"
+    override fun getCategory() = "ci-only"
+    override fun getDescription() = "like auto but with more swag"
+
+    override fun createProofMacroArray(): Array<ProofMacro> {
+        return arrayOf(
+                AutoPilotPrepareProofMacro(),
+                GatherStatistics(before),
+                AutoMacro(), //or TryCloseMacro()?
+                GatherStatistics(after)
+        )
+    }
+}
+
+data class Stats(var openGoals: Int = 0, var closedGoals: Int = 0)
+
+class GatherStatistics(val stats: Stats) : SkipMacro() {
+
+    override fun getName() = "gather-stats"
+    override fun getCategory() = "ci-only"
+    override fun getDescription() = "stat purpose"
+
+    override fun canApplyTo(proof: Proof?,
+                            goals: ImmutableList<Goal?>?,
+                            posInOcc: PosInOccurrence?): Boolean = true
+
+    override fun applyTo(uic: UserInterfaceControl?,
+                         proof: Proof,
+                         goals: ImmutableList<Goal?>?,
+                         posInOcc: PosInOccurrence?,
+                         listener: ProverTaskListener?): ProofMacroFinishedInfo? { // do nothing
+        stats.openGoals = proof.openGoals().size()
+        stats.closedGoals = proof.getClosedSubtreeGoals(proof.root()).size()
+        return super.applyTo(uic, proof, goals, posInOcc, listener)
+    }
+}
+//endregion

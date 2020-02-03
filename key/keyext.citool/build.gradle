@@ -15,3 +15,8 @@ dependencies {
 application {
     mainClassName = "de.uka.ilkd.key.CheckerKt"
 }
+
+run {
+    args = ["--measuring", "/home/weigl/work/verifythis-ltc-2020/simplified/Keyserver.java"]
+    println(args)
+}
