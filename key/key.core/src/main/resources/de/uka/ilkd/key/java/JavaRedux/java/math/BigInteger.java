@@ -6,10 +6,12 @@ public final class BigInteger extends java.lang.Number implements java.lang.Comp
     
    //@ public static invariant java.math.BigInteger.ZERO.value == (\bigint) 0;
 
-   public static final java.math.BigInteger ZERO = new java.math.BigInteger(0);
+   public static final java.math.BigInteger ZERO = BigInteger.valueOf(0);
    
-   public BigInteger(int v) {
-       //@ set value = (\bigint) v;
+   public static BigInteger valueOf(long v) {
+       BigInteger result = new BigInteger();
+       //@ set result.value = (\bigint) v;
+       return result;
    }
 
    /*@ public normal_behavior
