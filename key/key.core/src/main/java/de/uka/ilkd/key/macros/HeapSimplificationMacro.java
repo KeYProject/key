@@ -188,7 +188,6 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "closeTrue",
         "closeFalse",
         "ifthenelse_negated",
-        "ifthenelse_split",
         // TODO: those must be more expensive
 //        "replace_known_left",
 //        "replace_known_right",
