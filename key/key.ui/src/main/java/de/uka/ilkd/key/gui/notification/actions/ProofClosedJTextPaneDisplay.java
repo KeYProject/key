@@ -27,7 +27,7 @@ import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
+import de.uka.ilkd.key.gui.actions.ShowProofStatisticsWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
@@ -40,8 +40,8 @@ import de.uka.ilkd.key.util.Debug;
  * @author bubel
  */
 public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
-  
-    
+
+
     public ProofClosedJTextPaneDisplay(Frame parentComponent) {
         super(parentComponent);
     }
@@ -50,39 +50,41 @@ public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
      * If available some statistics are displayed as well.
      */
     @Override
-   public synchronized boolean execute(NotificationEvent pcne) {               
+   public synchronized boolean execute(NotificationEvent pcne) {
         if (pcne instanceof ProofClosedNotificationEvent) {
             Proof proof = ((ProofClosedNotificationEvent)pcne).getProof();
             if (proof != null) {
-                setMessage(ShowProofStatistics.getHTMLStatisticsMessage(proof));
+                ShowProofStatisticsWindow win = new ShowProofStatisticsWindow(
+                        MainWindow.getInstance(), proof);
+                win.setVisible(true);
             }
         } else {
             setMessage("Proof Closed. No statistics available.");
+
+            JEditorPane contentPane = new JEditorPane("text/html", getMessage());
+            contentPane.setEditable(false);
+            contentPane.setBorder(BorderFactory.createEmptyBorder());
+            contentPane.setCaretPosition(0);
+            contentPane.setBackground(MainWindow.getInstance().getBackground());
+            contentPane.setSize(new Dimension(10, 360));
+            contentPane.setPreferredSize(new Dimension(contentPane.getPreferredSize().width + 15, 360));
+
+            JScrollPane scrollPane = new JScrollPane(contentPane);
+            scrollPane.setBorder(BorderFactory.createEmptyBorder());
+
+            Font myFont = UIManager.getFont(Config.KEY_FONT_PROOF_TREE);
+            if (myFont != null) {
+                contentPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+                contentPane.setFont(myFont);
+            } else {
+                Debug.out("KEY_FONT_PROOF_TREE not available. Use standard font.");
+            }
+
+            JOptionPane.showMessageDialog
+                (parentComponent, scrollPane,
+                        "Proof closed", JOptionPane.INFORMATION_MESSAGE);
         }
-        
-        JEditorPane contentPane = new JEditorPane("text/html", getMessage());
-        contentPane.setEditable(false);
-        contentPane.setBorder(BorderFactory.createEmptyBorder());
-        contentPane.setCaretPosition(0);
-        contentPane.setBackground(MainWindow.getInstance().getBackground());
-        contentPane.setSize(new Dimension(10, 360));
-        contentPane.setPreferredSize(new Dimension(contentPane.getPreferredSize().width + 15, 360));
-        
-        JScrollPane scrollPane = new JScrollPane(contentPane);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        
-        Font myFont = UIManager.getFont(Config.KEY_FONT_PROOF_TREE);
-        if (myFont != null) {
-            contentPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-            contentPane.setFont(myFont);
-        } else {
-            Debug.out("KEY_FONT_PROOF_TREE not available. Use standard font.");
-        }
-        
-        JOptionPane.showMessageDialog
-            (parentComponent, scrollPane,
-                    "Proof closed", JOptionPane.INFORMATION_MESSAGE);
-        
+
         return true;
     }
 }
