@@ -71,12 +71,14 @@ public class ShowProofStatisticsWindow extends JFrame {
 
         JButton csvButton = new JButton("Export as CSV");
         csvButton.addActionListener(event -> {
-            export("csv", proof);
+            export("csv", proof.name().toString(),
+                    ShowProofStatistics.getCSVStatisticsMessage(proof));
         });
 
         JButton htmlButton = new JButton("Export as HTML");
         htmlButton.addActionListener(event -> {
-            export("html", proof);
+            export("html", proof.name().toString(),
+                    ShowProofStatistics.getHTMLStatisticsMessage(proof));
         });
 
         buttonPane.add(okButton);
@@ -95,18 +97,18 @@ public class ShowProofStatisticsWindow extends JFrame {
         setLocationRelativeTo(mainWindow);
     }
 
-    private void export(String fileExtension, Proof proof) {
+    private void export(String fileExtension, String fileName, String text) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter(
                 fileExtension.toUpperCase() + " files", fileExtension));
         fileChooser.setAcceptAllFileFilterUsed(false);
-        fileChooser.setSelectedFile(new File(proof.name() + "." + fileExtension));
+        fileChooser.setSelectedFile(new File(fileName + "." + fileExtension));
         int returnVal = fileChooser.showSaveDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
             try(BufferedWriter writer = new BufferedWriter(
                         new OutputStreamWriter(new FileOutputStream(file)));) {
-                writer.write(ShowProofStatistics.getHTMLStatisticsMessage(proof));
+                writer.write(text);
             } catch (IOException e) {
                 e.printStackTrace();
                 assert false;
