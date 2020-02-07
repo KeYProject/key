@@ -292,6 +292,23 @@ private val Goal.pathToRoot: Sequence<Node>
         return generateSequence(node()) { it.parent() }
     }
 
+private fun Proof.openClosedProgramBranches(): Pair<Int, Int> {
+    val branchingNodes = this.root().subtreeIterator().asSequence()
+            .filter { it.childrenCount() > 1 }
+    val programBranchingNodes = branchingNodes.filter {
+        val childStmt = it.childrenIterator().asSequence().map { child ->
+            child.nodeInfo.activeStatement
+        }
+        childStmt.any {c -> c != it.nodeInfo.activeStatement }
+    }
+
+    val diverseProgramBranches = programBranchingNodes.filter { parent ->
+        !parent.isClosed && parent.childrenIterator().asSequence().any { it.isClosed}
+    }
+
+    return diverseProgramBranches.count() to programBranchingNodes.count()
+}
+
 
 //region Measuring
 
@@ -316,7 +333,6 @@ class MeasuringMacro : SequentialProofMacro() {
 data class Stats(var openGoals: Int = 0, var closedGoals: Int = 0)
 
 class GatherStatistics(val stats: Stats) : SkipMacro() {
-
     override fun getName() = "gather-stats"
     override fun getCategory() = "ci-only"
     override fun getDescription() = "stat purpose"
