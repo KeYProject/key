@@ -12,17 +12,17 @@ import java.io.OutputStreamWriter;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
+import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Shows proof statistics and allows the user to save them as HTML or CSV.
@@ -64,20 +64,20 @@ public class ShowProofStatisticsWindow extends JFrame {
 
         JPanel buttonPane = new JPanel();
 
-        JButton okButton = new JButton("OK");
+        JButton okButton = new JButton("Close");
         okButton.addActionListener(event -> {
             dispose();
         });
 
         JButton csvButton = new JButton("Export as CSV");
         csvButton.addActionListener(event -> {
-            export("csv", proof.name().toString(),
+            export("csv", MiscTools.toValidFileName(proof.name().toString()),
                     ShowProofStatistics.getCSVStatisticsMessage(proof));
         });
 
         JButton htmlButton = new JButton("Export as HTML");
         htmlButton.addActionListener(event -> {
-            export("html", proof.name().toString(),
+            export("html",  MiscTools.toValidFileName(proof.name().toString()),
                     ShowProofStatistics.getHTMLStatisticsMessage(proof));
         });
 
@@ -89,22 +89,21 @@ public class ShowProofStatisticsWindow extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
         add(buttonPane, BorderLayout.PAGE_END);
 
-        int w = Math.max(
+        int w = 50 + Math.max(
                 scrollPane.getPreferredSize().width,
                 buttonPane.getPreferredSize().width);
-        int h = scrollPane.getPreferredSize().height;
+        int h = scrollPane.getPreferredSize().height + buttonPane.getPreferredSize().height + 100;
         setSize(w, h);
         setLocationRelativeTo(mainWindow);
     }
 
     private void export(String fileExtension, String fileName, String text) {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter(
-                fileExtension.toUpperCase() + " files", fileExtension));
-        fileChooser.setAcceptAllFileFilterUsed(false);
-        fileChooser.setSelectedFile(new File(fileName + "." + fileExtension));
-        int returnVal = fileChooser.showSaveDialog(this);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
+        KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(
+                "Choose filename to save statistics");
+        fileChooser.setFileFilter(KeYFileChooser.STATISTICS_FILTER);
+        fileChooser.selectFile(new File(fileName + "." + fileExtension));
+        boolean approved = fileChooser.showSaveDialog(this);
+        if (approved) {
             File file = fileChooser.getSelectedFile();
             try(BufferedWriter writer = new BufferedWriter(
                         new OutputStreamWriter(new FileOutputStream(file)));) {

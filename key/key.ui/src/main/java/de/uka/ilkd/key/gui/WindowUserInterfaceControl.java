@@ -13,6 +13,33 @@
 
 package de.uka.ilkd.key.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
+import javax.swing.WindowConstants;
+
+import org.key_project.util.collection.ImmutableSet;
+
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
@@ -30,9 +57,18 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
-import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.proof.io.*;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
+import de.uka.ilkd.key.proof.io.GZipProofSaver;
+import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProofBundleSaver;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
@@ -47,19 +83,6 @@ import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ThreadUtilities;
-import org.key_project.util.collection.ImmutableSet;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * Implementation of {@link UserInterfaceControl} which controls the {@link MainWindow}
@@ -95,7 +118,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
           }
        };
     }
-    
+
     /**
      * loads the problem or proof from the given file
      *
@@ -327,7 +350,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       return mainWindow.getMediator();
    }
 
-   
+
    /**
     * {@inheritDoc}
     */
@@ -361,6 +384,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
    public File saveProof(Proof proof, String fileExtension) {
        final MainWindow mainWindow = MainWindow.getInstance();
        final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
+       jFC.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
 
        Pair<File, String> f = fileName(proof, fileExtension);
        final boolean saved = jFC.showSaveDialog(mainWindow, f.first, f.second);
@@ -441,7 +465,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
        }
        return new Pair<File, String>(selectedFile, defaultName);
    }
-   
+
    /**
     * {@inheritDoc}
     */
@@ -452,7 +476,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       ThreadUtilities.invokeAndWait(new Runnable() {
          @Override
          public void run() {
-            mainWindow.getProofList().removeProof(e.getSource());            
+            mainWindow.getProofList().removeProof(e.getSource());
          }
       });
     }
@@ -484,7 +508,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
              if ("".equals(result.getStatus())) {
                  this.resetStatus(this);
               } else {
-                 this.reportStatus(this, result.getStatus());                         
+                 this.reportStatus(this, result.getStatus());
               }
              getMediator().getSelectionModel().setSelectedNode(result.getNode());
              if (result.hasErrors()) {
@@ -498,7 +522,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             // should never happen as replay always returns a result object
              //TODO (DS): Why is it then there? If this happens, we will get\\
              // a NullPointerException just a line below...
-            getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());                         
+            getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());
          }
 
       }
@@ -507,11 +531,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
         }
    }
-   
-   
-   
 
-   
+
+
+
+
    /**
     * Loads the given location and returns all required references as {@link KeYEnvironment}
     * with KeY's {@link MainWindow}.
@@ -530,7 +554,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 //                                                                             boolean makeMainWindowVisible) throws ProblemLoaderException {
 //      return loadInMainWindow(null, location, classPaths, bootClassPath, includes, false, makeMainWindowVisible);
 //   }
-   
+
    /**
     * Loads the given location and returns all required references as {@link KeYEnvironment}
     * with KeY's {@link MainWindow}.
@@ -568,20 +592,20 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
    @Override
    public void reportWarnings(ImmutableSet<PositionedString> warnings) {
-     final JDialog dialog = new JDialog(MainWindow.getInstance(), 
-                                        SLEnvInput.getLanguage() + " warning", 
+     final JDialog dialog = new JDialog(MainWindow.getInstance(),
+                                        SLEnvInput.getLanguage() + " warning",
                                         true);
      dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
      Container pane = dialog.getContentPane();
      pane.setLayout(new BorderLayout());
-     
+
      //top label
      JLabel label = new JLabel("The following non-fatal "
-                               + "problems occurred when translating your " 
+                               + "problems occurred when translating your "
                                + SLEnvInput.getLanguage() + " specifications:");
      label.setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 5));
      pane.add(label, BorderLayout.NORTH);
-       
+
      //scrollable warning list
      JScrollPane scrollpane = new JScrollPane();
      scrollpane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -589,7 +613,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      list.setBorder(BorderFactory.createLoweredBevelBorder());
      scrollpane.setViewportView(list);
      pane.add(scrollpane, BorderLayout.CENTER);
- 
+
      //ok button
      final JButton button = new JButton("OK");
      button.addActionListener(new ActionListener() {
@@ -605,7 +629,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      panel.add(button);
      pane.add(panel, BorderLayout.SOUTH);
      dialog.getRootPane().setDefaultButton(button);
-     
+
      button.registerKeyboardAction(
          new ActionListener() {
              @Override
@@ -618,7 +642,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
          "ESC",
          KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
          JComponent.WHEN_IN_FOCUSED_WINDOW);
-     
+
      dialog.setSize(700, 300);
      dialog.setLocationRelativeTo(MainWindow.getInstance());
      dialog.setVisible(true);

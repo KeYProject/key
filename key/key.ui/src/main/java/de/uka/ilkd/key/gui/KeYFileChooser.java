@@ -28,7 +28,7 @@ import de.uka.ilkd.key.core.Main;
 public class KeYFileChooser {
 
     private static final File HOME_DIR = IOUtil.getHomeDirectory();
-    private static final FileFilter FILTER = new FileFilter() {
+    public static final FileFilter DEFAULT_FILTER = new FileFilter() {
         public boolean accept(File f) {
             return
                             f.isDirectory()
@@ -44,7 +44,18 @@ public class KeYFileChooser {
         }
     };
 
-    private static final FileFilter COMPRESSED_FILTER = new FileFilter() {
+    public static final FileFilter STATISTICS_FILTER = new FileFilter() {
+        public boolean accept(File f) {
+            return f.getName().endsWith(".html") || f.getName().endsWith(".csv")
+                    || f.isDirectory();
+        }
+
+        public String getDescription() {
+            return "proof statistics files (.csv, .html)";
+        }
+    };
+
+    public static final FileFilter COMPRESSED_FILTER = new FileFilter() {
         public boolean accept(File f) {
             return f.getName().endsWith(".proof.gz") || f.isDirectory();
         }
@@ -79,8 +90,9 @@ public class KeYFileChooser {
                 super.approveSelection();
             }
         };
+        fileChooser.addChoosableFileFilter(STATISTICS_FILTER);
         fileChooser.addChoosableFileFilter(COMPRESSED_FILTER);
-        fileChooser.setFileFilter(FILTER);
+        fileChooser.setFileFilter(DEFAULT_FILTER);
     }
 
     public void prepare() {
@@ -92,8 +104,9 @@ public class KeYFileChooser {
             }
         } else if (selFile.isFile()) { // present & not dir.
             String filename = selFile.getAbsolutePath();
-            if (!filename.endsWith(".proof"))
+            if (!filename.endsWith(".proof")) {
                 fileChooser.setSelectedFile(new File(filename+".proof"));
+            }
         } else if (selFile.isDirectory()) {
             fileChooser.setCurrentDirectory(selFile);
         }
@@ -105,6 +118,10 @@ public class KeYFileChooser {
         } else {
             fileChooser.setDialogTitle ("Select file to load");
         }
+    }
+
+    public void setFileFilter(FileFilter fileFilter) {
+        fileChooser.setFileFilter(fileFilter);
     }
 
     private void setSaveDialog(boolean b) {
