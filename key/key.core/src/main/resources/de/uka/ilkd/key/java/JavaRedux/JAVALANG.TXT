@@ -46,3 +46,4 @@ java.io.IOException
 java.io.OutputStream
 java.io.PrintStream
 java.io.Serializable
+java.math.BigInteger
