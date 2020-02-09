@@ -5,28 +5,29 @@ package java.util;
 
 public interface List extends java.util.Collection
 {
-   /*@ public normal_behavior
-     @ requires arg0 == 0;
-     @ ensures seq == \seq_concat(\seq_singleton(arg0), \old(seq));
-     @ assignable seq;
-     @ determines seq \by seq, arg0;
-     @*/
-   public void add(int arg0, java.lang.Object arg1);
-   
+
+   public int size();
+   public boolean isEmpty();
+   public boolean contains(java.lang.Object arg0);
+   public java.util.Iterator iterator();
+   public java.lang.Object[] toArray();
+   public java.lang.Object[] toArray(java.lang.Object[] arg0);
+   public boolean add(java.lang.Object arg0);
+   public boolean remove(java.lang.Object arg0);
+   public boolean containsAll(java.util.Collection arg0);
+   public boolean addAll(java.util.Collection arg0);
    public boolean addAll(int arg0, java.util.Collection arg1);
-   
-   /*@ public normal_behavior
-     @ requires 0 <= arg0 && arg0 < seq.length;
-     @ ensures ((Object)seq[arg0]) == \result;
-     @ assignable \nothing;
-     @ determines \result \by seq, arg0;
-     @*/
+   public boolean removeAll(java.util.Collection arg0);
+   public boolean retainAll(java.util.Collection arg0);
+   public void clear();
+   public boolean equals(java.lang.Object arg0);
+   public int hashCode();
    public java.lang.Object get(int arg0);
    public java.lang.Object set(int arg0, java.lang.Object arg1);
-   
+   public void add(int arg0, java.lang.Object arg1);
+   public java.lang.Object remove(int arg0);
    public int indexOf(java.lang.Object arg0);
    public int lastIndexOf(java.lang.Object arg0);
-   
    public java.util.ListIterator listIterator();
    public java.util.ListIterator listIterator(int arg0);
    public java.util.List subList(int arg0, int arg1);

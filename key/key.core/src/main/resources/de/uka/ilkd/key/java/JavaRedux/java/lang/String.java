@@ -33,15 +33,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public void getBytes(int arg0, int arg1, byte[] arg2, int arg3);
 // public byte[] getBytes(java.lang.String arg0) throws java.io.UnsupportedEncodingException;
 // public byte[] getBytes(java.nio.charset.Charset arg0);
-   
-   /*@ public normal_behavior
-     @ ensures \fresh(\result) && \typeof(\result) == \type(byte[]);
-     @ assignable \nothing;
-     @ determines \result \by \nothing \new_objects \result;
-     @ determines \result[*] \by \dl_strContent(this);
-     @*/
    public byte[] getBytes();
-   
    public boolean equals(java.lang.Object arg0);
 // public boolean contentEquals(java.lang.StringBuffer arg0);
 // public boolean contentEquals(java.lang.CharSequence arg0);
@@ -75,34 +67,11 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public java.lang.String[] split(java.lang.String arg0, int arg1);
    public java.lang.String[] split(java.lang.String arg0);
 // public java.lang.String toLowerCase(java.util.Locale arg0);
-   
-   /*@ public normal_behavior
-     @ ensures \fresh(\result) && \typeof(\result) == \type(String);
-     @ assignable \nothing;
-     @ determines \result \by \nothing \new_objects \result;
-     @ determines \dl_strContent(\result) \by \dl_strContent(this);
-     @*/
    public java.lang.String toLowerCase();
 // public java.lang.String toUpperCase(java.util.Locale arg0);
-   
-   /*@ public normal_behavior
-     @ ensures \fresh(\result) && \typeof(\result) == \type(String);
-     @ assignable \nothing;
-     @ determines \result \by \nothing \new_objects \result;
-     @ determines \dl_strContent(\result) \by \dl_strContent(this);
-     @*/
    public java.lang.String toUpperCase();
    public java.lang.String trim();
    public java.lang.String toString();
-   
-   /*@ public normal_behavior
-     @ ensures \result.length == \dl_strContent(this).length;
-     @ ensures (\forall \bigint i; 0 <= i && i < \result.length; \dl_inChar(\result[i]));
-     @ ensures \fresh(\result) && \typeof(\result) == \type(char[]);
-     @ assignable \nothing;
-     @ determines \result \by \nothing \new_objects \result;
-     @ determines \result[*] \by \dl_strContent(this);
-     @*/
    public char[] toCharArray();
    public static java.lang.String format(java.lang.String arg0, java.lang.Object[] arg1);
 // public static java.lang.String format(java.util.Locale arg0, java.lang.String arg1, java.lang.Object[] arg2);
