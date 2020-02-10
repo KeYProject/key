@@ -27,7 +27,7 @@ import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.ShowProofStatisticsWindow;
+import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
@@ -54,7 +54,7 @@ public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
         if (pcne instanceof ProofClosedNotificationEvent) {
             Proof proof = ((ProofClosedNotificationEvent)pcne).getProof();
             if (proof != null) {
-                ShowProofStatisticsWindow win = new ShowProofStatisticsWindow(
+                ShowProofStatistics.Window win = new ShowProofStatistics.Window(
                         MainWindow.getInstance(), proof);
                 win.setVisible(true);
             }
