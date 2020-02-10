@@ -12,6 +12,7 @@ import java.util.ServiceLoader;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -26,17 +27,25 @@ public class ProofScriptEngine {
 
     private final Location initialLocation;
     private final String script;
+    private final Goal initiallySelectedGoal;
+    private EngineState stateMap;
 
     private Observer commandMonitor;
 
     public ProofScriptEngine(File file) throws IOException {
         this.initialLocation = new Location(file.getAbsolutePath(), 1, 1);
         this.script = new String(Files.readAllBytes(file.toPath()));
+        this.initiallySelectedGoal = null;
     }
 
     public ProofScriptEngine(String script, Location initLocation) {
+        this(script, initLocation, null);
+    }
+
+    public ProofScriptEngine(String script, Location initLocation, Goal initiallySelectedGoal) {
         this.script = script;
         this.initialLocation = initLocation;
+        this.initiallySelectedGoal = initiallySelectedGoal;
     }
 
     private static Map<String, ProofScriptCommand> loadCommands() {
@@ -58,7 +67,11 @@ public class ProofScriptEngine {
         ScriptLineParser mlp = new ScriptLineParser(new StringReader(script));
         mlp.setLocation(initialLocation);
 
-        EngineState stateMap = new EngineState(proof);
+        stateMap = new EngineState(proof);
+
+        if (initiallySelectedGoal != null) {
+            stateMap.setGoal(initiallySelectedGoal);
+        }
 
         // add the filename (if available) to the statemap.
         String filename = initialLocation.getFilename();
@@ -136,6 +149,10 @@ public class ProofScriptEngine {
                         mlp.getColumn(), e);
             }
         }
+    }
+
+    public EngineState getStateMap() {
+        return stateMap;
     }
 
 //    private void write(String s, int cnt, Proof proof) {

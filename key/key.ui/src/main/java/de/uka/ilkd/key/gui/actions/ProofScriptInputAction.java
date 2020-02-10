@@ -1,0 +1,61 @@
+package de.uka.ilkd.key.gui.actions;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JTextArea;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.ProofScriptWorker;
+import de.uka.ilkd.key.parser.Location;
+
+public class ProofScriptInputAction extends AbstractAction {
+
+    private final KeYMediator mediator;
+
+    public ProofScriptInputAction(KeYMediator mediator) {
+        super("Input proof script...");
+        this.mediator = mediator;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Window win = new Window(MainWindow.getInstance(), mediator);
+        win.setVisible(true);
+    }
+
+    private static class Window extends JDialog {
+
+        private Window(MainWindow mainWindow, KeYMediator mediator) {
+            super(mainWindow, "Enter proof script");
+
+            JTextArea textArea = new JTextArea();
+            JButton confirmButton = new JButton("Ok");
+
+            confirmButton.addActionListener(event -> {
+                ProofScriptWorker psw = new ProofScriptWorker(
+                        mediator,
+                        textArea.getText(),
+                        new Location("<user input>", 0, 0),
+                        mediator.getSelectedGoal());
+
+                dispose();
+
+                psw.init();
+                psw.execute();
+            });
+
+            setLayout(new BorderLayout());
+            add(textArea, BorderLayout.CENTER);
+            add(confirmButton, BorderLayout.PAGE_END);
+
+            setSize(new Dimension(mainWindow.getWidth() / 3, mainWindow.getHeight() / 2));
+            setLocationRelativeTo(mainWindow);
+        }
+    }
+}

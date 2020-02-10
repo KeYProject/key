@@ -33,7 +33,9 @@ import javax.swing.text.Document;
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.util.Debug;
 
 public class ProofScriptWorker extends SwingWorker<Object, Object>
@@ -42,6 +44,8 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
     private final KeYMediator mediator;
     private final String script;
     private final Location initialLocation;
+    private final Goal initiallySelectedGoal;
+    private ProofScriptEngine engine;
     private JDialog monitor;
     private JTextArea logArea;
 
@@ -57,20 +61,27 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
         this.initialLocation = new Location(file.getAbsolutePath(), 1, 1);
         this.script = new String(Files.readAllBytes(file.toPath()));
         this.mediator = mediator;
+        this.initiallySelectedGoal = null;
     }
 
     public ProofScriptWorker(KeYMediator mediator, String script,
             Location location) {
+        this(mediator, script, location, null);
+    }
+
+    public ProofScriptWorker(
+            KeYMediator mediator, String script, Location location, Goal initiallySelectedGoal) {
         this.mediator = mediator;
         this.script = script;
         this.initialLocation = location;
+        this.initiallySelectedGoal = initiallySelectedGoal;
     }
 
     @Override
     protected Object doInBackground() throws Exception {
         try {
-            ProofScriptEngine engine = new ProofScriptEngine(script,
-                    initialLocation);
+            engine = new ProofScriptEngine(
+                    script, initialLocation, initiallySelectedGoal);
             engine.setCommandMonitor(observer);
             engine.execute(mediator.getUI(), mediator.getSelectedProof());
         } catch (InterruptedException ex) {
@@ -169,6 +180,14 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
         runWithDeadline(() -> {
             mediator.getUI().getProofControl().stopAndWaitAutoMode();
         }, 1000);
+
+        try {
+            if (!mediator.getSelectedProof().closed()) {
+                mediator.getSelectionModel().setSelectedGoal(
+                        engine.getStateMap().getFirstOpenAutomaticGoal());
+            }
+        } catch (ScriptException e) { }
+
         mediator.setInteractive(true);
     }
 
