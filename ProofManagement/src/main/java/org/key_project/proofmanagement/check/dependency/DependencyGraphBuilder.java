@@ -27,7 +27,7 @@ public abstract class DependencyGraphBuilder {
         for (Pair<String, BranchNodeIntermediate> currentContractProofPair : contractProofPairs) {
             String c = currentContractProofPair.first;
 
-            FunctionalOperationContract contract = contractMap.lookup(c);
+            Contract contract = contractMap.lookup(c);
             // create fresh node for current contract
             DependencyNode node = new DependencyNode(contract, specRepo);
             // add node to graph
@@ -45,7 +45,7 @@ public abstract class DependencyGraphBuilder {
             BranchNodeIntermediate currentIntermediateNode = currentContractProofPair.second;
 
             // collect all contracts referenced to in current proof
-            ContractApplicationCollector contractApplicationCollector = new ContractApplicationCollector(currentIntermediateNode);
+            ContractApplicationCollector contractApplicationCollector = new ContractApplicationCollector(currentIntermediateNode, specRepo);
             contractApplicationCollector.start();
             Set<String> dependentContractsAsStrings = contractApplicationCollector.getResult();
 

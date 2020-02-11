@@ -9,29 +9,26 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 public class ContractMap {
 
-    private Map<String, FunctionalOperationContract> myContractMap;
+    private Map<String, Contract> string2Contract;
     private final SpecificationRepository specRepo;
 
     public ContractMap(SpecificationRepository specRepo,
-                       Map<String, FunctionalOperationContract> contractMap) {
+                       Map<String, Contract> contractMap) {
         this.specRepo = specRepo;
-        myContractMap = contractMap;
+        string2Contract = contractMap;
     }
     public ContractMap(SpecificationRepository specRepo) {
         this(specRepo, new HashMap<>());
     }
 
-    public FunctionalOperationContract lookup(String contractName) {
-        if(!myContractMap.containsKey(contractName)) {
+    public Contract lookup(String contractName) {
+        if(!string2Contract.containsKey(contractName)) {
             // TODO: find and parse file with respective contract
             Contract contract = specRepo.getContractByName(contractName);
 
-            // TODO: assertion not valid for some contracts (related to dependency contracts and/or inv)
-            assert contract instanceof FunctionalOperationContract;
-
-            myContractMap.put(contractName, (FunctionalOperationContract) contract);
+            string2Contract.put(contractName, contract);
         }
-        return myContractMap.get(contractName);
+        return string2Contract.get(contractName);
     }
 
 }

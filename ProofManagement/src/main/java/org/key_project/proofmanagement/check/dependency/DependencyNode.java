@@ -1,8 +1,10 @@
 package org.key_project.proofmanagement.check.dependency;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.speclang.*;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -25,9 +27,10 @@ public class DependencyNode {
         UNKNOWN, MISSING_PROOFS, MODALITY_CLASH, ILLEGAL_CYCLES, CORRECT
     }
 
+    // we keep this (later on we will need it for reporting)
     private Status status;
-    private ImmutableSet<FunctionalOperationContract> modalityClashes              = DefaultImmutableSet.nil();
-    private ImmutableSet<ImmutableList<Contract>> illegalCycles = DefaultImmutableSet.nil();
+    private Set<FunctionalOperationContract> modalityClashes = new HashSet<>();
+    private Set<ImmutableList<Contract>> illegalCycles = new HashSet<>();
 
     public DependencyNode(Contract contract, Map<DependencyNode, DependencyNode> dependencies, SpecificationRepository specRepo) {
         this.specRepo = specRepo;
@@ -44,30 +47,7 @@ public class DependencyNode {
         dependencies.put(dependentNode, dependentNode);
     }
 
-    public Contract getContract() {
-        return contract;
-    }
-
-    public  Map<DependencyNode, DependencyNode> getDependencies() {
-        return dependencies;
-    }
-
-    public SpecificationRepository getSpecRepo() {
-        return specRepo;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public ImmutableSet<FunctionalOperationContract> getModalityClashes() {
-        return modalityClashes;
-    }
-    public ImmutableSet<ImmutableList<Contract>> getIllegalCycles() {
-        return illegalCycles;
-    }
-
-    // adapted from the classes: UseOperationContractRule and ProofCorrectnessMgt
+    // adapted from the classes: UseOperationContractRule/UseDependencyContractRule and ProofCorrectnessMgt
     public boolean isLegal() {
         // are proofs of method contracts missing that are used in the current proof?
         for (DependencyNode currentNode : dependencies.keySet()) {
@@ -109,17 +89,61 @@ public class DependencyNode {
         return true;
     }
 
+    public boolean isLegal2() {
+        // get target contract via specification repository
+        if (contract instanceof FunctionalOperationContract) {
+            FunctionalOperationContract func = (FunctionalOperationContract)contract;
+            Modality modality = func.getModality();
+            if (modality == Modality.BOX || modality == Modality.BOX_TRANSACTION) {
+                // if target modality is box than each contract application is legal
+                // -> return true without cycle check
+                status = Status.CORRECT;
+                return true;
+            } else if (modality == Modality.DIA || modality == Modality.DIA_TRANSACTION) {
+                // has any of the dependency nodes a contract with box?
+                // (testing direct dependencies is sufficient here, since we test all nodes)
+                for (DependencyNode node : dependencies.keySet()) {
+                    if (node.contract instanceof FunctionalOperationContract) {
+                        FunctionalOperationContract nodeFunc = (FunctionalOperationContract)node;
+                        if (nodeFunc.getModality() == Modality.BOX
+                                || nodeFunc.getModality() == Modality.BOX_TRANSACTION) {
+                            // invalid -> return false
+                            status = Status.MODALITY_CLASH;
+
+                            // TODO: Not really useful:
+                            //  There may be undetected clashes since we abort after we found one!
+                            modalityClashes.add(nodeFunc);
+                            return false;
+                        }
+                    }
+                }
+            }
+        } /* else if (contract instanceof DependencyContractImpl) {
+            // nothing extra to do here
+            DependencyContractImpl dep = (DependencyContractImpl)contract;
+        }*/
+
+        // find cycles containing with current node
+        // TODO: Currently we check the same cycle multiple times (from different nodes)
+        // for every found cycle:
+        //      if all have measured by clause -> legal
+        //      else -> illegal
+
+        status = Status.CORRECT;
+        return true;
+    }
+
     private boolean isApplicable(DependencyNode node) {
         // get initial contracts
         ImmutableSet<Contract> contractsToBeApplied = specRepo.splitContract(node.contract);
         assert contractsToBeApplied != null;
         contractsToBeApplied = specRepo.getInheritedContracts(contractsToBeApplied);
-        assert contractsToBeApplied.size() == 1;
+
         // construct initial paths from initial contracts
         ImmutableSet<ImmutableList<DependencyNode>> paths = DefaultImmutableSet.nil();
-        //for (Contract c : contractsToBeApplied) {
-        paths = paths.add(ImmutableSLList.<DependencyNode>nil().prepend(node));
-        //}
+        for (Contract c : contractsToBeApplied) {
+            paths = paths.add(ImmutableSLList.<DependencyNode>nil().prepend(node));
+        }
         // check for cycles
         while (!paths.isEmpty()) {
             final Iterator<ImmutableList<DependencyNode>> it = paths.iterator();

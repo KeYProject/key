@@ -8,14 +8,17 @@ import de.uka.ilkd.key.proof.io.intermediate.AppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediateWalker;
+import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
 public class ContractApplicationCollector extends NodeIntermediateWalker {
 
     private Set<String> result = new HashSet<>();
+    private SpecificationRepository specRepo;
 
-    public ContractApplicationCollector(NodeIntermediate root) {
+    public ContractApplicationCollector(NodeIntermediate root, SpecificationRepository specRepo) {
         super(root);
+        this.specRepo = specRepo;
     }
 
     public Set<String> getResult() {
@@ -30,23 +33,40 @@ public class ContractApplicationCollector extends NodeIntermediateWalker {
             AppIntermediate appIntermediate = appNode.getIntermediateRuleApp();
             String appName = appIntermediate.getRuleName();
 
-            // TODO: do we have to check other contract uses here (e.g. Dependency Contracts, Block Contracts)?
-            // TODO: same problem with inlining -> identify all relevant rules
-
-            // todo: relevant rules are:
-            //  "use operation contract
-            //  "use dependency contract"
-            //  ("contract_axiom_for_..." should not be relevant!)
+            // relevant rules are:
+            //    Use Operation Contract
+            //    Use Dependency Contract
+            //    Contract_axiom_for_...              (model methods)
 
             if (appName.equals("Use Operation Contract") || appName.equals("Use Dependency Contract")) {
                 BuiltInAppIntermediate biApp = (BuiltInAppIntermediate) appIntermediate;
 
                 // The string may still contain multiple contracts, syntax: contract1#contract2#...
                 // split and add all
+                // TODO: better use specRepo.splitContract()
                 String combinedContracts = biApp.getContract();
                 String[] contracts = combinedContracts.split("#");
                 Collections.addAll(result, contracts);
+            } else if (appName.contains("Contract_axiom_for_")) {
+                TacletAppIntermediate tacletApp = (TacletAppIntermediate) appIntermediate;
+                String name = tacletApp.getRuleName();
+                int methodStart = 19;       // prefix is Contract_axiom_for_
+                int methodEnd = name.indexOf("_in_");
+                String methodName = name.substring(methodStart, methodEnd);
+                int classStart = methodEnd + 4;
+                String className = name.substring(classStart);
+                // todo: use specRepo to get correct contract name
             }
         }
+
+        /* At the moment, we check only for illegal cycles. If at a later time we want
+         * to identify unproven dependencies, we should consider the following rules:
+         *      Evaluate Query
+         *      Definition_axiom_for_...            model methods
+         *      Class_invariant_axiom_...           invariants
+         *      Partial_invariant_axiom_...         invariants
+         *      todo: user defined taclets?
+         *      todo: inlining rules?
+         */
     }
 }
