@@ -20,15 +20,20 @@ import static de.uka.ilkd.key.util.MiscTools.isJMLComment;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.JarURLConnection;
 import java.net.URI;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import junit.framework.TestCase;
+import org.key_project.util.java.IOUtil;
 import recoder.io.ArchiveDataLocation;
 import recoder.io.DataFileLocation;
 import recoder.io.DataLocation;
@@ -139,55 +144,67 @@ public class TestMiscTools extends TestCase {
      * </ul>
      * Note: This test creates two temporary files.
      */
-    public void testExtractURI() {
-        try {
-            // test for URLDataLocation
-            Path tmp = Files.createTempFile("test with whitespace", ".txt");
-            URI tmpURI = tmp.toUri();
-            DataLocation urlDataLoc = new URLDataLocation(tmpURI.toURL());
-            assertEquals(tmpURI, MiscTools.extractURI(urlDataLoc));
+    public void testExtractURI() throws Exception {
+        // test for URLDataLocation
+        Path tmp = Files.createTempFile("test with whitespace", ".txt");
+        URI tmpURI = tmp.toUri();
+        DataLocation urlDataLoc = new URLDataLocation(tmpURI.toURL());
+        assertEquals(tmpURI, MiscTools.extractURI(urlDataLoc));
 
-            // additional test for URLDataLocation with whitespace in filename
-            Path tmpSpace = Files.createTempFile("test with whitespace", ".txt");
-            URI tmpSpaceURI = tmpSpace.toUri();
-            DataLocation urlDataLoc2 = new URLDataLocation(tmpSpaceURI.toURL());
-            assertEquals(tmpSpaceURI, MiscTools.extractURI(urlDataLoc2));
+        // additional test for URLDataLocation with whitespace in filename
+        Path tmpSpace = Files.createTempFile("test with whitespace", ".txt");
+        URI tmpSpaceURI = tmpSpace.toUri();
+        DataLocation urlDataLoc2 = new URLDataLocation(tmpSpaceURI.toURL());
+        assertEquals(tmpSpaceURI, MiscTools.extractURI(urlDataLoc2));
 
-            // test for ArchiveDataLocation
-            Path zipP = Files.createTempFile("test with whitespace", ".zip");
-            try (FileOutputStream fos = new FileOutputStream(zipP.toFile());
-                ZipOutputStream zos = new ZipOutputStream(fos)) {
-                zos.putNextEntry(new ZipEntry("entry.txt"));
-                zos.write("test content".getBytes());
-                zos.putNextEntry(new ZipEntry("entry with whitespace.txt"));
-                zos.write("another test content".getBytes());
-            }
+        // test for ArchiveDataLocation
+        byte[] b = "test content".getBytes();
+        Path zipP = Files.createTempFile("test with whitespace!", ".zip");
 
-            try (ZipFile zf = new ZipFile(zipP.toFile())) {
-                DataLocation entry0 = new ArchiveDataLocation(zf, "entry.txt");
-                DataLocation entry1 = new ArchiveDataLocation(zf, "entry with whitespace.txt");
-
-                URI tmpZipURI = zipP.toUri();
-                assertEquals("jar:" + tmpZipURI + "!/" + "entry.txt",
-                        MiscTools.extractURI(entry0).toString());
-                assertEquals("jar:" + tmpZipURI + "!/" + "entry%20with%20whitespace.txt",
-                        MiscTools.extractURI(entry1).toString());
-            }
-
-            // test for SpecDataLocation
-            DataLocation specDataLoc = new SpecDataLocation("UNKNOWN", "unknown");
-            assertEquals("urn:UNKNOWN:unknown", MiscTools.extractURI(specDataLoc).toString());
-
-            // test for DataFileLocation
-            DataLocation fileDataLoc = new DataFileLocation(tmp.toFile());
-            assertEquals(tmpURI, MiscTools.extractURI(fileDataLoc));
-
-            // clean up temporary files
-            Files.deleteIfExists(tmp);
-            Files.deleteIfExists(tmpSpace);
-            Files.deleteIfExists(zipP);
-        } catch (IOException e) {
-            e.printStackTrace();
+        try (FileOutputStream fos = new FileOutputStream(zipP.toFile());
+            ZipOutputStream zos = new ZipOutputStream(fos)) {
+            zos.putNextEntry(new ZipEntry("entry.txt"));
+            zos.putNextEntry(new ZipEntry("entry with whitespace.txt"));
+            zos.putNextEntry(new ZipEntry("entry with !bang!.txt"));
+            zos.write(b);
         }
+
+        try (ZipFile zf = new ZipFile(zipP.toFile())) {
+            DataLocation entry0 = new ArchiveDataLocation(zf, "entry.txt");
+            DataLocation entry1 = new ArchiveDataLocation(zf, "entry with whitespace.txt");
+            DataLocation entry2 = new ArchiveDataLocation(zf, "entry with !bang!.txt");
+
+            URI tmpZipURI = zipP.toUri();
+            assertEquals("jar:" + tmpZipURI + "!/" + "entry.txt",
+                    MiscTools.extractURI(entry0).toString());
+            assertEquals("jar:" + tmpZipURI + "!/" + "entry%20with%20whitespace.txt",
+                    MiscTools.extractURI(entry1).toString());
+            URI read = MiscTools.extractURI(entry2);
+
+            // we can not simply use read.toURL().openStream(), because that uses caches and thus
+            // keeps the file open (at least on Windows)
+            URLConnection juc = read.toURL().openConnection();
+            juc.setUseCaches(false);
+            try (InputStream is = juc.getInputStream()) {
+                assertNotNull(is);
+                // try if the file can be read correctly
+                assertEquals(new String(b), IOUtil.readFrom(is));
+            }
+            assertEquals("jar:" + tmpZipURI+ "!/" + "entry%20with%20!bang!.txt",
+                    read.toString());
+        }
+
+        // test for SpecDataLocation
+        DataLocation specDataLoc = new SpecDataLocation("UNKNOWN", "unknown");
+        assertEquals("urn:UNKNOWN:unknown", MiscTools.extractURI(specDataLoc).toString());
+
+        // test for DataFileLocation
+        DataLocation fileDataLoc = new DataFileLocation(tmp.toFile());
+        assertEquals(tmpURI, MiscTools.extractURI(fileDataLoc));
+
+        // clean up temporary files
+        Files.deleteIfExists(tmp);
+        Files.deleteIfExists(tmpSpace);
+        Files.deleteIfExists(zipP);
     }
 }
