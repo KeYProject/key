@@ -15,6 +15,7 @@ package de.uka.ilkd.key.java;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URI;
 
 import org.key_project.util.ExtList;
 
@@ -196,8 +197,8 @@ public abstract class JavaSourceElement implements SourceElement {
       * right after the object is created...
       * @param s the path of the parent class as String
       */
-    protected void setParentClass(String s) {
-        posInfo.setParentClass(s);
+    protected void setParentClass(URI s) {
+        posInfo.setParentClassURI(s);
     }
     
     /** get the class the statement originates from */

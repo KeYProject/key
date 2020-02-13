@@ -255,6 +255,7 @@ lexer grammar KeYLexer;
 	ISREFERENCE:'\\isReference';
 	ISREFERENCEARRAY:'\\isReferenceArray';
 	ISSTATICFIELD : '\\isStaticField';
+	ISMODELFIELD : '\\isModelField';
 	ISSUBTYPE : '\\sub';
 	EQUAL_UNIQUE : '\\equalUnique';
         NEW : '\\new';
