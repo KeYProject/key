@@ -193,12 +193,23 @@ public class TestJMLTranslator extends TestCase {
 
     // There is a problem with spaces here.
     // Adding spaces around "j < i" solves the problem.
-    // see bug #1548
+    // see bug MT-1548
     public void testSumParsing() throws SLTranslationException {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         JMLTranslator.translate(new PositionedString(
                 "0 == ((\\sum int j; 0<=j && j<i; j))"),
                 testClassType, selfVar, null, null, null, null, null, Term.class, services);
+    }
+
+    // see bug #1528
+    public void testParenExpression() throws SLTranslationException {
+        ProgramElementName classPEN = new ProgramElementName("o");
+        ProgramVariable var = new LocationVariable(classPEN, testClassType);
+        ProgramVariable selfVar = buildSelfVarAsProgVar();
+        JMLTranslator.translate(new PositionedString(
+                "(o.i)"),
+                testClassType, selfVar, ImmutableSLList.<ProgramVariable>nil().prepend(var),
+                null, null, null, null, Term.class, services);
     }
 
 
