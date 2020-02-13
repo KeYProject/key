@@ -27,6 +27,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  * ensures that the given instantiation for the schemavariable denotes a
  * static field
+ *
+ * @see StaticFieldCondition
  */
 public final class StaticReferenceCondition extends VariableConditionAdapter {
 

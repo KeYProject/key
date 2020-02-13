@@ -366,7 +366,11 @@ public class JMLSpecFactory {
         progVar.selfVar = tb.selfVar(pm, pm.getContainerType(), false);
         progVar.paramVars = tb.paramVars(pm, false);
         progVar.resultVar = tb.resultVar(pm, false);
-        progVar.excVar = pm.isModel() ? null : tb.excVar(pm, false);
+
+        // MU: Changed the following line since it broke KeY when
+        // MU: a model method is used in a set-statement.
+        // progVar.excVar = pm.isModel() ? null : tb.excVar(pm, false);
+        progVar.excVar = tb.excVar(pm, false);
 
         progVar.atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
         progVar.atPres = new LinkedHashMap<LocationVariable, Term>();
