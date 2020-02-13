@@ -29,6 +29,7 @@ import de.uka.ilkd.key.rule.metaconstruct.EnumConstantValue;
 import de.uka.ilkd.key.rule.metaconstruct.ExpandQueriesMetaConstruct;
 import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
 import de.uka.ilkd.key.rule.metaconstruct.MemberPVToField;
+import de.uka.ilkd.key.rule.metaconstruct.ModelFieldAccess;
 import de.uka.ilkd.key.rule.metaconstruct.ObserverEqualityMetaConstruct;
 import de.uka.ilkd.key.rule.metaconstruct.arith.DivideLCRMonomials;
 import de.uka.ilkd.key.rule.metaconstruct.arith.DivideMonomials;
@@ -110,6 +111,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer INTRODUCE_ATPRE_DEFINITIONS = new IntroAtPreDefsOp();
 
     public static final AbstractTermTransformer MEMBER_PV_TO_FIELD = new MemberPVToField();
+    public static final AbstractTermTransformer MODEL_FIELD_ACCESS = new ModelFieldAccess();
 
     /** The add-cast term transformer **/
     public static final AbstractTermTransformer ADD_CAST = new AddCast();

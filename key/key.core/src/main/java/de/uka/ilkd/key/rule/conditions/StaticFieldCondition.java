@@ -32,6 +32,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *
  * Inspired by {@link de.uka.ilkd.key.rule.conditions.FieldTypeToSortCondition}.
  *
+ * Same functionality as {@link StaticReferenceCondition}?
+ *
  * @author Michael Kirsten
  */
 public class StaticFieldCondition extends VariableConditionAdapter {

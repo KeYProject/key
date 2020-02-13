@@ -15,8 +15,14 @@ package de.uka.ilkd.key.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.zip.ZipFile;
 
+import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.*;
@@ -46,6 +52,9 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import recoder.io.ArchiveDataLocation;
+import recoder.io.DataFileLocation;
+import recoder.io.DataLocation;
 
 /**
  * Collection of some common, stateless functionality. Stolen from the weissInvariants side branch.
@@ -686,5 +695,91 @@ public final class MiscTools {
             result = result.substring("FILE:".length());
         }
         return result;
+    }
+
+    /**
+     * Tries to extract a valid URI from the given DataLocation.
+     * @param loc the given DataLocation
+     * @return an URI identifying the resource of the DataLocation
+     */
+    public static URI extractURI(DataLocation loc) {
+        if (loc == null) {
+            throw new IllegalArgumentException("The given DataLocation is null!");
+        }
+
+        try {
+            switch (loc.getType()) {
+            case "URL":                                                     // URLDataLocation
+                return ((URLDataLocation)loc).getUrl().toURI();
+            case "ARCHIVE":                                                 // ArchiveDataLocation
+                // format: "ARCHIVE:<filename>?<itemname>"
+                ArchiveDataLocation adl = (ArchiveDataLocation) loc;
+
+                // extract item name and zip file
+                int qmindex = adl.toString().lastIndexOf('?');
+                String itemName = adl.toString().substring(qmindex + 1);
+                ZipFile zip = adl.getFile();
+
+                // use special method to ensure that path separators are correct
+                return getZipEntryURI(zip, itemName);
+            case "FILE":                                                    // DataFileLocation
+                // format: "FILE:<path>"
+                return ((DataFileLocation)loc).getFile().toURI();
+            default:                                                        // SpecDataLocation
+                // format "<type>://<location>"
+                // wrap into URN to ensure URI encoding is correct (no spaces!)
+                return new URI("urn", loc.toString(), null);
+            }
+        } catch (URISyntaxException | IOException e) {
+            e.printStackTrace();
+        }
+        throw new IllegalArgumentException("The given DataLocation can not be converted" +
+                " into a valid URI: " + loc);
+    }
+
+    /**
+     * Creates a URI (that contains a URL) pointing to the entry with the given name inside
+     * the given zip file.
+     * <br><br>
+     * <b>Note:</b> There is an unresolved bug in Java for JarURLs when the jar path
+     * contains a directory ending with "!"
+     * ("!" should be encoded as "%21", but is not).
+     * In this case, the program will crash if trying to open a resource from the url.
+     * This will not be fixed until {@link java.net.URI} supports RFC 3986
+     * (currently, as of 02-2020, it seems like there are no plans for this).<br>
+     * <b>Workaround:</b> Don't use directory names ending with "!".
+     * @param zipFile the given zip
+     * @param entryName the entry path relative to the root of the zip
+     * @return a zip/jar URI to the entry inside the zip
+     * @throws IOException if an I/O error occurs
+     */
+    public static URI getZipEntryURI(ZipFile zipFile, String entryName) throws IOException {
+
+        Path zipPath = Paths.get(zipFile.getName());
+
+        // TODO: Delete these lines when migrating to newer Java version!
+        // These lines are needed since there is a bug in Java (up to Java 9 b80)
+        // where special characters such as spaces in URI get double encoded.
+        // see https://bugs.java.com/bugdatabase/view_bug.do?bug_id=8131067
+        // To make it even worse, this happens only in the part before "!/".
+        // We manually build our URI to ensure the encoding is correct:
+        try {
+            URI zipURI = zipPath.toUri();
+            URI entry = new URI(null, null, entryName, null);
+
+            // we have to cut off the starting slash if there is one
+            String entryStr = entry.toString();
+            entryStr = entryStr.startsWith("/") ? entryStr.substring(1) : entryStr;
+
+            return new URI("jar:" + zipURI + "!/" + entryStr);
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
+
+        // TODO: This should be enough if we use a Java  version newer than 9 b80!
+        //try (FileSystem fs = FileSystems.newFileSystem(zipPath, null)) {
+        //    Path p = fs.getPath(entryName);
+        //    return p.toUri();
+        //}
     }
 }

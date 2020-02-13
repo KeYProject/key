@@ -15,6 +15,9 @@ package de.uka.ilkd.key.parser;
 
 import org.antlr.runtime.RecognitionException;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 
 /** 
  * This class represents a location in a file.  It consists of a
@@ -29,14 +32,49 @@ import org.antlr.runtime.RecognitionException;
  */
 
 public final class Location {
+    /**
+     * The location of the resource of the Location. May be null!
+     */
+    private final URL filename;
 
-    /* --- constructors --- */
+    /** line number of the Location */
+    private final int line;
+
+    /** column number of the Location */
+    private final int column;
 
     /**
-     * @param filename the filename may be null.
+     * Legacy constructor for creating a new Location from a String denoting the file path and line
+     * and column number. Tries to convert the path given as String into a URL. If this fails,
+     * a RuntimeException is thrown.
+     * @param filename path to the resource of the Location (null is allowed)
+     * @param line line of the Location
+     * @param column column of the Location
      */
+    @Deprecated
     public Location(String filename, int line, int column) {
-        this.filename = filename;
+        URL url = null;
+        if (filename != null) {
+            // catch-rethrow to avoid to change the interface too much
+            try {
+                url = new URL("file://" + filename);
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        this.filename = url;
+        this.line = line;
+        this.column = column;
+    }
+
+    /**
+     * Creates a new Location with the given resource location, line and column numbers.
+     * @param url location of the resource
+     * @param line line of the Location
+     * @param column column of the Location
+     */
+    public Location(URL url, int line, int column) {
+        this.filename = url;
         this.line = line;
         this.column = column;
     }
@@ -46,11 +84,13 @@ public final class Location {
         this(re.input.getSourceName(), re.line, re.charPositionInLine + 1);
     }
 
-
-    /* --- methods --- */
-
     /** @return the filename may be null */
+    @Deprecated
     public String getFilename() {
+        return filename.getPath();
+    }
+
+    public URL getFileURL() {
         return filename;
     }
 
@@ -67,14 +107,4 @@ public final class Location {
     public String toString() {
         return "[" + filename + ":" + line + "," + column + "]";
     }
-
-
-    /* --- fields --- */
-
-    private final String filename;
-
-    private final int line;
-
-    private final int column;
-
 }
