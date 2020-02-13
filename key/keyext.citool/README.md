@@ -49,6 +49,9 @@ script:
 
 ## Changelog
 
+* [1.2.0](https://formal.iti.kit.edu/ci-tool/keyext.citool-1.2.0-all.jar): Hot-fix for KeY
+   - repairing model fields in set statements
+
 * [1.1.0](https://formal.iti.kit.edu/ci-tool/keyext.citool-1.1.0-all.jar): bug fixes and support for proofs in key-files
   - Change of console output 
   - Fix loading of proof files
