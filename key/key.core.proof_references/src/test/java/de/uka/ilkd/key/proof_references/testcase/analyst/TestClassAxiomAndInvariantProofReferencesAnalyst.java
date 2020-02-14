@@ -28,10 +28,10 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
     * Tests "InvariantInOperationContractOfArgument".
     */
    public void testInvariantInOperationContractOfArgument() throws Exception {
-      doReferenceMethodTest(TESTCASE_DIRECTORY, 
-                            "/proofReferences/InvariantInOperationContractOfArgument/InvariantInOperationContractOfArgument.java", 
+      doReferenceMethodTest(TESTCASE_DIRECTORY,
+                            "/proofReferences/InvariantInOperationContractOfArgument/InvariantInOperationContractOfArgument.java",
                             "InvariantInOperationContractOfArgument",
-                            "main", 
+                            "main",
                             false,
                             new ClassAxiomAndInvariantProofReferencesAnalyst(),
                             new IFilter<IProofReference<?>>() {
@@ -42,15 +42,15 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                             },
                             new ExpectedProofReferences(IProofReference.USE_INVARIANT, "and(geq(int::select(heap,self,Child::$x),Z(0(#))),leq(int::select(heap,self,Child::$x),Z(0(1(#)))))<<SC>>"));
    }
-   
+
    /**
     * Tests "InvariantInOperationContract".
     */
    public void testInvariantInOperationContract() throws Exception {
-      doReferenceMethodTest(TESTCASE_DIRECTORY, 
-                            "/proofReferences/InvariantInOperationContract/InvariantInOperationContract.java", 
+      doReferenceMethodTest(TESTCASE_DIRECTORY,
+                            "/proofReferences/InvariantInOperationContract/InvariantInOperationContract.java",
                             "InvariantInOperationContract",
-                            "main", 
+                            "main",
                             false,
                             new ClassAxiomAndInvariantProofReferencesAnalyst(),
                             new IFilter<IProofReference<?>>() {
@@ -61,15 +61,15 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                             },
                             new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),not(equals(Child::select(heap,self,InvariantInOperationContract::$child),null)))"));
    }
-   
+
    /**
     * Tests "NestedInvariantInOperationContract".
     */
    public void testNestedInvariantInOperationContract() throws Exception {
-      doReferenceMethodTest(TESTCASE_DIRECTORY, 
-                            "/proofReferences/NestedInvariantInOperationContract/NestedInvariantInOperationContract.java", 
+      doReferenceMethodTest(TESTCASE_DIRECTORY,
+                            "/proofReferences/NestedInvariantInOperationContract/NestedInvariantInOperationContract.java",
                             "NestedInvariantInOperationContract",
-                            "main", 
+                            "main",
                             false,
                             new ClassAxiomAndInvariantProofReferencesAnalyst(),
                             new IFilter<IProofReference<?>>() {
@@ -80,47 +80,47 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                              },
                             new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),not(equals(ChildContainer::select(heap,self,NestedInvariantInOperationContract::$cc),null)))"));
    }
-   
+
    /**
     * Tests "ModelFieldTest#doubleX".
     */
    public void testModelFieldTest_doubleX() throws Exception {
-      doReferenceMethodTest(TESTCASE_DIRECTORY, 
-                            "/proofReferences/ModelFieldTest/ModelFieldTest.java", 
+      doReferenceMethodTest(TESTCASE_DIRECTORY,
+                            "/proofReferences/ModelFieldTest/ModelFieldTest.java",
                             "test.ModelFieldTest",
-                            "doubleX", 
+                            "doubleX",
                             false,
                             new ClassAxiomAndInvariantProofReferencesAnalyst(),
                             new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"),
                             new ExpectedProofReferences(IProofReference.USE_AXIOM, "equals(test.ModelFieldTest::$f(heap,self),javaMulInt(Z(2(#)),int::select(heap,self,test.ModelFieldTest::$x)))"));
    }
-   
+
    /**
     * Tests "ModelFieldTest#test.ModelFieldTest::$f".
     */
    public void testModelFieldTest_f() throws Exception {
-      doReferenceFunctionTest(TESTCASE_DIRECTORY, 
-                              "/proofReferences/ModelFieldTest/ModelFieldTest.java", 
+      doReferenceFunctionTest(TESTCASE_DIRECTORY,
+                              "/proofReferences/ModelFieldTest/ModelFieldTest.java",
                               "test.ModelFieldTest",
-                              "test.ModelFieldTest::$f", 
+                              "test.ModelFieldTest::$f",
                               false,
                               new ClassAxiomAndInvariantProofReferencesAnalyst(),
                               new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"),
                               new ExpectedProofReferences(IProofReference.USE_AXIOM, "equals(test.ModelFieldTest::$f(heap,self),javaMulInt(Z(2(#)),int::select(heap,self,test.ModelFieldTest::$x)))"));
    }
-   
+
    /**
     * Tests "AccessibleTest".
     */
    public void testAccessibleTest() throws Exception {
-      doReferenceFunctionTest(TESTCASE_DIRECTORY, 
-                              "/proofReferences/AccessibleTest/AccessibleTest.java", 
+      doReferenceFunctionTest(TESTCASE_DIRECTORY,
+                              "/proofReferences/AccessibleTest/AccessibleTest.java",
                               "test.B",
-                              "java.lang.Object::<inv>", 
+                              "java.lang.Object::<inv>",
                               false,
                               new ClassAxiomAndInvariantProofReferencesAnalyst(),
                               new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),java.lang.Object::<inv>(heap,test.AccessibleTest::select(heap,self,test.B::$c)))"),
-                              new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"),
-                              new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),not(equals(java.lang.Class::select(heap,null,java.lang.Integer::$TYPE),null)))"));
+                              new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),and(leq(Z(0(#)),int::select(heap,self,java.util.Iterator::$index)),leq(int::select(heap,self,java.util.Iterator::$index),seqLen(Seq::select(heap,self,java.util.Iterator::$seq))))<<SC>>)"),
+                              new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"));
    }
 }
