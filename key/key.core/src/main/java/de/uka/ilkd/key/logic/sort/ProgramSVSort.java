@@ -87,6 +87,13 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
  */
 public abstract class ProgramSVSort extends AbstractSort {
 
+    // Keeps the mapping of ProgramSVSort names to
+    // ProgramSVSort instances (helpful in parsing
+    // schema variable declarations)
+    private static final Map<Name, ProgramSVSort> NAME2SORT =
+            new LinkedHashMap<Name, ProgramSVSort>(60);
+
+
     //----------- Types of Expression Program SVs ----------------------------
 
     public static final ProgramSVSort LEFTHANDSIDE = new LeftHandSideSort();
@@ -342,12 +349,6 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     //---------------REFERENCE SORTS ------------------------
     public static final ProgramSVSort EXECUTIONCONTEXT = new ExecutionContextSort();
-
-    // Keeps the mapping of ProgramSVSort names to
-    // ProgramSVSort instances (helpful in parsing
-    // schema variable declarations)
-    private static final Map<Name, ProgramSVSort> NAME2SORT =
-            new LinkedHashMap<Name, ProgramSVSort>(60);
 
     //--------------------------------------------------------------------------
 
