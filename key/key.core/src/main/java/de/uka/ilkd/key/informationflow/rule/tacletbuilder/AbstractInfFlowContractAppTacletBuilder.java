@@ -71,6 +71,12 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         return contractApplPredTerm;
     }
 
+    /**
+     * Builds the taclet.
+     *
+     * @param goal the goal
+     * @return the taclet
+     */
     public Taclet buildTaclet(Goal goal) {
         ProofObligationVars appData = poVars;
         return genInfFlowContractApplTaclet(goal, appData, services);
@@ -135,18 +141,47 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         return path.toString();
     }
 
+    /**
+     * Generate schema assumes term.
+     *
+     * @param schemaDataAssumes the proof obligation variables for the schema data assumes
+     * @param services the services
+     * @return the term
+     */
     abstract Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes, Services services);
 
+    /**
+     * Generate schema find term.
+     *
+     * @param schemaDataFind the proof obligation variables for the schema data find
+     * @param services the services
+     * @return the term
+     */
     abstract Term generateSchemaFind(ProofObligationVars schemaDataFind, Services services);
 
+    /**
+     * Gets the contract application predicate.
+     *
+     * @param appData the proof obligation variables for the application data
+     * @return the contract application predicate
+     */
     abstract Term getContractApplPred(ProofObligationVars appData);
 
-    ProofObligationVars generateApplicationDataSVs(String schemaPrefix, ProofObligationVars appData,
-            Services services) {
+    /**
+     * Generate application data schema variables.
+     *
+     * @param schemaPrefix the schema prefix
+     * @param appData the proof obligation variables for the application data
+     * @param services the services object
+     * @return the proof obligation variables
+     */
+    ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
+                                                   ProofObligationVars appData,
+                                                   Services services) {
         // generate a new schema variable for any pre variable
         Term selfAtPreSV = createTermSV(appData.pre.self, schemaPrefix, services);
-        ImmutableList<Term> localVarsAtPreSVs = createTermSV(appData.pre.localVars, schemaPrefix,
-                services);
+        ImmutableList<Term> localVarsAtPreSVs =
+                createTermSV(appData.pre.localVars, schemaPrefix, services);
         Term guardAtPreSV = createTermSV(appData.pre.guard, schemaPrefix, services);
         Term resAtPreSV = createTermSV(appData.pre.result, schemaPrefix, services);
         Term excAtPreSV = createTermSV(appData.pre.exception, schemaPrefix, services);
@@ -209,8 +244,8 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
         // collect quantifiable variables of the post term and replace them
         // by schema variables
-        Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars = collectQuantifiableVariables(
-                schemaFind, services);
+        Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
+                collectQuantifiableVariables(schemaFind, services);
         quantifiableVarsToSchemaVars.putAll(collectQuantifiableVariables(schemaAssumes, services));
         quantifiableVarsToSchemaVars
                 .putAll(collectQuantifiableVariables(replaceWithTerm, services));
@@ -227,7 +262,8 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
                 .createAnteSequent(new Semisequent(new SequentFormula(replaceWithTerm)));
 
         // create taclet
-        InfFlowContractAppRewriteTacletBuilder tacletBuilder = new InfFlowContractAppRewriteTacletBuilder();
+        InfFlowContractAppRewriteTacletBuilder tacletBuilder =
+                new InfFlowContractAppRewriteTacletBuilder();
         tacletBuilder.setName(tacletName);
         tacletBuilder.setFind(schemaFind);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);

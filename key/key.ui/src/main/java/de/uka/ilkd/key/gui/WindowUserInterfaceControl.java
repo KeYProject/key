@@ -374,46 +374,54 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       }
    }
 
-   /**
-    * save proof in file. If autoSave is on, this will potentially overwrite already
-    * existing proof files with the same name. Otherwise the save dialog pops up.
-    * For loaded proofs both are turned off by default, i.e. only manual saving is
-    * possible, and the save dialog never pops up automatically (except for hitting
-    * the "Save ..." or "Save current proof" button).
-    */
-   public File saveProof(Proof proof, String fileExtension) {
-       final MainWindow mainWindow = MainWindow.getInstance();
-       final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
-       jFC.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
+    /**
+     * Save proof in file. If autoSave is on, this will potentially overwrite already
+     * existing proof files with the same name. Otherwise the save dialog pops up.
+     * For loaded proofs both are turned off by default, i.e. only manual saving is
+     * possible, and the save dialog never pops up automatically (except for hitting
+     * the "Save ..." or "Save current proof" button).
+     *
+     * @param proof
+     *            the proof to be saved
+     * @param fileExtension
+     *            the respective file extension
+     * @return the saved proof as a file
+     */
+    public File saveProof(Proof proof, String fileExtension) {
+        final MainWindow mainWindow = MainWindow.getInstance();
+        final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
+        jFC.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
 
-       Pair<File, String> f = fileName(proof, fileExtension);
-       final boolean saved = jFC.showSaveDialog(mainWindow, f.first, f.second);
-       File file = null;
-       if (saved) {
-           file = jFC.getSelectedFile();
-           final String filename = file.getAbsolutePath();
-           ProofSaver saver;
-           if (jFC.useCompression()) {
-               saver = new GZipProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
-           } else {
-               saver = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
-           }
-           String errorMsg;
-           try {
-               errorMsg = saver.save();
-           } catch (IOException e) {
-               errorMsg = e.toString();
-           }
-           if (errorMsg != null) {
-               mainWindow.notify(new GeneralFailureEvent("Saving Proof failed.\n Error: " + errorMsg));
-           } else {
-              proof.setProofFile(file);
-           }
-       } else {
-           jFC.resetPath();
-       }
-       return file;
-   }
+        Pair<File, String> f = fileName(proof, fileExtension);
+        final boolean saved = jFC.showSaveDialog(mainWindow, f.first, f.second);
+        File file = null;
+        if (saved) {
+            file = jFC.getSelectedFile();
+            final String filename = file.getAbsolutePath();
+            ProofSaver saver;
+            if (jFC.useCompression()) {
+                saver = new GZipProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
+            } else {
+                saver = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
+            }
+            String errorMsg;
+            try {
+                errorMsg = saver.save();
+            } catch (IOException e) {
+                errorMsg = e.toString();
+            }
+            if (errorMsg != null) {
+                mainWindow.notify(
+                        new GeneralFailureEvent("Saving Proof failed.\n Error: " + errorMsg)
+                );
+            } else {
+                proof.setProofFile(file);
+            }
+        } else {
+            jFC.resetPath();
+        }
+        return file;
+    }
 
    public void saveProofBundle(Proof proof) {
        final MainWindow mainWindow = MainWindow.getInstance();
@@ -466,19 +474,19 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
        return new Pair<File, String>(selectedFile, defaultName);
    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void proofDisposing(final ProofDisposedEvent e) {
-      super.proofDisposing(e);
-      // Remove proof from user interface
-      ThreadUtilities.invokeAndWait(new Runnable() {
-         @Override
-         public void run() {
-            mainWindow.getProofList().removeProof(e.getSource());
-         }
-      });
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void proofDisposing(final ProofDisposedEvent e) {
+        super.proofDisposing(e);
+        // Remove proof from user interface
+        ThreadUtilities.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                mainWindow.getProofList().removeProof(e.getSource());
+            }
+        });
     }
 
    @Override
@@ -499,33 +507,38 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       super.loadingStarted(loader);
    }
 
-   @Override
-   public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer, ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
-      super.loadingFinished(loader, poContainer, proofList, result);
-      if (proofList != null) {
-         getMediator().setProof(loader.getProof());
-         if (result != null) {
-             if ("".equals(result.getStatus())) {
-                 this.resetStatus(this);
-              } else {
-                 this.reportStatus(this, result.getStatus());
-              }
-             getMediator().getSelectionModel().setSelectedNode(result.getNode());
-             if (result.hasErrors()) {
-                 throw new ProblemLoaderException(loader,
-                       "Proof could only be loaded partially.\n" +
-                             "In summary " + result.getErrorList().size() +
-                             " not loadable rule application(s) have been detected.\n" +
-                             "The first one:\n"+result.getErrorList().get(0).getMessage(), result.getErrorList().get(0));
-             }
-         } else {
-            // should never happen as replay always returns a result object
-             //TODO (DS): Why is it then there? If this happens, we will get\\
-             // a NullPointerException just a line below...
-            getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());
-         }
-
-      }
+    @Override
+    public void loadingFinished(AbstractProblemLoader loader,
+                                LoadedPOContainer poContainer,
+                                ProofAggregate proofList,
+                                ReplayResult result) throws ProblemLoaderException {
+        super.loadingFinished(loader, poContainer, proofList, result);
+        if (proofList != null) {
+            getMediator().setProof(loader.getProof());
+            if (result != null) {
+                if ("".equals(result.getStatus())) {
+                    this.resetStatus(this);
+                } else {
+                    this.reportStatus(this, result.getStatus());
+                }
+                getMediator().getSelectionModel().setSelectedNode(result.getNode());
+                if (result.hasErrors()) {
+                    throw new ProblemLoaderException(
+                            loader,
+                            "Proof could only be loaded partially.\n"
+                                    + "In summary " + result.getErrorList().size()
+                                    + " not loadable rule application(s) have been detected.\n"
+                                    + "The first one:\n"
+                                    + result.getErrorList().get(0).getMessage(),
+                            result.getErrorList().get(0));
+                }
+            } else {
+                // should never happen as replay always returns a result object
+                //TODO (DS): Why is it then there? If this happens, we will get\\
+                // a NullPointerException just a line below...
+                getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());
+            }
+        }
         getMediator().resetNrGoalsClosedByHeuristics();
         if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
             ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
@@ -590,64 +603,67 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       mainWindow.notify(event);
    }
 
-   @Override
-   public void reportWarnings(ImmutableSet<PositionedString> warnings) {
-     final JDialog dialog = new JDialog(MainWindow.getInstance(),
-                                        SLEnvInput.getLanguage() + " warning",
-                                        true);
-     dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-     Container pane = dialog.getContentPane();
-     pane.setLayout(new BorderLayout());
+    @Override
+    public void reportWarnings(ImmutableSet<PositionedString> warnings) {
+        final JDialog dialog = new JDialog(MainWindow.getInstance(),
+                                           SLEnvInput.getLanguage() + " warning",
+                                           true);
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        Container pane = dialog.getContentPane();
+        pane.setLayout(new BorderLayout());
 
-     //top label
-     JLabel label = new JLabel("The following non-fatal "
-                               + "problems occurred when translating your "
-                               + SLEnvInput.getLanguage() + " specifications:");
-     label.setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 5));
-     pane.add(label, BorderLayout.NORTH);
+        //top label
+        JLabel label = new JLabel("The following non-fatal "
+                                  + "problems occurred when translating your "
+                                  + SLEnvInput.getLanguage() + " specifications:");
+        label.setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 5));
+        pane.add(label, BorderLayout.NORTH);
 
-     //scrollable warning list
-     JScrollPane scrollpane = new JScrollPane();
-     scrollpane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-     JList<PositionedString> list = new JList<PositionedString>(warnings.toArray(new PositionedString[warnings.size()]));
-     list.setBorder(BorderFactory.createLoweredBevelBorder());
-     scrollpane.setViewportView(list);
-     pane.add(scrollpane, BorderLayout.CENTER);
+        //scrollable warning list
+        JScrollPane scrollpane = new JScrollPane();
+        scrollpane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        JList<PositionedString> list =
+                new JList<PositionedString>(
+                        warnings.toArray(new PositionedString[warnings.size()])
+                        );
+        list.setBorder(BorderFactory.createLoweredBevelBorder());
+        scrollpane.setViewportView(list);
+        pane.add(scrollpane, BorderLayout.CENTER);
 
-     //ok button
-     final JButton button = new JButton("OK");
-     button.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-             dialog.setVisible(false);
-         }
-     });
-     Dimension buttonDim = new Dimension(100, 27);
-     button.setPreferredSize(buttonDim);
-     button.setMinimumSize(buttonDim);
-     JPanel panel = new JPanel();
-     panel.add(button);
-     pane.add(panel, BorderLayout.SOUTH);
-     dialog.getRootPane().setDefaultButton(button);
+        //ok button
+        final JButton button = new JButton("OK");
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialog.setVisible(false);
+            }
+        });
+        Dimension buttonDim = new Dimension(100, 27);
+        button.setPreferredSize(buttonDim);
+        button.setMinimumSize(buttonDim);
+        JPanel panel = new JPanel();
+        panel.add(button);
+        pane.add(panel, BorderLayout.SOUTH);
+        dialog.getRootPane().setDefaultButton(button);
 
-     button.registerKeyboardAction(
-         new ActionListener() {
-             @Override
-            public void actionPerformed(ActionEvent event) {
-                 if(event.getActionCommand().equals("ESC")) {
-                     button.doClick();
-                 }
-             }
-         },
-         "ESC",
-         KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-         JComponent.WHEN_IN_FOCUSED_WINDOW);
+        button.registerKeyboardAction(
+            new ActionListener() {
+                @Override
+               public void actionPerformed(ActionEvent event) {
+                    if(event.getActionCommand().equals("ESC")) {
+                        button.doClick();
+                    }
+                }
+            },
+            "ESC",
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-     dialog.setSize(700, 300);
-     dialog.setLocationRelativeTo(MainWindow.getInstance());
-     dialog.setVisible(true);
-     dialog.dispose();
-   }
+        dialog.setSize(700, 300);
+        dialog.setLocationRelativeTo(MainWindow.getInstance());
+        dialog.setVisible(true);
+        dialog.dispose();
+    }
 
    /**
     * {@inheritDoc}

@@ -283,7 +283,7 @@ public final class SourceView extends JComponent {
 
         Tab tab = tabs.get(fileURI);
 
-        if (line < 0 || line >= tab.lineInformation.length) {
+        if (tab == null || line < 0 || line >= tab.lineInformation.length) {
             throw new BadLocationException("Not a valid line number for " + fileURI, line);
         }
 
@@ -327,12 +327,12 @@ public final class SourceView extends JComponent {
 
         Tab tab = tabs.get(fileURI);
 
-        String[] lines = tab.source.split("\\R", -1);
+        String[] lines = tab != null ? tab.source.split("\\R", -1) : new String[] {};
 
         // If we are in a JML comment, highlight everything until the next semicolon.
         // Otherwise, just highlight the first line.
         int lastLine = firstLine;
-        if (lines[firstLine - 1].trim().startsWith("@")) {
+        if (0 < lines.length && lines[firstLine - 1].trim().startsWith("@")) {
             int parens = 0;
 
             outer_loop:
@@ -350,9 +350,9 @@ public final class SourceView extends JComponent {
             }
         }
 
-        Set<Highlight> result = new HashSet<>();
+        Set<Highlight> result = new HashSet<Highlight>();
 
-        for (int i = firstLine; i <= lastLine; ++i) {
+        for (int i = firstLine; i <= lastLine && tab != null; ++i) {
             result.add(addHighlight(fileURI, i, color, level));
         }
 

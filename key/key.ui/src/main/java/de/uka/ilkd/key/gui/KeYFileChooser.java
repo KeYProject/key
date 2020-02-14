@@ -27,8 +27,8 @@ import de.uka.ilkd.key.core.Main;
 
 public class KeYFileChooser {
 
-    private static final File HOME_DIR = IOUtil.getHomeDirectory();
-    public static final FileFilter DEFAULT_FILTER = new FileFilter() {
+    /** The Constant for the default file filter. */
+    public final static FileFilter DEFAULT_FILTER = new FileFilter() {
         public boolean accept(File f) {
             return
                             f.isDirectory()
@@ -44,7 +44,8 @@ public class KeYFileChooser {
         }
     };
 
-    public static final FileFilter STATISTICS_FILTER = new FileFilter() {
+    /** The Constant for the filter for statistics files. */
+    public final static FileFilter STATISTICS_FILTER = new FileFilter() {
         public boolean accept(File f) {
             return f.getName().endsWith(".html") || f.getName().endsWith(".csv")
                     || f.isDirectory();
@@ -55,7 +56,8 @@ public class KeYFileChooser {
         }
     };
 
-    public static final FileFilter COMPRESSED_FILTER = new FileFilter() {
+    /** The Constant for the filter for compressed files. */
+    public final static FileFilter COMPRESSED_FILTER = new FileFilter() {
         public boolean accept(File f) {
             return f.getName().endsWith(".proof.gz") || f.isDirectory();
         }
@@ -64,6 +66,9 @@ public class KeYFileChooser {
             return "compressed KeY proof files (.proof.gz)";
         }
     };
+
+    /** The Constant for the home directory. */
+    private final static File HOME_DIR = IOUtil.getHomeDirectory();
 
     private static KeYFileChooser INSTANCE;
 
@@ -120,6 +125,11 @@ public class KeYFileChooser {
         }
     }
 
+    /**
+     * Sets the file filter.
+     *
+     * @param fileFilter the new file filter
+     */
     public void setFileFilter(FileFilter fileFilter) {
         fileChooser.setFileFilter(fileFilter);
     }

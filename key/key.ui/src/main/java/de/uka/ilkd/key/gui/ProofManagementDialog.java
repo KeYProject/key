@@ -337,6 +337,10 @@ public final class ProofManagementDialog extends JDialog {
      * <b>This method is required, because the Eclipse integration of KeY
      * needs this functionality to start a new proof for a selected method.</b>
      * </p>
+     *
+     * @param initConfig the initial prover configuration
+     * @param selectedKJT the selected {@link KeYJavaType}
+     * @param selectedTarget the selected target
      */
     public static void showInstance(InitConfig initConfig, KeYJavaType selectedKJT,
                                     IObserverFunction selectedTarget) {

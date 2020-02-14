@@ -46,6 +46,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     private final String baseName;
     private final String name;
     private final Term origPre;
+    /** The original free precondition. */
     private final Term origFreePre;
     private final Term origMby;
     private final Term origMod;

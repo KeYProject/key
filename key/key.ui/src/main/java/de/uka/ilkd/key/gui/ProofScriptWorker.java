@@ -44,7 +44,11 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
     private final KeYMediator mediator;
     private final String script;
     private final Location initialLocation;
+
+    /** The initially selected goal. */
     private final Goal initiallySelectedGoal;
+
+    /** The proof script engine. */
     private ProofScriptEngine engine;
     private JDialog monitor;
     private JTextArea logArea;
@@ -64,13 +68,28 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
         this.initiallySelectedGoal = null;
     }
 
+    /**
+     * Instantiates a new proof script worker.
+     *
+     * @param mediator the mediator
+     * @param script the script
+     * @param location the location
+     */
     public ProofScriptWorker(KeYMediator mediator, String script,
-            Location location) {
+                             Location location) {
         this(mediator, script, location, null);
     }
 
-    public ProofScriptWorker(
-            KeYMediator mediator, String script, Location location, Goal initiallySelectedGoal) {
+    /**
+     * Instantiates a new proof script worker.
+     *
+     * @param mediator the mediator
+     * @param script the script
+     * @param location the location
+     * @param initiallySelectedGoal the initially selected goal
+     */
+    public ProofScriptWorker(KeYMediator mediator, String script,
+                             Location location, Goal initiallySelectedGoal) {
         this.mediator = mediator;
         this.script = script;
         this.initialLocation = location;

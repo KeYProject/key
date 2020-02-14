@@ -14,10 +14,23 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofScriptWorker;
 import de.uka.ilkd.key.parser.Location;
 
+/**
+ * The Class ProofScriptInputAction.
+ *
+ * @author lanzinger
+ */
 public class ProofScriptInputAction extends AbstractAction {
 
+    private static final long serialVersionUID = -1193756128644859298L;
+
+    /** The mediator. */
     private final KeYMediator mediator;
 
+    /**
+     * Instantiates a new proof script input action.
+     *
+     * @param mediator the mediator
+     */
     public ProofScriptInputAction(KeYMediator mediator) {
         super("Input proof script...");
         this.mediator = mediator;
@@ -29,7 +42,9 @@ public class ProofScriptInputAction extends AbstractAction {
         win.setVisible(true);
     }
 
-    private static class Window extends JDialog {
+    private static final class Window extends JDialog {
+
+        private static final long serialVersionUID = -6219149431583804843L;
 
         private Window(MainWindow mainWindow, KeYMediator mediator) {
             super(mainWindow, "Enter proof script");

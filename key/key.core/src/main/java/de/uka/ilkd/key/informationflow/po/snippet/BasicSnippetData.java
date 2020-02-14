@@ -87,6 +87,9 @@ class BasicSnippetData {
          */
         TARGET_BLOCK(StatementBlock.class),
         PRECONDITION(Term.class),
+        /**
+         * Returns the free precondition.
+         */
         FREE_PRECONDITION(Term.class),
         POSTCONDITION(Term.class),
         LOOP_INVARIANT(LoopSpecification.class),
