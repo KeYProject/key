@@ -329,6 +329,13 @@ public class ContractSelectionPanel extends JPanel {
 	setContracts(contracts.toArray(new Contract[contracts.size()]), title);
     }
 
+    /**
+     * Selects the given contract in the list.
+     * @param contract
+     */
+    public void selectContract(Contract contract) {
+        contractList.setSelectedValue(contract, true);
+    }
 
     public Contract getContract() {
         final List<Contract> selection = contractList.getSelectedValuesList();
