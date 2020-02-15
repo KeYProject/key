@@ -193,11 +193,11 @@ public final class Main {
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
 
     public static void main(final String[] args) {
-        Runtime rt = Runtime.getRuntime();
-        System.out.println ("Total memory: " + (rt.totalMemory() / 1048576.0) + " MB");
-        System.out.println ("Maximum memory:   " + (rt.maxMemory() / 1048576.0) + " MB");
-        System.out.println ("Free memory:  " + (rt.freeMemory() / 1048576.0) + " MB");
-        System.out.println ("Available processors:  " + rt.availableProcessors());
+        // Runtime rt = Runtime.getRuntime();
+        // System.out.println ("Total memory: " + (rt.totalMemory() / 1048576.0) + " MB");
+        // System.out.println ("Maximum memory:   " + (rt.maxMemory() / 1048576.0) + " MB");
+        // System.out.println ("Free memory:  " + (rt.freeMemory() / 1048576.0) + " MB");
+        // System.out.println ("Available processors:  " + rt.availableProcessors());
 
         Locale.setDefault(Locale.US);
 
