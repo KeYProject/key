@@ -48,6 +48,11 @@ public class FullUseInformationFlowContractMacro extends SequentialProofMacro {
     }
 
     @Override
+    public String getScriptCommandName() {
+        return "use-inf-flow-contracts";
+    }
+
+    @Override
     protected ProofMacro[] createProofMacroArray() {
         return new ProofMacro[] {
                 new UseInformationFlowContractMacro(),

@@ -47,12 +47,20 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class ProofManagementDialog extends JDialog {
+
+    private static final long serialVersionUID = 3543411893273433386L;
 
     /**
      * The contracts are stored by name of the {@link KeYJavaType}, method name, and contract name
@@ -86,7 +94,7 @@ public final class ProofManagementDialog extends JDialog {
         this.initConfig = initConfig;
 
         //create class tree
-        targetIcons = new LinkedHashMap<>();
+        targetIcons = new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, Icon>();
         classTree = new ClassTree(true, true, initConfig.getServices(), targetIcons);
         classTree.addMouseListener(new MouseAdapter() {
             @Override
@@ -116,7 +124,8 @@ public final class ProofManagementDialog extends JDialog {
             @Override
             public Component getListCellRendererComponent(JList<?> list,
                                                           Object value, int index,
-                                                          boolean isSelected, boolean cellHasFocus) {
+                                                          boolean isSelected,
+                                                          boolean cellHasFocus) {
                 Component result = super.getListCellRendererComponent(list,
                         value, index, isSelected, cellHasFocus);
 
@@ -321,14 +330,20 @@ public final class ProofManagementDialog extends JDialog {
 
     /**
      * <p>
-     * Shows the dialog and selects the passed {@link KeYJavaType} and its {@link IObserverFunction}.
+     * Shows the dialog and selects the passed {@link KeYJavaType} and its
+     * {@link IObserverFunction}.
      * </p>
      * <p>
      * <b>This method is required, because the Eclipse integration of KeY
      * needs this functionality to start a new proof for a selected method.</b>
      * </p>
+     *
+     * @param initConfig the initial prover configuration
+     * @param selectedKJT the selected {@link KeYJavaType}
+     * @param selectedTarget the selected target
      */
-    public static void showInstance(InitConfig initConfig, KeYJavaType selectedKJT, IObserverFunction selectedTarget) {
+    public static void showInstance(InitConfig initConfig, KeYJavaType selectedKJT,
+                                    IObserverFunction selectedTarget) {
         showInstance(initConfig, selectedKJT, selectedTarget, null);
     }
 
@@ -339,7 +354,8 @@ public final class ProofManagementDialog extends JDialog {
         return showInstance(initConfig, null, null, null);
     }
 
-    private static boolean showInstance(InitConfig initConfig, KeYJavaType selectedKJT, IObserverFunction selectedTarget, Proof selectedProof) {
+    private static boolean showInstance(InitConfig initConfig, KeYJavaType selectedKJT,
+                                        IObserverFunction selectedTarget, Proof selectedProof) {
         MainWindow mainWindow = MainWindow.getInstance();
         ProofManagementDialog dialog = new ProofManagementDialog(mainWindow, initConfig);
 
@@ -366,7 +382,7 @@ public final class ProofManagementDialog extends JDialog {
         dialog.setLocationRelativeTo(mainWindow);
         dialog.setVisible(true);
 
-        if(dialog.getSelectedContract()!=null) {
+        if (dialog.getSelectedContract() != null) {
             Contract c = dialog.getSelectedContract();
             String kjtName = c.getKJT().getFullName();
             String contractName = c.getName();
@@ -382,14 +398,17 @@ public final class ProofManagementDialog extends JDialog {
     private void select(@NotNull ContractId cid) {
         Services servicesLocal = initConfig.getServices();
         String keyJavaTypeName = cid.keyJavaTypeName;
-        Optional<KeYJavaType> allJavaTypes = servicesLocal.getJavaInfo().getAllKeYJavaTypes().stream()
+        Optional<KeYJavaType> allJavaTypes =
+                servicesLocal.getJavaInfo().getAllKeYJavaTypes().stream()
                 // filter out library classes
                 .filter(kjtTmp -> !(kjtTmp.getJavaType() instanceof TypeDeclaration &&
                         ((TypeDeclaration) kjtTmp.getJavaType()).isLibraryClass()))
                 .filter(it -> it.getFullName().equals(keyJavaTypeName))
                 .findAny();
 
-        if(!allJavaTypes.isPresent()) return;
+        if (!allJavaTypes.isPresent()) {
+            return;
+        }
         KeYJavaType javaType = allJavaTypes.get();
         Name methodName = new Name(cid.methodName);
         Optional<IObserverFunction> target =
@@ -399,12 +418,16 @@ public final class ProofManagementDialog extends JDialog {
                                 .isEmpty())
                         .filter(it -> it.name().equals(methodName))
                         .findAny();
-        if(!target.isPresent()) return;
+        if (!target.isPresent()) {
+            return;
+        }
         final IObserverFunction method = target.get();
         select(javaType, method);
 
-        if(!isInstanceMethodOfAbstractClass(javaType, method)) {
-            Optional<Contract> contract = initConfig.getServices().getSpecificationRepository().getContracts(javaType, method)
+        if (!isInstanceMethodOfAbstractClass(javaType, method)) {
+            Optional<Contract> contract =
+                    initConfig.getServices().getSpecificationRepository()
+                    .getContracts(javaType, method)
                     .stream().filter(it -> it.getName().equals(cid.contractName))
                     .findAny();
             contract.ifPresent(value -> contractPanelByMethod.selectContract(value));
@@ -667,10 +690,17 @@ public final class ProofManagementDialog extends JDialog {
     /**
      * Stores the identification of a {@link Contract}, i.e. type, method, contract name.
      */
-    private static class ContractId {
-        @Nullable public final String keyJavaTypeName, methodName, contractName;
+    private static final class ContractId {
+        /** The key java type name. */
+        @Nullable public final String keyJavaTypeName;
+        /** The method name. */
+        @Nullable public final String methodName;
+        /** The contract name. */
+        @Nullable public final String contractName;
 
-        private ContractId(@Nullable String keyJavaTypeName, @Nullable String methodName, @Nullable String contractName) {
+        private ContractId(@Nullable String keyJavaTypeName,
+                           @Nullable String methodName,
+                           @Nullable String contractName) {
             this.keyJavaTypeName = keyJavaTypeName;
             this.methodName = methodName;
             this.contractName = contractName;

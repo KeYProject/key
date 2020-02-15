@@ -331,7 +331,7 @@ public class ContractSelectionPanel extends JPanel {
 
     /**
      * Selects the given contract in the list.
-     * @param contract
+     * @param contract The {@link Contract}
      */
     public void selectContract(Contract contract) {
         contractList.setSelectedValue(contract, true);

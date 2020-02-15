@@ -1164,6 +1164,10 @@ options {
             					         getServices());
                         
             if(sort != null && firstInstance != null) {
+            	if (baseName.startsWith("<$" + "inv" + ">")) {
+					return getJavaInfo().getStaticInv(getJavaInfo().getKeYJavaType(sort));            	
+            	}
+
                 v = firstInstance.getInstanceFor(sort, getServices());
                 if(v != null) {
                     return v;
@@ -2079,7 +2083,9 @@ pred_decl
 	            String baseName = pred_name.substring(separatorIndex + 2);
 		    Sort genSort = lookupSort(sortName);
 		    
-		    if(genSort instanceof GenericSort) {	        	            	
+		    if (baseName.startsWith("<$" + "inv" + ">")) {
+		    	p = (Function) getJavaInfo().getStaticInv(getJavaInfo().getKeYJavaType(genSort));
+		    } else if(genSort instanceof GenericSort) {	        	            	
 		    	p = SortDependingFunction.createFirstInstance(
 		    	    		(GenericSort)genSort,
 		    	    		new Name(baseName),
@@ -2174,7 +2180,9 @@ func_decl
 	            String baseName = func_name.substring(separatorIndex + 2);
 		    Sort genSort = lookupSort(sortName);
 		    
-		    if(genSort instanceof GenericSort) {	        	            	
+		    if (baseName.startsWith("<$" + "inv" + ">")) {
+		    	f = (Function) getJavaInfo().getStaticInv(getJavaInfo().getKeYJavaType(genSort));
+		    } else if(genSort instanceof GenericSort) {	        	            	
 		    	f = SortDependingFunction.createFirstInstance(
 		    	    		(GenericSort)genSort,
 		    	    		new Name(baseName),
@@ -2480,7 +2488,9 @@ id_declaration returns [ IdDeclaration idd = null ]
 
 funcpred_name returns [String result = null]
     :
-     
+    (sort_name DOUBLECOLON LESS) => (prefix = sort_name 
+        DOUBLECOLON LESS name = simple_ident GREATER {result = prefix + "::<" + name + ">";})
+  | 
     (sort_name DOUBLECOLON) => (prefix = sort_name 
         DOUBLECOLON name = simple_ident {result = prefix + "::" + name;})
   | 
@@ -3565,8 +3575,10 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
 	            } else {
 	                op = lookupVarfuncId(varfuncid, args);
 	            }
-
-	            if (op instanceof ParsableVariable) {
+	            
+	            if (op.name().toString().equals("<$" + "inv>")) {
+	            	a = getServices().getTermBuilder().staticInv(getJavaInfo().getKeYJavaType(varfuncid.substring(0, varfuncid.indexOf("::"))));
+	            } else if (op instanceof ParsableVariable) {
 	                a = termForParsedVariable((ParsableVariable)op);
 	            } else {
 	                if (args==null) {

@@ -49,6 +49,10 @@ compileJavacc {
     }
 }
 
+tasks.withType(Test) {
+    enableAssertions = true
+}
+
 test {
     /*filter {
         // use testProofRules or testRunAllProofs, avoid double execution on jenkins

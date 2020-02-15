@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
+import de.uka.ilkd.key.informationflow.po.snippet.BasicSnippetData.Key;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
@@ -20,11 +21,21 @@ class BasicSymbolicExecutionWithPreconditionSnippet extends ReplaceAndRegisterMe
                 POSnippetFactory.getBasicFactory(d, poVars);
 
         // precondition
+        final Term pre;
+
         final Term freePre =
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_PRE);
         final Term contractPre =
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
-        final Term pre = d.tb.and(freePre, contractPre);
+
+        Term freeReq =
+                (Term) d.get(Key.FREE_PRECONDITION);
+        if (freeReq != null) {
+            freeReq = replace(freeReq, d.origVars, poVars.pre, d.tb);
+            pre = d.tb.and(freePre, freeReq, contractPre);
+        } else {
+            pre = d.tb.and(freePre, contractPre);
+        }
 
         // symbolic execution
         final Term symExec =
