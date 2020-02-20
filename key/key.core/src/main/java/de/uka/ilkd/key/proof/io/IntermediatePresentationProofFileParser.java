@@ -213,6 +213,11 @@ public class IntermediatePresentationProofFileParser
             ((BuiltinRuleInformation) ruleInfo).currContract = str;
             break;
 
+        case MODALITY:
+            // we just ignore this part (it is only additional information which can
+            // be used in external tools such as proof management)
+            break;
+
         case ASSUMES_INST_BUILT_IN: // ifInst (for built in rules)
             BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
 

@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.rule.ContractRuleApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
@@ -568,6 +570,18 @@ public class OutputStreamProofSaver {
         if (appliedRuleApp.rule() instanceof UseOperationContractRule
                 || appliedRuleApp.rule() instanceof UseDependencyContractRule) {
             printRuleJustification(appliedRuleApp, output);
+
+            // for operation contract rules we add the modality under which the rule was applied
+            // -> needed for proof management tool
+            if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
+                if (appliedRuleApp instanceof ContractRuleApp) {
+                    ContractRuleApp app = (ContractRuleApp) appliedRuleApp;
+                    Modality modality = (Modality) app.programTerm().op();
+                    output.append(" (modality \"");
+                    output.append(modality.toString());
+                    output.append("\")");
+                }
+            }
         }
         if (appliedRuleApp instanceof MergeRuleBuiltInRuleApp) {
             printSingleMergeRuleApp((MergeRuleBuiltInRuleApp) appliedRuleApp,
