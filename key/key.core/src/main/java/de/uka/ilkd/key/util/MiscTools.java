@@ -15,8 +15,10 @@ package de.uka.ilkd.key.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -781,5 +783,24 @@ public final class MiscTools {
         //    Path p = fs.getPath(entryName);
         //    return p.toUri();
         //}
+    }
+
+    /**
+     * Tries to create a URL from the the given string. The method will be successful if the given
+     * string contains either a correct URL or a simple path (without "file:" prefix).
+     * @param str the string to convert
+     * @return a URL if successful
+     * @throws MalformedURLException if the string can not be converted to URL
+     */
+    public static URL tryParseURL(String str) throws MalformedURLException {
+        try {
+            // if this works we were lucky: str already had correct url format
+            return new URL(str);
+        } catch (Exception e) {
+            // If the above did not work, we hope that str contains only a path string.
+            // If this also fails, the method will throw an exception.
+            Path p = Paths.get(str);
+            return p.toUri().toURL();
+        }
     }
 }

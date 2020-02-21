@@ -21,9 +21,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -202,6 +204,62 @@ public class TestMiscTools extends TestCase {
         // clean up temporary files
         Files.deleteIfExists(tmp);
         Files.deleteIfExists(tmpSpace);
+        Files.deleteIfExists(zipP);
+    }
+
+    /**
+     * This is a test for the method {@link MiscTools#tryParseURL(String)}.
+     * It tests for some strings if they can be converted to URLs correctly.
+     * Note: This test creates a temporary zip file.
+     * @throws Exception if a string can not be converted successfully
+     */
+    public void testTryParseURL() throws Exception {
+        String tmp = System.getProperty("java.io.tmpdir");
+        Path p = Paths.get(tmp, "te st.txt");
+
+        // test simple path string without url prefix and encoding
+        URL u1 = MiscTools.tryParseURL(p.toString());
+        assertNotNull(u1);
+
+        // test file url string
+        String correctURL = p.toUri().toURL().toString();
+        URL u2 = MiscTools.tryParseURL(correctURL);
+        assertNotNull(u2);
+
+        assertEquals(u1, u2);
+
+        // test http url string
+        String correctHttp = "https://www.key-project.org/KEY.cer";
+        URL u3 = MiscTools.tryParseURL(correctHttp);
+        assertNotNull(u3);
+
+        // write a test zip file
+        byte[] b = "test content".getBytes();
+        String entryName = "entry with whitespace.txt";
+        Path zipP = Files.createTempFile("test with whitespace!", ".zip");
+        try (FileOutputStream fos = new FileOutputStream(zipP.toFile());
+             ZipOutputStream zos = new ZipOutputStream(fos)) {
+            zos.putNextEntry(new ZipEntry(entryName));
+            zos.write(b);
+        }
+
+        try (ZipFile zf = new ZipFile(zipP.toFile())) {
+            URL entryURL = MiscTools.getZipEntryURI(zf, entryName).toURL();
+            URLConnection juc = entryURL.openConnection();
+            juc.setUseCaches(false);
+            try (InputStream is = juc.getInputStream()) {
+                assertNotNull(is);
+                // try if the file can be read correctly
+                assertEquals(new String(b), IOUtil.readFrom(is));
+            }
+
+            // test reparsing jar url
+            URL u4 = MiscTools.tryParseURL(entryURL.toString());
+            assertNotNull(u4);
+            assertEquals(entryURL, u4);
+        }
+
+        // clean up temporary file
         Files.deleteIfExists(zipP);
     }
 }

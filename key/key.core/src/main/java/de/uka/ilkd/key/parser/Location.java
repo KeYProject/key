@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.runtime.RecognitionException;
 
 import java.net.MalformedURLException;
@@ -57,7 +58,7 @@ public final class Location {
         if (filename != null) {
             // catch-rethrow to avoid to change the interface too much
             try {
-                url = new URL("file://" + filename);
+                url = MiscTools.tryParseURL(filename);
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
@@ -87,6 +88,9 @@ public final class Location {
     /** @return the filename may be null */
     @Deprecated
     public String getFilename() {
+        if (filename == null) {
+            return null;
+        }
         return filename.getPath();
     }
 
