@@ -793,6 +793,12 @@ public final class MiscTools {
      * @throws MalformedURLException if the string can not be converted to URL
      */
     public static URL tryParseURL(String str) throws MalformedURLException {
+        /* For empty string we explicitly have to return null.
+         * If we would not do this, a given empty string would result in a URL
+         * to the current working directory. */
+        if (str.isEmpty()) {
+            return null;
+        }
         try {
             // if this works we were lucky: str already had correct url format
             return new URL(str);
@@ -800,6 +806,8 @@ public final class MiscTools {
             // If the above did not work, we hope that str contains only a path string.
             // If this also fails, the method will throw an exception.
             Path p = Paths.get(str);
+            // eliminate redundant parts (e.g. 'a/./b')
+            p = p.normalize();
             return p.toUri().toURL();
         }
     }

@@ -214,6 +214,10 @@ public class TestMiscTools extends TestCase {
      * @throws Exception if a string can not be converted successfully
      */
     public void testTryParseURL() throws Exception {
+        // test empty string -> null URL
+        URL u0 = MiscTools.tryParseURL("");
+        assertNull(u0);
+
         String tmp = System.getProperty("java.io.tmpdir");
         Path p = Paths.get(tmp, "te st.txt");
 
@@ -226,7 +230,12 @@ public class TestMiscTools extends TestCase {
         URL u2 = MiscTools.tryParseURL(correctURL);
         assertNotNull(u2);
 
+        // test removal of redundant elements
+        Path p_redundant = Paths.get(tmp, ".", ".", "te st.txt");
+        URL u_redundant = MiscTools.tryParseURL(p_redundant.toString());
+
         assertEquals(u1, u2);
+        assertEquals(u1, u_redundant);
 
         // test http url string
         String correctHttp = "https://www.key-project.org/KEY.cer";
