@@ -793,12 +793,22 @@ public final class MiscTools {
      * @throws MalformedURLException if the string can not be converted to URL
      */
     public static URL tryParseURL(String str) throws MalformedURLException {
+        if (str == null) {
+            return null;
+        }
+
         /* For empty string we explicitly have to return null.
          * If we would not do this, a given empty string would result in a URL
          * to the current working directory. */
         if (str.isEmpty()) {
             return null;
         }
+
+        // sometimes parser produces a string of the form "URL:<url_string>" -> remove prefix
+        if (str.startsWith("URL:")) {
+            str = str.substring(4);
+        }
+
         try {
             // if this works we were lucky: str already had correct url format
             return new URL(str);
