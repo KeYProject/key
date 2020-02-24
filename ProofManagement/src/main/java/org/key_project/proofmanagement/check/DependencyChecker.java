@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 import org.key_project.proofmanagement.check.dependency.DependencyGraphBuilder;

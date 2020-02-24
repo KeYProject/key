@@ -5,19 +5,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.speclang.Contract;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.Pair;
 
 public abstract class DependencyGraphBuilder {
 
     public static DependencyGraph buildGraph(SpecificationRepository specRepo, List<Pair<String, BranchNodeIntermediate>> contractProofPairs) {
         // create contract map to look up contracts from their strings
-        ContractMap contractMap = new ContractMap(specRepo);
+        //ContractMap contractMap = new ContractMap(specRepo);
 
         // create empty graph
         DependencyGraph graph = new DependencyGraph();
@@ -27,7 +25,9 @@ public abstract class DependencyGraphBuilder {
         for (Pair<String, BranchNodeIntermediate> currentContractProofPair : contractProofPairs) {
             String c = currentContractProofPair.first;
 
-            Contract contract = contractMap.lookup(c);
+            //Contract contract = contractMap.lookup(c);
+            Contract contract = specRepo.getContractByName(c);
+
             // create fresh node for current contract
             DependencyNode node = new DependencyNode(contract, specRepo);
             // add node to graph
@@ -35,8 +35,6 @@ public abstract class DependencyGraphBuilder {
             // and the node map for later reference
             graph.addNode(node);
         }
-
-        // TODO: NPE when building the graph (from here downwards)
 
         // add dependencies between nodes
         for (Pair<String, BranchNodeIntermediate> currentContractProofPair : contractProofPairs) {
@@ -47,20 +45,21 @@ public abstract class DependencyGraphBuilder {
             // collect all contracts referenced to in current proof
             ContractApplicationCollector contractApplicationCollector = new ContractApplicationCollector(currentIntermediateNode, specRepo);
             contractApplicationCollector.start();
-            Set<String> dependentContractsAsStrings = contractApplicationCollector.getResult();
+            Set<Pair<String, Modality>> dependentContracts = contractApplicationCollector.getResult();
 
             // add dependencies between nodes
-            for (String currentDependentContractString : dependentContractsAsStrings) {
-                DependencyNode dependentNode = dependencyNodes.get(currentDependentContractString);
+            for (Pair<String, Modality> currentDependent : dependentContracts) {
+                DependencyNode dependentNode = dependencyNodes.get(currentDependent.first);
 
                 // TODO: should these missing dependency nodes be created earlier (to ensure that their dependencies
                 //  are collected as well)?
                 if (dependentNode == null) {
-                    Contract contract = specRepo.getContractByName(currentDependentContractString);
+                    Contract contract = specRepo.getContractByName(currentDependent.first);
                     dependentNode = new DependencyNode(contract, specRepo);
+                    graph.addNode(dependentNode);
                 }
 
-                currentDependencyNode.addDependency(dependentNode);
+                currentDependencyNode.addDependency(dependentNode, currentDependent.second);
             }
             // add the freshly created node to the graph
             graph.addNode(currentDependencyNode);

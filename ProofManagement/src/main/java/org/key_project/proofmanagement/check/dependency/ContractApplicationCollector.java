@@ -1,19 +1,20 @@
 package org.key_project.proofmanagement.check.dependency;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.io.intermediate.AppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.util.Pair;
 
 public class ContractApplicationCollector extends NodeIntermediateWalker {
 
-    private Set<String> result = new HashSet<>();
+    private Set<Pair<String, Modality>> result = new HashSet<>();
     private SpecificationRepository specRepo;
 
     public ContractApplicationCollector(NodeIntermediate root, SpecificationRepository specRepo) {
@@ -21,7 +22,7 @@ public class ContractApplicationCollector extends NodeIntermediateWalker {
         this.specRepo = specRepo;
     }
 
-    public Set<String> getResult() {
+    public Set<Pair<String, Modality>> getResult() {
         return result;
     }
 
@@ -46,7 +47,21 @@ public class ContractApplicationCollector extends NodeIntermediateWalker {
                 // TODO: better use specRepo.splitContract()
                 String combinedContracts = biApp.getContract();
                 String[] contracts = combinedContracts.split("#");
-                Collections.addAll(result, contracts);
+
+                // load information about the modality under which the contract was applied
+                Modality modality = Modality.getModality(biApp.getModality());
+                if (modality == null) {
+                    // in default case (e.g. legacy proofs without saved modality information)
+                    // we assume diamond modality but print a warning
+                    // TODO: really? or is it just incomplete?
+                    System.err.println("No saved modality information was found! Assuming \"diamond\"" +
+                            " (be careful, this may be unsound)!");
+                    modality = Modality.DIA;
+                }
+
+                for (String contract : contracts) {
+                    result.add(new Pair<>(contract, modality));
+                }
             } else if (appName.contains("Contract_axiom_for_")) {
                 TacletAppIntermediate tacletApp = (TacletAppIntermediate) appIntermediate;
                 String name = tacletApp.getRuleName();
