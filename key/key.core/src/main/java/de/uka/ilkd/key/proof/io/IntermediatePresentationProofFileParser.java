@@ -214,8 +214,8 @@ public class IntermediatePresentationProofFileParser
             break;
 
         case MODALITY:
-            // we just ignore this part (it is only additional information which can
-            // be used in external tools such as proof management)
+            // (additional information which can be used in external tools such as proof management)
+            ((BuiltinRuleInformation) ruleInfo).currContractModality = str;
             break;
 
         case ASSUMES_INST_BUILT_IN: // ifInst (for built in rules)
@@ -406,10 +406,12 @@ public class IntermediatePresentationProofFileParser
                 builtinInfo.currNewNames);
         } else {
             result = new BuiltInAppIntermediate(builtinInfo.currRuleName,
-                new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
-                    builtinInfo.currPosInTerm),
-                builtinInfo.currContract, builtinInfo.builtinIfInsts,
-                builtinInfo.currNewNames);
+                    new Pair<>(builtinInfo.currFormula,
+                            builtinInfo.currPosInTerm),
+                    builtinInfo.currContract,
+                    builtinInfo.currContractModality,
+                    builtinInfo.builtinIfInsts,
+                    builtinInfo.currNewNames);
         }
 
         return result;
@@ -486,6 +488,7 @@ public class IntermediatePresentationProofFileParser
         protected PosInTerm currIfInstPosInTerm;
         /* > Method Contract */
         protected String currContract = null;
+        protected String currContractModality = null;
         /* > Merge Rule */
         protected String currMergeProc = null;
         protected int currNrPartners = 0;
