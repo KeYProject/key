@@ -53,7 +53,7 @@ public interface Collection extends java.lang.Iterable
      @ ensures \result.index == 0;
      @ ensures \result.seq == seq;
      @ ensures \fresh(\result) && \fresh(\result.*);
-     @ ensures \typeof(\result) == \type(java.util.CollectionIterator);
+     @ ensures \result instanceof java.util.CollectionIterator;
      @ assignable \nothing;
      @ determines \result.seq \by seq;
      @ determines \result.index \by \nothing;
