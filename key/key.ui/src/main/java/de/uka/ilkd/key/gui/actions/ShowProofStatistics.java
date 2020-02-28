@@ -17,6 +17,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -260,6 +262,17 @@ public class ShowProofStatistics extends MainWindowAction {
             buttonPane.add(csvButton);
             buttonPane.add(htmlButton);
 
+            getRootPane().setDefaultButton(okButton);
+            getRootPane().addKeyListener(new KeyAdapter() {
+
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        getRootPane().getDefaultButton().doClick();
+                    }
+                }
+            });
+
             setLayout(new BorderLayout());
             add(scrollPane, BorderLayout.CENTER);
             add(buttonPane, BorderLayout.PAGE_END);
@@ -270,6 +283,14 @@ public class ShowProofStatistics extends MainWindowAction {
             int h = scrollPane.getPreferredSize().height + buttonPane.getPreferredSize().height + 100;
             setSize(w, h);
             setLocationRelativeTo(mainWindow);
+        }
+
+        @Override
+        public void setVisible(boolean visible) {
+            super.setVisible(visible);
+            if (visible) {
+                requestFocus();
+            }
         }
 
         private void export(String fileExtension, String fileName, String text) {
