@@ -13,11 +13,12 @@
 
 package de.uka.ilkd.key.ui;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.List;
-
-import de.uka.ilkd.key.proof.init.*;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -29,6 +30,7 @@ import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -41,6 +43,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
@@ -49,6 +55,7 @@ import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -68,17 +75,17 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
    // for a progress bar
    int progressMax = 0;
 
-    
+
     // flag to indicate that a file should merely be loaded not proved. (for
     // "reload" testing)
     private final boolean loadOnly;
-    
-    
+
+
     /**
      * Current key problem file that is attempted to be proven.
      */
     private File keyProblemFile = null;
-    
+
     /**
      * We want to record whether there was a proof that could not be proven.
      * {@link Main} calls System.exit() after all files have been loaded with
@@ -86,7 +93,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * whether there has been a proof attempt that was not successful.
      */
     public boolean allProofsSuccessful = true;
-    
+
     public ConsoleUserInterfaceControl(byte verbosity, boolean loadOnly) {
         this.verbosity = verbosity;
         this.mediator  = new KeYMediator(this);
@@ -125,7 +132,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
        Runtime.getRuntime().gc();
 
        /*
-        * It is assumed that this part of the code is never reached, unless a 
+        * It is assumed that this part of the code is never reached, unless a
         * value has been assigned to keyProblemFile in method loadProblem(File).
         */
        assert keyProblemFile != null : "Unexcpected null pointer. Trying to"
@@ -145,8 +152,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
    }
 
     @Override
-   public void taskFinished(TaskFinishedInfo info) {    	
-       super.taskFinished(info);              
+   public void taskFinished(TaskFinishedInfo info) {
+       super.taskFinished(info);
        progressMax = 0; // reset progress bar marker
        final Proof proof = info.getProof();
        if (proof==null) {
@@ -155,7 +162,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                final Object error = info.getResult();
                if (error instanceof Throwable) {
                    ((Throwable) error).printStackTrace();
-               }               
+               }
            }
            System.exit(1);
        }
@@ -167,18 +174,23 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                printResults(openGoals, info, result2);
            }
        } else if (info.getSource() instanceof ProblemLoader) {
-           if (verbosity > Verbosity.SILENT) System.out.println("[ DONE ... loading ]");
+           if (verbosity > Verbosity.SILENT) {
+            System.out.println("[ DONE ... loading ]");
+        }
            if (result2 != null) {
-               if (verbosity > Verbosity.SILENT) System.out.println(result2);
+               if (verbosity > Verbosity.SILENT) {
+                System.out.println(result2);
+            }
                if (verbosity >= Verbosity.HIGH && result2 instanceof Throwable) {
                    ((Throwable) result2).printStackTrace();
                }
                System.exit(-1);
            }
            if(loadOnly ||  openGoals==0) {
-               if (verbosity > Verbosity.SILENT)
-                   System.out.println("Number of open goals after loading: " +
+               if (verbosity > Verbosity.SILENT) {
+                System.out.println("Number of open goals after loading: " +
                            openGoals);
+            }
                System.exit(0);
            }
            ProblemLoader problemLoader = (ProblemLoader) info.getSource();
@@ -259,7 +271,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         mediator.setProof(pa.getFirstProof());
         proofStack = proofStack.prepend(pa.getFirstProof());
     }
-    
+
     void finish(Proof proof) {
        // setInteractive(false) has to be called because the ruleAppIndex
        // has to be notified that we work in auto mode (CS)
@@ -392,7 +404,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 //        }
 //        return false;
     }
-    
+
    /**
     * {@inheritDoc}
     */
@@ -451,6 +463,17 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
          proof.saveToFile(new File(f.getAbsolutePath()));
          // save current proof under common name as well
          proof.saveToFile(new File(baseName + ".auto.proof"));
+
+         // save proof statistics
+         ShowProofStatistics.getCSVStatisticsMessage(proof);
+         File file = new File(MiscTools.toValidFileName(proof.name().toString()) + ".csv");
+         try(BufferedWriter writer = new BufferedWriter(
+                     new OutputStreamWriter(new FileOutputStream(file)));) {
+             writer.write(ShowProofStatistics.getCSVStatisticsMessage(proof));
+         } catch (IOException e) {
+             e.printStackTrace();
+             assert false;
+         }
       }
       catch (IOException e) {
          e.printStackTrace();
