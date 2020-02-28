@@ -123,9 +123,16 @@ public class VariableReference extends JavaNonTerminalProgramElement
 	return this;
     }
 
+    /**
+     * Gets the KeY java type.
+     *
+     * @param javaServ the java services
+     * @param ec the execution context
+     * @return the KeY java type
+     */
     public KeYJavaType getKeYJavaType(Services javaServ,
-				      ExecutionContext ec) {
-	return getKeYJavaType();
+                                      ExecutionContext ec) {
+        return getKeYJavaType();
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {

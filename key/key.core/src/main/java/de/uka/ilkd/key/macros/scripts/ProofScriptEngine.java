@@ -27,7 +27,11 @@ public class ProofScriptEngine {
 
     private final Location initialLocation;
     private final String script;
+
+    /** The initially selected goal. */
     private final Goal initiallySelectedGoal;
+
+    /** The engine state map. */
     private EngineState stateMap;
 
     private Observer commandMonitor;
@@ -42,6 +46,13 @@ public class ProofScriptEngine {
         this(script, initLocation, null);
     }
 
+    /**
+     * Instantiates a new proof script engine.
+     *
+     * @param script the script
+     * @param initLocation the initial location
+     * @param initiallySelectedGoal the initially selected goal
+     */
     public ProofScriptEngine(String script, Location initLocation, Goal initiallySelectedGoal) {
         this.script = script;
         this.initialLocation = initLocation;

@@ -79,6 +79,12 @@ public class ShowProofStatistics extends MainWindowAction {
         }
     }
 
+    /**
+     * Gets the CSV statistics message.
+     *
+     * @param proof the proof
+     * @return the CSV statistics message
+     */
     public static String getCSVStatisticsMessage(Proof proof) {
         final int openGoals = proof.openGoals().size();
         String stats = "";
@@ -89,8 +95,7 @@ public class ShowProofStatistics extends MainWindowAction {
         for (Pair<String, String> x : s.getSummary()) {
             if ("".equals(x.second)) {
                 stats += x.first + "\n";
-            }
-            else {
+            } else {
                 stats += x.first + "," + x.second + "\n";
             }
         }
@@ -99,23 +104,16 @@ public class ShowProofStatistics extends MainWindowAction {
             SortedSet<Map.Entry<String, Integer>> sortedEntries =
                     new TreeSet<Map.Entry<String, Integer>>(
                             new Comparator<Map.Entry<String, Integer>>() {
-                                @Override
-                                public int compare(
-                                        Entry<String, Integer> o1,
-                                        Entry<String, Integer> o2) {
-                                    int cmpRes =
-                                            o2.getValue().compareTo(
-                                                    o1.getValue());
-
-                                    if (cmpRes == 0) {
-                                        cmpRes =
-                                                o1.getKey().compareTo(
-                                                        o2.getKey());
-                                    }
-
-                                    return cmpRes;
-                                }
-                            });
+                        @Override
+                        public int compare(Entry<String, Integer> o1,
+                                           Entry<String, Integer> o2) {
+                            int cmpRes = o2.getValue().compareTo(o1.getValue());
+                            if (cmpRes == 0) {
+                                cmpRes = o1.getKey().compareTo(o2.getKey());
+                            }
+                            return cmpRes;
+                        }
+                });
             sortedEntries.addAll(s.getInteractiveAppsDetails().entrySet());
 
             for (Map.Entry<String, Integer> entry : sortedEntries) {
@@ -206,7 +204,9 @@ public class ShowProofStatistics extends MainWindowAction {
      *
      * @author lanzinger
      */
-    public static class Window extends JDialog {
+    public static final class Window extends JDialog {
+
+        private static final long serialVersionUID = 1266280148508192284L;
 
         /**
          * Creates a new (initially invisible) proof statistics window.
@@ -233,7 +233,8 @@ public class ShowProofStatistics extends MainWindowAction {
 
             Font myFont = UIManager.getFont(Config.KEY_FONT_PROOF_TREE);
             if (myFont != null) {
-                statisticsPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+                statisticsPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
+                                                 Boolean.TRUE);
                 statisticsPane.setFont(myFont);
             } else {
                 Debug.out("KEY_FONT_PROOF_TREE not available. Use standard font.");
@@ -277,10 +278,14 @@ public class ShowProofStatistics extends MainWindowAction {
             add(scrollPane, BorderLayout.CENTER);
             add(buttonPane, BorderLayout.PAGE_END);
 
-            int w = 50 + Math.max(
-                    scrollPane.getPreferredSize().width,
-                    buttonPane.getPreferredSize().width);
-            int h = scrollPane.getPreferredSize().height + buttonPane.getPreferredSize().height + 100;
+            int w = 50
+                    + Math.max(
+                            scrollPane.getPreferredSize().width,
+                            buttonPane.getPreferredSize().width
+                            );
+            int h = scrollPane.getPreferredSize().height
+                    + buttonPane.getPreferredSize().height
+                    + 100;
             setSize(w, h);
             setLocationRelativeTo(mainWindow);
         }

@@ -11,6 +11,9 @@ import de.uka.ilkd.key.macros.scripts.meta.Option;
  */
 public class AssertCommand extends AbstractCommand<AssertCommand.Parameters> {
 
+    /**
+     * Instantiates a new assert command.
+     */
     public AssertCommand() {
         super(Parameters.class);
     }
@@ -44,6 +47,9 @@ public class AssertCommand extends AbstractCommand<AssertCommand.Parameters> {
         return "assert";
     }
 
+    /**
+     * The Assigned parameters (currently only the passed goals).
+     */
     public static class Parameters {
         /**
          * The number of open and enabled goals.

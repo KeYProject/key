@@ -81,7 +81,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
     private final SequentView sequentView;
 
     /** Whether term info should be shown in the status line. */
-    private boolean showTermInfo = true;
+    private boolean showTermInfo = false;
 
     /** @see #isRefresh() */
     private static boolean refresh = true;

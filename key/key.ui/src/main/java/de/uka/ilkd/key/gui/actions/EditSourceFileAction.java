@@ -37,9 +37,17 @@ import de.uka.ilkd.key.util.ExceptionTools;
 public class EditSourceFileAction extends AbstractAction {
     private static final long serialVersionUID = -2540941448174197032L;
 
+    /** The parent dialog. */
     private final ExceptionDialog parent;
+    /** The exception. */
     private final Throwable exception;
 
+    /**
+     * Instantiates a new edits the source file action.
+     *
+     * @param parent the parent
+     * @param exception the exception
+     */
     public EditSourceFileAction(final ExceptionDialog parent, final Throwable exception) {
         super("Edit Source File");
         this.parent = parent;
@@ -66,6 +74,12 @@ public class EditSourceFileAction extends AbstractAction {
         textArea.setCaretPosition(i);
     }
 
+    /**
+     * Checks if is valid location.
+     *
+     * @param location the location
+     * @return true, if is valid location
+     */
     public static boolean isValidLocation(final Location location) {
         return !(location == null || location.getFilename() == null
                 || location.getFilename().length() == 0);
@@ -207,6 +221,11 @@ public class EditSourceFileAction extends AbstractAction {
         }
     }
 
+    /**
+     * Center dialog relative to main window.
+     *
+     * @param dialog the dialog
+     */
     static void centerDialogRelativeToMainWindow(final JDialog dialog) {
         dialog.setLocationRelativeTo(MainWindow.getInstance());
 //      Rectangle bounds = dialog.getBounds();

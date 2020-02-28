@@ -151,23 +151,22 @@ public class Function extends AbstractSortedOperator {
      * function or predicate symbol.
      */
     public final String proofToString() {
-       String s =
-	   (sort() == Sort.FORMULA ? "" : sort().toString()) + " ";
-       s += name();
-       if (arity()>0) {
-          int i = 0;
-          s+="(";
-          while (i<arity()) {
-             if (i>0) {
-                s+=",";
+        String s = (sort() == Sort.FORMULA ? "" : sort().toString()) + " ";
+        s += name();
+        if (arity() > 0) {
+            int i = 0;
+            s += "(";
+            while (i < arity()) {
+                if (i > 0) {
+                    s += ",";
+                }
+                s += argSort(i);
+                i++;
             }
-             s+=argSort(i);
-             i++;
-          }
-          s+=")";
-       }
-       s+=";\n";
-       return s;
+            s += ")";
+        }
+        s += ";\n";
+        return s;
     }
 
     public Function rename(Name newName) {

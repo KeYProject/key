@@ -25,6 +25,11 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofScriptWorker;
 import de.uka.ilkd.key.proof.Proof;
 
+/**
+ * The Class ProofScriptFromFileAction.
+ *
+ * @author Mattias Ulbrich
+ */
 public class ProofScriptFromFileAction extends AbstractAction {
     private static final long serialVersionUID = -3181592516055470032L;
 
@@ -32,6 +37,11 @@ public class ProofScriptFromFileAction extends AbstractAction {
 
     private static File lastDirectory;
 
+    /**
+     * Instantiates a new proof script from file action.
+     *
+     * @param mediator the mediator
+     */
     public ProofScriptFromFileAction(KeYMediator mediator) {
         super("Run proof script from file...");
         this.mediator = mediator;

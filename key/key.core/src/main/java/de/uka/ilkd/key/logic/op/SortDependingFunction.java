@@ -132,14 +132,17 @@ public final class SortDependingFunction extends Function {
      * @return the variant for the given sort
      */
     public synchronized SortDependingFunction getInstanceFor(Sort sort,
-            TermServices services) {
+                                                             TermServices services) {
         if(sort == this.sortDependingOn) {
             return this;
         }
 
-        SortDependingFunction n = (SortDependingFunction) services.getNamespaces().lookup(instantiateName(getKind(), sort));
+        SortDependingFunction n =
+                (SortDependingFunction)
+                    services.getNamespaces().lookup(instantiateName(getKind(), sort));
 
-        if (instantiateName(getKind(), sort).toString().contains("String") && instantiateName(getKind(), sort).toString().contains("seqGet")
+        if (instantiateName(getKind(), sort).toString().contains("String")
+                && instantiateName(getKind(), sort).toString().contains("seqGet")
                 && (n == null || sort instanceof GenericSort && n.getSortDependingOn() != sort)) {
             System.out.println();
         }
@@ -162,8 +165,11 @@ public final class SortDependingFunction extends Function {
                 result = new SortDependingFunction(template, sort);
                 synchronized(functions) {
                     functions.add(result);
-                    if (instantiateName(getKind(), sort).toString().contains("String") && instantiateName(getKind(), sort).toString().contains("seqGet")
-                            && (n == null || sort instanceof GenericSort && n.getSortDependingOn() != sort)) {
+                    if (instantiateName(getKind(), sort).toString().contains("String")
+                            && instantiateName(getKind(), sort).toString().contains("seqGet")
+                            && (n == null
+                                || sort instanceof GenericSort
+                                    && n.getSortDependingOn() != sort)) {
                         System.out.println(result.hashCode());
                     }
                 }

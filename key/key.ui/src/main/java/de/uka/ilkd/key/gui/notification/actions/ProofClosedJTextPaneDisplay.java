@@ -67,7 +67,9 @@ public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
             contentPane.setCaretPosition(0);
             contentPane.setBackground(MainWindow.getInstance().getBackground());
             contentPane.setSize(new Dimension(10, 360));
-            contentPane.setPreferredSize(new Dimension(contentPane.getPreferredSize().width + 15, 360));
+            contentPane.setPreferredSize(
+                    new Dimension(contentPane.getPreferredSize().width + 15, 360)
+            );
 
             JScrollPane scrollPane = new JScrollPane(contentPane);
             scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -80,9 +82,8 @@ public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
                 Debug.out("KEY_FONT_PROOF_TREE not available. Use standard font.");
             }
 
-            JOptionPane.showMessageDialog
-                (parentComponent, scrollPane,
-                        "Proof closed", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(parentComponent, scrollPane,
+                                          "Proof closed", JOptionPane.INFORMATION_MESSAGE);
         }
 
         return true;
