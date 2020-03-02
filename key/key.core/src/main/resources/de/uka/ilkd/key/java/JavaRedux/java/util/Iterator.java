@@ -18,14 +18,12 @@ public interface Iterator
    public boolean hasNext();
    
    /*@ public normal_behavior
-     @ ensures \old(index) < seq.length ==> \result == ((Object)seq[\old(index)]);
-     @ ensures \old(index) < seq.length ==> \result != null;
-     @ ensures \old(index) < seq.length ==> index == \old(index) + 1;
-     @ ensures \old(index) == seq.length ==> \result == null;
-     @ ensures \old(index) == seq.length ==> index == \old(index);
+     @ requires index < seq.length;
+     @ ensures \result == ((Object)seq[\old(index)]);
+     @ ensures index == \old(index) + 1;
      @ assignable index;
      @ determines \result \by seq, index;
-     @ determines index \by seq.length, index;
+     @ determines index \by \itself;
      @*/
    public /*@nullable@*/ java.lang.Object next();
    
