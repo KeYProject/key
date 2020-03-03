@@ -29,6 +29,12 @@ public final class ExceptionTools {
      * Tries to resolve the location (i.e., file name, line, and column)
      * from a parsing exception.
      * Result may be null.
+     *
+     * @param exc the Throwable to extract the Location from
+     * @return the Location stored inside the Throwable or null if no such can be found
+     * @throws MalformedURLException if the no URL can be parsed from the String stored
+     *      inside the given Throwable can not be successfully converted to a URL and thus
+     *      no Location can be created
      */
     public static Location getLocation(Throwable exc) throws MalformedURLException {
         assert exc != null;
@@ -43,8 +49,7 @@ public final class ExceptionTools {
                location = new Location(ste.getFileName(), 
                                ste.getLine(), 
                                ste.getColumn());
-            }
-            else if(exc instanceof KeYSemanticException) {
+            } else if(exc instanceof KeYSemanticException) {
                 KeYSemanticException kse = (KeYSemanticException) exc;
              // ANTLR has 0-based column numbers, hence +1.
                 location = new Location(kse.getFilename(), kse.getLine(), kse.getColumn() + 1);
@@ -53,8 +58,7 @@ public final class ExceptionTools {
                 location = new Location(recEx.input.getSourceName(),
                       recEx.line, recEx.charPositionInLine + 1);
             }
-        }
-        else if (exc instanceof ParserException) {
+        } else if (exc instanceof ParserException) {
             location = ((ParserException) exc).getLocation();
         } else if (exc instanceof ParseExceptionInFile) {
             // This kind of exception has a filename but no line/col information

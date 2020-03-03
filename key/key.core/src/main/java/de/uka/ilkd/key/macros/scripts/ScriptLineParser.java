@@ -84,6 +84,11 @@ class ScriptLineParser {
         this.fileURL = null;
     }
 
+    /**
+     * Creates a ScriptLineParser that reads from the given resource.
+     * @param fileURL the resource to read from
+     * @throws IOException if opening an InputStream from the resource fails
+     */
     public ScriptLineParser(URL fileURL) throws IOException {
         this.reader = new BufferedReader(new InputStreamReader(fileURL.openStream()));
         this.fileURL = fileURL;
