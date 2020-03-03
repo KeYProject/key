@@ -2,6 +2,7 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +28,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoFindTaclet;
@@ -98,8 +100,14 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                     .ofNullable(state.getFirstOpenAutomaticGoal()
                             .indexOfTaclets().lookup(p.rulename));
 
-            return maybeApp.orElseThrow(() -> new ScriptException(
+            TacletApp app = maybeApp.orElseThrow(() -> new ScriptException(
                     "Taclet '" + p.rulename + "' not known."));
+
+            if (app.taclet() instanceof FindTaclet) {
+                app = findTacletApp(p, state);
+            }
+
+            return app;
         }
 
         if (maybeTaclet.isPresent()) {
@@ -127,10 +135,12 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             throws ScriptException {
         TacletApp result = theApp;
 
-        final Services services = proof.getServices();
-        final ImmutableList<TacletApp> assumesCandidates = theApp
+        Services services = proof.getServices();
+        ImmutableList<TacletApp> assumesCandidates = theApp
                 .findIfFormulaInstantiations(
                         state.getFirstOpenAutomaticGoal().sequent(), services);
+
+        assumesCandidates = ImmutableList.fromList(filterList(p, assumesCandidates));
 
         if (assumesCandidates.size() != 1) {
             throw new ScriptException("Not a unique \\assumes instantiation");
@@ -372,8 +382,20 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp) {
                 PosTacletApp pta = (PosTacletApp) tacletApp;
-                if (p.on == null || pta.posInOccurrence().subTerm()
-                        .equalsModRenaming(p.on)) {
+                boolean add = p.on == null
+                        || pta.posInOccurrence().subTerm().equalsModRenaming(p.on);
+
+                Iterator<SchemaVariable> it = pta.instantiations().svIterator();
+                while (it.hasNext()) {
+                    SchemaVariable sv = it.next();
+                    Term userInst = p.instantiations.get(sv.name().toString());
+                    Object ptaInst
+                        = pta.instantiations().getInstantiationEntry(sv).getInstantiation();
+
+                    add &= userInst == null || userInst.equalsModIrrelevantTermLabels(ptaInst);
+                }
+
+                if (add) {
                     matchingApps.add(pta);
                 }
             }

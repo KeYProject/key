@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.key_project.util.collection.ImmutableList;
+
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -33,7 +35,13 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         Goal g;
         if (args.number != null && args.formula == null
                 && args.branch == null) {
-            g = state.getProof().openEnabledGoals().take(args.number).head();
+            ImmutableList<Goal> goals = state.getProof().openEnabledGoals();
+
+            if (args.number >= 0) {
+                g = goals.take(args.number).head();
+            } else {
+                g = goals.take(goals.size() + args.number).head();
+            }
         } else if (args.formula != null && args.number == null
                 && args.branch == null) {
             g = findGoalWith(args.formula, state.getProof());
@@ -155,7 +163,10 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         /** A formula defining the goal to select */
         @Option(value = "formula", required = false)
         public Term formula;
-        /** The number of the goal to select, starts with 0 */
+        /**
+         * The number of the goal to select, starts with 0.
+         * Negative indices are also allowed: -1 is the last goal, -2 the second-to-last, etc.
+         */
         @Option(value = "number", required = false)
         public Integer number;
         /** The name of the branch to select */

@@ -16,7 +16,7 @@ package de.uka.ilkd.key.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -25,6 +25,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import recoder.io.DataLocation;
 
@@ -96,10 +97,9 @@ public class ZipFileCollection implements FileCollection {
             if (currentEntry == null) {
                 throw new NoSuchElementException();
             } else if (fileRepo != null) {
-                // build a URL from file and entry and request an InputStream from the FileRepo
-                URL jar = file.toURI().toURL();
-                URL entryUrl = new URL("jar:" + jar + "!/" + currentEntry.getName());
-                return fileRepo.getInputStream(entryUrl);
+                // request an InputStream from the FileRepo
+                URI uri = MiscTools.getZipEntryURI(zipFile, currentEntry.getName());
+                return fileRepo.getInputStream(uri.toURL());
             } else {
                 return openCurrent();       // fallback without FileRepo
             }
@@ -125,7 +125,14 @@ public class ZipFileCollection implements FileCollection {
 
         public DataLocation getCurrentDataLocation() {
             // dont use ArchiveDataLocation this keeps the zip open and keeps reference to it!
-            return new SpecDataLocation("zip", file.getAbsolutePath() + "!" + currentEntry.getName());
+            try {
+                // since we actually return a zip/jar, we use URLDataLocation
+                URI uri = MiscTools.getZipEntryURI(zipFile, currentEntry.getName());
+                return new URLDataLocation(uri.toURL());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return SpecDataLocation.UNKNOWN_LOCATION;       // fallback
         }
     }
     

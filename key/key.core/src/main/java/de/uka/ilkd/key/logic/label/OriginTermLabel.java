@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.logic.label;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -29,6 +30,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * <p> An {@link OriginTermLabel} saves a term's origin in the JML specification
@@ -303,7 +305,7 @@ public class OriginTermLabel implements TermLabel {
         }
 
         SpecType commonSpecType = null;
-        String commonFileName = null;
+        URI commonFileName = null;
         int commonLine = -1;
 
         for (FileOrigin origin : origins) {
@@ -326,7 +328,12 @@ public class OriginTermLabel implements TermLabel {
             }
         }
 
-        return new FileOrigin(commonSpecType, commonFileName, commonLine);
+        if (commonFileName == null) {
+            Debug.out("commonFileName is null!");
+            return new Origin(SpecType.NONE);
+        }
+
+        return new FileOrigin(commonSpecType, commonFileName.getPath(), commonLine);
     }
 
     /**
@@ -686,7 +693,7 @@ public class OriginTermLabel implements TermLabel {
         /**
          * The file the term originates from.
          */
-        public final String fileName;
+        public final URI fileName;
 
         /**
          * The line in the file the term originates from.
@@ -703,17 +710,25 @@ public class OriginTermLabel implements TermLabel {
         public FileOrigin(SpecType specType, String fileName, int line) {
             super(specType);
 
-
             assert fileName != null;
             assert line >= 0;
 
-            this.fileName = fileName;
+            // wrap fileName into URI
+            if (fileName.equals("no file")) {
+                this.fileName = null;
+            } else {
+                this.fileName = new File(fileName).toURI();
+            }
             this.line = line;
         }
 
         @Override
         public String toString() {
-            return specType + " @ file " + new File(fileName).getName() + " @ line " + line;
+            if (fileName == null) {
+                return specType + " @ [no file]";
+            } else {
+                return specType + " @ file " + new File(fileName).getName() + " @ line " + line;
+            }
         }
 
         @Override

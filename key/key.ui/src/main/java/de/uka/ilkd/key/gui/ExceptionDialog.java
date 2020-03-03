@@ -27,12 +27,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Dialog to display error messages.
@@ -163,9 +163,14 @@ public class ExceptionDialog extends JDialog {
         if(loc != null && loc.getFilename() != null && !"".equals(loc.getFilename())
                 && !"no file".equals(loc.getFilename())) {
             try {
-                List<String> lines = Files.readAllLines(
-                        Paths.get(loc.getFilename()), Charset.defaultCharset());
-                String line = lines.get(loc.getLine() - 1);
+                // read the content via URLs openStream() method
+                BufferedReader br = new BufferedReader(new InputStreamReader(
+                        loc.getFileURL().openStream()));
+                List<String> list = br.lines()
+                                      // optimization: read only as far as necessary
+                                      .limit(loc.getLine())
+                                      .collect(Collectors.toList());
+                String line = list.get(loc.getLine() - 1);
                 String pointLine = StringUtil.createLine(" ", loc.getColumn() - 1) + "^";
                 message.append(StringUtil.NEW_LINE).
                     append(StringUtil.NEW_LINE).

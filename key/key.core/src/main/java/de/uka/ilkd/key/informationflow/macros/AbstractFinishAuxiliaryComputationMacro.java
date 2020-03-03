@@ -7,6 +7,9 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -61,6 +64,32 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
             }
         }
         return composedStates;
+    }
+
+    /**
+     * Merge namespaces.
+     *
+     * @param initiatingProof the initiating proof
+     * @param sideProof the side proof
+     */
+    protected final void mergeNamespaces(Proof initiatingProof, Proof sideProof) {
+        NamespaceSet initiatingProofNS = initiatingProof.getServices().getNamespaces();
+        NamespaceSet sideProofNS = sideProof.getServices().getNamespaces();
+
+        mergeNamespace(initiatingProofNS.variables(), sideProofNS.variables());
+        mergeNamespace(initiatingProofNS.programVariables(), sideProofNS.programVariables());
+        mergeNamespace(initiatingProofNS.functions(), sideProofNS.functions());
+        mergeNamespace(initiatingProofNS.ruleSets(), sideProofNS.ruleSets());
+        mergeNamespace(initiatingProofNS.sorts(), sideProofNS.sorts());
+        mergeNamespace(initiatingProofNS.choices(), sideProofNS.choices());
+    }
+
+    private final <E extends Named> void mergeNamespace(Namespace<E> tar, Namespace<E> src) {
+        for (E el : src.allElements()) {
+            if (!tar.contains(el)) {
+                tar.add(el);
+            }
+        }
     }
 
     private static Term[] buildExecution(ProofObligationVars c,

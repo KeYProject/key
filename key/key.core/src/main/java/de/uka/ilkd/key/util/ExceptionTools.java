@@ -75,7 +75,7 @@ public final class ExceptionTools {
                 location = new Location("", token.next.beginLine, token.next.beginColumn);
             }
         } else if (exc instanceof SVInstantiationExceptionWithPosition) {	      
-            location = new Location(null, 
+            location = new Location((String) null,
                             ((SVInstantiationExceptionWithPosition)exc).getRow(),
                             ((SVInstantiationExceptionWithPosition)exc).getColumn());
         } else if (exc instanceof ScriptException) {

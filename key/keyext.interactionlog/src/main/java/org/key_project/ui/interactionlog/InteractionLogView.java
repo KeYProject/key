@@ -12,7 +12,6 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import org.jetbrains.annotations.Nullable;
 import org.key_project.ui.BoundsPopupMenuListener;
 import org.key_project.ui.interactionlog.algo.MUProofScriptExport;
 import org.key_project.ui.interactionlog.algo.MarkdownExport;

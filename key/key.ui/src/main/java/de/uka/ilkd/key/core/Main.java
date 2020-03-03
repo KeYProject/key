@@ -24,7 +24,6 @@ import java.util.Locale;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import de.uka.ilkd.key.logic.sort.GenericSort;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 import org.xml.sax.SAXException;
@@ -194,6 +193,12 @@ public final class Main {
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
 
     public static void main(final String[] args) {
+        // Runtime rt = Runtime.getRuntime();
+        // System.out.println ("Total memory: " + (rt.totalMemory() / 1048576.0) + " MB");
+        // System.out.println ("Maximum memory:   " + (rt.maxMemory() / 1048576.0) + " MB");
+        // System.out.println ("Free memory:  " + (rt.freeMemory() / 1048576.0) + " MB");
+        // System.out.println ("Available processors:  " + rt.availableProcessors());
+
         Locale.setDefault(Locale.US);
 
         // this property overrides the default

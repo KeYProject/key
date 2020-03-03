@@ -1322,7 +1322,7 @@ unaryexpr returns [SLExpression ret=null] throws SLTranslationException
         result = intHelper.buildUnaryMinusExpression(result);
     }
     |
-    (LPAREN typespec RPAREN ) => result = castexpr
+    (LPAREN typespec RPAREN unaryexpr) => result = castexpr
     |
         result=unaryexprnotplusminus
 ;
