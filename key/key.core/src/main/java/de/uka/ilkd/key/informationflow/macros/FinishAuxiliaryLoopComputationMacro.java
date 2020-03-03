@@ -58,12 +58,14 @@ public class FinishAuxiliaryLoopComputationMacro extends
         final InfFlowProof initiatingProof = (InfFlowProof) initiatingGoal.proof();
         final Services services = initiatingProof.getServices();
 
-        final LoopInvariantBuiltInRuleApp loopInvRuleApp = 
+        final LoopInvariantBuiltInRuleApp loopInvRuleApp =
                 (LoopInvariantBuiltInRuleApp) initiatingGoal.node().parent().getAppliedRuleApp();
         LoopSpecification loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
         loopInv = loopInv != null ? loopInv : loopInvRuleApp.getSpec();
         IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
         ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
+
+        mergeNamespaces(initiatingProof, proof);
 
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
@@ -83,11 +85,11 @@ public class FinishAuxiliaryLoopComputationMacro extends
         initiatingProof.getIFSymbols().useProofSymbols();
 
         final ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, initiatingGoal);
-        
+
         // close auxiliary computation proof
         initiatingProof.addSideProof((InfFlowProof) proof);
         proof.dispose();
-        
+
         return info;
     }
 }

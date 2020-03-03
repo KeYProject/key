@@ -45,26 +45,26 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
                     +"It applies simplification rules (including the \"unoptimized\" select rules), "
                     +"One Step Simplification, alpha, and delta rules.";
     }
-    
+
     // note that rules in the 'concrete' rule set are usually not included here
     private static final Set<String> ADMITTED_RULES_SET = asSet(new String[]{
         "selectOfStore",
         "selectOfCreate",
         "selectOfAnon",
         "selectOfMemset",
-        
+
         "selectCreatedOfStore",
         "selectCreatedOfCreate",
         "selectCreatedOfAnon",
         "selectCreatedOfMemset",
-        
+
         "dismissNonSelectedField",
         "dismissNonSelectedFieldEQ",
         "replaceKnownSelect",
         "dropEffectlessStores",
         "memsetEmpty",
         "selectCreatedOfAnonAsFormula",
-        
+
         "wellFormedStoreObject",
         "wellFormedStoreArray",
         "wellFormedStorePrimitive",
@@ -77,14 +77,14 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "wellFormedMemsetObject",
         "wellFormedMemsetLocSet",
         "wellFormedMemsetPrimitive",
-        
-        
+
+
         // EQ versions of the above
         "selectOfStoreEQ",
         "selectOfCreateEQ",
         "selectOfAnonEQ",
         "selectOfMemsetEQ",
-        
+
         "selectCreatedOfStoreEQ",
         "selectCreatedOfCreateEQ",
         "selectCreatedOfAnonEQ",
@@ -102,7 +102,7 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "wellFormedMemsetObjectEQ",
         "wellFormedMemsetLocSetEQ",
         "wellFormedMemsetPrimitiveEQ",
-        
+
         // locset rules
         "elementOfEmpty",
         "elementOfAllLocs",
@@ -110,13 +110,13 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "elementOfUnion",
         "elementOfIntersect",
         "elementOfSetMinus",
-        "elementOfAllFields",            
+        "elementOfAllFields",
         "elementOfAllObjects",
         "elementOfArrayRange",
         "elementOfFreshLocs",
         "elementOfInfiniteUnion",
         "elementOfInfiniteUnion2Vars",
-        
+
         "allFieldsEq",
         "subsetSingletonLeft",
         "subsetSingletonLeftEQ",
@@ -135,7 +135,7 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "disjointWithSingleton1",
         "disjointWithSingleton2",
         "sortsDisjointModuloNull",
-        
+
         "createdInHeapWithSingleton",
         "createdInHeapWithAllFields",
         "createdInHeapWithArrayRange",
@@ -146,19 +146,19 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "createdInHeapWithArrayRangeEQ",
         "createdInHeapWithSelectEQ",
         "createdInHeapWithObserverEQ",
-        
+
         "elementOfEmptyEQ",
         "elementOfAllLocsEQ",
         "elementOfSingletonEQ",
         "elementOfUnionEQ",
         "elementOfIntersectEQ",
         "elementOfSetMinusEQ",
-        "elementOfAllFieldsEQ",            
+        "elementOfAllFieldsEQ",
         "elementOfAllObjectsEQ",
         "elementOfArrayRangeEQ",
         "elementOfFreshLocsEQ",
         "elementOfInfiniteUnion2VarsEQ",
-        
+
         // rules listed under "other lemma"
         "unionEqualsEmpty",
         "unionEqualsEmptyEQ",
@@ -170,16 +170,16 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "unionIntersectItself_4",
         "unionIntersectItself_5",
         "unionIntersectItself_6",
-        
+
         // normalization rules are currently not included
-        
+
         // semantics blasting rules
 //        "equalityToElementOfRight",
 //        "subsetToElementOfRight",
         "disjointDefinition", // TODO: may have own rules in future
         "definitionAllElementsOfArray",
         "definitionAllElementsOfArrayLocsets",
-        
+
         // alpha rules
         "impRight",
         "andLeft",
@@ -191,7 +191,7 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         // TODO: those must be more expensive
 //        "replace_known_left",
 //        "replace_known_right",
-        
+
         // others
         "castDel",
         "nonNull",
@@ -205,7 +205,7 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
     protected Set<String> getAdmittedRuleNames() {
         return ADMITTED_RULES_SET;
     }
-    
+
     @Override
     protected boolean allowOSS () {
         return true;

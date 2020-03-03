@@ -505,7 +505,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         ifContractBuilder.setProofObligationVars(poVars);
 
         Term contractApplPredTerm = ifContractBuilder.buildContractApplPredTerm();
-        Taclet informationFlowContractApp = ifContractBuilder.buildTaclet();
+        Taclet informationFlowContractApp = ifContractBuilder.buildTaclet(goal);
 
         // add term and taclet to post goal
         goal.addFormula(new SequentFormula(contractApplPredTerm),

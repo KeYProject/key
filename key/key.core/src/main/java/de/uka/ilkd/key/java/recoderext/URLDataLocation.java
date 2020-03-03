@@ -71,7 +71,15 @@ public class URLDataLocation implements DataLocation {
     public String getType() {
         return LOCATION_TYPE_FILE;
     }
-    
+
+    /**
+     * Getter for url.
+     * @return the url of this data location
+     */
+    public URL getUrl() {
+        return url;
+    }
+
     public String toString() {
         return getType() + ":" + url;
     }
