@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -690,16 +691,15 @@ public final class JMLTransformer extends RecoderModelTransformer {
                     // fix mu: units carry an artificial file name.
                     // use getOriginalDataLocation instead
                     DataLocation dl = unit.getOriginalDataLocation();
-                    String fileName = dl == null ? "" : dl.toString();
-                    fileName = fileName.replaceFirst("FILE:", "");
+                    String resource = MiscTools.extractURI(dl).toString();
 
-                    transformClasslevelComments(td, fileName);
+                    transformClasslevelComments(td, resource);
 
                     // iterate over all pre-existing constructors
                     for (Constructor aConstructorList : constructorList) {
                         if (aConstructorList instanceof ConstructorDeclaration) {
                             ConstructorDeclaration cd = (ConstructorDeclaration) aConstructorList;
-                            transformMethodlevelComments(cd, fileName);
+                            transformMethodlevelComments(cd, resource);
                         }
                     }
 
@@ -709,7 +709,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                                                                         // be
                                                                         // ImplicitEnumMethod
                             MethodDeclaration md = (MethodDeclaration) aMethodList;
-                            transformMethodlevelComments(md, fileName);
+                            transformMethodlevelComments(md, resource);
                         }
                     }
 

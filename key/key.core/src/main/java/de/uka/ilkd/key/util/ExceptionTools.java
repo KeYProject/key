@@ -16,6 +16,8 @@ import recoder.java.CompilationUnit;
 import recoder.kit.UnitKit;
 import recoder.service.UnresolvedReferenceException;
 
+import java.net.MalformedURLException;
+
 /**
  * Various utility methods related to exceptions.
  * @author bruns
@@ -28,7 +30,7 @@ public final class ExceptionTools {
      * from a parsing exception.
      * Result may be null.
      */
-    public static Location getLocation(Throwable exc) {
+    public static Location getLocation(Throwable exc) throws MalformedURLException {
         assert exc != null;
     
         Location location = null;

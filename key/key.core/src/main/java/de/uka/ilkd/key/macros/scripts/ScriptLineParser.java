@@ -1,9 +1,12 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,9 +46,9 @@ class ScriptLineParser {
     private int pos = 0;
 
     /**
-     * the filename from which the script is taken.
+     * the file URL from which the script is taken.
      */
-    private String file;
+    private URL fileURL;
 
     /**
      * number of characters read so far
@@ -78,12 +81,12 @@ class ScriptLineParser {
 
     public ScriptLineParser(Reader reader) {
         this.reader = reader;
-        this.file = null;
+        this.fileURL = null;
     }
 
-    public ScriptLineParser(String filename) throws IOException {
-        this.reader = new FileReader(filename);
-        this.file = filename;
+    public ScriptLineParser(URL fileURL) throws IOException {
+        this.reader = new BufferedReader(new InputStreamReader(fileURL.openStream()));
+        this.fileURL = fileURL;
     }
 
     public Map<String, String> parseCommand() throws IOException, ScriptException {
@@ -111,7 +114,7 @@ class ScriptLineParser {
             case -1:
                 if(sb.length() > 0 || key != null || !result.isEmpty()) {
                     throw new ScriptException("Trailing characters at end of script (missing ';'?)",
-                            file, line, col);
+                            fileURL, line, col);
                 }
                 return null;
             case '=':
@@ -212,7 +215,7 @@ class ScriptLineParser {
 
     private void exc(int c) throws ScriptException {
         throw new ScriptException("Unexpected char '" + (char)c + "' at " + line + ":" + col,
-                file, line, col);
+                fileURL, line, col);
     }
 
     // TODO make this a testcase
@@ -257,7 +260,7 @@ class ScriptLineParser {
     public void setLocation(Location location) {
         this.line = location.getLine();
         this.col = location.getColumn();
-        this.file = location.getFilename();
+        this.fileURL = location.getFileURL();
     }
 
 }

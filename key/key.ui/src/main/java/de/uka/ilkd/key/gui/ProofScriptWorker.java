@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Observable;
@@ -62,7 +63,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
 
     public ProofScriptWorker(KeYMediator mediator, File file)
             throws IOException {
-        this.initialLocation = new Location(file.getAbsolutePath(), 1, 1);
+        this.initialLocation = new Location(file.toURI().toURL(), 1, 1);
         this.script = new String(Files.readAllBytes(file.toPath()));
         this.mediator = mediator;
         this.initiallySelectedGoal = null;
@@ -111,10 +112,10 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
     }
 
     private void makeDialog() {
-        String file = initialLocation.getFilename();
+        URL url = initialLocation.getFileURL();
 
         if (monitor != null) {
-            logArea.setText("Running script from file '" + file + "':\n");
+            logArea.setText("Running script from URL '" + url + "':\n");
             return;
         }
 
@@ -124,7 +125,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
         logArea = new JTextArea();
         logArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         logArea.setEditable(false);
-        logArea.setText("Running script from file '" + file + "':\n");
+        logArea.setText("Running script from URL '" + url + "':\n");
         cp.add(new JScrollPane(logArea), BorderLayout.CENTER);
 
         JButton cancel = new JButton("Cancel");
