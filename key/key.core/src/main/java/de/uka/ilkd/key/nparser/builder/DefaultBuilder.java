@@ -140,7 +140,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 variables().lookup(name),
                 programVariables().lookup(new ProgramElementName(varfuncName)),
                 functions().lookup(name),
-                AbstractTermTransformer.name2metaop(varfuncName)
+                AbstractTermTransformer.name2metaop(varfuncName),
+
         };
 
         for (var op : operators) {
@@ -150,6 +151,21 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         }
 
         if (sort != null) {
+            Name fqName = new Name(sort.toString() + "::" + varfuncName);
+            operators = new Operator[]{
+                    schemaVariables().lookup(fqName),
+                    variables().lookup(fqName),
+                    programVariables().lookup(new ProgramElementName(fqName.toString())),
+                    functions().lookup(fqName),
+                    AbstractTermTransformer.name2metaop(fqName.toString())
+            };
+
+            for (var op : operators) {
+                if (op != null) {
+                    return op;
+                }
+            }
+
             SortDependingFunction firstInstance
                     = SortDependingFunction.getFirstInstance(new Name(varfuncName),
                     getServices());

@@ -30,7 +30,6 @@ import java.util.*;
 
 public class TacletPBuilder extends ExpressionBuilder {
     private final List<TacletBuilderCommand> conditionBuilder = new LinkedList<>();
-
     private final Stack<TacletBuilder> currentTBuilder = new Stack<>();
     private HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new HashMap<>();
     private boolean axiomMode;
