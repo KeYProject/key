@@ -152,69 +152,69 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
    }
 
     @Override
-   public void taskFinished(TaskFinishedInfo info) {
-       super.taskFinished(info);
-       progressMax = 0; // reset progress bar marker
-       final Proof proof = info.getProof();
-       if (proof==null) {
-           if (verbosity > Verbosity.SILENT) {
-               System.out.println("Proof loading failed");
-               final Object error = info.getResult();
-               if (error instanceof Throwable) {
-                   ((Throwable) error).printStackTrace();
-               }
-           }
-           System.exit(1);
-       }
-       final int openGoals = proof.openGoals().size();
-       final Object result2 = info.getResult();
-       if (info.getSource() instanceof ProverCore ||
-           info.getSource() instanceof ProofMacro) {
-           if (!isAtLeastOneMacroRunning()) {
-               printResults(openGoals, info, result2);
-           }
-       } else if (info.getSource() instanceof ProblemLoader) {
-           if (verbosity > Verbosity.SILENT) {
-            System.out.println("[ DONE ... loading ]");
+    public void taskFinished(TaskFinishedInfo info) {
+        super.taskFinished(info);
+        progressMax = 0; // reset progress bar marker
+        final Proof proof = info.getProof();
+        if (proof == null) {
+            if (verbosity > Verbosity.SILENT) {
+                System.out.println("Proof loading failed");
+                final Object error = info.getResult();
+                if (error instanceof Throwable) {
+                    ((Throwable) error).printStackTrace();
+                }
+            }
+            System.exit(1);
         }
-           if (result2 != null) {
-               if (verbosity > Verbosity.SILENT) {
-                System.out.println(result2);
+        final int openGoals = proof.openGoals().size();
+        final Object result2 = info.getResult();
+        if (info.getSource() instanceof ProverCore
+                || info.getSource() instanceof ProofMacro) {
+            if (!isAtLeastOneMacroRunning()) {
+                printResults(openGoals, info, result2);
             }
-               if (verbosity >= Verbosity.HIGH && result2 instanceof Throwable) {
-                   ((Throwable) result2).printStackTrace();
-               }
-               System.exit(-1);
-           }
-           if(loadOnly ||  openGoals==0) {
-               if (verbosity > Verbosity.SILENT) {
-                System.out.println("Number of open goals after loading: " +
-                           openGoals);
+        } else if (info.getSource() instanceof ProblemLoader) {
+            if (verbosity > Verbosity.SILENT) {
+                System.out.println("[ DONE ... loading ]");
             }
-               System.exit(0);
-           }
-           ProblemLoader problemLoader = (ProblemLoader) info.getSource();
-           if(problemLoader.hasProofScript()) {
-               try {
-                   Pair<String, Location> script = problemLoader.readProofScript();
-                   ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
-                   this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
-                   pse.execute(this, proof);
-                   // The start and end messages are fake to persuade the system ...
-                   // All this here should refactored anyway ...
-                   this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
-               } catch (Exception e) {
-                   // TODO
-                   e.printStackTrace();
-                   System.exit(-1);
-               }
-           } else if (macroChosen()) {
-               applyMacro();
-           } else {
-               finish(proof);
-           }
-       }
-   }
+            if (result2 != null) {
+                if (verbosity > Verbosity.SILENT) {
+                    System.out.println(result2);
+                }
+                if (verbosity >= Verbosity.HIGH && result2 instanceof Throwable) {
+                    ((Throwable) result2).printStackTrace();
+                }
+                System.exit(-1);
+            }
+            if (loadOnly ||  openGoals == 0) {
+                if (verbosity > Verbosity.SILENT) {
+                    System.out.println("Number of open goals after loading: " + openGoals);
+                }
+                System.exit(0);
+            }
+            ProblemLoader problemLoader = (ProblemLoader) info.getSource();
+            if (problemLoader.hasProofScript()) {
+                try {
+                    Pair<String, Location> script = problemLoader.readProofScript();
+                    ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+                    this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro,
+                                                                "Script started", 0));
+                    pse.execute(this, proof);
+                    // The start and end messages are fake to persuade the system ...
+                    // All this here should refactored anyway ...
+                    this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
+                } catch (Exception e) {
+                    // TODO
+                    e.printStackTrace();
+                    System.exit(-1);
+                }
+            } else if (macroChosen()) {
+                applyMacro();
+            } else {
+                finish(proof);
+            }
+        }
+    }
 
     @Override
     public void taskStarted(TaskStartedInfo info) {
@@ -433,61 +433,59 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
       // Nothing to do
    }
 
-   public static boolean saveProof(Object result, Proof proof,
-         File keyProblemFile) {
+    /**
+     * Save proof.
+     *
+     * @param result the result
+     * @param proof the proof
+     * @param keyProblemFile the key problem file
+     * @return true, if successful
+     */
+    public static boolean saveProof(Object result, Proof proof,
+                                    File keyProblemFile) {
+        if (result instanceof Throwable) {
+            throw new Error("Error in batchmode.", (Throwable) result);
+        }
 
-      if (result instanceof Throwable) {
-         throw new Error("Error in batchmode.", (Throwable) result);
-      }
+        // Save the proof before exit.
+        String baseName = keyProblemFile.getAbsolutePath();
+        int idx = baseName.indexOf(".key");
+        if (idx == -1) {
+            idx = baseName.indexOf(".proof");
+        }
+        baseName = baseName.substring(0, idx == -1 ? baseName.length() : idx);
 
-      // Save the proof before exit.
+        File f;
+        int counter = 0;
+        do {
+            f = new File(baseName + ".auto." + counter + ".proof");
+            counter++;
+        } while (f.exists());
 
-      String baseName = keyProblemFile.getAbsolutePath();
-      int idx = baseName.indexOf(".key");
-      if (idx == -1) {
-         idx = baseName.indexOf(".proof");
-      }
-      baseName = baseName.substring(0, idx == -1 ? baseName.length() : idx);
+        try {
+            // a copy with running number to compare different runs
+            proof.saveToFile(new File(f.getAbsolutePath()));
+            // save current proof under common name as well
+            proof.saveToFile(new File(baseName + ".auto.proof"));
 
-      File f;
-      int counter = 0;
-      do {
-
-         f = new File(baseName + ".auto." + counter + ".proof");
-         counter++;
-      }
-      while (f.exists());
-
-      try {
-         // a copy with running number to compare different runs
-         proof.saveToFile(new File(f.getAbsolutePath()));
-         // save current proof under common name as well
-         proof.saveToFile(new File(baseName + ".auto.proof"));
-
-         // save proof statistics
-         ShowProofStatistics.getCSVStatisticsMessage(proof);
-         File file = new File(MiscTools.toValidFileName(proof.name().toString()) + ".csv");
-         try(BufferedWriter writer = new BufferedWriter(
-                     new OutputStreamWriter(new FileOutputStream(file)));) {
-             writer.write(ShowProofStatistics.getCSVStatisticsMessage(proof));
-         } catch (IOException e) {
-             e.printStackTrace();
-             assert false;
-         }
-      }
-      catch (IOException e) {
-         e.printStackTrace();
-      }
-
-      if (proof.openGoals().size() == 0) {
-         // Says that all Proofs have succeeded
-         return true;
-      }
-      else {
-         // Says that there is at least one open Proof
-         return false;
-      }
-   }
+            // save proof statistics
+            ShowProofStatistics.getCSVStatisticsMessage(proof);
+            File file = new File(MiscTools.toValidFileName(proof.name().toString()) + ".csv");
+            try (BufferedWriter writer =
+                    new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+                    ) {
+                writer.write(ShowProofStatistics.getCSVStatisticsMessage(proof));
+            } catch (IOException e) {
+                e.printStackTrace();
+                assert false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // Says true if all Proofs have succeeded,
+        // or false if there is at least one open Proof
+        return proof.openGoals().size() == 0;
+    }
 
    @Override
    public TermLabelVisibilityManager getTermLabelVisibilityManager() {
