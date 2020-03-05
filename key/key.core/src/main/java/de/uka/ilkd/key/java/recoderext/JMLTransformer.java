@@ -691,7 +691,11 @@ public final class JMLTransformer extends RecoderModelTransformer {
                     // fix mu: units carry an artificial file name.
                     // use getOriginalDataLocation instead
                     DataLocation dl = unit.getOriginalDataLocation();
-                    String resource = dl == null ? "" : MiscTools.extractURI(dl).toString();
+                    /* If the DataLocation is not set, we set an invalid URL string.
+                     * This may cause a MalformedURLException later if a parsing error occurs,
+                     * but at least show the error message of the parser. */
+                    String resource = dl == null ? "UNKNOWN:unknown"
+                            : MiscTools.extractURI(dl).toString();
 
                     transformClasslevelComments(td, resource);
 
