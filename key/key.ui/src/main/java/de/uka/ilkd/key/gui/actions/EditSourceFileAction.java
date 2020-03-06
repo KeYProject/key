@@ -8,7 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -21,12 +24,11 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 
-import org.key_project.util.java.IOUtil;
-
 import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.ExceptionTools;
+import org.key_project.util.java.IOUtil;
 
 /**
  * Used by {@link ExceptionDialog} to open the source file containing an error
@@ -36,6 +38,11 @@ import de.uka.ilkd.key.util.ExceptionTools;
  */
 public class EditSourceFileAction extends AbstractAction {
     private static final long serialVersionUID = -2540941448174197032L;
+
+    /** tooltip of save buttons and textarea if the file is not writeable
+     * (e.g. inside a zip archive) */
+    private static final String READONLY_TOOLTIP = "The resource is readonly, " +
+            "probably the URL points into a zip/jar archive!";
 
     /** The parent dialog. */
     private final ExceptionDialog parent;
@@ -74,17 +81,6 @@ public class EditSourceFileAction extends AbstractAction {
         textArea.setCaretPosition(i);
     }
 
-    /**
-     * Checks if is valid location.
-     *
-     * @param location the location
-     * @return true, if is valid location
-     */
-    public static boolean isValidLocation(final Location location) {
-        return !(location == null || location.getFilename() == null
-                || location.getFilename().length() == 0);
-    }
-
     private static JScrollPane createParserMessageScrollPane(final Throwable exception,
                                                              final int columnNumber) {
         JTextArea parserMessage = new JTextArea();
@@ -107,9 +103,7 @@ public class EditSourceFileAction extends AbstractAction {
     }
 
     private static JTextArea createTextArea(final Location location,
-                                            final File sourceFile,
-                                            final String source,
-                                            final int columnNumber) {
+                                            final int columnNumber) throws IOException {
         final JTextArea textArea = new JTextArea(30, columnNumber) {
             private static final long serialVersionUID = 1L;
 
@@ -120,17 +114,33 @@ public class EditSourceFileAction extends AbstractAction {
                 textAreaGoto(this, location.getLine(), location.getColumn());
             }
         };
+        // read the content via URLs openStream() method
+        String source = IOUtil.readFrom(location.getFileURL().openStream());
+
         textArea.setText(source);
         textArea.setFont(ExceptionDialog.MESSAGE_FONT);
         textArea.setLineWrap(false);
-        textArea.setBorder(new TitledBorder(sourceFile.getName()));
+        textArea.setBorder(new TitledBorder(location.getFileURL().toString()));
         return textArea;
     }
 
 
-    private JPanel createButtonPanel(final File sourceFile,
-                                     final JDialog dialog,
-                                     final String text) {
+    private static File tryGetFile(URL sourceURL) {
+        File sourceFile = null;
+        if (sourceURL != null && sourceURL.getProtocol().equals("file")) {
+            try {
+                sourceFile = Paths.get(sourceURL.toURI()).toFile();
+            } catch (URISyntaxException e) {
+                // TODO: error reporting
+                e.printStackTrace();
+            }
+        }
+        return sourceFile;
+    }
+
+    private JPanel createButtonPanel(final URL sourceURL,
+                                     final JTextArea textArea,
+                                     final JDialog dialog) {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
         JButton saveButton = new JButton("Save");
@@ -142,29 +152,42 @@ public class EditSourceFileAction extends AbstractAction {
                 dialog.dispose();
             }
         };
-        ActionListener saveAction = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                try {
-                    Files.write(sourceFile.toPath(), text.getBytes());
-                } catch (IOException ioe) {
-                    String message = "Cannot write to file:\n" + ioe.getMessage();
-                    JOptionPane.showMessageDialog(parent, message);
-                }
-            }
-        };
-        ActionListener reloadAction = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                parent.setVisible(false);
-                MainWindow.getInstance().loadProblem(sourceFile);
-            }
-        };
         cancelButton.addActionListener(closeAction);
-        saveButton.addActionListener(saveAction);
-        reloadButton.addActionListener(saveAction);
-        reloadButton.addActionListener(closeAction);
-        reloadButton.addActionListener(reloadAction);
+
+        final File sourceFile = tryGetFile(sourceURL);
+        if (sourceFile == null) {
+            // make content read-only and show tooltips
+            saveButton.setEnabled(false);
+            reloadButton.setEnabled(false);
+            textArea.setEditable(false);
+            saveButton.setToolTipText(READONLY_TOOLTIP);
+            reloadButton.setToolTipText(READONLY_TOOLTIP);
+            textArea.setToolTipText(READONLY_TOOLTIP);
+        } else {
+            ActionListener saveAction = new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    try {
+                        Files.write(sourceFile.toPath(), textArea.getText().getBytes());
+                    } catch (IOException ioe) {
+                        String message = "Cannot write to file:\n" + ioe.getMessage();
+                        JOptionPane.showMessageDialog(parent, message);
+                    }
+                }
+            };
+            ActionListener reloadAction = new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    parent.setVisible(false);
+                    MainWindow.getInstance().loadProblem(sourceFile);
+                }
+            };
+            saveButton.addActionListener(saveAction);
+            reloadButton.addActionListener(saveAction);
+            reloadButton.addActionListener(closeAction);
+            reloadButton.addActionListener(reloadAction);
+        }
+
         buttonPanel.add(saveButton);
         buttonPanel.add(cancelButton);
         buttonPanel.add(reloadButton);
@@ -175,17 +198,19 @@ public class EditSourceFileAction extends AbstractAction {
     public void actionPerformed(ActionEvent arg0) {
         try {
             final Location location = ExceptionTools.getLocation(exception);
-            if (!isValidLocation(location)) {
+            if (!Location.isValidLocation(location)) {
                 throw new IOException("Cannot recover file location from exception.");
             }
 
-            String fileName = location.getFilename();
-            final File sourceFile = new File(fileName);
-            String source = IOUtil.readFrom(sourceFile);
-
-            final JDialog dialog =
-                    new JDialog(parent, "Edit " + sourceFile.getName(),
-                            Dialog.ModalityType.DOCUMENT_MODAL);
+            // indicate edit/readonly in dialog title
+            String prefix;
+            if (tryGetFile(location.getFileURL()) != null) {
+                prefix = "Edit ";
+            } else {
+                prefix = "[Readonly] ";
+            }
+            final JDialog dialog = new JDialog(parent, prefix + location.getFileURL(),
+                    Dialog.ModalityType.DOCUMENT_MODAL);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
             final int columnNumber = 75;
@@ -193,16 +218,14 @@ public class EditSourceFileAction extends AbstractAction {
             final JScrollPane parserMessageScrollPane =
                     createParserMessageScrollPane(exception, columnNumber);
 
-            final JTextArea textArea =
-                    createTextArea(location, sourceFile, source, columnNumber);
-            final String text = textArea.getText();
+            final JTextArea textArea = createTextArea(location, columnNumber);
             JScrollPane textAreaScrollPane = new JScrollPane(textArea);
             textAreaScrollPane
             .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
             textAreaScrollPane
             .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-            JPanel buttonPanel = createButtonPanel(sourceFile, dialog, text);
+            JPanel buttonPanel = createButtonPanel(location.getFileURL(), textArea, dialog);
 
             Container container = dialog.getContentPane();
             //container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
