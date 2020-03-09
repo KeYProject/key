@@ -1,5 +1,5 @@
 <table>
-    <thead>
+    <thead class="tableHead">
     <tr>
         <th>Proof</th>
         <th></th>
@@ -7,6 +7,6 @@
     </tr>
     </thead>
     <tbody>
-        $graph.nodes.keys:{node | $dep(node=node)$}$
+        $graph.nodes:{node | $dep(node=node)$}$
     </tbody>
 </table>

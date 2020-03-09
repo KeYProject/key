@@ -1,103 +1,20 @@
 <head>
-<style type="text/css">
-body, html {
-    margin: 0;
-    font-family: Arial;
-}
-
-.tab {
-    overflow: hidden;
-    background-color: #f1f1f1;
-}
-
-.tab button {
-    background-color: inherit;
-    float: left;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 14px 16px;
-    transition: 0.3s;
-    font-size: 20px;
-}
-
-.tab button:hover {
-    background-color: #ddd;
-}
-
-.tab button.active {
-    background-color: #ccc
-}
-
-.tabcontent {
-    display: none;
-    padding: 6px 12px;
-
-}
-
-ul, #fileTree {
-	list-style-type: none;
-}
-
-#fileTree {
-	margin: 0;
-	padding: 0;
-}
-
-.caret {
-	cursor: pointer;
-	user-select: none;
-}
-
-.caret::before {
-	content: "\25B6";
-	color: black;
-	display: inline-block;
-	margin-right: 6px;
-}
-
-.caret-down::before {
-	transform: rotate(90deg);
-}
-
-.nested {
-	display: none;
-}
-
-.active {
-	display: block;
-}
-
-table {
-    border-collapse: separate;
-    border-spacing: 15px 15px;
-}
-
-tr:hover {
-    background-color:#f5f5f5;
-}
-
-td, th {
-    vertical-align: top;
-    text-align: left;
-}
-
-</style>
+    <style type="text/css">
+        $style()$
+    </style>
 </head>
 
 <body>
 
 <div class="tab">
-    <button class="tablinks" onclick="openTab(event, 'overview')" id="defaultOpen">overview</button>
-    <button class="tablinks" onclick="openTab(event, 'files')">files</button>
-	<button class="tablinks" onclick="openTab(event, 'contracts')">contracts</button>
-	<button class="tablinks" onclick="openTab(event, 'dependencies')">dependencies</button>
+    <button class="tablinks" onclick="openTab(event, 'overview')" id="defaultOpen">Overview</button>
+    <button class="tablinks" onclick="openTab(event, 'files')">Files</button>
+	<button class="tablinks" onclick="openTab(event, 'contracts')">Contracts</button>
+	<button class="tablinks" onclick="openTab(event, 'dependencies')">Dependencies</button>
 </div>
 
 <div id="overview" class="tabcontent">
-	<h3>Overview:</h3>
-	<!-- TODO -->
-    $/overview/overview(tree=treeRoot)$
+    $/overview/overview(cd=checkerData, dataView=dataView)$
 </div>
 
 <div id="files" class="tabcontent">
@@ -107,7 +24,7 @@ td, th {
 
 <div id="contracts" class="tabcontent">
     <h3>Contracts found inside proof bundle:</h3>
-    $/lines/lines(contracts=lines)$
+    $/lines/lines(dataView=dataView, contracts=lines)$
 </div>
 
 <div id="dependencies" class="tabcontent">

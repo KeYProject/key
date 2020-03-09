@@ -79,11 +79,15 @@ public class Report {
 
         PathNode fileTree = dataView.getFileTree();
 
+        st.add("checkerData", dataView.getCheckerData());
         st.add("bundleFileName", fileTree == null ? null : fileTree.content);
         st.add("treeRoot", fileTree);
+        st.add("dataView", dataView);
         st.add("lines", dataView.getProofLines());
         st.add("graph", dataView.getDependencyGraph());
 
+        dataView.getCheckerData().print("All checks completed!");
+        dataView.getCheckerData().print("Generating html report ...");
         String output = st.render();
         printToOutputFile(output);
 

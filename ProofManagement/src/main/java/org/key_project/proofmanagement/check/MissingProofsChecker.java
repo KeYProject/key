@@ -30,16 +30,14 @@ import java.util.stream.Collectors;
  */
 public class MissingProofsChecker implements Checker {
 
-    private ProofBundleHandler pbh;
-
     @Override
     public CheckerData check(List<Path> proofFiles, CheckerData data) {
-
+        data.addCheck("missing");
         try {
             // TODO: implement case with no proof file
 
             // load all contracts from source files
-            pbh = data.getPbh();
+            ProofBundleHandler pbh = data.getPbh();
             Path base = pbh.getDir();
             File src = base.resolve(Paths.get("src")).toFile();
             List<File> cp = null;
@@ -81,7 +79,7 @@ public class MissingProofsChecker implements Checker {
                     System.err.println("Missing contract for proof: " + p.name());
                     // TODO: should not happen
                 } else {
-                    //System.out.println("Contract found for proof: " + p.name());
+                    //data.print("Contract found for proof: " + p.name());
 
                     // search for matching contract and delete it (this contract has a proof)
                     Contract rem = null;
@@ -114,7 +112,7 @@ public class MissingProofsChecker implements Checker {
             for (Contract c : copy) {
                 // TODO: currently contracts from inside java.* package are filtered/ignored
                 if (!c.getName().startsWith("java.")) {
-                    System.out.println("Error! Missing proof for contract " + c.getName());
+                    data.print("Error! Missing proof for contract " + c.getName());
                     data.setConsistent(false); // at least one contract is left unproven!
                 }
             }

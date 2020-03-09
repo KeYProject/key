@@ -51,9 +51,7 @@ public class DependencyGraph {
      * @param node the DependencyNode to add
      */
     public void addNode(DependencyNode node) {
-        if (nodes.contains(node)) {
-            System.out.println("Dependency node already present: " + node);
-        } else {
+        if (!nodes.contains(node)) {
             nodes.add(node);
             // adding a node directly invalidates the strongly connected components,
             // since now two SCCs may be connected

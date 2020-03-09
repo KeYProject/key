@@ -12,7 +12,8 @@ import java.util.stream.Stream;
 import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.util.java.IOUtil;
 
-
+// TODO: this class should better use URLs and ZipFileSystem instead of extracting the zip to a
+//  temporary directory and using Paths
 /**
  * This class serves as an extractor to get the paths of specific files inside a proof bundle
  * (a zip containing possibly multiple *.proof/*.key files and corresponding source/classpath
@@ -48,6 +49,14 @@ public class ProofBundleHandler {
      */
     private static final PathMatcher BOOTCLASSPATH_MATCHER =
             FileSystems.getDefault().getPathMatcher("glob:**.java");
+
+    public Path getZipPath() {
+        return zipPath;
+    }
+
+    public Path zipName() {
+        return zipPath.getFileName();
+    }
 
     private Path zipPath;
     private boolean isInitialized = false;

@@ -89,8 +89,6 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        System.out.println("Proof management is running ...");
-
         try {
             CommandLine cl = setUpCL();
             cl.parse(args);

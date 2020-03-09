@@ -21,8 +21,10 @@ public class ReplayChecker implements Checker {
 
     @Override
     public CheckerData check(List<Path> proofFiles, CheckerData data) {
+        data.addCheck("replay");
+        data.print("Running replay checker ...");
 
-        // TODO: iterate
+        // TODO: proofFiles parameter ignored?
         for (CheckerData.ProofLine line : data.getProofLines()) {
 
             Proof proof = line.proof;
@@ -35,9 +37,8 @@ public class ReplayChecker implements Checker {
                     // store result in CheckerData
                     line.replayResult = replayProof(proof, envInput, problemInitializer);
                 } catch (ProofInputException e) {
-                    e.printStackTrace();
-                } catch (ProblemLoaderException e) {
-                    e.printStackTrace();
+                    data.print("Error: Could not replay proof from " + envInput
+                            + System.lineSeparator() + e.toString());
                 }
             }
         }
@@ -45,7 +46,7 @@ public class ReplayChecker implements Checker {
         return data;
     }
 
-    private AbstractProblemLoader.ReplayResult replayProof(Proof proof, EnvInput envInput, ProblemInitializer problemInitializer) throws ProofInputException, ProblemLoaderException {
+    private AbstractProblemLoader.ReplayResult replayProof(Proof proof, EnvInput envInput, ProblemInitializer problemInitializer) throws ProofInputException {
         String status = "";
         List<Throwable> errors = new LinkedList<>();
         Node lastTouchedNode = proof.root();
@@ -87,12 +88,12 @@ public class ReplayChecker implements Checker {
 
             lastTouchedNode = replayResult.getLastSelectedGoal() != null ? replayResult.getLastSelectedGoal().node() : proof.root();
 
-        } catch (Exception e) {
+        /*} catch (Exception e) {
             if (parserResult == null || parserResult.getErrors() == null || parserResult.getErrors().isEmpty() ||
                 replayer == null || replayResult == null || replayResult.getErrors() == null || replayResult.getErrors().isEmpty()) {
                 // this exception was something unexpected
                 errors.add(e);
-            }
+            }*/
         } finally {
             if (parserResult != null) {
                 status = parserResult.getStatus();
@@ -103,8 +104,7 @@ public class ReplayChecker implements Checker {
                 errors.addAll(replayResult.getErrors());
             }
 
-            StrategyProperties newProps =
-                proof.getSettings().getStrategySettings()
+            StrategyProperties newProps = proof.getSettings().getStrategySettings()
                     .getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
                 ossStatus);

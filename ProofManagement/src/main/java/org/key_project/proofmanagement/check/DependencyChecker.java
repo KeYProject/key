@@ -39,6 +39,9 @@ public class DependencyChecker implements Checker {
 
     @Override
     public CheckerData check(List<Path> proofFiles, CheckerData data) {
+        data.addCheck("dependency");
+        data.print("Running dependency checker ...");
+
         List<Pair<String, BranchNodeIntermediate>> contractProofPairs = new ArrayList<>();
         try {
             // for each proof: parse and construct intermediate AST
@@ -68,10 +71,8 @@ public class DependencyChecker implements Checker {
                 //  and how can they be extracted?
                 data.setConsistent(false);
             }
-        } catch (IOException e) {
-            // TODO:
-        } catch (ProofInputException e) {
-            // TODO:
+        } catch (IOException | ProofInputException e) {
+            data.print("Error: Could not load proof! " + System.lineSeparator() + e.toString());
         }
         return data;
     }
@@ -84,7 +85,7 @@ public class DependencyChecker implements Checker {
      * @throws IOException
      * @throws ProofInputException
      */
-    public Pair<String, BranchNodeIntermediate> loadProof(Path path, CheckerData.ProofLine line) throws IOException, ProofInputException {
+    public Pair<String, BranchNodeIntermediate> loadProof(Path path, CheckerData.ProofLine line) throws ProofInputException, IOException {
         Profile profile = AbstractProfile.getDefaultProfile();
 
         FileRepo fileRepo = new TrivialFileRepo();

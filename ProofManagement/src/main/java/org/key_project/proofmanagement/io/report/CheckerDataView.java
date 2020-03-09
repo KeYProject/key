@@ -5,6 +5,8 @@ import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class CheckerDataView {
     final CheckerData cd;
@@ -23,5 +25,17 @@ public class CheckerDataView {
 
     public DependencyGraph getDependencyGraph() {           // TODO: filter
         return cd.getDependencyGraph();
+    }
+
+    public Map<String, String> checks() {
+        return cd.getChecks();
+    }
+
+    public CheckerData getCheckerData() {
+        return cd;
+    }
+
+    public String lineSeparator() {
+        return System.lineSeparator();
     }
 }

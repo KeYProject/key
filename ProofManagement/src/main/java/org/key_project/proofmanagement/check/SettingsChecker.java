@@ -34,6 +34,8 @@ public class SettingsChecker implements Checker {
     //TODO: Consistency Checker should work on a higher abstraction level and not handle files, do file handling separately (we'll also need to reuse that)
     @Override
     public CheckerData check(List<Path> proofFiles, CheckerData data) {
+        data.addCheck("settings");
+        data.print("Running settings checker ...");
 
         List<KeYUserProblemFile> problemFiles = new ArrayList<>();
 
@@ -49,7 +51,8 @@ public class SettingsChecker implements Checker {
             try {
                 proofSettings.add(f.readPreferences());
             } catch (ProofInputException e) {
-                e.printStackTrace();
+                data.print("Error: Proof settings could not be read from " + f
+                        + System.lineSeparator() + e.toString());
             }
         }
 
