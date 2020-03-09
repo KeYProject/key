@@ -14,8 +14,6 @@ import de.uka.ilkd.key.util.Pair;
 public abstract class DependencyGraphBuilder {
 
     public static DependencyGraph buildGraph(SpecificationRepository specRepo, List<Pair<String, BranchNodeIntermediate>> contractProofPairs) {
-        // create contract map to look up contracts from their strings
-        //ContractMap contractMap = new ContractMap(specRepo);
 
         // create empty graph
         DependencyGraph graph = new DependencyGraph();
@@ -29,7 +27,7 @@ public abstract class DependencyGraphBuilder {
             Contract contract = specRepo.getContractByName(c);
 
             // create fresh node for current contract
-            DependencyNode node = new DependencyNode(contract, specRepo);
+            DependencyNode node = new DependencyNode(contract);
             // add node to graph
             dependencyNodes.put(c, node);
             // and the node map for later reference
@@ -55,7 +53,7 @@ public abstract class DependencyGraphBuilder {
                 //  are collected as well)?
                 if (dependentNode == null) {
                     Contract contract = specRepo.getContractByName(currentDependent.first);
-                    dependentNode = new DependencyNode(contract, specRepo);
+                    dependentNode = new DependencyNode(contract);
                     graph.addNode(dependentNode);
                 }
 

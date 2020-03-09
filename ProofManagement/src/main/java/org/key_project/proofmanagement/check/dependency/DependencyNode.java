@@ -9,8 +9,6 @@ import java.util.Map;
 
 public class DependencyNode {
 
-    private SpecificationRepository specRepo;
-
     private Contract contract;
 
     /**
@@ -46,9 +44,8 @@ public class DependencyNode {
     //private Set<FunctionalOperationContract> modalityClashes = new HashSet<>();
     //private Set<List<Contract>> illegalCycles = new HashSet<>();
 
-    public DependencyNode(Contract contract, SpecificationRepository specRepo) {
+    public DependencyNode(Contract contract) {
         this.contract = contract;
-        this.specRepo = specRepo;
     }
 
     public void addDependency(DependencyNode dependentNode, Modality modality) {
