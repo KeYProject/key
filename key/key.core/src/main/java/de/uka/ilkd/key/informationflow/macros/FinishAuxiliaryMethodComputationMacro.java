@@ -59,6 +59,8 @@ public class FinishAuxiliaryMethodComputationMacro
         final IFProofObligationVars ifVars = ifPO.getIFVars().labelHeapAtPreAsAnonHeapFunc();
         final InformationFlowContract ifContract = ifPO.getContract();
 
+        mergeNamespaces(initiatingProof, proof);
+
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final MethodInfFlowUnfoldTacletBuilder tacletBuilder =
@@ -73,13 +75,13 @@ public class FinishAuxiliaryMethodComputationMacro
         addContractApplicationTaclets(initiatingGoal, proof);
         initiatingProof.unionIFSymbols(((InfFlowProof) proof).getIFSymbols());
         initiatingProof.getIFSymbols().useProofSymbols();
-        
+
         final ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, initiatingGoal);
-        
+
         // close auxiliary computation proof
         initiatingProof.addSideProof((InfFlowProof) proof);
         proof.dispose();
-        
-        return info; 
+
+        return info;
     }
 }

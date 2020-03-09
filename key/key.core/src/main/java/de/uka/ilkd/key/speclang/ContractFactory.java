@@ -291,6 +291,7 @@ public class ContractFactory {
             KeYJavaType specifiedIn,
             Modality modality,
             Term requires,
+            Term requiresFree,
             Term measuredBy,
             Term modifies,
             boolean hasMod,
@@ -307,7 +308,7 @@ public class ContractFactory {
         final Term exc = progVars.excVar != null ? tb.var(progVars.excVar) : null;
         return new InformationFlowContractImpl(
                 INFORMATION_FLOW_CONTRACT_BASENAME, forClass, pm, specifiedIn,
-                modality, requires, measuredBy, modifies, hasMod, self, params,
+                modality, requires, requiresFree, measuredBy, modifies, hasMod, self, params,
                 result, exc, atPre, accessible, infFlowSpecs, toBeSaved);
     }
 

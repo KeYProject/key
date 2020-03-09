@@ -2,14 +2,12 @@ package de.uka.ilkd.key.logic.label;
 
 import java.io.File;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -32,6 +30,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * <p> An {@link OriginTermLabel} saves a term's origin in the JML specification
@@ -725,7 +724,11 @@ public class OriginTermLabel implements TermLabel {
 
         @Override
         public String toString() {
-            return specType + " @ file " + new File(fileName).getName() + " @ line " + line;
+            if (fileName == null) {
+                return specType + " @ [no file]";
+            } else {
+                return specType + " @ file " + new File(fileName).getName() + " @ line " + line;
+            }
         }
 
         @Override

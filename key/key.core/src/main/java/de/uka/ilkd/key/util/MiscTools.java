@@ -15,14 +15,8 @@ package de.uka.ilkd.key.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -706,7 +700,7 @@ public final class MiscTools {
     /**
      * Tries to extract a valid URI from the given DataLocation.
      * @param loc the given DataLocation
-     * @return an URI identifying the resource of the DataLocation or null if loc is null
+     * @return an URI identifying the resource of the DataLocation
      */
     public static URI extractURI(DataLocation loc) {
         if (loc == null) {
@@ -746,6 +740,14 @@ public final class MiscTools {
     /**
      * Creates a URI (that contains a URL) pointing to the entry with the given name inside
      * the given zip file.
+     * <br><br>
+     * <b>Note:</b> There is an unresolved bug in Java for JarURLs when the jar path
+     * contains a directory ending with "!"
+     * ("!" should be encoded as "%21", but is not).
+     * In this case, the program will crash if trying to open a resource from the url.
+     * This will not be fixed until {@link java.net.URI} supports RFC 3986
+     * (currently, as of 02-2020, it seems like there are no plans for this).<br>
+     * <b>Workaround:</b> Don't use directory names ending with "!".
      * @param zipFile the given zip
      * @param entryName the entry path relative to the root of the zip
      * @return a zip/jar URI to the entry inside the zip
@@ -754,39 +756,30 @@ public final class MiscTools {
     public static URI getZipEntryURI(ZipFile zipFile, String entryName) throws IOException {
 
         Path zipPath = Paths.get(zipFile.getName());
-        // construct URI with correct escaping
-        try (FileSystem fs = FileSystems.newFileSystem(zipPath, null)) {
-            Path p = fs.getPath(entryName);
-            URI uri = p.toUri();
 
-            // TODO: Delete these lines when migrating to newer Java version!
-            // These lines are needed since there is a bug in Java (up to Java 9 b80)
-            // where special characters such as spaces in URI get double encoded.
-            // see https://bugs.java.com/bugdatabase/view_bug.do?bug_id=8131067
-            // To make it even worse, this happens only in the part before "!/".
-            // We need a solution working for java before and after 9b80:
-            String version = System.getProperty("java.runtime.version");
-            if (version.startsWith("1.") || version.startsWith("9")) {
+        // TODO: Delete these lines when migrating to newer Java version!
+        // These lines are needed since there is a bug in Java (up to Java 9 b80)
+        // where special characters such as spaces in URI get double encoded.
+        // see https://bugs.java.com/bugdatabase/view_bug.do?bug_id=8131067
+        // To make it even worse, this happens only in the part before "!/".
+        // We manually build our URI to ensure the encoding is correct:
+        try {
+            URI zipURI = zipPath.toUri();
+            URI entry = new URI(null, null, entryName, null);
 
-                // special handling for Java 9 prior to b80
-                if (version.startsWith("9")) {
-                    int plusIndex = version.indexOf('+');
-                    String bugfix = plusIndex < 0 ? "0" : version.substring(plusIndex + 1);
-                    int bVersion = Integer.parseInt(bugfix);
-                    if (bVersion > 80) {
-                        return uri;
-                    } // else: we continue with our fix
-                }
+            // we have to cut off the starting slash if there is one
+            String entryStr = entry.toString();
+            entryStr = entryStr.startsWith("/") ? entryStr.substring(1) : entryStr;
 
-                String ssp = uri.getSchemeSpecificPart();
-                String rssp = uri.getRawSchemeSpecificPart();
-                int sep = ssp.indexOf("!/");
-                int rsep = rssp.indexOf("!/");
-                String zip = ssp.substring(0, sep);
-                String entry = rssp.substring(rsep + 2);
-                uri = URI.create(uri.getScheme() + ":" + zip + "!/" + entry);
-            } // else: newer java versions do not need our fix
-            return uri;
+            return new URI("jar:" + zipURI + "!/" + entryStr);
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
         }
+
+        // TODO: This should be enough if we use a Java  version newer than 9 b80!
+        //try (FileSystem fs = FileSystems.newFileSystem(zipPath, null)) {
+        //    Path p = fs.getPath(entryName);
+        //    return p.toUri();
+        //}
     }
 }

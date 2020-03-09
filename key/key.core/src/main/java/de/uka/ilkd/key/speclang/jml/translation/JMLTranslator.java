@@ -875,15 +875,12 @@ public final class JMLTranslator {
                                new JMLTranslationMethod() {
 
             @Override
-            public SLExpression translate(
-                    SLTranslationExceptionManager excManager,
-                    Object... params)
-                    throws SLTranslationException {
-                checkParameters(params, Services.class, SLExpression.class);
-                final Services services = (Services)params[0];
-                IObserverFunction inv = services.getJavaInfo().getInv();
-                Term obj = ((SLExpression) params[1]).getTerm();
-                return new SLExpression(tb.func(inv, tb.getBaseHeap(), obj));
+            public SLExpression translate(SLTranslationExceptionManager excManager,
+                                          Object... params)
+                                                  throws SLTranslationException {
+                    checkParameters(params, Services.class, SLExpression.class);
+                    Term obj = ((SLExpression) params[1]).getTerm();
+                    return new SLExpression(tb.inv(obj));
             }
         });
 

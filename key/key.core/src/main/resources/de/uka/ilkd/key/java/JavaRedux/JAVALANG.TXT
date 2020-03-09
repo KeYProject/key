@@ -46,3 +46,11 @@ java.io.IOException
 java.io.OutputStream
 java.io.PrintStream
 java.io.Serializable
+java.math.BigInteger
+java.util.ArrayList
+java.util.Arrays
+java.util.CollectionIterator
+java.util.Date
+java.util.LinkedHashMap
+java.util.LinkedList
+
