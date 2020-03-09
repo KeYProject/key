@@ -230,7 +230,7 @@ public class TacletFindModel extends AbstractTableModel {
             return parser.id_declaration();
         } catch (RecognitionException re) {
             // parser cannot be null
-            throw new ParserException(parser.getErrorMessage(re), new Location(re));
+            throw new ParserException(parser.getErrorMessage(re), Location.create(re));
         }
     }
 

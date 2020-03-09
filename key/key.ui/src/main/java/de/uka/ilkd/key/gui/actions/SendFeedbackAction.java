@@ -15,7 +15,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,6 +46,7 @@ import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.KeYConstants;
+import org.key_project.util.java.IOUtil;
 
 /**
  * {@link AbstractAction} used by {@link ExceptionDialog} in KeY report error
@@ -269,8 +272,15 @@ public class SendFeedbackAction extends AbstractAction {
         @Override
         boolean isEnabled() {
             if(throwable != null) {
-                Location location = ExceptionTools.getLocation(throwable);
-                return location != null && location.getFilename() != null;
+                Location location = null;
+                try {
+                    location = ExceptionTools.getLocation(throwable);
+                } catch (MalformedURLException e) {
+                    // no valid location could be extracted
+                    e.printStackTrace();
+                    return false;
+                }
+                return Location.isValidLocation(location);
             }
             return false;
         }
@@ -278,8 +288,11 @@ public class SendFeedbackAction extends AbstractAction {
         @Override
         byte[] retrieveFileData() throws IOException {
             Location location = ExceptionTools.getLocation(throwable);
-            String sourceFileName = location.getFilename();
-            return Files.readAllBytes(new File(sourceFileName).toPath());
+            /* Certainly there are more efficient methods than reading to string with IOUtil
+             * (using default charset) and then writing back to byte[] (using default charset
+             * again). However, this way it is a very concise and easy to read. */
+            String source = IOUtil.readFrom(location.getFileURL());
+            return source.getBytes(Charset.defaultCharset());
         }
     }
 
