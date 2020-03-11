@@ -49,7 +49,7 @@ import de.uka.ilkd.key.util.Debug;
  * highlighting formulas, selecting applicable rules (in particular taclets) and
  * drag'n drop instantiation of taclets.
  */
-public class CurrentGoalView extends SequentView implements Autoscroll {
+public final class CurrentGoalView extends SequentView implements Autoscroll {
 
     /**
      *

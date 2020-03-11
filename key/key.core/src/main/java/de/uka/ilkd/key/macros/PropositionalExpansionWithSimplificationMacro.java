@@ -10,7 +10,7 @@ public class PropositionalExpansionWithSimplificationMacro extends AbstractPropo
 
     @Override
     public String getName() {
-        return "Propositional expansion (w/o splits) + simplification";
+        return "Propositional Expansion (w/o Splits) + Simplification";
     }
 
     @Override

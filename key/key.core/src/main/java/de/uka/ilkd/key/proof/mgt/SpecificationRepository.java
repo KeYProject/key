@@ -1232,20 +1232,39 @@ public final class SpecificationRepository {
                 final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(
                         kjt);
                 final ProgramVariable selfVar = tb.selfVar(kjt, false);
+
                 Term invDef = tb.tt();
+                Term staticInvDef = tb.tt();
+
                 for (ClassInvariant inv : myInvs) {
                     invDef = tb.and(invDef, inv.getInv(selfVar, services));
+
+                    if (inv.isStatic()) {
+                        staticInvDef = tb.and(staticInvDef, inv.getInv(null, services));
+                    }
                 }
+
                 invDef = tb.tf().createTerm(Equality.EQV,
                         tb.inv(tb.var(selfVar)), invDef);
+                staticInvDef = tb.tf().createTerm(Equality.EQV,
+                        tb.staticInv(kjt), staticInvDef);
+
                 final IObserverFunction invSymbol = services.getJavaInfo()
                         .getInv();
+                final IObserverFunction staticInvSymbol = services.getJavaInfo()
+                        .getStaticInv(kjt);
 
                 final ClassAxiom invRepresentsAxiom = new RepresentsAxiom(
                         "Class invariant axiom for " + kjt.getFullName(),
                         invSymbol, kjt, new Private(), null, invDef, selfVar,
                         ImmutableSLList.<ProgramVariable> nil(), null);
                 result = result.add(invRepresentsAxiom);
+
+                final ClassAxiom staticInvRepresentsAxiom = new RepresentsAxiom(
+                        "Static class invariant axiom for " + kjt.getFullName(),
+                        staticInvSymbol, kjt, new Private(), null, staticInvDef, null,
+                        ImmutableSLList.<ProgramVariable> nil(), null);
+                result = result.add(staticInvRepresentsAxiom);
             }
             // add query axioms for own class
             for (IProgramMethod pm : services.getJavaInfo()

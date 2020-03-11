@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Observable;
@@ -33,7 +34,9 @@ import javax.swing.text.Document;
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.util.Debug;
 
 public class ProofScriptWorker extends SwingWorker<Object, Object>
@@ -42,6 +45,12 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
     private final KeYMediator mediator;
     private final String script;
     private final Location initialLocation;
+
+    /** The initially selected goal. */
+    private final Goal initiallySelectedGoal;
+
+    /** The proof script engine. */
+    private ProofScriptEngine engine;
     private JDialog monitor;
     private JTextArea logArea;
 
@@ -54,23 +63,45 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
 
     public ProofScriptWorker(KeYMediator mediator, File file)
             throws IOException {
-        this.initialLocation = new Location(file.getAbsolutePath(), 1, 1);
+        this.initialLocation = new Location(file.toURI().toURL(), 1, 1);
         this.script = new String(Files.readAllBytes(file.toPath()));
         this.mediator = mediator;
+        this.initiallySelectedGoal = null;
     }
 
+    /**
+     * Instantiates a new proof script worker.
+     *
+     * @param mediator the mediator
+     * @param script the script
+     * @param location the location
+     */
     public ProofScriptWorker(KeYMediator mediator, String script,
-            Location location) {
+                             Location location) {
+        this(mediator, script, location, null);
+    }
+
+    /**
+     * Instantiates a new proof script worker.
+     *
+     * @param mediator the mediator
+     * @param script the script
+     * @param location the location
+     * @param initiallySelectedGoal the initially selected goal
+     */
+    public ProofScriptWorker(KeYMediator mediator, String script,
+                             Location location, Goal initiallySelectedGoal) {
         this.mediator = mediator;
         this.script = script;
         this.initialLocation = location;
+        this.initiallySelectedGoal = initiallySelectedGoal;
     }
 
     @Override
     protected Object doInBackground() throws Exception {
         try {
-            ProofScriptEngine engine = new ProofScriptEngine(script,
-                    initialLocation);
+            engine = new ProofScriptEngine(
+                    script, initialLocation, initiallySelectedGoal);
             engine.setCommandMonitor(observer);
             engine.execute(mediator.getUI(), mediator.getSelectedProof());
         } catch (InterruptedException ex) {
@@ -81,10 +112,10 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
     }
 
     private void makeDialog() {
-        String file = initialLocation.getFilename();
+        URL url = initialLocation.getFileURL();
 
         if (monitor != null) {
-            logArea.setText("Running script from file '" + file + "':\n");
+            logArea.setText("Running script from URL '" + url + "':\n");
             return;
         }
 
@@ -94,7 +125,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
         logArea = new JTextArea();
         logArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         logArea.setEditable(false);
-        logArea.setText("Running script from file '" + file + "':\n");
+        logArea.setText("Running script from URL '" + url + "':\n");
         cp.add(new JScrollPane(logArea), BorderLayout.CENTER);
 
         JButton cancel = new JButton("Cancel");
@@ -169,6 +200,14 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
         runWithDeadline(() -> {
             mediator.getUI().getProofControl().stopAndWaitAutoMode();
         }, 1000);
+
+        try {
+            if (!mediator.getSelectedProof().closed()) {
+                mediator.getSelectionModel().setSelectedGoal(
+                        engine.getStateMap().getFirstOpenAutomaticGoal());
+            }
+        } catch (ScriptException e) { }
+
         mediator.setInteractive(true);
     }
 

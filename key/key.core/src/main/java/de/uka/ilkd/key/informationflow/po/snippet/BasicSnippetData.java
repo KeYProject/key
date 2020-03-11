@@ -18,8 +18,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -87,6 +87,10 @@ class BasicSnippetData {
          */
         TARGET_BLOCK(StatementBlock.class),
         PRECONDITION(Term.class),
+        /**
+         * Returns the free precondition.
+         */
+        FREE_PRECONDITION(Term.class),
         POSTCONDITION(Term.class),
         LOOP_INVARIANT(LoopSpecification.class),
         LOOP_INVARIANT_TERM(Term.class),
@@ -139,7 +143,7 @@ class BasicSnippetData {
                 new StateVars(contract.getSelf(), contract.getParams(),
                               contract.getResult(), contract.getExc(), heap);
     }
-    
+
     BasicSnippetData(LoopSpecification invariant,
                      ExecutionContext context,
                      Term guardTerm,
@@ -189,8 +193,8 @@ class BasicSnippetData {
         origVars = new StateVars(invariant.getInternalSelfTerm(),
                                  guardTerm, localVarsTerms, heap);
     }
-    
-    
+
+
     BasicSnippetData(InformationFlowContract contract,
                      Services services) {
         this.hasMby = contract.hasMby();
@@ -199,7 +203,8 @@ class BasicSnippetData {
 
         contractContents.put(Key.TARGET_METHOD, contract.getTarget());
         contractContents.put(Key.FOR_CLASS, contract.getKJT());
-        contractContents.put(Key.PRECONDITION, contract.getPre());        
+        contractContents.put(Key.PRECONDITION, contract.getPre());
+        contractContents.put(Key.FREE_PRECONDITION, contract.getFreePre());
         contractContents.put(Key.MODIFIES, contract.getMod());
         contractContents.put(Key.DEPENDENS, contract.getDep());
         contractContents.put(Key.MEASURED_BY, contract.getMby());

@@ -1,13 +1,29 @@
-//TODO figure out why javacc is always executed
+// TODO figure out why javacc is always executed
 
 plugins {
+    //Support for IntelliJ IDEA
+    //https://docs.gradle.org/current/userguide/idea_plugin.html
     id("idea")
-    id("eclipse")
+
+    //Support for Eclipse
+    //https://docs.gradle.org/current/userguide/eclipse_plugin.html
+    id("eclipse")  //support for Eclipse
+
+    //Uploading maven artifacts to bintray
+    //If you want access ask @weigl for repository permission.
+    //https://github.com/bintray/gradle-bintray-plugin
     id "com.jfrog.bintray" version "1.8.4" apply false
-    id "com.github.hierynomus.license-base" version"0.15.0"
-    id "com.github.hierynomus.license-report" version"0.15.0"
+
+    //Checks and adds the license header of the source files:
+    // Task: `licenseMain' and `licenseFormatMain'
+    //https://github.com/hierynomus/license-gradle-plugin
+    id "com.github.hierynomus.license-base" version "0.15.0"
+    //Generates reports on the license of used packages: Task `downloadLicenses'
+    //Some Licenses requires an entry in the credits (MIT, BSD)
+    id "com.github.hierynomus.license-report" version "0.15.0"
 }
 
+// Configure this project for use inside IntelliJ:
 idea {
     module {
         downloadJavadoc = false
@@ -15,6 +31,8 @@ idea {
     }
 }
 
+// Helper function that calls "git rev-parse" to
+// find names/SHAs for commits
 static def gitRevParse(String args) {
     try {
         return "git rev-parse $args".execute().text.trim()
@@ -27,11 +45,10 @@ static def getDate() {
     return new Date().format('yyyyMMdd')
 }
 
-def gitRevision = gitRevParse('--short HEAD')
-def gitBranch = gitRevParse('--abbrev-ref HEAD')
+// The $BUILD_NUMBER is an environment variable set by Jenkins.
+def build = System.env.BUILD_NUMBER == null ? "" : "-${System.env.BUILD_NUMBER}"
 
 group = "org.key_project"
-def build = "${System.env.BUILD_NUMBER}" ? "" : "-${System.env.BUILD_NUMBER}"
 version = "2.7$build"
 
 subprojects {
@@ -42,17 +59,25 @@ subprojects {
     apply plugin: "eclipse"
     apply plugin: "com.jfrog.bintray"
 
-    /*
-    apply plugin: 'checkstyle'
-    apply plugin: 'pmd'
-    apply plugin: 'findbugs'
-    */
+    // apply plugin: 'checkstyle'
+    // apply plugin: 'pmd'
+    // apply plugin: 'findbugs'    
 
-    group = "org.key_project"
-    build = "${System.env.BUILD_NUMBER}" ? "" : "-${System.env.BUILD_NUMBER}"
-    version = "2.7$build"
+    group = rootProject.group
+    version = rootProject.version
 
+    repositories {
+        mavenCentral()
+        flatDir { dirs "lib", "$rootDir/key.core/lib" }
+    }
 
+    dependencies {
+        compile     'org.jetbrains:annotations:17.0.0'
+        testCompile 'junit:junit:4.12'
+        testCompile project(':key.util')
+    }
+
+    // Setting UTF-8 as the java source encoding.
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
     }
@@ -74,7 +99,6 @@ subprojects {
         systemProperty "EXAMPLES_DIR", file("$rootProject/key.ui/examples")
         systemProperty "RUNALLPROOFS_DIR", "$buildDir/report/runallproves"
 
-
         systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
 
@@ -83,61 +107,92 @@ subprojects {
     }
 
     test {
+        // TODO consider moving this to key.core where it is repeated ...
+        // weigl: This has to be here. We repeat this in key.core because I was not sure whether
+        // it gets overwritten or not on a redeclaration of `test'.
+
         useJUnit {
             excludeCategories 'org.key_project.util.testcategories.Interactive', 'org.key_project.util.testcategories.Performance'
         }
+
         afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
         beforeTest { desc -> logger.error "> ${desc.className}#${desc.name}" }
-
+        
+        testLogging {
+           outputs.upToDateWhen {false}
+            showStandardStreams = true
+        }
     }
 
     task testFast(type: Test) {
         group "verification"
         useJUnit {
+            // CAUTION! These settings do not affect :key.core since the
+            // detection mechanism is different there.
             excludeCategories 'org.key_project.util.testcategories.Slow'
             excludeCategories 'org.key_project.util.testcategories.Interactive'
         }
-    }
 
-    /*findbugs { findbugsTest.enabled = false; ignoreFailures = true }
-    pmd { pmdTest.enabled = false; ignoreFailures = true }
-    tasks.withType(Checkstyle) {
-        configFile file("$rootDir/scripts/tools/checkstyle/key_checks.xml")
-    }
-    tasks.withType(FindBugs) {
-        reports {
-            xml.enabled = false
-            html.enabled = true
+        testLogging {
+            // set options for log level LIFECYCLE
+            events "failed"
+            exceptionFormat "short"
+
+            // set options for log level DEBUG
+            debug {
+                events "started", "skipped", "failed"
+                exceptionFormat "full"
+            }
+
+            // remove standard output/error logging from --info builds
+            // by assigning only 'failed' and 'skipped' events
+            info.events = ["failed", "skipped"]
         }
     }
-    tasks.withType(Pmd) {
-        reports {
-            xml.enabled = true
-            html.enabled = true
-        }
-    }*/
 
-    repositories {
-        mavenCentral()
-        flatDir { dirs "lib", "$rootDir/key.core/lib" }
+    // The following two tasks can be used to execute main methods from the project
+    // The main class is set via "gradle -DmainClass=... execute --args ..."
+    // see https://stackoverflow.com/questions/21358466/gradle-to-execute-java-class-without-modifying-build-gradle
+    task execute(type:JavaExec) {
+        description 'Execute main method from the project. Set main class via "gradle -DmainClass=... execute --args ..."'
+        group "application"
+        main = System.getProperty('mainClass')
+        classpath = sourceSets.main.runtimeClasspath
     }
 
-    dependencies {
-        testCompile("junit:junit:4.12")
-        compile 'org.jetbrains:annotations:17.0.0'
-        //testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
-        //testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
-        //testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.3.1'
-        testCompile project(":key.util")
+    task executeInTests(type:JavaExec) {
+        description 'Execute main method from the project (tests loaded). Set main class via "gradle -DmainClass=... execute --args ..."'
+        group "application"
+        main = System.getProperty('mainClass')
+        classpath = sourceSets.test.runtimeClasspath
     }
 
-
+    // findbugs { findbugsTest.enabled = false; ignoreFailures = true }
+    // pmd { pmdTest.enabled = false; ignoreFailures = true }
+    // tasks.withType(Checkstyle) {
+    //     configFile file("$rootDir/scripts/tools/checkstyle/key_checks.xml")
+    // }
+    // tasks.withType(FindBugs) {
+    //     reports {
+    //         xml.enabled = false
+    //         html.enabled = true
+    //     }
+    // }
+    // tasks.withType(Pmd) {
+    //     reports {
+    //         xml.enabled = true
+    //         html.enabled = true
+    //     }
+    // }
+    
     task sourcesJar(type: Jar) {
+        description = 'Create a jar file with the sources from this project'
         from sourceSets.main.allJava
         archiveClassifier = 'sources'
     }
 
     task javadocJar(type: Jar) {
+        description = 'Create a jar file with the javadocs from this project'
         from javadoc
         archiveClassifier = 'javadoc'
     }
@@ -182,7 +237,10 @@ subprojects {
         }
     }
 
-    bintray {
+    bintray { //configures the bintray plugin.
+
+        //credentials are either defined in the  project or by preferable as environment variables
+        //ask @weigl if you need the username and password.
         user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
         key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
         publications = ['mavenJava']
@@ -200,7 +258,7 @@ subprojects {
         }
     }
 
-    license {
+    license {//configures the license file header
         header = file("$rootDir/gradle/header")
 
         mapping {
@@ -212,10 +270,11 @@ subprojects {
         mapping("key", "SLASHSTAR_STYLE")
     }
 
-    eclipse {
+    eclipse { //configures the generated .project and .classpath files.
         classpath {
             file {
-                whenMerged {
+                whenMerged { // This adds the exclude entry for every resource and antlr folder.
+                    //As eclipse is so stupid, that it does not distuinguish between resource and java folder correctly.
                     entries.findAll { it.path.endsWith('src/test/antlr') }.each { it.excludes = ["**/*.java"] }
                     entries.findAll { it.path.endsWith('/resources') }.each { it.excludes = ["**/*.java"] }
                 }
@@ -224,16 +283,17 @@ subprojects {
     }
 }
 
-
 task start {
+    description "Use :key.ui:run instead"
     doFirst {
         println "Use :key.ui:run instead"
     }
 }
 
-
+// Generation of a JavaDoc across sub projects.
 task alldoc(type: Javadoc) {
     group "documentation"
+    description "Generate a JavaDoc across sub projects"
     def projects = subprojects
     //key.ui javadoc is broken
     source projects.collect { it.sourceSets.main.allJava }
@@ -241,7 +301,8 @@ task alldoc(type: Javadoc) {
     destinationDir = file("${buildDir}/docs/javadoc")
 
     if (JavaVersion.current().isJava9Compatible()) {
-        //notworking on jenkins    options.addBooleanOption('html5', true)
+        //notworking on jenkins
+        //options.addBooleanOption('html5', true)
     }
 
     configure(options) {
@@ -261,34 +322,11 @@ task alldoc(type: Javadoc) {
     }
 }
 
+// Creates a jar file with the javadoc over all sub projects.
 task alldocJar(type: Zip) {
     dependsOn alldoc
+    description 'Create a jar file with the javadoc over all sub projects'
     from alldoc
     archiveFileName = "key-api-doc-${project.version}.zip"
     destinationDirectory = file("$buildDir/distribution")
 }
-
-/*task fatJar(type: Jar) {
-    dependsOn project(":key.ui").jar
-    dependsOn project(":keyext.interactionlog").jar
-    //dependsOn project(":keyext.script.ui").jar
-
-    def jarFiles = //[project(":key.ui").jar.archivePath] +
-            project(":key.ui").configurations.runtimeClasspath
-    def names = jarFiles.collect { "./${it.name}" }.join(", ")
-
-    manifest {
-        attributes 'Main-Class': "de.uka.ilkd.key.core.Main",
-                "Manifest-Version": "1.0",
-                "Permissions": "all-permissions",
-                "Codebase": "formal.iti.kit.edu",
-                "Application-Name": "KeY",
-                "Class-Path": names
-    }
-
-    archiveName = "key-${project.version}-exec.jar"
-    destinationDir(buildDir)
-    from jarFiles
-    with project(":key.ui").jar
-    from "$rootDir/LICENSE.TXT"
-}*/

@@ -22,12 +22,7 @@ import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.text.Format;
 
 /**
  * Extension of {@link SimpleSettingsPanel} which uses {@link MigLayout} to
@@ -41,6 +36,8 @@ import java.text.Format;
  * @author weigl
  */
 public abstract class SettingsPanel extends SimpleSettingsPanel {
+    private static final long serialVersionUID = 3465371513326517504L;
+
     protected SettingsPanel() {
         pCenter.setLayout(new MigLayout(
                 new LC().fillX().wrapAfter(3),
@@ -192,7 +189,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
             }
         });
         if (info != null && !info.isEmpty()) {
-            add(new JLabel());
+            pCenter.add(new JLabel());
             pCenter.add(comboBox);
             JLabel infoButton = createHelpLabel(info);
             pCenter.add(infoButton, new CC().wrap());

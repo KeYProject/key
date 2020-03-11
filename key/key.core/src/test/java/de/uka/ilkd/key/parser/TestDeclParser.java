@@ -16,8 +16,6 @@ package de.uka.ilkd.key.parser;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import junit.framework.TestCase;
-
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -28,7 +26,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -36,6 +33,7 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import junit.framework.TestCase;
 
 
 public class TestDeclParser extends TestCase {
@@ -51,8 +49,11 @@ public class TestDeclParser extends TestCase {
     public void setUp() {
 	serv = new Services(AbstractProfile.getDefaultProfile());
 	nss = serv.getNamespaces();
-	
-	String sorts = "\\sorts{boolean;int;LocSet;}";
+
+    // This must contain all basic sorts used in the JavaRedux libraries
+    // and the files for these test cases.
+	String sorts = "\\sorts{boolean;int;LocSet;Seq;}";
+
 	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION,
 		new KeYLexerF(sorts,
 			"No file. Call of parser from logic/TestClashFreeSubst.java"),
@@ -61,8 +62,8 @@ public class TestDeclParser extends TestCase {
 	    basicSortsParser.parseSorts();
 	} catch(Exception e) {
 	    throw new RuntimeException(e);
-	}	
-	
+	}
+
 	Recoder2KeY r2k = new Recoder2KeY(serv, nss);
 	r2k.parseSpecialClasses();
     }
@@ -90,7 +91,7 @@ public class TestDeclParser extends TestCase {
     public void testSortDecl() {
 	parseDecls("\\sorts { elem; list; }");
 	assertEquals("find sort elem", new Name("elem"),
-		     nss.sorts().lookup(new Name("elem")).name()); 
+		     nss.sorts().lookup(new Name("elem")).name());
 	assertEquals("find sort list", new Name("list"),
 		     nss.sorts().lookup(new Name("list")).name());
     }
@@ -104,14 +105,14 @@ public class TestDeclParser extends TestCase {
 		     p_n instanceof GenericSort );
 
 	GenericSort gs = (GenericSort)p_n;
-	
+
 	assertEquals ( "Generic sort has wrong supersorts",
 		       p_ext,
 		       gs.extendsSorts () );
 	assertEquals ( "Generic sort has wrong oneof-list",
 		       p_oneof,
 		       gs.getOneOf () );
-	
+
 	return gs;
     }
 
@@ -127,19 +128,19 @@ public class TestDeclParser extends TestCase {
         nss = new NamespaceSet ();
         parseDecls("\\sorts { A; B; \\proxy P; \\proxy Q \\extends A,B; \\proxy R \\extends Q; }");
 
-        Sort P = (Sort) nss.sorts().lookup(new Name("P"));
+        Sort P = nss.sorts().lookup(new Name("P"));
         assertTrue(P instanceof ProxySort);
         assertEquals("P", P.name().toString());
         assertEquals(DefaultImmutableSet.nil().add(Sort.ANY), P.extendsSorts());
 
-        Sort A = (Sort) nss.sorts().lookup(new Name("A"));
-        Sort B = (Sort) nss.sorts().lookup(new Name("B"));
-        Sort Q = (Sort) nss.sorts().lookup(new Name("Q"));
+        Sort A = nss.sorts().lookup(new Name("A"));
+        Sort B = nss.sorts().lookup(new Name("B"));
+        Sort Q = nss.sorts().lookup(new Name("Q"));
         assertTrue(Q instanceof ProxySort);
         assertEquals("Q", Q.name().toString());
         assertEquals(DefaultImmutableSet.nil().add(A).add(B), Q.extendsSorts());
 
-        Sort R = (Sort) nss.sorts().lookup(new Name("R"));
+        Sort R = nss.sorts().lookup(new Name("R"));
         assertTrue(P instanceof ProxySort);
         assertEquals("R", R.name().toString());
         assertEquals(DefaultImmutableSet.nil().add(Q), R.extendsSorts());
@@ -149,7 +150,7 @@ public class TestDeclParser extends TestCase {
     public void testGenericSortDecl() {
 	GenericSort G, H;
 	Sort        S, T;
-	
+
 	nss = new NamespaceSet ();
 	parseDecls("\\sorts { \\generic G; \\generic H \\extends G; }");
 
@@ -163,7 +164,7 @@ public class TestDeclParser extends TestCase {
 
 	nss = new NamespaceSet ();
 	parseDecls("\\sorts { S; \\generic G; \\generic H \\extends G, S; }");
-	
+
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
 			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
@@ -181,7 +182,7 @@ public class TestDeclParser extends TestCase {
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
 			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
 			       DefaultImmutableSet.<Sort>nil().add ( S ).add ( T ) );
-	
+
 
 	nss = new NamespaceSet ();
 	parseDecls("\\sorts { S; T; \\generic G; \\generic H \\oneof {S} \\extends T, G; }");
@@ -194,7 +195,7 @@ public class TestDeclParser extends TestCase {
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
 			       DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),
 			       DefaultImmutableSet.<Sort>nil().add ( S ) );
-	
+
 
 	nss = new NamespaceSet ();
 	parseDecls("\\sorts { S, T; \\generic G,G2; \\generic H,H2 \\oneof {S} \\extends T, G; }");
@@ -213,7 +214,7 @@ public class TestDeclParser extends TestCase {
 	checkGenericSort     ( nss.sorts().lookup(new Name("H2")),
 			       DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),
 			       DefaultImmutableSet.<Sort>nil().add ( S ) );
-	
+
 
 	nss = new NamespaceSet ();
 	String str = "\\sorts { \\generic G; \\generic H \\oneof {G}; }";
@@ -228,10 +229,10 @@ public class TestDeclParser extends TestCase {
 	}
     }
 
-    /** asserts that the found object is a schemavariable and 
+    /** asserts that the found object is a schemavariable and
      * that the allowed macthing type is QuantifiableVariable
      */
-    public void assertVariableSV(String msg, 
+    public void assertVariableSV(String msg,
 				 Object o) {
 	assertTrue("The named object: "+o+" is of type "+o.getClass()+
 		   ", but the type SchemaVariable was expected",
@@ -241,9 +242,9 @@ public class TestDeclParser extends TestCase {
     }
 
     /** asserts that the SchemaVariable matches to term but not to a
-     * formula 
+     * formula
      */
-    public void assertTermSV(String msg, 
+    public void assertTermSV(String msg,
 			     Object o) {
 
 	assertTrue("The named object: "+o+" is of type "+o.getClass()+
@@ -253,21 +254,21 @@ public class TestDeclParser extends TestCase {
 		   ((SchemaVariable)o).sort() != Sort.FORMULA);
     }
 
-    /** asserts that the SchemaVariable matches to a formula 
+    /** asserts that the SchemaVariable matches to a formula
      * and not to a term (of sort != Sort.FORMULA)
      */
-    public void assertFormulaSV(String msg, 
+    public void assertFormulaSV(String msg,
 				Object o) {
 	assertTrue("The named object: "+o+" is of type "+o.getClass()+
 		   ", but the type SchemaVariable was expected",
 		   o instanceof SchemaVariable);
 	assertSame("Only matches to terms of sort FORMULA allowed. "+
-		   "But term has sort "+((SchemaVariable)o).sort(), 
+		   "But term has sort "+((SchemaVariable)o).sort(),
 		   ((SchemaVariable)o).sort(), Sort.FORMULA);
 
-	
+
     }
-  
+
     public void testArrayDecl() {
 	parseDecls("\\sorts { aSort;}\n" +
 		   "\\functions {\n" +
@@ -279,21 +280,21 @@ public class TestDeclParser extends TestCase {
         Sort serializableSort = serv.getJavaInfo().serializableSort();
 	Sort aSortArr = ArraySort.getArraySort(aSort, objectSort, cloneableSort, serializableSort);
 	Sort aSortArr2 = ArraySort.getArraySort(aSortArr, objectSort, cloneableSort, serializableSort);
-	assertTrue("aSort[] should extend Cloneable: " + aSortArr.extendsSorts(), 
-		   aSortArr.extendsSorts().contains(cloneableSort)); 
- 	assertTrue("aSort[] should transitively extend Object ", 
-		   aSortArr.extendsTrans(objectSort)); 
-  	assertTrue("aSort[][] should transitively extend Object ", 
-		   aSortArr2.extendsTrans(objectSort)); 
-  	assertTrue("aSort[][] should transitively extend Cloneable ", 
+	assertTrue("aSort[] should extend Cloneable: " + aSortArr.extendsSorts(),
+		   aSortArr.extendsSorts().contains(cloneableSort));
+ 	assertTrue("aSort[] should transitively extend Object ",
+		   aSortArr.extendsTrans(objectSort));
+  	assertTrue("aSort[][] should transitively extend Object ",
+		   aSortArr2.extendsTrans(objectSort));
+  	assertTrue("aSort[][] should transitively extend Cloneable ",
 		   aSortArr2.extendsTrans(cloneableSort));
-	assertTrue("aSort[][] should extend Cloneable[] ", 
+	assertTrue("aSort[][] should extend Cloneable[] ",
 		   aSortArr2.extendsSorts().contains
 		   (ArraySort.getArraySort(cloneableSort, objectSort, cloneableSort, serializableSort)));
-  	assertTrue("Cloneable should extend Object ", 
+  	assertTrue("Cloneable should extend Object ",
 		   cloneableSort.extendsSorts().contains(objectSort));
     }
-  
+
     public void testFunctionDecl() {
 	parseDecls("\\sorts { elem; list; }\n" +
 		   "\\functions {\n" +
@@ -303,56 +304,56 @@ public class TestDeclParser extends TestCase {
 		   "  list nil;\n" +
 		   "  list cons(elem,list);\n" +
 		   "}\n");
-	
+
 	Sort elem = nss.sorts().lookup(new Name("elem"));
 	Sort list = nss.sorts().lookup(new Name("list"));
 
         Sort objectSort = serv.getJavaInfo().objectSort();
         Sort cloneableSort = serv.getJavaInfo().cloneableSort();
         Sort serializableSort = serv.getJavaInfo().serializableSort();
-        
+
 	assertEquals("find head function", new Name("head"),
 		     nss.functions().lookup(new Name("head")).name());
 	assertEquals("head arity", 1,
-		     ((Function)nss.functions().lookup(new Name("head"))).arity());
+		     nss.functions().lookup(new Name("head")).arity());
 	assertEquals("head arg sort 0", list,
-		     ((Function)nss.functions().lookup(new Name("head"))).argSort(0));
+		     nss.functions().lookup(new Name("head")).argSort(0));
 	assertEquals("head return sort", elem,
-		     ((Function)nss.functions().lookup(new Name("head"))).sort());
+		     nss.functions().lookup(new Name("head")).sort());
 
 	assertEquals("find tail function", new Name("tail"),
 		     nss.functions().lookup(new Name("tail")).name());
 	assertEquals("tail arity", 1,
-		     ((Function)nss.functions().lookup(new Name("tail"))).arity());
+		     nss.functions().lookup(new Name("tail")).arity());
 	assertEquals("tail arg sort 0", list,
-		     ((Function)nss.functions().lookup(new Name("tail"))).argSort(0));
+		     nss.functions().lookup(new Name("tail")).argSort(0));
 	assertEquals("tail return sort", list,
-		     ((Function)nss.functions().lookup(new Name("tail"))).sort());
-	assertEquals("tailarray arg sort 0", 
+		     nss.functions().lookup(new Name("tail")).sort());
+	assertEquals("tailarray arg sort 0",
                 ArraySort.getArraySort(elem, objectSort, cloneableSort, serializableSort),
 
-		     ((Function)nss.functions().lookup(new Name("tailarray"))).argSort(0));
-	assertEquals("tailarray return sort", ArraySort.getArraySort(elem, 
+		     nss.functions().lookup(new Name("tailarray")).argSort(0));
+	assertEquals("tailarray return sort", ArraySort.getArraySort(elem,
                 objectSort, cloneableSort, serializableSort),
-		     ((Function)nss.functions().lookup(new Name("tailarray"))).sort());
+		     nss.functions().lookup(new Name("tailarray")).sort());
 
 	assertEquals("find nil function", new Name("nil"),
 		     nss.functions().lookup(new Name("nil")).name());
 	assertEquals("nil arity", 0,
-		     ((Function)nss.functions().lookup(new Name("nil"))).arity());
+		     nss.functions().lookup(new Name("nil")).arity());
 	assertEquals("nil return sort", list,
-		     ((Function)nss.functions().lookup(new Name("nil"))).sort());
+		     nss.functions().lookup(new Name("nil")).sort());
 
 	assertEquals("find cons function", new Name("cons"),
 		     nss.functions().lookup(new Name("cons")).name());
 	assertEquals("cons arity", 2,
-		     ((Function)nss.functions().lookup(new Name("cons"))).arity());
+		     nss.functions().lookup(new Name("cons")).arity());
  	assertEquals("cons arg sort 0", elem,
-		     ((Function)nss.functions().lookup(new Name("cons"))).argSort(0));
+		     nss.functions().lookup(new Name("cons")).argSort(0));
  	assertEquals("cons arg sort 1", list,
-		     ((Function)nss.functions().lookup(new Name("cons"))).argSort(1));
+		     nss.functions().lookup(new Name("cons")).argSort(1));
 	assertEquals("cons return sort", list,
-		     ((Function)nss.functions().lookup(new Name("cons"))).sort());
+		     nss.functions().lookup(new Name("cons")).sort());
     }
 
     public void testPredicateDecl() {
@@ -362,7 +363,7 @@ public class TestDeclParser extends TestCase {
 		   "  contains(list,elem);\n" +
 		   "  maybe;\n" +
 		   "}\n");
-	
+
 	Sort elem = nss.sorts().lookup(new Name("elem"));
 	Sort list = nss.sorts().lookup(new Name("list"));
 
@@ -370,29 +371,29 @@ public class TestDeclParser extends TestCase {
 	assertEquals("find isEmpty predicate", new Name("isEmpty"),
 		     nss.functions().lookup(new Name("isEmpty")).name());
 	assertEquals("isEmpty arity", 1,
-		     ((Function)nss.functions().lookup(new Name("isEmpty"))).arity());
+		     nss.functions().lookup(new Name("isEmpty")).arity());
 	assertEquals("isEmpty arg sort 0", list,
-		   ((Function)nss.functions().lookup(new Name("isEmpty"))).argSort(0));
+		   nss.functions().lookup(new Name("isEmpty")).argSort(0));
 	assertEquals("isEmpty return sort", Sort.FORMULA,
-		     ((Function)nss.functions().lookup(new Name("isEmpty"))).sort());
+		     nss.functions().lookup(new Name("isEmpty")).sort());
 
 	assertEquals("find contains predicate", new Name("contains"),
 		     nss.functions().lookup(new Name("contains")).name());
 	assertEquals("contains arity", 2,
-		     ((Function)nss.functions().lookup(new Name("contains"))).arity());
+		     nss.functions().lookup(new Name("contains")).arity());
 	assertEquals("contains arg sort 0", list,
-		   ((Function)nss.functions().lookup(new Name("contains"))).argSort(0));
+		   nss.functions().lookup(new Name("contains")).argSort(0));
 	assertEquals("contains arg sort 1", elem,
-		   ((Function)nss.functions().lookup(new Name("contains"))).argSort(1));
+		   nss.functions().lookup(new Name("contains")).argSort(1));
 	assertEquals("contains return sort", Sort.FORMULA,
-		     ((Function)nss.functions().lookup(new Name("contains"))).sort());
+		     nss.functions().lookup(new Name("contains")).sort());
 
 	assertEquals("find maybe predicate", new Name("maybe"),
 		     nss.functions().lookup(new Name("maybe")).name());
 	assertEquals("maybe arity", 0,
-		     ((Function)nss.functions().lookup(new Name("maybe"))).arity());
+		     nss.functions().lookup(new Name("maybe")).arity());
 	assertEquals("maybe return sort", Sort.FORMULA,
-		     ((Function)nss.functions().lookup(new Name("maybe"))).sort());
+		     nss.functions().lookup(new Name("maybe")).sort());
     }
 
     public void testSVDecl() {
@@ -403,8 +404,8 @@ public class TestDeclParser extends TestCase {
 		   "  \\variables list lv ;\n" +
 		   "  \\formula b;\n" +
 		   "}\n");
-	
-	
+
+
 	Sort elem = nss.sorts().lookup(new Name("elem"));
 	Sort list = nss.sorts().lookup(new Name("list"));
 
@@ -412,44 +413,44 @@ public class TestDeclParser extends TestCase {
 
 	assertEquals("find SV x", new Name("x"),
 		     variables.lookup(new Name("x")).name());
-	assertTermSV("SV x type", 
+	assertTermSV("SV x type",
 		     variables.lookup(new Name("x")));
 	assertEquals("SV x sort", elem,
-		     ((SchemaVariable)variables.lookup(new Name("x"))).sort());
+		     variables.lookup(new Name("x")).sort());
 
 	assertEquals("find SV ", new Name("y"),
 		     variables.lookup(new Name("y")).name());
-	assertTermSV("SV y type", 
+	assertTermSV("SV y type",
 		     variables.lookup(new Name("y")));
 	assertEquals("SV y sort", elem,
-		     ((SchemaVariable)variables.lookup(new Name("y"))).sort());
+		     variables.lookup(new Name("y")).sort());
 
 	assertEquals("find SV ", new Name("lv"),
 		     variables.lookup(new Name("lv")).name());
-	assertVariableSV("SV lv type", 
+	assertVariableSV("SV lv type",
 		     variables.lookup(new Name("lv")));
 	assertEquals("SV lv sort", list,
-		     ((SchemaVariable)variables.lookup(new Name("lv"))).sort());
-	
+		     variables.lookup(new Name("lv")).sort());
+
 	assertEquals("find SV ", new Name("b"),
 		     variables.lookup(new Name("b")).name());
-	assertFormulaSV("SV b type", 
+	assertFormulaSV("SV b type",
 		     variables.lookup(new Name("b")));
 	assertEquals("SV b sort", Sort.FORMULA,
-		     ((SchemaVariable)variables.lookup(new Name("b"))).sort());
+		     variables.lookup(new Name("b")).sort());
     }
-    
+
 
     public void testAmbigiousDecls() {
 	try {
 	    stringParser
 		("\\sorts { elem; list; }\n" +
-		 "\\functions {" + 
+		 "\\functions {" +
 		 "elem x;"+
 		 "elem fn;"+
 		 "elem p;"    +
 		 "}" +
-		 "\\predicates {" + 
+		 "\\predicates {" +
 		 "fn(elem);"+
 		 "y;"    +
 		 "p;"    +
@@ -471,18 +472,18 @@ public class TestDeclParser extends TestCase {
 	        re.printStackTrace();
 	        fail("Unexpected recognition excpetion. Testcase failed." + re);
 	    }
-	} 
-	
+	}
+
     }
 
 
     public void testHeurDecl() {
 	parseDecls("\\heuristicsDecl { bool; shoot_foot; }");
 	assertEquals("find heuristic bool", new Name("bool"),
-		     nss.ruleSets().lookup(new Name("bool")).name()); 
+		     nss.ruleSets().lookup(new Name("bool")).name());
 	assertEquals("find heuristic shoot_foot", new Name("shoot_foot"),
 		     nss.ruleSets().lookup(new Name("shoot_foot")).name());
     }
-    
+
 
 }

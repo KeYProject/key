@@ -7,6 +7,7 @@ import javax.swing.*;
  * @date 2019-04-11
  */
 public class InvalidSettingsInputException extends Exception {
+    private static final long serialVersionUID = -7504257775646675899L;
     private SettingsProvider panel;
     private JComponent focusable;
 

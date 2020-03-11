@@ -33,9 +33,8 @@ import de.uka.ilkd.key.pp.PosInSequent;
  *
  * @author Mattias Ulbrich
  */
-
-@SuppressWarnings("serial")
 public class MacroKeyBinding extends AbstractAction {
+    private static final long serialVersionUID = 1529344940571000989L;
 
     private final SequentView sequentView;
     private final KeYMediator mediator;
@@ -50,13 +49,17 @@ public class MacroKeyBinding extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
         PosInSequent mousePos = sequentView.getLastPosInSequent();
-        if(mousePos == null) {
-            return;
+        PosInOccurrence posInOcc;
+
+        if (mousePos == null) {
+            posInOcc = null;
+        } else {
+            posInOcc = mousePos.getPosInOccurrence();
         }
 
-        PosInOccurrence posInOcc = mousePos.getPosInOccurrence();
+        // System.out.println("macro key binding -- mousePos=" + mousePos + ", pio=" + posInOcc);
+
         if(macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
             mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro, posInOcc);
         }

@@ -13,6 +13,38 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
+import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.ADDITIONAL_HIGHLIGHT_COLOR;
+import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Shape;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Objects;
+import java.util.StringJoiner;
+
+import javax.swing.JEditorPane;
+import javax.swing.UIManager;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.html.HTMLDocument;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -21,34 +53,36 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.logic.FormulaChangeInfo;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
+import de.uka.ilkd.key.pp.InitialPositionTable;
+import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.SequentPrintFilterEntry;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
+import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.Debug;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import javax.swing.*;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
-import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
-import javax.swing.text.Highlighter;
-import javax.swing.text.Highlighter.HighlightPainter;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.html.HTMLDocument;
-import java.awt.*;
-import java.util.*;
-
-import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.ADDITIONAL_HIGHLIGHT_COLOR;
-import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR;
 
 /*
  * Parent class of CurrentGoalView and InnerNodeView.
  */
 public abstract class SequentView extends JEditorPane {
-    private static final long serialVersionUID = 5012937393965787981L;
+    private static final long serialVersionUID = 6867808795064180589L;
+
+    public static final Color PERMANENT_HIGHLIGHT_COLOR = new Color(110, 85, 181, 76);
+
+    public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
+
+    protected static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
 
     protected static final Color INACTIVE_BACKGROUND_COLOR
             = new Color(UIManager.getColor("Panel.background").getRGB());
@@ -69,7 +103,7 @@ public abstract class SequentView extends JEditorPane {
         return mainWindow;
     }
 
-    /*
+    /**
      * The current line width. Static declaration for this prevents constructors from
      * using lineWidth 0.
      */
@@ -116,6 +150,12 @@ public abstract class SequentView extends JEditorPane {
     /** the last observed mouse position for which a highlight was created */
     private Point lastMousePosition;
 
+    private SequentViewInputListener sequentViewInputListener;
+
+    private Object userSelectionHighlight = null;
+    private Range userSelectionHighlightRange = null;
+    private PosInSequent userSelectionHighlightPis = null;
+
     protected SequentView(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
 
@@ -127,8 +167,7 @@ public abstract class SequentView extends JEditorPane {
         setEditable(false);
         setFont();
 
-        SequentViewInputListener sequentViewInputListener = new SequentViewInputListener(this);
-        addKeyListener(sequentViewInputListener);
+        sequentViewInputListener = new SequentViewInputListener(this);
         addMouseMotionListener(sequentViewInputListener);
         addMouseListener(sequentViewInputListener);
 
@@ -147,6 +186,9 @@ public abstract class SequentView extends JEditorPane {
 
         filter = new IdentitySequentPrintFilter();
 
+        // Register tooltip
+        setToolTipText("");
+
         KeYGuiExtensionFacade.installKeyboardShortcuts(getMainWindow().getMediator(),
                 this, KeYGuiExtension.KeyboardShortcuts.SEQUENT_VIEW);
     }
@@ -163,6 +205,38 @@ public abstract class SequentView extends JEditorPane {
 
     public void unregisterListener() {
        Config.DEFAULT.removeConfigChangeListener(configChangeListener);
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent event) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .isShowSequentViewTooltips()) {
+            return null;
+        }
+
+        PosInSequent pis = getPosInSequent(event.getPoint());
+
+        String text = "";
+
+        if (pis != null && !pis.isSequent()) {
+            Term term = pis.getPosInOccurrence().subTerm();
+            text += "<b>Operator:</b> " + term.op().getClass().getSimpleName()
+                    + " (" + term.op() + ")";
+            text += "<br><b>Sort</b>: " + term.sort();
+        }
+
+        StringJoiner extensionStr = new StringJoiner("<hr>", "<hr>", "");
+        extensionStr.setEmptyValue("");
+        KeYGuiExtensionFacade.getTooltipStrings(getMainWindow(), pis).stream()
+            .filter(s -> !s.isEmpty())
+            .forEach(extensionStr::add);
+        text += extensionStr;
+
+        if (text.isEmpty()) {
+            return null;
+        } else {
+            return "<html>" + text + "</html>";
+        }
     }
 
     @Override
@@ -470,6 +544,9 @@ public abstract class SequentView extends JEditorPane {
         }
     }
 
+    /**
+     * Updates the head map highlights.
+     */
     protected void updateHeatMapHighlights() {
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         int max_age = vs.getMaxAgeForHeatmap();
@@ -489,6 +566,112 @@ public abstract class SequentView extends JEditorPane {
             }
         }
     }
+
+    Range getUserSelectionHighlightRange() {
+        return userSelectionHighlightRange;
+    }
+
+    void recalculateUserSelectionRange() {
+        if (userSelectionHighlight == null) {
+            return;
+        }
+
+        InitialPositionTable posTable = printer.getInitialPositionTable();
+        PosInSequent pis = userSelectionHighlightPis;
+        Range range = posTable.rangeForPath(
+                posTable.pathForPosition(pis.getPosInOccurrence(), filter));
+
+        removeUserSelectionHighlight();
+
+        try {
+            userSelectionHighlightPis = pis;
+            userSelectionHighlightRange = new Range(range.start() + 1, range.end() + 1);
+            userSelectionHighlight = getHighlighter().addHighlight(
+                    userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
+                    new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+
+            sequentViewInputListener.highlightOriginInSourceView(pis);
+        } catch (BadLocationException e) {
+            Debug.out("Error while setting permanent highlight", e);
+        }
+    }
+
+    protected void setUserSelectionHighlight(Point point) {
+        removeUserSelectionHighlight();
+
+        try {
+            userSelectionHighlightPis = getPosInSequent(point);
+            userSelectionHighlightRange = getHighlightRange(point);
+            userSelectionHighlight = getHighlighter().addHighlight(
+                    userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
+                    new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+
+            sequentViewInputListener.highlightOriginInSourceView(userSelectionHighlightPis);
+        } catch (BadLocationException e) {
+            Debug.out("Error while setting permanent highlight", e);
+        }
+    }
+
+    /**
+     * Removes the user selection.
+     *
+     * @see #setUserSelectionHighlight(PosInSequent)
+     * @see #setUserSelectionHighlight(Point)
+     * @see #isInUserSelectionHighlight(Point)
+     */
+    protected void removeUserSelectionHighlight() {
+        if (userSelectionHighlight != null) {
+            getHighlighter().removeHighlight(userSelectionHighlight);
+        }
+
+        userSelectionHighlight = null;
+        userSelectionHighlightPis = null;
+        userSelectionHighlightRange = null;
+
+        sequentViewInputListener.highlightOriginInSourceView(null);
+    }
+
+    /**
+     *
+     * @param point a point.
+     * @return {@code true} if and only if the argument points to the user selection.
+     *
+     * @see #setUserSelectionHighlight(PosInSequent)
+     * @see #setUserSelectionHighlight(Point)
+     * @see #removeUserSelectionHighlight()
+     */
+    protected boolean isInUserSelectionHighlight(Point point) {
+        return point == null && userSelectionHighlightRange == null
+                || point != null && userSelectionHighlightRange != null
+                        && Objects.equals(
+                                userSelectionHighlightRange,
+                                getHighlightRange(point));
+    }
+
+    /**
+     * Highlights the term at the specified position as the user's selection.
+     *
+     * @param pis the term to select.
+     *
+     * @see #setUserSelectionHighlight(Point)
+     * @see #removeUserSelectionHighlight()
+     * @see #isInUserSelectionHighlight(Point)
+     */
+    protected void setUserSelectionHighlight(PosInSequent pis) {
+        removeUserSelectionHighlight();
+
+        try {
+            userSelectionHighlightRange = new Range(pis.getBounds().start(), pis.getBounds().end());
+            userSelectionHighlight = getHighlighter().addHighlight(
+                    userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
+                    new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+
+            sequentViewInputListener.highlightOriginInSourceView(pis);
+        } catch (BadLocationException e) {
+            Debug.out("Error while setting permanent highlight", e);
+        }
+    }
+
 
     public void highlight(Point p) {
         setCurrentHighlight(defaultHighlight);

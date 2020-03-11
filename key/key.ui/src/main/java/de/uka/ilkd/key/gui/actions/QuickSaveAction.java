@@ -26,40 +26,59 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
 
 /**
- * Saves the current selected proof immediately to a temporaly location.
- * This feature can be conveniently accessed with the F5 key.
+ * Immediately saves the currently selected proof to a temporaly location. This
+ * feature can be conveniently accessed with the F5 key.
+ *
  * @author bruns
  */
 public final class QuickSaveAction extends MainWindowAction {
+    private static final long serialVersionUID = -7084304175671744403L;
 
-    private static final long serialVersionUID = 8475988170848683884L;
+    /** The OS's tmp directory. */
     private static final File TMP_DIR = IOUtil.getTempDirectory();
-    public static final String QUICK_SAVE_PATH = TMP_DIR+File.separator+".quicksave.key";
 
+    /** The path to the quick save file. */
+    public static final String QUICK_SAVE_PATH = TMP_DIR + File.separator + ".quicksave.key";
+
+    /**
+     * Create a new action.
+     *
+     * @param mainWindow the main window.
+     */
     public QuickSaveAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Quicksave");
-//        setIcon(IconFactory.saveFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Save current proof to a temporal location.");
         mainWindow.getMediator().enableWhenProofLoaded(this);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
+    /**
+     * Immediately saves the currently selected proof to a temporaly location.
+     *
+     * @param mainWindow the main window.
+     */
+    public static void quickSave(MainWindow mainWindow) {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             final String filename = QUICK_SAVE_PATH;
             final Proof proof = mainWindow.getMediator().getSelectedProof();
             try {
                 new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
-                final String status = "File quicksaved: "+filename;
+                final String status = "File quicksaved: " + filename;
                 mainWindow.setStatusLine(status);
                 Debug.out(status);
             } catch (IOException x) {
-                mainWindow.popupWarning("Quicksaving file "+filename+" failed:\n"+x.getMessage(), "Quicksave failed");
-                Debug.out("Quicksaving file "+filename+" failed.",x);
+                mainWindow.popupWarning(
+                        "Quicksaving file " + filename + " failed:\n" + x.getMessage(),
+                        "Quicksave failed");
+                Debug.out("Quicksaving file " + filename + " failed.", x);
             }
         } else {
             mainWindow.popupWarning("No proof.", "Oops...");
         }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        quickSave(mainWindow);
     }
 }

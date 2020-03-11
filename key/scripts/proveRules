@@ -8,7 +8,7 @@ LIST_TESTS_FLAG=--list-tests
 HELP_FLAG=--help
 
 list_help() {
-    echo "Usage: proveRules  [$HELP_FLAG] | [$LIST_TESTS_FLAG]"
+    echo "Usage: proveRules  [$HELP_FLAG] | [$LIST_TESTS_FLAG] | <test names>"
 }
 
 resolve_symlink() {
@@ -30,35 +30,40 @@ resolve_symlink() {
 SCRIPTLOCATION=`resolve_symlink "$0"`
 SCRIPTFOLDER=`dirname $SCRIPTLOCATION`
 
+KEY_HOME="$SCRIPTFOLDER/.."
+
 #
 # Parse command line parameters
 #
 
-JAVA_ARGS=""
-
+testCases=""
 while [ "$#" -ne 0 ]
     do
     case $1 in
         $LIST_TESTS_FLAG)
-        $SCRIPTFOLDER/tools/testRunner.sh de.uka.ilkd.key.proof.proverules.ListProveRulesTestCases
-        exit
-        ;;
+            $KEY_HOME/gradlew -p $KEY_HOME -DmainClass=de.uka.ilkd.key.proof.proverules.ListProveRulesTestCases :key.core:executeInTest
+            exit
+            ;;
+        
         -h|--help|-?)
-        list_help
-        exit
-        ;;
+            list_help
+            exit
+            ;;
+        
         -*)
-        echo Unrecognised option: $1
-        exit
-        ;;
+            echo Unrecognised option: $1
+            exit
+            ;;
+        
         *)
-        break
-        ;;
+            testCases="$testCases --tests de.uka.ilkd.key.proof.proverules.ProveRulesTest.$1"
+            shift
+            ;;
     esac
     done
 
 #
-# Run JUnit
+# Run JUnit via gradle
 #
 
-$SCRIPTFOLDER/tools/testRunner.sh $JAVA_ARGS org.junit.runner.JUnitCore de.uka.ilkd.key.proof.proverules.ProveRulesTest
+$KEY_HOME/gradlew -p $KEY_HOME :key.core:testProofRules $testCases

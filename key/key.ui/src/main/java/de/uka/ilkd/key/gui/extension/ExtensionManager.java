@@ -12,6 +12,7 @@ import net.miginfocom.layout.CC;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,6 +23,7 @@ import java.util.Set;
  */
 public class ExtensionManager extends SettingsPanel
         implements SettingsProvider {
+    private static final long serialVersionUID = 6682677093231975786L;
     private static final ExtensionSettings EXTENSION_SETTINGS = new ExtensionSettings();
     private HashMap<JCheckBox, Extension> map;
     private String keywords = "";
@@ -31,6 +33,14 @@ public class ExtensionManager extends SettingsPanel
         setSubHeaderText("Settings will be applied on next restart");
         lblSubhead.setIcon(IconFactory.WARNING_INCOMPLETE.get());
         lblSubhead.setBackground(Color.orange.darker());
+
+
+        JLabel lblExplainExperimental = new JLabel("<html>The flask marks extensions " +
+                "that are only available, <br>" +
+                "if KeY was started in experimental mode. Restart KeY with `--experimental`.");
+        lblExplainExperimental.setIcon(IconFactory.EXPERIMENTAL_EXTENSION.get());
+        pNorth.add(lblExplainExperimental);
+
         refresh();
     }
 
@@ -47,7 +57,10 @@ public class ExtensionManager extends SettingsPanel
 
         keywords += lblSubhead.getText();
 
-        KeYGuiExtensionFacade.getExtensions().forEach(it -> {
+        KeYGuiExtensionFacade.getExtensions().stream()
+                .sorted(Comparator.comparingInt(it ->
+                        it.isDisabledByMaintainer() || !it.isOptional() ? 1 : 0))
+                .filter(it -> !it.isDisabledByMaintainer()).forEach(it -> {
             JCheckBox box = new JCheckBox();
             box.setText(it.getName());
             box.setSelected(!it.isDisabled());

@@ -5,6 +5,8 @@ package org.key_project.util.lookup;
  * @version 1 (13.01.19)
  */
 public class InjectionException extends RuntimeException {
+    private static final long serialVersionUID = 119998955722036861L;
+
     public InjectionException() {
         super();
     }

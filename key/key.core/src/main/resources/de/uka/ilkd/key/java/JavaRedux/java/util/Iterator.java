@@ -5,8 +5,29 @@ package java.util;
 
 public interface Iterator
 {
+   //@ public instance ghost \seq seq;
+   //@ public instance ghost \bigint index;
+   
+   //@ public instance invariant 0 <= index && index <= seq.length;
 
+   /*@ public normal_behavior
+     @ ensures \result == true <==> index < seq.length;
+     @ assignable \strictly_nothing;
+     @ determines \result \by seq.length, index;
+     @*/
    public boolean hasNext();
-   public java.lang.Object next();
+   
+   /*@ public normal_behavior
+     @ ensures \old(index) < seq.length ==> \result == ((Object)seq[\old(index)]);
+     @ ensures \old(index) < seq.length ==> \result != null;
+     @ ensures \old(index) < seq.length ==> index == \old(index) + 1;
+     @ ensures \old(index) == seq.length ==> \result == null;
+     @ ensures \old(index) == seq.length ==> index == \old(index);
+     @ assignable index;
+     @ determines \result \by seq, index;
+     @ determines index \by seq.length, index;
+     @*/
+   public /*@nullable@*/ java.lang.Object next();
+   
    public void remove();
 }

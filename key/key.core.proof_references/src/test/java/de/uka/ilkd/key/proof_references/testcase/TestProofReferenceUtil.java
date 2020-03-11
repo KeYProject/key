@@ -39,76 +39,76 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
     */
    public void testReferenceComputation_ExpandAndContract() throws Exception {
-      doAPITest(TESTCASE_DIRECTORY, 
-                "/proofReferences/UseOperationContractTest/UseOperationContractTest.java", 
-                "UseOperationContractTest", 
-                "main", 
+      doAPITest(TESTCASE_DIRECTORY,
+                "/proofReferences/UseOperationContractTest/UseOperationContractTest.java",
+                "UseOperationContractTest",
+                "main",
                 true,
                 ImmutableSLList.<IProofReferencesAnalyst>nil().append(new MethodBodyExpandProofReferencesAnalyst(), new ContractProofReferencesAnalyst()),
-                new ExpectedProofReferences(IProofReference.INLINE_METHOD, "UseOperationContractTest::main"), 
-                new ExpectedProofReferences(IProofReference.USE_CONTRACT, "pre: {heap=java.lang.Object::<inv>(heap,self)<<impl>>}; mby: null; post: {heap=and(and(equals(result<<origin(ensures @ UseOperationContractTest.java @ line 12) ([])>>,Z(2(4(#))))<<origin(ensures @ UseOperationContractTest.java @ line 12) ([])>>,java.lang.Object::<inv>(heap,self)<<impl>>)<<SC>>,equals(exc<<origin(ensures (implicit)) ([])>>,null)<<impl, origin(ensures (implicit)) ([])>>)}; mods: {heap=allLocs, savedHeap=null}; hasMod: {heap=true, savedHeap=true}; termination: diamond; transaction: false"));
+                new ExpectedProofReferences(IProofReference.INLINE_METHOD, "UseOperationContractTest::main"),
+                new ExpectedProofReferences(IProofReference.USE_CONTRACT, "pre: {heap=java.lang.Object::<inv>(heap,self)<<impl>>}; mby: null; post: {heap=and(and(equals(result<<origin(ensures @ file UseOperationContractTest.java @ line 12) ([])>>,Z(2(4(#))))<<origin(ensures @ file UseOperationContractTest.java @ line 12) ([])>>,java.lang.Object::<inv>(heap,self)<<impl>>)<<SC>>,equals(exc<<origin(ensures (implicit)) ([])>>,null)<<impl, origin(ensures (implicit)) ([])>>)}; mods: {heap=allLocs, savedHeap=null}; hasMod: {heap=true, savedHeap=true}; termination: diamond; transaction: false"));
    }
-   
+
    /**
     * Tests {@link ProofReferenceUtil#computeProofReferences(Proof, ImmutableList)} and
     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
     */
    public void testReferenceComputation_NoAnalysts() throws Exception {
-      doAPITest(TESTCASE_DIRECTORY, 
-                "/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
-                "MethodBodyExpand", 
-                "main", 
+      doAPITest(TESTCASE_DIRECTORY,
+                "/proofReferences/MethodBodyExpand/MethodBodyExpand.java",
+                "MethodBodyExpand",
+                "main",
                 false,
                 ImmutableSLList.<IProofReferencesAnalyst>nil());
    }
-   
+
    /**
     * Tests {@link ProofReferenceUtil#computeProofReferences(Proof, ImmutableList)} and
     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
     */
    public void testReferenceComputation_ContractOnly() throws Exception {
-      doAPITest(TESTCASE_DIRECTORY, 
-                "/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
-                "MethodBodyExpand", 
-                "main", 
+      doAPITest(TESTCASE_DIRECTORY,
+                "/proofReferences/MethodBodyExpand/MethodBodyExpand.java",
+                "MethodBodyExpand",
+                "main",
                 false,
                 ImmutableSLList.<IProofReferencesAnalyst>nil().append(new ContractProofReferencesAnalyst()));
    }
-   
+
    /**
     * Tests {@link ProofReferenceUtil#computeProofReferences(Proof, ImmutableList)} and
     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
     */
    public void testReferenceComputation_ExpandOnly() throws Exception {
-      doAPITest(TESTCASE_DIRECTORY, 
-                "/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
-                "MethodBodyExpand", 
-                "main", 
+      doAPITest(TESTCASE_DIRECTORY,
+                "/proofReferences/MethodBodyExpand/MethodBodyExpand.java",
+                "MethodBodyExpand",
+                "main",
                 false,
                 ImmutableSLList.<IProofReferencesAnalyst>nil().append(new MethodBodyExpandProofReferencesAnalyst()),
-                new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::main"), 
+                new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::main"),
                 new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::magic42"));
    }
-   
+
    /**
     * Tests {@link ProofReferenceUtil#computeProofReferences(Proof)} and
     * {@link ProofReferenceUtil#computeProofReferences(Node)}.
     */
    public void testReferenceComputation_DefaultAnalysts() throws Exception {
-      doAPITest(TESTCASE_DIRECTORY, 
-                "/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
-                "MethodBodyExpand", 
+      doAPITest(TESTCASE_DIRECTORY,
+                "/proofReferences/MethodBodyExpand/MethodBodyExpand.java",
+                "MethodBodyExpand",
                 "main",
                 false,
                 null,
-                new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"), 
-                new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::main"), 
-                new ExpectedProofReferences(IProofReference.CALL_METHOD, "MethodBodyExpand::magic42"), 
+                new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"),
+                new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::main"),
+                new ExpectedProofReferences(IProofReference.CALL_METHOD, "MethodBodyExpand::magic42"),
                 new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::magic42"));
    }
-   
+
    /**
-    * Executes the test steps of test methods. 
+    * Executes the test steps of test methods.
     * @param baseDir The base directory which contains test and oracle file.
     * @param javaPathInBaseDir The path to the java file inside the base directory.
     * @param containerTypeName The name of the type which contains the method.
@@ -129,8 +129,8 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
          @Override
          public void doTest(KeYEnvironment<?> environment, Proof proof) throws Exception {
             // Extract and assert proof references
-            final LinkedHashSet<IProofReference<?>> references = analysts != null ? 
-                                                                 ProofReferenceUtil.computeProofReferences(proof, analysts) : 
+            final LinkedHashSet<IProofReference<?>> references = analysts != null ?
+                                                                 ProofReferenceUtil.computeProofReferences(proof, analysts) :
                                                                  ProofReferenceUtil.computeProofReferences(proof);
             assertReferences(references, expectedReferences);
             // Test references of each node individually
@@ -138,8 +138,8 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
                @Override
                public void visit(Proof proof, Node visitedNode) {
                   LinkedHashSet<IProofReference<?>> expectedNodeRefs = findReferences(references, visitedNode);
-                  LinkedHashSet<IProofReference<?>> currentNodeRefs = analysts != null ? 
-                                                                      ProofReferenceUtil.computeProofReferences(visitedNode, proof.getServices(), analysts) : 
+                  LinkedHashSet<IProofReference<?>> currentNodeRefs = analysts != null ?
+                                                                      ProofReferenceUtil.computeProofReferences(visitedNode, proof.getServices(), analysts) :
                                                                       ProofReferenceUtil.computeProofReferences(visitedNode, proof.getServices());
                   assertReferences(expectedNodeRefs, currentNodeRefs);
                }

@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
  * @version 1 (09.05.19)
  */
 public class ShortcutSettings extends SimpleSettingsPanel implements SettingsProvider {
+    private static final long serialVersionUID = -7609149706562761596L;
     private final JTable tblShortcuts = new JTable();
     private ShortcutsTableModel modelShortcuts;
 
@@ -159,6 +160,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
     }
 
     private static class ShortcutsTableModel extends AbstractTableModel {
+        private static final long serialVersionUID = -2854179933936417703L;
         private static final String[] COLUMNS = new String[]{"Name", "Description", "Shortcut"};
         private final List<String> actionName;
         private final List<String> shortcut;
@@ -189,7 +191,9 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         public Object getValueAt(int rowIndex, int columnIndex) {
             switch (columnIndex) {
                 case 0:
-                    return actionName.get(rowIndex);
+                    return actionName.get(rowIndex)
+                            //remove common package prefixes
+                            .replaceAll("([a-z]\\w*\\.)*", "");
                 case 1:
                     Action a = actions.get(rowIndex);
                     if (a == null) return "";

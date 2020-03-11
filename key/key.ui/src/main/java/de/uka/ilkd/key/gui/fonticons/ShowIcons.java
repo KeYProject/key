@@ -9,6 +9,7 @@ import java.util.ArrayList;
  * @version 1 (15.03.19)
  */
 public class ShowIcons extends JFrame {
+    private static final long serialVersionUID = 8775474163870717215L;
     //private Box box = new Box(BoxLayout.Y_AXIS);
     private JPanel box = new JPanel(new GridLayout(0, 10));
     private JPanel search = new JPanel();

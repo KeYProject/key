@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
  * @version 1 (10.05.19)
  */
 public class ColorSettingsProvider extends SimpleSettingsPanel implements SettingsProvider {
+    private static final long serialVersionUID = -6253991459166324512L;
     private final JTable tblColors = new JTable();
     private ColorSettingsTableModel modelColor;
 
@@ -58,6 +59,8 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
         tblColors.getColumnModel().getColumn(2).setCellEditor(HexColorCellEditor.make());
 
         tblColors.setDefaultRenderer(Color.class, new DefaultTableCellRenderer() {
+            private static final long serialVersionUID = -7602735597024671100L;
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Color c = (Color) value;
@@ -85,6 +88,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
     }
 
     private static class ColorSettingsTableModel extends AbstractTableModel {
+        private static final long serialVersionUID = 4722928883386296559L;
         private static final String[] COLUMNS = new String[]{"Key", "Description", "Color"};
         private final List<ColorPropertyData> colorData;
 
@@ -155,6 +159,8 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
 }
 
 class HexColorCellEditor extends DefaultCellEditor {
+    private static final long serialVersionUID = -4352607386521686931L;
+
     HexColorCellEditor(JTextField textField) {
         super(textField);
         textField.addActionListener(e -> stopCellEditing());

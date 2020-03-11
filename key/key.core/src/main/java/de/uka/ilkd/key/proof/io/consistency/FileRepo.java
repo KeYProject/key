@@ -22,8 +22,10 @@ import de.uka.ilkd.key.proof.io.RuleSource;
 public interface FileRepo extends ProofDisposedListener {
     /**
      * Provides access to a file on disk.
+     *
+     * May return <code>null</code> if the path cannot be handled by this repository.
      * @param path the path of the file
-     * @return an InputStream of the requested file
+     * @return an InputStream of the requested file, or <code>null</code>
      * @throws FileNotFoundException if the file does not exist
      * @throws IOException on IO errors, e.g. if the user has no permission to read the file
      */
@@ -31,18 +33,22 @@ public interface FileRepo extends ProofDisposedListener {
 
     /**
      * Provides access to the InputStream of a RuleSource. The file the RuleSource is read from
-     * is copied to the FileRepo.
+     * is registered to the FileRepo.
+     *
+     * May return <code>null</code> if the source cannot be handled by this repository.
      * @param ruleSource the RuleSource
-     * @return an InputStream of the RuleSource
+     * @return an InputStream of the RuleSource, or <code>null</code>
      * @throws IOException on IO errors
      */
     public InputStream getInputStream(RuleSource ruleSource) throws IOException;
 
     /**
-     * Provides access to the InputStream of a file identified by an URL. The file is copied to the
-     * FileRepo.
+     * Provides access to the InputStream of a file identified by an URL. The file is registered to
+     * the FileRepo.
+     *
+     * May return <code>null</code> if the url cannot be handled by this repository.
      * @param url the URL of the file
-     * @return an InputStream to the file identified by the URL
+     * @return an InputStream to the file identified by the URL, or <code>null</code>
      * @throws IOException on IO errors
      */
     public InputStream getInputStream(URL url) throws IOException;

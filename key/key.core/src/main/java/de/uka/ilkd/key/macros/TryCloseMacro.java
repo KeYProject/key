@@ -101,7 +101,7 @@ public class TryCloseMacro extends AbstractProofMacro {
      */
     @Override
     public String getName() {
-        return "Close provable goals below";
+        return "Close Provable Goals Below";
     }
 
     /* (non-Javadoc)

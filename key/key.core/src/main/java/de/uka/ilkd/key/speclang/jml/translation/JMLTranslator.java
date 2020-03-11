@@ -28,6 +28,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
@@ -47,6 +48,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -237,7 +240,9 @@ public final class JMLTranslator {
 
                     @Override
                     public JMLTranslationMethod get(Object key) {
-                        if (key == null) throw new IllegalArgumentException("null");
+                        if (key == null) {
+                            throw new IllegalArgumentException("null");
+                        }
                         JMLTranslationMethod m = super.get(key);
                         if (m != null) {
                             return m;
@@ -618,11 +623,21 @@ public final class JMLTranslator {
                 Term res = tb.tt();
                 for (QuantifiableVariable qv: qvs) {
                     if (type instanceof PrimitiveType) {
-                        if (type == PrimitiveType.JAVA_BYTE) res = tb.and(res,tb.inByte(tb.var(qv)));
-                        if (type == PrimitiveType.JAVA_SHORT) res = tb.and(res,tb.inShort(tb.var(qv)));
-                        if (type == PrimitiveType.JAVA_CHAR) res = tb.and(res,tb.inChar(tb.var(qv)));
-                        if (type == PrimitiveType.JAVA_INT) res = tb.and(res,tb.inInt(tb.var(qv)));
-                        if (type == PrimitiveType.JAVA_LONG) res = tb.and(res,tb.inLong(tb.var(qv)));
+                        if (type == PrimitiveType.JAVA_BYTE) {
+                            res = tb.and(res,tb.inByte(tb.var(qv)));
+                        }
+                        if (type == PrimitiveType.JAVA_SHORT) {
+                            res = tb.and(res,tb.inShort(tb.var(qv)));
+                        }
+                        if (type == PrimitiveType.JAVA_CHAR) {
+                            res = tb.and(res,tb.inChar(tb.var(qv)));
+                        }
+                        if (type == PrimitiveType.JAVA_INT) {
+                            res = tb.and(res,tb.inInt(tb.var(qv)));
+                        }
+                        if (type == PrimitiveType.JAVA_LONG) {
+                            res = tb.and(res,tb.inLong(tb.var(qv)));
+                        }
                     } else {
                         // assume reference type
                         if (nullable) {
@@ -655,8 +670,9 @@ public final class JMLTranslator {
                 @SuppressWarnings("unchecked")
                 final ImmutableList<QuantifiableVariable> qvs = (ImmutableList<QuantifiableVariable>) params[3];
                 final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-                if (body.sort() != intSort)
+                if (body.sort() != intSort) {
                     throw excManager.createException("body of \\min expression must be integer type");
+                }
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
                 final Term min = tb.min(qvs, tb.andSC(tr, guard), body, services);
                 final KeYJavaType type = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
@@ -678,11 +694,21 @@ public final class JMLTranslator {
                 Term res = tb.tt();
                 for (QuantifiableVariable qv: qvs) {
                     if (type instanceof PrimitiveType) {
-                        if (type == PrimitiveType.JAVA_BYTE) res = tb.and(res,tb.inByte(tb.var(qv)));
-                        if (type == PrimitiveType.JAVA_SHORT) res = tb.and(res,tb.inShort(tb.var(qv)));
-                        if (type == PrimitiveType.JAVA_CHAR) res = tb.and(res,tb.inChar(tb.var(qv)));
-                        if (type == PrimitiveType.JAVA_INT) res = tb.and(res,tb.inInt(tb.var(qv)));
-                        if (type == PrimitiveType.JAVA_LONG) res = tb.and(res,tb.inLong(tb.var(qv)));
+                        if (type == PrimitiveType.JAVA_BYTE) {
+                            res = tb.and(res,tb.inByte(tb.var(qv)));
+                        }
+                        if (type == PrimitiveType.JAVA_SHORT) {
+                            res = tb.and(res,tb.inShort(tb.var(qv)));
+                        }
+                        if (type == PrimitiveType.JAVA_CHAR) {
+                            res = tb.and(res,tb.inChar(tb.var(qv)));
+                        }
+                        if (type == PrimitiveType.JAVA_INT) {
+                            res = tb.and(res,tb.inInt(tb.var(qv)));
+                        }
+                        if (type == PrimitiveType.JAVA_LONG) {
+                            res = tb.and(res,tb.inLong(tb.var(qv)));
+                        }
                     } else {
                         // assume reference type
                         if (nullable) {
@@ -713,8 +739,9 @@ public final class JMLTranslator {
                 @SuppressWarnings("unchecked")
                 final ImmutableList<QuantifiableVariable> qvs = (ImmutableList<QuantifiableVariable>) params[3];
                 final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-                if (body.sort() != intSort)
+                if (body.sort() != intSort) {
                     throw excManager.createException("body of \\max expression must be integer type");
+                }
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
                 final Term max = tb.max(qvs, tb.andSC(tr, guard), body, services);
                 final KeYJavaType type = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
@@ -848,15 +875,12 @@ public final class JMLTranslator {
                                new JMLTranslationMethod() {
 
             @Override
-            public SLExpression translate(
-                    SLTranslationExceptionManager excManager,
-                    Object... params)
-                    throws SLTranslationException {
-                checkParameters(params, Services.class, SLExpression.class);
-                final Services services = (Services)params[0];
-                IObserverFunction inv = services.getJavaInfo().getInv();
-                Term obj = ((SLExpression) params[1]).getTerm();
-                return new SLExpression(tb.func(inv, tb.getBaseHeap(), obj));
+            public SLExpression translate(SLTranslationExceptionManager excManager,
+                                          Object... params)
+                                                  throws SLTranslationException {
+                    checkParameters(params, Services.class, SLExpression.class);
+                    Term obj = ((SLExpression) params[1]).getTerm();
+                    return new SLExpression(tb.inv(obj));
             }
         });
 
@@ -1780,7 +1804,8 @@ public final class JMLTranslator {
 
             if (specType != null) {
                 return castToReturnType(services.getTermBuilder().addLabelToAllSubs(term,
-                        new OriginTermLabel(specType, expr.fileName, expr.pos.getLine())),
+                        new OriginTermLabel(
+                                new FileOrigin(specType, expr.fileName, expr.pos.getLine()))),
                         resultClass);
             } else {
                 return castToReturnType(result, resultClass);
@@ -1828,8 +1853,12 @@ public final class JMLTranslator {
             }
 
             if (specType != null) {
+                Origin origin = expr.pos == Position.UNDEFINED
+                        ? new Origin(specType)
+                        : new FileOrigin(specType, expr.fileName, expr.pos.getLine());
+
                 return castToReturnType(services.getTermBuilder().addLabelToAllSubs(term,
-                        new OriginTermLabel(specType, expr.fileName, expr.pos.getLine())),
+                        new OriginTermLabel(origin)),
                         resultClass);
             } else {
                 return castToReturnType(result, resultClass);
@@ -1927,8 +1956,9 @@ public final class JMLTranslator {
         final String shortName = jmlKeyWord.getText().replace("\\", "");
         int x = -1;
         Name name = null;
-        do name = new Name(shortName+"_"+ ++x);
-        while (fns.lookup(name)!=null);
+        do {
+            name = new Name(shortName+"_"+ ++x);
+        } while (fns.lookup(name)!=null);
         final Function sk = new Function(name,Sort.FORMULA);
         fns.add(sk);
         final Term t = tb.func(sk);
@@ -2011,8 +2041,9 @@ public final class JMLTranslator {
         final String shortName = jmlKeyWord.getText().replace("\\", "");
         int x = -1;
         Name name = null;
-        do name = new Name(shortName+"_"+ ++x);
-        while (fns.lookup(name)!= null);
+        do {
+            name = new Name(shortName+"_"+ ++x);
+        } while (fns.lookup(name)!= null);
         final Function sk = new Function(name,sort);
         fns.add(sk);
         final Term t = tb.func(sk);
@@ -2249,16 +2280,18 @@ public final class JMLTranslator {
             services = (Services) params[6];
             assert services != null;
             KeYJavaType resultType = (KeYJavaType) params[5];
-            if (resultType == null) // happens with num_of
+            if (resultType == null) {
                 resultType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+            }
 
-            if (declsType instanceof PrimitiveType && ((PrimitiveType)declsType).isIntegerType())
+            if (declsType instanceof PrimitiveType && ((PrimitiveType)declsType).isIntegerType()) {
                 return super.translate(excManager, params);
-            else
+            } else {
                 return new SLExpression(
                         translateUnboundedNumericalQuantifier(_declsType, nullable, qvs,
                                                               (Term)params[0], (Term)params[1]),
                         resultType);
+            }
         }
 
         @Override
@@ -2279,7 +2312,9 @@ public final class JMLTranslator {
             if (it.hasNext() || !isBoundedNumerical(t1, lv)) {
                 // not interval range, create unbounded comprehension term
                 ImmutableList<QuantifiableVariable> _qvs = ImmutableSLList.<QuantifiableVariable>nil().prepend(lv);
-                while (it.hasNext()) _qvs = _qvs.prepend(it.next());
+                while (it.hasNext()) {
+                    _qvs = _qvs.prepend(it.next());
+                }
                 t = translateUnboundedNumericalQuantifier(declsType, nullable, _qvs, t1, t2);
             } else {
                 t = translateBoundedNumericalQuantifier(lv,
@@ -2569,12 +2604,24 @@ public final class JMLTranslator {
         Term res = tb.tt();
         for (QuantifiableVariable qv: qvs) {
             if (type instanceof PrimitiveType) {
-                if (type == PrimitiveType.JAVA_BYTE) res = tb.and(res,tb.inByte(tb.var(qv)));
-                if (type == PrimitiveType.JAVA_SHORT) res = tb.and(res,tb.inShort(tb.var(qv)));
-                if (type == PrimitiveType.JAVA_CHAR) res = tb.and(res,tb.inChar(tb.var(qv)));
-                if (type == PrimitiveType.JAVA_INT) res = tb.and(res,tb.inInt(tb.var(qv)));
-                if (type == PrimitiveType.JAVA_LONG) res = tb.and(res,tb.inLong(tb.var(qv)));
-                if (type == PrimitiveType.JAVA_LOCSET) res = tb.and(res,tb.disjoint(tb.var(qv), tb.freshLocs(tb.getBaseHeap())));
+                if (type == PrimitiveType.JAVA_BYTE) {
+                    res = tb.and(res,tb.inByte(tb.var(qv)));
+                }
+                if (type == PrimitiveType.JAVA_SHORT) {
+                    res = tb.and(res,tb.inShort(tb.var(qv)));
+                }
+                if (type == PrimitiveType.JAVA_CHAR) {
+                    res = tb.and(res,tb.inChar(tb.var(qv)));
+                }
+                if (type == PrimitiveType.JAVA_INT) {
+                    res = tb.and(res,tb.inInt(tb.var(qv)));
+                }
+                if (type == PrimitiveType.JAVA_LONG) {
+                    res = tb.and(res,tb.inLong(tb.var(qv)));
+                }
+                if (type == PrimitiveType.JAVA_LOCSET) {
+                    res = tb.and(res,tb.disjoint(tb.var(qv), tb.freshLocs(tb.getBaseHeap())));
+                }
             } else {
                 // assume reference type
                 if (nullable) {

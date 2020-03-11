@@ -193,6 +193,12 @@ public final class Main {
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
 
     public static void main(final String[] args) {
+        // Runtime rt = Runtime.getRuntime();
+        // System.out.println ("Total memory: " + (rt.totalMemory() / 1048576.0) + " MB");
+        // System.out.println ("Maximum memory:   " + (rt.maxMemory() / 1048576.0) + " MB");
+        // System.out.println ("Free memory:  " + (rt.freeMemory() / 1048576.0) + " MB");
+        // System.out.println ("Available processors:  " + rt.availableProcessors());
+
         Locale.setDefault(Locale.US);
 
         // this property overrides the default
@@ -292,9 +298,9 @@ public final class Main {
     }
 
     /**
-     * Evaluate the parsed commandline options
+     * Evaluate the commandline options
      *
-     * @param commandline object cl
+     * @param cl parsed command lines, not null
      */
     public static void evaluateOptions(CommandLine cl) {
 
@@ -528,10 +534,6 @@ public final class Main {
             return new ConsoleUserInterfaceControl(verbosity, loadOnly);
         } else {
             updateSplashScreen();
-
-            /* explicitly enable pruning in closed branches for interactive mode
-             * (if not manually disabled) */
-            GeneralSettings.noPruningClosed = cl.isSet(NO_PRUNING_CLOSED) ? true : false;
 
             MainWindow mainWindow = MainWindow.getInstance();
 

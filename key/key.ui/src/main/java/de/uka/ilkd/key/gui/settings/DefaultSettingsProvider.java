@@ -3,8 +3,6 @@ package de.uka.ilkd.key.gui.settings;
 import de.uka.ilkd.key.gui.MainWindow;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**

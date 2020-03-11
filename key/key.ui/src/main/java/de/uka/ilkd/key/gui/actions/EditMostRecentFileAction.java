@@ -35,7 +35,7 @@ public final class EditMostRecentFileAction extends MainWindowAction {
     public EditMostRecentFileAction(MainWindow mainWindow) {
         super(mainWindow);
 	
-        setName("Edit last opened file");
+        setName("Edit Last Opened File");
         setIcon(IconFactory.editFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Open the last opened file with the default external editor");
 	

@@ -17,8 +17,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Stack;
 
-import junit.framework.TestCase;
-
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -39,6 +37,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import junit.framework.TestCase;
 
 public class TestClashFreeSubst extends TestCase {
 
@@ -66,7 +65,10 @@ public class TestClashFreeSubst extends TestCase {
 	nss = services.getNamespaces();
 	tf = services.getTermFactory();
 
-	String sorts = "\\sorts{boolean;int;LocSet;}";
+	// This must contain all basic sorts used in the JavaRedux libraries
+	// and the files for these test cases.
+	String sorts = "\\sorts{boolean;int;LocSet;Seq;}";
+
 	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION,
 		new KeYLexerF(sorts,
 			"No file. Call of parser from logic/TestClashFreeSubst.java"),
@@ -110,7 +112,7 @@ public class TestClashFreeSubst extends TestCase {
     }
 
     Sort lookup_sort(String name) {
-	Sort s = (Sort)nss.sorts().lookup(new Name(name));
+	Sort s = nss.sorts().lookup(new Name(name));
  	if ( s == null ) {
 	    throw new RuntimeException("Sort named "+name+" not found");
 	}
@@ -118,7 +120,7 @@ public class TestClashFreeSubst extends TestCase {
     }
 
     Function lookup_func(String name) {
-	Function f = (Function)nss.functions().lookup(new Name(name));
+	Function f = nss.functions().lookup(new Name(name));
  	if ( f == null ) {
 	    throw new RuntimeException("Function named "+name+" not found");
 	}
@@ -212,7 +214,7 @@ public class TestClashFreeSubst extends TestCase {
 	    Operator op = visited.op();
 	    int arity = visited.arity();
 	    if ( op == Quantifier.ALL ) {
-		Term top = (Term) subStack.peek();
+		Term top = subStack.peek();
 		if ( top.op() == Quantifier.ALL )  {
 		    QuantifiableVariable[] bv =
 			new QuantifiableVariable[visited.varsBoundHere(0).size()
@@ -232,13 +234,13 @@ public class TestClashFreeSubst extends TestCase {
 	    }
 	    Term[] sub = new Term[arity];
 	    for ( int i = arity-1; i>=0; i-- ) {
-		sub[i] = (Term) (subStack.pop());
+		sub[i] = (subStack.pop());
 	    }
 	    subStack.push(tf.createTerm(op, sub, visited.boundVars(), null));
 	}
 
 	Term getResult() {
-	    return (Term) subStack.pop();
+	    return subStack.pop();
 	}
     }
 

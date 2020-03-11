@@ -4,6 +4,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,9 +13,7 @@ import java.nio.file.Paths;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -34,7 +34,7 @@ public class TestProofBundleIO {
     private static Path testDir;
 
     /** to reset the setting after the tests (usually should be false if not in GUI mode) */
-    private static boolean allowBundleSaving = false;
+    private static boolean ensureConsistency = false;
 
     /**
      * Set up the test path and store the current allowBundleSaving setting.
@@ -43,42 +43,21 @@ public class TestProofBundleIO {
     public static void prepare() {
         testDir = Paths.get(HelperClassForTests.TESTCASE_DIRECTORY.getAbsolutePath(), "proofBundle");
 
-        // remember setting to be able to reset after the test
-        allowBundleSaving = ProofIndependentSettings.DEFAULT_INSTANCE
+        // remember settings to be able to reset after the test
+        ensureConsistency = ProofIndependentSettings.DEFAULT_INSTANCE
                                                     .getGeneralSettings()
-                                                    .isAllowBundleSaving();
-
-        // ensure that allowBundleSaving is true to enable repo
-        ProofIndependentSettings.DEFAULT_INSTANCE
-                                .getGeneralSettings()
-                                .setAllowBundleSaving(true);
+                                                    .isEnsureSourceConsistency();
     }
 
     /**
-     * Reset allowBundleSaving setting to value before tests.
+     * Reset settings to value before tests.
      */
     @AfterClass
     public static void cleanUp() {
-        // reset the setting to value before test
+        // reset the settings to value before test
         ProofIndependentSettings.DEFAULT_INSTANCE
                                 .getGeneralSettings()
-                                .setAllowBundleSaving(allowBundleSaving);
-    }
-
-    /**
-     * Tests if:
-     * <ul>
-     *  <li> an existing bundle is loadable
-     *  <li> the containing proof is closed
-     * </ul>
-     * @throws Exception on errors (should not happen)
-     */
-    @Test
-    public void testBundleLoading() throws Exception {
-        // load a bundle and test if proof is closed
-        Path file = testDir.resolve("bundleLoading").resolve("loadingTest.zproof");
-        Proof proof = loadBundle(file);
-        assertTrue(proof.closed());
+                                .setEnsureSourceConsistency(ensureConsistency);
     }
 
     /**
@@ -95,8 +74,10 @@ public class TestProofBundleIO {
          * we check only for 10 kb -> not empty */
         Path zip = testBundleGeneration("complexBundleGeneration", 10000);
 
-        // test if bundle is loadable again
-        assertNotNull(loadBundle(zip));
+        // test that bundle is loadable again and proof is closed
+        Proof proof = loadBundle(zip);
+        assertNotNull(proof);
+        assertTrue(proof.closed());
 
         // clean up
         Files.delete(zip);
@@ -116,8 +97,10 @@ public class TestProofBundleIO {
          * we check only for 1 kb -> not empty */
         Path zip = testBundleGeneration("simpleBundleGeneration", 1000);
 
-        // test if bundle is loadable again
-        assertNotNull(loadBundle(zip));
+        // test that bundle is loadable again and proof is closed
+        Proof proof = loadBundle(zip);
+        assertNotNull(proof);
+        assertTrue(proof.closed());
 
         Path unzip = zip.getParent().resolve("unzip");
         IOUtil.extractZip(zip, unzip);
@@ -130,6 +113,42 @@ public class TestProofBundleIO {
         // clean up
         Files.delete(zip);
         IOUtil.delete(unzip.toFile());
+    }
+
+    /**
+     * Tests that the SimpleFileRepo is able to save a proof as bundle (without consistency).
+     * @throws IOException on I/O errors
+     */
+    @Test
+    public void testSimpleFileRepo() throws IOException {
+        ProofIndependentSettings.DEFAULT_INSTANCE
+                                .getGeneralSettings()
+                                .setEnsureSourceConsistency(false);
+
+        AbstractFileRepo simple = new SimpleFileRepo();
+        Path base = testDir.resolve("simpleBundleGeneration");
+
+        simple.setBaseDir(base);
+        simple.setJavaPath(base.resolve("src").toString());
+
+        Path src = base.resolve("src");
+        InputStream is1 = simple.getInputStream(base.resolve("test.key"));
+        InputStream is2 = simple.getInputStream(src.resolve("Client.java"));
+        InputStream is3 = simple.getInputStream(src.resolve("Test.java"));
+
+        Path zip = base.resolve("test.zproof");
+        simple.saveProof(zip);
+
+        assertNotNull(is1);
+        assertNotNull(is2);
+        assertNotNull(is3);
+        assertTrue(Files.exists(zip));
+
+        // clean up
+        is1.close();
+        is2.close();
+        is3.close();
+        Files.delete(zip);
     }
 
     /**
@@ -160,6 +179,11 @@ public class TestProofBundleIO {
      * @throws Exception on errors (should not happen)
      */
     private Path testBundleGeneration(String dirName, long expectedSize) throws Exception {
+        // we test DiskFileRepo here!
+        ProofIndependentSettings.DEFAULT_INSTANCE
+                                .getGeneralSettings()
+                                .setEnsureSourceConsistency(true);
+
         Path path = testDir.resolve(dirName).resolve("test.key");
 
         // load *.key file

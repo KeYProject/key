@@ -9,8 +9,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Collections;
@@ -24,6 +22,7 @@ import java.util.stream.Collectors;
  * @version 1 (08.04.19)
  */
 public class SettingsUi extends JPanel {
+    private static final long serialVersionUID = -217841876110516940L;
     private static final Icon ICON_TREE_NODE_RETRACTED = IconFactory.TREE_NODE_EXPANDED.get();
     private static final Icon ICON_TREE_NODE_EXPANDED = IconFactory.TREE_NODE_RETRACTED.get();
 
@@ -38,6 +37,8 @@ public class SettingsUi extends JPanel {
         this.mainWindow = mainWindow;
         treeSettingsPanels.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         treeSettingsPanels.setCellRenderer(new DefaultTreeCellRenderer() {
+            private static final long serialVersionUID = 1770380144400699946L;
+
             @Override
             public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
                 SettingsTreeNode node = (SettingsTreeNode) value;

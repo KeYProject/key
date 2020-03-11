@@ -18,15 +18,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.*;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.zip.ZipFile;
+
 import org.antlr.runtime.MismatchedTokenException;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
@@ -43,8 +41,8 @@ import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
+import de.uka.ilkd.key.proof.io.consistency.SimpleFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -121,6 +119,11 @@ public abstract class AbstractProblemLoader {
     private final File file;
 
     /**
+     * The filename of the proof in the zipped file (null if file is not a proof bundle).
+     */
+    private File proofFilename;
+
+    /**
      * The optional class path entries to use.
      */
     private final List<File> classPath;
@@ -188,11 +191,6 @@ public abstract class AbstractProblemLoader {
     private ReplayResult result;
 
     /**
-     * The FileRepo used to ensure consistency of proof and source code.
-     */
-    private FileRepo fileRepo;          // TODO: WP
-
-    /**
      * Maps internal error codes of the parser to human readable strings.
      * The integers refer to the common MismatchedTokenExceptions,
      * where one token is expected and another is found.
@@ -253,15 +251,7 @@ public abstract class AbstractProblemLoader {
     public void load() throws ProofInputException, IOException, ProblemLoaderException {
         control.loadingStarted(this);
 
-        // create a FileRepo depending on the setting
-        boolean bundle = ProofIndependentSettings.DEFAULT_INSTANCE
-                                                 .getGeneralSettings()
-                                                 .isAllowBundleSaving();
-        if (bundle) {
-            fileRepo = new DiskFileRepo("KeYTmpFileRepo");
-        } else {
-            fileRepo = new TrivialFileRepo();
-        }
+        FileRepo fileRepo = createFileRepo();
 
         // Read environment
         envInput = createEnvInput(fileRepo);
@@ -365,6 +355,25 @@ public abstract class AbstractProblemLoader {
     }
 
     /**
+     * Creates a new FileRepo (with or without consistency) based on the settings.
+     * @return a FileRepo that can be used for proof bundle saving
+     * @throws IOException if for some reason the FileRepo can not be created
+     *   (e.g. temporary directory can not be created).
+     */
+    protected FileRepo createFileRepo() throws IOException {
+        // create a FileRepo depending on the settings
+        boolean consistent = ProofIndependentSettings.DEFAULT_INSTANCE
+                                                     .getGeneralSettings()
+                                                     .isEnsureSourceConsistency();
+
+        if (consistent) {
+            return new DiskFileRepo("KeYTmpFileRepo");
+        } else {
+            return new SimpleFileRepo();
+        }
+    }
+
+    /**
      * Instantiates the {@link EnvInput} which represents the file to load.
      * @param fileRepo the FileRepo used to ensure consistency between proof and source code
      * @return The created {@link EnvInput}.
@@ -379,7 +388,7 @@ public abstract class AbstractProblemLoader {
 
         if (filename.endsWith(".java")) {
             // java file, probably enriched by specifications
-            SLEnvInput ret;
+            SLEnvInput ret = null;
             if (file.getParentFile() == null) {
                 ret = new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs, includes);
             } else {
@@ -390,9 +399,50 @@ public abstract class AbstractProblemLoader {
             ret.setIgnoreOtherJavaFiles(loadSingleJavaFile);
             return ret;
         } else if (filename.endsWith(".zproof")) {            // zipped proof package
+            /* TODO: Currently it is not possible to load proof bundles with multiple proofs.
+             *  This feature is still pending, since the functionality to save multiple proofs in
+             *  one (consistent!) package is not yet implemented (see ProofManagement tool from
+             *  1st HacKeYthon).
+             *  The current implementation allows the user to pick one of the proofs via a dialog.
+             *  The user choice is given to the AbstractProblem Loader via the proofName field.
+             */
+            if (proofFilename == null) {    // no proof to load given -> try to determine one
+                // create a list of all *.proof files (only top level in bundle)
+                ZipFile bundle = new ZipFile(file);
+                List<Path> proofs = bundle.stream()
+                    .filter(e -> !e.isDirectory())
+                    .filter(e -> e.getName().endsWith(".proof"))
+                    .map(e -> Paths.get(e.getName()))
+                    .collect(Collectors.toList());
+                if (!proofs.isEmpty()) {
+                    // load first proof found in file
+                    proofFilename = proofs.get(0).toFile();
+                } else {
+                    // no proof found in bundle!
+                    throw new IOException("The bundle contains no proof to load!");
+                }
+            }
+
+            // we are sure proofFilename is set now:
+            // assert proofFilename != null;
+
             // unzip to a temporary directory
             Path tmpDir = Files.createTempDirectory("KeYunzip");
             IOUtil.extractZip(file.toPath(), tmpDir);
+
+            // hook for deleting tmpDir + content at program exit
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    // delete the temporary directory with all contained files
+                    Files.walk(tmpDir)
+                         .sorted(Comparator.reverseOrder())
+                         .map(Path::toFile)
+                         .forEach(File::delete);
+                } catch (IOException e) {
+                    // this is called at program exist, so we only print a console message
+                    e.printStackTrace();
+                }
+            }));
 
             // point the FileRepo to the temporary directory
             fileRepo.setBaseDir(tmpDir);
@@ -400,20 +450,11 @@ public abstract class AbstractProblemLoader {
             // create new KeYUserProblemFile pointing to the (unzipped) proof file
             PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.proof");
 
-            /* TODO: Currently it is not possible to load proof bundles with multiple proofs.
-             *  This feature is still pending, since the functionality to save multiple proofs in
-             *  one (consistent!) package is not yet implemented (see ProofManagement tool from
-             *  1st HacKeYthon).
-             *  So the current implementation just picks one of the proofs and loads it.
-             */
-            // pick one of the proofs
-            Path unzippedProof = Files.list(tmpDir)
-                    .filter(matcher::matches)
-                    .findFirst()
-                    .get(); // TODO: message if the path is null, i.e. no proof is in package
+            // construct the absolute path to the unzipped proof file
+            Path unzippedProof = tmpDir.resolve(proofFilename.toPath());
 
             return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof.toFile(),
-                    fileRepo, control, profileOfNewProofs, false);
+                fileRepo, control, profileOfNewProofs, false);
         } else if (filename.endsWith(".key") || filename.endsWith(".proof")
               || filename.endsWith(".proof.gz")) {
             // KeY problem specification or saved proof
@@ -575,8 +616,13 @@ public abstract class AbstractProblemLoader {
         KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
 
             Triple<String, Integer, Integer> script = kupf.readProofScript();
-        String path = kupf.getInitialFile().getAbsolutePath();
-        Location location = new Location(path, script.second, script.third);
+        URL url = null;
+        try {
+            url = kupf.getInitialFile().toURI().toURL();
+        } catch (MalformedURLException e) {
+            throw new ProofInputException(e);
+        }
+        Location location = new Location(url, script.second, script.third);
 
         return new Pair<String, Location>(script.first, location);
     }
@@ -728,6 +774,9 @@ public abstract class AbstractProblemLoader {
        return result;
     }
 
+    public void setProofPath(File proofFilename) {
+        this.proofFilename = proofFilename;
+    }
 
     public boolean isLoadSingleJavaFile() {
         return loadSingleJavaFile;

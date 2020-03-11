@@ -3,7 +3,10 @@ package de.uka.ilkd.key.macros.scripts;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Observer;
@@ -12,6 +15,7 @@ import java.util.ServiceLoader;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -27,16 +31,35 @@ public class ProofScriptEngine {
     private final Location initialLocation;
     private final String script;
 
+    /** The initially selected goal. */
+    private final Goal initiallySelectedGoal;
+
+    /** The engine state map. */
+    private EngineState stateMap;
+
     private Observer commandMonitor;
 
     public ProofScriptEngine(File file) throws IOException {
-        this.initialLocation = new Location(file.getAbsolutePath(), 1, 1);
+        this.initialLocation = new Location(file.toURI().toURL(), 1, 1);
         this.script = new String(Files.readAllBytes(file.toPath()));
+        this.initiallySelectedGoal = null;
     }
 
     public ProofScriptEngine(String script, Location initLocation) {
+        this(script, initLocation, null);
+    }
+
+    /**
+     * Instantiates a new proof script engine.
+     *
+     * @param script the script
+     * @param initLocation the initial location
+     * @param initiallySelectedGoal the initially selected goal
+     */
+    public ProofScriptEngine(String script, Location initLocation, Goal initiallySelectedGoal) {
         this.script = script;
         this.initialLocation = initLocation;
+        this.initiallySelectedGoal = initiallySelectedGoal;
     }
 
     private static Map<String, ProofScriptCommand> loadCommands() {
@@ -58,12 +81,20 @@ public class ProofScriptEngine {
         ScriptLineParser mlp = new ScriptLineParser(new StringReader(script));
         mlp.setLocation(initialLocation);
 
-        EngineState stateMap = new EngineState(proof);
+        stateMap = new EngineState(proof);
+
+        if (initiallySelectedGoal != null) {
+            stateMap.setGoal(initiallySelectedGoal);
+        }
 
         // add the filename (if available) to the statemap.
-        String filename = initialLocation.getFilename();
-        if (filename != null && filename.length() > 0) {
-            stateMap.setBaseFileName(new File(filename));
+        URL url = initialLocation.getFileURL();
+        if (url != null) {
+            try {
+                stateMap.setBaseFileName(Paths.get(url.toURI()).toFile());
+            } catch (URISyntaxException e) {
+                throw new IOException(e);
+            }
         }
 
         // add the observer (if installed) to the state map
@@ -132,10 +163,14 @@ public class ProofScriptEngine {
                         "Error while executing script: " + e.getMessage()
                                 + "\n\nCommand: "
                                 + argMap.get(ScriptLineParser.LITERAL_KEY),
-                        initialLocation.getFilename(), mlp.getLine(),
+                        initialLocation.getFileURL(), mlp.getLine(),
                         mlp.getColumn(), e);
             }
         }
+    }
+
+    public EngineState getStateMap() {
+        return stateMap;
     }
 
 //    private void write(String s, int cnt, Proof proof) {
