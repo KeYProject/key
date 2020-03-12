@@ -9,7 +9,6 @@ import com.github.ajalt.clikt.parameters.types.file
 import de.uka.ilkd.key.nparser.KeYParser
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor
 import de.uka.ilkd.key.nparser.ParsingFacade
-import kotlinx.html.stream.appendHTML
 import java.io.File
 
 object App {
@@ -60,19 +59,15 @@ class GenDoc() : CliktCommand() {
     fun run(ctx: KeYParser.FileContext, f: File) {
         try {
             val target = File(outputFolder, f.nameWithoutExtension + ".html")
-            target.bufferedWriter().use {
-                it.appendHTML(true).writeDocumentationFile(target.name, f, ctx, symbols)
-            }
+            DocumentationFile(target, f, ctx, symbols).invoke()
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    fun generateIndex(): Unit {
+    fun generateIndex() {
         val f = File(outputFolder, "index.html")
-        f.bufferedWriter().use {
-            it.appendHTML(true).writeIndexFile(f.name, symbols)
-        }
+        Indexfile(f, symbols).invoke()
     }
 }
 
@@ -134,7 +129,7 @@ object IndexHelper {
     fun transformer(page: String, text: String) =
             Symbol(text, page, text, Symbol.Type.TRANSFORMER)
 
-    fun file(self: String) = Symbol(self, self, "root", Symbol.Type.FILE)
+    fun file(self: String) = Symbol(self.replace(".html", ""), self, "root", Symbol.Type.FILE)
 }
 
 data class Symbol(val displayName: String,
@@ -145,5 +140,6 @@ data class Symbol(val displayName: String,
         TACLET, SORT, PREDICATE, TRANSFORMER, FUNCTION, CATEGORY, OPTION, FILE
     }
 
-    val url = "$page#$type.$id"
+    val target = "$type-$id"
+    val url = "$page#$target"
 }

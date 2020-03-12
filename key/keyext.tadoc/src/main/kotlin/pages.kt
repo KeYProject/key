@@ -3,47 +3,86 @@ package org.key_project.core.doc
 import de.uka.ilkd.key.nparser.KeYParser
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor
 import kotlinx.html.*
+import kotlinx.html.stream.appendHTML
 import org.antlr.v4.runtime.ParserRuleContext
 import java.io.File
 
+abstract class DefaultPage(
+        val target: File,
+        val pageTitle: String,
+        val index: Symbols) {
+    var brandTitle: String = "KeY Logic Documentation"
+    var tagLine: String = "Auto-generated from the KeY files."
+    val self = target.name
 
-fun <R> TagConsumer<R>.region(title: String, types: Iterable<Symbol>) {
-    div("region") {
-        h2 { +title }
-        div("links") {
-            types.sortedBy { it.displayName }.forEach {
-                a(it.url, classes = it.type.toString()) { +it.displayName }
-                +" "
+    operator fun invoke() {
+        target.bufferedWriter().use {
+            it.appendHTML(true).html {
+                head {
+                    title(pageTitle)
+                    styleLink("style.css")
+                }
+                body {
+                    div("pure-g") {
+                        id = "layout"
+                        commonHeader(this)
+                        div("content pure-u-3-4") {
+                            content(this)
+                            commonFooter(this)
+                        }
+                    }
+                }
             }
         }
     }
-}
 
-internal fun <R> TagConsumer<R>.defaultPage(
-        fileName: String,
-        pageTitle: String,
-        index: Symbols,
-        funcBody: TagConsumer<R>.() -> Unit) {
+    abstract fun content(div: DIV)
 
-    html {
-        head {
-            defaultHeader(pageTitle)
-        }
-        body {
-            div("pure-g") {
-                id = "layout"
-                commonHeader(fileName, index)
-                div("content pure-u-3-4") {
-                    funcBody()
-                    commonFooter()
+    open fun commonHeader(body: DIV) =
+            body.div("sidebar pure-u-1-4") {
+                div("0header") {
+                    h1("brand-title") { +brandTitle }
+                    h2("brand-tagline") { +tagLine }
+                    nav("nav") {
+                        ul("nav-list") {
+                            li("nav-item") {
+                                a(classes = "pure-button", href = "index.html") { +"Startpage" }
+                            }
+                            val cat = index.map { (a, b) -> b }
+                                    .filter { it.page == self }
+                                    .groupBy { it.type }
+                            cat.forEach { c ->
+                                li {
+                                    +c.key.name
+                                    ul {
+
+                                        c.value.forEach {
+                                            li { a(it.url) { +it.displayName } }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+    open fun commonFooter(div: DIV) {
+        div.div("footer") {
+            div("pure-menu pure-menu-horizontal") {
+                ul {
+                    li("pure-menu-item") { a(href = "http://purecss.io/", classes = "pure-menu-link") { +"About" } }
+                    li("pure-menu-item") { a(href = "http://twitter.com/yuilibrary/", classes = "pure-menu-link") { +"Twitter" } }
+                    li("pure-menu-item") { a(href = "http://github.com/pure-css/pure/", classes = "pure-menu-link") { +"GitHub" } }
                 }
             }
         }
     }
 }
 
-internal fun <R> TagConsumer<R>.writeIndexFile(fileName: String, index: Symbols) =
-        defaultPage(fileName, "Index Page", index) {
+class Indexfile(target: File, index: Symbols) : DefaultPage(target, "Index Page", index) {
+    override fun content(div: DIV) {
+        div.div {
             h1 { +"Index page" }
             val symbols = index.map { (a, b) -> b }
             region("Choice categories", symbols.filter { it.type == Symbol.Type.CATEGORY })
@@ -55,72 +94,25 @@ internal fun <R> TagConsumer<R>.writeIndexFile(fileName: String, index: Symbols)
             region("Taclets", symbols.filter { it.type == Symbol.Type.TACLET })
             region("Files", symbols.filter { it.type == Symbol.Type.FILE })
         }
-
-fun <R> TagConsumer<R>.commonHeader(self: String, index: Symbols) =
-        div("sidebar pure-u-1-4") {
-            div("0header") {
-                h1("brand-title") { +"A Sample Blog" }
-                h2("brand-tagline") { +"Creating a blog layout using Pure" }
-                nav("nav") {
-                    ul("nav-list") {
-                        /*li("nav-item") {
-                            a(classes = "pure-button", href = "http://purecss.io") { +"Pure" }
-                        }*/
-                        val cat = index.map { (a, b) -> b }
-                                .filter { it.page == self }
-                                .groupBy { it.type }
-                        cat.forEach { c ->
-                            li {
-                                +c.key.name
-                                ul {
-
-                                    c.value.forEach {
-                                        li { a(it.url) { +it.displayName } }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-fun <R> TagConsumer<R>.commonFooter() {
-    div("footer") {
-        div("pure-menu pure-menu-horizontal") {
-            ul {
-                li("pure-menu-item") { a(href = "http://purecss.io/", classes = "pure-menu-link") { +"About" } }
-                li("pure-menu-item") { a(href = "http://twitter.com/yuilibrary/", classes = "pure-menu-link") { +"Twitter" } }
-                li("pure-menu-item") { a(href = "http://github.com/pure-css/pure/", classes = "pure-menu-link") { +"GitHub" } }
-            }
-        }
     }
 }
 
-private fun HEAD.defaultHeader(pageTitle: String) {
-    title(pageTitle)
-    styleLink("style.css")
-}
-
-fun <R> TagConsumer<R>.writeDocumentationFile(fileName: String, file: File, ctx: KeYParser.FileContext,
-                                              symbols: Symbols) = defaultPage(fileName, "${file.nameWithoutExtension} -- Documentation", symbols) {
-    body {
-        h1 {
-            +file.name
-        }
-
+class DocumentationFile(target: File, val keyFile: File, val ctx: KeYParser.FileContext, symbols: Symbols)
+    : DefaultPage(target, "${keyFile.nameWithoutExtension} -- Documentation", symbols) {
+    override fun content(div: DIV) {
+        div.h1 { +keyFile.name }
         //small { +file.relativeTo(File(".").absoluteFile).toString() }
-
-        val self = "${file.nameWithoutExtension}.html"
-        ctx.accept(FileVisitor(self, this@writeDocumentationFile, symbols))
+        ctx.accept(FileVisitor(self, div, index))
     }
 }
 
 
-class FileVisitor<R>(val self: String,
-                     val tagConsumer: TagConsumer<R>,
-                     val symbols: Symbols) : KeYParserBaseVisitor<Unit>() {
-    override fun visitFile(ctx: KeYParser.FileContext?) {
+class FileVisitor(val self: String,
+                  val tagConsumer: DIV,
+                  val symbols: Symbols) : KeYParserBaseVisitor<Unit>() {
+    override fun visitFile(ctx: KeYParser.FileContext) {
+        val symbol = symbols.lookup(ctx)
+        tagConsumer.div { id = symbol!!.target }
         super.visitFile(ctx)
     }
 
@@ -132,7 +124,8 @@ class FileVisitor<R>(val self: String,
         super.visitProblem(ctx)
     }
 
-    override fun visitOne_include_statement(ctx: KeYParser.One_include_statementContext?) {
+    override fun visitOne_include_statement(ctx: KeYParser.One_include_statementContext) {
+        tagConsumer.div { +"Requires: ${ctx.text}" }
         super.visitOne_include_statement(ctx)
     }
 
@@ -155,12 +148,12 @@ class FileVisitor<R>(val self: String,
     override fun visitChoice(ctx: KeYParser.ChoiceContext) {
         val catsym = symbols.lookup(ctx)
         tagConsumer.div("doc category") {
-            catsym?.id?.let { id = it }
+            catsym?.target?.let { id = it }
             h3 {
                 +ctx.category.text
             }
 
-            +(ctx.DOC_COMMENT?.text?:"")
+            +(ctx.DOC_COMMENT?.text ?: "")
 
             printDefinition(ctx)
 
@@ -184,7 +177,7 @@ class FileVisitor<R>(val self: String,
         for (s in ctx.sortIds.simple_ident_dots()) {
             val symbol = symbols.lookup(s)
             tagConsumer.div("doc sort") {
-                symbol?.id?.let { id = it }
+                symbol?.target?.let { id = it }
                 h3("sort") {
                     +s.text
                 }
@@ -206,7 +199,7 @@ class FileVisitor<R>(val self: String,
     override fun visitPred_decl(ctx: KeYParser.Pred_declContext) {
         val symbol = symbols.lookup(ctx)
         tagConsumer.div("doc pred") {
-            symbol?.id?.let { id = it }
+            symbol?.target?.let { id = it }
             h3("sort") {
                 +ctx.pred_name.text
             }
@@ -222,7 +215,7 @@ class FileVisitor<R>(val self: String,
     override fun visitFunc_decl(ctx: KeYParser.Func_declContext) {
         val symbol = symbols.lookup(ctx)
         tagConsumer.div("doc pred") {
-            symbol?.id?.let { id = it }
+            symbol?.target?.let { id = it }
             h3("sort") {
                 +ctx.func_name.text
             }
@@ -248,7 +241,7 @@ class FileVisitor<R>(val self: String,
     override fun visitTaclet(ctx: KeYParser.TacletContext) {
         val symbol = symbols.lookup(ctx)
         tagConsumer.div("doc taclet") {
-            symbol?.id?.let { id = it }
+            symbol?.target?.let { id = it }
             h3("taclet") {
                 +ctx.name.text
             }
@@ -265,16 +258,29 @@ private fun Symbols.findChoice(text: String?, text1: String?): Symbol? {
     }
 }
 
+fun DIV.region(title: String, types: Iterable<Symbol>) {
+    div("region") {
+        h2 { +title }
+        div("links") {
+            types.sortedBy { it.displayName }.forEach {
+                a(it.url, classes = it.type.toString()) { +it.displayName }
+                +" "
+            }
+        }
+    }
+}
+
+
 private fun DIV.printDefinition(ctx: ParserRuleContext) {
     div("raw") {
         code {
             pre {
-                +ctx.text
+                +ctx.accept(PrettyPrinter(Symbols()))
             }
         }
         small {
             val source = ctx.getStart().tokenSource
-            +"defined in: ${source.sourceName} Line: ${ctx.start.line} Offset :${ctx.start.charPositionInLine}"
+            +"defined in: ${File(source.sourceName).name} Line: ${ctx.start.line} Offset :${ctx.start.charPositionInLine}"
         }
     }
 }

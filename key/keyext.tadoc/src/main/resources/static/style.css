@@ -187,3 +187,16 @@ h3 {
         text-align: center;
     }
 }
+
+.raw {
+    font-size:10pt;
+    border:1px solid #ccc;
+    padding:1em 1em 0em 1em;
+}
+
+.raw small {
+    display:block;
+    text-align:right;
+    color:#666;
+    font-style:italic;
+}
