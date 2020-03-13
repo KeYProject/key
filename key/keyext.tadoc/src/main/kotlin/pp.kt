@@ -1,5 +1,6 @@
 package org.key_project.core.doc
 
+import de.uka.ilkd.key.nparser.KeYLexer
 import de.uka.ilkd.key.nparser.KeYParser
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor
 import org.antlr.v4.runtime.tree.TerminalNode
@@ -9,13 +10,24 @@ import org.antlr.v4.runtime.tree.TerminalNode
  * @author Alexander Weigl
  * @version 1 (3/12/20)
  */
-class PrettyPrinter(val symbols: Symbols) : KeYParserBaseVisitor<String>() {
+class PrettyPrinter(val index: Index) : KeYParserBaseVisitor<String>() {
     private val printReferences = true
+    val tokenSymbols = index.map { (a, b) -> b }.filterIsInstance<Symbol.Token>()
 
     override fun aggregateResult(aggregate: String?, nextResult: String?) =
             (aggregate ?: "") + (nextResult ?: "")
 
-    override fun visitTerminal(node: TerminalNode): String = node.text
+    override fun visitTerminal(node: TerminalNode): String {
+        val t = node.symbol
+        val text = t.text
+        if (t.type == KeYLexer.DOC_COMMENT) return ""
+        if (!printReferences) return "$text "
+        val s = tokenSymbols.find { it.tokenType == t.type }
+        return if (s != null)
+            "<a class=\"token\" href=\"${s.href}\">$text</a> "
+        else
+            "$text "
+    }
 
     override fun defaultResult(): String {
         return ""
@@ -76,27 +88,28 @@ class PrettyPrinter(val symbols: Symbols) : KeYParserBaseVisitor<String>() {
                     append(ctx.ONEOF().text)
                     append(" ")
                     ctx.oneof_sorts().sortId().joinTo(this, ", ", "{", "}") {
-                        append(ref(it.text, Symbol.Type.SORT))
+                        append(ref<Symbol.SORT>(it.text))
                     }
                 }
                 if (null != ctx.EXTENDS()) {
                     append(" ")
                     append(ctx.EXTENDS().text).append(" ")
                     ctx.sortExt.sortId().joinTo(this, ", ") {
-                        append(ref(it.text, Symbol.Type.SORT))
+                        it.accept(this@PrettyPrinter)
                     }
                 }
                 append(ctx.SEMI().text)
             }
 
-    private fun ref(text: String, sort: Symbol.Type): String {
-        if(!printReferences) return text
-        val s = symbols.find { (a, b) -> b.type == sort && b.id == text }?.second
+
+    private inline fun <reified T : Symbol> ref(text: String): String {
+        if (!printReferences) return "$text "
+        val s = index.find { (a, b) -> b is T && b.displayName == text }?.second
         return if (s != null)
-            "<a href=\"${s.url}\">$text</a>"
+            "<a href=\"${s.href}\">$text</a> "
         else
-            text.also {
-                System.err.println("Could not found symbol for $text : $sort")
+            "text ".also {
+                System.err.println("Could not found symbol for $text : ${T::class.java.simpleName}")
             }
     }
 
@@ -204,8 +217,8 @@ class PrettyPrinter(val symbols: Symbols) : KeYParserBaseVisitor<String>() {
         return super.visitRuleset_decls(ctx)
     }
 
-    override fun visitSortId(ctx: KeYParser.SortIdContext?): String {
-        return super.visitSortId(ctx)
+    override fun visitSortId(ctx: KeYParser.SortIdContext): String {
+        return ref<Symbol.SORT>(ctx.text)
     }
 
     override fun visitId_declaration(ctx: KeYParser.Id_declarationContext?): String {

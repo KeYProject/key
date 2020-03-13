@@ -5,12 +5,19 @@ import de.uka.ilkd.key.nparser.KeYParserBaseVisitor
 import kotlinx.html.*
 import kotlinx.html.stream.appendHTML
 import org.antlr.v4.runtime.ParserRuleContext
+import org.commonmark.ext.autolink.AutolinkExtension
+import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
+import org.commonmark.ext.gfm.tables.TablesExtension
+import org.commonmark.ext.ins.InsExtension
+import org.commonmark.parser.Parser
+import org.commonmark.renderer.html.HtmlRenderer
+import org.key_project.core.doc.Markdown.markdown
 import java.io.File
 
 abstract class DefaultPage(
         val target: File,
         val pageTitle: String,
-        val index: Symbols) {
+        val index: Index) {
     var brandTitle: String = "KeY Logic Documentation"
     var tagLine: String = "Auto-generated from the KeY files."
     val self = target.name
@@ -43,21 +50,30 @@ abstract class DefaultPage(
                 div("0header") {
                     h1("brand-title") { +brandTitle }
                     h2("brand-tagline") { +tagLine }
+
                     nav("nav") {
                         ul("nav-list") {
                             li("nav-item") {
                                 a(classes = "pure-button", href = "index.html") { +"Startpage" }
+                                a(classes = "pure-button", href = "https://key-project.org/docs/") { +"KeY Docs" }
                             }
-                            val cat = index.map { (a, b) -> b }
-                                    .filter { it.page == self }
-                                    .groupBy { it.type }
-                            cat.forEach { c ->
-                                li {
-                                    +c.key.name
-                                    ul {
+                        }
+                    }
 
-                                        c.value.forEach {
-                                            li { a(it.url) { +it.displayName } }
+                    h3 { +"Overview" }
+                    nav("nav") {
+                        ul("nav-list") {
+                            val cat = index.asSequence()
+                                    .map { (_, b) -> b }
+                                    .filter { it.url == self }
+                                    .filter { it !is Symbol.FILE && it !is Symbol.External }
+                                    .groupBy { it.javaClass }
+                            cat.forEach { c ->
+                                li() {
+                                    +c.key.simpleName
+                                    ul {
+                                        c.value.sortedBy { it.displayName }.forEach {
+                                            li { a(it.href) { +it.displayName } }
                                         }
                                     }
                                 }
@@ -80,27 +96,32 @@ abstract class DefaultPage(
     }
 }
 
-class Indexfile(target: File, index: Symbols) : DefaultPage(target, "Index Page", index) {
+class Indexfile(target: File, index: Index) : DefaultPage(target, "Index Page", index) {
     override fun content(div: DIV) {
         div.div {
             h1 { +"Index page" }
             val symbols = index.map { (a, b) -> b }
-            region("Choice categories", symbols.filter { it.type == Symbol.Type.CATEGORY })
-            region("Choice options", symbols.filter { it.type == Symbol.Type.OPTION })
-            region("Sorts", symbols.filter { it.type == Symbol.Type.SORT })
-            region("Predicates", symbols.filter { it.type == Symbol.Type.PREDICATE })
-            region("Functions", symbols.filter { it.type == Symbol.Type.FUNCTION })
-            region("Transformers", symbols.filter { it.type == Symbol.Type.TRANSFORMER })
-            region("Taclets", symbols.filter { it.type == Symbol.Type.TACLET })
-            region("Files", symbols.filter { it.type == Symbol.Type.FILE })
+            region("Choice categories", symbols.filterIsInstance<Symbol.CATEGORY>())
+            region("Choice options", symbols.filterIsInstance<Symbol.OPTION>())
+            region("Sorts", symbols.filterIsInstance<Symbol.SORT>())
+            region("Predicates", symbols.filterIsInstance<Symbol.PREDICATE>())
+            region("Functions", symbols.filterIsInstance<Symbol.FUNCTION>())
+            region("Transformers", symbols.filterIsInstance<Symbol.TRANSFORMER>())
+            region("Taclets", symbols.filterIsInstance<Symbol.TACLET>())
+            region("Files", symbols.filterIsInstance<Symbol.FILE>())
         }
     }
 }
 
-class DocumentationFile(target: File, val keyFile: File, val ctx: KeYParser.FileContext, symbols: Symbols)
-    : DefaultPage(target, "${keyFile.nameWithoutExtension} -- Documentation", symbols) {
+class DocumentationFile(target: File, val keyFile: File, val ctx: KeYParser.FileContext, index: Index)
+    : DefaultPage(target, "${keyFile.nameWithoutExtension} -- Documentation", index) {
     override fun content(div: DIV) {
         div.h1 { +keyFile.name }
+
+        ctx.DOC_COMMENT().forEach {
+            div.markdown(it.text)
+        }
+
         //small { +file.relativeTo(File(".").absoluteFile).toString() }
         ctx.accept(FileVisitor(self, div, index))
     }
@@ -109,9 +130,9 @@ class DocumentationFile(target: File, val keyFile: File, val ctx: KeYParser.File
 
 class FileVisitor(val self: String,
                   val tagConsumer: DIV,
-                  val symbols: Symbols) : KeYParserBaseVisitor<Unit>() {
+                  val index: Index) : KeYParserBaseVisitor<Unit>() {
     override fun visitFile(ctx: KeYParser.FileContext) {
-        val symbol = symbols.lookup(ctx)
+        val symbol = index.lookup(ctx)
         tagConsumer.div { id = symbol!!.target }
         super.visitFile(ctx)
     }
@@ -146,19 +167,19 @@ class FileVisitor(val self: String,
     }
 
     override fun visitChoice(ctx: KeYParser.ChoiceContext) {
-        val catsym = symbols.lookup(ctx)
+        val catsym = index.lookup(ctx)
         tagConsumer.div("doc category") {
             catsym?.target?.let { id = it }
             h3 {
                 +ctx.category.text
             }
 
-            +(ctx.DOC_COMMENT?.text ?: "")
+            markdown(ctx.DOC_COMMENT?.text)
 
-            printDefinition(ctx)
+            printDefinition(ctx, index)
 
             ctx.choice_option.forEachIndexed { i, co ->
-                val optsym = symbols.lookup(co)
+                val optsym = index.lookup(co)
                 div("doc option") {
                     h4 { +co.text }
                     //TODO+ctx.DOC_COMMENT(i + 1).text
@@ -175,13 +196,13 @@ class FileVisitor(val self: String,
 
     override fun visitOne_sort_decl(ctx: KeYParser.One_sort_declContext) {
         for (s in ctx.sortIds.simple_ident_dots()) {
-            val symbol = symbols.lookup(s)
+            val symbol = index.lookup(s)
             tagConsumer.div("doc sort") {
                 symbol?.target?.let { id = it }
                 h3("sort") {
                     +s.text
                 }
-                printDefinition(ctx)
+                printDefinition(ctx, index)
             }
         }
     }
@@ -197,13 +218,13 @@ class FileVisitor(val self: String,
 
 
     override fun visitPred_decl(ctx: KeYParser.Pred_declContext) {
-        val symbol = symbols.lookup(ctx)
+        val symbol = index.lookup(ctx)
         tagConsumer.div("doc pred") {
             symbol?.target?.let { id = it }
             h3("sort") {
                 +ctx.pred_name.text
             }
-            printDefinition(ctx)
+            printDefinition(ctx, index)
         }
     }
 
@@ -213,13 +234,12 @@ class FileVisitor(val self: String,
     }
 
     override fun visitFunc_decl(ctx: KeYParser.Func_declContext) {
-        val symbol = symbols.lookup(ctx)
-        tagConsumer.div("doc pred") {
-            symbol?.target?.let { id = it }
-            h3("sort") {
-                +ctx.func_name.text
-            }
-            printDefinition(ctx)
+        val symbol = index.lookup(ctx)
+        tagConsumer.div("doc func") {
+            symbol?.anchor?.let { id = it }
+            h3 { +ctx.func_name.text }
+            markdown(ctx.DOC_COMMENT()?.text)
+            printDefinition(ctx, index)
         }
     }
 
@@ -227,11 +247,15 @@ class FileVisitor(val self: String,
         tagConsumer.h2 { +"Taclets" }
 
         tagConsumer.div {
-            +"Enabled under choices:"
-            ctx.choices?.option()?.forEach {
-                val target = symbols.findChoice(it.cat.text, it.value.text)?.url ?: ""
-                a(target) { +it.text }
-                +" "
+            if (ctx.choices?.option().isNullOrEmpty()) {
+                +"No choice condition specified"
+            } else {
+                +"Enabled under choices:"
+                ctx.choices?.option()?.forEach {
+                    val target = index.findChoice(it.cat.text, it.value.text)?.href ?: ""
+                    a(target) { +it.text }
+                    +" "
+                }
             }
         }
 
@@ -239,22 +263,21 @@ class FileVisitor(val self: String,
     }
 
     override fun visitTaclet(ctx: KeYParser.TacletContext) {
-        val symbol = symbols.lookup(ctx)
+        val symbol = index.lookup(ctx)
         tagConsumer.div("doc taclet") {
             symbol?.target?.let { id = it }
             h3("taclet") {
                 +ctx.name.text
             }
-            printDefinition(ctx)
+            printDefinition(ctx, index)
         }
     }
 }
 
-private fun Symbols.findChoice(text: String?, text1: String?): Symbol? {
+private fun Index.findChoice(text: String?, text1: String?): Symbol? {
     val t = "$text:$text1"
     return asSequence().map { (a, b) -> b }.find {
-        it.type == Symbol.Type.OPTION
-                && it.displayName == t
+        it is Symbol.OPTION && it.displayName == t
     }
 }
 
@@ -263,20 +286,38 @@ fun DIV.region(title: String, types: Iterable<Symbol>) {
         h2 { +title }
         div("links") {
             types.sortedBy { it.displayName }.forEach {
-                a(it.url, classes = it.type.toString()) { +it.displayName }
+                a(it.href, classes = it.javaClass.simpleName) { +it.displayName }
                 +" "
             }
         }
     }
 }
 
+object Markdown {
+    private val extensions = arrayListOf(TablesExtension.create(),
+            AutolinkExtension.create(),
+            InsExtension.create(),
+            StrikethroughExtension.create())
 
-private fun DIV.printDefinition(ctx: ParserRuleContext) {
+    private val parser = Parser.builder()
+            .extensions(extensions)
+            .build()
+    private val renderer = HtmlRenderer.builder()
+            .extensions(extensions)
+            .build()
+
+    fun DIV.markdown(doc: String?) {
+        if (doc == null) return
+        div("markdown") {
+            unsafe { +renderer.render(parser.parse(doc.trim('/', '!', '*'))) }
+        }
+    }
+}
+
+private fun DIV.printDefinition(ctx: ParserRuleContext, index: Index) {
     div("raw") {
         code {
-            pre {
-                +ctx.accept(PrettyPrinter(Symbols()))
-            }
+            unsafe { +ctx.accept(PrettyPrinter(index)) }
         }
         small {
             val source = ctx.getStart().tokenSource
@@ -285,5 +326,5 @@ private fun DIV.printDefinition(ctx: ParserRuleContext) {
     }
 }
 
-private fun Symbols.lookup(s: Any): Symbol? = this.find { (a, _) -> a == s }?.second
+private fun Index.lookup(s: Any): Symbol? = this.find { (a, _) -> a == s }?.second
 

@@ -511,13 +511,13 @@ MOD_CHAR_END: '\'' -> more,popMode;
 MOD_CHAR_ANY: . -> more;
 
 mode modComment;
-MOD_COMMENT_END: '*/' -> more,popMode;
+MOD_COMMENT_END: ('*/'|EOF) -> more, popMode;
 MOD_COMMENT_ANY: . -> more;
 
 mode COMMENT;
-COMMENT_END: '*/' -> channel(HIDDEN), popMode;
+COMMENT_END: ('*/'|EOF) -> channel(HIDDEN), popMode;
 COMMENT_ANY_CHAR: . -> more;
 
 mode docComment;
-DOC_COMMENT_END: '*/' -> type(DOC_COMMENT), popMode;
+DOC_COMMENT_END: ('*/'|EOF) -> type(DOC_COMMENT), popMode;
 DOC_COMMENT_ANY_CHAR: . -> more;

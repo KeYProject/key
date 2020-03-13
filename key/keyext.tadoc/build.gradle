@@ -7,6 +7,11 @@ dependencies {
     implementation("com.github.ajalt:clikt:2.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.1")
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile 'com.atlassian.commonmark:commonmark:0.14.0'
+    compile 'com.atlassian.commonmark:commonmark-ext-gfm-tables:0.14.0'
+    compile 'com.atlassian.commonmark:commonmark-ext-autolink:0.14.0'
+    compile 'com.atlassian.commonmark:commonmark-ext-gfm-strikethrough:0.14.0'
+    compile 'com.atlassian.commonmark:commonmark-ext-ins:0.14.0'
 }
 
 

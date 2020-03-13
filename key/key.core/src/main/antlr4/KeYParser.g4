@@ -25,7 +25,7 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 
 options { tokenVocab=KeYLexer; } // use tokens from STLexer.g4
 
-file: (decls problem? proof?) EOF;
+file: DOC_COMMENT* (decls problem? proof?) EOF;
 
 decls
 :
@@ -100,11 +100,14 @@ sort_decls
 
 one_sort_decl
 :
-      GENERIC  sortIds=simple_ident_dots_comma_list
+  doc=DOC_COMMENT?
+  (
+     GENERIC  sortIds=simple_ident_dots_comma_list
         (ONEOF sortOneOf = oneof_sorts)?
         (EXTENDS sortExt = extends_sorts)? SEMI
     | PROXY  sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)? SEMI
     | ABSTRACT? sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)?  SEMI
+  )
 ;
 
 simple_ident_dots
@@ -216,6 +219,7 @@ one_schema_modal_op_decl
 
 pred_decl
 :
+  doc=DOC_COMMENT?
   pred_name = funcpred_name
   (whereToBind=where_to_bind)?
   argSorts=arg_sorts
@@ -229,6 +233,7 @@ pred_decls
 
 func_decl
 :
+  doc=DOC_COMMENT?
   (UNIQUE)?
   retSort = sortId
   func_name = funcpred_name
@@ -264,53 +269,30 @@ arg_sorts_or_formula_helper
 ;
 
 transform_decl
-    :
-        (
-          retSort = sortId
-        | FORMULA 
-        )
+:
+    doc=DOC_COMMENT?
+    (retSort = sortId
+    | FORMULA
+    )
 
-        trans_name = funcpred_name
-        argSorts = arg_sorts_or_formula
-        SEMI
-    ;
+    trans_name=funcpred_name
+    argSorts=arg_sorts_or_formula
+    SEMI
+;
 
-transform_decls
-    :
-        TRANSFORMERS
-        LBRACE
-        (
-            transform_decl
-        ) *
-        RBRACE
-    ;
+transform_decls:
+    TRANSFORMERS LBRACE (transform_decl)* RBRACE
+;
 
-arrayopid
+arrayopid:
+        EMPTYBRACKETS LPAREN componentType=keyjavatype RPAREN
+;
 
-    :
-        EMPTYBRACKETS
-        LPAREN
-        componentType = keyjavatype
-        RPAREN
-    ;
+arg_sorts:
+        (LPAREN sortId (COMMA sortId)* RPAREN)?
+;
 
-arg_sorts
-
-    :
-        (
-            LPAREN
-            s = sortId 
-            (
-                COMMA s = sortId 
-            ) *
-            RPAREN
-        ) ?
-        
-    ;
-
-where_to_bind
-
-    :
+where_to_bind:
         LBRACE
         b+=(TRUE | FALSE)
         (COMMA b+=(TRUE | FALSE) )*
@@ -333,12 +315,12 @@ sortId
 
 id_declaration
 :
-  id=IDENT ( COLON s=sortId ) ?
+  id=IDENT ( COLON s=sortId )?
 ;
 
 funcpred_name
 :
-    (sortId DOUBLECOLON)? name=simple_ident_dots
+  (sortId DOUBLECOLON)? name=simple_ident_dots
 ;
 
 
@@ -542,7 +524,8 @@ triggers
 
 taclet
 :
-  (LEMMA )?
+  doc=DOC_COMMENT?
+  (LEMMA)?
   name=IDENT (choices_=option_list)?
   LBRACE
   ( form=term
@@ -745,6 +728,7 @@ one_invariant
 ;
 
 rulesOrAxioms:
+    doc=DOC_COMMENT?
     (RULES|AXIOMS)
     (choices = option_list)?
     (LBRACE (s=taclet SEMI)* RBRACE)
