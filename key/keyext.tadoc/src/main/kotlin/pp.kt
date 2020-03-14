@@ -3,24 +3,35 @@ package org.key_project.core.doc
 import de.uka.ilkd.key.nparser.KeYLexer
 import de.uka.ilkd.key.nparser.KeYParser
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor
+import org.antlr.v4.runtime.Token
+import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.TerminalNode
+import org.key_project.core.doc.Symbol.Type.SORT
+import java.util.*
 
 /**
  *
  * @author Alexander Weigl
  * @version 1 (3/12/20)
  */
-class PrettyPrinter(val index: Index) : KeYParserBaseVisitor<String>() {
-    private val printReferences = true
-    val tokenSymbols = index.map { (a, b) -> b }.filterIsInstance<Symbol.Token>()
+class PrettyPrinter(val index: Index,
+                    val printReferences: Boolean = true)
+    : KeYParserBaseVisitor<String>() {
+    private val tokenSymbols = index.filterIsInstance<TokenSymbol>()
 
     override fun aggregateResult(aggregate: String?, nextResult: String?) =
             (aggregate ?: "") + (nextResult ?: "")
 
-    override fun visitTerminal(node: TerminalNode): String {
-        val t = node.symbol
+    override fun visitTerminal(node: TerminalNode) = visitToken(node.symbol)
+
+    private fun visitToken(t: Token): String {
         val text = t.text
         if (t.type == KeYLexer.DOC_COMMENT) return ""
+        if (t.type == KeYLexer.LPAREN || t.type == KeYLexer.LBRACE || t.type == KeYLexer.LBRACKET)
+            return openParenthesis(t)
+        if (t.type == KeYLexer.RPAREN || t.type == KeYLexer.RBRACE || t.type == KeYLexer.RBRACKET)
+            return closeParenthesis(t)
+
         if (!printReferences) return "$text "
         val s = tokenSymbols.find { it.tokenType == t.type }
         return if (s != null)
@@ -29,9 +40,42 @@ class PrettyPrinter(val index: Index) : KeYParserBaseVisitor<String>() {
             "$text "
     }
 
-    override fun defaultResult(): String {
-        return ""
+    private val rainbowColors = arrayOf(
+            "#458588",
+            "#b16286",
+            "#cc241d",
+            "#d65d0e",
+            "#458588",
+            "#b16286",
+            "#cc241d",
+            "#d65d0e",
+            "#458588",
+            "#b16286",
+            "#cc241d",
+            "#d65d0e",
+            "#458588",
+            "#b16286",
+            "#cc241d",
+            "#d65d0e")
+
+    private val parenthesisIds = LinkedList<Int>()
+    private var parenthesisCounter = 0
+    private fun openParenthesis(token: Token): String {
+        val p = ++parenthesisCounter
+        parenthesisIds.push(p)
+        val c = rainbowColors[p % rainbowColors.size]
+        return "<span style=\"color:$c\" " +
+                "class=\"paired-element\" id=\"open-${p}\" mouseover=\"highlight(${p})\">${token.text}</span>"
     }
+
+    private fun closeParenthesis(token: Token): String {
+        val pop = parenthesisIds.pop()
+        val c = rainbowColors[pop % rainbowColors.size]
+        return "<span style=\"color:$c\" class=\"paired-element\" id=\"close-$pop\" mouseover=\"highlight($pop)\">${token.text}</span>"
+
+    }
+
+    override fun defaultResult() = " "
 
     override fun visitProblem(ctx: KeYParser.ProblemContext?): String {
         return super.visitProblem(ctx)
@@ -88,7 +132,7 @@ class PrettyPrinter(val index: Index) : KeYParserBaseVisitor<String>() {
                     append(ctx.ONEOF().text)
                     append(" ")
                     ctx.oneof_sorts().sortId().joinTo(this, ", ", "{", "}") {
-                        append(ref<Symbol.SORT>(it.text))
+                        append(ref(it.text, SORT))
                     }
                 }
                 if (null != ctx.EXTENDS()) {
@@ -102,14 +146,14 @@ class PrettyPrinter(val index: Index) : KeYParserBaseVisitor<String>() {
             }
 
 
-    private inline fun <reified T : Symbol> ref(text: String): String {
+    private fun ref(text: String, vararg types: Symbol.Type): String {
         if (!printReferences) return "$text "
-        val s = index.find { (a, b) -> b is T && b.displayName == text }?.second
+        val s = index.find { b -> b.type in types && b.displayName == text }
         return if (s != null)
-            "<a href=\"${s.href}\">$text</a> "
+            "<a href=\"${s.href}\" class=\"symbol ${s.type.name}\">$text</a> "
         else
             "text ".also {
-                System.err.println("Could not found symbol for $text : ${T::class.java.simpleName}")
+                System.err.println("Could not found symbol for $text : $types")
             }
     }
 
@@ -218,15 +262,20 @@ class PrettyPrinter(val index: Index) : KeYParserBaseVisitor<String>() {
     }
 
     override fun visitSortId(ctx: KeYParser.SortIdContext): String {
-        return ref<Symbol.SORT>(ctx.text)
+        return ref(ctx.text, SORT)
     }
 
     override fun visitId_declaration(ctx: KeYParser.Id_declarationContext?): String {
         return super.visitId_declaration(ctx)
     }
 
-    override fun visitFuncpred_name(ctx: KeYParser.Funcpred_nameContext?): String {
-        return super.visitFuncpred_name(ctx)
+    override fun visitFuncpred_name(ctx: KeYParser.Funcpred_nameContext) = buildString {
+        ctx.sortId()?.let {
+            appendn(it)
+            appendn(ctx.DOUBLECOLON())
+        }
+        append(ref(ctx.simple_ident_dots().text,
+                Symbol.Type.PREDICATE, Symbol.Type.TRANSFORMER, Symbol.Type.FUNCTION))
     }
 
     override fun visitTermEOF(ctx: KeYParser.TermEOFContext?): String {
@@ -465,12 +514,86 @@ class PrettyPrinter(val index: Index) : KeYParserBaseVisitor<String>() {
         return super.visitTriggers(ctx)
     }
 
-    override fun visitTaclet(ctx: KeYParser.TacletContext?): String {
-        return super.visitTaclet(ctx)
+    private fun accept(ctx: ParseTree) = ctx.accept(this)
+    private fun accept(ctx: Token) = visitToken(ctx)
+    private fun StringBuilder.appendn(ctx: ParseTree?) = if (ctx != null) append(accept(ctx)) else this
+    private fun StringBuilder.appendn(ctx: Token?) = if (ctx != null) append(accept(ctx)) else this
+    private fun StringBuilder.appendn(ctx: ParseTree?, suffix: String): StringBuilder {
+        if (ctx != null) appendn(ctx).append(suffix)
+        return this
     }
 
-    override fun visitModifiers(ctx: KeYParser.ModifiersContext?): String {
-        return super.visitModifiers(ctx)
+    override fun visitTaclet(ctx: KeYParser.TacletContext) = buildString {
+        appendn(ctx.LEMMA(), " ")
+        appendn(ctx.name)
+
+        if (ctx.choices_ != null) {
+            append(accept(ctx.choices_))
+        }
+        append(" {\n")
+
+
+        appendn(ctx.form)
+
+
+        if (ctx.SCHEMAVAR().isNotEmpty()) {
+            for (i in 0 until ctx.SCHEMAVAR().size) {
+                appendn(ctx.SCHEMAVAR(i))
+                        .append(" ")
+                        .appendn(ctx.one_schema_var_decl(i))
+                        .append(";\n")
+            }
+        }
+
+        ctx.ifSeq?.let {
+            append(accept(ctx.ASSUMES()))
+            append("(")
+            append(accept(it))
+            append(")\n")
+        }
+
+        ctx.find?.let {
+            append(accept(ctx.FIND()))
+            append("(")
+            append(accept(ctx.find))
+            append(")\n")
+        }
+
+        if (ctx.SAMEUPDATELEVEL().isNotEmpty())
+            appendn(ctx.SAMEUPDATELEVEL().first(), "\n")
+        if (ctx.INSEQUENTSTATE().isNotEmpty())
+            appendn(ctx.INSEQUENTSTATE().first(), "\n")
+        if (ctx.ANTECEDENTPOLARITY().isNotEmpty())
+            appendn(ctx.ANTECEDENTPOLARITY().first(), "\n")
+        if (ctx.INSEQUENTSTATE().isNotEmpty())
+            appendn(ctx.INSEQUENTSTATE().first(), "\n")
+
+        if (ctx.VARCOND() != null) {
+            appendn(ctx.VARCOND()).append("(").appendn(ctx.varexplist()).append(")\n")
+        }
+        appendn(ctx.goalspecs())
+        appendn(ctx.modifiers())
+        append("\n};")
+    }
+
+    override fun visitModifiers(ctx: KeYParser.ModifiersContext) = buildString {
+        for (i in 0 until ctx.rulesets().size) {
+            appendn(ctx.rulesets(0)).append("\n")
+        }
+
+        ctx.NONINTERACTIVE().firstOrNull().let {
+            appendn(it, "\n")
+        }
+
+        ctx.dname?.let {
+            appendn(ctx.DISPLAYNAME().first()).append(" ").appendn(ctx.dname).append("\n")
+        }
+
+        ctx.htext?.let {
+            appendn(ctx.HELPTEXT().first()).append(" ").append(it).append("\n")
+        }
+
+        ctx.triggers().forEach { appendn(it) }
     }
 
     override fun visitSeq(ctx: KeYParser.SeqContext?): String {
@@ -505,13 +628,16 @@ class PrettyPrinter(val index: Index) : KeYParserBaseVisitor<String>() {
         return super.visitVarexp(ctx)
     }
 
-    override fun visitGoalspecs(ctx: KeYParser.GoalspecsContext?): String {
-        return super.visitGoalspecs(ctx)
-    }
+    override fun visitGoalspecs(ctx: KeYParser.GoalspecsContext) =
+            if (ctx.CLOSEGOAL() != null) {
+                accept(ctx.CLOSEGOAL())
+            } else {
+                ctx.goalspecwithoption().joinToString(";\n") { accept(it) }
+            } + "\n"
 
-    override fun visitGoalspecwithoption(ctx: KeYParser.GoalspecwithoptionContext?): String {
-        return super.visitGoalspecwithoption(ctx)
-    }
+    override fun visitGoalspecwithoption(ctx: KeYParser.GoalspecwithoptionContext) =
+            if (ctx.option_list() == null) accept(ctx.goalspec())
+            else buildString { appendn(ctx.option_list()).append(" {\n").appendn(ctx.goalspec()).append("}\n") }
 
     override fun visitOption(ctx: KeYParser.OptionContext?): String {
         return super.visitOption(ctx)
@@ -549,13 +675,14 @@ class PrettyPrinter(val index: Index) : KeYParserBaseVisitor<String>() {
         return super.visitPvset(ctx)
     }
 
-    override fun visitRulesets(ctx: KeYParser.RulesetsContext?): String {
-        return super.visitRulesets(ctx)
+    override fun visitRulesets(ctx: KeYParser.RulesetsContext) = buildString {
+        appendn(ctx.HEURISTICS())
+        append(" (")
+        ctx.ruleset().joinToString(", ") { accept(it) }
+        append(")")
     }
 
-    override fun visitRuleset(ctx: KeYParser.RulesetContext?): String {
-        return super.visitRuleset(ctx)
-    }
+    override fun visitRuleset(ctx: KeYParser.RulesetContext) = ref(ctx.text, Symbol.Type.RULESET)
 
     override fun visitMetaId(ctx: KeYParser.MetaIdContext?): String {
         return super.visitMetaId(ctx)

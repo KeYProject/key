@@ -301,12 +301,9 @@ where_to_bind:
    ;
 
 ruleset_decls
-    :
-        HEURISTICSDECL
-        LBRACE
-        (id = simple_ident SEMI)*
-        RBRACE
-    ;
+:
+  HEURISTICSDECL LBRACE  (doc+=DOC_COMMENT? id+=simple_ident SEMI)* RBRACE
+;
 
 sortId
 :
@@ -551,8 +548,8 @@ modifiers
 :
   ( rs = rulesets
   | NONINTERACTIVE
-  | DISPLAYNAME dname = string_value
-  | HELPTEXT htext = string_value
+  | DISPLAYNAME dname=string_value
+  | HELPTEXT htext=string_value
   | triggers
   ) *
 ;

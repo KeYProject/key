@@ -63,25 +63,28 @@ abstract class DefaultPage(
                     h3 { +"Overview" }
                     nav("nav") {
                         ul("nav-list") {
-                            val cat = index.asSequence()
-                                    .map { (_, b) -> b }
-                                    .filter { it.url == self }
-                                    .filter { it !is Symbol.FILE && it !is Symbol.External }
-                                    .groupBy { it.javaClass }
-                            cat.forEach { c ->
-                                li() {
-                                    +c.key.simpleName
-                                    ul {
-                                        c.value.sortedBy { it.displayName }.forEach {
-                                            li { a(it.href) { +it.displayName } }
-                                        }
-                                    }
-                                }
-                            }
+                            navigation()
                         }
                     }
                 }
             }
+
+    open fun UL.navigation() {
+        val cat = index.asSequence()
+                .filter { it.url == self }
+                .filter { it.type != Symbol.Type.FILE && it != Symbol.Type.EXTERNAL }
+                .groupBy { it.type }
+        cat.forEach { c ->
+            li() {
+                +c.key.navigationTitle
+                ul {
+                    c.value.sortedBy { it.displayName }.forEach {
+                        li { a(it.href) { +it.displayName } }
+                    }
+                }
+            }
+        }
+    }
 
     open fun commonFooter(div: DIV) {
         div.div("footer") {
@@ -100,15 +103,29 @@ class Indexfile(target: File, index: Index) : DefaultPage(target, "Index Page", 
     override fun content(div: DIV) {
         div.div {
             h1 { +"Index page" }
-            val symbols = index.map { (a, b) -> b }
-            region("Choice categories", symbols.filterIsInstance<Symbol.CATEGORY>())
-            region("Choice options", symbols.filterIsInstance<Symbol.OPTION>())
-            region("Sorts", symbols.filterIsInstance<Symbol.SORT>())
-            region("Predicates", symbols.filterIsInstance<Symbol.PREDICATE>())
-            region("Functions", symbols.filterIsInstance<Symbol.FUNCTION>())
-            region("Transformers", symbols.filterIsInstance<Symbol.TRANSFORMER>())
-            region("Taclets", symbols.filterIsInstance<Symbol.TACLET>())
-            region("Files", symbols.filterIsInstance<Symbol.FILE>())
+            Symbol.Type.values().forEach {
+                region(it)
+            }
+        }
+    }
+
+    override fun UL.navigation() {
+    }
+
+    fun DIV.region(title: Symbol.Type) {
+        val types = index.filter { it.type == title }
+        div("region") {
+            h2 { id = title.name; +title.navigationTitle }
+            if (types.isNotEmpty()) {
+                div("links") {
+                    types.sortedBy { it.displayName }.forEach {
+                        a(it.href, classes = it.javaClass.simpleName) { +it.displayName }
+                        +" "
+                    }
+                }
+            } else {
+                div("") { "No entry in this category" }
+            }
         }
     }
 }
@@ -131,9 +148,11 @@ class DocumentationFile(target: File, val keyFile: File, val ctx: KeYParser.File
 class FileVisitor(val self: String,
                   val tagConsumer: DIV,
                   val index: Index) : KeYParserBaseVisitor<Unit>() {
+
+
     override fun visitFile(ctx: KeYParser.FileContext) {
         val symbol = index.lookup(ctx)
-        tagConsumer.div { id = symbol!!.target }
+        tagConsumer.div { id = symbol!!.anchor }
         super.visitFile(ctx)
     }
 
@@ -169,8 +188,8 @@ class FileVisitor(val self: String,
     override fun visitChoice(ctx: KeYParser.ChoiceContext) {
         val catsym = index.lookup(ctx)
         tagConsumer.div("doc category") {
-            catsym?.target?.let { id = it }
             h3 {
+                id = catsym?.anchor ?: ""
                 +ctx.category.text
             }
 
@@ -181,7 +200,10 @@ class FileVisitor(val self: String,
             ctx.choice_option.forEachIndexed { i, co ->
                 val optsym = index.lookup(co)
                 div("doc option") {
-                    h4 { +co.text }
+                    h4 {
+                        id = optsym?.anchor ?: ""
+                        +co.text
+                    }
                     //TODO+ctx.DOC_COMMENT(i + 1).text
                 }
             }
@@ -190,7 +212,7 @@ class FileVisitor(val self: String,
     }
 
     override fun visitSort_decls(ctx: KeYParser.Sort_declsContext?) {
-        tagConsumer.h2 { +"Sorts" }
+        tagConsumer.h2 { id = "sorts"; +"Sorts" }
         super.visitSort_decls(ctx)
     }
 
@@ -198,8 +220,8 @@ class FileVisitor(val self: String,
         for (s in ctx.sortIds.simple_ident_dots()) {
             val symbol = index.lookup(s)
             tagConsumer.div("doc sort") {
-                symbol?.target?.let { id = it }
                 h3("sort") {
+                    id = symbol?.anchor ?: ""
                     +s.text
                 }
                 printDefinition(ctx, index)
@@ -220,8 +242,8 @@ class FileVisitor(val self: String,
     override fun visitPred_decl(ctx: KeYParser.Pred_declContext) {
         val symbol = index.lookup(ctx)
         tagConsumer.div("doc pred") {
-            symbol?.target?.let { id = it }
             h3("sort") {
+                id = symbol?.anchor ?: ""
                 +ctx.pred_name.text
             }
             printDefinition(ctx, index)
@@ -236,8 +258,10 @@ class FileVisitor(val self: String,
     override fun visitFunc_decl(ctx: KeYParser.Func_declContext) {
         val symbol = index.lookup(ctx)
         tagConsumer.div("doc func") {
-            symbol?.anchor?.let { id = it }
-            h3 { +ctx.func_name.text }
+            h3 {
+                id = symbol?.anchor ?: ""
+                +ctx.func_name.text
+            }
             markdown(ctx.DOC_COMMENT()?.text)
             printDefinition(ctx, index)
         }
@@ -265,8 +289,8 @@ class FileVisitor(val self: String,
     override fun visitTaclet(ctx: KeYParser.TacletContext) {
         val symbol = index.lookup(ctx)
         tagConsumer.div("doc taclet") {
-            symbol?.target?.let { id = it }
             h3("taclet") {
+                id = symbol?.anchor ?: ""
                 +ctx.name.text
             }
             printDefinition(ctx, index)
@@ -276,22 +300,11 @@ class FileVisitor(val self: String,
 
 private fun Index.findChoice(text: String?, text1: String?): Symbol? {
     val t = "$text:$text1"
-    return asSequence().map { (a, b) -> b }.find {
-        it is Symbol.OPTION && it.displayName == t
+    return asSequence().find {
+        it.type == Symbol.Type.OPTION && it.displayName == t
     }
 }
 
-fun DIV.region(title: String, types: Iterable<Symbol>) {
-    div("region") {
-        h2 { +title }
-        div("links") {
-            types.sortedBy { it.displayName }.forEach {
-                a(it.href, classes = it.javaClass.simpleName) { +it.displayName }
-                +" "
-            }
-        }
-    }
-}
 
 object Markdown {
     private val extensions = arrayListOf(TablesExtension.create(),
@@ -323,8 +336,27 @@ private fun DIV.printDefinition(ctx: ParserRuleContext, index: Index) {
             val source = ctx.getStart().tokenSource
             +"defined in: ${File(source.sourceName).name} Line: ${ctx.start.line} Offset :${ctx.start.charPositionInLine}"
         }
+        /*
+        small {
+            val file = ctx.start.tokenSource.sourceName
+            val lineStart = ctx.start.line
+            val lineStop = ctx.stop.line
+            val repo = FileRepositoryBuilder().findGitDir(File(file)).build()
+            val blame = BlameCommand(repo)
+            blame.setFilePath(file)
+            blame.call()?.let { result ->
+                result.computeRange(lineStart, lineStop)
+                (lineStart..lineStop).forEach {
+                    val author = result.getSourceAuthor(it)
+                    val n = author.name
+                    val w = author.name
+                    val e = author.emailAddress
+                    span { +w; +n }
+                }
+            }
+        }*/
     }
 }
 
-private fun Index.lookup(s: Any): Symbol? = this.find { (a, _) -> a == s }?.second
+private fun Index.lookup(s: Any): Symbol? = this.find { it.ctx == s }
 

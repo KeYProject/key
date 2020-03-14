@@ -20,6 +20,9 @@ object App {
     }
 }
 
+/**
+ * Ideas:
+ */
 class GenDoc() : CliktCommand() {
     val outputFolder by option("-o", "--output", help = "output folder", metavar = "FOLDER")
             .file().default(File("target"))
@@ -33,7 +36,8 @@ class GenDoc() : CliktCommand() {
                 .filter { l.vocabulary.getLiteralName(it) != null }
                 .forEach { t ->
                     l.vocabulary.getSymbolicName(t)?.let { name ->
-                        it += Any() to Symbol.Token(name, t)
+                        it += Symbol.token(name, t)
+                        println("## ${name} {: #Token-${name}}\n")
                     }
                 }
     }
@@ -82,88 +86,103 @@ class GenDoc() : CliktCommand() {
 
 class Indexer(val self: String, val index: Index) : KeYParserBaseVisitor<Unit>() {
     override fun visitFile(ctx: KeYParser.FileContext) {
-        index += ctx to IndexHelper.file(self)
+        index += Symbol.file(self, ctx)
         super.visitFile(ctx)
     }
 
     override fun visitOne_sort_decl(ctx: KeYParser.One_sort_declContext) {
         for (name in ctx.sortIds.simple_ident_dots()) {
-            index += ctx to IndexHelper.sort(self, name.text)
+            index += Symbol.sort(self, name.text, name)
         }
     }
 
     override fun visitFunc_decl(ctx: KeYParser.Func_declContext) {
-        index += ctx to IndexHelper.function(self, ctx.func_name.text)
+        index += Symbol.function(self, ctx.func_name.text, ctx)
     }
 
     override fun visitTransform_decl(ctx: KeYParser.Transform_declContext) {
-        index += ctx to IndexHelper.transformer(self, ctx.trans_name.text)
+        index += Symbol.transformer(self, ctx.trans_name.text, ctx)
     }
 
     override fun visitPred_decl(ctx: KeYParser.Pred_declContext) {
-        index += ctx to IndexHelper.predicate(self, ctx.pred_name.text)
+        index += Symbol.predicate(self, ctx.pred_name.text, ctx)
     }
 
     override fun visitTaclet(ctx: KeYParser.TacletContext) {
-        index += ctx to IndexHelper.taclet(self, ctx.name.text)
+        index += Symbol.taclet(self, ctx.name.text, ctx)
     }
 
     override fun visitChoice(ctx: KeYParser.ChoiceContext) {
-        index += ctx to IndexHelper.choiceCategory(self, ctx.category.text)
+        index += Symbol.choiceCategory(self, ctx.category.text)
         ctx.choice_option.forEach { co ->
-            index += co to IndexHelper.choiceOption(self, ctx.category.text, co.text)
+            index += Symbol.choiceOption(self, ctx.category.text, co.text, co)
         }
     }
-}
 
-object IndexHelper {
-    fun choiceCategory(page: String, cat: String): Symbol = Symbol.CATEGORY(cat, page)
+    override fun visitRuleset_decls(ctx: KeYParser.Ruleset_declsContext) {
+        ctx.id.forEach {
+            index += Symbol.ruleset(it.text, self, it)
+        }
+    }
 
-    fun choiceOption(page: String, cat: String, option: String): Symbol =
-            Symbol.OPTION(page, cat, option)
+    override fun visitOne_contract(ctx: KeYParser.One_contractContext) {
+        index += Symbol.contract(ctx.contractName.text, self, ctx)
+    }
 
-    fun taclet(page: String, text: String) =
-            Symbol.TACLET(text, page, text)
-
-    fun predicate(page: String, text: String) =
-            Symbol.PREDICATE(text, page, text)
-
-    fun function(page: String, text: String) =
-            Symbol.FUNCTION(text, page, text)
-
-    fun sort(page: String, text: String) =
-            Symbol.SORT(text, page)
-
-    fun transformer(page: String, text: String) =
-            Symbol.TRANSFORMER(text, page, text)
-
-    fun file(self: String) = Symbol.FILE(self)
+    override fun visitOne_invariant(ctx: KeYParser.One_invariantContext) {
+        index += Symbol.invariant(ctx.invName.text, self, ctx)
+    }
 }
 
 /**
  * Represents a link to an entry.
  */
-sealed class Symbol(
+open class Symbol(
         val displayName: String,
         val url: String,
-        val target: String) {
-    val anchor = javaClass.simpleName + "-$target"
-    val href = "$url#$anchor"
+        val target: String = displayName,
+        val type: Type,
+        val ctx: Any? = null) {
+    open val anchor = javaClass.simpleName + "-$target"
+    open val href = "$url#$anchor"
 
-    class TACLET(displayName: String, page: String, id: String) : Symbol(displayName, page, id)
-    class PREDICATE(displayName: String, page: String, id: String) : Symbol(displayName, page, id)
-    class TRANSFORMER(displayName: String, page: String, id: String) : Symbol(displayName, page, id)
-    class FUNCTION(displayName: String, page: String, id: String) : Symbol(displayName, page, id)
-    class CATEGORY(displayName: String, page: String) : Symbol(displayName, page, displayName)
-    class OPTION(page: String, val cat: String, val option: String) : Symbol("$cat:$option", page, "${cat}_$option")
-    class SORT(displayName: String, page: String) : Symbol(displayName, page, displayName)
-    class FILE(self: String) : Symbol(self, self.replace(".html", ""), "root")
+    enum class Type(val navigationTitle: String) {
+        CATEGORY("Choice categories"),
+        OPTION("Choice options"),
+        SORT("Sorts"),
+        PREDICATE("Predicates"),
+        FUNCTION("Functions"),
+        TRANSFORMER("Transformers"),
+        RULESET("Rulesets"),
+        TACLET("Taclets"),
+        CONTRACT("Contracts"),
+        INVARIANT("Invariants"),
+        FILE("Files"),
+        TOKEN("t"), EXTERNAL("ext");
+    }
 
+    companion object {
+        fun choiceCategory(page: String, cat: String, ctx: Any? = null): Symbol = Symbol(cat, page, cat, Type.CATEGORY, ctx)
+        fun choiceOption(page: String, cat: String, option: String, ctx: Any? = null): Symbol = Symbol("$cat:$option", page, "$cat-$option", Type.OPTION, ctx)
+        fun taclet(page: String, text: String, ctx: Any? = null) = Symbol(text, page, text, Type.TACLET, ctx)
+        fun predicate(page: String, text: String, ctx: Any? = null) = Symbol(text, page, text, Type.PREDICATE, ctx)
+        fun function(page: String, text: String, ctx: Any? = null) = Symbol(text, page, text, Type.FUNCTION, ctx)
+        fun sort(page: String, text: String, ctx: Any? = null) = Symbol(text, page, type = Type.SORT, ctx = ctx)
+        fun transformer(page: String, text: String, ctx: Any? = null) = Symbol(text, page, text, Type.TRANSFORMER, ctx)
+        fun file(self: String, ctx: Any? = null) = Symbol(self, self.replace(".html", ""), "root", Type.FILE, ctx)
+        fun ruleset(name: String, page: String, ctx: Any? = null) = Symbol(name, page, name, Type.RULESET, ctx)
+        fun token(display: String, tokenType: Int) = TokenSymbol(display, tokenType)
+        fun external(url: String, anchor: String = "", ctx: Any? = null) = object : Symbol("", url, "", Type.EXTERNAL, ctx) {
+            override val anchor: String = anchor
+            override val href = url
+        }
 
-    class Token(val display: String, val tokenType: Int) : Symbol(display,
-            "https://key-project.org/docs/grammar/", display)
-
-    class External(url: String) : Symbol("", url, "")
+        fun contract(name: String, self: String, ctx: Any? = null) = Symbol(name, self, name, Type.CONTRACT, ctx)
+        fun invariant(name: String, self: String, ctx: Any? = null) = Symbol(name, self, name, Type.INVARIANT, ctx)
+    }
 }
 
-typealias Index = ArrayList<Pair<Any, Symbol>>
+class TokenSymbol(val display: String, val tokenType: Int)
+    : Symbol(display, "https://key-project.org/docs/grammar/", display, Type.TOKEN)
+
+typealias Index = ArrayList<Symbol>
