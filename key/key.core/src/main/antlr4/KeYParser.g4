@@ -340,6 +340,51 @@ literals:
   | string_literal
 ;
 
+
+term: labeled_term;
+labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
+parallel_term: a=elementary_update_term (PARALLEL b=term)?;
+elementary_update_term: a=equivalence_term (ASSIGN b=elementary_update_term)?;
+equivalence_term: a=implication_term (EQV b=equality_term)?;
+implication_term: a=disjunction_term (IMP b=implication_term)?;
+disjunction_term: a=conjunction_term (OR b=disjunction_term)?;
+conjunction_term: a=term60 (AND b=conjunction_term)?;
+term60: equality_term | negation_term | quantifierterm | modality_term;
+equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=equality_term)?;
+comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=comparison_term)?;
+weak_arith_term: a=strong_arith_term ((PLUS|MINUS) b=weak_arith_term)?;
+strong_arith_term: a=brace_term ((STAR|SLASH |PERCENT) b=strong_arith_term)?;
+term110: (call_term) (AT term)?;
+call_term:  attribute_term argument_list?;
+attribute_term: primitive_term (DOT STAR|attrid)? (AT heap=term)?;
+
+primitive_term:
+    LPAREN term RPAREN        #termParen
+  | MINUS term                #unaryMinus
+  | locset_term               #termLocset
+  | location_term             #termLocation
+  | substitutionterm          #termSubstitution
+  | updateterm                #termUpdate
+  | ifThenElseTerm            #termIfThenElse
+  | ifExThenElseTerm          #termIfExThenElse
+  | LPAREN sort=sortId RPAREN term #cast
+  | AT name=simple_ident      #abbreviation
+  | accessterm                #termAccess  //also handles function calls
+  | literals                  #termLiterals
+;
+
+modality_term: MODALITY term;
+negation_term: NOT term;
+
+brace_term: term110 brace_suffix?;
+brace_suffix:
+    LBRACKET target=term ASSIGN val=term RBRACKET       #bracket_access_heap_upate
+  | LBRACKET id=simple_ident args=argument_list RBRACKET #bracket_access_heap_term
+  | LBRACKET STAR RBRACKET                               #bracket_access_star
+  | LBRACKET indexTerm=term (DOTRANGE rangeTo=term)? RBRACKET #bracket_access_indexrange
+;
+
+/*
 term
 :
     term (LGUILLEMETS labels = label RGUILLEMETS)   #termLabeled
@@ -347,24 +392,24 @@ term
   | MODALITY term             #termModality
   | locset_term               #termLocset
   | quantifierterm            #termQuantifier
-  | term ASSIGN term          #elementary_update_term
-  | term EQV term             #equivalence_term
-  | term IMP term             #implication_term
-  | term OR term              #disjunction_term
-  | term AND term             #conjunction_term
-  | term EQUALS term          #termEquals
-  | term NOT_EQUALS term      #termNotEquals
-  | term ( LESS | LESSEQUAL | GREATER |  GREATEREQUAL ) term #termCompare
   |	term STAR term            #termMult
   |<assoc=right> term (SLASH | PERCENT) term #termDivisionModulo
   | term (PLUS|MINUS) term    #termWeakArith
   | location_term             #termLocation
   | substitutionterm          #termSubstitution
+  | term EQUALS term          #termEquals
+  | term AND term             #conjunction_term
   | updateterm                #termUpdate
   | ifThenElseTerm            #termIfThenElse
   | ifExThenElseTerm          #termIfExThenElse
   | NOT term                  #negation
   | MINUS term                #unaryMinus
+  | term OR term              #disjunction_term
+  | term NOT_EQUALS term      #termNotEquals
+  | term ( LESS | LESSEQUAL | GREATER |  GREATEREQUAL ) term #termCompare
+  | term ASSIGN term          #elementary_update_term
+  | term IMP term             #implication_term
+  | term EQV term             #equivalence_term
   | LPAREN sort=sortId RPAREN term #cast
   | LPAREN term RPAREN        #termParen
   | AT name=simple_ident      #abbreviation
@@ -379,6 +424,8 @@ term
   | accessterm                #termAccess  //also handles function calls
   | literals                  #termLiterals
 ;
+*/
+
 
 /**
  * Access: a.b.c@f, T.staticQ()

@@ -58,10 +58,19 @@ public class ExpressionBuilder extends DefaultBuilder {
         this(services, nss, new Namespace<>());
     }
 
-
     public ExpressionBuilder(Services services, NamespaceSet nss, Namespace<SchemaVariable> schemaNamespace) {
         super(services, nss);
         setSchemaVariables(schemaNamespace);
+    }
+
+    public static Term updateOrigin(Term t, ParserRuleContext ctx) {
+        try {
+            TermImpl ti = (TermImpl) t;
+            ti.setOrigin(ctx.start.getTokenSource().getSourceName()
+                    + "@" + ctx.start.getLine() + ":" + ctx.start.getCharPositionInLine());
+        } catch (ClassCastException ignored) {
+        }
+        return t;
     }
 
     /**
@@ -121,10 +130,13 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Term visitParallel(KeYParser.ParallelContext ctx) {
-        Term termL = accept(ctx.term(0));
-        Term termR = accept(ctx.term(1));
-        return getTermFactory().createTerm(UpdateJunctor.PARALLEL_UPDATE, termL, termR);
+    public Term visitParallel_term(KeYParser.Parallel_termContext ctx) {
+        Term a = accept(ctx.elementary_update_term());
+        if (ctx.term() != null) {
+            Term b = accept(ctx.term());
+            return updateOrigin(getTermFactory().createTerm(UpdateJunctor.PARALLEL_UPDATE, a, b), ctx);
+        }
+        return updateOrigin(a, ctx);
     }
 
     @Override
@@ -134,41 +146,47 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Term visitElementary_update_term(KeYParser.Elementary_update_termContext ctx) {
-        Term termL = accept(ctx.term(0));
-        Term termR = accept(ctx.term(1));
-        return getServices().getTermBuilder().elementary(termL, termR);
+        Term a = accept(ctx.a);
+        Term b = accept(ctx.b);
+        if (b != null) {
+            return updateOrigin(getServices().getTermBuilder().elementary(a, b), ctx);
+        }
+        return updateOrigin(a, ctx);
     }
 
     @Override
     public Term visitEquivalence_term(KeYParser.Equivalence_termContext ctx) {
-        Term termL = accept(ctx.term(0));
-        Term termR = accept(ctx.term(1));
-        return getTermFactory().createTerm(Equality.EQV, termL, termR);
+        Term a = accept(ctx.a);
+        Term b = accept(ctx.b);
+        return binaryTerm(ctx, Equality.EQV, a, b);
+    }
+
+    private Term binaryTerm(ParserRuleContext ctx, Operator operator, Term left, Term right) {
+        if (right == null) {
+            return updateOrigin(left, ctx);
+        }
+        return capsulateTf(ctx, () -> updateOrigin(getTermFactory().createTerm(operator, left, right), ctx));
     }
 
     @Override
     public Term visitImplication_term(KeYParser.Implication_termContext ctx) {
-        Term termL = accept(ctx.term(0));
-        Term termR = accept(ctx.term(1));
-        return getTermFactory().createTerm(Junctor.IMP, termL, termR);
+        Term termL = accept(ctx.a);
+        Term termR = accept(ctx.b);
+        return binaryTerm(ctx, Junctor.IMP, termL, termR);
     }
 
     @Override
     public Term visitDisjunction_term(KeYParser.Disjunction_termContext ctx) {
-        Term termL = accept(ctx.term(0));
-        Term termR = accept(ctx.term(1));
-        return getTermFactory().createTerm(Junctor.OR, termL, termR);
+        Term termL = accept(ctx.a);
+        Term termR = accept(ctx.b);
+        return binaryTerm(ctx, Junctor.OR, termL, termR);
     }
 
     @Override
     public Term visitConjunction_term(KeYParser.Conjunction_termContext ctx) {
-        if (accept(ctx.term(0)) == null) {
-            System.out.println("sss");
-        }
-        Term termL = accept(ctx.term(0));
-        Term termR = accept(ctx.term(1));
-
-        return getTermFactory().createTerm(Junctor.AND, termL, termR);
+        Term termL = accept(ctx.a);
+        Term termR = accept(ctx.b);
+        return binaryTerm(ctx, Junctor.AND, termL, termR);
     }
 
     @Override
@@ -180,48 +198,31 @@ public class ExpressionBuilder extends DefaultBuilder {
         } else {
             semanticError(ctx, "Formula cannot be prefixed with '-'");
         }
-        return result;
+        return updateOrigin(result, ctx);
     }
 
     @Override
-    public Term visitNegation(KeYParser.NegationContext ctx) {
+    public Term visitNegation_term(KeYParser.Negation_termContext ctx) {
         Term termL = accept(ctx.term());
-        return getTermFactory().createTerm(Junctor.NOT, termL);
+        return updateOrigin(getTermFactory().createTerm(Junctor.NOT, termL), ctx);
     }
 
     @Override
-    public Term visitTermEquals(KeYParser.TermEqualsContext ctx) {
-        Term termL = accept(ctx.term(0));
-        Term termR = accept(ctx.term(1));
-        return capsulateTf(ctx, () -> getTermFactory().createTerm(Equality.EQUALS, termL, termR));
-    }
-
-
-    @Override
-    public Term visitTermNotEquals(KeYParser.TermNotEqualsContext ctx) {
-        Term termL = accept(ctx.term(0));
-        Term termR = accept(ctx.term(1));
-        return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.NOT,
-                getTermFactory().createTerm(Equality.EQUALS, termL, termR)));
-        /*
-                Term b = accept(ctx.a1); if (a.sort() == Sort.FORMULA || b.sort() == Sort.FORMULA) {
-            String errorMessage =
-                    "The term equality \'=\'/\'!=\' is not " +
-                            "allowed between formulas.\n Please use \'" + Equality.EQV +
-                            "\' in combination with \'" + Junctor.NOT + "\' instead.";
-            if (a.op() == Junctor.TRUE || a.op() == Junctor.FALSE ||
-                    b.op() == Junctor.TRUE || b.op() == Junctor.FALSE) {
-                errorMessage +=
-                        " It seems as if you have mixed up the boolean " +
-                                "constants \'TRUE\'/\'FALSE\' " +
-                                "with the formulas \'true\'/\'false\'.";
-            }
-            semanticError(ctx, errorMessage);
-        }*/
+    public Term visitEquality_term(KeYParser.Equality_termContext ctx) {
+        Term termL = accept(ctx.a);
+        Term termR = accept(ctx.b);
+        Term eq = binaryTerm(ctx, Equality.EQUALS, termL, termR);
+        if (ctx.NOT_EQUALS() != null) {
+            return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.NOT, eq));
+        }
+        return eq;
     }
 
     @Override
-    public Term visitTermCompare(KeYParser.TermCompareContext ctx) {
+    public Object visitComparison_term(KeYParser.Comparison_termContext ctx) {
+        Term termL = accept(ctx.a);
+        Term termR = accept(ctx.b);
+
         String op_name = "";
         if (ctx.LESS() != null)
             op_name = "lt";
@@ -233,15 +234,16 @@ public class ExpressionBuilder extends DefaultBuilder {
             op_name = "geq";
         var op = (Function) functions().lookup(new Name(op_name));
         if (op == null) {
-            semanticError(ctx, "Function symbol '" + op_name + "' not found.");
+            return updateOrigin(termL, ctx);
+            //semanticError(ctx, "Function symbol '" + op_name + "' not found.");
         }
-        Term termL = accept(ctx.term(0));
-        Term termR = accept(ctx.term(1));
-        return capsulateTf(ctx, () -> getTermFactory().createTerm(op, termL, termR));
+        return binaryTerm(ctx, op, termL, termR);
     }
 
     @Override
-    public Term visitTermWeakArith(KeYParser.TermWeakArithContext ctx) {
+    public Object visitWeak_arith_term(KeYParser.Weak_arith_termContext ctx) {
+        Term termL = accept(ctx.a);
+        Term termR = accept(ctx.b);
         String op_name = "";
         if (ctx.PLUS() != null) {
             op_name = "add";
@@ -251,40 +253,29 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
         var op = (Function) functions().lookup(new Name(op_name));
         if (op == null) {
-            semanticError(ctx, "Function symbol '" + op_name + "' not found.");
+            return updateOrigin(termL, ctx);
+//            semanticError(ctx, "Function symbol '" + op_name + "' not found.");
         }
-        Term termL = accept(ctx.term(0));
-        Term termR = accept(ctx.term(1));
-        return capsulateTf(ctx, () -> getTermFactory().createTerm(op, termL, termR));
+        return binaryTerm(ctx, op, termL, termR);
     }
 
     @Override
-    public Term visitTermMult(KeYParser.TermMultContext ctx) {
-        Term termL = accept(ctx.term(0));
-        Term termR = accept(ctx.term(1));
-        var op = (Function) functions().lookup(new Name("mul"));
-        if (op == null) {
-            semanticError(ctx, "Function symbol 'mul' not found.");
-        }
-        return capsulateTf(ctx, () -> getTermFactory().createTerm(op, termL, termR));
-    }
+    public Object visitStrong_arith_term(KeYParser.Strong_arith_termContext ctx) {
+        Term termL = accept(ctx.a);
+        Term termR = accept(ctx.b);
+        Function op = null;
+        if (ctx.SLASH() != null)
+            op = (Function) functions().lookup("div");
+        if (ctx.PERCENT() != null)
+            op = (Function) functions().lookup("mod");
+        if (ctx.STAR() != null)
+            op = (Function) functions().lookup(new Name("mul"));
 
-    @Override
-    public Term visitTermDivisionModulo(KeYParser.TermDivisionModuloContext ctx) {
-        Term termL = accept(ctx.term(0));
-        Term termR = accept(ctx.term(1));
-        String op_name = "";
-        if (ctx.SLASH() != null) {
-            op_name = "div";
-        }
-        if (ctx.PERCENT() != null) {
-            op_name = "mod";
-        }
-        var op = (Function) functions().lookup(new Name(op_name));
         if (op == null) {
-            semanticError(ctx, "Function symbol '" + op_name + "' not found.");
+            return updateOrigin(termL, ctx);
+            //semanticError(ctx, "Function symbol 'mul' not found.");
         }
-        return capsulateTf(ctx, () -> getTermFactory().createTerm(op, termL, termR));
+        return binaryTerm(ctx, op, termL, termR);
     }
 
     protected Term capsulateTf(ParserRuleContext ctx, Supplier<Term> termSupplier) {
@@ -496,40 +487,27 @@ public class ExpressionBuilder extends DefaultBuilder {
 
 
     @Override
-    public Term visitDotAll(KeYParser.DotAllContext ctx) {
-        Term prefix = pop();
-        return services.getTermBuilder().allFields(prefix);
-    }
-
-    @Override
-    public Term visitTermHeap(KeYParser.TermHeapContext ctx) {
-        //TODO
-        return (Term) super.visitTermHeap(ctx);
-    }
-
-    @Override
-    public Term visitTermCall(KeYParser.TermCallContext ctx) {
-        //TODO
-        return (Term) super.visitTermCall(ctx);
-    }
-
-
-    @Override
-    public Term visitTermAttribute(KeYParser.TermAttributeContext ctx) {
-        Term prefix = accept(ctx.term());
-        String memberName = ctx.attrid().getText();
-        if (prefix.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
-            if ("length".equals(memberName)) {
-                return getServices().getTermBuilder().seqLen(prefix);
-            } else {
-                semanticError(ctx,
-                        "There is no attribute '%s'for sequences (Seq), only 'length' is supported.", memberName);
-            }
+    public Object visitAttribute_term(KeYParser.Attribute_termContext ctx) {
+        Term t = accept(ctx.primitive_term());
+        if (ctx.STAR() != null) {
+            return services.getTermBuilder().allFields(t);
         }
-        if (ctx.attrid().clss != null) {
-            String className = ctx.attrid().clss.getText();
-            String qname = ctx.attrid().id2.getText();
-            //Term result = getServices().getJavaInfo().getStaticProgramMethodTerm(qname, (Term[]) args.toArray(), className);
+        if (ctx.attrid() != null) {
+            //TODO handle attribute
+            Term prefix = accept(ctx.term());
+            String memberName = ctx.attrid().getText();
+            if (prefix.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
+                if ("length".equals(memberName)) {
+                    return getServices().getTermBuilder().seqLen(prefix);
+                } else {
+                    semanticError(ctx,
+                            "There is no attribute '%s'for sequences (Seq), only 'length' is supported.", memberName);
+                }
+            }
+            if (ctx.attrid().clss != null) {
+                String className = ctx.attrid().clss.getText();
+                String qname = ctx.attrid().id2.getText();
+                //Term result = getServices().getJavaInfo().getStaticProgramMethodTerm(qname, (Term[]) args.toArray(), className);
             /*if (result == null) {
                 final Sort sort = lookupSort(className);
                 if (sort == null) {
@@ -541,13 +519,20 @@ public class ExpressionBuilder extends DefaultBuilder {
                             " but no corresponding java type!");
                 }
             }*/
-        } else {
-            memberName = CharMatcher.anyOf("()").trimFrom(memberName);
-            Operator v = getAttributeInPrefixSort(prefix.sort(), memberName);
-            return createAttributeTerm(prefix, v, ctx);
+            } else {
+                memberName = CharMatcher.anyOf("()").trimFrom(memberName);
+                Operator v = getAttributeInPrefixSort(prefix.sort(), memberName);
+                return createAttributeTerm(prefix, v, ctx);
+            }
+            return prefix;
         }
-        return prefix;
+
+        if (ctx.heap != null) {
+            //TODO handle heap
+        }
+        return updateOrigin(t, ctx);
     }
+
 
     public Term createAttributeTerm(Term prefix, Operator attribute, ParserRuleContext ctx) {
         Term result = prefix;
@@ -862,16 +847,17 @@ public class ExpressionBuilder extends DefaultBuilder {
             return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.FALSE));
     }
 
+
     @Override
-    public Object visitTermLabeled(KeYParser.TermLabeledContext ctx) {
-        Term t = accept(ctx.term());
+    public Object visitLabeled_term(KeYParser.Labeled_termContext ctx) {
+        Term t = accept(ctx.parallel_term());
         if (ctx.LGUILLEMETS() != null) {
             ImmutableArray<TermLabel> labels = accept(ctx.label());
             if (labels.size() > 0) {
                 t = getServices().getTermBuilder().addLabel(t, labels);
             }
         }
-        return t;
+        return updateOrigin(t, ctx);
     }
 
     @Override
@@ -1046,7 +1032,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
 
     @Override
-    public Object visitTermModality(KeYParser.TermModalityContext ctx) {
+    public Object visitModality_term(KeYParser.Modality_termContext ctx) {
         PairOfStringAndJavaBlock sjb = getJavaBlock(ctx.MODALITY().getSymbol());
 
         Operator op;
@@ -1155,7 +1141,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     public Term visitAccessterm(KeYParser.AccesstermContext ctx) {
         var name = accept(ctx.funcpred_name()); // Term or Operator
-        if(name instanceof Term) return (Term) name; //TODO validate
+        if (name instanceof Term) return (Term) name; //TODO validate
         Namespace<QuantifiableVariable> orig = variables();
         List<QuantifiableVariable> boundVars = accept(ctx.bound_variables());
         ImmutableArray<QuantifiableVariable> bv = boundVars != null
