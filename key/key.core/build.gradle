@@ -101,6 +101,7 @@ testFast {
     }
 }
 
+
 task testProveRules(type: Test) {
     description 'Proves KeY taclet rules tagged as lemma'
     group "verification"
