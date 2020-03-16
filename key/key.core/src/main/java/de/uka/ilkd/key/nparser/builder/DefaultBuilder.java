@@ -166,9 +166,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 }
             }
 
-            SortDependingFunction firstInstance
-                    = SortDependingFunction.getFirstInstance(new Name(varfuncName),
-                    getServices());
+            SortDependingFunction firstInstance =
+                    SortDependingFunction.getFirstInstance(new Name(varfuncName), getServices());
             if (firstInstance != null) {
                 var v = firstInstance.getInstanceFor(sort, getServices());
                 if (v != null) {
@@ -176,7 +175,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 }
             }
         }
-        semanticError(ctx, "(program) variable or constant %s", varfuncName);
+        semanticError(ctx, "Could not found (program) variable or constant %s", varfuncName);
         return null;
     }
 

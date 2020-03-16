@@ -62,6 +62,7 @@ public class TestDeclParser {
         NamespaceBuilder nb = new NamespaceBuilder(nss);
         nb.addSort("boolean")
                 .addSort("int")
+                .addSort("\\seq")
                 .addSort("LocSet");
         //String sorts = "\\sorts{boolean;int;LocSet;}";
         //parseDecls(sorts);

@@ -814,9 +814,9 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitBracket_access_indexrange(KeYParser.Bracket_access_indexrangeContext ctx) {
-        Term reference = pop();
-        //FIXME This is ugly as hell. How to a have a better check than just a name?
-        boolean sequenceAccess = reference.sort().name().toString().equalsIgnoreCase("seq");
+        //  | term LBRACKET indexTerm=term (DOTRANGE rangeTo=term)? RBRACKET #bracket_access_indexrange
+        Term term = accept(ctx.term(0));
+        boolean sequenceAccess = term.sort().name().toString().equalsIgnoreCase("seq");
         //boolean heapUpdate = reference.sort().name().toString().equalsIgnoreCase("Heap");
 
         if (sequenceAccess) {
@@ -824,10 +824,11 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "Range access for sequence terms not allowed");
             }
             Term indexTerm = accept(ctx.indexTerm);
+            assert indexTerm != null;
             if (!isIntTerm(indexTerm))
                 semanticError(ctx, "Expecting term of sort %s as index of sequence %s, but found: %s",
-                        IntegerLDT.NAME, reference, indexTerm);
-            return getServices().getTermBuilder().seqGet(Sort.ANY, reference, indexTerm);
+                        IntegerLDT.NAME, term, indexTerm);
+            return getServices().getTermBuilder().seqGet(Sort.ANY, term, indexTerm);
         }
 
         if (ctx.rangeTo != null) {
@@ -850,7 +851,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         }
         Term indexTerm = accept(ctx.indexTerm);
-        return getServices().getTermBuilder().dotArr(reference, indexTerm);
+        return getServices().getTermBuilder().dotArr(term, indexTerm);
     }
 
     @Override
@@ -1128,14 +1129,33 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "Cannot can be limited: " + op);
             }
         } else {
-            op = lookupVarfuncId(ctx, varfuncid, sortId);
+            var firstName = ctx.name.simple_ident().size() == 0 ? ctx.name.NUM_LITERAL().getText()
+                    : ctx.name.simple_ident(0).getText();
+            var otherParts = ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
+            op = lookupVarfuncId(ctx, firstName, sortId);
+            if (op instanceof ProgramVariable && otherParts.size() > 0) {
+                var v = (ProgramVariable) op;
+                var tv = getServices().getTermFactory().createTerm(v);
+                var memberName = otherParts.get(0).getText();
+                if (v.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
+                    if ("length".equals(memberName)) {
+                        return getServices().getTermBuilder().seqLen(tv);
+                    } else {
+                        semanticError(ctx,
+                                "There is no attribute '%s'for sequences (Seq), only 'length' is supported.", memberName);
+                    }
+                }
+                memberName = CharMatcher.anyOf("()").trimFrom(memberName);
+                var attr = getAttributeInPrefixSort(v.sort(), memberName);
+                return createAttributeTerm(tv, attr, ctx);
+            }
         }
-
         return op;
     }
 
     public Term visitAccessterm(KeYParser.AccesstermContext ctx) {
         var name = accept(ctx.funcpred_name()); // Term or Operator
+        if(name instanceof Term) return (Term) name; //TODO validate
         Namespace<QuantifiableVariable> orig = variables();
         List<QuantifiableVariable> boundVars = accept(ctx.bound_variables());
         ImmutableArray<QuantifiableVariable> bv = boundVars != null

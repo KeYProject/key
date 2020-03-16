@@ -342,44 +342,42 @@ literals:
 
 term
 :
-    literals                  #termLiterals
-  | accessterm                #termAccess  //also handles function calls
-  | term DOT attrid           #termAttribute //this is ambigous
-  | term AT term              #termHeap
-  | term argument_list        #termCall
-  | term DOT STAR             #dotAll
-  | term LBRACKET target=term ASSIGN val=term  RBRACKET       #bracket_access_heap_upate
-  | term LBRACKET id=simple_ident args=argument_list RBRACKET #bracket_access_heap_term
-  | term LBRACKET STAR RBRACKET                               #bracket_access_star
-  | term LBRACKET indexTerm=term (DOTRANGE rangeTo=term)? RBRACKET #bracket_access_indexrange
-  | AT name=simple_ident      #abbreviation
-  | LPAREN term RPAREN        #termParen
+    term (LGUILLEMETS labels = label RGUILLEMETS)   #termLabeled
+  | term PARALLEL term        #parallel
+  | MODALITY term             #termModality
+  | locset_term               #termLocset
+  | quantifierterm            #termQuantifier
+  | term ASSIGN term          #elementary_update_term
+  | term EQV term             #equivalence_term
+  | term IMP term             #implication_term
+  | term OR term              #disjunction_term
+  | term AND term             #conjunction_term
+  | term EQUALS term          #termEquals
+  | term NOT_EQUALS term      #termNotEquals
+  | term ( LESS | LESSEQUAL | GREATER |  GREATEREQUAL ) term #termCompare
+  |	term STAR term            #termMult
+  |<assoc=right> term (SLASH | PERCENT) term #termDivisionModulo
+  | term (PLUS|MINUS) term    #termWeakArith
+  | location_term             #termLocation
+  | substitutionterm          #termSubstitution
+  | updateterm                #termUpdate
   | ifThenElseTerm            #termIfThenElse
   | ifExThenElseTerm          #termIfExThenElse
   | NOT term                  #negation
   | MINUS term                #unaryMinus
   | LPAREN sort=sortId RPAREN term #cast
-  | location_term             #termLocation
-  | substitutionterm          #termSubstitution
-  | updateterm                #termUpdate
-  |<assoc=right>
-    term (SLASH | PERCENT) term #termDivisionModulo
-  |	term STAR term            #termMult
-  | term (PLUS|MINUS) term    #termWeakArith
-  | term ( LESS | LESSEQUAL | GREATER |  GREATEREQUAL ) term #termCompare
-  | term NOT_EQUALS term      #termNotEquals
-  | term EQUALS term          #termEquals
-  | term AND term             #conjunction_term
-  | term OR term              #disjunction_term
-  | term IMP term             #implication_term
-  | term EQV term             #equivalence_term
-  | term ASSIGN term          #elementary_update_term
-  | quantifierterm            #termQuantifier
-  | locset_term               #termLocset
-  | MODALITY term             #termModality
-  | term PARALLEL term        #parallel
-  | term (LGUILLEMETS labels = label RGUILLEMETS)
-                              #termLabeled
+  | LPAREN term RPAREN        #termParen
+  | AT name=simple_ident      #abbreviation
+  | term LBRACKET target=term ASSIGN val=term  RBRACKET       #bracket_access_heap_upate
+  | term LBRACKET id=simple_ident args=argument_list RBRACKET #bracket_access_heap_term
+  | term LBRACKET STAR RBRACKET                               #bracket_access_star
+  | term LBRACKET indexTerm=term (DOTRANGE rangeTo=term)? RBRACKET #bracket_access_indexrange
+  | term DOT STAR             #dotAll
+  | term argument_list        #termCall
+  | term AT term              #termHeap
+  | term DOT attrid           #termAttribute //this is ambigous
+  | accessterm                #termAccess  //also handles function calls
+  | literals                  #termLiterals
 ;
 
 /**

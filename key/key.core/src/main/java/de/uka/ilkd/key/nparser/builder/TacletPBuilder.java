@@ -67,6 +67,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         List<Taclet> seq = mapOf(ctx.taclet());
         Map<RuleKey, Taclet> taclets = new HashMap<>();
         for (Taclet s : seq) {
+            if(s==null) continue;
             final RuleKey key = new RuleKey(s);
             if (taclets.containsKey(key)) {
                 semanticError(ctx, "Cannot add taclet \"" + s.name() +
@@ -192,7 +193,9 @@ public class TacletPBuilder extends ExpressionBuilder {
             currentTBuilder.pop();
             return r;
         } catch (RuntimeException e) {
-            throw new BuildingException(ctx, e);
+            //new BuildingException(e).printStackTrace();
+            return null;
+            //throw new BuildingException(ctx, e);
         }
     }
 
