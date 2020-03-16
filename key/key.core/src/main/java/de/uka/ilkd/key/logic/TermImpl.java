@@ -146,11 +146,13 @@ class TermImpl implements Term {
      * TermCreationException is thrown.
      */
     public Term checked() {
-        if (op.validTopLevel(this)) {
+        op.validTopLevelException(this);
+        return this;
+        /*if (op.validTopLevel(this)) {
             return this;
         } else {
             throw new TermCreationException(op, this);
-        }
+        }*/
     }
 
     @Override

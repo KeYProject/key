@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.logic.TermCreationException;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.Name;
@@ -42,8 +43,10 @@ public final class UpdateApplication extends AbstractOperator {
     
     
     @Override
-    public boolean additionalValidTopLevel (Term term) {
-        return term.sub(0).sort() == Sort.UPDATE;
+    public void additionalValidTopLevel (Term term) {
+        if (term.sub(0).sort() != Sort.UPDATE) {
+            throw new TermCreationException(this, term);
+        }
     }
     
     

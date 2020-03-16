@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.logic.TermCreationException;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.Name;
@@ -90,24 +91,30 @@ abstract class AbstractOperator implements Operator {
      * Allows subclasses to impose custom demands on what constitutes a 
      * valid term using the operator represented by the subclass. 
      */
-    protected abstract boolean additionalValidTopLevel(Term term);
+    protected abstract void additionalValidTopLevel(Term term) throws TermCreationException;
     
     
     @Override
-    public boolean validTopLevel(Term term) {
-	if(arity != term.arity()
-	   || arity != term.subs().size()
-	   || (whereToBind == null) != term.boundVars().isEmpty()) {
-	    return false;
-	}
+    public void validTopLevelException(Term term) throws TermCreationException {
+        if(arity != term.arity()) {
+            throw new TermCreationException(this, term);
+        }
+
+        if (arity != term.subs().size()) {
+            throw new TermCreationException(this, term);
+        }
+
+        if((whereToBind == null) != term.boundVars().isEmpty()) {
+            throw new TermCreationException(this, term);
+        }
 	
-	for(int i = 0, n = arity; i < n; i++) {
-	    if(term.sub(i) == null) {
-		return false;
-	    }
-	}
-	
-	return additionalValidTopLevel(term);
+        for(int i = 0; i < arity; i++) {
+            if(term.sub(i) == null) {
+                throw new TermCreationException(this, term);
+            }
+        }
+
+        additionalValidTopLevel(term);
     }
     
     
