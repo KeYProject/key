@@ -68,8 +68,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             TermImpl ti = (TermImpl) t;
             ti.setOrigin(ctx.start.getTokenSource().getSourceName()
                     + "@" + ctx.start.getLine() + ":" + ctx.start.getCharPositionInLine());
-        } catch (ClassCastException ignored) {
-        }
+        } catch (ClassCastException ignored) {}
         return t;
     }
 
@@ -488,7 +487,8 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitAttribute_term(KeYParser.Attribute_termContext ctx) {
-        Term t = accept(ctx.primitive_term());
+        assert(ctx.primitive_term()!=null);
+        final Term t = accept(ctx.primitive_term());
         if (ctx.STAR() != null) {
             return services.getTermBuilder().allFields(t);
         }
@@ -1091,6 +1091,10 @@ public class ExpressionBuilder extends DefaultBuilder {
         List<String> parts = mapOf(ctx.name.simple_ident());
         String varfuncid = ctx.name.getText();
 
+        if (ctx.name.NUM_LITERAL() != null) {//number
+            return toZNotation(ctx.name.NUM_LITERAL().getText(), functions());
+        }
+
         assert parts != null && varfuncid != null;
 
         boolean javaReference = parts.size() > 1
@@ -1117,9 +1121,9 @@ public class ExpressionBuilder extends DefaultBuilder {
         } else {
             var firstName = ctx.name.simple_ident().size() == 0 ? ctx.name.NUM_LITERAL().getText()
                     : ctx.name.simple_ident(0).getText();
-            var otherParts = ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
             op = lookupVarfuncId(ctx, firstName, sortId);
-            if (op instanceof ProgramVariable && otherParts.size() > 0) {
+            if (op instanceof ProgramVariable && ctx.name.simple_ident().size() > 1) {
+                var otherParts = ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
                 var v = (ProgramVariable) op;
                 var tv = getServices().getTermFactory().createTerm(v);
                 var memberName = otherParts.get(0).getText();

@@ -354,9 +354,17 @@ equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=equality_term)?;
 comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=comparison_term)?;
 weak_arith_term: a=strong_arith_term ((PLUS|MINUS) b=weak_arith_term)?;
 strong_arith_term: a=brace_term ((STAR|SLASH |PERCENT) b=strong_arith_term)?;
-term110: (call_term) (AT term)?;
-call_term:  attribute_term argument_list?;
-attribute_term: primitive_term (DOT STAR|attrid)? (AT heap=term)?;
+//term110: (call_term) (AT term)?;
+//call_term:  attribute_term argument_list?;
+//attribute_term: primitive_term (DOT STAR|attrid)? (AT heap=term)?;
+
+brace_term: primitive_term brace_suffix?;
+brace_suffix:
+    LBRACKET target=term ASSIGN val=term RBRACKET       #bracket_access_heap_upate
+  | LBRACKET id=simple_ident args=argument_list RBRACKET #bracket_access_heap_term
+  | LBRACKET STAR RBRACKET                               #bracket_access_star
+  | LBRACKET indexTerm=term (DOTRANGE rangeTo=term)? RBRACKET #bracket_access_indexrange
+;
 
 primitive_term:
     LPAREN term RPAREN        #termParen
@@ -376,13 +384,6 @@ primitive_term:
 modality_term: MODALITY term;
 negation_term: NOT term;
 
-brace_term: term110 brace_suffix?;
-brace_suffix:
-    LBRACKET target=term ASSIGN val=term RBRACKET       #bracket_access_heap_upate
-  | LBRACKET id=simple_ident args=argument_list RBRACKET #bracket_access_heap_term
-  | LBRACKET STAR RBRACKET                               #bracket_access_star
-  | LBRACKET indexTerm=term (DOTRANGE rangeTo=term)? RBRACKET #bracket_access_indexrange
-;
 
 /*
 term
@@ -432,10 +433,14 @@ term
  */
 accessterm
 :
-  varfuncid=funcpred_name
-  ( (LBRACE boundVars=bound_variables RBRACE)?
-    args=argument_list
-  )?
+  (sortId DOUBLECOLON)?
+  simple_ident (accessterm_2)*
+;
+
+accessterm_2 :
+      LBRACE boundVars=bound_variables RBRACE
+    | argument_list
+    | DOT    simple_ident (AT heap=term)?
 ;
 
 label
@@ -455,7 +460,6 @@ single_label
     RPAREN
   )?
 ;
-
 
 location_term
 :
