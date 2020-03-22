@@ -487,6 +487,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
 
+    /*
     @Override
     public Object visitAccessterm_suffix_attr(KeYParser.Accessterm_suffix_attrContext ctx) {
         final Term t = pop();
@@ -518,7 +519,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     semanticError(ctx, "Found logic sort for " + className +
                             " but no corresponding java type!");
                 }
-            }*/
+            }
         } else {
             memberName = CharMatcher.anyOf("()").trimFrom(memberName);
             Operator v = getAttributeInPrefixSort(prefix.sort(), memberName);
@@ -529,7 +530,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             //TODO handle heap
         }
         return updateOrigin(t, ctx);
-    }
+    }*/
 
 
     public Term createAttributeTerm(Term prefix, Operator attribute, ParserRuleContext ctx) {
@@ -1178,7 +1179,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
             while (ctx.accessterm_2(currentSuffix) instanceof KeYParser.Accessterm_suffix_simpleattrContext) {
                 var a = (KeYParser.Accessterm_suffix_simpleattrContext) ctx.accessterm_2(currentSuffix);
-                var heap = a.heap;
+                var heap = a.heap; //TODO?
                 String attributeName = accept(a.id);
                 ProgramVariable maybeAttr = getJavaInfo().getAttribute(attributeName, kjt);
                 if (maybeAttr != null) {
@@ -1187,13 +1188,14 @@ public class ExpressionBuilder extends DefaultBuilder {
                 } else {
                     final var pm = getStaticQuery(kjt.getFullName(), attributeName);
                     if (pm != null) {
-                        current = getJavaInfo().getStaticProgramMethodTerm(attributeName, args, kjt.getFullName());
+                        current = getJavaInfo().getStaticProgramMethodTerm(attributeName, /*TODO*/new Term[0], kjt.getFullName());
                     } else {
                         semanticError(ctx, "Unknown java attribute: %s", attributeName);
                     }
                 }
             }
         } else { // The firstName has to be an variable
+            assert firstName != null;
             Operator op = null;
             if ("skip".equals(firstName)) {
                 op = UpdateJunctor.SKIP;
@@ -1208,72 +1210,117 @@ public class ExpressionBuilder extends DefaultBuilder {
                 } else {
                     semanticError(ctx, "Cannot can be limited: " + op);
                 }
+
             } else {
                 op = lookupVarfuncId(ctx, firstName, sortId);
-                if (op instanceof ProgramVariable && ctx.name.simple_ident().size() > 1) {
-                    var otherParts = ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
+            }
+
+            current = getServices().getTermFactory().createTerm(op);
+            Namespace<QuantifiableVariable> orig = null;
+            ImmutableArray<QuantifiableVariable> boundVars = null;
+
+            Operator finalOp = op;
+
+            while (ctx.accessterm_2(currentSuffix) != null) {
+                var ctxSuffix = ctx.accessterm_2(currentSuffix);
+
+                if (op instanceof ProgramVariable
+                        && ctxSuffix instanceof KeYParser.Accessterm_suffix_starContext) {
+                    System.err.println("this.*!");
+                    //TODO
+                }
+
+                if (op instanceof ProgramVariable
+                        && ctxSuffix instanceof KeYParser.Accessterm_suffix_simpleattrContext) {
                     var v = (ProgramVariable) op;
-                    var tv = getServices().getTermFactory().createTerm(v);
-                    var memberName = otherParts.get(0).getText();
+                    // var tv = getServices().getTermFactory().createTerm(v);
+                    var memberName = ((KeYParser.Accessterm_suffix_simpleattrContext) ctxSuffix).id.getText();
                     if (v.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
                         if ("length".equals(memberName)) {
-                            return getServices().getTermBuilder().seqLen(tv);
+                            return getServices().getTermBuilder().seqLen(current);
                         } else {
                             semanticError(ctx,
-                                    "There is no attribute '%s'for sequences (Seq), only 'length' is supported.", memberName);
+                                    "There is no attribute '%s'for sequences (Seq), only 'length' is supported.",
+                                    memberName);
                         }
+                    } else {
+                        //TODO check if needed:
+                        memberName = CharMatcher.anyOf("()").trimFrom(memberName);
+                        var attr = getAttributeInPrefixSort(v.sort(), memberName);
+                        current = createAttributeTerm(current, attr, ctx);
                     }
-                    memberName = CharMatcher.anyOf("()").trimFrom(memberName);
-                    var attr = getAttributeInPrefixSort(v.sort(), memberName);
-                    return createAttributeTerm(tv, attr, ctx);
                 }
-            }
 
-        }
+                if (ctxSuffix instanceof KeYParser.Accessterm_suffix_complexattrContext) {
+                    var attrid = (KeYParser.Accessterm_suffix_complexattrContext) ctxSuffix;
+                    String className = attrid.clss.getText();
+                    String qname = attrid.id2.getText();
+                    assert false;
+                    //current = getServices().getJavaInfo().getStaticProgramMethodTerm(qname, (Term[]) args.toArray(), className);
+                    /*if (result == null) {
+                    final Sort sort = lookupSort(className);
+                    if (sort == null) {
+                        semanticError(ctx, "Could not find matching sort for " + className);
+                    }
+                    KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
+                    if (kjt == null) {
+                        semanticError(ctx, "Found logic sort for " + className +
+                                " but no corresponding java type!");
+                    }
+                       }*/
+                }
 
+                if (ctxSuffix instanceof KeYParser.Accessterm_suffix_boundedVariableContext) {
+                    assert orig != null;
+                    var ctxbv = ((KeYParser.Accessterm_suffix_boundedVariableContext) ctxSuffix).boundVars;
+                    orig = variables();
+                    List<QuantifiableVariable> bv = accept(ctxbv);
+                    boundVars = bv != null
+                            ? new ImmutableArray<>(bv.toArray(new QuantifiableVariable[0]))
+                            : null;
+                }
 
-        Namespace<QuantifiableVariable> orig = variables();
-        List<QuantifiableVariable> boundVars = accept(ctx.bound_variables());
-        ImmutableArray<QuantifiableVariable> bv = boundVars != null
-                ? new ImmutableArray<>(boundVars.toArray(new QuantifiableVariable[0]))
-                : null;
+                if (ctxSuffix instanceof KeYParser.Accessterm_suffix_funcallContext) {
+                    var ctxargs = ((KeYParser.Accessterm_suffix_funcallContext) ctxSuffix).argument_list();
+                    List<Term> arguments = accept(ctxargs);
+                    Term[] args = arguments == null ? new Term[0] : arguments.toArray(new Term[0]);
 
-        List<Term> arguments = accept(ctx.argument_list());
-        Term[] args = arguments == null ? new Term[0] : arguments.toArray(new Term[0]);
-
-
-        Operator op = (Operator) name;
-        if (op instanceof ParsableVariable) {
-            if (ctx.argument_list() != null) {
-                semanticError(ctx, "You used a variable like a predicate or function.");
-            }
-            if (boundVars != null)
-                addWarning(ctx, "Bounded variable are ignored on a variable");
-            result = termForParsedVariable((ParsableVariable) op, ctx);
-        } else {
-            if (boundVars == null) {
-                result = capsulateTf(ctx, () -> getTermFactory().createTerm(op, args));
-            } else {
-                //sanity check
-                assert op instanceof Function;
-
-                for (int i = 0; i < args.length; i++) {
-                    if (i < op.arity() && !op.bindVarsAt(i)) {
-                        for (QuantifiableVariable qv : args[i].freeVars()) {
-                            if (boundVars.contains(qv)) {
-                                semanticError(ctx, "Building function term " + op + " with bound variables failed: "
-                                        + "Variable " + qv + " must not occur free in subterm " + args[i]);
+                    if (op instanceof ParsableVariable) {
+                        if (args.length != 0) {
+                            semanticError(ctx, "You used a variable like a predicate or function.");
+                        }
+                        if (boundVars != null)
+                            addWarning(ctx, "Bounded variable are ignored on a variable");
+                        current = termForParsedVariable((ParsableVariable) op, ctx);
+                    } else {
+                        if (boundVars == null) {
+                            current = capsulateTf(ctx, () -> getTermFactory().createTerm(finalOp, args));
+                        } else {
+                            //sanity check
+                            assert op instanceof Function;
+                            for (int i = 0; i < args.length; i++) {
+                                if (i < op.arity() && !op.bindVarsAt(i)) {
+                                    for (QuantifiableVariable qv : args[i].freeVars()) {
+                                        if (boundVars.contains(qv)) {
+                                            semanticError(ctx, "Building function term " + op + " with bound variables failed: "
+                                                    + "Variable " + qv + " must not occur free in subterm " + args[i]);
+                                        }
+                                    }
+                                }
                             }
+                            ImmutableArray<QuantifiableVariable> finalBoundVars = boundVars;
+                            //create term
+                            current = capsulateTf(ctx, () -> getTermFactory().createTerm(finalOp, args, finalBoundVars, null));
                         }
                     }
                 }
-                //create term
-                result = capsulateTf(ctx, () -> getTermFactory().createTerm(op, args, bv, null));
-            }
-        }
 
-        if (boundVars != null) {
-            unbindVars(orig);
+                currentSuffix++;
+            }
+
+            if (boundVars != null) {
+                unbindVars(orig);
+            }
         }
         return current;
     }
