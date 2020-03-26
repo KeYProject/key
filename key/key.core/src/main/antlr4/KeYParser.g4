@@ -433,15 +433,16 @@ term
  */
 accessterm
 :
-  (sortId DOUBLECOLON)? simple_ident (accessterm_2)*
+  (sortId DOUBLECOLON)?
+  firstName=simple_ident
+  ( attribute )*
+  ((LBRACE boundVars=bound_variables RBRACE)? argument_list)?
 ;
 
-accessterm_2 :
-      LBRACE boundVars=bound_variables RBRACE #accessterm_suffix_boundedVariable
-    | argument_list                           #accessterm_suffix_funcall
-    | DOT STAR                                #accessterm_suffix_star
-    | DOT id = simple_ident (AT heap=term)?   #accessterm_suffix_simpleattr
-    | LPAREN clss = sortId DOUBLECOLON id2 = simple_ident RPAREN #accessterm_suffix_complexattr
+attribute:
+    DOT STAR                                                       #attribute_star
+  | DOT id=simple_ident (AT heap=term)?                            #attribute_simple
+  | DOT LPAREN sort=sortId DOUBLECOLON id=simple_ident RPAREN #attribute_complex
 ;
 
 label
