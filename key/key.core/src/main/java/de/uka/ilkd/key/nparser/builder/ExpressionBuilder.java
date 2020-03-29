@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.nparser.BuildingException;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.parser.NotDeclException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -191,15 +190,17 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Term visitUnaryMinus(KeYParser.UnaryMinusContext ctx) {
-        Term result = accept(ctx.term());
+        Term result = accept(ctx.sub);
         assert result != null;
-        if (result.sort() != Sort.FORMULA) {
-            Function negation = functions().lookup(new Name("neg"));
-            return getTermFactory().createTerm(negation, result);
-        } else {
-            semanticError(ctx, "Formula cannot be prefixed with '-'");
+        if (ctx.MINUS() != null) {
+            if (result.sort() != Sort.FORMULA) {
+                Function negation = functions().lookup(new Name("neg"));
+                return capsulateTf(ctx, () -> getTermFactory().createTerm(negation, result));
+            } else {
+                semanticError(ctx, "Formula cannot be prefixed with '-'");
+            }
         }
-        return updateOrigin(result, ctx);
+        return result;
     }
 
     @Override
@@ -288,6 +289,15 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
+    public Object visitBrace_term(KeYParser.Brace_termContext ctx) {
+        Term t = accept(ctx.primitive_term());
+        for (KeYParser.Brace_suffixContext brace_suffix : ctx.brace_suffix()) {
+            t = accept(brace_suffix, t);
+        }
+        return t;
+    }
+
+    /*@Override
     public String visitStaticAttributeOrQueryReference(KeYParser.StaticAttributeOrQueryReferenceContext ctx) {
         //TODO weigl: this rule is a total grammar blower.
         String attrReference = ctx.id.getText();
@@ -308,8 +318,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                 state.backtracking = savedGuessing;
                 savedGuessing = -1;
             }*/
-        return attrReference;
-    }
+    //  return attrReference;
+    // }
 
     /*@Override
     public Term visitStatic_attribute_suffix(KeYParser.Static_attribute_suffixContext ctx) {
@@ -625,10 +635,10 @@ public class ExpressionBuilder extends DefaultBuilder {
         return result;
     }
 
-    @Override
+    /*@Override
     public String visitAttrid(KeYParser.AttridContext ctx) {
         return ctx.getText();
-    }
+    }*/
 
     private String unescapeString(String string) {
         char[] chars = string.toCharArray();
@@ -703,9 +713,13 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Term visitCast(KeYParser.CastContext ctx) {
-        final Sort objectSort = getServices().getJavaInfo().objectSort();
-        Term result = accept(ctx.term());
+        Term result = accept(ctx.sub);
+        if (ctx.sortId() == null) {
+            return result;
+        }
+
         Sort s = accept(ctx.sortId());
+        Sort objectSort = getServices().getJavaInfo().objectSort();
         if (s == null) {
             semanticError(ctx, "Tried to cast to unknown type.");
         } else if (objectSort != null
@@ -715,8 +729,9 @@ public class ExpressionBuilder extends DefaultBuilder {
                     " to sort " + s +
                     ". Casts between primitive and reference types are not allowed. ");
         }
-        return getTermFactory().createTerm(
-                s.getCastSymbol(getServices()), result);
+        assert s != null;
+        final var castSymbol = s.getCastSymbol(getServices());
+        return getTermFactory().createTerm(castSymbol, result);
     }
 
 
@@ -753,7 +768,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     */
 
     @Override
-    public Object visitBracket_access_heap_upate(KeYParser.Bracket_access_heap_upateContext ctx) {
+    public Object visitBracket_access_heap_update(KeYParser.Bracket_access_heap_updateContext ctx) {
         Term heap = pop();
         Term target = accept(ctx.target);
         Term val = accept(ctx.val);
@@ -1281,14 +1296,15 @@ public class ExpressionBuilder extends DefaultBuilder {
                 : null;
 
         List<Term> arguments = accept(ctx.argument_list());
-        Term[] args = arguments == null ? new Term[0] : arguments.toArray(new Term[0]);
+        Term[] args = arguments == null ? null : arguments.toArray(new Term[0]);
 
         if (op instanceof ParsableVariable) {
-            if (args.length != 0) {
+            if (args != null) {
                 semanticError(ctx, "You used a variable like a predicate or function.");
             }
             if (boundVars != null)
                 addWarning(ctx, "Bounded variable are ignored on a variable");
+
             current = termForParsedVariable((ParsableVariable) op, ctx);
         } else {
             if (boundVars == null) {
@@ -1312,7 +1328,9 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         }
 
-        if (boundVars != null) { unbindVars(orig); }
+        if (boundVars != null) {
+            unbindVars(orig);
+        }
         return current;
     }
 

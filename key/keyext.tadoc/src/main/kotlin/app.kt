@@ -20,6 +20,15 @@ object App {
     }
 }
 
+val GIT_VERSION by lazy {
+    val pb = ProcessBuilder("git", "describe", "--all")
+            .redirectErrorStream(true)
+            .redirectOutput(ProcessBuilder.Redirect.PIPE)
+    val p = pb.start();
+    p.waitFor()
+    String(p.inputStream.readAllBytes())
+}
+
 /**
  * Ideas:
  */
@@ -27,8 +36,18 @@ class GenDoc() : CliktCommand() {
     val outputFolder by option("-o", "--output", help = "output folder", metavar = "FOLDER")
             .file().default(File("target"))
 
-    val tacletFiles by argument("taclet-file", help = "")
+    val inputFiles by argument("taclet-file", help = "")
             .file().multiple(required = true)
+
+    val tacletFiles by lazy {
+        inputFiles.flatMap {
+            when {
+                it.isDirectory ->
+                    it.walkTopDown().filter { it.name.endsWith(".key") }.toList()
+                else -> listOf(it)
+            }
+        }
+    }
 
     val symbols = Index().also {
         val l = KeYLexer(CharStreams.fromString(""))
@@ -37,7 +56,7 @@ class GenDoc() : CliktCommand() {
                 .forEach { t ->
                     l.vocabulary.getSymbolicName(t)?.let { name ->
                         it += Symbol.token(name, t)
-                        println("## ${name} {: #Token-${name}}\n")
+                        //println("## ${name} {: #Token-${name}}\n")
                     }
                 }
     }
@@ -71,6 +90,7 @@ class GenDoc() : CliktCommand() {
 
     fun run(ctx: KeYParser.FileContext, f: File) {
         try {
+            println("Analyze: $f")
             val target = File(outputFolder, f.nameWithoutExtension + ".html")
             DocumentationFile(target, f, ctx, symbols).invoke()
         } catch (e: Exception) {
@@ -161,6 +181,7 @@ open class Symbol(
         TOKEN("t"), EXTERNAL("ext");
     }
 
+
     companion object {
         fun choiceCategory(page: String, cat: String, ctx: Any? = null): Symbol = Symbol(cat, page, cat, Type.CATEGORY, ctx)
         fun choiceOption(page: String, cat: String, option: String, ctx: Any? = null): Symbol = Symbol("$cat:$option", page, "$cat-$option", Type.OPTION, ctx)
@@ -169,7 +190,7 @@ open class Symbol(
         fun function(page: String, text: String, ctx: Any? = null) = Symbol(text, page, text, Type.FUNCTION, ctx)
         fun sort(page: String, text: String, ctx: Any? = null) = Symbol(text, page, type = Type.SORT, ctx = ctx)
         fun transformer(page: String, text: String, ctx: Any? = null) = Symbol(text, page, text, Type.TRANSFORMER, ctx)
-        fun file(self: String, ctx: Any? = null) = Symbol(self, self.replace(".html", ""), "root", Type.FILE, ctx)
+        fun file(self: String, ctx: Any? = null) = Symbol(self.replace(".html", ""), self, "root", Type.FILE, ctx)
         fun ruleset(name: String, page: String, ctx: Any? = null) = Symbol(name, page, name, Type.RULESET, ctx)
         fun token(display: String, tokenType: Int) = TokenSymbol(display, tokenType)
         fun external(url: String, anchor: String = "", ctx: Any? = null) = object : Symbol("", url, "", Type.EXTERNAL, ctx) {
@@ -180,9 +201,14 @@ open class Symbol(
         fun contract(name: String, self: String, ctx: Any? = null) = Symbol(name, self, name, Type.CONTRACT, ctx)
         fun invariant(name: String, self: String, ctx: Any? = null) = Symbol(name, self, name, Type.INVARIANT, ctx)
     }
+
+    override fun toString(): String {
+        return "Symbol(displayName='$displayName', url='$url', target='$target', type=$type, ctx=$ctx, anchor='$anchor', href='$href')"
+    }
 }
 
-class TokenSymbol(val display: String, val tokenType: Int)
+data class TokenSymbol(val display: String, val tokenType: Int)
     : Symbol(display, "https://key-project.org/docs/grammar/", display, Type.TOKEN)
 
 typealias Index = ArrayList<Symbol>
+

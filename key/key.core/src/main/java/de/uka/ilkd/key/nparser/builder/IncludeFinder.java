@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.nparser.builder;
 
 import com.google.common.base.CharMatcher;
-import de.uka.ilkd.key.nparser.BuildingException;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.io.RuleSource;

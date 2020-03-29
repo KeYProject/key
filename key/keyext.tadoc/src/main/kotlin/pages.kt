@@ -5,6 +5,7 @@ import de.uka.ilkd.key.nparser.KeYParserBaseVisitor
 import kotlinx.html.*
 import kotlinx.html.stream.appendHTML
 import org.antlr.v4.runtime.ParserRuleContext
+import org.antlr.v4.runtime.Token
 import org.commonmark.ext.autolink.AutolinkExtension
 import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
 import org.commonmark.ext.gfm.tables.TablesExtension
@@ -13,13 +14,14 @@ import org.commonmark.parser.Parser
 import org.commonmark.renderer.html.HtmlRenderer
 import org.key_project.core.doc.Markdown.markdown
 import java.io.File
+import java.util.*
 
 abstract class DefaultPage(
         val target: File,
         val pageTitle: String,
         val index: Index) {
     var brandTitle: String = "KeY Logic Documentation"
-    var tagLine: String = "Auto-generated from the KeY files."
+    var tagLine: String = "Defined symbols in the KeY System"
     val self = target.name
 
     operator fun invoke() {
@@ -51,6 +53,8 @@ abstract class DefaultPage(
                     h1("brand-title") { +brandTitle }
                     h2("brand-tagline") { +tagLine }
 
+                    span { +"Generated from version: $GIT_VERSION on ${Date()}" }
+
                     nav("nav") {
                         ul("nav-list") {
                             li("nav-item") {
@@ -72,7 +76,7 @@ abstract class DefaultPage(
     open fun UL.navigation() {
         val cat = index.asSequence()
                 .filter { it.url == self }
-                .filter { it.type != Symbol.Type.FILE && it != Symbol.Type.EXTERNAL }
+                .filter { it.type != Symbol.Type.FILE && it.type != Symbol.Type.EXTERNAL }
                 .groupBy { it.type }
         cat.forEach { c ->
             li() {
@@ -124,7 +128,7 @@ class Indexfile(target: File, index: Index) : DefaultPage(target, "Index Page", 
                     }
                 }
             } else {
-                div("") { "No entry in this category" }
+                div("no-entries") { +"No entry in this category" }
             }
         }
     }
@@ -136,7 +140,7 @@ class DocumentationFile(target: File, val keyFile: File, val ctx: KeYParser.File
         div.h1 { +keyFile.name }
 
         ctx.DOC_COMMENT().forEach {
-            div.markdown(it.text)
+            div.markdown(it.symbol)
         }
 
         //small { +file.relativeTo(File(".").absoluteFile).toString() }
@@ -156,10 +160,6 @@ class FileVisitor(val self: String,
         super.visitFile(ctx)
     }
 
-    override fun visitDecls(ctx: KeYParser.DeclsContext?) {
-        super.visitDecls(ctx)
-    }
-
     override fun visitProblem(ctx: KeYParser.ProblemContext?) {
         super.visitProblem(ctx)
     }
@@ -169,8 +169,8 @@ class FileVisitor(val self: String,
         super.visitOne_include_statement(ctx)
     }
 
-    override fun visitOne_include(ctx: KeYParser.One_includeContext?) {
-        super.visitOne_include(ctx)
+    override fun visitOne_include(ctx: KeYParser.One_includeContext) {
+        tagConsumer.div("include") { +"requires ${ctx.text}" }
     }
 
     override fun visitOptions_choice(ctx: KeYParser.Options_choiceContext?) {
@@ -193,9 +193,9 @@ class FileVisitor(val self: String,
                 +ctx.category.text
             }
 
-            markdown(ctx.DOC_COMMENT?.text)
+            markdown(ctx.DOC_COMMENT)
 
-            printDefinition(ctx, index)
+            printDefinition(ctx)
 
             ctx.choice_option.forEachIndexed { i, co ->
                 val optsym = index.lookup(co)
@@ -224,13 +224,25 @@ class FileVisitor(val self: String,
                     id = symbol?.anchor ?: ""
                     +s.text
                 }
-                printDefinition(ctx, index)
+                printDefinition(ctx)
             }
         }
     }
 
-    override fun visitProg_var_decls(ctx: KeYParser.Prog_var_declsContext?) {
-        super.visitProg_var_decls(ctx)
+    override fun visitTransform_decl(ctx: KeYParser.Transform_declContext) {
+        val symbol = index.lookup(ctx)
+        tagConsumer.div("doc transformer") {
+            h3("transformer") {
+                id = symbol?.anchor ?: ""
+                +ctx.trans_name.text
+            }
+            printDefinition(ctx)
+        }
+    }
+
+    override fun visitTransform_decls(ctx: KeYParser.Transform_declsContext?) {
+        tagConsumer.h2 { +"Transfomers" }
+        super.visitTransform_decls(ctx)
     }
 
     override fun visitPred_decls(ctx: KeYParser.Pred_declsContext?) {
@@ -241,12 +253,12 @@ class FileVisitor(val self: String,
 
     override fun visitPred_decl(ctx: KeYParser.Pred_declContext) {
         val symbol = index.lookup(ctx)
-        tagConsumer.div("doc pred") {
+        tagConsumer.div("doc predicate") {
             h3("sort") {
                 id = symbol?.anchor ?: ""
                 +ctx.pred_name.text
             }
-            printDefinition(ctx, index)
+            printDefinition(ctx)
         }
     }
 
@@ -257,13 +269,13 @@ class FileVisitor(val self: String,
 
     override fun visitFunc_decl(ctx: KeYParser.Func_declContext) {
         val symbol = index.lookup(ctx)
-        tagConsumer.div("doc func") {
+        tagConsumer.div("doc function") {
             h3 {
                 id = symbol?.anchor ?: ""
                 +ctx.func_name.text
             }
-            markdown(ctx.DOC_COMMENT()?.text)
-            printDefinition(ctx, index)
+            markdown(ctx.DOC_COMMENT()?.symbol)
+            printDefinition(ctx)
         }
     }
 
@@ -293,7 +305,40 @@ class FileVisitor(val self: String,
                 id = symbol?.anchor ?: ""
                 +ctx.name.text
             }
-            printDefinition(ctx, index)
+            printDefinition(ctx)
+        }
+    }
+
+    private val printer = PrettyPrinter(index)
+
+    private fun DIV.printDefinition(ctx: ParserRuleContext) {
+        div("raw") {
+            code {
+                unsafe { +ctx.accept(printer) }
+            }
+            small {
+                val source = ctx.getStart().tokenSource
+                +"defined in: ${File(source.sourceName).name} Line: ${ctx.start.line} Offset :${ctx.start.charPositionInLine}"
+            }
+            /*
+            small {
+                val file = ctx.start.tokenSource.sourceName
+                val lineStart = ctx.start.line
+                val lineStop = ctx.stop.line
+                val repo = FileRepositoryBuilder().findGitDir(File(file)).build()
+                val blame = BlameCommand(repo)
+                blame.setFilePath(file)
+                blame.call()?.let { result ->
+                    result.computeRange(lineStart, lineStop)
+                    (lineStart..lineStop).forEach {
+                        val author = result.getSourceAuthor(it)
+                        val n = author.name
+                        val w = author.name
+                        val e = author.emailAddress
+                        span { +w; +n }
+                    }
+                }
+            }*/
         }
     }
 }
@@ -319,42 +364,15 @@ object Markdown {
             .extensions(extensions)
             .build()
 
-    fun DIV.markdown(doc: String?) {
+    fun DIV.markdown(doc: Token?) {
         if (doc == null) return
         div("markdown") {
-            unsafe { +renderer.render(parser.parse(doc.trim('/', '!', '*'))) }
+            val regex = "^\\s{0,${doc.charPositionInLine}}".toRegex()
+            val text = doc.text
+                    .trim('/', '!', '*')
+                    .replace(regex, "")
+            unsafe { +renderer.render(parser.parse(text)) }
         }
-    }
-}
-
-private fun DIV.printDefinition(ctx: ParserRuleContext, index: Index) {
-    div("raw") {
-        code {
-            unsafe { +ctx.accept(PrettyPrinter(index)) }
-        }
-        small {
-            val source = ctx.getStart().tokenSource
-            +"defined in: ${File(source.sourceName).name} Line: ${ctx.start.line} Offset :${ctx.start.charPositionInLine}"
-        }
-        /*
-        small {
-            val file = ctx.start.tokenSource.sourceName
-            val lineStart = ctx.start.line
-            val lineStop = ctx.stop.line
-            val repo = FileRepositoryBuilder().findGitDir(File(file)).build()
-            val blame = BlameCommand(repo)
-            blame.setFilePath(file)
-            blame.call()?.let { result ->
-                result.computeRange(lineStart, lineStop)
-                (lineStart..lineStop).forEach {
-                    val author = result.getSourceAuthor(it)
-                    val n = author.name
-                    val w = author.name
-                    val e = author.emailAddress
-                    span { +w; +n }
-                }
-            }
-        }*/
     }
 }
 

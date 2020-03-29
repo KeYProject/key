@@ -17,6 +17,7 @@ import java.util.*
 class PrettyPrinter(val index: Index,
                     val printReferences: Boolean = true)
     : KeYParserBaseVisitor<String>() {
+    private var printed = mutableSetOf<String>()
     private val tokenSymbols = index.filterIsInstance<TokenSymbol>()
 
     override fun aggregateResult(aggregate: String?, nextResult: String?) =
@@ -152,8 +153,12 @@ class PrettyPrinter(val index: Index,
         return if (s != null)
             "<a href=\"${s.href}\" class=\"symbol ${s.type.name}\">$text</a> "
         else
-            "text ".also {
-                System.err.println("Could not found symbol for $text : $types")
+            "$text ".also {
+                val s = "Could not found symbol for $text : ${types.toList()}"
+                if (s !in printed) {
+                    printed.add(s)
+                    System.err.println(s)
+                }
             }
     }
 
@@ -290,10 +295,6 @@ class PrettyPrinter(val index: Index,
         return super.visitLiterals(ctx)
     }
 
-    override fun visitNegation(ctx: KeYParser.NegationContext?): String {
-        return super.visitNegation(ctx)
-    }
-
     override fun visitTermIfExThenElse(ctx: KeYParser.TermIfExThenElseContext?): String {
         return super.visitTermIfExThenElse(ctx)
     }
@@ -310,13 +311,6 @@ class PrettyPrinter(val index: Index,
         return super.visitTermParen(ctx)
     }
 
-    override fun visitTermCompare(ctx: KeYParser.TermCompareContext?): String {
-        return super.visitTermCompare(ctx)
-    }
-
-    override fun visitTermEquals(ctx: KeYParser.TermEqualsContext?): String {
-        return super.visitTermEquals(ctx)
-    }
 
     override fun visitBracket_access_indexrange(ctx: KeYParser.Bracket_access_indexrangeContext?): String {
         return super.visitBracket_access_indexrange(ctx)
@@ -330,25 +324,6 @@ class PrettyPrinter(val index: Index,
         return super.visitCast(ctx)
     }
 
-    override fun visitParallel(ctx: KeYParser.ParallelContext?): String {
-        return super.visitParallel(ctx)
-    }
-
-    override fun visitBracket_access_star(ctx: KeYParser.Bracket_access_starContext?): String {
-        return super.visitBracket_access_star(ctx)
-    }
-
-    override fun visitTermQuantifier(ctx: KeYParser.TermQuantifierContext?): String {
-        return super.visitTermQuantifier(ctx)
-    }
-
-    override fun visitTermAttribute(ctx: KeYParser.TermAttributeContext?): String {
-        return super.visitTermAttribute(ctx)
-    }
-
-    override fun visitTermModality(ctx: KeYParser.TermModalityContext?): String {
-        return super.visitTermModality(ctx)
-    }
 
     override fun visitTermLocset(ctx: KeYParser.TermLocsetContext?): String {
         return super.visitTermLocset(ctx)
@@ -358,13 +333,6 @@ class PrettyPrinter(val index: Index,
         return super.visitDisjunction_term(ctx)
     }
 
-    override fun visitTermNotEquals(ctx: KeYParser.TermNotEqualsContext?): String {
-        return super.visitTermNotEquals(ctx)
-    }
-
-    override fun visitTermDivisionModulo(ctx: KeYParser.TermDivisionModuloContext?): String {
-        return super.visitTermDivisionModulo(ctx)
-    }
 
     override fun visitElementary_update_term(ctx: KeYParser.Elementary_update_termContext?): String {
         return super.visitElementary_update_term(ctx)
@@ -386,33 +354,6 @@ class PrettyPrinter(val index: Index,
         return super.visitTermUpdate(ctx)
     }
 
-    override fun visitTermCall(ctx: KeYParser.TermCallContext?): String {
-        return super.visitTermCall(ctx)
-    }
-
-    override fun visitTermWeakArith(ctx: KeYParser.TermWeakArithContext?): String {
-        return super.visitTermWeakArith(ctx)
-    }
-
-    override fun visitDotAll(ctx: KeYParser.DotAllContext?): String {
-        return super.visitDotAll(ctx)
-    }
-
-    override fun visitTermLabeled(ctx: KeYParser.TermLabeledContext?): String {
-        return super.visitTermLabeled(ctx)
-    }
-
-    override fun visitTermHeap(ctx: KeYParser.TermHeapContext?): String {
-        return super.visitTermHeap(ctx)
-    }
-
-    override fun visitBracket_access_heap_upate(ctx: KeYParser.Bracket_access_heap_upateContext?): String {
-        return super.visitBracket_access_heap_upate(ctx)
-    }
-
-    override fun visitTermMult(ctx: KeYParser.TermMultContext?): String {
-        return super.visitTermMult(ctx)
-    }
 
     override fun visitUnaryMinus(ctx: KeYParser.UnaryMinusContext?): String {
         return super.visitUnaryMinus(ctx)
@@ -458,13 +399,6 @@ class PrettyPrinter(val index: Index,
         return super.visitUpdateterm(ctx)
     }
 
-    override fun visitStaticAttributeOrQueryReference(ctx: KeYParser.StaticAttributeOrQueryReferenceContext?): String {
-        return super.visitStaticAttributeOrQueryReference(ctx)
-    }
-
-    override fun visitAttrid(ctx: KeYParser.AttridContext?): String {
-        return super.visitAttrid(ctx)
-    }
 
     override fun visitIfThenElseTerm(ctx: KeYParser.IfThenElseTermContext?): String {
         return super.visitIfThenElseTerm(ctx)

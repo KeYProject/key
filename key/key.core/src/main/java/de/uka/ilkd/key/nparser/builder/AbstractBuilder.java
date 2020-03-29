@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.nparser.builder;
 
-import de.uka.ilkd.key.nparser.BuildingException;
+import de.uka.ilkd.key.nparser.BuildingIssue;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
@@ -24,11 +24,10 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unchecked")
 abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
-    //region handling of warnings
     @Nullable
-    protected List<BuildingException> warnings = null;
-    //region stack handling
-    private Stack<Object> parameters = new Stack<>();
+    private List<BuildingIssue> buildingIssues = null;
+    @Nullable
+    private Stack<Object> parameters = null;
 
     /**
      * Helper function for avoiding cast.
@@ -46,7 +45,7 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
 
     @Override
     protected T aggregateResult(T aggregate, T nextResult) {
-        if(nextResult!=null) return nextResult;
+        if (nextResult != null) return nextResult;
         return aggregate;
     }
 
@@ -64,14 +63,17 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     }
 
     protected <T> T pop() {
+        if(parameters==null) throw new IllegalStateException("Stack is empty");
         return (T) parameters.pop();
     }
 
     protected void push(Object... obj) {
+        if(parameters == null) parameters = new Stack<>();
         for (Object a : obj) parameters.push(a);
     }
 
     protected <T> @Nullable T accept(@Nullable RuleContext ctx, Object... args) {
+        if(parameters == null) parameters = new Stack<>();
         int stackSize = parameters.size();
         push(args);
         T t = accept(ctx);
@@ -110,20 +112,20 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
                 .collect(Collectors.toList());
     }
 
-    public @NotNull List<BuildingException> getWarnings() {
-        if (warnings == null) warnings = new LinkedList<>();
-        return warnings;
+    public @NotNull List<BuildingIssue> getBuildingIssues() {
+        if (buildingIssues == null) buildingIssues = new LinkedList<>();
+        return buildingIssues;
     }
 
-    protected BuildingException addWarning(ParserRuleContext node, String description) {
-        var be = new BuildingException(node, description);
-        getWarnings().add(be);
+    protected BuildingIssue addWarning(ParserRuleContext node, String description) {
+        var be = BuildingIssue.createWarning(description, node, null);
+        getBuildingIssues().add(be);
         return be;
     }
 
-    protected BuildingException addWarning(String description) {
-        var be = new BuildingException(description);
-        getWarnings().add(be);
+    protected BuildingIssue addWarning(String description) {
+        var be = BuildingIssue.createWarning(description, (ParserRuleContext) null, null);
+        getBuildingIssues().add(be);
         return be;
     }
     //endregion

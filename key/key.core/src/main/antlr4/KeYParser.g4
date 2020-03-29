@@ -345,7 +345,7 @@ term: labeled_term;
 labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
 parallel_term: a=elementary_update_term (PARALLEL b=term)?;
 elementary_update_term: a=equivalence_term (ASSIGN b=elementary_update_term)?;
-equivalence_term: a=implication_term (EQV b=equality_term)?;
+equivalence_term: a=implication_term (EQV b=equivalence_term)?;
 implication_term: a=disjunction_term (IMP b=implication_term)?;
 disjunction_term: a=conjunction_term (OR b=disjunction_term)?;
 conjunction_term: a=term60 (AND b=conjunction_term)?;
@@ -353,29 +353,26 @@ term60: equality_term | negation_term | quantifierterm | modality_term;
 equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=equality_term)?;
 comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=comparison_term)?;
 weak_arith_term: a=strong_arith_term ((PLUS|MINUS) b=weak_arith_term)?;
-strong_arith_term: a=brace_term ((STAR|SLASH |PERCENT) b=strong_arith_term)?;
-//term110: (call_term) (AT term)?;
-//call_term:  attribute_term argument_list?;
-//attribute_term: primitive_term (DOT STAR|attrid)? (AT heap=term)?;
+strong_arith_term: a=unaryMinus ((STAR|SLASH|PERCENT) b=strong_arith_term)?;
+unaryMinus: MINUS? sub=cast;
+cast: (LPAREN sort=sortId RPAREN)? sub=brace_term;
 
-brace_term: primitive_term brace_suffix?;
+brace_term: primitive_term brace_suffix*;
 brace_suffix:
-    LBRACKET target=term ASSIGN val=term RBRACKET       #bracket_access_heap_upate
-  | LBRACKET id=simple_ident args=argument_list RBRACKET #bracket_access_heap_term
-  | LBRACKET STAR RBRACKET                               #bracket_access_star
+    LBRACKET target=term ASSIGN val=term RBRACKET             #bracket_access_heap_update
+  | LBRACKET id=simple_ident args=argument_list RBRACKET      #bracket_access_heap_term
+  | LBRACKET STAR RBRACKET                                    #bracket_access_star
   | LBRACKET indexTerm=term (DOTRANGE rangeTo=term)? RBRACKET #bracket_access_indexrange
 ;
 
 primitive_term:
     LPAREN term RPAREN        #termParen
-  | MINUS term                #unaryMinus
   | locset_term               #termLocset
   | location_term             #termLocation
   | substitutionterm          #termSubstitution
   | updateterm                #termUpdate
   | ifThenElseTerm            #termIfThenElse
   | ifExThenElseTerm          #termIfExThenElse
-  | LPAREN sort=sortId RPAREN term #cast
   | AT name=simple_ident      #abbreviation
   | accessterm                #termAccess  //also handles function calls
   | literals                  #termLiterals
@@ -483,20 +480,21 @@ updateterm
   LBRACE term RBRACE term
 ;
 
+/*
 staticAttributeOrQueryReference
 :
   id=IDENT
   (EMPTYBRACKETS )*
-;
+;*/
 
 /**
   instead, one can write o.(packagename.Classname::f)
-*/
 attrid
 :
     id = simple_ident
   | LPAREN clss = sortId DOUBLECOLON id2 = simple_ident RPAREN
 ;
+*/
 
 
 ifThenElseTerm

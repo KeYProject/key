@@ -38,7 +38,7 @@ public class KeyIO {
     private final Services services;
     private final NamespaceSet nss;
     private @Nullable Namespace<SchemaVariable> schemaNamespace;
-    private @Nullable List<BuildingException> warnings;
+    private @Nullable List<BuildingIssue> warnings;
 
     public KeyIO(@NotNull Services services, @NotNull NamespaceSet nss) {
         this.services = services;
@@ -78,7 +78,7 @@ public class KeyIO {
         if (schemaNamespace != null)
             visitor.setSchemaVariables(schemaNamespace);
         var t = (Term) ctx.accept(visitor);
-        warnings = visitor.getWarnings();
+        warnings = visitor.getBuildingIssues();
         return t;
     }
 
@@ -96,7 +96,7 @@ public class KeyIO {
         if (schemaNamespace != null)
             visitor.setSchemaVariables(schemaNamespace);
         var seq = (Sequent) ctx.accept(visitor);
-        warnings = visitor.getWarnings();
+        warnings = visitor.getBuildingIssues();
         return seq;
     }
 

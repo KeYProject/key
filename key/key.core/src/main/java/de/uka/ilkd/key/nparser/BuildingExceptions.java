@@ -7,14 +7,14 @@ import java.util.List;
  * @version 1 (12/4/19)
  */
 public class BuildingExceptions extends RuntimeException {
-    private final List<BuildingException> errors;
+    private final List<BuildingIssue> errors;
 
-    public BuildingExceptions(List<BuildingException> errors) {
+    public BuildingExceptions(List<BuildingIssue> errors) {
         super("Multiple errors occured");
         this.errors = errors;
     }
 
-    public List<BuildingException> getErrors() {
+    public List<BuildingIssue> getErrors() {
         return errors;
     }
 }

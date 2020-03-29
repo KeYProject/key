@@ -18,7 +18,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.nparser.BuildingException;
+import de.uka.ilkd.key.nparser.builder.BuildingException;
 import de.uka.ilkd.key.rule.TacletForTests;
 import org.junit.Assert;
 import org.junit.Before;
@@ -249,15 +249,14 @@ public class TestTermParser extends AbstractTestTermParser {
         //	String s = "< { int x = 1; {String s = \"\\\"}\";} } > true";
         String s = "\\<{ int x = 1; {int s = 2;} }\\> x=x";
         Term t = parseTerm(s);
+    }
 
-        // for now, just check that the parser doesn't crash
-
-        //	 System.out.println(t);
-
+    @Test
+    public void test11() throws Exception {
         // Same with a box
-        s = "\\[{ int x = 2; {String s = \"\\\"}\";} }\\] true";
+        var s = "\\[{ int x = 2; {String s = \"\\\"}\";} }\\] true";
         //s = "< { int x = 1; {int s = 2;} } > true";
-        t = parseTerm(s);
+        var t = parseTerm(s);
         //System.out.println(t);
     }
 
@@ -318,7 +317,7 @@ public class TestTermParser extends AbstractTestTermParser {
     @Test
     public void testParsingArray() throws Exception {
         String s = "\\forall int[][] i; \\forall int j; i[j][j] = j";
-        Term t = parseTerm(s);
+        parseTerm(s);
     }
 
 
@@ -326,13 +325,13 @@ public class TestTermParser extends AbstractTestTermParser {
     @Ignore
     public void xtestParsingArrayWithSpaces() throws Exception {
         String s = "\\<{int[][] i; int j;}\\> i[ j ][ j ] = j";
-        Term t = parseTerm(s);
+        parseTerm(s);
     }
 
     @Test
     public void testParsingArrayCombination() throws Exception {
         String s = "\\forall int[][] i; \\forall int j; i [i[i[j][j]][i[j][j]]][i[j][i[j][j]]] = j";
-        Term t = parseTerm(s);
+        parseTerm(s);
     }
 
 
@@ -474,6 +473,7 @@ public class TestTermParser extends AbstractTestTermParser {
 
     @Test
     public void testInfix4() throws Exception {
+        // Test: Multiplication/Modulo/Div should be left associative
         Term termInfix = parseTerm("aa%bb*cc < -123");
         Term termPrefix = parseTerm("lt(mul(mod(aa,bb),cc),-123)");
         assertEqualsIgnoreWhitespaces("lt(mul(mod(aa,bb),cc),neg(Z(3(2(1(#))))))", termInfix.toString());
@@ -483,8 +483,9 @@ public class TestTermParser extends AbstractTestTermParser {
 
     @Test
     public void testCast() throws Exception {
-        assertEquals("cast stronger than plus", parseTerm("(int)3+2"),
-                parseTerm("((int)3)+2"));
+        assertEquals("cast stronger than plus",
+                parseTerm("((int)3)+2"),
+                parseTerm("(int)3+2"));
     }
 
 //    public void testParseTermsWithLabels() {
