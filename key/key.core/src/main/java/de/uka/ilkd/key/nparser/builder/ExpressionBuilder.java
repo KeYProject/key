@@ -262,21 +262,26 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitStrong_arith_term(KeYParser.Strong_arith_termContext ctx) {
+    public Object visitStrong_arith_term_1(KeYParser.Strong_arith_term_1Context ctx) {
         Term termL = accept(ctx.a);
-        Term termR = accept(ctx.b);
-        Function op = null;
-        if (ctx.SLASH() != null)
-            op = (Function) functions().lookup("div");
-        if (ctx.PERCENT() != null)
-            op = (Function) functions().lookup("mod");
-        if (ctx.STAR() != null)
-            op = (Function) functions().lookup(new Name("mul"));
+        if (ctx.b == null) return termL;
 
-        if (op == null) {
-            return updateOrigin(termL, ctx);
-            //semanticError(ctx, "Function symbol 'mul' not found.");
-        }
+        Term termR = accept(ctx.b);
+        Function op = functions().lookup(new Name("mul"));
+        assert op != null : "Could not find `mul` function symbol.";
+        return binaryTerm(ctx, op, termL, termR);
+    }
+
+    @Override
+    public Object visitStrong_arith_term_2(KeYParser.Strong_arith_term_2Context ctx) {
+        Term termL = accept(ctx.a);
+        if (ctx.b == null) return termL;
+
+        Term termR = accept(ctx.b);
+        var div = functions().lookup("div");
+        var mod = functions().lookup("mod");
+
+        var op = ctx.SLASH() != null ? div : mod;
         return binaryTerm(ctx, op, termL, termR);
     }
 
@@ -589,7 +594,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         final JavaInfo javaInfo = getJavaInfo();
 
         Operator result = schemaVariables().lookup(new Name(attributeName));
-        if (result == null) {
+        //if (result == null) {
 
             final boolean unambigousAttributeName = attributeName.indexOf(':') != -1;
 
@@ -613,7 +618,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                             "you use an array or object type in a .key-file with missing " +
                             "\\javaSource section.");
                 }
-                // WATCHOUT why not in DECLARATION MODE
+
                 ProgramVariable var = javaInfo.getCanonicalFieldProgramVariable(attributeName, prefixKJT);
                 if (var == null) {
                     LogicVariable logicalvar = (LogicVariable) namespaces().variables().lookup(attributeName);
@@ -627,7 +632,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     result = var;
                 }
             }
-        }
+        //}
 
         if (result == null && !("length".equals(attributeName))) {
             throwEx(new NotDeclException(null, "Attribute ", attributeName));
@@ -1169,7 +1174,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
             int currentSuffix = 0;
 
-            //consume packages
+            //region split up package and class name
             while (startWithPackage && ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
                 var a = (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
                 if (a.heap != null) break; //No heap on java package allowed
@@ -1189,24 +1194,53 @@ public class ExpressionBuilder extends DefaultBuilder {
                     currentSuffix++;
                 } else break;
             }
+            //endregion
 
             KeYJavaType kjt = getTypeByClassName(javaClass);
-            Term current = null; //TODO
-            while (ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
-                var a = (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
-                var heap = a.heap; //TODO?
-                String attributeName = accept(a.id);
-                ProgramVariable maybeAttr = getJavaInfo().getAttribute(attributeName, kjt);
-                if (maybeAttr != null) {
-                    var op = getAttributeInPrefixSort(kjt.getSort(), attributeName);
-                    current = createAttributeTerm(current, op, ctx);
-                } else {
-                    final var pm = getStaticQuery(kjt.getFullName(), attributeName);
-                    if (pm != null) {
-                        current = getJavaInfo().getStaticProgramMethodTerm(attributeName, /*TODO*/new Term[0], kjt.getFullName());
+
+            List<Term> arguments = accept(ctx.argument_list());
+            Term[] args = arguments != null ? arguments.toArray(new Term[0]) : null;
+
+            Term current = null;
+            for (KeYParser.AttributeContext attrib : ctx.attribute()) {
+                if (attrib instanceof KeYParser.Attribute_simpleContext) {
+                    var simpleContext = (KeYParser.Attribute_simpleContext) attrib;
+                    var heap = simpleContext.heap; //TODO?
+                    String attributeName = accept(simpleContext.id);
+                    ProgramVariable maybeAttr = getJavaInfo().getAttribute(attributeName, kjt);
+                    if (maybeAttr != null) {
+                        var op = getAttributeInPrefixSort(kjt.getSort(), attributeName);
+                        current = createAttributeTerm(current, op, ctx);
                     } else {
-                        semanticError(ctx, "Unknown java attribute: %s", attributeName);
+                        var pm = getStaticQuery(kjt.getFullName(), attributeName);
+                        if (pm != null) {
+                            current = getJavaInfo().getStaticProgramMethodTerm(attributeName, args, kjt.getFullName());
+                        } else {
+                            semanticError(ctx, "Unknown java attribute: %s", attributeName);
+                        }
+                        //TODO If not last attribute:
+                        addWarning("");
+                        return current;
                     }
+                } else if (attrib instanceof KeYParser.Attribute_complexContext) {
+                    var attrid = (KeYParser.Attribute_complexContext) attrib;
+                    String className = attrid.sort.getText();
+                    String attributeName = attrid.id.getText();
+                    current = getServices().getJavaInfo().getStaticProgramMethodTerm(attributeName, args, className);
+                    if (current == null) {
+                        final Sort sort = lookupSort(className);
+                        if (sort == null) {
+                            semanticError(ctx, "Could not find matching sort for " + className);
+                        }
+                        kjt = getServices().getJavaInfo().getKeYJavaType(sort);
+                        if (kjt == null) {
+                            semanticError(ctx, "Found logic sort for " + className +
+                                    " but no corresponding java type!");
+                        }
+                    }
+                    return current;
+                } else if (attrib instanceof KeYParser.Attribute_starContext) {
+                    //TODO
                 }
             }
             return current;
@@ -1222,7 +1256,6 @@ public class ExpressionBuilder extends DefaultBuilder {
         Sort sortId = accept(ctx.sortId());
         String firstName = accept(ctx.simple_ident());
         Term current = null;
-        int currentSuffix = 0;
         assert firstName != null;
         Operator op = null;
 
@@ -1244,20 +1277,24 @@ public class ExpressionBuilder extends DefaultBuilder {
             op = lookupVarfuncId(ctx, firstName, sortId);
         }
 
-        //current = getServices().getTermFactory().createTerm(op);
         Operator finalOp = op;
 
-        for (KeYParser.AttributeContext ctxSuffix : ctx.attribute()) {
-            if (op instanceof ProgramVariable
-                    && ctxSuffix instanceof KeYParser.Attribute_starContext) {
+        for (int i = 0; i < ctx.attribute().size(); i++) {
+            KeYParser.AttributeContext ctxSuffix = ctx.attribute(i);
+            boolean isLast = i == ctx.attribute().size() - 1;
+
+            if (//op instanceof ProgramVariable&&
+                     ctxSuffix instanceof KeYParser.Attribute_starContext) {
                 System.err.println("this.*!");
                 current = getServices().getTermFactory().createTerm(op);
-            } else if (op instanceof ProgramVariable
-                    && ctxSuffix instanceof KeYParser.Attribute_simpleContext) {
-                var v = (ProgramVariable) op;
-                // var tv = getServices().getTermFactory().createTerm(v);
+                //TODO
+            } else if (//op instanceof ProgramVariable &&
+                    ctxSuffix instanceof KeYParser.Attribute_simpleContext) {
+                current = getServices().getTermFactory().createTerm(op);
+                //var v = (ProgramVariable) op;
+                //var tv = getServices().getTermFactory().createTerm(v);
                 var memberName = ((KeYParser.Attribute_simpleContext) ctxSuffix).id.getText();
-                if (v.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
+                if (current.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
                     if ("length".equals(memberName)) {
                         return getServices().getTermBuilder().seqLen(current);
                     } else {
@@ -1267,8 +1304,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                     }
                 } else {
                     //TODO check if needed:
-                    memberName = CharMatcher.anyOf("()").trimFrom(memberName);
-                    var attr = getAttributeInPrefixSort(v.sort(), memberName);
+                    //memberName = CharMatcher.anyOf("()").trimFrom(memberName);
+                    var attr = getAttributeInPrefixSort(current.sort(), memberName);
                     current = createAttributeTerm(current, attr, ctx);
                 }
             } else if (ctxSuffix instanceof KeYParser.Attribute_complexContext) {
@@ -1303,7 +1340,9 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         if (op instanceof ParsableVariable) {
             if (args != null) {
-                semanticError(ctx, "You used a variable like a predicate or function.");
+                System.out.println(ctx.getText());
+                semanticError(ctx,
+                        "You used the variable `" + op + "` like a predicate or function.");
             }
             if (boundVars != null)
                 addWarning(ctx, "Bounded variable are ignored on a variable");

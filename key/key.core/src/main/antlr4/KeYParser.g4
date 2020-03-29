@@ -350,8 +350,12 @@ conjunction_term: a=term60 (AND b=conjunction_term)?;
 term60: equality_term | negation_term | quantifierterm | modality_term;
 equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=equality_term)?;
 comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=comparison_term)?;
-weak_arith_term: a=strong_arith_term ((PLUS|MINUS) b=weak_arith_term)?;
-strong_arith_term: a=unary_minus_term ((STAR|SLASH|PERCENT) b=strong_arith_term)?;
+weak_arith_term: a=strong_arith_term_1 ((PLUS|MINUS) b=weak_arith_term)?;
+strong_arith_term_1: a=strong_arith_term_2 ((STAR) b=strong_arith_term_1)?;
+//right associative
+//strong_arith_term_2: (a+=unary_minus_term op+=(PERCENT|SLASH))* b=unary_minus_term;
+strong_arith_term_2: a=unary_minus_term ((PERCENT|SLASH) b=strong_arith_term_2)?;
+
 unary_minus_term: MINUS? sub=cast_term;
 cast_term: (LPAREN sort=sortId RPAREN)? sub=update_term;
 update_term: (LBRACE parallel_term RBRACE)? bracket_term;
