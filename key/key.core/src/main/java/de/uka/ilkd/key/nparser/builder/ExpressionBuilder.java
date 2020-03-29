@@ -814,7 +814,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Object visitBracket_access_indexrange(KeYParser.Bracket_access_indexrangeContext ctx) {
         //  | term LBRACKET indexTerm=term (DOTRANGE rangeTo=term)? RBRACKET #bracket_access_indexrange
-        Term term = accept(ctx.term(0));
+        Term term = pop();
         boolean sequenceAccess = term.sort().name().toString().equalsIgnoreCase("seq");
         //boolean heapUpdate = reference.sort().name().toString().equalsIgnoreCase("Heap");
 
@@ -850,7 +850,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         }
         Term indexTerm = accept(ctx.indexTerm);
-        return getServices().getTermBuilder().dotArr(term, indexTerm);
+        return capsulateTf(ctx, () -> getServices().getTermBuilder().dotArr(term, indexTerm));
     }
 
     @Override
