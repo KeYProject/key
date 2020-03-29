@@ -134,8 +134,44 @@ class Indexfile(target: File, index: Index) : DefaultPage(target, "Index Page", 
     }
 }
 
-class DocumentationFile(target: File, val keyFile: File, val ctx: KeYParser.FileContext, index: Index)
+
+class UsageIndexFile(target: File, index: Index, val usageIndex: UsageIndex) : DefaultPage(target, "Usage", index) {
+    override fun content(div: DIV) {
+        div.div {
+            h1 { +"Usage Index" }
+            usageIndex.entries
+                    .groupBy { (a, _) -> a.type }
+                    .forEach { (category, usedSymbols) ->
+                        region(category, usedSymbols)
+                    }
+        }
+    }
+
+    private fun DIV.region(category: Symbol.Type,
+                           usedSymbols: List<MutableMap.MutableEntry<Symbol, MutableList<Symbol>>>) {
+        h2("") { +category.navigationTitle }
+        section {
+            usedSymbols
+                    .sortedBy { (a, _) -> a.displayName }
+                    .forEach { (used, where) ->
+                        h3 { a(href = used.href) { +(used.displayName) } }
+                        ul {
+                            where.sortedBy { it.displayName }
+                                    .distinctBy { it.href }
+                                    .forEach {
+                                        li { a(href = it.href) { +(it.displayName + " ( ${it.type}) ") } }
+                                    }
+                        }
+                    }
+        }
+    }
+}
+
+class DocumentationFile(target: File, val keyFile: File, val ctx: KeYParser.FileContext, index: Index,
+                        val usageIndex: UsageIndex)
     : DefaultPage(target, "${keyFile.nameWithoutExtension} -- Documentation", index) {
+
+
     override fun content(div: DIV) {
         div.h1 { +keyFile.name }
 
@@ -144,19 +180,23 @@ class DocumentationFile(target: File, val keyFile: File, val ctx: KeYParser.File
         }
 
         //small { +file.relativeTo(File(".").absoluteFile).toString() }
-        ctx.accept(FileVisitor(self, div, index))
+        ctx.accept(FileVisitor(self, div, index, usageIndex))
     }
 }
 
 
 class FileVisitor(val self: String,
                   val tagConsumer: DIV,
-                  val index: Index) : KeYParserBaseVisitor<Unit>() {
+                  val index: Index,
+                  val usageIndex: UsageIndex) : KeYParserBaseVisitor<Unit>() {
 
+    private lateinit var symbol: Symbol
+    private val printer : PrettyPrinter
+        get() = PrettyPrinter(index, symbol, true, usageIndex)
 
     override fun visitFile(ctx: KeYParser.FileContext) {
-        val symbol = index.lookup(ctx)
-        tagConsumer.div { id = symbol!!.anchor }
+        symbol = index.lookup(ctx)!!
+        tagConsumer.div { id = symbol.anchor }
         super.visitFile(ctx)
     }
 
@@ -208,7 +248,6 @@ class FileVisitor(val self: String,
                 }
             }
         }
-
     }
 
     override fun visitSort_decls(ctx: KeYParser.Sort_declsContext?) {
@@ -218,10 +257,10 @@ class FileVisitor(val self: String,
 
     override fun visitOne_sort_decl(ctx: KeYParser.One_sort_declContext) {
         for (s in ctx.sortIds.simple_ident_dots()) {
-            val symbol = index.lookup(s)
+            symbol = index.lookup(s)!!
             tagConsumer.div("doc sort") {
                 h3("sort") {
-                    id = symbol?.anchor ?: ""
+                    id = symbol.anchor
                     +s.text
                 }
                 printDefinition(ctx)
@@ -230,10 +269,10 @@ class FileVisitor(val self: String,
     }
 
     override fun visitTransform_decl(ctx: KeYParser.Transform_declContext) {
-        val symbol = index.lookup(ctx)
+        symbol = index.lookup(ctx)!!
         tagConsumer.div("doc transformer") {
             h3("transformer") {
-                id = symbol?.anchor ?: ""
+                id = symbol.anchor
                 +ctx.trans_name.text
             }
             printDefinition(ctx)
@@ -252,10 +291,10 @@ class FileVisitor(val self: String,
 
 
     override fun visitPred_decl(ctx: KeYParser.Pred_declContext) {
-        val symbol = index.lookup(ctx)
+        symbol = index.lookup(ctx)!!
         tagConsumer.div("doc predicate") {
             h3("sort") {
-                id = symbol?.anchor ?: ""
+                id = symbol.anchor
                 +ctx.pred_name.text
             }
             printDefinition(ctx)
@@ -299,17 +338,15 @@ class FileVisitor(val self: String,
     }
 
     override fun visitTaclet(ctx: KeYParser.TacletContext) {
-        val symbol = index.lookup(ctx)
+        symbol = index.lookup(ctx)!!
         tagConsumer.div("doc taclet") {
             h3("taclet") {
-                id = symbol?.anchor ?: ""
+                id = symbol.anchor
                 +ctx.name.text
             }
             printDefinition(ctx)
         }
     }
-
-    private val printer = PrettyPrinter(index)
 
     private fun DIV.printDefinition(ctx: ParserRuleContext) {
         div("raw") {

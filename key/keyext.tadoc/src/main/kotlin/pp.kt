@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.TerminalNode
 import org.key_project.core.doc.Symbol.Type.SORT
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  *
@@ -15,8 +16,11 @@ import java.util.*
  * @version 1 (3/12/20)
  */
 class PrettyPrinter(val index: Index,
-                    val printReferences: Boolean = true)
+                    val currentContext: Symbol,
+                    val printReferences: Boolean = true,
+                    private val usageIndex: UsageIndex = HashMap())
     : KeYParserBaseVisitor<String>() {
+
     private var printed = mutableSetOf<String>()
     private val tokenSymbols = index.filterIsInstance<TokenSymbol>()
 
@@ -150,9 +154,10 @@ class PrettyPrinter(val index: Index,
     private fun ref(text: String, vararg types: Symbol.Type): String {
         if (!printReferences) return "$text "
         val s = index.find { b -> b.type in types && b.displayName == text }
-        return if (s != null)
+        return if (s != null) {
+            usageIndex.add(s, currentContext)
             "<a href=\"${s.href}\" class=\"symbol ${s.type.name}\">$text</a> "
-        else
+        } else
             "$text ".also {
                 val s = "Could not found symbol for $text : ${types.toList()}"
                 if (s !in printed) {
@@ -320,11 +325,6 @@ class PrettyPrinter(val index: Index,
         return super.visitTermAccess(ctx)
     }
 
-    override fun visitCast(ctx: KeYParser.CastContext?): String {
-        return super.visitCast(ctx)
-    }
-
-
     override fun visitTermLocset(ctx: KeYParser.TermLocsetContext?): String {
         return super.visitTermLocset(ctx)
     }
@@ -348,15 +348,6 @@ class PrettyPrinter(val index: Index,
 
     override fun visitAbbreviation(ctx: KeYParser.AbbreviationContext?): String {
         return super.visitAbbreviation(ctx)
-    }
-
-    override fun visitTermUpdate(ctx: KeYParser.TermUpdateContext?): String {
-        return super.visitTermUpdate(ctx)
-    }
-
-
-    override fun visitUnaryMinus(ctx: KeYParser.UnaryMinusContext?): String {
-        return super.visitUnaryMinus(ctx)
     }
 
     override fun visitImplication_term(ctx: KeYParser.Implication_termContext?): String {
@@ -394,11 +385,6 @@ class PrettyPrinter(val index: Index,
     override fun visitSubstitutionterm(ctx: KeYParser.SubstitutiontermContext?): String {
         return super.visitSubstitutionterm(ctx)
     }
-
-    override fun visitUpdateterm(ctx: KeYParser.UpdatetermContext?): String {
-        return super.visitUpdateterm(ctx)
-    }
-
 
     override fun visitIfThenElseTerm(ctx: KeYParser.IfThenElseTermContext?): String {
         return super.visitIfThenElseTerm(ctx)

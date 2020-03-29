@@ -131,8 +131,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Term visitParallel_term(KeYParser.Parallel_termContext ctx) {
         Term a = accept(ctx.elementary_update_term());
-        if (ctx.term() != null) {
-            Term b = accept(ctx.term());
+        if (ctx.b != null) {
+            Term b = accept(ctx.b);
             return updateOrigin(getTermFactory().createTerm(UpdateJunctor.PARALLEL_UPDATE, a, b), ctx);
         }
         return updateOrigin(a, ctx);
@@ -189,7 +189,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Term visitUnaryMinus(KeYParser.UnaryMinusContext ctx) {
+    public Object visitUnary_minus_term(KeYParser.Unary_minus_termContext ctx) {
         Term result = accept(ctx.sub);
         assert result != null;
         if (ctx.MINUS() != null) {
@@ -289,7 +289,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitBrace_term(KeYParser.Brace_termContext ctx) {
+    public Object visitBracket_term(KeYParser.Bracket_termContext ctx) {
         Term t = accept(ctx.primitive_term());
         for (KeYParser.Brace_suffixContext brace_suffix : ctx.brace_suffix()) {
             t = accept(brace_suffix, t);
@@ -712,7 +712,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     */
 
     @Override
-    public Term visitCast(KeYParser.CastContext ctx) {
+    public Object visitCast_term(KeYParser.Cast_termContext ctx) {
         Term result = accept(ctx.sub);
         if (ctx.sortId() == null) {
             return result;
@@ -863,7 +863,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitLabeled_term(KeYParser.Labeled_termContext ctx) {
-        Term t = accept(ctx.parallel_term());
+        Term t = accept(ctx.a);
         if (ctx.LGUILLEMETS() != null) {
             ImmutableArray<TermLabel> labels = accept(ctx.label());
             if (labels.size() > 0) {
@@ -1006,10 +1006,13 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Term visitUpdateterm(KeYParser.UpdatetermContext ctx) {
-        Term u = accept(ctx.term(0));
-        Term a2 = accept(ctx.term(1));
-        return capsulateTf(ctx, () -> getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, a2));
+    public Object visitUpdate_term(KeYParser.Update_termContext ctx) {
+        Term t = accept(ctx.bracket_term());
+        if (ctx.parallel_term() != null) {
+            Term u = accept(ctx.parallel_term());
+            return capsulateTf(ctx, () -> getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, t));
+        }
+        return t;
     }
 
     public List<QuantifiableVariable> visitBound_variables(KeYParser.Bound_variablesContext ctx) {

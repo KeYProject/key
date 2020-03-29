@@ -342,9 +342,7 @@ literals:
 
 
 term: labeled_term;
-labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
-parallel_term: a=elementary_update_term (PARALLEL b=term)?;
-elementary_update_term: a=equivalence_term (ASSIGN b=elementary_update_term)?;
+labeled_term: a=equivalence_term (LGUILLEMETS labels=label RGUILLEMETS)?;
 equivalence_term: a=implication_term (EQV b=equivalence_term)?;
 implication_term: a=disjunction_term (IMP b=implication_term)?;
 disjunction_term: a=conjunction_term (OR b=disjunction_term)?;
@@ -353,11 +351,15 @@ term60: equality_term | negation_term | quantifierterm | modality_term;
 equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=equality_term)?;
 comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=comparison_term)?;
 weak_arith_term: a=strong_arith_term ((PLUS|MINUS) b=weak_arith_term)?;
-strong_arith_term: a=unaryMinus ((STAR|SLASH|PERCENT) b=strong_arith_term)?;
-unaryMinus: MINUS? sub=cast;
-cast: (LPAREN sort=sortId RPAREN)? sub=brace_term;
+strong_arith_term: a=unary_minus_term ((STAR|SLASH|PERCENT) b=strong_arith_term)?;
+unary_minus_term: MINUS? sub=cast_term;
+cast_term: (LPAREN sort=sortId RPAREN)? sub=update_term;
+update_term: (LBRACE parallel_term RBRACE)? bracket_term;
+parallel_term: a=elementary_update_term (PARALLEL b=parallel_term)?;
+elementary_update_term: a=term ASSIGN b=term;
 
-brace_term: primitive_term brace_suffix*;
+
+bracket_term: primitive_term brace_suffix*;
 brace_suffix:
     LBRACKET target=term ASSIGN val=term RBRACKET             #bracket_access_heap_update
   | LBRACKET id=simple_ident args=argument_list RBRACKET      #bracket_access_heap_term
@@ -370,7 +372,6 @@ primitive_term:
   | locset_term               #termLocset
   | location_term             #termLocation
   | substitutionterm          #termSubstitution
-  | updateterm                #termUpdate
   | ifThenElseTerm            #termIfThenElse
   | ifExThenElseTerm          #termIfExThenElse
   | AT name=simple_ident      #abbreviation
@@ -475,10 +476,6 @@ substitutionterm
    haystack=term
 ;
 
-updateterm
-:
-  LBRACE term RBRACE term
-;
 
 /*
 staticAttributeOrQueryReference

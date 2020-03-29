@@ -12,6 +12,7 @@ import de.uka.ilkd.key.nparser.KeYParserBaseVisitor
 import de.uka.ilkd.key.nparser.ParsingFacade
 import org.antlr.v4.runtime.CharStreams
 import java.io.File
+import kotlin.collections.ArrayList
 
 object App {
     @JvmStatic
@@ -33,6 +34,7 @@ val GIT_VERSION by lazy {
  * Ideas:
  */
 class GenDoc() : CliktCommand() {
+
     val outputFolder by option("-o", "--output", help = "output folder", metavar = "FOLDER")
             .file().default(File("target"))
 
@@ -49,7 +51,9 @@ class GenDoc() : CliktCommand() {
         }
     }
 
-    val symbols = Index().also {
+    private val usageIndex: UsageIndex = HashMap()
+
+    private val symbols = Index().also {
         val l = KeYLexer(CharStreams.fromString(""))
         (0..l.vocabulary.maxTokenType)
                 .filter { l.vocabulary.getLiteralName(it) != null }
@@ -92,7 +96,7 @@ class GenDoc() : CliktCommand() {
         try {
             println("Analyze: $f")
             val target = File(outputFolder, f.nameWithoutExtension + ".html")
-            DocumentationFile(target, f, ctx, symbols).invoke()
+            DocumentationFile(target, f, ctx, symbols, usageIndex).invoke()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -101,6 +105,9 @@ class GenDoc() : CliktCommand() {
     fun generateIndex() {
         val f = File(outputFolder, "index.html")
         Indexfile(f, symbols).invoke()
+
+        val uif = File(outputFolder, "usage.html")
+        UsageIndexFile(uif, symbols, usageIndex).invoke()
     }
 }
 
@@ -163,7 +170,7 @@ open class Symbol(
         val target: String = displayName,
         val type: Type,
         val ctx: Any? = null) {
-    open val anchor = javaClass.simpleName + "-$target"
+    open val anchor = "$type-$target"
     open val href = "$url#$anchor"
 
     enum class Type(val navigationTitle: String) {
@@ -210,5 +217,9 @@ open class Symbol(
 data class TokenSymbol(val display: String, val tokenType: Int)
     : Symbol(display, "https://key-project.org/docs/grammar/", display, Type.TOKEN)
 
-typealias Index = ArrayList<Symbol>
 
+typealias Index = ArrayList<Symbol>
+typealias Usages = MutableList<Symbol>
+typealias UsageIndex = MutableMap<Symbol, Usages>
+
+fun UsageIndex.add(used: Symbol, where: Symbol) = computeIfAbsent(used) { it -> ArrayList(1024) }.add(where)
