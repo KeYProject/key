@@ -253,11 +253,9 @@ public class TestTermParser extends AbstractTestTermParser {
 
     @Test
     public void test11() throws Exception {
-        // Same with a box
         var s = "\\[{ int x = 2; {String s = \"\\\"}\";} }\\] true";
-        //s = "< { int x = 1; {int s = 2;} } > true";
+        System.out.println(s);
         var t = parseTerm(s);
-        //System.out.println(t);
     }
 
 

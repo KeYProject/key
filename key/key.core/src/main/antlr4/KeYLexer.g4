@@ -503,6 +503,7 @@ MODALITYBB_ANY : . -> more;
 
 
 mode modString;
+MOD_STRING_ESC: [\\] '"' -> more;
 MOD_STRING_END: '"' -> more,popMode;
 MOD_STRING_ANY: . -> more;
 
