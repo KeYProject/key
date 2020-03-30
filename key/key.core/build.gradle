@@ -9,6 +9,7 @@ configurations { antlr4 }
 
 dependencies {
     compile project(':key.util')
+
     compile name: 'recoderKey'
     compile group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
     compile group: 'org.antlr', name: 'antlr-runtime', version: '3.5.2'

@@ -41,6 +41,7 @@ public class TestTermParser extends AbstractTestTermParser {
     public TestTermParser() {
         r2k = new Recoder2KeY(services, nss);
         r2k.parseSpecialClasses();
+        r2k.readCompilationUnit(COMPILATION_UNIT);
     }
 
     @Override
@@ -349,25 +350,71 @@ public class TestTermParser extends AbstractTestTermParser {
         }
     }
 
-    @Test
-    public void testParseQueriesAndAttributes() throws Exception {
+    static final String COMPILATION_UNIT = "public class T extends "
+            + "java.lang.Object{ "
+            + "private T a;"
+            + "private static T b;"
+            + "T c;"
+            + "static T d;"
+            + "public T e;"
+            + "public static T f;"
+            + "protected T g;"
+            + "protected T h;"
+            + "public T query(){} "
+            + "public static T staticQ(T p){} "
+            + "public static T staticQ() {}}";
+
+
+    public Term testParseQueriesAndAttributes(String expr) throws Exception {
         TacletForTests.getJavaInfo().readJavaBlock("{}");
-        r2k.readCompilationUnit("public class T extends "
-                + "java.lang.Object{ "
-                + "private T a;"
-                + "private static T b;"
-                + "T c;"
-                + "static T d;"
-                + "public T e;"
-                + "public static T f;"
-                + "protected T g;"
-                + "protected T h;"
-                + "public T query(){} "
-                + "public static T staticQ(T p){} "
-                + "public static T staticQ() {}}");
-        String s = "\\forall T t;( (t.query()=t & t.(T::query)()=t & T.staticQ()=t "
+        //r2k.readCompilationUnit(COMPILATION_UNIT);
+        return parseTerm("\\forall T t; " + expr);
+    }
+
+    @Test
+    public void testAttributeOnObject() throws Exception {
+        testParseQueriesAndAttributes("t.query()=t");
+    }
+
+    @Test
+    public void testAttributeWithSpecifiedSortOnObject() throws Exception {
+        testParseQueriesAndAttributes("t.(T::query)()=t");
+    }
+
+    @Test
+    public void testJavaStaticQuery() throws Exception {
+        testParseQueriesAndAttributes("T.staticQ()=t");
+    }
+
+    @Test
+    public void testJavaStaticQueryWithParameter() throws Exception {
+        testParseQueriesAndAttributes("T.staticQ(t)=t");
+    }
+
+    @Test
+    public void testJavaAttributeAccessBoth_1() throws Exception {
+        testParseQueriesAndAttributes("T.b=t.(T::a)");
+    }
+
+    @Test
+    public void testJavaAttributeAccessBoth_2() throws Exception {
+        testParseQueriesAndAttributes("T.d=t.(T::c)");
+    }
+
+    @Test
+    public void testJavaAttributeAccessBoth_3() throws Exception {
+        testParseQueriesAndAttributes("t.(T::e)=T.f");
+    }
+
+    @Test
+    public void testJavaAttributeAccess_4() throws Exception {
+        testParseQueriesAndAttributes("t.(T::g)=t.(T::h)");
+    }
+
+    public void testJavaQueryAndAttribute_all() throws Exception {
+        var all = "\\forall T t;( (t.query()=t & t.(T::query)()=t & T.staticQ()=t "
                 + "& T.staticQ(t)=t & T.b=t.(T::a) & T.d=t.(T::c) & t.(T::e)=T.f & t.(T::g)=t.(T::h)))";
-        parseTerm(s);
+        testParseQueriesAndAttributes(all);
     }
 
     @Test

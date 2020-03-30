@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.VariableDeclaration;
+import de.uka.ilkd.key.java.statement.Default;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -17,9 +18,11 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * Helper class for are visitor that requires a namespaces and services.
@@ -31,10 +34,9 @@ import java.util.List;
  * @version 1
  */
 public class DefaultBuilder extends AbstractBuilder<Object> {
-    //weigl: This is rubbish from the migration. We should get rid of this.
-    public static final int NORMAL_NONRIGID = 0;
-    public static final int LOCATION_MODIFIER = 1;
     public static final String LIMIT_SUFFIX = "$lmtd";
+
+    private static ResourceBundle bundle = ResourceBundle.getBundle("de.uka.ilkd.key.nparser.builder.resources");
 
     protected final Services services;
     protected final NamespaceSet nss;
@@ -44,6 +46,12 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     public DefaultBuilder(Services services, NamespaceSet nss) {
         this.services = services;
         this.nss = nss;
+    }
+
+    protected void semanticErrorMsg(String label, ParserRuleContext ctx, Object... args) {
+        var msg = bundle.getString(label);
+        MessageFormat formatter = new MessageFormat(msg);
+        semanticError(ctx, formatter.format(args));
     }
 
     @Override

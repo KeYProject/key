@@ -596,42 +596,42 @@ public class ExpressionBuilder extends DefaultBuilder {
         Operator result = schemaVariables().lookup(new Name(attributeName));
         //if (result == null) {
 
-            final boolean unambigousAttributeName = attributeName.indexOf(':') != -1;
+        final boolean unambigousAttributeName = attributeName.indexOf(':') != -1;
 
-            if (unambigousAttributeName) {
-                result = javaInfo.getAttribute(attributeName);
-            } else if (attributeName.equals("length")) {
-                try {
-                    result = javaInfo.getArrayLength();
-                } catch (Exception ex) {
-                    throw new BuildingException(ex);
-                }
-            } else if (attributeName.equals("<inv>")) {
-                // The invariant observer "<inv>" is implicit and
-                // not part of the class declaration
-                // A special case is needed, hence.
-                result = javaInfo.getInvProgramVar();
-            } else {
-                final KeYJavaType prefixKJT = javaInfo.getKeYJavaType(prefixSort);
-                if (prefixKJT == null) {
-                    semanticError(null, "Could not find type '" + prefixSort + "'. Maybe mispelled or " +
-                            "you use an array or object type in a .key-file with missing " +
-                            "\\javaSource section.");
-                }
-
-                ProgramVariable var = javaInfo.getCanonicalFieldProgramVariable(attributeName, prefixKJT);
-                if (var == null) {
-                    LogicVariable logicalvar = (LogicVariable) namespaces().variables().lookup(attributeName);
-                    if (logicalvar == null) {
-                        semanticError(null, "There is no attribute '" + attributeName +
-                                "' declared in type '" + prefixSort + "' and no logical variable of that name.");
-                    } else {
-                        result = logicalvar;
-                    }
-                } else {
-                    result = var;
-                }
+        if (unambigousAttributeName) {
+            result = javaInfo.getAttribute(attributeName);
+        } else if (attributeName.equals("length")) {
+            try {
+                result = javaInfo.getArrayLength();
+            } catch (Exception ex) {
+                throw new BuildingException(ex);
             }
+        } else if (attributeName.equals("<inv>")) {
+            // The invariant observer "<inv>" is implicit and
+            // not part of the class declaration
+            // A special case is needed, hence.
+            result = javaInfo.getInvProgramVar();
+        } else {
+            final KeYJavaType prefixKJT = javaInfo.getKeYJavaType(prefixSort);
+            if (prefixKJT == null) {
+                semanticError(null, "Could not find type '" + prefixSort + "'. Maybe mispelled or " +
+                        "you use an array or object type in a .key-file with missing " +
+                        "\\javaSource section.");
+            }
+
+            ProgramVariable var = javaInfo.getCanonicalFieldProgramVariable(attributeName, prefixKJT);
+            if (var == null) {
+                LogicVariable logicalvar = (LogicVariable) namespaces().variables().lookup(attributeName);
+                if (logicalvar == null) {
+                    semanticError(null, "There is no attribute '%s' declared in type '%s' and no logical variable of that name.",
+                            attributeName, prefixSort);
+                } else {
+                    result = logicalvar;
+                }
+            } else {
+                result = var;
+            }
+        }
         //}
 
         if (result == null && !("length".equals(attributeName))) {
@@ -1202,7 +1202,11 @@ public class ExpressionBuilder extends DefaultBuilder {
             Term[] args = arguments != null ? arguments.toArray(new Term[0]) : null;
 
             Term current = null;
-            for (KeYParser.AttributeContext attrib : ctx.attribute()) {
+            for (int i = 0; i < ctx.attribute().size(); i++) {
+                KeYParser.AttributeContext attrib = ctx.attribute(i);
+                boolean isLast = i == ctx.attribute().size() - 1;
+                boolean isCall = isLast && arguments != null;
+
                 if (attrib instanceof KeYParser.Attribute_simpleContext) {
                     var simpleContext = (KeYParser.Attribute_simpleContext) attrib;
                     var heap = simpleContext.heap; //TODO?
@@ -1255,6 +1259,16 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         Sort sortId = accept(ctx.sortId());
         String firstName = accept(ctx.simple_ident());
+
+        Namespace<QuantifiableVariable> orig = variables();
+        List<QuantifiableVariable> bv = accept(ctx.boundVars);
+        ImmutableArray<QuantifiableVariable> boundVars = bv != null
+                ? new ImmutableArray<>(bv.toArray(new QuantifiableVariable[0]))
+                : null;
+
+        List<Term> arguments = accept(ctx.argument_list());
+        Term[] args = arguments == null ? null : arguments.toArray(new Term[0]);
+
         Term current = null;
         assert firstName != null;
         Operator op = null;
@@ -1282,12 +1296,20 @@ public class ExpressionBuilder extends DefaultBuilder {
         for (int i = 0; i < ctx.attribute().size(); i++) {
             KeYParser.AttributeContext ctxSuffix = ctx.attribute(i);
             boolean isLast = i == ctx.attribute().size() - 1;
+            boolean isCall = isLast && arguments != null;
+
+            if (current == null)//first round
+                current = getServices().getTermFactory().createTerm(op);
 
             if (//op instanceof ProgramVariable&&
-                     ctxSuffix instanceof KeYParser.Attribute_starContext) {
+                    ctxSuffix instanceof KeYParser.Attribute_starContext) {
                 System.err.println("this.*!");
-                current = getServices().getTermFactory().createTerm(op);
-                //TODO
+                //current = getServices().getTermFactory().createTerm(op);
+                current = services.getTermBuilder().allFields(current);
+                if (!isLast) {
+                    addWarning("");
+                }
+                return current;
             } else if (//op instanceof ProgramVariable &&
                     ctxSuffix instanceof KeYParser.Attribute_simpleContext) {
                 current = getServices().getTermFactory().createTerm(op);
@@ -1303,40 +1325,50 @@ public class ExpressionBuilder extends DefaultBuilder {
                                 memberName);
                     }
                 } else {
-                    //TODO check if needed:
-                    //memberName = CharMatcher.anyOf("()").trimFrom(memberName);
-                    var attr = getAttributeInPrefixSort(current.sort(), memberName);
-                    current = createAttributeTerm(current, attr, ctx);
+                    if (isCall) {
+                        var classRef = current.sort().name().toString();
+                        KeYJavaType kjt = getTypeByClassName(classRef); //Why not direct use of Sort?
+                        if (kjt == null) semanticError(ctxSuffix, "Could not find sort for %s", classRef);
+                        assert kjt != null;
+                        classRef = kjt.getFullName();
+                        return getServices().getJavaInfo().getProgramMethodTerm(current, memberName, args, classRef, true);
+                    } else {
+                        var attr = getAttributeInPrefixSort(current.sort(), memberName);
+                        current = createAttributeTerm(current, attr, ctx);
+                    }
                 }
             } else if (ctxSuffix instanceof KeYParser.Attribute_complexContext) {
                 var attrid = (KeYParser.Attribute_complexContext) ctxSuffix;
                 String className = attrid.sort.getText();
-                String qname = attrid.id.getText();
-                assert false;
-                //current = getServices().getJavaInfo().getStaticProgramMethodTerm(qname, (Term[]) args.toArray(), className);
-                    /*if (result == null) {
+                String memberName = attrid.id.getText();
+                if (isCall) {
+                    var classRef = current.sort().name().toString();
+                    KeYJavaType kjt = getTypeByClassName(classRef); //Why not direct use of Sort?
+                    if (kjt == null) semanticError(ctxSuffix, "Could not find sort for %s", classRef);
+                    assert kjt != null;
+                    classRef = kjt.getFullName();
+                    return getServices().getJavaInfo().getProgramMethodTerm(current, memberName, args, classRef, false);
+                } else {
+                    Operator attribute = getAttributeInPrefixSort(getTypeByClassName(className).getSort(),
+                            className + "::" + memberName);
+                    current = createAttributeTerm(current, attribute, ctx);
+                }
+
+                if (current == null) {
                     final Sort sort = lookupSort(className);
                     if (sort == null) {
-                        semanticError(ctx, "Could not find matching sort for " + className);
+                        semanticError(ctx, "Could not find matching sort for %s", className);
                     }
                     KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
                     if (kjt == null) {
-                        semanticError(ctx, "Found logic sort for " + className +
-                                " but no corresponding java type!");
+                        semanticError(ctx, "Found logic sort for %s but no corresponding java type!", className);
                     }
-                       }*/
+                }
+                if (isLast) {
+                    return current;
+                }
             }
         }
-
-
-        Namespace<QuantifiableVariable> orig = variables();
-        List<QuantifiableVariable> bv = accept(ctx.boundVars);
-        ImmutableArray<QuantifiableVariable> boundVars = bv != null
-                ? new ImmutableArray<>(bv.toArray(new QuantifiableVariable[0]))
-                : null;
-
-        List<Term> arguments = accept(ctx.argument_list());
-        Term[] args = arguments == null ? null : arguments.toArray(new Term[0]);
 
         if (op instanceof ParsableVariable) {
             if (args != null) {

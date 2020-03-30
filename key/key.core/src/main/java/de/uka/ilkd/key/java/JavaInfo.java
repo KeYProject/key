@@ -1163,7 +1163,7 @@ public final class JavaInfo {
         }
 
         hierarchy = hierarchy.prepend(kpmi.getAllSupertypes(type));
-        assert hierarchy.head() == type;
+        //weigl: unclear assertion: assert hierarchy.head() == type;
 
 
         final Iterator<KeYJavaType> it = hierarchy.iterator();

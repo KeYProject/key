@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.nparser;
 
-import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
-import de.uka.ilkd.key.proof.io.KeYFile;
-import de.uka.ilkd.key.util.Position;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
