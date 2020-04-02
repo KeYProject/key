@@ -342,7 +342,9 @@ literals:
 
 
 term: labeled_term;
-labeled_term: a=equivalence_term (LGUILLEMETS labels=label RGUILLEMETS)?;
+labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
+parallel_term: a=elementary_update_term (PARALLEL b=parallel_term)?;
+elementary_update_term: a=equivalence_term (ASSIGN b=equivalence_term)?;
 equivalence_term: a=implication_term (EQV b=equivalence_term)?;
 implication_term: a=disjunction_term (IMP b=implication_term)?;
 disjunction_term: a=conjunction_term (OR b=disjunction_term)?;
@@ -356,9 +358,9 @@ strong_arith_term_2: a=unary_minus_term ((PERCENT|SLASH) b=strong_arith_term_2)?
 
 unary_minus_term: MINUS? sub=cast_term;
 cast_term: (LPAREN sort=sortId RPAREN)? sub=update_term;
-update_term: (LBRACE parallel_term RBRACE)? bracket_term; // term ? bracket_term;
-parallel_term: a=elementary_update_term (PARALLEL b=parallel_term)?;
-elementary_update_term: a=term ASSIGN b=term;
+//update_term: (LBRACE parallel_term RBRACE)? bracket_term; // term ? bracket_term;
+update_term: (LBRACE term RBRACE) term | bracket_term;
+
 
 
 bracket_term: primitive_term brace_suffix*;
@@ -370,7 +372,7 @@ brace_suffix:
 ;
 
 primitive_term:
-    LPAREN term RPAREN        #termParen
+    LPAREN term RPAREN  (attribute)*     #termParen
   | locset_term               #termLocset
   | location_term             #termLocation
   | substitutionterm          #termSubstitution
@@ -435,14 +437,19 @@ accessterm
 :
   (sortId DOUBLECOLON)?
   firstName=simple_ident
+  call?
   ( attribute )*
-  ((LBRACE boundVars=bound_variables RBRACE)? argument_list)?
 ;
 
 attribute:
-    DOT STAR                                                       #attribute_star
-  | DOT id=simple_ident (AT heap=term)?                            #attribute_simple
-  | DOT LPAREN sort=sortId DOUBLECOLON id=simple_ident RPAREN #attribute_complex
+    DOT STAR                                                             #attribute_star
+  | DOT id=simple_ident call? (AT heap=term)?                            #attribute_simple
+  | DOT LPAREN sort=sortId DOUBLECOLON id=simple_ident RPAREN
+     call? (AT heap=term)?                                               #attribute_complex
+;
+
+call:
+  ((LBRACE boundVars=bound_variables RBRACE)? argument_list)
 ;
 
 label

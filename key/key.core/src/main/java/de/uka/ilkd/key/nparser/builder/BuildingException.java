@@ -17,7 +17,7 @@ public class BuildingException extends RuntimeException {
     }
 
     public BuildingException(ParserRuleContext ctx, String format, Throwable e) {
-        this(ctx.start, format, e);
+        this(ctx == null ? null : ctx.start, format, e);
     }
 
     public BuildingException(Token t, String format, Throwable e) {

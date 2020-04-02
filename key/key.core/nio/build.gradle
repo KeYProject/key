@@ -1,0 +1,36 @@
+configurations { antlr4 }
+
+dependencies {
+    compile project(':key.util')
+    antlr4 "org.antlr:antlr4:4.7.1"
+    compile "org.antlr:antlr4-runtime:4.7.1"
+    compile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
+}
+
+sourceSets.main.java.srcDirs("$projectDir/build/generated-src/antlr4/main/")
+
+def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
+task runAntlr4(type: JavaExec) {
+    //see incremental task api, prevents rerun if nothing has changed.
+    inputs.dir "src/main/antlr4/"
+    outputs.dir "$projectDir/build/generated/antlr4/main/"
+    classpath = configurations.antlr4
+    main = "org.antlr.v4.Tool"
+    args = ["-visitor",
+            "-Xexact-output-dir", "-o", antlr4Output,
+            "-package", "de.uka.ilkd.key.nparser",
+            "src/main/antlr4/KeYLexer.g4", "src/main/antlr4/KeYParser.g4"]
+    doFirst {
+        file(antlr4Output).mkdirs()
+        println("create $antlr4Output")
+    }
+}
+compileJava.dependsOn runAntlr4
+
+task debugLexer(type: JavaExec) {
+    main = "de.uka.ilkd.key.nparser.DebugKeyLexer"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+}
+
+task ptest(type: Test) { group "verification"}

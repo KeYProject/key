@@ -17,6 +17,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.util.Debug;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -1012,12 +1013,10 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitUpdate_term(KeYParser.Update_termContext ctx) {
-        Term t = accept(ctx.bracket_term());
-        if (ctx.parallel_term() != null) {
-            Term u = accept(ctx.parallel_term());
-            return capsulateTf(ctx, () -> getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, t));
-        }
-        return t;
+        if (ctx.bracket_term() != null) return accept(ctx.bracket_term());
+        Term u = accept(ctx.term(0));
+        Term t = accept(ctx.term(1));
+        return capsulateTf(ctx, () -> getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, t));
     }
 
     public List<QuantifiableVariable> visitBound_variables(KeYParser.Bound_variablesContext ctx) {
@@ -1188,27 +1187,32 @@ public class ExpressionBuilder extends DefaultBuilder {
             while (ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
                 var a = (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
                 if (a.heap != null) break; //No heap on java Class name allowed
-                var cur = accept(a.id);
-                if (isClass(javaClass + "." + cur)) {
-                    javaClass += "." + cur;
+                String cur = accept(a.id);
+                String candidate = javaClass.isEmpty() ? cur : (javaClass + "." + cur);
+                if (isClass(
+                        javaPackage + (javaPackage.isEmpty() ? "" : ".") + candidate)) {
+                    javaClass = candidate;
                     currentSuffix++;
-                } else break;
+                } else {
+                    break;
+                }
             }
             //endregion
 
-            KeYJavaType kjt = getTypeByClassName(javaClass);
+            KeYJavaType kjt = getTypeByClassName(javaPackage + (javaPackage.isEmpty() ? "" : ".") + javaClass);
 
-            List<Term> arguments = accept(ctx.argument_list());
-            Term[] args = arguments != null ? arguments.toArray(new Term[0]) : null;
+            if (ctx.call() != null) {
+                addWarning("Call of package or class");
+            }
 
             Term current = null;
-            for (int i = 0; i < ctx.attribute().size(); i++) {
+            for (int i = currentSuffix; i < ctx.attribute().size(); i++) {
                 KeYParser.AttributeContext attrib = ctx.attribute(i);
                 boolean isLast = i == ctx.attribute().size() - 1;
-                boolean isCall = isLast && arguments != null;
 
                 if (attrib instanceof KeYParser.Attribute_simpleContext) {
                     var simpleContext = (KeYParser.Attribute_simpleContext) attrib;
+                    boolean isCall = simpleContext.call() != null;
                     var heap = simpleContext.heap; //TODO?
                     String attributeName = accept(simpleContext.id);
                     ProgramVariable maybeAttr = getJavaInfo().getAttribute(attributeName, kjt);
@@ -1216,8 +1220,9 @@ public class ExpressionBuilder extends DefaultBuilder {
                         var op = getAttributeInPrefixSort(kjt.getSort(), attributeName);
                         current = createAttributeTerm(current, op, ctx);
                     } else {
-                        var pm = getStaticQuery(kjt.getFullName(), attributeName);
+                        var pm = getStaticQuery(kjt, attributeName);
                         if (pm != null) {
+                            var args = visitArguments(simpleContext.call().argument_list());
                             current = getJavaInfo().getStaticProgramMethodTerm(attributeName, args, kjt.getFullName());
                         } else {
                             semanticError(ctx, "Unknown java attribute: %s", attributeName);
@@ -1230,6 +1235,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     var attrid = (KeYParser.Attribute_complexContext) attrib;
                     String className = attrid.sort.getText();
                     String attributeName = attrid.id.getText();
+                    var args = visitArguments(attrid.call().argument_list());
                     current = getServices().getJavaInfo().getStaticProgramMethodTerm(attributeName, args, className);
                     if (current == null) {
                         final Sort sort = lookupSort(className);
@@ -1253,6 +1259,93 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
+    public Object visitTermParen(KeYParser.TermParenContext ctx) {
+        Term base = accept(ctx.term());
+        if (ctx.attribute().isEmpty()) {
+            return base;
+        }
+        return handleAttributes(base, ctx.attribute());
+    }
+
+    private Term handleAttributes(Term current, List<KeYParser.AttributeContext> attribute) {
+        for (int i = 0; i < attribute.size(); i++) {
+            KeYParser.AttributeContext ctxSuffix = attribute.get(i);
+            boolean isLast = i == attribute.size() - 1;
+
+            if (ctxSuffix instanceof KeYParser.Attribute_starContext) {
+                current = services.getTermBuilder().allFields(current);
+                if (!isLast) {
+                    addWarning("");
+                }
+                return current;
+            } else if (ctxSuffix instanceof KeYParser.Attribute_simpleContext) {
+                final var attrid = (KeYParser.Attribute_simpleContext) ctxSuffix;
+                var memberName = attrid.id.getText();
+                if (current.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
+                    if ("length".equals(memberName)) {
+                        return getServices().getTermBuilder().seqLen(current);
+                    } else {
+                        semanticError(ctxSuffix,
+                                "There is no attribute '%s'for sequences (Seq), only 'length' is supported.",
+                                memberName);
+                    }
+                } else {
+                    boolean isCall = attrid.call() != null;
+                    var sfxargs = isCall ? visitArguments(attrid.call().argument_list()) : null;
+                    Term heap = accept(attrid.heap);
+                    if (isCall) {
+                        var classRef = current.sort().name().toString();
+                        KeYJavaType kjt = getTypeByClassName(classRef); //Why not direct use of Sort?
+                        if (kjt == null) semanticError(ctxSuffix, "Could not find sort for %s", classRef);
+                        assert kjt != null;
+                        classRef = kjt.getFullName();
+                        current = getServices().getJavaInfo().getProgramMethodTerm(current, memberName, sfxargs, classRef, true);
+                    } else {
+                        var attr = getAttributeInPrefixSort(current.sort(), memberName);
+                        current = createAttributeTerm(current, attr, ctxSuffix);
+                    }
+
+                    if (heap != null)
+                        current = replaceHeap(current, heap, ctxSuffix);
+                }
+            } else if (ctxSuffix instanceof KeYParser.Attribute_complexContext) {
+                var attrid = (KeYParser.Attribute_complexContext) ctxSuffix;
+                String className = attrid.sort.getText();
+                String memberName = attrid.id.getText();
+                boolean isCall = attrid.call() != null;
+                var sfxargs = isCall ? visitArguments(attrid.call().argument_list()) : null;
+                if (isCall) {
+                    var classRef = current.sort().name().toString();
+                    KeYJavaType kjt = getTypeByClassName(classRef); //Why not direct use of Sort?
+                    if (kjt == null) semanticError(ctxSuffix, "Could not find sort for %s", classRef);
+                    assert kjt != null;
+                    classRef = kjt.getFullName();
+                    return getServices().getJavaInfo().getProgramMethodTerm(current, memberName, sfxargs, classRef, false);
+                } else {
+                    Operator op = getAttributeInPrefixSort(getTypeByClassName(className).getSort(),
+                            className + "::" + memberName);
+                    current = createAttributeTerm(current, op, ctxSuffix);
+                }
+
+                if (current == null) {
+                    final Sort sort = lookupSort(className);
+                    if (sort == null) {
+                        semanticError(ctxSuffix, "Could not find matching sort for %s", className);
+                    }
+                    KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
+                    if (kjt == null) {
+                        semanticError(ctxSuffix, "Found logic sort for %s but no corresponding java type!", className);
+                    }
+                }
+                if (isLast) {
+                    return current;
+                }
+            }
+        }
+        return current;
+    }
+
+    @Override
     public Term visitAccessterm(KeYParser.AccesstermContext ctx) {
         Term t = visitAccesstermAsJava(ctx);
         if (t != null) return t;
@@ -1260,24 +1353,23 @@ public class ExpressionBuilder extends DefaultBuilder {
         Sort sortId = accept(ctx.sortId());
         String firstName = accept(ctx.simple_ident());
 
-        Namespace<QuantifiableVariable> orig = variables();
-        List<QuantifiableVariable> bv = accept(ctx.boundVars);
-        ImmutableArray<QuantifiableVariable> boundVars = bv != null
-                ? new ImmutableArray<>(bv.toArray(new QuantifiableVariable[0]))
-                : null;
+        Term[] args = ctx.call() != null ? visitArguments(ctx.call().argument_list()) : null;
+        ImmutableArray<QuantifiableVariable> boundVars = null;
+        Namespace<QuantifiableVariable> orig = null;
+        if (ctx.call() != null) {
+            orig = variables();
+            List<QuantifiableVariable> bv = accept(ctx.call().boundVars);
+            boundVars = bv != null
+                    ? new ImmutableArray<>(bv.toArray(new QuantifiableVariable[0]))
+                    : null;
+        }
 
-        List<Term> arguments = accept(ctx.argument_list());
-        Term[] args = arguments == null ? null : arguments.toArray(new Term[0]);
-
-        Term current = null;
         assert firstName != null;
-        Operator op = null;
+        Operator op;
 
         if ("skip".equals(firstName)) {
             op = UpdateJunctor.SKIP;
-        }
-
-        if (firstName.endsWith(LIMIT_SUFFIX)) {
+        } else if (firstName.endsWith(LIMIT_SUFFIX)) {
             firstName = firstName.substring(0, firstName.length() - 5);
             op = lookupVarfuncId(ctx, firstName, sortId);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
@@ -1286,99 +1378,19 @@ public class ExpressionBuilder extends DefaultBuilder {
             } else {
                 semanticError(ctx, "Cannot can be limited: " + op);
             }
-
         } else {
             op = lookupVarfuncId(ctx, firstName, sortId);
         }
 
+        Term current;
         Operator finalOp = op;
-
-        for (int i = 0; i < ctx.attribute().size(); i++) {
-            KeYParser.AttributeContext ctxSuffix = ctx.attribute(i);
-            boolean isLast = i == ctx.attribute().size() - 1;
-            boolean isCall = isLast && arguments != null;
-
-            if (current == null)//first round
-                current = getServices().getTermFactory().createTerm(op);
-
-            if (//op instanceof ProgramVariable&&
-                    ctxSuffix instanceof KeYParser.Attribute_starContext) {
-                System.err.println("this.*!");
-                //current = getServices().getTermFactory().createTerm(op);
-                current = services.getTermBuilder().allFields(current);
-                if (!isLast) {
-                    addWarning("");
-                }
-                return current;
-            } else if (//op instanceof ProgramVariable &&
-                    ctxSuffix instanceof KeYParser.Attribute_simpleContext) {
-                current = getServices().getTermFactory().createTerm(op);
-                //var v = (ProgramVariable) op;
-                //var tv = getServices().getTermFactory().createTerm(v);
-                var memberName = ((KeYParser.Attribute_simpleContext) ctxSuffix).id.getText();
-                if (current.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
-                    if ("length".equals(memberName)) {
-                        return getServices().getTermBuilder().seqLen(current);
-                    } else {
-                        semanticError(ctx,
-                                "There is no attribute '%s'for sequences (Seq), only 'length' is supported.",
-                                memberName);
-                    }
-                } else {
-                    if (isCall) {
-                        var classRef = current.sort().name().toString();
-                        KeYJavaType kjt = getTypeByClassName(classRef); //Why not direct use of Sort?
-                        if (kjt == null) semanticError(ctxSuffix, "Could not find sort for %s", classRef);
-                        assert kjt != null;
-                        classRef = kjt.getFullName();
-                        return getServices().getJavaInfo().getProgramMethodTerm(current, memberName, args, classRef, true);
-                    } else {
-                        var attr = getAttributeInPrefixSort(current.sort(), memberName);
-                        current = createAttributeTerm(current, attr, ctx);
-                    }
-                }
-            } else if (ctxSuffix instanceof KeYParser.Attribute_complexContext) {
-                var attrid = (KeYParser.Attribute_complexContext) ctxSuffix;
-                String className = attrid.sort.getText();
-                String memberName = attrid.id.getText();
-                if (isCall) {
-                    var classRef = current.sort().name().toString();
-                    KeYJavaType kjt = getTypeByClassName(classRef); //Why not direct use of Sort?
-                    if (kjt == null) semanticError(ctxSuffix, "Could not find sort for %s", classRef);
-                    assert kjt != null;
-                    classRef = kjt.getFullName();
-                    return getServices().getJavaInfo().getProgramMethodTerm(current, memberName, args, classRef, false);
-                } else {
-                    Operator attribute = getAttributeInPrefixSort(getTypeByClassName(className).getSort(),
-                            className + "::" + memberName);
-                    current = createAttributeTerm(current, attribute, ctx);
-                }
-
-                if (current == null) {
-                    final Sort sort = lookupSort(className);
-                    if (sort == null) {
-                        semanticError(ctx, "Could not find matching sort for %s", className);
-                    }
-                    KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
-                    if (kjt == null) {
-                        semanticError(ctx, "Found logic sort for %s but no corresponding java type!", className);
-                    }
-                }
-                if (isLast) {
-                    return current;
-                }
-            }
-        }
-
         if (op instanceof ParsableVariable) {
             if (args != null) {
                 System.out.println(ctx.getText());
-                semanticError(ctx,
-                        "You used the variable `" + op + "` like a predicate or function.");
+                semanticError(ctx, "You used the variable `" + op + "` like a predicate or function.");
             }
             if (boundVars != null)
                 addWarning(ctx, "Bounded variable are ignored on a variable");
-
             current = termForParsedVariable((ParsableVariable) op, ctx);
         } else {
             if (boundVars == null) {
@@ -1402,10 +1414,17 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         }
 
+        current = handleAttributes(current, ctx.attribute());
+
         if (boundVars != null) {
             unbindVars(orig);
         }
         return current;
+    }
+
+    private @Nullable Term[] visitArguments(@Nullable KeYParser.Argument_listContext call) {
+        List<Term> arguments = accept(call);
+        return arguments == null ? null : arguments.toArray(new Term[0]);
     }
 
     @Override
@@ -1547,9 +1566,13 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private IProgramMethod getStaticQuery(String className, String methodName) {
-        final JavaInfo javaInfo = getJavaInfo();
         KeYJavaType kjt = getTypeByClassName(className);
+        return getStaticQuery(kjt, methodName);
+    }
+
+    private IProgramMethod getStaticQuery(KeYJavaType kjt, String methodName) {
         if (kjt != null) {
+            final JavaInfo javaInfo = getJavaInfo();
             final String name = kjt.getFullName() + "::" + methodName;
             for (IProgramMethod pm : javaInfo.getAllProgramMethods(kjt)) {
                 if (pm != null && pm.isStatic() && pm.name().toString().equals(name)) {
