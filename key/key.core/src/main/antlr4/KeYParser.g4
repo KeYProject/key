@@ -361,9 +361,8 @@ cast_term: (LPAREN sort=sortId RPAREN)? sub=update_term;
 //update_term: (LBRACE parallel_term RBRACE)? bracket_term; // term ? bracket_term;
 update_term: (LBRACE term RBRACE) term | bracket_term;
 
-
-
-bracket_term: primitive_term brace_suffix*;
+bracket_term: primitive_term (bracket_suffix_heap)* attribute*;
+bracket_suffix_heap: brace_suffix (AT heap=term)?;
 brace_suffix:
     LBRACKET target=term ASSIGN val=term RBRACKET             #bracket_access_heap_update
   | LBRACKET id=simple_ident args=argument_list RBRACKET      #bracket_access_heap_term

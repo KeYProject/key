@@ -297,10 +297,16 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Object visitBracket_term(KeYParser.Bracket_termContext ctx) {
         Term t = accept(ctx.primitive_term());
-        for (KeYParser.Brace_suffixContext brace_suffix : ctx.brace_suffix()) {
+        for (int i = 0; i < ctx.bracket_suffix_heap().size(); i++) {
+            var brace_suffix = ctx.bracket_suffix_heap(i).brace_suffix();
+            var heap = ctx.bracket_suffix_heap(i).heap;
             t = accept(brace_suffix, t);
+            if (heap != null) {
+                t = replaceHeap(t, accept(heap), heap);
+            }
         }
-        return t;
+        if (ctx.attribute().isEmpty()) return t;
+        return handleAttributes(t, ctx.attribute());
     }
 
     /*@Override
@@ -740,12 +746,9 @@ public class ExpressionBuilder extends DefaultBuilder {
         return getTermFactory().createTerm(castSymbol, result);
     }
 
-
     private void markHeapAsExplicit(Term a) {
-        if (isSelectTerm(a)) {
             explicitHeap.add(a);
             a.subs().forEach(this::markHeapAsExplicit);
-        }
     }
 
     /*
@@ -1310,6 +1313,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 }
             } else if (ctxSuffix instanceof KeYParser.Attribute_complexContext) {
                 var attrid = (KeYParser.Attribute_complexContext) ctxSuffix;
+                Term heap = accept(attrid.heap);
                 String className = attrid.sort.getText();
                 String memberName = attrid.id.getText();
                 boolean isCall = attrid.call() != null;
@@ -1320,7 +1324,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     if (kjt == null) semanticError(ctxSuffix, "Could not find sort for %s", classRef);
                     assert kjt != null;
                     classRef = kjt.getFullName();
-                    return getServices().getJavaInfo().getProgramMethodTerm(current, memberName, sfxargs, classRef, false);
+                    current = getServices().getJavaInfo().getProgramMethodTerm(current, memberName, sfxargs, classRef, false);
                 } else {
                     Operator op = getAttributeInPrefixSort(getTypeByClassName(className).getSort(),
                             className + "::" + memberName);
@@ -1337,9 +1341,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                         semanticError(ctxSuffix, "Found logic sort for %s but no corresponding java type!", className);
                     }
                 }
-                if (isLast) {
-                    return current;
-                }
+                if (heap != null)
+                    current = replaceHeap(current, heap, ctxSuffix);
             }
         }
         return current;
@@ -1527,8 +1530,22 @@ public class ExpressionBuilder extends DefaultBuilder {
         return getServices().getTermBuilder().getBaseHeap().equals(t);
     }
 
+    /**
+     * Guard for {@link #replaceHeap0(Term, Term, ParserRuleContext)}
+     * to protect the double application of {@code @heap}.
+     * @param term
+     * @param heap
+     * @param ctx
+     * @return
+     */
     private Term replaceHeap(Term term, Term heap, ParserRuleContext ctx) {
         if (explicitHeap.contains(term)) return term;
+        var t = replaceHeap0(term, heap, ctx);
+        markHeapAsExplicit(t);
+        return t;
+    }
+
+    private Term replaceHeap0(Term term, Term heap, ParserRuleContext ctx) {
         if (isSelectTerm(term)) {
             if (!isImplicitHeap(term.sub(0))) {
                 //semanticError(null, "Expecting program variable heap as first argument of: %s", term);

@@ -70,8 +70,7 @@ public abstract class ParsingFacade {
 
     private static KeYParser createParser(CharStream stream) {
         var p = new KeYParser(new CommonTokenStream(lex(stream)));
-        //p.removeErrorListeners();
-        //TODO exception throwing
+        p.removeErrorListeners();
         p.addErrorListener(p.getErrorReporter());
         return p;
     }
@@ -118,7 +117,9 @@ public abstract class ParsingFacade {
 
     public static KeyAst.Term parseExpression(CharStream stream) {
         var p = createParser(stream);
-        return new KeyAst.Term(p.termEOF().term());
+        final var term = p.termEOF().term();
+        p.getErrorReporter().throwException();
+        return new KeyAst.Term(term);
     }
 
     public static KeyAst.Seq parseSequent(CharStream stream) {
