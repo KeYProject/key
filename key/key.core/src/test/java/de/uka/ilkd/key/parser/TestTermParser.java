@@ -308,7 +308,10 @@ public class TestTermParser extends AbstractTestTermParser {
     @Test
     public void testBindingUpdateTerm() throws Exception {
         String s = "\\forall int j; {globalIntPV:=j} globalIntPV = j";
+        String exp  = "\\forall int j; ({globalIntPV:=j} globalIntPV) = j";
         Term t = parseTerm(s);
+        var u = parseTerm(exp);
+        assertEquals(u, t);
         assertFalse("expected ({globalIntPV:=j}globalIntPV)=j) but is {globalIntPV:=j}(globalIntPV=j)",
                 t.sub(0).op() instanceof UpdateApplication);
     }

@@ -348,18 +348,21 @@ elementary_update_term: a=equivalence_term (ASSIGN b=equivalence_term)?;
 equivalence_term: a=implication_term (EQV b=equivalence_term)?;
 implication_term: a=disjunction_term (IMP b=implication_term)?;
 disjunction_term: a=conjunction_term (OR b=disjunction_term)?;
-conjunction_term: a=term60 (AND b=conjunction_term)?;
-term60: equality_term | negation_term | quantifierterm | modality_term;
+conjunction_term: a=update_term (AND b=conjunction_term)?;
+update_term: (LBRACE u+=term RBRACE)* sub=term70; //tear up location set and substitution
+term70:
+      MODALITY sub=term70 #modality_term
+    | NOT      sub=term70 #negation_term
+    | term60          #aaaaa;
+term60: equality_term | quantifierterm;
 equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=equality_term) ?;
 comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=comparison_term)?;
 weak_arith_term: a=strong_arith_term_1 ((PLUS|MINUS) b=weak_arith_term)?;
 strong_arith_term_1: a=strong_arith_term_2 ((STAR) b=strong_arith_term_1)?;
 strong_arith_term_2: a=unary_minus_term ((PERCENT|SLASH) b=strong_arith_term_2)?;
-
 unary_minus_term: MINUS? sub=cast_term;
-cast_term: (LPAREN sort=sortId RPAREN)? sub=update_term;
+cast_term: (LPAREN sort=sortId RPAREN)? sub=bracket_term;
 //update_term: (LBRACE parallel_term RBRACE)? bracket_term; // term ? bracket_term;
-update_term: (LBRACE term RBRACE) term | bracket_term;
 
 bracket_term: primitive_term (bracket_suffix_heap)* attribute*;
 bracket_suffix_heap: brace_suffix (AT heap=term)?;
@@ -381,10 +384,6 @@ primitive_term:
   | accessterm                #termAccess  //also handles function calls
   | literals                  #termLiterals
 ;
-
-modality_term: MODALITY term;
-negation_term: NOT term;
-
 
 /*
 term

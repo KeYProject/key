@@ -206,8 +206,9 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Term visitNegation_term(KeYParser.Negation_termContext ctx) {
-        Term termL = accept(ctx.term());
-        return updateOrigin(getTermFactory().createTerm(Junctor.NOT, termL), ctx);
+        Term termL = accept(ctx.sub);
+        if (ctx.NOT() != null) return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.NOT, termL));
+        else return termL;
     }
 
     @Override
@@ -747,8 +748,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private void markHeapAsExplicit(Term a) {
-            explicitHeap.add(a);
-            a.subs().forEach(this::markHeapAsExplicit);
+        explicitHeap.add(a);
+        a.subs().forEach(this::markHeapAsExplicit);
     }
 
     /*
@@ -1016,10 +1017,13 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitUpdate_term(KeYParser.Update_termContext ctx) {
-        if (ctx.bracket_term() != null) return accept(ctx.bracket_term());
-        Term u = accept(ctx.term(0));
-        Term t = accept(ctx.term(1));
-        return capsulateTf(ctx, () -> getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, t));
+        Term t = accept(ctx.sub);
+        if (ctx.u.isEmpty()) return accept(ctx.sub);
+        List<Term> u = mapOf(ctx.u);
+        for (int i = u.size() - 1; i >= 0; i--) {
+            t = getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u.get(i), t);
+        }
+        return t;
     }
 
     public List<QuantifiableVariable> visitBound_variables(KeYParser.Bound_variablesContext ctx) {
@@ -1056,8 +1060,10 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitModality_term(KeYParser.Modality_termContext ctx) {
-        PairOfStringAndJavaBlock sjb = getJavaBlock(ctx.MODALITY().getSymbol());
+        Term a1 = accept(ctx.sub);
+        if (ctx.MODALITY() == null) return a1;
 
+        PairOfStringAndJavaBlock sjb = getJavaBlock(ctx.MODALITY().getSymbol());
         Operator op;
         if (sjb.opName.charAt(0) == '#') {
             /*if (!inSchemaMode()) {
@@ -1071,7 +1077,6 @@ public class ExpressionBuilder extends DefaultBuilder {
             semanticError(ctx, "Unknown modal operator: " + sjb.opName);
         }
 
-        Term a1 = accept(ctx.term());
         return capsulateTf(ctx, () -> getTermFactory().createTerm(op, new Term[]{a1}, null, sjb.javaBlock));
     }
 
@@ -1314,31 +1319,30 @@ public class ExpressionBuilder extends DefaultBuilder {
             } else if (ctxSuffix instanceof KeYParser.Attribute_complexContext) {
                 var attrid = (KeYParser.Attribute_complexContext) ctxSuffix;
                 Term heap = accept(attrid.heap);
-                String className = attrid.sort.getText();
+                String classRef = attrid.sort.getText();
                 String memberName = attrid.id.getText();
                 boolean isCall = attrid.call() != null;
                 var sfxargs = isCall ? visitArguments(attrid.call().argument_list()) : null;
                 if (isCall) {
-                    var classRef = current.sort().name().toString();
                     KeYJavaType kjt = getTypeByClassName(classRef); //Why not direct use of Sort?
                     if (kjt == null) semanticError(ctxSuffix, "Could not find sort for %s", classRef);
                     assert kjt != null;
                     classRef = kjt.getFullName();
                     current = getServices().getJavaInfo().getProgramMethodTerm(current, memberName, sfxargs, classRef, false);
                 } else {
-                    Operator op = getAttributeInPrefixSort(getTypeByClassName(className).getSort(),
-                            className + "::" + memberName);
+                    Operator op = getAttributeInPrefixSort(getTypeByClassName(classRef).getSort(),
+                            classRef + "::" + memberName);
                     current = createAttributeTerm(current, op, ctxSuffix);
                 }
 
                 if (current == null) {
-                    final Sort sort = lookupSort(className);
+                    final Sort sort = lookupSort(classRef);
                     if (sort == null) {
-                        semanticError(ctxSuffix, "Could not find matching sort for %s", className);
+                        semanticError(ctxSuffix, "Could not find matching sort for %s", classRef);
                     }
                     KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
                     if (kjt == null) {
-                        semanticError(ctxSuffix, "Found logic sort for %s but no corresponding java type!", className);
+                        semanticError(ctxSuffix, "Found logic sort for %s but no corresponding java type!", classRef);
                     }
                 }
                 if (heap != null)
@@ -1533,6 +1537,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     /**
      * Guard for {@link #replaceHeap0(Term, Term, ParserRuleContext)}
      * to protect the double application of {@code @heap}.
+     *
      * @param term
      * @param heap
      * @param ctx
