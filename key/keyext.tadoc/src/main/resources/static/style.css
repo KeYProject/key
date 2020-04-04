@@ -1152,7 +1152,7 @@ h3 {
 }
 
 .raw code a.token {
-    color:black;
+    color: black;
     text-decoration: underline;
 }
 
@@ -1169,7 +1169,35 @@ h3 {
     border-left: 4px #129fea solid;
 }
 
-.symbol.sort { color: #5aba59;}
-.symbol.function { color: #129fea;}
-.symbol.predicate { color: #8156a7;}
-.symbol.transformer { color: #d65d0e; }
+.symbol.sort {
+    color: #5aba59;
+}
+
+.symbol.function {
+    color: #129fea;
+}
+
+.symbol.predicate {
+    color: #8156a7;
+}
+
+.symbol.transformer {
+    color: #d65d0e;
+}
+
+.token.modality {
+    border: 1px #ccc solid;
+    background: rgb(240, 2200, 200);
+}
+
+.symbol.choice {
+    color: white;
+    background: #646480;
+    padding: 0.3em;
+    border: 1px navy solid;
+    border-radius: 5px;
+}
+
+.schema-variable {
+    font-style: italic;
+}

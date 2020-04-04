@@ -13,6 +13,7 @@ import org.commonmark.ext.ins.InsExtension
 import org.commonmark.parser.Parser
 import org.commonmark.renderer.html.HtmlRenderer
 import org.key_project.core.doc.Markdown.markdown
+import org.key_project.core.doc.org.key_project.core.doc.GitBlameService
 import java.io.File
 import java.util.*
 
@@ -59,6 +60,7 @@ abstract class DefaultPage(
                         ul("nav-list") {
                             li("nav-item") {
                                 a(classes = "pure-button", href = "index.html") { +"Startpage" }
+                                a(classes = "pure-button", href = "usage.html") { +"Usage Index" }
                                 a(classes = "pure-button", href = "https://key-project.org/docs/") { +"KeY Docs" }
                             }
                         }
@@ -94,9 +96,7 @@ abstract class DefaultPage(
         div.div("footer") {
             div("pure-menu pure-menu-horizontal") {
                 ul {
-                    li("pure-menu-item") { a(href = "http://purecss.io/", classes = "pure-menu-link") { +"About" } }
-                    li("pure-menu-item") { a(href = "http://twitter.com/yuilibrary/", classes = "pure-menu-link") { +"Twitter" } }
-                    li("pure-menu-item") { a(href = "http://github.com/pure-css/pure/", classes = "pure-menu-link") { +"GitHub" } }
+                    li("pure-menu-item") { a(href = "https://key-project.org/docs/grammar/#how-to-doc", classes = "pure-menu-link") { +"About" } }
                 }
             }
         }
@@ -136,33 +136,57 @@ class Indexfile(target: File, index: Index) : DefaultPage(target, "Index Page", 
 
 
 class UsageIndexFile(target: File, index: Index, val usageIndex: UsageIndex) : DefaultPage(target, "Usage", index) {
+    val usedItems =
+            usageIndex.entries.groupBy { (a, _) -> a.type }
+                    .toList()
+                    .sortedBy { (a, _) -> a }
+
     override fun content(div: DIV) {
         div.div {
             h1 { +"Usage Index" }
-            usageIndex.entries
-                    .groupBy { (a, _) -> a.type }
-                    .forEach { (category, usedSymbols) ->
-                        region(category, usedSymbols)
-                    }
+            for ((category, usedSymbols) in usedItems) {
+                region(category, usedSymbols)
+            }
         }
     }
 
     private fun DIV.region(category: Symbol.Type,
                            usedSymbols: List<MutableMap.MutableEntry<Symbol, MutableList<Symbol>>>) {
-        h2("") { +category.navigationTitle }
+        h2("") {
+            id = category.name
+            +category.navigationTitle
+        }
         section {
             usedSymbols
                     .sortedBy { (a, _) -> a.displayName }
                     .forEach { (used, where) ->
-                        h3 { a(href = used.href) { +(used.displayName) } }
-                        ul {
-                            where.sortedBy { it.displayName }
-                                    .distinctBy { it.href }
-                                    .forEach {
-                                        li { a(href = it.href) { +(it.displayName + " ( ${it.type}) ") } }
+                        h3 { a(href = used.href) { id = used.anchor; +(used.displayName) } }
+                        where.sortedBy { it.displayName }
+                                .distinctBy { it.href }
+                                .forEach {
+                                    ul {
+                                        li {
+                                            a(href = it.href, classes = "symbol ${it.type}") {
+                                                +(it.displayName + " (${it.type}) ")
+                                            }
+                                        }
                                     }
-                        }
+                                }
                     }
+        }
+    }
+
+    override fun UL.navigation() {
+        usedItems.forEach { (type, seq) ->
+            li {
+                a("#${type.name}") { +type.navigationTitle }
+                ul {
+                    seq.sortedBy { (a, _) -> a.displayName }
+                            .forEach { (used, _) ->
+                                li { a(href = "#${used.anchor}", classes = used.type.name) { +(used.displayName) } }
+                            }
+                }
+            }
         }
     }
 }
@@ -191,7 +215,7 @@ class FileVisitor(val self: String,
                   val usageIndex: UsageIndex) : KeYParserBaseVisitor<Unit>() {
 
     private lateinit var symbol: Symbol
-    private val printer : PrettyPrinter
+    private val printer: PrettyPrinter
         get() = PrettyPrinter(index, symbol, true, usageIndex)
 
     override fun visitFile(ctx: KeYParser.FileContext) {
@@ -325,10 +349,10 @@ class FileVisitor(val self: String,
             if (ctx.choices?.option().isNullOrEmpty()) {
                 +"No choice condition specified"
             } else {
-                +"Enabled under choices:"
+                +"Enabled under choices: "
                 ctx.choices?.option()?.forEach {
                     val target = index.findChoice(it.cat.text, it.value.text)?.href ?: ""
-                    a(target) { +it.text }
+                    a(target, classes = "symbol choice") { +it.text }
                     +" "
                 }
             }
@@ -357,22 +381,29 @@ class FileVisitor(val self: String,
                 val source = ctx.getStart().tokenSource
                 +"defined in: ${File(source.sourceName).name} Line: ${ctx.start.line} Offset :${ctx.start.charPositionInLine}"
             }
-            /*
-            small {
+            /*div {
                 val file = ctx.start.tokenSource.sourceName
                 val lineStart = ctx.start.line
                 val lineStop = ctx.stop.line
-                val repo = FileRepositoryBuilder().findGitDir(File(file)).build()
-                val blame = BlameCommand(repo)
-                blame.setFilePath(file)
-                blame.call()?.let { result ->
-                    result.computeRange(lineStart, lineStop)
-                    (lineStart..lineStop).forEach {
-                        val author = result.getSourceAuthor(it)
-                        val n = author.name
-                        val w = author.name
-                        val e = author.emailAddress
-                        span { +w; +n }
+                val infos = GitBlameService.getLastAuthorsWithDates(file, lineStart, lineStop)
+                val last5Changes =
+                        infos.sortedByDescending { it.timestamp }.distinctBy { it.author }.take(5)
+                last5Changes.forEach {
+                    span {
+                        a(href = "https://git.key-project.org/key/key/-/commit/${it.gitCommit}") {
+                            +(it.author + " on " + it.timestamp)
+                        }
+                    }
+                }
+            }*/
+            /*div("git last-update") {
+                val file = ctx.start.tokenSource.sourceName
+                val lineStart = ctx.start.line
+                val lineStop = ctx.stop.line
+                val it = GitBlameService.lastUpdated(file, lineStart, lineStop)
+                span {
+                    a(href = "https://git.key-project.org/key/key/-/commit/${it.gitCommit}") {
+                        +(it.author + " on " + it.timestamp)
                     }
                 }
             }*/

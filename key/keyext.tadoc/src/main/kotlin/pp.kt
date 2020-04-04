@@ -3,6 +3,7 @@ package org.key_project.core.doc
 import de.uka.ilkd.key.nparser.KeYLexer
 import de.uka.ilkd.key.nparser.KeYParser
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor
+import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.TerminalNode
@@ -21,7 +22,7 @@ class PrettyPrinter(val index: Index,
                     private val usageIndex: UsageIndex = HashMap())
     : KeYParserBaseVisitor<String>() {
 
-    private var printed = mutableSetOf<String>()
+    private val vocabulary = KeYLexer(CharStreams.fromString("")).vocabulary
     private val tokenSymbols = index.filterIsInstance<TokenSymbol>()
 
     override fun aggregateResult(aggregate: String?, nextResult: String?) =
@@ -30,20 +31,23 @@ class PrettyPrinter(val index: Index,
     override fun visitTerminal(node: TerminalNode) = visitToken(node.symbol)
 
     private fun visitToken(t: Token): String {
-        val text = t.text
         if (t.type == KeYLexer.DOC_COMMENT) return ""
         if (t.type == KeYLexer.LPAREN || t.type == KeYLexer.LBRACE || t.type == KeYLexer.LBRACKET)
             return openParenthesis(t)
         if (t.type == KeYLexer.RPAREN || t.type == KeYLexer.RBRACE || t.type == KeYLexer.RBRACKET)
             return closeParenthesis(t)
-
-        if (!printReferences) return "$text "
+        if (t.type == KeYLexer.IDENT && t.text[0] == '#') {
+            return printSpan(t.text, "schema-variable")
+        }
         val s = tokenSymbols.find { it.tokenType == t.type }
-        return if (s != null)
-            "<a class=\"token\" href=\"${s.href}\">$text</a> "
+        val text = if (s != null && printReferences)
+            "<a class=\"token\" href=\"${s.href}\">${t.text}</a> "
         else
-            "$text "
+            "${t.text} "
+        return printSpan(text, vocabulary.getDisplayName(t.type))
     }
+
+    private fun printSpan(text: String, classes: String) = "<span class=\"token $classes\">${text}</span>"
 
     private val rainbowColors = arrayOf(
             "#458588",
@@ -159,11 +163,7 @@ class PrettyPrinter(val index: Index,
             "<a href=\"${s.href}\" class=\"symbol ${s.type.name}\">$text</a> "
         } else
             "$text ".also {
-                val s = "Could not found symbol for $text : ${types.toList()}"
-                if (s !in printed) {
-                    printed.add(s)
-                    System.err.println(s)
-                }
+                App.errordpln("Could not found symbol for $text : ${types.toList()}")
             }
     }
 
@@ -496,6 +496,7 @@ class PrettyPrinter(val index: Index,
         append("\n};")
     }
 
+
     override fun visitModifiers(ctx: KeYParser.ModifiersContext) = buildString {
         for (i in 0 until ctx.rulesets().size) {
             appendn(ctx.rulesets(0)).append("\n")
@@ -598,7 +599,7 @@ class PrettyPrinter(val index: Index,
     override fun visitRulesets(ctx: KeYParser.RulesetsContext) = buildString {
         appendn(ctx.HEURISTICS())
         append(" (")
-        ctx.ruleset().joinToString(", ") { accept(it) }
+        ctx.ruleset().joinTo(this, ", ") { accept(it) }
         append(")")
     }
 

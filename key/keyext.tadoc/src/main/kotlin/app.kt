@@ -12,22 +12,44 @@ import de.uka.ilkd.key.nparser.KeYParserBaseVisitor
 import de.uka.ilkd.key.nparser.ParsingFacade
 import org.antlr.v4.runtime.CharStreams
 import java.io.File
-import kotlin.collections.ArrayList
+import java.util.concurrent.TimeUnit
 
 object App {
+    private val fmt = "[%5d] %s%s%s"
+    private val startTime = System.currentTimeMillis()
+
     @JvmStatic
     fun main(args: Array<String>) {
         GenDoc().main(args)
     }
+
+    fun putln(s: String, colorOn: String = "", colorOff: String = "") {
+        println(String.format(fmt, (System.currentTimeMillis() - startTime), colorOn, s, colorOff))
+    }
+
+    val ESC = 27.toChar()
+    fun putln(s: String, color: Int) = putln(s, "$ESC[${color}m", "$ESC[0m")
+    fun errorln(s: String) = putln(s, 33)
+    private var printedErrors = mutableSetOf<String>()
+    fun errordpln(s: String) {
+        if (s !in printedErrors) {
+            printedErrors.add(s); errorln(s)
+        }
+    }
+}
+
+fun execute(vararg args: String): String {
+    App.putln(args.joinToString(" "))
+    val pb = ProcessBuilder(args.toList())
+            .redirectErrorStream(true)
+            .redirectOutput(ProcessBuilder.Redirect.PIPE)
+    val p = pb.start()
+    p.waitFor(1, TimeUnit.SECONDS)
+    return String(p.inputStream.readAllBytes())
 }
 
 val GIT_VERSION by lazy {
-    val pb = ProcessBuilder("git", "describe", "--all")
-            .redirectErrorStream(true)
-            .redirectOutput(ProcessBuilder.Redirect.PIPE)
-    val p = pb.start();
-    p.waitFor()
-    String(p.inputStream.readAllBytes())
+    execute("git", "describe", "--all")
 }
 
 /**
@@ -85,16 +107,18 @@ class GenDoc() : CliktCommand() {
     }
 
     fun index(f: File): KeYParser.FileContext {
+        App.putln("Parsing $f")
         val ast = ParsingFacade.parseFile(f)
         val ctx = ParsingFacade.getParseRuleContext(ast)
         val self = f.nameWithoutExtension + ".html"
+        App.putln("Indexing $f")
         ctx.accept(Indexer(self, symbols))
         return ctx
     }
 
     fun run(ctx: KeYParser.FileContext, f: File) {
         try {
-            println("Analyze: $f")
+            App.putln("Analyze: $f")
             val target = File(outputFolder, f.nameWithoutExtension + ".html")
             DocumentationFile(target, f, ctx, symbols, usageIndex).invoke()
         } catch (e: Exception) {
