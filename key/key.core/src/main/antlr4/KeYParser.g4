@@ -348,13 +348,16 @@ elementary_update_term: a=equivalence_term (ASSIGN b=equivalence_term)?;
 equivalence_term: a=implication_term (EQV b=equivalence_term)?;
 implication_term: a=disjunction_term (IMP b=implication_term)?;
 disjunction_term: a=conjunction_term (OR b=disjunction_term)?;
-conjunction_term: a=update_term (AND b=conjunction_term)?;
-update_term: (LBRACE u+=term RBRACE)* sub=term70; //tear up location set and substitution
-term70:
-      MODALITY sub=term70 #modality_term
-    | NOT      sub=term70 #negation_term
-    | term60          #aaaaa;
-term60: equality_term | quantifierterm;
+conjunction_term: a=formula_suffix (AND b=conjunction_term)?;
+formula_suffix:
+      (LBRACE u+=term RBRACE) sub=formula_suffix                      #update_term
+    | LBRACE SUBST  bv=one_bound_variable SEMI
+      replacement=term RBRACE
+      haystack=formula_suffix                                         #substitutionterm
+    | MODALITY sub=formula_suffix                                     #modality_term
+    | NOT      sub=formula_suffix                                     #negation_term
+    | (FORALL | EXISTS) bound_variables sub=formula_suffix            #quantifierterm
+    | equality_term                                                   #aaaaa;
 equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=equality_term) ?;
 comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=comparison_term)?;
 weak_arith_term: a=strong_arith_term_1 ((PLUS|MINUS) b=weak_arith_term)?;
@@ -473,16 +476,6 @@ location_term
     LPAREN obj=term COMMA field=term RPAREN
 ;
 
-substitutionterm
-:
-   LBRACE SUBST
-   bv=one_bound_variable
-   SEMI
-   replacement=term
-   RBRACE
-   haystack=term
-;
-
 
 /*
 staticAttributeOrQueryReference
@@ -507,8 +500,6 @@ ifThenElseTerm
   THEN LPAREN thenT = term RPAREN
   ELSE LPAREN elseT = term RPAREN
 ;
- 
-
 
 ifExThenElseTerm
 :
@@ -518,12 +509,6 @@ ifExThenElseTerm
   ELSE LPAREN elseT = term RPAREN
 ;
 
-quantifierterm
-:
-  (FORALL | EXISTS)
-  bound_variables term
-;
-
 locset_term
 :
     LBRACE
@@ -531,7 +516,6 @@ locset_term
         ( COMMA l = location_term  )* )?
     RBRACE
 ;
-
 
 bound_variables
 :
