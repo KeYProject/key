@@ -308,13 +308,67 @@ public class TestTermParser extends AbstractTestTermParser {
     @Test
     public void testBindingUpdateTerm() throws Exception {
         String s = "\\forall int j; {globalIntPV:=j} globalIntPV = j";
-        String exp  = "\\forall int j; ({globalIntPV:=j} globalIntPV) = j";
+        String exp = "\\forall int j; ({globalIntPV:=j} globalIntPV) = j";
         Term t = parseTerm(s);
         var u = parseTerm(exp);
         assertEquals(u, t);
         assertFalse("expected ({globalIntPV:=j}globalIntPV)=j) but is {globalIntPV:=j}(globalIntPV=j)",
                 t.sub(0).op() instanceof UpdateApplication);
     }
+
+    @Test
+    public void testBindingUpdateTerm_1() throws Exception {
+        assertTermEquals(
+                "\\forall int l;  {globalIntPV:=l} false & true",
+                "(\\forall int l;  {globalIntPV:=l} false) & true");
+    }
+
+    @Test
+    public void testBindingUpdateTerm_3() throws Exception {
+        assertTermEquals(
+                "\\forall int l;  ( \\<  {int globalIntPV=0;} \\>  {globalIntPV:=l} false & true )",
+                "\\forall int l;  ( (\\<  {int globalIntPV=0;} \\>  {globalIntPV:=l} false) & true )");
+    }
+
+    @Test
+    public void testBindingUpdateTerm_4() throws Exception {
+        assertTermEquals("! 1=1", "!(1=1)");
+    }
+
+    @Test
+    public void testBindingUpdateTerm_5() throws Exception {
+        assertTermEquals("{globalIntPV:=j} globalIntPV + j", "({globalIntPV:=j} globalIntPV) + j");
+    }
+
+    @Test
+    public void testBindingUpdateTerm_6() throws Exception {
+        assertTermEquals(
+                "(int) {\\subst int x; j} j +j",
+                "((int) {\\subst int x; j} j) + j");
+    }
+
+    @Test
+    public void testBindingUpdateTerm_7() throws Exception {
+        assertTermEquals(
+                "(int) {\\subst int x; j} j + j",
+                "((int) {\\subst int x; j} j) + j");
+    }
+
+    @Test
+    public void testBindingUpdateTerm_8() throws Exception {
+        assertTermEquals(
+                "{\\subst int x; j} (int) j + j",
+                "({\\subst int x; j} (int) j) + j");
+    }
+
+    private void assertTermEquals(String actual, String expected) throws Exception {
+        var t = parseTerm(actual);
+        var u = parseTerm(expected);
+        System.out.println(t);
+        System.out.println(u);
+        assertEquals(u, t);
+    }
+
 
     @Test
     public void testParsingArray() throws Exception {

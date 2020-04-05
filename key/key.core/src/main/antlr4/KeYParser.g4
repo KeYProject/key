@@ -340,7 +340,6 @@ literals:
   | string_literal
 ;
 
-
 term: labeled_term;
 labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
 parallel_term: a=elementary_update_term (PARALLEL b=parallel_term)?;
@@ -348,25 +347,29 @@ elementary_update_term: a=equivalence_term (ASSIGN b=equivalence_term)?;
 equivalence_term: a=implication_term (EQV b=equivalence_term)?;
 implication_term: a=disjunction_term (IMP b=implication_term)?;
 disjunction_term: a=conjunction_term (OR b=disjunction_term)?;
-conjunction_term: a=formula_suffix (AND b=conjunction_term)?;
-formula_suffix:
-      (LBRACE u+=term RBRACE) sub=formula_suffix                      #update_term
-    | LBRACE SUBST  bv=one_bound_variable SEMI
-      replacement=term RBRACE
-      haystack=formula_suffix                                         #substitutionterm
-    | MODALITY sub=formula_suffix                                     #modality_term
-    | NOT      sub=formula_suffix                                     #negation_term
-    | (FORALL | EXISTS) bound_variables sub=formula_suffix            #quantifierterm
+conjunction_term: a=formula_prefix (AND b=conjunction_term)?;
+formula_prefix:
+      MODALITY sub=formula_prefix                                     #modality_term
+    | NOT      sub=formula_prefix                                     #negation_term
+    | (FORALL | EXISTS) bound_variables sub=formula_prefix            #quantifierterm
     | equality_term                                                   #aaaaa;
 equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=equality_term) ?;
 comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=comparison_term)?;
 weak_arith_term: a=strong_arith_term_1 ((PLUS|MINUS) b=weak_arith_term)?;
 strong_arith_term_1: a=strong_arith_term_2 ((STAR) b=strong_arith_term_1)?;
-strong_arith_term_2: a=unary_minus_term ((PERCENT|SLASH) b=strong_arith_term_2)?;
-unary_minus_term: MINUS? sub=cast_term;
-cast_term: (LPAREN sort=sortId RPAREN)? sub=bracket_term;
-//update_term: (LBRACE parallel_term RBRACE)? bracket_term; // term ? bracket_term;
+strong_arith_term_2: a=atom_prefix ((PERCENT|SLASH) b=strong_arith_term_2)?;
 
+atom_prefix:
+    MINUS sub=atom_prefix                                      #unary_minus_term
+  | (LBRACE u+=term RBRACE) sub=atom_prefix                     #update_term
+  | LBRACE SUBST  bv=one_bound_variable SEMI
+    replacement=term RBRACE
+    haystack=atom_prefix                                        #substitutionterm
+  | (LPAREN sort=sortId RPAREN) sub=atom_prefix                #cast_term
+  | bracket_term                                                #bbbbbb
+;
+
+//update_term: (LBRACE parallel_term RBRACE)? bracket_term; // term ? bracket_term;
 bracket_term: primitive_term (bracket_suffix_heap)* attribute*;
 bracket_suffix_heap: brace_suffix (AT heap=term)?;
 brace_suffix:
@@ -380,7 +383,6 @@ primitive_term:
     LPAREN term RPAREN  (attribute)*     #termParen
   | locset_term               #termLocset
   | location_term             #termLocation
-  | substitutionterm          #termSubstitution
   | ifThenElseTerm            #termIfThenElse
   | ifExThenElseTerm          #termIfExThenElse
   | AT name=simple_ident      #abbreviation

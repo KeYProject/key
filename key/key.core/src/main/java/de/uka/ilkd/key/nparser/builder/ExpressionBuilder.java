@@ -970,7 +970,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ctx.EXISTS() != null)
             op = Quantifier.EX;
         List<QuantifiableVariable> vs = accept(ctx.bound_variables());
-        Term a1 = accept(ctx.term());
+        Term a1 = accept(ctx.sub);
         var a = getTermFactory().createTerm(op,
                 new ImmutableArray<>(a1),
                 new ImmutableArray<>(vs.toArray(new QuantifiableVariable[0])),
