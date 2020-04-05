@@ -308,10 +308,6 @@ class PrettyPrinter(val index: Index,
         return super.visitEquivalence_term(ctx)
     }
 
-    override fun visitTermSubstitution(ctx: KeYParser.TermSubstitutionContext?): String {
-        return super.visitTermSubstitution(ctx)
-    }
-
     override fun visitTermParen(ctx: KeYParser.TermParenContext?): String {
         return super.visitTermParen(ctx)
     }

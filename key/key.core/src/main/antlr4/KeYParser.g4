@@ -349,8 +349,7 @@ implication_term: a=disjunction_term (IMP b=implication_term)?;
 disjunction_term: a=conjunction_term (OR b=disjunction_term)?;
 conjunction_term: a=formula_prefix (AND b=conjunction_term)?;
 formula_prefix:
-      MODALITY sub=formula_prefix                                     #modality_term
-    | NOT      sub=formula_prefix                                     #negation_term
+      NOT      sub=formula_prefix                                     #negation_term
     | (FORALL | EXISTS) bound_variables sub=formula_prefix            #quantifierterm
     | equality_term                                                   #aaaaa;
 equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=equality_term) ?;
@@ -360,13 +359,14 @@ strong_arith_term_1: a=strong_arith_term_2 ((STAR) b=strong_arith_term_1)?;
 strong_arith_term_2: a=atom_prefix ((PERCENT|SLASH) b=strong_arith_term_2)?;
 
 atom_prefix:
-    MINUS sub=atom_prefix                                      #unary_minus_term
-  | (LBRACE u+=term RBRACE) sub=atom_prefix                     #update_term
+    MINUS sub=atom_prefix                                   #unary_minus_term
+  | MODALITY sub=formula_prefix                             #modality_term
+  | (LBRACE u+=term RBRACE) sub=atom_prefix                 #update_term
   | LBRACE SUBST  bv=one_bound_variable SEMI
     replacement=term RBRACE
-    haystack=atom_prefix                                        #substitutionterm
-  | (LPAREN sort=sortId RPAREN) sub=atom_prefix                #cast_term
-  | bracket_term                                                #bbbbbb
+    haystack=atom_prefix                                    #substitutionterm
+  | (LPAREN sort=sortId RPAREN) sub=atom_prefix             #cast_term
+  | bracket_term                                            #bbbbbb
 ;
 
 //update_term: (LBRACE parallel_term RBRACE)? bracket_term; // term ? bracket_term;
