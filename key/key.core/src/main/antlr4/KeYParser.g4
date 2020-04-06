@@ -330,6 +330,10 @@ funcpred_name
  * This gives a rather late error message. */
 //region terms and formulas
 
+//(i0=1 & i1=1| i0=Z(neglit(1(#))) & i1=Z(neglit(1(#))))
+// {\subst uSub; 0}!b
+//((geq(sk,0) & {\subst uSub; sk}!b)-> {\subst uSub; (sk + 1)}!b)
+
 termEOF: term EOF; // toplevel
 
 boolean_literal: TRUE | FALSE;
@@ -359,13 +363,13 @@ strong_arith_term_1: a=strong_arith_term_2 ((STAR) b=strong_arith_term_1)?;
 strong_arith_term_2: a=atom_prefix ((PERCENT|SLASH) b=strong_arith_term_2)?;
 
 atom_prefix:
-    MINUS sub=atom_prefix                                   #unary_minus_term
-  | MODALITY sub=formula_prefix                             #modality_term
+    MODALITY sub=formula_prefix                             #modality_term
   | (LBRACE u+=term RBRACE) sub=atom_prefix                 #update_term
   | LBRACE SUBST  bv=one_bound_variable SEMI
     replacement=term RBRACE
-    haystack=atom_prefix                                    #substitutionterm
+    haystack=formula_prefix                                 #substitutionterm
   | (LPAREN sort=sortId RPAREN) sub=atom_prefix             #cast_term
+  | MINUS sub=atom_prefix                                   #unary_minus_term
   | bracket_term                                            #bbbbbb
 ;
 

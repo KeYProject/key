@@ -14,6 +14,12 @@ public class ParseLDTsTests {
         load(services, "/de/uka/ilkd/key/proof/rules/ldt.key");
     }
 
+    @Test
+    public void testSR() throws IOException {
+        var services = new Services(new JavaProfile());
+        load(services, "/de/uka/ilkd/key/proof/rules/standardRules.key");
+    }
+
     /*
     @Test
     public void testlex() throws IOException {
