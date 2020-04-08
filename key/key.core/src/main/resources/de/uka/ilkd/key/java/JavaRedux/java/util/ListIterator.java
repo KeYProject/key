@@ -5,9 +5,29 @@ package java.util;
 
 public interface ListIterator extends java.util.Iterator
 {
+    //@ public instance ghost \seq seq;
+    //@ public instance ghost \bigint index;
+    
+    //@ public instance invariant 0 <= index && index <= seq.length;
 
-   public boolean hasNext();
-   public java.lang.Object next();
+    /*@ public normal_behavior
+      @ ensures \result == true <==> index < seq.length;
+      @ assignable \strictly_nothing;
+      @ determines \result \by seq.length, index;
+      @*/
+    public boolean hasNext();
+    
+    /*@ public behavior
+      @ requires index < seq.length;
+      @ ensures \result == ((Object)seq[\old(index)]);
+      @ ensures index == \old(index) + 1;
+      @ assignable index;
+      @ signals_only java.lang.RuntimeException;
+      @ determines \result \by seq, index;
+      @ determines index \by \itself;
+      @*/
+    public /*@nullable@*/ Object next();
+    
    public boolean hasPrevious();
    public java.lang.Object previous();
    public int nextIndex();
