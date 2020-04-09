@@ -13,35 +13,64 @@
 
 package de.uka.ilkd.key.control.instantiation_model;
 
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.nparser.ParsingFacade;
-import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.parser.IdDeclaration;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.*;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.util.Pair;
-import org.antlr.v4.runtime.CharStreams;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.swing.table.AbstractTableModel;
+
+import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 
-import javax.swing.table.AbstractTableModel;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Iterator;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.PosInProgram;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.parser.IdDeclaration;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.InstantiationProposerCollection;
+import de.uka.ilkd.key.proof.MissingInstantiationException;
+import de.uka.ilkd.key.proof.MissingSortException;
+import de.uka.ilkd.key.proof.SVInstantiationException;
+import de.uka.ilkd.key.proof.SVInstantiationParserException;
+import de.uka.ilkd.key.proof.SVRigidnessException;
+import de.uka.ilkd.key.proof.SortMismatchException;
+import de.uka.ilkd.key.proof.VariableNameProposer;
+import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
+import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
+import de.uka.ilkd.key.rule.inst.InstantiationEntry;
+import de.uka.ilkd.key.rule.inst.RigidnessException;
+import de.uka.ilkd.key.rule.inst.SortException;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.util.Pair;
 
 public class TacletFindModel extends AbstractTableModel {
 
@@ -49,54 +78,36 @@ public class TacletFindModel extends AbstractTableModel {
      *
      */
     private static final long serialVersionUID = 5285420522875326156L;
-    /**
-     * the related rule application
-     */
-    private final TacletApp originalApp;
-    /**
-     * the instantiations entries
-     */
+    /** the instantiations entries */
     private ArrayList<Pair<SchemaVariable, String>> entries;
-    /**
-     * the integer defines the row until which no editing is possible
-     */
+    /** the related rule application */
+    private final TacletApp originalApp;
+    /** the integer defines the row until which no editing is possible */
     private int noEditRow;
-    /**
-     * universal namespace of variables, minimum for input in a row
-     */
+    /** universal namespace of variables, minimum for input in a row */
     private NamespaceSet nss;
-    /**
-     * the java service object
-     */
+    /** the java service object */
     private Services services;
-    /**
-     * the abbreviation map
-     */
+    /** the abbreviation map */
     private AbbrevMap scm;
-    /**
-     * the current goal
-     */
+    /** the current goal */
     private Goal goal;
-    /**
-     * variable namer
-     */
+    /** variable namer */
     private VariableNamer varNamer;
-    /**
-     * proposers to ask when instantiating a schema variable
-     */
+    /** proposers to ask when instantiating a schema variable */
     private InstantiationProposerCollection instantiationProposers;
 
     /**
      * Create new data model for tree.
      *
-     * @param app      the TacletApp where to get the necessary entries
+     * @param app the TacletApp where to get the necessary entries
      * @param services services.
-     * @param nss      universal namespace of variables, minimum for input in a row.
-     * @param scm      the abbreviation map.
-     * @param goal     the current goal.
+     * @param nss universal namespace of variables, minimum for input in a row.
+     * @param scm the abbreviation map.
+     * @param goal the current goal.
      */
     public TacletFindModel(TacletApp app, Services services, NamespaceSet nss, AbbrevMap scm,
-                           Goal goal) {
+            Goal goal) {
         this.originalApp = app;
 
         this.nss = nss;
@@ -200,7 +211,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @param functNS the function namespace
      */
     private Term parseTerm(String s, Namespace<QuantifiableVariable> varNS,
-                           Namespace<Function> functNS) throws ParserException {
+            Namespace<Function> functNS) throws ParserException {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
         copy.setFunctions(functNS);
@@ -213,14 +224,20 @@ public class TacletFindModel extends AbstractTableModel {
      * skolem function)
      */
     private IdDeclaration parseIdDeclaration(String s) throws ParserException {
-        var ctx = ParsingFacade.parseIdDeclaration(CharStreams.fromString(s));
-        Sort sort = ctx.s != null ? services.getNamespaces().sorts().lookup(ctx.s.getText()) : null;
-        return new IdDeclaration(ctx.id.getText(), sort);
+        KeYParserF parser = null;
+        try {
+            parser = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s, ""), services, nss);
+            return parser.id_declaration();
+        } catch (RecognitionException re) {
+            // parser cannot be null
+            throw new ParserException(parser.getErrorMessage(re), Location.create(re));
+        }
     }
 
     /**
      * throws an exception iff no input in indicated row, and no metavariable
      * instantiation is possible
+     *
      */
 
     private void checkNeededInputAvailable(int irow) throws MissingInstantiationException {
@@ -250,7 +267,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @return the parsed term
      */
     private Term parseRow(int irow, Namespace<QuantifiableVariable> varNS,
-                          Namespace<Function> functNS)
+            Namespace<Function> functNS)
             throws SVInstantiationParserException, MissingInstantiationException {
 
         String instantiation = (String) getValueAt(irow, 1);
@@ -358,6 +375,7 @@ public class TacletFindModel extends AbstractTableModel {
 
     /**
      * @return new rule app with all inserted instantiations in the variable instantiations table
+     *
      * @throws SVInstantiationException if the instantiation is incorrect
      */
     public TacletApp createTacletAppFromVarInsts() throws SVInstantiationException {
@@ -461,9 +479,7 @@ public class TacletFindModel extends AbstractTableModel {
 
     }
 
-    /**
-     * sets the value of the cell
-     */
+    /** sets the value of the cell */
     @Override
     public void setValueAt(Object instantiation, int rowIndex, int columnIndex) {
         if (columnIndex == 0) {
@@ -488,7 +504,7 @@ public class TacletFindModel extends AbstractTableModel {
      * returns the index of the row the given Schemavariable stands
      *
      * @return the index of the row the given Schemavariable stands (-1 if not
-     * found)
+     *         found)
      */
     private int getSVRow(SchemaVariable sv) {
         int rowIndex = 0;

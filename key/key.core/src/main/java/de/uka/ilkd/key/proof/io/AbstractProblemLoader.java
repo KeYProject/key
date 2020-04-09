@@ -63,7 +63,7 @@ import de.uka.ilkd.key.util.Triple;
  * no user interaction is required.
  * </p>
  * <p>
- * The basic usage of this class is to instantiate a new
+ * The basic usage of this class is to instantiate a new 
  * {@link SingleThreadProblemLoader} or {@link ProblemLoader}
  * instance which should load the file configured by the constructor's arguments.
  * The next step is to call {@link #load()} which does the loading process and
@@ -82,7 +82,7 @@ public abstract class AbstractProblemLoader {
 		public ReplayResult(String status, List<Throwable> errors, Node node) {
 			this.status = status;
 			this.errors = errors;
-			this.node = node;
+			this.node = node;				
 		}
 
 		public Node getNode() {
@@ -122,7 +122,7 @@ public abstract class AbstractProblemLoader {
      * An optional boot class path.
      */
     private final File bootClassPath;
-
+    
     /**
      * The global includes to use.
      */
@@ -140,7 +140,7 @@ public abstract class AbstractProblemLoader {
 
     /**
      * {@code true} to call {@link UserInterfaceControl#selectProofObligation(InitConfig)}
-     * if no {@link Proof} is defined by the loaded proof or
+     * if no {@link Proof} is defined by the loaded proof or 
      * {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
      */
     private final boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
@@ -154,7 +154,7 @@ public abstract class AbstractProblemLoader {
      * {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
      */
     private final boolean forceNewProfileOfNewProofs;
-
+    
     /**
      * The instantiated {@link EnvInput} which describes the file to load.
      */
@@ -174,7 +174,7 @@ public abstract class AbstractProblemLoader {
      * The instantiate proof or {@code null} if no proof was instantiated during loading process.
      */
     private Proof proof;
-
+    
     /**
      * The {@link ReplayResult} if available or {@code null} otherwise.
      */
@@ -188,16 +188,16 @@ public abstract class AbstractProblemLoader {
      */
     private final static Map<Pair<Integer,Integer>,String> mismatchErrors;
     private final static Map<Integer,String> missedErrors;
-
+    
     static {
         // format: (expected, found)
         mismatchErrors = new HashMap<Pair<Integer, Integer>, String>();
-        //mismatchErrors.put(new Pair<Integer, Integer>(KeYLexer.SEMI, KeYLexer.COMMA), "there may be only one declaration per line");
-
+        mismatchErrors.put(new Pair<Integer, Integer>(KeYLexer.SEMI, KeYLexer.COMMA), "there may be only one declaration per line");
+        
         missedErrors = new HashMap<Integer, String>();
-        //missedErrors.put(KeYLexer.RPAREN, "closing parenthesis");
-        //missedErrors.put(KeYLexer.RBRACE, "closing brace");
-        //missedErrors.put(KeYLexer.SEMI, "semicolon");
+        missedErrors.put(KeYLexer.RPAREN, "closing parenthesis");
+        missedErrors.put(KeYLexer.RBRACE, "closing brace");
+        missedErrors.put(KeYLexer.SEMI, "semicolon");
     }
 
     /**
@@ -207,21 +207,15 @@ public abstract class AbstractProblemLoader {
      * @param bootClassPath An optional boot class path.
      * @param includes Optional includes to consider.
      * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
-     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs}
-     *                                          will be used as {@link Profile} of new proofs,
-     *                                          {@code false} {@link Profile} specified by problem
-     *                                          file will be used for new proofs.
+     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
      * @param control The {@link ProblemLoaderControl} to use.
-     * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true}
-     *        to call {@link UserInterfaceControl#selectProofObligation(InitConfig)} if no {@link Proof}
-     *        is defined by the loaded proof or {@code false} otherwise which still allows to work
-     *        with the loaded {@link InitConfig}.
+     * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call {@link UserInterfaceControl#selectProofObligation(InitConfig)} if no {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
      */
-    public AbstractProblemLoader(File file,
-                                 List<File> classPath,
+    public AbstractProblemLoader(File file, 
+                                 List<File> classPath, 
                                  File bootClassPath,
                                  List<File> includes,
-                                 Profile profileOfNewProofs,
+                                 Profile profileOfNewProofs, 
                                  boolean forceNewProfileOfNewProofs,
                                  ProblemLoaderControl control,
                                  boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
@@ -338,12 +332,12 @@ public abstract class AbstractProblemLoader {
                     final String genericMsg = "expected "+mte.expecting
                                     +", but found "+mte.c;
                     final String readable = mismatchErrors.get(new Pair<Integer, Integer>(mte.expecting,mte.c));
-                    final String msg = "Syntax error: "
+                    final String msg = "Syntax error: " 
                                     +(readable == null? genericMsg: readable)
                                     +" ("+mte.input.getSourceName()
                                     +":"+mte.line+")";
                     return new ProblemLoaderException(this, msg, mte);
-                }
+                } 
             }
         }
         // default
@@ -607,9 +601,14 @@ public abstract class AbstractProblemLoader {
         assert envInput instanceof KeYUserProblemFile;
         KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
 
-        Triple<String, Integer, Integer> script = kupf.readProofScript();
-        String path = kupf.getInitialFile().getAbsolutePath();
-        Location location = new Location(path, script.second, script.third);
+            Triple<String, Integer, Integer> script = kupf.readProofScript();
+        URL url = null;
+        try {
+            url = kupf.getInitialFile().toURI().toURL();
+        } catch (MalformedURLException e) {
+            throw new ProofInputException(e);
+        }
+        Location location = new Location(url, script.second, script.third);
 
         return new Pair<String, Location>(script.first, location);
     }
@@ -630,7 +629,7 @@ public abstract class AbstractProblemLoader {
         String status = "";
         List<Throwable> errors = new LinkedList<Throwable>();
         Node lastTouchedNode = proof.root();
-
+        
         IProofFileParser parser = null;
         IntermediateProofReplayer replayer = null;
         IntermediatePresentationProofFileParser.Result parserResult = null;
