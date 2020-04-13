@@ -1,205 +1,166 @@
 package org.key_project.proofmanagement.io;
 
-import java.io.IOException;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.key_project.proofmanagement.check.PathNode;
-import org.key_project.util.java.IOUtil;
 
-// TODO: this class should better use URLs and ZipFileSystem instead of extracting the zip to a
-//  temporary directory and using Paths
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
+
 /**
- * This class serves as an extractor to get the paths of specific files inside a proof bundle
- * (a zip containing possibly multiple *.proof/*.key files and corresponding source/classpath
- * files in a well defined directory structure).
+ * Provides methods to collect paths of files inside a proof bundle.
+ *
+ * @author Wolfram Pfeifer
  */
-public class ProofBundleHandler {
+public abstract class ProofBundleHandler implements AutoCloseable {
     /**
-     * A matcher matches *.proof files.
+     * This matcher matches *.proof files.
      */
-    private static final PathMatcher PROOF_MATCHER =
+    protected static final PathMatcher PROOF_MATCHER =
             FileSystems.getDefault().getPathMatcher("glob:**.proof");
-
     /**
-     * A matcher matches *.key files.
+     * This matcher matches *.key files.
      */
-    private static final PathMatcher KEY_MATCHER =
+    protected static final PathMatcher KEY_MATCHER =
             FileSystems.getDefault().getPathMatcher("glob:**.key");
-
     /**
      * This matcher matches *.java files.
      */
-    private static final PathMatcher SRC_MATCHER =
+    protected static final PathMatcher SRC_MATCHER =
             FileSystems.getDefault().getPathMatcher("glob:**.java");
-
     /**
      * This matcher matches *.java, *.class, *.zip, and *.jar files.
      */
-    private static final PathMatcher CLASSPATH_MATCHER =
+    protected static final PathMatcher CLASSPATH_MATCHER =
             FileSystems.getDefault().getPathMatcher("glob:**.{java,class,zip,jar}");
-
     /**
      * This matcher matches *.java files.
      */
-    private static final PathMatcher BOOTCLASSPATH_MATCHER =
+    protected static final PathMatcher BOOTCLASSPATH_MATCHER =
             FileSystems.getDefault().getPathMatcher("glob:**.java");
 
-    public Path getZipPath() {
-        return zipPath;
-    }
-
-    public Path zipName() {
-        return zipPath.getFileName();
-    }
-
-    private Path zipPath;
-    private boolean isInitialized = false;
-    private Path tmpDir;
+    /**
+     * Returns the name of the proof bundle.
+     * @return the name as a String
+     */
+    public abstract String getBundleName();
 
     /**
-     * Creates a new PackageHandler for the specified proof bundle.
-     * @param zipPath the path of the proof bundle (zip file)
+     * Returns the root path of the proof bundle.
+     * @return the path of the bundle
      */
-    public ProofBundleHandler(Path zipPath) {
-        this.zipPath = zipPath;
-    }
+    public abstract Path getBundlePath();
 
-    private void load() throws IOException {
-        if (!isInitialized) {
-            tmpDir = Files.createTempDirectory("KeY_PM_unzip");
-            IOUtil.extractZip(zipPath, tmpDir);
+    /**
+     * Returns a list of all paths to *.proof files in the bundle. Only *.proof files residing
+     * top-level in the bundle are considered.
+     * @return a list of paths to the *.proof files
+     * @throws IOException if the bundle can not be opened/accessed
+     */
+    public abstract List<Path> getProofFiles() throws IOException;
 
-            isInitialized = true;
+    /**
+     * Returns a list of all paths to *.key files in the bundle. Only *.key files residing
+     * top-level in the bundle are considered.
+     * @return a list of paths to the *.key files
+     * @throws IOException if the bundle can not be opened/accessed
+     */
+    public abstract List<Path> getKeYFiles() throws IOException;
+
+    /**
+     * Returns a list of all paths to Java source files in the bundle. Only *.java files residing
+     * inside the <code>src</code> subfolder are considered.
+     * @return a list of paths to the source files
+     * @throws IOException if the bundle can not be opened/accessed
+     */
+    public abstract List<Path> getSourceFiles() throws IOException;
+
+    /**
+     * Returns a list of all classpath files in the bundle. This includes only files inside the
+     * <code>classpath</code> subfolder. Considered file extensions are "java", "class",
+     * "zip" and "jar".
+     * @return a list of paths to the classpath files
+     * @throws IOException if the bundle can not be opened/accessed
+     */
+    public abstract List<Path> getClasspathFiles() throws IOException;
+
+    /**
+     * Returns a list of all bootclasspath files in the bundle. This includes only files inside the
+     * <code>bootclasspath</code> subfolder. The only file extension considered is "java".
+     * @return a list of paths to the bootclasspath files
+     * @throws IOException if the bundle can not be opened/accessed
+     */
+    public abstract List<Path> getBootclasspathFiles() throws IOException;
+
+    /**
+     * Returns a tree of the complete file hierarchy inside the bundle.
+     * @return the file tree of the bundle
+     * @throws IOException if the bundle can not be opened/accessed
+     */
+    public abstract PathNode getFileTree() throws IOException;
+
+    /**
+     * Creates a path to the entry with the given name inside the bundle.
+     * @param entryName the entry name inside the bundle
+     * @return the path of the entry
+     */
+    public abstract Path getPath(String entryName);
+
+    /**
+     * Static factory method to create a ProofBundleHandler based on the type of the proof bundle
+     * (zipped bundle or directory).
+     * @param root the path of the proof bundle
+     * @return a bundle handler suited for opening the type of proof bundle <code>root</code>
+     *  points to.
+     * @throws IOException if the bundle can not be opened/accessed
+     */
+    public static ProofBundleHandler createBundleHandler(Path root) throws IOException {
+        if (Files.isDirectory(root)) {
+            return new DirectoryProofBundleHandler(root);
+        } else {
+            return new ZipProofBundleHandler(root);
         }
-    }
-
-    // IMPORTANT: get... methods return paths to unzipped files!
-
-    private List<Path> getFiles(Path dir, PathMatcher matcher) throws IOException {
-        List<Path> files = new ArrayList<>();
-        if (Files.isDirectory(dir)) {
-            // IMPORTANT: use try-with-resources here to ensure the stream is closed and does not
-            //  prevent the files from deletion on Windows!
-            try (Stream<Path> stream = Files.list(dir)) {
-                files.addAll(stream.filter(matcher::matches)
-                                   .collect(Collectors.toList()));
-            }
-        }
-        return files;
-    }
-
-    // *.proof
-    public List<Path> getProofFiles() throws IOException {
-        // ensure the zip is extracted
-        load();
-
-        return getFiles(tmpDir, PROOF_MATCHER);
-    }
-
-    // *.key
-    public List<Path> getKeYFiles() throws IOException {
-        // ensure the zip is extracted
-        load();
-
-        return getFiles(tmpDir, KEY_MATCHER);
-    }
-
-    // *.java
-    public List<Path> getSourceFiles() throws IOException {
-        // ensure the zip is extracted
-        load();
-
-        Path srcPath = tmpDir.resolve(Paths.get("src"));
-        return getFiles(srcPath, SRC_MATCHER);
-    }
-
-    // *.java, *.class, *.zip, *.jar
-    public List<Path> getClasspathFiles() throws IOException {
-        // ensure the zip is extracted
-        load();
-
-        Path classpathPath = tmpDir.resolve(Paths.get("classpath"));
-        return getFiles(classpathPath, CLASSPATH_MATCHER);
-    }
-
-    // *.java
-    public List<Path> getBootclasspathFiles() throws IOException {
-        // ensure the zip is extracted
-        load();
-
-        Path bootclasspathPath = tmpDir.resolve(Paths.get("bootclasspath"));
-        return getFiles(bootclasspathPath, BOOTCLASSPATH_MATCHER);
-    }
-
-    public Path getDir() {
-        return tmpDir;
     }
 
     /**
-     * Deletes temporary content from disk.
+     * A FileVisitor for creating a file tree from the visited paths.
      */
-    public void dispose() {
-        try {
-            Files.walk(tmpDir)
-                    .sorted(Comparator.reverseOrder())
-                    .forEach(
-                        p -> {
-                            try {
-                                Files.delete(p);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    protected static class TreeFileVisitor extends SimpleFileVisitor<Path> {
+        /** the node corresponding the currently visited directory */
+        private PathNode current;
 
-    private static class TreeFileVisitor extends SimpleFileVisitor<Path> {
-
-        PathNode start;
-        PathNode current;
-
+        /**
+         * Create a new TreeFileVisitor with the given start node.
+         * @param start the root node of the tree
+         */
         public TreeFileVisitor(PathNode start) {
-            this.start = start;
             this.current = start;
         }
 
         @Override
-        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
             PathNode node = new PathNode(current, dir);
             current.addChild(node);
-            current = node;
+            current = node;                     // descend in tree
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
             PathNode node = new PathNode(current, file);
             current.addChild(node);
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-            current = current.getParent();
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+            current = current.getParent();      // ascend in tree
             return FileVisitResult.CONTINUE;
         }
-    }
-
-    public PathNode getFileTree() throws IOException {
-        load();
-
-        PathNode root = new PathNode(null, tmpDir);
-        Files.walkFileTree(tmpDir, new TreeFileVisitor(root));
-        // prevent double inclusion of root directory itself
-        // TODO: check why this is necessary
-        return (PathNode) root.getChildren().first();
     }
 }

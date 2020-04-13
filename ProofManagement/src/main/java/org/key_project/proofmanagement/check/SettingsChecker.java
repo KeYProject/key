@@ -33,7 +33,7 @@ public class SettingsChecker implements Checker {
     //TODO: Carry file info with the data to allow for good user feedback
     //TODO: Consistency Checker should work on a higher abstraction level and not handle files, do file handling separately (we'll also need to reuse that)
     @Override
-    public CheckerData check(List<Path> proofFiles, CheckerData data) {
+    public void check(List<Path> proofFiles, CheckerData data) throws ProofManagementException {
         data.addCheck("settings");
         data.print("Running settings checker ...");
 
@@ -51,7 +51,7 @@ public class SettingsChecker implements Checker {
             try {
                 proofSettings.add(f.readPreferences());
             } catch (ProofInputException e) {
-                data.print("Error: Proof settings could not be read from " + f
+                throw new ProofManagementException("Proof settings could not be read from " + f
                         + System.lineSeparator() + e.toString());
             }
         }
@@ -59,8 +59,6 @@ public class SettingsChecker implements Checker {
         if (!consistent(proofSettings)) {
             data.setConsistent(false);
         }
-
-        return data;
     }
 
     //TODO: SMT settings ignored for now! (strategy settings should be irrelevant)

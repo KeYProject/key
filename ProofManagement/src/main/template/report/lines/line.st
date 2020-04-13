@@ -1,4 +1,4 @@
-<tr>
+<tr class="blue">
     <td>$contract(data=data)$</td>
     <td><div title="$data.sourceFile$"> $data.shortSrc$ </div></td>
     <td><div title="$data.proofFile$"> $data.proofFile.fileName$ </div></td>

@@ -1,21 +1,23 @@
 package org.key_project.proofmanagement.check;
 
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
-import de.uka.ilkd.key.proof.io.EnvInput;
+import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.speclang.SLEnvInput;
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
+import org.key_project.proofmanagement.check.dependency.DependencyNode;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
-import org.key_project.util.java.IOUtil;
+import org.key_project.proofmanagement.io.LogLevel;
+import org.key_project.proofmanagement.io.Logger;
 
 import java.net.URL;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +32,11 @@ import java.util.Map;
  *
  * Note: This is a mutable data container!
  */
-public final class CheckerData {
+public final class CheckerData implements Logger {
+
+    public CheckerData(LogLevel minLogLevel) {
+        this.minLogLevel = minLogLevel;
+    }
 
     public String getCheckDate() {
         return checkDate;
@@ -41,18 +47,55 @@ public final class CheckerData {
 
     private final Map<String, String> checks = new HashMap<>();
 
+    /** minimum log level: all messages with a smaller LogLevel will be suppressed */
+    private final LogLevel minLogLevel;
+
     private final List<String> messages = new ArrayList<>();
+
+    /** unproven external (user provided) contracts */
+    private final List<Contract> unprovenExternal = new ArrayList<>();
+
+    /** unproven internal contracts (from classes shipped with KeY) */
+    private final List<Contract> unprovenInternal = new ArrayList<>();
+
+    /** fully proven contracts (including all dependencies) */
+    private final List<Contract> proven = new ArrayList<>();
+
+    /** proven contracts with lemmas/dependencies left unproven */
+    private final List<Contract> lemmasLeft = new ArrayList<>();
+
+    private final List<DependencyNode> missingMby = new ArrayList<>();
+    private final List<DependencyGraph.SCC> illegalCycles = new ArrayList<>();
+
+
+    public void addUnprovenContract(Contract c, boolean internal) {
+        if (internal) {
+            unprovenInternal.add(c);
+        } else {
+            unprovenExternal.add(c);
+        }
+    }
 
     // TODO: default value
     private boolean consistent = false;
     private ProofBundleHandler pbh;
     private PathNode fileTree;
-    private List<ProofLine> proofLines;
+    private final List<ProofEntry> proofEntries = new ArrayList<>();
     private DependencyGraph dependencyGraph;
+    private SLEnvInput slenv;
 
-    public static class ProofLine {
+    public SLEnvInput getSlenv() {
+        return slenv;
+    }
+
+    public void setSlenv(SLEnvInput slenv) {
+        this.slenv = slenv;
+    }
+
+    public static class ProofEntry {
+        public BranchNodeIntermediate rootNode;
         public Proof proof;
-        public EnvInput envInput;
+        public KeYUserProblemFile envInput;
         public ProblemInitializer problemInitializer;
         public Path proofFile;
         public Contract contract;
@@ -69,9 +112,18 @@ public final class CheckerData {
         return checks;
     }
 
+    @Override
     public void print(String message) {
-        messages.add(message);
-        System.out.println(message);
+        print(LogLevel.DEFAULT, message);
+    }
+
+    @Override
+    public void print(LogLevel level, String message) {
+        // suppress message if level is smaller than current log level
+        if (level.compareTo(minLogLevel) >= 0) {
+            messages.add(level + message);
+            System.out.println(level + message);
+        }
     }
 
     public List<String> getMessages() {
@@ -82,8 +134,8 @@ public final class CheckerData {
         return fileTree;
     }
 
-    public List<ProofLine> getProofLines() {
-        return proofLines;
+    public List<ProofEntry> getProofEntries() {
+        return proofEntries;
     }
 
     public DependencyGraph getDependencyGraph() {
@@ -108,10 +160,6 @@ public final class CheckerData {
 
     public void setFileTree(PathNode fileTree) {
         this.fileTree = fileTree;
-    }
-
-    public void setProofLines(List<ProofLine> proofLines) {
-        this.proofLines = proofLines;
     }
 
     public void setDependencyGraph(DependencyGraph dependencyGraph) {

@@ -79,8 +79,18 @@ td {
     text-align: left;
     padding-left: 10px;
     padding-right: 20px;
+}
+
+tr.blue {
     color: #284FA8;
     background-color: #DAE7FE;
+}
+
+td.SCCs {
+    text-align: left;
+    padding-left: 10px;
+    padding-right: 20px;
+    color: #284FA8;
 }
 
 thead.tableHead {

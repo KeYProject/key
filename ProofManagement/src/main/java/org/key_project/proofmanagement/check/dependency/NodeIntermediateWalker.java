@@ -2,12 +2,18 @@ package org.key_project.proofmanagement.check.dependency;
 
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 
+/**
+ * Walks an intermediate proof representation tree as created when loading a *.proof file.
+ *
+ * @author Jakob Laenge
+ * @author Wolfram Pfeifer
+ */
 public abstract class NodeIntermediateWalker {
-    /** the root the walker starts */
+    /** the root where the walker starts */
     private NodeIntermediate root;
 
-    /** create the Walker
-     * @param root the NodeIntermediate where to begin
+    /** create a walker starting from the given root
+     * @param root the root of the intermediate proof representation
      */
     public NodeIntermediateWalker(NodeIntermediate root) {
         this.root = root;
@@ -18,8 +24,8 @@ public abstract class NodeIntermediateWalker {
         walk(root);
     }
 
-    /** walks through the AST. While keeping track of the current node
-     * @param node the JavaProgramElement the walker is at 
+    /** walks the tree while performing specified action
+     * @param node the current position of the walker in tree
      */
     protected void walk(NodeIntermediate node) {
         doAction(node);
@@ -29,8 +35,7 @@ public abstract class NodeIntermediateWalker {
         }
     }
 
-    /** the action that is performed just before leaving the node the
-     * last time 
-     */
+    /** the action to be performed just before leaving the node the last time
+     * @param node the current position of the walker */
     protected abstract void doAction(NodeIntermediate node);
 }

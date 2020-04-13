@@ -53,11 +53,10 @@ public class FilesChecker {
     // counterpart in b (with same location and same content!)
     // However, both paths may contain additional unique files.
     private static boolean pathsConsistent(Path a, Path b, CheckedFunction<ProofBundleHandler, List<Path>> f) {
-        ProofBundleHandler pha = new ProofBundleHandler(a);
-        ProofBundleHandler phb = new ProofBundleHandler(b);
         List<Path> filesA = new ArrayList<>();
         List<Path> filesB = new ArrayList<>();
-        try {
+        try (ProofBundleHandler pha = ProofBundleHandler.createBundleHandler(a);
+             ProofBundleHandler phb = ProofBundleHandler.createBundleHandler(b)) {
             filesA = f.apply(pha);
             filesB = f.apply(phb);
 
@@ -65,32 +64,31 @@ public class FilesChecker {
             //if (filesA.size() != filesB.size()) {
             //    return false;
             //}
+
+            HashMap<Path, byte[]> mapA = new HashMap<>();
+            HashMap<Path, byte[]> mapB = new HashMap<>();
+            try {
+                for (Path p : filesA) {
+                    mapA.put(p, createMd5Checksum(p));
+                }
+                for (Path p : filesB) {
+                    mapB.put(p, createMd5Checksum(p));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // check if all files contained in both classpaths are equal
+            for (Path p : mapA.keySet()) {
+                if (mapB.containsKey(p) && !(Arrays.equals(mapA.get(p), mapB.get(p)))) {
+                    return false;
+                }
+            }
         } catch (IOException e1) {
             e1.printStackTrace();
-        }
-        HashMap<Path, byte[]> mapA = new HashMap<>();
-        HashMap<Path, byte[]> mapB = new HashMap<>();
-        try {
-            for (Path p : filesA) {
-                mapA.put(p, createMd5Checksum(p));
-            }
-            for (Path p : filesB) {
-                mapB.put(p, createMd5Checksum(p));
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // check if all files contained in both classpaths are equal
-        for (Path p : mapA.keySet()) {
-            if (mapB.containsKey(p) && !(Arrays.equals(mapA.get(p), mapB.get(p)))) {
-                return false;
-            }
-        }
-
-        // TODO: organize try-catch-finally blocks
-        pha.dispose();
-        phb.dispose();
 
         return true;
     }

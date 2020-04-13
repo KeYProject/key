@@ -9,12 +9,12 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.zip.ZipException;
 
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 import org.key_project.proofmanagement.check.*;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
+import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.report.Report;
 import org.key_project.proofmanagement.merge.ProofBundleMerger;
 
@@ -57,6 +57,7 @@ public class Main {
             + System.lineSeparator();
 
     private static CommandLine setUpCL() {
+        // TODO: check todos in CommandLine class
         CommandLine cl = new CommandLine();
         cl.addSubCommand("check");
         CommandLine check = cl.getSubCommandLine("check");
@@ -122,43 +123,56 @@ public class Main {
             commandLine.printUsage(System.out);
         }
 
-        Path bundlePath = Paths.get(arguments.get(0));
-        ProofBundleHandler pbh = new ProofBundleHandler(bundlePath);
-
-        List<Path> proofFiles = new ArrayList<>();
-        try {
-            proofFiles.addAll(pbh.getProofFiles());
-        } catch (ZipException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         // we accumulate results in this variable
-        CheckerData globalResult = new CheckerData();
-        globalResult.setConsistent(true);   // should be implicit
-        globalResult.setPbh(pbh);
+        CheckerData globalResult = new CheckerData(LogLevel.DEBUG);
+        Path bundlePath = Paths.get(arguments.get(0));
+        try (ProofBundleHandler pbh = ProofBundleHandler.createBundleHandler(bundlePath)) {
 
-        try {
-            // add file tree to result
-            globalResult.setFileTree(pbh.getFileTree());
+            try {
+                List<Path> proofFiles = pbh.getProofFiles();
 
-            // completeness check
-            globalResult = new MissingProofsChecker().check(proofFiles, globalResult);
-        } catch (IOException e) {
+                globalResult.setConsistent(true);   // should be implicit
+                globalResult.setPbh(pbh);
+
+                try {
+                    // add file tree to result
+                    globalResult.setFileTree(pbh.getFileTree());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    if (commandLine.isSet("--missing")) {
+                        new MissingProofsChecker().check(proofFiles, globalResult);
+                    }
+                    if (commandLine.isSet("--settings")) {
+                        new SettingsChecker().check(proofFiles, globalResult);
+                    }
+                    if (commandLine.isSet("--dependency")) {
+                        new DependencyChecker().check(proofFiles, globalResult);
+                    }
+                    if (commandLine.isSet("--replay")) {
+                        new ReplayChecker().check(proofFiles, globalResult);
+                    }
+                    globalResult.print("All checks done!");
+                    globalResult.print("Global result: ");
+                } catch (ProofManagementException e) {
+                    globalResult.print(LogLevel.ERROR, e.getMessage());
+                    globalResult.print("ProofManagment interrupted due to critical error.");
+                    globalResult.print("Generating report.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        if (commandLine.isSet("--settings")) {
-            globalResult = new SettingsChecker().check(proofFiles, globalResult);
-        }
-        if (commandLine.isSet("--dependency")) {
-            globalResult = new DependencyChecker().check(proofFiles, globalResult);
-        }
-        if (commandLine.isSet("--replay")) {
-            globalResult = new ReplayChecker().check(proofFiles, globalResult);
-        }
-        pbh.dispose();
+        // TODO: print overall report
+        //  proven contracts
+        //  contracts proven but missing dependencies
+        //  unproven
+        //  different settings
 
         if (commandLine.isSet("--report")) {
             String outFileName = commandLine.getString("--report", "");
@@ -166,10 +180,9 @@ public class Main {
             Report report = new Report(globalResult);
             report.setOutPath(output);
             try {
-                System.out.println(report.printReport());
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (URISyntaxException e) {
+                report.printReport();
+            } catch (IOException | URISyntaxException e) {
+                System.err.println("Error creating the report: ");
                 e.printStackTrace();
             }
         }

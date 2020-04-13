@@ -1,69 +1,78 @@
 package org.key_project.proofmanagement.check.dependency;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.speclang.Contract;
+import org.key_project.proofmanagement.check.CheckerData;
+import org.key_project.proofmanagement.io.Logger;
 
+import java.util.List;
+import java.util.Map;
+
+/**
+ * A builder providing a static factory method for building dependency graphs.
+ *
+ * @author Wolfram Pfeifer
+ */
 public abstract class DependencyGraphBuilder {
+    /**
+     * Builds a new DependencyGraph from the given proof entries.
+     * @param proofEntries the proof entries to build the graph from
+     * @param logger the logger to print out error messages generated during graph creation
+     * @return the newly created DependencyGraph
+     */
+    public static DependencyGraph buildGraph(List<CheckerData.ProofEntry> proofEntries,
+                                             Logger logger) {
 
-    public static DependencyGraph buildGraph(SpecificationRepository specRepo, List<Pair<String, BranchNodeIntermediate>> contractProofPairs) {
-
-        // create empty graph
         DependencyGraph graph = new DependencyGraph();
-        // create empty graph nodes
-        Map<String, DependencyNode> dependencyNodes = new HashMap<>();
 
-        for (Pair<String, BranchNodeIntermediate> currentContractProofPair : contractProofPairs) {
-            String c = currentContractProofPair.first;
+        // first create the nodes of the graph (one for each loaded proof)
+        for (CheckerData.ProofEntry line : proofEntries) {
 
-            //Contract contract = contractMap.lookup(c);
-            Contract contract = specRepo.getContractByName(c);
+            Proof proof = line.proof;
+            String contractName = proof.name().toString();
+            Services services = proof.getServices();
+            SpecificationRepository specRepo = services.getSpecificationRepository();
+            Contract contract = specRepo.getContractByName(contractName);
 
             // create fresh node for current contract
             DependencyNode node = new DependencyNode(contract);
-            // add node to graph
-            dependencyNodes.put(c, node);
-            // and the node map for later reference
             graph.addNode(node);
         }
 
         // add dependencies between nodes
-        for (Pair<String, BranchNodeIntermediate> currentContractProofPair : contractProofPairs) {
+        for (CheckerData.ProofEntry line : proofEntries) {
             // get current node and root of proof
-            DependencyNode currentDependencyNode = dependencyNodes.get(currentContractProofPair.first);
-            BranchNodeIntermediate currentIntermediateNode = currentContractProofPair.second;
+            Proof proof = line.proof;
+            DependencyNode currentNode = graph.getNodeByName(proof.name().toString());
+            BranchNodeIntermediate node = line.rootNode;
 
-            // collect all contracts referenced to in current proof
-            ContractApplicationCollector contractApplicationCollector = new ContractApplicationCollector(currentIntermediateNode, specRepo);
-            contractApplicationCollector.start();
-            Set<Pair<String, Modality>> dependentContracts = contractApplicationCollector.getResult();
+            // collect all contracts the current proof refers to
+            Services services = proof.getServices();
+            SpecificationRepository specRepo = services.getSpecificationRepository();
+            ContractAppCollector collector = new ContractAppCollector(node, proof, logger);
+            collector.start();
+            Map<String, DependencyGraph.EdgeType> dependentContracts = collector.getResult();
 
-            // add dependencies between nodes
-            for (Pair<String, Modality> currentDependent : dependentContracts) {
-                DependencyNode dependentNode = dependencyNodes.get(currentDependent.first);
+            // add actual dependency edges
+            for (String depName : dependentContracts.keySet()) {
+                DependencyNode dependentNode = graph.getNodeByName(depName);
 
-                // TODO: should these missing dependency nodes be created earlier (to ensure that their dependencies
-                //  are collected as well)?
+                // If no node for this contract exists, create one.
+                // This is the case for contracts that have no proof in bundle,
+                // particularly those from JavaRedux shipped with KeY.
                 if (dependentNode == null) {
-                    Contract contract = specRepo.getContractByName(currentDependent.first);
+                    Contract contract = specRepo.getContractByName(depName);
                     dependentNode = new DependencyNode(contract);
                     graph.addNode(dependentNode);
                 }
 
-                currentDependencyNode.addDependency(dependentNode, currentDependent.second);
+                // add edge
+                currentNode.addEdge(dependentNode, dependentContracts.get(depName));
             }
-            // add the freshly created node to the graph
-            graph.addNode(currentDependencyNode);
         }
-        // return the created graph
         return graph;
     }
-
 }

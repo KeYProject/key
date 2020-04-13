@@ -14,7 +14,7 @@
 </div>
 
 <div id="overview" class="tabcontent">
-    $/overview/overview(cd=checkerData, dataView=dataView)$
+$/overview/overview(cd=checkerData, dataView=dataView)$
 </div>
 
 <div id="files" class="tabcontent">

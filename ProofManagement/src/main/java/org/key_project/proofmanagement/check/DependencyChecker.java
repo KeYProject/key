@@ -1,141 +1,139 @@
 package org.key_project.proofmanagement.check;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-
-import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
 
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
-import org.key_project.proofmanagement.check.dependency.DependencyGraphBuilder;
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
-import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
-import de.uka.ilkd.key.proof.init.IPersistablePO;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
-import de.uka.ilkd.key.proof.io.IntermediatePresentationProofFileParser;
-import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.ProgressMonitor;
+import org.key_project.proofmanagement.check.dependency.DependencyNode;
+import org.key_project.proofmanagement.io.LogLevel;
 
+import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_SENSITIVE;
+
+/**
+ * Checks for illegal cyclic dependencies between proofs.<br>
+ * Algorithm description:
+ *  <ul>
+ *      <li>create the dependency graph:<br>
+ *          for each proof p
+ *          <ul>
+ *              <li>create a node containing the contract of p</li>
+ *              <li>create edges for proofs p depends on, i.e. to all contracts applied in p
+ *                  (operation contracts, dependency contracts, model method contract axioms)</li>
+ *              <li>for each edge store if termination has to be proven. This is the case if:
+ *                  <ul>
+ *                      <li>an operation contract has been applied under diamond modality or</li>
+ *                      <li>the applied contract is a dependency contract or</li>
+ *                      <li>a contract axiom for a model method has been applied</li>
+ *                  </ul>
+ *              </li>
+ *          </ul>
+ *      </li>
+ *      <li>calculate the strongly connected components (SCCs) of the graph (only considering
+ *          termination sensitive edges</li>
+ *      <li>check for each SCC that each contract has a decreases clause or all edges
+ *          are termination insensitive</li>
+ * </ul>
+ *
+ * Possible results are:
+ * <ul>
+ *      <li>no unsound dependencies</li>
+ *      <li>illegal cycle (termination arguments needed for contracts ...)</li>
+ * </ul>
+ *
+ * <b>Note:</b> We do not check if the contract actually is applicable (i.e. no box contract is
+ * applied inside a diamond modality). This can be checked by the replay checker.
+ *
+ * @author Wolfram Pfeifer
+ */
 public class DependencyChecker implements Checker {
-    /**
-     * The SpecificationRepository which is created when a proof is loaded.
-     */
-    private SpecificationRepository specRepo = null;
+
+    /** data container used to store checker result and share intermediate data
+     * (for example proof AST, dependency graph, ...) */
+    private CheckerData data;
 
     @Override
-    public CheckerData check(List<Path> proofFiles, CheckerData data) {
+    public void check(List<Path> proofFiles, CheckerData checkerData)
+            throws ProofManagementException {
+        this.data = checkerData;
         data.addCheck("dependency");
         data.print("Running dependency checker ...");
 
-        List<Pair<String, BranchNodeIntermediate>> contractProofPairs = new ArrayList<>();
-        try {
-            // for each proof: parse and construct intermediate AST
-            for (Path proofPath : proofFiles) {
-                CheckerData.ProofLine line = null;
-                for (CheckerData.ProofLine l : data.getProofLines()) {
-                    if (l.proofFile.equals(proofPath)) {
-                        line = l;
-                        break;
-                    }
-                }
-                if (line == null) {
-                    throw new RuntimeException("No matching proof line found!");
-                }
-                Pair<String, BranchNodeIntermediate> currentContractAndProof = loadProof(proofPath, line);
-                contractProofPairs.add(currentContractAndProof);
-            }
-            // construct dependency graph from proofs
-            // WARNING: the analysis as is currently implemented asserts there is exactly one proof for each contract!!!
-            DependencyGraph dependencyGraph = DependencyGraphBuilder.buildGraph(specRepo, contractProofPairs);
+        // for each proof: parse and construct intermediate AST
+        ProverService.ensureProofsLoaded(proofFiles, data);
 
-            data.setDependencyGraph(dependencyGraph);
+        // build dependency graph
+        ProverService.ensureDependencyGraphBuilt(data);
+        DependencyGraph graph = data.getDependencyGraph();
 
-            // check if graph contains illegal structures, e.g. cycles, unproven dependencies, ...
-            if (!dependencyGraph.isLegal()) {
-                // TODO: what exactly are the problems
-                //  and how can they be extracted?
-                data.setConsistent(false);
-            }
-        } catch (IOException | ProofInputException e) {
-            data.print("Error: Could not load proof! " + System.lineSeparator() + e.toString());
+        // check if graph contains illegal structures, e.g. cycles, unproven dependencies, ...
+        if (checkGraph(graph)) {
+            data.print(LogLevel.INFO, "No illegal dependencies found.");
+        } else {
+            data.print(LogLevel.INFO, "Illegal dependency found." +
+                    " Skipping further dependency checks.");
         }
-        return data;
     }
 
     /**
-     * Loads a proof from file without replaying it.
-     * @param path the path of the *.proof file.
-     * @return a pair of proof name (identifies the contract)
-     *          and the root node of the parsed proof tree.
-     * @throws IOException
-     * @throws ProofInputException
+     * Checks if the given graph is legal, i.e. has no unsound cyclic dependencies.
+     * @param graph the graph to check
+     * @return true iff the graph is legal
      */
-    public Pair<String, BranchNodeIntermediate> loadProof(Path path, CheckerData.ProofLine line) throws ProofInputException, IOException {
-        Profile profile = AbstractProfile.getDefaultProfile();
+    private boolean checkGraph(DependencyGraph graph) {
 
-        FileRepo fileRepo = new TrivialFileRepo();
-        fileRepo.setBaseDir(path);
+        for (DependencyGraph.SCC scc : graph.getAllSCCs()) {
+            // IMPORTANT: we do not check that the modalities inside a cycle match,
+            //  i.e. that from diamond modalities only "diamond" contracts are used ...
+            //  This (check that a rule is actually applicable) is the job of the replay checker!
 
-        ProgressMonitor control = ProgressMonitor.Empty.getInstance();
-
-        KeYUserProblemFile keyFile = new KeYUserProblemFile(path.getFileName().toString(),
-                path.toFile(), fileRepo, control, profile, false);
-        line.envInput = keyFile;    // store in CheckerData for later use (e.g. in ReplayChecker)
-
-        ProblemInitializer pi = new ProblemInitializer(control, new Services(profile),
-                new DefaultUserInterfaceControl());
-        pi.setFileRepo(fileRepo);
-        line.problemInitializer = pi;
-
-        InitConfig initConfig = pi.prepare(keyFile);
-        initConfig.setFileRepo(fileRepo);
-
-        String proofObligation = keyFile.getProofObligation();
-
-        // Load proof obligation settings
-        final Properties properties = new Properties();
-        properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
-        properties.setProperty(IPersistablePO.PROPERTY_FILENAME, path.toString());
-
-        LoadedPOContainer poContainer = FunctionalOperationContractPO.loadFrom(initConfig, properties);
-        ProofAggregate proofList = pi.startProver(initConfig, poContainer.getProofOblInput());
-
-        for (Proof p : proofList.getProofs()) {
-            // register proof
-            initConfig.getServices().getSpecificationRepository().registerProof(poContainer.getProofOblInput(), p);
+            if (!terminationInsensitive(scc) && !terminationEnsured(scc)) {
+                scc.setLegal(false);
+                return false;
+            }
         }
+        return true;
+    }
 
-        Proof proof = proofList.getProof(poContainer.getProofNum());
+    /**
+     * Checks if all edges inside the given SCC are termination insensitive.
+     * @param scc the given strongly connected component
+     * @return true iff all edges are termination insensitive
+     */
+    private boolean terminationInsensitive(DependencyGraph.SCC scc) {
+        // are all edges inside scc termination insensitive?
+        for (DependencyNode node : scc.getNodes()) {
+            for (DependencyGraph.EdgeType term : scc.internalEdges(node).values()) {
+                if (term == TERMINATION_SENSITIVE) {
+                    // found single termination sensitive contract application
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
-        IntermediatePresentationProofFileParser parser = null;
-
-        // set the SpecificationRepo (used in the ContractMap to get the contract from name)
-        specRepo = proof.getServices().getSpecificationRepository();
-
-        parser = new IntermediatePresentationProofFileParser(proof);
-        pi.tryReadProof(parser, keyFile);
-
-        /* WP: this works with my toy examples, but I don't know how the interplay with
-         * ProofAggregates with more than one element is.
-         * However, it is safer than reading from the filename. */
-        String contractString = proof.name().toString();
-
-        BranchNodeIntermediate proofTree = parser.getParsedResult();
-        return new Pair<>(contractString, proofTree);
+    /**
+     * Checks if all contracts in SCC have termination arguments (decreases/measured by clause).
+     * <br>
+     * <b>Note:</b> We do not check here that the decreases clause is actually proven/the proof
+     * is actually closed.
+     * @param scc the given strongly connected component
+     * @return true iff termination is ensured for all contracts in SCC
+     */
+    private boolean terminationEnsured(DependencyGraph.SCC scc) {
+        for (DependencyNode node : scc.getNodes()) {
+            for (DependencyNode next : scc.internalEdges(node).keySet()) {
+                // cycle is illegal if:
+                // edge is termination sensitive and target contract does not have mby
+                if (node.getDependencies().get(next) == TERMINATION_SENSITIVE
+                        && !next.getContract().hasMby()) {
+                    // TODO: print illegal SCC/cycle in a readable format
+                    data.print(LogLevel.WARNING, "Illegal cycle, contract has no termination"
+                            + " argument: " + node.getContract().getName());
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

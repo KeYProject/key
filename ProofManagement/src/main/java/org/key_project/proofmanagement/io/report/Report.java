@@ -8,6 +8,7 @@ import org.stringtemplate.v4.misc.STMessage;
 import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -80,7 +81,7 @@ public class Report {
         PathNode fileTree = dataView.getFileTree();
 
         st.add("checkerData", dataView.getCheckerData());
-        st.add("bundleFileName", fileTree == null ? null : fileTree.content);
+        st.add("bundleFileName", fileTree == null ? null : fileTree.getContent());
         st.add("treeRoot", fileTree);
         st.add("dataView", dataView);
         st.add("lines", dataView.getProofLines());

@@ -22,17 +22,17 @@ public class ProofBundleMerger {
                 FileSystem fs = FileSystems.newFileSystem(URI.create("jar:" + abs), env);
 
                 for (Path p : inputs) {
-                    ProofBundleHandler ph = new ProofBundleHandler(p);
-                    try {
+                    try (ProofBundleHandler ph = ProofBundleHandler.createBundleHandler(p)) {
                         List<Path> allJavaFiles = ph.getSourceFiles();
                         allJavaFiles.addAll(ph.getClasspathFiles());
                         allJavaFiles.addAll(ph.getBootclasspathFiles());
 
+                        /*
                         // merge sources from all packages
                         // TODO: possible problem with bootclasspath (implicit vs. explicit)
                         for (Path sourceFile : allJavaFiles) {
-                            Path rel = ph.getDir().relativize(sourceFile);
-                            Path internal = fs.getPath(rel.toString());
+                            //Path rel = ph.getDir().relativize(sourceFile);        TODO
+                            //Path internal = fs.getPath(rel.toString());
 
                             // skip existing (we know due to our previous check that its equal)
                             if (!Files.exists(internal)) {
@@ -43,20 +43,21 @@ public class ProofBundleMerger {
 
                         // add .proof files
                         for (Path proofFilePath : ph.getProofFiles()) {
-                            Path relativePath = ph.getDir().relativize(proofFilePath);
-                            Path newAbsolutePath = fs.getPath(relativePath.toString());
+                            //Path relativePath = ph.getDir().relativize(proofFilePath);   TODO
+                            //Path newAbsolutePath = fs.getPath(relativePath.toString());
                             // TODO: check that replace_existing is correct option
-                            Files.copy(proofFilePath, newAbsolutePath, StandardCopyOption.REPLACE_EXISTING);
+                            //Files.copy(proofFilePath, newAbsolutePath, StandardCopyOption.REPLACE_EXISTING);
                         }
 
                         // add .key files
                         for (Path keyFilePath : ph.getKeYFiles()) {
-                            Path relativePath = ph.getDir().relativize(keyFilePath);
-                            Path newAbsolutePath = fs.getPath(relativePath.toString());
-                            Files.copy(keyFilePath, newAbsolutePath);
+                            //Path relativePath = ph.getDir().relativize(keyFilePath);
+                            //Path newAbsolutePath = fs.getPath(relativePath.toString());      TODO
+                            //Files.copy(keyFilePath, newAbsolutePath);
                         }
-                    } finally {
-                        ph.dispose();
+                         */
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
                 fs.close();

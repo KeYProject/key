@@ -1,89 +1,138 @@
 package org.key_project.proofmanagement.check.dependency;
 
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
+import org.key_project.proofmanagement.io.Logger;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_SENSITIVE;
+
+/**
+ * Represents a node in the graph of dependencies between proofs/contracts.
+ * Use {@link DependencyGraphBuilder#buildGraph(List, Logger)} to build a graph.
+ *
+ * @author Wolfram Pfeifer
+ */
 public class DependencyNode {
-
+    /** the contract represented by this node */
     private Contract contract;
 
     /**
-     * Stores each contract used in the proof of the contract of this DependencyNode.
-     * Each used contract is mapped to the modality under which it was used.
-     * If a contract is used under different modalities, (TODO: possible?)
-     * only the strongest one (that one with termination, i.e. diamond) is stored.
-     * For dependency contracts, modality may be null as it is not relevant.
+     * Stores the outgoing edges of the node, i.e. target node and edge type
+     * (if edge is termination sensitive or not). The edge type is determined by the type of
+     * the contract (operation contract, dependency contract, model method axiom) and if it was
+     * applied under a box or diamond modality. If the same contract is applied under different
+     * modalities, only the strongest one (that one with termination, i.e. diamond)
+     * is stored.
      */
-    private final Map<DependencyNode, Modality> dependencies = new HashMap<>();
+    private final Map<DependencyNode, DependencyGraph.EdgeType> dependencies = new HashMap<>();
+
+    /** indicates if the node is on stack for Tarjan's algorithm */
+    private boolean onStack = false;
+
+    /** index of the node in Tarjan's algorithm */
+    private int index = -1;
+
+    /** id of the SCC the node belongs to (for Tarjan's algorithm) */
+    private int lowLink = 0;
+
+    /**
+     * Creates a new dependency node for the given contract.
+     * @param contract the contract represented by this node
+     */
+    public DependencyNode(Contract contract) {
+        this.contract = contract;
+    }
+
+    boolean isOnStack() {
+        return onStack;
+    }
+
+    void setOnStack(boolean onStack) {
+        this.onStack = onStack;
+    }
+
+    int getIndex() {
+        return index;
+    }
+
+    void setIndex(int index) {
+        this.index = index;
+    }
+
+    int getLowLink() {
+        return lowLink;
+    }
+
+    void setLowLink(int lowLink) {
+        this.lowLink = lowLink;
+    }
 
     public Contract getContract() {
         return contract;
     }
 
-    public Map<DependencyNode, Modality> getDependencies() {
+    public Map<DependencyNode, DependencyGraph.EdgeType> getDependencies() {
         return dependencies;
     }
 
-    // used for Tarjan algorithm
-    boolean onStack = false;
-    int index = -1;
-    int lowLink = 0;
-
-    // TODO: check if these are all problems that can arise
-    // and track details about the respective errors for outputting
-    public enum Status {
-        UNKNOWN, MISSING_PROOFS, MODALITY_CLASH, ILLEGAL_CYCLES, CORRECT
+    /**
+     * Filters the outgoing edges for those which are termination sensitive.
+     * @return all termination sensitive edges starting from this node
+     */
+    public Set<DependencyNode> getTermSensitiveDependencies() {
+        return dependencies.keySet()
+                           .stream()
+                           .filter(n -> dependencies.get(n) == TERMINATION_SENSITIVE)
+                           .collect(Collectors.toSet());
     }
 
-    // we keep this (later on we will need it for reporting)
-    //private Status status;
-    //private Set<FunctionalOperationContract> modalityClashes = new HashSet<>();
-    //private Set<List<Contract>> illegalCycles = new HashSet<>();
-
-    public DependencyNode(Contract contract) {
-        this.contract = contract;
-    }
-
-    public void addDependency(DependencyNode dependentNode, Modality modality) {
-        // TODO: does this work for dependency contracts?
-        Modality current = dependencies.get(dependentNode);
+    /**
+     * Adds a new edge from this node to the given target node.
+     * @param targetNode the target node of the edge
+     * @param edgeType the type of the edge to add
+     */
+    public void addEdge(DependencyNode targetNode, DependencyGraph.EdgeType edgeType) {
+        DependencyGraph.EdgeType current = dependencies.get(targetNode);
         if (current != null) {
-            // overwrite current modality only if the given wrong is stronger
-            if (!current.terminationSensitive()) {
-                dependencies.put(dependentNode, modality);
+            // overwrite current edge type only if the given one is stronger
+            if (current != TERMINATION_SENSITIVE) {
+                dependencies.put(targetNode, edgeType);
             }
         } else {
-            dependencies.put(dependentNode, modality);
+            dependencies.put(targetNode, edgeType);
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof DependencyNode) {
-            DependencyNode node = (DependencyNode) o;
-            if (node.contract.equals(contract)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    // TODO: equals and hashCode needed for HashMaps?
+//    @Override
+//    public boolean equals(Object o) {
+//        if (o instanceof DependencyNode) {
+//            DependencyNode node = (DependencyNode) o;
+//            if (node.contract.equals(contract)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     @Override
     public String toString() {
-        String result = "";
-        result = result + contract.getName() + " -> (";
+        StringBuilder result = new StringBuilder();
+        result.append(contract.getName()).append(" -> (");
         boolean first = true;
         for(DependencyNode currentNode : dependencies.keySet()) {
-            if (!first) result = result + " ";
-            result = result + currentNode.contract.getName();
+            if (!first) {
+                result.append(" ");
+            }
+            result.append(currentNode.contract.getName());
             first = false;
         }
-        result = result + ")";
-        return result;
+        result.append(")");
+        return result.toString();
     }
-
 }

@@ -6,7 +6,6 @@ import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class CheckerDataView {
     final CheckerData cd;
@@ -19,8 +18,8 @@ public class CheckerDataView {
         return cd.getFileTree();
     }
 
-    public List<CheckerData.ProofLine> getProofLines() {     // TODO: filter
-        return cd.getProofLines();
+    public List<CheckerData.ProofEntry> getProofLines() {     // TODO: filter
+        return cd.getProofEntries();
     }
 
     public DependencyGraph getDependencyGraph() {           // TODO: filter
