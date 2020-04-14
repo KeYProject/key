@@ -1111,8 +1111,8 @@ h3 {
 }
 
 .content {
-    padding: 2em 3em 0;
     margin-left: 25%;
+    padding: 2em 25% 0 3em;
 }
 
 .header {

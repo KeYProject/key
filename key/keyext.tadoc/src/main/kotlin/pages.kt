@@ -257,18 +257,18 @@ class FileVisitor(val self: String,
                 +ctx.category.text
             }
 
-            markdown(ctx.DOC_COMMENT)
+            ctx.maindoc.forEach { markdown(it)}
 
             printDefinition(ctx)
 
-            ctx.choice_option.forEachIndexed { i, co ->
+            ctx.optionDecl().forEachIndexed { i, co ->
                 val optsym = index.lookup(co)
                 div("doc option") {
                     h4 {
                         id = optsym?.anchor ?: ""
-                        +co.text
+                        +co.IDENT.text
                     }
-                    //TODO+ctx.DOC_COMMENT(i + 1).text
+                    markdown(co.DOC_COMMENT)
                 }
             }
         }
@@ -439,10 +439,20 @@ object Markdown {
             val text = doc.text
                     .trim('/', '!', '*')
                     .replace(regex, "")
+                    .replaceAll(replacements)
             unsafe { +renderer.render(parser.parse(text)) }
         }
     }
+
+    val replacements = listOf(
+            "@choiceDefaultOption" to "This is the default option.",
+            "@choiceUnsound" to """**This option is unsound**""",
+            "@choiceIncomplete" to """**This option is incomplete**"""
+    )
 }
+
+private fun String.replaceAll(replacements: List<Pair<String, String>>): String =
+        replacements.fold(this, {acc, pair -> acc.replace(pair.first, pair.second)})
 
 private fun Index.lookup(s: Any): Symbol? = this.find { it.ctx == s }
 

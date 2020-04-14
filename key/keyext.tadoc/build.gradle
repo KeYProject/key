@@ -12,6 +12,7 @@ dependencies {
     compile 'com.atlassian.commonmark:commonmark-ext-autolink:0.14.0'
     compile 'com.atlassian.commonmark:commonmark-ext-gfm-strikethrough:0.14.0'
     compile 'com.atlassian.commonmark:commonmark-ext-ins:0.14.0'
+    compile 'com.atlassian.commonmark:commonmark-ext-heading-anchor:0.14.0'
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.7.0.202003110725-r'
 }
 

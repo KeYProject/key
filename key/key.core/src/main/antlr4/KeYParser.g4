@@ -89,9 +89,12 @@ option_decls
 
 choice
 :
+  maindoc+=DOC_COMMENT*
   category=IDENT
-  (COLON LBRACE doc+=DOC_COMMENT? choice_option+=IDENT (COMMA doc+=DOC_COMMENT? choice_option+=IDENT)* RBRACE)?
+  (COLON LBRACE optionDecl (COMMA optionDecl)* RBRACE)?
 ;
+
+optionDecl: doc+=DOC_COMMENT? choice_option+=IDENT;
 
 sort_decls
 :
@@ -372,8 +375,6 @@ atom_prefix:
   | MINUS sub=atom_prefix                                   #unary_minus_term
   | bracket_term                                            #bbbbbb
 ;
-
-//update_term: (LBRACE parallel_term RBRACE)? bracket_term; // term ? bracket_term;
 bracket_term: primitive_term (bracket_suffix_heap)* attribute*;
 bracket_suffix_heap: brace_suffix (AT heap=term)?;
 brace_suffix:

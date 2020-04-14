@@ -165,8 +165,8 @@ class Indexer(val self: String, val index: Index) : KeYParserBaseVisitor<Unit>()
 
     override fun visitChoice(ctx: KeYParser.ChoiceContext) {
         index += Symbol.choiceCategory(self, ctx.category.text)
-        ctx.choice_option.forEach { co ->
-            index += Symbol.choiceOption(self, ctx.category.text, co.text, co)
+        ctx.optionDecl().forEach { co ->
+            index += Symbol.choiceOption(self, ctx.category.text, co.IDENT.text, co)
         }
     }
 

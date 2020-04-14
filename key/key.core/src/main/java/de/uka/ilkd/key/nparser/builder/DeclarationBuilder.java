@@ -85,7 +85,8 @@ public class DeclarationBuilder extends DefaultBuilder {
     public Object visitChoice(KeYParser.ChoiceContext ctx) {
         String cat = ctx.category.getText();
         //System.out.println("choice: " + cat);
-        for (Token catctx : ctx.choice_option) {
+        for (KeYParser.OptionDeclContext optdecl : ctx.optionDecl()) {
+            Token catctx = optdecl.IDENT;
             var name = cat + ":" + catctx.getText();
             Choice c = choices().lookup(new Name(name));
             if (c == null) {
