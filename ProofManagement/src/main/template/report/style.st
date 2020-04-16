@@ -75,10 +75,14 @@ th {
     text-align: left;
 }
 
+th.clickable {
+    cursor: pointer;
+}
+
 td {
     text-align: left;
-    padding-left: 10px;
-    padding-right: 20px;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
 tr.blue {

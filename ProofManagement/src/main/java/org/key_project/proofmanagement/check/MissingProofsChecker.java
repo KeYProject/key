@@ -15,9 +15,11 @@ import java.nio.file.Path;
 import java.util.*;
 
 /**
- * Checks that there exists a proof for every contract.
+ * Checks that there exists a closed proof for every contract.
  * Has to be combined with other checkers to ensure that the proofs are actually consistent
  * as well as correct.
+ *
+ * @author Wolfram Pfeifer
  */
 public class MissingProofsChecker implements Checker {
 
@@ -29,6 +31,8 @@ public class MissingProofsChecker implements Checker {
         ProverService.ensureProofsLoaded(proofFiles, data);
         ProverService.ensureSourceLoaded(data);
 
+        /* check that for all contracts found in Java source (in directory "src" in bundle)
+         * there is a closed proof */
         try {
             Profile profile = AbstractProfile.getDefaultProfile();
             ProgressMonitor control = ProgressMonitor.Empty.getInstance();
@@ -42,13 +46,18 @@ public class MissingProofsChecker implements Checker {
             Set<Contract> contracts = specRepo.getAllContracts().toSet();
             Set<Contract> copy = new HashSet<>(contracts);
 
-            List<Proof> foundProofs = new ArrayList<>();
+            List<Proof> closedProofs = new ArrayList<>();
             for (CheckerData.ProofEntry pl : data.getProofEntries()) {
-                foundProofs.add(pl.proof);
+                // TODO: proofs can only be closed if replayed
+                if (pl.proof != null && pl.proof.closed()) {
+                    closedProofs.add(pl.proof);
+                }
             }
 
-            // compare: Is there a proof for every contract?
-            for (Proof p : foundProofs) {
+            // TODO: proof categories? open/closed/started/not-replayed proofs?
+
+            // compare: Is there a closed proof for every contract?
+            for (Proof p : closedProofs) {
                 SpecificationRepository sr = p.getServices().getSpecificationRepository();
                 ContractPO cpo = sr.getPOForProof(p);
                 Contract foundContract = cpo.getContract();

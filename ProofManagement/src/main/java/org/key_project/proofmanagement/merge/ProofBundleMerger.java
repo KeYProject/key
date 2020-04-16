@@ -25,7 +25,7 @@ public class ProofBundleMerger {
                     try (ProofBundleHandler ph = ProofBundleHandler.createBundleHandler(p)) {
                         List<Path> allJavaFiles = ph.getSourceFiles();
                         allJavaFiles.addAll(ph.getClasspathFiles());
-                        allJavaFiles.addAll(ph.getBootclasspathFiles());
+                        //allJavaFiles.addAll(ph.getBootclasspath());
 
                         /*
                         // merge sources from all packages

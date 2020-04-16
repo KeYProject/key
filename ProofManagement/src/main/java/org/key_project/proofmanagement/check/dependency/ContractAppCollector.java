@@ -114,6 +114,24 @@ public class ContractAppCollector extends NodeIntermediateWalker {
         Services services = proof.getInitConfig().getServices();
         KeYJavaType classType = services.getJavaInfo().getKeYJavaType(className);
 
+        if (classType == null) {
+            // since className does not include package prefix, we have to search the complete list
+            Set<KeYJavaType> allTypes = services.getJavaInfo().getAllKeYJavaTypes();
+            for (KeYJavaType t : allTypes) {
+                if (t.getJavaType().getName().equals(className)) {
+                    // found match
+                    classType = t;
+                    break;
+                }
+            }
+
+            if (classType == null) {
+                // still no hit -> critical error
+                throw new NullPointerException("KeYJavaType still is null for class with name "
+                        + className);
+            }
+        }
+
         // get all class axioms of the class via SpecificationRepository, filter for name
         SpecificationRepository specRepo = proof.getServices().getSpecificationRepository();
         String axiomName = tacletApp.getRuleName().replace('_', ' ');
@@ -165,7 +183,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
             // in default case (e.g. legacy proofs without saved modality information)
             // we assume diamond modality but print a warning
             logger.print(LogLevel.WARNING, "No saved modality information was found!" +
-                    "Assuming \"diamond\" (incomplete for box contracts)!");
+                    " Assuming \"diamond\" (incomplete for box contracts)!");
             edgeType = TERMINATION_SENSITIVE;
         } else if (modality.terminationSensitive()) {
             edgeType = TERMINATION_SENSITIVE;

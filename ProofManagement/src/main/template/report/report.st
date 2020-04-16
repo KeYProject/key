@@ -24,7 +24,9 @@ $/overview/overview(cd=checkerData, dataView=dataView)$
 
 <div id="contracts" class="tabcontent">
     <h3>Contracts found inside proof bundle:</h3>
-    $/lines/lines(dataView=dataView, contracts=lines)$
+    $/lines/lines(cd=checkerData, dataView=dataView, contracts=lines)$
+    <h3>Settings comparison:</h3>
+    $/settings/settings(cd=checkerData)$
 </div>
 
 <div id="dependencies" class="tabcontent">
@@ -36,34 +38,6 @@ $/overview/overview(cd=checkerData, dataView=dataView)$
     $endif$
 </div>
 
-<script type="text/javascript">
-function openTab(evt, tabName) {
-    var i, tabcontent, tablinks;
+$script()$
 
-    tabcontent = document.getElementsByClassName("tabcontent");
-    for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-    }
-
-    tablinks = document.getElementsByClassName("tablinks");
-    for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
-
-    document.getElementById(tabName).style.display = "block";
-    evt.currentTarget.className += " active";
-}
-
-document.getElementById("defaultOpen").click()
-
-var toggler = document.getElementsByClassName("caret");
-var i;
-
-for (i = 0; i < toggler.length; i++) {
-	toggler[i].addEventListener("click", function() {
-		this.parentElement.querySelector(".nested").classList.toggle("active");
-		this.classList.toggle("caret-down");
-	});
-}
-</script>
 </body>

@@ -18,49 +18,58 @@ import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.report.Report;
 import org.key_project.proofmanagement.merge.ProofBundleMerger;
 
-public class Main {
-
-    /* CLI commands:
-     *  check [-s|--settings] [-d|--dependency] [-r|--report <out_path>] <bundle_path>
-     *    options:
-     *        -s --settings settings check
-     *        -d --dependency dependency check
-     *        -a --auto try to use automode to close open proofs
-     *        -e --explicit (implies a) stores automatically found proofs explicitly as files
-     *        -r --report generate html report + API
-     *        -c --completion check for completion state (have all POs been proven?)
-     *    checks that are always enabled:
-     *        - check for duplicate proofs of the same contracts
-     *    individually and independently trigger different checks
-     *  merge [-f|--force] [-n|--no-check] <bundle1> <bundle2> ... <output>
-     *    options:
-     *        -f --force merge the bundles even when the consistency check failed
-     *        -c --check "<check_options>" passes the given options to the check command and
-     *                  executes it
-     *  bundle [-c|--check]
-     *    options:
-     *        -c --check "<check_options>" passes the given options to the check command and
-     *                  executes it
-     */
-
+/**
+ * This is the starting class for ProofManagement.
+ * <br>
+ * CLI commands:
+ *  check [-s|--settings] [-d|--dependency] [-r|--report <out_path>] <bundle_path>
+ *    options:
+ *        -s --settings settings check
+ *        -d --dependency dependency check
+ *        -a --auto try to use automode to close open proofs
+ *        -e --explicit (implies a) stores automatically found proofs explicitly as files
+ *        -r --report generate html report + API
+ *        -c --completion check for completion state (have all POs been proven?)
+ *    checks that are always enabled:
+ *        - check for duplicate proofs of the same contracts
+ *    individually and independently trigger different checks
+ *  merge [-f|--force] [-n|--no-check] <bundle1> <bundle2> ... <output>
+ *    options:
+ *        -f --force merge the bundles even when the consistency check failed
+ *        -c --check "<check_options>" passes the given options to the check command and
+ *                  executes it
+ *  bundle [-c|--check]
+ *    options:
+ *        -c --check "<check_options>" passes the given options to the check command and
+ *                  executes it
+ *
+ * @author Wolfram Pfeifer
+ */
+public final class Main {
+    /** usage string for general pm command */
     private static final String USAGE = "Usage: pm <command>" + System.lineSeparator()
         + System.lineSeparator() + "available commands:" + System.lineSeparator()
         + "    check: Checks a single proof bundle for consistency." + System.lineSeparator()
         + "    merge: Merges two proof bundles." + System.lineSeparator();
 
+    /** usage string for check subcommand */
     private static final String USAGE_CHECK =
         "pm check [-s|--settings] [-d|--dependency] [-f|--files] [-r|--report <out_path>]" +
             "<bundle_path>" + System.lineSeparator();
 
+    /** usage string for merge subcommand */
     private static final String USAGE_MERGE =
         "pm merge [-f|--force] [-n|--no-check] <bundle1> <bundle2> ... <output>"
             + System.lineSeparator();
 
-    private static CommandLine setUpCL() {
+    /** command line of proof management */
+    private static final CommandLine CL;
+
+    static {
         // TODO: check todos in CommandLine class
-        CommandLine cl = new CommandLine();
-        cl.addSubCommand("check");
-        CommandLine check = cl.getSubCommandLine("check");
+        CL = new CommandLine();
+        CL.addSubCommand("check");
+        CommandLine check = CL.getSubCommandLine("check");
         check.addOption("--settings", null, "Enables check for consistent proof settings");
         check.addOption("--dependency", null, "Enables check for cyclic dependencies");
         check.addOption("--files", null, "Enables check for compatible files");
@@ -70,35 +79,39 @@ public class Main {
         check.addOption("--explicit", null, "Makes automatically found proofs explicit (implies --auto).");
         check.addOption("--report", "out_path", "Writes the report to a HTML file at the given path");
 
-        cl.addSubCommand("merge");
-        CommandLine merge = cl.getSubCommandLine("merge");
+        CL.addSubCommand("merge");
+        CommandLine merge = CL.getSubCommandLine("merge");
         merge.addOption("--force", null, "Tries to merge the proof bundles even if the files check fails (may rename some files). Only use if you know what you are doing!");
         merge.addOption("--check", "check_arguments", "Performs a check after successful merge. The arguments are passed too check");
 
         // enable check option forwarding for merge command
         merge.addSubCommand("check");
-        CommandLine merge_check = merge.getSubCommandLine("check");
-        merge_check.addOption("--settings", null, "Enables check for consistent proof settings");
-        merge_check.addOption("--dependency", null, "Enables check for cyclic dependencies");
-        merge_check.addOption("--files", null, "Enables check for compatible files");
-        merge_check.addOption("--report", "out_path", "Writes the report to a HTML file at the given path");
+        CommandLine mergeCheck = merge.getSubCommandLine("check");
+        mergeCheck.addOption("--settings", null, "Enables check for consistent proof settings");
+        mergeCheck.addOption("--dependency", null, "Enables check for cyclic dependencies");
+        mergeCheck.addOption("--files", null, "Enables check for compatible files");
+        mergeCheck.addOption("--report", "out_path", "Writes the report to a HTML file at the given path");
 
         // TODO: bundle subcommand
-        cl.addSubCommand("bundle");
-
-        return cl;
+        CL.addSubCommand("bundle");
     }
 
+    private Main() {
+    }
+
+    /**
+     * Main entry point for ProofManagement.
+     * @param args the commandline arguments. See class JavaDoc for a detailed description.
+     */
     public static void main(String[] args) {
         try {
-            CommandLine cl = setUpCL();
-            cl.parse(args);
-            if (cl.subCommandUsed("check")) {
-                check(cl.getSubCommandLine("check"));
-            } else if (cl.subCommandUsed("merge")) {
-                merge(cl.getSubCommandLine("merge"));
-            } else if (cl.subCommandUsed("bundle")) {
-                bundle(cl.getSubCommandLine("bundle"));
+            CL.parse(args);
+            if (CL.subCommandUsed("check")) {
+                check(CL.getSubCommandLine("check"));
+            } else if (CL.subCommandUsed("merge")) {
+                merge(CL.getSubCommandLine("merge"));
+            } else if (CL.subCommandUsed("bundle")) {
+                bundle(CL.getSubCommandLine("bundle"));
             }
         } catch (CommandLineException e) {
             e.printStackTrace();
@@ -134,12 +147,8 @@ public class Main {
                 globalResult.setConsistent(true);   // should be implicit
                 globalResult.setPbh(pbh);
 
-                try {
-                    // add file tree to result
-                    globalResult.setFileTree(pbh.getFileTree());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                // add file tree to result
+                globalResult.setFileTree(pbh.getFileTree());
 
                 try {
                     if (commandLine.isSet("--missing")) {

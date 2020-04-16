@@ -90,12 +90,12 @@ public abstract class ProofBundleHandler implements AutoCloseable {
     public abstract List<Path> getClasspathFiles() throws IOException;
 
     /**
-     * Returns a list of all bootclasspath files in the bundle. This includes only files inside the
-     * <code>bootclasspath</code> subfolder. The only file extension considered is "java".
-     * @return a list of paths to the bootclasspath files
+     * Returns the bootclasspath of the bundle. This is the <code>bootclasspath</code> subfolder,
+     * if it exists. Otherwise null is returned.
+     * @return the bootclasspath or null, if none is specified
      * @throws IOException if the bundle can not be opened/accessed
      */
-    public abstract List<Path> getBootclasspathFiles() throws IOException;
+    public abstract Path getBootclasspath() throws IOException;
 
     /**
      * Returns a tree of the complete file hierarchy inside the bundle.

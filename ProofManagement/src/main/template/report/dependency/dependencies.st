@@ -1,8 +1,8 @@
-<table>
+<table id="depTable">
     <thead class="tableHead">
     <tr>
-        <th>Proof</th>
-        <th>SCC</th>
+        <th class="clickable" onclick="sortTable('depTable', 0, 1)">Proof</th>
+        <th class="clickable" onclick="sortTable('depTable', 1, 1)">SCC</th>
         <th></th>
         <th>Dependencies</th>
     </tr>

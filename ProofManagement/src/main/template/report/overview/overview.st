@@ -11,7 +11,7 @@
                         font-size:16px;
                         width:max-content;">
                 <pre style="margin: 10pt">
-$cd.messages; separator=dataView.lineSeparator$
+$cd.messages; separator=dataView.lineSeparator, format="xml-encode"$
                 </pre>
             </div>
         </li>

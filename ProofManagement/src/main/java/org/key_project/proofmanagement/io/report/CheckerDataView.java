@@ -7,7 +7,7 @@ import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 import java.util.List;
 import java.util.Map;
 
-public class CheckerDataView {
+public class CheckerDataView { //implements InvocationHandler {
     final CheckerData cd;
 
     public CheckerDataView(CheckerData cd) {
@@ -37,4 +37,18 @@ public class CheckerDataView {
     public String lineSeparator() {
         return System.lineSeparator();
     }
+
+    /*
+    public List<String> choices() {
+
+        return cd.get
+    }*/
+
+    /*
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        // TODO: delegate method to cd if not found here
+        return null;
+    }
+    */
 }

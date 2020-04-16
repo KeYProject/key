@@ -46,7 +46,8 @@ public class FilesChecker {
     }
 
     private static boolean bootclasspathsConsistent(Path a, Path b) {
-        return pathsConsistent(a, b, ProofBundleHandler::getBootclasspathFiles);
+        return false;
+        //return pathsConsistent(a, b, ProofBundleHandler::getBootclasspath);
     }
 
     // two paths are considered consistent if all files (recursively) inside pathA have a

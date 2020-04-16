@@ -87,9 +87,9 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
-    public List<Path> getBootclasspathFiles() throws IOException {
+    public Path getBootclasspath() throws IOException {
         //return getFiles(fs.getPath("/bootclasspath"), ProofBundleHandler.BOOTCLASSPATH_MATCHER);
-        return dbh.getBootclasspathFiles();
+        return dbh.getBootclasspath();
     }
 
     @Override

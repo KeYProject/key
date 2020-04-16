@@ -2,13 +2,19 @@ package org.key_project.proofmanagement.io.report;
 
 import org.key_project.proofmanagement.check.CheckerData;
 import org.key_project.proofmanagement.check.PathNode;
-import org.stringtemplate.v4.*;
+import org.stringtemplate.v4.Interpreter;
+import org.stringtemplate.v4.NumberRenderer;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STErrorListener;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STRawGroupDir;
+import org.stringtemplate.v4.StringRenderer;
+import org.stringtemplate.v4.misc.MapModelAdaptor;
 import org.stringtemplate.v4.misc.ObjectModelAdaptor;
 import org.stringtemplate.v4.misc.STMessage;
 import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -16,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 public class Report {
     private final CheckerDataView dataView;
@@ -51,6 +58,24 @@ public class Report {
                 return super.getProperty(interp, self, o, property, propertyName);
             }
         });
+
+        // provide access to entrySet property of Maps
+        group.registerModelAdaptor(Map.class, new MapModelAdaptor() {
+            @Override
+            public Object getProperty(Interpreter interp, ST self, Object o, Object property, String propertyName)
+                    throws STNoSuchPropertyException {
+                Map<?, ?> map = (Map<?, ?>) o;
+                if (property.equals("entrySet")) {
+                    return map.entrySet();
+                }
+                return super.getProperty(interp, self, o, property, propertyName);
+            }
+        });
+
+        // StringRenderer to escape special HTML chars, for example in java.lang.Object::<inv>
+        group.registerRenderer(String.class, new StringRenderer());
+        // NumberRenderer to allow for format strings such as %02d
+        group.registerRenderer(Number.class, new NumberRenderer());
 
         // register listeners to get error output on console
         group.setListener(new STErrorListener() {

@@ -5,6 +5,8 @@ import java.util.List;
 
 /**
  * Checks that all files stored in the bundle can successfully be replayed.
+ *
+ * @author Wolfram Pfeifer
  */
 public class ReplayChecker implements Checker {
 

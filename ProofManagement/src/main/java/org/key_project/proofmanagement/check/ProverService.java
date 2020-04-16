@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -16,10 +17,12 @@ import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.IntermediatePresentationProofFileParser;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
+import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -31,12 +34,17 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 import org.key_project.proofmanagement.check.dependency.DependencyGraphBuilder;
+import org.key_project.proofmanagement.io.LogLevel;
+import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
+import org.key_project.util.reflection.ClassLoaderUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -78,9 +86,21 @@ public final class ProverService {
     public static void ensureProofsLoaded(List<Path> proofPaths, CheckerData data) throws ProofManagementException {
         try {
             // for each proof: parse and construct intermediate AST
-            for (Path proofPath : proofPaths) {
+            Iterator<Path> iterator = proofPaths.iterator();
+            //for (Path proofPath : proofPaths) {
+            while (iterator.hasNext()) {
+                Path proofPath = iterator.next();
                 CheckerData.ProofEntry line = ensureProofEntryExists(proofPath, data);
-                loadProofTree(proofPath, line);
+                // only load every line once
+                if (!line.loaded) {
+                    if (!loadProofTree(proofPath, line, data)) {
+                        // remove invalid line (e.g. from taclet proof)
+                        data.getProofEntries().remove(line);
+                        // TODO: code quality (hidden side effect):
+                        //  modifies given list of paths to check
+                        iterator.remove();
+                    }
+                }
             }
         } catch (IOException | ProofInputException e) {
             throw new ProofManagementException("Could not load proof! " + System.lineSeparator() + e.toString());
@@ -90,7 +110,7 @@ public final class ProverService {
     private static CheckerData.ProofEntry ensureProofEntryExists(Path proofPath, CheckerData data) {
         CheckerData.ProofEntry line = findProofLine(proofPath, data);
         if (line == null) {
-            line = new CheckerData.ProofEntry();
+            line = data.new ProofEntry();
             data.getProofEntries().add(line);
         }
         return line;
@@ -105,10 +125,17 @@ public final class ProverService {
         return null;
     }
 
-    private static void loadProofTree(Path path, CheckerData.ProofEntry line) throws ProofInputException, IOException {
+    private static boolean loadProofTree(Path path, CheckerData.ProofEntry line, Logger logger) throws ProofInputException, IOException {
 
+        logger.print(LogLevel.DEBUG, "Loading proof from " + path);
         line.proofFile = path;
         Proof[] proofs = loadProofFile(path, line);
+
+        // TODO: ignore taclet proofs
+        if (proofs == null || proofs.length == 0) {
+            logger.print(LogLevel.DEBUG, "Ignoring taclet proof from " + path);
+            return false;
+        }
 
         // TODO: what if poContainer contains multiple proofs?
         //Proof proof = proofList.getProof(poContainer.getProofNum());
@@ -122,6 +149,9 @@ public final class ProverService {
         pi.tryReadProof(parser, keyFile);
 
         line.rootNode = parser.getParsedResult();
+        line.loaded = true;
+        logger.print(LogLevel.DEBUG, "... loading done!");
+        return true;
     }
 
     private static Proof[] loadProofFile(Path path, CheckerData.ProofEntry line) throws ProofInputException, IOException {
@@ -133,26 +163,42 @@ public final class ProverService {
 
         ProgressMonitor control = ProgressMonitor.Empty.getInstance();
 
+        /////////////////// comparison to AbstractProblemLoader load
+        /////////////////// createEnvInput
         KeYUserProblemFile keyFile = new KeYUserProblemFile(path.getFileName().toString(),
                 path.toFile(), fileRepo, control, profile, false);
         line.envInput = keyFile;    // store in CheckerData for later use (e.g. in ReplayChecker)
+
+        /////////////////// createEnvInput
+        // TODO: do we need this?
+        profile = keyFile.getProfile() == null ? profile : keyFile.getProfile();
 
         ProblemInitializer pi = new ProblemInitializer(control, new Services(profile),
                 new DefaultUserInterfaceControl());
         pi.setFileRepo(fileRepo);
         line.problemInitializer = pi;
 
+        ///////////////////
         InitConfig initConfig = pi.prepare(keyFile);
         initConfig.setFileRepo(fileRepo);
 
+        /////////////////// createProofObligationContainer
         String proofObligation = keyFile.getProofObligation();
 
         // Load proof obligation settings
         final Properties properties = new Properties();
         properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
         properties.setProperty(IPersistablePO.PROPERTY_FILENAME, path.toString());
+        //properties.setProperty("contract",keyFile.chooseContract());
 
-        IPersistablePO.LoadedPOContainer poContainer = FunctionalOperationContractPO.loadFrom(initConfig, properties);
+        if (keyFile instanceof KeYFile) {
+            KeYFile key = (KeYFile)keyFile;
+            //proofObligation = keyFile.getProofObligation();
+        }
+        //IPersistablePO.LoadedPOContainer poContainer = FunctionalOperationContractPO.loadFrom(initConfig, properties);
+
+        // more generic version (works e.g. for taclet proofs)
+        IPersistablePO.LoadedPOContainer poContainer = createProofObligationContainer(keyFile, initConfig, properties);
 
         ProofAggregate proofList = pi.startProver(initConfig, poContainer.getProofOblInput());
         for (Proof p : proofList.getProofs()) {
@@ -164,7 +210,13 @@ public final class ProverService {
 
         Proof proof = proofList.getFirstProof();
         SpecificationRepository specRepo = initConfig.getServices().getSpecificationRepository();
-        Contract contract = specRepo.getContractPOForProof(proof).getContract();
+        ContractPO contractPO = specRepo.getContractPOForProof(proof);
+        if (contractPO == null) {
+            // happens for taclet proofs (they have no contract)
+            // TODO: currently we ignore taclet proofs
+            return null;
+        }
+        Contract contract = contractPO.getContract();
         line.contract = contract;
         Type type = contract.getTarget().getContainerType().getJavaType();
         if (type instanceof JavaSourceElement) {
@@ -175,6 +227,76 @@ public final class ProverService {
         }
 
         return proofList.getProofs();
+    }
+
+    // TODO: adapted copy from AbstractProblemLoader
+    /**
+     * Creates a {@link IPersistablePO.LoadedPOContainer} if available which contains
+     * the {@link ProofOblInput} for which a {@link Proof} should be instantiated.
+     * @return The {@link IPersistablePO.LoadedPOContainer} or {@code null} if not available.
+     * @throws IOException Occurred Exception.
+     */
+    protected static IPersistablePO.LoadedPOContainer createProofObligationContainer(KeYFile keyFile, InitConfig initConfig, Properties properties) throws IOException {
+        final String chooseContract;
+        final String proofObligation;
+        //if (envInput instanceof KeYFile) {
+        //    KeYFile keyFile = (KeYFile)envInput;
+            chooseContract = keyFile.chooseContract();
+            proofObligation = keyFile.getProofObligation();
+        //}
+        //else {
+        //    chooseContract = null;
+        //    proofObligation = null;
+        //}
+        // Instantiate proof obligation
+        if (keyFile instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
+            return new IPersistablePO.LoadedPOContainer((ProofOblInput)keyFile);
+        }
+        else if (chooseContract != null && chooseContract.length() > 0) {
+            int proofNum = 0;
+            String baseContractName = null;
+            int ind = -1;
+            for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
+                ind = chooseContract.indexOf("." + tag);
+                if (ind > 0) {
+                    break;
+                }
+                proofNum++;
+            }
+            if (ind == -1) {
+                baseContractName = chooseContract;
+                proofNum = 0;
+            }
+            else {
+                baseContractName = chooseContract.substring(0, ind);
+            }
+            final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
+            if (contract == null) {
+                throw new RuntimeException("Contract not found: " + baseContractName);
+            }
+            else {
+                return new IPersistablePO.LoadedPOContainer(contract.createProofObl(initConfig), proofNum);
+            }
+        }
+        else if (proofObligation != null && proofObligation.length() > 0) {
+
+            String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
+            if (poClass == null || poClass.isEmpty()) {
+                throw new IOException("Proof obligation class property \"" + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
+            }
+            try {
+                // Try to instantiate proof obligation by calling static method: public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException
+                Class<?> poClassInstance = ClassLoaderUtil.getClassforName(poClass);
+                Method loadMethod = poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
+                return (IPersistablePO.LoadedPOContainer)loadMethod.invoke(null, initConfig, properties);
+            }
+            catch (Exception e) {
+                throw new IOException("Can't call static factory method \"loadFrom\" on class \"" + poClass + "\".", e);
+            }
+        }
+        else {
+            return null;
+        }
     }
 
     /**
@@ -296,8 +418,8 @@ public final class ProverService {
                         .collect(Collectors.toList());
             }
             File bcp = null;
-            if (!pbh.getBootclasspathFiles().isEmpty()) {
-                bcp = pbh.getPath("bcp").toFile();
+            if (pbh.getBootclasspath() != null) {
+                bcp = pbh.getBootclasspath().toFile();
             }
 
             Profile profile = AbstractProfile.getDefaultProfile();

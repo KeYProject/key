@@ -1,11 +1,11 @@
 package org.key_project.proofmanagement.check;
 
-import java.nio.file.Path;
-import java.util.List;
-
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 import org.key_project.proofmanagement.check.dependency.DependencyNode;
 import org.key_project.proofmanagement.io.LogLevel;
+
+import java.nio.file.Path;
+import java.util.List;
 
 import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_SENSITIVE;
 
@@ -127,9 +127,9 @@ public class DependencyChecker implements Checker {
                 // edge is termination sensitive and target contract does not have mby
                 if (node.getDependencies().get(next) == TERMINATION_SENSITIVE
                         && !next.getContract().hasMby()) {
-                    // TODO: print illegal SCC/cycle in a readable format
-                    data.print(LogLevel.WARNING, "Illegal cycle, contract has no termination"
+                    data.print(LogLevel.WARNING, "Illegal cycle/SCC, contract has no termination"
                             + " argument: " + node.getContract().getName());
+                    data.print(LogLevel.WARNING, "The illegal SCC is: " + scc);
                     return false;
                 }
             }
