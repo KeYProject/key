@@ -1,4 +1,5 @@
 <head>
+    <meta charset="UTF-8">
     <style type="text/css">
         $style()$
     </style>
@@ -14,7 +15,7 @@
 </div>
 
 <div id="overview" class="tabcontent">
-$/overview/overview(cd=checkerData, dataView=dataView)$
+$/overview/overview(cd=checkerData)$
 </div>
 
 <div id="files" class="tabcontent">
@@ -23,8 +24,10 @@ $/overview/overview(cd=checkerData, dataView=dataView)$
 </div>
 
 <div id="contracts" class="tabcontent">
-    <h3>Contracts found inside proof bundle:</h3>
-    $/lines/lines(cd=checkerData, dataView=dataView, contracts=lines)$
+    <h3>Contracts with proof inside bundle:</h3>
+    $/lines/lines(cd=checkerData, entries=entries)$
+    <h3>Contracts declared inside bundle without proof:</h3>
+    $/lines/prooflessContracts(cd=checkerData)$
     <h3>Settings comparison:</h3>
     $/settings/settings(cd=checkerData)$
 </div>

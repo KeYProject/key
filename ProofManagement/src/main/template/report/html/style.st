@@ -51,10 +51,11 @@ ul, #fileTree {
     color: black;
     display: inline-block;
     margin-right: 6px;
+    transform: rotate(90deg);
 }
 
 .caret-down::before {
-    transform: rotate(90deg);
+    transform: rotate(0deg);
 }
 
 .nested {
@@ -107,4 +108,9 @@ thead.tableHead {
     white-space: nowrap;
     padding-left: 4px;
     padding-right: 4px;
+}
+
+#messages span {
+    display: block;
+    white-space: pre;
 }

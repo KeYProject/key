@@ -46,7 +46,7 @@ public class DependencyGraph {
         private boolean legal = true;
 
         /** nodes the SCC consists of */
-        private Set<DependencyNode> nodes = new HashSet<>();
+        private final Set<DependencyNode> nodes = new HashSet<>();
 
         /**
          * Creates a new SCC with the given id.
@@ -111,7 +111,7 @@ public class DependencyGraph {
     private Set<SCC> allSCCs = null;
 
     /** maps each dependency node to the SCC it corresponds to */
-    private Map<DependencyNode, SCC> node2SCC = new HashMap<>();
+    private final Map<DependencyNode, SCC> node2SCC = new HashMap<>();
 
     /** index for Tarjan's algorithm */
     private int index = 0;

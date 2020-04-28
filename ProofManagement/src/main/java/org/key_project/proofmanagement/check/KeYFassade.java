@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.IntermediatePresentationProofFileParser;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
@@ -44,6 +45,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,9 +57,9 @@ import java.util.stream.Collectors;
  *
  * @author Wolfram Pfeifer
  */
-public final class ProverService {
+public final class KeYFassade {
     // prevents from instantiating this class
-    private ProverService() {
+    private KeYFassade() {
     }
 
     /**
@@ -83,7 +85,8 @@ public final class ProverService {
      * @param data the CheckerData object to store the result
      * @throws ProofManagementException
      */
-    public static void ensureProofsLoaded(List<Path> proofPaths, CheckerData data) throws ProofManagementException {
+    public static void ensureProofsLoaded(CheckerData data) throws ProofManagementException {
+        List<Path> proofPaths = data.getProofPaths();
         try {
             // for each proof: parse and construct intermediate AST
             Iterator<Path> iterator = proofPaths.iterator();
@@ -92,7 +95,7 @@ public final class ProverService {
                 Path proofPath = iterator.next();
                 CheckerData.ProofEntry line = ensureProofEntryExists(proofPath, data);
                 // only load every line once
-                if (!line.loaded) {
+                if (line.loadingState == CheckerData.LoadingState.UNKNOWN) {
                     if (!loadProofTree(proofPath, line, data)) {
                         // remove invalid line (e.g. from taclet proof)
                         data.getProofEntries().remove(line);
@@ -103,6 +106,7 @@ public final class ProverService {
                 }
             }
         } catch (IOException | ProofInputException e) {
+            // TODO: exception handling: better not throw exceptions, but print to log and continue
             throw new ProofManagementException("Could not load proof! " + System.lineSeparator() + e.toString());
         }
     }
@@ -125,7 +129,8 @@ public final class ProverService {
         return null;
     }
 
-    private static boolean loadProofTree(Path path, CheckerData.ProofEntry line, Logger logger) throws ProofInputException, IOException {
+    private static boolean loadProofTree(Path path, CheckerData.ProofEntry line, Logger logger)
+            throws ProofInputException, IOException {
 
         logger.print(LogLevel.DEBUG, "Loading proof from " + path);
         line.proofFile = path;
@@ -148,13 +153,15 @@ public final class ProverService {
         KeYUserProblemFile keyFile = line.envInput;
         pi.tryReadProof(parser, keyFile);
 
-        line.rootNode = parser.getParsedResult();
-        line.loaded = true;
+        line.parseResult = parser.getResult();
+
+        line.loadingState = CheckerData.LoadingState.SUCCESS;
         logger.print(LogLevel.DEBUG, "... loading done!");
         return true;
     }
 
-    private static Proof[] loadProofFile(Path path, CheckerData.ProofEntry line) throws ProofInputException, IOException {
+    private static Proof[] loadProofFile(Path path, CheckerData.ProofEntry line)
+            throws ProofInputException, IOException {
         Profile profile = AbstractProfile.getDefaultProfile();
 
         // TODO: FileRepo/InitConfig/ProblemInitializer reuse possible?
@@ -189,13 +196,6 @@ public final class ProverService {
         final Properties properties = new Properties();
         properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
         properties.setProperty(IPersistablePO.PROPERTY_FILENAME, path.toString());
-        //properties.setProperty("contract",keyFile.chooseContract());
-
-        if (keyFile instanceof KeYFile) {
-            KeYFile key = (KeYFile)keyFile;
-            //proofObligation = keyFile.getProofObligation();
-        }
-        //IPersistablePO.LoadedPOContainer poContainer = FunctionalOperationContractPO.loadFrom(initConfig, properties);
 
         // more generic version (works e.g. for taclet proofs)
         IPersistablePO.LoadedPOContainer poContainer = createProofObligationContainer(keyFile, initConfig, properties);
@@ -236,18 +236,14 @@ public final class ProverService {
      * @return The {@link IPersistablePO.LoadedPOContainer} or {@code null} if not available.
      * @throws IOException Occurred Exception.
      */
-    protected static IPersistablePO.LoadedPOContainer createProofObligationContainer(KeYFile keyFile, InitConfig initConfig, Properties properties) throws IOException {
+    private static IPersistablePO.LoadedPOContainer createProofObligationContainer(KeYFile keyFile,
+            InitConfig initConfig, Properties properties) throws IOException {
         final String chooseContract;
         final String proofObligation;
-        //if (envInput instanceof KeYFile) {
-        //    KeYFile keyFile = (KeYFile)envInput;
-            chooseContract = keyFile.chooseContract();
-            proofObligation = keyFile.getProofObligation();
-        //}
-        //else {
-        //    chooseContract = null;
-        //    proofObligation = null;
-        //}
+
+        chooseContract = keyFile.chooseContract();
+        proofObligation = keyFile.getProofObligation();
+
         // Instantiate proof obligation
         if (keyFile instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
             return new IPersistablePO.LoadedPOContainer((ProofOblInput)keyFile);
@@ -270,7 +266,9 @@ public final class ProverService {
             else {
                 baseContractName = chooseContract.substring(0, ind);
             }
-            final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
+            final Contract contract = initConfig.getServices()
+                                                .getSpecificationRepository()
+                                                .getContractByName(baseContractName);
             if (contract == null) {
                 throw new RuntimeException("Contract not found: " + baseContractName);
             }
@@ -282,7 +280,7 @@ public final class ProverService {
 
             String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
             if (poClass == null || poClass.isEmpty()) {
-                throw new IOException("Proof obligation class property \"" + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
+                throw new IOException("Proof obligation class property \"" + IPersistablePO.PROPERTY_CLASS + "\" is not defined or empty.");
             }
             try {
                 // Try to instantiate proof obligation by calling static method: public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException
@@ -300,39 +298,46 @@ public final class ProverService {
     }
 
     /**
-     * Ensures that the given proof files are loaded and the parsed proof trees are stored inside
-     * the CheckerData object. Does not replay the proofs! Proofs that already have been loaded
-     * are not reloaded.
-     * @param proofPaths paths of the proof files to load
+     * Ensures that a replay is attempted for each proof file in bundle. The replay results are stored
+     * inside the given CheckerData object. Proofs for which a replay has already been tried are not
+     * replayed again.
      * @param data the CheckerData object to store the result
      * @throws ProofManagementException
      */
-    public static void ensureProofsReplayed(List<Path> proofPaths, CheckerData data) throws ProofManagementException {
-        ensureProofsLoaded(proofPaths, data);
+    public static void ensureProofsReplayed(CheckerData data) throws ProofManagementException {
+        List<Path> proofPaths = data.getProofPaths();
+        ensureProofsLoaded(data);
 
         for (CheckerData.ProofEntry line : data.getProofEntries()) {
             // skip replay for proofs if not requested
             if (proofPaths.contains(line.proofFile)) {
-                Proof proof = line.proof;
-                EnvInput envInput = line.envInput;
-                ProblemInitializer problemInitializer = line.problemInitializer;
+                // skip proofs that have already been replayed
+                if (line.replayState == CheckerData.ReplayState.UNKNOWN) {
+                    Proof proof = line.proof;
+                    EnvInput envInput = line.envInput;
+                    ProblemInitializer problemInitializer = line.problemInitializer;
 
-                if (proof != null) {
-                    OneStepSimplifier.refreshOSS(proof);
-                    try {
-                        // store result in CheckerData
-                        line.replayResult = replayProof(proof, envInput, problemInitializer);
-                    } catch (ProofInputException e) {
-                        throw new ProofManagementException("Could not replay proof from " + envInput
-                                + System.lineSeparator() + e.toString());
+                    if (proof != null) {
+                        OneStepSimplifier.refreshOSS(proof);
+                        try {
+                            // store result in CheckerData
+                            line.replayResult = replayProof(line, envInput, problemInitializer, data);
+                        } catch (ProofInputException e) {
+                            throw new ProofManagementException("Could not replay proof from " + envInput
+                                    + System.lineSeparator() + e.toString());
+                        }
                     }
                 }
             }
         }
     }
 
-    private static AbstractProblemLoader.ReplayResult replayProof(Proof proof, EnvInput envInput, ProblemInitializer problemInitializer) throws ProofInputException {
-        String status = "";
+    private static ReplayResult replayProof(CheckerData.ProofEntry line, EnvInput envInput,
+                                            ProblemInitializer problemInitializer, Logger logger)
+            throws ProofInputException {
+        Proof proof = line.proof;
+        logger.print(LogLevel.INFO, "Starting replay of proof " + proof.name());
+
         List<Throwable> errors = new LinkedList<>();
         Node lastTouchedNode = proof.root();
 
@@ -341,44 +346,44 @@ public final class ProverService {
         IntermediatePresentationProofFileParser.Result parserResult = null;
         IntermediateProofReplayer.Result replayResult = null;
 
-        final String ossStatus = (String) proof.getSettings().getStrategySettings()
+        final String ossStatus = (String) proof.getSettings()
+                                               .getStrategySettings()
                                                .getActiveStrategyProperties()
                                                .get(StrategyProperties.OSS_OPTIONS_KEY);
-        AbstractProblemLoader.ReplayResult result;
+        ReplayResult result;
         try {
             assert envInput instanceof KeYUserProblemFile;
 
-            parser = new IntermediatePresentationProofFileParser(proof);
-            problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
-            parserResult = parser.getResult();
-
-            // Parser is no longer needed, set it to null to free memory.
-            parser = null;
+            // we assume that the proof has been successfully loaded!
+            parserResult = line.parseResult;
 
             // For loading, we generally turn on one step simplification to be
             // able to load proofs that used it even if the user has currently
             // turned OSS off.
             StrategyProperties newProps = proof.getSettings()
-                    .getStrategySettings().getActiveStrategyProperties();
+                                               .getStrategySettings()
+                                               .getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
-                    StrategyProperties.OSS_ON);
+                                 StrategyProperties.OSS_ON);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
 
             // passing null is ok since ProblemLoader is only used for error reporting as origin
             replayer = new IntermediateProofReplayer(null, proof, parserResult);
-            replayResult = replayer.replay();
+            // pass false here to keep the intermediate tree (may be needed for later checkers)!
+            replayResult = replayer.replay(false);
 
             Goal lastGoal = replayResult.getLastSelectedGoal();
             lastTouchedNode = lastGoal != null ? lastGoal.node() : proof.root();
 
-        /*} catch (Exception e) {
+        } catch (Exception e) {
             if (parserResult == null || parserResult.getErrors() == null || parserResult.getErrors().isEmpty() ||
                 replayer == null || replayResult == null || replayResult.getErrors() == null || replayResult.getErrors().isEmpty()) {
                 // this exception was something unexpected
                 errors.add(e);
-            }*/
+            }
         } finally {
+            String status = "";
             if (parserResult != null) {
                 status = parserResult.getStatus();
                 errors.addAll(parserResult.getErrors());
@@ -388,13 +393,30 @@ public final class ProverService {
                 errors.addAll(replayResult.getErrors());
             }
 
+            // reset OSS
             StrategyProperties newProps = proof.getSettings().getStrategySettings()
                     .getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, ossStatus);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
 
-            result = new AbstractProblemLoader.ReplayResult(status, errors, lastTouchedNode);
+            result = new ReplayResult(status, errors, lastTouchedNode);
+        }
+
+        if (result.hasErrors()) {
+            line.replayState = CheckerData.ReplayState.ERROR;
+            logger.print(LogLevel.WARNING, result.getErrorList().toString());
+            logger.print(LogLevel.WARNING, "... failed!");
+        } else {
+            line.replayState = CheckerData.ReplayState.SUCCESS;
+            // update status from UNKNOWN to OPEN/CLOSED depending on replay result
+            if (line.proof.closed()) {
+                line.proofState = CheckerData.ProofState.CLOSED;
+                logger.print(LogLevel.INFO, "... successful (proof is closed)!");
+            } else {
+                line.proofState = CheckerData.ProofState.OPEN;
+                logger.print(LogLevel.INFO, "... successful (proof is open)!");
+            }
         }
 
         return result;
@@ -407,6 +429,7 @@ public final class ProverService {
      * @throws ProofManagementException
      */
     public static void ensureSourceLoaded(CheckerData data) throws ProofManagementException {
+        data.print(LogLevel.DEBUG, "Loading Java sources ...");
         try {
             // load all contracts from source files
             ProofBundleHandler pbh = data.getPbh();
@@ -426,19 +449,13 @@ public final class ProverService {
 
             SLEnvInput slenv = new SLEnvInput(src.toString(), cp, bcp, profile, null);
             data.setSlenv(slenv);
+            data.setSrcLoadingState(CheckerData.LoadingState.SUCCESS);
+            data.print(LogLevel.DEBUG, "Java sources successfully loaded!");
 
-//            ProgressMonitor control = ProgressMonitor.Empty.getInstance();
-//            ProblemInitializer pi = new ProblemInitializer(control, new Services(profile),
-//                    new DefaultUserInterfaceControl());
-//            pi.setFileRepo(new TrivialFileRepo());
-//            InitConfig ic = pi.prepare(slenv);
-//            SpecificationRepository specRepo = ic.getServices().getSpecificationRepository();
-//            Set<Contract> contracts = specRepo.getAllContracts().toSet();
-//        } catch (ProofInputException e) {
-//            throw new ProofManagementException("Java source could not be loaded."
-//                + System.lineSeparator() + e.getMessage());
         } catch (IOException e) {
-            throw new ProofManagementException(System.lineSeparator() + e.getMessage());
+            data.setSrcLoadingState(CheckerData.LoadingState.ERROR);
+            throw new ProofManagementException("Java sources could not be loaded."
+                    + System.lineSeparator() + e.getMessage());
         }
     }
 }

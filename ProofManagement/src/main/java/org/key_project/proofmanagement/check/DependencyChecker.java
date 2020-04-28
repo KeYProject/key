@@ -3,9 +3,10 @@ package org.key_project.proofmanagement.check;
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 import org.key_project.proofmanagement.check.dependency.DependencyNode;
 import org.key_project.proofmanagement.io.LogLevel;
+import org.key_project.proofmanagement.io.ProofBundleHandler;
 
-import java.nio.file.Path;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_SENSITIVE;
 
@@ -52,26 +53,105 @@ public class DependencyChecker implements Checker {
     private CheckerData data;
 
     @Override
-    public void check(List<Path> proofFiles, CheckerData checkerData)
+    public void check(ProofBundleHandler pbh, CheckerData checkerData)
             throws ProofManagementException {
         this.data = checkerData;
         data.addCheck("dependency");
         data.print("Running dependency checker ...");
 
         // for each proof: parse and construct intermediate AST
-        ProverService.ensureProofsLoaded(proofFiles, data);
+        KeYFassade.ensureProofsLoaded(data);
 
         // build dependency graph
-        ProverService.ensureDependencyGraphBuilt(data);
+        KeYFassade.ensureDependencyGraphBuilt(data);
         DependencyGraph graph = data.getDependencyGraph();
 
-        // check if graph contains illegal structures, e.g. cycles, unproven dependencies, ...
-        if (checkGraph(graph)) {
-            data.print(LogLevel.INFO, "No illegal dependencies found.");
+        // check if graph contains illegal cycles
+        if (hasIllegalCycles(graph)) {
+            data.print(LogLevel.WARNING, "Illegal cyclic dependency found" +
+                    " (further illegal cycles may exist but will not be reported)!");
         } else {
-            data.print(LogLevel.INFO, "Illegal dependency found." +
-                    " Skipping further dependency checks.");
+            data.print(LogLevel.INFO, "No illegal dependencies found.");
         }
+
+        // TODO: due to early aborting, dependency results may be wrong if a cyclic dep is found
+
+        data.print(LogLevel.DEBUG, "Searching for unproven dependencies ...");
+
+        // TODO: this should be a separate checker!
+        // replay is needed to determine if a proof is closed or not
+        // TODO: could be determined with proof tree (without replay)
+        if (data.getChecks().get("replay") != null) {
+            // check for unproven dependencies
+            if (hasUnprovenDependencies(graph, data)) {
+                data.print(LogLevel.INFO, "Unproven dependencies found in bundle!");
+            } else {
+                data.print(LogLevel.INFO, "No unproven dependencies found in bundle!");
+            }
+        } else {
+            data.print(LogLevel.INFO, "Replay is disabled. Skipping check for unproven" +
+                    "dependencies");
+        }
+
+        data.print(LogLevel.INFO, "Dependency checks completed!");
+    }
+
+    private boolean hasUnprovenDependencies(DependencyGraph graph, CheckerData data)
+            throws ProofManagementException {
+        // needs replay (to ensure that proof can be closed)
+        KeYFassade.ensureProofsReplayed(data);
+
+        // TODO: probably, topological sorting from Tarjan could be used for speedup ...
+        /* time complexity in O(n*n):
+         * C <- find closed proofs without dependencies
+         * while (C gets larger)
+         *     n <- find node that has only dependencies in C
+         *     C <- C + n
+         */
+        Set<DependencyNode> closed = new HashSet<>();
+        boolean changed = true;
+        while (changed) {
+            changed = false;
+            for (DependencyNode n : graph.getNodes()) {
+                if (!closed.contains(n)) {
+                    CheckerData.ProofEntry entry = data.getProofEntryByContract(n.getContract());
+                    if (entry != null) {
+                        if (entry.proofState == CheckerData.ProofState.CLOSED
+                                && closed.containsAll(n.getDependencies().keySet())) {
+                            closed.add(n);
+
+                            // update status in data object
+                            entry.dependencyState = CheckerData.DependencyState.OK;
+                            data.print(LogLevel.INFO, "Proof is closed and has no" +
+                                    " unproven dependencies: " + entry.proof.name());
+                            data.addProvenContract(n.getContract());
+
+                            changed = true;
+                        }
+                    }
+                    //else {
+                    //    // These nodes have been created during intermediate proof tree traversal.
+                    //    // There is no proof for them, therefore they are not considered closed.
+                    //}
+                }
+            }
+        }
+
+        boolean hasUnprovenDeps = false;
+
+        // update data: all other (successfully replayed) closed proofs
+        // have dependencies left unproven
+        for (CheckerData.ProofEntry entry : data.getProofEntries()) {
+            if (entry.dependencyState == CheckerData.DependencyState.UNKNOWN
+                    && entry.replayState == CheckerData.ReplayState.SUCCESS) {
+                entry.dependencyState = CheckerData.DependencyState.UNPROVEN_DEP;
+                data.print(LogLevel.WARNING, "Unproven dependencies found for proof "
+                        + entry.proof.name());
+                hasUnprovenDeps = true;
+            }
+        }
+
+        return hasUnprovenDeps;
     }
 
     /**
@@ -79,7 +159,7 @@ public class DependencyChecker implements Checker {
      * @param graph the graph to check
      * @return true iff the graph is legal
      */
-    private boolean checkGraph(DependencyGraph graph) {
+    private boolean hasIllegalCycles(DependencyGraph graph) {
 
         for (DependencyGraph.SCC scc : graph.getAllSCCs()) {
             // IMPORTANT: we do not check that the modalities inside a cycle match,
@@ -88,10 +168,20 @@ public class DependencyChecker implements Checker {
 
             if (!terminationInsensitive(scc) && !terminationEnsured(scc)) {
                 scc.setLegal(false);
-                return false;
+
+                // update all nodes from SCC to illegal cycle state
+                for (DependencyNode n : scc.getNodes()) {
+                    CheckerData.ProofEntry entry = data.getProofEntryByContract(n.getContract());
+                    // TODO: entry == null can not happen
+                    //  (if node has dependencies it has been parsed,
+                    //  thus also a proof entry exists)
+                    // assert entry != null;
+                    entry.dependencyState = CheckerData.DependencyState.ILLEGAL_CYCLE;
+                }
+                return true;        // cycle found
             }
         }
-        return true;
+        return false;               // no cycle
     }
 
     /**

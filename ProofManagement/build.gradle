@@ -30,6 +30,8 @@ dependencies {
 
 application {
     mainClassName = "org.key_project.proofmanagement.Main"
+    // for start script generated with createStartScripts
+    applicationName = "pm"
 }
 
 sourceSets {
@@ -41,5 +43,5 @@ sourceSets {
 }
 
 run {
-    args('check', '--missing', '--settings', '--report', '../../../testReport.html', '--dependency', '../../../ba_bcp_func')
+    args('check', '--missing', '--settings', '--report', '../../../testReport.html', '--replay', '--dependency', '../../../ba_simple')
 }

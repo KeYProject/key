@@ -172,8 +172,20 @@ public class IntermediateProofReplayer {
      * Starts the actual replay process. Results are stored in the supplied
      * proof object; the last selected goal may be obtained by
      * {@link #getLastSelectedGoal()}.
+     * Note: This method deletes the intermediate proof tree!
      */
     public Result replay() {
+        return replay(true);
+    }
+
+    /**
+     * Starts the actual replay process. Results are stored in the supplied
+     * proof object; the last selected goal may be obtained by
+     * {@link #getLastSelectedGoal()}.
+     * @param deleteIntermediateTree indicates if the intermediate proof tree should be
+     *                               deleted (set to false if it shal be kept for further use)
+     */
+    public Result replay(boolean deleteIntermediateTree) {
         while (!queue.isEmpty()) {
             final Pair<Node, NodeIntermediate> currentP = queue.pollFirst();
             final Node currNode = currentP.first;
@@ -219,9 +231,11 @@ public class IntermediateProofReplayer {
 
                             addChildren(children, intermChildren);
 
-                            // Children are no longer needed, set them to null
-                             // to free memory.
-                            currInterm.setChildren(null);
+                            if (deleteIntermediateTree) {
+                                // Children are no longer needed, set them to null
+                                // to free memory.
+                                currInterm.setChildren(null);
+                            }
                         } catch (Exception e) {
                             reportError(ERROR_LOADING_PROOF_LINE + "Line "
                                     + appInterm.getLineNr() + ", goal "

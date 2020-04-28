@@ -1,7 +1,9 @@
 package org.key_project.proofmanagement.io;
 
 import org.key_project.proofmanagement.check.PathNode;
+import org.key_project.proofmanagement.check.ProofManagementException;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -17,7 +19,7 @@ import java.util.List;
  *
  * @author Wolfram Pfeifer
  */
-public abstract class ProofBundleHandler implements AutoCloseable {
+public abstract class ProofBundleHandler implements Closeable {
     /**
      * This matcher matches *.proof files.
      */
@@ -60,9 +62,9 @@ public abstract class ProofBundleHandler implements AutoCloseable {
      * Returns a list of all paths to *.proof files in the bundle. Only *.proof files residing
      * top-level in the bundle are considered.
      * @return a list of paths to the *.proof files
-     * @throws IOException if the bundle can not be opened/accessed
+     * @throws ProofManagementException if the bundle can not be opened/accessed
      */
-    public abstract List<Path> getProofFiles() throws IOException;
+    public abstract List<Path> getProofFiles() throws ProofManagementException;
 
     /**
      * Returns a list of all paths to *.key files in the bundle. Only *.key files residing

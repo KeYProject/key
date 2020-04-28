@@ -90,3 +90,22 @@ for (i = 0; i < toggler.length; i++) {
 	});
 }
 </script>
+
+<script type="text/javascript">
+function handleClick(source) {
+	var messages = document.getElementById("messages");
+	var spans = messages.getElementsByTagName("span");
+	var filter = source.value;
+	console.log(filter);
+	for (const s of spans) {
+		var str = s.textContent;
+		if (str.startsWith(filter)) {
+			if (source.checked) {
+				s.style.display = "block";
+			} else {
+				s.style.display = "none";
+			}
+		}
+	}
+}
+</script>

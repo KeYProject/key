@@ -1,6 +1,7 @@
 package org.key_project.proofmanagement.io;
 
 import org.key_project.proofmanagement.check.PathNode;
+import org.key_project.proofmanagement.check.ProofManagementException;
 import org.key_project.util.java.IOUtil;
 
 import java.io.IOException;
@@ -24,6 +25,9 @@ import java.util.List;
 public class ZipProofBundleHandler extends ProofBundleHandler {
     /** path of the actual proof bundle file */
     private final Path zipPath;
+
+    /** indicates if the close() method has already been called */
+    private boolean closed = false;
 
     // TODO: using ZipFileSystem is not possible, since KeY uses File objects as input
     //  (a Path from a ZipFileSystemProvider can not be converted to a File)
@@ -63,7 +67,7 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
-    public List<Path> getProofFiles() throws IOException {
+    public List<Path> getProofFiles() throws ProofManagementException {
         //return getFiles(fs.getPath("/"), ProofBundleHandler.PROOF_MATCHER);
         return dbh.getProofFiles();
     }
@@ -111,16 +115,20 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
-    public void close() throws Exception {
-        // delete temporary content from disk
-        Files.walk(tmpDir)
-             .sorted(Comparator.reverseOrder())
-             .forEach(p -> {
-                 try {
-                     Files.delete(p);
-                 } catch (IOException e) {
-                     e.printStackTrace();
-                 }
-             });
+    public void close() throws IOException {
+        // check if close has already been called
+        if (!closed) {
+            closed = true;
+            // delete temporary content from disk
+            Files.walk(tmpDir)
+                 .sorted(Comparator.reverseOrder())
+                 .forEach(p -> {
+                     try {
+                         Files.delete(p);
+                     } catch (IOException e) {
+                         e.printStackTrace();
+                     }
+                 });
+        }
     }
 }

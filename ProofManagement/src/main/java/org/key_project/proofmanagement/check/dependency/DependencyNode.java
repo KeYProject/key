@@ -19,7 +19,7 @@ import static org.key_project.proofmanagement.check.dependency.DependencyGraph.E
  */
 public class DependencyNode {
     /** the contract represented by this node */
-    private Contract contract;
+    private final Contract contract;
 
     /**
      * Stores the outgoing edges of the node, i.e. target node and edge type

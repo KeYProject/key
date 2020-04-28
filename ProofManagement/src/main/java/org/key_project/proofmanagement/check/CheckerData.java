@@ -4,7 +4,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
-import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
+import de.uka.ilkd.key.proof.io.IntermediatePresentationProofFileParser;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
@@ -28,14 +28,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * This class serves as a container for the data given to and returned by a Checker. It contains:
- *      - the consistency result (boolean)
- *      - the file tree
- *      - information about the proofs (basically a table)
- *      - the dependency graph
- *      - additional raw text messages
- *
- * Note: This is a mutable data container!
+ * This container serves for accumulating data given to checkers and results returned by them.
  */
 public final class CheckerData implements Logger {
 
@@ -57,37 +50,54 @@ public final class CheckerData implements Logger {
 
     private final List<String> messages = new ArrayList<>();
 
+    // TODO: side effects: may be changed by checkers (e.g. remove paths of taclet proofs)
+    private List<Path> proofPaths;
+
     ////////////////////////////////// results from dependency checker
 
     private DependencyGraph dependencyGraph;
 
-    /** unproven external (user provided) contracts */
-    private final List<Contract> unprovenExternal = new ArrayList<>();
+    /** proven contracts with lemmas/dependencies left unproven */
+    private final Set<Contract> lemmasLeft = new HashSet<>();
 
-    /** unproven internal contracts (from classes shipped with KeY) */
-    private final List<Contract> unprovenInternal = new ArrayList<>();
+    public void addProvenContract(Contract contract) {
+        proven.add(contract);
+    }
 
     /** fully proven contracts (including all dependencies) */
-    private final List<Contract> proven = new ArrayList<>();
+    private final Set<Contract> proven = new HashSet<>();
 
-    /** proven contracts with lemmas/dependencies left unproven */
-    private final List<Contract> lemmasLeft = new ArrayList<>();
+    private final Set<DependencyNode> missingMby = new HashSet<>();
+    private final Set<DependencyGraph.SCC> illegalCycles = new HashSet<>();
 
-    private final List<DependencyNode> missingMby = new ArrayList<>();
-    private final List<DependencyGraph.SCC> illegalCycles = new ArrayList<>();
+    ////////////////////////////////// results from missing proofs checker
 
+    public Set<Contract> getContractsWithoutProof() {
+        return contractsWithoutProof;
+    }
 
-    public void addUnprovenContract(Contract c, boolean internal) {
+    /** user provided contracts for which no proof exists */
+    private final Set<Contract> contractsWithoutProof = new HashSet<>();
+
+    /** internal contracts (from classes shipped with KeY) without a proof */
+    private final Set<Contract> internalContractsWithoutProof = new HashSet<>();
+
+    public void addContractWithoutProof(Contract c, boolean internal) {
         if (internal) {
-            unprovenInternal.add(c);
+            internalContractsWithoutProof.add(c);
         } else {
-            unprovenExternal.add(c);
+            contractsWithoutProof.add(c);
+        }
+        // if there is a proof for this contract, set its state to unproven
+        ProofEntry entry = getProofEntryByContract(c);
+        if (entry != null) {
+            entry.dependencyState = DependencyState.UNPROVEN_DEP;
         }
     }
 
     ////////////////////////////////// results from settings checker
 
-    // all choice names that are used in the settings of at least one proof
+    /** all choice names that occur in at least one settings object of a proof */
     private final SortedSet<String> choiceNames = new TreeSet<>();
 
     public SortedSet<String> getChoiceNames() {
@@ -98,20 +108,52 @@ public final class CheckerData implements Logger {
         choiceNames.add(name);
     }
 
-    private final Map<HashMap<String, String>, Integer> choices2Id = new HashMap<>();
+    /** choices used as reference (mapped to their corresponding id) */
+    private final Map<Map<String, String>, Integer> referenceChoices = new HashMap<>();
 
-    public void addChoices(HashMap<String, String> choices, int id) {
-        choices2Id.put(choices, id);
+    /** mapping from choices to the reference id */
+    private final Map<Map<String, String>, Integer> choices2Id = new HashMap<>();
+
+    /**
+     * Adds a choices map to the map of reference choices. The newly added map gets the next free
+     * id. Use only if it is known that the given choices object is not yet in the map!
+     * In addition, an entry in the map for id lookup is added ({@link #addChoices(Map)} is
+     * called).
+     * @param choices the reference choices to add
+     */
+    public void addReferenceChoices(Map<String, String> choices) {
+        int nextId = referenceChoices.size();
+        referenceChoices.putIfAbsent(choices, nextId);
+        // add an entry in the map for id lookup
+        addChoices(choices);
     }
 
-    public Map<HashMap<String, String>, Integer> getChoices2Id() {
+    /**
+     * Adds a mapping to a reference choices id for the given choices. Use only if an equal
+     * reference choices object has already been added via {@link #addReferenceChoices(Map)}.
+     * @param choices the choices to add a mapping
+     * @return
+     */
+    public void addChoices(Map<String, String> choices) {
+        // if no id is found, a NPE is thrown
+        int referenceId = referenceChoices.get(choices);
+        choices2Id.putIfAbsent(choices, referenceId);
+    }
+
+    public Map<Map<String, String>, Integer> getChoices2Id() {
         return choices2Id;
     }
 
     //////////////////////////////////
 
-    // TODO: default value
-    private boolean consistent = false;
+    private LoadingState srcLoadingState = LoadingState.UNKNOWN;
+    // we use methods to determine these states on the fly
+    //private LoadingState proofLoadingState = LoadingState.UNKNOWN;
+    //private ReplayState replayState = ReplayState.UNKNOWN;
+    //private DependencyState depState = DependencyState.UNKNOWN;
+    private SettingsState settingsState = SettingsState.UNKNOWN;
+    private GlobalState globalState = GlobalState.UNKNOWN;
+
     private ProofBundleHandler pbh;
     private PathNode fileTree;
     private final List<ProofEntry> proofEntries = new ArrayList<>();
@@ -125,35 +167,118 @@ public final class CheckerData implements Logger {
         this.slenv = slenv;
     }
 
+    // we rely on the order of the enums (from worst to best)!!!
+    public enum GlobalState {
+        ERROR,
+        UNKNOWN,
+        CLOSED,
+        OPEN
+    }
+
+    public enum SettingsState {
+        UNKNOWN,
+        INCONSISTENT,
+        CONSISTENT
+    }
+
+    public enum ReplayState {
+        ERROR("\u2718"),
+        UNKNOWN("?"),
+        SUCCESS("\u2714");
+
+        private String shortStr;
+        ReplayState(String shortStr) {
+            this.shortStr = shortStr;
+        }
+
+        @Override
+        public String toString() {
+            return shortStr;
+        }
+    }
+
+    public enum LoadingState {
+        ERROR("\u2718"),
+        UNKNOWN("?"),
+        SUCCESS("\u2714");
+
+        private String shortStr;
+        LoadingState(String shortStr) {
+            this.shortStr = shortStr;
+        }
+
+        @Override
+        public String toString() {
+            return shortStr;
+        }
+    }
+
+    public enum DependencyState {
+        UNKNOWN("?"),
+        ILLEGAL_CYCLE("cycle"),
+        UNPROVEN_DEP("lemma left"),
+        OK("\u2714");
+
+        private String shortStr;
+        DependencyState(String shortStr) {
+            this.shortStr = shortStr;
+        }
+
+        @Override
+        public String toString() {
+            return shortStr;
+        }
+    }
+
+    public enum ProofState {
+        UNKNOWN("?"),
+        OPEN("open"),
+        CLOSED("closed");
+
+        private String shortStr;
+        ProofState(String shortStr) {
+            this.shortStr = shortStr;
+        }
+
+        @Override
+        public String toString() {
+            return shortStr;
+        }
+    }
+
     public class ProofEntry {
-        public boolean loaded = false;
-        public BranchNodeIntermediate rootNode;
-        public Proof proof;
+        public LoadingState loadingState = LoadingState.UNKNOWN;
+        public ReplayState replayState = ReplayState.UNKNOWN;
+        public DependencyState dependencyState = DependencyState.UNKNOWN;
+        public ProofState proofState = ProofState.UNKNOWN;
+
+        public boolean replaySuccess() {
+            return replayState == ReplayState.SUCCESS;
+        }
+
+        public Path proofFile;
         public KeYUserProblemFile envInput;
         public ProblemInitializer problemInitializer;
-        public Path proofFile;
+        public Proof proof;
+
         public Contract contract;
         public URL sourceFile;
         public String shortSrc;
+        public IntermediatePresentationProofFileParser.Result parseResult;
         public AbstractProblemLoader.ReplayResult replayResult;
 
         public Integer settingsId() {
-            HashMap<String, String> cs = proof.getSettings().getChoiceSettings().getDefaultChoices();
-            Integer lookup = choices2Id.get(cs);
-            if (lookup != null) {
-                return lookup;      // found exact match
-            }
-            /*
-            // no exact match -> look for equal settings
-            for (ChoiceSettings s : choices2Id.keySet()) {
-                if (settingsEqual(s, cs)) {
-                    // found matching settings
-                    return choices2Id.get(s);
-                }
-            }
-            */
-            return null;            // should not happen
+            return choices2Id.get(proof.getSettings().getChoiceSettings().getDefaultChoices());
         }
+    }
+
+    public ProofEntry getProofEntryByContract(Contract contract) {
+        for (ProofEntry p : proofEntries) {
+            if (p.contract.equals(contract)) {
+                return p;
+            }
+        }
+        return null;
     }
 
     // TODO: equals method of ChoiceSettings (may be impossible, since listeners are not compared)
@@ -208,16 +333,145 @@ public final class CheckerData implements Logger {
         return pbh;
     }
 
-    public boolean isConsistent() {
-        return consistent;
+    public void setSrcLoadingState(LoadingState srcLoadingState) {
+        this.srcLoadingState = srcLoadingState;
     }
 
-    public void setConsistent(boolean consistent) {
-        this.consistent = consistent;
+    private LoadingState getSrcLoadingState() {
+        return srcLoadingState;
+    }
+
+    private LoadingState determineProofLoadingState() {
+        LoadingState worst = LoadingState.SUCCESS;
+        for (ProofEntry entry : proofEntries) {
+            if (entry.loadingState.compareTo(worst) < 0) {
+                // found proof with worse state
+                worst = entry.loadingState;
+            }
+        }
+        return worst;
+    }
+
+    private ReplayState determineReplayState() {
+        ReplayState worst = ReplayState.SUCCESS;
+        for (ProofEntry entry : proofEntries) {
+            if (entry.replayState.compareTo(worst) < 0) {
+                // found proof with worse state
+                worst = entry.replayState;
+            }
+        }
+        return worst;
+    }
+
+    private DependencyState determineDependencyState() {
+        DependencyState worst = DependencyState.OK;
+        for (ProofEntry entry : proofEntries) {
+            if (entry.dependencyState.compareTo(worst) < 0) {
+                // found proof with worse state
+                worst = entry.dependencyState;
+            }
+        }
+        return worst;
+    }
+
+    private SettingsState getSettingsState() {
+        return settingsState;
+    }
+
+    public void setSettingsState(SettingsState settingsState) {
+        this.settingsState = settingsState;
+    }
+
+    public void updateGlobalState() {
+        // we don't want to call these methods too often, since they iterate the proofs
+        LoadingState srcLoadingState = getSrcLoadingState();
+        LoadingState proofLoadingState = determineProofLoadingState();
+        ReplayState replayState = determineReplayState();
+        DependencyState depState = determineDependencyState();
+        SettingsState settingsState = getSettingsState();
+
+        if (srcLoadingState == LoadingState.ERROR
+                || proofLoadingState == LoadingState.ERROR
+                || replayState == ReplayState.ERROR) {
+            globalState = GlobalState.ERROR;                                // error
+        } else if (srcLoadingState == LoadingState.UNKNOWN
+                || proofLoadingState == LoadingState.UNKNOWN
+                || replayState == ReplayState.UNKNOWN
+                || settingsState == SettingsState.UNKNOWN
+                || depState == DependencyState.UNKNOWN) {
+            globalState = GlobalState.UNKNOWN;                              // unknown
+        } else if (srcLoadingState == LoadingState.SUCCESS
+                && proofLoadingState == LoadingState.SUCCESS
+                && replayState == ReplayState.SUCCESS
+                && settingsState == SettingsState.CONSISTENT
+                && depState == DependencyState.OK
+                && contractsWithoutProof.isEmpty()
+                && proofEntries.stream().allMatch(p -> p.proofState == ProofState.CLOSED)) {
+            globalState = GlobalState.CLOSED;                               // closed
+        } else {
+            globalState = GlobalState.OPEN;                                 // open
+        }
+    }
+
+    public int bundleProofCount() {
+        return provenCount() + lemmaLeftCount() + unprovenCount();
+    }
+
+    // count proofs that are closed but have unproven dependencies
+    public int lemmaLeftCount() {
+        int count = 0;
+        for (ProofEntry entry : proofEntries) {
+            if (entry.proofState == ProofState.CLOSED
+                    && entry.dependencyState == DependencyState.UNPROVEN_DEP) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // count proofs that are closed and have all dependencies proven
+    public int provenCount() {
+        int count = 0;
+        for (ProofEntry entry : proofEntries) {
+            if (entry.proofState == ProofState.CLOSED
+                    && entry.dependencyState != DependencyState.UNPROVEN_DEP
+                    && entry.dependencyState != DependencyState.ILLEGAL_CYCLE) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // count proofs that are open, unknown (due to error), or have cyclic dependencies
+    public int unprovenCount() {
+        int count = 0;
+        for (ProofEntry entry : proofEntries) {
+            // proofs that are closed but have illegal cyclic dependencies are considered unproven!
+            if (entry.proofState != ProofState.CLOSED
+                    || (entry.proofState == ProofState.CLOSED
+                        && entry.dependencyState == DependencyState.ILLEGAL_CYCLE)) {
+                count++;
+            }
+        }
+        // count in contracts defined inside bundle that have no proof
+        count += contractsWithoutProof.size();
+        return count;
+    }
+
+    public GlobalState getGlobalState() {
+        updateGlobalState();
+        return globalState;
     }
 
     public void setPbh(ProofBundleHandler pbh) {
         this.pbh = pbh;
+    }
+
+    public List<Path> getProofPaths() throws ProofManagementException {
+        if (proofPaths == null) {
+            proofPaths = pbh.getProofFiles();
+        }
+        return proofPaths;
     }
 
     public void setFileTree(PathNode fileTree) {

@@ -1,6 +1,7 @@
 package org.key_project.proofmanagement.io;
 
 import org.key_project.proofmanagement.check.PathNode;
+import org.key_project.proofmanagement.check.ProofManagementException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -60,8 +61,13 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
-    public List<Path> getProofFiles() throws IOException {
-        return getFiles(rootPath, ProofBundleHandler.PROOF_MATCHER);
+    public List<Path> getProofFiles() throws ProofManagementException {
+        try {
+            return getFiles(rootPath, ProofBundleHandler.PROOF_MATCHER);
+        } catch (IOException e) {
+            // we wrap the exception, this allows for easier Checker interface
+            throw new ProofManagementException("Can no access the proof bundle.", e);
+        }
     }
 
     @Override
@@ -105,7 +111,7 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         // nothing to do
     }
 }
