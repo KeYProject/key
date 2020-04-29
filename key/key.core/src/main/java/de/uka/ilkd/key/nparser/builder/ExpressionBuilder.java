@@ -177,16 +177,22 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Term visitDisjunction_term(KeYParser.Disjunction_termContext ctx) {
-        Term termL = accept(ctx.a);
-        Term termR = accept(ctx.b);
-        return binaryTerm(ctx, Junctor.OR, termL, termR);
+        Term t = accept(ctx.a);
+        for (KeYParser.Conjunction_termContext c : ctx.b) {
+            t = binaryTerm(ctx, Junctor.OR, t, accept(c));
+        }
+        return t;
     }
 
     @Override
     public Term visitConjunction_term(KeYParser.Conjunction_termContext ctx) {
-        Term termL = accept(ctx.a);
-        Term termR = accept(ctx.b);
-        return binaryTerm(ctx, Junctor.AND, termL, termR);
+        Term t = accept(ctx.a);
+        for (KeYParser.Term60Context c : ctx.b) {
+            t = binaryTerm(ctx, Junctor.AND, t, accept(c));
+        }
+        return t;
+        //Term termR = accept(ctx.b);
+        //return binaryTerm(ctx, Junctor.AND, termL, termR);
     }
 
     @Override
@@ -297,7 +303,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitBracket_term(KeYParser.Bracket_termContext ctx) {
-        Term t = accept(ctx.primitive_term());
+        Term t = accept(ctx.primitive_labeled_term());
         for (int i = 0; i < ctx.bracket_suffix_heap().size(); i++) {
             var brace_suffix = ctx.bracket_suffix_heap(i).brace_suffix();
             var heap = ctx.bracket_suffix_heap(i).heap;
@@ -872,8 +878,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitLabeled_term(KeYParser.Labeled_termContext ctx) {
-        Term t = accept(ctx.a);
+    public Object visitPrimitive_labeled_term(KeYParser.Primitive_labeled_termContext ctx) {
+        Term t = accept(ctx.primitive_term());
         if (ctx.LGUILLEMETS() != null) {
             ImmutableArray<TermLabel> labels = accept(ctx.label());
             if (labels.size() > 0) {
@@ -993,7 +999,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Term visitSubstitutionterm(KeYParser.SubstitutiontermContext ctx) {
+    public Object visitSubstitution_term(KeYParser.Substitution_termContext ctx) {
         SubstOp op = WarySubstOp.SUBST;
         Namespace<QuantifiableVariable> orig = variables();
         AbstractSortedOperator v = accept(ctx.bv);
@@ -1004,7 +1010,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             bindVar();
 
         Term a1 = accept(ctx.replacement);
-        Term a2 = accept(ctx.haystack);
+        Term a2 = oneOf(ctx.atom_prefix(), ctx.unary_formula());
         try {
             Term result = getServices().getTermBuilder().subst(op, (QuantifiableVariable) v, a1, a2);
             return result;
@@ -1017,13 +1023,10 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitUpdate_term(KeYParser.Update_termContext ctx) {
-        Term t = accept(ctx.sub);
-        if (ctx.u.isEmpty()) return accept(ctx.sub);
-        List<Term> u = mapOf(ctx.u);
-        for (int i = u.size() - 1; i >= 0; i--) {
-            t = getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u.get(i), t);
-        }
-        return t;
+        Term t = oneOf(ctx.atom_prefix(), ctx.unary_formula());
+        if (ctx.u.isEmpty()) return t;
+        Term u = accept(ctx.u);
+        return getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, t);
     }
 
     public List<QuantifiableVariable> visitBound_variables(KeYParser.Bound_variablesContext ctx) {

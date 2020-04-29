@@ -1,4 +1,3 @@
-java.lang.Object.toString()
 1 = 1 -> 2 = 2
 \< { int x = 1; } \> x=1
 \<{ int x = 1; {int s = 2;} }\> x=x

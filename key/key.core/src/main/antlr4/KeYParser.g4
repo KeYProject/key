@@ -347,35 +347,42 @@ literals:
   | string_literal
 ;
 
-term: labeled_term;
-labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
+term: parallel_term;
+//labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
 parallel_term: a=elementary_update_term (PARALLEL b=parallel_term)?;
 elementary_update_term: a=equivalence_term (ASSIGN b=equivalence_term)?;
 equivalence_term: a=implication_term (EQV b=equivalence_term)?;
 implication_term: a=disjunction_term (IMP b=implication_term)?;
-disjunction_term: a=conjunction_term (OR b=disjunction_term)?;
-conjunction_term: a=formula_prefix (AND b=conjunction_term)?;
-formula_prefix:
-      NOT      sub=formula_prefix                                     #negation_term
-    | (FORALL | EXISTS) bound_variables sub=formula_prefix            #quantifierterm
-    | equality_term                                                   #aaaaa;
-equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=equality_term) ?;
-comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=comparison_term)?;
+disjunction_term: a=conjunction_term (OR b+=conjunction_term)*;
+conjunction_term: a=term60 (AND b+=term60)*;
+term60: unary_formula | equality_term;
+unary_formula:
+    NOT sub=term60                         #negation_term
+  | (FORALL | EXISTS) bound_variables sub=term60  #quantifierterm
+  | MODALITY sub=term60                           #modality_term
+;
+equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=comparison_term)?;
+comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=weak_arith_term)?;
 weak_arith_term: a=strong_arith_term_1 ((PLUS|MINUS) b=weak_arith_term)?;
 strong_arith_term_1: a=strong_arith_term_2 ((STAR) b=strong_arith_term_1)?;
 strong_arith_term_2: a=atom_prefix ((PERCENT|SLASH) b=strong_arith_term_2)?;
-
-atom_prefix:
-    MODALITY sub=formula_prefix                             #modality_term
-  | (LBRACE u+=term RBRACE) sub=atom_prefix                 #update_term
-  | LBRACE SUBST  bv=one_bound_variable SEMI
-    replacement=term RBRACE
-    haystack=formula_prefix                                 #substitutionterm
-  | (LPAREN sort=sortId RPAREN) sub=atom_prefix             #cast_term
-  | MINUS sub=atom_prefix                                   #unary_minus_term
-  | bracket_term                                            #bbbbbb
+update_term: (LBRACE u=term RBRACE) (atom_prefix | unary_formula);
+substitution_term:
+ LBRACE SUBST  bv=one_bound_variable SEMI
+     replacement=comparison_term RBRACE
+     (atom_prefix|unary_formula)
 ;
-bracket_term: primitive_term (bracket_suffix_heap)* attribute*;
+cast_term: (LPAREN sort=sortId RPAREN) sub=atom_prefix;
+unary_minus_term: MINUS sub=atom_prefix;
+atom_prefix:
+    update_term
+  | substitution_term
+  | locset_term
+  | cast_term
+  | unary_minus_term
+  | bracket_term
+;
+bracket_term: primitive_labeled_term (bracket_suffix_heap)* attribute*;
 bracket_suffix_heap: brace_suffix (AT heap=term)?;
 brace_suffix:
     LBRACKET target=term ASSIGN val=term RBRACKET             #bracket_access_heap_update
@@ -383,16 +390,17 @@ brace_suffix:
   | LBRACKET STAR RBRACKET                                    #bracket_access_star
   | LBRACKET indexTerm=term (DOTRANGE rangeTo=term)? RBRACKET #bracket_access_indexrange
 ;
-
+primitive_labeled_term:
+  primitive_term ( LGUILLEMETS labels= label RGUILLEMETS )?;
+termParen: LPAREN term RPAREN (attribute)*;
+abbreviation: AT name=simple_ident;
 primitive_term:
-    LPAREN term RPAREN  (attribute)*     #termParen
-  | locset_term               #termLocset
-  | location_term             #termLocation
-  | ifThenElseTerm            #termIfThenElse
-  | ifExThenElseTerm          #termIfExThenElse
-  | AT name=simple_ident      #abbreviation
-  | accessterm                #termAccess  //also handles function calls
-  | literals                  #termLiterals
+    termParen
+  | ifThenElseTerm
+  | ifExThenElseTerm
+  | abbreviation
+  | accessterm
+  | literals
 ;
 
 /*
@@ -480,7 +488,7 @@ single_label
 
 location_term
 :
-    LPAREN obj=term COMMA field=term RPAREN
+    LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN
 ;
 
 
