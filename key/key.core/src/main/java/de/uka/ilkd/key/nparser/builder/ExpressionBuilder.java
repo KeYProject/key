@@ -1373,12 +1373,21 @@ public class ExpressionBuilder extends DefaultBuilder {
         return current;
     }
 
+    public <T> T defaultOnException(T defaultValue, Supplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
     @Override
     public Term visitAccessterm(KeYParser.AccesstermContext ctx) {
         Term t = visitAccesstermAsJava(ctx);
         if (t != null) return t;
 
-        Sort sortId = accept(ctx.sortId());
+        //weigl: I am unsure if this is wise.
+        Sort sortId = defaultOnException(null, () -> accept(ctx.sortId()));
         String firstName = accept(ctx.simple_ident());
 
         Term[] args = ctx.call() != null ? visitArguments(ctx.call().argument_list()) : null;
