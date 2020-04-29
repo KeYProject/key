@@ -55,6 +55,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Object visitRulesOrAxioms(KeYParser.RulesOrAxiomsContext ctx) {
+        enableJavaSchemaMode();
         if (ctx.RULES() != null) axiomMode = false;
         if (ctx.AXIOMS() != null) axiomMode = true;
         List<Choice> choices = accept(ctx.choices);
@@ -77,6 +78,7 @@ public class TacletPBuilder extends ExpressionBuilder {
                 taclets.put(key, s);
             }
         }
+        disableJavaSchemaMode();
         return null;
     }
 

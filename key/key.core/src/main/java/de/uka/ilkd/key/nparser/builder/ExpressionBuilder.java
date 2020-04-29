@@ -54,6 +54,11 @@ public class ExpressionBuilder extends DefaultBuilder {
      */
     private List<Term> explicitHeap = new LinkedList<>();
 
+    /**
+     *
+     */
+    protected boolean javaSchemaModeAllowed = false;
+
     public ExpressionBuilder(Services services, NamespaceSet nss) {
         this(services, nss, new Namespace<>());
     }
@@ -464,6 +469,14 @@ public class ExpressionBuilder extends DefaultBuilder {
         return ss;
     }
 
+    protected void enableJavaSchemaMode() {
+        javaSchemaModeAllowed = true;
+    }
+
+    protected void disableJavaSchemaMode() {
+        javaSchemaModeAllowed = false;
+    }
+
     private PairOfStringAndJavaBlock getJavaBlock(Token t) {
         PairOfStringAndJavaBlock sjb = new PairOfStringAndJavaBlock();
         String s = t.getText().trim();
@@ -475,17 +488,22 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         try {
             try {
-                SchemaJavaReader jr = new SchemaRecoder2KeY(services, nss);
-                jr.setSVNamespace(schemaVariables());
-                try {
-                    sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), cleanJava);
-                } catch (Exception e) {
-                    sjb.javaBlock = jr.readBlockWithEmptyContext(cleanJava);
+                if (javaSchemaModeAllowed) {//TEST
+                    SchemaJavaReader jr = new SchemaRecoder2KeY(services, nss);
+                    jr.setSVNamespace(schemaVariables());
+                    try {
+                        sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), cleanJava);
+                    } catch (Exception e) {
+                        sjb.javaBlock = jr.readBlockWithEmptyContext(cleanJava);
+                    }
                 }
             } catch (Exception e) {
                 if (cleanJava.startsWith("{..")) {// do not fallback
                     throw e;
                 }
+            }
+
+            if (sjb.javaBlock == null) {
                 JavaReader jr = new Recoder2KeY(services, nss);
                 try {
                     sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), cleanJava);
