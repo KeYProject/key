@@ -390,7 +390,7 @@ public class KeYFile implements EnvInput {
         var visitor = new TacletPBuilder(initConfig.getServices(), initConfig.namespaces(),
                 initConfig.getTaclet2Builder());
         ctx.accept(visitor);
-        var taclets = visitor.getTaclets();
+        var taclets = visitor.getTopLevelTaclets();
         //System.out.format("Found taclets (%s): %d%n", file, taclets.size());
         initConfig.addTaclets(taclets);
     }

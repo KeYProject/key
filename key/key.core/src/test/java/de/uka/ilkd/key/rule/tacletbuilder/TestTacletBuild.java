@@ -17,6 +17,8 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.nparser.builder.BuildingException;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -158,10 +160,15 @@ public class TestTacletBuild {
         try {
             helper.parseThrowException(new File(testRules + File.separator +
                     "schemaVarInAddruleRespectPrefix.key"));
-        } catch (Throwable t) {
-            assertTrue("Expected taclet prefix exception but was " + t,
-                    t instanceof TacletPrefixBuilder.InvalidPrefixException);
+        } catch (BuildingException e) {
+            assertTrue("Position of error message is wrong.",
+                    e.getMessage().contains("schemaVarInAddruleRespectPrefix.key:21:2"));
+            assertTrue("Cause should be prefix error",
+                    e.getCause().getMessage()
+                            .contains("Schema variable b (formula)occurs at different places in taclet all_left_hide with different prefixes."));
             return;
+        } catch (ProofInputException e) {
+            fail("Unexpected exception");
         }
         fail("Expected an invalid prefix exception as the the addrule contains " +
                 "a schemavariable with wrong prefix.");

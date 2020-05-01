@@ -146,7 +146,7 @@ public class KeyIO {
     public List<Taclet> findTaclets(KeyAst.File ctx) {
         var visitor = new TacletPBuilder(services, nss);
         ctx.accept(visitor);
-        return visitor.getTaclets();
+        return visitor.getTopLevelTaclets();
     }
 
     /**
@@ -243,7 +243,7 @@ public class KeyIO {
                 s.accept(declBuilder);
             }
             long stop = System.currentTimeMillis();
-            System.err.format("MODE: %s took %d%n", "declarations", stop - start);
+            //System.err.format("MODE: %s took %d%n", "declarations", stop - start);
             return this;
         }
 
@@ -255,7 +255,7 @@ public class KeyIO {
                 s.accept(visitor);
             }
             long stop = System.currentTimeMillis();
-            System.err.format("MODE: %s took %d%n", "2nd degree decls", stop - start);
+            //System.err.format("MODE: %s took %d%n", "2nd degree decls", stop - start);
             return this;
         }
 
@@ -280,11 +280,11 @@ public class KeyIO {
                     p.setSchemaVariables(new Namespace<>(KeyIO.this.schemaNamespace));
                 }
                 s.accept(p);
-                taclets.addAll(p.getTaclets());
+                taclets.addAll(p.getTopLevelTaclets());
                 schemaNamespace = p.schemaVariables();
             }
             long stop = System.currentTimeMillis();
-            System.err.format("MODE: %s took %d%n", "taclets", stop - start);
+            //System.err.format("MODE: %s took %d%n", "taclets", stop - start);
             return taclets;
         }
 

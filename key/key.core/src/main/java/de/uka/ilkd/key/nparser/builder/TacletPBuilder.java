@@ -33,7 +33,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     private HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new HashMap<>();
     private boolean axiomMode;
     private boolean negated = false;
-    private List<Taclet> taclets = new ArrayList<>(2048);
+    private List<Taclet> topLevelTaclets = new ArrayList<>(2048);
     private ImmutableSet<Choice> requiredChoices = DefaultImmutableSet.nil();
     private ImmutableSet<Choice> goalChoice = DefaultImmutableSet.nil();
 
@@ -67,7 +67,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         List<Taclet> seq = mapOf(ctx.taclet());
         Map<RuleKey, Taclet> taclets = new HashMap<>();
         for (Taclet s : seq) {
-            if(s==null) continue;
+            if(s==null) continue; //TODO investigate why null taclets appear!
             final RuleKey key = new RuleKey(s);
             if (taclets.containsKey(key)) {
                 semanticError(ctx, "Cannot add taclet \"" + s.name() +
@@ -98,7 +98,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         SchemaVariable osv = schemaVariables().lookup(new Name(id));
         if (osv != null) {
             //semanticError("Schema variable " + id + " already defined.");
-            System.err.format("Clash with %s\n", osv);
+            //System.err.format("Clash with %s\n", osv);
         }
 
         osv = SchemaVariableFactory.createModalOperatorSV(new Name(id), sort, modalities);
@@ -195,18 +195,16 @@ public class TacletPBuilder extends ExpressionBuilder {
             return r;
         } catch (RuntimeException e) {
             //new BuildingException(e).printStackTrace();
-            return null;
-            //throw new BuildingException(ctx, e);
+            throw new BuildingException(ctx, e);
         }
     }
 
     private void announceTaclet(ParserRuleContext ctx, Taclet taclet) {
-        RuleKey key = new RuleKey(taclet);
+        taclet2Builder.put(taclet, peekTBuilder());
         if (currentTBuilder.size() > 1) {//toplevel taclet
             return;
         }
-        taclets.add(taclet);
-        taclet2Builder.put(taclet, peekTBuilder());
+        topLevelTaclets.add(taclet);
         /*if (parsedKeyFile.getTaclets().containsKey(key)) {
             //semanticError(ctx, "A taclet with name %s was already defined", key);
             System.err.format("Taclet clash with %s%n", key);
@@ -787,11 +785,11 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Object visitGoalspec(KeYParser.GoalspecContext ctx) {
+        String name = accept(ctx.string_value());
+
         var addSeq = Sequent.EMPTY_SEQUENT;
         var addRList = ImmutableSLList.<Taclet>nil();
         var addpv = DefaultImmutableSet.<SchemaVariable>nil();
-
-        String name = accept(ctx.string_value());
 
         var rwObj = accept(ctx.replacewith());
         if (ctx.add() != null) addSeq = accept(ctx.add());
@@ -897,9 +895,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         TacletGoalTemplate gt = null;
         if (rwObj == null) {
             // there is no replacewith, so we take
-            gt = new TacletGoalTemplate(addSeq,
-                    addRList,
-                    pvs);
+            gt = new TacletGoalTemplate(addSeq, addRList, pvs);
         } else {
             if (b instanceof NoFindTacletBuilder) {
                 // there is a replacewith without a find.
@@ -1096,7 +1092,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         schemaVariables().add(v);
     }
 
-    public List<Taclet> getTaclets() {
-        return taclets;
+    public List<Taclet> getTopLevelTaclets() {
+        return topLevelTaclets;
     }
 }

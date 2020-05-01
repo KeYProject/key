@@ -713,7 +713,7 @@ option_list
 goalspec
 :
   (name=string_value COLON)?
-  ( rwObj = replacewith
+  ( rwObj=replacewith
     addSeq=add?
     addRList=addrules?
     addpv=addprogvar?

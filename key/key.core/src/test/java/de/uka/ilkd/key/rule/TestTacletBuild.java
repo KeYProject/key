@@ -17,10 +17,11 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.nparser.builder.BuildingException;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletPrefixBuilder;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,13 +84,13 @@ public class TestTacletBuild {
 
     }
 
-	@Test
+    @Test
     public void testUniquenessOfIfAndFindVarSVsInIfAndFind() {
         boolean thrown = false;
         SchemaVariable u =
                 TacletForTests.getSchemaVariables().lookup(new Name("u"));
         Term A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")),
-                        NO_SUBTERMS);
+                NO_SUBTERMS);
         Term t1 = tb.all((QuantifiableVariable) u, A);
         Sequent seq = Sequent.createSuccSequent
                 (Semisequent.EMPTY_SEMISEQUENT.insert
@@ -158,16 +159,20 @@ public class TestTacletBuild {
 
     public static final String testRules = HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "tacletprefix";
 
-	@Test
-	public void testSchemavariablesInAddrulesRespectPrefix() {
+    @Test
+    public void testSchemavariablesInAddrulesRespectPrefix() {
         try {
-            helper.parseThrowException
-                    (new File(testRules + File.separator +
-                            "schemaVarInAddruleRespectPrefix.key"));
-        } catch (Throwable t) {
-            assertTrue("Expected taclet prefix exception but was " + t,
-                    t instanceof TacletPrefixBuilder.InvalidPrefixException);
+            helper.parseThrowException(new File(testRules + File.separator +
+                    "schemaVarInAddruleRespectPrefix.key"));
+        } catch (BuildingException e) {
+            assertTrue("Position of error message is wrong.",
+                    e.getMessage().contains("schemaVarInAddruleRespectPrefix.key:21:2"));
+            assertTrue("Cause should be prefix error",
+                    e.getCause().getMessage()
+                            .contains("Schema variable b (formula)occurs at different places in taclet all_left_hide with different prefixes."));
             return;
+        } catch (ProofInputException e) {
+            fail("Unexpected exception");
         }
         fail("Expected an invalid prefix exception as the the addrule contains " +
                 "a schemavariable with wrong prefix.");
