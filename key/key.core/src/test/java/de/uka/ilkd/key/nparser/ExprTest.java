@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import org.antlr.v4.runtime.CharStreams;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
@@ -15,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +38,7 @@ public class ExprTest {
              BufferedReader reader = new BufferedReader(new InputStreamReader(s))) {
             String l;
             while ((l = reader.readLine()) != null) {
-                if (l.isBlank() || l.startsWith("#")) {
+                if (l.trim().isEmpty() || l.startsWith("#")) {
                     continue;
                 }
                 seq.add(new Object[]{l});
@@ -47,7 +50,7 @@ public class ExprTest {
     @Test
     public void parseAndVisit() throws IOException {
         KeyIO io = getIo();
-        var actual = io.parseExpression(expr);
+        @NotNull Term actual = io.parseExpression(expr);
         if (actual == null) {
             ParseAllKeyFilesTest.debugLexer(ParsingFacade.lex(CharStreams.fromString(expr)));
         }
@@ -88,8 +91,8 @@ public class ExprTest {
          */
 
         //services.getTypeConverter().init();
-        var p = "/de/uka/ilkd/key/proof/rules/ldt.key";
-        var url = getClass().getResource(p);
+        String p = "/de/uka/ilkd/key/proof/rules/ldt.key";
+        URL url = getClass().getResource(p);
         Assume.assumeNotNull(url);
         KeyIO io = new KeyIO(services);
         io.load(url).parseFile()

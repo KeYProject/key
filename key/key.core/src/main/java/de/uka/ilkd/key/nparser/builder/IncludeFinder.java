@@ -24,7 +24,7 @@ public class IncludeFinder extends AbstractBuilder<Void> {
 
     public IncludeFinder(URL base) {
         this.base = base;
-        var a = base.getPath();
+        String a = base.getPath();
         basePath = a.substring(0, a.lastIndexOf('/'));
     }
 

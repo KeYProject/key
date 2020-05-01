@@ -265,7 +265,7 @@ public class TacletBuilderManipulators {
     }
 
     public static void register(TacletBuilderCommand... cb) {
-        for (var a : cb) {
+        for (TacletBuilderCommand a : cb) {
             register(a);
         }
     }

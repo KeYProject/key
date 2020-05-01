@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.Token;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -168,11 +169,11 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
 
     @Test
     public void testLex() {
-        var lexer = ParsingFacade.lex(CharStreams.fromString(input));
-        var toks = lexer.getAllTokens();
+        KeYLexer lexer = ParsingFacade.lex(CharStreams.fromString(input));
+        List<? extends Token> toks = lexer.getAllTokens();
         System.out.println(toks);
         assertEquals(1, toks.size());
-        var t = toks.get(0).getType();
+        int t = toks.get(0).getType();
         assertTrue("Wrong literal type", KeYLexer.NUM_LITERAL == t ||
                 KeYLexer.HEX_LITERAL == t ||
                 KeYLexer.BIN_LITERAL == t ||
@@ -180,14 +181,14 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
     }
 
     public Term parseTerm(String s) {
-        var ctx = ParsingFacade.parseExpression(CharStreams.fromString(s));
+        KeyAst.Term ctx = ParsingFacade.parseExpression(CharStreams.fromString(s));
         return (Term) ctx.accept(new ExpressionBuilder(services, nss));
     }
 
     @Test
     public void testParse() {
         try {
-            var actual = parseTerm(input);
+            Term actual = parseTerm(input);
             if (type == ERROR) fail();
             else assertEquals(expected, actual.toString());
         } catch (Exception e) {

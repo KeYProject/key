@@ -13,10 +13,7 @@
 
 package de.uka.ilkd.key.proof.io;
 
-import de.uka.ilkd.key.nparser.KeyAst;
-import de.uka.ilkd.key.nparser.KeyIO;
-import de.uka.ilkd.key.nparser.ParsingFacade;
-import de.uka.ilkd.key.nparser.ProblemInformation;
+import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.nparser.builder.ContractsAndInvariantsFinder;
 import de.uka.ilkd.key.nparser.builder.ProblemFinder;
 import de.uka.ilkd.key.nparser.builder.TacletPBuilder;
@@ -26,10 +23,12 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -217,7 +216,7 @@ public class KeYFile implements EnvInput {
         if (file.isDirectory()) {
             return null;
         }
-        var ctx = getParseContext();
+        KeyAst.File ctx = getParseContext();
         return ctx.findProofSettings();
     }
 
@@ -243,7 +242,7 @@ public class KeYFile implements EnvInput {
     public Includes readIncludes() throws ProofInputException {
         if (includes == null) {
             try {
-                var ctx = getParseContext();
+                KeyAst.File  ctx = getParseContext();
                 includes = ctx.getIncludes(file.file().getParentFile().toURI().toURL());
             } catch (Exception e) {
                 throw new ProofInputException(e);
@@ -255,7 +254,7 @@ public class KeYFile implements EnvInput {
 
     @Override
     public File readBootClassPath() {
-        var pi = getProblemInformation();
+        @NotNull ProblemInformation pi = getProblemInformation();
         String bootClassPath = pi.getBootClassPath();
         if (bootClassPath == null) return null;
         File bootClassPathFile = new File(bootClassPath);
@@ -270,7 +269,7 @@ public class KeYFile implements EnvInput {
 
     protected @NotNull ProblemInformation getProblemInformation() {
         if (problemInformation == null) {
-            var ctx = getParseContext();
+            KeyAst.File ctx = getParseContext();
             problemInformation = ctx.getProblemInformation();
         }
         return problemInformation;
@@ -280,7 +279,7 @@ public class KeYFile implements EnvInput {
     @NotNull
     @Override
     public List<@NotNull File> readClassPath() {
-        var pi = getProblemInformation();
+        @NotNull ProblemInformation pi = getProblemInformation();
         String parentDirectory = file.file().getParent();
         List<File> fileList = new ArrayList<>();
         for (String cp : pi.getClasspath()) {
@@ -299,7 +298,7 @@ public class KeYFile implements EnvInput {
 
     @Override
     public String readJavaPath() throws ProofInputException {
-        var pi = getProblemInformation();
+        @NotNull ProblemInformation pi = getProblemInformation();
         String javaPath = pi.getJavaSource();
         if (javaPath != null) {
             File absFile = new File(javaPath);
@@ -326,7 +325,7 @@ public class KeYFile implements EnvInput {
 
         //read .key file
         Debug.out("Reading KeY file", file);
-        var ci = getParseContext().getChoices();
+        ChoiceInformation ci = getParseContext().getChoices();
         initConfig.addCategory2DefaultChoices(ci.getDefaultOptions());
 
         readSorts();
@@ -334,7 +333,7 @@ public class KeYFile implements EnvInput {
         readRules();
         SpecificationRepository specRepos
                 = initConfig.getServices().getSpecificationRepository();
-        var cinvs = new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
+        ContractsAndInvariantsFinder cinvs = new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
         getParseContext().accept(cinvs);
         specRepos.addContracts(ImmutableSet.fromCollection(cinvs.getContracts()));
         specRepos.addClassInvariants(ImmutableSet.fromCollection(cinvs.getInvariants()));
@@ -358,10 +357,10 @@ public class KeYFile implements EnvInput {
      * of the initial configuration
      */
     public void readSorts() throws ProofInputException {
-        var ctx = getParseContext();
+        KeyAst.File  ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         io.evalDeclarations(ctx);
-        var choice = getParseContext().getChoices();
+        ChoiceInformation choice = getParseContext().getChoices();
         //we ignore the namespace of choice finder.
         initConfig.addCategory2DefaultChoices(choice.getDefaultOptions());
     }
@@ -373,7 +372,7 @@ public class KeYFile implements EnvInput {
      */
     public void readFuncAndPred() throws ProofInputException {
         if (file == null) return;
-        var ctx = getParseContext();
+        KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         io.evalFuncAndPred(ctx);
     }
@@ -386,11 +385,11 @@ public class KeYFile implements EnvInput {
      */
     public void readRules() throws ProofInputException {
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
-        var ctx = getParseContext();
-        var visitor = new TacletPBuilder(initConfig.getServices(), initConfig.namespaces(),
+        KeyAst.File ctx = getParseContext();
+        TacletPBuilder visitor = new TacletPBuilder(initConfig.getServices(), initConfig.namespaces(),
                 initConfig.getTaclet2Builder());
         ctx.accept(visitor);
-        var taclets = visitor.getTopLevelTaclets();
+        List<Taclet> taclets = visitor.getTopLevelTaclets();
         //System.out.format("Found taclets (%s): %d%n", file, taclets.size());
         initConfig.addTaclets(taclets);
     }

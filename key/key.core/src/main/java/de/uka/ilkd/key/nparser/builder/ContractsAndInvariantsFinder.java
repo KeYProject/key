@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeYParser;
@@ -61,7 +62,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     public Object visitOne_contract(KeYParser.One_contractContext ctx) {
         String contractName = visitSimple_ident(ctx.contractName);
         //for program variable declarations
-        var oldProgVars = namespaces().programVariables();
+        Namespace<IProgramVariable> oldProgVars = namespaces().programVariables();
         namespaces().setProgramVariables(new Namespace<>(oldProgVars));
         declarationBuilder.visitProg_var_decls(ctx.prog_var_decls());
         Term fma = accept(ctx.fma);
@@ -93,7 +94,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     public Object visitOne_invariant(KeYParser.One_invariantContext ctx) {
         String invName = visitSimple_ident(ctx.simple_ident());
         Term fma = accept(ctx.fma);
-        var displayName = ctx.displayName != null ? ctx.displayName.getText() : null;
+        String displayName = ctx.displayName != null ? ctx.displayName.getText() : null;
         DLSpecFactory dsf = new DLSpecFactory(getServices());
         try {
             ClassInvariant inv = dsf.createDLClassInvariant(invName, displayName, selfVar, fma);

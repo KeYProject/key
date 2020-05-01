@@ -16,7 +16,7 @@ public class ConstructorBasedBuilder extends AbstractConditionBuilder {
 
     private static boolean lastArgumentOfFirstContructorIsBoolean(Class<? extends VariableCondition> clazz) {
         try {
-            var types = clazz.getConstructors()[0].getParameterTypes();
+            Class<?>[] types = clazz.getConstructors()[0].getParameterTypes();
             return types[types.length - 1] == Boolean.class
                     || types[types.length - 1] == Boolean.TYPE;
         } catch (ArrayIndexOutOfBoundsException e) {

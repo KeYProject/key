@@ -12,6 +12,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -37,7 +38,7 @@ public class NamespaceBuilder {
     }
 
     public NamespaceBuilder addFunction(String expr) {
-        var matcher = FUNCTION.matcher(expr);
+        Matcher matcher = FUNCTION.matcher(expr);
         if (matcher.find()) {
             Sort sort = getOrCreateSort(matcher.group(1));
             String name = matcher.group(2);

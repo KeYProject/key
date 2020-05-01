@@ -48,7 +48,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         public @Nullable ProofSettings findProofSettings() {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
             if (ctx.decls() != null && ctx.decls().pref != null) {
-                var text = BuilderHelpers.trim(ctx.decls().pref.getText(), '"')
+                String text = BuilderHelpers.trim(ctx.decls().pref.getText(), '"')
                         .replace("\\\\:", ":");
                 settings.loadSettingsFromString(text);
             }
@@ -57,21 +57,21 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
         public @Nullable Triple<String, Integer, Integer> findProofScript() {
             if (ctx.problem() != null && ctx.problem().proofScript() != null) {
-                var pctx = ctx.problem().proofScript();
-                var text = pctx.ps.getText();
+                KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
+                String text = pctx.ps.getText();
                 return new Triple<>(CharMatcher.is('"').trimFrom(text), pctx.ps.getLine(), pctx.ps.getCharPositionInLine());
             }
             return null;
         }
 
         public Includes getIncludes(URL base) {
-            var finder = new IncludeFinder(base);
+            IncludeFinder finder = new IncludeFinder(base);
             accept(finder);
             return finder.getIncludes();
         }
 
         public ChoiceInformation getChoices() {
-            var finder = new ChoiceFinder();
+            ChoiceFinder finder = new ChoiceFinder();
             accept(finder);
             return finder.getChoiceInformation();
         }
@@ -83,7 +83,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
 
         public Token findProof() {
-            var a = ctx.proof();
+            KeYParser.ProofContext a = ctx.proof();
             if (a != null)
                 return a.PROOF().getSymbol();
             return null;

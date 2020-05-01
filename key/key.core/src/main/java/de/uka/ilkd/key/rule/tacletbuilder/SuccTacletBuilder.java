@@ -75,7 +75,7 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
 		final TacletPrefixBuilder prefixBuilder =
 				new TacletPrefixBuilder(this);
 		prefixBuilder.build();
-		var t=  new SuccTaclet(name,
+		SuccTaclet t = new SuccTaclet(name,
 				new TacletApplPart(ifseq,
 						varsNew,
 						varsNotFreeIn,

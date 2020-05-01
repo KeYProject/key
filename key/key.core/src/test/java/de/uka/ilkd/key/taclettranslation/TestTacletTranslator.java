@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.ParsingFacade;
@@ -61,7 +62,7 @@ public class TestTacletTranslator extends TestCase {
     }
 
     private Term parseTerm(String s) {
-        var ctx = ParsingFacade.parseExpression(CharStreams.fromString(s));
+        KeyAst.Term ctx = ParsingFacade.parseExpression(CharStreams.fromString(s));
         return (Term) ctx.accept(new ExpressionBuilder(services, nss, lastSchemaNamespace));
     }
 

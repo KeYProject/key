@@ -247,7 +247,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             op_name = "gt";
         if (ctx.GREATEREQUAL() != null)
             op_name = "geq";
-        var op = (Function) functions().lookup(new Name(op_name));
+        Function op = (Function) functions().lookup(new Name(op_name));
         if (op == null) {
             return updateOrigin(termL, ctx);
             //semanticError(ctx, "Function symbol '" + op_name + "' not found.");
@@ -266,7 +266,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ctx.MINUS() != null) {
             op_name = "sub";
         }
-        var op = (Function) functions().lookup(new Name(op_name));
+        Function op = (Function) functions().lookup(new Name(op_name));
         if (op == null) {
             return updateOrigin(termL, ctx);
 //            semanticError(ctx, "Function symbol '" + op_name + "' not found.");
@@ -291,10 +291,10 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ctx.b == null) return termL;
 
         Term termR = accept(ctx.b);
-        var div = functions().lookup("div");
-        var mod = functions().lookup("mod");
+        Function div = functions().lookup("div");
+        Function mod = functions().lookup("mod");
 
-        var op = ctx.SLASH() != null ? div : mod;
+        Function op = ctx.SLASH() != null ? div : mod;
         return binaryTerm(ctx, op, termL, termR);
     }
 
@@ -310,8 +310,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Object visitBracket_term(KeYParser.Bracket_termContext ctx) {
         Term t = accept(ctx.primitive_labeled_term());
         for (int i = 0; i < ctx.bracket_suffix_heap().size(); i++) {
-            var brace_suffix = ctx.bracket_suffix_heap(i).brace_suffix();
-            var heap = ctx.bracket_suffix_heap(i).heap;
+            KeYParser.Brace_suffixContext brace_suffix = ctx.bracket_suffix_heap(i).brace_suffix();
+            KeYParser.TermContext heap = ctx.bracket_suffix_heap(i).heap;
             t = accept(brace_suffix, t);
             if (heap != null) {
                 t = replaceHeap(t, accept(heap), heap);
@@ -519,7 +519,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitMetaId(KeYParser.MetaIdContext ctx) {
-        var id = visitSimple_ident(ctx.simple_ident());
+        String id = visitSimple_ident(ctx.simple_ident());
         TermTransformer v = AbstractTermTransformer.name2metaop(id);
         if (v == null)
             semanticError(ctx, "Unknown metaoperator: " + id);
@@ -767,7 +767,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     ". Casts between primitive and reference types are not allowed. ");
         }
         assert s != null;
-        final var castSymbol = s.getCastSymbol(getServices());
+        SortDependingFunction castSymbol = s.getCastSymbol(getServices());
         return getTermFactory().createTerm(castSymbol, result);
     }
 
@@ -954,12 +954,12 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Term visitIfThenElseTerm(KeYParser.IfThenElseTermContext ctx) {
-        var condF = (Term) ctx.condF.accept(this);
+        Term condF = (Term) ctx.condF.accept(this);
         if (condF.sort() != Sort.FORMULA) {
             semanticError(ctx, "Condition of an \\if-then-else term has to be a formula.");
         }
-        var thenT = (Term) ctx.thenT.accept(this);
-        var elseT = (Term) ctx.elseT.accept(this);
+        Term thenT = (Term) ctx.thenT.accept(this);
+        Term elseT = (Term) ctx.elseT.accept(this);
         return capsulateTf(ctx, () -> getTermFactory().createTerm(IfThenElse.IF_THEN_ELSE, condF, thenT, elseT));
     }
 
@@ -977,7 +977,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term elseT = accept(ctx.elseT);
         ImmutableArray<QuantifiableVariable> exVarsArray
                 = new ImmutableArray<>(exVars);
-        var result = getTermFactory().createTerm(IfExThenElse.IF_EX_THEN_ELSE,
+        Term result = getTermFactory().createTerm(IfExThenElse.IF_EX_THEN_ELSE,
                 new Term[]{condF, thenT, elseT},
                 exVarsArray,
                 null);
@@ -995,7 +995,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             op = Quantifier.EX;
         List<QuantifiableVariable> vs = accept(ctx.bound_variables());
         Term a1 = accept(ctx.sub);
-        var a = getTermFactory().createTerm(op,
+        Term a = getTermFactory().createTerm(op,
                 new ImmutableArray<>(a1),
                 new ImmutableArray<>(vs.toArray(new QuantifiableVariable[0])),
                 null);
@@ -1168,14 +1168,14 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "Cannot can be limited: " + op);
             }
         } else {
-            var firstName = ctx.name.simple_ident().size() == 0 ? ctx.name.NUM_LITERAL().getText()
+            String firstName = ctx.name.simple_ident().size() == 0 ? ctx.name.NUM_LITERAL().getText()
                     : ctx.name.simple_ident(0).getText();
             op = lookupVarfuncId(ctx, firstName, sortId);
             if (op instanceof ProgramVariable && ctx.name.simple_ident().size() > 1) {
-                var otherParts = ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
-                var v = (ProgramVariable) op;
-                var tv = getServices().getTermFactory().createTerm(v);
-                var memberName = otherParts.get(0).getText();
+                List<KeYParser.Simple_identContext> otherParts = ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
+                ProgramVariable v = (ProgramVariable) op;
+                Term tv = getServices().getTermFactory().createTerm(v);
+                String memberName = otherParts.get(0).getText();
                 if (v.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
                     if ("length".equals(memberName)) {
                         return getServices().getTermBuilder().seqLen(tv);
@@ -1185,7 +1185,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     }
                 }
                 memberName = CharMatcher.anyOf("()").trimFrom(memberName);
-                var attr = getAttributeInPrefixSort(v.sort(), memberName);
+                Operator attr = getAttributeInPrefixSort(v.sort(), memberName);
                 return createAttributeTerm(tv, attr, ctx);
             }
         }
@@ -1196,17 +1196,17 @@ public class ExpressionBuilder extends DefaultBuilder {
         String firstName = accept(ctx.firstName);
         if (isPackage(firstName) || isClass(firstName)) {
             //consume suffix as long as it is part of a java class or package
-            var javaPackage = isPackage(firstName) ? firstName : "";
-            var startWithPackage = isPackage(firstName);
-            var javaClass = isClass(firstName) ? firstName : "";
+            String javaPackage = isPackage(firstName) ? firstName : "";
+            boolean startWithPackage = isPackage(firstName);
+            String javaClass = isClass(firstName) ? firstName : "";
 
             int currentSuffix = 0;
 
             //region split up package and class name
             while (startWithPackage && ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
-                var a = (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
+                KeYParser.Attribute_simpleContext a = (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
                 if (a.heap != null) break; //No heap on java package allowed
-                var cur = accept(a.id);
+                @Nullable Object cur = accept(a.id);
                 if (isPackage(javaPackage + "." + cur)) {
                     javaPackage += "." + cur;
                     currentSuffix++;
@@ -1214,7 +1214,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
 
             while (ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
-                var a = (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
+                KeYParser.Attribute_simpleContext a = (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
                 if (a.heap != null) break; //No heap on java Class name allowed
                 String cur = accept(a.id);
                 String candidate = javaClass.isEmpty() ? cur : (javaClass + "." + cur);
@@ -1240,18 +1240,18 @@ public class ExpressionBuilder extends DefaultBuilder {
                 boolean isLast = i == ctx.attribute().size() - 1;
 
                 if (attrib instanceof KeYParser.Attribute_simpleContext) {
-                    var simpleContext = (KeYParser.Attribute_simpleContext) attrib;
+                    KeYParser.Attribute_simpleContext simpleContext = (KeYParser.Attribute_simpleContext) attrib;
                     boolean isCall = simpleContext.call() != null;
-                    var heap = simpleContext.heap; //TODO?
+                    KeYParser.TermContext heap = simpleContext.heap; //TODO?
                     String attributeName = accept(simpleContext.id);
                     ProgramVariable maybeAttr = getJavaInfo().getAttribute(attributeName, kjt);
                     if (maybeAttr != null) {
-                        var op = getAttributeInPrefixSort(kjt.getSort(), attributeName);
+                        Operator op = getAttributeInPrefixSort(kjt.getSort(), attributeName);
                         current = createAttributeTerm(current, op, ctx);
                     } else {
-                        var pm = getStaticQuery(kjt, attributeName);
+                        IProgramMethod pm = getStaticQuery(kjt, attributeName);
                         if (pm != null) {
-                            var args = visitArguments(simpleContext.call().argument_list());
+                            Term[] args = visitArguments(simpleContext.call().argument_list());
                             current = getJavaInfo().getStaticProgramMethodTerm(attributeName, args, kjt.getFullName());
                         } else {
                             semanticError(ctx, "Unknown java attribute: %s", attributeName);
@@ -1261,10 +1261,10 @@ public class ExpressionBuilder extends DefaultBuilder {
                         return current;
                     }
                 } else if (attrib instanceof KeYParser.Attribute_complexContext) {
-                    var attrid = (KeYParser.Attribute_complexContext) attrib;
+                    KeYParser.Attribute_complexContext attrid = (KeYParser.Attribute_complexContext) attrib;
                     String className = attrid.sort.getText();
                     String attributeName = attrid.id.getText();
-                    var args = visitArguments(attrid.call().argument_list());
+                    Term[] args = visitArguments(attrid.call().argument_list());
                     current = getServices().getJavaInfo().getStaticProgramMethodTerm(attributeName, args, className);
                     if (current == null) {
                         final Sort sort = lookupSort(className);
@@ -1308,8 +1308,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                 }
                 return current;
             } else if (ctxSuffix instanceof KeYParser.Attribute_simpleContext) {
-                final var attrid = (KeYParser.Attribute_simpleContext) ctxSuffix;
-                var memberName = attrid.id.getText();
+                KeYParser.Attribute_simpleContext attrid = (KeYParser.Attribute_simpleContext) ctxSuffix;
+                String memberName = attrid.id.getText();
                 if (current.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
                     if ("length".equals(memberName)) {
                         return getServices().getTermBuilder().seqLen(current);
@@ -1320,17 +1320,17 @@ public class ExpressionBuilder extends DefaultBuilder {
                     }
                 } else {
                     boolean isCall = attrid.call() != null;
-                    var sfxargs = isCall ? visitArguments(attrid.call().argument_list()) : null;
+                    Term[] sfxargs = isCall ? visitArguments(attrid.call().argument_list()) : null;
                     Term heap = accept(attrid.heap);
                     if (isCall) {
-                        var classRef = current.sort().name().toString();
+                        String classRef = current.sort().name().toString();
                         KeYJavaType kjt = getTypeByClassName(classRef); //Why not direct use of Sort?
                         if (kjt == null) semanticError(ctxSuffix, "Could not find sort for %s", classRef);
                         assert kjt != null;
                         classRef = kjt.getFullName();
                         current = getServices().getJavaInfo().getProgramMethodTerm(current, memberName, sfxargs, classRef, true);
                     } else {
-                        var attr = getAttributeInPrefixSort(current.sort(), memberName);
+                        Operator attr = getAttributeInPrefixSort(current.sort(), memberName);
                         current = createAttributeTerm(current, attr, ctxSuffix);
                     }
 
@@ -1338,12 +1338,12 @@ public class ExpressionBuilder extends DefaultBuilder {
                         current = replaceHeap(current, heap, ctxSuffix);
                 }
             } else if (ctxSuffix instanceof KeYParser.Attribute_complexContext) {
-                var attrid = (KeYParser.Attribute_complexContext) ctxSuffix;
+                KeYParser.Attribute_complexContext attrid = (KeYParser.Attribute_complexContext) ctxSuffix;
                 Term heap = accept(attrid.heap);
                 String classRef = attrid.sort.getText();
                 String memberName = attrid.id.getText();
                 boolean isCall = attrid.call() != null;
-                var sfxargs = isCall ? visitArguments(attrid.call().argument_list()) : null;
+                Term[] sfxargs = isCall ? visitArguments(attrid.call().argument_list()) : null;
                 if (isCall) {
                     KeYJavaType kjt = getTypeByClassName(classRef); //Why not direct use of Sort?
                     if (kjt == null) semanticError(ctxSuffix, "Could not find sort for %s", classRef);
@@ -1575,7 +1575,7 @@ public class ExpressionBuilder extends DefaultBuilder {
      */
     private Term replaceHeap(Term term, Term heap, ParserRuleContext ctx) {
         if (explicitHeap.contains(term)) return term;
-        var t = replaceHeap0(term, heap, ctx);
+        Term t = replaceHeap0(term, heap, ctx);
         markHeapAsExplicit(t);
         return t;
     }
@@ -1664,7 +1664,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 break;
             }
         }
-        final var classEnd = i - 1;
+        int classEnd = i - 1;
         attributeName = parts.stream().skip(classEnd).collect(Collectors.toList());
         return (new JavaQuery(packageName, className, attributeName, kjt));
     }

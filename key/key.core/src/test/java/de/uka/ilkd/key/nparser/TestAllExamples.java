@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nparser;
 
+import de.uka.ilkd.key.nparser.builder.ProblemFinder;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Ignore;
@@ -45,7 +46,7 @@ public class TestAllExamples {
         File examples = FindResources.findFolder("key.ui/examples", "../key.ui/examples");
         Assume.assumeTrue(examples != null);
         Files.walkFileTree(examples.toPath(),
-                new SimpleFileVisitor<>() {
+                new SimpleFileVisitor<Path>() {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                         if (attrs.isRegularFile() && file.toString().endsWith(".key")
@@ -63,7 +64,7 @@ public class TestAllExamples {
     @Ignore("Not all files are parseable without Java Type support. ")
     public void parse() throws IOException {
         KeyIO io = getIo();
-        var o = io.load(file).loadCompleteProblem();
+        ProblemFinder o = io.load(file).loadCompleteProblem();
         System.out.println(o);
         //Assert.assertTrue(pkf.problemTerm != null || pkf.getChooseContract() != null || pkf.getProofObligation() != null);
     }

@@ -2,10 +2,7 @@ package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.proof.io.RuleSource;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedInputStream;
@@ -49,9 +46,9 @@ public abstract class ParsingFacade {
         while (!queue.isEmpty()) {
             url = queue.pop();
             reached.add(url);
-            var ctx = parseFile(url);
+            KeyAst.File ctx = parseFile(url);
             ctxs.add(ctx);
-            var includes = ctx.getIncludes(url).getRuleSets();
+            Collection<RuleSource> includes = ctx.getIncludes(url).getRuleSets();
             for (RuleSource u : includes) {
                 if (!reached.contains(u.url())) {
                     queue.add(u.url());
@@ -63,13 +60,13 @@ public abstract class ParsingFacade {
 
     public static ChoiceInformation getChoices(List<KeyAst.File> ctxs) {
         ChoiceInformation ci = new ChoiceInformation();
-        var finder = new ChoiceFinder(ci);
+        ChoiceFinder finder = new ChoiceFinder(ci);
         ctxs.forEach(it -> it.accept(finder));
         return ci;
     }
 
     private static KeYParser createParser(CharStream stream) {
-        var p = new KeYParser(new CommonTokenStream(lex(stream)));
+        KeYParser p = new KeYParser(new CommonTokenStream(lex(stream)));
         p.removeErrorListeners();
         p.addErrorListener(p.getErrorReporter());
         return p;
@@ -87,7 +84,7 @@ public abstract class ParsingFacade {
         long start = System.currentTimeMillis();
         try (BufferedInputStream is = new BufferedInputStream(url.openStream());
              ReadableByteChannel channel = Channels.newChannel(is)) {
-            var stream = CharStreams.fromChannel(
+            CodePointCharStream stream = CharStreams.fromChannel(
                     channel,
                     Charset.defaultCharset(),
                     4096,
@@ -110,20 +107,20 @@ public abstract class ParsingFacade {
     }
 
     public static KeyAst.File parseFile(CharStream stream) {
-        var p = createParser(stream);
+        KeYParser p = createParser(stream);
         KeYParser.FileContext ctx = p.file();
         return new KeyAst.File(ctx);
     }
 
     public static KeyAst.Term parseExpression(CharStream stream) {
-        var p = createParser(stream);
-        final var term = p.termEOF().term();
+        KeYParser p = createParser(stream);
+        KeYParser.TermContext term = p.termEOF().term();
         p.getErrorReporter().throwException();
         return new KeyAst.Term(term);
     }
 
     public static KeyAst.Seq parseSequent(CharStream stream) {
-        var p = createParser(stream);
+        KeYParser p = createParser(stream);
         return new KeyAst.Seq(p.seqEOF().seq());
     }
 
@@ -132,7 +129,7 @@ public abstract class ParsingFacade {
     }
 
     public static KeYParser.Id_declarationContext parseIdDeclaration(CharStream stream) {
-        var p = createParser(stream);
+        KeYParser p = createParser(stream);
         return p.id_declaration();
         /*
     @Override

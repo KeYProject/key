@@ -254,9 +254,9 @@ public class TestTermParser extends AbstractTestTermParser {
 
     @Test
     public void test11() throws Exception {
-        var s = "\\[{ int x = 2; {String s = \"\\\"}\";} }\\] true";
+        String s = "\\[{ int x = 2; {String s = \"\\\"}\";} }\\] true";
         System.out.println(s);
-        var t = parseTerm(s);
+        Term t = parseTerm(s);
     }
 
 
@@ -310,7 +310,7 @@ public class TestTermParser extends AbstractTestTermParser {
         String s = "\\forall int j; {globalIntPV:=j} globalIntPV = j";
         String exp = "\\forall int j; ({globalIntPV:=j} globalIntPV) = j";
         Term t = parseTerm(s);
-        var u = parseTerm(exp);
+        Term u = parseTerm(exp);
         assertFalse("expected ({globalIntPV:=j}globalIntPV)=j) but is {globalIntPV:=j}(globalIntPV=j)",
                 t.sub(0).op() instanceof UpdateApplication);
     }
@@ -361,8 +361,8 @@ public class TestTermParser extends AbstractTestTermParser {
     }
 
     private void assertTermEquals(String actual, String expected) throws Exception {
-        var t = parseTerm(actual);
-        var u = parseTerm(expected);
+        Term t = parseTerm(actual);
+        Term u = parseTerm(expected);
         System.out.println(t);
         System.out.println(u);
         assertEquals(u.toString(), t.toString());
@@ -468,7 +468,7 @@ public class TestTermParser extends AbstractTestTermParser {
     }
 
     public void testJavaQueryAndAttribute_all() throws Exception {
-        var all = "\\forall T t;( (t.query()=t & t.(T::query)()=t & T.staticQ()=t "
+        String all = "\\forall T t;( (t.query()=t & t.(T::query)()=t & T.staticQ()=t "
                 + "& T.staticQ(t)=t & T.b=t.(T::a) & T.d=t.(T::c) & t.(T::e)=T.f & t.(T::g)=t.(T::h)))";
         testParseQueriesAndAttributes(all);
     }
@@ -491,7 +491,7 @@ public class TestTermParser extends AbstractTestTermParser {
     @Test
     public void testNegativeLiteralParsing1() throws Exception {
         String s1 = "-1234";
-        var t = parseTerm(s1);
+        Term t = parseTerm(s1);
         assertEquals("neg", t.op().name().toString());
         assertEquals("Z", t.sub(0).op().name().toString());
     }
@@ -499,7 +499,7 @@ public class TestTermParser extends AbstractTestTermParser {
     @Test
     public void testNegativeLiteralParsing2() throws Exception {
         String s2 = "-(1) ";
-        var t = parseTerm(s2);
+        Term t = parseTerm(s2);
         assertEquals("Failed parsing negative complex term", "neg", t.op().name().toString());
         assertEquals("Z", t.sub(0).op().name().toString());
 
@@ -508,7 +508,7 @@ public class TestTermParser extends AbstractTestTermParser {
     @Test
     public void testNegativeLiteralParsing3() throws Exception {
         String s3 = "\\forall int i; -i = 0 ";
-        var t = parseTerm(s3);
+        Term t = parseTerm(s3);
         assertEquals("neg", t.sub(0).sub(0).op().name().toString());
     }
 

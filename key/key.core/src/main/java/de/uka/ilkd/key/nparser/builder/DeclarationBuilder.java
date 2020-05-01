@@ -55,8 +55,8 @@ public class DeclarationBuilder extends DefaultBuilder {
     public Object visitProg_var_decls(KeYParser.Prog_var_declsContext ctx) {
         String var_name;
         for (int i = 0; i < ctx.simple_ident_comma_list().size(); i++) {
-            var var_names = (List<String>) accept(ctx.simple_ident_comma_list(i));
-            var kjt = (KeYJavaType) accept(ctx.keyjavatype(i));
+            List<String> var_names = (List<String>) accept(ctx.simple_ident_comma_list(i));
+            KeYJavaType kjt = (KeYJavaType) accept(ctx.keyjavatype(i));
             assert var_names != null;
             for (String varName : var_names) {
                 var_name = varName;
@@ -87,7 +87,7 @@ public class DeclarationBuilder extends DefaultBuilder {
         //System.out.println("choice: " + cat);
         for (KeYParser.OptionDeclContext optdecl : ctx.optionDecl()) {
             Token catctx = optdecl.IDENT;
-            var name = cat + ":" + catctx.getText();
+            String name = cat + ":" + catctx.getText();
             Choice c = choices().lookup(new Name(name));
             if (c == null) {
                 c = new Choice(catctx.getText(), cat);

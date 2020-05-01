@@ -15,6 +15,9 @@ package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.nparser.ChoiceInformation;
+import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.nparser.ProblemInformation;
 import de.uka.ilkd.key.nparser.ProofReplayer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -26,7 +29,9 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.Triple;
+import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
+import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -111,7 +116,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         ProofSettings settings = getPreferences();
         initConfig.setSettings(settings);
 
-        var ci = getParseContext().getChoices();
+        ChoiceInformation ci = getParseContext().getChoices();
         settings.getChoiceSettings().updateWith(ci.getActivatedChoices());
         initConfig.setActivatedChoices(
                 settings.getChoiceSettings().getDefaultChoicesAsSet());
@@ -200,10 +205,10 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * Reads a saved proof of a .key file.
      */
     public void readProof(IProofFileParser prl) throws IOException {
-        var ctx = getParseContext();
+        KeyAst.File ctx = getParseContext();
         Token token = ctx.findProof();
         if (token != null) {
-            var stream = file.getCharStream();
+            CharStream stream = file.getCharStream();
             ProofReplayer.run(token, stream, prl);
         }
     }
@@ -249,7 +254,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @throws Exception Occurred Exception.
      */
     protected Profile readProfileFromFile() throws Exception {
-        var pi = getProblemInformation();
+        @NotNull ProblemInformation pi = getProblemInformation();
         String profileName = pi.getProfile();
         if (profileName != null && !profileName.isEmpty()) {
             return ProofInitServiceUtil.getDefaultProfile(profileName);

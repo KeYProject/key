@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.*;
@@ -198,7 +199,7 @@ public class Matcher {
     public void parseDecls(String s, Services services) {
         try {
             KeyIO io = new KeyIO(services);
-            var ctx = ParsingFacade.parseFile(CharStreams.fromString(s));
+            KeyAst.File ctx = ParsingFacade.parseFile(CharStreams.fromString(s));
             io.evalDeclarations(ctx);
             //KeYParserF p = stringDeclParser(s, services);
             //p.decls();
@@ -212,7 +213,7 @@ public class Matcher {
 
     private Taclet parseTaclet(String s, Services services) throws RecognitionException {
         KeyIO io = new KeyIO(services);
-        var ctx = ParsingFacade.parseFile(CharStreams.fromString(s));
+        KeyAst.File ctx = ParsingFacade.parseFile(CharStreams.fromString(s));
         io.evalDeclarations(ctx);
         io.evalFuncAndPred(ctx);
         return io.findTaclets(ctx).get(0);

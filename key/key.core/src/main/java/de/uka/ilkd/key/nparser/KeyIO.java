@@ -73,11 +73,11 @@ public class KeyIO {
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
     public @NotNull Term parseExpression(@NotNull CharStream stream) {
-        var ctx = ParsingFacade.parseExpression(stream);
+        KeyAst.Term ctx = ParsingFacade.parseExpression(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         if (schemaNamespace != null)
             visitor.setSchemaVariables(schemaNamespace);
-        var t = (Term) ctx.accept(visitor);
+        Term t = (Term) ctx.accept(visitor);
         warnings = visitor.getBuildingIssues();
         return t;
     }
@@ -91,11 +91,11 @@ public class KeyIO {
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
     public @NotNull Sequent parseSequence(@NotNull CharStream stream) {
-        var ctx = ParsingFacade.parseSequent(stream);
+        KeyAst.Seq ctx = ParsingFacade.parseSequent(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         if (schemaNamespace != null)
             visitor.setSchemaVariables(schemaNamespace);
-        var seq = (Sequent) ctx.accept(visitor);
+        Sequent seq = (Sequent) ctx.accept(visitor);
         warnings = visitor.getBuildingIssues();
         return seq;
     }
@@ -144,7 +144,7 @@ public class KeyIO {
      * @return
      */
     public List<Taclet> findTaclets(KeyAst.File ctx) {
-        var visitor = new TacletPBuilder(services, nss);
+        TacletPBuilder visitor = new TacletPBuilder(services, nss);
         ctx.accept(visitor);
         return visitor.getTopLevelTaclets();
     }
@@ -153,7 +153,7 @@ public class KeyIO {
      * @param ctx
      */
     public void evalDeclarations(KeyAst.File ctx) {
-        var declBuilder = new DeclarationBuilder(services, nss);
+        DeclarationBuilder declBuilder = new DeclarationBuilder(services, nss);
         ctx.accept(declBuilder);
     }
 
@@ -161,7 +161,7 @@ public class KeyIO {
      * @param ctx
      */
     public void evalFuncAndPred(KeyAst.File ctx) {
-        var visitor = new FunctionPredicateBuilder(services, nss);
+        FunctionPredicateBuilder visitor = new FunctionPredicateBuilder(services, nss);
         ctx.accept(visitor);
     }
 
@@ -210,7 +210,7 @@ public class KeyIO {
             if (resource != null)
                 ctx = parseFiles(resource);
             else {
-                var c = ParsingFacade.parseFile(content);
+                KeyAst.File c = ParsingFacade.parseFile(content);
                 ctx.add(c);
             }
             //long stop = System.currentTimeMillis();
@@ -234,7 +234,7 @@ public class KeyIO {
 
         public Loader loadDeclarations() {
             //var choiceFinder = new ChoiceFinder(nss.choices());
-            var declBuilder = new DeclarationBuilder(services, nss);
+            DeclarationBuilder declBuilder = new DeclarationBuilder(services, nss);
             long start = System.currentTimeMillis();
             for (int i = ctx.size() - 1; i >= 0; i--) { // process backwards
                 KeyAst.File s = ctx.get(i);
@@ -248,7 +248,7 @@ public class KeyIO {
         }
 
         public Loader loadSndDegreeDeclarations() {
-            var visitor = new FunctionPredicateBuilder(services, nss);
+            FunctionPredicateBuilder visitor = new FunctionPredicateBuilder(services, nss);
             long start = System.currentTimeMillis();
             for (int i = ctx.size() - 1; i >= 0; --i) {
                 KeyAst.File s = ctx.get(i);
@@ -268,14 +268,14 @@ public class KeyIO {
 
         public List<Taclet> loadTaclets() {
             if (ctx.isEmpty()) throw new IllegalStateException();
-            var parsers = ctx.stream().map(it -> new TacletPBuilder(services, nss))
+            List<TacletPBuilder> parsers = ctx.stream().map(it -> new TacletPBuilder(services, nss))
                     .collect(Collectors.toList());
             //Collections.reverse(parsers);
             long start = System.currentTimeMillis();
             List<Taclet> taclets = new ArrayList<>(2048);
             for (int i = 0; i < ctx.size(); i++) {
                 KeyAst.File s = ctx.get(i);
-                var p = parsers.get(i);
+                TacletPBuilder p = parsers.get(i);
                 if (KeyIO.this.schemaNamespace != null) {
                     p.setSchemaVariables(new Namespace<>(KeyIO.this.schemaNamespace));
                 }

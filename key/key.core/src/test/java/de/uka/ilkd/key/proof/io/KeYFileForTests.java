@@ -16,8 +16,10 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.io.IOException;
 import java.security.Key;
+import java.util.List;
 
 import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.rule.Taclet;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -63,8 +65,8 @@ public class KeYFileForTests extends KeYFile {
 		new ParserConfig(initConfig.getServices(),
 				 initConfig.namespaces());
 		KeyIO io = new KeyIO(initConfig.getServices());
-        var l = io.load(file.getCharStream());
-        var taclets = l.loadComplete();
+        KeyIO.Loader l = io.load(file.getCharStream());
+        List<Taclet> taclets = l.loadComplete();
         initConfig.addTaclets(taclets);
 
         variables = new Namespace<>(); //problemParser.namespaces().variables().copy();

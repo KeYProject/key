@@ -75,7 +75,7 @@ public class TestDeclParser {
 
     private void evaluateDeclarations(String s) {
         try {
-            var l = io.load(s);
+            KeyIO.Loader l = io.load(s);
             l.parseFile().loadComplete();
             parsedSchemaVars = l.getSchemaNamespace();
         } catch (Exception e) {
@@ -160,11 +160,11 @@ public class TestDeclParser {
     public void testGenericSortDecl2() {
         evaluateDeclarations("\\sorts { S; \\generic G; \\generic H \\extends G, S; }");
 
-        var S = checkSort(nss.sorts().lookup(new Name("S")));
-        var G = checkGenericSort(nss.sorts().lookup(new Name("G")),
+        Sort S = checkSort(nss.sorts().lookup(new Name("S")));
+        GenericSort G = checkGenericSort(nss.sorts().lookup(new Name("G")),
                 DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
                 DefaultImmutableSet.nil());
-        var H = checkGenericSort(nss.sorts().lookup(new Name("H")),
+        GenericSort H = checkGenericSort(nss.sorts().lookup(new Name("H")),
                 DefaultImmutableSet.<Sort>nil().add(S).add(G),
                 DefaultImmutableSet.nil());
     }
@@ -173,9 +173,9 @@ public class TestDeclParser {
     public void testGenericSortDecl3() {
         evaluateDeclarations("\\sorts { S; T; \\generic H \\oneof {S, T}; }");
 
-        var S = checkSort(nss.sorts().lookup(new Name("S")));
-        var T = checkSort(nss.sorts().lookup(new Name("T")));
-        var H = checkGenericSort(nss.sorts().lookup(new Name("H")),
+        Sort S = checkSort(nss.sorts().lookup(new Name("S")));
+        Sort T = checkSort(nss.sorts().lookup(new Name("T")));
+        GenericSort H = checkGenericSort(nss.sorts().lookup(new Name("H")),
                 DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
                 DefaultImmutableSet.<Sort>nil().add(S).add(T));
     }
@@ -184,12 +184,12 @@ public class TestDeclParser {
     public void testGenericSortDecl6() {
         evaluateDeclarations("\\sorts { S; T; \\generic G; \\generic H \\oneof {S} \\extends T, G; }");
 
-        var S = checkSort(nss.sorts().lookup(new Name("S")));
-        var T = checkSort(nss.sorts().lookup(new Name("T")));
-        var G = checkGenericSort(nss.sorts().lookup(new Name("G")),
+        Sort S = checkSort(nss.sorts().lookup(new Name("S")));
+        Sort T = checkSort(nss.sorts().lookup(new Name("T")));
+        GenericSort G = checkGenericSort(nss.sorts().lookup(new Name("G")),
                 DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
                 DefaultImmutableSet.nil());
-        var H = checkGenericSort(nss.sorts().lookup(new Name("H")),
+        GenericSort H = checkGenericSort(nss.sorts().lookup(new Name("H")),
                 DefaultImmutableSet.<Sort>nil().add(T).add(G),
                 DefaultImmutableSet.<Sort>nil().add(S));
 
@@ -199,15 +199,15 @@ public class TestDeclParser {
     public void testGenericSortDecl4() {
         evaluateDeclarations("\\sorts { S, T; \\generic G,G2; \\generic H,H2 \\oneof {S} \\extends T, G; }");
 
-        var S = checkSort(nss.sorts().lookup(new Name("S")));
-        var T = checkSort(nss.sorts().lookup(new Name("T")));
-        var G = checkGenericSort(nss.sorts().lookup(new Name("G")),
+        Sort S = checkSort(nss.sorts().lookup(new Name("S")));
+        Sort T = checkSort(nss.sorts().lookup(new Name("T")));
+        GenericSort G = checkGenericSort(nss.sorts().lookup(new Name("G")),
                 DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
                 DefaultImmutableSet.nil());
         checkGenericSort(nss.sorts().lookup(new Name("G2")),
                 DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
                 DefaultImmutableSet.nil());
-        var H = checkGenericSort(nss.sorts().lookup(new Name("H")),
+        GenericSort H = checkGenericSort(nss.sorts().lookup(new Name("H")),
                 DefaultImmutableSet.<Sort>nil().add(T).add(G),
                 DefaultImmutableSet.<Sort>nil().add(S));
         checkGenericSort(nss.sorts().lookup(new Name("H2")),

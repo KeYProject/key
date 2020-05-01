@@ -30,10 +30,10 @@ public class BuildingIssue {
 
     public static BuildingIssue createError(String message, @Nullable Token token, @Nullable Throwable cause) {
         if (token != null) {
-            var lineNumber = token.getLine();
-            var posInLine = token.getCharPositionInLine();
-            var startOffset = token.getStartIndex();
-            var endOffset = token.getStopIndex();
+            int lineNumber = token.getLine();
+            int posInLine = token.getCharPositionInLine();
+            int startOffset = token.getStartIndex();
+            int endOffset = token.getStopIndex();
             return new BuildingIssue(message, cause, false, lineNumber, posInLine, startOffset, endOffset);
         }
         return new BuildingIssue(message, cause, false, -1, -1, -1, -1);
@@ -46,10 +46,10 @@ public class BuildingIssue {
 
     public static BuildingIssue createWarning(String message, @Nullable Token token, @Nullable Throwable cause) {
         if (token != null) {
-            var lineNumber = token.getLine();
-            var posInLine = token.getCharPositionInLine();
-            var startOffset = token.getStartIndex();
-            var endOffset = token.getStopIndex();
+            int lineNumber = token.getLine();
+            int posInLine = token.getCharPositionInLine();
+            int startOffset = token.getStartIndex();
+            int endOffset = token.getStopIndex();
             return new BuildingIssue(message, cause, true, lineNumber, posInLine, startOffset, endOffset);
         }
         return new BuildingIssue(message, cause, true, -1, -1, -1, -1);

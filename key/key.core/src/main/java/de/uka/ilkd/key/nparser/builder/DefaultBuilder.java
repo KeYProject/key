@@ -7,7 +7,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.VariableDeclaration;
-import de.uka.ilkd.key.java.statement.Default;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -49,7 +48,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     protected void semanticErrorMsg(String label, ParserRuleContext ctx, Object... args) {
-        var msg = bundle.getString(label);
+        String msg = bundle.getString(label);
         MessageFormat formatter = new MessageFormat(msg);
         semanticError(ctx, formatter.format(args));
     }
@@ -152,7 +151,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
         };
 
-        for (var op : operators) {
+        for (Operator op : operators) {
             if (op != null) {
                 return op;
             }
@@ -168,7 +167,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                     AbstractTermTransformer.name2metaop(fqName.toString())
             };
 
-            for (var op : operators) {
+            for (Operator op : operators) {
                 if (op != null) {
                     return op;
                 }
@@ -177,7 +176,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             SortDependingFunction firstInstance =
                     SortDependingFunction.getFirstInstance(new Name(varfuncName), getServices());
             if (firstInstance != null) {
-                var v = firstInstance.getInstanceFor(sort, getServices());
+                SortDependingFunction v = firstInstance.getInstanceFor(sort, getServices());
                 if (v != null) {
                     return v;
                 }
@@ -285,7 +284,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         Collection<String> ids = accept(ctx.simple_ident_comma_list());
         List<ParsableVariable> list = new ArrayList<>(ids.size());
         for (String id : ids) {
-            var v = (ParsableVariable) lookup(new Name(id));
+            ParsableVariable v = (ParsableVariable) lookup(new Name(id));
             if (v == null) {
                 semanticError(ctx, "Variable " + id + " not declared.");
             }
@@ -324,7 +323,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     @Override
     public Sort visitSortId(KeYParser.SortIdContext ctx) {
-        var primitiveName = ctx.id.getText();
+        String primitiveName = ctx.id.getText();
         //Special handling for byte, char, short, long:
         //these are *not* sorts, but they are nevertheless valid
         //prefixes for array sorts such as byte[], char[][][].
@@ -365,12 +364,12 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     @Override
     public KeYJavaType visitKeyjavatype(KeYParser.KeyjavatypeContext ctx) {
         boolean array = false;
-        var type = visitSimple_ident_dots(ctx.simple_ident_dots());
+        String type = visitSimple_ident_dots(ctx.simple_ident_dots());
         for (int i = 0; i < ctx.EMPTYBRACKETS().size(); i++) {
             array = true;
             type += "[]";
         }
-        var kjt = getJavaInfo().getKeYJavaType(type);
+        KeYJavaType kjt = getJavaInfo().getKeYJavaType(type);
 
         //expand to "java.lang"
         if (kjt == null) {

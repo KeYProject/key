@@ -38,7 +38,7 @@ public class ParseAllKeyFilesTest {
     public static Collection<Object[]> getFiles() throws IOException {
         List<Object[]> seq = new LinkedList<>();
         Files.walkFileTree(HelperClassForTests.TESTCASE_DIRECTORY.toPath(),
-                new SimpleFileVisitor<>() {
+                new SimpleFileVisitor<Path>() {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                         if (attrs.isRegularFile() && file.toString().endsWith(".key")) {
@@ -52,7 +52,7 @@ public class ParseAllKeyFilesTest {
 
     @Test
     public void parse() throws IOException {
-        var ctx = ParsingFacade.parseFile(file);
+        KeyAst.File ctx = ParsingFacade.parseFile(file);
         Assert.assertNull(ctx.ctx.exception);
         Services services = new Services(new JavaProfile());
         //ProblemFinder b = new ProblemFinder(services, services.getNamespaces(), new ParsedKeyFile());
@@ -74,7 +74,7 @@ public class ParseAllKeyFilesTest {
 
     @Test
     public void lex() throws IOException {
-        var toks = ParsingFacade.lex(file);
+        KeYLexer toks = ParsingFacade.lex(file);
         debugLexer(toks);
     }
 }

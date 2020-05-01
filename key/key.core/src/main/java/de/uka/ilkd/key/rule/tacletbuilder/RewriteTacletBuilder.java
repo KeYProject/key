@@ -84,7 +84,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
 		checkBoundInIfAndFind();
 		TacletPrefixBuilder prefixBuilder=new TacletPrefixBuilder(this);
 		prefixBuilder.build();
-		var t = new RewriteTaclet(name,
+		RewriteTaclet t = new RewriteTaclet(name,
 				new TacletApplPart(ifseq,
 						varsNew,
 						varsNotFreeIn,

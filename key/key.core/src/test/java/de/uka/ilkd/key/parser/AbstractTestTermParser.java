@@ -64,7 +64,7 @@ public class AbstractTestTermParser {
         try {
             new Recoder2KeY(TacletForTests.services(), nss).parseSpecialClasses();
             KeyIO io = new KeyIO(TacletForTests.services(), nss);
-            var loader = io.load(s);
+            KeyIO.Loader loader = io.load(s);
             return loader.getProblem();
         } catch (Exception e) {
             throw new RuntimeException("Exc while Parsing", e);

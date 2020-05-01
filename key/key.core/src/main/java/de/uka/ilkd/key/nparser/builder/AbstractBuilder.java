@@ -118,13 +118,13 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     }
 
     protected BuildingIssue addWarning(ParserRuleContext node, String description) {
-        var be = BuildingIssue.createWarning(description, node, null);
+        BuildingIssue be = BuildingIssue.createWarning(description, node, null);
         getBuildingIssues().add(be);
         return be;
     }
 
     protected BuildingIssue addWarning(String description) {
-        var be = BuildingIssue.createWarning(description, (ParserRuleContext) null, null);
+        BuildingIssue be = BuildingIssue.createWarning(description, (ParserRuleContext) null, null);
         getBuildingIssues().add(be);
         return be;
     }

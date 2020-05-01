@@ -41,7 +41,7 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
     public NoFindTaclet getNoFindTaclet(){
 		TacletPrefixBuilder prefixBuilder=new TacletPrefixBuilder(this);
 		prefixBuilder.build();
-		var t= new NoFindTaclet(this.name,
+		NoFindTaclet t = new NoFindTaclet(this.name,
 				new TacletApplPart(ifseq,
 						varsNew,
 						varsNotFreeIn,

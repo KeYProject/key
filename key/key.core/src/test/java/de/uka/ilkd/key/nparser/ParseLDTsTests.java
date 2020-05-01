@@ -6,17 +6,18 @@ import org.junit.Assume;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.URL;
 
 public class ParseLDTsTests {
     @Test
     public void testLDT() throws IOException {
-        var services = new Services(new JavaProfile());
+        Services services = new Services(new JavaProfile());
         load(services, "/de/uka/ilkd/key/proof/rules/ldt.key");
     }
 
     @Test
     public void testSR() throws IOException {
-        var services = new Services(new JavaProfile());
+        Services services = new Services(new JavaProfile());
         load(services, "/de/uka/ilkd/key/proof/rules/standardRules.key");
     }
 
@@ -36,7 +37,7 @@ public class ParseLDTsTests {
     }
 */
     private void load(Services services, String resources) throws IOException {
-        var url = getClass().getResource(resources);
+        URL url = getClass().getResource(resources);
         Assume.assumeNotNull(url, services);
         KeyIO io = new KeyIO(services);
         io.load(url).loadComplete();

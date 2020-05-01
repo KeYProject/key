@@ -38,7 +38,7 @@ import java.io.Reader;
  * @author weigl
  * @deprecated Use the facade new KeyIO(services).parseTerm directly
  */
-@Deprecated(forRemoval = true, since = "2.8.0")
+@Deprecated//java11:(forRemoval = true, since = "2.8.0")
 public final class DefaultTermParser {
 
     /**

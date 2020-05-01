@@ -67,7 +67,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         List<Taclet> seq = mapOf(ctx.taclet());
         Map<RuleKey, Taclet> taclets = new HashMap<>();
         for (Taclet s : seq) {
-            if(s==null) continue; //TODO investigate why null taclets appear!
+            if (s == null) continue; //TODO investigate why null taclets appear!
             final RuleKey key = new RuleKey(s);
             if (taclets.containsKey(key)) {
                 semanticError(ctx, "Cannot add taclet \"" + s.name() +
@@ -122,14 +122,14 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Taclet visitTaclet(KeYParser.TacletContext ctx) {
-        var ifSeq = Sequent.EMPTY_SEQUENT;
+        Sequent ifSeq = Sequent.EMPTY_SEQUENT;
         ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.nil();
         if (ctx.LEMMA() != null) {
             tacletAnnotations = tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);
         }
-        var name = ctx.name.getText();
+        String name = ctx.name.getText();
         List<Choice> ch = accept(ctx.option_list());
-        var choices = requiredChoices;
+        ImmutableSet<Choice> choices = requiredChoices;
         if (ch != null) {
             choices = choices.add(ch);
         }
@@ -139,7 +139,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             if (!axiomMode) {
                 semanticError(ctx, "formula rules are only permitted for \\axioms");
             }
-            var b = createTacletBuilderFor(null, RewriteTaclet.NONE, ctx);
+            TacletBuilder b = createTacletBuilderFor(null, RewriteTaclet.NONE, ctx);
             currentTBuilder.push(b);
             SequentFormula sform = new SequentFormula(form);
             Semisequent semi = new Semisequent(sform);
@@ -176,8 +176,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         if (!ctx.SUCCEDENTPOLARITY().isEmpty()) {
             applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY;
         }
-        var find = accept(ctx.find);
-        var b = createTacletBuilderFor(find, applicationRestriction, ctx);
+        @Nullable Object find = accept(ctx.find);
+        TacletBuilder b = createTacletBuilderFor(find, applicationRestriction, ctx);
         currentTBuilder.push(b);
         b.setIfSequent(ifSeq);
         b.setName(new Name(name));
@@ -250,10 +250,10 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitVarexp(KeYParser.VarexpContext ctx) {
         negated = ctx.NOT_() != null;
-        var tb = peekTBuilder();
+        TacletBuilder<?> tb = peekTBuilder();
         String name = ctx.varexpId().getText();
-        var arguments = ctx.varexp_argument();
-        var suitableManipulators = TacletBuilderManipulators.getConditionBuildersFor(name);
+        List<KeYParser.Varexp_argumentContext> arguments = ctx.varexp_argument();
+        List<TacletBuilderCommand> suitableManipulators = TacletBuilderManipulators.getConditionBuildersFor(name);
         boolean applied = false;
         Object[] argCache = new Object[arguments.size()];
         for (TacletBuilderCommand manipulator : suitableManipulators) {
@@ -278,7 +278,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             TacletBuilderCommand manipulator,
             List<KeYParser.Varexp_argumentContext> arguments) {
         assert args.length == arguments.size();
-        var types = manipulator.getArgumentTypes();
+        ArgumentType[] types = manipulator.getArgumentTypes();
 
         if (types.length != arguments.size())
             return false;
@@ -771,7 +771,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Choice visitOption(KeYParser.OptionContext ctx) {
         String choice = ctx.getText();
-        var c = choices().lookup(choice);
+        Choice c = choices().lookup(choice);
         if (c == null) {
             semanticError(ctx, "Could not find choice: %s", choice);
         }
@@ -787,11 +787,11 @@ public class TacletPBuilder extends ExpressionBuilder {
     public Object visitGoalspec(KeYParser.GoalspecContext ctx) {
         String name = accept(ctx.string_value());
 
-        var addSeq = Sequent.EMPTY_SEQUENT;
-        var addRList = ImmutableSLList.<Taclet>nil();
-        var addpv = DefaultImmutableSet.<SchemaVariable>nil();
+        Sequent addSeq = Sequent.EMPTY_SEQUENT;
+        ImmutableSLList<Taclet> addRList = ImmutableSLList.<Taclet>nil();
+        DefaultImmutableSet<SchemaVariable> addpv = DefaultImmutableSet.<SchemaVariable>nil();
 
-        var rwObj = accept(ctx.replacewith());
+        @Nullable Object rwObj = accept(ctx.replacewith());
         if (ctx.add() != null) addSeq = accept(ctx.add());
         if (ctx.addrules() != null) addRList = accept(ctx.addrules());
         if (ctx.addprogvar() != null) addpv = accept(ctx.addprogvar());
@@ -891,7 +891,7 @@ public class TacletPBuilder extends ExpressionBuilder {
                                  ImmutableList<Taclet> addRList,
                                  ImmutableSet<SchemaVariable> pvs,
                                  ImmutableSet<Choice> soc, ParserRuleContext ctx) {
-        var b = peekTBuilder();
+        TacletBuilder<?> b = peekTBuilder();
         TacletGoalTemplate gt = null;
         if (rwObj == null) {
             // there is no replacewith, so we take
@@ -933,14 +933,14 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Operator visitVarId(KeYParser.VarIdContext ctx) {
-        var id = ctx.id.getText();
+        String id = ctx.id.getText();
         Operator v = varId(ctx, id);
         return v;
     }
 
     @Nullable
     private Operator varId(ParserRuleContext ctx, String id) {
-        final var name = new Name(id);
+        Name name = new Name(id);
         Operator v = variables().lookup(name);
         if (v == null) {
             v = schemaVariables().lookup(name);
@@ -1032,7 +1032,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitSchema_modifiers(KeYParser.Schema_modifiersContext ctx) {
         SchemaVariableModifierSet mods = pop();
-        var ids = visitSimple_ident_comma_list(ctx.simple_ident_comma_list());
+        List<String> ids = visitSimple_ident_comma_list(ctx.simple_ident_comma_list());
         for (String id : ids) {
             if (!mods.addModifier(id))
                 semanticError(ctx, "Illegal or unknown modifier in declaration of schema variable: %s", id);
@@ -1083,7 +1083,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
 
         if (schemaVariables().lookup(v.name()) != null) {
-            var old = schemaVariables().lookup(v.name());
+            SchemaVariable old = schemaVariables().lookup(v.name());
             if (!old.sort().equals(v.sort()))
                 semanticError(null,
                         "Schema variables clashes with previous declared schema variable: %s.", v.name());

@@ -20,17 +20,17 @@ import java.util.stream.Collectors;
  * @version 1 (13.09.19)
  */
 public class SyntaxErrorReporter extends BaseErrorListener {
-    private final List<SyntaxError> errors = new ArrayList<SyntaxError>();
+    private final List<SyntaxError> errors = new ArrayList<>();
     private boolean print = true;
 
     @Override
     public void syntaxError(@Nullable Recognizer<?, ?> recognizer, @Nullable Object offendingSymbol,
                             int line, int charPositionInLine, String msg, RecognitionException e) {
 
-        var parser = (Parser) recognizer;
-        var stack = String.join(", ", parser.getRuleInvocationStack());
-        var tok = (Token) offendingSymbol;
-        var se = new SyntaxError(
+        Parser parser = (Parser) recognizer;
+        String stack = String.join(", ", parser.getRuleInvocationStack());
+        Token tok = (Token) offendingSymbol;
+        SyntaxError se = new SyntaxError(
                 recognizer,
                 line,
                 tok,
@@ -70,7 +70,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      */
     public void throwException(String[] lines) {
         if (hasErrors()) {
-            var msg = errors.stream().map(it -> it.getBeatifulErrorMessage(lines))
+            String msg = errors.stream().map(it -> it.getBeatifulErrorMessage(lines))
                     .collect(Collectors.joining("\n--- \n"));
             throw new ParserException(msg, Collections.unmodifiableList(errors));
         }
@@ -118,8 +118,8 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         }
 
         public String showInInput(String[] lines) {
-            var line = lines[this.line];
-            var sb = new StringBuilder();
+            String line = lines[this.line];
+            StringBuilder sb = new StringBuilder();
             sb.append(line)
                     .append("\n")
                     .append(Strings.repeat(" ", (charPositionInLine - 1)))

@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.init.Includes;
@@ -51,8 +52,8 @@ public class TestParser {
         expected.put(include.toString(),
                 RuleSourceFactory.initRuleFile(include.toURI().toURL()));
         final String keyFile = "\\include \"" + include.getPath() + "\";";
-        var file = ParsingFacade.parseFile(CharStreams.fromString(keyFile));
-        var actual = file.getIncludes(new File(".").toURI().toURL());
+        KeyAst.File file = ParsingFacade.parseFile(CharStreams.fromString(keyFile));
+        Includes actual = file.getIncludes(new File(".").toURI().toURL());
 
         // `Includes` does not provide an `Object#equals()` redefinition for the
         // moment, at least compare the list of filenames
@@ -68,7 +69,7 @@ public class TestParser {
 
         Services services = TacletForTests.services();
         KeyIO io = new KeyIO(services);
-        var loader = io.load(content);
+        KeyIO.Loader loader = io.load(content);
         loader.parseFile().loadComplete();
         loader.loadProblem();
     }

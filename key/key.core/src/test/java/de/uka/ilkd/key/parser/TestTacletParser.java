@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.key_project.util.collection.ImmutableSLList;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -89,7 +90,7 @@ public class TestTacletParser {
 
 
     private void parseDecls(String s) throws IOException {
-        var l = io.load(s);
+        KeyIO.Loader l = io.load(s);
         l.loadComplete();
         schemaVariableNS = l.getSchemaNamespace();
         io.setSchemaNamespace(schemaVariableNS);
@@ -127,7 +128,7 @@ public class TestTacletParser {
         s = "\n\\rules { " + s + "; }";
         try {
             KeyIO.Loader l = io.load(s);
-            var taclets = l.loadComplete();
+            List<Taclet> taclets = l.loadComplete();
             return taclets.get(0);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -144,12 +145,12 @@ public class TestTacletParser {
         builder.setName(new Name("imp_left"));
         builder.addTacletGoalTemplate(new
                 AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.<Taclet>nil(),
+                ImmutableSLList.nil(),
                 sequent("b0", null)));
 
         builder.addTacletGoalTemplate(new
                 AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.<Taclet>nil(),
+                ImmutableSLList.nil(),
                 sequent(null, "b")));
 
         Taclet impleft = builder.getAntecTaclet();
@@ -166,7 +167,7 @@ public class TestTacletParser {
         builder.setFind(parseFma("b->b0"));
         builder.addTacletGoalTemplate(new
                 AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.<Taclet>nil(),
+                ImmutableSLList.nil(),
                 sequent("b", "b0")));
         builder.setName(new Name("imp_right"));
         Taclet impright = builder.getSuccTaclet();
@@ -183,12 +184,12 @@ public class TestTacletParser {
         NoFindTacletBuilder builder = new NoFindTacletBuilder();
         builder.addTacletGoalTemplate(new
                 TacletGoalTemplate(sequent("b", null),
-                ImmutableSLList.<Taclet>nil()
+                ImmutableSLList.nil()
         ));
 
         builder.addTacletGoalTemplate(new
                 TacletGoalTemplate(sequent(null, "b"),
-                ImmutableSLList.<Taclet>nil()
+                ImmutableSLList.nil()
         ));
         builder.setName(new Name("cut"));
 
@@ -220,7 +221,7 @@ public class TestTacletParser {
         builder.setFind(parseFma("b->b0"));
         builder.addTacletGoalTemplate(new
                 RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.<Taclet>nil(),
+                ImmutableSLList.nil(),
                 parseFma("!b0->!b")));
         builder.setName(new Name("contraposition"));
         Taclet contraposition = builder.getRewriteTaclet();
@@ -240,7 +241,7 @@ public class TestTacletParser {
         builder.setFind(parseFma("\\forall z; b"));
         builder.addTacletGoalTemplate(new
                 AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.<Taclet>nil(),
+                ImmutableSLList.nil(),
                 sequent(null, "{\\subst z; sk}b")));
         builder.addVarsNewDependingOn(lookup_schemavar("sk"),
                 lookup_schemavar("b"));
@@ -262,7 +263,7 @@ public class TestTacletParser {
 
         builder.addTacletGoalTemplate(new
                 TacletGoalTemplate(sequent("{\\subst z; x}b", null),
-                ImmutableSLList.<Taclet>nil()));
+                ImmutableSLList.nil()));
         builder.setName(new Name("all_left"));
         Taclet allleft = builder.getAntecTaclet();
         String allleftString =
@@ -283,7 +284,7 @@ public class TestTacletParser {
                 lookup_schemavar("b"));
         builder.addTacletGoalTemplate(new
                 RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.<Taclet>nil(),
+                ImmutableSLList.nil(),
                 parseFma("b & \\exists z; b0")));
         builder.setName(new Name("exists_conj_split"));
         Taclet exconjsplit = builder.getRewriteTaclet();
@@ -304,7 +305,7 @@ public class TestTacletParser {
         builder.setFind(parseTerm("f(f(x))"));
         builder.addTacletGoalTemplate(new
                 RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.<Taclet>nil(),
+                ImmutableSLList.nil(),
                 parseTerm("f(x)")));
         builder.setName(new Name("f_idempotent"));
         Taclet fidempotent = builder.getRewriteTaclet();
@@ -322,7 +323,7 @@ public class TestTacletParser {
         insertbuilder.setFind(parseTerm("x"));
         insertbuilder.addTacletGoalTemplate(new
                 RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.<Taclet>nil(),
+                ImmutableSLList.nil(),
                 parseTerm("x0")));
         insertbuilder.setName(new Name("insert_eq"));
         Taclet inserteq = insertbuilder.getTaclet();

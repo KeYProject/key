@@ -2,6 +2,7 @@ package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -120,21 +121,21 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     @Test
     public void testAtOperator_2() throws Exception {
-        var prettySyntax = "a1.f@h";
-        var verboseSyntax = "int::select(h, a1, testTermParserHeap.A1::$f)";
+        String prettySyntax = "a1.f@h";
+        String verboseSyntax = "int::select(h, a1, testTermParserHeap.A1::$f)";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
     }
 
     @Test
     public void testAtOperator_3() throws Exception {
-        var prettySyntax = "a1.(testTermParserHeap.A::f)@h";
-        var verboseSyntax = "int::select(h, a1, testTermParserHeap.A::$f)";
+        String prettySyntax = "a1.(testTermParserHeap.A::f)@h";
+        String verboseSyntax = "int::select(h, a1, testTermParserHeap.A::$f)";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
     }
 
     @Test
     public void testAtOperator_4() throws Exception {
-        var expectedParseResult = getSelectTerm("testTermParserHeap.A", h, a, next);
+        Term expectedParseResult = getSelectTerm("testTermParserHeap.A", h, a, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
@@ -148,7 +149,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     public void testAtOperator_5() throws Exception {
         Term h2 = parseTerm("h2");
-        var expectedParseResult = getSelectTerm("testTermParserHeap.A", h2, a, next);
+        Term expectedParseResult = getSelectTerm("testTermParserHeap.A", h2, a, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h2, expectedParseResult, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
@@ -159,22 +160,22 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     public void testAtOperator_6() throws Exception {
         Term aDotF = getSelectTerm("int", tb.getBaseHeap(), a, f); // a.f
         Term aDotArray = getSelectTerm("int[]", h, a, parseTerm("testTermParserHeap.A::$array")); // a.array
-        var expectedParseResult = getSelectTerm("int", h, aDotArray, tb.arr(aDotF));
+        Term expectedParseResult = getSelectTerm("int", h, aDotArray, tb.arr(aDotF));
         compareStringRepresentationAgainstTermRepresentation("a.array[a.f]@h", expectedParseResult);
     }
 
     @Test
     public void testAtOperator_7() throws Exception {
-        var aDotF = getSelectTerm("int", h, a, f); // a.f
-        var aDotArray = getSelectTerm("int[]", tb.getBaseHeap(), a, parseTerm("testTermParserHeap.A::$array")); // a.array
-        var expectedParseResult = getSelectTerm("int", tb.getBaseHeap(), aDotArray, tb.arr(aDotF));
+        Term aDotF = getSelectTerm("int", h, a, f); // a.f
+        Term aDotArray = getSelectTerm("int[]", tb.getBaseHeap(), a, parseTerm("testTermParserHeap.A::$array")); // a.array
+        Term expectedParseResult = getSelectTerm("int", tb.getBaseHeap(), aDotArray, tb.arr(aDotF));
         compareStringRepresentationAgainstTermRepresentation("a.array[a.f@h]", expectedParseResult);
 
     }
 
     @Test
     public void testAtOperator_8() throws Exception {
-        var expectedParseResult = getSelectTerm("testTermParserHeap.A", tb.getBaseHeap(), a, next);
+        Term expectedParseResult = getSelectTerm("testTermParserHeap.A", tb.getBaseHeap(), a, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
         compareStringRepresentationAgainstTermRepresentation("(a.next@heap).next.f@h",
@@ -197,7 +198,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     public void testVerifyExceptionIfAtOperatorNotPreceededBySelectTerm() {
         try {
-            var t = io.parseExpression("(a.f + a.f)@h2");
+            @NotNull Term t = io.parseExpression("(a.f + a.f)@h2");
             System.out.println(t);
             fail();
         } catch (Exception e) {

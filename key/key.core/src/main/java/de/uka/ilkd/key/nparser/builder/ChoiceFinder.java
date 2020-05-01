@@ -62,14 +62,14 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
 
     @Override
     public Choice visitActivated_choice(KeYParser.Activated_choiceContext ctx) {
-        var cat = ctx.cat.getText();
-        var ch = ctx.choice_.getText();
+        String cat = ctx.cat.getText();
+        String ch = ctx.choice_.getText();
         if (activatedChoicesCategories().contains(cat)) {
             throw new IllegalArgumentException("You have already chosen a different option for " + cat);
         }
         activatedChoicesCategories().add(cat);
-        var name = cat + ":" + ch;
-        var c = (Choice) choices().lookup(new Name(name));
+        String name = cat + ":" + ch;
+        Choice c = choices().lookup(new Name(name));
         if (c == null) {
             semanticError(ctx, "Choice %s not previously declared", name);
         } else {
