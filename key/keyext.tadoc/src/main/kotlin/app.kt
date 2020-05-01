@@ -45,7 +45,7 @@ fun execute(vararg args: String): String {
             .redirectOutput(ProcessBuilder.Redirect.PIPE)
     val p = pb.start()
     p.waitFor(1, TimeUnit.SECONDS)
-    return String(p.inputStream.readAllBytes())
+    return p.inputStream.reader().readText()
 }
 
 val GIT_VERSION by lazy {

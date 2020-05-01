@@ -300,110 +300,12 @@ class PrettyPrinter(val index: Index,
         return super.visitLiterals(ctx)
     }
 
-    override fun visitTermIfExThenElse(ctx: KeYParser.TermIfExThenElseContext?): String {
-        return super.visitTermIfExThenElse(ctx)
-    }
-
     override fun visitEquivalence_term(ctx: KeYParser.Equivalence_termContext?): String {
         return super.visitEquivalence_term(ctx)
     }
 
     override fun visitTermParen(ctx: KeYParser.TermParenContext?): String {
         return super.visitTermParen(ctx)
-    }
-
-
-    override fun visitBracket_access_indexrange(ctx: KeYParser.Bracket_access_indexrangeContext?): String {
-        return super.visitBracket_access_indexrange(ctx)
-    }
-
-    override fun visitTermAccess(ctx: KeYParser.TermAccessContext?): String {
-        return super.visitTermAccess(ctx)
-    }
-
-    override fun visitTermLocset(ctx: KeYParser.TermLocsetContext?): String {
-        return super.visitTermLocset(ctx)
-    }
-
-    override fun visitDisjunction_term(ctx: KeYParser.Disjunction_termContext?): String {
-        return super.visitDisjunction_term(ctx)
-    }
-
-
-    override fun visitElementary_update_term(ctx: KeYParser.Elementary_update_termContext?): String {
-        return super.visitElementary_update_term(ctx)
-    }
-
-    override fun visitBracket_access_heap_term(ctx: KeYParser.Bracket_access_heap_termContext?): String {
-        return super.visitBracket_access_heap_term(ctx)
-    }
-
-    override fun visitTermIfThenElse(ctx: KeYParser.TermIfThenElseContext?): String {
-        return super.visitTermIfThenElse(ctx)
-    }
-
-    override fun visitAbbreviation(ctx: KeYParser.AbbreviationContext?): String {
-        return super.visitAbbreviation(ctx)
-    }
-
-    override fun visitImplication_term(ctx: KeYParser.Implication_termContext?): String {
-        return super.visitImplication_term(ctx)
-    }
-
-    override fun visitConjunction_term(ctx: KeYParser.Conjunction_termContext?): String {
-        return super.visitConjunction_term(ctx)
-    }
-
-    override fun visitTermLocation(ctx: KeYParser.TermLocationContext?): String {
-        return super.visitTermLocation(ctx)
-    }
-
-    override fun visitTermLiterals(ctx: KeYParser.TermLiteralsContext?): String {
-        return super.visitTermLiterals(ctx)
-    }
-
-    override fun visitAccessterm(ctx: KeYParser.AccesstermContext?): String {
-        return super.visitAccessterm(ctx)
-    }
-
-    override fun visitLabel(ctx: KeYParser.LabelContext?): String {
-        return super.visitLabel(ctx)
-    }
-
-    override fun visitSingle_label(ctx: KeYParser.Single_labelContext?): String {
-        return super.visitSingle_label(ctx)
-    }
-
-    override fun visitLocation_term(ctx: KeYParser.Location_termContext?): String {
-        return super.visitLocation_term(ctx)
-    }
-
-    override fun visitSubstitutionterm(ctx: KeYParser.SubstitutiontermContext?): String {
-        return super.visitSubstitutionterm(ctx)
-    }
-
-    override fun visitIfThenElseTerm(ctx: KeYParser.IfThenElseTermContext?): String {
-        return super.visitIfThenElseTerm(ctx)
-    }
-
-    override fun visitIfExThenElseTerm(ctx: KeYParser.IfExThenElseTermContext?): String {
-        return super.visitIfExThenElseTerm(ctx)
-    }
-
-    override fun visitQuantifierterm(ctx: KeYParser.QuantifiertermContext?): String {
-        return super.visitQuantifierterm(ctx)
-    }
-
-    override fun visitLocset_term(ctx: KeYParser.Locset_termContext?): String {
-        return super.visitLocset_term(ctx)
-    }
-
-    override fun visitBound_variables(ctx: KeYParser.Bound_variablesContext?): String {
-        return super.visitBound_variables(ctx)
-    }
-
-    override fun visitOne_bound_variable(ctx: KeYParser.One_bound_variableContext?): String {
-        return super.visitOne_bound_variable(ctx)
     }
 
     override fun visitArgument_list(ctx: KeYParser.Argument_listContext?): String {
@@ -601,63 +503,5 @@ class PrettyPrinter(val index: Index,
 
     override fun visitRuleset(ctx: KeYParser.RulesetContext) = ref(ctx.text, Symbol.Type.RULESET)
 
-    override fun visitMetaId(ctx: KeYParser.MetaIdContext?): String {
-        return super.visitMetaId(ctx)
-    }
 
-    override fun visitMetaTerm(ctx: KeYParser.MetaTermContext?): String {
-        return super.visitMetaTerm(ctx)
-    }
-
-    override fun visitContracts(ctx: KeYParser.ContractsContext?): String {
-        return super.visitContracts(ctx)
-    }
-
-    override fun visitInvariants(ctx: KeYParser.InvariantsContext?): String {
-        return super.visitInvariants(ctx)
-    }
-
-    override fun visitOne_contract(ctx: KeYParser.One_contractContext?): String {
-        return super.visitOne_contract(ctx)
-    }
-
-    override fun visitOne_invariant(ctx: KeYParser.One_invariantContext?): String {
-        return super.visitOne_invariant(ctx)
-    }
-
-    override fun visitRulesOrAxioms(ctx: KeYParser.RulesOrAxiomsContext?): String {
-        return super.visitRulesOrAxioms(ctx)
-    }
-
-    override fun visitBootClassPath(ctx: KeYParser.BootClassPathContext?): String {
-        return super.visitBootClassPath(ctx)
-    }
-
-    override fun visitClassPaths(ctx: KeYParser.ClassPathsContext?): String {
-        return super.visitClassPaths(ctx)
-    }
-
-    override fun visitJavaSource(ctx: KeYParser.JavaSourceContext?): String {
-        return super.visitJavaSource(ctx)
-    }
-
-    override fun visitOneJavaSource(ctx: KeYParser.OneJavaSourceContext?): String {
-        return super.visitOneJavaSource(ctx)
-    }
-
-    override fun visitProfile(ctx: KeYParser.ProfileContext?): String {
-        return super.visitProfile(ctx)
-    }
-
-    override fun visitPreferences(ctx: KeYParser.PreferencesContext?): String {
-        return super.visitPreferences(ctx)
-    }
-
-    override fun visitProofScript(ctx: KeYParser.ProofScriptContext?): String {
-        return super.visitProofScript(ctx)
-    }
-
-    override fun visitProof(ctx: KeYParser.ProofContext?): String {
-        return super.visitProof(ctx)
-    }
 }
