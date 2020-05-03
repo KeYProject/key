@@ -1056,7 +1056,6 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public QuantifiableVariable visitOne_bound_variable(KeYParser.One_bound_variableContext ctx) {
-        //public Object visitOne_schema_bound_variable(KeYParser.One_schema_bound_variableContext ctx) {
         String id = accept(ctx.simple_ident());
         Sort sort = accept(ctx.sortId());
 
@@ -1390,15 +1389,19 @@ public class ExpressionBuilder extends DefaultBuilder {
         Sort sortId = defaultOnException(null, () -> accept(ctx.sortId()));
         String firstName = accept(ctx.simple_ident());
 
-        Term[] args = ctx.call() != null ? visitArguments(ctx.call().argument_list()) : null;
         ImmutableArray<QuantifiableVariable> boundVars = null;
         Namespace<QuantifiableVariable> orig = null;
+        Term[] args = null;
         if (ctx.call() != null) {
             orig = variables();
             List<QuantifiableVariable> bv = accept(ctx.call().boundVars);
             boundVars = bv != null
                     ? new ImmutableArray<>(bv.toArray(new QuantifiableVariable[0]))
                     : null;
+            args = visitArguments(ctx.call().argument_list());
+            if (boundVars != null) {
+                unbindVars(orig);
+            }
         }
 
         assert firstName != null;
@@ -1431,7 +1434,8 @@ public class ExpressionBuilder extends DefaultBuilder {
             current = termForParsedVariable((ParsableVariable) op, ctx);
         } else {
             if (boundVars == null) {
-                current = capsulateTf(ctx, () -> getTermFactory().createTerm(finalOp, args));
+                Term[] finalArgs = args;
+                current = capsulateTf(ctx, () -> getTermFactory().createTerm(finalOp, finalArgs));
             } else {
                 //sanity check
                 assert op instanceof Function;
@@ -1447,15 +1451,11 @@ public class ExpressionBuilder extends DefaultBuilder {
                 }
                 ImmutableArray<QuantifiableVariable> finalBoundVars = boundVars;
                 //create term
-                current = capsulateTf(ctx, () -> getTermFactory().createTerm(finalOp, args, finalBoundVars, null));
+                Term[] finalArgs1 = args;
+                current = capsulateTf(ctx, () -> getTermFactory().createTerm(finalOp, finalArgs1, finalBoundVars, null));
             }
         }
-
         current = handleAttributes(current, ctx.attribute());
-
-        if (boundVars != null) {
-            unbindVars(orig);
-        }
         return current;
     }
 
@@ -1667,6 +1667,10 @@ public class ExpressionBuilder extends DefaultBuilder {
         int classEnd = i - 1;
         attributeName = parts.stream().skip(classEnd).collect(Collectors.toList());
         return (new JavaQuery(packageName, className, attributeName, kjt));
+    }
+
+    public void setScm(AbbrevMap scm) {
+        this.scm = scm;
     }
 
     private static class PairOfStringAndJavaBlock {
