@@ -25,7 +25,7 @@ public class TestProofStarter {
      *
      * @throws ProblemLoaderException Occurred Exception
      */
-    @Test(timeout = 30000)
+    @Test(timeout = 60000)
     public void testDirectProof() throws ProblemLoaderException {
         doProofStarter(false);
     }
@@ -37,7 +37,7 @@ public class TestProofStarter {
      *
      * @throws ProblemLoaderException Occurred Exception
      */
-    @Test(timeout = 60000)
+    @Test(timeout = 120000)
     public void testDirectProofWithOneStepSimplification() throws ProblemLoaderException {
         doProofStarter(true);
     }
