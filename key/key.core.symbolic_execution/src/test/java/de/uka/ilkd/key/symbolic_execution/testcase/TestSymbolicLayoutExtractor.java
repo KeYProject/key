@@ -42,6 +42,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import org.key_project.util.lookup.Inject;
 import org.key_project.util.testcategories.Slow;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -276,6 +277,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
     */
+   @Ignore
    @Test public void testInstanceCreationTest() throws Exception {
       doTest("/set/configurationExtractorInstanceCreationTest/test/InstanceCreationTest.java",
              "InstanceCreationTest",
