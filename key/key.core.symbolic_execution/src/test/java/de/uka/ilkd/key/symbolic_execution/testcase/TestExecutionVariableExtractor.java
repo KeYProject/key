@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
 import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import de.uka.ilkd.key.symbolic_execution.ExecutionVariableExtractor;
@@ -14,6 +15,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    /**
     * Tests example: /set/variablesEmptyArrayCreationTest
     */
+   @Test
    public void testVariablesEmptyArrayCreationTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/variablesEmptyArrayCreationTest/test/EmptyArrayCreationTest.java", 
@@ -41,7 +43,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    /**
     * Tests example: /set/variablesNonSimpleArrayCreationTest
     */
-   public void testVariablesNonSimpleArrayCreationTest() throws Exception {
+   @Test public void testVariablesNonSimpleArrayCreationTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/variablesNonSimpleArrayCreationTest/test/NonSimpleArrayCreationTest.java", 
                           "NonSimpleArrayCreationTest", 
@@ -68,7 +70,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    /**
     * Tests example: /set/variablesNonSimpleArrayAssignmentTest
     */
-   public void testVariablesNonSimpleArrayAssignmentTest() throws Exception {
+   @Test public void testVariablesNonSimpleArrayAssignmentTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/variablesNonSimpleArrayAssignmentTest/test/NonSimpleArrayAssignmentTest.java", 
                           "NonSimpleArrayAssignmentTest", 
@@ -95,7 +97,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    /**
     * Tests example: /set/variablesArrayCreationInstanceTest
     */
-   public void testVariablesArrayCreationInstanceTest() throws Exception {
+   @Test public void testVariablesArrayCreationInstanceTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/variablesArrayCreationInstanceTest/test/ArrayCreationInstanceTest.java", 
                           "ArrayCreationInstanceTest", 
@@ -122,7 +124,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    /**
     * Tests example: /set/variablesArrayAssignmentTest
     */
-   public void testVariablesArrayAssignmentTest() throws Exception {
+   @Test public void testVariablesArrayAssignmentTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/variablesArrayAssignmentTest/test/ArrayAssignmentTest.java", 
                           "ArrayAssignmentTest", 
@@ -149,7 +151,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    /**
     * Tests example: /set/variablesArrayCreationTest
     */
-   public void testVariablesArrayCreationTest() throws Exception {
+   @Test public void testVariablesArrayCreationTest() throws Exception {
       doSETTestAndDispose(testCaseDirectory, 
                           "/set/variablesArrayCreationTest/test/ArrayCreationTest.java", 
                           "ArrayCreationTest", 
@@ -176,7 +178,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    /**
     * Tests example: /set/variableVariableMethodContractTest
     */
-   public void testVariableMethodContractTest() throws Exception {
+   @Test public void testVariableMethodContractTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/variableVariableMethodContractTest/test/VariableMethodContractTest.java", 
                 "VariableMethodContractTest", 
@@ -203,7 +205,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    /**
     * Tests example: /set/variablesConditionalCycle
     */
-   public void testVariablesConditionalCycle() throws Exception {
+   @Test public void testVariablesConditionalCycle() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/variablesConditionalCycle/test/VariablesConditionalCycle.java", 
                 "VariablesConditionalCycle", 
@@ -230,7 +232,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    /**
     * Tests example: /set/variablesSimpleCycle
     */
-   public void testVariablesSimpleCycle() throws Exception {
+   @Test public void testVariablesSimpleCycle() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/variablesSimpleCycle/test/VariablesSimpleCycle.java", 
                 "VariablesSimpleCycle", 
@@ -257,7 +259,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    /**
     * Tests example: /set/variablesWithQuantifier
     */
-   public void testVariablesWithQuantifier() throws Exception {
+   @Test public void testVariablesWithQuantifier() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/variablesWithQuantifier/test/EnoughInfoReturn.java", 
                 "EnoughInfoReturn", 
@@ -284,7 +286,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    /**
     * Tests example: /set/variablesVariableArrayIndex
     */
-   public void testVariableArrayIndex() throws Exception {
+   @Test public void testVariableArrayIndex() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/variablesVariableArrayIndex/test/VariableArrayIndex.java", 
                 "VariableArrayIndex", 
@@ -311,7 +313,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    /**
     * Tests example: /set/variablesConditionalValuesTest
     */
-   public void testVariablesConditionalValuesTest_next() throws Exception {
+   @Test public void testVariablesConditionalValuesTest_next() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/variablesConditionalValuesTest/test/ConditionalValuesTest.java", 
                 "ConditionalValuesTest", 
@@ -338,7 +340,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    /**
     * Tests example: /set/variablesConditionalValuesTest
     */
-   public void testVariablesConditionalValuesTest() throws Exception {
+   @Test public void testVariablesConditionalValuesTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/variablesConditionalValuesTest/test/ConditionalValuesTest.java", 
                 "ConditionalValuesTest", 
@@ -365,7 +367,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    /**
     * Tests example: /set/variableVariablesArrayTest
     */
-   public void testVariableVariablesArrayTest() throws Exception {
+   @Test public void testVariableVariablesArrayTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/variableVariablesArrayTest/test/VariablesArrayTest.java", 
                 "VariablesArrayTest", 
@@ -392,7 +394,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    /**
     * Tests example: /set/variablesLocalVariablesTest
     */
-   public void testVariablesLocalVariablesTest() throws Exception {
+   @Test public void testVariablesLocalVariablesTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/variablesLocalVariablesTest/test/LocalVariablesTest.java", 
                 "LocalVariablesTest", 
@@ -419,7 +421,7 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    /**
     * Tests example: /set/variablesUpdateVariablesTest
     */
-   public void testUpdateVariablesTest() throws Exception {
+   @Test public void testUpdateVariablesTest() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/variablesUpdateVariablesTest/test/UpdateVariablesTest.java", 
                 "UpdateVariablesTest", 

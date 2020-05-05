@@ -108,12 +108,14 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.KeYConstants;
 
+import static org.junit.Assert.*;
+
 /**
  * Provides the basic functionality of {@link TestCase}s which tests
  * the symbolic execution features.
  * @author Martin Hentschel
  */
-public abstract class AbstractSymbolicExecutionTestCase extends TestCase {
+public abstract class AbstractSymbolicExecutionTestCase {
    /**
     * <p>
     * If this constant is {@code true} a temporary directory is created with

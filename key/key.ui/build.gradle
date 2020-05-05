@@ -22,6 +22,7 @@ dependencies {
                 'lib/docking-frames-core.jar')
 
     runtimeOnly project(":keyext.interactionlog")
+
     //runtimeOnly project(":keyext.script.ui")
 }
 
