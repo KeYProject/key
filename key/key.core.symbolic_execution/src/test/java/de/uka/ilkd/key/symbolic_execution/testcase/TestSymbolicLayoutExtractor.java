@@ -53,6 +53,7 @@ import org.junit.Test;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @Category(Slow.class)
+@Ignore
 public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCase {
 //   @Test public void testSimpleLinkedOjbectsWithAdditionalInstances() throws Exception {
 //      doTest("/set/configurationExtractorSimpleLinkedOjbectsWithAdditionalInstances/test/SimpleLinkedOjbectsWithAdditionalInstances.java",
@@ -258,7 +259,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorArrayInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   @Test @Ignore public void testArrayInstanceCreationTest() throws Exception {
+   @Test public void testArrayInstanceCreationTest() throws Exception {
       doTest("/set/configurationExtractorArrayInstanceCreationTest/test/ArrayInstanceCreationTest.java",
              "ArrayInstanceCreationTest",
              "/set/configurationExtractorArrayInstanceCreationTest/oracle/",
@@ -277,7 +278,6 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   @Ignore
    @Test public void testInstanceCreationTest() throws Exception {
       doTest("/set/configurationExtractorInstanceCreationTest/test/InstanceCreationTest.java",
              "InstanceCreationTest",
