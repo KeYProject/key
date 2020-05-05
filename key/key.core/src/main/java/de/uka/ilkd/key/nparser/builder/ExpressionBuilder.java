@@ -271,14 +271,13 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
 
         List<Term> terms = mapOf(ctx.b);
-        terms.add(0, termL);
-        Term last = terms.get(terms.size() - 1);
-        for (int i = terms.size() - 2; i >= 0; i--) {
+        Term last = termL;
+        for (int i = 0; i < terms.size(); i++) {
             final String opTok = ctx.op.get(i).getText();
             String operator = opTok.equals("+") ? "add" : "sub";
             Function op = functions().lookup(new Name(operator));
             Term cur = terms.get(i);
-            last = binaryTerm(ctx, op, cur, last);
+            last = binaryTerm(ctx, op, last, cur);
         }
         return last;
     }
@@ -286,12 +285,18 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Object visitStrong_arith_term_1(KeYParser.Strong_arith_term_1Context ctx) {
         Term termL = accept(ctx.a);
-        if (ctx.b == null) return termL;
-
-        Term termR = accept(ctx.b);
+        if (ctx.b.isEmpty()) {
+            return updateOrigin(termL, ctx);
+        }
         Function op = functions().lookup(new Name("mul"));
         assert op != null : "Could not find `mul` function symbol.";
-        return binaryTerm(ctx, op, termL, termR);
+        List<Term> terms = mapOf(ctx.b);
+        Term last = termL;
+        for (int i = 0; i < terms.size(); i++) {
+            Term cur = terms.get(i);
+            last = binaryTerm(ctx, op, last, cur);
+        }
+        return last;
     }
 
     @Override

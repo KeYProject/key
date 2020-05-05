@@ -364,7 +364,7 @@ unary_formula:
 equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=comparison_term)?;
 comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=weak_arith_term)?;
 weak_arith_term: a=strong_arith_term_1 (op+=(PLUS|MINUS) b+=strong_arith_term_1)*;
-strong_arith_term_1: a=strong_arith_term_2 ((STAR) b=strong_arith_term_1)?;
+strong_arith_term_1: a=strong_arith_term_2 (STAR b+=strong_arith_term_2)*;
 strong_arith_term_2: a=atom_prefix ((PERCENT|SLASH) b=strong_arith_term_2)?;
 update_term: (LBRACE u=term RBRACE) (atom_prefix | unary_formula);
 substitution_term:
