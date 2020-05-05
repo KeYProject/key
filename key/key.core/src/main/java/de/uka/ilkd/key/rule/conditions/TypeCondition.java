@@ -38,7 +38,8 @@ public final class TypeCondition extends VariableConditionAdapter {
     /**
      * create a type condition     
      * @param tr the TypeResolver for the type to be checked
-     * @param isReference check for reference or primitive type  
+     * @param isReference check for reference or primitive type
+     *                     (weigl: This parameter is used as negation)
      * @param nonNull if Sort null should be allowed (only important when 
      * isReference is set to true)
      */

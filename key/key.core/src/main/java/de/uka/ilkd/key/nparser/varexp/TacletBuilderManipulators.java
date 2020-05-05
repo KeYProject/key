@@ -46,7 +46,7 @@ public class TacletBuilderManipulators {
      */
     public static final AbstractConditionBuilder SAME = new AbstractConditionBuilder("same", TR, TR) {
         @Override
-        public TypeComparisonCondition build(Object[] arguments, boolean negated) {
+        public TypeComparisonCondition build(Object[] arguments, List<String> parameters, boolean negated) {
             return new TypeComparisonCondition((TypeResolver) arguments[0],
                     (TypeResolver) arguments[1], negated ? NOT_SAME : TypeComparisonCondition.Mode.SAME);
         }
@@ -57,7 +57,7 @@ public class TacletBuilderManipulators {
      */
     public static final AbstractConditionBuilder IS_SUBTYPE = new AbstractConditionBuilder("sub", TR, TR) {
         @Override
-        public TypeComparisonCondition build(Object[] arguments, boolean negated) {
+        public TypeComparisonCondition build(Object[] arguments, List<String> parameters, boolean negated) {
             return new TypeComparisonCondition((TypeResolver) arguments[0],
                     (TypeResolver) arguments[1], negated ? NOT_IS_SUBTYPE : TypeComparisonCondition.Mode.IS_SUBTYPE);
         }
@@ -74,7 +74,7 @@ public class TacletBuilderManipulators {
         }
 
         @Override
-        public TypeComparisonCondition build(Object[] arguments, boolean negated) {
+        public TypeComparisonCondition build(Object[] arguments, List<String> parameters, boolean negated) {
             if (negated) throw new IllegalArgumentException("Negation is not supported");
             return new TypeComparisonCondition((TypeResolver) arguments[0],
                     (TypeResolver) arguments[1], STRICT_SUBTYPE);
@@ -88,7 +88,7 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder DISJOINT_MODULO_NULL = new AbstractConditionBuilder(
             "disjointModuloNull", TR, TR) {
         @Override
-        public TypeComparisonCondition build(Object[] arguments, boolean negated) {
+        public TypeComparisonCondition build(Object[] arguments, List<String> parameters, boolean negated) {
             if (negated) throw new IllegalArgumentException("Negation is not supported");
             return new TypeComparisonCondition((TypeResolver) arguments[0],
                     (TypeResolver) arguments[1], DISJOINTMODULONULL);
@@ -106,7 +106,7 @@ public class TacletBuilderManipulators {
      */
     public static final AbstractTacletBuilderCommand NEW_JAVATYPE = new AbstractTacletBuilderCommand("new", SV, KJT) {
         @Override
-        public void build(TacletBuilder tacletBuilder, Object[] arguments, boolean negated) {
+        public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments, List<String> parameters, boolean negated) {
             if (negated) throw new IllegalArgumentException("Negation is not supported");
             KeYJavaType kjt = (KeYJavaType) arguments[1];
             tacletBuilder.addVarsNew((SchemaVariable) arguments[0], kjt.getJavaType());
@@ -119,7 +119,7 @@ public class TacletBuilderManipulators {
         }
 
         @Override
-        public void build(TacletBuilder tacletBuilder, Object[] arguments, boolean negated) {
+        public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments, List<String> parameters, boolean negated) {
             SchemaVariable x = (SchemaVariable) arguments[0];
             for (int i = 1; i < arguments.length; i++) {
                 tacletBuilder.addVarsNotFreeIn(x, (SchemaVariable) arguments[i]);
@@ -138,7 +138,7 @@ public class TacletBuilderManipulators {
             "newTypeOf", SV, SV) {
 
         @Override
-        public void build(TacletBuilder tacletBuilder, Object[] arguments, boolean negated) {
+        public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments, List<String> parameters, boolean negated) {
             if (negated) throw new IllegalArgumentException("Negation is not supported");
             tacletBuilder.addVarsNew((SchemaVariable) arguments[0], (SchemaVariable) arguments[1]);
 
@@ -147,7 +147,7 @@ public class TacletBuilderManipulators {
     public static final AbstractTacletBuilderCommand NEW_DEPENDING_ON = new AbstractTacletBuilderCommand(
             "newDependingOn", SV, SV) {
         @Override
-        public void build(TacletBuilder tb, Object[] arguments, boolean negated) {
+        public void apply(TacletBuilder<?> tb, Object[] arguments, List<String> parameters, boolean negated) {
             if (negated) throw new IllegalArgumentException("Negation is not supported");
             tb.addVarsNewDependingOn((SchemaVariable) arguments[0],
                     (SchemaVariable) arguments[1]);
@@ -169,7 +169,12 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder ARRAY
             = new ConstructorBasedBuilder("isArray", ArrayTypeCondition.class, SV);
     public static final AbstractConditionBuilder REFERENCE_ARRAY
-            = new ConstructorBasedBuilder("isReferenceArray", ArrayComponentTypeCondition.class, SV);
+            = new AbstractConditionBuilder("isReferenceArray", SV) {
+        @Override
+        public VariableCondition build(Object[] arguments, List<String> parameters, boolean negated) {
+            return new ArrayComponentTypeCondition((SchemaVariable) arguments[0], !negated);
+        }
+    };
     public static final AbstractConditionBuilder MAY_EXPAND_METHOD_2
             = new ConstructorBasedBuilder("mayExpandMethod", MayExpandMethodCondition.class, SV, SV);
     public static final AbstractConditionBuilder MAY_EXPAND_METHOD_3
@@ -181,8 +186,9 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder REFERENCE
             = new AbstractConditionBuilder("isReference", TR) {
         @Override
-        public VariableCondition build(Object[] arguments, boolean negated) {
-            return new TypeCondition((TypeResolver) arguments[0], true, false /*todo*/);
+        public VariableCondition build(Object[] arguments, List<String> parameters, boolean negated) {
+            final boolean non_null = parameters.contains("non_null");
+            return new TypeCondition((TypeResolver) arguments[0], !negated, non_null);
         }
     };
     public static final AbstractConditionBuilder ENUM_TYPE
@@ -230,7 +236,7 @@ public class TacletBuilderManipulators {
         }
 
         @Override
-        public VariableCondition build(Object[] arguments, boolean negated) {
+        public VariableCondition build(Object[] arguments, List<String> parameters, boolean negated) {
             SchemaVariable v = (SchemaVariable) arguments[0];
             Sort s = (Sort) arguments[1];
             if (!(s instanceof GenericSort)) {
@@ -243,8 +249,8 @@ public class TacletBuilderManipulators {
         }
     }
 
-    public static final AbstractConditionBuilder HAS_SORT = new JavaTypeToSortConditionBuilder("hasSort",false);
-    public static final AbstractConditionBuilder HAS_ELEM_SORT = new JavaTypeToSortConditionBuilder("hasElementarySort",true);
+    public static final AbstractConditionBuilder HAS_SORT = new JavaTypeToSortConditionBuilder("hasSort", false);
+    public static final AbstractConditionBuilder HAS_ELEM_SORT = new JavaTypeToSortConditionBuilder("hasElementarySort", true);
 
     public static final AbstractConditionBuilder LABEL
             = new ConstructorBasedBuilder("hasLabel", TermLabelCondition.class, TSV, S);

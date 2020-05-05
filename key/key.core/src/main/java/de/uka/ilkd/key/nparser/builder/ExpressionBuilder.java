@@ -205,7 +205,15 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term result = accept(ctx.sub);
         assert result != null;
         if (ctx.MINUS() != null) {
-            if (result.sort() != Sort.FORMULA) {
+            Operator Z = functions().lookup("Z");
+            if (result.op() == Z) {
+                //weigl: rewrite neg(Z(1(#)) to Z(neglit(1(#))
+                //       This mimics the old KeyParser behaviour. Unknown if necessary.
+                final Function neglit = functions().lookup("neglit");
+                final Term num = result.sub(0);
+                return capsulateTf(ctx, () -> getTermFactory().createTerm(Z,
+                        getTermFactory().createTerm(neglit, num)));
+            } else if (result.sort() != Sort.FORMULA) {
                 Function negation = functions().lookup(new Name("neg"));
                 return capsulateTf(ctx, () -> getTermFactory().createTerm(negation, result));
             } else {
@@ -258,20 +266,21 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Object visitWeak_arith_term(KeYParser.Weak_arith_termContext ctx) {
         Term termL = accept(ctx.a);
-        Term termR = accept(ctx.b);
-        String op_name = "";
-        if (ctx.PLUS() != null) {
-            op_name = "add";
-        }
-        if (ctx.MINUS() != null) {
-            op_name = "sub";
-        }
-        Function op = (Function) functions().lookup(new Name(op_name));
-        if (op == null) {
+        if (ctx.op.isEmpty()) {
             return updateOrigin(termL, ctx);
-//            semanticError(ctx, "Function symbol '" + op_name + "' not found.");
         }
-        return binaryTerm(ctx, op, termL, termR);
+
+        List<Term> terms = mapOf(ctx.b);
+        terms.add(0, termL);
+        Term last = terms.get(terms.size() - 1);
+        for (int i = terms.size() - 2; i >= 0; i--) {
+            final String opTok = ctx.op.get(i).getText();
+            String operator = opTok.equals("+") ? "add" : "sub";
+            Function op = functions().lookup(new Name(operator));
+            Term cur = terms.get(i);
+            last = binaryTerm(ctx, op, cur, last);
+        }
+        return last;
     }
 
     @Override

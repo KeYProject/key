@@ -27,7 +27,7 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
-import org.antlr.v4.runtime.CharStreams;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.key_project.util.collection.ImmutableSLList;

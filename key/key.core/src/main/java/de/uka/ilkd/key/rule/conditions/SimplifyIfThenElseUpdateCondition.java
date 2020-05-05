@@ -211,4 +211,9 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     }
 
+    @Override
+    public String toString() {
+        return String.format("\\simplifyIfThenElseUpdate(%s, %s, %s, %s, %s)",
+                phi, u1, u2, commonFormula, result);
+    }
 }

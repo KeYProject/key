@@ -19,6 +19,7 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.conditions.TypeResolver;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -26,6 +27,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TacletPBuilder extends ExpressionBuilder {
     private final List<TacletBuilderCommand> conditionBuilder = new LinkedList<>();
@@ -250,14 +252,14 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitVarexp(KeYParser.VarexpContext ctx) {
         negated = ctx.NOT_() != null;
-        TacletBuilder<?> tb = peekTBuilder();
         String name = ctx.varexpId().getText();
         List<KeYParser.Varexp_argumentContext> arguments = ctx.varexp_argument();
         List<TacletBuilderCommand> suitableManipulators = TacletBuilderManipulators.getConditionBuildersFor(name);
+        List<String> parameters = ctx.parameter.stream().map(Token::getText).collect(Collectors.toList());
         boolean applied = false;
         Object[] argCache = new Object[arguments.size()];
         for (TacletBuilderCommand manipulator : suitableManipulators) {
-            if (applyManipulator(negated, argCache, manipulator, arguments)) {
+            if (applyManipulator(negated, argCache, manipulator, arguments, parameters)) {
                 applied = true;
                 break;
             }
@@ -272,11 +274,20 @@ public class TacletPBuilder extends ExpressionBuilder {
         return null;
     }
 
+    /**
+     *
+     * @param negated
+     * @param args
+     * @param manipulator
+     * @param arguments
+     * @param parameters
+     * @return
+     */
     private boolean applyManipulator(
             boolean negated,
             Object[] args,
             TacletBuilderCommand manipulator,
-            List<KeYParser.Varexp_argumentContext> arguments) {
+            List<KeYParser.Varexp_argumentContext> arguments, List<String> parameters) {
         assert args.length == arguments.size();
         ArgumentType[] types = manipulator.getArgumentTypes();
 
@@ -288,7 +299,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
 
         try {
-            manipulator.build(peekTBuilder(), args, negated);
+            manipulator.apply(peekTBuilder(), args, parameters, negated);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

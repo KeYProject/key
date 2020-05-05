@@ -363,7 +363,7 @@ unary_formula:
 ;
 equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=comparison_term)?;
 comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=weak_arith_term)?;
-weak_arith_term: a=strong_arith_term_1 ((PLUS|MINUS) b=weak_arith_term)?;
+weak_arith_term: a=strong_arith_term_1 (op+=(PLUS|MINUS) b+=strong_arith_term_1)*;
 strong_arith_term_1: a=strong_arith_term_2 ((STAR) b=strong_arith_term_1)?;
 strong_arith_term_2: a=atom_prefix ((PERCENT|SLASH) b=strong_arith_term_2)?;
 update_term: (LBRACE u=term RBRACE) (atom_prefix | unary_formula);
@@ -550,8 +550,7 @@ argument_list
 ;
 
 number:
-  (MINUS )?
-  ( NUM_LITERAL | HEX_LITERAL | BIN_LITERAL)
+  (MINUS)? (NUM_LITERAL | HEX_LITERAL | BIN_LITERAL)
 ;
 
 char_literal:
@@ -624,6 +623,15 @@ semisequent
 
 varexplist : varexp (COMMA varexp)* ;
 
+varexp
+:
+  negate=NOT_?
+  varexpId
+  (LBRACKET  parameter+=IDENT (COMMA parameter+=IDENT)* RBRACKET)?
+  LPAREN varexp_argument (COMMA varexp_argument)* RPAREN
+;
+
+
 varexpId:
     APPLY_UPDATE_ON_RIGID
   | SAME_OBSERVER
@@ -677,14 +685,6 @@ varexp_argument
   | TYPEOF LPAREN y=varId RPAREN
   | CONTAINERTYPE LPAREN y=varId RPAREN
   | DEPENDINGON LPAREN y=varId RPAREN
-;
-
-varexp
-:
-  negate=NOT_?
-  varexpId
-  (LBRACKET IDENT RBRACKET)?
-  LPAREN varexp_argument (COMMA varexp_argument)* RPAREN
 ;
 
 goalspecs:
