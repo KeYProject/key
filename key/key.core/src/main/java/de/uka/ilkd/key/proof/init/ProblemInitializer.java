@@ -39,6 +39,7 @@ import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
@@ -49,8 +50,7 @@ import org.key_project.util.collection.ImmutableSet;
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 
@@ -471,7 +471,35 @@ public final class ProblemInitializer {
                 cleanupNamespaces(currentBaseConfig);
                 baseConfig = currentBaseConfig;
             }
-            return prepare(envInput, currentBaseConfig);
+            InitConfig ic = prepare(envInput, currentBaseConfig);
+            print(ic);
+            return ic;
+        }
+    }
+
+    private void print(Proof firstProof) {
+        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("/tmp/proof.txt")))) {
+            out.print(firstProof.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void print(InitConfig ic) {
+        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("/tmp/taclets.txt")))) {
+            out.format("Date: %s\n", new Date());
+            out.format("Activated Taclets: \n");
+            final List<Taclet> taclets = new ArrayList<Taclet>();
+            for (Taclet t : ic.activatedTaclets()) taclets.add(t);
+            taclets.sort(Comparator.comparing((a) -> a.name().toString()));
+            for (Taclet taclet : taclets) {
+                out.format("== %s (%s) =========================================\n",
+                        taclet.name(), taclet.displayName());
+                out.println(taclet.toString());
+                out.format("-----------------------------------------------------\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -566,6 +594,8 @@ public final class ProblemInitializer {
             //final work
             setUpProofHelper(po, pa);
 
+            print(pa.getFirstProof());
+
             //done
             proofCreated(pa);
             return pa;
@@ -576,6 +606,7 @@ public final class ProblemInitializer {
             progressStopped(this);
         }
     }
+
 
     public ProofAggregate startProver(EnvInput envInput, ProofOblInput po)
             throws ProofInputException {
