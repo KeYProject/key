@@ -42,6 +42,8 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import org.key_project.util.testcategories.Slow;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests {@link SymbolicLayoutExtractor}.
@@ -50,7 +52,7 @@ import org.key_project.util.testcategories.Slow;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @Category(Slow.class)
 public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCase {
-//   public void testSimpleLinkedOjbectsWithAdditionalInstances() throws Exception {
+//   @Test public void testSimpleLinkedOjbectsWithAdditionalInstances() throws Exception {
 //      doTest("/set/configurationExtractorSimpleLinkedOjbectsWithAdditionalInstances/test/SimpleLinkedOjbectsWithAdditionalInstances.java",
 //             "SimpleLinkedOjbectsWithAdditionalInstances",
 //             "/set/configurationExtractorSimpleLinkedOjbectsWithAdditionalInstances/oracle/",
@@ -62,7 +64,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
 //             null);
 //   }
 
-//   public void testSimpleLinkedOjbectsWithAdditionalInstancesPreCondition() throws Exception {
+//   @Test public void testSimpleLinkedOjbectsWithAdditionalInstancesPreCondition() throws Exception {
 //      doTest("/set/configurationExtractorSimpleLinkedOjbectsWithAdditionalInstances/test/SimpleLinkedOjbectsWithAdditionalInstances.java",
 //             "SimpleLinkedOjbectsWithAdditionalInstances",
 //             "/set/configurationExtractorSimpleLinkedOjbectsWithAdditionalInstances/oracle/",
@@ -78,7 +80,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testEmptyArrayCreationTest() throws Exception {
+   @Test public void testEmptyArrayCreationTest() throws Exception {
       doTest("/set/configurationExtractorEmptyArrayCreationTest/test/EmptyArrayCreationTest.java",
              "EmptyArrayCreationTest",
              "/set/configurationExtractorEmptyArrayCreationTest/oracle/",
@@ -98,7 +100,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testArrayCreationTest() throws Exception {
+   @Test public void testArrayCreationTest() throws Exception {
       doTest("/set/configurationExtractorArrayCreationTest/test/ArrayCreationTest.java",
              "ArrayCreationTest",
              "/set/configurationExtractorArrayCreationTest/oracle/",
@@ -118,7 +120,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testMyInteger() throws Exception {
+   @Test public void testMyInteger() throws Exception {
       doTest("/set/configurationExtractorMyInteger/test/MyInteger.java",
              "MyInteger",
              "/set/configurationExtractorMyInteger/oracle/",
@@ -138,7 +140,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testVariableArrayIndex() throws Exception {
+   @Test public void testVariableArrayIndex() throws Exception {
       doTest("/set/configurationExtractorVariableArrayIndex/test/VariableArrayIndex.java",
              "VariableArrayIndex",
              "/set/configurationExtractorVariableArrayIndex/oracle/",
@@ -158,7 +160,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testStaticMember_OnReturnNode() throws Exception {
+   @Test public void testStaticMember_OnReturnNode() throws Exception {
       doTest("/set/configurationExtractorStaticMember/test/StaticMember.java",
              "StaticMember",
              "/set/configurationExtractorStaticMember/oracle/",
@@ -178,7 +180,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorExistsQuantifierTest".
     * @throws Exception Occurred Exception.
     */
-   public void testExistsQuantifierTest() throws Exception {
+   @Test public void testExistsQuantifierTest() throws Exception {
       doTest("/set/configurationExtractorExistsQuantifierTest/test/ExistsQuantifierTest.proof",
              "/set/configurationExtractorExistsQuantifierTest/oracle/",
              "ExistsQuantifierTest.xml",
@@ -196,7 +198,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testInstanceCreationTest_OnReturnNode() throws Exception {
+   @Test public void testInstanceCreationTest_OnReturnNode() throws Exception {
       doTest("/set/configurationExtractorInstanceCreationTest/test/InstanceCreationTest.java",
              "InstanceCreationTest",
              "/set/configurationExtractorInstanceCreationTest/oracle/",
@@ -216,7 +218,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorWithOperationContractsTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testWithOperationContracts() throws Exception {
+   @Test public void testWithOperationContracts() throws Exception {
       doTest("/set/configurationExtractorWithOperationContractsTest/test/ConfigurationExtractorWithOperationContractsTest.java",
              "ConfigurationExtractorWithOperationContractsTest",
              "/set/configurationExtractorWithOperationContractsTest/oracle/",
@@ -235,7 +237,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorAssociationSourceIsNotRepresentativeTermOfEquivalenceClass" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testAssociationSourceIsNotRepresentativeTermOfEquivalenceClass() throws Exception {
+   @Test public void testAssociationSourceIsNotRepresentativeTermOfEquivalenceClass() throws Exception {
       doTest("/set/configurationExtractorAssociationSourceIsNotRepresentativeTermOfEquivalenceClass/test/AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.java",
              "algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass",
              "/set/configurationExtractorAssociationSourceIsNotRepresentativeTermOfEquivalenceClass/oracle/",
@@ -254,7 +256,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorArrayInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testArrayInstanceCreationTest() throws Exception {
+   @Test public void testArrayInstanceCreationTest() throws Exception {
       doTest("/set/configurationExtractorArrayInstanceCreationTest/test/ArrayInstanceCreationTest.java",
              "ArrayInstanceCreationTest",
              "/set/configurationExtractorArrayInstanceCreationTest/oracle/",
@@ -273,7 +275,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testInstanceCreationTest() throws Exception {
+   @Test public void testInstanceCreationTest() throws Exception {
       doTest("/set/configurationExtractorInstanceCreationTest/test/InstanceCreationTest.java",
              "InstanceCreationTest",
              "/set/configurationExtractorInstanceCreationTest/oracle/",
@@ -292,7 +294,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorSimpleArrayCreation" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testSimpleArrayCreation() throws Exception {
+   @Test public void testSimpleArrayCreation() throws Exception {
       doTest("/set/configurationExtractorSimpleArrayCreation/test/SimpleArrayCreation.java",
              "SimpleArrayCreation",
              "/set/configurationExtractorSimpleArrayCreation/oracle/",
@@ -311,7 +313,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorMultiArrayIndexReadWriteAccess" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testMultiArrayIndexReadWriteAccess() throws Exception {
+   @Test public void testMultiArrayIndexReadWriteAccess() throws Exception {
       doTest("/set/configurationExtractorMultiArrayIndexReadWriteAccess/test/MultiArrayIndexReadWriteAccess.java",
              "MultiArrayIndexReadWriteAccess",
              "/set/configurationExtractorMultiArrayIndexReadWriteAccess/oracle/",
@@ -330,7 +332,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorSimpleLinkedArrays" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testSimpleLinkedArrays() throws Exception {
+   @Test public void testSimpleLinkedArrays() throws Exception {
       doTest("/set/configurationExtractorSimpleLinkedArrays/test/SimpleLinkedArrays.java",
              "SimpleLinkedArrays",
              "/set/configurationExtractorSimpleLinkedArrays/oracle/",
@@ -349,7 +351,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorObjectArrayIndexWriteAccess" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testObjectArrayIndexWriteAccess() throws Exception {
+   @Test public void testObjectArrayIndexWriteAccess() throws Exception {
       doTest("/set/configurationExtractorObjectArrayIndexWriteAccess/test/ObjectArrayIndexWriteAccess.java",
              "ObjectArrayIndexWriteAccess",
              "/set/configurationExtractorObjectArrayIndexWriteAccess/oracle/",
@@ -368,7 +370,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorArrayIndexWriteAccess" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testArrayIndexWriteAccess() throws Exception {
+   @Test public void testArrayIndexWriteAccess() throws Exception {
       doTest("/set/configurationExtractorArrayIndexWriteAccess/test/ArrayIndexWriteAccess.java",
              "ArrayIndexWriteAccess",
              "/set/configurationExtractorArrayIndexWriteAccess/oracle/",
@@ -387,7 +389,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorObjectArrayIndexReadAccess" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testObjectArrayIndexReadAccess() throws Exception {
+   @Test public void testObjectArrayIndexReadAccess() throws Exception {
       doTest("/set/configurationExtractorObjectArrayIndexReadAccess/test/ObjectArrayIndexReadAccess.java",
              "ObjectArrayIndexReadAccess",
              "/set/configurationExtractorObjectArrayIndexReadAccess/oracle/",
@@ -406,7 +408,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorOneAssignmentTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testArrayIndexReadAccess() throws Exception {
+   @Test public void testArrayIndexReadAccess() throws Exception {
       doTest("/set/configurationExtractorArrayIndexReadAccess/test/ArrayIndexReadAccess.java",
              "ArrayIndexReadAccess",
              "/set/configurationExtractorArrayIndexReadAccess/oracle/",
@@ -425,7 +427,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorOneAssignmentTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testOneAssignmentTest() throws Exception {
+   @Test public void testOneAssignmentTest() throws Exception {
       doTest("/set/configurationExtractorOneAssignmentTest/test/OneAssignmentTest.java",
              "OneAssignmentTest",
              "/set/configurationExtractorOneAssignmentTest/oracle/",
@@ -444,7 +446,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorEmptyPathConditionAndNoUpdates" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testEmptyPathConditionAndNoUpdates() throws Exception {
+   @Test public void testEmptyPathConditionAndNoUpdates() throws Exception {
       doTest("/set/configurationExtractorEmptyPathConditionAndNoUpdates/test/EmptyPathConditionAndNoUpdates.java",
              "EmptyPathConditionAndNoUpdates",
              "/set/configurationExtractorEmptyPathConditionAndNoUpdates/oracle/",
@@ -463,7 +465,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorSimpleLinkedOjbectsInsertion" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testSimpleLinkedOjbectsInsertion() throws Exception {
+   @Test public void testSimpleLinkedOjbectsInsertion() throws Exception {
       doTest("/set/configurationExtractorSimpleLinkedOjbectsInsertion/test/SimpleLinkedOjbectsInsertion.java",
              "SimpleLinkedOjbectsInsertion",
              "/set/configurationExtractorSimpleLinkedOjbectsInsertion/oracle/",
@@ -482,7 +484,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorIntegerConditionTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testObjectConditionTest() throws Exception {
+   @Test public void testObjectConditionTest() throws Exception {
       doTest("/set/configurationExtractorObjectConditionTest/test/ObjectConditionTest.java",
              "ObjectConditionTest",
              "/set/configurationExtractorObjectConditionTest/oracle/",
@@ -501,7 +503,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorIntegerConditionTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testIntegerConditionTest() throws Exception {
+   @Test public void testIntegerConditionTest() throws Exception {
       doTest("/set/configurationExtractorIntegerConditionTest/test/IntegerConditionTest.java",
              "IntegerConditionTest",
              "/set/configurationExtractorIntegerConditionTest/oracle/",
@@ -520,7 +522,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorIsInstanceTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testIsInstanceTest() throws Exception {
+   @Test public void testIsInstanceTest() throws Exception {
       doTest("/set/configurationExtractorIsInstanceTest/test/IsInstanceTest.java",
              "IsInstanceTest",
              "/set/configurationExtractorIsInstanceTest/oracle/",
@@ -539,7 +541,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorIsNullTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testIsNullTest() throws Exception {
+   @Test public void testIsNullTest() throws Exception {
       doTest("/set/configurationExtractorIsNullTest/test/IsNullTest.java",
              "IsNullTest",
              "/set/configurationExtractorIsNullTest/oracle/",
@@ -558,7 +560,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorSimpleLinkedOjbects" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testSimpleLinkedOjbectsInstanceVariable() throws Exception {
+   @Test public void testSimpleLinkedOjbectsInstanceVariable() throws Exception {
       doTest("/set/configurationExtractorSimpleLinkedOjbectsInstanceVariable/test/SimpleLinkedOjbectsInstanceVariable.java",
              "SimpleLinkedOjbectsInstanceVariable",
              "/set/configurationExtractorSimpleLinkedOjbectsInstanceVariable/oracle/",
@@ -577,7 +579,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorSimpleStaticAttributes" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testSimpleStaticAttributes() throws Exception {
+   @Test public void testSimpleStaticAttributes() throws Exception {
       doTest("/set/configurationExtractorSimpleStaticAttributes/test/SimpleStaticAttributes.java",
              "SimpleStaticAttributes",
              "/set/configurationExtractorSimpleStaticAttributes/oracle/",
@@ -596,7 +598,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorSimpleArrayLength" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testSimpleArrayLength() throws Exception {
+   @Test public void testSimpleArrayLength() throws Exception {
       doTest("/set/configurationExtractorSimpleArrayLength/test/SimpleArrayLength.java",
              "SimpleArrayLength",
              "/set/configurationExtractorSimpleArrayLength/oracle/",
@@ -615,7 +617,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorSimpleLinkedOjbectsDeletion" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testSimpleLinkedOjbectsDeletion() throws Exception {
+   @Test public void testSimpleLinkedOjbectsDeletion() throws Exception {
       doTest("/set/configurationExtractorSimpleLinkedOjbectsDeletion/test/SimpleLinkedOjbectsDeletion.java",
              "SimpleLinkedOjbectsDeletion",
              "/set/configurationExtractorSimpleLinkedOjbectsDeletion/oracle/",
@@ -635,7 +637,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorSimpleLinkedOjbectsDeletion" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testSimpleLinkedOjbectsDeletionPreCondition() throws Exception {
+   @Test public void testSimpleLinkedOjbectsDeletionPreCondition() throws Exception {
       doTest("/set/configurationExtractorSimpleLinkedOjbectsDeletion/test/SimpleLinkedOjbectsDeletion.java",
              "SimpleLinkedOjbectsDeletion",
              "/set/configurationExtractorSimpleLinkedOjbectsDeletion/oracle/",
@@ -654,7 +656,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorSimpleLinkedOjbects" without precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testSimpleLinkedOjbects() throws Exception {
+   @Test public void testSimpleLinkedOjbects() throws Exception {
       doTest("/set/configurationExtractorSimpleLinkedOjbects/test/SimpleLinkedOjbects.java",
              "SimpleLinkedOjbects",
              "/set/configurationExtractorSimpleLinkedOjbects/oracle/",
@@ -673,7 +675,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorSimpleLinkedOjbects" with precondition.
     * @throws Exception Occurred Exception.
     */
-   public void testSimpleLinkedOjbectsPreCondition() throws Exception {
+   @Test public void testSimpleLinkedOjbectsPreCondition() throws Exception {
       doTest("/set/configurationExtractorSimpleLinkedOjbects/test/SimpleLinkedOjbects.java",
              "SimpleLinkedOjbects",
              "/set/configurationExtractorSimpleLinkedOjbects/oracle/",

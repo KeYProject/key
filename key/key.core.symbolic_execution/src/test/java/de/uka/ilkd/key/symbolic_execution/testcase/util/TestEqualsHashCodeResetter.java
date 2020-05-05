@@ -20,16 +20,18 @@ import java.util.Set;
 
 import de.uka.ilkd.key.symbolic_execution.util.EqualsHashCodeResetter;
 import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests for {@link EqualsHashCodeResetter}
  * @author Martin Hentschel
  */
-public class TestEqualsHashCodeResetter extends TestCase {
+public class TestEqualsHashCodeResetter {
    /**
     * Tests {@link EqualsHashCodeResetter#getWrappedElement()}.
     */
-   public void testGetWrappedElement() {
+   @Test public void testGetWrappedElement() {
       // Create model
       String a1 = "a";
       String a2 = "a";
@@ -54,7 +56,7 @@ public class TestEqualsHashCodeResetter extends TestCase {
     * Tests {@link EqualsHashCodeResetter#equals(Object)} by direct comparison
     * and used in a {@link LinkedHashSet}.
     */
-   public void testEquals() {
+   @Test public void testEquals() {
       // Create model
       String a1 = "a";
       String a2 = "a";
@@ -147,7 +149,7 @@ public class TestEqualsHashCodeResetter extends TestCase {
     * Tests {@link EqualsHashCodeResetter#hashCode()} by direct comparison
     * and used in a {@link HashMap}.
     */
-   public void testHashCode() {
+   @Test public void testHashCode() {
       // Create model
       String a1 = "a";
       String a2 = "a";
