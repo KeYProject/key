@@ -492,17 +492,15 @@ public class TestTermParser extends AbstractTestTermParser {
     public void testNegativeLiteralParsing1() throws Exception {
         String s1 = "-1234";
         Term t = parseTerm(s1);
-        assertEquals("neg", t.op().name().toString());
-        assertEquals("Z", t.sub(0).op().name().toString());
+        assertEquals("Z", t.op().name().toString());
+        assertEquals("neglit", t.sub(0).op().name().toString());
     }
 
     @Test
     public void testNegativeLiteralParsing2() throws Exception {
-        String s2 = "-(1) ";
+        String s2 = "-(1+1) ";
         Term t = parseTerm(s2);
         assertEquals("Failed parsing negative complex term", "neg", t.op().name().toString());
-        assertEquals("Z", t.sub(0).op().name().toString());
-
     }
 
     @Test
@@ -577,8 +575,8 @@ public class TestTermParser extends AbstractTestTermParser {
         // Test: Multiplication/Modulo/Div should be left associative
         Term termInfix = parseTerm("aa%bb*cc < -123");
         Term termPrefix = parseTerm("lt(mul(mod(aa,bb),cc),-123)");
-        assertEqualsIgnoreWhitespaces("lt(mul(mod(aa,bb),cc),neg(Z(3(2(1(#))))))", termInfix.toString());
-        assertEqualsIgnoreWhitespaces("lt(mul(mod(aa,bb),cc),neg(Z(3(2(1(#))))))", termPrefix.toString());
+        assertEqualsIgnoreWhitespaces("lt(mul(mod(aa,bb),cc),Z(neglit(3(2(1(#))))))", termInfix.toString());
+        assertEqualsIgnoreWhitespaces("lt(mul(mod(aa,bb),cc),Z(neglit(3(2(1(#))))))", termPrefix.toString());
         assertEquals(termInfix, termPrefix);
     }
 
