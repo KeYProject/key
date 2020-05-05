@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.experimental.categories.Category;
 import org.junit.runners.MethodSorters;
 import org.key_project.util.collection.ImmutableList;
@@ -256,7 +257,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorArrayInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   @Test public void testArrayInstanceCreationTest() throws Exception {
+   @Test @Ignore public void testArrayInstanceCreationTest() throws Exception {
       doTest("/set/configurationExtractorArrayInstanceCreationTest/test/ArrayInstanceCreationTest.java",
              "ArrayInstanceCreationTest",
              "/set/configurationExtractorArrayInstanceCreationTest/oracle/",
