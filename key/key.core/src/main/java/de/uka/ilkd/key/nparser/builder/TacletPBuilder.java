@@ -30,13 +30,25 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class TacletPBuilder extends ExpressionBuilder {
-    private final List<TacletBuilderCommand> conditionBuilder = new LinkedList<>();
+
     private final Stack<TacletBuilder> currentTBuilder = new Stack<>();
+
     private HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new HashMap<>();
+
     private boolean axiomMode;
+
     private boolean negated = false;
+
     private List<Taclet> topLevelTaclets = new ArrayList<>(2048);
+
+    /**
+     * Current required choices for taclets
+     */
     private ImmutableSet<Choice> requiredChoices = DefaultImmutableSet.nil();
+
+    /**
+     * Required choices for taclet goals.
+     */
     private ImmutableSet<Choice> goalChoice = DefaultImmutableSet.nil();
 
     public TacletPBuilder(Services services, NamespaceSet nss) {
@@ -179,7 +191,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY;
         }
         @Nullable Object find = accept(ctx.find);
-        TacletBuilder b = createTacletBuilderFor(find, applicationRestriction, ctx);
+        TacletBuilder<?> b = createTacletBuilderFor(find, applicationRestriction, ctx);
         currentTBuilder.push(b);
         b.setIfSequent(ifSeq);
         b.setName(new Name(name));
@@ -275,7 +287,6 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     /**
-     *
      * @param negated
      * @param args
      * @param manipulator
@@ -796,6 +807,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Object visitGoalspec(KeYParser.GoalspecContext ctx) {
+        ImmutableSet<Choice> soc = this.goalChoice;
         String name = accept(ctx.string_value());
 
         Sequent addSeq = Sequent.EMPTY_SEQUENT;
@@ -804,9 +816,9 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         @Nullable Object rwObj = accept(ctx.replacewith());
         if (ctx.add() != null) addSeq = accept(ctx.add());
-        if (ctx.addrules() != null) addRList = accept(ctx.addrules());
+        if (ctx.addrules() != null) addRList = accept(ctx.addrules()); //modifies goalChoice
         if (ctx.addprogvar() != null) addpv = accept(ctx.addprogvar());
-        addGoalTemplate(name, rwObj, addSeq, addRList, addpv, goalChoice, ctx);
+        addGoalTemplate(name, rwObj, addSeq, addRList, addpv, soc, ctx);
         return null;
     }
 
@@ -901,7 +913,8 @@ public class TacletPBuilder extends ExpressionBuilder {
                                  Sequent addSeq,
                                  ImmutableList<Taclet> addRList,
                                  ImmutableSet<SchemaVariable> pvs,
-                                 ImmutableSet<Choice> soc, ParserRuleContext ctx) {
+                                 @Nullable ImmutableSet<Choice> soc,
+                                 ParserRuleContext ctx) {
         TacletBuilder<?> b = peekTBuilder();
         TacletGoalTemplate gt = null;
         if (rwObj == null) {
