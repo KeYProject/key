@@ -155,10 +155,10 @@ public abstract class TacletBuilder<T extends Taclet> {
      * <code>soc</code>
      */
     public void addGoal2ChoicesMapping(TacletGoalTemplate gt, ImmutableSet<Choice> soc){
-	if(goal2Choices==null){
-	    goal2Choices = new LinkedHashMap<TacletGoalTemplate, ImmutableSet<Choice>>();
-	}
-	goal2Choices.put(gt, soc);
+        if(goal2Choices == null){
+            goal2Choices = new LinkedHashMap<>();
+        }
+        goal2Choices.put(gt, soc);
     }
 	
     public HashMap<TacletGoalTemplate, ImmutableSet<Choice>> getGoal2Choices(){

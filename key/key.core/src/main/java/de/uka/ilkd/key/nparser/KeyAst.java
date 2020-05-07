@@ -8,8 +8,10 @@ import de.uka.ilkd.key.nparser.builder.IncludeFinder;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Triple;
+import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -96,7 +98,19 @@ public abstract class KeyAst<T extends ParserRuleContext> {
          * @return
          */
         public String getProblemHeader() {
-            return ctx.decls().getText();
+            final KeYParser.DeclsContext decls = ctx.decls();
+            if (decls != null) {
+                final Token start = decls.start;
+                final Token stop = decls.stop;
+                if (start != null && stop != null) {
+                    int a = start.getStartIndex();
+                    int b = stop.getStopIndex();
+                    Interval interval = new Interval(a, b);
+                    CharStream input = ctx.start.getInputStream();
+                    return input.getText(interval);
+                }
+            }
+            return "";
         }
     }
 
