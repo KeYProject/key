@@ -105,8 +105,8 @@ public class ProofReplayer {
                     int pos = idToken.getLine() + startLine;
                     if (stream.LA(1) == KeYLexer.STRING_LITERAL) {
                         arg = stream.LT(1).getText();
+                        arg = unescape(arg.substring(1, arg.length() - 1));
                         stream.consume();//throw string away
-                        arg = arg.substring(1, arg.length() - 1);
                     }
 
                     prl.beginExpr(cur, arg);
@@ -124,5 +124,9 @@ public class ProofReplayer {
                     stream.consume();
             }
         }
+    }
+
+    private static String unescape(String text) {
+        return text.replace("\\\"", "\"");
     }
 }
