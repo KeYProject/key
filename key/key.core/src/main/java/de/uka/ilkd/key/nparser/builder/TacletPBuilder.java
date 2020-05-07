@@ -79,19 +79,19 @@ public class TacletPBuilder extends ExpressionBuilder {
             this.requiredChoices = DefaultImmutableSet.nil();
         }
         List<Taclet> seq = mapOf(ctx.taclet());
-        Map<RuleKey, Taclet> taclets = new HashMap<>();
+        topLevelTaclets.addAll(seq);
+        /* no check for conflicts: Check should happen after options
         for (Taclet s : seq) {
             if (s == null) continue; //TODO investigate why null taclets appear!
             final RuleKey key = new RuleKey(s);
-            if (taclets.containsKey(key)) {
+            /*if (topLevelTaclets.containsKey(key)) {
                 semanticError(ctx, "Cannot add taclet \"" + s.name() +
                         "\" to rule base as a taclet with the same " +
                         "name already exists.");
 
             } else {
-                taclets.put(key, s);
             }
-        }
+        }*/
         disableJavaSchemaMode();
         return null;
     }
@@ -215,11 +215,11 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     private void announceTaclet(ParserRuleContext ctx, Taclet taclet) {
         taclet2Builder.put(taclet, peekTBuilder());
+        /*
         if (currentTBuilder.size() > 1) {//toplevel taclet
             return;
         }
-        topLevelTaclets.add(taclet);
-        /*if (parsedKeyFile.getTaclets().containsKey(key)) {
+        if (parsedKeyFile.getTaclets().containsKey(key)) {
             //semanticError(ctx, "A taclet with name %s was already defined", key);
             System.err.format("Taclet clash with %s%n", key);
         }*/

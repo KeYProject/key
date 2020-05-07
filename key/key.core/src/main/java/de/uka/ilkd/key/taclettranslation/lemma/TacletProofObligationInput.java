@@ -13,6 +13,18 @@
 
 package de.uka.ilkd.key.taclettranslation.lemma;
 
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,30 +32,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.IPersistablePO;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
-import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
-import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
-
 /**
  * The Class TacletProofObligationInput is a special purpose proof obligations
  * for taclet proofs.
- * 
+ * <p>
  * A proof for a KeY system-taclet can thus be reloaded and checked against the
  * current environment.
- * 
+ *
  * @author mattias ulbrich
  */
 public class TacletProofObligationInput implements ProofOblInput, IPersistablePO {
@@ -62,11 +57,11 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
      * required name.
      */
     private TacletFilter filter = new TacletFilter() {
-        @Override 
+        @Override
         public ImmutableSet<Taclet> filter(List<TacletInfo> taclets) {
             Name name = new Name(tacletName);
             for (TacletInfo tacletInfo : taclets) {
-                if(tacletInfo.getTaclet().name().equals(name)) {
+                if (tacletInfo.getTaclet().name().equals(name)) {
                     return DefaultImmutableSet.<Taclet>nil().add(tacletInfo.getTaclet());
                 }
             }
@@ -79,44 +74,43 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
      */
     private LoaderListener listener = new LoaderListener() {
 
-        @Override 
+        @Override
         public void stopped(Throwable exception) {
             System.err.println("Exception while loading proof obligation for taclet:");
             exception.printStackTrace();
         }
 
-        @Override 
+        @Override
         public void stopped(ProofAggregate p, ImmutableSet<Taclet> taclets, boolean addAsAxioms) {
+            assert p != null;
             proofObligation = p;
         }
 
-        @Override 
+        @Override
         public void started() {
         }
 
-        @Override 
+        @Override
         public void resetStatus(Object sender) {
         }
 
-        @Override 
+        @Override
         public void reportStatus(Object sender, String string) {
         }
 
-        @Override 
+        @Override
         public void progressStarted(Object sender) {
         }
     };
-   
+
     private final InitConfig environmentConfig;
- 
+
 
     /**
      * Instantiates a new taclet proof obligation input object.
-     * 
-     * @param tacletName
-     *            the name of the taclet which is to be created
-     * @param initConfig
-     *            the initconfig under which the PO is to be examined
+     *
+     * @param tacletName the name of the taclet which is to be created
+     * @param initConfig the initconfig under which the PO is to be examined
      */
     public TacletProofObligationInput(String tacletName, InitConfig initConfig) {
         this.tacletName = tacletName;
@@ -126,7 +120,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     /*
      * Fill in only the necessary info.
      */
-    @Override 
+    @Override
     public void fillSaveProperties(Properties properties) throws IOException {
         properties.setProperty(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
         properties.setProperty(IPersistablePO.PROPERTY_NAME, name());
@@ -148,7 +142,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         }
     }
 
-    @Override 
+    @Override
     public String name() {
         return tacletName;
     }
@@ -156,16 +150,16 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     /*
      * use the TacletLoader and TacletSoundlessPOLoader to generate the PO.
      */
-    @Override 
+    @Override
     public void readProblem() throws ProofInputException {
         TacletLoader loader = null;
-        
+
         if (tacletFile == null) {
             // prove a KeY taclet
             loader = new TacletLoader.KeYsTacletsLoader(null, null, environmentConfig.getProfile());
         } else {
             final ProblemInitializer problemInitializer =
-                    new ProblemInitializer( environmentConfig.getProfile());
+                    new ProblemInitializer(environmentConfig.getProfile());
             // bugfix: All files are loaded relative to the basedir of the loaded file
             loader = new TacletLoader.TacletFromFileLoader(null, null, problemInitializer,
                     new File(baseDir, tacletFile),
@@ -180,10 +174,10 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
                         initConfig, true);
 
         poloader.startSynchronously();
-        if(proofObligation == null) {
-            throw new ProofInputException("Cannot instantiate the proof obligation for taclet '" + 
+        if (proofObligation == null) {
+            throw new ProofInputException("Cannot instantiate the proof obligation for taclet '" +
                     tacletName + "'. Is it defined (in the specified tacletFile?)");
-            }
+        }
     }
 
     private ProofEnvironment createProofEnvironment() throws ProofInputException {
@@ -202,10 +196,10 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     /*
      * just deliver the precalculated PO
      */
-    @Override 
+    @Override
     public ProofAggregate getPO() throws ProofInputException {
-        assert proofObligation != null : 
-            "readProblem should have been called first";
+        assert proofObligation != null :
+                "readProblem should have been called first";
         return proofObligation;
     }
 
@@ -242,7 +236,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     }
 
     public void setLoadInfo(File tacletFile, File definitionFile,
-            Collection<File> axiomFiles) {
+                            Collection<File> axiomFiles) {
         this.tacletFile = tacletFile.toString();
         this.definitionFile = definitionFile.toString();
         this.axiomFiles = new String[axiomFiles.size()];
@@ -259,6 +253,6 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
      */
     @Override
     public KeYJavaType getContainerType() {
-       return null;
+        return null;
     }
 }

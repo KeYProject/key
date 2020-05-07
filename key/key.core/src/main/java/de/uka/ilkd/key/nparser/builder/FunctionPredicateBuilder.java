@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nparser;
+package de.uka.ilkd.key.nparser.builder;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -8,7 +8,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.nparser.builder.DefaultBuilder;
+import de.uka.ilkd.key.nparser.KeYParser;
 import org.key_project.util.collection.ImmutableArray;
 
 import java.util.List;
@@ -98,6 +98,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         }
 
         Function f = null;
+        assert func_name != null;
         int separatorIndex = func_name.indexOf("::");
         if (separatorIndex > 0) {
             String sortName = func_name.substring(0, separatorIndex);
@@ -121,10 +122,10 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                     unique);
         }
 
-
-        if (lookup(f.name()) != null) {
-        } else {
+        if (lookup(f.name()) == null) {
             functions().add(f);
+        } else {
+            addWarning("Function '" + func_name + "' is already defined!");
         }
         return f;
     }

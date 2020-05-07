@@ -1173,7 +1173,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         Operator op;
         if (varfuncid.endsWith(LIMIT_SUFFIX)) {
             varfuncid = varfuncid.substring(0, varfuncid.length() - 5);
-            op = lookupVarfuncId(ctx, varfuncid, sortId);
+            op = lookupVarfuncId(ctx, varfuncid, ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
                         .limitObs((ObserverFunction) op).first;
@@ -1183,7 +1183,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         } else {
             String firstName = ctx.name.simple_ident().size() == 0 ? ctx.name.NUM_LITERAL().getText()
                     : ctx.name.simple_ident(0).getText();
-            op = lookupVarfuncId(ctx, firstName, sortId);
+            op = lookupVarfuncId(ctx, firstName, ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
             if (op instanceof ProgramVariable && ctx.name.simple_ident().size() > 1) {
                 List<KeYParser.Simple_identContext> otherParts = ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
                 ProgramVariable v = (ProgramVariable) op;
@@ -1425,7 +1425,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             op = UpdateJunctor.SKIP;
         } else if (firstName.endsWith(LIMIT_SUFFIX)) {
             firstName = firstName.substring(0, firstName.length() - 5);
-            op = lookupVarfuncId(ctx, firstName, sortId);
+            op = lookupVarfuncId(ctx, firstName, ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
                         .limitObs((ObserverFunction) op).first;
@@ -1433,7 +1433,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "Cannot can be limited: " + op);
             }
         } else {
-            op = lookupVarfuncId(ctx, firstName, sortId);
+            op = lookupVarfuncId(ctx, firstName, ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
         }
 
         Term current;

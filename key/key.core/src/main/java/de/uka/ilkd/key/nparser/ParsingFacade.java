@@ -81,7 +81,7 @@ public abstract class ParsingFacade {
     }
 
     public static KeyAst.File parseFile(URL url) throws IOException {
-        long start = System.currentTimeMillis();
+        //long start = System.currentTimeMillis();
         try (BufferedInputStream is = new BufferedInputStream(url.openStream());
              ReadableByteChannel channel = Channels.newChannel(is)) {
             CodePointCharStream stream = CharStreams.fromChannel(
@@ -93,8 +93,8 @@ public abstract class ParsingFacade {
                     -1);
             return parseFile(stream);
         } finally {
-            long stop = System.currentTimeMillis();
-            System.err.printf("PARSING %s took %d ms\n", url, stop - start);
+            //long stop = System.currentTimeMillis();
+            //System.err.printf("PARSING %s took %d ms\n", url, stop - start);
         }
     }
 

@@ -10,8 +10,6 @@ import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.rule.RuleSet;
 import org.antlr.v4.runtime.Token;
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.util.HashMap;
@@ -34,7 +32,7 @@ import java.util.Map;
  *
  * @author Alexander Weigl
  * @version 1 (12/4/19)
- * @see de.uka.ilkd.key.nparser.FunctionPredicateBuilder for level-1 declarations
+ * @see FunctionPredicateBuilder for level-1 declarations
  */
 public class DeclarationBuilder extends DefaultBuilder {
     private Map<String, String> category2Default = new HashMap<>();
@@ -121,8 +119,6 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitSort_decls(KeYParser.Sort_declsContext ctx) {
-        ImmutableList<Sort> lsorts = ImmutableSLList.nil();
-        //TODO multipleSorts = ImmutableSLList.<Sort>nil();
         for (KeYParser.One_sort_declContext c : ctx.one_sort_decl()) {
             c.accept(this);
         }

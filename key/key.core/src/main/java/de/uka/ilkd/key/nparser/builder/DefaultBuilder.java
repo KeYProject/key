@@ -140,7 +140,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      *
      * @param varfuncName the String with the symbols name
      */
-    protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, Sort sort) {
+    protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, String sortName, Sort sort) {
         Name name = new Name(varfuncName);
         Operator[] operators = new Operator[]{
                 schemaVariables().lookup(name),
@@ -157,8 +157,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             }
         }
 
-        if (sort != null) {
-            Name fqName = new Name(sort.toString() + "::" + varfuncName);
+        if (sort != null || sortName != null) {
+            Name fqName = new Name((sort != null ? sort.toString() : sortName) + "::" + varfuncName);
             operators = new Operator[]{
                     schemaVariables().lookup(fqName),
                     variables().lookup(fqName),

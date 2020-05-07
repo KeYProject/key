@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -208,6 +209,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     // this was a bug in the pretty printing
     @Test
+    //@Ignore(value="weigl: This test is not comprehensible anymore.")
     public void testUnknownConstant() throws Exception {
         parseDecls("\\functions { \\unique Field unkonwn.Clazz::$unknownField; }");
         String string = "int::select(heap,a,unkonwn.Clazz::$unknownField)";

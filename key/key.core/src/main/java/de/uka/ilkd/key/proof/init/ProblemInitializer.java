@@ -450,7 +450,7 @@ public final class ProblemInitializer {
 
         synchronized (SchemaJavaParser.class) {
             // It is required to work with a copy to make this method thread save required by the Eclipse plug-ins.
-            InitConfig currentBaseConfig = baseConfig;
+            InitConfig currentBaseConfig = baseConfig != null ? baseConfig.copy() : null;
             progressStarted(this);
             alreadyParsed.clear();
 
