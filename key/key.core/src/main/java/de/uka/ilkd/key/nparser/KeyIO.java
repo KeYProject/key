@@ -27,9 +27,10 @@ import static de.uka.ilkd.key.nparser.ParsingFacade.parseFiles;
 
 /**
  * This facade provides high level access to parse and
- * interpret key files (declarations, proof, problem) or input string like terms.
+ * interpret key files or input strings into declarations, proof, problem, terms.
  * <p>
  * This classes encapsulates the {@link Services}, {@link NamespaceSet} for {@link SchemaVariable}s.
+ * <b>It also modifies them during interpretation.</b>
  *
  * @author Alexander Weigl
  * @version 1 (17.10.19)
@@ -170,6 +171,12 @@ public class KeyIO {
         schemaNamespace = ns;
     }
 
+    /**
+     * Loading of complete KeY files into the given schema.
+     * Supports recursive loading, but does not provide support for Java and Java type informations.
+     * <p>
+     * Little sister of {@link de.uka.ilkd.key.proof.init.ProblemInitializer}.
+     */
     public class Loader {
         private final URL resource;
         private final CharStream content;

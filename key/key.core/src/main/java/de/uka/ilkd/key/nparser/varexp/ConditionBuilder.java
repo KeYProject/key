@@ -13,7 +13,7 @@ public interface ConditionBuilder extends TacletBuilderCommand {
     VariableCondition build(Object[] arguments, List<String> parameters, boolean negated);
 
     @Override
-    public default void apply(TacletBuilder<?> tacletBuilder, Object[] arguments, List<String> parameters, boolean negated) {
+    default void apply(TacletBuilder<?> tacletBuilder, Object[] arguments, List<String> parameters, boolean negated) {
         VariableCondition condition = build(arguments, parameters, negated);
         tacletBuilder.addVariableCondition(condition);
     }

@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 import static de.uka.ilkd.key.nparser.varexp.ArgumentType.SORT;
@@ -268,6 +269,7 @@ public class TacletBuilderManipulators {
                 SUBFORMULAS, STATIC_FIELD, SUBFORMULA, DROP_EFFECTLESS_STORES, EQUAL_UNIQUE,
                 META_DISJOINT, IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT
         );
+        loadWithServiceLoader();
     }
 
     public static void register(TacletBuilderCommand... cb) {
@@ -278,6 +280,11 @@ public class TacletBuilderManipulators {
 
     public static void register(TacletBuilderCommand cb) {
         tacletBuilderCommands.add(cb);
+    }
+
+    public static void loadWithServiceLoader() {
+        ServiceLoader<TacletBuilderCommand> serviceLoader = ServiceLoader.load(TacletBuilderCommand.class);
+        serviceLoader.iterator().forEachRemaining(TacletBuilderManipulators::register);
     }
 
     public static List<TacletBuilderCommand> getConditionBuilders() {

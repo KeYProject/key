@@ -24,7 +24,7 @@ import java.net.URL;
  * from the rest of the Key system.
  *
  * <p>
- * To obtain an KeYAst use the {@link ParsingFacade}.
+ * To obtain an KeYAst use the {@link ParsingFacade#getParseRuleContext(KeyAst)}.
  * </p>
  *
  * @author Alexander Weigl

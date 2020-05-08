@@ -27,11 +27,11 @@ import java.util.*;
 public abstract class ParsingFacade {
     /**
      * Use this function to retrieve the {@link ParserRuleContext} inside and {@link KeyAst} object.
-     * <b>The use of this is discourage and should be avoided in all high level scenarios.</b>
+     * <b>The use of this method is discourage and should be avoided in all high level scenarios.</b>
      *
-     * @param ast
-     * @param <T>
-     * @return
+     * @param ast a key ast object
+     * @param <T> parse tree type
+     * @return the {@link ParserRuleContext} inside the given ast object.
      */
     public static <T extends ParserRuleContext> @NotNull T getParseRuleContext(@NotNull KeyAst<T> ast) {
         return ast.ctx;
@@ -58,7 +58,13 @@ public abstract class ParsingFacade {
         return ctxs;
     }
 
-    public static ChoiceInformation getChoices(List<KeyAst.File> ctxs) {
+    /**
+     * Extracts the choice information from the given the parsed files {@code ctxs}.
+     *
+     * @param ctxs non-null list
+     * @return
+     */
+    public static @NotNull ChoiceInformation getChoices(@NotNull List<KeyAst.File> ctxs) {
         ChoiceInformation ci = new ChoiceInformation();
         ChoiceFinder finder = new ChoiceFinder(ci);
         ctxs.forEach(it -> it.accept(finder));
@@ -124,20 +130,29 @@ public abstract class ParsingFacade {
         return new KeyAst.Seq(p.seqEOF().seq());
     }
 
-    public static String getValue(KeYParser.String_valueContext ctx) {
-        return ctx.getText().substring(1, ctx.getText().length() - 1);
+    /**
+     * Translate a given context of a {@code string_value} grammar rule into a the literal value.
+     * In particular it truncates, and substitutes quote escapes {@code \"}.
+     *
+     * @param ctx non-null context
+     * @return non-null string
+     */
+    public static @NotNull String getValue(@NotNull KeYParser.String_valueContext ctx) {
+        return ctx.getText().substring(1, ctx.getText().length() - 1)
+                .replace("\\\"", "\"");
     }
 
+    /**
+     * Parse the id declaration. This a seldom special case somewhere in key.ui.
+     * <p>
+     * <b>Use is discourage.</b>
+     *
+     * @param stream
+     * @return
+     * @deprecated
+     */
     public static KeYParser.Id_declarationContext parseIdDeclaration(CharStream stream) {
         KeYParser p = createParser(stream);
         return p.id_declaration();
-        /*
-    @Override
-    public IdDeclaration visitId_declaration(KeYParser.Id_declarationContext ctx) {
-        var id = (String) ctx.IDENT().getText();
-        var s = (Sort) (ctx.sortId_check() != null ? accept(ctx.sortId_check()) : null);
-        return new IdDeclaration(id, s);
-    }
-    */
     }
 }
