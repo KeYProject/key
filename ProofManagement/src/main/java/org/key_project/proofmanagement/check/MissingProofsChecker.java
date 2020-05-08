@@ -100,12 +100,13 @@ public class MissingProofsChecker implements Checker {
             if (type instanceof TypeDeclaration) {
                 TypeDeclaration td = (TypeDeclaration) type;
                 PositionInfo positionInfo = td.getPositionInfo();
-                URI uri = positionInfo.getURI();
-                Path contractSrc = Paths.get(uri).toAbsolutePath().normalize();
-                Path srcPath = data.getPbh().getPath("src").toAbsolutePath().normalize();
+                URI uri = positionInfo.getURI().normalize();
+                URI srcURI = data.getPbh().getPath("src").toAbsolutePath().normalize().toUri();
 
-                // ignore contracts from files not in path src (e.g. in bootclasspath)
-                if (!contractSrc.startsWith(srcPath)) {
+
+                // ignore contracts from files not in src path (e.g. from bootclasspath)
+                // (this check works independent from number of slashes in URIs)
+                if (srcURI.relativize(uri).isAbsolute()) {
                     data.addContractWithoutProof(c, true);
                     data.print(LogLevel.DEBUG, "Ignoring internal contract " + c.getName());
                     continue;

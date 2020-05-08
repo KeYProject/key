@@ -124,7 +124,6 @@ public class DependencyChecker implements Checker {
                             entry.dependencyState = CheckerData.DependencyState.OK;
                             data.print(LogLevel.INFO, "Proof is closed and has no" +
                                     " unproven dependencies: " + entry.proof.name());
-                            data.addProvenContract(n.getContract());
 
                             changed = true;
                         }

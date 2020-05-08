@@ -29,6 +29,8 @@ import java.util.TreeSet;
 
 /**
  * This container serves for accumulating data given to checkers and results returned by them.
+ *
+ * @author Wolfram Pfeifer
  */
 public final class CheckerData implements Logger {
 
@@ -56,19 +58,6 @@ public final class CheckerData implements Logger {
     ////////////////////////////////// results from dependency checker
 
     private DependencyGraph dependencyGraph;
-
-    /** proven contracts with lemmas/dependencies left unproven */
-    private final Set<Contract> lemmasLeft = new HashSet<>();
-
-    public void addProvenContract(Contract contract) {
-        proven.add(contract);
-    }
-
-    /** fully proven contracts (including all dependencies) */
-    private final Set<Contract> proven = new HashSet<>();
-
-    private final Set<DependencyNode> missingMby = new HashSet<>();
-    private final Set<DependencyGraph.SCC> illegalCycles = new HashSet<>();
 
     ////////////////////////////////// results from missing proofs checker
 
@@ -186,7 +175,7 @@ public final class CheckerData implements Logger {
         UNKNOWN("?"),
         SUCCESS("\u2714");
 
-        private String shortStr;
+        private final String shortStr;
         ReplayState(String shortStr) {
             this.shortStr = shortStr;
         }
@@ -202,7 +191,7 @@ public final class CheckerData implements Logger {
         UNKNOWN("?"),
         SUCCESS("\u2714");
 
-        private String shortStr;
+        private final String shortStr;
         LoadingState(String shortStr) {
             this.shortStr = shortStr;
         }
@@ -219,7 +208,7 @@ public final class CheckerData implements Logger {
         UNPROVEN_DEP("lemma left"),
         OK("\u2714");
 
-        private String shortStr;
+        private final String shortStr;
         DependencyState(String shortStr) {
             this.shortStr = shortStr;
         }
@@ -235,7 +224,7 @@ public final class CheckerData implements Logger {
         OPEN("open"),
         CLOSED("closed");
 
-        private String shortStr;
+        private final String shortStr;
         ProofState(String shortStr) {
             this.shortStr = shortStr;
         }
@@ -429,6 +418,10 @@ public final class CheckerData implements Logger {
         return count;
     }
 
+    public boolean hasLemmaLeftContracts() {
+        return lemmaLeftCount() != 0;
+    }
+
     // count proofs that are closed and have all dependencies proven
     public int provenCount() {
         int count = 0;
@@ -442,20 +435,27 @@ public final class CheckerData implements Logger {
         return count;
     }
 
+    public boolean hasProvenContracts() {
+        return provenCount() != 0;
+    }
+
     // count proofs that are open, unknown (due to error), or have cyclic dependencies
     public int unprovenCount() {
         int count = 0;
         for (ProofEntry entry : proofEntries) {
             // proofs that are closed but have illegal cyclic dependencies are considered unproven!
             if (entry.proofState != ProofState.CLOSED
-                    || (entry.proofState == ProofState.CLOSED
-                        && entry.dependencyState == DependencyState.ILLEGAL_CYCLE)) {
+                    || (entry.dependencyState == DependencyState.ILLEGAL_CYCLE)) {
                 count++;
             }
         }
         // count in contracts defined inside bundle that have no proof
         count += contractsWithoutProof.size();
         return count;
+    }
+
+    public boolean hasUnprovenContracts() {
+        return unprovenCount() != 0;
     }
 
     public GlobalState getGlobalState() {
