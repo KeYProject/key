@@ -93,10 +93,6 @@ public final class CheckerData implements Logger {
         return choiceNames;
     }
 
-    public void addChoiceName(String name) {
-        choiceNames.add(name);
-    }
-
     /** choices used as reference (mapped to their corresponding id) */
     private final Map<Map<String, String>, Integer> referenceChoices = new HashMap<>();
 
@@ -115,6 +111,8 @@ public final class CheckerData implements Logger {
         referenceChoices.putIfAbsent(choices, nextId);
         // add an entry in the map for id lookup
         addChoices(choices);
+        // ensure that all keys are in set
+        choiceNames.addAll(choices.keySet());
     }
 
     /**
@@ -131,6 +129,29 @@ public final class CheckerData implements Logger {
 
     public Map<Map<String, String>, Integer> getChoices2Id() {
         return choices2Id;
+    }
+
+    /**
+     * Prepare short names for concise display of ChoiceSettings:
+     * In the values, everything up to and including the colon is removed.
+     * @return a map of choice settings to reference id, using short choice values
+     */
+    public Map<Map<String, String>, Integer> getShortChoices2Id() {
+
+        Map<Map<String, String>, Integer> res = new HashMap<>();
+
+        // copy outer mapping
+        for (Map.Entry<Map<String, String>, Integer> inner : choices2Id.entrySet()) {
+            // in inner mapping, replace values by short names
+            Map<String, String> copy = new HashMap<>();
+            for (Map.Entry<String, String> s : inner.getKey().entrySet()) {
+                // remove everything up to and including the colon
+                String val = s.getValue();
+                copy.put(s.getKey(), val.substring(val.indexOf(':') + 1));
+            }
+            res.put(copy, inner.getValue());
+        }
+        return res;
     }
 
     //////////////////////////////////

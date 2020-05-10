@@ -7,6 +7,6 @@
     </tr>
     </thead>
     <tbody>
-        $cd.choices2Id.entrySet:{entry | $choices(names=cd.choiceNames,entry=entry)$}$
+        $cd.shortChoices2Id.entrySet:{entry | $choices(names=cd.choiceNames,entry=entry)$}$
     </tbody>
 </table>

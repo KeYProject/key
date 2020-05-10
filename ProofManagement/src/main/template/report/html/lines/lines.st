@@ -12,10 +12,10 @@
         <th rowspan="2">Statistics</th>
     </tr>
     <tr>
-        <td>loaded</td>
-        <td>replayed</td>
-        <td>state</td>
-        <td>dependencies</td>
+        <th>loaded</th>
+        <th>replayed</th>
+        <th>state</th>
+        <th>dependencies</th>
     </tr>
     </thead>
     <tbody>

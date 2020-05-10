@@ -130,7 +130,6 @@ public class SettingsChecker implements Checker {
                     data.print(LogLevel.DEBUG, "Incompatible (additional key found)!");
                 }
                 for (String key: refChoices.keySet()) {
-                    data.addChoiceName(key);
                     if (!compatible(new Choice(new Name(key), refChoices.get(key)),
                             new Choice(new Name(key), cs.get(key)))) {
                         // found at least one different value
