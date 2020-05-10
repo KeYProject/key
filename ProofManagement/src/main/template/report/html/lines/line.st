@@ -4,7 +4,7 @@
     </td>
     <td><div title="$entry.sourceFile$"> $entry.shortSrc$ </div></td>
     <td><div title="$entry.proofFile$"> $entry.proofFile.fileName$ </div></td>
-    <td>#$entry.settingsId; format="%02d"$</td>
+    <td><a href="#settings-$entry.settingsId$">#$entry.settingsId; format="%02d"$</a></td>
     <td>$entry.loadingState$</td>
     <td>$entry.replayState$</td>
     <td>$entry.proofState$</td>
