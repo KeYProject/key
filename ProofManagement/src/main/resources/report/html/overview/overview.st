@@ -4,7 +4,7 @@
         <li>Date: $cd.checkDate$</li>
         <li>Overall Status: $cd.globalState$</li>
         <li>Contracts:
-            $globalProgress(data=cd,
+            $globalprogress(data=cd,
                             total=cd.bundleProofCount,
                             proven=cd.provenCount,
                             lemmaLeft=cd.lemmaLeftCount,
