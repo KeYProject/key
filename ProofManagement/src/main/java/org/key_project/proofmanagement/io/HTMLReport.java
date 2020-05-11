@@ -7,7 +7,6 @@ import org.stringtemplate.v4.NumberRenderer;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STErrorListener;
 import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupDir;
 import org.stringtemplate.v4.STRawGroupDir;
 import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.misc.MapModelAdaptor;
@@ -22,7 +21,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 
 /**
@@ -70,7 +68,7 @@ public final class HTMLReport {
      */
     private static ST prepareStringTemplate() throws URISyntaxException {
         ClassLoader classLoader = HTMLReport.class.getClassLoader();
-        URL url = classLoader.getResource("report/html/");
+        URL url = classLoader.getResource("report/html");
         //Path resPath = Paths.get(url.toURI());
 
         STGroup group = new STRawGroupDir(url, "UTF-8", '$', '$');
