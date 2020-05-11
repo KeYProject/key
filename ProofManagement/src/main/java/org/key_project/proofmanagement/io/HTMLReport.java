@@ -7,6 +7,7 @@ import org.stringtemplate.v4.NumberRenderer;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STErrorListener;
 import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupDir;
 import org.stringtemplate.v4.STRawGroupDir;
 import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.misc.MapModelAdaptor;
@@ -70,9 +71,9 @@ public final class HTMLReport {
     private static ST prepareStringTemplate() throws URISyntaxException {
         ClassLoader classLoader = HTMLReport.class.getClassLoader();
         URL url = classLoader.getResource("report/html/");
-        Path resPath = Paths.get(url.toURI());
+        //Path resPath = Paths.get(url.toURI());
 
-        STGroup group = new STRawGroupDir(resPath.toString(), '$', '$');
+        STGroup group = new STRawGroupDir(url, "UTF-8", '$', '$');
 
         // provide access to getter methods with a name equal to the property (without "get")
         // (needed to access some KeY properties, e.g. Proof.name()
