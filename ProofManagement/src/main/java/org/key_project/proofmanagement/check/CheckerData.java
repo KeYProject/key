@@ -226,7 +226,7 @@ public final class CheckerData implements Logger {
     public enum DependencyState {
         UNKNOWN("?"),
         ILLEGAL_CYCLE("cycle"),
-        UNPROVEN_DEP("lemma left"),
+        UNPROVEN_DEP("open dep."),
         OK("\u2714");
 
         private final String shortStr;

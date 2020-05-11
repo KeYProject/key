@@ -3,7 +3,7 @@
     <div style="width: calc($proven$/$total$*100%); float:left;">proven</div>
     $endif$
     $if(cd.hasLemmaLeftContracts)$
-    <div style="width: calc($lemmaLeft$/$total$*100%); float:left; white-space:nowrap;">lemma(s) left</div>
+    <div style="width: calc($lemmaLeft$/$total$*100%); float:left; white-space:nowrap;">dependencies left</div>
     $endif$
     $if(cd.hasUnprovenContracts)$
     <div style="width: calc($unproven$/$total$*100%); float:left;">unproven</div>
