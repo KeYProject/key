@@ -6,12 +6,12 @@ plugins {
 dependencies {
     compile project(':key.util')
     compile name: 'recoderKey'
-    compile group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
-    compile group: 'org.antlr', name:'antlr-runtime', version:'3.5.2'
+    compile group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
+    compile group: 'org.antlr', name: 'antlr-runtime', version: '3.5.2'
     compile group: 'antlr', name: 'antlr', version: '2.7.7'
 
-    javacc  group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
-    antlr   group: 'org.antlr', name:'antlr', version:'3.5.2'   // use ANTLR version 3
+    javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
+    antlr group: 'org.antlr', name: 'antlr', version: '3.5.2'   // use ANTLR version 3
 }
 
 // The target directory for JavaCC (parser generation)
@@ -102,12 +102,22 @@ task testProveRules(type: Test) {
 task testRunAllProofs(type: Test) {
     description 'Proof/reload all keyfiles tagged for regression testing'
     group "verification"
-    filter { 
+    filter {
         // TODO does not exist any more: includeTestsMatching "RunAllProofsTestSuite"
         includeTestsMatching "RunAllProofsInfFlow"
         includeTestsMatching "RunAllProofsFunctional"
     }
 }
+
+
+task generateRunAllProofs(type: JavaExec) {
+    //Test runtime
+    classpath = sourceSets.test.runtimeClasspath
+    main = "de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests"
+    args "$buildDir/generated-src/rap-unittests/test"
+}
+sourceSets.test.java.srcDir "$buildDir/generated-src/rap-unittests/test"
+
 
 //Generation of the three version files within the resources by executing `git'.
 task generateVersionFiles() {
