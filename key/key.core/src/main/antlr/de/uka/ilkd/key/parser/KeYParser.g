@@ -132,6 +132,7 @@ options {
          prooflabel2tag.put("contract", ProofElementID.CONTRACT);
          prooflabel2tag.put("ifInst", ProofElementID.ASSUMES_INST_BUILT_IN);     
          prooflabel2tag.put("userinteraction", ProofElementID.USER_INTERACTION);
+         prooflabel2tag.put("notes", ProofElementID.NOTES);
          prooflabel2tag.put("proofscript", ProofElementID.PROOF_SCRIPT);
          prooflabel2tag.put("newnames", ProofElementID.NEW_NAMES);
          prooflabel2tag.put("autoModeTime", ProofElementID.AUTOMODE_TIME);  
