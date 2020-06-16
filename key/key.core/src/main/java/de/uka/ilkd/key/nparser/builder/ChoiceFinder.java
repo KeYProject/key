@@ -71,10 +71,11 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
         String name = cat + ":" + ch;
         Choice c = choices().lookup(new Name(name));
         if (c == null) {
-            semanticError(ctx, "Choice %s not previously declared", name);
-        } else {
-            activatedChoices().add(c);
+            c = new Choice(ch, cat);
+            choices().add(c);
+            //semanticError(ctx, "Choice %s not previously declared", name);
         }
+        activatedChoices().add(c);
         return c;
     }
 
