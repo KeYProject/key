@@ -162,8 +162,15 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Term visitEquivalence_term(KeYParser.Equivalence_termContext ctx) {
         Term a = accept(ctx.a);
-        Term b = accept(ctx.b);
-        return binaryTerm(ctx, Equality.EQV, a, b);
+        if(ctx.b.isEmpty()) return a;
+
+        Term cur = a;
+        for (KeYParser.Implication_termContext context : ctx.b) {
+            Term b = accept(context);
+            cur =  binaryTerm(ctx, Equality.EQV, cur, b);
+
+        }
+        return cur;
     }
 
     private Term binaryTerm(ParserRuleContext ctx, Operator operator, Term left, Term right) {

@@ -351,7 +351,7 @@ term: parallel_term;
 //labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
 parallel_term: a=elementary_update_term (PARALLEL b=parallel_term)?;
 elementary_update_term: a=equivalence_term (ASSIGN b=equivalence_term)?;
-equivalence_term: a=implication_term (EQV b=equivalence_term)?;
+equivalence_term: a=implication_term (EQV b+=implication_term)*;
 implication_term: a=disjunction_term (IMP b=implication_term)?;
 disjunction_term: a=conjunction_term (OR b+=conjunction_term)*;
 conjunction_term: a=term60 (AND b+=term60)*;
