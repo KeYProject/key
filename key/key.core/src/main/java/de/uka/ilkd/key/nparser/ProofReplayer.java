@@ -127,6 +127,8 @@ public class ProofReplayer {
     }
 
     private static String unescape(String text) {
-        return text.replace("\\\"", "\"");
+        return text
+                .replace("\\\\", "\\")
+                .replace("\\\"", "\"");
     }
 }

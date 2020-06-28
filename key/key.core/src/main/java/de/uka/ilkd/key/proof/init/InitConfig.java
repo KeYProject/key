@@ -452,7 +452,7 @@ public class InitConfig {
         ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
         ic.setTaclet2Builder(
                 (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
-        ic.taclets = taclets;
+        ic.taclets = new ArrayList<>(taclets);//weigl: making a copy fixes a bug in loadTacletProofs
         ic.originalKeYFileName = originalKeYFileName;
         ic.justifInfo = justifInfo.copy();
         ic.fileRepo = fileRepo;     // TODO: copy instead? delete via dispose method?

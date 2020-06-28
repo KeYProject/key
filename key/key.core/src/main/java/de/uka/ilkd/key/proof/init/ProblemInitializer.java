@@ -478,7 +478,14 @@ public final class ProblemInitializer {
     }
 
     private void print(Proof firstProof) {
-        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("/tmp/proof.txt")))) {
+        File taclets1 = null;
+        try {
+            taclets1 = File.createTempFile("proof", ".txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Taclets under: " + taclets1);
+        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(taclets1)))) {
             out.print(firstProof.toString());
         } catch (IOException e) {
             e.printStackTrace();
@@ -486,7 +493,14 @@ public final class ProblemInitializer {
     }
 
     private void print(InitConfig ic) {
-        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("/tmp/taclets.txt")))) {
+        File taclets1 = null;
+        try {
+            taclets1 = File.createTempFile("taclets", ".txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Taclets under: " + taclets1);
+        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(taclets1)))) {
             out.format("Date: %s\n", new Date());
             out.format("Activated Taclets: \n");
             final List<Taclet> taclets = new ArrayList<Taclet>();

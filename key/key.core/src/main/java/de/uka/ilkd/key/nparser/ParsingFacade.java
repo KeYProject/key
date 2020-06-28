@@ -3,6 +3,8 @@ package de.uka.ilkd.key.nparser;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.dfa.DFA;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedInputStream;
@@ -75,6 +77,28 @@ public abstract class ParsingFacade {
         KeYParser p = new KeYParser(new CommonTokenStream(lex(stream)));
         p.removeErrorListeners();
         p.addErrorListener(p.getErrorReporter());
+        p.addErrorListener(new ANTLRErrorListener() {
+            @Override
+            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+                System.out.println(((CommonToken) offendingSymbol).getTokenSource().getInputStream().toString());
+                throw e;
+            }
+
+            @Override
+            public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
+
+            }
+
+            @Override
+            public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, ATNConfigSet configs) {
+
+            }
+
+            @Override
+            public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, ATNConfigSet configs) {
+
+            }
+        });
         return p;
     }
 
