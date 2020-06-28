@@ -40,9 +40,9 @@ public class ExpressionBuilder extends DefaultBuilder {
     public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE = "Expecting select term before '@', not: ";
 
     /**
-     * TODO Support for abbreviation maps.
+     * The current abbreviation used for resolving "@name" terms.
      */
-    private AbbrevMap scm;
+    private AbbrevMap abbrevMap;
 
     /**
      * Altlast.
@@ -136,10 +136,10 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Term visitParallel_term(KeYParser.Parallel_termContext ctx) {
-        Term a = accept(ctx.elementary_update_term());
-        if (ctx.b != null) {
-            Term b = accept(ctx.b);
-            return updateOrigin(getTermFactory().createTerm(UpdateJunctor.PARALLEL_UPDATE, a, b), ctx);
+        List<Term> t = mapOf(ctx.elementary_update_term());
+        Term a = t.get(0);
+        for (int i = 1; i < t.size(); i++) {
+            a = getTermFactory().createTerm(UpdateJunctor.PARALLEL_UPDATE, a, t.get(i));
         }
         return updateOrigin(a, ctx);
     }
@@ -162,12 +162,12 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Term visitEquivalence_term(KeYParser.Equivalence_termContext ctx) {
         Term a = accept(ctx.a);
-        if(ctx.b.isEmpty()) return a;
+        if (ctx.b.isEmpty()) return a;
 
         Term cur = a;
         for (KeYParser.Implication_termContext context : ctx.b) {
             Term b = accept(context);
-            cur =  binaryTerm(ctx, Equality.EQV, cur, b);
+            cur = binaryTerm(ctx, Equality.EQV, cur, b);
 
         }
         return cur;
@@ -966,7 +966,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Object visitAbbreviation(KeYParser.AbbreviationContext ctx) {
         String sc = accept(ctx.name);
-        Term a = scm.getTerm(sc);
+        Term a = abbrevMap.getTerm(sc);
         if (a == null) {
             throwEx(new NotDeclException(null, "abbreviation", sc));
         }
@@ -1690,14 +1690,18 @@ public class ExpressionBuilder extends DefaultBuilder {
         return (new JavaQuery(packageName, className, attributeName, kjt));
     }
 
-    public void setScm(AbbrevMap scm) {
-        this.scm = scm;
+    public void setAbbrevMap(AbbrevMap abbrevMap) {
+        this.abbrevMap = abbrevMap;
+    }
+
+    public AbbrevMap getAbbrevMap() {
+        return abbrevMap;
     }
 
     private static class PairOfStringAndJavaBlock {
-        String opName;
-        JavaBlock javaBlock;
-    }
+    String opName;
+    JavaBlock javaBlock;
+}
 
     /*private boolean isStaticAttribute(String dotName) {
         final JavaInfo javaInfo = getJavaInfo();

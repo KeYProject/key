@@ -89,6 +89,7 @@ public final class DefaultTermParser {
                       AbbrevMap scm)
             throws ParserException {
         KeyIO keyIO = new KeyIO(services, nss);
+        keyIO.setAbbrevMap(scm);
         try {
             Term result = keyIO.parseExpression(CharStreams.fromReader(in));
             if (sort != null && !result.sort().extendsTrans(sort))

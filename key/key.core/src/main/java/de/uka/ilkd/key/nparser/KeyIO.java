@@ -7,7 +7,9 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.nparser.builder.*;
+import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.rule.Taclet;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -40,6 +42,7 @@ public class KeyIO {
     private final NamespaceSet nss;
     private @Nullable Namespace<SchemaVariable> schemaNamespace;
     private @Nullable List<BuildingIssue> warnings;
+    private AbbrevMap abbrevMap;
 
     public KeyIO(@NotNull Services services, @NotNull NamespaceSet nss) {
         this.services = services;
@@ -76,6 +79,7 @@ public class KeyIO {
     public @NotNull Term parseExpression(@NotNull CharStream stream) {
         KeyAst.Term ctx = ParsingFacade.parseExpression(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
+        visitor.setAbbrevMap(abbrevMap);
         if (schemaNamespace != null)
             visitor.setSchemaVariables(schemaNamespace);
         Term t = (Term) ctx.accept(visitor);
@@ -171,11 +175,19 @@ public class KeyIO {
         schemaNamespace = ns;
     }
 
+    public void setAbbrevMap(AbbrevMap abbrevMap) {
+        this.abbrevMap = abbrevMap;
+    }
+
+    public AbbrevMap getAbbrevMap() {
+        return abbrevMap;
+    }
+
     /**
      * Loading of complete KeY files into the given schema.
      * Supports recursive loading, but does not provide support for Java and Java type informations.
      * <p>
-     * Little sister of {@link de.uka.ilkd.key.proof.init.ProblemInitializer}.
+     * Little sister of {@link ProblemInitializer}.
      */
     public class Loader {
         private final URL resource;

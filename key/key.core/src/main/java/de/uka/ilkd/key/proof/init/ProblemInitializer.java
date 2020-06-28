@@ -502,6 +502,10 @@ public final class ProblemInitializer {
         System.out.println("Taclets under: " + taclets1);
         try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(taclets1)))) {
             out.format("Date: %s\n", new Date());
+
+            out.format("Choices: \n");
+            ic.getActivatedChoices().forEach(i -> out.format("\t%s\n", i));
+
             out.format("Activated Taclets: \n");
             final List<Taclet> taclets = new ArrayList<Taclet>();
             for (Taclet t : ic.activatedTaclets()) taclets.add(t);
