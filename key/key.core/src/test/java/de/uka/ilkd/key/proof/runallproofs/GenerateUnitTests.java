@@ -89,7 +89,7 @@ public class GenerateUnitTests {
     }
 
     private static void createUnitClass(ProofCollection col, RunAllProofsTestUnit unit) throws IOException {
-        String packageName = "de.uka.ilkd.key.proof.runallproofs";
+        String packageName = "de.uka.ilkd.key.proof.runallproofs.units";
         String name = unit.getTestName();
         String className = name
                 .replaceAll("\\.java", "")
@@ -147,15 +147,16 @@ public class GenerateUnitTests {
                     .append("public void test").append(testName).append("() throws Exception {\n");
             //        "// This tests is based on").append(keyFile.getAbsolutePath()).append("\n");
 
+            String path = keyFile.getAbsolutePath().replace("\\", "/");
             switch (file.getTestProperty()) {
                 case PROVABLE:
-                    methods.append("assertProvability(\"").append(keyFile.getAbsolutePath()).append("\");");
+                    methods.append("assertProvability(\"").append(path).append("\");");
                     break;
                 case NOTPROVABLE:
-                    methods.append("assertUnProvability(\"").append(keyFile.getAbsolutePath()).append("\");");
+                    methods.append("assertUnProvability(\"").append(path).append("\");");
                     break;
                 case LOADABLE:
-                    methods.append("assertLoadability(\"").append(keyFile.getAbsolutePath()).append("\");");
+                    methods.append("assertLoadability(\"").append(path).append("\");");
                     break;
             }
             methods.append("}");
