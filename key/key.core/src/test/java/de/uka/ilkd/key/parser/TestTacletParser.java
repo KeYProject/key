@@ -423,7 +423,7 @@ public class TestTacletParser {
                         "\\replacewith(\\<{..for(#k=0;#k<#length-reference(#ar);#k++){" +
                         "#ar1[#k]=#ar[#k];}" +
                         "#v0=#e; #v=#ar1[#v0];...}\\>post)" +
-                        "\\displayname \"eval_order_array_access_right\"};");
+                        "\\displayname \"eval_order_array_access_right\"}");
     }
 
 
