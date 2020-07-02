@@ -5,6 +5,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -37,15 +38,15 @@ public class ProblemFinder extends ExpressionBuilder {
     public Term visitProblem(KeYParser.ProblemContext ctx) {
         if (ctx.CHOOSECONTRACT() != null) {
             if (ctx.chooseContract != null)
-                chooseContract = ((String) accept(ctx.chooseContract))
-                        .replace("\\\\:", ":");
+                chooseContract = ParsingFacade.getValue(ctx.chooseContract);
+                //.replace("\\\\:", ":");
             else
                 chooseContract = "";
         }
         if (ctx.PROOFOBLIGATION() != null) {
             if (ctx.proofObligation != null)
-                proofObligation = ((String) accept(ctx.proofObligation))
-                        .replace("\\\\:", ":");
+                proofObligation = ParsingFacade.getValue(ctx.proofObligation);
+                //.replace("\\\\:", ":");
             else
                 proofObligation = "";
         }

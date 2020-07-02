@@ -163,7 +163,8 @@ public abstract class ParsingFacade {
      */
     public static @NotNull String getValue(@NotNull KeYParser.String_valueContext ctx) {
         return ctx.getText().substring(1, ctx.getText().length() - 1)
-                .replace("\\\"", "\"");
+                .replace("\\\"", "\"")
+                .replace("\\\\", "\\");
     }
 
     /**
