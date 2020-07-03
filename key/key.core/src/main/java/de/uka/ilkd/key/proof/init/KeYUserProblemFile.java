@@ -55,7 +55,6 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * a rule source representing the physical source of the input, and
      * a graphical representation to call back in order to report the progress
      * while reading.
-     *
      * @param name    the name of the file
      * @param file    the file to read from
      * @param monitor the possibly <tt>null</tt> monitor for progress

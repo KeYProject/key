@@ -20,7 +20,6 @@ import java.util.TreeSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeyIO;
-import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 

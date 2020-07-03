@@ -101,7 +101,7 @@ public class Proof implements Named {
      */
     private ImmutableList<Goal> closedGoals = ImmutableSLList.<Goal>nil();
 
-    /** declarations read from a problem file or otherwise */
+    /** declarations &c, read from a problem file or otherwise */
     private String problemHeader = "";
 
     /** the proof environment (optional) */

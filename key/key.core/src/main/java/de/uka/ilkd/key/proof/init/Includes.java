@@ -14,7 +14,11 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Collection;
 
 import de.uka.ilkd.key.proof.io.RuleSource;
 
@@ -26,6 +30,7 @@ import de.uka.ilkd.key.proof.io.RuleSource;
  * RuleSources.
  */
 public class Includes {
+
     /** a list containing the "normal" includes, represented as Strings */
     private final List<String> includes;
     /** a list containing the LDT includes, represented as Strings */

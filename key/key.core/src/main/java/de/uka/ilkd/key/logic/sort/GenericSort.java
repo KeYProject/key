@@ -21,7 +21,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 
 /**
- * Sort used for generic taclets.
+ * Sort used for generic taclets
  *
  * Within an SVInstantiations-object a generic sort is instantiated by
  * a concrete sort, which has to be a subsort of the instantiations of

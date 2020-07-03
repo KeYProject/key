@@ -26,9 +26,17 @@ stages:
     - secondary
     - ternary
 
+# compile:oraclejdk8:
+#   stage: primary
+#   image: key-dev-jdk8
+#   script:
+#     - javac -version
+#     - ant -f key/scripts/build.xml compileAll
+
+
 compile:classes:
   stage: primary
-  image: wadoon/key-test-docker:jdk14
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
@@ -42,7 +50,7 @@ compile:classes:
 
 compile:testClasses:
   stage: secondary
-  image: wadoon/key-test-docker:jdk14
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
@@ -54,17 +62,17 @@ compile:testClasses:
       - build
       - .gradle
 
-# compile:testClasses8:
-#   stage: secondary
-#   image: wadoon/key-test-docker:jdk8
-#   script:
-#     - javac -version
-#     - cd key
-#     - gradle --parallel classes testClasses
+compile:testClasses8:
+  stage: secondary
+  image: wadoon/key-test-docker:jdk8
+  script:
+    - javac -version
+    - cd key
+    - gradle --parallel classes testClasses
 
 compile:testFast:key.util:
   stage: ternary
-  image: wadoon/key-test-docker:jdk14
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
@@ -83,7 +91,7 @@ compile:testFast:key.util:
 
 compile:testFast:key.core:
   stage: ternary
-  image: wadoon/key-test-docker:jdk14
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
@@ -102,7 +110,7 @@ compile:testFast:key.core:
 
 compile:testFast:proofref:
   stage: ternary
-  image: wadoon/key-test-docker:jdk14
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
@@ -139,7 +147,7 @@ compile:testFast:testgen:
 
 compile:testFast:interactionlog:
   stage: ternary
-  image: wadoon/key-test-docker:jdk14
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
@@ -176,7 +184,7 @@ compile:testFast:ui:
 
 compile:testFast:removegenerics:
   stage: ternary
-  image: wadoon/key-test-docker:jdk14
+  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
@@ -236,7 +244,7 @@ compile:testFast:removegenerics:
 
 checkstyle:
   stage: primary
-  image: wadoon/key-test-docker:jdk14
+  image: wadoon/key-test-docker:jdk11
   allow_failure: true
   script:
     - echo "**** Check the commit's gitlab page for a readable checkstyle report ****"

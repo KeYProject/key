@@ -14,7 +14,6 @@
 package org.key_project.util.collection;
 
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -72,7 +71,6 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     private DefaultImmutableSet(ImmutableList<T> elementList) {
         this.elementList = elementList;
     }
-
 
 //    private static HashSet<String> previousComplains = new HashSet<>();
     private void complainAboutSize() {

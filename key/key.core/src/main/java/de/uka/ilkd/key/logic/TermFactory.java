@@ -16,7 +16,7 @@ package de.uka.ilkd.key.logic;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.op.Junctor;
+import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -177,7 +177,15 @@ public final class TermFactory {
         }
     }
 
-    public Term createTerm(Operator junctor, List<Term> terms) {
+    /**
+     * Reduce the given list of terms into a one term by using the operator.
+     * The reduction is left-associative. e.g., the result is
+     * {@code ((a op b) op c) op d }.
+     *
+     * @param junctor the left-associative operator to combine the terms together
+     * @param terms a list of non-null temrs
+     */
+    public @NotNull Term createTerm(@NotNull  Operator junctor, @NotNull List<@NotNull Term> terms) {
         if(terms.size()==1)
             return terms.get(0);
         else if (terms.size() == 2)

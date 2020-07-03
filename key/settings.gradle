@@ -10,5 +10,4 @@ include "key.core.proof_references"
 include "key.core.example"
 include "key.core.symbolic_execution.example"
 include 'keyext.interactionlog'
-include 'keyext.tadoc'
 

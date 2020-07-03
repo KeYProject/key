@@ -288,10 +288,7 @@ public class InitConfig {
 
              if (t != null) {
                 tacletCache.put(t.name(), t);
-                 //System.out.format("Activate taclet: %s\n", t.name());
              }
-          }else{
-              //System.out.format("deactivate taclet: %s, %s\n", t.name(), t.getChoices());
           }
        }
        activatedTacletCache = Collections.unmodifiableMap(tacletCache);
@@ -477,6 +474,4 @@ public class InitConfig {
     public void setFileRepo(FileRepo fileRepo) {
         this.fileRepo = fileRepo;
     }
-
-
 }

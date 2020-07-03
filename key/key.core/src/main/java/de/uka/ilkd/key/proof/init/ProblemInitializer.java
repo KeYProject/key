@@ -42,6 +42,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -472,7 +473,7 @@ public final class ProblemInitializer {
                 baseConfig = currentBaseConfig;
             }
             InitConfig ic = prepare(envInput, currentBaseConfig);
-            print(ic);
+            if(Debug.ENABLE_DEBUG) print(ic);
             return ic;
         }
     }
@@ -612,7 +613,7 @@ public final class ProblemInitializer {
             //final work
             setUpProofHelper(po, pa);
 
-            print(pa.getFirstProof());
+            if(Debug.ENABLE_DEBUG) print(pa.getFirstProof());
 
             //done
             proofCreated(pa);
