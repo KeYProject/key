@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.nparser.varexp;
 
-import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import org.jetbrains.annotations.NotNull;
 
 /**

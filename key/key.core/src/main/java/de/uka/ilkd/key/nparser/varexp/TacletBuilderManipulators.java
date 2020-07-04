@@ -20,10 +20,14 @@ import static de.uka.ilkd.key.nparser.varexp.ArgumentType.TYPE_RESOLVER;
 import static de.uka.ilkd.key.rule.conditions.TypeComparisonCondition.Mode.*;
 
 /**
+ * This class manages the register of various factories for the different built-in {@link VariableCondition}s.
+ *
  * @author Alexander Weigl
  * @version 1 (12/9/19)
  */
 public class TacletBuilderManipulators {
+    //region Factories
+    // Short cut for argument types
     private static final ArgumentType TR = TYPE_RESOLVER;
     private static final ArgumentType KJT = ArgumentType.JAVA_TYPE;
     private static final ArgumentType PV = ArgumentType.VARIABLE;
@@ -69,7 +73,7 @@ public class TacletBuilderManipulators {
      */
     public static final AbstractConditionBuilder STRICT = new AbstractConditionBuilder("scrictSub", TR, TR) {
         @Override
-        public boolean isSuitableFor(String name) {
+        public boolean isSuitableFor(@NotNull String name) {
             if (super.isSuitableFor(name)) return true;
             return "\\strict\\sub".equalsIgnoreCase(name);
         }
@@ -255,7 +259,9 @@ public class TacletBuilderManipulators {
 
     public static final AbstractConditionBuilder LABEL
             = new ConstructorBasedBuilder("hasLabel", TermLabelCondition.class, TSV, S);
+    //endregion
 
+    //region Registry
     static {
         register(SAME_OBSERVER, SIMPLIFY_ITE_UPDATE,
                 ABSTRACT_OR_INTERFACE, SAME, IS_SUBTYPE,
@@ -272,26 +278,45 @@ public class TacletBuilderManipulators {
         loadWithServiceLoader();
     }
 
+    /**
+     * Announce a {@link TacletBuilderCommand} for the use during the interpretation of asts.
+     * This affects every following interpretation of rule contextes
+     * in {@link de.uka.ilkd.key.nparser.builder.TacletPBuilder}.
+     */
     public static void register(TacletBuilderCommand... cb) {
         for (TacletBuilderCommand a : cb) {
             register(a);
         }
     }
 
+    /**
+     * @see #register(TacletBuilderCommand...)
+     */
     public static void register(TacletBuilderCommand cb) {
         tacletBuilderCommands.add(cb);
     }
 
+    /**
+     * Register all {@link TacletBuilderCommand} that are found via the Java's {@link ServiceLoader} facility.
+     */
     public static void loadWithServiceLoader() {
         ServiceLoader<TacletBuilderCommand> serviceLoader = ServiceLoader.load(TacletBuilderCommand.class);
         serviceLoader.iterator().forEachRemaining(TacletBuilderManipulators::register);
     }
 
+    /**
+     * Returns all available {@link TacletBuilderCommand}s.
+     */
     public static List<TacletBuilderCommand> getConditionBuilders() {
         return Collections.unmodifiableList(tacletBuilderCommands);
     }
 
+    /**
+     * Returns all available {@link TacletBuilderCommand}s that response on the given name.
+     * @see TacletBuilderCommand#isSuitableFor(String)
+     */
     public static List<TacletBuilderCommand> getConditionBuildersFor(String name) {
         return tacletBuilderCommands.stream().filter(it -> it.isSuitableFor(name)).collect(Collectors.toList());
     }
+    //endregion
 }

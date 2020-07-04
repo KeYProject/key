@@ -31,15 +31,13 @@ import java.util.stream.Collectors;
 
 public class TacletPBuilder extends ExpressionBuilder {
 
-    private final Stack<TacletBuilder> currentTBuilder = new Stack<>();
+    private final Stack<TacletBuilder<?>> currentTBuilder = new Stack<>();
 
     private HashMap<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new HashMap<>();
 
     private boolean axiomMode;
 
-    private boolean negated = false;
-
-    private List<Taclet> topLevelTaclets = new ArrayList<>(2048);
+    private final List<Taclet> topLevelTaclets = new ArrayList<>(2048);
 
     /**
      * Current required choices for taclets
@@ -110,10 +108,10 @@ public class TacletPBuilder extends ExpressionBuilder {
             modalities = opSVHelper(s, modalities);
         }
         SchemaVariable osv = schemaVariables().lookup(new Name(id));
-        if (osv != null) {
+        /*if (osv != null) {
             //semanticError("Schema variable " + id + " already defined.");
             //System.err.format("Clash with %s\n", osv);
-        }
+        }*/
 
         osv = SchemaVariableFactory.createModalOperatorSV(new Name(id), sort, modalities);
         schemaVariables().add(osv);
@@ -263,7 +261,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Object visitVarexp(KeYParser.VarexpContext ctx) {
-        negated = ctx.NOT_() != null;
+        boolean negated = ctx.NOT_() != null;
         String name = ctx.varexpId().getText();
         List<KeYParser.Varexp_argumentContext> arguments = ctx.varexp_argument();
         List<TacletBuilderCommand> suitableManipulators = TacletBuilderManipulators.getConditionBuildersFor(name);
@@ -856,7 +854,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     */
 
 
-    private TacletBuilder createTacletBuilderFor(Object find, int applicationRestriction, ParserRuleContext ctx) {
+    private TacletBuilder<?> createTacletBuilderFor(Object find, int applicationRestriction, ParserRuleContext ctx) {
         if (applicationRestriction != RewriteTaclet.NONE &&
                 applicationRestriction != RewriteTaclet.IN_SEQUENT_STATE &&
                 !(find instanceof Term)) {
@@ -958,8 +956,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Operator visitVarId(KeYParser.VarIdContext ctx) {
         String id = ctx.id.getText();
-        Operator v = varId(ctx, id);
-        return v;
+        return varId(ctx, id);
     }
 
     @Nullable
@@ -1066,8 +1063,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Object visitSchema_var_decls(KeYParser.Schema_var_declsContext ctx) {
-        List<SchemaVariable> seq = mapOf(ctx.one_schema_var_decl());
-        return seq;
+        return this.<SchemaVariable>mapOf(ctx.one_schema_var_decl());
     }
 
     protected void declareSchemaVariable(
