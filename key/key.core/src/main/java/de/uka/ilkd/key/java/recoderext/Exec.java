@@ -366,8 +366,8 @@ public class Exec extends BranchStatement
         if (v instanceof SourceVisitorExtended) {
             ((SourceVisitorExtended) v).visitExec(this);
         } else {
-            throw new IllegalStateException(
-                "Method 'accept' not implemented in Exec");
+//            throw new IllegalStateException(
+//                "Method 'accept' not implemented in Exec");
         }
     }
 

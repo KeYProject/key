@@ -4619,7 +4619,7 @@ Exec ExecStatement() :
 {
   "exec"
       {
-        result = factory.createTry();
+        result = factory.createExec();
         setPrefixInfo(result);
       }
   block = Block()
@@ -4631,7 +4631,7 @@ Exec ExecStatement() :
 
   ( "ccatch"
     {
-      cat = factory.createCCatch();
+      cat = factory.createCcatch();
       setPrefixInfo(cat);
     }
     "("  param = FormalParameter() ")"

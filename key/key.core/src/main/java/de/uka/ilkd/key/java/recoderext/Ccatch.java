@@ -355,8 +355,8 @@ public class Ccatch extends Branch
         if (v instanceof SourceVisitorExtended) {
             ((SourceVisitorExtended) v).visitCcatch(this);
         } else {
-            throw new IllegalStateException(
-                "Method 'accept' not implemented in Ccatch");
+//            throw new IllegalStateException(
+//                "Method 'accept' not implemented in Ccatch");
         }
     }
 }
