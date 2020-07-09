@@ -440,13 +440,16 @@ TOKEN :
 | < REAL: "\\real">
 | < BOOLEAN: "boolean" >
 | < BREAK: "break" >
+| < BREAKTYPE: "\\Break" >
 | < BYTE: "byte" >
 | < CASE: "case" >
 | < CATCH: "catch" >
+| < CCATCH: "ccatch" >
 | < CHAR: "char" >
 | < CLASS: "class" >
 | < CONST: "const" >
 | < CONTINUE: "continue" >
+| < CONTINUETYPE: "\\Continue" >
 | < _DEFAULT: "default" >
 | < DO: "do" >
 | < DOUBLE: "double" >
@@ -456,6 +459,7 @@ TOKEN :
 	  	matchedToken.kind = IDENTIFIER;
 	  }
 }
+| < EXEC: "exec" >
 | < EXTENDS: "extends" >
 | < FALSE: "false" >
 | < FINAL: "final" >
@@ -484,6 +488,7 @@ TOKEN :
 | < PROTECTED: "protected" >
 | < PUBLIC: "public" >
 | < RETURN: "return" >
+| < RETURNTYPE: "\\Return" >
 | < SEQ: "\\seq" >
 | < SET: "\\set" >
 | < SHORT: "short" >
@@ -3682,6 +3687,7 @@ Statement Statement() :
 | result = TryStatement()
 | result = AssertStatement()
 | result = KeYCatchAllStatement()
+| result = ExecStatement()
 )
   {
     checkConstruction(result);
@@ -4593,6 +4599,49 @@ Try TryStatement() :
           branches.add(fin);
       }
   ])
+  {
+    result.setBranchList(branches);
+    checkConstruction(result);
+    setPostfixInfo(result);
+    return result;
+  }
+
+}
+
+Exec ExecStatement() :
+{
+    Exec result;
+    StatementBlock block;
+    ParameterDeclaration param;
+    ASTList<Branch> branches = new ASTArrayList<Branch>(1);
+    Ccatch cat;
+}
+{
+  "exec"
+      {
+        result = factory.createTry();
+        setPrefixInfo(result);
+      }
+  block = Block()
+      {
+          result.setBody(block);
+      }
+      
+  // TODO: Catch Return, break, continue
+
+  ( "ccatch"
+    {
+      cat = factory.createCCatch();
+      setPrefixInfo(cat);
+    }
+    "("  param = FormalParameter() ")"
+    block = Block()
+    {
+        cat.setParameterDeclaration(param);
+        cat.setBody(block);
+        branches.add(cat);
+    }
+  )*
   {
     result.setBranchList(branches);
     checkConstruction(result);
