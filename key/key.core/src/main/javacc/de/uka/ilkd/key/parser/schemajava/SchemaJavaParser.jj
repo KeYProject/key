@@ -525,7 +525,7 @@ TOKEN :
 | < BYTE: "byte" >
 | < CASE: "case" >
 | < CATCH: "catch" >
-| < CCATCH: "ccatch" >
+| < CCATCH: "ccat" >
 | < CHAR: "char" >
 | < CLASS: "class" >
 | < CONST: "const" >
@@ -4923,6 +4923,66 @@ Try TryStatement() :
     }
 }
 
+/*
+Exec ExecStatement() :
+{
+    Exec result;
+    StatementBlock block;
+    ParameterDeclaration param;
+    ASTList<Branch> branches = new ASTArrayList<Branch>(1);
+    Ccatch cat;
+}
+{
+    "exec"
+    {
+        result = factory.createExec();
+        setPrefixInfo(result);
+    }
+    block = Block()
+    {
+        result.setBody(block);
+    }
+
+    (
+        (
+            { CcatchSVWrapper cfsv; } cfsv=CcatchSV()
+            { branches.add(cfsv); } 
+        )
+        |
+        (
+            ( 
+                "ccat"
+                (
+                    (
+                        {
+                            cat = factory.createCcatch();
+                            setPrefixInfo(cat);
+                        }
+                        "("  param = FormalParameter() ")"
+                        block = Block()
+                        {
+                            cat.setParameterDeclaration(param);
+                            cat.setBody(block);
+                            branches.add(cat);
+                        } 
+                    )
+                    |
+                    (
+                        { CcatchSVWrapper cfsv2; } cfsv2=CcatchSV()
+                        { branches.add(cfsv2); } 
+                    ) 
+                )
+            )*
+        )
+    )
+    {
+        result.setBranchList(branches);
+        checkConstruction(result);
+        return result;
+    }
+}
+*/
+
 Exec ExecStatement() :
 {
     Exec result;
@@ -4950,14 +5010,15 @@ Exec ExecStatement() :
         |
         (
             [
-                LOOKAHEAD("ccatch" "\\Return")
-                "ccatch"
+                //LOOKAHEAD("ccat" "(" "\\Return" ")")
+                LOOKAHEAD(4)
+                "ccat"
                 (
                     {
                         cat = factory.createCcatch();
                         setPrefixInfo(cat);
                     }
-                    "("  "\\Return" ")"
+                    "(" <RETURNTYPE> ")"
                     block = Block()
                     {
                         cat.setNonStdParameterDeclaration(factory.createCcatchReturnParameterDeclaration());
@@ -4966,9 +5027,10 @@ Exec ExecStatement() :
                     } 
                 )
             ]
-            ( 
-                LOOKAHEAD("ccatch" FormalParameter())
-                "ccatch"
+            (
+                //LOOKAHEAD("ccat" "("  param = FormalParameter() ")")
+                LOOKAHEAD(4)
+                "ccat"
                 (
                     (
                         {

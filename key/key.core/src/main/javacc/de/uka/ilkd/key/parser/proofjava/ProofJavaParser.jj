@@ -443,8 +443,8 @@ TOKEN :
 | < BREAKTYPE: "\\Break" >
 | < BYTE: "byte" >
 | < CASE: "case" >
-| < CATCH: "catch" >
 | < CCATCH: "ccatch" >
+| < CATCH: "catch" >
 | < CHAR: "char" >
 | < CLASS: "class" >
 | < CONST: "const" >
