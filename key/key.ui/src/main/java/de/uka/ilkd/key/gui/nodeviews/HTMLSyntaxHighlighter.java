@@ -99,7 +99,12 @@ public class HTMLSyntaxHighlighter {
             "exec", "ccatch", "\\Return" };
 
     public final static String JAVA_KEYWORDS_REGEX = concat("|",
-            Arrays.asList(JAVA_KEYWORDS));
+        Arrays.asList(JAVA_KEYWORDS), new StringTransformer() {
+            @Override
+            public String transform(Object input) {
+                return Pattern.quote((String) input);
+            }
+        });
 
     // NOTE: \Q(...)\E escapes the String in (...)
     private final static String DELIMITERS_REGEX = concat(
@@ -298,26 +303,6 @@ public class HTMLSyntaxHighlighter {
      */
     private static String toHTML(String plainTextString) {
         return LogicPrinter.escapeHTML(plainTextString, true);
-    }
-
-    /**
-     * Concatenates the given String array where the elements are separated by
-     * the given delimiter in the result String.
-     *
-     * @param delim
-     *            Delimiter for the elements in the array.
-     * @param strings
-     *            Strings to concatenate.
-     * @return The concatenated array, elements separated by the given
-     *         delimiter.
-     */
-    private static String concat(String delim, Iterable<? extends Object> strings) {
-        return concat(delim, strings, new StringTransformer() {
-            @Override
-            public String transform(Object input) {
-                return input.toString();
-            }
-        });
     }
 
     /**

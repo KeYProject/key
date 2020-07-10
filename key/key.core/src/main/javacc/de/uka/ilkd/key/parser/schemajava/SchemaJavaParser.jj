@@ -5026,6 +5026,25 @@ Exec ExecStatement() :
                     } 
                 )
             ]
+
+            [
+                LOOKAHEAD("ccat" "("  "\\Return" param = FormalParameter() ")")
+                "ccat"
+                {
+                    cat = factory.createCcatch();
+                    setPrefixInfo(cat);
+                }
+                
+                "("  "\\Return" param = FormalParameter() ")"
+                
+                block = Block()
+                {
+                    cat.setNonStdParameterDeclaration(factory.createCcatchReturnValParameterDeclaration(param));
+                    cat.setBody(block);
+                    branches.add(cat);
+                }
+            ]
+            
             (
                 LOOKAHEAD(4)
                 "ccat"

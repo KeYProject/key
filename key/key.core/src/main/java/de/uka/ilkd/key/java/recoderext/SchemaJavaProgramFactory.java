@@ -588,6 +588,10 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
         return new CcatchReturnParameterDeclaration();
     }
 
+    public CcatchReturnValParameterDeclaration createCcatchReturnValParameterDeclaration(ParameterDeclaration p) {
+        return new CcatchReturnValParameterDeclaration(p);
+    }
+
     public Ccatch createCcatch() {
         return new Ccatch();
     }

@@ -21,14 +21,15 @@ import org.key_project.util.collection.ImmutableArray;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.rule.MatchConditions;
 
 /**
  * A "\Return int v" parameter declaration of a ccatch clause.
  *
  * @author Dominic Steinhöfel
  */
-public class CcatchReturnValParameterDeclaration
-        extends CcatchNonstandardParameterDeclaration {
+public class CcatchReturnValParameterDeclaration extends
+        CcatchNonstandardParameterDeclaration implements ParameterContainer {
 
     private final ParameterDeclaration delegate;
 
@@ -85,6 +86,34 @@ public class CcatchReturnValParameterDeclaration
     @Override
     public void prettyPrint(PrettyPrinter w) throws IOException {
         w.printCcatchReturnValParameterDeclaration(this);
+    }
+
+    @Override
+    public int getStatementCount() {
+        return 0;
+    }
+
+    @Override
+    public Statement getStatementAt(int index) {
+        throw new ArrayIndexOutOfBoundsException();
+    }
+
+    @Override
+    public int getParameterDeclarationCount() {
+        return delegate != null ? 1 : 0;
+    }
+
+    @Override
+    public ParameterDeclaration getParameterDeclarationAt(int idx) {
+        if (delegate != null && idx == 0) {
+            return delegate;
+        }
+        throw new ArrayIndexOutOfBoundsException();
+    }
+
+    @Override
+    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+        return super.match(source, matchCond);
     }
 
 }
