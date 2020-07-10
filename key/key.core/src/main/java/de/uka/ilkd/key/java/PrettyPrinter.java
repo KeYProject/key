@@ -3129,10 +3129,14 @@ public class PrettyPrinter {
         printHeader(x);
         writeToken("ccatch", x);
         write(" (");
-        if (x.getParameterDeclaration() != null) {
+        if (x.hasParameterDeclaration()) {
             noLinefeed = true;
             noSemicolons = true;
             writeElement(x.getParameterDeclaration());
+        } else if (x.hasNonStdParameterDeclaration()) {
+            noLinefeed = true;
+            noSemicolons = true;
+            writeElement(x.getNonStdParameterDeclaration());
         }
         write(")");
         noSemicolons = false;
@@ -3140,6 +3144,20 @@ public class PrettyPrinter {
         if (x.getBody() != null) {
             writeElement(1, x.getBody());
         }
+        printFooter(x);
+    }
+
+    /**
+     * TODO Comment.
+     *
+     * @param ccatchReturnParameterDeclaration
+     * @throws IOException
+     */
+    public void printCcatchReturnParameterDeclaration(
+            CcatchReturnParameterDeclaration x) throws IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\Return", x);
         printFooter(x);
     }
 

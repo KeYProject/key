@@ -13,8 +13,11 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import java.util.Optional;
+
 import org.key_project.util.ExtList;
 
+import de.uka.ilkd.key.java.CcatchNonstandardParameterDeclaration;
 import de.uka.ilkd.key.java.ParameterContainer;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -35,7 +38,9 @@ public class Ccatch extends BranchImp
     /**
      * Parameter.
      */
-    protected final ParameterDeclaration parameter;
+    protected final Optional<ParameterDeclaration> parameter;
+
+    private Optional<CcatchNonstandardParameterDeclaration> nonStdParameter;
 
     /**
      * Body.
@@ -47,7 +52,7 @@ public class Ccatch extends BranchImp
      */
     public Ccatch() {
         super();
-        parameter = null;
+        parameter = Optional.empty();
         body = null;
     }
 
@@ -62,7 +67,24 @@ public class Ccatch extends BranchImp
     public Ccatch(ParameterDeclaration e, StatementBlock body) {
         super();
         this.body = body;
-        parameter = e;
+        parameter = Optional.of(e);
+        nonStdParameter = Optional.empty();
+    }
+
+    /**
+     * Ccatch.
+     *
+     * @param e
+     *            a parameter declaration.
+     * @param body
+     *            a statement.
+     */
+    public Ccatch(CcatchNonstandardParameterDeclaration e,
+            StatementBlock body) {
+        super();
+        this.body = body;
+        parameter = Optional.empty();
+        nonStdParameter = Optional.of(e);
     }
 
     /**
@@ -76,13 +98,24 @@ public class Ccatch extends BranchImp
      */
     public Ccatch(ExtList children) {
         super(children);
-        parameter = children.get(ParameterDeclaration.class);
+        parameter = Optional
+                .ofNullable(children.get(ParameterDeclaration.class));
+        nonStdParameter = Optional.ofNullable(
+            children.get(CcatchNonstandardParameterDeclaration.class));
         body = children.get(StatementBlock.class);
     }
 
     @Override
     public SourceElement getLastElement() {
         return (body != null) ? body.getLastElement() : this;
+    }
+
+    public boolean hasParameterDeclaration() {
+        return parameter.isPresent();
+    }
+
+    public boolean hasNonStdParameterDeclaration() {
+        return nonStdParameter.isPresent();
     }
 
     /**
@@ -93,7 +126,9 @@ public class Ccatch extends BranchImp
     @Override
     public int getChildCount() {
         int result = 0;
-        if (parameter != null)
+        if (hasParameterDeclaration())
+            result++;
+        if (hasNonStdParameterDeclaration())
             result++;
         if (body != null)
             result++;
@@ -112,9 +147,14 @@ public class Ccatch extends BranchImp
      */
     @Override
     public ProgramElement getChildAt(int index) {
-        if (parameter != null) {
+        if (hasParameterDeclaration()) {
             if (index == 0)
-                return parameter;
+                return parameter.get();
+            index--;
+        }
+        if (hasNonStdParameterDeclaration()) {
+            if (index == 0)
+                return nonStdParameter.get();
             index--;
         }
         if (body != null) {
@@ -161,7 +201,7 @@ public class Ccatch extends BranchImp
      */
     @Override
     public int getParameterDeclarationCount() {
-        return (parameter != null) ? 1 : 0;
+        return (hasParameterDeclaration()) ? 1 : 0;
     }
 
     /**
@@ -178,8 +218,28 @@ public class Ccatch extends BranchImp
      */
     @Override
     public ParameterDeclaration getParameterDeclarationAt(int index) {
-        if (parameter != null && index == 0) {
-            return parameter;
+        if (hasParameterDeclaration() && index == 0) {
+            return parameter.get();
+        }
+        throw new ArrayIndexOutOfBoundsException();
+    }
+
+    /**
+     * Return the non-standard parameter declaration at the specified index in
+     * this node's "virtual" parameter declaration array.
+     *
+     * @param index
+     *            an index for a parameter declaration.
+     *
+     * @return the parameter declaration with the given index.
+     *
+     * @exception ArrayIndexOutOfBoundsException
+     *                if <tt>index</tt> is out of bounds.
+     */
+    public CcatchNonstandardParameterDeclaration getNonStdParameterDeclarationAt(
+            int index) {
+        if (hasNonStdParameterDeclaration() && index == 0) {
+            return nonStdParameter.get();
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -199,7 +259,16 @@ public class Ccatch extends BranchImp
      * @return the parameter declaration.
      */
     public ParameterDeclaration getParameterDeclaration() {
-        return parameter;
+        return parameter.orElse(null);
+    }
+
+    /**
+     * Get non-standard parameter declaration.
+     *
+     * @return the parameter declaration.
+     */
+    public CcatchNonstandardParameterDeclaration getNonStdParameterDeclaration() {
+        return nonStdParameter.orElse(null);
     }
 
     /**

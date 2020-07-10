@@ -14,15 +14,7 @@
 package de.uka.ilkd.key.java.visitor;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.CompilationUnit;
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.Import;
-import de.uka.ilkd.key.java.PackageSpecification;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -922,6 +914,12 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 
     @Override
     public void performActionOnCcatch(Ccatch x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnCcatchReturnParameterDeclaration(
+            CcatchReturnParameterDeclaration x) {
         doDefaultAction(x);
     }
 

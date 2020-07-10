@@ -15,6 +15,7 @@ package de.uka.ilkd.key.java.recoderext;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import recoder.java.ParameterContainer;
 import recoder.java.ProgramElement;
@@ -45,7 +46,9 @@ public class Ccatch extends Branch
     /**
      * Parameter.
      */
-    private ParameterDeclaration parameter;
+    private Optional<ParameterDeclaration> parameter;
+
+    private Optional<CcatchNonstandardParameterDeclaration> nonStdParameter;
 
     /**
      * Body.
@@ -57,6 +60,8 @@ public class Ccatch extends Branch
      */
     public Ccatch() {
         super();
+        setParameterDeclaration(null);
+        setNonStdParameterDeclaration(null);
     }
 
     /**
@@ -71,6 +76,23 @@ public class Ccatch extends Branch
         super();
         setBody(body);
         setParameterDeclaration(e);
+        setNonStdParameterDeclaration(null);
+        makeParentRoleValid();
+    }
+
+    /**
+     * Ccatch.
+     *
+     * @param e
+     *            a parameter declaration.
+     * @param body
+     *            a statement.
+     */
+    public Ccatch(CcatchNonstandardParameterDeclaration e, StatementBlock body) {
+        super();
+        setBody(body);
+        setNonStdParameterDeclaration(e);
+        setParameterDeclaration(null);
         makeParentRoleValid();
     }
 
@@ -82,8 +104,11 @@ public class Ccatch extends Branch
      */
     protected Ccatch(Ccatch proto) {
         super(proto);
-        if (proto.parameter != null) {
-            parameter = proto.parameter.deepClone();
+        if (proto.hasParameterDeclaration()) {
+            parameter = Optional.ofNullable(proto.parameter.get().deepClone());
+        }
+        if (proto.hasNonStdParameterDeclaration()) {
+            nonStdParameter = Optional.ofNullable(proto.nonStdParameter.get().deepClone());
         }
         if (proto.body != null) {
             body = proto.body.deepClone();
@@ -107,9 +132,8 @@ public class Ccatch extends Branch
      */
     @Override
     public void makeParentRoleValid() {
-        if (parameter != null) {
-            parameter.setParameterContainer(this);
-        }
+        parameter.ifPresent(p -> p.setParameterContainer(this));
+        nonStdParameter.ifPresent(p -> p.setParameterContainer(this));
         if (body != null) {
             body.setStatementContainer(this);
         }
@@ -128,7 +152,9 @@ public class Ccatch extends Branch
     @Override
     public int getChildCount() {
         int result = 0;
-        if (parameter != null)
+        if (hasParameterDeclaration())
+            result++;
+        if (hasNonStdParameterDeclaration())
             result++;
         if (body != null)
             result++;
@@ -147,9 +173,14 @@ public class Ccatch extends Branch
      */
     @Override
     public ProgramElement getChildAt(int index) {
-        if (parameter != null) {
+        if (hasParameterDeclaration()) {
             if (index == 0)
-                return parameter;
+                return parameter.get();
+            index--;
+        }
+        if (hasNonStdParameterDeclaration()) {
+            if (index == 0)
+                return nonStdParameter.get();
             index--;
         }
         if (body != null) {
@@ -164,7 +195,10 @@ public class Ccatch extends Branch
     public int getChildPositionCode(ProgramElement child) {
         // role 0: parameter
         // role 1: body
-        if (parameter == child) {
+        if (parameter.map(p -> p == child).orElse(false)) {
+            return 0;
+        }
+        if (nonStdParameter.map(p -> p == child).orElse(false)) {
             return 0;
         }
         if (body == child) {
@@ -193,9 +227,19 @@ public class Ccatch extends Branch
         if (p == null) {
             throw new NullPointerException();
         }
-        if (parameter == p) {
+        if (hasParameterDeclaration()
+                && parameter.map(param -> param == p).orElse(false)) {
             ParameterDeclaration r = (ParameterDeclaration) q;
-            parameter = r;
+            parameter = Optional.of(r);
+            if (r != null) {
+                r.setParameterContainer(this);
+            }
+            return true;
+        }
+        if (hasNonStdParameterDeclaration()
+                && nonStdParameter.map(param -> param == p).orElse(false)) {
+            CcatchNonstandardParameterDeclaration r = (CcatchNonstandardParameterDeclaration) q;
+            nonStdParameter = Optional.of(r);
             if (r != null) {
                 r.setParameterContainer(this);
             }
@@ -243,7 +287,7 @@ public class Ccatch extends Branch
      */
     @Override
     public int getParameterDeclarationCount() {
-        return (parameter != null) ? 1 : 0;
+        return (hasParameterDeclaration()) ? 1 : 0;
     }
 
     /*
@@ -255,8 +299,16 @@ public class Ccatch extends Branch
      */
     @Override
     public ParameterDeclaration getParameterDeclarationAt(int index) {
-        if (parameter != null && index == 0) {
-            return parameter;
+        if (hasParameterDeclaration() && index == 0) {
+            return parameter.get();
+        }
+        throw new ArrayIndexOutOfBoundsException();
+    }
+
+    public CcatchNonstandardParameterDeclaration getNonstandardParameterDeclarationAt(
+            int index) {
+        if (hasNonStdParameterDeclaration() && index == 0) {
+            return nonStdParameter.get();
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -290,13 +342,30 @@ public class Ccatch extends Branch
         this.parent = parent;
     }
 
+    public boolean hasParameterDeclaration() {
+        return parameter.isPresent();
+    }
+
+    public boolean hasNonStdParameterDeclaration() {
+        return nonStdParameter.isPresent();
+    }
+
     /**
      * Get parameter declaration.
      *
      * @return the parameter declaration.
      */
     public ParameterDeclaration getParameterDeclaration() {
-        return parameter;
+        return parameter.orElse(null);
+    }
+
+    /**
+     * Get parameter declaration.
+     *
+     * @return the parameter declaration.
+     */
+    public CcatchNonstandardParameterDeclaration getNonStdParameterDeclaration() {
+        return nonStdParameter.orElse(null);
     }
 
     /**
@@ -306,7 +375,18 @@ public class Ccatch extends Branch
      *            a parameter declaration.
      */
     public void setParameterDeclaration(ParameterDeclaration p) {
-        parameter = p;
+        parameter = Optional.ofNullable(p);
+    }
+
+    /**
+     * Set parameter declaration.
+     *
+     * @param p
+     *            a parameter declaration.
+     */
+    public void setNonStdParameterDeclaration(
+            CcatchNonstandardParameterDeclaration p) {
+        nonStdParameter = Optional.ofNullable(p);
     }
 
     @Override
@@ -321,17 +401,19 @@ public class Ccatch extends Branch
 
     @Override
     public List<VariableSpecification> getVariablesInScope() {
-        if (parameter != null) {
-            return parameter.getVariables();
+        if (hasParameterDeclaration()) {
+            return parameter.map(ParameterDeclaration::getVariables)
+                    .orElse(null);
         }
         return Collections.<VariableSpecification> emptyList();
     }
 
     @Override
     public VariableSpecification getVariableInScope(String name) {
-        Debug.assertNonnull(name);
-        if (parameter != null) {
-            VariableSpecification v = parameter.getVariableSpecification();
+        if (hasParameterDeclaration()) {
+            VariableSpecification v = parameter
+                    .map(ParameterDeclaration::getVariableSpecification)
+                    .orElse(null);
             if (name.equals(v.getName())) {
                 return v;
             }
@@ -349,14 +431,13 @@ public class Ccatch extends Branch
         Debug.assertNonnull(name);
     }
 
-
     @Override
     public void accept(SourceVisitor v) {
         if (v instanceof SourceVisitorExtended) {
             ((SourceVisitorExtended) v).visitCcatch(this);
         } else {
-//            throw new IllegalStateException(
-//                "Method 'accept' not implemented in Ccatch");
+            // throw new IllegalStateException(
+            // "Method 'accept' not implemented in Ccatch");
         }
     }
 }

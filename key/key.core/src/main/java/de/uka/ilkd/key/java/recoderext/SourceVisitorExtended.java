@@ -23,9 +23,8 @@ import recoder.java.SourceVisitor;
  */
 public class SourceVisitorExtended extends SourceVisitor {
 
-
-    public void visitCatchAll(CatchAllStatement x ){
-	// default do nothing
+    public void visitCatchAll(CatchAllStatement x) {
+        // default do nothing
     }
 
     public void visitExec(Exec exec) {
@@ -33,6 +32,11 @@ public class SourceVisitorExtended extends SourceVisitor {
     }
 
     public void visitCcatch(Ccatch ccatch) {
+        // default do nothing
+    }
+
+    public void visitCcatchReturnParameterDeclaration(
+            CcatchReturnParameterDeclaration ccatchReturnParameterDeclaration) {
         // default do nothing
     }
 

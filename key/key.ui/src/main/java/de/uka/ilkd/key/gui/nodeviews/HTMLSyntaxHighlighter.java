@@ -1,5 +1,15 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
+import static de.uka.ilkd.key.util.UnicodeHelper.*;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.swing.JEditorPane;
+import javax.swing.text.html.HTMLDocument;
+
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -7,15 +17,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
-
-import javax.swing.*;
-import javax.swing.text.html.HTMLDocument;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static de.uka.ilkd.key.util.UnicodeHelper.*;
 
 /**
  * Performs a simple pattern-based syntax highlighting for KeY sequents by
@@ -94,7 +95,8 @@ public class HTMLSyntaxHighlighter {
     private final static String[] JAVA_KEYWORDS = { "if", "else", "for", "do",
             "while", "return", "break", "switch", "case", "continue", "try",
             "catch", "finally", "assert", "null", "throw", "this", "true",
-            "false", "int", "char", "long", "short", "method-frame", "boolean" };
+            "false", "int", "char", "long", "short", "method-frame", "boolean",
+            "exec", "ccatch", "\\Return" };
 
     public final static String JAVA_KEYWORDS_REGEX = concat("|",
             Arrays.asList(JAVA_KEYWORDS));

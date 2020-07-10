@@ -4628,8 +4628,21 @@ Exec ExecStatement() :
       }
       
   // TODO: Catch Return, break, continue
-
-  ( "ccatch"
+  (  LOOKAHEAD(2) "ccatch"
+    {
+      cat = factory.createCcatch();
+      setPrefixInfo(cat);
+    }
+    "("  "\\Return" ")"
+    block = Block()
+    {
+        cat.setNonStdParameterDeclaration(factory.createCcatchReturnParameterDeclaration());
+        cat.setBody(block);
+        branches.add(cat);
+    }
+  )?
+  
+  ( LOOKAHEAD(2) "ccatch"
     {
       cat = factory.createCcatch();
       setPrefixInfo(cat);

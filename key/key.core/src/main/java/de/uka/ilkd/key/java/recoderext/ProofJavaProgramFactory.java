@@ -495,4 +495,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         Ccatch res = new Ccatch(e, body);
         return res;
     }
+
+    public CcatchNonstandardParameterDeclaration createCcatchReturnParameterDeclaration() {
+        return new CcatchReturnParameterDeclaration();
+    }
 }
