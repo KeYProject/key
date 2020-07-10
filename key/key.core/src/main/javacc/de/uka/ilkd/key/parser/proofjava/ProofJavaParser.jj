@@ -4617,53 +4617,61 @@ Exec ExecStatement() :
     Ccatch cat;
 }
 {
-  "exec"
-      {
+    "exec"
+    {
         result = factory.createExec();
         setPrefixInfo(result);
-      }
-  block = Block()
-      {
-          result.setBody(block);
-      }
-      
-  // TODO: Catch Return, break, continue
-  (  LOOKAHEAD(2) "ccatch"
-    {
-      cat = factory.createCcatch();
-      setPrefixInfo(cat);
     }
-    "("  "\\Return" ")"
-    block = Block()
-    {
-        cat.setNonStdParameterDeclaration(factory.createCcatchReturnParameterDeclaration());
-        cat.setBody(block);
-        branches.add(cat);
-    }
-  )?
-  
-  ( LOOKAHEAD(2) "ccatch"
-    {
-      cat = factory.createCcatch();
-      setPrefixInfo(cat);
-    }
-    "("  param = FormalParameter() ")"
-    block = Block()
-    {
-        cat.setParameterDeclaration(param);
-        cat.setBody(block);
-        branches.add(cat);
-    }
-  )*
-  {
-    result.setBranchList(branches);
-    checkConstruction(result);
-    setPostfixInfo(result);
-    return result;
-  }
 
+    block = Block()
+    {
+        result.setBody(block);
+    }
+        
+    // TODO: Catch break, continue, labels
+
+    /*[
+        LOOKAHEAD("ccatch" "("  "\\Return" ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  "\\Return" ")"
+        
+        block = Block()
+        {
+            cat.setNonStdParameterDeclaration(factory.createCcatchReturnParameterDeclaration());
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    ]*/
+    
+    ( 
+        LOOKAHEAD("ccatch" "("  param = FormalParameter() ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  param = FormalParameter() ")"
+        
+        block = Block()
+        {
+            cat.setParameterDeclaration(param);
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    )*
+    {
+        result.setBranchList(branches);
+        checkConstruction(result);
+        setPostfixInfo(result);
+        return result;
+    }
 }
-
 
 /**
    For partial parsing ONLY. Allows this()/super() calls, as in

@@ -5010,7 +5010,6 @@ Exec ExecStatement() :
         |
         (
             [
-                //LOOKAHEAD("ccat" "(" "\\Return" ")")
                 LOOKAHEAD(4)
                 "ccat"
                 (
@@ -5028,7 +5027,6 @@ Exec ExecStatement() :
                 )
             ]
             (
-                //LOOKAHEAD("ccat" "("  param = FormalParameter() ")")
                 LOOKAHEAD(4)
                 "ccat"
                 (
