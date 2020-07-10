@@ -40,4 +40,14 @@ public class SourceVisitorExtended extends SourceVisitor {
         // default do nothing
     }
 
+    /**
+     * TODO Comment.
+     *
+     * @param ccatchReturnValParameterDeclaration
+     */
+    public void visitCcatchReturnValParameterDeclaration(
+            CcatchReturnValParameterDeclaration ccatchReturnValParameterDeclaration) {
+        // default do nothing
+    }
+
 }

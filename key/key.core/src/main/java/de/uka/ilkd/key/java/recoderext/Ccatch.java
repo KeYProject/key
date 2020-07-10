@@ -88,7 +88,8 @@ public class Ccatch extends Branch
      * @param body
      *            a statement.
      */
-    public Ccatch(CcatchNonstandardParameterDeclaration e, StatementBlock body) {
+    public Ccatch(CcatchNonstandardParameterDeclaration e,
+            StatementBlock body) {
         super();
         setBody(body);
         setNonStdParameterDeclaration(e);
@@ -108,7 +109,8 @@ public class Ccatch extends Branch
             parameter = Optional.ofNullable(proto.parameter.get().deepClone());
         }
         if (proto.hasNonStdParameterDeclaration()) {
-            nonStdParameter = Optional.ofNullable(proto.nonStdParameter.get().deepClone());
+            nonStdParameter = Optional
+                    .ofNullable(proto.nonStdParameter.get().deepClone());
         }
         if (proto.body != null) {
             body = proto.body.deepClone();
@@ -404,8 +406,16 @@ public class Ccatch extends Branch
         if (hasParameterDeclaration()) {
             return parameter.map(ParameterDeclaration::getVariables)
                     .orElse(null);
+        } else if (nonStdParameter
+                .map(p -> p instanceof CcatchReturnValParameterDeclaration)
+                .orElse(false)) {
+            return nonStdParameter
+                    .map(CcatchReturnValParameterDeclaration.class::cast)
+                    .map(CcatchReturnValParameterDeclaration::getDelegate)
+                    .map(ParameterDeclaration::getVariables).orElse(null);
         }
-        return Collections.<VariableSpecification> emptyList();
+
+        return Collections.emptyList();
     }
 
     @Override
@@ -417,7 +427,19 @@ public class Ccatch extends Branch
             if (name.equals(v.getName())) {
                 return v;
             }
+        } else if (nonStdParameter
+                .map(p -> p instanceof CcatchReturnValParameterDeclaration)
+                .orElse(false)) {
+            VariableSpecification v = nonStdParameter
+                    .map(CcatchReturnValParameterDeclaration.class::cast)
+                    .map(CcatchReturnValParameterDeclaration::getDelegate)
+                    .map(ParameterDeclaration::getVariableSpecification)
+                    .orElse(null);
+            if (name.equals(v.getName())) {
+                return v;
+            }
         }
+
         return null;
     }
 

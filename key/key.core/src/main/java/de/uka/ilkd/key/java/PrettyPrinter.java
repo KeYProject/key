@@ -3161,4 +3161,20 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
+    /**
+     * TODO Comment.
+     *
+     * @param ccatchReturnValParameterDeclaration
+     * @throws IOException
+     */
+    public void printCcatchReturnValParameterDeclaration(
+            CcatchReturnValParameterDeclaration x) throws IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\Return", x);
+        write(" ");
+        writeElement(x.getDelegate());
+        printFooter(x);
+    }
+
 }

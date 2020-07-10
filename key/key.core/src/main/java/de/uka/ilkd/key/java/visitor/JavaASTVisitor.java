@@ -923,4 +923,10 @@ public abstract class JavaASTVisitor extends JavaASTWalker
         doDefaultAction(x);
     }
 
+    @Override
+    public void performActionOnCcatchReturnValParameterDeclaration(
+            CcatchReturnValParameterDeclaration x) {
+        doDefaultAction(x);
+    }
+
 }

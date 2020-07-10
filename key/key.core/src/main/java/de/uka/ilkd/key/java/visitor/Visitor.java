@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.java.CcatchReturnParameterDeclaration;
+import de.uka.ilkd.key.java.CcatchReturnValParameterDeclaration;
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.CompilationUnit;
 import de.uka.ilkd.key.java.ContextStatementBlock;
@@ -399,4 +400,7 @@ public interface Visitor {
 
     void performActionOnCcatchReturnParameterDeclaration(
             CcatchReturnParameterDeclaration ccatchReturnParameterDeclaration);
+
+    void performActionOnCcatchReturnValParameterDeclaration(
+            CcatchReturnValParameterDeclaration ccatchReturnValParameterDeclaration);
 }

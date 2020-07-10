@@ -4647,6 +4647,24 @@ Exec ExecStatement() :
             branches.add(cat);
         }
     ]
+
+    [
+        LOOKAHEAD("ccatch" "("  "\\Return" param = FormalParameter() ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  "\\Return" param = FormalParameter() ")"
+        
+        block = Block()
+        {
+            cat.setNonStdParameterDeclaration(factory.createCcatchReturnValParameterDeclaration(param));
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    ]
     
     ( 
         LOOKAHEAD("ccatch" "("  param = FormalParameter() ")")
