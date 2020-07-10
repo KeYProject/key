@@ -525,6 +525,7 @@ TOKEN :
 | < BYTE: "byte" >
 | < CASE: "case" >
 | < CATCH: "catch" >
+| < CCATCH: "ccatch" >
 | < CHAR: "char" >
 | < CLASS: "class" >
 | < CONST: "const" >
@@ -539,6 +540,7 @@ TOKEN :
 	  }
 }
 		    | < EXTENDS: "extends" >
+            | < EXEC: "exec" >
 		    | < FALSE: "false" >
 		    | < FINAL: "final" >
 		    | < FINALLY: "finally" >
@@ -566,6 +568,7 @@ TOKEN :
 		    | < PROTECTED: "protected" >
 		    | < PUBLIC: "public" >
 		    | < RETURN: "return" >
+            | < RETURNTYPE: "\\Return" >
 		    | < SHORT: "short" >
 		    | < STATIC: "static" >
 		    | < SUPER: "super" >
@@ -2378,8 +2381,15 @@ CatchSVWrapper CatchSV() :
 	}
 }
 
-
-
+CcatchSVWrapper CcatchSV() :
+{
+}
+{
+    <SVIDENTIFIER>
+    {
+        return factory.getCcatchSV(token.image);
+    }
+}
 
 Assignment AssignmentOperator() :
 {
@@ -3608,6 +3618,7 @@ Statement Statement() :
      | result = ThrowStatement()
      | result = SynchronizedStatement()
      | result = TryStatement()
+     | result = ExecStatement()
      | result = AssertStatement()
      | result = StatementSV()
      )
@@ -4841,7 +4852,7 @@ Try TryStatement() :
     /*
      * Semantic check required here to make sure that at least one
      * finally/catch is present.
- */
+     */
 {
     Try result;
     StatementBlock block;
@@ -4852,52 +4863,140 @@ Try TryStatement() :
 }
 {
     "try"
-	{
-	    result = factory.createTry();
-	    setPrefixInfo(result);
-	}
+    {
+        result = factory.createTry();
+        setPrefixInfo(result);
+    }
     block = Block()
     {
-	result.setBody(block);
+        result.setBody(block);
     }
 
-    (( {CatchSVWrapper cfsv;} cfsv=CatchSV()
-	{branches.add(cfsv); } )
-     |
-     (
-      ( "catch"
-	( ( {
-	    cat = factory.createCatch();
-	    setPrefixInfo(cat);
-	}
-	    "("  param = FormalParameter() ")"
-	    block = Block()
-	    {
-		cat.setParameterDeclaration(param);
-		cat.setBody(block);
-		branches.add(cat);
-	    } )
-	  |
-	  ( {CatchSVWrapper cfsv2;} cfsv2=CatchSV()
-	      {branches.add(cfsv2); } ) )
-	)*
-      [ "finally"
-      {
-	  fin = factory.createFinally();
-	  setPrefixInfo(fin);
-      }
-      block = Block()
-	  {
-	      fin.setBody(block);
-	      branches.add(fin);
-	  }
-      ]))
-	{
-	    result.setBranchList(branches);
-	    checkConstruction(result);
-	    return result;
-	}
+    (
+        (
+            { CatchSVWrapper cfsv; } cfsv=CatchSV()
+            { branches.add(cfsv); } 
+        )
+        |
+        (
+            ( 
+                "catch"
+                (
+                    (
+                        {
+                            cat = factory.createCatch();
+                            setPrefixInfo(cat);
+                        }
+                        "("  param = FormalParameter() ")"
+                        block = Block()
+                        {
+                            cat.setParameterDeclaration(param);
+                            cat.setBody(block);
+                            branches.add(cat);
+                        } 
+                    )
+                    |
+                    (
+                        { CatchSVWrapper cfsv2; } cfsv2=CatchSV()
+                        { branches.add(cfsv2); } 
+                    ) 
+                )
+            )*
+            [
+                "finally"
+                {
+                    fin = factory.createFinally();
+                    setPrefixInfo(fin);
+                }
+                block = Block()
+                {
+                    fin.setBody(block);
+                    branches.add(fin);
+                }
+            ]
+        )
+    )
+    {
+        result.setBranchList(branches);
+        checkConstruction(result);
+        return result;
+    }
+}
 
+Exec ExecStatement() :
+{
+    Exec result;
+    StatementBlock block;
+    ParameterDeclaration param;
+    ASTList<Branch> branches = new ASTArrayList<Branch>(1);
+    Ccatch cat;
+}
+{
+    "exec"
+    {
+        result = factory.createExec();
+        setPrefixInfo(result);
+    }
+    block = Block()
+    {
+        result.setBody(block);
+    }
+
+    (
+        (
+            { CcatchSVWrapper cfsv; } cfsv=CcatchSV()
+            { branches.add(cfsv); } 
+        )
+        |
+        (
+            [
+                LOOKAHEAD("ccatch" "\\Return")
+                "ccatch"
+                (
+                    {
+                        cat = factory.createCcatch();
+                        setPrefixInfo(cat);
+                    }
+                    "("  "\\Return" ")"
+                    block = Block()
+                    {
+                        cat.setNonStdParameterDeclaration(factory.createCcatchReturnParameterDeclaration());
+                        cat.setBody(block);
+                        branches.add(cat);
+                    } 
+                )
+            ]
+            ( 
+                LOOKAHEAD("ccatch" FormalParameter())
+                "ccatch"
+                (
+                    (
+                        {
+                            cat = factory.createCcatch();
+                            setPrefixInfo(cat);
+                        }
+                        "("  param = FormalParameter() ")"
+                        block = Block()
+                        {
+                            cat.setParameterDeclaration(param);
+                            cat.setBody(block);
+                            branches.add(cat);
+                        } 
+                    )
+                    |
+                    (
+                        { CcatchSVWrapper cfsv2; } cfsv2 = CcatchSV()
+                        { branches.add(cfsv2); } 
+                    ) 
+                )
+            )*
+        )
+    )
+    {
+        result.setBranchList(branches);
+        checkConstruction(result);
+        return result;
+    }
 }
 
 Expression ADTConstructor() :
