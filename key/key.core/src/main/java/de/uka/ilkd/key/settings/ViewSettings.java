@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.settings;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -22,18 +23,21 @@ import java.util.Set;
  * is allowed to have. If this number is exceeded no SchemaVariables get
  * instantiated in the displayed tooltip.
  * 3) whether intermediate proofsteps should be hidden in the proof tree view
+ *
+ * @author unknown
+ * @author weigl
  */
 public class ViewSettings extends AbstractPropertiesSettings {
 
     private static final String CLUTTER_RULES = "[View]clutterRules";
 
-    private static final String CLUTTER_RULES_DEFAULT = "cut_direct_r,cut_direct_l," +
-            "case_distinction_r,case_distinction_l,local_cut,commute_and_2,commute_or_2," +
-            "boxToDiamond,pullOut,typeStatic,less_is_total,less_zero_is_total,apply_eq_monomials" +
-            "eqTermCut,instAll,instEx,divIncreasingPos,divIncreasingNeg,jmodUnique1,jmodeUnique2," +
-            "jmodjmod,jmodDivisble,jdivAddMultDenom,jmodAltZero,add_non_neq_square,divide_geq," +
-            "add_greatereq,geq_add_one,leq_add_one,polySimp_addOrder,polySimp_expand,add_lesseq," +
-            "divide_equation,equal_add_one,add_eq";
+    private static final String CLUTTER_RULES_DEFAULT = "cut_direct_r,cut_direct_l,"
+            + "case_distinction_r,case_distinction_l,local_cut,commute_and_2,commute_or_2,"
+            + "boxToDiamond,pullOut,typeStatic,less_is_total,less_zero_is_total,apply_eq_monomials"
+            + "eqTermCut,instAll,instEx,divIncreasingPos,divIncreasingNeg,jmodUnique1,jmodeUnique2,"
+            + "jmodjmod,jmodDivisble,jdivAddMultDenom,jmodAltZero,add_non_neq_square,divide_geq,"
+            + "add_greatereq,geq_add_one,leq_add_one,polySimp_addOrder,polySimp_expand,add_lesseq,"
+            + "divide_equation,equal_add_one,add_eq";
 
     private static final String CLUTTER_RULESSETS = "[View]clutterRuleSets";
 
@@ -106,11 +110,12 @@ public class ViewSettings extends AbstractPropertiesSettings {
      * Heatmap options property
      */
     private static final String HEATMAP_OPTIONS = "[View]HeatmapOptions";
-    /**
-     *
-     */
+
     private static final String FONT_SIZE_FACTOR = "[View]uiFontSizeFactor";
 
+    private static final String SEQUENT_VIEW_TOOLTIP = "[View]SequentViewTooltips";
+
+    private static final String HIGHLIGHT_ORIGIN = "[View]HighlightOrigin";
     /**
      *
      */
@@ -137,9 +142,16 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private static final String HEATMAP_MAXAGE = "[View][Heatmap]maxAge";
 
     /**
+     * A list of bookmark of favourite folders of the user. Can be manipulated with
+     * {@link de.uka.ilkd.key.gui.KeYFileChooserBookmarkPanel}.
+     */
+    private static final String USER_FOLDER_BOOKMARKS = "[View]folderBookmarks";
+
+    /**
      * Show Taclet uninstantiated in tooltip -- for learning
      */
-    private PropertyEntry<Boolean> showUninstantiatedTaclet = createBooleanProperty(SHOW_UNINSTANTIATED_TACLET, true);
+    private PropertyEntry<Boolean> showUninstantiatedTaclet =
+            createBooleanProperty(SHOW_UNINSTANTIATED_TACLET, true);
     private PropertyEntry<Boolean> showHeatmap = createBooleanProperty(HEATMAP_SHOW, false);
     private PropertyEntry<Boolean> heatmapSF = createBooleanProperty(HEATMAP_SF, true);
     /**
@@ -151,23 +163,44 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     private PropertyEntry<Integer> maxAgeForHeatmap = createIntegerProperty(HEATMAP_MAXAGE, 5);
     private PropertyEntry<Double> uiFontSizeFactor = createDoubleProperty(FONT_SIZE_FACTOR, 1.0);
-    private PropertyEntry<Integer> maxTooltipLines = createIntegerProperty(MAX_TOOLTIP_LINES_KEY, 40);
-    private PropertyEntry<Boolean> hideIntermediateProofsteps = createBooleanProperty(HIDE_INTERMEDIATE_PROOFSTEPS, false);
-    private PropertyEntry<Boolean> hideAutomodeProofsteps = createBooleanProperty(HIDE_AUTOMODE_PROOFSTEPS, false);
-    private PropertyEntry<Boolean> hideClosedSubtrees = createBooleanProperty(HIDE_CLOSED_SUBTREES, false);
-    private PropertyEntry<Boolean> notifyLoadBehaviour = createBooleanProperty(NOTIFY_LOAD_BEHAVIOUR, false);
+    private PropertyEntry<Integer> maxTooltipLines =
+            createIntegerProperty(MAX_TOOLTIP_LINES_KEY, 40);
+    private PropertyEntry<Boolean> hideIntermediateProofsteps =
+            createBooleanProperty(HIDE_INTERMEDIATE_PROOFSTEPS, false);
+    private PropertyEntry<Boolean> hideAutomodeProofsteps =
+            createBooleanProperty(HIDE_AUTOMODE_PROOFSTEPS, false);
+    private PropertyEntry<Boolean> hideClosedSubtrees =
+            createBooleanProperty(HIDE_CLOSED_SUBTREES, false);
+    private PropertyEntry<Boolean> notifyLoadBehaviour =
+            createBooleanProperty(NOTIFY_LOAD_BEHAVIOUR, false);
     private PropertyEntry<Boolean> usePretty = createBooleanProperty(PRETTY_SYNTAX, true);
     private PropertyEntry<Boolean> useUnicode = createBooleanProperty(USE_UNICODE, false);
-    private PropertyEntry<Boolean> useSyntaxHighlighting = createBooleanProperty(SYNTAX_HIGHLIGHTING, true);
-    private PropertyEntry<Boolean> hidePackagePrefix = createBooleanProperty(HIDE_PACKAGE_PREFIX, false);
-    private PropertyEntry<Boolean> confirmExit = createBooleanProperty(CONFIRM_EXIT, false);
-    private PropertyEntry<Boolean> showWholeTaclet = createBooleanProperty(SHOW_WHOLE_TACLET, false);
+    private PropertyEntry<Boolean> useSyntaxHighlighting =
+            createBooleanProperty(SYNTAX_HIGHLIGHTING, true);
+    private PropertyEntry<Boolean> hidePackagePrefix =
+            createBooleanProperty(HIDE_PACKAGE_PREFIX, false);
+    private PropertyEntry<Boolean> confirmExit = createBooleanProperty(CONFIRM_EXIT, true);
+    private PropertyEntry<Boolean> showWholeTaclet =
+            createBooleanProperty(SHOW_WHOLE_TACLET, false);
     private PropertyEntry<Integer> sizeIndex = createIntegerProperty(FONT_INDEX, 2);
     private PropertyEntry<Boolean> useSystemLaF = createBooleanProperty(USE_SYSTEM_LAF, false);
-    private PropertyEntry<Set<String>> clutterRules = createStringSetProperty(CLUTTER_RULES, CLUTTER_RULES_DEFAULT);
+    private PropertyEntry<Boolean> showSequentViewTooltips =
+            createBooleanProperty(SEQUENT_VIEW_TOOLTIP, true);
+    private PropertyEntry<Boolean> highlightOrigin = createBooleanProperty(HIGHLIGHT_ORIGIN, true);
+    private PropertyEntry<Set<String>> clutterRules =
+            createStringSetProperty(CLUTTER_RULES, CLUTTER_RULES_DEFAULT);
 
     private PropertyEntry<Set<String>> clutterRuleSets =
             createStringSetProperty(CLUTTER_RULESSETS, CLUTTER_RULESETS_DEFAULT);
+
+    /**
+     * User-definable folder bookmarks.
+     *
+     * @see #getFolderBookmarks()
+     * @see #setFolderBookmarks(List)
+     */
+    private PropertyEntry<List<String>> folderBookmarks
+            = createStringListProperty(USER_FOLDER_BOOKMARKS, System.getProperty("user.home"));
 
     /**
      * Clutter rules are rules with less priority in the taclet menu
@@ -185,7 +218,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
     }
 
     /**
-     * Name of rule sets containing clutter rules, which has a minor priority in the taclet menu.
+     * Name of rule sets containing clutter rules, which has a minor priority in the
+     * taclet menu.
      */
     public Set<String> getClutterRuleSets() {
         return clutterRuleSets.get();
@@ -208,8 +242,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
     }
 
     /**
-     * returns whether the Find and VarCond part of Taclets should be
-     * pretty-printed with instantiations of schema-variables or not
+     * returns whether the Find and VarCond part of Taclets should be pretty-printed
+     * with instantiations of schema-variables or not
      *
      * @return true iff the find part should be pretty-printed instantiated
      */
@@ -218,8 +252,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
     }
 
     /**
-     * Sets whether the Find and VarCond part of Taclets should be
-     * pretty-printed with instantiations of schema-variables or not
+     * Sets whether the Find and VarCond part of Taclets should be pretty-printed
+     * with instantiations of schema-variables or not
      *
      * @param b indicates whether the Find and VarCond part of Taclets should
      *          be pretty-printed with instantiations of schema-variables or
@@ -247,23 +281,27 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
 
     /**
-     * Are system look and feel activated?
+     * @return {@code true} iff the system look-and-feel is activated.
      */
     public boolean useSystemLaF() {
         return useSystemLaF.get();
     }
 
     /**
-     * Sets the system look and feel option.
+     * Sets the system look-and-feel option.
+     *
+     * @param b whether to activate the system look-and-feel
      */
     public void setUseSystemLaF(boolean b) {
         useSystemLaF.set(b);
     }
 
     /**
-     * When loading a Java file, all other java files in the parent
-     * directory are loaded as well.
-     * Should there be a notification about this when opening a file?
+     * When loading a Java file, all other java files in the parent directory are
+     * loaded as well. Should there be a notification about this when opening a
+     * file?
+     *
+     * @return whether to show the notification.
      */
     public boolean getNotifyLoadBehaviour() {
         return notifyLoadBehaviour.get();
@@ -341,7 +379,6 @@ public class ViewSettings extends AbstractPropertiesSettings {
             setUseUnicode(false);
             return false;
         }
-
     }
 
     public void setUseUnicode(boolean useUnicode) {
@@ -435,6 +472,22 @@ public class ViewSettings extends AbstractPropertiesSettings {
         return maxAgeForHeatmap.get();
     }
 
+    public boolean isHighlightOrigin() {
+        return highlightOrigin.get();
+    }
+
+    public void setHighlightOrigin(boolean highlightOrigin) {
+        this.highlightOrigin.set(highlightOrigin);
+    }
+
+    public boolean isShowSequentViewTooltips() {
+        return showSequentViewTooltips.get();
+    }
+
+    public void setShowSequentViewTooltips(boolean showSequentViewTooltips) {
+        this.showSequentViewTooltips.set(showSequentViewTooltips);
+    }
+
     public double getUIFontSizeFactor() {
         return uiFontSizeFactor.get();
     }
@@ -443,4 +496,17 @@ public class ViewSettings extends AbstractPropertiesSettings {
         this.uiFontSizeFactor.set(factor);
     }
 
+    /**
+     * @see #folderBookmarks
+     */
+    public List<String> getFolderBookmarks() {
+        return folderBookmarks.get();
+    }
+
+    /**
+     * @see #folderBookmarks
+     */
+    public void setFolderBookmarks(List<String> bm) {
+        folderBookmarks.set(bm);
+    }
 }

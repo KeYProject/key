@@ -8,30 +8,36 @@ import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
+import org.jetbrains.annotations.NotNull;
 import org.key_project.util.java.ObjectUtil;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TacletOptionsSettings extends SimpleSettingsPanel implements SettingsProvider {
+    private static final long serialVersionUID = 1455572432081960150L;
     private static final String EXPLANATIONS_RESOURCE = "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
     private static Properties explanationMap;
     private HashMap<String, String> category2Choice;
     private HashMap<String, Set<String>> category2Choices;
     private ChoiceSettings settings;
     private boolean warnNoProof = true;
-    private JScrollPane root = new JScrollPane();
 
     public TacletOptionsSettings() {
         setHeaderText(getDescription());
+        JScrollPane root = new JScrollPane();
+        root.getVerticalScrollBar().setUnitIncrement(10);
+        root.getHorizontalScrollBar().setUnitIncrement(10);
         root.setViewportView(pCenter);
         add(root, BorderLayout.CENTER);
 
@@ -221,7 +227,42 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         explanationArea.setText(explanation);
         explanationArea.setCaretPosition(0);
         explanationArea.setBackground(getBackground());
-        pCenter.add(explanationArea, new CC().span().newline());
+        JPanel p = createCollapsibleTitlePane("Info", explanationArea);
+        pCenter.add(p, new CC().span().newline());
+    }
+
+    @NotNull
+    private JPanel createCollapsibleTitlePane(String titleText, JComponent child) {
+        JPanel p = new JPanel(new BorderLayout());
+        JPanel north = new JPanel(new BorderLayout());
+
+        p.setBorder(BorderFactory.createLineBorder(Color.black));
+        JButton title = new JButton(titleText);
+        title.setContentAreaFilled(false);
+        title.setBorderPainted(false);
+        north.add(title, BorderLayout.WEST);
+        //north.add(new JSeparator(), BorderLayout.CENTER);
+        p.add(north, BorderLayout.NORTH);
+        p.add(child);
+        child.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        child.setVisible(false);
+
+        title.setIcon(IconFactory.TREE_NODE_RETRACTED.get());
+        title.addMouseListener(new MouseAdapter() {
+            private boolean opened = false;
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                opened = !opened;
+                child.setVisible(opened);
+                if (opened) {
+                    title.setIcon(IconFactory.TREE_NODE_EXPANDED.get());
+                } else {
+                    title.setIcon(IconFactory.TREE_NODE_RETRACTED.get());
+                }
+            }
+        });
+        return p;
     }
 
     private JRadioButton addRadioButton(ChoiceEntry c, ButtonGroup btnGroup) {
@@ -251,6 +292,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
 
     private void addTitleRow(String cat) {
         JLabel lbl = new JLabel(cat);
+        lbl.setFont(lbl.getFont().deriveFont(14f));
         pCenter.add(lbl, new CC().span().newline());
     }
 

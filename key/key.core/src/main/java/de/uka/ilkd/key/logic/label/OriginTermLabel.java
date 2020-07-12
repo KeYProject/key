@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.logic.label;
 
 import java.io.File;
-import java.nio.file.Paths;
+import java.net.URI;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -26,8 +26,11 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * <p> An {@link OriginTermLabel} saves a term's origin in the JML specification
@@ -58,6 +61,57 @@ public class OriginTermLabel implements TermLabel {
      */
     public final static int CHILD_COUNT = 2;
 
+
+    /**
+     * Find a term's origin.
+     * If the term has no origin, iterate through its parent terms until we find one with an origin.
+     *
+     * @param pis the position of the term whose origin to find.
+     * @return the term's origin, or the origin of one of its parents.
+     */
+    public static Origin getOrigin(PosInSequent pis) {
+        if (pis == null) {
+            return null;
+        }
+
+        return getOrigin(pis.getPosInOccurrence());
+    }
+
+    /**
+     * Find a term's origin.
+     * If the term has no origin, iterate through its parent terms until we find one with an origin.
+     *
+     * @param pio the position of the term whose origin to find.
+     * @return the term's origin, or the origin of one of its parents.
+     */
+    public static Origin getOrigin(PosInOccurrence pio) {
+        if (pio == null) {
+            return null;
+        }
+
+        Term term = pio.subTerm();
+
+        OriginTermLabel originLabel =
+                (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
+
+        // If the term has no origin label,
+        // iterate over its parent terms until we find one with an origin label,
+        // then show that term's origin.
+        while (originLabel == null && !pio.isTopLevel()) {
+            pio = pio.up();
+            term = pio.subTerm();
+
+            originLabel =
+                    (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
+        }
+
+        if (originLabel != null && originLabel.getOrigin().specType != SpecType.NONE) {
+            return originLabel.getOrigin();
+        } else {
+            return null;
+        }
+    }
+
     /**
      * The term's origin.
      * @see #getOrigin()
@@ -68,7 +122,7 @@ public class OriginTermLabel implements TermLabel {
      * The origins of the term's sub-terms and former sub-terms.
      * @see #getSubtermOrigins()
      */
-    private Set<Origin> subtermOrigins;
+    private final Set<Origin> subtermOrigins;
 
     /**
      * Creates a new {@link OriginTermLabel}.
@@ -77,7 +131,7 @@ public class OriginTermLabel implements TermLabel {
      */
     public OriginTermLabel(Origin origin) {
         this.origin = origin;
-        this.subtermOrigins = new HashSet<>();
+        this.subtermOrigins = new LinkedHashSet<>();
     }
 
     /**
@@ -89,41 +143,9 @@ public class OriginTermLabel implements TermLabel {
     public OriginTermLabel(Origin origin, Set<Origin> subtermOrigins) {
         this(origin);
         this.subtermOrigins.addAll(subtermOrigins);
-        this.subtermOrigins = this.subtermOrigins.stream()
-                .filter(o -> o.specType != SpecType.NONE).collect(Collectors.toSet());
-    }
-
-    /**
-     * Creates a new {@link OriginTermLabel}.
-     *
-     * @param specType the JML spec type the term originates from.
-     * @param file the file the term originates from.
-     * @param line the line in the file.
-     * @param subtermOrigins the origins of the term's (former) subterms.
-     */
-    public OriginTermLabel(SpecType specType, String file, int line, Set<Origin> subtermOrigins) {
-        this(specType, file, line);
-        this.subtermOrigins.addAll(subtermOrigins);
-        this.subtermOrigins = this.subtermOrigins.stream()
-                .filter(o -> o.specType != SpecType.NONE).collect(Collectors.toSet());
-    }
-
-    /**
-     * Creates a new {@link OriginTermLabel}.
-     *
-     * @param specType the JML spec type the term originates from.
-     * @param file the file the term originates from.
-     * @param line the line in the file.
-     */
-    public OriginTermLabel(SpecType specType, String file, int line) {
-        String filename = file == null || file.equals("no file")
-                ? null
-                : new File(file).getName();
-                //weigl: fix #1504: On Windows the filename was not parseable as it was not a valid filename (containing ':').
-                // use more liberal old File API instead of Paths.get(file).getFileName().toString();
-
-        this.origin = new Origin(specType, filename, line);
-        this.subtermOrigins = new HashSet<>();
+        this.subtermOrigins.removeIf(o -> o.specType == SpecType.NONE);
+        // this.subtermOrigins = this.subtermOrigins.stream()
+        //        .filter(o -> o.specType != SpecType.NONE).collect(Collectors.toSet());
     }
 
     /**
@@ -132,11 +154,11 @@ public class OriginTermLabel implements TermLabel {
      * @param subtermOrigins the origins of the term's (former) subterms.
      */
     public OriginTermLabel(Set<Origin> subtermOrigins) {
-        this.origin = new Origin(SpecType.NONE, null, -1);
-        this.subtermOrigins = new HashSet<>();
-        this.subtermOrigins.addAll(subtermOrigins);
-        this.subtermOrigins = this.subtermOrigins.stream()
-                .filter(o -> o.specType != SpecType.NONE).collect(Collectors.toSet());
+        this.origin = new Origin(SpecType.NONE);
+        this.subtermOrigins = new LinkedHashSet<>(subtermOrigins);
+        this.subtermOrigins.removeIf(o -> o.specType == SpecType.NONE);
+        // this.subtermOrigins = this.subtermOrigins.stream()
+        //         .filter(o -> o.specType != SpecType.NONE).collect(Collectors.toSet());
     }
 
     @Override
@@ -185,6 +207,9 @@ public class OriginTermLabel implements TermLabel {
      *  with the specified operator.
      */
     public static boolean canAddLabel(Operator op, Services services) {
+        //TODO: Instead of not adding origin labels to certain terms, we should investigate why
+        // adding labels to these kinds of terms breaks the prover and fix these issues.
+
         final TypeConverter tc = services.getTypeConverter();
         final JavaInfo ji = services.getJavaInfo();
 
@@ -202,7 +227,9 @@ public class OriginTermLabel implements TermLabel {
                 return false;
             }
         } else {
-            return !(op instanceof Function);
+            return !(op instanceof Function)
+                    || (op.getClass().equals(Function.class)
+                            && ((Function) op).sort().extendsTrans(Sort.FORMULA));
         }
     }
 
@@ -267,46 +294,122 @@ public class OriginTermLabel implements TermLabel {
                              new ImmutableArray<>(labels));
     }
 
+    /**
+     * Compute the common origin from all origins in the passed origins set.
+     * @param origins the passed origins set
+     * @return the computed common origin
+     */
+    public static Origin computeCommonFileOrigin(final Set<FileOrigin> origins) {
+        if (origins.isEmpty()) {
+            return new Origin(SpecType.NONE);
+        }
+
+        SpecType commonSpecType = null;
+        URI commonFileName = null;
+        int commonLine = -1;
+
+        for (FileOrigin origin : origins) {
+            if (commonSpecType == null) {
+                commonSpecType = origin.specType;
+            } else if (commonSpecType != origin.specType) {
+                return new Origin(SpecType.NONE);
+            }
+
+            if (commonFileName == null) {
+                commonFileName = origin.fileName;
+            } else if (!commonFileName.equals(origin.fileName)) {
+                return new Origin(SpecType.NONE);
+            }
+
+            if (commonLine == -1) {
+                commonLine = origin.line;
+            } else if (commonLine != origin.line) {
+                return new Origin(SpecType.NONE);
+            }
+        }
+
+        if (commonFileName == null) {
+            Debug.out("commonFileName is null!");
+            return new Origin(SpecType.NONE);
+        }
+
+        return new FileOrigin(commonSpecType, commonFileName.getPath(), commonLine);
+    }
 
     /**
      * Compute the common origin from all origins in the passed origins set.
      * @param origins the passed origins set
      * @return the computed common origin
      */
-    public static Origin computeCommonOrigin(final Set<Origin> origins) {
-        SpecType commonSpecType = null;
-        String commonFileName = null;
-        int commonLine = -1;
+    public static Origin computeCommonNodeOrigin(final Set<NodeOrigin> origins) {
+        if (origins.isEmpty()) {
+            return new Origin(SpecType.NONE);
+        }
 
-        for (Origin origin : origins) {
+        SpecType commonSpecType = SpecType.NONE;
+        String commonRuleName = null;
+        int commonNr = -1;
+
+        for (NodeOrigin origin : origins) {
             if (commonSpecType == null) {
                 commonSpecType = origin.specType;
             } else if (commonSpecType != origin.specType) {
-                commonSpecType = SpecType.NONE;
-                commonFileName = null;
-                commonLine = -1;
-                break;
+                return new Origin(SpecType.NONE);
             }
 
-            if (commonFileName == null) {
-                commonFileName = origin.fileName;
-            } else if (!commonFileName.equals(origin.fileName)) {
-                commonFileName = Origin.MULTIPLE_FILES;
-                commonLine = Origin.MULTIPLE_LINES;
+            if (commonRuleName == null) {
+                commonRuleName = origin.ruleName;
+            } else if (!commonRuleName.equals(origin.ruleName)) {
+                return new Origin(SpecType.NONE);
             }
 
-            if (commonLine == -1) {
-                commonLine = origin.line;
-            } else if (commonLine != origin.line) {
-                commonLine = Origin.MULTIPLE_LINES;
+            if (commonNr == -1) {
+                commonNr = origin.nodeNr;
+            } else if (commonNr != origin.nodeNr) {
+                return new Origin(SpecType.NONE);
             }
         }
 
-        if (commonSpecType == null) {
-            commonSpecType = SpecType.NONE;
+        return new NodeOrigin(commonSpecType, commonRuleName, commonNr);
+    }
+
+    /**
+     * Compute the common origin from all origins in the passed origins set.
+     * @param origins the passed origins set
+     * @return the computed common origin
+     */
+    @SuppressWarnings("unchecked")
+    public static Origin computeCommonOrigin(final Set<? extends Origin> origins) {
+        if (origins.isEmpty()) {
+            return new Origin(SpecType.NONE);
         }
 
-        return new Origin(commonSpecType, commonFileName, commonLine);
+        Iterator<? extends Origin> it = origins.iterator();
+        Class<? extends Origin> clazz = it.next().getClass();
+
+        while (it.hasNext()) {
+            if (!it.next().getClass().equals(clazz)) {
+                return new Origin(SpecType.NONE);
+            }
+        }
+
+        if (clazz.equals(FileOrigin.class)) {
+            return computeCommonFileOrigin((Set<FileOrigin>) origins);
+        } else if (clazz.equals(NodeOrigin.class)) {
+            return computeCommonNodeOrigin((Set<NodeOrigin>) origins);
+        } else {
+            SpecType commonSpecType = SpecType.NONE;
+
+            for (Origin origin : origins) {
+                if (commonSpecType == SpecType.NONE) {
+                    commonSpecType = origin.specType;
+                } else if (commonSpecType != origin.specType) {
+                    return new Origin(SpecType.NONE);
+                }
+            }
+
+            return new Origin(commonSpecType);
+        }
     }
 
     /**
@@ -398,9 +501,7 @@ public class OriginTermLabel implements TermLabel {
 
             if ((!origins.isEmpty() || oldLabel.getOrigin().specType != SpecType.NONE)) {
                 labels.add(new OriginTermLabel(
-                        oldLabel.getOrigin().specType,
-                        oldLabel.getOrigin().fileName,
-                        oldLabel.getOrigin().line,
+                        oldLabel.getOrigin(),
                         origins));
             }
         } else if (!origins.isEmpty()) {
@@ -422,7 +523,7 @@ public class OriginTermLabel implements TermLabel {
     private static SubTermOriginData getSubTermOriginData(final ImmutableArray<Term> subs,
                                                           final Services services) {
         Term[] newSubs = new Term[subs.size()];
-        Set<Origin> origins = new HashSet<>();
+        Set<Origin> origins = new LinkedHashSet<>();
 
         for (int i = 0; i < newSubs.length; ++i) {
             newSubs[i] = collectSubtermOrigins(subs.get(i), services);
@@ -465,42 +566,134 @@ public class OriginTermLabel implements TermLabel {
     }
 
     /**
-     * An origin encapsulates some information about where in the JML specification a term
-     * originates from.
+     * An origin encapsulates some information about where a term originates from.
      *
      * @author lanzinger
      */
     public static class Origin implements Comparable<Origin> {
-
         /**
-         * Placeholder file name used for implicit specifications.
-         */
-        public static final String IMPLICIT_FILE_NAME = "<implicit>";
-
-        /**
-         * Placeholder line number used for implicit specifications.
-         */
-        public static final int IMPLICIT_LINE = -1;
-
-        /**
-         * Placeholder line number used for specifications across multiple lines.
-         */
-        public static final String MULTIPLE_FILES = "<multiple>";
-
-        /**
-         * Placeholder line number used for specifications across multiple lines.
-         */
-        public static final int MULTIPLE_LINES = -2;
-
-        /**
-         * The JML spec type the term originates from.
+         * The spec type the term originates from.
          */
         public final SpecType specType;
 
         /**
+         * Creates a new {@link OriginTermLabel.Origin}.
+         *
+         * @param specType the spec type the term originates from.
+         */
+        public Origin(SpecType specType) {
+            assert specType != null;
+
+            this.specType = specType;
+        }
+
+
+        @Override
+        public int compareTo(Origin other) {
+            return Integer.compare(hashCode(), other.hashCode());
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj != null
+                    && obj.getClass().equals(getClass()) && ((Origin) obj).specType == specType;
+        }
+
+        @Override
+        public int hashCode() {
+            return specType.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return specType + " (implicit)";
+        }
+    }
+
+    /**
+     * Origin for terms that originate from a proof node.
+     *
+     * @author lanzinger
+     */
+    public static final class NodeOrigin extends Origin {
+
+        /**
+         * The name of the rule applied at the node the term originates from.
+         */
+        public final String ruleName;
+
+        /**
+         * The {@link Node#serialNr()} of the node the term originates from.
+         */
+        public final int nodeNr;
+
+        /**
+         * Creates a new {@link OriginTermLabel.Origin}.
+         *
+         * @param specType the spec type the term originates from.
+         * @param ruleName the name of the rule applied at the node the term originates from.
+         * @param nodeNr the {@link Node#serialNr()} of the node the term originates from.
+         */
+        public NodeOrigin(SpecType specType, String ruleName, int nodeNr) {
+            super(specType);
+
+            assert ruleName != null;
+
+            this.ruleName = ruleName;
+            this.nodeNr = nodeNr;
+        }
+
+        @Override
+        public String toString() {
+            return specType + " @ node " + nodeNr + " (" + ruleName + ")";
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!super.equals(obj)) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            NodeOrigin other = (NodeOrigin) obj;
+            if (nodeNr != other.nodeNr) {
+                return false;
+            }
+            if (ruleName == null) {
+                if (other.ruleName != null) {
+                    return false;
+                }
+            } else if (!ruleName.equals(other.ruleName)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = super.hashCode();
+            result = prime * result + nodeNr;
+            result = prime * result + ((ruleName == null) ? 0 : ruleName.hashCode());
+            return result;
+        }
+    }
+
+    /**
+     * Origin for terms that originate from a file.
+     *
+     * @author lanzinger
+     */
+    public static final class FileOrigin extends Origin {
+
+        /**
          * The file the term originates from.
          */
-        public final String fileName;
+        public final URI fileName;
 
         /**
          * The line in the file the term originates from.
@@ -510,61 +703,40 @@ public class OriginTermLabel implements TermLabel {
         /**
          * Creates a new {@link OriginTermLabel.Origin}.
          *
-         * @param specType the JML spec type the term originates from.
+         * @param specType the spec type the term originates from.
          * @param fileName the file the term originates from.
          * @param line the line in the file.
          */
-        public Origin(SpecType specType, String fileName, int line) {
-            this.specType = specType;
-            this.fileName = fileName == null ? IMPLICIT_FILE_NAME : fileName;
+        public FileOrigin(SpecType specType, String fileName, int line) {
+            super(specType);
+
+            assert fileName != null;
+            assert line >= 0;
+
+            // wrap fileName into URI
+            if (fileName.equals("no file")) {
+                this.fileName = null;
+            } else {
+                this.fileName = new File(fileName).toURI();
+            }
             this.line = line;
         }
 
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder(specType.toString());
-
-            if (fileName.equals(IMPLICIT_FILE_NAME)) {
-                sb.append(" (implicit)");
-            } else if (fileName.equals(MULTIPLE_FILES)) {
-                sb.append(" (multiple files)");
+            if (fileName == null) {
+                return specType + " @ [no file]";
             } else {
-                sb.append(" @ ");
-                sb.append(fileName);
-
-                if (line == MULTIPLE_LINES) {
-                    sb.append(" (multiple lines)");
-                } else {
-                    sb.append(" @ line ");
-                    sb.append(line);
-                }
+                return specType + " @ file " + new File(fileName).getName() + " @ line " + line;
             }
-
-            return sb.toString();
-        }
-
-        @Override
-        public int compareTo(Origin other) {
-            int result = specType.toString().compareTo(other.specType.toString());
-
-            if (result == 0) {
-                result = fileName.compareTo(other.fileName);
-
-                if (result == 0) {
-                    result = Integer.compare(line, other.line);
-                }
-            }
-
-            return result;
         }
 
         @Override
         public int hashCode() {
             final int prime = 31;
-            int result = 1;
+            int result = super.hashCode();
             result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
             result = prime * result + line;
-            result = prime * result + ((specType == null) ? 0 : specType.hashCode());
             return result;
         }
 
@@ -573,17 +745,13 @@ public class OriginTermLabel implements TermLabel {
             if (this == obj) {
                 return true;
             }
-
-            if (obj == null) {
+            if (!super.equals(obj)) {
                 return false;
             }
-
             if (getClass() != obj.getClass()) {
                 return false;
             }
-
-            Origin other = (Origin) obj;
-
+            FileOrigin other = (FileOrigin) obj;
             if (fileName == null) {
                 if (other.fileName != null) {
                     return false;
@@ -591,15 +759,9 @@ public class OriginTermLabel implements TermLabel {
             } else if (!fileName.equals(other.fileName)) {
                 return false;
             }
-
             if (line != other.line) {
                 return false;
             }
-
-            if (specType != other.specType) {
-                return false;
-            }
-
             return true;
         }
     }
@@ -693,7 +855,12 @@ public class OriginTermLabel implements TermLabel {
         RETURNS("returns"),
 
         /**
-         * None. Used for terms that do not originate from a JML spec and terms whose origin was
+         * Interaction. Used for terms entered by the user.
+         */
+        INTERACTION("User_Interaction"),
+
+        /**
+         * None. Used when no other spec type fits and for terms whose origin was
          * not set upon their creation.
          */
         NONE("<none>");

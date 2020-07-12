@@ -16,7 +16,9 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.nio.file.Path;
 
+import de.uka.ilkd.key.gui.ProofSelectionDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -47,9 +49,20 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
             if (recentFile != null) {
                 File file = new File(recentFile);
                 KeYFileChooser fileChooser =
-                        KeYFileChooser.getFileChooser("Select file to load proof or problem");
+                    KeYFileChooser.getFileChooser("Select file to load proof or problem");
                 fileChooser.selectFile(file);
-                mainWindow.loadProblem(file);
+
+                if (ProofSelectionDialog.isProofBundle(file.toPath())) {
+                    Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
+                    if (proofPath == null) {
+                        // canceled by user
+                        return;
+                    } else {
+                        mainWindow.loadProofFromBundle(file, proofPath.toFile());
+                    }
+                } else {
+                    mainWindow.loadProblem(file);
+                }
             }
         }
     }

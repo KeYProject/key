@@ -1,5 +1,52 @@
 package de.uka.ilkd.key.gui.sourceview;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
+import javax.swing.text.Document;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
+import javax.swing.text.SimpleAttributeSet;
+
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.IOUtil.LineInformation;
+
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -9,44 +56,26 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.statement.Else;
 import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.IOUtil.LineInformation;
-
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
-import javax.swing.text.Document;
-import javax.swing.text.Highlighter.Highlight;
-import javax.swing.text.Highlighter.HighlightPainter;
-import javax.swing.text.SimpleAttributeSet;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map.Entry;
-
-import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR;
 
 /**
  * This class is responsible for showing the source code and visualizing the symbolic execution
@@ -59,7 +88,7 @@ import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_CO
  * Editing the source code in the tabs is currently not implemented
  * (not supported by {@link JavaDocument}).
  *
- * @author Wolfram Pfeifer
+ * @author Wolfram Pfeifer, lanzinger
  */
 public final class SourceView extends JComponent {
 
@@ -91,14 +120,25 @@ public final class SourceView extends JComponent {
      */
     private static final ColorSettings.ColorProperty NORMAL_HIGHLIGHT_COLOR =
             ColorSettings.define("[SourceView]normalHighlight",
-            "Color for Highlighting things in source view", new Color(194, 245, 194));
+            "Color for highlighting symbolically executed lines in source view",
+            new Color(194, 245, 194));
 
     /**
      * The color of the most recent highlight in source code (green).
      */
     private static final ColorSettings.ColorProperty MOST_RECENT_HIGHLIGHT_COLOR =
             ColorSettings.define("[SourceView]mostRecentHighlight",
-                    "Second color for highlightning",
+                    "Color for highlighting most recently"
+                    + " symbolically executed line in source view",
+                    new Color(57, 210, 81));
+
+    /**
+     * The color of the most recent highlight in source code (green).
+     */
+    private static final ColorSettings.ColorProperty TAB_HIGHLIGHT_COLOR =
+            ColorSettings.define("[SourceView]tabHighlight",
+                    "Color for highlighting source view tabs"
+                    + " whose files contain highlighted lines.",
                     new Color(57, 210, 81));
 
     /**
@@ -107,44 +147,32 @@ public final class SourceView extends JComponent {
     private final MainWindow mainWindow;
 
     /**
-     * The container for the tabs containing source code.
+     * Maps every file to a tab.
      */
-    private final JTabbedPane tabs;
+    private final Map<URI, Tab> tabs = new HashMap<>();
 
     /**
-     * Stores the actual textPanes of the tabs. Needed for correct updates when font (size) changes.
+     * Pane containing the tabs.
      */
-    private final List<JTextPane> textPanes = new LinkedList<JTextPane>();
+    private final TabbedPane tabPane = new TabbedPane();
+
+    /**
+     * Currently selected file.
+     */
+    private URI selectedFile = null;
 
     /**
      * The status bar for displaying information about the current proof branch.
      */
     private final JLabel sourceStatusBar;
 
-    /* TODO: make proof independent, move sources and hashes to proof.services.JavaModel or similar
-     * There is still a consistency problem here if the proof is change: In that case the code is
-     * silently reloaded from the (possibly changed) file. This will be solved in future work.
-     * Corresponding feature request:
-     */
-    /**
-     * HashMap mapping filenames to files (of the current proof!).
-     */
-    private HashMap<String, File> files = new HashMap<String, File>();
-
-    /**
-     * HashMap mapping filenames to hashes of the content (files of the current proof!).
-     */
-    private HashMap<String, String> hashes = new HashMap<String, String>();
-
-    /**
-     * HashMap mapping filenames to content strings (files of the current proof!).
-     */
-    private HashMap<String, String> sources = new HashMap<String, String>();
-
     /**
      * Lines to highlight (contains all highlights of the current proof) and corresponding Nodes.
      */
     private LinkedList<Pair<Node, PositionInfo>> lines;
+
+    /** The symbolic execution highlights. */
+    private Set<Highlight> symbExHighlights = new HashSet<>();
 
     /**
      * Creates a new JComponent with the given MainWindow and adds change listeners.
@@ -154,9 +182,25 @@ public final class SourceView extends JComponent {
         super();
         this.mainWindow = mainWindow;
 
-        tabs = new JTabbedPane();
         sourceStatusBar = new JLabel();
-        tabs.setBorder(new TitledBorder("No source loaded"));
+        tabPane.setBorder(new TitledBorder(NO_SOURCE));
+
+        tabPane.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if (tabPane.getSelectedTab() == null) {
+                    selectedFile = null;
+                } else {
+                    selectedFile = tabPane.getSelectedTab().absoluteFileName;
+                }
+
+                // Mark tabs that contain highlights.
+                for (Tab tab : tabs.values()) {
+                    tab.markTabComponent();
+                }
+            }
+        });
 
         // set the same style as the main status line:
         sourceStatusBar.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -168,15 +212,15 @@ public final class SourceView extends JComponent {
         sourceStatusBar.setHorizontalAlignment(SwingConstants.CENTER);
 
         setLayout(new BorderLayout());
-        add(tabs, BorderLayout.CENTER);
+        add(tabPane, BorderLayout.CENTER);
         add(sourceStatusBar, BorderLayout.SOUTH);
 
         // react to font changes
         Config.DEFAULT.addConfigChangeListener(new ConfigChangeListener() {
             @Override
             public void configChanged(ConfigChangeEvent e) {
-                for (JTextPane tp : textPanes) {
-                    tp.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
+                for (Tab tab : tabs.values()) {
+                    tab.textPane.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
                 }
             }
         });
@@ -192,7 +236,7 @@ public final class SourceView extends JComponent {
 
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
-                clearCaches();
+                clear();
                 updateGUI();
             }
         });
@@ -203,186 +247,229 @@ public final class SourceView extends JComponent {
     }
 
     /**
-     * This listener checks if a highlighted section is clicked. If true, a jump in the proof tree
-     * to the most recently created node (in the current branch) containing the highlighted
-     * statement is performed.<br>
-     * <b>Note:</b> No jumping down in the proof tree is possible. Implementing this would be
-     * non-trivial, because it was not unique into which branch we would want to descent.
-     *
-     * @author Wolfram Pfeifer
+     * Returns the singleton instance of the SourceView.
+     * @param mainWindow KeY's main window
+     * @return the component responsible for showing source code and symbolic execution information
      */
-    private class TextPaneMouseAdapter extends MouseAdapter {
-        /**
-         * The precalculated start indices of the lines. Used to compute the clicked line number.
-         */
-        final LineInformation[] li;
+    public static SourceView getSourceView(MainWindow mainWindow) {
+        if (instance == null) {
+            instance = new SourceView(mainWindow);
+        }
+        return instance;
+    }
 
-        /**
-         * The Painter used for painting the highlights (except for the most recent one).
-         */
-        final HighlightPainter painter;
+    /**
+     * <p> Creates a new highlight. </p>
+     *
+     * <p> If the are multiple highlights for a given line, they are drawn on top of each other,
+     *  starting with the one with the lowest level. </p>
+     *
+     * <p> The highlights added by the {@code SourceView} itself have level {@code 0},
+     *  except for the highlight that appears when the user moves the mouse over a line,
+     *  which has level {@code Integer.maxValue() - 1}. </p>
+     *
+     * @param fileURI the URI of the file in which to create the highlight.
+     * @param line the line to highlight.
+     * @param color the color to use for the highlight.
+     * @param level the level of the highlight.
+     * @return the highlight.
+     *
+     * @throws BadLocationException if the line number is invalid.
+     * @throws IOException if the file cannot be read.
+     */
+    public Highlight addHighlight(URI fileURI, int line, Color color, int level)
+            throws BadLocationException, IOException {
+        openFile(fileURI);
 
-        /**
-         * The JTextPane containing the source code.
-         */
-        final JTextPane textPane;
+        Tab tab = tabs.get(fileURI);
 
-        /**
-         * The filename of the file whose content is displayed in the JTextPane.
-         */
-        final String filename;
-
-        public TextPaneMouseAdapter(JTextPane textPane, LineInformation[] li,
-                HighlightPainter painter, String filename) {
-            this.textPane = textPane;
-            this.li = li;
-            this.painter = painter;
-            this.filename = filename;
+        if (tab == null || line < 0 || line >= tab.lineInformation.length) {
+            throw new BadLocationException("Not a valid line number for " + fileURI, line);
         }
 
-        /**
-         * Checks if the given position is within a highlight.
-         * @param pos the position to check
-         * @return true if highlighted and false if not
-         */
-        private boolean isHighlighted(int pos) {
-            Highlight[] hs = textPane.getHighlighter().getHighlights();
-            for (Highlight h : hs) {
-                // search for highlight by the same painter
-                if (h.getPainter() == painter) {
-                    // check if the position is within the highlighted range
-                    if (h.getStartOffset() <= pos && h.getEndOffset() >= pos) {
-                        return true;
+        if (!tab.highlights.containsKey(line)) {
+            tab.highlights.put(line, new TreeSet<>(Collections.reverseOrder()));
+        }
+
+        SortedSet<Highlight> highlights = tab.highlights.get(line);
+
+        Highlight highlight = new Highlight(fileURI, line, color, level);
+        highlights.add(highlight);
+
+        tab.markTabComponent();
+
+        tab.removeHighlights(line);
+        tab.applyHighlights(line);
+
+        return highlight;
+    }
+
+    /**
+     * <p> Creates a new set of highlights for a range of lines starting with {@code firstLine}.
+     * </p>
+     *
+     * <p> This method applies a heuristic to try and highlight the complete JML statement
+     *  starting in {@code firstLine}. </p>
+     *
+     * @param fileURI the URI of the file in which to create the highlights.
+     * @param firstLine the first line to highlight.
+     * @param color the color to use for the highlights.
+     * @param level the level of the highlights.
+     * @return the highlights.
+     *
+     * @throws BadLocationException if the line number is invalid.
+     * @throws IOException if the file cannot be read.
+     */
+    public Set<Highlight> addHighlightsForJMLStatement(
+            URI fileURI, int firstLine, Color color, int level)
+            throws BadLocationException, IOException {
+        openFile(fileURI);
+
+        Tab tab = tabs.get(fileURI);
+
+        String[] lines = tab != null ? tab.source.split("\\R", -1) : new String[] {};
+
+        // If we are in a JML comment, highlight everything until the next semicolon.
+        // Otherwise, just highlight the first line.
+        int lastLine = firstLine;
+        if (0 < lines.length && lines[firstLine - 1].trim().startsWith("@")) {
+            int parens = 0;
+
+            outer_loop:
+            for (int i = firstLine; i <= lines.length; ++i) {
+                for (int j = 0; j < lines[i - 1].length(); ++j) {
+                    if (lines[i - 1].charAt(j) == '(') {
+                        ++parens;
+                    } else if (lines[i - 1].charAt(j) == ')') {
+                        --parens;
+                    } else if (parens == 0 && lines[i - 1].charAt(j) == ';') {
+                        lastLine = i;
+                        break outer_loop;
                     }
                 }
             }
+        }
+
+        Set<Highlight> result = new HashSet<Highlight>();
+
+        for (int i = firstLine; i <= lastLine && tab != null; ++i) {
+            result.add(addHighlight(fileURI, i, color, level));
+        }
+
+        return result;
+    }
+
+    /**
+     * Moves an existing highlight to another line.
+     *
+     * @param highlight the highlight to change.
+     * @param newLine the line to move the highlight to.
+     *
+     * @throws BadLocationException if the line number is invalid.
+     */
+    public void changeHighlight(Highlight highlight, int newLine)
+            throws BadLocationException {
+        URI fileURI = highlight.getFileURI();
+        int oldLine = highlight.getLine();
+
+        Tab tab = tabs.get(fileURI);
+
+        if (tab == null
+                || !tab.highlights.containsKey(oldLine)
+                || !tab.highlights.get(oldLine).contains(highlight)) {
+            throw new IllegalArgumentException("highlight");
+        }
+
+        tab.removeHighlights(oldLine);
+        tab.highlights.get(oldLine).remove(highlight);
+        tab.applyHighlights(oldLine);
+
+        if (tab.highlights.get(oldLine).isEmpty()) {
+            tab.highlights.remove(oldLine);
+        }
+
+        highlight.line = newLine;
+        highlight.setTag(null);
+
+        if (!tab.highlights.containsKey(newLine)) {
+            tab.highlights.put(newLine, new TreeSet<>());
+        }
+
+        tab.highlights.get(newLine).add(highlight);
+        tab.removeHighlights(newLine);
+        tab.applyHighlights(newLine);
+    }
+
+    /**
+     * Removes a highlight.
+     *
+     * @param highlight the highlight to remove.
+     * @return {@code true} iff
+     *      this {@code SourceView} previously contained the specified highlight.
+     */
+    public boolean removeHighlight(Highlight highlight) {
+        Tab tab = tabs.get(highlight.getFileURI());
+
+        if (tab == null) {
             return false;
         }
 
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            int pos = textPane.viewToModel(e.getPoint());
-            if (isHighlighted(pos)) {
-                int line = 0;
-                // calculate the line number
-                while (line < li.length - 1) {
-                    if (li[line].getOffset() <= pos && pos < li[line + 1].getOffset()) {
-                        break;
-                    }
-                    line++;
-                }
-                // jump in proof tree (get corresponding node from list)
-                Node n = null;
-                for (Pair<Node, PositionInfo> p : lines) {
-                    if (p.second.getStartPosition().getLine() == line + 1
-                            && p.second.getFileName().equals(filename)) {
-                        n = p.first;
-                        break;
-                    }
-                }
-                if (n != null) {
-                    mainWindow.getMediator().getSelectionModel().setSelectedNode(n);
-                }
+        tab.removeHighlights(highlight.getLine());
+
+        boolean result = tab.highlights.containsKey(highlight.getLine())
+                && tab.highlights.get(highlight.getLine()).remove(highlight);
+        highlight.setTag(null);
+
+        if (result && tab.highlights.get(highlight.getLine()).isEmpty()) {
+            tab.highlights.remove(highlight.getLine());
+        } else {
+            try {
+                tab.applyHighlights(highlight.getLine());
+            } catch (BadLocationException e) {
+                // The locations of the highlights have already been checked
+                // in addHighlight & changeHighlight, so no error can occur here.
+                throw new AssertionError();
             }
         }
+
+        tab.markTabComponent();
+
+        return result;
     }
 
     /**
-     * Paints the highlights for symbolically executed lines. The most recently executed line is
-     * highlighted with a different color.
-     * @param textPane the JTextPane containing the source code
-     * @param li precalculated start indices of the lines
-     * @param filename the filename corresponding to the given JTextPane
-     * @param hp the painter to use for highlighting
+     * Adds an additional tab for the specified file.
+     *
+     * @param fileURI the URI of the file to open.
+     *
+     * @throws IOException if the file cannot be opened.
      */
-    private void paintSymbExHighlights(JTextPane textPane, LineInformation[] li, String filename,
-            HighlightPainter hp) {
-        try {
-            for (int i = 0; i < lines.size(); i++) {
-                Pair<Node, PositionInfo> l = lines.get(i);
-                if (filename.equals(l.second.getFileName())) {
-                    Range r = calculateLineRange(textPane,
-                            li[l.second.getStartPosition().getLine() - 1].getOffset());
-                    // use a different color for most recent
-                    if (i == 0) {
-                        textPane.getHighlighter().addHighlight(r.start(), r.end(),
-                                new DefaultHighlightPainter(MOST_RECENT_HIGHLIGHT_COLOR.get()));
-                    } else {
-                        textPane.getHighlighter().addHighlight(r.start(), r.end(), hp);
-                    }
-                }
+    public void openFile(URI fileURI) throws IOException {
+        Set<URI> set = new HashSet<>();
+        set.add(fileURI);
+        openFiles(set);
+    }
+
+    /**
+     * Adds additional tabs for the specified files.
+     *
+     * @param fileURIs the URIs of the files to open.
+     *
+     * @throws IOException if one of the files cannot be opened.
+     */
+    public void openFiles(Set<URI> fileURIs) throws IOException {
+        boolean updateNecessary = false;
+
+        for (URI fileURI : fileURIs) {
+            if (addFile(fileURI)) {
+                updateNecessary = true;
+                mainWindow.getMediator().getSelectedNode().getNodeInfo().addRelevantFile(fileURI);
             }
-        } catch (BadLocationException e) {
-            Debug.out(e);
-        }
-    }
-
-    /**
-     * Paints the highlight for the line where the mouse pointer currently points to.
-     * @param textPane the textPane to highlight lines
-     * @param p the current position of the mouse pointer
-     * @param tag the highlight to change
-     */
-    private static void paintSelectionHighlight(JTextPane textPane, Point p, Object tag) {
-        Range r = calculateLineRange(textPane, p);
-        try {
-            textPane.getHighlighter().changeHighlight(tag, r.start(), r.end());
-        } catch (BadLocationException e) {
-            Debug.out(e);
-        }
-    }
-
-    /**
-     * Calculates the range of actual text (not whitespace) in the line under the given point.
-     * @param textPane the JTextPane with the text
-     * @param p the point to check
-     * @return the range of text (may be empty if there is just whitespace in the line)
-     */
-    private static Range calculateLineRange(JTextPane textPane, Point p) {
-        return calculateLineRange(textPane, textPane.viewToModel(p));
-    }
-
-    /**
-     * Calculates the range of actual text (not whitespace) in the line containing the given
-     * position.
-     * @param textPane the JTextPane with the text
-     * @param pos the position to check
-     * @return the range of text (may be empty if there is just whitespace in the line)
-     */
-    private static Range calculateLineRange(JTextPane textPane, int pos) {
-        Document doc = textPane.getDocument();
-        String text = "";
-        try {
-            text = doc.getText(0, doc.getLength());
-        } catch (BadLocationException e) {
-            Debug.out(e);
         }
 
-        // find line end
-        int end = text.indexOf('\n', pos);
-        end = end == -1 ? text.length() : end;      // last line?
-
-        // find line start
-        int start = text.lastIndexOf('\n', pos - 1);          // TODO: different line endings?
-        start = start == -1 ? 0 : start;            // first line?
-
-        // ignore whitespace at the beginning of the line
-        while (start < text.length() && start < end && Character.isWhitespace(text.charAt(start))) {
-            start++;
+        if (updateNecessary) {
+            updateGUI();
         }
-
-        return new Range(start, end);
-    }
-
-    /**
-     * Clears cached files, lines, and existing tabs.
-     */
-    private void clearCaches() {
-        files.clear();
-        hashes.clear();
-        sources.clear();
-        lines = null;
-        tabs.removeAll();
     }
 
     /**
@@ -393,122 +480,83 @@ public final class SourceView extends JComponent {
     private static String replaceTabs(String s) {
         // fill a new array with the specified amount of spaces
         char[] rep = new char[TAB_SIZE];
-        for (int i = 0; i < rep.length; i++) {
-            rep[i] = ' ';
-        }
+        Arrays.fill(rep, ' ');
         return s.replace("\t", new String(rep));
     }
 
+    private boolean isSelected(Tab tab) {
+        return Objects.equals(selectedFile, tab.absoluteFileName);
+    }
+
     /**
-     * Initializes a new JTextPane with the source code from the file in the HashMap entry.
-     * In addition, listeners are added and highlights are painted.
-     * @param entry the HashMap entry containing the file
+     * Adds all files relevant to the currently selected node, closing all others
+     *
+     * @see NodeInfo#getRelevantFiles()
      */
-    private void initTextPane(Entry<String, File> entry) {
-        try {
-            JTextPane textPane = new JTextPane();
-            textPanes.add(textPane);
+    private void addFiles() throws IOException {
+        ImmutableSet<URI> fileURIs =
+                mainWindow.getMediator().getSelectedNode().getNodeInfo().getRelevantFiles();
 
-            // We use the same font as in SequentView for consistency.
-            textPane.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
-            textPane.setToolTipText(TEXTPANE_TOOLTIP);
-            textPane.setEditable(false);
+        Iterator<URI> it = tabs.keySet().iterator();
 
-            // compare stored hash with a newly created
-            //String origHash = hashes.get(entry.getKey());
-            //String curHash = IOUtil.computeMD5(entry.getValue());
-            //if (!origHash.equals(curHash)) {
-                    // TODO: consistency problem, see comment in line 128
-            //}
+        while (it.hasNext()) {
+            URI fileURI = it.next();
 
-            String original = sources.get(entry.getKey());
-            String source = replaceTabs(original);  // replace all tabs by spaces
+            if (!fileURIs.contains(fileURI)) {
+                Tab tab = tabs.get(fileURI);
+                it.remove();
+                tabPane.remove(tab);
+            }
+        }
 
-            // use input stream here to compute line information of the string with replaced tabs
-            InputStream inStream = new ByteArrayInputStream(source.getBytes());
-            LineInformation[] li = IOUtil.computeLineInformation(inStream);
-
-            JavaDocument doc = new JavaDocument();
-            textPane.setDocument(doc);
-            doc.insertString(0, source, new SimpleAttributeSet());
-
-            // add a listener to highlight the line currently pointed to
-            Object selectionHL = textPane.getHighlighter().addHighlight(0, 0,
-                    new DefaultHighlightPainter(DEFAULT_HIGHLIGHT_COLOR.get()));
-            textPane.addMouseMotionListener(new MouseMotionListener() {
-                @Override
-                public void mouseMoved(MouseEvent e) {
-                    paintSelectionHighlight(textPane, e.getPoint(), selectionHL);
-                }
-
-                @Override
-                public void mouseDragged(MouseEvent e) {
-                }
-            });
-
-            // paint the highlights (symbolically executed lines) for this file
-            HighlightPainter hp = new DefaultHighlightPainter(NORMAL_HIGHLIGHT_COLOR.get());
-            paintSymbExHighlights(textPane, li, entry.getKey(), hp);
-
-            textPane.addMouseListener(new TextPaneMouseAdapter(textPane, li, hp, entry.getKey()));
-
-            /* for each File, create a Tab in TabbedPane
-             * (additional panel is needed to prevent line wrapping) */
-            JPanel nowrap = new JPanel(new BorderLayout());
-            nowrap.add(textPane);
-            JScrollPane textScrollPane = new JScrollPane();
-            textScrollPane.setViewportView(nowrap);
-            textScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            textScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-
-            // increase unit increment (for faster scrolling)
-            textScrollPane.getVerticalScrollBar().setUnitIncrement(30);
-            textScrollPane.getHorizontalScrollBar().setUnitIncrement(30);
-
-            tabs.addTab(entry.getValue().getName(), textScrollPane);
-
-            // add the full path as tooltip for the tab
-            int index = tabs.indexOfTab(entry.getValue().getName());
-            tabs.setToolTipTextAt(index, entry.getValue().getAbsolutePath());
-        } catch (IOException e) {
-            Debug.out("An error occurred while reading " + entry.getValue().getAbsolutePath(), e);
-        } catch (BadLocationException e) {
-            Debug.out(e);
+        for (URI fileURI : fileURIs) {
+            addFile(fileURI);
         }
     }
 
     /**
-     * Fills the HashMaps containing Files and translations from lines (in source code) to
-     * corresponding nodes in proof tree.
+     * Adds a file (identified by its URI) to this source view.
+     *
+     * @param fileURI the URI of the file to add.
+     * @return {@code true} if this source view did not already contain the file.
+     * @throws IOException if the file cannot be opened.
      */
-    private void fillMaps() {
-        for (Pair<Node, PositionInfo> p : lines) {
-            PositionInfo l = p.second;
-            File f = new File(l.getFileName());
-            if (f.exists() && files.putIfAbsent(l.getFileName(), f) == null) {
-                try {
-                    String text = IOUtil.readFrom(f);
-                    if (text != null && !text.isEmpty()) {
-                        hashes.put(l.getFileName(), IOUtil.computeMD5(f));
-                        sources.put(l.getFileName(), text);
-                    }
-                } catch (IOException e) {
-                    Debug.out("Unknown IOException!", e);
+    private boolean addFile(URI fileURI) throws IOException {
+        // quick fix: fileName could be null (see bug #1520)
+        if (fileURI == null || tabs.containsKey(fileURI)) {
+            return false;
+        } else {
+            // try to load the file via the FileRepo
+            Proof proof = mainWindow.getMediator().getSelectedProof();
+            FileRepo repo = proof.getInitConfig().getFileRepo();
+
+            try (InputStream is = repo.getInputStream(fileURI.toURL())) {
+                if (is != null) {
+                    // fileName and file.getAbsolutePath() should be equal here,
+                    // but because of a bug somewhere in Recoder2KeY, on Windows, fileName
+                    // is of the (illegal!) form "/C:/path/to/file/" which the File constructor
+                    // silently converts to the correct form "C:\path\to\file".
+                    // Using file.getAbsolutePath() instead of fileName makes the SourceView
+                    // behave weirdly on Windows systems.
+
+                    Tab tab = new Tab(fileURI, is);
+                    tabs.put(fileURI, tab);
+                    // filename as tab title, complete file URI as tooltip
+                    tabPane.addTab(tab.simpleFileName, tab);
+                    int index = tabPane.indexOfComponent(tab);
+                    tabPane.setToolTipTextAt(index, tab.absoluteFileName.toString());
+                    tab.paintSymbExHighlights();
+                    return true;
                 }
             }
         }
+        throw new IOException("Could not open file: " + fileURI);
     }
 
-    /**
-     * Returns the singleton instance of the SourceView.
-     * @param mainWindow KeY's main window
-     * @return the component responsible for showing source code and symbolic execution information
-     */
-    public static JComponent getSourceView(MainWindow mainWindow) {
-        if (instance == null) {
-            instance = new SourceView(mainWindow);
-        }
-        return instance;
+    private void clear() {
+        lines = null;
+        tabs.clear();
+        tabPane.removeAll();
     }
 
     /**
@@ -522,45 +570,41 @@ public final class SourceView extends JComponent {
      */
     private void updateGUI() {
         Node currentNode = mainWindow.getMediator().getSelectedNode();
-        textPanes.clear();
-        tabs.removeAll();
 
-        if (currentNode == null) {
-            tabs.setBorder(new TitledBorder(NO_SOURCE));
-            sourceStatusBar.setText(NO_SOURCE);
-            return;
+        if (currentNode != null) {
+            // get PositionInfo of all symbEx nodes
+            lines = constructLinesSet(currentNode);
+            if (lines == null) {
+                tabPane.setBorder(new TitledBorder(NO_SOURCE));
+                sourceStatusBar.setText(NO_SOURCE);
+                return;
+            }
+
+            try {
+                addFiles();
+            } catch (IOException e) {
+                Debug.out(e);
+            }
         }
 
-        // get PositionInfo of all symbEx nodes
-        lines = constructLinesSet(currentNode);
-        if (lines == null) {
-            tabs.setBorder(new TitledBorder(NO_SOURCE));
-            sourceStatusBar.setText(NO_SOURCE);
-            return;
-        }
+        tabs.values().forEach(Tab::paintSymbExHighlights);
 
-        fillMaps();
-
-        // create and initialize a new TextPane for every file
-        for (Entry<String, File> entry : files.entrySet()) {
-            initTextPane(entry);
-        }
-        if (tabs.getTabCount() > 0) {
-            tabs.setBorder(new EmptyBorder(0, 0, 0, 0));
+        if (tabPane.getTabCount() > 0) {
+            tabPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 
             // activate the tab with the most recent file
             PositionInfo p = lines.isEmpty() ? null : lines.getFirst().second;
             if (p != null) {
-                File f = files.get(p.getFileName());
-                if (f != null) {
-                    String s = f.getName();
-                    for (int i = 0; i < tabs.getTabCount(); i++) {
-                        if (tabs.getTitleAt(i).equals(s)) {
-                            tabs.setSelectedIndex(i);
+                Tab t = tabs.get(p.getURI());
+                if (t != null) {
+                    String s = t.simpleFileName;
+                    for (int i = 0; i < tabPane.getTabCount(); i++) {
+                        if (tabPane.getTitleAt(i).equals(s)) {
+                            tabPane.setSelectedIndex(i);
 
                             // scroll to most recent highlight
                             int line = lines.getFirst().second.getEndPosition().getLine();
-                            scrollNestedTextPaneToLine(tabs.getComponent(i), line, f);
+                            t.scrollToLine(line);
                         }
                     }
                 }
@@ -569,76 +613,102 @@ public final class SourceView extends JComponent {
             // set the path information in the status bar
             sourceStatusBar.setText(collectPathInformation(currentNode));
         } else {
-            tabs.setBorder(new TitledBorder(NO_SOURCE));
+            tabPane.setBorder(new TitledBorder(NO_SOURCE));
             sourceStatusBar.setText(NO_SOURCE);
         }
     }
 
-    /**
-     * Looks for a nested JTextPane in the component of the JTabbedPane.
-     * If it exists, JTextPane is scrolled to the given line.
-     * @param comp the component of a JTabbedPane
-     * @param line the line to scroll to
-     * @param f the file of the JTextPane
-     */
-    private static void scrollNestedTextPaneToLine(Component comp, int line, File f) {
-        if (comp instanceof JScrollPane) {
-            JScrollPane sp = (JScrollPane)comp;
-            if (sp.getComponent(0) instanceof JViewport) {
-                JViewport vp = (JViewport)sp.getComponent(0);
-                if (vp.getComponent(0) instanceof JPanel) {
-                    JPanel panel = (JPanel)vp.getComponent(0);
-                    if (panel.getComponent(0) instanceof JTextPane) {
-                        JTextPane tp = (JTextPane)panel.getComponent(0);
-                        try {
-                            String original = IOUtil.readFrom(f);
-                            String source = replaceTabs(original);  // replace all tabs by spaces
-
-                            /* use input stream here to compute line information of the string with
-                             * replaced tabs
-                             */
-                            InputStream inStream = new ByteArrayInputStream(source.getBytes());
-                            LineInformation[] li = IOUtil.computeLineInformation(inStream);
-                            int offs = li[line].getOffset();
-                            tp.setCaretPosition(offs);
-                        } catch (IOException e) {
-                            Debug.out(e);
-                        }
-                    }
-                }
-            }
+    private void addPosToList(
+            PositionInfo pos, LinkedList<Pair<Node, PositionInfo>> list, Node node) {
+        if (pos != null
+                && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
+                && pos.getURI() != null) {
+            list.addLast(new Pair<>(node, pos));
+            node.getNodeInfo().addRelevantFile(pos.getURI());
         }
     }
 
     /**
      * Collects the set of lines to highlight starting from the given node in the proof tree.
-     * @param cur the given node
+     * @param node the given node
      * @return a linked list of pairs of PositionInfo objects containing the start and end
      * positions for the highlighting and Nodes.
      */
-    private static LinkedList<Pair<Node, PositionInfo>> constructLinesSet(Node cur) {
-        LinkedList<Pair<Node, PositionInfo>> list = new LinkedList<Pair<Node, PositionInfo>>();
+    private LinkedList<Pair<Node, PositionInfo>> constructLinesSet(Node node) {
+        LinkedList<Pair<Node, PositionInfo>> list = new LinkedList<>();
 
-        if (cur == null) {
+        if (node == null) {
             return null;
         }
+
+        Node cur = node;
 
         do {
             SourceElement activeStatement = cur.getNodeInfo().getActiveStatement();
             if (activeStatement != null) {
-                if (activeStatement instanceof SourceElement) {
-                    PositionInfo pos = joinPositionsRec((SourceElement)activeStatement);
-
-                    // we are only interested in well defined PositionInfo objects with a file name
-                    if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
-                            && pos.getFileName() != null) {
-                        list.addLast(new Pair<Node, PositionInfo>(cur, pos));
-                    }
-                }
+                addPosToList(joinPositionsRec(activeStatement), list, cur);
             }
             cur = cur.parent();
 
         } while (cur != null);
+
+        if (list.isEmpty()) {
+            // If the list is empty, search the sequent for method body statements
+            // and add the files containing the called methods.
+            // This is a hack to make sure that the file containing the method which the current
+            // proof obligation belongs to is always loaded.
+
+            node.sequent().forEach(formula ->
+                formula.formula().execPostOrder(new de.uka.ilkd.key.logic.Visitor() {
+
+                    @Override
+                    public boolean visitSubtree(Term visited) {
+                        return visited.containsJavaBlockRecursive();
+                    }
+
+                    @Override
+                    public void visit(Term visited) { }
+
+                    @Override
+                    public void subtreeLeft(Term subtreeRoot) { }
+
+                    @Override
+                    public void subtreeEntered(Term subtreeRoot) {
+                        if (subtreeRoot.javaBlock() != null) {
+                            JavaASTVisitor visitor = new JavaASTVisitor(
+                                    subtreeRoot.javaBlock().program(),
+                                    mainWindow.getMediator().getServices()) {
+
+                                @Override
+                                protected void doDefaultAction(SourceElement el) {
+                                    if (el instanceof MethodBodyStatement) {
+                                        MethodBodyStatement mb = (MethodBodyStatement) el;
+                                        Statement body = mb.getBody(services);
+                                        PositionInfo posInf = null;
+                                        // try to find position information of the source element
+                                        if (body != null) {
+                                            posInf = body.getPositionInfo();
+                                        } else {
+                                            // the method is declared without a body
+                                            // -> we try to show the file either way
+                                            IProgramMethod pm = mb.getProgramMethod(services);
+                                            if (pm != null) {
+                                                posInf = pm.getPositionInfo();
+                                            }
+                                        }
+                                        if (posInf != null && posInf.getURI() != null) {
+                                            node.getNodeInfo().addRelevantFile(posInf.getURI());
+                                        }
+                                    }
+                                }
+                            };
+                            visitor.start();
+                        }
+                    }
+                })
+            );
+        }
+
         return list;
     }
 
@@ -696,7 +766,10 @@ public final class SourceView extends JComponent {
                         || label.startsWith("Post (")               // postcondition of a method
                         || label.contains("Normal Execution")
                         || label.contains("Null Reference")
-                        || label.contains("Index Out of Bounds")) {
+                        || label.contains("Index Out of Bounds")
+                        || label.contains("Validity")
+                        || label.contains("Precondition")
+                        || label.contains("Usage")) {
                     return label;
                 }
             }
@@ -704,5 +777,600 @@ public final class SourceView extends JComponent {
         }
         // if no label was found we have to prove the postcondition
         return "Show Postcondition/Assignable";
+    }
+
+    /**
+     * The type of the tabbed pane contained in this {@code SourceView}.
+     *
+     * @author lanzinger
+     * @see #tabPane
+     */
+    private final static class TabbedPane extends JTabbedPane {
+        private static final long serialVersionUID = -5438740208669700183L;
+
+        Tab getSelectedTab() {
+            return (Tab) getSelectedComponent();
+        }
+    }
+
+    /**
+     * Wrapper for all tab-specific data, i.e., all data pertaining to the file shown in the tab.
+     *
+     * @author Wolfram Pfeifer
+     * @author lanzinger
+     */
+    private final class Tab extends JScrollPane {
+        private static final long serialVersionUID = -8964428275919622930L;
+
+        /**
+         * The file this tab belongs to.
+         */
+        private final URI absoluteFileName;
+
+        /**
+         * The file this tab belongs to.
+         */
+        private final String simpleFileName;
+
+        /**
+         * The text pane containing the file's content.
+         */
+        private final JTextPane textPane = new JTextPane();
+
+        /**
+         * The line information for the file this tab belongs to.
+         */
+        private LineInformation[] lineInformation;
+
+        /**
+         * The file's content with tabs replaced by spaces.
+         */
+        private String source;
+
+        /**
+         * The highlight for the user's selection.
+         */
+        private Highlight selectionHL;
+
+        /**
+         * Maps line numbers to highlights.
+         */
+        private Map<Integer, SortedSet<Highlight>> highlights = new HashMap<>();
+
+        private Tab(URI fileURI, InputStream stream) {
+            this.absoluteFileName = fileURI;
+            this.simpleFileName  = extractFileName(fileURI);
+
+            try {
+                String text = IOUtil.readFrom(stream);
+                if (text != null && !text.isEmpty()) {
+                    source = replaceTabs(text);
+                } else {
+                    source = "[SOURCE COULD NOT BE LOADED]";
+                }
+            } catch (IOException e) {
+                source = "[SOURCE COULD NOT BE LOADED]";
+                Debug.out("Unknown IOException!", e);
+            }
+
+            initLineInfo();
+
+            initTextPane();
+
+            JPanel nowrap = new JPanel(new BorderLayout());
+            nowrap.add(textPane);
+            setViewportView(nowrap);
+            setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+            // increase unit increment (for faster scrolling)
+            getVerticalScrollBar().setUnitIncrement(30);
+            getHorizontalScrollBar().setUnitIncrement(30);
+
+            //add Line numbers to each Scrollview
+            TextLineNumber tln = new TextLineNumber(textPane, 1);
+            setRowHeaderView(tln);
+        }
+
+        private String extractFileName(URI uri) {
+            String s = uri.toString();
+            int index = s.lastIndexOf("/");
+            if (index < 0) {
+                return s;                       // fallback: return whole URI
+            } else {
+                return s.substring(index + 1);
+            }
+        }
+
+        private void initLineInfo() {
+            try {
+                InputStream inStream = new ByteArrayInputStream(source.getBytes());
+                lineInformation = IOUtil.computeLineInformation(inStream);
+            } catch (IOException e) {
+                Debug.out("Error while computing line information from " + absoluteFileName, e);
+            }
+        }
+
+        private void initTextPane() {
+            // We use the same font as in SequentView for consistency.
+            textPane.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
+            textPane.setToolTipText(TEXTPANE_TOOLTIP);
+            textPane.setEditable(false);
+
+            // insert source code into text pane
+            try {
+                JavaDocument doc = new JavaDocument();
+                textPane.setDocument(doc);
+                doc.insertString(0, source, new SimpleAttributeSet());
+            } catch (BadLocationException e) {
+                throw new AssertionError();
+            }
+
+            // add a listener to highlight the line currently pointed to
+            textPane.addMouseMotionListener(new MouseMotionListener() {
+                @Override
+                public void mouseMoved(MouseEvent e) {
+                    synchronized(SourceView.this) {
+                        if (selectionHL != null) {
+                            paintSelectionHighlight(e.getPoint(), selectionHL);
+                        }
+                    }
+                }
+
+                @Override
+                public void mouseDragged(MouseEvent e) { }
+            });
+
+            textPane.addMouseListener(new MouseAdapter() {
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    synchronized(SourceView.this) {
+                        if (selectionHL != null) {
+                            removeHighlight(selectionHL);
+                            selectionHL = null;
+                        }
+                    }
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    synchronized(SourceView.this) {
+                        if (selectionHL == null) {
+                            initSelectionHL();
+                        }
+                    }
+                }
+            });
+
+            textPane.addMouseListener(new TextPaneMouseAdapter(
+                textPane, lineInformation, absoluteFileName));
+        }
+
+        private void markTabComponent() {
+            if (highlights.isEmpty()) {
+                tabPane.setForegroundAt(
+                        tabPane.indexOfComponent(this),
+                        UIManager.getColor("TabbedPane.foreground"));
+                tabPane.setBackgroundAt(
+                        tabPane.indexOfComponent(this),
+                        UIManager.getColor("TabbedPane.background"));
+            } else {
+                if (isSelected(this)) {
+                    tabPane.setForegroundAt(
+                            tabPane.indexOfComponent(this),
+                            TAB_HIGHLIGHT_COLOR.get());
+                    tabPane.setBackgroundAt(
+                            tabPane.indexOfComponent(this),
+                            UIManager.getColor("TabbedPane.background"));
+                } else {
+                    tabPane.setForegroundAt(
+                            tabPane.indexOfComponent(this),
+                            UIManager.getColor("TabbedPane.foreground"));
+                    tabPane.setBackgroundAt(
+                            tabPane.indexOfComponent(this),
+                            TAB_HIGHLIGHT_COLOR.get());
+                }
+            }
+        }
+
+        private void initSelectionHL() {
+            try {
+                selectionHL = addHighlight(
+                        absoluteFileName,
+                        1,
+                        CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR.get(),
+                        Integer.MAX_VALUE - 1);
+            } catch (BadLocationException | IOException e) {
+                Debug.out(e);
+            }
+        }
+
+        private void removeHighlights(int line) {
+            SortedSet<Highlight> set = highlights.get(line);
+
+            if (set == null) {
+                return;
+            }
+
+            for (Highlight highlight : set) {
+                if (highlight.getTag() != null) {
+                    textPane.getHighlighter().removeHighlight(highlight.getTag());
+                    highlight.setTag(null);
+                }
+            }
+        }
+
+        private void applyHighlights(int line)
+                throws BadLocationException {
+            SortedSet<Highlight> set = highlights.get(line);
+
+            if (set != null && !set.isEmpty()) {
+                for (Highlight highlight : set) {
+                    Range range = calculateLineRange(
+                            textPane,
+                            lineInformation[highlight.getLine() - 1].getOffset());
+
+                    Color c = highlight.getColor();
+                    int alpha = set.size() == 1 ? c.getAlpha() : 256 / set.size();
+                    Color color = new Color(
+                            c.getRed(), c.getGreen(), c.getBlue(), alpha);
+
+                    highlight.setTag(textPane.getHighlighter().addHighlight(
+                            range.start(),
+                            range.end(),
+                            new DefaultHighlightPainter(color)));
+                }
+            }
+
+            textPane.revalidate();
+            textPane.repaint();
+        }
+
+        /**
+         * Calculates the range of actual text (not whitespace) in the line containing the given
+         * position.
+         * @param textPane the JTextPane with the text
+         * @param pos the position to check
+         * @return the range of text (may be empty if there is just whitespace in the line)
+         */
+        private Range calculateLineRange(JTextPane textPane, int pos) {
+            Document doc = textPane.getDocument();
+            String text = "";
+            try {
+                text = doc.getText(0, doc.getLength());
+            } catch (BadLocationException e) {
+                Debug.out(e);
+            }
+
+            // find line end
+            int end = text.indexOf('\n', pos);
+            end = end == -1 ? text.length() : end;      // last line?
+
+            // find line start
+            int start = text.lastIndexOf('\n', pos - 1);          // TODO: different line endings?
+            start = start == -1 ? 0 : start;            // first line?
+
+            // ignore whitespace at the beginning of the line
+            while (start < text.length() && start < end
+                && Character.isWhitespace(text.charAt(start))) {
+                start++;
+            }
+
+            return new Range(start, end);
+        }
+
+        /**
+         * Paints the highlights for symbolically executed lines. The most recently executed line is
+         * highlighted with a different color.
+         */
+        private void paintSymbExHighlights() {
+            for (Highlight hl : symbExHighlights) {
+                removeHighlight(hl);
+            }
+
+            symbExHighlights.clear();
+
+            try {
+                int mostRecentLine = -1;
+
+                for (int i = 0; i < lines.size(); i++) {
+                    Pair<Node, PositionInfo> l = lines.get(i);
+
+                    if (absoluteFileName.equals(l.second.getURI())) {
+                        int line = l.second.getStartPosition().getLine();
+
+                        // use a different color for most recent
+                        if (i == 0) {
+                            mostRecentLine = line;
+                            symbExHighlights.add(addHighlight(
+                                    absoluteFileName,
+                                    line,
+                                    MOST_RECENT_HIGHLIGHT_COLOR.get(),
+                                    0));
+                        } else if (line != mostRecentLine) {
+                            symbExHighlights.add(addHighlight(
+                                    absoluteFileName,
+                                    line,
+                                    NORMAL_HIGHLIGHT_COLOR.get(),
+                                    0));
+                        }
+                    }
+                }
+            } catch (BadLocationException | IOException e) {
+                Debug.out(e);
+            }
+        }
+
+        /**
+         * Paints the highlight for the line where the mouse pointer currently points to.
+         * @param p the current position of the mouse pointer
+         * @param highlight the highlight to change
+         */
+        private void paintSelectionHighlight(Point p, Highlight highlight) {
+            try {
+                int line = posToLine(textPane.viewToModel(p));
+                changeHighlight(highlight, line);
+            } catch (BadLocationException e) {
+                Debug.out(e);
+            }
+        }
+
+        private int posToLine(int pos) {
+            return textPane.getDocument().getDefaultRootElement().getElementIndex(pos) + 1;
+        }
+
+        private void scrollToLine(int line) {
+            int offs = lineInformation[line].getOffset();
+            textPane.setCaretPosition(offs);
+        }
+    }
+
+    /**
+     * <p> An object of this class represents a highlight of a specific line in the
+     *  {@code SourceView}. </p>
+     *
+     * @author lanzinger
+     *
+     * @see SourceView#addHighlight(URI, int, Color, int)
+     * @see SourceView#changeHighlight(Highlight, int)
+     * @see SourceView#removeHighlight(Highlight)
+     */
+    public static final class Highlight implements Comparable<Highlight> {
+
+        /** @see #getTag() */
+        private static final Map<Highlight, Object> TAGS = new HashMap<>();
+
+        /** @see #getLevel() */
+        private int level;
+
+        /** @see #getColor() */
+        private Color color;
+
+        /** @see #getFileURI() */
+        private URI fileURI;
+
+        /** @see #getLine() */
+        private int line;
+
+        /**
+         * Creates a new highlight.
+         *
+         * @param fileURI URI of the file in which this highlight is used.
+         * @param line the line being highlighted.
+         * @param color this highlight's color.
+         * @param level this highlight's level.
+         */
+        private Highlight(URI fileURI, int line, Color color, int level) {
+            this.level = level;
+            this.color = color;
+            this.fileURI = fileURI;
+            this.line = line;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((color == null) ? 0 : color.hashCode());
+            result = prime * result + ((fileURI == null) ? 0 : fileURI.hashCode());
+            result = prime * result + level;
+            result = prime * result + line;
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            Highlight other = (Highlight) obj;
+            if (color == null) {
+                if (other.color != null) {
+                    return false;
+                }
+            } else if (!color.equals(other.color)) {
+                return false;
+            }
+            if (fileURI == null) {
+                if (other.fileURI != null) {
+                    return false;
+                }
+            } else if (!fileURI.equals(other.fileURI)) {
+                return false;
+            }
+            if (level != other.level) {
+                return false;
+            }
+            if (line != other.line) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int compareTo(Highlight other) {
+            int result = fileURI.compareTo(other.fileURI);
+
+            if (result == 0) {
+                result = Integer.compare(line, other.line);
+            }
+
+            if (result == 0) {
+                result = Integer.compare(level, other.level);
+            }
+
+            if (result == 0) {
+                result = Integer.compare(color.getRGB(), other.color.getRGB());
+            }
+
+            return result;
+        }
+
+        /**
+         *
+         * @param tag the new tag wrapped by this object.
+         *
+         * @see Highlighter#addHighlight(int, int, HighlightPainter)
+         * @see Highlighter#changeHighlight(Object, int, int)
+         * @see Highlighter#removeHighlight(Object)
+         */
+        private void setTag(Object tag) {
+            if (tag == null) {
+                TAGS.remove(this);
+            } else {
+                TAGS.put(this, tag);
+            }
+        }
+
+        /**
+         *
+         * @return the tag wrapped by this object.
+         *
+         * @see Highlighter#addHighlight(int, int, HighlightPainter)
+         * @see Highlighter#changeHighlight(Object, int, int)
+         * @see Highlighter#removeHighlight(Object)
+         */
+        private Object getTag() {
+            return TAGS.get(this);
+        }
+
+        /**
+         *
+         * @return this highlight's level.
+         */
+        public int getLevel() {
+            return level;
+        }
+
+        /**
+         *
+         * @return this highlight's color.
+         */
+        public Color getColor() {
+            return color;
+        }
+
+        /**
+         *
+         * @return the file in which this highlight is used.
+         */
+        public URI getFileURI() {
+            return fileURI;
+        }
+
+        /**
+         *
+         * @return the line being highlighted.
+         */
+        public int getLine() {
+            return line;
+        }
+    }
+
+    /**
+     * This listener checks if a highlighted section is clicked. If true, a jump in the proof tree
+     * to the most recently created node (in the current branch) containing the highlighted
+     * statement is performed.<br>
+     * <b>Note:</b> No jumping down in the proof tree is possible. Implementing this would be
+     * non-trivial, because it was not unique into which branch we would want to descent.
+     *
+     * @author Wolfram Pfeifer
+     */
+    private final class TextPaneMouseAdapter extends MouseAdapter {
+        /**
+         * The precalculated start indices of the lines. Used to compute the clicked line number.
+         */
+        final LineInformation[] li;
+
+        /**
+         * The JTextPane containing the source code.
+         */
+        final JTextPane textPane;
+
+        /**
+         * The URI of the file whose content is displayed in the JTextPane.
+         */
+        final URI fileURI;
+
+        private TextPaneMouseAdapter(JTextPane textPane, LineInformation[] li,
+                URI fileURI) {
+            this.textPane = textPane;
+            this.li = li;
+            this.fileURI = fileURI;
+        }
+
+        /**
+         * Checks if the given position is within a highlight.
+         * @param pos the position to check
+         * @return true if highlighted and false if not
+         */
+        private boolean isHighlighted(int pos) {
+            Tab tab = tabs.get(selectedFile);
+
+            int line = tab.posToLine(pos);
+
+            for (Highlight h : symbExHighlights) {
+                if (line == h.line) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            int pos = textPane.viewToModel(e.getPoint());
+            if (isHighlighted(pos)) {
+                int line = 0;
+                // calculate the line number
+                while (line < li.length - 1) {
+                    if (li[line].getOffset() <= pos && pos < li[line + 1].getOffset()) {
+                        break;
+                    }
+                    line++;
+                }
+                // jump in proof tree (get corresponding node from list)
+                Node n = null;
+                for (Pair<Node, PositionInfo> p : lines) {
+                    if (p.second.getStartPosition().getLine() == line + 1
+                            && p.second.getURI().equals(fileURI)) {
+                        n = p.first;
+                        break;
+                    }
+                }
+
+                if (n != null) {
+                    mainWindow.getMediator().getSelectionModel().setSelectedNode(n);
+                }
+            }
+        }
     }
 }

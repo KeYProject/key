@@ -1,6 +1,10 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
     <comment>This is a comment</comment>
+    <entry key="assert">
+        
+    </entry>
+    
     <entry key="assume">
         The assume command is an unsound taclet rule and takes one argument:
 

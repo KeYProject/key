@@ -1,12 +1,14 @@
 package de.uka.ilkd.key.logic.label;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 
@@ -47,7 +49,7 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
                     + "delimited by \"[\" and \"]\"");
         }
 
-        Set<Origin> result = new HashSet<>();
+        Set<Origin> result = new LinkedHashSet<>();
 
         for (String s : str.substring(1, str.length() - 1).split("\\s*,\\s*")) {
             if (s.isEmpty()) {
@@ -69,10 +71,6 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
      */
     private Origin parseOrigin(String str) throws TermLabelException {
         try {
-            if (str.equals("<none>")) {
-                return new Origin(SpecType.NONE, "", -1);
-            }
-
             StringTokenizer tokenizer = new StringTokenizer(str, " ");
 
             SpecType specType = parseSpecType(tokenizer.nextToken());
@@ -82,44 +80,46 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
             if (token.equals("(implicit)")) {
                 matchEnd(tokenizer, str);
 
-                return new Origin(specType, Origin.IMPLICIT_FILE_NAME, Origin.IMPLICIT_LINE);
-            } else if (token.contentEquals("(multiple")) {
-                matchId(tokenizer.nextToken(), str, "files)");
-                matchEnd(tokenizer, str);
-
-                return new Origin(specType, Origin.MULTIPLE_FILES, Origin.MULTIPLE_LINES);
+                return new Origin(specType);
             } else {
                 matchChar(token, str, "@");
-                String filename = tokenizer.nextToken();
 
                 token = tokenizer.nextToken();
 
-                if (token.equals("(multiple")) {
-                    matchId(tokenizer.nextToken(), str, "lines)");
-                    matchEnd(tokenizer, str);
+                if (token.equals("file")) {
+                    String filename = tokenizer.nextToken();
 
-                    return new Origin(specType, filename, Origin.MULTIPLE_LINES);
-                } else {
-                    matchChar(token, str, "@");
+                    matchChar(tokenizer.nextToken(), str, "@");
                     matchId(tokenizer.nextToken(), str, "line");
                     int line = Integer.parseInt(tokenizer.nextToken());
                     matchEnd(tokenizer, str);
 
+                    return new FileOrigin(specType, filename, line);
+                } else if (token.equals("node")) {
+                    int number = Integer.parseInt(tokenizer.nextToken());
 
-                    return new Origin(specType, filename, line);
+                    String ruleName = tokenizer.nextToken();
+
+                    if (!ruleName.startsWith("(") || !ruleName.endsWith(")")) {
+                        throw new IllegalArgumentException();
+                    }
+
+                    ruleName = ruleName.substring(1, ruleName.length() - 1);
+
+                    matchEnd(tokenizer, str);
+
+                    return new NodeOrigin(specType, ruleName, number);
+                } else {
+                    throw new IllegalArgumentException();
                 }
             }
         } catch (NoSuchElementException | IllegalArgumentException e) {
             throw new TermLabelException(
                       "Malformed origin string: \""
                     + str + "\"\n"
-                    + "(Well-formed origins have either this format: \""
-                    + "spec_type @ filename @ line xx\")\n"
-                    + "(                                    or this: \""
-                    + "spec_type @ filename (multiple lines)\")\n"
-                    + "(                                    or this: \""
-                    + "spec_type (multiple files)\")\n"
-                    + "(                                    or this: \""
+                    + "(Well-formed origins have one of the following formats: \""
+                    + "spec_type @ file <file name> @ line <line number>\")\n"
+                    + "spec_type @ node <node number> (<rule name>)\")\n"
                     + "spec_type (implicit)\")\n"
             );
         }

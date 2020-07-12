@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 // 
 
-class A {
+final class A {
 
   public  byte m(long i) { return 2; }
 
@@ -28,7 +28,7 @@ class A {
 
 }
 
-class B {
+final class B {
 
   static int callM() {
      A a = new A();

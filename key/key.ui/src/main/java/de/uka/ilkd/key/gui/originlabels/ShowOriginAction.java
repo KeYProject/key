@@ -2,20 +2,24 @@ package de.uka.ilkd.key.gui.originlabels;
 
 import java.awt.event.ActionEvent;
 
+import javax.swing.AbstractAction;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
 
 /**
- * Opens a {@link OriginTermLabelWindow} for the selected term.
+ * Opens a {@link OriginTermLabelVisualizer} for the selected term.
  *
  * @author lanzinger
  */
 public class ShowOriginAction extends MainWindowAction {
 
-    private static final long serialVersionUID = -2631175646560838963L;
+    private static final long serialVersionUID = 4557953425770258852L;
 
     private PosInSequent pos;
 
@@ -28,12 +32,8 @@ public class ShowOriginAction extends MainWindowAction {
         super(MainWindow.getInstance());
         this.pos = pos == null ? PosInSequent.createSequentPos() : pos;
 
-        final TermLabelSettings settings;
-        if (getMediator().getSelectedProof() != null) {
-            settings = getMediator().getSelectedProof().getSettings().getTermLabelSettings();
-        } else {
-            settings = ProofSettings.DEFAULT_SETTINGS.getTermLabelSettings();
-        }
+        final TermLabelSettings settings =
+                ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings();
 
         setName("Show origin");
         setEnabled(settings.getUseOriginLabels());
@@ -44,9 +44,32 @@ public class ShowOriginAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        new OriginTermLabelWindow(
-                pos.getPosInOccurrence(),
+        PosInOccurrence pio = pos.getPosInOccurrence();
+
+        // OriginTermLabelVisualizer.TermView can only print sequents or formulas, not terms.
+        if (pio != null) {
+            while (!pio.subTerm().sort().equals(Sort.FORMULA)) {
+                pio = pio.up();
+            }
+        }
+
+        OriginTermLabelVisualizer vis = new OriginTermLabelVisualizer(
+                pio,
                 getMediator().getSelectedNode(),
                 getMediator().getServices());
+
+        mainWindow.getSourceViewFrame().addComponent(
+                vis,
+                vis.getLongName(),
+                new AbstractAction() {
+
+                    private static final long serialVersionUID = 2410334588447893970L;
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        mainWindow.getSourceViewFrame().removeComponent(vis);
+                        vis.dispose();
+                    }
+                });
     }
 }

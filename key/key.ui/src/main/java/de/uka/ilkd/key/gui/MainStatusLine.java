@@ -15,7 +15,6 @@ package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.util.TipOfTheDay;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -38,6 +37,7 @@ import java.awt.*;
  * @see de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.StatusLine
  */
 class MainStatusLine extends JPanel {
+    private static final long serialVersionUID = 2278249652314818379L;
     private final JLabel lblStatusText = new JLabel();
     private final JProgressBar progressBar = new JProgressBar();
     //private boolean phantomBoxAdded = false;
@@ -78,7 +78,6 @@ class MainStatusLine extends JPanel {
      */
     public void reset() {
         setProgressPanelVisible(false);
-        setStatusText("Hint: " + TipOfTheDay.get());
     }
 
     /**

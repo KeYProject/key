@@ -2,6 +2,7 @@ package de.uka.ilkd.key.logic;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Set;
 
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -124,9 +125,9 @@ public class TestLocalSymbols extends TestCase {
 
         KeYEnvironment<?> env = loadProof("doubleSkolem.key");
         Proof proof = env.getLoadedProof();
-        String script = env.getProofScript().first; 
+        String script = env.getProofScript().first;
 
-        ProofScriptEngine pse = new ProofScriptEngine(script , new Location("n/a",1,1));
+        ProofScriptEngine pse = new ProofScriptEngine(script , new Location((URL) null,1,1));
         pse.execute(null, proof);
 
         ImmutableList<Goal> openGoals = proof.openGoals();

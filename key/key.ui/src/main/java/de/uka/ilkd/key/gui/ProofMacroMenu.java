@@ -9,7 +9,7 @@
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.gui;
 
@@ -27,7 +27,8 @@ import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.gui.actions.ProofScriptAction;
+import de.uka.ilkd.key.gui.actions.ProofScriptFromFileAction;
+import de.uka.ilkd.key.gui.actions.ProofScriptInputAction;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -87,18 +88,18 @@ public class ProofMacroMenu extends JMenu {
      * available.
      */
     public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc) {
-        super("Strategy macros");
+        super("Strategy Macros");
 
         // Macros are group according to their category.
         // Store the submenus in this map.
         Map<String, JMenu> submenus = new HashMap<String, JMenu>();
-        
+
         int count = 0;
         Node node = mediator.getSelectedNode();
         for (ProofMacro macro : REGISTERED_MACROS) {
-                
+
             boolean applicable = node != null && macro.canApplyTo(node, posInOcc);
-                
+
             if(applicable) {
                 JMenuItem menuItem = createMenuItem(macro, mediator, posInOcc);
 
@@ -113,20 +114,21 @@ public class ProofMacroMenu extends JMenu {
                         add(submenu);
             }
         }
-        
+
                 submenu.add(menuItem);
                 count++;
             }
         }
 
         if(Main.isExperimentalMode()) {
-            add(new JMenuItem(new ProofScriptAction(mediator)));
+            add(new JMenuItem(new ProofScriptFromFileAction(mediator)));
+            add(new JMenuItem(new ProofScriptInputAction(mediator)));
         }
 
         mediator.enableWhenProofLoaded(this);
         this.numberOfMacros = count;
     }
-    
+
 
     /**
      * Instantiates a new proof macro menu.
@@ -147,7 +149,7 @@ public class ProofMacroMenu extends JMenu {
         JMenuItem menuItem = new JMenuItem(macro.getName());
         menuItem.setToolTipText(macro.getDescription());
         final KeyStroke macroKey = KeyStrokeManager.get(macro);
-        
+
         if (macroKey != null && posInOcc == null) { // currently only for global macro applications
             menuItem.setAccelerator(macroKey);
         }

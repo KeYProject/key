@@ -22,10 +22,10 @@ import de.uka.ilkd.key.proof.ProofEvent;
  * @author mihai
  * 
  */
-@SuppressWarnings("serial")
 public class TestGenerationAction extends MainWindowAction {
-	
-	private static final String NAME = "Generate Testcases";
+    private static final long serialVersionUID = -4911859008849602897L;
+
+    private static final String NAME = "Generate Testcases";
 	private static final String TOOLTIP = "Generate test cases for open goals";
 	
 	//public static Proof originalProof;

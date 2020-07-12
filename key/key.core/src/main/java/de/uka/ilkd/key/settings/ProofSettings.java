@@ -13,14 +13,21 @@
 
 package de.uka.ilkd.key.settings;
 
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYResourceManager;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+
+import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
  * This class is used to load and save settings for proofs such as which data
@@ -42,7 +49,13 @@ public class ProofSettings {
     public static final File PROVER_CONFIG_FILE = new File(PathConfig.getKeyConfigDir(), "proof-settings.props");
     public static final URL PROVER_CONFIG_FILE_TEMPLATE = KeYResourceManager.getManager()
             .getResourceFile(ProofSettings.class, "default-proof-settings.props");
-    public static final ProofSettings DEFAULT_SETTINGS = new ProofSettings();
+    public static final ProofSettings DEFAULT_SETTINGS = ProofSettings.loadedSettings();
+
+    private static ProofSettings loadedSettings() {
+        ProofSettings ps = new ProofSettings();
+        ps.loadSettings();
+        return ps;
+    }
 
     /**
      * all setting objects in the following order: heuristicSettings
@@ -108,17 +121,6 @@ public class ProofSettings {
         }
     }
 
-
-    public void ensureInitialized() {
-        if (isInitialized()) {
-            loadSettings();
-        }
-    }
-
-    private boolean isInitialized() {
-        return lastLoadedProperties != null;
-    }
-
     /**
      *
      */
@@ -147,7 +149,6 @@ public class ProofSettings {
      * Saves the current settings in this dialog into a configuration file.
      */
     public void saveSettings() {
-        ensureInitialized();
         try {
             if (!PROVER_CONFIG_FILE.exists()) {
                 PROVER_CONFIG_FILE.getParentFile().mkdirs();
@@ -174,9 +175,9 @@ public class ProofSettings {
     public void loadSettingsFromStream(Reader in) {
         Properties defaultProps = new Properties();
 
-        if (PROVER_CONFIG_FILE_TEMPLATE == null)
+        if (PROVER_CONFIG_FILE_TEMPLATE == null) {
             System.err.println("Warning: default proof-settings file could not be found.");
-        else {
+        } else {
             try {
                 defaultProps.load(PROVER_CONFIG_FILE_TEMPLATE.openStream());
             } catch (IOException e) {
@@ -193,17 +194,20 @@ public class ProofSettings {
             Debug.out(e);
         }
         lastLoadedProperties = props;
-        for (Settings s : settings) s.readSettings(props);
+        for (Settings s : settings) {
+            s.readSettings(props);
+        }
     }
 
     /**
      * Loads the the former settings from configuration file.
      */
+    //private AtomicInteger counter = new AtomicInteger();
     public void loadSettings() {
+        //System.out.println("ProofSettings.loadSettings:" + counter.getAndIncrement());
         try (FileReader in = new FileReader(PROVER_CONFIG_FILE)) {
             if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
-                //System.err.println("The settings in " +
-                //        PROVER_CONFIG_FILE + " are *not* read.");
+                System.err.println("The settings in " + PROVER_CONFIG_FILE + " are *not* read.");
             } else {
                 loadSettingsFromStream(in);
             }
@@ -218,8 +222,9 @@ public class ProofSettings {
      * Used to load Settings from a .key file
      */
     public void loadSettingsFromString(String s) {
-        if (s == null)
+        if (s == null) {
             return;
+        }
         StringReader reader = new StringReader(s);
         loadSettingsFromStream(reader);
     }
@@ -230,7 +235,6 @@ public class ProofSettings {
      * @return the StrategySettings object
      */
     public StrategySettings getStrategySettings() {
-        ensureInitialized();
         return strategySettings;
     }
 
@@ -240,7 +244,6 @@ public class ProofSettings {
      * @return the ChoiceSettings object
      */
     public ChoiceSettings getChoiceSettings() {
-        ensureInitialized();
         return choiceSettings;
     }
 
@@ -250,7 +253,6 @@ public class ProofSettings {
      * @return the DecisionProcedureSettings object
      */
     public ProofDependentSMTSettings getSMTSettings() {
-        ensureInitialized();
         return smtSettings;
     }
 
@@ -282,7 +284,6 @@ public class ProofSettings {
      * @return the term label settings
      */
     public TermLabelSettings getTermLabelSettings() {
-        ensureInitialized();
         return termLabelSettings;
     }
 }

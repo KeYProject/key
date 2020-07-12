@@ -37,7 +37,7 @@ public class Extension<T> implements Comparable<Extension> {
     }
 
     public boolean isOptional() {
-        return info != null && info.optional();
+        return info != null && info.optional() && (!isExperimental() || Main.isExperimentalMode());
     }
 
     public int getPriority() {
@@ -45,10 +45,18 @@ public class Extension<T> implements Comparable<Extension> {
     }
 
     public boolean isDisabled() {
-        return (info != null && info.disabled()) //disabled by options
+        return isDisabledByMaintainer() //disabled by options
                 || (!Main.isExperimentalMode() && isExperimental()) //disabled because of wrong mode
                 || ExtensionManager.getExtensionSettings() //disabled by command line
-                        .getForbiddenClasses().contains(getType().getName());
+                .getForbiddenClasses().contains(getType().getName());
+    }
+
+    /**
+     * @return true iff this extension was disabled by the annotation
+     * {@link de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.Info}.
+     */
+    public boolean isDisabledByMaintainer() {
+        return info != null && info.disabled();
     }
 
     public boolean isExperimental() {

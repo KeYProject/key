@@ -27,7 +27,7 @@ public class FullPropositionalExpansionMacro extends AbstractPropositionalExpans
 
     @Override
     public String getName() {
-        return "Propositional expansion (w/ splits)";
+        return "Propositional Expansion (w/ Splits)";
     }
 
     @Override

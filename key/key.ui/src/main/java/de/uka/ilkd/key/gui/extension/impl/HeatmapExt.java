@@ -48,7 +48,7 @@ public class HeatmapExt implements KeYGuiExtension,
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         getActions(mainWindow);//initialize
-        JToolBar tb = new JToolBar("Heatmap");
+        JToolBar tb = new JToolBar("Heatmap Options");
         JToggleButton comp = new JToggleButton(toggleAction);
         comp.setHideActionText(true);
         tb.add(comp);
@@ -68,10 +68,11 @@ public class HeatmapExt implements KeYGuiExtension,
  * It is possible to highlight all sf/terms up to a specified age, or to
  * highlight the x newest sf/terms, x being specified by the user.
  *
- * @author weigl
- * @author jschiffl
+ * @author weigl, jschiffl
  */
 class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider {
+    private static final long serialVersionUID = 7783431483026950930L;
+
     /**
      * Minimal setting for number of highlighted terms
      */
@@ -98,8 +99,8 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
     private final JSpinner spinnerAge;
 
     enum HeatmapMode {
-        DEFAULT("No Heatmaps",
-                "No Heatmaps are shown.",
+        DEFAULT("No heatmaps",
+                "No heatmaps are shown.",
                 false, false, false),
         SF_AGE("Sequent formulae up to age",
                 "All sequent formulae that have been added or changed in the last k steps are highlighted. \n"
@@ -154,7 +155,7 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
         }
         pCenter.add(new JLabel(INTRO_LABEL), new CC().span().alignX("left"));
 
-        addSeparator("Disable Heatmaps");
+        addSeparator("Disable heatmaps");
         addRadio(HeatmapMode.DEFAULT);
         addSeparator("Highlight sequent formulae");
         addRadio(HeatmapMode.SF_AGE);
@@ -180,27 +181,29 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
 
     @Override
     public JComponent getPanel(MainWindow window) {
-        final ViewSettings VS = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        final ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         for (Map.Entry<HeatmapMode, JRadioButton> entry : map.entrySet()) {
             HeatmapMode mode = entry.getKey();
-            if (mode.enableHeatmap == VS.isShowHeatmap() &&
-                    mode.sequent == VS.isHeatmapSF() &&
-                    mode.newest == VS.isHeatmapNewest()) {
+            if (mode.enableHeatmap == vs.isShowHeatmap() &&
+                    (!mode.enableHeatmap
+                            || (mode.sequent == vs.isHeatmapSF() &&
+                            mode.newest == vs.isHeatmapNewest()))) {
                 entry.getValue().setSelected(true);
                 break;
             }
         }
-        spinnerAge.setValue(VS.getMaxAgeForHeatmap());
+        spinnerAge.setValue(vs.getMaxAgeForHeatmap());
         return this;
     }
 
     @Override
     public void applySettings(MainWindow window) {
-        final ViewSettings VS = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        final ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         for (Map.Entry<HeatmapMode, JRadioButton> entry : map.entrySet()) {
             if (entry.getValue().isSelected()) {
                 HeatmapMode mode = entry.getKey();
-                VS.setHeatmapOptions(mode.enableHeatmap, mode.sequent, mode.newest, (int) spinnerAge.getValue());
+                vs.setHeatmapOptions(mode.enableHeatmap, mode.sequent, mode.newest,
+                                     (int) spinnerAge.getValue());
                 break;
             }
         }

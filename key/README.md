@@ -48,7 +48,13 @@ Run all test cases
 ./gradlew test 
 ```
 
-You can use `--test <class>.<method>` to select single unit tests.
+Run a specific test case
+```
+./gradlew :key.<subproject>:test --tests "<class>.<method>"
+```
+
+You can debug KeY by adding the `--debug-jvm` option, then attaching a debugger at `localhost:5005`.
+
 
 You can create a *fat jar* with 
 ```

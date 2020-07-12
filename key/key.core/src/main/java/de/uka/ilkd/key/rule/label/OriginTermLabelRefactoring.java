@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.rule.label;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -21,6 +22,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
  * Refactoring for {@link OriginTermLabel}s.
@@ -43,6 +45,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             Rule rule, Goal goal, Object hint, Term tacletTerm) {
         if (rule instanceof BuiltInRule
                 && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
+            return RefactoringScope.NONE;
+        } else if (rule instanceof Taclet && !shouldRefactorOnTaclet((Taclet) rule)) {
             return RefactoringScope.NONE;
         } else {
             return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE;
@@ -77,37 +81,43 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             }
         }
 
-        if (!services.getProof().getSettings().getTermLabelSettings().getUseOriginLabels()) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE
+                .getTermLabelSettings().getUseOriginLabels()) {
             if (oldLabel != null) {
                 labels.remove(oldLabel);
             }
             return;
         }
 
-        Set<Origin> subtermOrigins = collectSubtermOrigins(term.subs(), new HashSet<>());
+        Set<Origin> subtermOrigins = collectSubtermOrigins(term.subs(), new LinkedHashSet<>());
 
-        final OriginTermLabel newLabel;
+        OriginTermLabel newLabel = null;
         if (oldLabel != null) {
             labels.remove(oldLabel);
             final Origin oldOrigin = oldLabel.getOrigin();
-            newLabel = new OriginTermLabel(oldOrigin.specType,
-                                           oldOrigin.fileName,
-                                           oldOrigin.line,
-                                           subtermOrigins);
-        } else {
+            newLabel = new OriginTermLabel(oldOrigin, subtermOrigins);
+        } else if (!subtermOrigins.isEmpty()) {
             final Origin commonOrigin = OriginTermLabel.computeCommonOrigin(subtermOrigins);
             newLabel = new OriginTermLabel(commonOrigin, subtermOrigins);
         }
 
-        if (OriginTermLabel.canAddLabel(term, services)
-                && (!subtermOrigins.isEmpty()
-                        || newLabel.getOrigin().specType != SpecType.NONE)) {
-            labels.add(newLabel);
+        if (newLabel != null) {
+            final Origin origin = newLabel.getOrigin();
+            if (OriginTermLabel.canAddLabel(term, services)
+                    && (!subtermOrigins.isEmpty()
+                            || origin.specType != SpecType.NONE)) {
+                labels.add(newLabel);
+            }
+
+            if (newLabel.getOrigin() instanceof FileOrigin
+                    && goal != null && goal.node() != null) {
+                goal.node().getNodeInfo().addRelevantFile(((FileOrigin) origin).fileName);
+            }
         }
     }
 
     private Set<Origin> collectSubtermOrigins(ImmutableArray<Term> terms,
-            HashSet<Origin> result) {
+            Set<Origin> result) {
         for (Term term : terms) {
             collectSubtermOrigins(term, result);
         }

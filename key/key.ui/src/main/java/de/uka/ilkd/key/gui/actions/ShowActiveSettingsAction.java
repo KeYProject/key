@@ -51,7 +51,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
                 getMediator().getSelectedProof().getSettings();
         SettingsTreeModel model = new SettingsTreeModel(settings, ProofIndependentSettings.DEFAULT_INSTANCE);
         ViewSettingsDialog dialog = new ViewSettingsDialog(model, model.getStartComponent());
-        dialog.setTitle("All Active Settings");
+        dialog.setTitle("All active settings");
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
@@ -60,6 +60,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
      * The old (cleaned up) SettingsDialog.
      */
     private class ViewSettingsDialog extends JDialog {
+        private static final long serialVersionUID = -3780496399924182275L;
         private JTree optionTree;
         private JSplitPane splitPane;
         private JPanel optionPanel;

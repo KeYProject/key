@@ -15,7 +15,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,6 +46,7 @@ import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.KeYConstants;
+import org.key_project.util.java.IOUtil;
 
 /**
  * {@link AbstractAction} used by {@link ExceptionDialog} in KeY report error
@@ -52,8 +55,9 @@ import de.uka.ilkd.key.util.KeYConstants;
  * @author Kai Wallisch
  *
  */
-@SuppressWarnings("serial")
 public class SendFeedbackAction extends AbstractAction {
+
+    private static final long serialVersionUID = 8146108238901822515L;
 
     /*
      * This is the email address to which feedback will be sent.
@@ -129,7 +133,7 @@ public class SendFeedbackAction extends AbstractAction {
     private static class LastLoadedProblemItem extends SendFeedbackFileItem {
 
         LastLoadedProblemItem() {
-            super("Send Last Loaded Problem", "lastLoadedProblem.key");
+            super("Send last loaded problem", "lastLoadedProblem.key");
         }
 
         @Override
@@ -158,7 +162,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     private static class VersionItem extends SendFeedbackFileItem {
         VersionItem() {
-            super("Send KeY Version", "keyVersion.txt");
+            super("Send KeY version", "keyVersion.txt");
         }
 
         @Override
@@ -169,7 +173,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     private static class SystemPropertiesItem extends SendFeedbackFileItem {
         SystemPropertiesItem() {
-            super("Send System Properties", "systemProperties.txt");
+            super("Send system properties", "systemProperties.txt");
         }
 
         @Override
@@ -185,7 +189,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     private class OpenGoalItem extends SendFeedbackFileItem {
         OpenGoalItem() {
-            super("Send Open Goal", "openGoal.txt");
+            super("Send open proof goal", "openGoal.txt");
         }
 
         @Override
@@ -208,7 +212,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     private class OpenProofItem extends SendFeedbackFileItem {
         OpenProofItem() {
-            super("Send Open Proof", "openProof.proof");
+            super("Send open proof", "openProof.proof");
         }
 
         @Override
@@ -235,7 +239,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     private static class SettingsItem extends SendFeedbackFileItem {
         SettingsItem() {
-            super("Send KeY Settings", "keySettings.txt");
+            super("Send KeY settings", "keySettings.txt");
         }
 
         @Override
@@ -246,7 +250,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     private class StacktraceItem extends SendFeedbackFileItem {
         StacktraceItem() {
-            super("Send Stacktrace", "stacktrace.txt");
+            super("Send stacktrace", "stacktrace.txt");
         }
 
         @Override
@@ -262,14 +266,21 @@ public class SendFeedbackAction extends AbstractAction {
 
     private class FaultyFileItem extends SendFeedbackFileItem {
         FaultyFileItem() {
-            super("Send File Exception points to", "exceptionSourceFile.txt");
+            super("Send file referenced by exception", "exceptionSourceFile.txt");
         }
 
         @Override
         boolean isEnabled() {
             if(throwable != null) {
-                Location location = ExceptionTools.getLocation(throwable);
-                return location != null && location.getFilename() != null;
+                Location location = null;
+                try {
+                    location = ExceptionTools.getLocation(throwable);
+                } catch (MalformedURLException e) {
+                    // no valid location could be extracted
+                    e.printStackTrace();
+                    return false;
+                }
+                return Location.isValidLocation(location);
             }
             return false;
         }
@@ -277,15 +288,18 @@ public class SendFeedbackAction extends AbstractAction {
         @Override
         byte[] retrieveFileData() throws IOException {
             Location location = ExceptionTools.getLocation(throwable);
-            String sourceFileName = location.getFilename();
-            return Files.readAllBytes(new File(sourceFileName).toPath());
+            /* Certainly there are more efficient methods than reading to string with IOUtil
+             * (using default charset) and then writing back to byte[] (using default charset
+             * again). However, this way it is a very concise and easy to read. */
+            String source = IOUtil.readFrom(location.getFileURL());
+            return source.getBytes(Charset.defaultCharset());
         }
     }
 
 
     private static class JavaSourceItem extends SendFeedbackItem {
         public JavaSourceItem() {
-            super("Send Java Source");
+            super("Send Java source");
         }
 
         @Override
@@ -430,7 +444,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     private JDialog makeDialog() {
 
-        final JDialog dialog = new JDialog(parent, "Report an Error to KeY Developers",
+        final JDialog dialog = new JDialog(parent, "Report an error to KeY developers",
                 Dialog.ModalityType.DOCUMENT_MODAL);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 

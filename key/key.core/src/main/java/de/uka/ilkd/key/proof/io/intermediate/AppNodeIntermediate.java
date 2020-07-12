@@ -14,6 +14,8 @@ public class AppNodeIntermediate extends NodeIntermediate {
     private boolean interactiveRuleApplication = false;
     /** Signals that this app has been triggered by a proof script. */
     private boolean scriptRuleApplication = false;
+    /** user-provided notes for the node */
+    private String notes = null;
 
     public AppIntermediate getIntermediateRuleApp() {
         return ruleApp;
@@ -39,4 +41,11 @@ public class AppNodeIntermediate extends NodeIntermediate {
         this.scriptRuleApplication = scriptRuleApplication;
     }
 
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
 }
