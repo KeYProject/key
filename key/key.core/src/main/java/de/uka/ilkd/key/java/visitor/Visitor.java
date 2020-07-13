@@ -13,14 +13,7 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.java.CcatchReturnParameterDeclaration;
-import de.uka.ilkd.key.java.CcatchReturnValParameterDeclaration;
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.CompilationUnit;
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.Import;
-import de.uka.ilkd.key.java.PackageSpecification;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -403,4 +396,10 @@ public interface Visitor {
 
     void performActionOnCcatchReturnValParameterDeclaration(
             CcatchReturnValParameterDeclaration ccatchReturnValParameterDeclaration);
+
+    void performActionOnCcatchContinueParameterDeclaration(
+            CcatchContinueParameterDeclaration ccatchContinueParameterDeclaration);
+
+    void performActionOnCcatchBreakParameterDeclaration(
+            CcatchBreakParameterDeclaration ccatchBreakParameterDeclaration);
 }

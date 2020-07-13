@@ -1961,6 +1961,14 @@ public class Recoder2KeYConverter {
         return new CcatchReturnParameterDeclaration(collectChildrenAndComments(arg));
     }
 
+    public CcatchBreakParameterDeclaration convert(de.uka.ilkd.key.java.recoderext.CcatchBreakParameterDeclaration arg) {
+        return new CcatchBreakParameterDeclaration(collectChildrenAndComments(arg));
+    }
+
+    public CcatchContinueParameterDeclaration convert(de.uka.ilkd.key.java.recoderext.CcatchContinueParameterDeclaration arg) {
+        return new CcatchContinueParameterDeclaration(collectChildrenAndComments(arg));
+    }
+
     public CcatchReturnValParameterDeclaration convert(de.uka.ilkd.key.java.recoderext.CcatchReturnValParameterDeclaration arg) {
         return new CcatchReturnValParameterDeclaration(collectChildrenAndComments(arg));
     }

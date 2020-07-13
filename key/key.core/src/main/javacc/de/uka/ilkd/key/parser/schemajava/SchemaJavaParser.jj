@@ -520,6 +520,7 @@ TOKEN :
   }
 | < BOOLEAN: "boolean" >
 | < BREAK: "break" >
+| < BREAKTYPE: "\\Break" >
 | < BIGINT: "\\bigint" >
 | < REAL: "\\real" >
 | < BYTE: "byte" >
@@ -530,6 +531,7 @@ TOKEN :
 | < CLASS: "class" >
 | < CONST: "const" >
 | < CONTINUE: "continue" >
+| < CONTINUETYPE: "\\Continue" >
 | < _DEFAULT: "default" >
 | < DO: "do" >
 | < DOUBLE: "double" >
@@ -5043,6 +5045,42 @@ Exec ExecStatement() :
                     cat.setBody(block);
                     branches.add(cat);
                 }
+            ]
+            
+            [
+                LOOKAHEAD(4)
+                "ccat"
+                (
+                    {
+                        cat = factory.createCcatch();
+                        setPrefixInfo(cat);
+                    }
+                    "(" <BREAKTYPE> ")"
+                    block = Block()
+                    {
+                        cat.setNonStdParameterDeclaration(factory.createCcatchBreakParameterDeclaration());
+                        cat.setBody(block);
+                        branches.add(cat);
+                    } 
+                )
+            ]
+            
+            [
+                LOOKAHEAD(4)
+                "ccat"
+                (
+                    {
+                        cat = factory.createCcatch();
+                        setPrefixInfo(cat);
+                    }
+                    "(" <CONTINUETYPE> ")"
+                    block = Block()
+                    {
+                        cat.setNonStdParameterDeclaration(factory.createCcatchContinueParameterDeclaration());
+                        cat.setBody(block);
+                        branches.add(cat);
+                    } 
+                )
             ]
             
             (

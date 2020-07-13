@@ -500,6 +500,14 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         return new CcatchReturnParameterDeclaration();
     }
 
+    public CcatchBreakParameterDeclaration createCcatchBreakParameterDeclaration() {
+        return new CcatchBreakParameterDeclaration();
+    }
+
+    public CcatchContinueParameterDeclaration createCcatchContinueParameterDeclaration() {
+        return new CcatchContinueParameterDeclaration();
+    }
+
     public CcatchNonstandardParameterDeclaration createCcatchReturnValParameterDeclaration(ParameterDeclaration e) {
         return new CcatchReturnValParameterDeclaration(e);
     }

@@ -4628,7 +4628,7 @@ Exec ExecStatement() :
         result.setBody(block);
     }
         
-    // TODO: Catch break, continue, labels
+    // TODO: Labeled continues & breaks
 
     [
         LOOKAHEAD("ccatch" "("  "\\Return" ")")
@@ -4661,6 +4661,42 @@ Exec ExecStatement() :
         block = Block()
         {
             cat.setNonStdParameterDeclaration(factory.createCcatchReturnValParameterDeclaration(param));
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    ]
+
+    [
+        LOOKAHEAD("ccatch" "("  "\\Break" ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  "\\Break" ")"
+        
+        block = Block()
+        {
+            cat.setNonStdParameterDeclaration(factory.createCcatchBreakParameterDeclaration());
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    ]
+
+    [
+        LOOKAHEAD("ccatch" "("  "\\Continue" ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  "\\Continue" ")"
+        
+        block = Block()
+        {
+            cat.setNonStdParameterDeclaration(factory.createCcatchContinueParameterDeclaration());
             cat.setBody(block);
             branches.add(cat);
         }

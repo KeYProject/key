@@ -3147,12 +3147,6 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    /**
-     * TODO Comment.
-     *
-     * @param ccatchReturnParameterDeclaration
-     * @throws IOException
-     */
     public void printCcatchReturnParameterDeclaration(
             CcatchReturnParameterDeclaration x) throws IOException {
         printHeader(x);
@@ -3161,12 +3155,6 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    /**
-     * TODO Comment.
-     *
-     * @param ccatchReturnValParameterDeclaration
-     * @throws IOException
-     */
     public void printCcatchReturnValParameterDeclaration(
             CcatchReturnValParameterDeclaration x) throws IOException {
         printHeader(x);
@@ -3174,6 +3162,22 @@ public class PrettyPrinter {
         writeToken(0, "\\Return", x);
         write(" ");
         writeElement(x.getDelegate());
+        printFooter(x);
+    }
+
+    public void printCcatchContinueParameterDeclaration(
+            CcatchContinueParameterDeclaration x) throws IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\Continue", x);
+        printFooter(x);
+    }
+
+    public void printCcatchBreakParameterDeclaration(
+            CcatchBreakParameterDeclaration x) throws IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\Break", x);
         printFooter(x);
     }
 
