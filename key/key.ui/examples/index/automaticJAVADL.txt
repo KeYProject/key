@@ -933,6 +933,8 @@ group completionScopes {
    provable ./completionscopes/testNestedExec.key
    provable ./completionscopes/testCcatchBreakLabel.key
    provable ./completionscopes/testCcatchContinueLabel.key
+   provable ./completionscopes/testCcatchBreakLabelWildcard.key
+   provable ./completionscopes/testCcatchContinueLabelWildcard.key
    provable ./completionscopes/testCcatchBreakLabelNonmatchingNested.key
 }
 

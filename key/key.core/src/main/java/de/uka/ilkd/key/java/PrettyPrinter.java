@@ -3127,7 +3127,7 @@ public class PrettyPrinter {
      */
     public void printCcatch(Ccatch x) throws java.io.IOException {
         printHeader(x);
-        writeInternalIndentation(x);
+        write(" ");
         markKeywordStart();
         write("ccatch");
         markKeywordEnd();
