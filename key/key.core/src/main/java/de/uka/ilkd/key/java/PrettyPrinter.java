@@ -3127,7 +3127,12 @@ public class PrettyPrinter {
      */
     public void printCcatch(Ccatch x) throws java.io.IOException {
         printHeader(x);
-        writeToken("ccatch", x);
+        writeInternalIndentation(x);
+        markKeywordStart();
+        write("ccatch");
+        markKeywordEnd();
+        write(" ");
+
         write(" (");
         if (x.hasParameterDeclaration()) {
             noLinefeed = true;
@@ -3178,6 +3183,48 @@ public class PrettyPrinter {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\Break", x);
+        printFooter(x);
+    }
+
+    public void printCcatchBreakLabelParameterDeclaration(
+            CcatchBreakLabelParameterDeclaration x) throws IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+
+        markStart(0, x);
+        markKeywordStart();
+        write("\\Break");
+        markKeywordEnd();
+        write(" ");
+        noLinefeed = true;
+        if (x.getLabel() != null) {
+            writeElement(1, x.getLabel());
+        }
+        noLinefeed = false;
+
+        markEnd(0, x);
+
+        printFooter(x);
+    }
+
+    public void printCcatchContinueLabelParameterDeclaration(
+            CcatchContinueLabelParameterDeclaration x) throws IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+
+        markStart(0, x);
+        markKeywordStart();
+        write("\\Continue");
+        markKeywordEnd();
+        write(" ");
+        noLinefeed = true;
+        if (x.getLabel() != null) {
+            writeElement(1, x.getLabel());
+        }
+        noLinefeed = false;
+
+        markEnd(0, x);
+
         printFooter(x);
     }
 

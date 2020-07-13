@@ -4992,6 +4992,7 @@ Exec ExecStatement() :
     ParameterDeclaration param;
     ASTList<Branch> branches = new ASTArrayList<Branch>(1);
     Ccatch cat;
+    Identifier id = null;
 }
 {
     "exec"
@@ -5003,6 +5004,8 @@ Exec ExecStatement() :
     {
         result.setBody(block);
     }
+        
+    // TODO: Wildcard continues & breaks
 
     (
         (
@@ -5048,7 +5051,7 @@ Exec ExecStatement() :
             ]
             
             [
-                LOOKAHEAD(4)
+                LOOKAHEAD(5)
                 "ccat"
                 (
                     {
@@ -5065,8 +5068,46 @@ Exec ExecStatement() :
                 )
             ]
             
+            (
+                LOOKAHEAD(5)
+                "ccat"
+                (
+                    {
+                        cat = factory.createCcatch();
+                        setPrefixInfo(cat);
+                    }
+                    
+                    "(" <BREAKTYPE>
+                    
+                    (
+                        (
+                            <IDENTIFIER>
+                            {
+                                id = factory.createIdentifier(token.image);
+                                setPrefixInfo(id);
+                            }
+                        )
+                        |
+                        (
+                            <SVIDENTIFIER>
+                            {
+                                id = factory.getLabelSV(token.image);
+                                setPrefixInfo(id);
+                            }
+                        )
+                    )
+                    ")"
+                    block = Block()
+                    {
+                        cat.setNonStdParameterDeclaration(factory.createCcatchBreakLabelParameterDeclaration(id));
+                        cat.setBody(block);
+                        branches.add(cat);
+                    } 
+                )
+            )*
+            
             [
-                LOOKAHEAD(4)
+                LOOKAHEAD(5)
                 "ccat"
                 (
                     {
@@ -5082,6 +5123,44 @@ Exec ExecStatement() :
                     } 
                 )
             ]
+            
+            (
+                LOOKAHEAD(5)
+                "ccat"
+                (
+                    {
+                        cat = factory.createCcatch();
+                        setPrefixInfo(cat);
+                    }
+                    
+                    "(" <CONTINUETYPE>
+                    
+                    (
+                        (
+                            <IDENTIFIER>
+                            {
+                                id = factory.createIdentifier(token.image);
+                                setPrefixInfo(id);
+                            }
+                        )
+                        |
+                        (
+                            <SVIDENTIFIER>
+                            {
+                                id = factory.getLabelSV(token.image);
+                                setPrefixInfo(id);
+                            }
+                        )
+                    )
+                    ")"
+                    block = Block()
+                    {
+                        cat.setNonStdParameterDeclaration(factory.createCcatchContinueLabelParameterDeclaration(id));
+                        cat.setBody(block);
+                        branches.add(cat);
+                    } 
+                )
+            )*
             
             (
                 LOOKAHEAD(4)

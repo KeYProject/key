@@ -596,8 +596,16 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
         return new CcatchBreakParameterDeclaration();
     }
 
+    public CcatchBreakLabelParameterDeclaration createCcatchBreakLabelParameterDeclaration(Identifier label) {
+        return new CcatchBreakLabelParameterDeclaration(label);
+    }
+
     public CcatchContinueParameterDeclaration createCcatchContinueParameterDeclaration() {
         return new CcatchContinueParameterDeclaration();
+    }
+
+    public CcatchContinueLabelParameterDeclaration createCcatchContinueLabelParameterDeclaration(Identifier label) {
+        return new CcatchContinueLabelParameterDeclaration(label);
     }
 
     public Ccatch createCcatch() {

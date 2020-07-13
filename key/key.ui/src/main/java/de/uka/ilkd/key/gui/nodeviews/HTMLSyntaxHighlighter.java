@@ -93,18 +93,14 @@ public class HTMLSyntaxHighlighter {
     ///////////////////////////////////////
 
     private final static String[] JAVA_KEYWORDS = { "if", "else", "for", "do",
-            "while", "return", "break", "switch", "case", "continue", "try",
-            "catch", "finally", "assert", "null", "throw", "this", "true",
-            "false", "int", "char", "long", "short", "method-frame", "boolean",
-            "exec", "ccatch", "\\Return" };
+        "while", "return", "break", "switch", "case", "continue", "try",
+        "catch", "finally", "assert", "null", "throw", "this", "true", "false",
+        "int", "char", "long", "short", "\\Qmethod&#045;frame\\E",
+        "\\Qloop&#045;scope\\E", "boolean", "exec", "ccatch", "\\Q\\Return\\E",
+        "\\Q\\Break\\E", "\\Q\\Continue\\E" };
 
     public final static String JAVA_KEYWORDS_REGEX = concat("|",
-        Arrays.asList(JAVA_KEYWORDS), new StringTransformer() {
-            @Override
-            public String transform(Object input) {
-                return Pattern.quote((String) input);
-            }
-        });
+        Arrays.asList(JAVA_KEYWORDS));
 
     // NOTE: \Q(...)\E escapes the String in (...)
     private final static String DELIMITERS_REGEX = concat(
@@ -303,6 +299,26 @@ public class HTMLSyntaxHighlighter {
      */
     private static String toHTML(String plainTextString) {
         return LogicPrinter.escapeHTML(plainTextString, true);
+    }
+
+    /**
+     * Concatenates the given String array where the elements are separated by
+     * the given delimiter in the result String.
+     *
+     * @param delim
+     *            Delimiter for the elements in the array.
+     * @param strings
+     *            Strings to concatenate.
+     * @return The concatenated array, elements separated by the given
+     *         delimiter.
+     */
+    private static String concat(String delim, Iterable<? extends Object> strings) {
+        return concat(delim, strings, new StringTransformer() {
+            @Override
+            public String transform(Object input) {
+                return input.toString();
+            }
+        });
     }
 
     /**

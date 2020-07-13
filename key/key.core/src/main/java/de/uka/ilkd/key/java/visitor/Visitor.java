@@ -402,4 +402,10 @@ public interface Visitor {
 
     void performActionOnCcatchBreakParameterDeclaration(
             CcatchBreakParameterDeclaration ccatchBreakParameterDeclaration);
+
+    void performActionOnCcatchBreakLabelParameterDeclaration(
+            CcatchBreakLabelParameterDeclaration ccatchBreakLabelParameterDeclaration);
+
+    void performActionOnCCcatchContinueLabelParameterDeclaration(
+            CcatchContinueLabelParameterDeclaration ccatchContinueLabelParameterDeclaration);
 }

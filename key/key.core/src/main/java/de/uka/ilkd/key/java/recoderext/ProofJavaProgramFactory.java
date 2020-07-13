@@ -496,7 +496,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         return res;
     }
 
-    public CcatchNonstandardParameterDeclaration createCcatchReturnParameterDeclaration() {
+    public CcatchReturnParameterDeclaration createCcatchReturnParameterDeclaration() {
         return new CcatchReturnParameterDeclaration();
     }
 
@@ -504,8 +504,16 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         return new CcatchBreakParameterDeclaration();
     }
 
+    public CcatchBreakLabelParameterDeclaration createCcatchBreakLabelParameterDeclaration(Identifier label) {
+        return new CcatchBreakLabelParameterDeclaration(label);
+    }
+
     public CcatchContinueParameterDeclaration createCcatchContinueParameterDeclaration() {
         return new CcatchContinueParameterDeclaration();
+    }
+
+    public CcatchContinueLabelParameterDeclaration createCcatchContinueLabelParameterDeclaration(Identifier label) {
+        return new CcatchContinueLabelParameterDeclaration(label);
     }
 
     public CcatchNonstandardParameterDeclaration createCcatchReturnValParameterDeclaration(ParameterDeclaration e) {

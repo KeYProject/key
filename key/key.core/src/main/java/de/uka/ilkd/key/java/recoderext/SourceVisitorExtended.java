@@ -55,4 +55,14 @@ public class SourceVisitorExtended extends SourceVisitor {
         // default do nothing
     }
 
+    public void visitCcatchBreakLabelParameterDeclaration(
+            CcatchBreakLabelParameterDeclaration ccatchBreakLabelParameterDeclaration) {
+        // default do nothing
+    }
+
+    public void visitCcatchContinueLabelParameterDeclaration(
+            CcatchContinueLabelParameterDeclaration ccatchContinueLabelParameterDeclaration) {
+        // default do nothing
+    }
+
 }

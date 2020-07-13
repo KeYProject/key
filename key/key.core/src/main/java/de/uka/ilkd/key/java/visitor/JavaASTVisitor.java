@@ -941,4 +941,16 @@ public abstract class JavaASTVisitor extends JavaASTWalker
         doDefaultAction(x);
     }
 
+    @Override
+    public void performActionOnCcatchBreakLabelParameterDeclaration(
+            CcatchBreakLabelParameterDeclaration x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnCCcatchContinueLabelParameterDeclaration(
+            CcatchContinueLabelParameterDeclaration x) {
+        doDefaultAction(x);
+    }
+
 }

@@ -4615,6 +4615,7 @@ Exec ExecStatement() :
     ParameterDeclaration param;
     ASTList<Branch> branches = new ASTArrayList<Branch>(1);
     Ccatch cat;
+    Identifier id = null;
 }
 {
     "exec"
@@ -4628,7 +4629,7 @@ Exec ExecStatement() :
         result.setBody(block);
     }
         
-    // TODO: Labeled continues & breaks
+    // TODO: Wildcard continues & breaks
 
     [
         LOOKAHEAD("ccatch" "("  "\\Return" ")")
@@ -4684,6 +4685,30 @@ Exec ExecStatement() :
         }
     ]
 
+    (
+        LOOKAHEAD("ccatch" "("  "\\Break" <IDENTIFIER> ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  "\\Break"
+        <IDENTIFIER>
+        {
+            id = factory.createIdentifier(token.image);
+            setPrefixInfo(id);
+            setPostfixInfo(id);
+        } ")"
+        
+        block = Block()
+        {
+            cat.setNonStdParameterDeclaration(factory.createCcatchBreakLabelParameterDeclaration(id));
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    )*
+
     [
         LOOKAHEAD("ccatch" "("  "\\Continue" ")")
         "ccatch"
@@ -4701,6 +4726,30 @@ Exec ExecStatement() :
             branches.add(cat);
         }
     ]
+
+    (
+        LOOKAHEAD("ccatch" "("  "\\Continue" <IDENTIFIER> ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  "\\Continue"
+        <IDENTIFIER>
+        {
+            id = factory.createIdentifier(token.image);
+            setPrefixInfo(id);
+            setPostfixInfo(id);
+        } ")"
+        
+        block = Block()
+        {
+            cat.setNonStdParameterDeclaration(factory.createCcatchContinueLabelParameterDeclaration(id));
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    )*
     
     ( 
         LOOKAHEAD("ccatch" "("  param = FormalParameter() ")")

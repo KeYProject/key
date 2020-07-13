@@ -931,6 +931,9 @@ group completionScopes {
    provable ./completionscopes/testCcatchReturnVal.key
    provable ./completionscopes/testMultCcatchClauses.key
    provable ./completionscopes/testNestedExec.key
+   provable ./completionscopes/testCcatchBreakLabel.key
+   provable ./completionscopes/testCcatchContinueLabel.key
+   provable ./completionscopes/testCcatchBreakLabelNonmatchingNested.key
 }
 
 # These are the proof files which can be loaded from the examples menu.
