@@ -95,7 +95,7 @@ public class CompletionScopes {
     }
     
     /*@ public normal_behavior
-      @ ensures \result == -10;
+      @ ensures \result == -11;
       @*/
     public int testBreakLabelNonmatchingNested() {
         exec {
@@ -108,11 +108,12 @@ public class CompletionScopes {
                 ccatch (\Continue) { return -5; }
                 ccatch (\Continue l1) { return -6; }
                 ccatch (\Continue l2) { return -7; }
-                ccatch (Throwable t) { return -8; }
-                return -9;
+                ccatch (\Continue *) { return -8; }
+                ccatch (Throwable t) { return -9; }
+                return -10;
             }
-            return -10;
-        } ccatch (\Break l3) { return -11; }
+            return -11;
+        } ccatch (\Break l3) { return -12; }
     
         return 42;
     }
