@@ -41,6 +41,24 @@ public class CompletionScopes {
     }
     
     /*@ public normal_behavior
+      @ ensures \result == -5;
+      @*/
+    public int testBreakLabelWildcard() {
+        exec { break l3; }
+        ccatch (\Return) { return -1; }
+        ccatch (\Break) { return -2; }
+        ccatch (\Break l1) { return -3; }
+        ccatch (\Break l2) { return -4; }
+        ccatch (\Break *) { return -5; }
+        ccatch (\Continue) { return -6; }
+        ccatch (\Continue l1) { return -7; }
+        ccatch (\Continue l2) { return -8; }
+        ccatch (Throwable t) { return -9; }
+          
+        return 42;
+    }
+    
+    /*@ public normal_behavior
       @ ensures \result == -7;
       @*/
     public int testContinueLabel() {
@@ -53,6 +71,25 @@ public class CompletionScopes {
         ccatch (\Continue l1) { return -6; }
         ccatch (\Continue l2) { return -7; }
         ccatch (Throwable t) { return -8; }
+          
+        return 42;
+    }
+    
+    /*@ public normal_behavior
+      @ ensures \result == -9;
+      @*/
+    public int testContinueLabelWildcard() {
+        exec { continue l3; }
+        ccatch (\Return) { return -1; }
+        ccatch (\Break) { return -2; }
+        ccatch (\Break l1) { return -3; }
+        ccatch (\Break l2) { return -4; }
+        ccatch (\Break *) { return -5; }
+        ccatch (\Continue) { return -6; }
+        ccatch (\Continue l1) { return -7; }
+        ccatch (\Continue l2) { return -7; }
+        ccatch (\Continue *) { return -9; }
+        ccatch (Throwable t) { return -10; }
           
         return 42;
     }

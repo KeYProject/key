@@ -65,4 +65,14 @@ public class SourceVisitorExtended extends SourceVisitor {
         // default do nothing
     }
 
+    public void visitCcatchContinueWildcardParameterDeclaration(
+            CcatchContinueWildcardParameterDeclaration ccatchContinueWildcardParameterDeclaration) {
+        // default do nothing
+    }
+
+    public void visitCcatchReturnWildcardParameterDeclaration(
+            CcatchBreakWildcardParameterDeclaration ccatchReturnWildcardParameterDeclaration) {
+        // default do nothing
+    }
+
 }

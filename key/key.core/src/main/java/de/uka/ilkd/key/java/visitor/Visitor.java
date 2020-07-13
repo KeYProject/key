@@ -408,4 +408,10 @@ public interface Visitor {
 
     void performActionOnCCcatchContinueLabelParameterDeclaration(
             CcatchContinueLabelParameterDeclaration ccatchContinueLabelParameterDeclaration);
+
+    void performActionOnCcatchContinueWildcardParameterDeclaration(
+            CcatchContinueWildcardParameterDeclaration ccatchContinueWildcardParameterDeclaration);
+
+    void performActionOnCcatchBreakWildcardParameterDeclaration(
+            CcatchBreakWildcardParameterDeclaration ccatchBreakWildcardParameterDeclaration);
 }

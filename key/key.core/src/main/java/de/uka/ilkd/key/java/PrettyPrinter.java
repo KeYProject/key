@@ -3228,4 +3228,20 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
+    public void printCcatchBreakWildcardParameterDeclaration(
+            CcatchBreakWildcardParameterDeclaration x) throws IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\Break *", x);
+        printFooter(x);
+    }
+
+    public void printCcatchContinueWildcardParameterDeclaration(
+            CcatchContinueWildcardParameterDeclaration x) throws IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\Continue *", x);
+        printFooter(x);
+    }
+
 }

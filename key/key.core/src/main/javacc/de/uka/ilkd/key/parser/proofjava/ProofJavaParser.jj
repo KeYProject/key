@@ -4710,6 +4710,24 @@ Exec ExecStatement() :
     )*
 
     [
+        LOOKAHEAD("ccatch" "("  "\\Break" "*" ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  "\\Break" "*" ")"
+        
+        block = Block()
+        {
+            cat.setNonStdParameterDeclaration(factory.createCcatchBreakWildcardParameterDeclaration());
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    ]
+
+    [
         LOOKAHEAD("ccatch" "("  "\\Continue" ")")
         "ccatch"
         {
@@ -4750,6 +4768,24 @@ Exec ExecStatement() :
             branches.add(cat);
         }
     )*
+
+    [
+        LOOKAHEAD("ccatch" "("  "\\Continue" "*" ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  "\\Continue" "*" ")"
+        
+        block = Block()
+        {
+            cat.setNonStdParameterDeclaration(factory.createCcatchContinueWildcardParameterDeclaration());
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    ]
     
     ( 
         LOOKAHEAD("ccatch" "("  param = FormalParameter() ")")

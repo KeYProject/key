@@ -508,12 +508,20 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         return new CcatchBreakLabelParameterDeclaration(label);
     }
 
+    public CcatchBreakWildcardParameterDeclaration createCcatchBreakWildcardParameterDeclaration() {
+        return new CcatchBreakWildcardParameterDeclaration();
+    }
+
     public CcatchContinueParameterDeclaration createCcatchContinueParameterDeclaration() {
         return new CcatchContinueParameterDeclaration();
     }
 
     public CcatchContinueLabelParameterDeclaration createCcatchContinueLabelParameterDeclaration(Identifier label) {
         return new CcatchContinueLabelParameterDeclaration(label);
+    }
+
+    public CcatchContinueWildcardParameterDeclaration createCcatchContinueWildcardParameterDeclaration() {
+        return new CcatchContinueWildcardParameterDeclaration();
     }
 
     public CcatchNonstandardParameterDeclaration createCcatchReturnValParameterDeclaration(ParameterDeclaration e) {

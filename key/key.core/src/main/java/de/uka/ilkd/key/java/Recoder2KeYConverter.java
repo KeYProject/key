@@ -1965,12 +1965,20 @@ public class Recoder2KeYConverter {
         return new CcatchBreakParameterDeclaration(collectChildrenAndComments(arg));
     }
 
+    public CcatchBreakWildcardParameterDeclaration convert(de.uka.ilkd.key.java.recoderext.CcatchBreakWildcardParameterDeclaration arg) {
+        return new CcatchBreakWildcardParameterDeclaration(collectChildrenAndComments(arg));
+    }
+
     public CcatchBreakLabelParameterDeclaration convert(de.uka.ilkd.key.java.recoderext.CcatchBreakLabelParameterDeclaration arg) {
         return new CcatchBreakLabelParameterDeclaration(collectChildrenAndComments(arg));
     }
 
     public CcatchContinueParameterDeclaration convert(de.uka.ilkd.key.java.recoderext.CcatchContinueParameterDeclaration arg) {
         return new CcatchContinueParameterDeclaration(collectChildrenAndComments(arg));
+    }
+
+    public CcatchContinueWildcardParameterDeclaration convert(de.uka.ilkd.key.java.recoderext.CcatchContinueWildcardParameterDeclaration arg) {
+        return new CcatchContinueWildcardParameterDeclaration(collectChildrenAndComments(arg));
     }
 
     public CcatchContinueLabelParameterDeclaration convert(de.uka.ilkd.key.java.recoderext.CcatchContinueLabelParameterDeclaration arg) {
