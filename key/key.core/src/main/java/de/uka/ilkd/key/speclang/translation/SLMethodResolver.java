@@ -130,8 +130,9 @@ public final class SLMethodResolver extends SLExpressionResolver {
         for (SLExpression slExpression : params) {
             //Remember: parameters.isLisOfTerm() is true!
             final Term term = slExpression.getTerm();
-            subs[i++] = term.sort() == Sort.FORMULA ?
+            subs[i] = term.sort() == Sort.FORMULA ?
                     services.getTermBuilder().convertToBoolean(term) : term;
+            i++;
         }
         
         if (pm.isVoid()) {

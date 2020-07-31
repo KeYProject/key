@@ -47,7 +47,13 @@ public final class SLParameters {
         }
         return true;
     }
-    
+
+    /**
+     * returns the type signature of the parameter list
+     * 
+     * @param services the Services
+     * @return the list of types that compose the type signature
+     */
     public ImmutableList<KeYJavaType> getSignature(Services services) {
         ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
         for(SLExpression expr : parameters) {
