@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -157,12 +158,21 @@ public abstract class AbstractFileRepo implements FileRepo {
      */
     protected static boolean isInternalFile(Path path) throws MalformedURLException {
         URL url = path.toUri().toURL();
+        return isInternalResource(url);
+    }
 
-        // TODO: maybe we better should cut off the protocol part first?
+    /**
+     * Tests if the given URL references an internal resource of KeY, i.e. if it is a Java or rule
+     * file shipped with KeY (may be inside a jar file).
+     * @param url the url to test
+     * @return true iff the file is an internal file
+     */
+    protected static boolean isInternalResource(URL url) {
         String urlStr = url.toString();
         String rulesURLStr = RULES_URL.toString();
         String reduxURLStr = REDUX_URL.toString();
         return urlStr.startsWith(rulesURLStr) || urlStr.startsWith(reduxURLStr);
+
     }
 
     protected Path getJavaPath() {
@@ -314,7 +324,7 @@ public abstract class AbstractFileRepo implements FileRepo {
             // add classpath (has to be prior to javaSource)
             rep = addClasspath(rep);
 
-            return new ByteArrayInputStream(rep.getBytes("UTF-8"));
+            return new ByteArrayInputStream(rep.getBytes(StandardCharsets.UTF_8));
         }
     }
 
