@@ -566,7 +566,8 @@ public class Recoder2KeY implements JavaReader {
         while(walker.step()) {
             DataLocation loc = walker.getCurrentDataLocation();
             try (InputStream is = walker.openCurrent(fileRepo);
-                 Reader f = new BufferedReader(new InputStreamReader(is))) {
+                 Reader isr = new InputStreamReader(is);
+                 Reader f = new BufferedReader(isr)) {
 
                 recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
                 rcu.setDataLocation(loc);
@@ -634,7 +635,8 @@ public class Recoder2KeY implements JavaReader {
             while(walker.step()) {
                 currentDataLocation = walker.getCurrentDataLocation();
                 try (InputStream is = walker.openCurrent(fileRepo);
-                     Reader f = new BufferedReader(new InputStreamReader(is))) {
+                     Reader isr = new InputStreamReader(is);
+                     Reader f = new BufferedReader(isr)) {
 
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
                     rcu.setDataLocation(currentDataLocation);
@@ -652,7 +654,8 @@ public class Recoder2KeY implements JavaReader {
             while(walker.step()) {
                 currentDataLocation = walker.getCurrentDataLocation();
                 try (InputStream is = walker.openCurrent(fileRepo);
-                     Reader f = new BufferedReader(new InputStreamReader(is))) {
+                     Reader isr = new InputStreamReader(is);
+                     Reader f = new BufferedReader(isr)) {
 
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
                     rcu.setDataLocation(currentDataLocation);
