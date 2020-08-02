@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+    id 'antlr'
+}
+
+group 'org.key_project'
+version '2.7'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    antlr "org.antlr:antlr4:4.8"
+}
+
+generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments += ['-package', 'de.uka.ilkd.key.smt']
+    arguments += ['-visitor', '-long-messages']
+}
+
+/*
+sourceSets {
+    generated {
+        java.srcDir 'generated-src/antlr/main'
+    }
+}*/
+
