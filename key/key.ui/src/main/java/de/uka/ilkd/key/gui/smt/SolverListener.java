@@ -46,6 +46,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.smt.SMTReplayer;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
@@ -247,6 +248,22 @@ public class SolverListener implements SolverLauncherListener {
                 return title;
         }
 
+        private void replayResults() {
+            KeYMediator mediator = MainWindow.getInstance().getMediator();
+            mediator.stopInterface(true);
+            try {
+                for (SMTProblem problem : smtProblems) {
+                    if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
+
+                        SMTReplayer replayer = new SMTReplayer(problem);
+                        replayer.replay();
+                    }
+                }
+            } finally {
+                mediator.startInterface(true);
+            }
+        }
+
         private void applyResults() {
             KeYMediator mediator = MainWindow.getInstance().getMediator();
             mediator.stopInterface(true);
@@ -362,6 +379,12 @@ public class SolverListener implements SolverLauncherListener {
         private void discardEvent(final SolverLauncher launcher) {
                 launcher.stop();
                 progressDialog.setVisible(false);
+        }
+
+        private void replayEvent(final SolverLauncher launcher) {
+            launcher.stop();
+            replayResults();
+            progressDialog.setVisible(false);
         }
 
         private void applyEvent(final SolverLauncher launcher) {
@@ -675,11 +698,15 @@ public class SolverListener implements SolverLauncherListener {
                
                     stopEvent(launcher); 
             }
-            
+
+            @Override
+            public void replayButtonClicked() {
+                replayEvent(launcher);
+            }
+
             @Override
             public void applyButtonClicked() {
                     applyEvent(launcher);
-                    
             }
 
             @Override
@@ -689,7 +716,6 @@ public class SolverListener implements SolverLauncherListener {
                     if(counterexample && smtProof != null){
                         smtProof.dispose();
                     }
-                    
             }
 
             @Override
@@ -704,7 +730,7 @@ public class SolverListener implements SolverLauncherListener {
                               null,
                               null);
               	  }else if(obj instanceof InternSMTProblem){
-            		  showInformation((InternSMTProblem)obj);   
+            		  showInformation((InternSMTProblem)obj);
             	  }
             }
     };

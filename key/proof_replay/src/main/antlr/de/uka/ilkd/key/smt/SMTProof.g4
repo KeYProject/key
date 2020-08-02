@@ -1,5 +1,7 @@
 grammar SMTProof;
 
+smtoutput : ('Result: valid' 'unsat')? proof;
+
 proof
     : LPAREN command* LPAREN 'proof' proofsexpr+ RPAREN RPAREN EOF
     ;
@@ -96,6 +98,8 @@ PROOFRULE
     | PR_HYPOTHESIS
     | PR_LEMMA
     | PR_UNIT_RESOLUTION
+    | PR_IFF_TRUE
+    | PR_IFF_FALSE
     | PR_COMMUTATIVITY
     | PR_DEF_AXIOM
     | PR_NNF_POS

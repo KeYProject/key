@@ -57,6 +57,7 @@ public class ProgressDialog extends JDialog{
 
         private static final long serialVersionUID = 1L;
         private final ProgressTable   table;
+        private JButton  replayButton;
         private JButton  applyButton;
         private JButton  stopButton;
         private JScrollPane scrollPane;
@@ -74,6 +75,7 @@ public class ProgressDialog extends JDialog{
         public void stopButtonClicked();
         public void discardButtonClicked();
         public void additionalInformationChosen(Object obj);
+        public void replayButtonClicked();
     }
 
     public ProgressDialog(ProgressModel model,ProgressDialogListener listener, boolean counterexample,
@@ -102,6 +104,8 @@ public class ProgressDialog extends JDialog{
                 buttonBox.add(Box.createHorizontalStrut(5));
                 if(!counterexample){
                 	buttonBox.add(getApplyButton());
+                    buttonBox.add(Box.createHorizontalStrut(5));
+                    buttonBox.add(getReplayButton());
                     buttonBox.add(Box.createHorizontalStrut(5));
                 }
                 
@@ -188,7 +192,19 @@ public class ProgressDialog extends JDialog{
 
         
    
-        
+        private JButton getReplayButton() {
+            if (replayButton == null) {
+                replayButton = new JButton("Replay");
+                replayButton.setEnabled(false);
+                replayButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        listener.replayButtonClicked();
+                    }
+                });
+            }
+            return replayButton;
+        }
         
         private JButton getApplyButton() {
                 if(applyButton == null){
@@ -249,11 +265,15 @@ public class ProgressDialog extends JDialog{
                         stopButton.setText("Discard");
                         if(applyButton!=null)
                         applyButton.setEnabled(true);
+                        if (replayButton != null)
+                            replayButton.setEnabled(true);
                         break;
                 case stopModus:
                         stopButton.setText("Stop");
                         if(applyButton!=null)
                         applyButton.setEnabled(false);
+                        if (replayButton != null)
+                            replayButton.setEnabled(false);
                         break;
                         
                 }
