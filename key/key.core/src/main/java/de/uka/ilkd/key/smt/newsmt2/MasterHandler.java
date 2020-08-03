@@ -51,6 +51,9 @@ public class MasterHandler {
     /** Global state, i.e. a counter for the number of distinct field variables */
     private Map<String, Object> translationState = new HashMap<>();
 
+    /** A mapping from Strings (containing S-Expressions) to KeY terms*/
+    private Map<String, Term> translationToTermMap = new HashMap<>();
+
     public MasterHandler(Services services) throws IOException {
 
         for (SMTHandler smtHandler : ServiceLoader.load(SMTHandler.class)) {
@@ -84,10 +87,14 @@ public class MasterHandler {
         try {
             for (SMTHandler smtHandler : handlers) {
                 if(smtHandler.canHandle(problem)) {
-                    return smtHandler.handle(this, problem);
+                    SExpr res = smtHandler.handle(this, problem);
+                    translationToTermMap.put(res.toString(), problem);
+                    return res;
                 }
             }
-            return handleAsUnknownValue(problem);
+            SExpr res = handleAsUnknownValue(problem);
+            translationToTermMap.put(res.toString(), problem);
+            return res;
         } catch(Exception ex) {
             exceptions.add(ex);
             return handleAsUnknownValue(problem);
@@ -250,6 +257,10 @@ public class MasterHandler {
 
     public List<Writable> getOptions() {
         return options;
+    }
+
+    public Map<String, Term> getTranslationToTermMap() {
+        return translationToTermMap;
     }
 
     public void addOption(Writable w) {
