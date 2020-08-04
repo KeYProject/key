@@ -15,7 +15,7 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
 
 /**
  * A single unit that will be tested during {@link RunAllProofsTest} run.
- * 
+ *
  * @author Kai Wallisch
  */
 public final class RunAllProofsTestUnit implements Serializable {
@@ -59,8 +59,9 @@ public final class RunAllProofsTestUnit implements Serializable {
      *
      * @return either a single test result or an aggregated test result, not
      *         <code>null</code>.
+    * @param xml
      */
-    public TestResult runTest() throws Exception {
+    public TestResult runTest(JunitXmlWriter xml) throws Exception {
         /*
          * List of test results containing one test result for each test
          * file contained in this group.
@@ -121,12 +122,17 @@ public final class RunAllProofsTestUnit implements Serializable {
         }
 
         boolean success = true;
-        String message = "group " + testName + ":\n";
-        for (TestResult testResult : testResults) {
+        StringBuilder message = new StringBuilder("group " + testName + ":\n");
+        for (int i = 0; i < testResults.size(); i++) {
+            TestFile<?> file = testFiles.get(i);
+            TestResult testResult = testResults.get(i);
+            xml.addTestcase(file.getKeYFile().getName(), this.testName, false, "",
+                    !testResult.success ? "error" : "", testResult.message, ""
+            );
             success &= testResult.success;
-            message += testResult.message + "\n";
+            message.append(testResult.message).append("\n");
         }
-        return new TestResult(message, success);
+        return new TestResult(message.toString(), success);
     }
 
     public String getTestName() {
@@ -157,5 +163,9 @@ public final class RunAllProofsTestUnit implements Serializable {
 
     public ProofCollectionSettings getSettings() {
         return settings;
+    }
+
+    public int getTotalNumTests() {
+        return this.testFiles.size();
     }
 }

@@ -8,7 +8,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
@@ -91,8 +93,12 @@ public abstract class RunAllProofsTest {
                           * Tests each file defined by the instance variables. The tests steps are
                           * described in the constructor of this class.
                           */
-                         TestResult report = it.runTest();
-                         Assertions.assertTrue(report.success, report.message);
+                         String xmlFile = String.format("build/test-results/%s.xml", unit.getTestName());
+                         try(JunitXmlWriter xml = new JunitXmlWriter(new BufferedWriter(new FileWriter(xmlFile)),
+                                 unit.getTestName(), unit.getTotalNumTests())) {
+                            TestResult report = unit.runTest(xml);
+                            assertTrue(report.message, report.success);
+                         }
                       }));
    }
 
