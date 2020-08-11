@@ -114,7 +114,7 @@ class Pipe<T>{
 			}
 		}
 		
-		abstract protected void doWork();
+		abstract protected void doWork() throws IOException;
 		abstract protected void stopWorking() throws IOException;
 	}
 
@@ -179,7 +179,7 @@ class Pipe<T>{
 
 
 		
-		protected void doWork(){
+		protected void doWork() throws IOException {
 			// do not use BufferedReader directly, but this wrapper in order to support different
 			// message delimiters.
 			BufferedMessageReader reader = new BufferedMessageReader(
@@ -204,7 +204,7 @@ class Pipe<T>{
 				}
 			 }while(message != null && !Thread.currentThread().isInterrupted());
 			  // process last remaining input:
-			  StringBuffer buf = reader.getMessageBuffer();
+			  String buf = reader.drain();
 			  if(buf.length()>0){
 				  deliverMessage(buf.toString());
 			  }
