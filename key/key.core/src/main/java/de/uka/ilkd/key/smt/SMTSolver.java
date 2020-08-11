@@ -130,6 +130,16 @@ public interface SMTSolver {
     public boolean isRunning();
 
     /**
+     * Starts a solver process. This method should be accessed only by an
+     * instance of <code>SolverLauncher</code>. If you want to start a
+     * solver please have a look at <code>SolverLauncher</code>.
+     *
+     * @param timeout
+     * @param settings
+     */
+    void start(SolverTimeout timeout, SMTSettings settings);
+
+    /**
      * Returns the reason of the interruption: see
      * <code>ReasonOfInterruption</code>.
      */

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.smt;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -718,7 +719,7 @@ class ObjectTypeQuery extends AbstractQuery{
  * @author mihai
  *
  */
-public class ModelExtractor implements PipeListener<SolverCommunication>{
+public class ModelExtractor {
 
 	public static final int DEFAULT = 0;
 	public static final int TYPES = 4;
@@ -1095,7 +1096,7 @@ public class ModelExtractor implements PipeListener<SolverCommunication>{
 		return state;
 	}
 
-	private void finishBasicQueries(Pipe<SolverCommunication> pipe){
+	private void finishBasicQueries(Pipe<SolverCommunication> pipe) throws IOException {
 
 		processBasicQueries();
 		generateArrayQueries();
@@ -1328,9 +1329,8 @@ public class ModelExtractor implements PipeListener<SolverCommunication>{
 
 	}
 
-	@Override
 	public void messageIncoming(Pipe<SolverCommunication> pipe, String message,
-			int type) {	
+			int type) throws IOException {
 
 		//System.out.println("MQ: " + message);
 
@@ -1414,13 +1414,13 @@ public class ModelExtractor implements PipeListener<SolverCommunication>{
 
 	}
 
-	private void finishTypesQueries(Pipe<SolverCommunication> pipe) {
+	private void finishTypesQueries(Pipe<SolverCommunication> pipe) throws IOException {
 		processTypesQueries();
 		startBasicQueries(pipe);
 		
 	}
 	
-	private void finishSeqQueries(Pipe<SolverCommunication> pipe){
+	private void finishSeqQueries(Pipe<SolverCommunication> pipe) throws IOException {
 		processSeqQueries();
 		model.processSeqValues();
 		model.processSequenceNames();
@@ -1432,7 +1432,7 @@ public class ModelExtractor implements PipeListener<SolverCommunication>{
 
 
 
-	private void startBasicQueries(Pipe<SolverCommunication> pipe) {
+	private void startBasicQueries(Pipe<SolverCommunication> pipe) throws IOException {
 		generateBasicQueries();
 		Query q = queries.get(currentQuery);
 		state = WORKING;
@@ -1472,7 +1472,7 @@ public class ModelExtractor implements PipeListener<SolverCommunication>{
 
 
 
-	private void finishArrayQueries(Pipe<SolverCommunication> pipe) {
+	private void finishArrayQueries(Pipe<SolverCommunication> pipe) throws IOException {
 		
 		processArrayQueries();
 		state = SEQ;
@@ -1550,7 +1550,7 @@ public class ModelExtractor implements PipeListener<SolverCommunication>{
 
 
 
-	public void start(Pipe<SolverCommunication> pipe){
+	public void start(Pipe<SolverCommunication> pipe) throws IOException {
 		//pipe.addListener(this);
 		generateTypeQueries();
 		if(queries.size()>0){
@@ -1570,12 +1570,5 @@ public class ModelExtractor implements PipeListener<SolverCommunication>{
 		return state == WORKING || state == ARRAYFIELDS;
 	}
 
-
-	@Override
-	public void exceptionOccurred(Pipe<SolverCommunication> pipe,
-			Throwable exception) {
-
-
-	}
 
 }

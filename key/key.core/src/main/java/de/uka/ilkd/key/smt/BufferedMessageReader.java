@@ -84,7 +84,12 @@ class BufferedMessageReader {
 			}
 		}
 
+        if (sb.length() == 0) {
+            // return null to indicate a finished stream
+            return null;
+        } else {
 		return sb.toString();
+	}
 	}
 
 	/**

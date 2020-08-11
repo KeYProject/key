@@ -17,10 +17,11 @@ public class BufferedMessageReaderTest extends TestCase {
 
     public void testEmptyStart() throws IOException {
         String[] delims = { "X", "Y" };
-        BufferedMessageReader br = new BufferedMessageReader(new StringReader("XXXaXbYc"), delims);
+        BufferedMessageReader br = new BufferedMessageReader(new StringReader("XXXaXbYcYXY"), delims);
         assertEquals("a", br.readMessage());
         assertEquals("b", br.readMessage());
         assertEquals("c", br.readMessage());
+        assertEquals(null, br.readMessage());
     }
 
     public void testDrain() throws IOException {
@@ -35,6 +36,7 @@ public class BufferedMessageReaderTest extends TestCase {
         assertEquals("a", br.readMessage());
         assertEquals("b", br.readMessage());
         assertEquals("c", br.readMessage());
+        assertEquals(null, br.readMessage());
     }
 
     public void testNewline() throws IOException {
@@ -43,6 +45,7 @@ public class BufferedMessageReaderTest extends TestCase {
         assertEquals("a", br.readMessage());
         assertEquals("b", br.readMessage());
         assertEquals("c", br.readMessage());
+        assertEquals(null, br.readMessage());
     }
 
 }

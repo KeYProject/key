@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.smt;
 
+import de.uka.ilkd.key.smt.SolverCommunication.Message;
+
+import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
 
@@ -25,43 +28,29 @@ import java.util.concurrent.locks.ReentrantLock;
  * The parameter T of the class can be used to define user-specific parameters.
  */
 public class ExternalProcessLauncher<T> {
-	private Process process;
-	/**lock for the process-object in order to guarantee synchronous access: If you want to access on <code>process</code>
-	 * then acquire first the lock!*/        
-	private ReentrantLock lockProcess = new ReentrantLock(true);
-	private final Pipe<T> pipe;
-	ExternalProcessLauncher(T session, String [] messageDelimiters){
-		pipe = new Pipe<T>(session,messageDelimiters);
-	}
 
+	private Process process;
+
+	private final Pipe<T> pipe;
+
+	public ExternalProcessLauncher(T session, String[] messageDelimiters) {
+		pipe = new Pipe<T>(session, messageDelimiters);
+	}
 
     /**
      * Main procedure of the class. Starts the external process, then it goes sleeping until 
      * the process has finished its work.
-     */
-	public void launch(final String [] command,String initialMessage, PipeListener<T> listener) throws Throwable {
-		try{
+	 */
+	public void launch(final String [] command) throws IOException {
+        try {
+            ProcessBuilder builder = new ProcessBuilder(command);
+            process = builder.start();
 
-			lockProcess.lock();
-			try {
-				ProcessBuilder builder = new ProcessBuilder();
-				builder.command(command);
-				process = builder.start();
-
-				pipe.start(process.getInputStream(), process.getOutputStream(), process.getErrorStream(), listener);
-			} finally {
-				lockProcess.unlock();
-			}
-			
-			// send initial message: basically the smt problem.
-			pipe.sendMessage(initialMessage+"\n");
-			//pipe.closeSendingPipe();
-			// wait until the output has been processed
-			pipe.waitForPipe();
-
-		}finally{
-			stop(); // clean up
-		}	     			
+            pipe.start(process);
+        } catch (Exception ex) {
+            stop();
+            throw ex;
+        }
 	}
 	
 
@@ -76,15 +65,22 @@ public class ExternalProcessLauncher<T> {
     /**
      * Stops the external process: In particular the pipe is closed and the process is destroyed. 
      */
-	public void stop(){
-		lockProcess.lock();
-		try {
-			if(process != null){
-				process.destroy();
-			}
-			pipe.close();
-	    } finally {
-			lockProcess.unlock();
+	public void stop() {
+		if(process != null){
+			process.destroy();
 		}
+		pipe.close();
+	}
+
+	public Pipe<T> getPipe() {
+		return pipe;
+	}
+
+	public void sendMessage(String message) throws IOException {
+		pipe.sendMessage(message);
+	}
+
+	public Message readMessage() throws IOException, InterruptedException {
+		return pipe.readMessage();
 	}
 }
