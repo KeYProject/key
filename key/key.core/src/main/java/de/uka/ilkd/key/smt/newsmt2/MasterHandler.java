@@ -33,7 +33,7 @@ public class MasterHandler {
     /** All axioms */
     private List<Writable> axioms = new ArrayList<>();
 
-    /** All options */
+    /** All SMT options */
     private List<Writable> options = new ArrayList<>();
 
     /** A list of known symbols */
@@ -65,19 +65,27 @@ public class MasterHandler {
             }
             handlers.add(smtHandler);
         }
+
         snippets.loadFromXML(getClass().getResourceAsStream("preamble.xml"));
 
+        // If there are options in the preamble pass them through verbatim.
         if (snippets.containsKey("opts")) {
             VerbatimSMT opts = new VerbatimSMT(snippets.getProperty("opts"));
             addOption(opts);
         }
+
+        for (Object k : snippets.keySet()) {
+            String key = k.toString();
+            if(key.endsWith(".auto")) {
+                // strip the ".auto" and add the snippet
+                addFromSnippets(key.substring(0, key.length() - 5));
+            }
+        }
+
         //TODO js,mu: which of these are strictly always necessary, which can be loaded on demand?
-        addFromSnippets("general");
-        addFromSnippets("bool");
-        addFromSnippets("int");
+        // MU: I believe this should only be loaded on demand.
+        // perhaps: get rid of instanceof altogether!
         addFromSnippets("instanceof");
-        addFromSnippets("types");
-        addFromSnippets("null");
     }
 
     public SExpr translate(Term problem) {

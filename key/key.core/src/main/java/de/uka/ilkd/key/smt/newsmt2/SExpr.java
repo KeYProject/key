@@ -107,7 +107,7 @@ public class SExpr implements Writable {
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         appendTo(sb);
         return sb.toString();
     }
@@ -124,7 +124,7 @@ public class SExpr implements Writable {
     }
 
     @Override
-    public void appendTo(StringBuffer sb) {
+    public void appendTo(StringBuilder sb) {
         boolean noSpace = name.isEmpty();
         if(children.size() > 0 || noSpace) {
             sb.append("(").append(getEscapedName());

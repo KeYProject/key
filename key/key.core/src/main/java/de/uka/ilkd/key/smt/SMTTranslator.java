@@ -34,10 +34,10 @@ public interface SMTTranslator {
      * will be added.
      * @param problem the problem to be translated.
      * @param services
-     * @return a StringBuffer representing the term in the given syntax.
+     * @return a representation of the term in the given syntax.
      * @throws IllegalFormulaException
      */
-    public StringBuffer translateProblem(Term problem, Services services,SMTSettings settings)
+    public CharSequence translateProblem(Term problem, Services services,SMTSettings settings)
            throws IllegalFormulaException;
 
     /**

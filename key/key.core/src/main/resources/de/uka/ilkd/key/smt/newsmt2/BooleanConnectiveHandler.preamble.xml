@@ -2,7 +2,10 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
 
-<comment>These are the preamble snippets needed for handling the boolean sort</comment>
+<comment>These are the preamble snippets needed for handling the boolean sort.</comment>
+
+    <!-- This theory is always included. -->
+    <entry key="bool.auto">true</entry>
 
     <entry key="bool.decls">
 (declare-fun u2b (U) Bool)
@@ -16,10 +19,10 @@
 (assert (forall ((b Bool)) (= (u2b (b2u b)) b)))
 (assert (= (typeof TRUE) sort_boolean))
 (assert (= (typeof FALSE) sort_boolean))
-(assert (forall ((u U)) (=> (= (typeof u) sort_boolean) (or (= u TRUE) (= u FALSE)))))
+(assert (forall ((u U)) (! (=> (= (typeof u) sort_boolean) (or (= u TRUE) (= u FALSE))) :pattern ((typeof u)))))
 (assert (u2b TRUE))
 (assert (not (u2b FALSE)))
-(assert (forall ((x U)) (=> (instanceof x sort_boolean)  (= (typeof x ) sort_boolean))))
+(assert (forall ((x U)) (! (=> (instanceof x sort_boolean)  (= (typeof x ) sort_boolean)) :pattern ((instanceof x sort_boolean)))))
     </entry>
 
 </properties>

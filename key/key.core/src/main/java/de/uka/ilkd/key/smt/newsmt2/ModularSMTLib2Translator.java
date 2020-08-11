@@ -31,9 +31,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     private List<Throwable> tacletExceptions = Collections.emptyList();
 
-    // REVIEW MU: Eventually switch to StringBuilder which is faster
     @Override
-    public StringBuffer translateProblem(Term problem, Services services, SMTSettings settings) {
+    public CharSequence translateProblem(Term problem, Services services, SMTSettings settings) {
 
         MasterHandler master;
         try {
@@ -41,7 +40,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         } catch (IOException ex) {
             exceptions = Collections.singletonList(ex);
             // Review MU: This should not be reported as exceptions only ...
-            return new StringBuffer("error while translating");
+            return "error while translating";
         }
 
         List<Term> sequentAsserts = smashProblem(problem, services);
@@ -55,7 +54,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
 //        postProcess(result);
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         sb.append("; --- Preamble");
         for (Writable w : master.getOptions()) {

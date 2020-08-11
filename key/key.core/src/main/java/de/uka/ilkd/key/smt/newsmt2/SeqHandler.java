@@ -91,7 +91,7 @@ public class SeqHandler implements SMTHandler {
             }
         }
 
-        throw new SMTTranslationException("unreachable code");
+        throw new SMTTranslationException("Unsupported term: " + term);
     }
 
     private boolean isSeqGet(Operator op) {

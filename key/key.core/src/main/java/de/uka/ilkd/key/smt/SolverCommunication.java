@@ -26,8 +26,6 @@ import java.util.List;
  * Further, it also contains the final result of the solver. 
  */
 public class SolverCommunication {
-	public static SolverCommunication EMPTY = new SolverCommunication();
-
 	private final List<String> messages = Collections.synchronizedList(new LinkedList<String>());
 	
 	private SMTSolverResult finalResult = SMTSolverResult.NO_IDEA;
