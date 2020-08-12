@@ -27,12 +27,12 @@ class TypeManager {
             Set<Sort> children = directChildSorts(s, master.getSorts());
             for (Sort child : children) {
                 if (!isSpecialSort(s)) {
-                    master.addAxiom(new SExpr("assert", new SExpr("subtype", SExpr.sortExpr(child), SExpr.sortExpr(s))));
+                    master.addAxiom(new SExpr("assert", new SExpr("subtype", SExprs.sortExpr(child), SExprs.sortExpr(s))));
                 }
                 for (Sort otherChild : children) {
                     if (!(child.equals(otherChild)) && (!otherChild.name().toString().equals("Null"))
                             && (!child.name().toString().equals("Null"))) {
-                        SExpr st = new SExpr("subtype", SExpr.sortExpr(child), SExpr.sortExpr(otherChild));
+                        SExpr st = new SExpr("subtype", SExprs.sortExpr(child), SExprs.sortExpr(otherChild));
                         master.addAxiom(new SExpr("assert", new SExpr("not", st)));
                     }
                 }
@@ -42,7 +42,7 @@ class TypeManager {
         for (Sort s : master.getSorts()) {
             if (!(s instanceof NullSort) && !(s.equals(Sort.ANY))) {
                 if (s.extendsSorts().isEmpty()) {
-                    master.addAxiom(new SExpr("assert", new SExpr("subtype", SExpr.sortExpr(s), SExpr.sortExpr(Sort.ANY))));
+                    master.addAxiom(new SExpr("assert", new SExpr("subtype", SExprs.sortExpr(s), SExprs.sortExpr(Sort.ANY))));
                 }
             }
         }

@@ -35,11 +35,11 @@ public class InstanceOfHandler implements SMTHandler {
         if (exactInstanceOfOp.isSimilar(op)) {
             trans.addFromSnippets("exactinstanceof");
             return new SExpr("exactinstanceof", Type.BOOL, inner,
-                SExpr.sortExpr(op.getSortDependingOn()));
+                SExprs.sortExpr(op.getSortDependingOn()));
         } else if (instanceOfOp.isSimilar(op)) {
             trans.addFromSnippets("instanceof");
             return new SExpr("instanceof", Type.BOOL, inner,
-                SExpr.sortExpr(op.getSortDependingOn()));
+                SExprs.sortExpr(op.getSortDependingOn()));
         } else {
             throw new RuntimeException("unexpected case in instanceof-handling");
         }

@@ -244,7 +244,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                         interruptionOccurred(e);
                 } finally {
             // Close everything.
-            System.out.println(name() + " : " + solverCommunication.getFinalResult());
+            // System.out.println(name() + " : " + solverCommunication.getFinalResult());
 
                         solverTimeout.cancel();
                         setSolverState(SolverState.Stopped);

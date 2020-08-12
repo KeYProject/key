@@ -71,9 +71,9 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         List<SExpr> sortExprs = new LinkedList<>();
         for (Sort s : master.getSorts()) {
             if (s != Sort.ANY && !(TypeManager.isSpecialSort(s))) {
-                master.addDeclaration(new SExpr("declare-const", SExpr.sortExpr(s).toString(), "T"));
+                master.addDeclaration(new SExpr("declare-const", SExprs.sortExpr(s).toString(), "T"));
             }
-            sortExprs.add(SExpr.sortExpr(s));
+            sortExprs.add(SExprs.sortExpr(s));
         }
         if (master.getSorts().size() > 1) {
             master.addDeclaration(new SExpr("assert", Type.BOOL,

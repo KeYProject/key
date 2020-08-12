@@ -104,11 +104,11 @@ public class MasterHandler {
 
     public SExpr translate(Term problem, Type type)  {
         try {
-            return coerce(translate(problem), type);
+            return SExprs.coerce(translate(problem), type);
         }  catch(Exception ex) {
             exceptions.add(ex);
             try {
-                return coerce(handleAsUnknownValue(problem), type);
+                return SExprs.coerce(handleAsUnknownValue(problem), type);
             } catch (SMTTranslationException e) {
                 // This can actually never happen since a universe element is translated
                 throw new Error(e);
@@ -166,58 +166,7 @@ public class MasterHandler {
     }
 
     public List<SExpr> translate(Iterable<Term> terms, Type type) throws SMTTranslationException {
-        return coerce(translate(terms), type);
-    }
-
-    private List<SExpr> coerce(List<SExpr> exprs, Type type) throws SMTTranslationException {
-        ListIterator<SExpr> it = exprs.listIterator();
-        while(it.hasNext()) {
-            it.set(coerce(it.next(), type));
-        }
-        return exprs;
-    }
-
-    /**
-     * Takes an SExpression and converts it to the given type, if possible.
-     * @param exp the SExpression to convert
-     * @param type the desired type
-     * @return The same SExpr, but with the desired type
-     * @throws SMTTranslationException if an impossible conversion is attempted
-     */
-    SExpr coerce(SExpr exp, Type type) throws SMTTranslationException {
-        switch(type) {
-        case BOOL:
-            switch(exp.getType()) {
-            case BOOL:
-                return exp;
-            case UNIVERSE:
-                return new SExpr("u2b", Type.BOOL, exp);
-            default:
-                throw new SMTTranslationException("Cannot convert to bool: " + exp);
-            }
-        case INT:
-            switch(exp.getType()) {
-            case INT:
-                return exp;
-            case UNIVERSE:
-                return new SExpr("u2i", Type.INT, exp);
-            default:
-                throw new SMTTranslationException("Cannot convert to int: " + exp);
-            }
-        case UNIVERSE:
-            switch(exp.getType()) {
-            case UNIVERSE:
-                return exp;
-            case INT:
-                return new SExpr("i2u", Type.UNIVERSE, exp);
-            case BOOL:
-                return new SExpr("b2u", Type.UNIVERSE, exp);
-            default:
-                throw new SMTTranslationException("Cannot convert to universe: " + exp);
-            }
-        default:
-            throw new SMTTranslationException("Cannot convert into " + type);
-        }
+        return SExprs.coerce(translate(terms), type);
     }
 
     public List<SExpr> translate(Iterable<Term> terms) {
@@ -289,5 +238,13 @@ public class MasterHandler {
 
     Map<String, Object> getTranslationState() {
         return translationState;
+    }
+
+    /**
+     * @deprecated Use SExprs.coerce
+     */
+    @Deprecated
+    public SExpr coerce(SExpr sExpr, Type type) throws SMTTranslationException {
+        return SExprs.coerce(sExpr, type);
     }
 }

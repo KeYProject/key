@@ -31,7 +31,16 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class SExpr implements Writable {
 
     public enum Type {
-        INT, BOOL, UNIVERSE, PATTERN, NONE
+        /** to indicate that this expression holds a value of type Int */
+        INT,
+        /** to indicate that this expression holds a value of type Bool */
+        BOOL,
+        /** to indicate that this expression holds a value of type U */
+        UNIVERSE,
+        /** to indicate that this expression has some unknown type */
+        NONE,
+        /** to indicate that this element needs no escaping despite its name */
+        VERBATIM
     }
 
     private static final Pattern EXTRACHAR_PATTERN =
@@ -91,20 +100,6 @@ public class SExpr implements Writable {
         this("", Type.NONE, children);
     }
 
-    static SExpr patternSExpr(SExpr e, SExpr... patterns) {
-        return new SExpr("! " + e.toString() + " :pattern ", Type.PATTERN, new SExpr(patterns));
-    }
-
-    static SExpr sortExpr(Sort sort) {
-        return new SExpr(ModularSMTLib2Translator.SORT_PREFIX + sort.toString());
-    }
-
-    static SExpr castExpr(SExpr sortExp, SExpr exp) {
-        // REVIEW MU: Should there perhaps be a coercion to Universe before the call?
-        // What if a "Int" is given. That would fail.
-        return new SExpr("cast", Type.UNIVERSE, exp, sortExp);
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -112,11 +107,22 @@ public class SExpr implements Writable {
         return sb.toString();
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public List<SExpr> getChildren() {
+        return Collections.unmodifiableList(children);
+    }
+
     private String getEscapedName() {
         if (name.length() > 0 && name.charAt(0) == '|' && name.charAt(name.length() - 1) == '|') {
             return name; //already escaped
         }
-        if (EXTRACHAR_PATTERN.matcher(name).find() && type != Type.PATTERN) {
+        if (type == Type.VERBATIM) {
+            return name;
+        }
+        if (EXTRACHAR_PATTERN.matcher(name).find()) {
             return "|" + name + "|";
         } else {
             return name;
