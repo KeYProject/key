@@ -1,4 +1,4 @@
-class For implements Iterable {
+final class For implements Iterable {
 
   // This example has been refactored pending solution to bug #1288
   Trivial it;
@@ -29,7 +29,7 @@ class For implements Iterable {
 
   java.util.Iterator iterator () { return it; } 
 
-  class Trivial extends java.util.Iterator {
+  final class Trivial extends java.util.Iterator {
     boolean hasNext() { return true; }
     Object next() { return null; }
   }

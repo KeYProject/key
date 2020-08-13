@@ -1,5 +1,15 @@
 package de.uka.ilkd.key.gui.docking;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+
+import org.jetbrains.annotations.NotNull;
+
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.MultipleCDockable;
@@ -8,17 +18,15 @@ import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
 import bibliothek.gui.dock.common.action.CCheckBox;
 import bibliothek.gui.dock.common.intern.CDockable;
-import de.uka.ilkd.key.gui.*;
+import de.uka.ilkd.key.gui.GoalList;
+import de.uka.ilkd.key.gui.InfoView;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.StrategySelectionView;
+import de.uka.ilkd.key.gui.TaskTree;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.nodeviews.MainFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
-import de.uka.ilkd.key.gui.sourceview.SourceView;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Stream;
+import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 
 public class DockingHelper {
     public final static List<String> LEFT_TOP_PANEL = new LinkedList<>();
@@ -28,13 +36,15 @@ public class DockingHelper {
 
     static {
         LEFT_TOP_PANEL.add(TaskTree.class.getName());
-        RIGHT_PANEL.add(SourceView.class.getName());
-        MAIN_PANEL.add(MainFrame.class.getName());
 
         LEFT_PANEL.add(GoalList.class.getName());
         LEFT_PANEL.add(ProofTreeView.class.getName());
         LEFT_PANEL.add(InfoView.class.getName());
         LEFT_PANEL.add(StrategySelectionView.class.getName());
+
+        MAIN_PANEL.add(MainFrame.class.getName());
+
+        RIGHT_PANEL.add(SourceViewFrame.class.getName());
     }
 
     /**
@@ -62,10 +72,9 @@ public class DockingHelper {
 
         for (int c = mainWindow.getDockControl().getCDockableCount(), i = 0;
              i < c; i++) {
-            CDockable cur = mainWindow.getDockControl().getCDockable(i);
+            final CDockable cur = mainWindow.getDockControl().getCDockable(i);
             if (cur instanceof SingleCDockable) {
-                String id = ((SingleCDockable) cur).getUniqueId();
-                //System.out.println(id);
+                final String id = ((SingleCDockable) cur).getUniqueId();
                 if (LEFT_PANEL.contains(id)) {
                     leftPanels.add(cur);
                     continue;
@@ -90,7 +99,6 @@ public class DockingHelper {
             }
             leftPanels.add(cur);
         }
-
 
         CGrid grid = new CGrid(mainWindow.getDockControl());
         grid.add(0, 0, 1, 1, leftTopPanels.toArray(new CDockable[]{}));

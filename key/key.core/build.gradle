@@ -1,42 +1,43 @@
 plugins {
-    id("ca.coglinc.javacc") version("2.4.0")
-    id("antlr")
+    id 'ca.coglinc.javacc' version '2.4.0'
+    id 'antlr'
 }
-
 
 dependencies {
-    compile project(":key.util")
+    compile project(':key.util')
     compile name: 'recoderKey'
-    //compile name: 'javacc'
-    //compile name: 'antlr'
-    compile 'net.java.dev.javacc:javacc:4.0'
-    compile "org.antlr:antlr-runtime:3.5.2"
+    compile group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
+    compile group: 'org.antlr', name:'antlr-runtime', version:'3.5.2'
     compile group: 'antlr', name: 'antlr', version: '2.7.7'
 
-    //antlr name: 'antlr'
-    //javacc name: 'javacc'
-    javacc 'net.java.dev.javacc:javacc:4.0'
-    antlr "org.antlr:antlr:3.5.2"   // use ANTLR version 3
+    javacc  group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
+    antlr   group: 'org.antlr', name:'antlr', version:'3.5.2'   // use ANTLR version 3
 }
 
+// The target directory for JavaCC (parser generation)
 def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
 def javaCCOutputDirMain = file("$javaCCOutputDir/main")
+
 sourceSets.main.java.srcDirs(javaCCOutputDirMain)
 
+// Generate code from ANTLR grammars.
 generateGrammarSource {
     maxHeapSize = "64m"
     arguments += ["-visitor", "-listener", "-long-messages"]
 }
 
+// Generate code from ANTLR grammars in testing.
 generateTestGrammarSource {
     maxHeapSize = "64m"
     arguments += ["-visitor", "-listener", "-long-messages"]
 }
 
+// Generate code from JavaCC grammars.
 compileJavacc {
     outputDirectory = javaCCOutputDirMain
     inputDirectory = file("src/main/javacc")
     doLast {
+        // Some manual overwriting of Token files needed
         copy {
             from("src/main/javacc/de/uka/ilkd/key/parser/schemajava/Token.java")
             into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/schemajava/"
@@ -48,8 +49,12 @@ compileJavacc {
     }
 }
 
+tasks.withType(Test) {
+    enableAssertions = true
+}
+
 test {
-    filter {
+    /*filter {
         // use testProofRules or testRunAllProofs, avoid double execution on jenkins
         excludeTestsMatching "ProveRulesTest"
         excludeTestsMatching "RunAllProofsTestSuite"
@@ -58,27 +63,53 @@ test {
         excludeTestsMatching "RunAllProofsFunctional"
         excludeTestsMatching "TestParallelParsing"
         excludeTestsMatching "TestCvc4"
+    }*/
+    filter {
+        // To make test cases deterministic there is only one class per
+        // project called "Tests" that programmatically collects
+        // all test cases.
+        // See these classes for configuring the test runs!
+        // CAUTION! "excludeCategories" more filters are to be defined in the class!
+        includeTestsMatching "de.uka.ilkd.key.Tests"
     }
-    useJUnit {
-            excludeCategories 'org.key_project.util.testcategories.Performance'
-            excludeCategories 'org.key_project.util.testcategories.Interactive'
+    // pass debug flag from command line:
+    systemProperty "key.test.autosuite.debug", System.getProperty("key.test.autosuite.debug")
+
+    // TODO @AW. That is already in key/build.gradle. Here or there?
+    // useJUnit {
+    //         excludeCategories 'org.key_project.util.testcategories.Performance'
+    //         excludeCategories 'org.key_project.util.testcategories.Interactive'
+    // }
+}
+
+testFast {
+    filter {
+        // To make test cases deterministic there is only one class per
+        // project called "Tests" that programmatically collects
+        // all test cases.
+        // See these classes for configuring the test runs!
+        // CAUTION! "excludeCategories" more filters are to be defined in the class!
+        includeTestsMatching "de.uka.ilkd.key.FastTests"
     }
 }
 
-task testProofRules(type: Test) {
+task testProveRules(type: Test) {
+    description 'Proves KeY taclet rules tagged as lemma'
     group "verification"
     filter { includeTestsMatching "ProveRulesTest" }
 }
 
 task testRunAllProofs(type: Test) {
+    description 'Proof/reload all keyfiles tagged for regression testing'
     group "verification"
     filter { 
-        includeTestsMatching "RunAllProofsTestSuite"
+        // TODO does not exist any more: includeTestsMatching "RunAllProofsTestSuite"
         includeTestsMatching "RunAllProofsInfFlow"
         includeTestsMatching "RunAllProofsFunctional"
     }
 }
 
+//Generation of the three version files within the resources by executing `git'.
 task generateVersionFiles() {
     def outputFolder = file("build/resources/main/de/uka/ilkd/key/util")
     def sha1 = new File(outputFolder, "sha1")
@@ -96,6 +127,9 @@ task generateVersionFiles() {
         versionf.text = rootProject.version
     }
 }
+
+// @AW: Say something here. From POV this explain by itself.
 processResources.dependsOn generateVersionFiles
 
-//check.dependsOn << testProofRules << testRunAllProofs
+// @AW: Delete? weigl: depends: If want that gradle check validates everything then not.
+// check.dependsOn << testProofRules << testRunAllProofs

@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.settings;
 
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.*;
 import java.util.function.Function;
 
@@ -45,6 +48,25 @@ public abstract class AbstractPropertiesSettings implements Settings {
         return String.join(SET_DELIMITER, set);
     }
 
+    /**
+     * Translation of a string to a list of string by using {@link #SET_DELIMITER}
+     *
+     * @param str a nonnull, emptible string
+     * @return a possible empty, list of strings
+     * @see #stringListToString(List)
+     */
+    private static @NotNull List<String> parseStringList(@NotNull String str) {
+        return new ArrayList<>(Arrays.asList(str.split(SET_DELIMITER)));
+    }
+
+    /**
+     * @param seq a string list
+     * @return the strings concatenated with {@link #SET_DELIMITER}
+     */
+    private static @NotNull String stringListToString(@NotNull List<String> seq) {
+        return String.join(SET_DELIMITER, seq);
+    }
+
     public boolean isInitialized() {
         return properties != null;
     }
@@ -53,8 +75,10 @@ public abstract class AbstractPropertiesSettings implements Settings {
     public void readSettings(Properties props) {
         assert props != null;
         propertyEntries.forEach(it -> {
-            if (props.contains(it.getKey()))
-                properties.setProperty(it.getKey(), props.getProperty(it.getKey()));
+            String value = props.getProperty(it.getKey());
+            if (value != null) {
+                properties.setProperty(it.getKey(), value);
+            }
         });
     }
 
@@ -101,8 +125,8 @@ public abstract class AbstractPropertiesSettings implements Settings {
         return pe;
     }
 
-    protected PropertyEntry<Boolean> createBooleanProperty(String key, boolean b) {
-        PropertyEntry<Boolean> pe = new DefaultPropertyEntry<>(key, b, parseBoolean);
+    protected PropertyEntry<Boolean> createBooleanProperty(String key, boolean defValue) {
+        PropertyEntry<Boolean> pe = new DefaultPropertyEntry<>(key, defValue, parseBoolean);
         propertyEntries.add(pe);
         return pe;
     }
@@ -112,6 +136,23 @@ public abstract class AbstractPropertiesSettings implements Settings {
                 parseStringSet(defValue),
                 AbstractPropertiesSettings::parseStringSet,
                 AbstractPropertiesSettings::stringSetToString);
+        propertyEntries.add(pe);
+        return pe;
+    }
+
+    /**
+     * Creates a string list property.
+     *
+     * @param key      the key value of this property inside {@link Properties} instance
+     * @param defValue a default value
+     * @return returns a {@link PropertyEntry}
+     */
+    protected PropertyEntry<List<String>> createStringListProperty(@NotNull String key,
+                                                                   @Nullable String defValue) {
+        PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key,
+                parseStringList(defValue),
+                AbstractPropertiesSettings::parseStringList,
+                AbstractPropertiesSettings::stringListToString);
         propertyEntries.add(pe);
         return pe;
     }

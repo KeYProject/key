@@ -7,13 +7,15 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.Rule;;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;;
 
 /**
  * Policy for {@link OriginTermLabel}s.
@@ -34,7 +36,8 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
             return label;
         }
 
-        if (!services.getProof().getSettings().getTermLabelSettings().getUseOriginLabels()) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE
+                .getTermLabelSettings().getUseOriginLabels()) {
             return null;
         }
 
@@ -62,6 +65,11 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
 
         if (result.getOrigin().specType == SpecType.NONE && result.getSubtermOrigins().isEmpty()) {
             result = null;
+        }
+
+        if (result != null && result.getOrigin() instanceof FileOrigin
+                && goal != null && goal.node() != null) {
+            goal.node().getNodeInfo().addRelevantFile(((FileOrigin) result.getOrigin()).fileName);
         }
 
         return result;

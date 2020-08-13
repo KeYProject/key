@@ -179,7 +179,7 @@ public class EvaluationWizardDialog extends WizardDialog {
    }
 
    @Override
-   protected int getShellStyle() {
+   public int getShellStyle() {
       return SWT.CLOSE | SWT.MAX | SWT.TITLE | SWT.BORDER | SWT.RESIZE | getDefaultOrientation();
    }
 

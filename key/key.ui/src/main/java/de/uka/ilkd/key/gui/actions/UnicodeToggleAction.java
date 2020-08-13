@@ -24,13 +24,15 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
-@SuppressWarnings("serial")
 public class UnicodeToggleAction extends MainWindowAction {
-   public static final String NAME = "Use Unicode symbols";
-   
-   public static final String TOOL_TIP = "If checked formulae are displayed with special Unicode characters" +
-                                         " (such as \""+UnicodeHelper.AND+"\") instead of the traditional ASCII ones. \n"+
-                                         "Only works in combination with pretty printing (see above).";
+    private static final long serialVersionUID = 6078839876754730405L;
+
+    public static final String NAME = "Use Unicode Symbols";
+
+    public static final String TOOL_TIP =
+            "If checked formulae are displayed with special Unicode characters"
+          + " (such as \"" + UnicodeHelper.AND + "\") instead of the traditional ASCII ones. \n"
+          + "Only works in combination with pretty printing (see above).";
    
    /**
     * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()}.

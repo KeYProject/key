@@ -33,7 +33,7 @@ public class Function extends AbstractSortedOperator {
 
     //-------------------------------------------------------------------------
     //constructors
-    //-------------------------------------------------------------------------     
+    //-------------------------------------------------------------------------
 
     Function(Name name,
              Sort sort,
@@ -43,6 +43,7 @@ public class Function extends AbstractSortedOperator {
              boolean isRigid,
              boolean isSkolemConstant) {
 	super(name, argSorts, sort, whereToBind, isRigid);
+
 	this.unique = unique;
 	skolemConstant = isSkolemConstant;
 	assert sort != Sort.UPDATE;
@@ -121,7 +122,7 @@ public class Function extends AbstractSortedOperator {
 
     //-------------------------------------------------------------------------
     //public interface
-    //-------------------------------------------------------------------------     
+    //-------------------------------------------------------------------------
 
     /**
      * Indicates whether the function or predicate symbol has the "uniqueness"
@@ -150,21 +151,22 @@ public class Function extends AbstractSortedOperator {
      * function or predicate symbol.
      */
     public final String proofToString() {
-       String s =
-	   (sort() == Sort.FORMULA ? "" : sort().toString()) + " ";
-       s += name();
-       if (arity()>0) {
-          int i = 0;
-          s+="(";
-          while (i<arity()) {
-             if (i>0) s+=",";
-             s+=argSort(i);
-             i++;
-          }
-          s+=")";
-       }
-       s+=";\n";
-       return s;
+        String s = (sort() == Sort.FORMULA ? "" : sort().toString()) + " ";
+        s += name();
+        if (arity() > 0) {
+            int i = 0;
+            s += "(";
+            while (i < arity()) {
+                if (i > 0) {
+                    s += ",";
+                }
+                s += argSort(i);
+                i++;
+            }
+            s += ")";
+        }
+        s += ";\n";
+        return s;
     }
 
     public Function rename(Name newName) {

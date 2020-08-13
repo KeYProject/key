@@ -74,7 +74,7 @@ public class SMTCommand
         return new SolverTypeCollection(value, 1, types);
     }
 
-    static class SMTCommandArguments {
+    public static class SMTCommandArguments {
         @Option("solver")
         public String solver = "Z3";
     }

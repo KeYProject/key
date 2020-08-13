@@ -160,10 +160,13 @@ mod: {(self, E_Loop::$low)}" pathCondition="true" pathConditionChanged="false" i
                            <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
                            <variable name="high" isArrayIndex="false">
                               <value name="high {true}" typeString="int" valueString="int::select(heap,self,E_Loop::$high)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 <constraint name="geq(int::select(heap,self,E_Loop::$high),i_0)"/>
                               </value>
                            </variable>
                            <variable name="low" isArrayIndex="false">
                               <value name="low {true}" typeString="int" valueString="int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 <constraint name="geq(mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
+                                 <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
                               </value>
                            </variable>
                         </value>
@@ -211,10 +214,13 @@ mod: {(self, E_Loop::$low)}" pathCondition="true" pathConditionChanged="false" i
                               <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
                               <variable name="high" isArrayIndex="false">
                                  <value name="high {true}" typeString="int" valueString="int::select(heap,self,E_Loop::$high)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    <constraint name="geq(int::select(heap,self,E_Loop::$high),i_0)"/>
                                  </value>
                               </variable>
                               <variable name="low" isArrayIndex="false">
                                  <value name="low {true}" typeString="int" valueString="int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    <constraint name="geq(mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
+                                    <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
                                  </value>
                               </variable>
                            </value>
@@ -262,6 +268,7 @@ mod: {(self, E_Loop::$low)}" pathCondition="true" pathConditionChanged="false" i
                                  <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
                                  <variable name="high" isArrayIndex="false">
                                     <value name="high {true}" typeString="int" valueString="int::select(heap,self,E_Loop::$high)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       <constraint name="geq(int::select(heap,self,E_Loop::$high),i_0)"/>
                                     </value>
                                  </variable>
                                  <variable name="low" isArrayIndex="false">

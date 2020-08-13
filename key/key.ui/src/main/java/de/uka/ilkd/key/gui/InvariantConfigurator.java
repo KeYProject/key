@@ -204,7 +204,7 @@ public class InvariantConfigurator {
                 getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
 
-                setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+                setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
                 parse();
                 this.pack();
@@ -218,9 +218,9 @@ public class InvariantConfigurator {
              */
             private void initButtonPanel(JPanel buttonPanel) throws RuleAbortException {
                 buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-                JButton applyButton = new JButton("apply");
-                JButton cancelButton = new JButton("cancel");
-                JButton storeButton = new JButton("store");
+                JButton applyButton = new JButton("Apply");
+                JButton cancelButton = new JButton("Cancel");
+                JButton storeButton = new JButton("Store");
 
                 applyButton.addActionListener(new ActionListener() {
 
@@ -1049,6 +1049,7 @@ public class InvariantConfigurator {
 
         // Create the Dialog
         userPressedCancel = false;
+        // Caution: dialogue made modal in the constructor! (TODO change this)
         InvariantDialog dia = new InvariantDialog();
         dia.dispose();
         if(this.userPressedCancel) {

@@ -24,9 +24,9 @@ import recoder.java.Statement;
 import recoder.java.StatementContainer;
 import recoder.java.statement.JavaStatement;
 
-@SuppressWarnings("serial")
 public class MergePointStatement extends JavaStatement
         implements ExpressionContainer {
+    private static final long serialVersionUID = 8513553210611636414L;
 
     private StatementContainer astParent;
     private final PositionedString mergeProc;

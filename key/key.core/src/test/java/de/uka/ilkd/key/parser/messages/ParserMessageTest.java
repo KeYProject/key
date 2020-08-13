@@ -3,9 +3,9 @@ package de.uka.ilkd.key.parser.messages;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +16,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.parser.Location;
@@ -61,7 +60,7 @@ public class ParserMessageTest {
       return data;
    }
 
-   public ParserMessageTest(String testName, File sourceDir) throws IOException {
+   public ParserMessageTest(String testName, File sourceDir) throws Exception {
 
       // retrieve the Java file contained in the given source directory:
       for (File file : sourceDir.listFiles()) {
@@ -101,14 +100,13 @@ public class ParserMessageTest {
       assertTrue("Cannot recover error location from Exception: " + exception,
             location != null);
 
-      assertTrue("Couldn't recreate filename from received exception.",
-            location.getFilename() != null
-                  && location.getFilename().length() > 0);
+      assertTrue("Couldn't recreate file URL from received exception.",
+            location.getFileURL() != null);
 
       assertEquals("Filename retrieved from parser message "
             + "doesn't match filename of originally parsed file.",
               javaFile.getAbsoluteFile(),
-              new File(location.getFilename()));
+              Paths.get(location.getFileURL().toURI()));
    }
 
    @Test

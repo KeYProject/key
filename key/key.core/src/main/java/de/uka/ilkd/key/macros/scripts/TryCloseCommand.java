@@ -2,16 +2,19 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
 
+import org.key_project.util.collection.ImmutableList;
+
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
 /**
  * The script command tryclose" has two optional arguments:
  * <ul>
  *     <li>steps: INTEGER number of steps to use</li>
- *     <li>#2: STRING the branch which should be closed</li>
+ *     <li>#2: STRING the number of the branch which should be closed</li>
  * </ul>
  *
  * TryClose tries to close the specified branch. If it is not successful within the specified number
@@ -41,7 +44,17 @@ public class TryCloseCommand
             target = state.getFirstOpenAutomaticGoal().node();
         }
         else {
-            target = state.getProof().root();
+            try {
+                int num = Integer.parseInt(args.branch);
+                ImmutableList<Goal> goals = state.getProof().openEnabledGoals();
+                if (num >= 0) {
+                    target = goals.take(num).head().node();
+                } else {
+                    target = goals.take(goals.size() + num).head().node();
+                }
+            } catch (NumberFormatException e) {
+                target = state.getProof().root();
+            }
         }
 
         try {

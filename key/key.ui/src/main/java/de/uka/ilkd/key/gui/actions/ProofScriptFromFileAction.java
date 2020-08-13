@@ -25,15 +25,25 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofScriptWorker;
 import de.uka.ilkd.key.proof.Proof;
 
-@SuppressWarnings("serial")
-public class ProofScriptAction extends AbstractAction {
+/**
+ * The Class ProofScriptFromFileAction.
+ *
+ * @author Mattias Ulbrich
+ */
+public class ProofScriptFromFileAction extends AbstractAction {
+    private static final long serialVersionUID = -3181592516055470032L;
 
     private final KeYMediator mediator;
 
     private static File lastDirectory;
 
-    public ProofScriptAction(KeYMediator mediator) {
-        super("Run proof script ...");
+    /**
+     * Instantiates a new proof script from file action.
+     *
+     * @param mediator the mediator
+     */
+    public ProofScriptFromFileAction(KeYMediator mediator) {
+        super("Run proof script from file...");
         this.mediator = mediator;
     }
 
@@ -68,5 +78,4 @@ public class ProofScriptAction extends AbstractAction {
             ExceptionDialog.showDialog(MainWindow.getInstance(), ex);
         }
     }
-
 }

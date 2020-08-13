@@ -37,6 +37,8 @@ public class LoopInvariantRuleCompletion implements
     @Override
     public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
         Services services = goal.proof().getServices();
+        // fixing #1090: Local variables must be accessible
+        services = services.getOverlay(goal.getLocalNamespaces());
 
         LoopInvariantBuiltInRuleApp loopApp =
                 ((LoopInvariantBuiltInRuleApp) app).tryToInstantiate(goal);

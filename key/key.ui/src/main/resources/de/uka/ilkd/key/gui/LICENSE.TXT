@@ -8,8 +8,8 @@
                                Chalmers University of Technology, Sweden
 
 
-       Karlsruhe Institute of Technology
-       Institut fuer Theoretische Informatik
+       Karlsruhe Institute of Technology (KIT)
+       Institut für Theoretische Informatik
        Am Fasanengarten 5
        D-76131 Karlsruhe
        Germany

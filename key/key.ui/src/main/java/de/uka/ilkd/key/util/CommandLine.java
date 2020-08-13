@@ -216,7 +216,7 @@ public final class CommandLine {
     public void addOption(String image, String parameter, String description) {
 
         if(!image.startsWith(MINUS)) {
-            throw new IllegalArgumentException("Parameters need to start with '-': " + image);
+            throw new IllegalArgumentException("Parameters need to start with '" + MINUS + "': " + image);
         }
 
         if(options.containsKey(image)) {

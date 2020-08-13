@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
  * @see SettingsUi
  */
 public class SettingsDialog extends JDialog {
+    private static final long serialVersionUID = -3204453471778351602L;
     private final MainWindow mainWindow;
     private final SettingsUi ui;
     private Action actionCancel = new CancelAction();
@@ -97,6 +98,8 @@ public class SettingsDialog extends JDialog {
     }
 
     private class CancelAction extends KeyAction {
+        private static final long serialVersionUID = -7590820300477946158L;
+
         public CancelAction() {
             setName("Cancel");
         }
@@ -108,6 +111,8 @@ public class SettingsDialog extends JDialog {
     }
 
     private class AcceptAction extends KeyAction {
+        private static final long serialVersionUID = -4975054687458772222L;
+
         public AcceptAction() {
             setName("Accept");
         }
@@ -119,6 +124,8 @@ public class SettingsDialog extends JDialog {
     }
 
     private class ApplyAction extends KeyAction {
+        private static final long serialVersionUID = 3732950785908678379L;
+
         public ApplyAction() {
             setName("Apply");
         }

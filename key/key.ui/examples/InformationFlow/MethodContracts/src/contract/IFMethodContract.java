@@ -209,7 +209,8 @@ public class IFMethodContract {
     
 //    /*@ determines low, \exception \by low;
 //      @*/
-    void n7() {
+    // final for sound method expansion
+    final void n7() {
         throw new NullPointerException();
     }
     

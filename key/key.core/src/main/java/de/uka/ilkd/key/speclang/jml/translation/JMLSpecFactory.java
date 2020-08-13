@@ -54,6 +54,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -213,14 +214,16 @@ public class JMLSpecFactory {
             if (clauses.diverges.equals(tb.ff())) {
                 InformationFlowContract symbData = cf.createInformationFlowContract(
                         pm.getContainerType(), pm, pm.getContainerType(), Modality.DIA,
-                        clauses.requires.get(heap), clauses.measuredBy,
+                        clauses.requires.get(heap), clauses.requiresFree.get(heap),
+                        clauses.measuredBy,
                         clauses.assignables.get(heap), !clauses.hasMod.get(heap), progVars,
                         clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
                 symbDatas = symbDatas.add(symbData);
             } else if (clauses.diverges.equals(tb.tt())) {
                 InformationFlowContract symbData = cf.createInformationFlowContract(
                         pm.getContainerType(), pm, pm.getContainerType(), Modality.BOX,
-                        clauses.requires.get(heap), clauses.measuredBy,
+                        clauses.requires.get(heap), clauses.requiresFree.get(heap),
+                        clauses.measuredBy,
                         clauses.assignables.get(heap), !clauses.hasMod.get(heap), progVars,
                         clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
                 symbDatas = symbDatas.add(symbData);
@@ -228,12 +231,14 @@ public class JMLSpecFactory {
                 InformationFlowContract symbData1 = cf.createInformationFlowContract(
                         pm.getContainerType(), pm, pm.getContainerType(), Modality.DIA,
                         tb.and(clauses.requires.get(heap), tb.not(clauses.diverges)),
+                        clauses.requiresFree.get(heap),
                         clauses.measuredBy, clauses.assignables.get(heap),
                         !clauses.hasMod.get(heap), progVars, clauses.accessibles.get(heap),
                         clauses.infFlowSpecs, false);
                 InformationFlowContract symbData2 = cf.createInformationFlowContract(
                         pm.getContainerType(), pm, pm.getContainerType(), Modality.BOX,
-                        clauses.requires.get(heap), clauses.measuredBy,
+                        clauses.requires.get(heap), clauses.requiresFree.get(heap),
+                        clauses.measuredBy,
                         clauses.assignables.get(heap), !clauses.hasMod.get(heap), progVars,
                         clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
                 symbDatas = symbDatas.add(symbData1).add(symbData2);
@@ -821,7 +826,7 @@ public class JMLSpecFactory {
                     Term excNull = tb.addLabelToAllSubs(
                             (tb.label(tb.equals(tb.var(progVars.excVar), tb.NULL()),
                             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)),
-                            new OriginTermLabel(SpecType.ENSURES, null, -1));
+                            new OriginTermLabel(new Origin(SpecType.ENSURES)));
                     Term post1 = (originalBehavior == Behavior.NORMAL_BEHAVIOR
                             ? tb.convertToFormula(clauses.ensures.get(heap))
                             : tb.imp(excNull, tb.convertToFormula(clauses.ensures.get(heap))));

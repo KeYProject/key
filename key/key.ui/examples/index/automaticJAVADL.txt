@@ -52,7 +52,7 @@ tempDir = ../../key.core.test/runallproofs_tmp
  * 
  * Timeout per subprocess in seconds
  */
-forkTimeout = 1000
+forkTimeout = 2000
 
 /*
  * If the fork mode is not set to noFork, the launched subprocesses 
@@ -209,6 +209,8 @@ group blockContracts {
    provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_external.key
    provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_internal.key
    provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_loop.key
+   notprovable ./heap/block_loop_contracts/Finally/block_finally.key
+   notprovable ./heap/block_loop_contracts/Finally/loop_finally.key
 }
 
 # Tests for Java Card (should also include the API, pending fix to bug #1475)
@@ -364,6 +366,8 @@ group simpleTests {
    provable ./heap/strictly_pure/useStrictlyPureMethod.key
    provable ./heap/Wellfounded/ackermann.key
    provable ./standard_key/unicode_test.key
+   provable ./heap/strictlyModular/mayExpand.key
+   notprovable ./heap/strictlyModular/modularOnly.key
 }
 
 group SmansEtAl {
@@ -582,7 +586,8 @@ group javadl {
    provable ./standard_key/java_dl/methodCall.key
    provable ./standard_key/java_dl/methodCall1.key
    provable ./standard_key/java_dl/methodCall1box.key
-   provable ./standard_key/java_dl/methodCall2.key
+## Commented out as this can not be proved modularly sound (See !183 which is related)
+#  provable ./standard_key/java_dl/methodCall2.key
    provable ./standard_key/java_dl/methodCall3.key
    provable ./standard_key/java_dl/polishFlagSort.key
    provable ./standard_key/java_dl/postConditionTaclets1.key

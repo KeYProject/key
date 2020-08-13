@@ -15,21 +15,13 @@ package de.uka.ilkd.key.proof;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EventObject;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Vector;
+import java.util.*;
+import java.util.function.Predicate;
 
 import javax.swing.SwingUtilities;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -43,6 +35,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
@@ -224,11 +217,29 @@ public class Proof implements Named {
 
         this ( new Name ( name ), initConfig );
 
-        if (!getSettings().getTermLabelSettings().getUseOriginLabels()) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE
+                .getTermLabelSettings().getUseOriginLabels()) {
             problem = OriginTermLabel.removeOriginLabels(problem, getServices()).sequent();
         }
 
         Node rootNode = new Node(this, problem);
+
+        NodeInfo info = rootNode.getNodeInfo();
+
+        rootNode.sequent().forEach(formula -> {
+            OriginTermLabel originLabel = (OriginTermLabel)
+                    formula.formula().getLabel(OriginTermLabel.NAME);
+            if (originLabel != null) {
+                if (originLabel.getOrigin() instanceof FileOrigin) {
+                    info.addRelevantFile(((FileOrigin) originLabel.getOrigin()).fileName);
+                }
+
+                originLabel.getSubtermOrigins().stream()
+                    .filter(o -> o instanceof FileOrigin)
+                    .map(o -> (FileOrigin) o)
+                    .forEach(o -> info.addRelevantFile(o.fileName));
+            }
+        });
 
         Goal firstGoal = new Goal(rootNode,
                 new RuleAppIndex(new TacletAppIndex(rules, getServices()),
@@ -857,6 +868,26 @@ public class Proof implements Named {
             visitor.visit(this, currentNode);
         }
     }
+
+
+    /**
+     * Bread-first search for the first node, that matches the given
+     * predicate.
+     * @param pred non-null test function
+     * @return a node fulfilling {@code pred} or null
+     */
+    public @Nullable Node findAny(@NotNull Predicate<Node> pred) {
+        Queue<Node> queue = new LinkedList<>();
+        queue.add(root);
+        while(!queue.isEmpty()) {
+            Node cur = queue.poll();
+            if(pred.test(cur)) return cur;
+            Iterator<Node> iter = cur.childrenIterator();
+            while(iter.hasNext()) queue.add(iter.next());
+        }
+        return null;
+    }
+
 
     public void traverseFromChildToParent(Node child, Node parent, ProofVisitor visitor) {
         do {

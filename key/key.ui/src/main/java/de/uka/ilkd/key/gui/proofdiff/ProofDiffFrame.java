@@ -69,7 +69,7 @@ public class ProofDiffFrame extends JFrame {
         public Action(MainWindow mainWindow) {
             super(mainWindow);
             this.mainWindow = mainWindow;
-            putValue(NAME, "Visual node diff");
+            putValue(NAME, "Visual Node Diff");
             // putValue(SMALL_ICON, ...);
             putValue(SHORT_DESCRIPTION, "Open a new proof node diff window.");
         }
@@ -110,7 +110,7 @@ public class ProofDiffFrame extends JFrame {
      *            the main window of the system
      */
     public ProofDiffFrame(MainWindow mainWindow) {
-        super("Visual Diff between two sequents");
+        super("Visual difference between two sequents");
         this.mainWindow = mainWindow;
         guiInit();
     }
@@ -147,7 +147,7 @@ public class ProofDiffFrame extends JFrame {
                 bottom.add(to);
             }
             {
-                JButton go =  new JButton("Show diff");
+                JButton go =  new JButton("Show Diff");
                 go.setToolTipText("Show difference between the two nodes specified here.");
                 go.addActionListener(new ActionListener() {
                     @Override public void actionPerformed(ActionEvent e) {
@@ -158,7 +158,7 @@ public class ProofDiffFrame extends JFrame {
                 getRootPane().setDefaultButton(go);
             }
             {
-                JButton last = new JButton("Show selected node");
+                JButton last = new JButton("Show Selected Node");
                 last.setToolTipText("Show difference introduced by the rule application leading to the selected node");
                 last.addActionListener(new ActionListener() {
                     @Override public void actionPerformed(ActionEvent e) {

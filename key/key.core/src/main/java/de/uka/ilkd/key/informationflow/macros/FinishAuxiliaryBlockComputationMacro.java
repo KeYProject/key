@@ -31,7 +31,7 @@ public class FinishAuxiliaryBlockComputationMacro
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {        
+                              PosInOccurrence posInOcc) {
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
                     proof.getServices().getSpecificationRepository().getProofOblInput(proof);
@@ -58,10 +58,10 @@ public class FinishAuxiliaryBlockComputationMacro
 
         final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-        
+
         // must be BlockExecutionPO otherwise canApplyTo would not have been true
         // and we assume that before calling this method, the applicability of the macro was checked
-        
+
         final Goal initiatingGoal = ((BlockExecutionPO) poForProof).getInitiatingGoal();
         final InfFlowProof initiatingProof = (InfFlowProof) initiatingGoal.proof();
         final Services services = initiatingProof.getServices();
@@ -77,15 +77,17 @@ public class FinishAuxiliaryBlockComputationMacro
         IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
         ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
 
+        mergeNamespaces(initiatingProof, proof);
+
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final Taclet rwTaclet = buildBlockInfFlowUnfoldTaclet(
                 services, blockRuleApp, contract, ifVars, result);
-        
+
         initiatingProof.addLabeledTotalTerm(result);
         initiatingProof.addLabeledIFSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-        
+
         addContractApplicationTaclets(initiatingGoal, proof);
         initiatingProof.unionIFSymbols(((InfFlowProof)proof).getIFSymbols());
         initiatingProof.getIFSymbols().useProofSymbols();
@@ -93,7 +95,7 @@ public class FinishAuxiliaryBlockComputationMacro
         // close auxiliary computation proof
         initiatingProof.addSideProof((InfFlowProof) proof);
         proof.dispose();
-        
+
         return new ProofMacroFinishedInfo(this, initiatingGoal);
     }
 

@@ -10,13 +10,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,6 +27,7 @@ import java.util.zip.ZipOutputStream;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
@@ -53,7 +54,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * This matcher matches *.java files.
      */
     protected static final PathMatcher JAVA_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.java");
+            FileSystems.getDefault().getPathMatcher("glob:**.{java,jml}");
 
     /**
      * A matcher matches *.key and *.proof files.
@@ -100,7 +101,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * {@link #createOutputStream(Path)} are stored here. These files are stored as relative paths
      * respecting the repo structure, because they have no counterpart outside the repo.
      *
-     * When the method {@link #saveProof(Path, Proof)} is called, all files registered here will
+     * When the method {@link #saveProof(Path)} is called, all files registered here will
      * be saved.
      */
     private Set<Path> files = new HashSet<>();
@@ -137,6 +138,18 @@ public abstract class AbstractFileRepo implements FileRepo {
     }
 
     /**
+     * Copyies the file at source path to the target path
+     * and creates parent directories if required.
+     * @param source path of the source file
+     * @param target path of the target file
+     * @throws IOException if an I/O error occurs (e.g. user has no permission to write target)
+     */
+    protected static void createDirsAndCopy(Path source, Path target) throws IOException {
+        Files.createDirectories(target.getParent());
+        Files.copy(source, target);
+    }
+
+    /**
      * Tests if the given path references an internal file in KeY, i.e. if it is inside JavaRedux
      * or rules folder.
      * @param path the path to test
@@ -145,12 +158,21 @@ public abstract class AbstractFileRepo implements FileRepo {
      */
     protected static boolean isInternalFile(Path path) throws MalformedURLException {
         URL url = path.toUri().toURL();
+        return isInternalResource(url);
+    }
 
-        // TODO: maybe we better should cut off the protocol part first?
+    /**
+     * Tests if the given URL references an internal resource of KeY, i.e. if it is a Java or rule
+     * file shipped with KeY (may be inside a jar file).
+     * @param url the url to test
+     * @return true iff the file is an internal file
+     */
+    protected static boolean isInternalResource(URL url) {
         String urlStr = url.toString();
         String rulesURLStr = RULES_URL.toString();
         String reduxURLStr = REDUX_URL.toString();
         return urlStr.startsWith(rulesURLStr) || urlStr.startsWith(reduxURLStr);
+
     }
 
     protected Path getJavaPath() {
@@ -221,10 +243,8 @@ public abstract class AbstractFileRepo implements FileRepo {
 
         // write files to ZIP
         ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(savePath));
-        Iterator<Path> it = files.iterator();
 
-        while (it.hasNext()) {
-            Path p = it.next();
+        for (Path p : files) {
             // use the correct name for saving!
             zos.putNextEntry(new ZipEntry(getSaveName(p).toString()));
 
@@ -255,6 +275,17 @@ public abstract class AbstractFileRepo implements FileRepo {
      */
     protected abstract Path getSaveName(Path path);
 
+    @Override
+    public InputStream getInputStream(Path path) throws IOException {
+        // wrap path into URL for uniform treatment
+        return getInputStream(path.toUri().toURL());
+    }
+
+    @Override
+    public InputStream getInputStream(RuleSource ruleSource) throws IOException {
+        return getInputStream(ruleSource.url());
+    }
+
     /**
      * Can be used to get a direct InputStream to a file stored in the FileRepo.
      * The concrete implementation depends on the concrete FileRepo.
@@ -283,17 +314,17 @@ public abstract class AbstractFileRepo implements FileRepo {
             // create an in-memory copy of the file, modify it, prepend the classpath,
             // and return an InputStream
             String rep = lines                       // remove all classpath declarations
-                              .filter(l -> !l.matches(".*\\\\classpath \\\".*\\\";.*"))
-                              .map(l -> l.replaceAll("\\\\javaSource \\\".*\\\";",
+                              .filter(l -> !l.matches(".*\\\\classpath \".*\";.*"))
+                              .map(l -> l.replaceAll("\\\\javaSource \".*\";",
                                                      "\\\\javaSource \"src\";"))
-                              .map(l -> l.replaceAll("\\\\bootclasspath \\\".*\\\";",
+                              .map(l -> l.replaceAll("\\\\bootclasspath \".*\";",
                                                      "\\\\bootclasspath \"bootclasspath\";"))
                               .collect(Collectors.joining(System.lineSeparator()));
 
             // add classpath (has to be prior to javaSource)
             rep = addClasspath(rep);
 
-            return new ByteArrayInputStream(rep.getBytes("UTF-8"));
+            return new ByteArrayInputStream(rep.getBytes(StandardCharsets.UTF_8));
         }
     }
 
@@ -306,7 +337,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @return the modified content of the file with inserted "\classpath ..." declarations.
      */
     private String addClasspath(String keyFileContent) {
-        if (classpath.isEmpty()) {
+        if (classpath == null || classpath.isEmpty()) {
             return keyFileContent;
         }
 
@@ -324,7 +355,10 @@ public abstract class AbstractFileRepo implements FileRepo {
                 cp = Paths.get("classpath").resolve(t.getFileName());
             }
 
-            sb.append(cp);
+            // replace separator by '/' to avoid problems on Windows
+            String replaced = cp.toString().replace(FileSystems.getDefault().getSeparator(), "/");
+
+            sb.append(replaced);
             sb.append("\";");
             sb.append(System.lineSeparator());
         }
@@ -384,10 +418,12 @@ public abstract class AbstractFileRepo implements FileRepo {
     public void setBaseDir(Path path) {
         /* Path can be a file or a directory. In case of a file the complete containing directory
          * is read in. */
+        // solves #1524: make paths absolute first to avoid NPE
+        Path absolute = path.toAbsolutePath();
         if (Files.isDirectory(path)) {
-            baseDir = path.toAbsolutePath().normalize();
+            baseDir = absolute.normalize();
         } else {
-            baseDir = path.getParent().toAbsolutePath().normalize();
+            baseDir = absolute.getParent().normalize();
         }
     }
 

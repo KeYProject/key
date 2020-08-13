@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,7 +38,8 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 
-public class Node  {
+public class Node {
+
     private static final String RULE_WITHOUT_NAME = "rule without name";
 
     private static final String RULE_APPLICATION_WITHOUT_RULE = "rule application without rule";
@@ -53,80 +55,79 @@ public class Node  {
     private static final String NODES = "nodes";
 
     /** the proof the node belongs to */
-    private final Proof               proof;
+    private final Proof proof;
 
-    private Sequent              seq                 = Sequent.EMPTY_SEQUENT;
+    /** The parent node. **/
+    private Node parent = null;
 
-    private final ArrayList<Node>      children            = new ArrayList<>(1);
+    private Sequent seq = Sequent.EMPTY_SEQUENT;
 
-    Node                 parent              = null;
+    private final ArrayList<Node> children = new ArrayList<>(1);
 
-    private RuleApp              appliedRuleApp;
+    private RuleApp appliedRuleApp;
 
-    private NameRecorder         nameRecorder;
-
-    /**
-     * a linked list of the locally generated program variables.
-     * It extends the list of the parent node.
-     */
-    private ImmutableList<IProgramVariable> localProgVars
-        = ImmutableSLList.<IProgramVariable>nil();
+    private NameRecorder nameRecorder;
 
     /**
-     * a linked list of the locally generated function symbols.
-     * It extends the list of the parent node.
+     * a linked list of the locally generated program variables. It extends the list
+     * of the parent node.
      */
-    private ImmutableList<Function> localFunctions
-        = ImmutableSLList.<Function>nil();
+    private ImmutableList<IProgramVariable> localProgVars = ImmutableSLList.<IProgramVariable>nil();
 
-    private boolean              closed              = false;
+    /**
+     * a linked list of the locally generated function symbols. It extends the list
+     * of the parent node.
+     */
+    private ImmutableList<Function> localFunctions = ImmutableSLList.<Function>nil();
+
+    private boolean closed = false;
 
     /** contains non-logical content, used for user feedback */
-    private NodeInfo             nodeInfo;
+    private NodeInfo nodeInfo;
 
-    private final int            serialNr;
+    private final int serialNr;
 
-    private int                  siblingNr = -1;
+    private int siblingNr = -1;
 
-    private ImmutableList<RenamingTable>  renamings;
+    private ImmutableList<RenamingTable> renamings;
 
     private String cachedName = null;
 
     /**
-     * If the rule base has been extended e.g. by loading a new taclet as
-     * lemma or by applying a taclet with an addrule section on this node,
-     * then these taclets are stored in this list
+     * If the rule base has been extended e.g. by loading a new taclet as lemma or
+     * by applying a taclet with an addrule section on this node, then these taclets
+     * are stored in this list
      */
-    private ImmutableSet<NoPosTacletApp>  localIntroducedRules =
-            DefaultImmutableSet.<NoPosTacletApp>nil();
+    private ImmutableSet<NoPosTacletApp> localIntroducedRules = DefaultImmutableSet
+            .<NoPosTacletApp>nil();
 
     /**
      * Holds the undo methods for the information added by rules to the
      * {@link Goal#strategyInfos}.
      */
-    private final List<StrategyInfoUndoMethod>  undoInfoForStrategyInfo =
-            new ArrayList<>();
+    private final List<StrategyInfoUndoMethod> undoInfoForStrategyInfo = new ArrayList<>();
 
-    /** creates an empty node that is root and leaf.
+    /**
+     * creates an empty node that is root and leaf.
      */
 
     public Node(Proof proof) {
-	this.proof = proof;
+        this.proof = proof;
         serialNr = proof.getServices().getCounter(NODES).getCountPlusPlus();
         nodeInfo = new NodeInfo(this);
     }
 
-    /** creates a node with the given contents
+    /**
+     * creates a node with the given contents
      */
     public Node(Proof proof, Sequent seq) {
-	this ( proof );
-	this.seq=seq;
+        this(proof);
+        this.seq = seq;
     }
 
-
-    /** creates a node with the given contents, the given collection
-     * of children (all elements must be of class Node) and the given
-     * parent node.
+    /**
+     * creates a node with the given contents, the given collection of children (all
+     * elements must be of class Node) and the given parent node.
      */
     public Node(Proof proof, Sequent seq, Node parent) {
         this(proof, seq);
@@ -135,20 +136,21 @@ public class Node  {
         this.localProgVars = parent.localProgVars;
     }
 
-    /** sets the sequent at this node
+    /**
+     * sets the sequent at this node
      */
     public void setSequent(Sequent seq) {
-	this.seq=seq;
-   }
+        this.seq = seq;
+    }
 
     /** returns the sequent of this node */
     public Sequent sequent() {
-	return seq;
+        return seq;
     }
 
     /**
-     * the node information object encapsulates non-logical information
-     * of the node, e.g.
+     * the node information object encapsulates non-logical information of the node,
+     * e.g.
      *
      * @return the NodeInfo containing non-logical information
      */
@@ -158,7 +160,7 @@ public class Node  {
 
     /** returns the proof the Node belongs to */
     public Proof proof() {
-	return proof;
+        return proof;
     }
 
     public void setAppliedRuleApp(RuleApp ruleApp) {
@@ -172,15 +174,19 @@ public class Node  {
     }
 
     /**
-     * When pruning, data referring to future nodes has to be cleared;
-     * however, the sequent change info is related to the parent node,
-     * it has to be preserved.
+     * When pruning, data referring to future nodes has to be cleared; however, the
+     * sequent change info and the relevant files are related to the parent node,
+     * and have to be preserved.
      */
     void clearNodeInfo() {
         if (this.nodeInfo != null) {
             SequentChangeInfo oldSeqChangeInfo = this.nodeInfo.getSequentChangeInfo();
+            ImmutableSet<URI> oldRelevantFiles = this.nodeInfo.getRelevantFiles();
+
             this.nodeInfo = new NodeInfo(this);
+
             this.nodeInfo.setSequentChangeInfo(oldSeqChangeInfo);
+            this.nodeInfo.addRelevantFiles(oldRelevantFiles);
         } else {
             this.nodeInfo = new NodeInfo(this);
         }
@@ -194,12 +200,12 @@ public class Node  {
         nameRecorder = rec;
     }
 
-    public void setRenamings(ImmutableList<RenamingTable> list){
+    public void setRenamings(ImmutableList<RenamingTable> list) {
         renamings = list;
     }
 
-    public ImmutableList<RenamingTable> getRenamingTable(){
-	return renamings;
+    public ImmutableList<RenamingTable> getRenamingTable() {
+        return renamings;
     }
 
     public RuleApp getAppliedRuleApp() {
@@ -208,7 +214,7 @@ public class Node  {
 
     /** Returns the set of NoPosTacletApps at this node */
     public Iterable<NoPosTacletApp> getLocalIntroducedRules() {
-	return localIntroducedRules;
+        return localIntroducedRules;
     }
 
     /**
@@ -245,81 +251,99 @@ public class Node  {
         }
     }
 
-     /**
-      * adds a new NoPosTacletApp to the set of available NoPosTacletApps
-      * at this node
-      */
-     public void addNoPosTacletApp(NoPosTacletApp s) {
- 	localIntroducedRules = localIntroducedRules.add(s);
-     }
-
-    /** returns the parent node of this node.
+    /**
+     * adds a new NoPosTacletApp to the set of available NoPosTacletApps at this
+     * node
+     *
+     * @param s the app to add.
      */
-    public Node parent() {
-	return parent;
-    }
-
-    /** returns true, iff this node is a leaf, i.e. has no children.
-     */
-    public boolean leaf() {
-	return children.size()==0;
-    }
-
-    /** searches for a given node in the subtree starting with this node */
-    public boolean find(Node node) {
-	// we assume that the proof tree node is part of has proper
-	// links
-
-	while ( node != this ) {
-	    if ( node.root () )
-		return false;
-	    node = node.parent ();
-	}
-
-	return true;
+    public void addNoPosTacletApp(NoPosTacletApp s) {
+        localIntroducedRules = localIntroducedRules.add(s);
     }
 
     /**
-     * Search for the node being the root of the smallest subtree
-     * containing <code>this</code> and <code>p_node</code>; we assume
-     * that the two nodes are part of the same proof tree
+     * @return the parent node of this node.
      */
-    // XXX this method is never used
-    public Node commonAncestor ( Node p_node ) {
-	if ( root () )
-	    return this;
-	if ( p_node.root () )
-	    return p_node;
-
-	HashSet<Node> paths = new LinkedHashSet<> ();
-	Node    n     = this;
-
-	while ( true ) {
-	    if ( !paths.add ( n ) )
-		return n;
-	    if ( n.root () )
-		break;
-	    n = n.parent ();
-
-	    if ( !paths.add ( p_node ) )
-		return p_node;
-	    if ( p_node.root () ) {
-		p_node = n;
-		break;
-	    }
-	    p_node = p_node.parent ();
-	}
-
-	while ( !paths.contains ( p_node ) )
-	    p_node = p_node.parent ();
-
-	return p_node;
+    public Node parent() {
+        return parent;
     }
 
-    /**  returns true, iff this node is root, i.e. has no parents.
+    /**
+     * @return true iff this node is a leaf, i.e., has no children.
+     */
+    public boolean leaf() {
+        return children.size() == 0;
+    }
+
+    /**
+     * Searches for a given node in the subtree starting with this node.
+     *
+     * @return {@code true} iff the node was found.
+     */
+    public boolean find(Node node) {
+        // we assume that the proof tree node is part of has proper
+        // links
+
+        while (node != this) {
+            if (node.root()) {
+                return false;
+            }
+            node = node.parent();
+        }
+
+        return true;
+    }
+
+    /**
+     * Search for the root of the smallest subtree containing
+     * <code>this</code> and <code>other</code>; we assume that the two nodes are
+     * part of the same proof tree
+     *
+     * @param other a node.
+     * @return the most recent common ancestor of {@code this} and the specified node.
+     */
+    public Node commonAncestor(Node other) {
+        if (root()) {
+            return this;
+        }
+        if (other.root()) {
+            return other;
+        }
+
+        HashSet<Node> paths = new LinkedHashSet<>();
+        Node n = this;
+
+        while (true) {
+            if (!paths.add(n)) {
+                return n;
+            }
+            if (n.root()) {
+                break;
+            }
+            n = n.parent();
+
+            if (!paths.add(other)) {
+                return other;
+            }
+            if (other.root()) {
+                other = n;
+                break;
+            }
+            other = other.parent();
+        }
+
+        while (!paths.contains(other)) {
+            other = other.parent();
+        }
+
+        return other;
+    }
+
+    /**
+     * @return true iff this node is the root, i.e., has no parents.
      */
     public boolean root() {
-	return parent==null;
+        return parent == null;
     }
 
     public Statistics statistics() {
@@ -327,129 +351,143 @@ public class Node  {
     }
 
     /**
-     *  makes the given node a child of this node.
+     * Makes the given node a child of this node.
+     *
+     * @param newChild the node to make a child of this node.
      */
-    public void add(Node child) {
-        child.siblingNr = children.size();
-        children.add(child);
-        child.parent = this;
+    public void add(Node newChild) {
+        newChild.siblingNr = children.size();
+        children.add(newChild);
+        newChild.parent = this;
+        newChild.nodeInfo.addRelevantFiles(nodeInfo.getRelevantFiles());
         proof().fireProofExpanded(this);
     }
 
     /**
-     *  makes the given node a child of this node.
+     * Makes the given node children of this node.
+     *
+     * @param newChildren the node to make into children of this node.
      */
     public void addAll(Node[] newChildren) {
         final int size = children.size();
-        for (int i = 0; i<newChildren.length; i++) {
-            newChildren[i].siblingNr = i + size; 
+        for (int i = 0; i < newChildren.length; i++) {
+            newChildren[i].siblingNr = i + size;
             newChildren[i].parent = this;
-        }        
-        
+            newChildren[i].nodeInfo.addRelevantFiles(nodeInfo.getRelevantFiles());
+        }
+
         Collections.addAll(children, newChildren);
         children.trimToSize();
-        
+
         proof().fireProofExpanded(this);
     }
-    
-    
-    
-    /** removes child/parent relationship between this node and its
-     * parent; if this node is root nothing happens.
-     * This is only used for testing purposes.
+
+    /**
+     * Removes child/parent relationship between this node and its parent; if this
+     * node is root nothing happens. This is only used for testing purposes.
      */
     void remove() {
-	if (parent != null) {
-	    parent.remove(this);
-	}
+        if (parent != null) {
+            parent.remove(this);
+        }
     }
 
-    /** removes child/parent relationship between the given node and
-     * this node; if the given node is not child of this node,
-     * nothing happens and then and only then false is returned.
-     * @return false iff the given node was not child of this node and
-     * nothing has been done.
+    /**
+     * Removes child/parent relationship between the given node and this node; if
+     * the given node is not child of this node, nothing happens and then and only
+     * then false is returned.
+     *
+     * @param child the child to remove.
+     * @return false iff the given node was not child of this node and nothing has
+     *         been done.
      */
     boolean remove(Node child) {
-	if (children.remove(child)) {
-	    child.parent = null;
+        if (children.remove(child)) {
+            child.parent = null;
             final ListIterator<Node> it = children.listIterator(child.siblingNr);
             while (it.hasNext()) {
                 it.next().siblingNr--;
             }
             child.siblingNr = -1;
-	    return true;
-	} else {
-	    return false;
-	}
+            return true;
+        } else {
+            return false;
+        }
     }
 
-
     /**
-     * computes the leaves of the current subtree and returns them
+     * Computes the leaves of the current subtree and returns them.
+     *
+     * @return the leaves of the current subtree.
      */
     List<Node> getLeaves() {
-	final List<Node> leaves = new LinkedList<>();
-	final LinkedList<Node> nodesToCheck = new LinkedList<>();
-	nodesToCheck.add(this);
-	do {
-	    final Node n = nodesToCheck.poll();
-	    if (n.leaf()) {
-		leaves.add(n);
-	    } else {
-		nodesToCheck.addAll(0, n.children);
-	    }
-	} while (!nodesToCheck.isEmpty());
-    	return leaves;
+        final List<Node> leaves = new LinkedList<>();
+        final LinkedList<Node> nodesToCheck = new LinkedList<>();
+        nodesToCheck.add(this);
+        do {
+            final Node n = nodesToCheck.poll();
+            if (n.leaf()) {
+                leaves.add(n);
+            } else {
+                nodesToCheck.addAll(0, n.children);
+            }
+        } while (!nodesToCheck.isEmpty());
+        return leaves;
     }
-
 
     /**
-     * returns an iterator for the leaves of the subtree below this
-     * node. The computation is called at every call!
+     * @return an iterator for the leaves of the subtree below this node. The
+     *  computation is called at every call!
      */
     public Iterator<Node> leavesIterator() {
-	return new NodeIterator(getLeaves().iterator());
+        return new NodeIterator(getLeaves().iterator());
     }
 
-    /** returns an iterator for the direct children of this node.
+    /**
+     * @return an iterator for the direct children of this node.
      */
     public Iterator<Node> childrenIterator() {
-	return new NodeIterator(children.iterator());
+        return new NodeIterator(children.iterator());
     }
 
-    /** returns an iterator for all nodes in the subtree.
+    /**
+     * @return an iterator for all nodes in the subtree.
      */
     public Iterator<Node> subtreeIterator() {
         return new SubtreeIterator(this);
     }
 
-    /** returns number of children */
+    /** @return number of children */
     public int childrenCount() {
-	return children.size();
-    }
-
-    /** returns i-th child */
-    public Node child(int i) {
-	return children.get(i);
+        return children.size();
     }
 
     /**
-     * @return the number of the node <code>p_node</code>, if it is a
-     * child of this node (starting with <code>0</code>),
-     * <code>-1</code> otherwise
+     *
+     * @param i an index.
+     * @return the i-th child of this node.
      */
-    public int getChildNr ( Node p_node ) {
-	int            res = 0;
-	final Iterator<Node> it  = childrenIterator ();
+    public Node child(int i) {
+        return children.get(i);
+    }
 
-	while ( it.hasNext () ) {
-	    if ( it.next () == p_node )
-		return res;
-	    ++res;
-	}
+    /**
+     * @param child a child of this node.
+     * @return the number of the node <code>child</code>, if it is a child of this
+     *         node (starting with <code>0</code>), <code>-1</code> otherwise
+     */
+    public int getChildNr(Node child) {
+        int res = 0;
+        final Iterator<Node> it = childrenIterator();
 
-	return -1;
+        while (it.hasNext()) {
+            if (it.next() == child) {
+                return res;
+            }
+            ++res;
+        }
+
+        return -1;
     }
 
     public StringBuffer getUniqueTacletId() {
@@ -459,101 +497,94 @@ public class Node  {
 
         while (n != null) {
             c += n.localIntroducedRules.size();
-                      
+
             if (n.parent != null && n.parent.childrenCount() > 1) {
-               id.append(n.siblingNr);
+                id.append(n.siblingNr);
             }
-            
+
             n = n.parent;
-        }    
-        
+        }
+
         id.append("_").append(c);
-        
+
         return id;
     }
 
-    
-    /** helps toString method
+    /**
+     * Helper for {@link #toString()}
+     *
      * @param prefix needed to keep track if a line has to be printed
-     * @param tree the tree representation we want to add this subtree
-     " @param preEnumeration the enumeration of the parent without the
-     * last number
+     * @param tree   the tree representation we want to add this subtree " @param
+     *               preEnumeration the enumeration of the parent without the last
+     *               number
      * @param postNr the last number of the parents enumeration
-     * @param maxNr the number of nodes at this level
-     * @param ownNr the place of this node at this level
+     * @param maxNr  the number of nodes at this level
+     * @param ownNr  the place of this node at this level
+     * @return the string representation of this node.
      */
 
-    private StringBuffer toString(String prefix,
-				  StringBuffer tree,
-				  String preEnumeration,
-				  int postNr,
-				  int maxNr,
-				  int ownNr
-				  ) {
-	Iterator<Node> childrenIt = childrenIterator();
-	// Some constants
-	String frontIndent=(maxNr>1 ? " " : "");
-	String backFill="   "; // same length as connectNode without
-			       // frontIndent
-	String connectNode=(maxNr>1 ? frontIndent+"+--" : "");
-	String verticalLine=(maxNr>1 ? frontIndent+"|"+backFill : " |");
+    private StringBuffer toString(String prefix, StringBuffer tree, String preEnumeration,
+            int postNr, int maxNr, int ownNr) {
+        Iterator<Node> childrenIt = childrenIterator();
+        // Some constants
+        String frontIndent = (maxNr > 1 ? " " : "");
+        String backFill = "   "; // same length as connectNode without
+        // frontIndent
+        String connectNode = (maxNr > 1 ? frontIndent + "+--" : "");
+        String verticalLine = (maxNr > 1 ? frontIndent + "|" + backFill : " |");
 
+        // get enumeration
+        String newEnumeration = preEnumeration;
+        int newPostNr = 0;
+        if (maxNr > 1) {
+            newEnumeration += postNr + "." + ownNr + ".";
+            newPostNr = 1;
+        } else {
+            newPostNr = postNr + ownNr;
+        }
 
-	// get enumeration
-	String newEnumeration=preEnumeration;
-	int newPostNr=0;
-	if (maxNr>1) {
-	    newEnumeration+=postNr+"."+ownNr+".";
-	    newPostNr=1;
-	} else {
-	    newPostNr=postNr+ownNr;
-	}
+        // node is printed
 
-	// node is printed
+        if (postNr != 0) { // not starting node (usually not root)
+            // prefix is appended twice in order to get an
+            // empty line between two nodes
+            tree.append(prefix);
+            tree.append(verticalLine);
+            tree.append("\n");
+            tree.append(prefix);
+            // indent node
+            tree.append(connectNode);
+        }
 
-	if (postNr!=0) { // not starting node (usually not root)
-	    // prefix is appended twice in order to get an
-	    // empty line between two nodes
-	    tree.append(prefix);
-	    tree.append(verticalLine);
-	    tree.append("\n");
-       	    tree.append(prefix);
-	    // indent node
-	    tree.append(connectNode);
-	}
+        tree.append("(" + newEnumeration + newPostNr + ") " + sequent().toString() + "\n");
 
-	tree.append("("+newEnumeration+newPostNr+") "+sequent().toString()+"\n");
+        // create new prefix
+        if (ownNr < maxNr) {
+            // connect node with next node of same level
+            prefix += verticalLine;
+        } else if (ownNr == maxNr && maxNr > 1) {
+            // last node of level no further connection
+            prefix += frontIndent + " " + backFill;
+        } else if (ownNr != maxNr && maxNr <= 1) {
+            prefix = "";
+        }
 
-	// create new prefix
-	if (ownNr<maxNr) {
-	    // connect node with next node of same level
-	    prefix+=verticalLine;
-	} else if (ownNr==maxNr && maxNr>1) {
-	    // last node of level no further connection
-	    prefix+=frontIndent+" "+backFill;
-	} else if (ownNr!=maxNr && maxNr<=1) {
-	    prefix="";
-	}
+        // print subtrees
+        int childId = 0;
+        while (childrenIt.hasNext()) {
+            childId++;
+            childrenIt.next().toString(prefix, tree, newEnumeration, newPostNr, children.size(),
+                    childId);
+        }
 
-	// print subtrees
-	int childId=0;
-	while (childrenIt.hasNext()) {
-	    childId++;
-	    childrenIt.next().toString(prefix, tree, newEnumeration,
-				       newPostNr,
-				       children.size(), childId);
-	}
-
-	return tree;
+        return tree;
     }
-
 
     @Override
     public String toString() {
-	StringBuffer tree=new StringBuffer();
-	return "\n"+toString("",tree,"",0,0,1);
+        StringBuffer tree = new StringBuffer();
+        return "\n" + toString("", tree, "", 0, 0, 1);
     }
-
 
     public String name() {
         if (cachedName == null) {
@@ -567,7 +598,7 @@ public class Node  {
                     // should never happen (please check)
                     return "UNKNOWN GOAL KIND (Probably a bug)";
                 } else if (goal.isLinked()) {
-                   cachedName = LINKED_GOAL;
+                    cachedName = LINKED_GOAL;
                 } else if (goal.isAutomatic()) {
                     cachedName = OPEN_GOAL;
                 } else if (goal != null) {
@@ -593,32 +624,32 @@ public class Node  {
         return cachedName;
     }
 
-
     /**
-     * checks if the parent has this node as child and continues recursively
-     * with the children of this node.
-     * @return true iff the parent of this node has this node as child and
-     * this condition holds also for the own children.
+     * Checks if the parent has this node as child and continues recursively with
+     * the children of this node.
+     *
+     * @return true iff the parent of this node has this node as child and this
+     *         condition holds also for the own children.
      */
     public boolean sanityCheckDoubleLinks() {
-	if (!root()) {
-	    if (!parent().children.contains(this)) {
-		return false;
-	    }
-	    if (parent.proof() != proof()) {
-		return false;
-	    }
-	}
-	if (!leaf()) {
-	    final Iterator<Node> it = childrenIterator();
-	    while (it.hasNext()) {
-		if (!it.next().sanityCheckDoubleLinks())
-		    return false;
-	    }
-	}
-	return true;
+        if (!root()) {
+            if (!parent().children.contains(this)) {
+                return false;
+            }
+            if (parent.proof() != proof()) {
+                return false;
+            }
+        }
+        if (!leaf()) {
+            final Iterator<Node> it = childrenIterator();
+            while (it.hasNext()) {
+                if (!it.next().sanityCheckDoubleLinks()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
-
 
     /** marks a node as closed */
     Node close() {
@@ -633,15 +664,14 @@ public class Node  {
         clearNameCache();
         return result;
     }
-    
+
     /**
-     * Opens a previously closed node and all its closed
-     * parents.<p>
-     * 
-     * This is, for instance, needed for the {@link MergeRule}: In
-     * a situation where a merge node and its associated partners
-     * have been closed and the merge node is then pruned away,
-     * the partners have to be reopened again. Otherwise, we
+     * Opens a previously closed node and all its closed parents.
+     * <p>
+     *
+     * This is, for instance, needed for the {@link MergeRule}: In a situation where
+     * a merge node and its associated partners have been closed and the merge node
+     * is then pruned away, the partners have to be reopened again. Otherwise, we
      * have a soundness issue.
      */
     void reopen() {
@@ -654,36 +684,38 @@ public class Node  {
         clearNameCache();
     }
 
-    /** checks if an inner node is closeable */
+    /** @return true iff this inner node is closeable */
     private boolean isCloseable() {
-	assert childrenCount() > 0;
-	for (Node child: children) {
-	    if ( !child.isClosed() ) {
-		return false;
-	    }
-	}
-	return true;
+        assert childrenCount() > 0;
+        for (Node child : children) {
+            if (!child.isClosed()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public boolean isClosed() {
-	return closed;
+        return closed;
     }
 
     /**
-     * retrieves number of nodes
+     * @return number of nodes in the subtree below this node.
      */
     public int countNodes() {
         Iterator<Node> it = subtreeIterator();
         int res = 0;
-        for (; it.hasNext(); it.next()) res++;
+        for (; it.hasNext(); it.next()) {
+            res++;
+        }
         return res;
     }
 
     /**
-     * retrieves number of branches
+     * @return number of branches in the subtree below this node.
      */
     public int countBranches() {
-	return getLeaves().size();
+        return getLeaves().size();
     }
 
     public int serialNr() {
@@ -691,10 +723,9 @@ public class Node  {
     }
 
     /**
-     * returns the sibling number of this node or <tt>-1</tt> if
-     * it is the root node
-     * @return the sibling number of this node or <tt>-1</tt> if
-     * it is the root node
+     * Returns the sibling number of this node or <tt>-1</tt> if it is the root node
+     *
+     * @return the sibling number of this node or <tt>-1</tt> if it is the root node
      */
     public int siblingNr() {
         return siblingNr;
@@ -708,8 +739,11 @@ public class Node  {
         undoInfoForStrategyInfo.add(undoMethod);
     }
 
-    /** Iterator over children.
-     * Use <code>leavesIterator()</code> if you need to iterate over leaves instead.
+    /**
+     * Returns an iterator over this node's children.
+     * Use {@link #leavesIterator()} if you need to iterate over leaves instead.
+     *
+     * @return iterator over children.
      */
     public Iterator<Node> iterator() {
         return childrenIterator();

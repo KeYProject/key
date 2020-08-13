@@ -21,7 +21,7 @@ class SubtreeIterator implements Iterator<Node> {
     }
 
     private Node nextSibling(Node m) {
-        Node p = m.parent;
+        Node p = m.parent();
         while (p != null && m != root) {
             final int c = p.childrenCount();
             final int x = p.getChildNr(m);
@@ -30,7 +30,7 @@ class SubtreeIterator implements Iterator<Node> {
                 return result != root ? result : null;
             }
             m = p;
-            p = m.parent;
+            p = m.parent();
         }
         return null;
     }

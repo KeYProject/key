@@ -18,6 +18,7 @@ import java.util.List;
 @KeYGuiExtension.Info(name = "Interaction Logging",
         optional = true,
         experimental = false,
+        description = "Recording of all proof manipulation interactions",
         priority = 10000)
 public class InteractionLogExt implements KeYGuiExtension, KeYGuiExtension.LeftPanel, KeYGuiExtension.MainMenu {
     private InteractionLogView interactionLogView;

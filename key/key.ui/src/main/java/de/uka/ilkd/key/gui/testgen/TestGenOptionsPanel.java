@@ -8,8 +8,8 @@ import de.uka.ilkd.key.settings.TestGenerationSettings;
 
 import javax.swing.*;
 
-@SuppressWarnings("serial")
 public class TestGenOptionsPanel extends SettingsPanel implements SettingsProvider {
+    private static final long serialVersionUID = -2170118134719823425L;
     private static final String infoApplySymbolicEx = "Performs bounded symbolic execution on the current proof tree. More precisely, the TestGen Macro is executed which the user can also manually execute by right-clicking on the proof tree and selecting Strategy Macros->TestGen.";
     private static final String infoSaveTo = "Choose the folder where the test case files will be written.";
     private static final String infoMaxProcesses = "Maximal number of SMT processes that are allowed to run concurrently.";
@@ -55,7 +55,7 @@ public class TestGenOptionsPanel extends SettingsPanel implements SettingsProvid
     }
 
     private JSpinner getMaxProcesses() {
-        return addNumberField("Concurrent Processes:", 0, Integer.MAX_VALUE, 1, infoMaxProcesses,
+        return addNumberField("Concurrent processes:", 0, Integer.MAX_VALUE, 1, infoMaxProcesses,
                 obj -> {
                     settings.setConcurrentProcesses(obj);
                     settings.fireSettingsChanged();
@@ -63,7 +63,7 @@ public class TestGenOptionsPanel extends SettingsPanel implements SettingsProvid
     }
 
     private JSpinner getMaxUnwinds() {
-        return addNumberField("Maximal Unwinds:", 0, Integer.MAX_VALUE, 1, infoMaxUnwinds,
+        return addNumberField("Maximal unwinds:", 0, Integer.MAX_VALUE, 1, infoMaxUnwinds,
                 e -> {
                     settings.setMaxUnwinds(e);
                     settings.fireSettingsChanged();
@@ -135,7 +135,7 @@ public class TestGenOptionsPanel extends SettingsPanel implements SettingsProvid
     }
 
     private JCheckBox getIncludePostCondition() {
-        return addCheckBox("Include Post Condition", infoIncludePostcondition, false, val -> {
+        return addCheckBox("Include post condition", infoIncludePostcondition, false, val -> {
             settings.setIncludePostCondition(val);
             settings.fireSettingsChanged();
         });
