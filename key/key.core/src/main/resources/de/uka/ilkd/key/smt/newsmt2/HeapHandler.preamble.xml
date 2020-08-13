@@ -24,7 +24,13 @@
     </entry>
 
     <entry key="keyanon.axioms">
-        ; axioms for keyanon are still to be done!
+  <!--      (assert (forall ((h U)(h2 U)(ls U)(f U)(o2 U)(f2 U)(v U))
+            (=> (locsetMem o2 f2 ls)
+                (= (keyselect (keyanon h ls h2) o2 f2) (keyselect h2 o2 f2)))))
+        (assert (forall ((h U)(h2 U)(ls U)(f U)(o2 U)(f2 U)(v U))
+            (=> (not (locsetMem o2 f2 ls))
+            (= (keyselect (keyanon h ls h2) o2 f2) (keyselect h o2 f2)))))
+            -->
     </entry>
 
     <entry key="field_java.lang.Object::&lt;created&gt;.axioms">

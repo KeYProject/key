@@ -8,9 +8,18 @@
     <entry key="arr.decls">(declare-fun arr (U) U)</entry>
 
     <entry key="arr.axioms">
-        (assert (forall ((u U)) (= (fieldIdentifier u) (u2i u))))
+        (assert (forall ((u U)) (!
+            (=> (&gt;= (u2i u) 0) (= (fieldIdentifier (arr u)) (u2i u)))
+            :pattern ((arr u)))))
     </entry>
 
     <entry key="arr.deps">fieldIdentifier</entry>
+
+    <entry key="length.decls">(declare-fun length (U) U)</entry>
+
+    <entry key="length.axioms">
+        (assert (forall ((u U)) (! (&gt;= (u2i (length u)) 0) :pattern ((length u)))))
+        (assert (forall ((u U)) (! (= (typeof (length u)) sort_int) :pattern ((length u)))))
+    </entry>
 
 </properties>

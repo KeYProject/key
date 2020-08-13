@@ -82,10 +82,6 @@ public class MasterHandler {
             }
         }
 
-        //TODO js,mu: which of these are strictly always necessary, which can be loaded on demand?
-        // MU: I believe this should only be loaded on demand.
-        // perhaps: get rid of instanceof altogether!
-        addFromSnippets("instanceof");
     }
 
     public SExpr translate(Term problem) {
