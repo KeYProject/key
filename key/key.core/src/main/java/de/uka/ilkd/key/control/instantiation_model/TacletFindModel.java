@@ -294,7 +294,7 @@ public class TacletFindModel extends AbstractTableModel {
             return services.getTermBuilder().addLabelToAllSubs(
                     OriginTermLabel.removeOriginLabels(term, services),
                     new OriginTermLabel(new NodeOrigin(
-                            SpecType.INTERACTION,
+                            SpecType.USER_INTERACTION,
                             originalApp.rule().displayName(),
                             goal.node().serialNr())));
         } else {

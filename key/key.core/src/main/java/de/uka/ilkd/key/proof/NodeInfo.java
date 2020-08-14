@@ -104,6 +104,8 @@ public class NodeInfo {
         symbolicExecNames.add(new Name("split_cond"));
         symbolicExecNames.add(new Name("simplify_expression"));
         symbolicExecNames.add(new Name("loop_expand"));
+        symbolicExecNames.add(new Name("loop_scope_expand"));
+        symbolicExecNames.add(new Name("loop_scope_inv_taclet"));
     }
 
 

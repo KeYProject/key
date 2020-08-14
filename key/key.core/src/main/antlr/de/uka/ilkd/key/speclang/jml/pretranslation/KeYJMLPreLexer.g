@@ -15,9 +15,100 @@ lexer grammar KeYJMLPreLexer;
 
 
 @header {
-    package de.uka.ilkd.key.speclang.jml.pretranslation;
+package de.uka.ilkd.key.speclang.jml.pretranslation;
+import de.uka.ilkd.key.util.Debug;
+import java.util.*;
+import java.util.regex.*;
+}
 
-    import de.uka.ilkd.key.util.Debug;
+@members {
+    /**
+	 * Lookahead for determining if we are at the start of comment and not a "JML starter".
+	 * <p>
+	 * This method reads from the input stream to check the annotation markers between the
+	 * comment start and the "@"
+	 * This method returns true for starter "//" if we the comment begins with
+	 * <ul>
+	 * <li> "//" + End-of-line
+	 * <li> "// "
+	 * <li> "// @"
+	 * <li> "//+"
+	 * <li> "//-"
+	 * <li> "//-key+openjml@"  (or similar)
+	 * </ul>
+	 * <p>
+	 * (same for "/*")
+	 * <p>
+	 * It returns true if starter is followed by a sequence of "+", "-" or Java identifier
+	 * characters, and then "@" and the sequence does not contain "-key".
+	 * <p>
+	 * It implements JML Ref Manual 4.4:
+	 * <quote>
+	 * An annotation-key is a + or - sign followed by an ident (see section 4.6 Tokens). Note that
+	 * no white space can appear within, before, or after the annotation-key. Tools will provide a
+	 * way to enable a selection of annotation-key identifiers. These identifiers, hereafter called
+	 * "keys" provide for conditional inclusion of JML annotations as follows:
+	 * <ul>
+	 * <li> a JML annotation with no keys is always included,
+	 * <li> a JML annotation with at least one positive-key is only included if at least one of
+	 * these positive keys is enabled and there are no negative-keys in the annotation that have
+	 * enabled keys, and
+	 * <li> a JML annotation with an enabled negative-key is ignored (even if there are enabled
+	 * positive-keys).
+	 * </ul>
+	 * </quote>
+	 * <p>
+	 * This method resets the position on the input stream (mark/rewind).
+	 */
+    private boolean isComment(String starter) {
+        int mark = input.mark(); //store position for rewinding
+        try {
+            match(starter);
+            StringBuilder markerBuilder = new StringBuilder();
+            while (true) {
+                final char point = (char) input.LT(1);
+                if (point == '@') { // annotation marker finished
+                    if(markerBuilder.length() == 0) {
+                        // no markers --> active
+                        return false;
+                    }
+                    String[] markers = markerBuilder.toString().split("(?=[+-])");
+                    boolean plusFound = false;
+                    boolean plusKeyFound = false;
+                    for (int i = 0; i < markers.length; i++) {
+                        String marker = markers[i];
+                        if (marker.equalsIgnoreCase("-key") ||
+                            marker.length() < 2 ||
+                            !marker.matches("[+-].+")) {
+                               // 1) -key
+                               // 2) + or - alone
+                               // 3) identifier w/o +/-
+                               // means: this is a comment
+                            return true;
+                        } else if (marker.equalsIgnoreCase("+key")) {
+                            plusKeyFound = true;
+                        } else if (marker.startsWith("+")) {
+                            plusFound = true;
+                        }
+                    }
+                    // it is only a comment if "+" encountered, but not "+key"
+                    return plusFound && !plusKeyFound;
+                } else if (Character.isJavaIdentifierPart(point) || point == '-' || point == '+') {
+                    markerBuilder.append(point);
+                    input.consume();
+                } else {
+                    return true;
+                }
+            }
+        } catch (MismatchedTokenException e) {
+            //ignore
+        } finally {
+            input.rewind(mark);
+        }
+        return true;
+    }
+
+  boolean acceptAt = false;
 }
 
 @annotateclass{ @SuppressWarnings("all") } 
@@ -159,40 +250,34 @@ lexer grammar KeYJMLPreLexer;
     WORKING_SPACE_RED 		: 'working_space_redundantly';
     WRITABLE			: 'writable';
 
-fragment SL_COMMENT
+ML_COMMENT
 :
-    '//'
-    (
-	(~('@'|'\n'))
-	=>
-        ~('@'|'\n')
-        (
-            options { greedy = true; }
-            :
-            ~'\n'
-        )*
-    )?
+  {isComment("/*")}? =>
+    ('/*' (options { greedy = false; } : .)* '*/')
+  { $channel = HIDDEN; }
+;
+
+SL_COMMENT
+:
+  {isComment("//")}? =>('//' ~'\n'*)
+  { $channel = HIDDEN; }
+;
+
+JML_COMMENT_START
+:
+  ('//'|'/*') ANNOTATIONS? '@'
+  { $channel = HIDDEN; }
 ;
 
 
-fragment ML_COMMENT
+fragment ANNOTATIONS: ANNOTATION+;
+fragment ANNOTATION
 :
-    '/*'
-    (
-        (~('*').|'*'~'/')
-        =>
-        (	'\n'         { /*newline();*/ }
-            | 	~('@' | '\n')
-        )
-	(
-	    options { greedy = false; }
-            :
-                '\n'     { /*newline();*/ }
-            |	~'\n'
-	)*
-    )?
-    '*/'
+  ('+'|'-') ('a'..'z'|'A'..'Z')*
+  // in early JML //+@ and //-@ was also allowed.
+  // we accept both.
 ;
+
 
 fragment LETTER
 :
@@ -203,34 +288,23 @@ fragment LETTER
     |   '\\'
 ;
 
-
 fragment DIGIT
 :
     '0'..'9'
 ;
 
-
 WS
-@init {
-    boolean acceptAt = false;
-}
 :
-    (
+  (
 	    ' '
 	|   '\t'
-	|   '\n'  { /*newline();*/ acceptAt = true; }
+	|   '\n'  { acceptAt = true; }
 	|   '\r'
 	|   {acceptAt}? '@'
-	|   ('//@') => '//@'
-	|   ('/*@') => '/*@'
 	|   ('@*/') => '@*/'
 	|   ('*/') => '*/'
-	|   SL_COMMENT
-	|   ML_COMMENT
     )+
-    {
-	$channel = HIDDEN;
-    }
+  { $channel = HIDDEN; }
 ;
 
 

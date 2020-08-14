@@ -114,7 +114,7 @@ public class StrategySettingsDefinition {
 
                                 newProps.setProperty(
                                         StrategyProperties.LOOP_OPTIONS_KEY,
-                                        StrategyProperties.LOOP_INVARIANT);
+                                        StrategyProperties.LOOP_SCOPE_INV_TACLET);
 
                                 newProps.setProperty(
                                         StrategyProperties.BLOCK_OPTIONS_KEY,

@@ -161,6 +161,7 @@ import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopInit;
+import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -1043,6 +1044,12 @@ public class Recoder2KeYConverter {
                 keyArgs), methodName, invocationTarget);
 
         return new MethodBodyStatement(bodySource, resultVar, mr);
+    }
+
+    public LoopScopeBlock convert(
+        de.uka.ilkd.key.java.recoderext.LoopScopeBlock lsb) {
+        return new LoopScopeBlock((IProgramVariable) callConvert(lsb.getIndexPV()),
+                (StatementBlock) callConvert(lsb.getBody()));
     }
 
     public MergePointStatement convert(

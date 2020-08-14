@@ -27,8 +27,6 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -72,28 +70,7 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeWriter;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicExecutionCompletions;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionAuxiliaryContract;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionJoin;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLink;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
@@ -107,6 +84,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.KeYConstants;
+import junit.framework.TestCase;
 
 import static org.junit.Assert.*;
 
@@ -408,41 +386,41 @@ public abstract class AbstractSymbolicExecutionTestCase {
          assertEquals(((IExecutionBranchCondition)expected).isMergedBranchCondition(), ((IExecutionBranchCondition)current).isMergedBranchCondition());
          assertEquals(((IExecutionBranchCondition)expected).isBranchConditionComputed(), ((IExecutionBranchCondition)current).isBranchConditionComputed());
          assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getAdditionalBranchLabel() + "\" but is \"" + ((IExecutionBranchCondition)current).getAdditionalBranchLabel() + "\".", StringUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getAdditionalBranchLabel(), ((IExecutionBranchCondition)current).getAdditionalBranchLabel()));
-         assertVariables((IExecutionBranchCondition)expected, (IExecutionBranchCondition)current, compareVariables, compareConstraints);
-         assertConstraints((IExecutionBranchCondition)expected, (IExecutionBranchCondition)current, compareConstraints);
+         assertVariables(expected, current, compareVariables, compareConstraints);
+         assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionStart) {
          assertTrue("Expected IExecutionStartNode but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStart);
          assertTerminations((IExecutionStart)expected, (IExecutionStart)current);
-         assertVariables((IExecutionStart)expected, (IExecutionStart)current, compareVariables, compareConstraints);
-         assertConstraints((IExecutionStart)expected, (IExecutionStart)current, compareConstraints);
+         assertVariables(expected, current, compareVariables, compareConstraints);
+         assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionTermination) {
          assertTrue("Expected IExecutionTermination but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionTermination);
          assertEquals(((IExecutionTermination)expected).getTerminationKind(), ((IExecutionTermination)current).getTerminationKind());
          assertEquals(((IExecutionTermination)expected).isBranchVerified(), ((IExecutionTermination)current).isBranchVerified());
-         assertVariables((IExecutionTermination)expected, (IExecutionTermination)current, compareVariables, compareConstraints);
-         assertConstraints((IExecutionTermination)expected, (IExecutionTermination)current, compareConstraints);
+         assertVariables(expected, current, compareVariables, compareConstraints);
+         assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionBranchStatement) {
          assertTrue("Expected IExecutionBranchStatement but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBranchStatement);
-         assertVariables((IExecutionBranchStatement)expected, (IExecutionBranchStatement)current, compareVariables, compareConstraints);
-         assertConstraints((IExecutionBranchStatement)expected, (IExecutionBranchStatement)current, compareConstraints);
+         assertVariables(expected, current, compareVariables, compareConstraints);
+         assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionLoopCondition) {
          assertTrue("Expected IExecutionLoopCondition but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionLoopCondition);
-         assertVariables((IExecutionLoopCondition)expected, (IExecutionLoopCondition)current, compareVariables, compareConstraints);
-         assertConstraints((IExecutionLoopCondition)expected, (IExecutionLoopCondition)current, compareConstraints);
+         assertVariables(expected, current, compareVariables, compareConstraints);
+         assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionLoopStatement) {
          assertTrue("Expected IExecutionLoopStatement but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionLoopStatement);
-         assertVariables((IExecutionLoopStatement)expected, (IExecutionLoopStatement)current, compareVariables, compareConstraints);
-         assertConstraints((IExecutionLoopStatement)expected, (IExecutionLoopStatement)current, compareConstraints);
+         assertVariables(expected, current, compareVariables, compareConstraints);
+         assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionMethodCall) {
          assertTrue("Expected IExecutionMethodCall but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionMethodCall);
-         assertVariables((IExecutionMethodCall)expected, (IExecutionMethodCall)current, compareVariables, compareConstraints);
-         assertConstraints((IExecutionMethodCall)expected, (IExecutionMethodCall)current, compareConstraints);
+         assertVariables(expected, current, compareVariables, compareConstraints);
+         assertConstraints(expected, current, compareConstraints);
          assertMethodReturns((IExecutionMethodCall)expected, (IExecutionMethodCall)current);
       }
       else if (expected instanceof IExecutionMethodReturn) {
@@ -454,8 +432,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
             assertEquals(((IExecutionMethodReturn)expected).isReturnValuesComputed(), ((IExecutionMethodReturn)current).isReturnValuesComputed());
          }
          assertTrue(((IExecutionMethodReturn)expected).getFormatedMethodReturnCondition() + " does not match " + ((IExecutionMethodReturn)current).getFormatedMethodReturnCondition(), StringUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getFormatedMethodReturnCondition(), ((IExecutionMethodReturn)current).getFormatedMethodReturnCondition()));
-         assertVariables((IExecutionMethodReturn)expected, (IExecutionMethodReturn)current, compareVariables, compareConstraints);
-         assertConstraints((IExecutionMethodReturn)expected, (IExecutionMethodReturn)current, compareConstraints);
+         assertVariables(expected, current, compareVariables, compareConstraints);
+         assertConstraints(expected, current, compareConstraints);
          if (compareReturnValues) {
             assertReturnValues(((IExecutionMethodReturn)expected).getReturnValues(), ((IExecutionMethodReturn)current).getReturnValues());
          }
@@ -464,13 +442,13 @@ public abstract class AbstractSymbolicExecutionTestCase {
          assertTrue("Expected IExecutionExceptionalMethodReturn but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionExceptionalMethodReturn);
          assertTrue(((IExecutionExceptionalMethodReturn)expected).getSignature() + " does not match " + ((IExecutionExceptionalMethodReturn)current).getSignature(), StringUtil.equalIgnoreWhiteSpace(((IExecutionExceptionalMethodReturn)expected).getSignature(), ((IExecutionExceptionalMethodReturn)current).getSignature()));
          assertTrue(((IExecutionExceptionalMethodReturn)expected).getFormatedMethodReturnCondition() + " does not match " + ((IExecutionExceptionalMethodReturn)current).getFormatedMethodReturnCondition(), StringUtil.equalIgnoreWhiteSpace(((IExecutionExceptionalMethodReturn)expected).getFormatedMethodReturnCondition(), ((IExecutionExceptionalMethodReturn)current).getFormatedMethodReturnCondition()));
-         assertVariables((IExecutionExceptionalMethodReturn)expected, (IExecutionExceptionalMethodReturn)current, compareVariables, compareConstraints);
-         assertConstraints((IExecutionExceptionalMethodReturn)expected, (IExecutionExceptionalMethodReturn)current, compareConstraints);
+         assertVariables(expected, current, compareVariables, compareConstraints);
+         assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionStatement) {
          assertTrue("Expected IExecutionStatement but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStatement);
-         assertVariables((IExecutionStatement)expected, (IExecutionStatement)current, compareVariables, compareConstraints);
-         assertConstraints((IExecutionStatement)expected, (IExecutionStatement)current, compareConstraints);
+         assertVariables(expected, current, compareVariables, compareConstraints);
+         assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionOperationContract) {
          assertTrue("Expected IExecutionOperationContract but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionOperationContract);
@@ -481,26 +459,26 @@ public abstract class AbstractSymbolicExecutionTestCase {
          assertEquals(((IExecutionOperationContract)expected).getFormatedExceptionTerm(), ((IExecutionOperationContract)current).getFormatedExceptionTerm());
          assertEquals(((IExecutionOperationContract)expected).getFormatedSelfTerm(), ((IExecutionOperationContract)current).getFormatedSelfTerm());
          assertEquals(((IExecutionOperationContract)expected).getFormatedContractParams(), ((IExecutionOperationContract)current).getFormatedContractParams());
-         assertVariables((IExecutionOperationContract)expected, (IExecutionOperationContract)current, compareVariables, compareConstraints);
-         assertConstraints((IExecutionOperationContract)expected, (IExecutionOperationContract)current, compareConstraints);
+         assertVariables(expected, current, compareVariables, compareConstraints);
+         assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionLoopInvariant) {
          assertTrue("Expected IExecutionLoopInvariant but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionLoopInvariant);
          assertEquals(((IExecutionLoopInvariant)expected).isInitiallyValid(), ((IExecutionLoopInvariant)current).isInitiallyValid());
-         assertVariables((IExecutionLoopInvariant)expected, (IExecutionLoopInvariant)current, compareVariables, compareConstraints);
-         assertConstraints((IExecutionLoopInvariant)expected, (IExecutionLoopInvariant)current, compareConstraints);
+         assertVariables(expected, current, compareVariables, compareConstraints);
+         assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionAuxiliaryContract) {
          assertTrue("Expected IExecutionBlockContract but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionAuxiliaryContract);
          assertEquals(((IExecutionAuxiliaryContract)expected).isPreconditionComplied(), ((IExecutionAuxiliaryContract)current).isPreconditionComplied());
-         assertVariables((IExecutionAuxiliaryContract)expected, (IExecutionAuxiliaryContract)current, compareVariables, compareConstraints);
-         assertConstraints((IExecutionAuxiliaryContract)expected, (IExecutionAuxiliaryContract)current, compareConstraints);
+         assertVariables(expected, current, compareVariables, compareConstraints);
+         assertConstraints(expected, current, compareConstraints);
       }
       else if (expected instanceof IExecutionJoin) {
          assertTrue("Expected IExecutionJoin but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionJoin);
          assertEquals(((IExecutionJoin)expected).isWeakeningVerified(), ((IExecutionJoin)current).isWeakeningVerified());
-         assertVariables((IExecutionJoin)expected, (IExecutionJoin)current, compareVariables, compareConstraints);
-         assertConstraints((IExecutionJoin)expected, (IExecutionJoin)current, compareConstraints);
+         assertVariables(expected, current, compareVariables, compareConstraints);
+         assertConstraints(expected, current, compareConstraints);
       }
       else {
          fail("Unknown execution node \"" + expected + "\".");
@@ -1337,7 +1315,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
 	   ProofSettings settings = env.getInitConfig().getSettings();
 	   if (settings==null) {
 		   settings = ProofSettings.DEFAULT_SETTINGS;
-	   }	   
+	   }
 	   settings.getChoiceSettings().updateWith(choices);
    }
 
@@ -1882,7 +1860,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
          }
          assertTrue(maximalNumberOfExecutedSetNodes >= 1);
          // Make sure that the correct taclet options are defined.
-         originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, containerTypeName, methodFullName);         
+         originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, containerTypeName, methodFullName);
          setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
          SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
