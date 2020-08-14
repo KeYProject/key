@@ -13,12 +13,12 @@ import de.uka.ilkd.key.proof.Node;
 /**
  * The script command tryclose" has two optional arguments:
  * <ul>
- *     <li>steps: INTEGER number of steps to use</li>
- *     <li>#2: STRING the number of the branch which should be closed</li>
+ * <li>steps: INTEGER number of steps to use</li>
+ * <li>#2: STRING the number of the branch which should be closed</li>
  * </ul>
  *
- * TryClose tries to close the specified branch. If it is not successful within the specified number
-
+ * If #2 is not given or not a number, the TryClose macro is applied to all open
+ * goals.
  */
 public class TryCloseCommand
         extends AbstractCommand<TryCloseCommand.TryCloseArguments> {
