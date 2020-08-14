@@ -259,7 +259,7 @@ ML_COMMENT
 
 SL_COMMENT
 :
-  {isComment("//")}? => ('//' ~'\n'*)
+  {isComment("//")}? =>('//' ~'\n'*)
   { $channel = HIDDEN; }
 ;
 
@@ -303,7 +303,7 @@ WS
 	|   {acceptAt}? '@'
 	|   ('@*/') => '@*/'
 	|   ('*/') => '*/'
-  )+
+    )+
   { $channel = HIDDEN; }
 ;
 

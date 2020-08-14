@@ -1,11 +1,11 @@
 /**
- *
+ * 
  */
 package de.uka.ilkd.key.proof.io.intermediate;
 
 /**
  * Node in an intermediate proof representation storing a rule application.
- *
+ * 
  * @author Dominic Scheurer
  */
 public class AppNodeIntermediate extends NodeIntermediate {
@@ -20,7 +20,7 @@ public class AppNodeIntermediate extends NodeIntermediate {
     public AppIntermediate getIntermediateRuleApp() {
         return ruleApp;
     }
-
+    
     public void setIntermediateRuleApp(AppIntermediate ruleApp) {
         this.ruleApp = ruleApp;
     }
