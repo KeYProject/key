@@ -785,7 +785,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     }
 
 
-  
+
     public class ProofRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
         private List<Styler<GUIAbstractTreeNode>> stylers = new LinkedList<>();
         private Icon keyHole20x20 = IconFactory.keyHole(iconHeight, iconHeight);
@@ -890,6 +890,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 defaultIcon = IconFactory.editFile(16);
             } else if (node.getNodeInfo().getInteractiveRuleApplication()) {
                 defaultIcon = IconFactory.interactiveAppLogo(16);
+            } else if (node.getNodeInfo().getScriptRuleApplication()) {
+                defaultIcon = IconFactory.scriptAppLogo(16);
             } else {
                 defaultIcon = null;
             }

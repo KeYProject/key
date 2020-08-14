@@ -13,11 +13,12 @@
 
 package de.uka.ilkd.key.ui;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.List;
-
-import de.uka.ilkd.key.proof.init.*;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -29,6 +30,7 @@ import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -41,6 +43,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
@@ -49,6 +55,7 @@ import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -68,17 +75,17 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
    // for a progress bar
    int progressMax = 0;
 
-    
+
     // flag to indicate that a file should merely be loaded not proved. (for
     // "reload" testing)
     private final boolean loadOnly;
-    
-    
+
+
     /**
      * Current key problem file that is attempted to be proven.
      */
     private File keyProblemFile = null;
-    
+
     /**
      * We want to record whether there was a proof that could not be proven.
      * {@link Main} calls System.exit() after all files have been loaded with
@@ -86,7 +93,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * whether there has been a proof attempt that was not successful.
      */
     public boolean allProofsSuccessful = true;
-    
+
     public ConsoleUserInterfaceControl(byte verbosity, boolean loadOnly) {
         this.verbosity = verbosity;
         this.mediator  = new KeYMediator(this);
@@ -125,7 +132,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
        Runtime.getRuntime().gc();
 
        /*
-        * It is assumed that this part of the code is never reached, unless a 
+        * It is assumed that this part of the code is never reached, unless a
         * value has been assigned to keyProblemFile in method loadProblem(File).
         */
        assert keyProblemFile != null : "Unexcpected null pointer. Trying to"
@@ -145,64 +152,69 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
    }
 
     @Override
-   public void taskFinished(TaskFinishedInfo info) {    	
-       super.taskFinished(info);              
-       progressMax = 0; // reset progress bar marker
-       final Proof proof = info.getProof();
-       if (proof==null) {
-           if (verbosity > Verbosity.SILENT) {
-               System.out.println("Proof loading failed");
-               final Object error = info.getResult();
-               if (error instanceof Throwable) {
-                   ((Throwable) error).printStackTrace();
-               }               
-           }
-           System.exit(1);
-       }
-       final int openGoals = proof.openGoals().size();
-       final Object result2 = info.getResult();
-       if (info.getSource() instanceof ProverCore ||
-           info.getSource() instanceof ProofMacro) {
-           if (!isAtLeastOneMacroRunning()) {
-               printResults(openGoals, info, result2);
-           }
-       } else if (info.getSource() instanceof ProblemLoader) {
-           if (verbosity > Verbosity.SILENT) System.out.println("[ DONE ... loading ]");
-           if (result2 != null) {
-               if (verbosity > Verbosity.SILENT) System.out.println(result2);
-               if (verbosity >= Verbosity.HIGH && result2 instanceof Throwable) {
-                   ((Throwable) result2).printStackTrace();
-               }
-               System.exit(-1);
-           }
-           if(loadOnly ||  openGoals==0) {
-               if (verbosity > Verbosity.SILENT)
-                   System.out.println("Number of open goals after loading: " +
-                           openGoals);
-               System.exit(0);
-           }
-           ProblemLoader problemLoader = (ProblemLoader) info.getSource();
-           if(problemLoader.hasProofScript()) {
-               try {
-                   Pair<String, Location> script = problemLoader.readProofScript();
-                   ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
-                   this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
-                   pse.execute(this, proof);
-                   // The start and end messages are fake to persuade the system ...
-                   // All this here should refactored anyway ...
-                   this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
-               } catch (Exception e) {
-                   // TODO
-                   e.printStackTrace();
-                   System.exit(-1);
-               }
-           } else if (macroChosen()) {
-               applyMacro();
-           } else {
-               finish(proof);
-           }
-       }
-   }
+    public void taskFinished(TaskFinishedInfo info) {
+        super.taskFinished(info);
+        progressMax = 0; // reset progress bar marker
+        final Proof proof = info.getProof();
+        if (proof == null) {
+            if (verbosity > Verbosity.SILENT) {
+                System.out.println("Proof loading failed");
+                final Object error = info.getResult();
+                if (error instanceof Throwable) {
+                    ((Throwable) error).printStackTrace();
+                }
+            }
+            System.exit(1);
+        }
+        final int openGoals = proof.openGoals().size();
+        final Object result2 = info.getResult();
+        if (info.getSource() instanceof ProverCore
+                || info.getSource() instanceof ProofMacro) {
+            if (!isAtLeastOneMacroRunning()) {
+                printResults(openGoals, info, result2);
+            }
+        } else if (info.getSource() instanceof ProblemLoader) {
+            if (verbosity > Verbosity.SILENT) {
+                System.out.println("[ DONE ... loading ]");
+            }
+            if (result2 != null) {
+                if (verbosity > Verbosity.SILENT) {
+                    System.out.println(result2);
+                }
+                if (verbosity >= Verbosity.HIGH && result2 instanceof Throwable) {
+                    ((Throwable) result2).printStackTrace();
+                }
+                System.exit(-1);
+            }
+            if (loadOnly ||  openGoals == 0) {
+                if (verbosity > Verbosity.SILENT) {
+                    System.out.println("Number of open goals after loading: " + openGoals);
+                }
+                System.exit(0);
+            }
+            ProblemLoader problemLoader = (ProblemLoader) info.getSource();
+            if (problemLoader.hasProofScript()) {
+                try {
+                    Pair<String, Location> script = problemLoader.readProofScript();
+                    ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+                    this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro,
+                                                                "Script started", 0));
+                    pse.execute(this, proof);
+                    // The start and end messages are fake to persuade the system ...
+                    // All this here should refactored anyway ...
+                    this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
+                } catch (Exception e) {
+                    // TODO
+                    e.printStackTrace();
+                    System.exit(-1);
+                }
+            } else if (macroChosen()) {
+                applyMacro();
+            } else {
+                finish(proof);
+            }
+        }
+    }
 
     @Override
     public void taskStarted(TaskStartedInfo info) {
@@ -259,7 +271,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         mediator.setProof(pa.getFirstProof());
         proofStack = proofStack.prepend(pa.getFirstProof());
     }
-    
+
     void finish(Proof proof) {
        // setInteractive(false) has to be called because the ruleAppIndex
        // has to be notified that we work in auto mode (CS)
@@ -392,7 +404,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 //        }
 //        return false;
     }
-    
+
    /**
     * {@inheritDoc}
     */
@@ -421,50 +433,59 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
       // Nothing to do
    }
 
-   public static boolean saveProof(Object result, Proof proof,
-         File keyProblemFile) {
+    /**
+     * Save proof.
+     *
+     * @param result the result
+     * @param proof the proof
+     * @param keyProblemFile the key problem file
+     * @return true, if successful
+     */
+    public static boolean saveProof(Object result, Proof proof,
+                                    File keyProblemFile) {
+        if (result instanceof Throwable) {
+            throw new Error("Error in batchmode.", (Throwable) result);
+        }
 
-      if (result instanceof Throwable) {
-         throw new Error("Error in batchmode.", (Throwable) result);
-      }
+        // Save the proof before exit.
+        String baseName = keyProblemFile.getAbsolutePath();
+        int idx = baseName.indexOf(".key");
+        if (idx == -1) {
+            idx = baseName.indexOf(".proof");
+        }
+        baseName = baseName.substring(0, idx == -1 ? baseName.length() : idx);
 
-      // Save the proof before exit.
+        File f;
+        int counter = 0;
+        do {
+            f = new File(baseName + ".auto." + counter + ".proof");
+            counter++;
+        } while (f.exists());
 
-      String baseName = keyProblemFile.getAbsolutePath();
-      int idx = baseName.indexOf(".key");
-      if (idx == -1) {
-         idx = baseName.indexOf(".proof");
-      }
-      baseName = baseName.substring(0, idx == -1 ? baseName.length() : idx);
+        try {
+            // a copy with running number to compare different runs
+            proof.saveToFile(new File(f.getAbsolutePath()));
+            // save current proof under common name as well
+            proof.saveToFile(new File(baseName + ".auto.proof"));
 
-      File f;
-      int counter = 0;
-      do {
-
-         f = new File(baseName + ".auto." + counter + ".proof");
-         counter++;
-      }
-      while (f.exists());
-
-      try {
-         // a copy with running number to compare different runs
-         proof.saveToFile(new File(f.getAbsolutePath()));
-         // save current proof under common name as well
-         proof.saveToFile(new File(baseName + ".auto.proof"));
-      }
-      catch (IOException e) {
-         e.printStackTrace();
-      }
-
-      if (proof.openGoals().size() == 0) {
-         // Says that all Proofs have succeeded
-         return true;
-      }
-      else {
-         // Says that there is at least one open Proof
-         return false;
-      }
-   }
+            // save proof statistics
+            ShowProofStatistics.getCSVStatisticsMessage(proof);
+            File file = new File(MiscTools.toValidFileName(proof.name().toString()) + ".csv");
+            try (BufferedWriter writer =
+                    new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+                    ) {
+                writer.write(ShowProofStatistics.getCSVStatisticsMessage(proof));
+            } catch (IOException e) {
+                e.printStackTrace();
+                assert false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // Says true if all Proofs have succeeded,
+        // or false if there is at least one open Proof
+        return proof.openGoals().size() == 0;
+    }
 
    @Override
    public TermLabelVisibilityManager getTermLabelVisibilityManager() {

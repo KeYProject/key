@@ -1,6 +1,7 @@
-// This example has been refactored pending solution to bug #1288
-
 final class For implements Iterable {
+
+  // This example has been refactored pending solution to bug #1288
+  Trivial it;
 
   //@ ensures \result == (\sum int j; 0 <= j && j < a.length; a[j]);
   int sum (int[] a) {
@@ -21,16 +22,15 @@ final class For implements Iterable {
     @ ensures false;
     @*/
   void infiniteLoop(For f) {
-    java.util.Iterator it = f.iterator();
-    
     //@ maintaining \invariant_for(f);
     //@ assignable \strictly_nothing;
-    while (it.hasNext());
+    for (Object o: f);
   }
 
-  /*@ ensures \result instanceof java.util.CollectionIterator;
-    @ ensures \invariant_for(\result);
-    @ ensures \result.index < \result.seq.length;
-    @*/
-  java.util.Iterator iterator();
+  java.util.Iterator iterator () { return it; } 
+
+  final class Trivial extends java.util.Iterator {
+    boolean hasNext() { return true; }
+    Object next() { return null; }
+  }
 }

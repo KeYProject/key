@@ -230,7 +230,7 @@ public class TacletFindModel extends AbstractTableModel {
             return parser.id_declaration();
         } catch (RecognitionException re) {
             // parser cannot be null
-            throw new ParserException(parser.getErrorMessage(re), new Location(re));
+            throw new ParserException(parser.getErrorMessage(re), Location.create(re));
         }
     }
 
@@ -327,7 +327,7 @@ public class TacletFindModel extends AbstractTableModel {
             return services.getTermBuilder().addLabelToAllSubs(
                     OriginTermLabel.removeOriginLabels(term, services),
                     new OriginTermLabel(new NodeOrigin(
-                            SpecType.INTERACTION,
+                            SpecType.USER_INTERACTION,
                             originalApp.rule().displayName(),
                             goal.node().serialNr())));
         } else {

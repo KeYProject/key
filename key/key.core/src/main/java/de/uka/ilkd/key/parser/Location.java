@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.runtime.RecognitionException;
 
 import java.net.MalformedURLException;
@@ -35,7 +37,7 @@ public final class Location {
     /**
      * The location of the resource of the Location. May be null!
      */
-    private final URL filename;
+    private final URL fileUrl;
 
     /** line number of the Location */
     private final int line;
@@ -45,24 +47,15 @@ public final class Location {
 
     /**
      * Legacy constructor for creating a new Location from a String denoting the file path and line
-     * and column number. Tries to convert the path given as String into a URL. If this fails,
-     * a RuntimeException is thrown.
-     * @param filename path to the resource of the Location (null is allowed)
+     * and column number, tries to convert the path given as String into a URL.
+     * @param filename path to the resource of the Location
      * @param line line of the Location
      * @param column column of the Location
+     * @throws MalformedURLException if the given string is null or can not be parsed to URL
      */
     @Deprecated
-    public Location(String filename, int line, int column) {
-        URL url = null;
-        if (filename != null) {
-            // catch-rethrow to avoid to change the interface too much
-            try {
-                url = new URL("file://" + filename);
-            } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        this.filename = url;
+    public Location(String filename, int line, int column) throws MalformedURLException {
+        this.fileUrl = MiscTools.parseURL(filename);
         this.line = line;
         this.column = column;
     }
@@ -74,24 +67,40 @@ public final class Location {
      * @param column column of the Location
      */
     public Location(URL url, int line, int column) {
-        this.filename = url;
+        this.fileUrl = url;
         this.line = line;
         this.column = column;
     }
 
-    public Location(RecognitionException re) {
-        // ANTLR starts lines in column 0, files in line 1.
-        this(re.input.getSourceName(), re.line, re.charPositionInLine + 1);
+    /**
+     * This factory method can be used to create a Location for a RecognitionException.
+     * A possibly thrown MalformedURLException is caught and printed to debug output,
+     *  null is returned instead.
+     * @param re the RecognitionException to create a Location for
+     * @return the created Location or null if creation failed
+     */
+    public static Location create(RecognitionException re) {
+        try {
+            // ANTLR starts lines in column 0, files in line 1.
+            return new Location(re.input.getSourceName(), re.line, re.charPositionInLine + 1);
+        } catch (MalformedURLException e) {
+            Debug.out("Location could not be created from String: " + re.input.getSourceName(), e);
+            return null;
+        }
     }
 
-    /** @return the filename may be null */
-    @Deprecated
-    public String getFilename() {
-        return filename.getPath();
+    /**
+     * Checks if the given Location is valid, i.e. not null and has a URL.
+     *
+     * @param location the Location to check
+     * @return true iff Location is valid
+     */
+    public static boolean isValidLocation(final Location location) {
+        return !(location == null || location.getFileURL() == null);
     }
 
     public URL getFileURL() {
-        return filename;
+        return fileUrl;
     }
 
     public int getLine() {
@@ -105,6 +114,6 @@ public final class Location {
     /** Internal string representation. Do not rely on format! */
     @Override
     public String toString() {
-        return "[" + filename + ":" + line + "," + column + "]";
+        return "[" + fileUrl + ":" + line + "," + column + "]";
     }
 }

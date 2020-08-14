@@ -66,6 +66,8 @@ public final class IconFactory {
             new IconFontProvider(FontAwesomeSolid.EDIT);
     public static final IconFontProvider INTERACTIVE =
             new IconFontProvider(FontAwesomeSolid.HAND_POINT_RIGHT);
+    public static final IconFontProvider SCRIPT =
+            new IconFontProvider(FontAwesomeSolid.SCROLL);
     public static final IconFontProvider PRUNE =
             new IconFontProvider(FontAwesomeSolid.CUT);
     public static final IconFontProvider GOAL_BACK =
@@ -481,6 +483,11 @@ public final class IconFactory {
 
     public static Icon interactiveAppLogo(int size) {
         return INTERACTIVE.load(size);
+        //return scaleIcon(interactiveAppLogo, size, size);
+    }
+
+    public static Icon scriptAppLogo(int size) {
+        return SCRIPT.load(size);
         //return scaleIcon(interactiveAppLogo, size, size);
     }
 

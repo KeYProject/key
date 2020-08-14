@@ -71,10 +71,15 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Parameters args,
             EngineState state) throws ScriptException, InterruptedException {
-        final RuleApp theApp = makeRuleApp(args, state);
+        RuleApp theApp = makeRuleApp(args, state);
+        Goal g = state.getFirstOpenAutomaticGoal();
+
+        if (theApp instanceof TacletApp) {
+            RuleApp completeApp = ((TacletApp) theApp).tryToInstantiate(g.proof().getServices());
+            theApp = completeApp == null ? theApp : completeApp;
+        }
         assert theApp != null;
 
-        Goal g = state.getFirstOpenAutomaticGoal();
         g.apply(theApp);
     }
 

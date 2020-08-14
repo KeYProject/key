@@ -857,7 +857,7 @@ public class OriginTermLabel implements TermLabel {
         /**
          * Interaction. Used for terms entered by the user.
          */
-        INTERACTION("User_Interaction"),
+        USER_INTERACTION("User_Interaction"),
 
         /**
          * None. Used when no other spec type fits and for terms whose origin was
