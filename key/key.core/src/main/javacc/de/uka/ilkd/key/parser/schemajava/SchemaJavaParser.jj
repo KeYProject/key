@@ -591,7 +591,9 @@ TOKEN :
 		    | < TYPEOF: "#typeof" >
 		    | < SWITCHTOIF: "#switch-to-if" >
 		    | < UNPACK: "#unpack" >
+		    | < REATTACHLOOPINVARIANT: "#reattachLoopInvariant" >
 		    | < FORINITUNFOLDTRANSFORMER: "#forInitUnfoldTransformer" >
+		    | < LOOPSCOPEINVARIANTTRANSFORMER: "#loopScopeInvariantTransformer" >
 		    | < SET: "#set" >
 		    }
 
@@ -4197,6 +4199,17 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
        return result; 
    }
    )
+   |
+   (
+    <LOOPSCOPEINVARIANTTRANSFORMER> "(" ( loopStat=WhileStatement() ) ")" ";" 
+   {
+       result = factory.createRKeYMetaConstruct();
+       setPrefixInfo(result);
+       result.setChild(loopStat);  
+       result.setName("#loopScopeInvariantTransformer");
+       return result; 
+   }
+   )
      |
    (
     <UNPACK> "("
@@ -4432,7 +4445,18 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
 		  	return result;
 	     	}
 	   )
-	  }
+	   |
+	   (
+         <REATTACHLOOPINVARIANT> "(" loopStat = WhileStatement() ")" ";"
+         { 
+           result = factory.createRKeYMetaConstruct();
+           setPrefixInfo(result);
+           result.setChild(loopStat);
+           result.setName("#reattachLoopInvariant");
+           return result;
+         }
+       )
+	 }
 
 
 While WhileStatement() :

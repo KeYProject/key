@@ -60,7 +60,7 @@ public class Pair<T1, T2> {
      * @throws IllegalArgumentException if it contains duplicate first entries
      */
     public static <S,T> Map<S,T> toMap (Collection<Pair<S,T>> pairs){
-        Map<S,T> res = new java.util.HashMap<S,T>();
+        Map<S,T> res = new java.util.LinkedHashMap<S,T>();
         for (Pair<S,T> p: pairs){
             if (res.containsKey(p.first))
                 throw new IllegalArgumentException("Cannot covert "+pairs+" into a map; it contains duplicate first entries.");

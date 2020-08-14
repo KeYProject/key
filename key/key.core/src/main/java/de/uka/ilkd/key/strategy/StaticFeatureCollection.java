@@ -63,15 +63,17 @@ import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
  */
 public abstract class StaticFeatureCollection {
 
-    protected static Feature loopInvFeature(Feature costStdInv, Feature costLoopScopeInv) {
-        SetRuleFilter filterLoopInv = new SetRuleFilter();
+    protected static Feature loopInvFeature(Feature costStdInv) {
+        // NOTE (DS, 2019-04-10): This feature also deactivates the built-in loop
+        // scope invariant rule (always!) since we use the taclets now.
+        final SetRuleFilter filterLoopInv = new SetRuleFilter();
         filterLoopInv.addRuleToSet(WhileInvariantRule.INSTANCE);
-
-        SetRuleFilter filterLoopScopeInv = new SetRuleFilter();
+        final SetRuleFilter filterLoopScopeInv = new SetRuleFilter();
         filterLoopScopeInv.addRuleToSet(LoopScopeInvariantRule.INSTANCE);
-
+        
         return ConditionalFeature.createConditional(filterLoopInv, costStdInv,
-                ConditionalFeature.createConditional(filterLoopScopeInv, costLoopScopeInv));
+                ConditionalFeature.createConditional(filterLoopScopeInv,
+                        inftyConst()));
     }
 
     /**

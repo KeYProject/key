@@ -579,7 +579,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
         final Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
         heapContext.forEach(heap -> mods.put(heap,
-                inst.inv.getModifies(heap, inst.selfTerm, atPres, services)));
+                        inst.inv.getModifies(heap, inst.selfTerm, atPres, services)));
 
         ImmutableList<AnonUpdateData> anonUpdateData = ImmutableSLList
                 .<AnonUpdateData> nil();
