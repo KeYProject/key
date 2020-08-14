@@ -2,6 +2,8 @@ package org.key_project.exploration.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Node;
+import org.jetbrains.annotations.NotNull;
 import org.key_project.exploration.ProofExplorationService;
 
 import java.awt.event.ActionEvent;
@@ -27,7 +29,7 @@ public class AddFormulaToSuccedentAction extends ExplorationAction {
         Term t = promptForTerm(mainWindow, null);
         if (t == null) return;
         ProofExplorationService service = ProofExplorationService.get(getMediator());
-        var toBeSelected = service.soundAddition(getMediator().getSelectedGoal(), t, false);
+        @NotNull Node toBeSelected = service.soundAddition(getMediator().getSelectedGoal(), t, false);
         getMediator().getSelectionModel().setSelectedNode(toBeSelected);
     }
 }

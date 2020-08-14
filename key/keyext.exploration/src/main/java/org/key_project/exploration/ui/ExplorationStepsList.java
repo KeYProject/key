@@ -221,9 +221,8 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         ArrayList<MyTreeNode> list = new ArrayList<>();
         if (node.children() != null) {
             Enumeration<TreeNode> children = node.children();
-            Iterator<TreeNode> treeNodeIterator = children.asIterator();
-            while (treeNodeIterator.hasNext()) {
-                list.add((MyTreeNode) treeNodeIterator.next());
+            while (children.hasMoreElements()) {
+                list.add((MyTreeNode) children.nextElement());
             }
             list.forEach(myTreeNode -> setNodeExpanded(tree, myTreeNode, expanded));
             if (!expanded && node.isRoot()) {

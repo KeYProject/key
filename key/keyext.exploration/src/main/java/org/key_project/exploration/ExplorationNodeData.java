@@ -2,6 +2,7 @@ package org.key_project.exploration;
 
 import de.uka.ilkd.key.proof.Node;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -15,7 +16,7 @@ public class ExplorationNodeData {
     private  String explorationAction;
 
     public static @NotNull ExplorationNodeData get(@NotNull Node node) {
-        var data = node.lookup(ExplorationNodeData.class);
+        @Nullable ExplorationNodeData data = node.lookup(ExplorationNodeData.class);
         if(data == null) {
             data = new ExplorationNodeData();
             node.register(data, ExplorationNodeData.class);

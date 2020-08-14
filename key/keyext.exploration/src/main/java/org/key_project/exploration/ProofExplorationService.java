@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.Objects;
@@ -51,7 +52,7 @@ public class ProofExplorationService {
     }
 
     private static @NotNull ProofExplorationService get(Proof selectedProof) {
-        var service = selectedProof.lookup(ProofExplorationService.class);
+        @Nullable ProofExplorationService service = selectedProof.lookup(ProofExplorationService.class);
         if (service == null) {
             service = new ProofExplorationService(selectedProof, selectedProof.getServices());
             selectedProof.register(service, ProofExplorationService.class);
@@ -166,7 +167,7 @@ public class ProofExplorationService {
         TacletApp app = soundChange(pio, term, newTerm);
 
         //taint goal with exploration
-        var data = ExplorationNodeData.get(g.node());
+        @NotNull ExplorationNodeData data = ExplorationNodeData.get(g.node());
         data.setExplorationAction("Edit " + LogicPrinter.quickPrintTerm(term, services) + " to " + LogicPrinter.quickPrintTerm(newTerm, services));
 
         //apply cut
