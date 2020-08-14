@@ -148,6 +148,20 @@ public class ProofScriptEngine {
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
             } catch (InterruptedException ie) {
                 throw ie;
+            } catch (ProofAlreadyClosedException e) {
+                if (stateMap.isFailOnClosedOn()) {
+                    throw new ScriptException(
+                            String.format("Proof already closed while trying to fetch next goal.\n"
+                                    + "This error can be suppressed by setting '@failonclosed off'.\n\n"
+                                    + "Command: %s\nLine:%d\n",
+                                    argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine()),
+                            initialLocation.getFileURL(), mlp.getLine(), mlp.getColumn(), e);
+                } else {
+                    System.out.format(
+                            "Proof already closed at command \"%s\" at line %d, terminating.\n",
+                            argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine());
+                    break;
+                }
             } catch (Exception e) {
                 //@formatter:off
                 //System.out.println("GOALS:" + proof.getSubtreeGoals(proof.root()).size());
