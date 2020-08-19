@@ -279,7 +279,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             suitableManipulators.forEach(
                     it -> System.err.println(Arrays.toString(it.getArgumentTypes())));
             System.err.format("But you gave %d arguments.\n", arguments.size());
-            semanticError(ctx, "Could not apply the given variable condition: %s", name);
+            semanticError(ctx, "Could not apply the given variable condition: %s", ctx.getText());
         }
         return null;
     }
