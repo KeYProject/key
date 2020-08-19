@@ -2051,15 +2051,15 @@ public abstract class AbstractSymbolicExecutionTestCase {
     * @return The original settings which are overwritten.
     */
    public static HashMap<String, String> setDefaultTacletOptions() {
-	   HashMap<String,String> original = HelperClassForTests.setDefaultTacletOptions();
-	   // set non modular reasoning
-	   System.out.println(ProofSettings.DEFAULT_SETTINGS);
-	   ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-	   System.out.println(choiceSettings);
-	   ImmutableSet<Choice> cs = DefaultImmutableSet.nil();
-	   cs = cs.add(new Choice("noRestriction", "methodExpansion"));
-	   choiceSettings.updateWith(cs);
-	   return original;
+      HashMap<String, String> original = HelperClassForTests.setDefaultTacletOptions();
+      // set non modular reasoning
+      //System.out.println(ProofSettings.DEFAULT_SETTINGS);
+      ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+      //System.out.println(choiceSettings);
+      ImmutableSet<Choice> cs = DefaultImmutableSet.nil();
+      cs = cs.add(new Choice("noRestriction", "methodExpansion"));
+      choiceSettings.updateWith(cs);
+      return original;
    }
 
    /**
