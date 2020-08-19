@@ -303,12 +303,12 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         if (types.length != arguments.size())
             return false;
-
-        for (int i = 0; i < arguments.size(); i++) {
-            args[i] = evaluateVarcondArgument(types[i], args[i], arguments.get(i));
-        }
-
         try {
+
+            for (int i = 0; i < arguments.size(); i++) {
+                args[i] = evaluateVarcondArgument(types[i], args[i], arguments.get(i));
+            }
+
             manipulator.apply(peekTBuilder(), args, parameters, negated);
             return true;
         } catch (Throwable e) {
