@@ -55,18 +55,19 @@ public final class HeapLDT extends LDT {
         
     public static final Name SELECT_NAME = new Name("select");
     public static final Name STORE_NAME = new Name("store");
+    public static final Name FINAL_NAME = new Name("final");
     public static final Name BASE_HEAP_NAME = new Name("heap");
     public static final Name SAVED_HEAP_NAME = new Name("savedHeap");
     public static final Name PERMISSION_HEAP_NAME = new Name("permissions");
     public static final Name[] VALID_HEAP_NAMES = { BASE_HEAP_NAME, SAVED_HEAP_NAME, PERMISSION_HEAP_NAME };
 
 
-    
     //additional sorts
     private final Sort fieldSort;    
     
     //select/store
     private final SortDependingFunction select;
+    private final SortDependingFunction finalFunction;
     private final Function store;
     private final Function create;
     private final Function anon;
@@ -109,6 +110,7 @@ public final class HeapLDT extends LDT {
 	
         fieldSort         = (Sort) sorts.lookup(new Name("Field"));	
         select            = addSortDependingFunction(services, SELECT_NAME.toString());
+        finalFunction     = addSortDependingFunction(services, FINAL_NAME.toString());
         store             = addFunction(services, "store");
         create            = addFunction(services, "create");
         anon              = addFunction(services, "anon");
@@ -211,8 +213,12 @@ public final class HeapLDT extends LDT {
     public Function getSelect(Sort instanceSort, TermServices services) {
 	return select.getInstanceFor(instanceSort, services);
     }
-    
-    
+    public Function getFinal(Sort instanceSort, Services services) {
+        return finalFunction.getInstanceFor(instanceSort, services);
+    }
+
+
+
     /**
      * If the passed operator is an instance of "select", this method returns
      * the sort of the function (identical to its return type); otherwise, 
@@ -229,6 +235,11 @@ public final class HeapLDT extends LDT {
     public boolean isSelectOp(Operator op) {
         return op instanceof SortDependingFunction
                 && ((SortDependingFunction)op).isSimilar(select);
+    }
+
+    public boolean isFinalOp(Operator op) {
+        return op instanceof SortDependingFunction
+                && ((SortDependingFunction)op).isSimilar(finalFunction);
     }
 
 

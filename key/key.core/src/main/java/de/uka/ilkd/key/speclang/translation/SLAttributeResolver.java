@@ -157,7 +157,11 @@ public final class SLAttributeResolver extends SLExpressionResolver {
         	    if(attribute.isStatic()) {
         		attributeTerm = services.getTermBuilder().staticDot(attribute.sort(), 
         					     fieldSymbol);
-        	    } else {
+        	    } else if (attribute.isFinal()) {
+        	    	attributeTerm = services.getTermBuilder().finalDot(attribute.sort(),
+							recTerm,
+							fieldSymbol);
+				} else {
         		attributeTerm = services.getTermBuilder().dot(attribute.sort(), 
         				       recTerm, 
         				       fieldSymbol);
