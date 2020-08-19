@@ -194,7 +194,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         b.setIfSequent(ifSeq);
         b.setName(new Name(name));
         accept(ctx.goalspecs());
-        accept(ctx.varexplist());
+        mapOf(ctx.varexplist());
         accept(ctx.modifiers());
         b.setChoices(choices);
         b.setAnnotations(tacletAnnotations);
@@ -278,7 +278,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             System.err.println("Found name-matching conditions with following type signature:");
             suitableManipulators.forEach(
                     it -> System.err.println(Arrays.toString(it.getArgumentTypes())));
-            System.err.format("But you gave %d\n", arguments.size());
+            System.err.format("But you gave %d arguments.\n", arguments.size());
             semanticError(ctx, "Could not apply the given variable condition: %s", name);
         }
         return null;
@@ -296,7 +296,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             boolean negated,
             Object[] args,
             TacletBuilderCommand manipulator,
-            List<KeYParser.Varexp_argumentContext> arguments, List<String> parameters) {
+            List<KeYParser.Varexp_argumentContext> arguments,
+            List<String> parameters) {
         assert args.length == arguments.size();
         ArgumentType[] types = manipulator.getArgumentTypes();
 
@@ -310,7 +311,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         try {
             manipulator.apply(peekTBuilder(), args, parameters, negated);
             return true;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             return false;
         }
@@ -336,8 +337,10 @@ public class TacletPBuilder extends ExpressionBuilder {
                 return varId(ctx, ctx.getText());
             case STRING:
                 return ctx.getText();
+            case TERM:
+                return accept(ctx.term());
         }
-
+        assert false;
         return null;
     }
 

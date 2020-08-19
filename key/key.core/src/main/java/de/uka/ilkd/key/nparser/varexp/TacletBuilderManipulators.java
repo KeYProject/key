@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.nparser.varexp;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -38,6 +40,7 @@ public class TacletBuilderManipulators {
     private static final ArgumentType SV = ArgumentType.VARIABLE;
     private static final ArgumentType TLSV = ArgumentType.VARIABLE;
     private static final ArgumentType S = ArgumentType.STRING;
+    private static final ArgumentType T = ArgumentType.TERM;
 
 
     /**
@@ -117,6 +120,17 @@ public class TacletBuilderManipulators {
             tacletBuilder.addVarsNew((SchemaVariable) arguments[0], kjt);
         }
     };
+
+    public static final AbstractTacletBuilderCommand NEW_VAR = new AbstractTacletBuilderCommand("new", SV, SORT) {
+        @Override
+        public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments, List<String> parameters, boolean negated) {
+            if (negated) throw new IllegalArgumentException("Negation is not supported");
+            SchemaVariable sv = (SchemaVariable) arguments[0];
+            Sort sort = (Sort) arguments[1];
+            //TODO weigl tacletBuilder.addVarsNew(sv, sort);
+        }
+    };
+
 
     static class NotFreeInTacletBuilderCommand extends AbstractTacletBuilderCommand {
         public NotFreeInTacletBuilderCommand(@NotNull ArgumentType... argumentsTypes) {
@@ -260,12 +274,41 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder LABEL
             = new ConstructorBasedBuilder("hasLabel", TermLabelCondition.class, TSV, S);
     //endregion
+    public static final AbstractConditionBuilder STORE_TERM_IN = new AbstractConditionBuilder(
+            "storeTermIn", SV, T) {
+        @Override
+        public VariableCondition build(Object[] arguments, List<String> parameters, boolean negated) {
+            return new StoreTermInCondition((SchemaVariable) arguments[0], (Term) arguments[1]);
+        }
+    };
+
+    public static final AbstractConditionBuilder STORE_STMT_IN = new ConstructorBasedBuilder(
+            "storeStmtIn", StoreStmtInCondition.class, SV, T);
+    public static final AbstractConditionBuilder HAS_INVARIANT
+            = new ConstructorBasedBuilder("\\hasInvariant", HasLoopInvariantCondition.class, PV, SV);
+    public static final AbstractConditionBuilder GET_INVARIANT
+            = new ConstructorBasedBuilder("\\getInvariant", LoopInvariantCondition.class, PV, SV, SV);
+    public static final AbstractConditionBuilder GET_FREE_INVARIANT
+            = new ConstructorBasedBuilder("\\getFreeInvariant", LoopFreeInvariantCondition.class, PV, SV, SV);
+    public static final AbstractConditionBuilder GET_VARIANT
+            = new AbstractConditionBuilder("\\getVariant", PV, SV) {
+        @Override
+        public VariableCondition build(Object[] arguments, List<String> parameters, boolean negated) {
+            return new LoopVariantCondition((ProgramSV) arguments[0], (SchemaVariable) arguments[1]);
+        }
+    };
+    public static final AbstractConditionBuilder IS_LABELED = new AbstractConditionBuilder("isLabeled", PV) {
+        @Override
+        public IsLabeledCondition build(Object[] arguments, List<String> parameters, boolean negated) {
+            return new IsLabeledCondition((ProgramSV) arguments[0], negated);
+        }
+    };
 
     //region Registry
     static {
         register(SAME_OBSERVER, SIMPLIFY_ITE_UPDATE,
                 ABSTRACT_OR_INTERFACE, SAME, IS_SUBTYPE,
-                STRICT, DISJOINT_MODULO_NULL, NEW_JAVATYPE,
+                STRICT, DISJOINT_MODULO_NULL, NEW_VAR, NEW_JAVATYPE,
                 FREE_1, FREE_2, FREE_3, FREE_4, FREE_5, NEW_TYPE_OF, NEW_DEPENDING_ON,
                 FREE_LABEL_IN_VARIABLE, DIFFERENT, FINAL, ENUM_CONST,
                 LOCAL_VARIABLE, ARRAY_LENGTH, ARRAY, REFERENCE_ARRAY, MAY_EXPAND_METHOD_2,
@@ -275,6 +318,8 @@ public class TacletBuilderManipulators {
                 SUBFORMULAS, STATIC_FIELD, SUBFORMULA, DROP_EFFECTLESS_STORES, EQUAL_UNIQUE,
                 META_DISJOINT, IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT
         );
+        register(STORE_TERM_IN, STORE_STMT_IN, HAS_INVARIANT,
+                GET_INVARIANT, GET_FREE_INVARIANT, GET_VARIANT, IS_LABELED);
         loadWithServiceLoader();
     }
 
@@ -313,6 +358,7 @@ public class TacletBuilderManipulators {
 
     /**
      * Returns all available {@link TacletBuilderCommand}s that response on the given name.
+     *
      * @see TacletBuilderCommand#isSuitableFor(String)
      */
     public static List<TacletBuilderCommand> getConditionBuildersFor(String name) {
