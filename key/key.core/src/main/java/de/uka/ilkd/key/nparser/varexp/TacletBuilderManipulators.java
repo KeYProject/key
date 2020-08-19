@@ -114,7 +114,7 @@ public class TacletBuilderManipulators {
         public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments, List<String> parameters, boolean negated) {
             if (negated) throw new IllegalArgumentException("Negation is not supported");
             KeYJavaType kjt = (KeYJavaType) arguments[1];
-            tacletBuilder.addVarsNew((SchemaVariable) arguments[0], kjt.getJavaType());
+            tacletBuilder.addVarsNew((SchemaVariable) arguments[0], kjt);
         }
     };
 
