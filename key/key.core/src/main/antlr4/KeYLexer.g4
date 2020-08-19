@@ -125,6 +125,14 @@ MODIFIES : '\\modifies';
 PROGRAMVARIABLES : '\\programVariables';
 
 // Keywords for varcond and related stuff
+STORE_TERM_IN : '\\storeTermIn';
+STORE_STMT_IN : '\\storeStmtIn';
+HAS_INVARIANT : '\\hasInvariant';
+GET_INVARIANT : '\\getInvariant';
+GET_FREE_INVARIANT: '\\getFreeInvariant';
+GET_VARIANT: '\\getVariant';
+IS_LABELED: '\\isLabeled';
+
 SAME_OBSERVER : '\\sameObserver';
 VARCOND : '\\varcond';
 APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';

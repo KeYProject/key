@@ -588,7 +588,7 @@ taclet
         )*
     )?
 
-    ( VARCOND LPAREN varexplist RPAREN ) ?
+    ( VARCOND LPAREN varexplist RPAREN )*
     goalspecs
     modifiers
   )
@@ -674,6 +674,13 @@ varexpId:
   | NEWLABEL
   | ISREFERENCE
   | MAXEXPANDMETHOD
+  | STORE_TERM_IN
+  | STORE_STMT_IN
+  | HAS_INVARIANT
+  | GET_INVARIANT
+  | GET_FREE_INVARIANT
+  | GET_VARIANT
+  | IS_LABELED
 ;
 
 
@@ -685,6 +692,7 @@ varexp_argument
   | TYPEOF LPAREN y=varId RPAREN
   | CONTAINERTYPE LPAREN y=varId RPAREN
   | DEPENDINGON LPAREN y=varId RPAREN
+  | term
 ;
 
 goalspecs:
