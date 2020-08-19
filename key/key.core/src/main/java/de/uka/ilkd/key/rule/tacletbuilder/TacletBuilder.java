@@ -185,7 +185,9 @@ public abstract class TacletBuilder<T extends Taclet> {
      * the Taclet: v is new and has the given type
      */
     public void addVarsNew(SchemaVariable v, KeYJavaType type){
-	addVarsNew(new NewVarcond(v, type));
+        if (type == null)
+            throw new NullPointerException("given type is null");
+        addVarsNew(new NewVarcond(v, type));
     }
 
     /** adds a new <I>new</I> variable to the variable conditions of

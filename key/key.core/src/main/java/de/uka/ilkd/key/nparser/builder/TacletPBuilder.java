@@ -312,7 +312,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             manipulator.apply(peekTBuilder(), args, parameters, negated);
             return true;
         } catch (Throwable e) {
-            e.printStackTrace();
+            //handled: e.printStackTrace();
             return false;
         }
 
