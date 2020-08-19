@@ -6,8 +6,7 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.IllegalFormulaException;
@@ -32,7 +31,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     private List<Throwable> tacletExceptions = Collections.emptyList();
 
     @Override
-    public CharSequence translateProblem(Term problem, Services services, SMTSettings settings) {
+    public CharSequence translateProblem(Sequent sequent, Services services, SMTSettings settings) {
 
         MasterHandler master;
         try {
@@ -43,7 +42,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             return "error while translating";
         }
 
-        List<Term> sequentAsserts = smashProblem(problem, services);
+        List<Term> sequentAsserts = getTermsFromSequent(sequent, services);
+
         List<SExpr> results = new LinkedList<>();
         for (Term t : sequentAsserts) {
             results.add(master.translate(t, Type.BOOL));
@@ -63,9 +63,11 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         sb.append("; --- Declarations");
 
-        if (problem.arity() != 0) {
+        if (sequent.succedent().size() != 0 || sequent.antecedent().size() != 0) {
             master.addSort(Sort.ANY);
-            addAllSorts(problem, master);
+            for (Term t : sequentAsserts) {
+                addAllSorts(t, master);
+            }
         }
 
         List<SExpr> sortExprs = new LinkedList<>();
@@ -150,25 +152,14 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
     }
 
-    //just testing: break the top-level seq formula into single assertions
-    private List<Term> smashProblem(Term problem, Services s) {
-        TermBuilder tb = s.getTermBuilder();
+    private List<Term> getTermsFromSequent(Sequent seq, Services serv) {
+        TermBuilder tb = serv.getTermBuilder();
         List<Term> res = new LinkedList<>();
-        if (problem.op() == Junctor.IMP) {
-            Term left = problem.sub(0);
-            Term right = problem.sub(1);
-            while (left.op() == Junctor.AND) {
-                res.add(left.sub(1));
-                left = left.sub(0);
-            }
-            res.add(left);
-            while (right.op() == Junctor.OR) {
-                res.add(tb.not(right.sub(1)));
-                right = right.sub(0);
-            }
-            res.add(tb.not(right));
-        } else { //TODO js make sure this includes all cases
-            res.add(tb.not(problem));
+        for (SequentFormula sf : seq.antecedent().asList()) {
+            res.add(sf.formula());
+        }
+        for (SequentFormula sf : seq.succedent().asList()) {
+            res.add(tb.not(sf.formula()));
         }
         return res;
     }

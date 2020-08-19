@@ -21,6 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -213,7 +214,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 // Secondly: Translate the given problem
                 String commands[];
                 try {
-                        commands = translateToCommand(problem.getTerm());
+                        commands = translateToCommand(problem.getSequent());
                 } catch (Throwable e) {
                         interruptionOccurred(e);
                         listener.processInterrupted(this, problem, e);
@@ -303,7 +304,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         }
 
 
-    private String[] translateToCommand(Term term)
+    private String[] translateToCommand(Sequent sequent)
                 throws IllegalFormulaException, IOException {
         if (getType() == SolverType.Z3_CE_SOLVER) {
             Proof proof = problem.getGoal().proof();
@@ -323,7 +324,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
             SMTObjTranslator objTrans =
                     new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
-            problemString = objTrans.translateProblem(term, services, smtSettings).toString();
+            problemString = objTrans.translateProblem(sequent, services, smtSettings).toString();
             // problemTypeInformation = objTrans.getTypes();
             ModelExtractor query = objTrans.getQuery();
             getSocket().setQuery(query);
@@ -333,7 +334,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         } else {
             SMTTranslator trans = getType().createTranslator(services);
             //instantiateTaclets(trans);
-            problemString = indent(trans.translateProblem(term, services, smtSettings).toString());
+            problemString = indent(trans.translateProblem(sequent, services, smtSettings).toString());
 //            tacletTranslation = ((AbstractSMTTranslator) trans).getTacletSetTranslation();
             exceptionsForTacletTranslation.addAll(trans.getExceptionsOfTacletTranslation());
         }
