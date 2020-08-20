@@ -39,7 +39,7 @@ public class OpenSingleJavaFileAction extends MainWindowAction {
         super(mainWindow);
         setName("Open Single Java File...");
         //setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
-        setTooltip("Load a Java without a classpath.");
+        setTooltip("Browse and load a single Java file without classpath.");
         setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
         lookupAcceleratorKey();
     }
