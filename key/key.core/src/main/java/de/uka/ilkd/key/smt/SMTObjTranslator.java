@@ -15,6 +15,7 @@ package de.uka.ilkd.key.smt;
 
 import java.util.*;
 
+import de.uka.ilkd.key.logic.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -48,6 +49,8 @@ import de.uka.ilkd.key.smt.lang.SMTTermUnaryOp;
 import de.uka.ilkd.key.smt.lang.SMTTermVariable;
 import de.uka.ilkd.key.smt.lang.Util;
 import de.uka.ilkd.key.util.Debug;
+
+import static de.uka.ilkd.key.smt.SMTProblem.sequentToTerm;
 
 public class SMTObjTranslator implements SMTTranslator {
 	public static final String CLASS_INVARIANT = "classInvariant";
@@ -469,10 +472,11 @@ public class SMTObjTranslator implements SMTTranslator {
 	}
 
 	@Override
-	public StringBuffer translateProblem(Term problem, Services services,
-	        SMTSettings settings) throws IllegalFormulaException {
+	public StringBuffer translateProblem(Sequent sequent, Services services,
+										 SMTSettings settings) throws IllegalFormulaException {
 		this.settings = settings;
 		this.services = services;
+		Term problem = sequentToTerm(sequent, services);
 		SMTFile file = translateProblem(problem);
 		String s = file.toString();
 		// SolverQueryer q = new SolverQueryer();

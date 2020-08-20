@@ -147,7 +147,7 @@ public class SMTProblem {
                 solvers.add(solver);
         }
         
-        private static Term sequentToTerm(Sequent s, Services services) {
+        public static Term sequentToTerm(Sequent s, Services services) {
 
             ImmutableList<Term> ante = ImmutableSLList.nil();
 

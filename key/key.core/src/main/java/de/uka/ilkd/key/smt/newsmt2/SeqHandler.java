@@ -87,14 +87,15 @@ public class SeqHandler implements SMTHandler {
             if (dep == Sort.ANY) {
                 return get;
             } else {
-                return SExpr.castExpr(SExpr.sortExpr(dep), get);
+                return SExprs.castExpr(SExprs.sortExpr(dep), get);
             }
         }
 
-        throw new SMTTranslationException("unreachable code");
+        throw new SMTTranslationException("Unsupported term: " + term);
     }
 
     private boolean isSeqGet(Operator op) {
-        return op instanceof SortDependingFunction && op.name().equals(SEQGET_NAME);
+        return op instanceof SortDependingFunction &&
+                op.name().toString().endsWith("::" + SEQGET_NAME.toString());
     }
 }

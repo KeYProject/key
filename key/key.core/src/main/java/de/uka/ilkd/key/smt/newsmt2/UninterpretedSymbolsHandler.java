@@ -53,17 +53,8 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
                     new SExpr("declare-fun", new SExpr(name), signature, new SExpr(sortString)));
             trans.addKnownSymbol(name);
             if (op instanceof SortedOperator && term.sort() != Sort.FORMULA) {
-                if (op.arity() > 0) {
-                    SExpr axiom = funTypeAxiomFromTerm(term, name, trans);
-                    trans.addAxiom(axiom);
-                }
-                if (op.arity() == 0) {
-                    SortedOperator sop = (SortedOperator) op;
-                    SExpr axiom = new SExpr("assert",
-                            new SExpr("instanceof", Type.BOOL, name, SExpr.sortExpr(sop.sort()).toString()));
-                    trans.addAxiom(axiom);
-
-                }
+                SExpr axiom = funTypeAxiomFromTerm(term, name, trans);
+                trans.addAxiom(axiom);
             }
         }
 
@@ -95,20 +86,16 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
         for (Sort sort : op.argSorts()) {
             master.addSort(sort);
             SExpr var = new SExpr(LogicalVariableHandler.VAR_PREFIX + i);
-            tos.add(new SExpr("instanceof", var, SExpr.sortExpr(sort)));
+            tos.add(new SExpr("instanceof", var, SExprs.sortExpr(sort)));
             ++i;
         }
-        SExpr ante;
-        if (tos.size() == 1) {
-            ante = tos.get(0);
-        } else {
-            ante = new SExpr("and", tos);
-        }
+        SExpr ante = SExprs.and(tos);
+        master.addSort(op.sort());
         SExpr cons = new SExpr("instanceof", new SExpr(name, vars),
-                SExpr.sortExpr(op.sort()));
-        SExpr matrix = new SExpr("=>", ante, cons);
-        SExpr pattern = SExpr.patternSExpr(matrix, new SExpr(name, vars));
-        SExpr axiom = new SExpr("forall", BOOL, new SExpr(vars_U), pattern);
+                SExprs.sortExpr(op.sort()));
+        SExpr matrix = SExprs.imp(ante, cons);
+        SExpr pattern = SExprs.patternSExpr(matrix, new SExpr(name, vars));
+        SExpr axiom = SExprs.forall(vars_U, pattern);
         return new SExpr("assert", axiom);
     }
 

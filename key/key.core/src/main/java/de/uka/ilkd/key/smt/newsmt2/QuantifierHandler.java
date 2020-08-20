@@ -34,7 +34,7 @@ public class QuantifierHandler implements SMTHandler {
             String varName = LogicalVariableHandler.VAR_PREFIX + bv.name();
             vars.add(new SExpr(varName, Type.NONE, "U"));
             typeGuards.add(new SExpr("instanceof", Type.BOOL,
-                    new SExpr(varName), SExpr.sortExpr(bv.sort())));
+                    new SExpr(varName), SExprs.sortExpr(bv.sort())));
         }
         SExpr typeGuard = new SExpr("and", Type.BOOL, typeGuards);
         SExpr typeGuardConnector;

@@ -13,93 +13,131 @@
 
 package de.uka.ilkd.key.smt;
 
+import de.uka.ilkd.key.proof.mgt.AxiomJustification;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 
 
 /**
  * Wraps BufferedReader in order to provide different message delimiters.
+ *
+ * It returns successive message which are separated by one of a set of
+ * delimiters.
+ *
+ * For example:
+ * <pre>
+ *     delims = { "X", "Y" };
+ *     br = new BufferedMessageReader(new StringReader("aXbYc"), delims);
+ *     assert("a".equals(br.readMessage()));
+ *     assert("b".equals(br.readMessage()));
+ *     assert("c".equals(br.readMessage()));
+ *     assert(null == br.readMessage());
+ * </pre>
+ *
+ * The original implementation would *not* return "c" but return null after
+ * b.
+ *
+ * The method {@link #drain()} can be used to read the reader to the end
+ * and give it back as a single string.
+ *
+ * @author Benjamin Niedermann (original version)
+ * @author Mattias Ulbrich (complete overhaul)
  */
-public class BufferedMessageReader {
-	final InputStreamReader reader;
-	StringBuffer messageBuffer = new StringBuffer();
-	final String [] endOfMessage;
+class BufferedMessageReader {
 
-	public BufferedMessageReader(InputStreamReader reader, String [] endOfMessage) {
-		super();
+	/** the wrapped reader */
+	private final Reader reader;
+
+	/** the delimiters supported in this instance */
+	private final String[] delimiters;
+
+	public BufferedMessageReader(Reader reader, String[] delimiters) {
 		this.reader = reader;
-		this.endOfMessage = endOfMessage;
+		this.delimiters = delimiters;
 	}
-	
 
 	/**
 	 * Call this method in order to read the next message from the given input stream. If there is no message,
-	 * it blocks until there is a further message or the stream has been closed.	
+	 * it blocks until there is a further message or the stream has been closed.
+	 * @return a string between two delimiters or until the EOF.
+	 * @throws IOException if reading fails
 	 */
-	public String readMessage() {
-		int length = -1;
-		
-		String message = null;
-		do{
-		  do {
-			message = getNextMessage();
-		  } while (message != null && message.length() == 0); // ignore empty messages (can occur with Z3 on windows due to \r\n line ending)
-		  if (message != null){
-			  //System.out.println("Extracted a message with length " + message.length() + ", remaining buffer: " + messageBuffer.length());
-			  return message;
-		  }
-		  char buf[] = new char[128]; // create new buffer in every loop cycle!
-		  try{
-		    length = reader.read(buf);
-		  }catch(IOException e){
-			if(!Thread.currentThread().isInterrupted()){
-				throw new RuntimeException(e);
-			}  
-		  }
-		  messageBuffer = messageBuffer.append(convert(buf));
-		  //System.out.println("Read " + length + " bytes; new buffer: " + messageBuffer.length());
-		}while(length!=-1 && !Thread.currentThread().isInterrupted());
-		return message;
-	}
-	
-	private String getNextMessage(){
-		int index = -1;
-		String responsibleMark = "";
-		for(String mark : endOfMessage){
-			int temp = messageBuffer.indexOf(mark);
-			// make the message as small as possible: it may not contain delimiters.
-			if(temp > -1 && (index < 0 || temp < index)){
-				responsibleMark = mark;
-				index = temp;
+	public String readMessage() throws IOException {
+
+		StringBuilder sb = new StringBuilder();
+		int c;
+		while((c = reader.read()) != -1) {
+			sb.append((char)c);
+			for (String delim : delimiters) {
+				if(endsWith(sb, delim)) {
+					String result = sb.substring(0, sb.length() - delim.length());
+
+					if(!result.isEmpty()) {
+						return result;
+					}
+
+					// if empty then continue with an empty buffer
+					sb.setLength(0);
+				}
 			}
-			
-		
 		}
-		if(index == -1){
-			return null;
-		}
-		String message = index >= 0 ? messageBuffer.substring(0, index) : null;
-		messageBuffer = new StringBuffer(messageBuffer.substring( index+responsibleMark.length()));
-		return message;
+
+        if (sb.length() == 0) {
+            // return null to indicate a finished stream
+            return null;
+        } else {
+		return sb.toString();
 	}
-	
-	private String convert(char [] buf){
-		String result ="";
-		for(int i=0; i  <buf.length; i++){
-			if(buf[i]==0){
-				break;
-			}
-			result += buf[i];
-		}
-		return result;
 	}
-	
+
 	/**
-	 * Returns the currently message buffer encoded by a string.
+	 * This method checks if a character sequence ends with a string.
+	 *
+	 * Semantically it is equivalent to {@code sb.toString().endsWith(s)}.
+	 *
+	 * It is more efficient since no arrays must be copied ...
+	 *
+	 * @param sb any non-null character sequence
+	 * @param s the non-null string to check for
+	 * @return true if sb ends in s.
 	 */
-	public StringBuffer getMessageBuffer() {
-		return messageBuffer;
+	private static boolean endsWith(CharSequence sb, String s) {
+		int len = sb.length();
+		int dlen = s.length();
+
+		if (len < dlen) {
+			return false;
+		}
+
+		for (int i = len - dlen, j = 0; i < len; i++, j++) {
+			if(sb.charAt(i) != s.charAt(j)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
-	
-	
+
+	/**
+	 * Return the remainder of the reader's content as a String.
+	 *
+	 * The reader is read until its EOF.
+	 *
+	 * @return a string containing all text (including delimiters)
+	 * @throws IOException if reading fails
+	 */
+	public String drain() throws IOException {
+	    char[] buf = new char[1024];
+        StringBuilder result = new StringBuilder();
+        int len = reader.read(buf);
+        while (len >= 0) {
+            result.append(buf, 0, len);
+            len = reader.read(buf);
+        }
+        return result.toString();
+	}
+
+
 }

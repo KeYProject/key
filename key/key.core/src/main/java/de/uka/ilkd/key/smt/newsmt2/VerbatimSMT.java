@@ -18,7 +18,7 @@ public class VerbatimSMT implements Writable {
     }
 
     @Override
-    public void appendTo(StringBuffer sb) {
+    public void appendTo(StringBuilder sb) {
         sb.append(string);
     }
 }

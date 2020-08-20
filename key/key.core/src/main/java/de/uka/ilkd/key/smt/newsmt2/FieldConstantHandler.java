@@ -27,7 +27,7 @@ public class FieldConstantHandler implements SMTHandler {
                 && op instanceof Function
                 && term.arity() == 0
                 && op.name().toString().contains("::$")
-                || op == heapLDT.getArr();
+                || op == heapLDT.getArr() || op == heapLDT.getLength();
     }
 
     @Override
@@ -39,7 +39,13 @@ public class FieldConstantHandler implements SMTHandler {
         Operator op = term.op();
 
         if (op == heapLDT.getArr()) {
+            trans.addFromSnippets("arr");
             return trans.handleAsFunctionCall("arr", term);
+        }
+
+        if (op == heapLDT.getLength()) {
+            trans.addFromSnippets("length");
+            return trans.handleAsFunctionCall("length", term);
         }
 
         if(op == heapLDT.getCreated()) {

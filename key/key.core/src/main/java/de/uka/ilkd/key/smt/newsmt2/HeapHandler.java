@@ -75,7 +75,7 @@ public class HeapHandler implements SMTHandler {
             if (dep == Sort.ANY) {
                 return select;
             } else {
-                return SExpr.castExpr(SExpr.sortExpr(dep), select);
+                return SExprs.castExpr(SExprs.sortExpr(dep), select);
             }
         }
 
