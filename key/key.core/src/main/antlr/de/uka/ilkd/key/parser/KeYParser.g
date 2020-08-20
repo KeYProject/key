@@ -98,8 +98,6 @@ options {
   
   import de.uka.ilkd.key.ldt.SeqLDT;
   import de.uka.ilkd.key.ldt.IntegerLDT;
-  
-  
 }
 
 @annotateclass{ @SuppressWarnings("all") } 
@@ -132,6 +130,7 @@ options {
          prooflabel2tag.put("contract", ProofElementID.CONTRACT);
          prooflabel2tag.put("ifInst", ProofElementID.ASSUMES_INST_BUILT_IN);     
          prooflabel2tag.put("userinteraction", ProofElementID.USER_INTERACTION);
+         prooflabel2tag.put("notes", ProofElementID.NOTES);
          prooflabel2tag.put("proofscript", ProofElementID.PROOF_SCRIPT);
          prooflabel2tag.put("newnames", ProofElementID.NEW_NAMES);
          prooflabel2tag.put("autoModeTime", ProofElementID.AUTOMODE_TIME);  
@@ -723,7 +722,7 @@ options {
     }
 
     private void schema_var_decl(String name, 
-    				 Sort s, 
+    				 Sort s,
     				 boolean makeVariableSV,
             			 boolean makeSkolemTermSV,
                                  boolean makeTermLabelSV,
@@ -1077,7 +1076,7 @@ options {
                  throwRecognitionException(input, e);
                  //throw  new JavaParserException(e.getMessage(), t.getText(), getSourceName(), t.getLine(), t.getCharPositionInLine(), lineOffset, colOffset); 
                             
-            }
+            }   
             throwRecognitionException(input, e);
             //throw new JavaParserException(e.getMessage(), t.getText(), getSourceName(), t.getLine(), t.getCharPositionInLine());
         } 
@@ -1167,7 +1166,6 @@ options {
             	if (baseName.startsWith("<$" + "inv" + ">")) {
 					return getJavaInfo().getStaticInv(getJavaInfo().getKeYJavaType(sort));            	
             	}
-
                 v = firstInstance.getInstanceFor(sort, getServices());
                 if(v != null) {
                     return v;
@@ -1977,21 +1975,21 @@ one_schema_var_decl
     { mods = new SchemaVariableModifierSet.FormulaSV (); }
     ( schema_modifiers[mods] ) ?    
     {s = Sort.FORMULA;}
-    ids = simple_ident_comma_list  
+    ids = simple_ident_comma_list
   | (    TERM
          { mods = new SchemaVariableModifierSet.TermSV (); }
          ( schema_modifiers[mods] ) ?
       | ( (VARIABLES | VARIABLE)
          { makeVariableSV = true; }
          { mods = new SchemaVariableModifierSet.VariableSV (); }
-         ( schema_modifiers[mods] ) ?)
+         ( schema_modifiers[mods] ) ?) 
       | (SKOLEMTERM 
          { makeSkolemTermSV = true; }
          { mods = new SchemaVariableModifierSet.SkolemTermSV (); }
          ( schema_modifiers[mods] ) ?)    	
     )
     s = any_sortId_check[true]
-    ids = simple_ident_comma_list 
+    ids = simple_ident_comma_list
   ) SEMI
    { 
      Iterator<String> it = ids.iterator();
@@ -2083,7 +2081,7 @@ pred_decl
 	            String baseName = pred_name.substring(separatorIndex + 2);
 		    Sort genSort = lookupSort(sortName);
 		    
-		    if (baseName.startsWith("<$" + "inv" + ">")) {
+		    if(baseName.startsWith("<$" + "inv" + ">")) {
 		    	p = (Function) getJavaInfo().getStaticInv(getJavaInfo().getKeYJavaType(genSort));
 		    } else if(genSort instanceof GenericSort) {	        	            	
 		    	p = SortDependingFunction.createFirstInstance(
@@ -2180,7 +2178,7 @@ func_decl
 	            String baseName = func_name.substring(separatorIndex + 2);
 		    Sort genSort = lookupSort(sortName);
 		    
-		    if (baseName.startsWith("<$" + "inv" + ">")) {
+		    if(baseName.startsWith("<$" + "inv" + ">")) {
 		    	f = (Function) getJavaInfo().getStaticInv(getJavaInfo().getKeYJavaType(genSort));
 		    } else if(genSort instanceof GenericSort) {	        	            	
 		    	f = SortDependingFunction.createFirstInstance(
@@ -2488,6 +2486,7 @@ id_declaration returns [ IdDeclaration idd = null ]
 
 funcpred_name returns [String result = null]
     :
+     
     (sort_name DOUBLECOLON LESS) => (prefix = sort_name 
         DOUBLECOLON LESS name = simple_ident GREATER {result = prefix + "::<" + name + ">";})
   | 
@@ -3575,7 +3574,7 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
 	            } else {
 	                op = lookupVarfuncId(varfuncid, args);
 	            }
-	            
+
 	            if (op.name().toString().equals("<$" + "inv>")) {
 	            	a = getServices().getTermBuilder().staticInv(getJavaInfo().getKeYJavaType(varfuncid.substring(0, varfuncid.indexOf("::"))));
 	            } else if (op instanceof ParsableVariable) {
@@ -3748,7 +3747,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
             b.setName(new Name(name.getText()));
             b.setIfSequent(ifSeq);
         }
-        ( VARCOND LPAREN varexplist[b] RPAREN ) ?
+        ( VARCOND LPAREN varexplist[b] RPAREN ) *
         goalspecs[b, find != null]
         modifiers[b]
         { 
@@ -3844,7 +3843,13 @@ varexp[TacletBuilder b]
 }
 :
   ( varcond_applyUpdateOnRigid[b]
+    | varcond_hasInvariant[b]
+    | varcond_getInvariant[b]
+    | varcond_getFreeInvariant[b]
+    | varcond_getVariant[b]
     | varcond_dropEffectlessElementaries[b]
+    | varcond_storeTermIn[b]
+    | varcond_storeStmtIn[b]
     | varcond_dropEffectlessStores[b]
     | varcond_enum_const[b]
     | varcond_free[b]
@@ -3863,6 +3868,7 @@ varexp[TacletBuilder b]
   | 
   ( (NOT_ {negated = true;} )? 
     (   varcond_abstractOrInterface[b, negated]
+	    | varcond_isLabeled[b, negated]
 	    | varcond_array[b, negated]
         | varcond_array_length[b, negated]	
         | varcond_enumtype[b, negated]
@@ -3872,7 +3878,7 @@ varexp[TacletBuilder b]
         | varcond_reference[b, negated]        
         | varcond_referencearray[b, negated]
         | varcond_static[b,negated]
-        | varcond_staticmethod[b,negated]
+        | varcond_staticmethod[b,negated]  
         | varcond_mayexpandmethod[b,negated]
         | varcond_final[b,negated]
         | varcond_typecheck[b, negated]
@@ -3904,6 +3910,54 @@ varcond_applyUpdateOnRigid [TacletBuilder b]
    }
 ;
 
+varcond_hasInvariant [TacletBuilder b]
+:
+   HAS_INVARIANT LPAREN t=varId COMMA moda=varId RPAREN
+   { 
+      b.addVariableCondition(new HasLoopInvariantCondition((ProgramSV)t, (SchemaVariable)moda)); 
+   }
+;
+
+varcond_getInvariant [TacletBuilder b]
+:
+   GET_INVARIANT LPAREN t=varId COMMA moda=varId COMMA inv=varId RPAREN
+   { 
+      b.addVariableCondition(new LoopInvariantCondition((ProgramSV)t, (SchemaVariable)moda, (SchemaVariable)inv)); 
+   }
+;
+
+varcond_getFreeInvariant [TacletBuilder b]
+:
+   GET_FREE_INVARIANT LPAREN t=varId COMMA moda=varId COMMA inv=varId RPAREN
+   { 
+      b.addVariableCondition(new LoopFreeInvariantCondition((ProgramSV)t, (SchemaVariable)moda, (SchemaVariable)inv)); 
+   }
+;
+
+varcond_getVariant [TacletBuilder b]
+:
+   GET_VARIANT LPAREN t = varId COMMA variant=varId RPAREN
+   { 
+      b.addVariableCondition(new LoopVariantCondition((ProgramSV)t, (SchemaVariable)variant)); 
+   }
+;
+
+varcond_storeTermIn[TacletBuilder b]
+:
+   STORE_TERM_IN LPAREN sv=varId COMMA t=term RPAREN 
+   {
+      b.addVariableCondition(new StoreTermInCondition((SchemaVariable) sv, t));
+   }
+;
+
+varcond_storeStmtIn[TacletBuilder b]
+:
+   STORE_STMT_IN LPAREN sv=varId COMMA t=term RPAREN 
+   {
+      b.addVariableCondition(new StoreStmtInCondition((ProgramSV) sv, t));
+   }
+;
+
 varcond_dropEffectlessElementaries[TacletBuilder b]
 :
    DROP_EFFECTLESS_ELEMENTARIES LPAREN u=varId COMMA x=varId COMMA result=varId RPAREN 
@@ -3911,6 +3965,14 @@ varcond_dropEffectlessElementaries[TacletBuilder b]
       b.addVariableCondition(new DropEffectlessElementariesCondition((UpdateSV)u, 
                                                                      (SchemaVariable)x, 
                                                                      (SchemaVariable)result));
+   }
+;
+
+varcond_isLabeled[TacletBuilder b, boolean negated]
+:
+   IS_LABELED LPAREN t=varId RPAREN
+   {
+      b.addVariableCondition(new IsLabeledCondition((ProgramSV)t, negated));
    }
 ;
 
@@ -3977,23 +4039,29 @@ type_resolver returns [TypeResolver tr = null]
     )
 ;
 
+
 varcond_new [TacletBuilder b]
+@init {
+  boolean isDependingOn = false;
+}
 :
    NEW LPAREN x=varId COMMA
-      (
-          TYPEOF LPAREN y=varId RPAREN {
-	    b.addVarsNew((SchemaVariable) x, (SchemaVariable) y);
-	  }
-      |
-         DEPENDINGON LPAREN y=varId RPAREN {
-	    b.addVarsNewDependingOn((SchemaVariable)x, (SchemaVariable)y);
-	  }
-      | kjt=keyjavatype {
-		b.addVarsNew((SchemaVariable) x, kjt.getJavaType());
-	  }
-      )
+   (
+      ( TYPEOF LPAREN y=varId RPAREN | kjt=keyjavatype )
+      |  DEPENDINGON LPAREN y=varId RPAREN { isDependingOn = true; }
+   )
    RPAREN
-   
+   {
+       if (isDependingOn) {
+           b.addVarsNewDependingOn((SchemaVariable) x, (SchemaVariable) y);
+       } else {
+           if ( y != null) {
+              b.addVarsNew((SchemaVariable)x, (SchemaVariable)y);
+           } else if ( kjt != null) {
+              b.addVarsNew((SchemaVariable) x, kjt);
+           }
+       }
+   }
 ;
 
 varcond_newlabel [TacletBuilder b] 

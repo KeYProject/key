@@ -374,6 +374,7 @@ public class OutputStreamProofSaver {
         }
         output.append("");
         userInteraction2Proof(node, output);
+        notes2Proof(node, output);
         output.append(")\n");
     }
 
@@ -582,7 +583,7 @@ public class OutputStreamProofSaver {
 
         output.append("");
         userInteraction2Proof(node, output);
-
+        notes2Proof(node, output);
         output.append(")\n");
     }
 
@@ -679,6 +680,24 @@ public class OutputStreamProofSaver {
         }
         if (node.getNodeInfo().getScriptRuleApplication()) {
             output.append(" (proofscript)");
+        }
+    }
+
+    /**
+     * Saves user provided notes to the proof if present.
+     * @param node the node to check for notes
+     * @param output the writer to which to append the notes
+     * @throws IOException if printing fails
+     */
+    private void notes2Proof(Node node, Appendable output) throws IOException {
+        String notes = node.getNodeInfo().getNotes();
+        if (notes != null) {
+            output.append(" (notes \"");
+            // to allow for quotes inside the notes: escape backslashes and quotes
+            notes = notes.replaceAll("\\\\", "\\\\\\\\");
+            notes = notes.replaceAll("\\\"", "\\\\\"");
+            output.append(notes);
+            output.append("\")");
         }
     }
 

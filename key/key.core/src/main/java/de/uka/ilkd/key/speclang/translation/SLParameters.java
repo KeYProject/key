@@ -16,8 +16,11 @@ package de.uka.ilkd.key.speclang.translation;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Wraps a list of expressions.
@@ -44,12 +47,26 @@ public final class SLParameters {
         }
         return true;
     }
-    
-    
-    public ImmutableList<KeYJavaType> getSignature(TermServices services) {           
+
+    /**
+     * returns the type signature of the parameter list
+     *
+     * @param services the Services
+     * @return the list of types that compose the type signature
+     */
+    public ImmutableList<KeYJavaType> getSignature(Services services) {
         ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
         for(SLExpression expr : parameters) {
-            result = result.append(expr.getType());
+            KeYJavaType type = expr.getType();
+            if (type == null) {
+                final Term term = expr.getTerm();
+                if (term != null) {
+                    if (term.sort() == Sort.FORMULA) {
+                        type = services.getTypeConverter().getBooleanType();
+                    }
+                }
+            }
+            result = result.append(type);
         }        
         return result;
     }

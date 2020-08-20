@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.proof.io.consistency;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -15,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
+
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Debug;
 
@@ -73,17 +73,21 @@ public final class DiskFileRepo extends AbstractFileRepo {
             } catch (URISyntaxException e) {
                 throw new IOException(e);
             }
-        } else if (protocol.equals("jar")) {        // TODO: zip?
+        } else if (protocol.equals("jar")) {
             JarURLConnection juc = (JarURLConnection) url.openConnection();
             Path jarPath = Paths.get(juc.getJarFile().getName());
 
-            // TODO: wrong number of slashes somewhere?
-
-            // copy the actual file, but return an InputStream to the concrete entry:
-            // - copy file of URL to repo
-            // - add file to repo map
-            // - return an InputStream to the copy
-            getInputStream(jarPath).close();  // TODO: add private method registerPath or similar
+            if (isInternalResource(url)) {
+                // do not copy anything, just establish the mapping
+                map.put(jarPath, jarPath);
+            } else {
+                // copy the actual resource, but return an InputStream to the copy:
+                // - copy resource from URL to repo
+                // - add map entry URL -> file in repo
+                // - return InputStream to copy
+                // TODO: add private method registerPath or similar
+                getInputStream(jarPath).close();
+            }
             Path jarCopy = map.get(jarPath);
 
             // we have to create the URL as string:
@@ -313,7 +317,6 @@ public final class DiskFileRepo extends AbstractFileRepo {
             // delete the temporary directory with all contained files
             deleteDiskContent();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -331,8 +334,15 @@ public final class DiskFileRepo extends AbstractFileRepo {
         if (!isDisposed() && !GeneralSettings.keepFileRepos) {
             Files.walk(tmpDir)
                  .sorted(Comparator.reverseOrder())
-                 .map(Path::toFile)
-                 .forEach(File::delete);
+                 //.map(Path::toFile)
+                 .forEach(path -> {
+                     try {
+                         Files.delete(path);
+                         //path.delete();
+                     } catch (IOException e) {
+                         e.printStackTrace();
+                     }
+                 });
         }
     }
 }

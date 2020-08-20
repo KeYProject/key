@@ -42,6 +42,11 @@ public class StateExpansionAndInfFlowContractApplicationMacro extends Sequential
     }
 
     @Override
+    public String getScriptCommandName() {
+        return "inf-flow-state-expansion";
+    }
+
+    @Override
     public String getDescription() {
         return "Extract the self-composed states after the merge of the "
                 + "symbolic execution goals which is included in the proof "

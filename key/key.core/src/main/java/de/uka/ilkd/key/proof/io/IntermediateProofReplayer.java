@@ -198,6 +198,7 @@ public class IntermediateProofReplayer {
                         currInterm.isInteractiveRuleApplication());
                     currNode.getNodeInfo().setScriptRuleApplication(
                         currInterm.isScriptRuleApplication());
+                    currNode.getNodeInfo().setNotes(currInterm.getNotes());
 
                     // Register name proposals
                     proof.getServices().getNameRecorder().setProposals(
@@ -488,7 +489,7 @@ public class IntermediateProofReplayer {
                 ourApp = ourApp.setPosInOccurrence(pos, services);
             } catch (Exception e) {
                 throw (TacletConstructionException)new TacletConstructionException(
-                        "Wrong position information: " + pos).initCause(e);
+                    "Wrong position information: " + pos).initCause(e);
             }
         }
 

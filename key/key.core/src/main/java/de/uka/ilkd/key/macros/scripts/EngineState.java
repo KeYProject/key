@@ -45,6 +45,13 @@ public class EngineState {
      * only shows explicit echo messages.
      */
     private boolean echoOn = true;
+    
+    /**
+     * If set to true, an already closed proof leads to an exception if another goal
+     * should be picked. Otherwise, script execution terminates without an
+     * exception.
+     */
+    private boolean failOnClosedOn = true;
 
     public EngineState(Proof proof) {
         this.proof = proof;
@@ -79,6 +86,8 @@ public class EngineState {
      * @return the first open goal, which has to be automatic iff checkAutomatic
      *         is true.
      *
+     * @throws ProofAlreadyClosedException
+     *             If the proof is already closed when calling this method.
      * @throws ScriptException
      *             If there is no such {@link Goal}, or something else goes
      *             wrong.
@@ -87,7 +96,7 @@ public class EngineState {
     public Goal getFirstOpenGoal(boolean checkAutomatic)
             throws ScriptException {
         if (proof.closed()) {
-            throw new ScriptException("The proof is closed already");
+            throw new ProofAlreadyClosedException("The proof is closed already");
         }
 
         Node rootNodeForSearch = proof.root();
@@ -270,4 +279,11 @@ public class EngineState {
         this.echoOn = echoOn;
     }
 
+    public boolean isFailOnClosedOn() {
+        return failOnClosedOn;
+    }
+
+    public void setFailOnClosedOn(boolean failOnClosedOn) {
+        this.failOnClosedOn = failOnClosedOn;
+    }
 }

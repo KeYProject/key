@@ -71,6 +71,7 @@ import de.uka.ilkd.key.rule.metaconstruct.MethodCall;
 import de.uka.ilkd.key.rule.metaconstruct.MultipleVarDecl;
 import de.uka.ilkd.key.rule.metaconstruct.PostWork;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
+import de.uka.ilkd.key.rule.metaconstruct.ReattachLoopInvariant;
 import de.uka.ilkd.key.rule.metaconstruct.SpecialConstructorCall;
 import de.uka.ilkd.key.rule.metaconstruct.StaticInitialisation;
 import de.uka.ilkd.key.rule.metaconstruct.SwitchToIf;
@@ -198,6 +199,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         } else if ("#init-array-creation".equals(mcName)) {
             return new InitArrayCreation(mc.getFirstSV().getSV(),
                     list.get(Expression.class));
+        } else if ("#reattachLoopInvariant".equals(mcName)) {
+            return new ReattachLoopInvariant(list.get(LoopStatement.class));
         } else {
             throw new ConvertException("Program meta construct "
                     + mc.toString() + " unknown.");
