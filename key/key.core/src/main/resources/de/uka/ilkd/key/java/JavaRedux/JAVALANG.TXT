@@ -49,7 +49,7 @@ java.io.Serializable
 java.math.BigInteger
 java.util.ArrayList
 java.util.Arrays
-java.util.CollectionIterator
+java.util.ListIteratorImpl
 java.util.Date
 java.util.LinkedHashMap
 java.util.LinkedList

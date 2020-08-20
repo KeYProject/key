@@ -21,6 +21,11 @@ public class FinishAuxiliaryComputationMacro extends AlternativeMacro {
     }
 
     @Override
+    public String getScriptCommandName() {
+        return "aux-finish";
+    }
+
+    @Override
     protected ProofMacro[] createProofMacroArray() {
         return new ProofMacro[] { new FinishAuxiliaryMethodComputationMacro(),
                                   new FinishAuxiliaryLoopComputationMacro(),

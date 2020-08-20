@@ -27,6 +27,15 @@ public interface List extends java.util.Collection
    public int indexOf(java.lang.Object arg0);
    public int lastIndexOf(java.lang.Object arg0);
    
+   /*@ public normal_behavior
+     @ ensures \result.index == 0;
+     @ ensures \result.seq == seq;
+     @ ensures \fresh(\result) && \fresh(\result.*);
+     @ ensures \result instanceof ListIteratorImpl;
+     @ assignable \nothing;
+     @ determines \result.seq \by seq;
+     @ determines \result.index \by \nothing;
+     @*/
    public java.util.ListIterator listIterator();
    public java.util.ListIterator listIterator(int arg0);
    public java.util.List subList(int arg0, int arg1);

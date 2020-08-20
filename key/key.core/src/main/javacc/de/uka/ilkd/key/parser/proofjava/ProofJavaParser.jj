@@ -472,6 +472,7 @@ TOKEN :
 | < INTERFACE: "interface" >
 | < LOCSET: "\\locset">
 | < LONG: "long" >
+| < LOOPSCOPE: "loop-scope" >
 | < MAP: "\\map" >
 | < MERGE_POINT: "merge_point" >
 | < METHODFRAME: "method-frame" >

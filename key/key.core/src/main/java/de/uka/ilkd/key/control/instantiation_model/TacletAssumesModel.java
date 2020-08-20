@@ -154,7 +154,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
                     .getTermLabelSettings().getUseOriginLabels()) {
                 term = services.getTermBuilder().addLabelToAllSubs(term, new OriginTermLabel(
                         new NodeOrigin(
-                                SpecType.INTERACTION,
+                                SpecType.USER_INTERACTION,
                                 app.rule().displayName(),
                                 goal.node().serialNr())));
             }

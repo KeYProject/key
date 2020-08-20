@@ -15,6 +15,7 @@ package de.uka.ilkd.key.java.abstraction;
 
 import java.util.Comparator;
 
+import java.util.Optional;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -93,11 +94,13 @@ public class KeYJavaType implements Type {
     }
 
     public String getFullName() {
-	return getJavaType().getFullName();
+	return Optional.ofNullable(getJavaType()).map(Type::getFullName)
+                .orElse(getSort().name().toString());
     }
 
     public String getName() {
-	return getJavaType().getName();
+	return Optional.ofNullable(getJavaType()).map(Type::getName)
+                .orElse(getSort().name().toString());
     }
     
     @Override

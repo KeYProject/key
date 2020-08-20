@@ -15,34 +15,53 @@ package de.uka.ilkd.key.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipFile;
 
-import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
-import org.key_project.util.collection.*;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.KeYCollections;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
+import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
@@ -52,6 +71,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import recoder.io.ArchiveDataLocation;
 import recoder.io.DataFileLocation;
 import recoder.io.DataLocation;
@@ -61,12 +81,99 @@ import recoder.io.DataLocation;
  */
 public final class MiscTools {
 
+    /** Pattern to parse URL scheme (capture group 1) and scheme specific part (group 2). */
+    private static final Pattern URL_PATTERN =
+            Pattern.compile("(^[a-zA-Z][a-zA-Z0-9\\+\\-\\.]*):(.*)");
+
     private MiscTools() {
     }
 
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
+
+    /**
+     * Returns the {@link LoopSpecification} for the program in the given term,
+     * the active statement of which has to be a loop statement. Returns an
+     * empty {@link Optional} if there is no specification for that statement.
+     * Asserts that there is indeed a Java block in the term which has as active
+     * statement a loop statement, thus throws an {@link AssertionError} if not
+     * or otherwise results in undefined behavior in that case.
+     *
+     * @param loopTerm
+     *     The term for which to return the {@link LoopSpecification}.
+     * @param localSpecRepo TODO
+     * @return The {@link LoopSpecification} for the loop statement in the given
+     * term or an empty optional if there is no specified invariant for the
+     * loop.
+     */
+    public static Optional<LoopSpecification>
+            getSpecForTermWithLoopStmt(final Term loopTerm, final Services services) {
+        assert loopTerm.op() instanceof Modality;
+        assert loopTerm.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
+
+        final ProgramElement pe = loopTerm.javaBlock().program();
+        assert pe != null;
+        assert pe instanceof StatementBlock;
+        assert ((StatementBlock) pe).getFirstElement() instanceof LoopStatement;
+
+        final LoopStatement loop = //
+                (LoopStatement) ((StatementBlock) pe).getFirstElement();
+
+        return Optional.ofNullable(services.getSpecificationRepository().getLoopSpec(loop));
+    }
+
+    /**
+     * @param services
+     *     The {@link Services} object.
+     * @return true iff the given {@link Services} object is associated to a
+     * {@link Profile} with permissions.
+     */
+    public static boolean isPermissions(Services services) {
+        return services.getProfile() instanceof JavaProfile
+                && ((JavaProfile) services.getProfile()).withPermissions();
+    }
+
+    /**
+     * Checks whether the given {@link Modality} is a transaction modality.
+     *
+     * @param modality
+     *     The modality to check.
+     * @return true iff the given {@link Modality} is a transaction modality.
+     */
+    public static boolean isTransaction(final Modality modality) {
+        return modality == Modality.BOX_TRANSACTION
+                || modality == Modality.DIA_TRANSACTION;
+    }
+
+    /**
+     * Returns the applicable heap contexts out of the currently available set
+     * of three contexts: The normal heap, the saved heap (transaction), and the
+     * permission heap.
+     *
+     * @param modality
+     *     The current modality (checked for transaction).
+     * @param services
+     *     The {@link Services} object (for {@link HeapLDT} and for checking
+     *     whether we're in the permissions profile).
+     * @return The list of the applicable heaps for the given scenario.
+     */
+    public static List<LocationVariable>
+            applicableHeapContexts(Modality modality, Services services) {
+        final List<LocationVariable> result = new ArrayList<>();
+
+        result.add(services.getTypeConverter().getHeapLDT().getHeap());
+
+        if (isTransaction(modality)) {
+            result.add(services.getTypeConverter().getHeapLDT().getSavedHeap());
+        }
+
+        if (isPermissions(services)) {
+            result.add(services.getTypeConverter().getHeapLDT()
+                    .getPermissionHeap());
+        }
+        return result;
+    }
 
     // TODO Is rp always a program variable?
     public static ProgramVariable getSelf(MethodFrame mf) {
@@ -755,7 +862,7 @@ public final class MiscTools {
      */
     public static URI getZipEntryURI(ZipFile zipFile, String entryName) throws IOException {
 
-        Path zipPath = Paths.get(zipFile.getName());
+        Path zipPath = Paths.get(zipFile.getName()).toAbsolutePath().normalize();
 
         // TODO: Delete these lines when migrating to newer Java version!
         // These lines are needed since there is a bug in Java (up to Java 9 b80)
@@ -781,5 +888,90 @@ public final class MiscTools {
         //    Path p = fs.getPath(entryName);
         //    return p.toUri();
         //}
+    }
+
+    /**
+     * This method is the central place for parsing a URL from a String. Allowed input formats are:
+     * <ul>
+     *     <li>from DataLocation:
+     *          <ul>
+     *              <li>URLDataLocation: URL:&lt;url&gt;</li>
+     *              <li>ArchiveDataLocation: ARCHIVE:&lt;filename&gt;?&lt;entry&gt;</li>
+     *              <li>FileDataLocation: FILE:&lt;filename&gt;</li>
+     *              <li>SpecDataLocation: &lt;type&gt;://&lt;location&gt;</li>
+     *          </ul>
+     *     </li>
+     *     <li>from URL: &lt;scheme&gt;:&lt;scheme_specific_part&gt;</li>
+     *     <li>from File/Path (in both cases, paths may be relative and/or not normalized!):
+     *          <ul>
+     *              <li>Unix:       /a/b/c</li>
+     *              <li>Windows:    &lt;drive_letter&gt;:\a\b\c\</li>
+     *          </ul>
+     *     </li>
+     * </ul>
+     *
+     * A NullPointerException is thrown if null is given.
+     * If the input is "", ".", or a relative path in general, the path is resolved against the
+     * current working directory (see system property "user.dir") consistently to the behaviour
+     * of {@link Paths#get(String, String...)}.
+     *
+     * @param input the String to convert
+     * @return a URL if successful
+     * @throws MalformedURLException if the string can not be converted to URL because of an
+     *      unknown protocol or illegal format
+     */
+    public static URL parseURL(final String input) throws MalformedURLException {
+        if (input == null) {
+            throw new NullPointerException("No URL can be created from null!");
+        }
+
+        String scheme = "";
+        String schemeSpecPart = "";
+        Matcher m = URL_PATTERN.matcher(input);
+        if (m.matches() && m.groupCount() == 2) {
+            scheme = m.group(1);
+            schemeSpecPart = m.group(2);
+        }
+        switch (scheme) {
+        case "URL":
+            // schemeSpecPart actually contains a URL again
+            return new URL(schemeSpecPart);
+        case "ARCHIVE":
+            // format: "ARCHIVE:<filename>?<itemname>"
+            // extract item name and zip file
+            int qmindex = schemeSpecPart.lastIndexOf('?');
+            String zipName = schemeSpecPart.substring(0, qmindex);
+            String itemName = schemeSpecPart.substring(qmindex + 1);
+
+            try {
+                ZipFile zip = new ZipFile(zipName);
+                // use special method to ensure that path separators are correct
+                return getZipEntryURI(zip, itemName).toURL();
+            } catch (IOException e) {
+                MalformedURLException me = new MalformedURLException(input
+                        + " does not contain a valid URL");
+                me.initCause(e);
+                throw me;
+            }
+        case "FILE":
+            // format: "FILE:<path>"
+            Path path = Paths.get(schemeSpecPart).toAbsolutePath().normalize();
+            return path.toUri().toURL();
+        case "":
+            // only file/path without protocol
+            Path p = Paths.get(input).toAbsolutePath().normalize();
+            return p.toUri().toURL();
+        default:
+            // may still be Windows path starting with <drive_letter>:
+            if (scheme.length() == 1) {
+                // TODO: Theoretically, a protocol with only a single letter is allowed.
+                //  This (very rare) case currently is not handled correctly.
+                Path windowsPath = Paths.get(input).toAbsolutePath().normalize();
+                return windowsPath.toUri().toURL();
+            }
+            // otherwise call URL constructor
+            // if this also fails, there is an unknown protocol -> MalformedURLException
+            return new URL(input);
+        }
     }
 }

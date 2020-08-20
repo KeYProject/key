@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -603,8 +605,13 @@ public abstract class AbstractProblemLoader {
         KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
 
             Triple<String, Integer, Integer> script = kupf.readProofScript();
-        String path = kupf.getInitialFile().getAbsolutePath();
-        Location location = new Location(path, script.second, script.third);
+        URL url = null;
+        try {
+            url = kupf.getInitialFile().toURI().toURL();
+        } catch (MalformedURLException e) {
+            throw new ProofInputException(e);
+        }
+        Location location = new Location(url, script.second, script.third);
 
         return new Pair<String, Location>(script.first, location);
     }

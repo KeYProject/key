@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.HeapContext;
 
 
@@ -128,7 +129,10 @@ public final class SLMethodResolver extends SLExpressionResolver {
 
         for (SLExpression slExpression : params) {
             //Remember: parameters.isLisOfTerm() is true!
-            subs[i++] = slExpression.getTerm();
+            final Term term = slExpression.getTerm();
+            subs[i] = term.sort() == Sort.FORMULA ?
+                    services.getTermBuilder().convertToBoolean(term) : term;
+            i++;
         }
         
         if (pm.isVoid()) {
