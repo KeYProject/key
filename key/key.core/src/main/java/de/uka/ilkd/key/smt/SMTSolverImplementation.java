@@ -278,7 +278,14 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         }
 
         private static String indent(String string) {
-
+            try {
+                return SMTBeautifier.indent(string);
+            } catch (Exception ex) {
+                // fall back if pretty printing fails
+                ex.printStackTrace();
+                return string;
+            }
+            /*
             StringBuilder sb = new StringBuilder();
             int indention = 0;
 
@@ -301,6 +308,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
             }
 
             return sb.toString();
+            */
         }
 
 
