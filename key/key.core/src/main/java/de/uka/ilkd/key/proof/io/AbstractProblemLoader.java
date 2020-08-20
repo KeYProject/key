@@ -76,6 +76,13 @@ import de.uka.ilkd.key.util.Triple;
  * @author Martin Hentschel
  */
 public abstract class AbstractProblemLoader {
+    /**
+     * If set to true, only the given Java file will be parsed and loaded.
+     *
+     * @see EnvInput#isIgnoreOtherJavaFiles()
+     */
+    private boolean loadSingleJavaFile = false;
+
     public static class ReplayResult {
 
 		private Node node;
@@ -381,12 +388,16 @@ public abstract class AbstractProblemLoader {
 
         if (filename.endsWith(".java")) {
             // java file, probably enriched by specifications
+            SLEnvInput ret = null;
             if (file.getParentFile() == null) {
-                return new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs, includes);
+                ret = new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs, includes);
             } else {
-                return new SLEnvInput(file.getParentFile().getAbsolutePath(),
+                ret = new SLEnvInput(file.getParentFile().getAbsolutePath(),
                                 classPath, bootClassPath, profileOfNewProofs, includes);
             }
+            ret.setJavaFile(file.getAbsolutePath());
+            ret.setIgnoreOtherJavaFiles(loadSingleJavaFile);
+            return ret;
         } else if (filename.endsWith(".zproof")) {            // zipped proof package
             /* TODO: Currently it is not possible to load proof bundles with multiple proofs.
              *  This feature is still pending, since the functionality to save multiple proofs in
@@ -765,5 +776,13 @@ public abstract class AbstractProblemLoader {
 
     public void setProofPath(File proofFilename) {
         this.proofFilename = proofFilename;
+    }
+
+    public boolean isLoadSingleJavaFile() {
+        return loadSingleJavaFile;
+    }
+
+    public void setLoadSingleJavaFile(boolean loadSingleJavaFile) {
+        this.loadSingleJavaFile = loadSingleJavaFile;
     }
 }

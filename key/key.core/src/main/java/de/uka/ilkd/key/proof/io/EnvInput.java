@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.proof.init.Includes;
@@ -61,6 +62,16 @@ public interface EnvInput {
     String readJavaPath() throws ProofInputException;
 
     /**
+     * Returns the file path to specific requested Java file.
+     *
+     * @see #isIgnoreOtherJavaFiles()
+     */
+    default @Nullable String getJavaFile() throws ProofInputException {
+        return null;
+    }
+
+
+    /**
      * gets the classpath elements to be considered here.
      */
     @NotNull List<@NotNull File> readClassPath() throws ProofInputException;
@@ -69,7 +80,7 @@ public interface EnvInput {
      * gets the boot classpath element, null if none set.
      * @throws  
      */
-    File readBootClassPath();
+    File readBootClassPath() throws IOException;
     
     /**
      * Reads the input using the given modification strategy, i.e.,
@@ -90,4 +101,16 @@ public interface EnvInput {
      * @return The initial {@link File} which is loaded or {@code null} otherwise.
      */
     File getInitialFile();
+
+    /**
+     * This flag determines whether the given path to the Java source should be considered as a classpath,
+     * or just the Java file without other files should be loaded.
+     * <p>
+     * Default is false.
+     * <p>
+     *     If true, the requested Java file has to given via {@link #getJavaFile()}.
+     * </p>
+     * @see de.uka.ilkd.key.proof.init.ProblemInitializer#readJava(EnvInput, InitConfig)
+     */
+    default boolean isIgnoreOtherJavaFiles() {return false;}
 }

@@ -238,23 +238,30 @@ public final class ProblemInitializer {
 
     }
 
+
     /**
      * Helper for readEnvInput().
      */
     private void readJava(EnvInput envInput, InitConfig initConfig)
-            throws ProofInputException {
+                throws ProofInputException {
         //this method must only be called once per init config
         assert !initConfig.getServices()
-                .getJavaInfo()
-                .rec2key()
-                .parsedSpecial();
+                          .getJavaInfo()
+                          .rec2key()
+                          .parsedSpecial();
         assert initConfig.getServices().getJavaModel() == null;
 
         //read Java source and classpath settings
         envInput.setInitConfig(initConfig);
         final String javaPath = envInput.readJavaPath();
         final List<File> classPath = envInput.readClassPath();
-        final File bootClassPath = envInput.readBootClassPath();
+        final File bootClassPath;
+        try {
+         bootClassPath = envInput.readBootClassPath();
+        } catch (IOException ioe) {
+            throw new ProofInputException(ioe);
+        }
+
         final Includes includes = envInput.readIncludes();
 
         if (fileRepo != null) {
@@ -266,25 +273,32 @@ public final class ProblemInitializer {
 
         //create Recoder2KeY, set classpath
         final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(),
-                initConfig.namespaces());
+                                           initConfig.namespaces());
         //r2k.setFileRepository(envInput.getFileRepository()); xxx  // TODO:
         r2k.setClassPath(bootClassPath, classPath);
 
         //read Java (at least the library classes)
-        if (javaPath != null) {
+        if(javaPath != null) {
             reportStatus("Reading Java source");
             final ProjectSettings settings
-                    = initConfig.getServices()
-                    .getJavaInfo()
-                    .getKeYProgModelInfo()
-                    .getServConf()
-                    .getProjectSettings();
+                =  initConfig.getServices()
+                             .getJavaInfo()
+                             .getKeYProgModelInfo()
+                             .getServConf()
+                             .getProjectSettings();
             final PathList searchPathList = settings.getSearchPathList();
-            if (searchPathList.find(javaPath) == null) {
+            if(searchPathList.find(javaPath) == null) {
                 searchPathList.add(javaPath);
             }
-            Vector<String> var = getClasses(javaPath);
-            final String[] cus = var.toArray(new String[var.size()]);
+        Collection<String> var = getClasses(javaPath);
+            if(envInput.isIgnoreOtherJavaFiles()) {
+                String file = envInput.getJavaFile();
+                if (var.contains(file)) {
+                    var = Collections.singletonList(file);
+                }
+            }
+            //support for single file loading
+        final String[] cus = var.toArray(new String[var.size()]);
             try {
                 r2k.readCompilationUnitsAsFiles(cus, fileRepo);
             } catch (ParseExceptionInFile e) {
@@ -296,10 +310,10 @@ public final class ProblemInitializer {
         }
         File initialFile = envInput.getInitialFile();
         initConfig.getServices().setJavaModel(JavaModel.createJavaModel(javaPath,
-                classPath,
-                bootClassPath,
-                includes,
-                initialFile));
+                                                                        classPath,
+                                                                        bootClassPath,
+                                                                        includes,
+                                                                        initialFile));
     }
 
     /**
