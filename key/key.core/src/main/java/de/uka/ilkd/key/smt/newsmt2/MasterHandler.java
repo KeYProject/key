@@ -122,7 +122,7 @@ public class MasterHandler {
             return unknownValues.get(problem);
         }
         int number = unknownValues.size();
-        SExpr abbr = new SExpr("unknown_", Integer.toString(number));
+        SExpr abbr = new SExpr("unknown_" + number, Type.UNIVERSE);
         SExpr e = new SExpr("declare-const", Type.UNIVERSE, abbr.toString(), "U");
         addAxiom(e);
         unknownValues.put(problem, abbr);
@@ -136,12 +136,22 @@ public class MasterHandler {
      * @return an expression with the name functionName and subterms as children
      */
     SExpr handleAsFunctionCall(String functionName, Term term) {
+        return handleAsFunctionCall(functionName, Type.UNIVERSE, term);
+    }
+
+    /**
+     * Treats the given term as a function call.
+     * @param functionName the name of the function
+     * @param term the term to be translated
+     * @return an expression with the name functionName and subterms as children
+     */
+    SExpr handleAsFunctionCall(String functionName, Type type, Term term) {
         addFromSnippets(functionName);
         List<SExpr> children = new ArrayList<>();
         for (int i = 0; i < term.arity(); i++) {
             children.add(translate(term.sub(i), Type.UNIVERSE));
         }
-        return new SExpr(functionName, Type.UNIVERSE, children);
+        return new SExpr(functionName, type, children);
     }
 
     /**

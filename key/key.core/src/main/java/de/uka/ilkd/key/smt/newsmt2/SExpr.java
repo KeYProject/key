@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -151,4 +153,10 @@ public class SExpr implements Writable {
     public Type getType() {
         return type;
     }
+
+    public SExpr map(Function<SExpr, SExpr> mapFunction) {
+        return new SExpr(name, children.stream().map(mapFunction).collect(Collectors.toList()));
+    }
+
+
 }

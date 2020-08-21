@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<comment>These are the preamble snippets needed by class LocSetHandler in this package</comment>
+
+    <entry key="elementOf.decls">(declare-fun elementOf (U U U) Bool)</entry>
+    <entry key="freshLocs.decls">(declare-fun freshLocs (U) U)</entry>
+    <entry key="empty.decls">(declare-fun empty () U)</entry>
+
+    <entry key="freshLocs.axioms">
+        (assert (forall ((o U) (f U) (h U))
+         (! (= (elementOf o f (freshLocs h))
+               (and (not (= o null))
+                    (not (= (cast (keyselect h o |KeY_java.lang.Object::&lt;created&gt;|) sort_boolean)
+                      (b2u true)))))
+          :pattern ((elementOf o f (freshLocs h))))))
+    </entry>
+
+    <entry key="empty.axioms">
+        (assert (forall ((o U) (f U)) (! (not (elementOf o f empty)) :pattern ((elementOf o f empty)))))
+    </entry>
+
+    <entry key="freshLocs.depends">elementOf, field_java.lang.Object::&lt;created&gt;</entry>
+    <entry key="empty.depends">elementOf</entry>
+
+</properties>

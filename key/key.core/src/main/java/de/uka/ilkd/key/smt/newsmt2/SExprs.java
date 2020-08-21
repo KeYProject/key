@@ -9,11 +9,33 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
+/**
+ * This class is a collection of static functions to construct SExpr objects.
+ *
+ * @author Mattias Ulbrich
+ */
 public class SExprs {
 
+    /**
+     * The constant "true" of type Bool
+     */
     public static final SExpr TRUE = new SExpr("true", Type.BOOL);
+
+    /**
+     * The constant "false" of type Bool
+     */
     public static final SExpr FALSE = new SExpr("false", Type.BOOL);
 
+    /**
+     * Produce a conjunction of SExprs.
+     *
+     * There is some optimisation regarding the nature of the list of expressions:
+     * If it is empty, the result is "true". If it is a singleton, it is this
+     * single expression.
+     *
+     * @param clauses non-null list of boolean expression
+     * @return an SExpr equivalent to the conjunction of the clauses.
+     */
     public static SExpr and(List<SExpr> clauses) {
         switch (clauses.size()) {
             case 0:
@@ -25,6 +47,20 @@ public class SExprs {
         }
     }
 
+    /**
+     * Produce an implication from an assumption and a conclusion.
+     * <p>
+     * There is some optimisation if there are constants involved.
+     * <p>
+     * If the assumption is false, the result is true. If the assumption is
+     * true, the result is the conclusion. If the conclusion is true, the result
+     * is true. If the conclusion is false, the result is the negation of the
+     * assumption.
+     *
+     * @param ante a boolean expression
+     * @param cons a boolean expression
+     * @return a boolean expression equivalent to the implication {@code (=> ante concl)}
+     */
     public static SExpr imp(SExpr ante, SExpr cons) {
         if(ante.equals(TRUE)) {
             return cons;
@@ -38,18 +74,33 @@ public class SExprs {
         return new SExpr("=>", Type.BOOL, ante, cons);
     }
 
+    /**
+     * Produce a logical negation
+     * @param se a boolean expression
+     * @return a boolean expresion
+     */
     private static SExpr not(SExpr se) {
         return new SExpr("not", Type.BOOL, se);
     }
 
-    public static SExpr forall(List<SExpr> vars, SExpr matrix) {
+    /**
+     * Produce a universal quantification.
+     *
+     * If vars is empty, no quantifiers are produced.
+     * If the matrix has a pattern, the pattern is removed.
+     *
+     * @param vars a list of variable declarations {@code (var Type)}
+     * @param matrix a boolean expression
+     * @return
+     */
+    public static SExpr forall(List<SExpr> vars, SExpr matrix) throws SMTTranslationException {
         if (vars.isEmpty()) {
             if (matrix.getName().equals("!")) {
                 return matrix.getChildren().get(0);
             }
             return matrix;
         } else {
-            return new SExpr("forall", Type.BOOL, new SExpr(vars), matrix);
+            return new SExpr("forall", Type.BOOL, new SExpr(vars), coerce(matrix, Type.BOOL));
         }
     }
 
@@ -104,7 +155,14 @@ public class SExprs {
         return result;
     }
 
-    static SExpr patternSExpr(SExpr e, SExpr... patterns) {
+    /**
+     * Produce a smt matching pattern. The result is {@code (! e :patterns ((patterns))}.
+     *
+     * @param e the expression to wrap
+     * @param patterns a non-empty list of expressions
+     * @return the expanded pattern with the same type as e
+     */
+    public static SExpr patternSExpr(SExpr e, SExpr... patterns) {
         ArrayList<SExpr> children = new ArrayList<>();
         children.add(e);
         children.add(new SExpr(":pattern", Type.VERBATIM));
@@ -112,14 +170,28 @@ public class SExprs {
         return new SExpr("!", e.getType(), children);
     }
 
-    static SExpr sortExpr(Sort sort) {
+    /**
+     * Turn a KeY sort into an SMT sort (by prefixing
+     * {@link ModularSMTLib2Translator#SORT_PREFIX}.
+     *
+     * @param sort the sort to translate to SMT
+     * @return an SEXpr representing the sort (of type T)
+     */
+    public static SExpr sortExpr(Sort sort) {
         return new SExpr(ModularSMTLib2Translator.SORT_PREFIX + sort.toString());
     }
 
-    static SExpr castExpr(SExpr sortExp, SExpr exp) {
+    /**
+     * Produce a cast expression
+     * @param sortExp the sort as an SExpr
+     * @param exp the expression to cast
+     * @return a cast of type exp to sort sortExp
+     * @throws SMTTranslationException if coercion fails
+     */
+    public static SExpr castExpr(SExpr sortExp, SExpr exp) throws SMTTranslationException {
         // REVIEW MU: Should there perhaps be a coercion to Universe before the call?
         // What if a "Int" is given. That would fail.
-        return new SExpr("cast", Type.UNIVERSE, exp, sortExp);
+        return new SExpr("cast", Type.UNIVERSE, coerce(exp, Type.UNIVERSE), sortExp);
     }
 
 }

@@ -5,8 +5,8 @@
     <comment>These are the preamble snippets needed for handling the seq sort</comment>
 
 
-    <entry key="seqGet.decls">(declare-fun seqGet (U U) U)</entry>
-    <entry key="seqLen.decls">(declare-fun seqLen (U) Int)</entry>
+    <entry key="seqGet.decls">(declare-fun seqGet (U U) I)</entry>
+    <entry key="seqLen.decls">(declare-fun seqLen (U) U)</entry>
     <entry key="seqConcat.decls">(declare-fun seqConcat (U U) U)</entry>
     <entry key="seqDef.decls">(declare-fun seqDef (U Int Int U) U)</entry>
     <entry key="seqEmpty.decls">(declare-fun seqEmpty (U) U)</entry>

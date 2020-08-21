@@ -7,28 +7,29 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.IllegalFormulaException;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
-/*
-    This class provides a translation from a KeY sequent to the SMT-LIB 2 language,
-    a common input language for modern SMT solvers. It aims to be modular and therefore
-    easily extendable. Special handlers are used for different terms. New handlers need
-    to be registered in the file "de.uka.ilkd.key.smt.newsmt2.SMTHandler" in the
-    /key/key.core/src/main/resources/META-INF/services/ directory.
+/**
+ * This class provides a translation from a KeY sequent to the SMT-LIB 2 language, a common input
+ * language for modern SMT solvers.
+ *
+ * It aims to be modular and therefore easily extendable. Special handlers are used for different
+ * terms. New handlers need to be registered in the file "de.uka.ilkd.key.smt.newsmt2.SMTHandler" in
+ * the /key/key.core/src/main/resources/META-INF/services/ directory.
+ *
+ * @author Jonas Schiffl
+ * @author Mattias Ulbrich
  */
-
 public class ModularSMTLib2Translator implements SMTTranslator {
 
-    static final String SORT_PREFIX = "sort_";
-
-    private List<Throwable> exceptions = Collections.emptyList();
-
-    private List<Throwable> tacletExceptions = Collections.emptyList();
+    /**
+     * The string prefix used for sort names in SMT,
+     */
+    public static final String SORT_PREFIX = "sort_";
 
     @Override
     public CharSequence translateProblem(Sequent sequent, Services services, SMTSettings settings) {
@@ -37,9 +38,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         try {
             master = new MasterHandler(services);
         } catch (IOException ex) {
-            exceptions = Collections.singletonList(ex);
-            // Review MU: This should not be reported as exceptions only ...
-            return "error while translating";
+            throw new RuntimeException(ex);
         }
 
         List<Term> sequentAsserts = getTermsFromSequent(sequent, services);
@@ -49,10 +48,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             results.add(master.translate(t, Type.BOOL));
         }
 
-//        SExpr result = master.translate(problem, Type.BOOL);
-        exceptions = master.getExceptions();
-
-//        postProcess(result);
+        // result = postProcess(result);
 
         StringBuilder sb = new StringBuilder();
 
@@ -111,8 +107,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             sb.append("; " + master.getUnknownValues().get(t).toString() + " :  " + t.toString() + "\n");
         }
 
-
         // any exceptions?
+        List<Throwable> exceptions = master.getExceptions();
         for (Throwable t : exceptions) {
             sb.append("\n; " + t.toString());
         }
@@ -152,33 +148,48 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
     }
 
+    /*
+     * Turn a sequent to collection of formuls. Antecedent positive, succedent negated.
+     */
     private List<Term> getTermsFromSequent(Sequent seq, Services serv) {
         TermBuilder tb = serv.getTermBuilder();
         List<Term> res = new LinkedList<>();
-        for (SequentFormula sf : seq.antecedent().asList()) {
+        for (SequentFormula sf : seq.antecedent()) {
             res.add(sf.formula());
         }
-        for (SequentFormula sf : seq.succedent().asList()) {
+        for (SequentFormula sf : seq.succedent()) {
             res.add(tb.not(sf.formula()));
         }
         return res;
     }
 
-    private void postProcess(SExpr result) {
-        // TODO: remove (u2i (i2u x)) --->  x
+    /*
+     * That would be so nice to code in Scala ...
+     */
+    private SExpr postProcess(SExpr result) {
+        // remove (u2i (i2u x)) --->  x
+        if(result.getName().equals("u2i") && result.getChildren().get(0).getName().equals("i2u")) {
+            return postProcess(result.getChildren().get(0).getChildren().get(0));
+        }
+
+        // remove (u2b (b2u x)) --->  x
+        if(result.getName().equals("u2b") && result.getChildren().get(0).getName().equals("b2u")) {
+            return postProcess(result.getChildren().get(0).getChildren().get(0));
+        }
+
+        return result.map(this::postProcess);
     }
-
-
-    @Override
-    public Collection<Throwable> getExceptionsOfTacletTranslation() {
-        return tacletExceptions;
-    }
-
 
     @Override
     public ArrayList<StringBuffer> translateTaclets(Services services, SMTSettings settings) throws IllegalFormulaException {
         // not yet implemented. maybe adapt the existing method from abstractsmttranslator
         return null;
+    }
+
+    @Override
+    public Collection<Throwable> getExceptionsOfTacletTranslation() {
+        // Currently, no taclets are translated, we return an empty list.
+        return Collections.emptyList();
     }
 
 }
