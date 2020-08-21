@@ -2,6 +2,7 @@ package de.uka.ilkd.key.nparser.builder;
 
 import antlr.RecognitionException;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -332,7 +333,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             case SORT:
                 return accept(ctx.sortId());
             case JAVA_TYPE:
-                return getJavaInfo().getKeYJavaType(ctx.sortId().getText());
+                return getOrCreateJavaType(ctx.sortId());
             case VARIABLE:
                 return varId(ctx, ctx.getText());
             case STRING:
@@ -342,6 +343,12 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
         assert false;
         return null;
+    }
+
+    private KeYJavaType getOrCreateJavaType(KeYParser.SortIdContext sortId) {
+        KeYJavaType t = getJavaInfo().getKeYJavaType(sortId.getText());
+        if (t != null) return t;
+        return new KeYJavaType((Sort) accept(sortId));
     }
 
 
