@@ -36,7 +36,7 @@ public class QuantifierHandler implements SMTHandler {
             typeGuards.add(new SExpr("instanceof", Type.BOOL,
                     new SExpr(varName), SExprs.sortExpr(bv.sort())));
         }
-        SExpr typeGuard = new SExpr("and", Type.BOOL, typeGuards);
+        SExpr typeGuard = SExprs.and(typeGuards);
         SExpr typeGuardConnector;
         String smtOp;
         Operator op = term.op();

@@ -72,7 +72,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
      * @param master the associated master handler
      * @return the function expression
      */
-    private static SExpr funTypeAxiomFromTerm(Term term, String name, MasterHandler master) {
+    private static SExpr funTypeAxiomFromTerm(Term term, String name, MasterHandler master) throws SMTTranslationException {
         SortedOperator op = (SortedOperator) term.op();
         List<SExpr> vars_U = new ArrayList<>();
         List<SExpr> vars = new ArrayList<>();
