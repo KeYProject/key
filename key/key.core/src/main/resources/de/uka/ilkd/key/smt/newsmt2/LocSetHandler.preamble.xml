@@ -24,4 +24,9 @@
     <entry key="freshLocs.depends">elementOf, field_java.lang.Object::&lt;created&gt;</entry>
     <entry key="empty.depends">elementOf</entry>
 
+    <entry key="keyunion.key.axiom">
+        \forall Object o; \forall Field f; \forall LocSet l1; \forall LocSet l2;
+           (elementOf(o, f, union(l1, l2)) &lt;-&gt; elementOf(o,f,l1) | elementOf(o,f,l2))
+    </entry>
+
 </properties>

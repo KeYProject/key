@@ -24,5 +24,6 @@ public class LocSetHandler extends SMTFunctionsHandler {
         addOperator(locSetLDT.getElementOf(), Type.BOOL);
         addOperator(locSetLDT.getFreshLocs());
         addOperator(locSetLDT.getEmpty());
+        addOperator(locSetLDT.getUnion(), "keyunion");
     }
 }

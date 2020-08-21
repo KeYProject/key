@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,11 +17,15 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 public class MasterHandler {
 
+    private final Services services;
     /** Exceptions that occur during translation */
     private List<Throwable> exceptions = new ArrayList<>();
 
@@ -52,6 +57,8 @@ public class MasterHandler {
     private Map<String, Object> translationState = new HashMap<>();
 
     public MasterHandler(Services services) throws IOException {
+
+        this.services = services;
 
         for (SMTHandler smtHandler : ServiceLoader.load(SMTHandler.class)) {
             smtHandler.init(services);
@@ -224,6 +231,9 @@ public class MasterHandler {
             return;
         }
 
+        // mark it known to avoid cyclic inclusion
+        addKnownSymbol(functionName);
+
         if (snippets.containsKey(functionName + ".decls")) {
             VerbatimSMT decl = new VerbatimSMT(snippets.getProperty(functionName + ".decls"));
             addDeclaration(decl);
@@ -234,7 +244,21 @@ public class MasterHandler {
             addAxiom(ax);
         }
 
-        addKnownSymbol(functionName);
+        String keyAxName = functionName + ".key.axiom";
+        int cnt = 2;
+        while (snippets.containsKey(keyAxName)) {
+            DefaultTermParser tp = new DefaultTermParser();
+            try {
+                Term axiom = tp.parse(new StringReader(snippets.getProperty(keyAxName)), Sort.FORMULA, services,
+                        services.getNamespaces(), new AbbrevMap());
+                addAxiom(translate(axiom));
+            } catch (ParserException e) {
+                // TODO think about handling this ...
+                e.printStackTrace();
+            }
+            keyAxName = functionName + "." + cnt + ".key.axiom";
+            cnt ++;
+        }
 
         String[] deps = snippets.getProperty(functionName + ".deps", "").trim().split(", *");
         for (String dep : deps) {
