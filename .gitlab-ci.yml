@@ -15,6 +15,8 @@ cache:
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  SONAR_TOKEN: "533cf8bfa3eac2dc4be3c63252a7090000797699"
+  GIT_DEPTH: 0
 
 before_script:
   #  - echo `pwd` # debug
@@ -256,3 +258,14 @@ checkstyle:
     when: always
     paths:
     - report.txt
+
+sonarqube:
+  stage: primary
+  image: wadoon/key-test-docker:jdk11
+  allow_failure: true
+  script:
+    - cd key
+    - gradle --build-cache sonarqube -Dsonar.qualitygate.wait=true
+  only:
+    - merge_requests
+    - master
