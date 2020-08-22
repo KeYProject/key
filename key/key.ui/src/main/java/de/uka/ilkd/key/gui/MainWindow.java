@@ -111,6 +111,7 @@ import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
 import de.uka.ilkd.key.gui.actions.SearchInSequentAction;
 import de.uka.ilkd.key.gui.actions.SearchModeChangeAction;
 import de.uka.ilkd.key.gui.actions.SearchNextAction;
+import de.uka.ilkd.key.gui.actions.OpenSingleJavaFileAction;
 import de.uka.ilkd.key.gui.actions.SearchPreviousAction;
 import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
 import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
@@ -166,6 +167,7 @@ import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.util.ThreadUtilities;
+import org.jetbrains.annotations.NotNull;
 
 @HelpInfo()
 public final class MainWindow extends JFrame {
@@ -265,6 +267,9 @@ public final class MainWindow extends JFrame {
      * action for opening a KeY file
      */
     private OpenFileAction openFileAction;
+
+    private OpenSingleJavaFileAction openSingleJavaFileAction;
+
     /**
      * action for opening an example
      */
@@ -493,6 +498,7 @@ public final class MainWindow extends JFrame {
 
         // set up actions
         openFileAction = new OpenFileAction(this);
+        openSingleJavaFileAction = new OpenSingleJavaFileAction(this);
         openExampleAction = new OpenExampleAction(this);
         openMostRecentFileAction = new OpenMostRecentFileAction(this);
         editMostRecentFileAction = new EditMostRecentFileAction(this);
@@ -1268,7 +1274,11 @@ public final class MainWindow extends JFrame {
         return notificationManager;
     }
 
-    protected void addRecentFile(String absolutePath) {
+    /**
+     * A file to the menu of recent opened files.
+     * @see RecentFileMenu#addRecentFile(String)
+     */
+    public void addRecentFile(@NotNull String absolutePath) {
         recentFileMenu.addRecentFile(absolutePath);
     }
 

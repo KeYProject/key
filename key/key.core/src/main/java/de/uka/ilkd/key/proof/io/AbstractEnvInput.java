@@ -36,6 +36,8 @@ public abstract class AbstractEnvInput implements EnvInput {
     protected final Profile profile;
     
     protected InitConfig initConfig;
+    private boolean ignoreOtherJavaFiles;
+    private String javaFile;
 
 
     //-------------------------------------------------------------------------
@@ -112,5 +114,23 @@ public abstract class AbstractEnvInput implements EnvInput {
     @Override
     public Profile getProfile() {
         return profile;
+    }
+
+    public void setIgnoreOtherJavaFiles(boolean ignoreOtherJavaFiles) {
+        this.ignoreOtherJavaFiles = ignoreOtherJavaFiles;
+    }
+
+    @Override
+    public boolean isIgnoreOtherJavaFiles() {
+        return ignoreOtherJavaFiles;
+    }
+
+    @Override
+    public String getJavaFile() {
+        return javaFile;
+    }
+
+    public void setJavaFile(String javaFile) {
+        this.javaFile = javaFile;
     }
 }
