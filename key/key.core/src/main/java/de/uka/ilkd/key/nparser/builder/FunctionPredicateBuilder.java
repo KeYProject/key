@@ -61,24 +61,26 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             String baseName = pred_name.substring(separatorIndex + 2);
             Sort genSort = lookupSort(sortName);
             if (genSort instanceof GenericSort) {
+                assert argSorts != null;
                 p = SortDependingFunction.createFirstInstance(
                         (GenericSort) genSort,
                         new Name(baseName),
                         Sort.FORMULA,
-                        (Sort[]) argSorts.toArray(),
+                        argSorts.toArray(new Sort[0]),
                         false);
             }
         }
 
         if (p == null) {
+            assert argSorts != null;
             p = new Function(new Name(pred_name),
                     Sort.FORMULA,
                     argSorts.toArray(new Sort[0]),
                     whereToBind == null ? null : whereToBind.toArray(new Boolean[0]),
                     false);
         }
-        if (lookup(p.name()) != null) {
-        } else {
+
+        if (lookup(p.name()) == null) {
             functions().add(p);
         }
         return null;

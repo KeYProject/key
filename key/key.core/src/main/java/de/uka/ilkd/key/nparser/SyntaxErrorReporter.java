@@ -24,12 +24,15 @@ public class SyntaxErrorReporter extends BaseErrorListener {
     private boolean print = true;
 
     @Override
-    public void syntaxError(@Nullable Recognizer<?, ?> recognizer, @Nullable Object offendingSymbol,
+    public void syntaxError(Recognizer<?, ?> recognizer, @Nullable Object offendingSymbol,
                             int line, int charPositionInLine, String msg, RecognitionException e) {
 
         Parser parser = (Parser) recognizer;
         String stack = String.join(", ", parser.getRuleInvocationStack());
         Token tok = (Token) offendingSymbol;
+        if (tok == null) {
+            throw new IllegalArgumentException("offendedSymbol is null. Use SyntaxErrorReporter only in Parsers");
+        }
         SyntaxError se = new SyntaxError(
                 recognizer,
                 line,
@@ -57,7 +60,8 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      * @see #hasErrors()
      */
     public void throwException() {
-        if (hasErrors()) throw new ParserException("", errors);
+        if (hasErrors())
+            throw new ParserException("", errors);
     }
 
 
@@ -119,12 +123,10 @@ public class SyntaxErrorReporter extends BaseErrorListener {
 
         public String showInInput(String[] lines) {
             String line = lines[this.line];
-            StringBuilder sb = new StringBuilder();
-            sb.append(line)
-                    .append("\n")
-                    .append(Strings.repeat(" ", (charPositionInLine - 1)))
-                    .append(Strings.repeat("^", (offendingSymbol.getText().length())));
-            return sb.toString();
+            return line +
+                    "\n" +
+                    Strings.repeat(" ", (charPositionInLine - 1)) +
+                    Strings.repeat("^", (offendingSymbol.getText().length()));
         }
 
         public String positionAsUrl() {

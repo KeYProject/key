@@ -1671,7 +1671,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
 
         KeYJavaType kjt = null;
-        final int packageEnd = i - 1;
+        final long packageEnd = i - 1;
         for (i = 0; i < parts.size(); i++) {
             String test = parts.stream()
                     //.skip(packageEnd)

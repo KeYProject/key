@@ -21,14 +21,18 @@ import de.uka.ilkd.key.rule.conditions.TypeResolver;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.text.MessageFormat.format;
 
 public class TacletPBuilder extends ExpressionBuilder {
 
@@ -864,30 +868,13 @@ public class TacletPBuilder extends ExpressionBuilder {
     */
 
 
-    private TacletBuilder<?> createTacletBuilderFor(Object find, int applicationRestriction, ParserRuleContext ctx) {
-        if (applicationRestriction != RewriteTaclet.NONE &&
-                applicationRestriction != RewriteTaclet.IN_SEQUENT_STATE &&
-                !(find instanceof Term)) {
-            String mod = "";
-            if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
-                mod = "\"\\sameUpdateLevel\"";
-            }
-            if ((applicationRestriction & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
-                if (mod != "") mod += " and ";
-                mod += "\"\\antecedentPolarity\"";
-            }
-            if ((applicationRestriction & RewriteTaclet.SUCCEDENT_POLARITY) != 0) {
-                if (mod != "") mod += " and ";
-                mod += "\"\\succedentPolarity\"";
-            }
-            if (mod == "") {
-                mod = "Application restrictions";
-            }
-        }
+    private @NotNull TacletBuilder<?> createTacletBuilderFor(
+            Object find, int applicationRestriction, ParserRuleContext ctx) {
         if (find == null) {
             return new NoFindTacletBuilder();
         } else if (find instanceof Term) {
-            return new RewriteTacletBuilder().setFind((Term) find)
+            return new RewriteTacletBuilder()
+                    .setFind((Term) find)
                     .setApplicationRestriction(applicationRestriction);
         } else if (find instanceof Sequent) {
             Sequent findSeq = (Sequent) find;
@@ -913,7 +900,9 @@ public class TacletPBuilder extends ExpressionBuilder {
         } else {
             semanticError(ctx, "Unknown find class type: %s", find.getClass().getName());
         }
-        return null;
+
+        throw new IllegalArgumentException(
+                format("Could not find a suitable TacletBuilder for {0}", find));
     }
 
     private void addGoalTemplate(String id,

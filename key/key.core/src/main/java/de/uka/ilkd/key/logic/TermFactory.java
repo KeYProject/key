@@ -15,6 +15,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.ImmutableArray;
@@ -190,6 +191,10 @@ public final class TermFactory {
             return terms.get(0);
         else if (terms.size() == 2)
             return createTerm(junctor, terms.get(0), terms.get(1));
-        return terms.stream().reduce((a, b) -> createTerm(junctor, a, b)).get();
+        final Optional<@NotNull Term> reduce = terms.stream()
+                .reduce((a, b) -> createTerm(junctor, a, b));
+        if(reduce.isPresent())
+            return reduce.get();
+        throw new IllegalArgumentException("list of terms is empty.");
     }
 }
