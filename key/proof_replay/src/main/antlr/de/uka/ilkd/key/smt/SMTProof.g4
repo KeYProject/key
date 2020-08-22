@@ -10,15 +10,27 @@ proofsexpr
     : LPAREN rulename=PROOFRULE proofsexpr+ RPAREN
     | LPAREN LPAREN UNDERSCORE rulename=PROOFRULE proofsexpr+ RPAREN proofsexpr+ RPAREN
     // same as original 'term' rule:
-    | spec_constant
-    | qual_identifier
-    | LPAREN proofsexpr proofsexpr+ RPAREN
+//    | spec_constant
+//    | qual_identifier
+//    | LPAREN proofsexpr proofsexpr+ RPAREN
     | LPAREN rulename=LET LPAREN var_binding+ RPAREN proofsexpr RPAREN
     | LPAREN rulename='lambda' LPAREN sorted_var+ RPAREN proofsexpr+ RPAREN
     | LPAREN FORALL LPAREN sorted_var+ RPAREN proofsexpr RPAREN
     | LPAREN EXISTS LPAREN sorted_var+ RPAREN proofsexpr RPAREN
     | LPAREN MATCH proofsexpr LPAREN match_case+ RPAREN RPAREN
     | LPAREN EXCL proofsexpr attribute+ RPAREN
+    | noproofterm
+    ;
+
+/** term that does not contain nested proof rules (just a "normal" SMT term with functions/constants) */
+noproofterm
+    : spec_constant
+    | qual_identifier
+    | LPAREN func=noproofterm noproofterm+ RPAREN
+    | LPAREN FORALL LPAREN sorted_var+ RPAREN noproofterm RPAREN
+    | LPAREN EXISTS LPAREN sorted_var+ RPAREN noproofterm RPAREN
+    | LPAREN MATCH noproofterm LPAREN match_case+ RPAREN RPAREN
+    | LPAREN EXCL noproofterm attribute+ RPAREN
     ;
 
 function_def : SYMBOL LPAREN sorted_var* RPAREN sort term ;
@@ -256,7 +268,7 @@ INDEX : NUM | SYMBOL ;
 // TODO: escaping " is allowed : """" is a valid string denoting "
 STRING : '"' .*? '"' ;
 
-WS : [ \t\r\n]+ -> skip ;
+WS : [ \t\r\n]+ -> channel(HIDDEN) ;
 COMMENT : ';' .*? '\n' -> skip ;
 
 ANY : . ;

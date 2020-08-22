@@ -15,6 +15,7 @@ package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -42,6 +43,17 @@ public class SMTProblem {
         private final Goal goal;
         private Sequent sequent;
         private String name = "";
+        private Map<String, Term> translationToTermMap;
+
+        public Map<String, Term> getTranslationToTermMap() {
+            for (SMTSolver solver : solvers) {
+                // only this solver type has a useful map
+                if (solver.getType() == SolverType.Z3_NEW_TL_SOLVER) {
+                    return solver.getType().getTranslationToTermMap();
+                }
+            }
+            return null;
+        }
 
         /* ############# public interface ############# */
         /**

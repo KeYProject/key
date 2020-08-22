@@ -17,8 +17,10 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 
@@ -126,6 +128,8 @@ public interface SolverType  {
 	 */
 	public boolean supportHasBeenChecked();
 
+	public Map<String, Term> getTranslationToTermMap();
+
 	/**
      * Class for the Z3 solver. It makes use of the SMT2-format.
      */
@@ -218,6 +222,7 @@ public interface SolverType  {
 	 */
 	static public final SolverType Z3_NEW_TL_SOLVER = new AbstractSolverType() {
 
+		private ModularSMTLib2Translator translator = null;
 
 		@Override
 		public String getDefaultSolverCommand() {
@@ -272,9 +277,9 @@ public interface SolverType  {
 
 		@Override
 		public SMTTranslator createTranslator(Services services) {
-			return new ModularSMTLib2Translator();
+			translator = new ModularSMTLib2Translator();
+			return translator;
 		}
-
 
 		@Override
 		public String getInfo() {
@@ -291,7 +296,15 @@ public interface SolverType  {
 //                                    + "You can activate quantifier elimination by appending QUANT_FM=true to"
 //                                    + " the execution command.";
 		}
-	};
+
+        @Override
+        public Map<String, Term> getTranslationToTermMap() {
+            if (translator == null) {
+                return null;
+            }
+            return translator.getTranslationToTermMap();
+        }
+    };
 
 	/**
 	 * Class for the Z3 solver. It makes use of the SMT2-format.
@@ -833,4 +846,8 @@ abstract class AbstractSolverType implements SolverType {
 		 return problem;
 	 }
 
+	@Override
+	public Map<String, Term> getTranslationToTermMap() {
+		return null;
+	}
 }

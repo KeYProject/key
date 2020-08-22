@@ -30,6 +30,13 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     private List<Throwable> tacletExceptions = Collections.emptyList();
 
+    public Map<String, Term> getTranslationToTermMap() {
+        return translationToTermMap;
+    }
+
+    /** A mapping from Strings (containing S-Expressions) to KeY terms*/
+    private Map<String, Term> translationToTermMap = new HashMap<>();
+
     @Override
     public CharSequence translateProblem(Sequent sequent, Services services, SMTSettings settings) {
 
@@ -118,6 +125,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         for (Throwable t : exceptions) {
             sb.append("\n; " + t.toString());
         }
+
+        translationToTermMap = master.getTranslationToTermMap();
 
         return sb;
     }
