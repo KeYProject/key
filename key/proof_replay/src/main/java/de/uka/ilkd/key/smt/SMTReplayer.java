@@ -21,11 +21,14 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletMatcher;
 import de.uka.ilkd.key.smt.SMTProofParser.*;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.key_project.util.collection.ImmutableSLList;
@@ -159,6 +162,13 @@ public class SMTReplayer {
         BindingsCollector bindingsCollector = new BindingsCollector();
         tree.accept(bindingsCollector);
 
+        // before starting the actual replay: disable OSS (or else some taclets will not be found)
+        StrategyProperties newProps = proof.getSettings()
+                                           .getStrategySettings()
+                                           .getActiveStrategyProperties();
+        newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_OFF);
+        Strategy.updateStrategySettings(proof, newProps);
+
         // hide the original formula to prove
         TacletApp hide = goal.indexOfTaclets().lookup("hide_right");
         SequentFormula hideF = goal.sequent().succedent().get(0);
@@ -175,7 +185,8 @@ public class SMTReplayer {
         } catch (IllegalStateException e) {
             e.printStackTrace();
             // prune back proof to original
-            // TODO: disabled for now
+            // TODO: disabled for now (debugging)
+            // TODO: show error message in GUI
             //goal.proof().pruneProof(original.node());
         }
     }
@@ -214,7 +225,7 @@ public class SMTReplayer {
                 return visit(ctx.noproofterm());
             }
             //return super.visitProofsexpr(ctx);
-            throw new IllegalStateException("The subtree is neither a nor");
+            throw new IllegalStateException("The subtree is neither a Proofsexpr nor a Noproofterm!");
         }
 
         @Override
@@ -222,7 +233,6 @@ public class SMTReplayer {
             ProofsexprContext proofsexpr = symbolTable.get(ctx.getText());
             if (proofsexpr != null) {
                 // descend into nested let term
-                //return visitProofsexpr(proofsexpr);
                 return visit(proofsexpr);
             }
 
@@ -265,7 +275,7 @@ public class SMTReplayer {
                         // important: and is n-ary in Z3!
                         // subtract 1: "and" token also is noProofTerm
                         arity = ctx.noproofterm().size() - 1;
-                        // first | in string should be top level: start with last child when building term
+                        // first & in string should be top level: start with last child when building term
                         t1 = visit(ctx.noproofterm(arity));
                         for (int i = arity - 1; i >= 1; i--) {
                             t2 = visit(ctx.noproofterm(i));
@@ -320,47 +330,62 @@ public class SMTReplayer {
             Token rule = ctx.rulename;
             if (rule == null) {
                 return super.visitProofsexpr(ctx);
-                //return null;
             }
 
             String rulename = ctx.rulename.getText();
             System.out.println(rulename);
             goal.node().getNodeInfo().setNotes(rulename);
 
-            if (rulename.equals("asserted")) {
-                runAutoMode(goal, true);
-                return null; // TODO ?
-            } else if (rulename.equals("rewrite")) {
-                runAutoMode(goal, false);
-                return null; // TODO ?
-            } else if (rulename.equals("monotonicity")) {
-                replayMonotonicity(ctx);
-                return null;
-            } else if (rulename.equals("trans")) {
-                replayTrans(ctx);
-                return null;
-            } else if (rulename.equals("iff-true")) {
-                replayIffTrue(ctx);
-                return null;
-            } else if (rulename.equals("iff-false")) {
-                replayIffFalse(ctx);
-                return null;
-            } else if (rulename.equals("not-or-elim")) {
-                replayNotOrElim(ctx);
-                return null;
-            } else if (rulename.equals("and-elim")) {
-                replayAndElim(ctx);
-                return null;
-            } else if (rulename.equals("mp")) {
-                replayMp(ctx);
-                return null;
-            } else if (rulename.equals("unit-resolution")) {
-                replayUnitResolution(ctx);
-                return null;
-            } else {
-                throw new IllegalStateException("Replay for rule currently not implemented: " + rulename);
+            switch (rulename) {
+                case "asserted":
+                    runAutoMode(goal, true);
+                    return null;
+                case "rewrite":
+                    replayRewrite(ctx);
+                    return null;
+                case "monotonicity":
+                    replayMonotonicity(ctx);
+                    return null;
+                case "trans":
+                    replayTrans(ctx);
+                    return null;
+                case "iff-true":
+                    replayIffTrue(ctx);
+                    return null;
+                case "iff-false":
+                    replayIffFalse(ctx);
+                    return null;
+                case "not-or-elim":
+                    replayNotOrElim(ctx);
+                    return null;
+                case "and-elim":
+                    replayAndElim(ctx);
+                    return null;
+                case "mp":
+                    replayMp(ctx);
+                    return null;
+                case "unit-resolution":
+                    replayUnitResolution(ctx);
+                    return null;
+                default:
+                    throw new IllegalStateException("Replay for rule currently not implemented: " + rulename);
             }
             //return super.visitProofsexpr(ctx);
+        }
+
+        private void replayRewrite(ProofsexprContext ctx) {
+            if (goal.sequent().succedent().get(0).formula().op() == Equality.EQV) {
+                // equiv_right top level to guide the prover
+                SequentFormula seqForm = goal.sequent().succedent().get(0);
+                PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
+                TacletApp app = createTacletApp("equiv_right", pio, goal);
+                List<Goal> goals = goal.apply(app).toList();
+                // running automode separately on both goals increases success rate
+                runAutoMode(goals.get(0), false);
+                runAutoMode(goals.get(1), false);
+            } else {
+                runAutoMode(goal, false);
+            }
         }
 
         private void replayAndElim(ProofsexprContext ctx) {
@@ -446,12 +471,8 @@ public class SMTReplayer {
             left = left.apply(app).head();
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
             goal = goals.get(0);
-            seqForm = goal.sequent().succedent().get(0);
-            goal = hideAllOther(seqForm, goal);
-
-            visit(ctx.proofsexpr(0));
+            replayRightSideHelper(ctx);
         }
 
         private void replayMonotonicity(ProofsexprContext ctx) {
@@ -519,25 +540,7 @@ public class SMTReplayer {
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////
             goal = goals.get(0);
-            seqForm = goal.sequent().succedent().get(0);
-            goal = hideAllOther(seqForm, goal);
-
-            // TODO: apply andRight multiple times (cases with other size)
-            if (params == 2) {
-                pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-                app = createTacletApp("andRight", pio, goal);
-                List<Goal> antecs = goal.apply(app).toList();
-
-                goal = antecs.get(1);
-                visit(ctx.proofsexpr(0));
-
-                goal = antecs.get(0);
-                visit(ctx.proofsexpr(1));
-            } else if (params == 1) {
-                visit(ctx.proofsexpr(0));
-            } else {
-                throw new IllegalStateException("Splitting to more than 2 branches is currently not implemented!");
-            }
+            replayRightSideHelper(ctx);
         }
 
         private void replayUnitResolution(ProofsexprContext ctx) {
@@ -556,17 +559,9 @@ public class SMTReplayer {
             app = createTacletApp("andLeft", pio, left);
             left = left.apply(app).head();
 
-            /* while toplevel.op is and
-             *      andLeft
-             * for every unit clause
-             *      notLeft
-             *      replace_known_right
-             *      simplify
-             * close
-             */
-
+            // split unit clauses from cut formula
             seqForm = left.sequent().antecedent().get(1);
-            while (seqForm.formula().op() == Junctor.AND) {
+            for (int i = 0; i < unitClauseCount - 1; i++) {
                 pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
                 app = createTacletApp("andLeft", pio, left);
                 left = left.apply(app).head();
@@ -604,64 +599,34 @@ public class SMTReplayer {
             ////////////////////////////////////////////////////////////////////////////////////////////////////////
             goal = goals.get(0);
             replayRightSideHelper(ctx);
-
-            /*
-            goal = goals.get(0);
-            seqForm = goal.sequent().succedent().get(0);
-            goal = hideAllOther(seqForm, goal);
-            */
-
-            /* while toplevel operator is &
-             *      andRight
-             */
-
-            /*
-            seqForm = goal.sequent().succedent().get(0);
-            int subTermIndex = 0;
-            while (seqForm.formula().op() == Junctor.AND) {
-                pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-                app = createTacletApp("andRight", pio, goal);
-                List<Goal> antecs = goal.apply(app).toList();
-
-                goal = antecs.get(1);
-                visit(ctx.proofsexpr(subTermIndex));
-
-                goal = antecs.get(0);
-                seqForm = goal.sequent().succedent().get(0);
-
-                subTermIndex++;
-            }
-            visit(ctx.proofsexpr(subTermIndex));
-            */
         }
 
         private void replayRightSideHelper(ProofsexprContext ctx) {
+
             SequentFormula seqForm = goal.sequent().succedent().get(0);
             goal = hideAllOther(seqForm, goal);
 
             PosInOccurrence pio;
             TacletApp app;
-
-            /* while toplevel operator is &
-             *      andRight
-             */
-
             seqForm = goal.sequent().succedent().get(0);
-            int subTermIndex = 0;
-            while (seqForm.formula().op() == Junctor.AND) {
+
+            // last is succedent, others are subterms
+            int arity = ctx.proofsexpr().size() - 1;
+            System.out.println("Found " + getOriginalText(ctx));
+            System.out.println("  Arity is " + arity);
+
+            for (int i = 0; i < arity - 1; i++) {
                 pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
                 app = createTacletApp("andRight", pio, goal);
                 List<Goal> antecs = goal.apply(app).toList();
 
                 goal = antecs.get(1);
-                visit(ctx.proofsexpr(subTermIndex));
+                visit(ctx.proofsexpr(i));
 
                 goal = antecs.get(0);
                 seqForm = goal.sequent().succedent().get(0);
-
-                subTermIndex++;
             }
-            visit(ctx.proofsexpr(subTermIndex));
+            visit(ctx.proofsexpr(arity - 1));
         }
 
         private void replayTrans(ProofsexprContext ctx) {
@@ -695,18 +660,7 @@ public class SMTReplayer {
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////
             goal = goals.get(0);
-            seqForm = goal.sequent().succedent().get(0);
-            goal = hideAllOther(seqForm, goal);
-
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-            app = createTacletApp("andRight", pio, goal);
-            List<Goal> antecs = goal.apply(app).toList();
-
-            goal = antecs.get(1);
-            visit(ctx.proofsexpr(0));
-
-            goal = antecs.get(0);
-            visit(ctx.proofsexpr(1));
+            replayRightSideHelper(ctx);
         }
 
         private void replayMp(ProofsexprContext ctx) {
@@ -759,23 +713,8 @@ public class SMTReplayer {
             assert left.node().isClosed();
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // right: and_right, continue proof of the two antecedents
-            Goal right = goals.get(0);
-
-            seqForm = right.sequent().succedent().get(0);
-
-            // right side of cut: hide everything else
-            right = hideAllOther(seqForm, right);
-
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-            app = createTacletApp("andRight", pio, right);
-            List<Goal> antecs = right.apply(app).toList();
-
-            goal = antecs.get(1);
-            visit(p);
-
-            goal = antecs.get(0);
-            visit(p_imp_q);
+            goal = goals.get(0);
+            replayRightSideHelper(ctx);
         }
 
         @Override
@@ -787,6 +726,16 @@ public class SMTReplayer {
             }
             return null;
         }
+    }
+
+    private static String getOriginalText(ProofsexprContext ctx) {
+        if (ctx.start == null || ctx.start.getStartIndex() < 0 || ctx.stop == null || ctx.stop.getStopIndex() < 0) {
+            // fallback
+            return ctx.getText();
+        }
+        int start = ctx.start.getStartIndex();
+        int end = ctx.stop.getStopIndex();
+        return ctx.start.getInputStream().getText(Interval.of(start, end));
     }
 
     private Goal hideAllOther(SequentFormula remaining, Goal goal) {
