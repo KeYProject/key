@@ -955,6 +955,17 @@ public class TermBuilder {
 
             final Term fullRhs = store(heapTerm, objectTerm, fieldTerm, rhs);
             return elementary(heapLDT.getHeap(), fullRhs);
+        } else if (lhs.op() == UpdateApplication.UPDATE_APPLICATION) {
+            // #1536 A nested updates like
+            //      { {a:=1} b :=a}
+            // should be parsed as (see KeY-Book, Sec. 3.4.1, Def. 3.8)
+            //      { {a:=1} (b :=a)}
+            // but is parsed as:
+            //      { ({a:=1} b) :=a}
+            // The latter is (currently) not supported, hence the exception.
+            throw new TermCreationException("lhs cannot have a nested update. "
+                           + "If you have a nested update like '{{a:=1} b:=a}', "
+                           + "replace it with the bracketed version '{{a:=1} (b:=a)}'.");
         } else {
             throw new TermCreationException("Not a legal lhs: " + lhs);
         }
