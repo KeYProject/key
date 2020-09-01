@@ -44,6 +44,14 @@ constructs a box formula in the antecedent 'defining' the constant as the result
 a method call. The method call is encoded directly as a method call in the box modality. 
 The query is invoked in a context equal to the container type of the query method.
 </entry>
+
+<entry key="Focus on Formula">
+This rule focuses the proof search on the selected formula (in antecedent or succedent).
+All other formulas on the sequent are deleted.
+
+The rule application is irreversible, i.e. no insert_hidden_... taclets are generated for the deleted formulas as the hide_left/hide_right taclets would do.
+</entry>
+
 <entry key="One Step Simplification">
 The One Step Simplifier (OSS) aggregates the application of simplification rules into a single rule. This is done to make the calculus more efficient.
 

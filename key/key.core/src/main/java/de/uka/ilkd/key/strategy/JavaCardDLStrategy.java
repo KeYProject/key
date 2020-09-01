@@ -30,6 +30,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
+import de.uka.ilkd.key.rule.FocusRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.AgeFeature;
@@ -2788,6 +2789,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
             Goal goal) {
+        if (app.rule() instanceof FocusRule) {
+            // the FocusRule can only be applied manually!
+            return TopRuleAppCost.INSTANCE;
+        }
         return costComputationF.computeCost(app, pio, goal);
     }
 
