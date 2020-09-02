@@ -4,6 +4,8 @@ smtoutput : ('Result: valid' 'unsat')? proof;
 
 proof
     : LPAREN command* LPAREN 'proof' proofsexpr+ RPAREN RPAREN EOF
+    // with pretty proof option, the enclosing proof term is missing
+    | proofsexpr EOF
     ;
 
 proofsexpr

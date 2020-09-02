@@ -45,6 +45,7 @@ public class SMTReplayer {
     /** the current "main goal" of the proof */
     private final Goal original;
     private Goal goal;
+    private Map<SequentFormula, NoPosTacletApp> sf2InsertTaclet = new HashMap<>();
     private final Proof proof;
     private final Services services;
     private final TermBuilder tb;
@@ -162,21 +163,28 @@ public class SMTReplayer {
         BindingsCollector bindingsCollector = new BindingsCollector();
         tree.accept(bindingsCollector);
 
-        // before starting the actual replay: disable OSS (or else some taclets will not be found)
+        // before starting the actual replay: disable OSS (otherwise some taclets will not be found)
         StrategyProperties newProps = proof.getSettings()
                                            .getStrategySettings()
                                            .getActiveStrategyProperties();
         newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_OFF);
         Strategy.updateStrategySettings(proof, newProps);
 
-        // hide the original formula to prove
-        TacletApp hide = goal.indexOfTaclets().lookup("hide_right");
-        SequentFormula hideF = goal.sequent().succedent().get(0);
-        PosInOccurrence hidePio = new PosInOccurrence(hideF, PosInTerm.getTopLevel(), false);
-        hide = hide.setPosInOccurrence(hidePio, services);
-        SchemaVariable sv = hide.uninstantiatedVars().iterator().next();
-        hide = hide.addInstantiation(sv, hideF.formula(), true, services);
-        goal.apply(hide);
+        // hide all original formulas, remember the mapping to insert_hidden_... taclets
+        for (SequentFormula sf : goal.sequent().antecedent().asList()) {
+            PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), true);
+            TacletApp hide = createTacletApp("hide_left", pio, goal);
+            goal = goal.apply(hide).head();
+            NoPosTacletApp insertRule = goal.node().getLocalIntroducedRules().iterator().next();
+            sf2InsertTaclet.put(sf, insertRule);
+        }
+        for (SequentFormula sf : goal.sequent().succedent().asList()) {
+            PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
+            TacletApp hide = createTacletApp("hide_right", pio, goal);
+            goal = goal.apply(hide).head();
+            NoPosTacletApp insertRule = goal.node().getLocalIntroducedRules().iterator().next();
+            sf2InsertTaclet.put(sf, insertRule);
+        }
 
         // do actual replay (starting from found proof root)
         ReplayVisitor replayVisitor = new ReplayVisitor();
@@ -265,10 +273,16 @@ public class SMTReplayer {
                         // subtract 1: "or" token also is noProofTerm
                         arity = ctx.noproofterm().size() - 1;
                         // first | in string should be top level: start with last child when building term
+                        /*
                         t1 = visit(ctx.noproofterm(arity));
                         for (int i = arity - 1; i >= 1; i--) {
                             t2 = visit(ctx.noproofterm(i));
                             t1 = tf.createTerm(Junctor.OR, t2, t1);
+                        }*/
+                        t1 = visit(ctx.noproofterm(1));
+                        for (int i = 2; i <= arity; i++) {
+                            t2 = visit(ctx.noproofterm(i));
+                            t1 = tf.createTerm(Junctor.OR, t1, t2);
                         }
                         return t1;
                     case "and":
@@ -276,10 +290,17 @@ public class SMTReplayer {
                         // subtract 1: "and" token also is noProofTerm
                         arity = ctx.noproofterm().size() - 1;
                         // first & in string should be top level: start with last child when building term
+                        /*
                         t1 = visit(ctx.noproofterm(arity));
                         for (int i = arity - 1; i >= 1; i--) {
                             t2 = visit(ctx.noproofterm(i));
                             t1 = tf.createTerm(Junctor.AND, t2, t1);
+                        }
+                        */
+                        t1 = visit(ctx.noproofterm(1));
+                        for (int i = 2; i <= arity; i++) {
+                            t2 = visit(ctx.noproofterm(i));
+                            t1 = tf.createTerm(Junctor.AND, t1, t2);
                         }
                         return t1;
                     default:
@@ -338,7 +359,8 @@ public class SMTReplayer {
 
             switch (rulename) {
                 case "asserted":
-                    runAutoMode(goal, true);
+                    //runAutoMode(goal, true);
+                    replayAsserted(ctx);
                     return null;
                 case "rewrite":
                     replayRewrite(ctx);
@@ -373,6 +395,69 @@ public class SMTReplayer {
             //return super.visitProofsexpr(ctx);
         }
 
+        private void replayAsserted(ProofsexprContext ctx) {
+            // todo: get sequentFormula, get corresponding insert_taclet from map, apply
+            SequentFormula seqForm = goal.sequent().succedent().get(0);
+            PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
+
+            // two possible choices:
+            TacletApp app = sf2InsertTaclet.get(seqForm);
+            TacletApp notApp = sf2InsertTaclet.get(new SequentFormula(tb.not(seqForm.formula())));
+
+            if (app != null) {
+                goal = goal.apply(app).head();
+            } else if (notApp != null) {
+                goal = goal.apply(notApp).head();
+
+                if (seqForm.formula().op() == Junctor.NOT) {
+                    app = createTacletApp("notRight", pio, goal);
+                    goal = goal.apply(app).head();
+
+                    /*
+                    seqForm = goal.sequent().antecedent().get(0);
+                    app = sf2InsertTaclet.get(seqForm);
+                    if (app == null) {
+                        throw new IllegalStateException("The formula " + seqForm.formula() + "is not an assertion!");
+                    }
+                    goal = goal.apply(app).head();
+                     */
+                    SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
+                    SequentFormula addedAntec = sci.addedFormulas(true).head();
+                    pio = new PosInOccurrence(addedAntec, PosInTerm.getTopLevel(), true);
+                    app = createTacletApp("closeAntec", pio, goal);
+                    goal = goal.apply(app).head();
+                }
+            } else {
+                throw new IllegalStateException("The formula " + seqForm.formula() + "is not an assertion!");
+            }
+
+            /*
+            SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
+            SequentFormula addedAntec = sci.addedFormulas(true).head();
+            SequentFormula addedSucc = sci.addedFormulas(false).head();
+
+            if (addedAntec != null) {
+                pio = new PosInOccurrence(addedAntec, PosInTerm.getTopLevel(), true);
+                app = createTacletApp("closeAntec", pio, goal);
+                goal = goal.apply(app).head();
+            } else if (addedSucc != null) {
+
+                pio = new PosInOccurrence(addedSucc, PosInTerm.getTopLevel(), false);
+                app = createTacletApp("notRight", pio, goal);
+                goal = goal.apply(app).head();
+
+
+                //sci = goal.node().getNodeInfo().getSequentChangeInfo();
+                pio = new PosInOccurrence(sci.addedFormulas(true).head(), PosInTerm.getTopLevel(), true);
+                app = createTacletApp("closeAntec", pio, goal);
+                goal = goal.apply(app).head();
+
+            } else {
+                throw new IllegalStateException("Error applying insert_hidden_.. taclet!");
+            }
+             */
+        }
+
         private void replayRewrite(ProofsexprContext ctx) {
             if (goal.sequent().succedent().get(0).formula().op() == Equality.EQV) {
                 // equiv_right top level to guide the prover
@@ -386,34 +471,6 @@ public class SMTReplayer {
             } else {
                 runAutoMode(goal, false);
             }
-        }
-
-        private void replayAndElim(ProofsexprContext ctx) {
-            Term cutTerm = extractRuleAntecedents(ctx);
-            TacletApp app = createCutApp(goal, cutTerm);
-            List<Goal> goals = goal.apply(app).toList();
-            Goal left = goals.get(1);
-            SequentFormula orig = left.sequent().succedent().get(0);
-
-            SequentFormula seqForm = left.sequent().antecedent().get(0);
-            PosInOccurrence pio;
-            while (seqForm.formula().op() == Junctor.AND) {
-                pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-                app = createTacletApp("andLeft", pio, left);
-                left = left.apply(app).head();
-                SequentChangeInfo sci = left.node().getNodeInfo().getSequentChangeInfo();
-                // TODO: is the order of the added formulas deterministic?
-                seqForm = sci.addedFormulas().head();
-            }
-
-            seqForm = left.sequent().succedent().get(0);
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-            app = createTacletApp("close", pio, left);
-            left = left.apply(app).head();
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            goal = goals.get(0);
-            replayRightSideHelper(ctx);
         }
 
         private void replayIffTrue(ProofsexprContext ctx) {
@@ -432,6 +489,39 @@ public class SMTReplayer {
             visit(ctx.proofsexpr(0));
         }
 
+        private void replayAndElim(ProofsexprContext ctx) {
+            Term cutTerm = extractRuleAntecedents(ctx);
+            TacletApp app = createCutApp(goal, cutTerm);
+            List<Goal> goals = goal.apply(app).toList();
+            Goal left = goals.get(1);
+            SequentFormula orig = left.sequent().succedent().get(0);
+
+            SequentFormula seqForm = left.sequent().antecedent().get(0);
+            PosInOccurrence pio;
+            for (int i = 0; i < ctx.proofsexpr().size(); i++) {
+            // while (seqForm.formula().op() == Junctor.AND) {
+                pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
+                app = createTacletApp("andLeft", pio, left);
+                left = left.apply(app).head();
+                SequentChangeInfo sci = left.node().getNodeInfo().getSequentChangeInfo();
+                // TODO: is the order of the added formulas deterministic?
+                seqForm = sci.addedFormulas().tail().head();
+                if (seqForm == null) {
+                    // attention: the formula may be equal to the original one by chance
+                    break;
+                }
+            }
+
+            seqForm = left.sequent().succedent().get(0);
+            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
+            app = createTacletApp("close", pio, left);
+            left = left.apply(app).head();
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            goal = goals.get(0);
+            replayRightSideHelper(ctx);
+        }
+
         private void replayNotOrElim(ProofsexprContext ctx) {
             Term cutTerm = extractRuleAntecedents(ctx);
             TacletApp app = createCutApp(goal, cutTerm);
@@ -446,14 +536,20 @@ public class SMTReplayer {
 
             // orRight
             seqForm = left.sequent().succedent().get(0);
-            while (seqForm.formula().op() == Junctor.OR) {
+            // better count up to arity
+            for (int i = 0; i < ctx.proofsexpr().size(); i++) {
+            //while (seqForm.formula().op() == Junctor.OR) {
                 pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
                 app = createTacletApp("orRight", pio, left);
                 left = left.apply(app).head();
                 //seqForm = left.sequent().succedent().get(0);
                 SequentChangeInfo sci = left.node().getNodeInfo().getSequentChangeInfo();
                 // TODO: is the order of the added formulas deterministic?
-                seqForm = sci.addedFormulas().head();
+                seqForm = sci.addedFormulas().tail().head();
+                if (seqForm == null) {
+                    // attention: the formula may be equal to the original one by chance
+                    break;
+                }
             }
 
             pio = new PosInOccurrence(orig, PosInTerm.getTopLevel(), false);
