@@ -19,10 +19,10 @@ import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
 
 public class UninterpretedSymbolsHandler implements SMTHandler {
 
-    public final static String PREFIX = "KeY_";
+    public final static String PREFIX = "__";
 
     @Override
-    public void init(Services services) {
+    public void init(MasterHandler masterHandler, Services services) {
         // nothing to be done
     }
 

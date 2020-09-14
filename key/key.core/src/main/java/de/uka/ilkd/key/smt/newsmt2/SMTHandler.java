@@ -22,7 +22,7 @@ import java.net.URL;
  * They are always used within the same proof, but possibly for several proof
  * obligations.
  *
- * After creation, the {@link #init(Services)} method is called that injects the
+ * After creation, the {@link #init(MasterHandler, Services)} method is called that injects the
  * {@link Services} object belonging to the proof.
  *
  * During translation, an SMT handler can be asked via {@link #canHandle(Term)}
@@ -45,12 +45,14 @@ public interface SMTHandler {
      * This method may also allocate additional resources that it needs for
      * translation.
      *
+     *
+     * @param masterHandler
      * @param services the non-null services object which is relevant for
      *                 this handler
      *
      * @throws IOException if resources cannot be read.
      */
-    void init(Services services) throws IOException;
+    void init(MasterHandler masterHandler, Services services) throws IOException;
 
     /**
      * Query if this handler can translate a term.
@@ -80,20 +82,4 @@ public interface SMTHandler {
      */
     SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException;
 
-    /**
-     * Get the URL for the preamble definitions for this handler.
-     *
-     * Any handler can go together with a set of named declarations.
-     * (The file needs not exist however).
-     *
-     * By default the name of the preamble is defined from the class name.
-     * This behaviour can be overridden.
-     *
-     * @return a non-nul URL that points to the potential preable xml
-     * definitions file.
-     */
-    default URL getSnippetResource() {
-        String resourceName = getClass().getSimpleName() + ".preamble.xml";
-        return getClass().getResource(resourceName);
-    }
 }

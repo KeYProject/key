@@ -6,13 +6,16 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+import java.io.IOException;
+
 public class CastHandler implements SMTHandler {
 
     private SortDependingFunction anyCast;
 
     @Override
-    public void init(Services services) {
+    public void init(MasterHandler masterHandler, Services services) throws IOException {
         this.anyCast = Sort.ANY.getCastSymbol(services);
+        masterHandler.registerSnippets(getClass());
     }
 
     @Override

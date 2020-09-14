@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
@@ -61,15 +62,8 @@ public class MasterHandler {
         this.services = services;
 
         for (SMTHandler smtHandler : ServiceLoader.load(SMTHandler.class)) {
-            smtHandler.init(services);
-            URL snippetResources = smtHandler.getSnippetResource();
-            if(snippetResources != null) {
-                try {
-                    snippets.loadFromXML(snippetResources.openStream());
-                } catch (IOException e) {
-                    throw new IOException("Error while reading snippet resource " + snippetResources, e);
-                }
-            }
+            smtHandler.init(this, services);
+            registerSnippets(smtHandler.getClass());
             handlers.add(smtHandler);
         }
 
@@ -276,5 +270,19 @@ public class MasterHandler {
     @Deprecated
     public SExpr coerce(SExpr sExpr, Type type) throws SMTTranslationException {
         return SExprs.coerce(sExpr, type);
+    }
+
+    public void registerSnippets(Class<?> aClass) throws IOException {
+        String resourceName = aClass.getSimpleName() + ".preamble.xml";
+        URL resource = aClass.getResource(resourceName);
+        if (resource != null) {
+            registerSnippets(resource);
+        }
+    }
+
+    private void registerSnippets(URL resource) throws IOException {
+        try (InputStream is = resource.openStream()) {
+            snippets.loadFromXML(is);
+        }
     }
 }

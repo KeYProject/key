@@ -10,7 +10,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
-import java.io.IOException;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -29,7 +28,7 @@ public class HeapHandler implements SMTHandler {
 
 
     @Override
-    public void init(Services services) {
+    public void init(MasterHandler masterHandler, Services services) {
         this.services = services;
 
         supportedFunctions.clear();

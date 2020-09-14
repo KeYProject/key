@@ -21,7 +21,7 @@ public class IntegerOpHandler implements SMTHandler {
     private Function jDivision;
 
     @Override
-    public void init(Services services) {
+    public void init(MasterHandler masterHandler, Services services) {
         supportedOperators.clear();
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
 

@@ -14,7 +14,7 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 public class QuantifierHandler implements SMTHandler {
 
     @Override
-    public void init(Services services) {
+    public void init(MasterHandler masterHandler, Services services) {
         // nothing to be done
     }
 
