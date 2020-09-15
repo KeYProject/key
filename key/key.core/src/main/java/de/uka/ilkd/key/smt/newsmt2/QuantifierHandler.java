@@ -33,19 +33,24 @@ public class QuantifierHandler implements SMTHandler {
         for(QuantifiableVariable bv : term.boundVars()) {
             String varName = LogicalVariableHandler.VAR_PREFIX + bv.name();
             vars.add(new SExpr(varName, Type.NONE, "U"));
-            typeGuards.add(new SExpr("instanceof", Type.BOOL,
+            // use "typeguard" instead of semantically equivalent "instanceof" to be able to distinguish
+            // between typeguards (without direct counterpart on KeY sequent) and "real" instanceof uses
+            // (this is needed for proof replay)
+            typeGuards.add(new SExpr("typeguard", Type.BOOL,
                     new SExpr(varName), SExprs.sortExpr(bv.sort())));
         }
         SExpr typeGuard = new SExpr("and", Type.BOOL, typeGuards);
         SExpr typeGuardConnector;
         String smtOp;
         Operator op = term.op();
-        if(op == Quantifier.ALL) {
+        if (op == Quantifier.ALL) {
             smtOp = "forall";
             typeGuardConnector = new SExpr("=>", Type.BOOL);
+            trans.addFromSnippets("typeguard");
         } else if(op == Quantifier.EX) {
             smtOp = "exists";
             typeGuardConnector = new SExpr("and", Type.BOOL);
+            trans.addFromSnippets("typeguard");
         } else {
             throw new SMTTranslationException("Unknown quantifier " + op);
         }

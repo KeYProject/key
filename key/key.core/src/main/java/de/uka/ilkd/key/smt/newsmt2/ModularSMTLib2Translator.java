@@ -67,9 +67,6 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         for (Writable w : master.getOptions()) {
             w.appendTo(sb);
         }
-        sb.append("\n(set-option :produce-proofs true)");
-        sb.append("\n(set-option :auto-config false)\n");
-        sb.append("\n(set-option :pp.pretty-proof true)\n");
 
         sb.append("; --- Declarations");
 
