@@ -17,8 +17,9 @@ proofsexpr
 //    | LPAREN proofsexpr proofsexpr+ RPAREN
     | LPAREN rulename=LET LPAREN var_binding+ RPAREN proofsexpr RPAREN
     | LPAREN rulename='lambda' LPAREN sorted_var+ RPAREN proofsexpr+ RPAREN
-    | LPAREN FORALL LPAREN sorted_var+ RPAREN proofsexpr RPAREN
-    | LPAREN EXISTS LPAREN sorted_var+ RPAREN proofsexpr RPAREN
+// TODO: no quantifiers here?
+//    | LPAREN rulename=FORALL LPAREN sorted_var+ RPAREN proofsexpr RPAREN
+//    | LPAREN rulename=EXISTS LPAREN sorted_var+ RPAREN proofsexpr RPAREN
     | LPAREN MATCH proofsexpr LPAREN match_case+ RPAREN RPAREN
     | LPAREN EXCL proofsexpr attribute+ RPAREN
     | noproofterm
@@ -29,8 +30,8 @@ noproofterm
     : spec_constant
     | qual_identifier
     | LPAREN func=noproofterm noproofterm+ RPAREN
-    | LPAREN FORALL LPAREN sorted_var+ RPAREN noproofterm RPAREN
-    | LPAREN EXISTS LPAREN sorted_var+ RPAREN noproofterm RPAREN
+    | LPAREN quant=FORALL LPAREN sorted_var+ RPAREN noproofterm RPAREN
+    | LPAREN quant=EXISTS LPAREN sorted_var+ RPAREN noproofterm RPAREN
     | LPAREN MATCH noproofterm LPAREN match_case+ RPAREN RPAREN
     | LPAREN EXCL noproofterm attribute+ RPAREN
     ;
