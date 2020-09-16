@@ -9,18 +9,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
@@ -61,13 +59,14 @@ public class MasterHandler {
 
         this.services = services;
 
+        snippets.loadFromXML(getClass().getResourceAsStream("preamble.xml"));
+
         for (SMTHandler smtHandler : ServiceLoader.load(SMTHandler.class)) {
             smtHandler.init(this, services);
             registerSnippets(smtHandler.getClass());
             handlers.add(smtHandler);
         }
 
-        snippets.loadFromXML(getClass().getResourceAsStream("preamble.xml"));
 
         // If there are options in the preamble pass them through verbatim.
         if (snippets.containsKey("opts")) {
@@ -75,9 +74,12 @@ public class MasterHandler {
             addOption(opts);
         }
 
-        for (Object k : snippets.keySet()) {
+        // sort the entries in the snippets to make this deterministic
+        SortedSet<Object> keys = new TreeSet<>(snippets.keySet());
+        for (Object k : keys) {
             String key = k.toString();
             if(key.endsWith(".auto")) {
+                System.out.println(key);
                 // strip the ".auto" and add the snippet
                 addFromSnippets(key.substring(0, key.length() - 5));
             }
@@ -238,22 +240,6 @@ public class MasterHandler {
             addAxiom(ax);
         }
 
-        String keyAxName = functionName + ".key.axiom";
-        int cnt = 2;
-        while (snippets.containsKey(keyAxName)) {
-            DefaultTermParser tp = new DefaultTermParser();
-            try {
-                Term axiom = tp.parse(new StringReader(snippets.getProperty(keyAxName)), Sort.FORMULA, services,
-                        services.getNamespaces(), new AbbrevMap());
-                addAxiom(translate(axiom));
-            } catch (ParserException e) {
-                // TODO think about handling this ...
-                e.printStackTrace();
-            }
-            keyAxName = functionName + "." + cnt + ".key.axiom";
-            cnt ++;
-        }
-
         String[] deps = snippets.getProperty(functionName + ".deps", "").trim().split(", *");
         for (String dep : deps) {
             addFromSnippets(dep);
@@ -284,5 +270,30 @@ public class MasterHandler {
         try (InputStream is = resource.openStream()) {
             snippets.loadFromXML(is);
         }
+    }
+
+    public void registerSnippets(Properties props) {
+        snippets.putAll(props);
+    }
+
+    public String getSnippet(String s) {
+        return snippets.getProperty(s);
+    }
+
+    public String getSnippet(String s, String orElse) {
+        return snippets.getProperty(s, orElse);
+    }
+
+    public Writable getSnippet(String s, Writable orElse) {
+        String result = snippets.getProperty(s);
+        if (result == null) {
+            return orElse;
+        } else {
+            return new VerbatimSMT(result);
+        }
+    }
+
+    public boolean hasSnippet(String s) {
+        return snippets.containsKey(s);
     }
 }

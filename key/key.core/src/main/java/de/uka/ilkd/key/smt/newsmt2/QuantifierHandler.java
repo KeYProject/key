@@ -33,7 +33,7 @@ public class QuantifierHandler implements SMTHandler {
         for(QuantifiableVariable bv : term.boundVars()) {
             String varName = LogicalVariableHandler.VAR_PREFIX + bv.name();
             vars.add(new SExpr(varName, Type.NONE, "U"));
-            typeGuards.add(new SExpr("instanceof", Type.BOOL,
+            typeGuards.add(SExprs.instanceOf(
                     new SExpr(varName), SExprs.sortExpr(bv.sort())));
         }
         SExpr typeGuard = SExprs.and(typeGuards);
@@ -51,6 +51,7 @@ public class QuantifierHandler implements SMTHandler {
         }
 
         matrix = new SExpr(typeGuardConnector, typeGuard, matrix);
+        matrix = SExprs.pullOutPatterns(matrix);
 
         return new SExpr(smtOp, Type.BOOL, new SExpr(vars), matrix);
 

@@ -13,6 +13,8 @@ import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+import javax.management.relation.RelationNotFoundException;
+
 /**
  * This class provides a translation from a KeY sequent to the SMT-LIB 2 language, a common input
  * language for modern SMT solvers.
@@ -111,7 +113,10 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         List<Throwable> exceptions = master.getExceptions();
         for (Throwable t : exceptions) {
             sb.append("\n; " + t.toString());
+            t.printStackTrace();
         }
+
+        // TODO . Find a concept for exceptions here
 
         return sb;
     }

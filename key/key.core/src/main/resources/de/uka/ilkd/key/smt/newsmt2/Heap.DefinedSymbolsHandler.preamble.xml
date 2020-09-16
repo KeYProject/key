@@ -1,0 +1,22 @@
+<entry key="store.dl">
+    \forall Heap h; \forall Object o; \forall Field f; \forall Object o2; \forall Field f2; \forall Any v;
+    PATTERN( o=o2 &amp; f=f2 &amp; f != java.lang.Object::&lt;created&gt; ->
+        any::select(store(h,o,f,v), o2, f2) = v, any::select(store(h,o,f,v), o2, f2) )
+</entry>
+<entry key="store.dl">
+    \forall Heap h; \forall Object o; \forall Field f; \forall Object o2; \forall Field f2; \forall Any v;
+    PATTERN( o!=o2 | f!=f2 | f == java.lang.Object::&lt;created&gt; ->
+        any::select(store(h,o,f,v), o2, f2) = any::select(h,o2,f2), any::select(store(h,o,f,v), o2, f2) )
+</entry>
+
+<entry key="anon.dl">
+    true
+<!--        (assert (forall ((h U)(h2 U)(ls U)(o2 U)(f2 U))
+        (! (= (keyselect (keyanon h ls h2) o2 f2)
+              (ite (or (and (elementOf o2 f2 empty)
+                            (not (= f2 |KeY_java.lang.Object::&lt;created&gt;|)))
+                       (elementOf o2 f2 (freshLocs h)))
+                   (keyselect h2 o2 f2)
+                   (keyselect h o2 f2)))
+          :pattern ((keyselect (keyanon h ls h2) o2 f2)))))-->
+</entry>

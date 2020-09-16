@@ -1,0 +1,8 @@
+<entry key="empty.dl">
+  \forall Any o; \forall Field f; PATTERN(!elementOf(o,f,empty), empty)
+</entry>
+
+<entry key="union.dl">
+  \forall Object o; \forall Field f; \forall LocSet l1; \forall LocSet l2;
+     PATTERN(elementOf(o, f, union(l1, l2))) &lt;-&gt; elementOf(o,f,l1) | elementOf(o,f,l2)), union(l1,l2))
+</entry>

@@ -6,8 +6,10 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 /**
  * This class is a collection of static functions to construct SExpr objects.
@@ -93,7 +95,7 @@ public class SExprs {
      * @param matrix a boolean expression
      * @return
      */
-    public static SExpr forall(List<SExpr> vars, SExpr matrix) throws SMTTranslationException {
+    public static SExpr forall(List<SExpr> vars, SExpr matrix)  throws SMTTranslationException {
         if (vars.isEmpty()) {
             if (matrix.getName().equals("!")) {
                 return matrix.getChildren().get(0);
@@ -194,4 +196,43 @@ public class SExprs {
         return new SExpr("cast", Type.UNIVERSE, coerce(exp, Type.UNIVERSE), sortExp);
     }
 
+    public static SExpr assertion(SExpr assertion) throws SMTTranslationException {
+        return new SExpr("assert", coerce(assertion, Type.BOOL));
+    }
+
+    public static SExpr pullOutPatterns(SExpr matrix) {
+        Set<SExpr> collected = new HashSet<>();
+        matrix = filterAndCollectPatterns(matrix, collected);
+        if (collected.isEmpty()) {
+            return matrix;
+        } else {
+            return patternSExpr(matrix, collected.toArray(new SExpr[collected.size()]));
+        }
+    }
+
+    private static SExpr filterAndCollectPatterns(SExpr matrix, Set<SExpr> collected) {
+        List<SExpr> orgChildren = matrix.getChildren();
+        if(matrix.getName().equals("!")) {
+            collected.addAll(orgChildren.get(2).getChildren());
+            return filterAndCollectPatterns(orgChildren.get(0), collected);
+        }
+        List<SExpr> children = null;
+        for (int i = 0; i < orgChildren.size(); i++) {
+            SExpr repl = filterAndCollectPatterns(orgChildren.get(i), collected);
+            if (repl != orgChildren.get(i)) {
+                if (children == null) {
+                    children = new ArrayList<>(orgChildren);
+                }
+                children.set(i, repl);
+            }
+        }
+        if(children == null) {
+            return matrix;
+        }
+        return new SExpr(matrix.getName(), matrix.getType(), children);
+    }
+
+    public static SExpr instanceOf(SExpr var, SExpr sortExpr) {
+        return new SExpr("instanceof", Type.BOOL, var, sortExpr);
+    }
 }

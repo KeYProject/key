@@ -1,0 +1,33 @@
+    <entry key="seqGet.dl">
+    \forall int i; \forall Seq s; PATTERN( i &lt; 0 -> any::seqGet(s, i) = seqError, any::seqGet(s, i) )
+    </entry>
+    <entry key="seqGet.dl.2">
+    \forall int i; \forall Seq s; PATTERN( i &gt;= seqLen(s) -> any::seqGet(s, i) = seqError, any::seqGet(s, i) )
+    </entry>
+
+    <entry key="seqLen.dl">
+    \forall Seq s; PATTERN( seqLen(s) &gt;= 0, seqLen(s) )
+    </entry>
+
+    <!--
+    <entry key="seqConcat.axioms">
+(assert (forall ((s1 U) (s2 U)) (= (seqLen (seqConcat s1 s2)) (+ (seqLen s1) (seqLen s2)))))
+(assert (forall ((s1 U) (s2 U) (i U)) (=> (&lt; i seqLen(s1)) (= (seqGet (seqConcat s1 s2) i) (seqGet s1 i)))))
+(assert (forall ((s1 U) (s2 U) (i U)) (=> (&gt;= i seqLen(s1)) (= (seqGet (seqConcat s1 s2) i) (seqGet s2 (- i (seqLen s1))))))
+    </entry>
+
+    <entry key="seqDef.axioms">
+
+    </entry>
+
+    <entry key="seqEmpty.axioms">
+(assert (= (seqLen seqEmpty) (i2u 0)))
+    </entry>
+
+    <entry key="seqSingleton.axioms">
+(assert (forall ((u U)) (= (seqLen (seqSingleton u)) 1)))
+(assert (forall ((u U)(i U)) (! (=> (= i (i2u 0)) (= (seqGet (seqSingleton u) i) u)) :pattern ((seqGet (seqSingleton u) i)))))
+    </entry>
+
+
+-->

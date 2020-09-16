@@ -41,8 +41,7 @@ public class InstanceOfHandler implements SMTHandler {
         } else if (instanceOfOp.isSimilar(op)) {
             trans.addFromSnippets("instanceof");
             trans.addSort(op.getSortDependingOn());
-            return new SExpr("instanceof", Type.BOOL, inner,
-                SExprs.sortExpr(op.getSortDependingOn()));
+            return SExprs.instanceOf(inner, SExprs.sortExpr(op.getSortDependingOn()));
         } else {
             throw new SMTTranslationException("unexpected case in instanceof-handling: " + term);
         }

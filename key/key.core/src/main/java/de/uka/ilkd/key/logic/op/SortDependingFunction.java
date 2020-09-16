@@ -107,7 +107,7 @@ public final class SortDependingFunction extends Function {
             Sort[] argSorts,
             boolean unique) {
         SortDependingFunctionTemplate template
-        = new SortDependingFunctionTemplate(sortDependingOn,
+                = new SortDependingFunctionTemplate(sortDependingOn,
                 kind,
                 sort,
                 new ImmutableArray<Sort>(argSorts),
