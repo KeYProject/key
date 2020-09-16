@@ -52,7 +52,7 @@ compileJavacc {
 task generateSMTListings {
     def pack = "de/uka/ilkd/key/smt/newsmt2"
     def resourcesDir = "${project.projectDir}/src/main/resources"
-    def outputDir = "${project.buildDir}/resources/main"
+    def outputDir = resourcesDir // in the future that should be "${project.buildDir}/resources/main"
     // ${project.buildDir}
     doLast {
         new File("$outputDir/$pack/DefinedSymbolsHandler.preamble.xml").withWriter { list ->
