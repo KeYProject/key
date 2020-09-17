@@ -142,7 +142,8 @@ public class DefinedSymbolsHandler implements SMTHandler {
 
     private void handleDLAxioms(String name, MasterHandler trans) throws SMTTranslationException {
         int cnt = 2;
-        String dl = trans.getSnippet(name + ".dl");
+        String snipName = name + ".dl";
+        String dl = trans.getSnippet(snipName);
         do {
             DefaultTermParser tp = new DefaultTermParser();
             try {
@@ -150,9 +151,10 @@ public class DefinedSymbolsHandler implements SMTHandler {
                         services.getNamespaces(), new AbbrevMap());
                 trans.addAxiom(SExprs.assertion(trans.translate(axiom)));
             } catch (ParserException e) {
-                throw new SMTTranslationException(e);
+                throw new SMTTranslationException("Error while translating snippet " + snipName, e);
             }
-            dl = trans.getSnippet(name + ".dl." + cnt);
+            snipName = name + ".dl." + cnt;
+            dl = trans.getSnippet(snipName);
             cnt ++;
         } while(dl != null);
     }

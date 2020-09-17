@@ -1,5 +1,5 @@
 <entry key="empty.dl">
-  \forall Any o; \forall Field f; PATTERN(!elementOf(o,f,empty), empty)
+  \forall any o; \forall Field f; PATTERN(!elementOf(o,f,empty), empty)
 </entry>
 
 <entry key="union.dl">

@@ -112,7 +112,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         // any exceptions?
         List<Throwable> exceptions = master.getExceptions();
         for (Throwable t : exceptions) {
-            sb.append("\n; " + t.toString());
+            sb.append("\n; " + t.toString().replace("\n", "\n;"));
             t.printStackTrace();
         }
 
