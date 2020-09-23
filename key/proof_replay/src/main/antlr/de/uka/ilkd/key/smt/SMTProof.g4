@@ -32,6 +32,8 @@ noproofterm
     | LPAREN func=noproofterm noproofterm+ RPAREN
     | LPAREN quant=FORALL LPAREN sorted_var+ RPAREN noproofterm RPAREN
     | LPAREN quant=EXISTS LPAREN sorted_var+ RPAREN noproofterm RPAREN
+    // TODO: this rules is needed but makes the parser really slow (needs lookahead of > 1500)???
+    //| LPAREN rulename=LET LPAREN var_binding+ RPAREN noproofterm RPAREN
     | LPAREN MATCH noproofterm LPAREN match_case+ RPAREN RPAREN
     | LPAREN EXCL noproofterm attribute+ RPAREN
     ;

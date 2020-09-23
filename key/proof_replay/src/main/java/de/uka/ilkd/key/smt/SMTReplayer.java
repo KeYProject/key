@@ -1,39 +1,19 @@
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.TacletMatcher;
-import de.uka.ilkd.key.smt.SMTProofParser.IdentifierContext;
-import de.uka.ilkd.key.smt.SMTProofParser.NoprooftermContext;
 import de.uka.ilkd.key.smt.SMTProofParser.ProofsexprContext;
 import de.uka.ilkd.key.smt.SMTProofParser.SmtoutputContext;
-import de.uka.ilkd.key.smt.SMTProofParser.Sorted_varContext;
 import de.uka.ilkd.key.smt.SMTProofParser.Var_bindingContext;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -42,18 +22,13 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.key_project.util.collection.ImmutableSLList;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class SMTReplayer {
     private final String smtOutput;
@@ -62,22 +37,32 @@ public class SMTReplayer {
     private Goal goal;
     private final Map<SequentFormula, NoPosTacletApp> sf2InsertTaclet = new HashMap<>();
     private final Proof proof;
-    private final Services services;
-    private final TermBuilder tb;
-    private final TermFactory tf;
     private SMTProofLexer lexer;
     private SMTProofParser parser;
+
     private ParseTree tree;
+    private ProofsexprContext proofStart;
+
+
+    public ParseTree getTree() {
+        return tree;
+    }
 
     public ProofsexprContext getProofStart() {
         return proofStart;
     }
 
-    private ProofsexprContext proofStart;
-
     private final Map<String, ProofsexprContext> symbolTable = new LinkedHashMap<>();   // TODO: why linked?
     private final Map<String, Term> translationToTermMap;
     private final Map<String, Term> skMap = new HashMap<>();
+
+    public void putSkolemSymbol(String symbol, Term def) {
+        skMap.put(symbol, def);
+    }
+
+    public Term getSkolemSymbolDef(String symbol) {
+        return skMap.get(symbol);
+    }
 
     public SMTReplayer(SMTProblem problem) {
         if (problem.getSolvers().size() != 1) {
@@ -88,9 +73,6 @@ public class SMTReplayer {
         goal = problem.getGoal();
         original = goal;
         proof = problem.getGoal().proof();
-        services = proof.getServices();
-        tb = services.getTermBuilder();
-        tf = services.getTermFactory();
         translationToTermMap = problem.getTranslationToTermMap();
     }
 
@@ -99,9 +81,6 @@ public class SMTReplayer {
         this.goal = goal;
         original = goal;
         proof = goal.proof();
-        services = proof.getServices();
-        tb = services.getTermBuilder();
-        tf = services.getTermFactory();
         translationToTermMap = null;
     }
 
@@ -169,7 +148,7 @@ public class SMTReplayer {
         findProofStart();
 
         // collect bindings from let expressions in symbolTable
-        BindingsCollector bindingsCollector = new BindingsCollector();
+        BindingsCollector bindingsCollector = new BindingsCollector(this);
         tree.accept(bindingsCollector);
 
         // before starting the actual replay: disable OSS (otherwise some taclets will not be found)
@@ -179,24 +158,25 @@ public class SMTReplayer {
         newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_OFF);
         Strategy.updateStrategySettings(proof, newProps);
 
+        // TODO: use FocusRule instead
         // hide all original formulas, remember the mapping to insert_hidden_... taclets
         for (SequentFormula sf : goal.sequent().antecedent().asList()) {
             PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), true);
-            TacletApp hide = createTacletApp("hide_left", pio, goal);
+            TacletApp hide = ReplayVisitor.createTacletApp("hide_left", pio, goal);
             goal = goal.apply(hide).head();
             NoPosTacletApp insertRule = goal.node().getLocalIntroducedRules().iterator().next();
             sf2InsertTaclet.put(sf, insertRule);
         }
         for (SequentFormula sf : goal.sequent().succedent().asList()) {
             PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
-            TacletApp hide = createTacletApp("hide_right", pio, goal);
+            TacletApp hide = ReplayVisitor.createTacletApp("hide_right", pio, goal);
             goal = goal.apply(hide).head();
             NoPosTacletApp insertRule = goal.node().getLocalIntroducedRules().iterator().next();
             sf2InsertTaclet.put(sf, insertRule);
         }
 
         // do actual replay (starting from found proof root)
-        ReplayVisitor replayVisitor = new ReplayVisitor();
+        ReplayVisitor replayVisitor = new ReplayVisitor(this, goal);
         try {
             proofStart.accept(replayVisitor);
         } catch (IllegalStateException e) {
@@ -208,1000 +188,31 @@ public class SMTReplayer {
         }
     }
 
-    /**
-     * This visitor collects the definition of a variable introduced in a proof leaf by Z3's skolemization rule (sk).
-     *
-     */
-    private class SkolemCollector extends SMTProofBaseVisitor<Void> {
-        private String skVariable;
-
-        public SkolemCollector(String skVariable) {
-            this.skVariable = skVariable;
-        }
-
-        @Override
-        public Void visitProofsexpr(ProofsexprContext ctx) {
-            if (ctx.rulename != null && ctx.rulename.getText().equals("sk")) {
-                // found sk rule -> create ifEx/epsilon term for skolem variable
-
-                ProofsexprContext succ = ctx.proofsexpr(0);
-                // inside of the sk rule there is always an equisatisfiability Noproofterm
-                NoprooftermContext eqSat = succ.noproofterm();
-                if (!eqSat.func.getText().equals("~")) {
-                    throw new IllegalStateException("Found sk rule that does not contain ~ top level!");
-                }
-                NoprooftermContext ex = eqSat.noproofterm(1);
-
-                DefCollector collector = new DefCollector();
-                Term exTerm = collector.visit(ex);
-                if (exTerm.op() != Quantifier.EX) {
-                    throw new IllegalStateException("Invalid sk rule found (no existential quantifier)!");
-                }
-
-                // TODO: check that we have the right variable (sk term may contain other skolem symbols as well!)
-
-                // TODO: how to get a collision free var name?
-                Name varName = new Name(skVariable);
-                // TODO: currently ifEx supports integer sort only!
-                IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
-                QuantifiableVariable qv = new LogicVariable(varName, intLDT.targetSort());
-
-                // as condition, we take the formula under the exists quantifier and replace the bound variable by qv
-                QuantifiableVariable exBoundVar = exTerm.boundVars().get(0);
-                Term cond = replace(exBoundVar, qv, exTerm.sub(0));
-                Term _then = tb.var(qv);
-                Term _else = tb.zTerm(-1);    // error value: -1
-
-                Term def = tb.ifEx(qv, cond, _then, _else);
-
-                // add to map
-                skMap.put(skVariable, def);
-                translationToTermMap.putIfAbsent(skVariable, def);
-                return null;
-            }
-            // descend into rules that are not sk
-            return super.visitProofsexpr(ctx);
-        }
-
-        // builds a new Term where orig has been replaced by repl
-        private Term replace(QuantifiableVariable toReplace, QuantifiableVariable with, Term in) {
-            // using OpReplacer does not replace the QuantifiableVariables (due to missing equals method?)
-            //return OpReplacer.replace(tb.var(orig), tb.var(repl), t, tf);
-            Operator newOp = in.op();
-            //if (newOp.name().equals(toReplace.name())) {
-            if (newOp instanceof QuantifiableVariable
-                && equalsOp((QuantifiableVariable) newOp, toReplace)) {
-                newOp = with;
-            }
-
-            Term[] newTerms = new Term[in.subs().size()];
-            for (int i = 0; i < newTerms.length; i++) {
-                newTerms[i] = replace(toReplace, with, in.subs().get(i));
-            }
-            return tf.createTerm(newOp, newTerms);
-        }
+    public NoPosTacletApp getInsertTacletForSF(SequentFormula sequentFormula) {
+        return sf2InsertTaclet.get(sequentFormula);
     }
 
-    /**
-     * This visitor is responsible for collecting all variables bound by let and their definitions in the symbol table.
-     */
-    private class BindingsCollector extends SMTProofBaseVisitor<Void> {
-        @Override
-        public Void visitVar_binding(Var_bindingContext ctx) {
-
-            String symbol = ctx.SYMBOL().getSymbol().getText();
-            ProofsexprContext def = ctx.proofsexpr();
-
-            symbolTable.put(symbol, def);
-            return super.visitVar_binding(ctx);
-        }
+    public Proof getProof() {
+        return proof;
     }
 
-    /**
-     * This visitor converts a Z3 term to a KeY term, descending into the succedents of Z3 proof rule terms
-     * if necessary.
-     */
-    private class DefCollector extends SMTProofBaseVisitor<Term> {
-        @Override
-        public Term visitProofsexpr(ProofsexprContext ctx) {
-            if (ctx.rulename != null) {
-                // last proofsexpr holds the succedent of the rule application
-                assert ctx.proofsexpr() != null && ctx.proofsexpr().size() >= 2;
-                ParseTree succedent = ctx.proofsexpr(ctx.proofsexpr().size() - 1);
-
-                ProofsexprContext def = symbolTable.get(succedent.getText());
-                if (def != null) {
-                    // descend further if this still is a symbol bound by let
-                    return visit(def);
-                } else if (translationToTermMap.get(succedent.getText()) != null) {
-                    // not a symbol -> should be in KeY translation table
-                    return translationToTermMap.get(succedent.getText());
-                } else {
-                    return visit(succedent);
-                }
-            } else if (ctx.noproofterm() != null) {
-                return visit(ctx.noproofterm());
-            }
-            //return super.visitProofsexpr(ctx);
-            throw new IllegalStateException("The subtree is neither a Proofsexpr nor a Noproofterm!");
-        }
-
-        @Override
-        public Term visitNoproofterm(NoprooftermContext ctx) {
-            System.out.println("Trying to translate " + getOriginalText(ctx) + " ...");
-
-            // term may be a new symbol introduced by the let binder
-            ProofsexprContext proofsexpr = symbolTable.get(ctx.getText());
-            if (proofsexpr != null) {
-                // descend into nested let term
-                return visit(proofsexpr);
-            }
-
-            // term may be in cache already
-            Term cached = translationToTermMap.get(ctx.getText());
-            if (cached != null) {
-                return cached;
-            }
-
-            // otherwise: translate top level function or quantifier "by hand" and descend into child terms
-            // Note: use TermFactory instead of TermBuilder to prevent from simplification!
-            if (ctx.func != null) {
-                Term t1, t2;
-                int arity;
-                IntegerLDT integerLDT;
-                switch (ctx.func.getText()) {
-                    case "=":
-                    case "~":
-                        assert ctx.noproofterm().size() == 3;
-                        t1 = visit(ctx.noproofterm(1));
-                        t2 = visit(ctx.noproofterm(2));
-                        return equals(t1, t2);
-                    case "=>":
-                        assert ctx.noproofterm().size() == 3;
-                        t1 = visit(ctx.noproofterm(1));
-                        t2 = visit(ctx.noproofterm(2));
-                        return tf.createTerm(Junctor.IMP, t1, t2);
-                    case "not":
-                        assert ctx.getChildCount() == 4;
-                        t1 = visit(ctx.noproofterm(1));
-                        return tf.createTerm(Junctor.NOT, t1);
-                    case "or":
-                        // important: or is n-ary in Z3!
-                        // subtract 1: "or" token also is noProofTerm
-                        arity = ctx.noproofterm().size() - 1;
-                        t1 = visit(ctx.noproofterm(1));
-                        for (int i = 2; i <= arity; i++) {
-                            t2 = visit(ctx.noproofterm(i));
-                            t1 = tf.createTerm(Junctor.OR, t1, t2);
-                        }
-                        return t1;
-                    case "and":
-                        // important: and is n-ary in Z3!
-                        // subtract 1: "and" token also is noProofTerm
-                        arity = ctx.noproofterm().size() - 1;
-                        t1 = visit(ctx.noproofterm(1));
-                        for (int i = 2; i <= arity; i++) {
-                            t2 = visit(ctx.noproofterm(i));
-                            t1 = tf.createTerm(Junctor.AND, t1, t2);
-                        }
-                        return t1;
-                    case "<=":
-                        t1 = visit(ctx.noproofterm(1));
-                        t2 = visit(ctx.noproofterm(2));
-                        return tb.leq(t1, t2);
-                    case ">=":
-                        t1 = visit(ctx.noproofterm(1));
-                        t2 = visit(ctx.noproofterm(2));
-                        return tb.geq(t1, t2);
-                    case ">":
-                        t1 = visit(ctx.noproofterm(1));
-                        t2 = visit(ctx.noproofterm(2));
-                        return tb.gt(t1, t2);
-                    case "<":
-                        t1 = visit(ctx.noproofterm(1));
-                        t2 = visit(ctx.noproofterm(2));
-                        return tb.lt(t1, t2);
-                    case "+":
-                        t1 = visit(ctx.noproofterm(1));
-                        t2 = visit(ctx.noproofterm(2));
-                        integerLDT = services.getTypeConverter().getIntegerLDT();
-                        return tb.func(integerLDT.getAdd(), t1, t2);
-                    case "-":
-                        arity = ctx.noproofterm().size() - 1;
-                        t1 = visit(ctx.noproofterm(1));
-                        integerLDT = services.getTypeConverter().getIntegerLDT();
-                        if (arity == 1) {
-                            throw new IllegalStateException("Negative term not yet implemented!");
-                            //return tb.func(integerLDT.getNegativeNumberSign(), t1);
-                        } else if (arity == 2) {
-                            t2 = visit(ctx.noproofterm(2));
-                            return tb.func(integerLDT.getSub(), t1, t2);
-                        } else {
-                            throw new IllegalStateException("Minus with invalid arity: " + arity);
-                        }
-                    case "*":
-                        t1 = visit(ctx.noproofterm(1));
-                        t2 = visit(ctx.noproofterm(2));
-                        integerLDT = services.getTypeConverter().getIntegerLDT();
-                        return tb.func(integerLDT.getMul(), t1, t2);
-                    case "/":
-                        t1 = visit(ctx.noproofterm(1));
-                        t2 = visit(ctx.noproofterm(2));
-                        integerLDT = services.getTypeConverter().getIntegerLDT();
-                        return tb.func(integerLDT.getDiv(), t1, t2);
-                    // TODO: currently, u2i/i2u/sort_int are hardcoded into the translation
-                    //  (see IntegerOpHandler.preamble.xml)
-                    case "u2i":     // TODO: hack
-                    case "i2u":
-                        // just skip the additional function application
-                        // for faster lookup additionally add it to map
-                        t1 = visit(ctx.noproofterm(1));
-                        translationToTermMap.put(ctx.getText(), t1);
-                        return t1;
-                    // marker for instanceof uses w/o direct counterpart in the original sequent
-                    case "typeguard":
-                        // TODO: better detect at and/implies or quantifier case?
-                        return tb.tt();
-                    case "length":
-                        t1 = visit(ctx.noproofterm(1));
-                        return tb.dotLength(t1);
-                    default:
-                        throw new IllegalStateException("Currently not supported: " + ctx.func.getText());
-                }
-            } else if (ctx.quant != null) {
-                // forall, exists
-                if (ctx.quant.getText().equals("forall")) {
-                    Term t = visit(ctx.noproofterm(0));
-                    for (int i = ctx.sorted_var().size() - 1; i >= 0; i--) {
-                        QuantifiableVariable qv = extractQV(ctx.sorted_var(i), ctx.noproofterm(0));
-                        t = tb.all(qv, t);
-                    }
-                    return t;
-                } else if (ctx.quant.getText().equals("exists")) {
-                    Term t = visit(ctx.noproofterm(0));
-                    for (int i = ctx.sorted_var().size() - 1; i >= 0; i--) {
-                        QuantifiableVariable qv = extractQV(ctx.sorted_var(i), ctx.noproofterm(0));
-                        t = tb.ex(qv, t);
-                    }
-                    return t;
-                } else {
-                    throw new IllegalStateException("Unknown quantifier: " + ctx.quant.getText());
-                }
-            } else {
-                //, match, !, spec_const, qual_identifier
-                // TODO:
-                //throw new IllegalStateException("Currently not supported!");
-                return visitChildren(ctx);
-            }
-        }
-
-        /**
-         * Extract the original name of the quantified variable and its sort (from the typeguard).
-         * @param sortedVar the context containing the quantified variable with its SMT sort
-         * @param quantForm the quantified formula (containing the typeguard)
-         * @return a QuantifiableVariable (containing original KeY name and sort)
-         */
-        private QuantifiableVariable extractQV(Sorted_varContext sortedVar, NoprooftermContext quantForm) {
-            NamespaceSet nss = services.getNamespaces();
-
-            // cut the "var_" prefix
-            String varName = sortedVar.SYMBOL().getText().substring(4);
-            Term cached = translationToTermMap.get(sortedVar.SYMBOL().getText());
-            if (cached != null) {
-                if (cached.op() instanceof QuantifiableVariable) {
-                    System.out.println("Found QuantifiableVariable " + cached.op());
-                    return (QuantifiableVariable) cached.op();
-                }
-            }
-
-            Name name = new Name(varName);
-
-            NoprooftermContext typeguard = extractTypeguard(quantForm);
-            if (typeguard == null) {
-                throw new IllegalStateException("No typeguard found!");
-            }
-            // typeguard has the following form: (typeguard var_x sort_int)
-            NoprooftermContext nameCtx = typeguard.noproofterm(1);
-            NoprooftermContext sortCtx = typeguard.noproofterm(2);
-            // cut the "sort_" prefix
-            String sortName = sortCtx.getText().substring(5);
-            Sort keySort = nss.sorts().lookup(sortName);
-
-            // TODO: SMT quantifiers may have multiple quantified variables
-
-            return new LogicVariable(name, keySort);
-        }
-
-        private NoprooftermContext extractTypeguard(NoprooftermContext quantForm) {
-            if (quantForm.func != null && quantForm.func.getText().equals("typeguard")) {
-                return quantForm;
-            } else {
-                for (NoprooftermContext child : quantForm.noproofterm()) {
-                    NoprooftermContext res = extractTypeguard(child);
-                    if (res != null) {
-                        return res;
-                    }
-                }
-                return null;
-            }
-        }
-
-        // does no boolean simplification as TermBuilder.equals() does,
-        // returns <-> or = according to sort of terms
-        private Term equals(Term t1, Term t2) {
-            TermFactory tf = services.getTermFactory();
-            if (t1.sort() == Sort.FORMULA) {
-                return tf.createTerm(Equality.EQV, t1, t2);
-            } else {
-                return tf.createTerm(Equality.EQUALS, t1, t2);
-            }
-        }
-
-        @Override
-        public Term visitIdentifier(IdentifierContext ctx) {
-            if (ctx.getText().equals("false")) {
-                return tb.ff();
-            } else if (ctx.getText().equals("true")) {
-                return tb.tt();
-            } else {
-                // the symbol is a new skolem symbol introduced by an sk rule in a proof leaf
-                Term skDef = skMap.get(ctx.getText());
-                if (skDef != null) {
-                    // found definition of skolem symbol (was already in map)
-                    return skDef;
-                } else {    // try to find definition of skolem symbol
-                    SkolemCollector skCollector = new SkolemCollector(ctx.getText());
-                    // collect all skolem symbols and their definitions using ifEx/eps terms
-                    skCollector.visit(tree);
-                    skDef = skMap.get(ctx.getText());
-                    if (skDef != null) {
-                        // found definition of skolem symbol
-                        return skDef;
-                    }
-                }
-            }
-            throw new IllegalStateException("Unknown identifier: " + ctx.getText());
-            //return super.visitIdentifier(ctx);
-        }
+    public void addSymbolDef(String symbol, ProofsexprContext def) {
+        symbolTable.put(symbol, def);
     }
 
-    private class ReplayVisitor extends SMTProofBaseVisitor<Void> {
-        @Override
-        public Void visitProofsexpr(ProofsexprContext ctx) {
-
-            // do not descend into let terms
-            if (ctx.LET() != null) {
-                return null;
-            }
-
-            Token rule = ctx.rulename;
-            if (rule == null) {
-                return super.visitProofsexpr(ctx);
-            }
-
-            String rulename = ctx.rulename.getText();
-            System.out.println(rulename);
-            goal.node().getNodeInfo().setNotes(rulename);
-
-            switch (rulename) {
-                case "asserted":
-                    //runAutoMode(goal, true);
-                    replayAsserted(ctx);
-                    return null;
-                case "rewrite":
-                    replayRewrite(ctx);
-                    return null;
-                case "monotonicity":
-                    replayMonotonicity(ctx);
-                    return null;
-                case "trans":
-                    replayTrans(ctx);
-                    return null;
-                case "iff-true":
-                    replayIffTrue(ctx);
-                    return null;
-                case "iff-false":
-                    replayIffFalse(ctx);
-                    return null;
-                case "not-or-elim":
-                    replayNotOrElim(ctx);
-                    return null;
-                case "and-elim":
-                    replayAndElim(ctx);
-                    return null;
-                case "mp":
-                case "mp~":
-                    replayMp(ctx);
-                    return null;
-                case "unit-resolution":
-                    replayUnitResolution(ctx);
-                    return null;
-                case "th-lemma":
-                    replayThLemma(ctx);
-                    return null;
-                case "sk":
-                    replaySk(ctx);
-                    return null;
-                default:
-                    throw new IllegalStateException("Replay for rule currently not implemented: " + rulename);
-            }
-            //return super.visitProofsexpr(ctx);
-        }
-
-        private void replaySk(ProofsexprContext ctx) {
-            // equiv_right
-            SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
-            SequentFormula seqForm = sci.addedFormulas(false).head();
-            PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-            TacletApp app = createTacletApp("equiv_right", pio, goal);
-            List<Goal> goals = goal.apply(app).toList();
-            Goal left = goals.get(1);
-
-            // collect all positions of the quantified variable in ex term
-            // <-> positions of ifEx term in right side formula
-            ProofsexprContext equiSat = ctx.proofsexpr(0);
-            NoprooftermContext exCtx = equiSat.noproofterm().noproofterm(1);
-            Term ex = new DefCollector().visit(exCtx);
-            List<PosInTerm> pits = collectQvPositions(ex);
-
-            // pullOut ifEx term
-            sci = left.node().getNodeInfo().getSequentChangeInfo();
-            seqForm = sci.addedFormulas(false).head();
-            PosInTerm firstPit = pits.get(0);
-            pio = new PosInOccurrence(seqForm, firstPit, false);
-            app = createTacletApp("pullOut", pio, left);
-            app = app.tryToInstantiate(services.getOverlay(left.getLocalNamespaces()));
-            left = left.apply(app).head();
-
-            sci = left.node().getNodeInfo().getSequentChangeInfo();
-            SequentFormula ifExPulledOut = sci.addedFormulas(true).head();
-
-            // applyEqRigid on every occurrence of ifEx term (pits)
-            // except first one (was already pulled out)
-            for (int i = 1; i < pits.size(); i++) {
-                PosInTerm pit = pits.get(i);
-                sci = left.node().getNodeInfo().getSequentChangeInfo();
-                seqForm = sci.modifiedFormulas(false).head().getNewFormula();
-                pio = new PosInOccurrence(seqForm, pit, false);
-                app = createTacletApp("applyEqRigid", pio, left);
-                left = left.apply(app).head();
-            }
-
-            // ifExthenelsesplit
-            PosInTerm ifExPit = PosInTerm.getTopLevel().down(0);
-            pio = new PosInOccurrence(ifExPulledOut, ifExPit, true);
-            TacletFilter ifExSplitFilter = new TacletFilter() {
-                @Override
-                protected boolean filter(Taclet taclet) {
-                    return taclet.name().equals(new Name("ifExthenelse1_split"));
-                }
-            };
-            app = left.ruleAppIndex().getTacletAppAt(ifExSplitFilter, pio, services).head();
-            app = app.tryToInstantiate(services.getOverlay(left.getLocalNamespaces()));
-            List<Goal> ifExGoals = left.apply(app).toList();
-            left = ifExGoals.get(1);
-
-            // applyEqRigid on every occurrence of skolem variable
-            for (int i = 0; i < pits.size(); i++) {
-                sci = left.node().getNodeInfo().getSequentChangeInfo();
-                if (i == 0) {
-                    seqForm = sci.addedFormulas(true).head();
-                } else {
-                    seqForm = sci.modifiedFormulas(true).head().getNewFormula();
-                }
-                pio = new PosInOccurrence(seqForm, pits.get(i), true);
-                app = createTacletApp("applyEqRigid", pio, left);
-                left = left.apply(app).head();
-            }
-
-            // close
-            sci = left.node().getNodeInfo().getSequentChangeInfo();
-            seqForm = sci.modifiedFormulas(true).head().getNewFormula();
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-            app = createTacletApp("closeAntec", pio, left);
-            left = left.apply(app).head();
-
-            //////////////////////////////////////////////////////////
-            // close
-            Goal right = ifExGoals.get(0);
-            sci = right.node().getNodeInfo().getSequentChangeInfo();
-            seqForm = sci.addedFormulas(false).head();
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-            app = createTacletApp("close", pio, right);
-            right = right.apply(app).head();
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-            // instEx
-            right = goals.get(0);
-            sci = right.node().getNodeInfo().getSequentChangeInfo();
-            seqForm = sci.addedFormulas(false).head();
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-
-            TacletFilter exRightFilter = new TacletFilter() {
-                @Override
-                protected boolean filter(Taclet taclet) {
-                    return taclet.name().equals(new Name("exRight"));
-                }
-            };
-            Services locServ = services.getOverlay(right.getLocalNamespaces());
-            app = right.ruleAppIndex().getFindTaclet(exRightFilter, pio, locServ).head();
-            SchemaVariable t = app.uninstantiatedVars().iterator().next();
-            Term phi_x = sci.addedFormulas(true).head().formula();
-            Term inst = pits.get(0).getSubTerm(phi_x);
-            app = app.setPosInOccurrence(pio, locServ);
-            app = app.addCheckedInstantiation(t, inst, locServ, true);
-
-
-            right = right.apply(app).head();
-
-            // close
-            sci = right.node().getNodeInfo().getSequentChangeInfo();
-            seqForm = sci.addedFormulas(false).head();
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-            app = createTacletApp("close", pio, right);
-            right = right.apply(app).head();
-            // TODO: what about goal?
-        }
-
-        private List<PosInTerm> collectQvPositions(Term ex) {
-            QuantifiableVariable qv = ex.boundVars().last(); // there is exact one by construction
-            return collectQvPositionsRec(qv, ex.sub(0), PosInTerm.getTopLevel());
-        }
-
-        private List<PosInTerm> collectQvPositionsRec(QuantifiableVariable qv, Term subTerm, PosInTerm prefix) {
-            List<PosInTerm> result = new ArrayList<>();
-            if (subTerm.op() instanceof QuantifiableVariable
-                && equalsOp((QuantifiableVariable) subTerm.op(), qv)) {
-                result.add(prefix);
-            } else {
-                for (int i = 0; i < subTerm.subs().size(); i++) {
-                    List<PosInTerm> subPos = collectQvPositionsRec(qv, subTerm.sub(i), prefix.down(i));
-                    result.addAll(subPos);
-                }
-            }
-            return result;
-        }
-
-        private void replayThLemma(ProofsexprContext ctx) {
-            int arity = ctx.proofsexpr().size();
-
-            // two cases: leaf rule or final rule in proof
-            if (ctx.proofsexpr(arity - 1).getText().equals("false")) {
-                // final rule
-                Term cutTerm = extractRuleAntecedents(ctx);
-                TacletApp app = createCutApp(goal, cutTerm);
-                List<Goal> goals = goal.apply(app).toList();
-            } else {
-                // leaf rule
-                runAutoMode(goal);
-            }
-        }
-
-        private void replayAsserted(ProofsexprContext ctx) {
-            // get sequentFormula, get corresponding insert_taclet from map, apply
-            SequentFormula seqForm = goal.sequent().succedent().get(0);
-            PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-
-            // two possible choices:
-            TacletApp app = sf2InsertTaclet.get(seqForm);
-            TacletApp notApp = sf2InsertTaclet.get(new SequentFormula(tb.not(seqForm.formula())));
-
-            if (app != null) {
-                goal = goal.apply(app).head();
-            } else if (notApp != null) {
-                goal = goal.apply(notApp).head();
-
-                if (seqForm.formula().op() == Junctor.NOT) {
-                    app = createTacletApp("notRight", pio, goal);
-                    goal = goal.apply(app).head();
-
-                    SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
-                    SequentFormula addedAntec = sci.addedFormulas(true).head();
-                    pio = new PosInOccurrence(addedAntec, PosInTerm.getTopLevel(), true);
-                    app = createTacletApp("closeAntec", pio, goal);
-                    goal = goal.apply(app).head();
-                }
-            } else {
-                //throw new IllegalStateException("The formula " + seqForm.formula() + " is not an assertion!");
-                System.out.println("The formula " + seqForm.formula() + " is not found as assertion!");
-                //System.out.println("Starting auto mode ...");
-                // TODO: insert matching assertion (how to find?)
-            }
-        }
-
-        private void replayRewrite(ProofsexprContext ctx) {
-            if (goal.sequent().succedent().get(0).formula().op() == Equality.EQV) {
-                // equiv_right top level to guide the prover
-                SequentFormula seqForm = goal.sequent().succedent().get(0);
-                PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-                TacletApp app = createTacletApp("equiv_right", pio, goal);
-                List<Goal> goals = goal.apply(app).toList();
-                // running automode separately on both goals increases success rate
-                runAutoMode(goals.get(0));
-                runAutoMode(goals.get(1));
-            } else {
-                runAutoMode(goal);
-            }
-        }
-
-        private void replayIffTrue(ProofsexprContext ctx) {
-            SequentFormula seqForm = goal.sequent().succedent().get(0);
-            PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-            TacletApp concreteEq3 = createTacletApp("concrete_eq_3", pio, goal);
-            goal = goal.apply(concreteEq3).head();
-            visit(ctx.proofsexpr(0));
-        }
-
-        private void replayIffFalse(ProofsexprContext ctx) {
-            SequentFormula seqForm = goal.sequent().succedent().get(0);
-            PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-            TacletApp concreteEq4 = createTacletApp("concrete_eq_4", pio, goal);
-            goal = goal.apply(concreteEq4).head();
-            visit(ctx.proofsexpr(0));
-        }
-
-        private void replayAndElim(ProofsexprContext ctx) {
-            Term cutTerm = extractRuleAntecedents(ctx);
-            TacletApp app = createCutApp(goal, cutTerm);
-            List<Goal> goals = goal.apply(app).toList();
-            Goal left = goals.get(1);
-            SequentFormula orig = left.sequent().succedent().get(0);
-
-            SequentFormula seqForm = left.sequent().antecedent().get(0);
-            PosInOccurrence pio;
-            for (int i = 0; i < ctx.proofsexpr().size(); i++) {
-                pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-                app = createTacletApp("andLeft", pio, left);
-                left = left.apply(app).head();
-                SequentChangeInfo sci = left.node().getNodeInfo().getSequentChangeInfo();
-                // TODO: is the order of the added formulas deterministic?
-                seqForm = sci.addedFormulas().tail().head();
-                if (seqForm == null) {
-                    // attention: the formula may be equal to the original one by chance
-                    break;
-                }
-            }
-
-            seqForm = left.sequent().succedent().get(0);
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-            app = createTacletApp("close", pio, left);
-            left = left.apply(app).head();
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            goal = goals.get(0);
-            replayRightSideHelper(ctx);
-        }
-
-        private void replayNotOrElim(ProofsexprContext ctx) {
-            Term cutTerm = extractRuleAntecedents(ctx);
-            TacletApp app = createCutApp(goal, cutTerm);
-            List<Goal> goals = goal.apply(app).toList();
-            Goal left = goals.get(1);
-            SequentFormula orig = left.sequent().succedent().get(0);
-
-            SequentFormula seqForm = left.sequent().antecedent().get(0);
-            PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-            app = createTacletApp("notLeft", pio, left);
-            left = left.apply(app).head();
-
-            // orRight
-            seqForm = left.sequent().succedent().get(0);
-            // better count up to arity
-            for (int i = 0; i < ctx.proofsexpr().size(); i++) {
-            //while (seqForm.formula().op() == Junctor.OR) {
-                pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-                app = createTacletApp("orRight", pio, left);
-                left = left.apply(app).head();
-                //seqForm = left.sequent().succedent().get(0);
-                SequentChangeInfo sci = left.node().getNodeInfo().getSequentChangeInfo();
-                // TODO: is the order of the added formulas deterministic?
-                seqForm = sci.addedFormulas().tail().head();
-                if (seqForm == null) {
-                    // attention: the formula may be equal to the original one by chance
-                    break;
-                }
-            }
-
-            pio = new PosInOccurrence(orig, PosInTerm.getTopLevel(), false);
-            if (orig.formula().op() == Junctor.NOT) {
-                app = createTacletApp("notRight", pio, left);
-            } else {
-                // TODO: additional rule (not in standard taclets!)
-                app = createTacletApp("notElimRight", pio, left);
-            }
-            left = left.apply(app).head();
-
-            seqForm = left.sequent().antecedent().get(0);
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-            app = createTacletApp("closeAntec", pio, left);
-            left = left.apply(app).head();
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////
-            goal = goals.get(0);
-            replayRightSideHelper(ctx);
-        }
-
-        private void replayMonotonicity(ProofsexprContext ctx) {
-            Term cutTerm = extractRuleAntecedents(ctx);
-            TacletApp app = createCutApp(goal, cutTerm);
-            List<Goal> goals = goal.apply(app).toList();
-            Goal left = goals.get(1);
-            SequentFormula seqForm = left.sequent().antecedent().get(0);
-
-            PosInOccurrence pio;
-
-            int params = 1;
-
-            // and left
-            while (seqForm.formula().op() == Junctor.AND) {
-                pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-                app = createTacletApp("andLeft", pio, left);
-                left = left.apply(app).head();
-                seqForm = left.sequent().antecedent().get(0);
-                params++;
-            }
-
-            // apply equalities
-            for (int i = 0; i < params; i++) {
-
-                // TODO: =
-                //seqForm = left.sequent().succedent().get(0);
-                //pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel().down(0).down(i), false);
-                //app = createTacletApp("applyEq", pio, left);
-                //left = left.apply(app).head();
-
-                // TODO: <->
-                seqForm = left.sequent().antecedent().get(i);
-                pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-                app = createTacletApp("insert_eqv_once_lr", pio, left);
-                left = left.apply(app).head();
-
-
-                seqForm = left.sequent().succedent().get(0);
-                pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel().down(0).down(i), false);
-                //app = createTacletApp("insert_eqv", pio, left);
-                // TODO: is there always only one locally introduced rule?
-                Iterable<NoPosTacletApp> localRules = left.node().getLocalIntroducedRules();
-                app = localRules.iterator().next();
-                app = autoInst(app, pio, left);
-                left = left.apply(app).head();
-            }
-
-            // TODO: =
-            //seqForm = left.sequent().succedent().get(0);
-            //pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-            //app = createTacletApp("eqClose", pio, left);
-            //left = left.apply(app).head();
-
-            // TODO: <->
-            seqForm = left.sequent().succedent().get(0);
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-            app = createTacletApp("eq_eq", pio, left);
-            left = left.apply(app).head();
-
-            seqForm = left.sequent().succedent().get(0);
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-            app = createTacletApp("closeTrue", pio, left);
-            left = left.apply(app).head();
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////
-            goal = goals.get(0);
-            replayRightSideHelper(ctx);
-        }
-
-        private void replayUnitResolution(ProofsexprContext ctx) {
-            Term cutTerm = extractRuleAntecedents(ctx);
-            TacletApp app = createCutApp(goal, cutTerm);
-            List<Goal> goals = goal.apply(app).toList();
-
-            // last child is succedent, first child is a | b | ..., others are unit clauses
-            int unitClauseCount = ctx.proofsexpr().size() - 2;
-
-            Goal left = goals.get(1);
-            SequentChangeInfo sci = left.node().getNodeInfo().getSequentChangeInfo();
-
-            SequentFormula seqForm = sci.addedFormulas().head();
-
-            // split unit clauses from cut formula
-            PosInOccurrence pio;
-            SequentFormula clause = null;
-            List<SequentFormula> unitClauses = new ArrayList<>();
-            for (int i = 0; i < unitClauseCount; i++) {
-                pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-                app = createTacletApp("andLeft", pio, left);
-                left = left.apply(app).head();
-                sci = left.node().getNodeInfo().getSequentChangeInfo();
-                // TODO: is the order of the added formulas deterministic?
-                seqForm = sci.addedFormulas().tail().head();
-                unitClauses.add(sci.addedFormulas().head());
-
-                // the clause a | b | ... is the last one remaining after the split
-                clause = seqForm;
-            }
-
-            List<SequentFormula> negUnitClauses = new ArrayList<>();
-
-            // for every unit clause: apply notLeft
-            for (SequentFormula unitClause : unitClauses) {
-                pio = new PosInOccurrence(unitClause, PosInTerm.getTopLevel(), true);
-                app = createTacletApp("notLeft", pio, left);
-                left = left.apply(app).head();
-                sci = left.node().getNodeInfo().getSequentChangeInfo();
-                negUnitClauses.add(sci.addedFormulas().head());
-            }
-
-            if (unitClauseCount > 1) {
-                for (int i = 0; i < unitClauseCount; i++) {
-                    // TODO: order and clause count may differ
-                    if (i == unitClauseCount - 1) {
-                        // different position for last unit clause!
-                        pio = new PosInOccurrence(clause, PosInTerm.getTopLevel(), true);
-                    } else {
-                        pio = new PosInOccurrence(clause, PosInTerm.getTopLevel().down(0), true);
-                    }
-                    app = createTacletApp("replace_known_right", pio, left);
-                    left = left.apply(app).head();
-
-                    sci = left.node().getNodeInfo().getSequentChangeInfo();
-                    clause = sci.modifiedFormulas().head().getNewFormula();
-
-                    // not necessary for last clause!
-                    if (i != unitClauseCount - 1) {
-                        pio = new PosInOccurrence(clause, PosInTerm.getTopLevel(), true);
-                        app = createTacletApp("concrete_or_2", pio, left);
-                        left = left.apply(app).head();
-
-                        sci = left.node().getNodeInfo().getSequentChangeInfo();
-                        clause = sci.modifiedFormulas().head().getNewFormula();
-                    }
-                }
-                pio = new PosInOccurrence(clause, PosInTerm.getTopLevel(), true);
-                app = createTacletApp("closeFalse", pio, left);
-                left = left.apply(app).head();
-            } else {    // unitClauseCount == 1
-                pio = new PosInOccurrence(clause, PosInTerm.getTopLevel(), true);
-                app = createTacletApp("closeAntec", pio, left);
-                left = left.apply(app).head();
-            }
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////
-            goal = goals.get(0);
-            replayRightSideHelper(ctx);
-        }
-
-        /**
-         * Splits the formula at the right side of a cut into the different antecedents of a rule and starts
-         * replay of the corresponding subtrees.
-         * @param ctx
-         */
-        private void replayRightSideHelper(ProofsexprContext ctx) {
-
-            SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
-            SequentFormula cutFormula = sci.addedFormulas().head();
-
-            goal = hideAllOther(cutFormula, goal);
-
-            PosInOccurrence pio;
-            TacletApp app;
-
-            // last is succedent, others are subterms
-            int antecCount = ctx.proofsexpr().size() - 1;
-            System.out.println("Found " + getOriginalText(ctx));
-            System.out.println("  Arity is " + antecCount);
-
-            for (int i = antecCount - 1; i > 0; i--) {
-                pio = new PosInOccurrence(cutFormula, PosInTerm.getTopLevel(), false);
-                app = createTacletApp("andRight", pio, goal);
-                List<Goal> antecs = goal.apply(app).toList();
-
-                goal = antecs.get(0);
-                visit(ctx.proofsexpr(i));
-
-                goal = antecs.get(1);
-                sci = goal.node().getNodeInfo().getSequentChangeInfo();
-                cutFormula = sci.addedFormulas().head();
-            }
-            visit(ctx.proofsexpr(0));
-        }
-
-        private void replayTrans(ProofsexprContext ctx) {
-            Term cutTerm = extractRuleAntecedents(ctx);
-            TacletApp app = createCutApp(goal, cutTerm);
-            List<Goal> goals = goal.apply(app).toList();
-
-            Goal left = goals.get(1);
-            SequentFormula seqForm = goal.sequent().antecedent().get(0);
-            PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-            app = createTacletApp("andLeft", pio, left);
-            left = left.apply(app).head();
-
-            seqForm = left.sequent().antecedent().get(1);
-            // TODO: other operators
-            //if (seqForm.formula().op().equals(Junctor.IMP)) { ... }
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-            app = createTacletApp("insert_eqv_once_lr", pio, left);
-            left = left.apply(app).head();
-
-            NoPosTacletApp insert_eqv = findLocalRule("insert_eqv", left);
-            seqForm = left.sequent().antecedent().get(0);
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel().down(1), true);
-            app = autoInst(insert_eqv, pio, left);
-            left = left.apply(app).head();
-
-            seqForm = left.sequent().antecedent().get(0);
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-            app = createTacletApp("closeAntec", pio, left);
-            left = left.apply(app).head();
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////
-            goal = goals.get(0);
-            replayRightSideHelper(ctx);
-        }
-
-        private void replayMp(ProofsexprContext ctx) {
-            Term cutTerm = extractRuleAntecedents(ctx);
-            TacletApp app = createCutApp(goal, cutTerm);
-            List<Goal> goals = goal.apply(app).toList();
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // left: and_left, replace_known_left, concrete_impl, close
-            Goal left = goals.get(1);
-
-            SequentFormula seqForm = left.sequent().antecedent().get(0);
-            PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-            app = createTacletApp("andLeft", pio, left);
-            left = left.apply(app).head();
-
-            seqForm = left.sequent().antecedent().get(1);
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel().down(0), true);
-            app = createTacletApp("replace_known_left", pio, left);
-            left = left.apply(app).head();
-
-            seqForm = left.sequent().antecedent().get(1);
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-            app = createTacletApp("concrete_eq_1", pio, left);
-            left = left.apply(app).head();
-
-            // Two cases: Is the last changed formula "false" or not?
-            SequentChangeInfo sci = left.node().getNodeInfo().getSequentChangeInfo();
-            FormulaChangeInfo fci = sci.modifiedFormulas(true).head();
-            Term newTerm = fci.getNewFormula().formula();
-            if (newTerm.equals(tb.ff())) {
-                // 1. case: Gamma, false ==> Delta
-                //   in this case apply closeFalse (used for final refutation of proof)
-                seqForm = left.sequent().antecedent().get(1);
-                pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-                app = createTacletApp("closeFalse", pio, left);
-                left = left.apply(app).head();
-            } else {
-                // 2. case: Gamma, f ==> Delta, f
-                //   in this case apply closeAntec
-                seqForm = left.sequent().antecedent().get(1);
-                pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-                app = createTacletApp("closeAntec", pio, left);
-                left = left.apply(app).head();
-            }
-
-            assert left.node().isClosed();
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////
-            goal = goals.get(0);
-            replayRightSideHelper(ctx);
-        }
-
-        @Override
-        public Void visitIdentifier(IdentifierContext ctx) {
-            ProofsexprContext def = symbolTable.get(ctx.getText());
-            if (def != null) {
-                // continue proof replay with the partial tree from the symbol table
-                visit(def);
-            }
-            return null;
-        }
+    public ProofsexprContext getSymbolDef(String symbol) {
+        return symbolTable.get(symbol);
     }
 
-    private static String getOriginalText(ParserRuleContext ctx) {
+    public Term getTranslationToTerm(String smtExpr) {
+        return translationToTermMap.get(smtExpr);
+    }
+
+    public void addTranslationToTerm(String smtExpr, Term keyTerm) {
+        translationToTermMap.put(smtExpr, keyTerm);
+    }
+
+    static String getOriginalText(ParserRuleContext ctx) {
         if (ctx.start == null || ctx.start.getStartIndex() < 0 || ctx.stop == null || ctx.stop.getStopIndex() < 0) {
             // fallback
             return ctx.getText();
@@ -1211,131 +222,8 @@ public class SMTReplayer {
         return ctx.start.getInputStream().getText(Interval.of(start, end));
     }
 
-    private Goal hideAllOther(SequentFormula remaining, Goal goal) {
-        PosInOccurrence pio;
-        TacletApp app;
-        for (SequentFormula other : goal.sequent().succedent()) {
-            if (!other.equals(remaining)) {
-                pio = new PosInOccurrence(other, PosInTerm.getTopLevel(), false);
-                app = createTacletApp("hide_right", pio, goal);
-                goal = goal.apply(app).head();
-            }
-        }
-        for (SequentFormula other : goal.sequent().antecedent()) {
-            if (!other.equals(remaining)) {
-                pio = new PosInOccurrence(other, PosInTerm.getTopLevel(), true);
-                app = createTacletApp("hide_left", pio, goal);
-                goal = goal.apply(app).head();
-            }
-        }
-        return goal;
-    }
-
-    private NoPosTacletApp findLocalRule(String namePrefix, Goal goal) {
-        for (NoPosTacletApp app : goal.node().getLocalIntroducedRules()) {
-            // TODO: there may be multiple rules with this prefix
-            if (app.taclet().name().toString().startsWith(namePrefix)) {
-                return app;
-            }
-        }
-        return null;
-    }
-
     // TODO: replace by real equals method in QuantifiableVariable
-    private static boolean equalsOp(QuantifiableVariable a, QuantifiableVariable b) {
+    static boolean equalsOp(QuantifiableVariable a, QuantifiableVariable b) {
         return a.name().equals(b.name()) && a.sort().equals(b.sort());
-    }
-
-    private Term extractRuleAntecedents(ProofsexprContext ctx) {
-        List<ProofsexprContext> children = ctx.proofsexpr();
-        if (children.size() == 1) {
-            // closing rule (e.g. rewrite, asserted, ...)
-            return null;
-        } else {
-            List<Term> antecs = new ArrayList<>();
-            // antecendent of the rule are all terms expect the last one
-            for (int i = 0; i < children.size() - 1; i++) {
-                ProofsexprContext child = children.get(i);
-                antecs.add(lookupOrCreate(child));
-            }
-            if (antecs.size() == 1) {
-                return antecs.get(0);
-            }
-            Term result = antecs.get(0);
-            for (int i = 1; i < antecs.size(); i++) {
-                result = tf.createTerm(Junctor.AND, result, antecs.get(i));
-            }
-            return result;
-        }
-    }
-
-    private Term lookupOrCreate(ProofsexprContext ctx) {
-        // child could be:
-        // - symbol from KeY (is in translation map)
-        // - symbol bound via let
-        // - a term with nested rule applications
-        Term term = translationToTermMap.get(ctx.getText());
-        if (term == null) {
-            // recursively descend into let definition
-            ProofsexprContext let_def = symbolTable.get(ctx.getText());
-            if (let_def != null) {
-                term = let_def.accept(new DefCollector());
-            } else {
-                // could be a term containing nested rule applications again
-                term = ctx.accept(new DefCollector());
-            }
-        }
-        return term;
-    }
-
-    private static TacletApp createTacletApp(String tacletName, PosInOccurrence pos, Goal goal) {
-        TacletApp app = goal.indexOfTaclets().lookup(tacletName);
-        System.out.println("Creating TacletApp " + tacletName);
-        return autoInst(app, pos, goal);
-    }
-
-    // automatically instantiates taclet from PosInOccurrence, only works for taclets where all instantiations
-    // are determined by the position
-    private static TacletApp autoInst(TacletApp app, PosInOccurrence pos, Goal goal) {
-        Services services = goal.proof().getServices();
-        Term posTerm = pos.subTerm();
-        app = app.setPosInOccurrence(pos, services);
-
-        // automatically find instantiations for matching find term
-        TacletMatcher matcher = app.taclet().getMatcher();
-        // use app.matchConditions(): must not overwrite fixed instantiations (e.g. insert_hidden taclet)
-        MatchConditions current = app.matchConditions();
-        MatchConditions mc = matcher.matchFind(posTerm, current, services);
-        app = app.setMatchConditions(mc, services);
-
-        // automatically find formulas for matching assume
-        app = app.findIfFormulaInstantiations(goal.sequent(), services).head();
-
-        assert app.complete();
-        return app;
-    }
-
-    private static NoPosTacletApp createCutApp(Goal goal, Term cutFormula) {
-        NoPosTacletApp app = goal.indexOfTaclets().lookup("cut");
-        SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-        // since all branches in addInstantiation return NoPosTacletApp, the cast should always be safe
-        return (NoPosTacletApp) app.addInstantiation(sv, cutFormula, true, goal.proof().getServices());
-    }
-
-    private void runAutoMode(Goal goal) {
-        // current notes could contain rule name -> append
-        String currentNotes = goal.node().getNodeInfo().getNotes();
-        if (currentNotes != null) {
-            goal.node().getNodeInfo().setNotes(currentNotes + " automatic proof search");
-        } else {
-            goal.node().getNodeInfo().setNotes("automatic proof search");
-        }
-
-        TryCloseMacro close = new TryCloseMacro(50);
-        try {
-            close.applyTo(null, goal.proof(), ImmutableSLList.<Goal>nil().append(goal), null, null);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }
