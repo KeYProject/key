@@ -35,7 +35,6 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
     public Term visitProofsexpr(SMTProofParser.ProofsexprContext ctx) {
         if (ctx.rulename != null) {
             // last proofsexpr holds the succedent of the rule application
-            assert ctx.proofsexpr() != null && ctx.proofsexpr().size() >= 2;
             ParseTree succedent = ctx.proofsexpr(ctx.proofsexpr().size() - 1);
 
             SMTProofParser.ProofsexprContext def = smtReplayer.getSymbolDef(succedent.getText());

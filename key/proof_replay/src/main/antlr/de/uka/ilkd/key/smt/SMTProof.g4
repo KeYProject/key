@@ -4,24 +4,17 @@ smtoutput : ('Result: valid' 'unsat')? proof;
 
 proof
     : LPAREN command* LPAREN 'proof' proofsexpr+ RPAREN RPAREN EOF
-    // with pretty proof option, the enclosing proof term is missing
+    // with pretty proof option, the enclosing 'proof' term is missing
     | proofsexpr EOF
     ;
 
 proofsexpr
     : LPAREN rulename=PROOFRULE proofsexpr+ RPAREN
     | LPAREN LPAREN UNDERSCORE rulename=PROOFRULE proofsexpr+ RPAREN proofsexpr+ RPAREN
-    // same as original 'term' rule:
-//    | spec_constant
-//    | qual_identifier
-//    | LPAREN proofsexpr proofsexpr+ RPAREN
-    | LPAREN rulename=LET LPAREN var_binding+ RPAREN proofsexpr RPAREN
+    | LPAREN rulename=LET LPAREN var_binding+ RPAREN proofsexpr RPAREN          // shared subtree of proof
     | LPAREN rulename='lambda' LPAREN sorted_var+ RPAREN proofsexpr+ RPAREN
-// TODO: no quantifiers here?
-//    | LPAREN rulename=FORALL LPAREN sorted_var+ RPAREN proofsexpr RPAREN
-//    | LPAREN rulename=EXISTS LPAREN sorted_var+ RPAREN proofsexpr RPAREN
     | LPAREN MATCH proofsexpr LPAREN match_case+ RPAREN RPAREN
-    | LPAREN EXCL proofsexpr attribute+ RPAREN
+    //| LPAREN EXCL proofsexpr attribute+ RPAREN
     | noproofterm
     ;
 
@@ -32,8 +25,7 @@ noproofterm
     | LPAREN func=noproofterm noproofterm+ RPAREN
     | LPAREN quant=FORALL LPAREN sorted_var+ RPAREN noproofterm RPAREN
     | LPAREN quant=EXISTS LPAREN sorted_var+ RPAREN noproofterm RPAREN
-    // TODO: this rules is needed but makes the parser really slow (needs lookahead of > 1500)???
-    //| LPAREN rulename=LET LPAREN var_binding+ RPAREN noproofterm RPAREN
+    | LPAREN rulename=LET LPAREN var_binding+ RPAREN noproofterm RPAREN         // shared formula/term
     | LPAREN MATCH noproofterm LPAREN match_case+ RPAREN RPAREN
     | LPAREN EXCL noproofterm attribute+ RPAREN
     ;
@@ -62,6 +54,8 @@ s_expr
  //   | LPAREN EXCL s_expr attribute+ RPAREN
     ;
 
+qual_identifier : identifier | LPAREN AS identifier sort RPAREN ;
+
 identifier
     : SYMBOL
     | LPAREN UNDERSCORE SYMBOL INDEX+ RPAREN
@@ -72,11 +66,8 @@ sort : identifier | LPAREN identifier sort+ RPAREN ;
 attribute_value : spec_constant | SYMBOL | LPAREN s_expr* RPAREN ;
 attribute : KEYWORD | KEYWORD attribute_value ;
 
-qual_identifier : identifier | LPAREN AS identifier sort RPAREN ;
-var_binding
-    : //LPAREN SYMBOL term RPAREN
-    LPAREN SYMBOL proofsexpr RPAREN
-    ;
+var_binding : LPAREN SYMBOL proofsexpr RPAREN ;
+//var_binding_noproof : LPAREN SYMBOL noproofterm RPAREN ;
 sorted_var : LPAREN SYMBOL sort RPAREN ;
 pattern : SYMBOL | LPAREN SYMBOL SYMBOL+ RPAREN ;
 match_case : LPAREN pattern term LPAREN ;
@@ -181,26 +172,6 @@ GET_PROOF :     'get-proof' ;
 SET_LOGIC :     'set-logic' ;
 SET_OPTION :    'set-option' ;
 
-/*
-FUNC
-    : FORALL
-    | EXISTS
-    | NOT
-    | AND
-    | OR
-    | IMPLIES
-    | EQUIV
-    | EQ
-    | LT
-    | GT
-    | LTE
-    | GTE
-    | PLUS
-    | MINUS
-    | TIMES
-    ;
-*/
-
 // reserved words
 // TODO: BINARY, DECIMAL, HEXADECIMAL, NUMERAL, STRING
 UNDERSCORE : '_';
@@ -211,23 +182,6 @@ EXISTS : 'exists' ;
 FORALL : 'forall' ;
 MATCH : 'match' ;
 PAR : 'par' ;
-
-/*
-NOT : 'not';
-AND : 'and';
-OR : 'or';
-IMPLIES : 'implies' | '=>';
-EQUIV : 'equiv';
-
-EQ : '=';
-LT : '<';
-GT : '>';
-LTE : '<=';
-GTE : '>=';
-PLUS : '+';
-MINUS : '-';
-TIMES : '*';
-*/
 
 fragment Digit
       : [0-9]

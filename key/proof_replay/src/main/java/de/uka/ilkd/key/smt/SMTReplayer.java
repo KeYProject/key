@@ -1,12 +1,9 @@
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -81,7 +78,7 @@ public class SMTReplayer {
         this.goal = goal;
         original = goal;
         proof = goal.proof();
-        translationToTermMap = null;
+        translationToTermMap = new HashMap<>();
     }
 
     private SmtoutputContext parse(String s) {
