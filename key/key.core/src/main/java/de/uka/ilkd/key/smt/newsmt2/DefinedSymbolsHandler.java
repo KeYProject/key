@@ -37,8 +37,6 @@ public class DefinedSymbolsHandler implements SMTHandler {
     private final static Set<String> SUPPORTED_SUFFIXES =
             new HashSet<>(Arrays.asList(".axioms", ".dl", ".taclets"));
 
-    private static final String PATTERN_NAME = "__P__";
-
     private final Set<String> supportedFunctions = new HashSet<>();
     private Services services;
 

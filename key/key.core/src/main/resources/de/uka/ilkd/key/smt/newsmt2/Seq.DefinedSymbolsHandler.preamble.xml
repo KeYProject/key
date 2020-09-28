@@ -1,12 +1,13 @@
     <entry key="seqGet.dl">
-    \forall int i; \forall Seq s; PATTERN( i &lt; 0 -> any::seqGet(s, i) = seqError, any::seqGet(s, i) )
+    \forall int i; \forall Seq s; ( i &lt; 0 -> any::PATTERN(any::seqGet(s, i)) = seqGetOutside )
     </entry>
+
     <entry key="seqGet.dl.2">
-    \forall int i; \forall Seq s; PATTERN( i &gt;= seqLen(s) -> any::seqGet(s, i) = seqError, any::seqGet(s, i) )
+    \forall int i; \forall Seq s; ( i &gt;= seqLen(s) -> any::PATTERN(any::seqGet(s, i)) = seqGetOutside )
     </entry>
 
     <entry key="seqLen.dl">
-    \forall Seq s; PATTERN( seqLen(s) &gt;= 0, seqLen(s) )
+    \forall Seq s; int::PATTERN(seqLen(s)) &gt;= 0
     </entry>
 
     <!--

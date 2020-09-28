@@ -13,6 +13,7 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+@Deprecated
 public class HeapHandler implements SMTHandler {
 
     private static final String WELL_FORMED = "wellFormed";

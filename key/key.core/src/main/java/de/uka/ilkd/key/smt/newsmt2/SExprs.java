@@ -191,8 +191,8 @@ public class SExprs {
      * @throws SMTTranslationException if coercion fails
      */
     public static SExpr castExpr(SExpr sortExp, SExpr exp) throws SMTTranslationException {
-        // REVIEW MU: Should there perhaps be a coercion to Universe before the call?
-        // What if a "Int" is given. That would fail.
+        // There is a coercion to Universe before the call.
+        // What if a "Int" is given, it would fai otherwise.
         return new SExpr("cast", Type.UNIVERSE, coerce(exp, Type.UNIVERSE), sortExp);
     }
 

@@ -13,6 +13,18 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+/**
+ * This SMT translation handler takes care of those sort-depending functions f whose return type is
+ * coerced, i.e.
+ * <pre>
+ *     T::f(params) = T::cast(Any::f(params))
+ * </pre>
+ *
+ * Currently these are: seqGet and (heap-) select.
+ *
+ * @author Mattias Ulbrich
+ * @see CastHandler
+ */
 public class CastingFunctionsHandler implements SMTHandler {
 
     private Services services;
@@ -38,7 +50,6 @@ public class CastingFunctionsHandler implements SMTHandler {
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
-
         Operator op = term.op();
         SortDependingFunction sdf = (SortDependingFunction) op;
         String name = sdf.getKind().toString();

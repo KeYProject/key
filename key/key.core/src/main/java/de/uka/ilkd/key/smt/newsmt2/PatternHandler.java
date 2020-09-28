@@ -14,20 +14,21 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 public class PatternHandler implements SMTHandler {
 
-    public static final Function PATTERN_FUNCTION = makePatternFunction();
+    public static final SortDependingFunction PATTERN_FUNCTION = makePatternFunction();
     public static final Function FORMULA_PATTERN_FUNCTION = makeFormulaPatternFunction();
 
     private static final String PATTERN_NAME = "PATTERN";
     private static final String FORMULA_PATTERN_NAME = "FPATTERN";
 
     private static Function makeFormulaPatternFunction() {
-        Sort[] argSorts = { Sort.FORMULA, Sort.FORMULA };
+        Sort[] argSorts = { Sort.FORMULA };
         return new Function(new Name(FORMULA_PATTERN_NAME), Sort.FORMULA, argSorts);
     }
 
-    private static Function makePatternFunction() {
-        Sort[] argSorts = { Sort.FORMULA, Sort.ANY };
-        return new Function(new Name(PATTERN_NAME), Sort.FORMULA, argSorts);
+    private static SortDependingFunction makePatternFunction() {
+        GenericSort g = new GenericSort(new Name("G"));
+        Sort[] argSorts = { g };
+        return SortDependingFunction.createFirstInstance(g, new Name(PATTERN_NAME), g, argSorts, false);
     }
 
     @Override
@@ -37,7 +38,16 @@ public class PatternHandler implements SMTHandler {
     @Override
     public boolean canHandle(Term term) {
         Operator op = term.op();
-        return op == FORMULA_PATTERN_FUNCTION || op == PATTERN_FUNCTION;
+        if (op == FORMULA_PATTERN_FUNCTION) {
+            return true;
+        }
+
+        if (op instanceof SortDependingFunction) {
+            SortDependingFunction sdf = (SortDependingFunction) op;
+            return PATTERN_FUNCTION.isSimilar(sdf);
+        }
+
+        return false;
     }
 
     @Override

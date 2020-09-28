@@ -4,10 +4,17 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import java.io.IOException;
 
+/**
+ * This SMT translation handler takes care of cast expressions <code>T::cast(term)</code>.
+ *
+ * @author Jonas Schiffl
+ * @see CastingFunctionsHandler
+ */
 public class CastHandler implements SMTHandler {
 
     private SortDependingFunction anyCast;
@@ -25,10 +32,10 @@ public class CastHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term) {
+    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         SortDependingFunction op = (SortDependingFunction) term.op();
         SExpr inner = trans.translate(term.sub(0));
-        return new SExpr("cast", Type.UNIVERSE, inner, SExprs.sortExpr(op.getSortDependingOn()));
+        return SExprs.castExpr(SExprs.sortExpr(op.getSortDependingOn()), inner);
     }
 
 }
