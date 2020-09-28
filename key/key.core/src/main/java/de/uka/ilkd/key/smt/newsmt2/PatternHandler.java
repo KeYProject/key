@@ -52,6 +52,6 @@ public class PatternHandler implements SMTHandler {
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) {
-        return SExprs.patternSExpr(trans.translate(term.sub(0)), new SExpr(trans.translate(term.sub(1))));
+        return SExprs.patternSExpr(trans.translate(term.sub(0)), new SExpr(trans.translate(term.sub(0))));
     }
 }

@@ -199,7 +199,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     /**
      * Convert an {@link ImmutableArray} to a {@link List}.
      *
-     * @return This element converted to a {@link List}.
+     * @return A freshly created {@link List} containing the elements of this array.
      */
     public List<S> toList() {
         List<S> result = new ArrayList<>();
