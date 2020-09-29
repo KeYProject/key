@@ -1,14 +1,11 @@
-    <entry key="seqGet.dl">
-    \forall int i; \forall Seq s; ( i &lt; 0 -> any::PATTERN(any::seqGet(s, i)) = seqGetOutside )
-    </entry>
+<entry key="seqGet.dl"><![CDATA[
+    \forall int i; \forall Seq s; ( i < 0 | i >= seqLen(s) -> any::seqGet(s, i)<<Trigger>> = seqGetOutside )
+]]></entry>
 
-    <entry key="seqGet.dl.2">
-    \forall int i; \forall Seq s; ( i &gt;= seqLen(s) -> any::PATTERN(any::seqGet(s, i)) = seqGetOutside )
-    </entry>
 
-    <entry key="seqLen.dl">
-    \forall Seq s; int::PATTERN(seqLen(s)) &gt;= 0
-    </entry>
+<entry key="seqLen.dl">
+    \forall Seq s; seqLen(s)&lt;&lt;Trigger&gt;&gt; &gt;= 0
+</entry>
 
     <!--
     <entry key="seqConcat.axioms">

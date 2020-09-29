@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -35,12 +37,21 @@ public class QuantifierHandler implements SMTHandler {
 
         term = collectQuantifications(term);
 
+        Set<Term> triggerTerms = new HashSet<>();
+        collectTriggers(term, triggerTerms);
+
+        Set<SExpr> triggers = new HashSet<>();
+        for (Term triggerTerm : triggerTerms) {
+            triggers.add(trans.translate(triggerTerm));
+        }
+
         SExpr matrix = trans.translate(term.sub(0), Type.BOOL);
         List<SExpr> vars = new ArrayList<>();
         List<SExpr> typeGuards = new ArrayList<>();
         for(QuantifiableVariable bv : term.boundVars()) {
             String varName = LogicalVariableHandler.VAR_PREFIX + bv.name();
             vars.add(new SExpr(varName, Type.NONE, "U"));
+            trans.addSort(bv.sort());
             typeGuards.add(SExprs.instanceOf(
                     new SExpr(varName), SExprs.sortExpr(bv.sort())));
         }
@@ -59,10 +70,16 @@ public class QuantifierHandler implements SMTHandler {
         }
 
         matrix = new SExpr(typeGuardConnector, typeGuard, matrix);
-        matrix = SExprs.pullOutPatterns(matrix);
+        matrix = SExprs.patternSExpr(matrix, triggers);
 
         return new SExpr(smtOp, Type.BOOL, new SExpr(vars), matrix);
+    }
 
+    private void collectTriggers(Term term, Set<Term> triggers) {
+        if(term.containsLabel(DefinedSymbolsHandler.TRIGGER_LABEL)) {
+            triggers.add(term);
+        }
+        term.subs().forEach(x -> collectTriggers(x, triggers));
     }
 
     private Term collectQuantifications(Term term) {

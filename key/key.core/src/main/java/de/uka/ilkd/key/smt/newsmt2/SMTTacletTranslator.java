@@ -11,7 +11,9 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.smt.SMTTranslationException;
+import de.uka.ilkd.key.taclettranslation.DefaultTacletTranslator;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -21,6 +23,15 @@ import java.util.List;
 import java.util.Map;
 
 public class SMTTacletTranslator {
+
+    private SkeletonGenerator tacletTranslator =
+            new DefaultTacletTranslator() {
+                @Override
+                protected Term getFindFromTaclet(FindTaclet findTaclet) {
+                    Term org = super.getFindFromTaclet(findTaclet);
+                    return services.getTermBuilder().label(org, DefinedSymbolsHandler.TRIGGER_LABEL);
+                }
+            };
 
     private Services services;
 
@@ -34,20 +45,11 @@ public class SMTTacletTranslator {
             throw new SMTTranslationException("Only unconditional taclets without varconds can be used as SMT axioms: " + taclet.name());
         }
 
-        Term skeleton = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet, services);
-        Term find = null;
+        Term skeleton = tacletTranslator.translate(taclet, services);
+
         Map<SchemaVariable, LogicVariable> variables = new HashMap<>();
-        if (taclet instanceof FindTaclet) {
-            FindTaclet findTaclet = (FindTaclet) taclet;
-            find = findTaclet.find();
-            find = variablify(find, variables);
-        }
 
         skeleton = variablify(skeleton, variables);
-
-        if (find != null) {
-            skeleton = patternify(skeleton, find);
-        }
 
         return quantify(skeleton, variables);
     }
@@ -106,15 +108,10 @@ public class SMTTacletTranslator {
 
         if (changes) {
             ImmutableArray bvars = new ImmutableArray(qvars);
-            return services.getTermFactory().createTerm(op, subs, bvars, null);
+            return services.getTermFactory().createTerm(op, subs, bvars, null, term.getLabels());
         } else {
             return term;
         }
-    }
-
-    private Term patternify(Term formula, Term find) {
-        return services.getTermFactory().createTerm(
-                PatternHandler.SMT_PATTERN_FUNCTION, formula, find);
     }
 
 }

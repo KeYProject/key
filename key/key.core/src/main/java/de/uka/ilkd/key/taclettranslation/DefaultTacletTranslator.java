@@ -178,8 +178,8 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 	// translate the find pattern.
 	if (taclet instanceof FindTaclet) {
 	    FindTaclet findTaclet = (FindTaclet) taclet;
-	    if (findTaclet.find() != null)
-	        find = findTaclet.find();
+	    if (getFindFromTaclet(findTaclet) != null)
+	        find = getFindFromTaclet(findTaclet);
 	}
 
 	// translate the replace and add patterns of the taclet.
@@ -227,7 +227,21 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 	return tb.imp(tb.and(list),assum);
     }
 
-    private int getPolarity(RewriteTaclet rwTaclet) {
+	/**
+	 * Retrieve the "find" Term from a FindTaclet.
+	 *
+	 * Originally, this simply calls {@link FindTaclet#find()}.
+	 * Overriding classes may choose to garnish the result with additional
+	 * information.
+	 *
+	 * @param findTaclet a non-null taclet instance
+	 * @return the find clause of the argument
+	 */
+	protected Term getFindFromTaclet(FindTaclet findTaclet) {
+		return findTaclet.find();
+	}
+
+	private int getPolarity(RewriteTaclet rwTaclet) {
         int restr = rwTaclet.getApplicationRestriction();
         if((restr & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
             return -1;

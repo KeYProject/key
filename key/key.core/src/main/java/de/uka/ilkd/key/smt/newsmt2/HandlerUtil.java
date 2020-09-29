@@ -41,15 +41,15 @@ public class HandlerUtil {
         }
 
         List<SExpr> tos = new ArrayList<>();
-        int i = 0;
-        for (Sort sort : op.argSorts()) {
-            // TODO MU: are these restrictions actually needed?
-            // It is way simpler to leave them out. Still sound?
-            master.addSort(sort);
-            SExpr var = new SExpr(LogicalVariableHandler.VAR_PREFIX + i);
-            tos.add(SExprs.instanceOf(var, SExprs.sortExpr(sort)));
-            ++i;
-        }
+//        int i = 0;
+//        for (Sort sort : op.argSorts()) {
+//            // TODO MU: are these restrictions actually needed?
+//            // It is way simpler to leave them out. Still sound? I assume so ...
+//            master.addSort(sort);
+//            SExpr var = new SExpr(LogicalVariableHandler.VAR_PREFIX + i);
+//            tos.add(SExprs.instanceOf(var, SExprs.sortExpr(sort)));
+//            ++i;
+//        }
 
         SExpr ante = SExprs.and(tos);
         master.addSort(op.sort());

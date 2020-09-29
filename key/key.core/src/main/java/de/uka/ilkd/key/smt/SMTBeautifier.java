@@ -127,7 +127,7 @@ public class SMTBeautifier {
                     }
                     result = new Element();
                     pos.val++;
-                    result.head = s.substring(start, pos.val);
+                    result.head = s.substring(start, Math.min(s.length() - 1, pos.val));
                     return result;
 
                 default:

@@ -79,7 +79,6 @@ public class MasterHandler {
         for (Object k : keys) {
             String key = k.toString();
             if(key.endsWith(".auto")) {
-                System.out.println(key);
                 // strip the ".auto" and add the snippet
                 addFromSnippets(key.substring(0, key.length() - 5));
             }

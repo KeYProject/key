@@ -61,7 +61,7 @@ task generateSMTListings {
             list.writeLine '<properties>'
             new File("$resourcesDir/$pack").eachFile {
                 if(it.name.endsWith('.DefinedSymbolsHandler.preamble.xml')) {
-                    println it.name
+                    // println it.name
                     it.eachLine { list.writeLine it }
                 }
             }
@@ -130,6 +130,14 @@ task testRunAllProofs(type: Test) {
         // TODO does not exist any more: includeTestsMatching "RunAllProofsTestSuite"
         includeTestsMatching "RunAllProofsInfFlow"
         includeTestsMatching "RunAllProofsFunctional"
+    }
+}
+
+task testProveSMTLemmas(type: Test) {
+    description 'Prove (or load proofs for) lemmas used in the SMT translation'
+    group "verification"
+    filter {
+        includeTestsMatching "ProveSMTLemmasTest"
     }
 }
 

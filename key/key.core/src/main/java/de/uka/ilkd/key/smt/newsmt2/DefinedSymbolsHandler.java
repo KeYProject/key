@@ -2,7 +2,12 @@ package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -12,10 +17,13 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.PropertiesUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,13 +50,13 @@ public class DefinedSymbolsHandler implements SMTHandler {
     private final Set<String> supportedFunctions = new HashSet<>();
     private Services services;
 
+    public static final TermLabel TRIGGER_LABEL =
+            new ParameterlessTermLabel(new Name("Trigger"));
+
     @Override
     public void init(MasterHandler masterHandler, Services services) throws IOException {
 
-        this.services = services.copy(true);
-        this.services.setProof(services.getProof());
-        this.services.getNamespaces().functions().add(PatternHandler.FORMULA_PATTERN_FUNCTION);
-        this.services.getNamespaces().functions().add(PatternHandler.PATTERN_FUNCTION);
+        this.services = services;
 
         String resourceName = getClass().getSimpleName() + ".preamble.xml";
         URL url = getClass().getResource(resourceName);
@@ -154,13 +162,16 @@ public class DefinedSymbolsHandler implements SMTHandler {
         int cnt = 2;
         String snipName = name + ".dl";
         String dl = trans.getSnippet(snipName);
+        System.err.println("DL TEXT FOR " + snipName + " WAS: " + dl);
         do {
             DefaultTermParser tp = new DefaultTermParser();
             try {
+                NamespaceSet nss = services.getNamespaces().copy();
                 Term axiom = tp.parse(new StringReader(dl), Sort.FORMULA, services,
-                        services.getNamespaces(), new AbbrevMap());
+                        nss, new AbbrevMap());
                 trans.addAxiom(SExprs.assertion(trans.translate(axiom)));
             } catch (ParserException e) {
+                e.printStackTrace();
                 throw new SMTTranslationException("Error while translating snippet " + snipName, e);
             }
             snipName = name + ".dl." + cnt;

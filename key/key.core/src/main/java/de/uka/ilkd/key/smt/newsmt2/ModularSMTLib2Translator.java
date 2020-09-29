@@ -117,6 +117,12 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
 
         // TODO . Find a concept for exceptions here
+        if(!exceptions.isEmpty()) {
+            System.err.println("Exception while translating:");
+            System.err.println(sb);
+            throw new RuntimeException(exceptions.get(0));
+        }
+
 
         return sb;
     }

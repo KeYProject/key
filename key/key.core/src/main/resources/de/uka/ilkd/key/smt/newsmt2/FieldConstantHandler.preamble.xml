@@ -9,8 +9,9 @@
 
     <entry key="arr.axioms">
         (assert (forall ((u U)) (!
-            (=> (&gt;= (u2i u) 0) (= (fieldIdentifier (arr u)) (u2i u)))
+            (=&gt; (&gt;= (u2i u) 0) (= (fieldIdentifier (arr u)) (u2i u)))
             :pattern ((arr u)))))
+        (assert (forall ((u U)) (! (exactinstanceof (arr u) sort_Field) :pattern ((arr u)))) )
     </entry>
 
     <entry key="arr.deps">fieldIdentifier</entry>

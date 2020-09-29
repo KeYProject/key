@@ -6,6 +6,7 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
@@ -161,15 +162,34 @@ public class SExprs {
     /**
      * Produce a smt matching pattern. The result is {@code (! e :patterns ((patterns))}.
      *
+     * If the list is empty, then {@code e} is returned.
+     *
      * @param e the expression to wrap
-     * @param patterns a non-empty list of expressions
+     * @param patterns a possibly empty list of expressions
      * @return the expanded pattern with the same type as e
      */
     public static SExpr patternSExpr(SExpr e, SExpr... patterns) {
+       return patternSExpr(e, Arrays.asList(patterns));
+    }
+
+    /**
+     * Produce a smt matching pattern. The result is {@code (! e :patterns ((patterns))}.
+     *
+     * If the list is empty, then {@code e} is returned.
+     *
+     * @param e the expression to wrap
+     * @param patterns a possibly empty collection of expressions
+     * @return the expanded pattern with the same type as e
+     */
+    public static SExpr patternSExpr(SExpr e, Collection<SExpr> patterns) {
+        if (patterns.isEmpty()) {
+            return e;
+        }
+
         ArrayList<SExpr> children = new ArrayList<>();
         children.add(e);
         children.add(new SExpr(":pattern", Type.VERBATIM));
-        children.addAll(Arrays.asList(patterns));
+        children.addAll(patterns);
         return new SExpr("!", e.getType(), children);
     }
 
