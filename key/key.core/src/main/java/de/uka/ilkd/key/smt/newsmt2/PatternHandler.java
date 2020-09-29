@@ -16,9 +16,16 @@ public class PatternHandler implements SMTHandler {
 
     public static final SortDependingFunction PATTERN_FUNCTION = makePatternFunction();
     public static final Function FORMULA_PATTERN_FUNCTION = makeFormulaPatternFunction();
+    public static final Function SMT_PATTERN_FUNCTION = makeSMTPatternFunction();
 
     private static final String PATTERN_NAME = "PATTERN";
     private static final String FORMULA_PATTERN_NAME = "FPATTERN";
+    private static final String SMT_PATTERN_NAME = "SMT_PATTERN";
+
+    private static Function makeSMTPatternFunction() {
+        Sort[] argSorts = { Sort.FORMULA, Sort.ANY };
+        return new Function(new Name(SMT_PATTERN_NAME), Sort.FORMULA, argSorts);
+    }
 
     private static Function makeFormulaPatternFunction() {
         Sort[] argSorts = { Sort.FORMULA };
@@ -38,7 +45,7 @@ public class PatternHandler implements SMTHandler {
     @Override
     public boolean canHandle(Term term) {
         Operator op = term.op();
-        if (op == FORMULA_PATTERN_FUNCTION) {
+        if (op == FORMULA_PATTERN_FUNCTION || op == SMT_PATTERN_FUNCTION) {
             return true;
         }
 
@@ -52,6 +59,10 @@ public class PatternHandler implements SMTHandler {
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) {
-        return SExprs.patternSExpr(trans.translate(term.sub(0)), new SExpr(trans.translate(term.sub(0))));
+        if (term.op() == SMT_PATTERN_FUNCTION) {
+            return SExprs.patternSExpr(trans.translate(term.sub(0)), new SExpr(trans.translate(term.sub(1))));
+        } else {
+            return SExprs.patternSExpr(trans.translate(term.sub(0)), new SExpr(trans.translate(term.sub(0))));
+        }
     }
 }

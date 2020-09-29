@@ -88,8 +88,9 @@ public class SExprs {
     /**
      * Produce a universal quantification.
      *
-     * If vars is empty, no quantifiers are produced.
-     * If the matrix has a pattern, the pattern is removed.
+     * If vars is empty:
+     * no quantifiers are produced and
+     * if the matrix has a pattern, the pattern is removed.
      *
      * @param vars a list of variable declarations {@code (var Type)}
      * @param matrix a boolean expression

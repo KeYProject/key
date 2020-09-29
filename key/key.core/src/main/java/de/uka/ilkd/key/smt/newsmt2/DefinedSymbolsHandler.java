@@ -12,8 +12,10 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,6 +46,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
     public void init(MasterHandler masterHandler, Services services) throws IOException {
 
         this.services = services.copy(true);
+        this.services.setProof(services.getProof());
         this.services.getNamespaces().functions().add(PatternHandler.FORMULA_PATTERN_FUNCTION);
         this.services.getNamespaces().functions().add(PatternHandler.PATTERN_FUNCTION);
 
@@ -123,9 +126,18 @@ public class DefinedSymbolsHandler implements SMTHandler {
 
     }
 
-    private void handleTacletAxioms(String name, MasterHandler trans) {
-        String taclets = trans.getSnippet(name + ".taclets");
-        throw new Error("not supported yet");
+    private void handleTacletAxioms(String name, MasterHandler trans) throws SMTTranslationException {
+        String[] strTaclets = trans.getSnippet(name + ".taclets").trim().split(" *, *");
+        for (String str : strTaclets) {
+            Taclet taclet = services.getProof().getInitConfig().lookupActiveTaclet(new Name(str));
+            if(taclet == null) {
+                throw new SMTTranslationException("Unknown taclet: " + str);
+            }
+            SMTTacletTranslator tacletTranslator = new SMTTacletTranslator(services);
+            Term formula = tacletTranslator.translate(taclet);
+            SExpr smt = trans.translate(formula);
+            trans.addAxiom(SExprs.assertion(smt));
+        }
     }
 
     private void handleSMTAxioms(MasterHandler trans, String name) {

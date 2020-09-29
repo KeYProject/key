@@ -1,0 +1,8 @@
+<!-- The function symbols required for Java arithmetics -->
+<entry key="javaMulInt.taclets">
+    translateJavaMulInt
+</entry>
+
+<entry key="javaAddInt.taclets">
+    translateJavaAddInt
+</entry>

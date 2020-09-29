@@ -18,3 +18,19 @@
          \then(any::select(h2, o, f))
          \else(any::select(h, o, f))
 </entry>
+
+<entry key="memset.dl">
+    \forall Heap h; \forall LocSet s; \forall any x; \forall Object o; \forall Field f;
+      any::PATTERN(any::select(memset(h, s, x), o, f)) =
+         \if(elementOf(o, f, s) &amp; f != java.lang.Object::&lt;created&gt;)
+         \then(x)
+         \else(any::select(h, o, f))
+</entry>
+
+<entry key="create.dl">
+  \forall Heap h; \forall Object o; \forall Object o2; \forall Field f;
+      any::PATTERN(any::select(create(h, o), o2, f)) =
+         \if(o = o2 &amp; o != null &amp; f = java.lang.Object::&lt;created&gt;)
+         \then(TRUE)
+         \else(any::select(h, o2, f))
+</entry>

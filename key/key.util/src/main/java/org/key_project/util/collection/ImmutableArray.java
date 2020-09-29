@@ -16,6 +16,7 @@ package org.key_project.util.collection;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -51,7 +52,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
      * @param list a LinkedList (order is preserved)
      */
     @SuppressWarnings("unchecked")
-    public ImmutableArray(List<S> list) {
+    public ImmutableArray(Collection<? extends S> list) {
         content = (S[]) list.toArray();
     }
 
