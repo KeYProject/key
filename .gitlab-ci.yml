@@ -108,6 +108,26 @@ compile:testFast:key.core:
       junit:
         - "**/**/build/test-results/*/TEST-*.xml"
 
+compile:testFast:proveSMT:
+  stage: ternary
+  image: wadoon/key-test-docker:jdk11
+  script:
+    - javac -version
+    - cd key
+    - gradle --build-cache --continue :key.core:testProveSMTLemmas
+    - ls
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/*/TEST-*.xml"
+  
+
 compile:testFast:proofref:
   stage: ternary
   image: wadoon/key-test-docker:jdk11
