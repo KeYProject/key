@@ -33,28 +33,7 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.statement.Break;
-import de.uka.ilkd.key.java.statement.Case;
-import de.uka.ilkd.key.java.statement.Catch;
-import de.uka.ilkd.key.java.statement.Continue;
-import de.uka.ilkd.key.java.statement.Default;
-import de.uka.ilkd.key.java.statement.Do;
-import de.uka.ilkd.key.java.statement.Else;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
-import de.uka.ilkd.key.java.statement.Finally;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.Guard;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.LabelJumpStatement;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.Return;
-import de.uka.ilkd.key.java.statement.Switch;
-import de.uka.ilkd.key.java.statement.SynchronizedBlock;
-import de.uka.ilkd.key.java.statement.Then;
-import de.uka.ilkd.key.java.statement.Try;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -425,6 +404,17 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             @Override
             ProgramElement createNewElement(final ExtList changeList) {
                 return new Catch(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnCcatch(final Ccatch x) {
+        DefaultAction def = new DefaultAction() {
+            @Override
+            ProgramElement createNewElement(final ExtList changeList) {
+                return new Ccatch(changeList);
             }
         };
         def.doAction(x);

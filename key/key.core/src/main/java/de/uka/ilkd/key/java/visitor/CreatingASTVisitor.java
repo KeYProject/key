@@ -19,16 +19,7 @@ import java.util.Deque;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.PackageSpecification;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ClassInitializer;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -36,52 +27,7 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
-import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
-import de.uka.ilkd.key.java.expression.operator.BinaryAndAssignment;
-import de.uka.ilkd.key.java.expression.operator.BinaryNot;
-import de.uka.ilkd.key.java.expression.operator.BinaryOr;
-import de.uka.ilkd.key.java.expression.operator.BinaryOrAssignment;
-import de.uka.ilkd.key.java.expression.operator.BinaryXOr;
-import de.uka.ilkd.key.java.expression.operator.BinaryXOrAssignment;
-import de.uka.ilkd.key.java.expression.operator.Conditional;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.DLEmbeddedExpression;
-import de.uka.ilkd.key.java.expression.operator.Divide;
-import de.uka.ilkd.key.java.expression.operator.DivideAssignment;
-import de.uka.ilkd.key.java.expression.operator.Equals;
-import de.uka.ilkd.key.java.expression.operator.GreaterOrEquals;
-import de.uka.ilkd.key.java.expression.operator.GreaterThan;
-import de.uka.ilkd.key.java.expression.operator.Instanceof;
-import de.uka.ilkd.key.java.expression.operator.Intersect;
-import de.uka.ilkd.key.java.expression.operator.LessOrEquals;
-import de.uka.ilkd.key.java.expression.operator.LessThan;
-import de.uka.ilkd.key.java.expression.operator.LogicalAnd;
-import de.uka.ilkd.key.java.expression.operator.LogicalNot;
-import de.uka.ilkd.key.java.expression.operator.LogicalOr;
-import de.uka.ilkd.key.java.expression.operator.Minus;
-import de.uka.ilkd.key.java.expression.operator.MinusAssignment;
-import de.uka.ilkd.key.java.expression.operator.Modulo;
-import de.uka.ilkd.key.java.expression.operator.ModuloAssignment;
-import de.uka.ilkd.key.java.expression.operator.Negative;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.expression.operator.NewArray;
-import de.uka.ilkd.key.java.expression.operator.NotEquals;
-import de.uka.ilkd.key.java.expression.operator.Plus;
-import de.uka.ilkd.key.java.expression.operator.PlusAssignment;
-import de.uka.ilkd.key.java.expression.operator.Positive;
-import de.uka.ilkd.key.java.expression.operator.PostDecrement;
-import de.uka.ilkd.key.java.expression.operator.PostIncrement;
-import de.uka.ilkd.key.java.expression.operator.PreDecrement;
-import de.uka.ilkd.key.java.expression.operator.PreIncrement;
-import de.uka.ilkd.key.java.expression.operator.ShiftLeft;
-import de.uka.ilkd.key.java.expression.operator.ShiftLeftAssignment;
-import de.uka.ilkd.key.java.expression.operator.ShiftRight;
-import de.uka.ilkd.key.java.expression.operator.ShiftRightAssignment;
-import de.uka.ilkd.key.java.expression.operator.Times;
-import de.uka.ilkd.key.java.expression.operator.TimesAssignment;
-import de.uka.ilkd.key.java.expression.operator.TypeCast;
-import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRight;
-import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRightAssignment;
+import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
@@ -91,52 +37,8 @@ import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
 import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
 import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
 import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
-import de.uka.ilkd.key.java.reference.ArrayLengthReference;
-import de.uka.ilkd.key.java.reference.ArrayReference;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.reference.MetaClassReference;
-import de.uka.ilkd.key.java.reference.MethodName;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.SchematicFieldReference;
-import de.uka.ilkd.key.java.reference.SuperConstructorReference;
-import de.uka.ilkd.key.java.reference.SuperReference;
-import de.uka.ilkd.key.java.reference.ThisConstructorReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.Assert;
-import de.uka.ilkd.key.java.statement.Break;
-import de.uka.ilkd.key.java.statement.Case;
-import de.uka.ilkd.key.java.statement.Catch;
-import de.uka.ilkd.key.java.statement.Continue;
-import de.uka.ilkd.key.java.statement.Default;
-import de.uka.ilkd.key.java.statement.Do;
-import de.uka.ilkd.key.java.statement.Else;
-import de.uka.ilkd.key.java.statement.EmptyStatement;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
-import de.uka.ilkd.key.java.statement.Finally;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.ForUpdates;
-import de.uka.ilkd.key.java.statement.Guard;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopInit;
-import de.uka.ilkd.key.java.statement.LoopScopeBlock;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.Return;
-import de.uka.ilkd.key.java.statement.Switch;
-import de.uka.ilkd.key.java.statement.SynchronizedBlock;
-import de.uka.ilkd.key.java.statement.Then;
-import de.uka.ilkd.key.java.statement.Throw;
-import de.uka.ilkd.key.java.statement.Try;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -489,6 +391,17 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     @Override
+    public void performActionOnCcatch(Ccatch x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new Ccatch(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
     public void performActionOnThrow(Throw x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
@@ -509,6 +422,18 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         };
         def.doAction(x);
     }
+
+    @Override
+    public void performActionOnExec(Exec x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new Exec(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
 
     @Override
     public void performActionOnDefault(Default x) {
