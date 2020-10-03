@@ -49,7 +49,8 @@ public class SMTReplayer {
         return proofStart;
     }
 
-    private final Map<String, ProofsexprContext> symbolTable = new LinkedHashMap<>();   // TODO: why linked?
+    // HashMap is linked to make debugging easier
+    private final Map<String, ProofsexprContext> symbolTable = new LinkedHashMap<>();
     private final Map<String, Term> translationToTermMap;
     private final Map<String, Term> skMap = new HashMap<>();
 
@@ -73,14 +74,6 @@ public class SMTReplayer {
         translationToTermMap = problem.getTranslationToTermMap();
     }
 
-    public SMTReplayer(String smtOutput, Goal goal) {
-        this.smtOutput = smtOutput;
-        this.goal = goal;
-        original = goal;
-        proof = goal.proof();
-        translationToTermMap = new HashMap<>();
-    }
-
     private SmtoutputContext parse(String s) {
         return parse(CharStreams.fromString(s));
     }
@@ -94,9 +87,9 @@ public class SMTReplayer {
         BailOutErrorStrategy errorStrategy = new BailOutErrorStrategy();
         parser.setErrorHandler(errorStrategy);
         SmtoutputContext result = null;
-        try {
+        //try {
             return parser.smtoutput();
-        } catch (RecognitionException ex) {
+        /*} catch (RecognitionException ex) {
             errorStrategy.reportError(parser, ex);
             throw ex;
         } catch (RuntimeException rex) {
@@ -107,7 +100,7 @@ public class SMTReplayer {
                 throw rex;
             }
         }
-        return result;
+        return result;*/
     }
 
     private void findProofStart() {

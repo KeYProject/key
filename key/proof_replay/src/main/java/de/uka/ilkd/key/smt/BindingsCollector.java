@@ -1,7 +1,8 @@
 package de.uka.ilkd.key.smt;
 
 /**
- * This visitor is responsible for collecting all variables bound by let and their definitions in the symbol table.
+ * This visitor is responsible for collecting all variables bound by let and their definitions in
+ * the symbol table.
  */
 class BindingsCollector extends SMTProofBaseVisitor<Void> {
     private final SMTReplayer smtReplayer;
@@ -9,6 +10,14 @@ class BindingsCollector extends SMTProofBaseVisitor<Void> {
     public BindingsCollector(SMTReplayer smtReplayer) {
         this.smtReplayer = smtReplayer;
     }
+
+    /*
+     * We need a map from (Context x String) -> Context, i.e. every context must have an attached
+     * map to look up symbols
+     *
+     * The visitor could use a stack to keep track of the currently relevant binding
+     * (allows for shadowing of symbols in subterms)
+     */
 
     @Override
     public Void visitVar_binding(SMTProofParser.Var_bindingContext ctx) {

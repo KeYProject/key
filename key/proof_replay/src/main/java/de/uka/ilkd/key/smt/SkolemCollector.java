@@ -11,7 +11,10 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
 /**
- * This visitor collects the definition of a variable introduced in a proof leaf by Z3's skolemization rule (sk).
+ * This visitor collects the definition of a variable introduced in a proof leaf by Z3's
+ * skolemization rule (sk).
+ *
+ * @author Wolfram Pfeifer
  */
 class SkolemCollector extends SMTProofBaseVisitor<Void> {
     private final SMTReplayer smtReplayer;

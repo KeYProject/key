@@ -15,11 +15,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.TacletMatcher;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.smt.SMTProofParser.ProofsexprContext;
 import org.antlr.v4.runtime.Token;
 import org.key_project.util.collection.ImmutableSLList;
@@ -56,46 +52,46 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         goal.node().getNodeInfo().setNotes(rulename);
 
         switch (rulename) {
-            case "asserted":
-                //runAutoMode(goal, true);
-                replayAsserted(ctx);
-                return null;
-            case "rewrite":
-                replayRewrite(ctx);
-                return null;
-            case "monotonicity":
-                replayMonotonicity(ctx);
-                return null;
-            case "trans":
-                replayTrans(ctx);
-                return null;
-            case "iff-true":
-                replayIffTrue(ctx);
-                return null;
-            case "iff-false":
-                replayIffFalse(ctx);
-                return null;
-            case "not-or-elim":
-                replayNotOrElim(ctx);
-                return null;
-            case "and-elim":
-                replayAndElim(ctx);
-                return null;
-            case "mp":
-            case "mp~":
-                replayMp(ctx);
-                return null;
-            case "unit-resolution":
-                replayUnitResolution(ctx);
-                return null;
-            case "th-lemma":
-                replayThLemma(ctx);
-                return null;
-            case "sk":
-                replaySk(ctx);
-                return null;
-            default:
-                throw new IllegalStateException("Replay for rule currently not implemented: " + rulename);
+        case "asserted":
+            //runAutoMode(goal, true);
+            replayAsserted(ctx);
+            return null;
+        case "rewrite":
+            replayRewrite(ctx);
+            return null;
+        case "monotonicity":
+            replayMonotonicity(ctx);
+            return null;
+        case "trans":
+            replayTrans(ctx);
+            return null;
+        case "iff-true":
+            replayIffTrue(ctx);
+            return null;
+        case "iff-false":
+            replayIffFalse(ctx);
+            return null;
+        case "not-or-elim":
+            replayNotOrElim(ctx);
+            return null;
+        case "and-elim":
+            replayAndElim(ctx);
+            return null;
+        case "mp":
+        case "mp~":
+            replayMp(ctx);
+            return null;
+        case "unit-resolution":
+            replayUnitResolution(ctx);
+            return null;
+        case "th-lemma":
+            replayThLemma(ctx);
+            return null;
+        case "sk":
+            replaySk(ctx);
+            return null;
+        default:
+            throw new IllegalStateException("Replay for rule not yet implemented: " + rulename);
         }
         //return super.visitProofsexpr(ctx);
     }
@@ -182,7 +178,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         app = createTacletApp("close", pio, right);
         right = right.apply(app).head();
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         // instEx
         right = goals.get(0);
@@ -199,8 +195,8 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         Services locServ = services.getOverlay(right.getLocalNamespaces());
         app = right.ruleAppIndex().getFindTaclet(exRightFilter, pio, locServ).head();
         SchemaVariable t = app.uninstantiatedVars().iterator().next();
-        Term phi_x = sci.addedFormulas(true).head().formula();
-        Term inst = pits.get(0).getSubTerm(phi_x);
+        Term phiX = sci.addedFormulas(true).head().formula();
+        Term inst = pits.get(0).getSubTerm(phiX);
         app = app.setPosInOccurrence(pio, locServ);
         app = app.addCheckedInstantiation(t, inst, locServ, true);
 
@@ -221,7 +217,8 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         return collectQvPositionsRec(qv, ex.sub(0), PosInTerm.getTopLevel());
     }
 
-    private List<PosInTerm> collectQvPositionsRec(QuantifiableVariable qv, Term subTerm, PosInTerm prefix) {
+    private List<PosInTerm> collectQvPositionsRec(QuantifiableVariable qv,
+                                                  Term subTerm, PosInTerm prefix) {
         List<PosInTerm> result = new ArrayList<>();
         if (subTerm.op() instanceof QuantifiableVariable
             && SMTReplayer.equalsOp((QuantifiableVariable) subTerm.op(), qv)) {
@@ -244,6 +241,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             Term cutTerm = extractRuleAntecedents(ctx);
             TacletApp app = createCutApp(goal, cutTerm);
             List<Goal> goals = goal.apply(app).toList();
+            // TODO: finish implementation
         } else {
             // leaf rule
             runAutoMode(goal);
@@ -257,7 +255,8 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
 
         // two possible choices:
         TacletApp app = smtReplayer.getInsertTacletForSF(seqForm);
-        SequentFormula negForm = new SequentFormula(services.getTermBuilder().not(seqForm.formula()));
+        Term negTerm = services.getTermBuilder().not(seqForm.formula());
+        SequentFormula negForm = new SequentFormula(negTerm);
         TacletApp notApp = smtReplayer.getInsertTacletForSF(negForm);
 
         if (app != null) {
@@ -323,8 +322,23 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
 
         SequentFormula seqForm = left.sequent().antecedent().get(0);
         PosInOccurrence pio;
-        for (int i = 0; i < ctx.proofsexpr().size(); i++) {
+
+        int arity = ctx.proofsexpr().size();
+
+        // special case for typeguard
+
+        // this selects the text "typeguard" in the contraposition example
+        //smtReplayer.getSymbolDef(ctx.proofsexpr(0).proofsexpr(ctx.proofsexpr(0).proofsexpr().size()-1).getText()).noproofterm().noproofterm(1).noproofterm(0).getText()
+
+        for (int i = 0; i < arity; i++) {
             pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
+
+            // TODO: this case may occur for other rules as well
+            if (!pio.subTerm().op().equals(Junctor.AND)) {
+                // this may occur if a typeguard has been skipped by the translation
+                break;
+            }
+
             app = createTacletApp("andLeft", pio, left);
             left = left.apply(app).head();
             SequentChangeInfo sci = left.node().getNodeInfo().getSequentChangeInfo();
@@ -341,7 +355,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         app = createTacletApp("close", pio, left);
         left = left.apply(app).head();
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
         replayRightSideHelper(ctx);
     }
@@ -390,7 +404,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         app = createTacletApp("closeAntec", pio, left);
         left = left.apply(app).head();
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
         replayRightSideHelper(ctx);
     }
@@ -458,7 +472,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         app = createTacletApp("closeTrue", pio, left);
         left = left.apply(app).head();
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
         replayRightSideHelper(ctx);
     }
@@ -493,15 +507,12 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             clause = seqForm;
         }
 
-        List<SequentFormula> negUnitClauses = new ArrayList<>();
-
         // for every unit clause: apply notLeft
         for (SequentFormula unitClause : unitClauses) {
             pio = new PosInOccurrence(unitClause, PosInTerm.getTopLevel(), true);
             app = createTacletApp("notLeft", pio, left);
             left = left.apply(app).head();
             sci = left.node().getNodeInfo().getSequentChangeInfo();
-            negUnitClauses.add(sci.addedFormulas().head());
         }
 
         if (unitClauseCount > 1) {
@@ -538,23 +549,23 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             left = left.apply(app).head();
         }
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
         replayRightSideHelper(ctx);
     }
 
     /**
-     * Splits the formula at the right side of a cut into the different antecedents of a rule and starts
-     * replay of the corresponding subtrees.
+     * Splits the formula at the right side of a cut into the different antecedents of a rule and
+     * starts replay of the corresponding subtrees.
      *
      * @param ctx
      */
     private void replayRightSideHelper(ProofsexprContext ctx) {
 
         SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
-        SequentFormula cutFormula = sci.addedFormulas().head();
+        SequentFormula cutFormula = sci.addedFormulas(false).head();
 
-        goal = hideAllOther(cutFormula, goal);
+        goal = focus(cutFormula, goal, false);
 
         PosInOccurrence pio;
         TacletApp app;
@@ -597,10 +608,10 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         app = createTacletApp("insert_eqv_once_lr", pio, left);
         left = left.apply(app).head();
 
-        NoPosTacletApp insert_eqv = findLocalRule("insert_eqv", left);
+        NoPosTacletApp insertEqv = findLocalRule("insert_eqv", left);
         seqForm = left.sequent().antecedent().get(0);
         pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel().down(1), true);
-        app = autoInst(insert_eqv, pio, left);
+        app = autoInst(insertEqv, pio, left);
         left = left.apply(app).head();
 
         seqForm = left.sequent().antecedent().get(0);
@@ -608,7 +619,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         app = createTacletApp("closeAntec", pio, left);
         left = left.apply(app).head();
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
         replayRightSideHelper(ctx);
     }
@@ -618,7 +629,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         TacletApp app = createCutApp(goal, cutTerm);
         List<Goal> goals = goal.apply(app).toList();
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////
         // left: and_left, replace_known_left, concrete_impl, close
         Goal left = goals.get(1);
 
@@ -659,7 +670,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
 
         assert left.node().isClosed();
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
         replayRightSideHelper(ctx);
     }
@@ -682,9 +693,9 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         Term term = smtReplayer.getTranslationToTerm(ctx.getText());
         if (term == null) {
             // recursively descend into let definition
-            ProofsexprContext let_def = smtReplayer.getSymbolDef(ctx.getText());
-            if (let_def != null) {
-                term = let_def.accept(new DefCollector(smtReplayer, services));
+            ProofsexprContext letDef = smtReplayer.getSymbolDef(ctx.getText());
+            if (letDef != null) {
+                term = letDef.accept(new DefCollector(smtReplayer, services));
             } else {
                 // could be a term containing nested rule applications again
                 term = ctx.accept(new DefCollector(smtReplayer, services));
@@ -722,8 +733,8 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         return autoInst(app, pos, goal);
     }
 
-    // automatically instantiates taclet from PosInOccurrence, only works for taclets where all instantiations
-    // are determined by the position
+    // automatically instantiates taclet from PosInOccurrence, only works for taclets where all
+    // instantiations are determined by the position
     private static TacletApp autoInst(TacletApp app, PosInOccurrence pos, Goal goal) {
         Services services = goal.proof().getServices();
         Term posTerm = pos.subTerm();
@@ -777,24 +788,10 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         return null;
     }
 
-    // TODO: use the new built-in FocusRule instead
-    private Goal hideAllOther(SequentFormula remaining, Goal goal) {
-        PosInOccurrence pio;
-        TacletApp app;
-        for (SequentFormula other : goal.sequent().succedent()) {
-            if (!other.equals(remaining)) {
-                pio = new PosInOccurrence(other, PosInTerm.getTopLevel(), false);
-                app = ReplayVisitor.createTacletApp("hide_right", pio, goal);
-                goal = goal.apply(app).head();
-            }
-        }
-        for (SequentFormula other : goal.sequent().antecedent()) {
-            if (!other.equals(remaining)) {
-                pio = new PosInOccurrence(other, PosInTerm.getTopLevel(), true);
-                app = ReplayVisitor.createTacletApp("hide_left", pio, goal);
-                goal = goal.apply(app).head();
-            }
-        }
-        return goal;
+    private Goal focus(SequentFormula formula, Goal goal, boolean antec) {
+        FocusRule focusRule = FocusRule.INSTANCE;
+        PosInOccurrence pio = new PosInOccurrence(formula, PosInTerm.getTopLevel(), antec);
+        RuleApp app = focusRule.createApp(pio, services);
+        return goal.apply(app).head();
     }
 }

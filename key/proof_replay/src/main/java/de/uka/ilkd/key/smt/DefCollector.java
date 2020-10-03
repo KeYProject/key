@@ -2,21 +2,22 @@ package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.smt.SMTProofParser.Sorted_varContext;
 import org.antlr.v4.runtime.tree.ParseTree;
+
+import de.uka.ilkd.key.smt.SMTProofParser.NoprooftermContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This visitor converts a Z3 term to a KeY term, descending into the succedents of Z3 proof rule terms
  * if necessary.
+ *
+ * @author Wolfram Pfeifer
  */
 class DefCollector extends SMTProofBaseVisitor<Term> {
     private final SMTReplayer smtReplayer;
@@ -55,7 +56,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
     }
 
     @Override
-    public Term visitNoproofterm(SMTProofParser.NoprooftermContext ctx) {
+    public Term visitNoproofterm(NoprooftermContext ctx) {
         System.out.println("Trying to translate " + SMTReplayer.getOriginalText(ctx) + " ...");
 
         // term may be a new symbol introduced by the let binder
@@ -71,110 +72,161 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
             return cached;
         }
 
-        // otherwise: translate top level function or quantifier "by hand" and descend into child terms
+        // otherwise: translate top level function or quantifier "by hand" and descend into children
         // Note: use TermFactory instead of TermBuilder to prevent from simplification!
         if (ctx.func != null) {
+            System.out.println("    ctx.func: " + ctx.func.getText());
             Term t1, t2;
             int arity;
             IntegerLDT integerLDT;
             switch (ctx.func.getText()) {
-                case "=":
-                case "~":
-                    assert ctx.noproofterm().size() == 3;
-                    t1 = visit(ctx.noproofterm(1));
-                    t2 = visit(ctx.noproofterm(2));
-                    return equals(t1, t2);
-                case "=>":
-                    assert ctx.noproofterm().size() == 3;
-                    t1 = visit(ctx.noproofterm(1));
-                    t2 = visit(ctx.noproofterm(2));
-                    return tf.createTerm(Junctor.IMP, t1, t2);
-                case "not":
-                    assert ctx.getChildCount() == 4;
-                    t1 = visit(ctx.noproofterm(1));
-                    return tf.createTerm(Junctor.NOT, t1);
-                case "or":
-                    // important: or is n-ary in Z3!
-                    // subtract 1: "or" token also is noProofTerm
-                    arity = ctx.noproofterm().size() - 1;
-                    t1 = visit(ctx.noproofterm(1));
-                    for (int i = 2; i <= arity; i++) {
-                        t2 = visit(ctx.noproofterm(i));
-                        t1 = tf.createTerm(Junctor.OR, t1, t2);
+            case "=":
+            case "~":
+                assert ctx.noproofterm().size() == 3;
+                t1 = visit(ctx.noproofterm(1));
+                t2 = visit(ctx.noproofterm(2));
+                return equals(t1, t2);
+            case "=>":
+            //case "implies":
+                assert ctx.noproofterm().size() == 3;
+                t1 = visit(ctx.noproofterm(1));
+
+                // could be typeguard (special case):
+                if (ctx.noproofterm(1) != null) {
+                    if (ctx.noproofterm(1).noproofterm(0) != null) {
+                        String leftFunc = ctx.noproofterm(1).noproofterm(0).getText();
+                        if (leftFunc.equals("typeguard")) {
+                            // skip top level "=>" as well as left subterm (typeguard)
+                            return visit(ctx.noproofterm(2));
+                        }
                     }
-                    return t1;
-                case "and":
-                    // important: and is n-ary in Z3!
-                    // subtract 1: "and" token also is noProofTerm
-                    arity = ctx.noproofterm().size() - 1;
-                    t1 = visit(ctx.noproofterm(1));
-                    for (int i = 2; i <= arity; i++) {
-                        t2 = visit(ctx.noproofterm(i));
-                        t1 = tf.createTerm(Junctor.AND, t1, t2);
+                }
+
+                t2 = visit(ctx.noproofterm(2));
+                return tf.createTerm(Junctor.IMP, t1, t2);
+            case "not":
+                assert ctx.getChildCount() == 4;
+                t1 = visit(ctx.noproofterm(1));
+                return tf.createTerm(Junctor.NOT, t1);
+            case "or":
+                // important: or is n-ary in Z3!
+                // subtract 1: "or" token also is noProofTerm
+                arity = ctx.noproofterm().size() - 1;
+                t1 = visit(ctx.noproofterm(1));
+                for (int i = 2; i <= arity; i++) {
+                    t2 = visit(ctx.noproofterm(i));
+                    t1 = tf.createTerm(Junctor.OR, t1, t2);
+                }
+                return t1;
+            case "and":
+                // important: and is n-ary in Z3!
+                // subtract 1: "and" token also is noProofTerm
+                arity = ctx.noproofterm().size() - 1;
+
+                // could be typeguard (special case):
+                if (ctx.noproofterm(1) != null) {
+                    if (ctx.noproofterm(1).noproofterm(0) != null) {
+                        String leftFunc = ctx.noproofterm(1).noproofterm(0).getText();
+                        if (leftFunc.equals("typeguard")) {
+                            // skip top level "and" as well as left subterm (typeguard)
+                            t1 = visit(ctx.noproofterm(2));
+                            for (int i = 3; i <= arity; i++) {
+                                t2 = visit(ctx.noproofterm(i));
+                                t1 = tf.createTerm(Junctor.AND, t1, t2);
+                            }
+                            return t1;
+                        }
                     }
-                    return t1;
-                case "<=":
-                    t1 = visit(ctx.noproofterm(1));
+                }
+
+                t1 = visit(ctx.noproofterm(1));
+
+                for (int i = 2; i <= arity; i++) {
+                    t2 = visit(ctx.noproofterm(i));
+                    t1 = tf.createTerm(Junctor.AND, t1, t2);
+                }
+                return t1;
+            case "<=":
+                t1 = visit(ctx.noproofterm(1));
+                t2 = visit(ctx.noproofterm(2));
+                return tb.leq(t1, t2);
+            case ">=":
+                t1 = visit(ctx.noproofterm(1));
+                t2 = visit(ctx.noproofterm(2));
+                return tb.geq(t1, t2);
+            case ">":
+                t1 = visit(ctx.noproofterm(1));
+                t2 = visit(ctx.noproofterm(2));
+                return tb.gt(t1, t2);
+            case "<":
+                t1 = visit(ctx.noproofterm(1));
+                t2 = visit(ctx.noproofterm(2));
+                return tb.lt(t1, t2);
+            case "+":
+                t1 = visit(ctx.noproofterm(1));
+                t2 = visit(ctx.noproofterm(2));
+                integerLDT = services.getTypeConverter().getIntegerLDT();
+                return tb.func(integerLDT.getAdd(), t1, t2);
+            case "-":
+                arity = ctx.noproofterm().size() - 1;
+                t1 = visit(ctx.noproofterm(1));
+                integerLDT = services.getTypeConverter().getIntegerLDT();
+                if (arity == 1) {
+                    throw new IllegalStateException("Negative term not yet implemented!");
+                    //return tb.func(integerLDT.getNegativeNumberSign(), t1);
+                } else if (arity == 2) {
                     t2 = visit(ctx.noproofterm(2));
-                    return tb.leq(t1, t2);
-                case ">=":
-                    t1 = visit(ctx.noproofterm(1));
-                    t2 = visit(ctx.noproofterm(2));
-                    return tb.geq(t1, t2);
-                case ">":
-                    t1 = visit(ctx.noproofterm(1));
-                    t2 = visit(ctx.noproofterm(2));
-                    return tb.gt(t1, t2);
-                case "<":
-                    t1 = visit(ctx.noproofterm(1));
-                    t2 = visit(ctx.noproofterm(2));
-                    return tb.lt(t1, t2);
-                case "+":
-                    t1 = visit(ctx.noproofterm(1));
-                    t2 = visit(ctx.noproofterm(2));
-                    integerLDT = services.getTypeConverter().getIntegerLDT();
-                    return tb.func(integerLDT.getAdd(), t1, t2);
-                case "-":
-                    arity = ctx.noproofterm().size() - 1;
-                    t1 = visit(ctx.noproofterm(1));
-                    integerLDT = services.getTypeConverter().getIntegerLDT();
-                    if (arity == 1) {
-                        throw new IllegalStateException("Negative term not yet implemented!");
-                        //return tb.func(integerLDT.getNegativeNumberSign(), t1);
-                    } else if (arity == 2) {
-                        t2 = visit(ctx.noproofterm(2));
-                        return tb.func(integerLDT.getSub(), t1, t2);
-                    } else {
-                        throw new IllegalStateException("Minus with invalid arity: " + arity);
+                    return tb.func(integerLDT.getSub(), t1, t2);
+                } else {
+                    throw new IllegalStateException("Minus with invalid arity: " + arity);
+                }
+            case "*":
+                t1 = visit(ctx.noproofterm(1));
+                t2 = visit(ctx.noproofterm(2));
+                integerLDT = services.getTypeConverter().getIntegerLDT();
+                return tb.func(integerLDT.getMul(), t1, t2);
+            case "/":
+                t1 = visit(ctx.noproofterm(1));
+                t2 = visit(ctx.noproofterm(2));
+                integerLDT = services.getTypeConverter().getIntegerLDT();
+                return tb.func(integerLDT.getDiv(), t1, t2);
+            // TODO: currently, u2i/i2u/sort_int are hardcoded into the translation
+            //  (see IntegerOpHandler.preamble.xml)
+            case "u2i":     // TODO: hack
+            case "i2u":
+                // just skip the additional function application
+                // for faster lookup additionally add it to map
+                t1 = visit(ctx.noproofterm(1));
+                smtReplayer.addTranslationToTerm(ctx.getText(), t1);
+                return t1;
+            // marker for instanceof uses w/o direct counterpart in the original sequent
+            case "typeguard":
+                // TODO: better detect at and/implies or quantifier case?
+                return tb.tt();
+            case "length":
+                t1 = visit(ctx.noproofterm(1));
+                return tb.dotLength(t1);
+            default:
+                // what about sorts and variables and other?
+
+                // translate KeY predicates/functions (cut "KeY_" prefix)
+                String origFuncName = ctx.func.getText().substring(4);
+                Function f = services.getNamespaces().functions().lookup(new Name(origFuncName));
+
+                if (f != null) {
+                    int n = f.arity();
+                    if (n == ctx.noproofterm().size()) {
+                        throw new IllegalStateException(
+                            "Arity does not match: " + ctx.func.getText()
+                                + " with arity " + ctx.noproofterm().size() + " vs. " + n);
                     }
-                case "*":
-                    t1 = visit(ctx.noproofterm(1));
-                    t2 = visit(ctx.noproofterm(2));
-                    integerLDT = services.getTypeConverter().getIntegerLDT();
-                    return tb.func(integerLDT.getMul(), t1, t2);
-                case "/":
-                    t1 = visit(ctx.noproofterm(1));
-                    t2 = visit(ctx.noproofterm(2));
-                    integerLDT = services.getTypeConverter().getIntegerLDT();
-                    return tb.func(integerLDT.getDiv(), t1, t2);
-                // TODO: currently, u2i/i2u/sort_int are hardcoded into the translation
-                //  (see IntegerOpHandler.preamble.xml)
-                case "u2i":     // TODO: hack
-                case "i2u":
-                    // just skip the additional function application
-                    // for faster lookup additionally add it to map
-                    t1 = visit(ctx.noproofterm(1));
-                    smtReplayer.addTranslationToTerm(ctx.getText(), t1);
-                    return t1;
-                // marker for instanceof uses w/o direct counterpart in the original sequent
-                case "typeguard":
-                    // TODO: better detect at and/implies or quantifier case?
-                    return tb.tt();
-                case "length":
-                    t1 = visit(ctx.noproofterm(1));
-                    return tb.dotLength(t1);
-                default:
-                    throw new IllegalStateException("Currently not supported: " + ctx.func.getText());
+                    List<Term> children = new ArrayList<>();
+                    for (NoprooftermContext child : ctx.noproofterm()) {
+                        children.add(visit(child));
+                    }
+                    return tb.func(f, children.toArray(new Term[0]));
+                }
+                throw new IllegalStateException("Currently not supported: " + ctx.func.getText());
             }
         } else if (ctx.quant != null) {
             // forall, exists
@@ -195,6 +247,9 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
             } else {
                 throw new IllegalStateException("Unknown quantifier: " + ctx.quant.getText());
             }
+        } else if (ctx.EXCL() != null) {
+            // skip annotations, directly descend into single child term
+            return visit(ctx.noproofterm(0));
         } else {
             //, match, !, spec_const, qual_identifier
             // TODO:
@@ -210,7 +265,8 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
      * @param quantForm the quantified formula (containing the typeguard)
      * @return a QuantifiableVariable (containing original KeY name and sort)
      */
-    private QuantifiableVariable extractQV(SMTProofParser.Sorted_varContext sortedVar, SMTProofParser.NoprooftermContext quantForm) {
+    private QuantifiableVariable extractQV(Sorted_varContext sortedVar,
+                                           NoprooftermContext quantForm) {
         NamespaceSet nss = services.getNamespaces();
 
         // cut the "var_" prefix
@@ -225,13 +281,13 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
 
         Name name = new Name(varName);
 
-        SMTProofParser.NoprooftermContext typeguard = extractTypeguard(quantForm);
+        NoprooftermContext typeguard = extractTypeguard(quantForm);
         if (typeguard == null) {
             throw new IllegalStateException("No typeguard found!");
         }
         // typeguard has the following form: (typeguard var_x sort_int)
-        SMTProofParser.NoprooftermContext nameCtx = typeguard.noproofterm(1);
-        SMTProofParser.NoprooftermContext sortCtx = typeguard.noproofterm(2);
+        NoprooftermContext nameCtx = typeguard.noproofterm(1);
+        NoprooftermContext sortCtx = typeguard.noproofterm(2);
         // cut the "sort_" prefix
         String sortName = sortCtx.getText().substring(5);
         Sort keySort = nss.sorts().lookup(sortName);
@@ -241,12 +297,12 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         return new LogicVariable(name, keySort);
     }
 
-    private SMTProofParser.NoprooftermContext extractTypeguard(SMTProofParser.NoprooftermContext quantForm) {
+    private NoprooftermContext extractTypeguard(NoprooftermContext quantForm) {
         if (quantForm.func != null && quantForm.func.getText().equals("typeguard")) {
             return quantForm;
         } else {
-            for (SMTProofParser.NoprooftermContext child : quantForm.noproofterm()) {
-                SMTProofParser.NoprooftermContext res = extractTypeguard(child);
+            for (NoprooftermContext child : quantForm.noproofterm()) {
+                NoprooftermContext res = extractTypeguard(child);
                 if (res != null) {
                     return res;
                 }
@@ -278,9 +334,9 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                 // found definition of skolem symbol (was already in map)
                 return skDef;
             } else {    // try to find definition of skolem symbol
-                SkolemCollector skCollector = new SkolemCollector(smtReplayer, ctx.getText(), services);
+                SkolemCollector skColl = new SkolemCollector(smtReplayer, ctx.getText(), services);
                 // collect all skolem symbols and their definitions using ifEx/eps terms
-                skCollector.visit(smtReplayer.getTree());
+                skColl.visit(smtReplayer.getTree());
                 skDef = smtReplayer.getSkolemSymbolDef(ctx.getText());
                 if (skDef != null) {
                     // found definition of skolem symbol
