@@ -15,9 +15,13 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 public class MasterHandler {
 
@@ -54,7 +58,10 @@ public class MasterHandler {
     /** A mapping from Strings (containing S-Expressions) to KeY terms*/
     private Map<String, Term> translationToTermMap = new HashMap<>();
 
+    private final Services services;
+
     public MasterHandler(Services services) throws IOException {
+        this.services = services;
 
         for (SMTHandler smtHandler : ServiceLoader.load(SMTHandler.class)) {
             smtHandler.init(services);
@@ -93,15 +100,68 @@ public class MasterHandler {
                 if(smtHandler.canHandle(problem)) {
                     SExpr res = smtHandler.handle(this, problem);
                     translationToTermMap.put(res.toString(), problem);
+                    // put the normalized term to map, too
+                    // hopefully this helps for proof replay
+                    SExpr normalized = normalize(res);
+                    translationToTermMap.put(normalized.toString(), problem);
                     return res;
                 }
             }
             SExpr res = handleAsUnknownValue(problem);
             translationToTermMap.put(res.toString(), problem);
+            // put the normalized term to map, too
+            // hopefully this helps for proof replay
+            SExpr normalized = normalize(res);
+            translationToTermMap.put(normalized.toString(), problem);
             return res;
         } catch(Exception ex) {
             exceptions.add(ex);
             return handleAsUnknownValue(problem);
+        }
+    }
+
+    /**
+     * Normalizes terms, i.e. flattens nested binary and/or terms.
+     * @param res original term which may contain nested and/or terms
+     * @return SExpr with n-ary and/or terms and no more nested ones.
+     */
+    private SExpr normalize(SExpr res) {
+        if (res.getName().equals("and")) {
+            List<SExpr> normChildren = new ArrayList<>();
+            for (SExpr child : res.getChildren()) {
+                normChildren.add(normalize(child));
+            }
+
+            List<SExpr> flatChildren = new ArrayList<>();
+            for (SExpr child : normChildren) {
+                if (child.getName().equals("and")) {
+                    flatChildren.addAll(child.getChildren());
+                } else {
+                    flatChildren.add(child);
+                }
+            }
+            return new SExpr("and", Type.BOOL, flatChildren);
+        } else if (res.getName().equals("or")) {
+            List<SExpr> normChildren = new ArrayList<>();
+            for (SExpr child : res.getChildren()) {
+                normChildren.add(normalize(child));
+            }
+
+            List<SExpr> flatChildren = new ArrayList<>();
+            for (SExpr child : normChildren) {
+                if (child.getName().equals("or")) {
+                    flatChildren.addAll(child.getChildren());
+                } else {
+                    flatChildren.add(child);
+                }
+            }
+            return new SExpr("or", Type.BOOL, flatChildren);
+        } else {
+            List<SExpr> newSubs = new ArrayList<>();
+            for (SExpr sub : res.getChildren()) {
+                newSubs.add(normalize(sub));
+            }
+            return new SExpr(res.getName(), res.getType(), newSubs);
         }
     }
 
