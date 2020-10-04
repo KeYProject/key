@@ -230,7 +230,8 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                                 + " with arity " + ctx.noproofterm().size() + " vs. " + n);
                     }
                     List<Term> children = new ArrayList<>();
-                    for (NoprooftermContext child : ctx.noproofterm()) {
+                    for (int i = 1; i < ctx.noproofterm().size(); i++) {
+                        NoprooftermContext child = ctx.noproofterm(i);
                         children.add(visit(child));
                     }
                     return tb.func(f, children.toArray(new Term[0]));
