@@ -92,9 +92,12 @@ public class SMTReplayerTest {
     /**
      * Tests if replay of the simple proof is successful.
      */
-    //@Test
+    @Test
     public void testSimpleProofReplay() throws Exception {
         File f = Paths.get(SMTReplayer.class.getResource("simple.key").toURI()).toFile();
+        /* TODO: currently this proof can not be closed automatically (KeY's auto mode needed for
+         *  th-lemma/asserted replay)
+         */
         assertNotNull(loadAndReplaySMT(f));
     }
 
