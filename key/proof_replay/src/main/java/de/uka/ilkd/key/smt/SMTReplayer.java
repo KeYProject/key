@@ -1,9 +1,6 @@
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -18,9 +15,9 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.util.HashMap;
@@ -38,6 +35,14 @@ public class SMTReplayer {
     private SMTProofParser parser;
 
     private ParseTree tree;
+
+    public ParseTreeProperty<Namespace<NamedParserRuleContext>> getNamespaces() {
+        return namespaces;
+    }
+
+    private final ParseTreeProperty<Namespace<NamedParserRuleContext>>
+        namespaces = new ParseTreeProperty<>();
+
     private ProofsexprContext proofStart;
 
 
@@ -148,8 +153,7 @@ public class SMTReplayer {
         newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_OFF);
         Strategy.updateStrategySettings(proof, newProps);
 
-        // TODO: use FocusRule instead
-        // hide all original formulas, remember the mapping to insert_hidden_... taclets
+        // hide all original formulas (assertions), remember mapping to insert_hidden_... taclets
         for (SequentFormula sf : goal.sequent().antecedent().asList()) {
             PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), true);
             TacletApp hide = ReplayVisitor.createTacletApp("hide_left", pio, goal);
@@ -186,12 +190,26 @@ public class SMTReplayer {
         return proof;
     }
 
+    /*
     public void addSymbolDef(String symbol, ProofsexprContext def) {
         symbolTable.put(symbol, def);
-    }
+    }*/
 
+    /*
     public ProofsexprContext getSymbolDef(String symbol) {
         return symbolTable.get(symbol);
+    }*/
+
+    public ParserRuleContext getSymbolDef(String symbol, ParserRuleContext ctx) {
+        // term may be a new symbol introduced by the let binder
+        Namespace<NamedParserRuleContext> ctxNS = namespaces.get(ctx);
+        if (ctxNS != null) {
+            NamedParserRuleContext nprc = ctxNS.lookup(symbol);
+            if (nprc != null) {
+                return nprc.getCtx();
+            }
+        }
+        return null;
     }
 
     public Term getTranslationToTerm(String smtExpr) {

@@ -16,7 +16,9 @@ import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.smt.SMTProofParser.IdentifierContext;
 import de.uka.ilkd.key.smt.SMTProofParser.ProofsexprContext;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -676,8 +678,8 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
     }
 
     @Override
-    public Void visitIdentifier(SMTProofParser.IdentifierContext ctx) {
-        ProofsexprContext def = smtReplayer.getSymbolDef(ctx.getText());
+    public Void visitIdentifier(IdentifierContext ctx) {
+        ParserRuleContext def = smtReplayer.getSymbolDef(ctx.getText(), ctx);
         if (def != null) {
             // continue proof replay with the partial tree from the symbol table
             visit(def);
@@ -693,7 +695,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         Term term = smtReplayer.getTranslationToTerm(ctx.getText());
         if (term == null) {
             // recursively descend into let definition
-            ProofsexprContext letDef = smtReplayer.getSymbolDef(ctx.getText());
+            ParserRuleContext letDef = smtReplayer.getSymbolDef(ctx.getText(), ctx);
             if (letDef != null) {
                 term = letDef.accept(new DefCollector(smtReplayer, services));
             } else {
@@ -750,7 +752,6 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         // automatically find formulas for matching assume
         app = app.findIfFormulaInstantiations(goal.sequent(), services).head();
 
-        assert app.complete();
         return app;
     }
 

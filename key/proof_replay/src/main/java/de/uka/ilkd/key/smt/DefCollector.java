@@ -6,12 +6,15 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTProofParser.Sorted_varContext;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import de.uka.ilkd.key.smt.SMTProofParser.NoprooftermContext;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static de.uka.ilkd.key.smt.SMTProofParser.*;
 
 /**
  * This visitor converts a Z3 term to a KeY term, descending into the succedents of Z3 proof rule terms
@@ -33,12 +36,12 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
     }
 
     @Override
-    public Term visitProofsexpr(SMTProofParser.ProofsexprContext ctx) {
+    public Term visitProofsexpr(ProofsexprContext ctx) {
         if (ctx.rulename != null) {
             // last proofsexpr holds the succedent of the rule application
             ParseTree succedent = ctx.proofsexpr(ctx.proofsexpr().size() - 1);
 
-            SMTProofParser.ProofsexprContext def = smtReplayer.getSymbolDef(succedent.getText());
+            ParserRuleContext def = smtReplayer.getSymbolDef(succedent.getText(), ctx);
             if (def != null) {
                 // descend further if this still is a symbol bound by let
                 return visit(def);
@@ -60,7 +63,13 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         System.out.println("Trying to translate " + SMTReplayer.getOriginalText(ctx) + " ...");
 
         // term may be a new symbol introduced by the let binder
-        SMTProofParser.ProofsexprContext proofsexpr = smtReplayer.getSymbolDef(ctx.getText());
+        //ProofsexprContext proofsexpr = smtReplayer.getSymbolDef(ctx.getText());
+        /*Namespace<NamedParserRuleContext> ctxNS = smtReplayer.getNamespaces().get(ctx);
+        NamedParserRuleContext nprc = ctxNS.lookup(ctx.getText());
+        ParserRuleContext proofsexpr = nprc.getCtx();*/
+
+        ParserRuleContext proofsexpr = smtReplayer.getSymbolDef(ctx.getText(), ctx);
+
         if (proofsexpr != null) {
             // descend into nested let term
             return visit(proofsexpr);
@@ -322,7 +331,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
     }
 
     @Override
-    public Term visitIdentifier(SMTProofParser.IdentifierContext ctx) {
+    public Term visitIdentifier(IdentifierContext ctx) {
         if (ctx.getText().equals("false")) {
             return tb.ff();
         } else if (ctx.getText().equals("true")) {
