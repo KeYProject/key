@@ -19,6 +19,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 import de.uka.ilkd.key.util.Debug;
 import java.util.*;
 import java.util.regex.*;
+import de.uka.ilkd.key.speclang.jml.JMLUtils;
 }
 
 @members {
@@ -72,27 +73,7 @@ import java.util.regex.*;
                         // no markers --> active
                         return false;
                     }
-                    String[] markers = markerBuilder.toString().split("(?=[+-])");
-                    boolean plusFound = false;
-                    boolean plusKeyFound = false;
-                    for (int i = 0; i < markers.length; i++) {
-                        String marker = markers[i];
-                        if (marker.equalsIgnoreCase("-key") ||
-                            marker.length() < 2 ||
-                            !marker.matches("[+-].+")) {
-                               // 1) -key
-                               // 2) + or - alone
-                               // 3) identifier w/o +/-
-                               // means: this is a comment
-                            return true;
-                        } else if (marker.equalsIgnoreCase("+key")) {
-                            plusKeyFound = true;
-                        } else if (marker.startsWith("+")) {
-                            plusFound = true;
-                        }
-                    }
-                    // it is only a comment if "+" encountered, but not "+key"
-                    return plusFound && !plusKeyFound;
+                    return !JMLUtils.isJmlCommentStarter(markerBuilder.toString());
                 } else if (Character.isJavaIdentifierPart(point) || point == '-' || point == '+') {
                     markerBuilder.append(point);
                     input.consume();
