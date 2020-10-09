@@ -9,11 +9,6 @@ plugins {
     //https://docs.gradle.org/current/userguide/eclipse_plugin.html
     id("eclipse")  //support for Eclipse
 
-    //Uploading maven artifacts to bintray
-    //If you want access ask @weigl for repository permission.
-    //https://github.com/bintray/gradle-bintray-plugin
-    id "com.jfrog.bintray" version "1.8.4" apply false
-
     //Checks and adds the license header of the source files:
     // Task: `licenseMain' and `licenseFormatMain'
     //https://github.com/hierynomus/license-gradle-plugin
@@ -21,6 +16,8 @@ plugins {
     //Generates reports on the license of used packages: Task `downloadLicenses'
     //Some Licenses requires an entry in the credits (MIT, BSD)
     id "com.github.hierynomus.license-report" version "0.15.0"
+
+    id "org.sonarqube" version "3.0"
 }
 
 // Configure this project for use inside IntelliJ:
@@ -51,17 +48,20 @@ def build = System.env.BUILD_NUMBER == null ? "" : "-${System.env.BUILD_NUMBER}"
 group = "org.key_project"
 version = "2.7$build"
 
+sonarqube {
+    properties {
+        property "sonar.projectKey", "key-main"
+        property "sonar.organization", "keyproject"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
+}
+
 subprojects {
     apply plugin: "java"
     apply plugin: "java-library"
     apply plugin: "maven-publish"
     apply plugin: "idea"
     apply plugin: "eclipse"
-    apply plugin: "com.jfrog.bintray"
-
-    // apply plugin: 'checkstyle'
-    // apply plugin: 'pmd'
-    // apply plugin: 'findbugs'    
 
     group = rootProject.group
     version = rootProject.version
@@ -237,27 +237,6 @@ subprojects {
         }
     }
 
-    bintray { //configures the bintray plugin.
-
-        //credentials are either defined in the  project or by preferable as environment variables
-        //ask @weigl if you need the username and password.
-        user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
-        key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
-        publications = ['mavenJava']
-
-        dryRun = false //[Default: false] Whether to run this as dry-run, without deploying
-        publish = true //[Default: false] Whether version should be auto published after an upload
-        override = false //[Default: false] Whether to override version artifacts already published
-
-        pkg {
-            userOrg = "key"
-            repo = 'stable-snapshots'
-            name = "key"
-            licenses = ['GPL-2.0']
-            vcsUrl = 'https://git.key-project.org/key/key.git'
-        }
-    }
-
     license {//configures the license file header
         header = file("$rootDir/gradle/header")
 
@@ -329,4 +308,11 @@ task alldocJar(type: Zip) {
     from alldoc
     archiveFileName = "key-api-doc-${project.version}.zip"
     destinationDirectory = file("$buildDir/distribution")
+}
+
+//conditionally enable jacoco coverage when `-DjacocoEnabled=true` is given on CLI.
+def jacocoEnabled = System.properties.getProperty("jacocoEnabled") ?: "false"
+if (jacocoEnabled.toBoolean()) {
+    project.logger.lifecycle("Jacoco enabled. Test performance will be slower.")
+    apply from: rootProject.file("scripts/jacocokey.gradle")
 }
