@@ -14,9 +14,9 @@ cache:
   key: ${CI_COMMIT_REF_SLUG}
 
 variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-  SONAR_TOKEN: "533cf8bfa3eac2dc4be3c63252a7090000797699"
+  GRADLE_OPTS:  "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=2 -Dorg.gradle.configureondemand=true"
   GIT_DEPTH: 0
+  # SONAR_TOKEN: configured in gitlab-ci web ui. Ask <weigl@kit.edu> if you need this token.
 
 before_script:
   #  - echo `pwd` # debug
@@ -27,14 +27,6 @@ stages:
     - primary
     - secondary
     - ternary
-
-# compile:oraclejdk8:
-#   stage: primary
-#   image: key-dev-jdk8
-#   script:
-#     - javac -version
-#     - ant -f key/scripts/build.xml compileAll
-
 
 compile:classes:
   stage: primary
@@ -51,6 +43,7 @@ compile:classes:
       - .gradle
 
 compile:testClasses:
+  dependencies:  ["compile:classes"]
   stage: secondary
   image: wadoon/key-test-docker:jdk11
   script:
@@ -65,6 +58,7 @@ compile:testClasses:
       - .gradle
 
 compile:testClasses8:
+  dependencies:  []
   stage: secondary
   image: wadoon/key-test-docker:jdk8
   script:
@@ -72,14 +66,17 @@ compile:testClasses8:
     - cd key
     - gradle --parallel classes testClasses
 
-compile:testFast:key.util:
+sonarqube:
+  dependencies:  ["compile:testClasses"]
   stage: ternary
   image: wadoon/key-test-docker:jdk11
+  allow_failure: true
   script:
-    - javac -version
     - cd key
-    - gradle --build-cache --continue :key.util:testFast
-    - ls
+    - gradle --build-cache --continue -Dsonar.qualitygate.wait=true -DjacocoEnabled=true testFast sonarqube
+  only:
+    - merge_requests
+    - master
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
@@ -90,159 +87,6 @@ compile:testFast:key.util:
     reports:
       junit:
         - "**/**/build/test-results/*/TEST-*.xml"
-
-compile:testFast:key.core:
-  stage: ternary
-  image: wadoon/key-test-docker:jdk11
-  script:
-    - javac -version
-    - cd key
-    - gradle --build-cache --continue :key.core:testFast
-    - ls
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull
-    paths:
-      - build
-      - .gradle
-  artifacts:
-    reports:
-      junit:
-        - "**/**/build/test-results/*/TEST-*.xml"
-
-compile:testFast:proofref:
-  stage: ternary
-  image: wadoon/key-test-docker:jdk11
-  script:
-    - javac -version
-    - cd key
-    - gradle --build-cache --continue :key.core.proof_references:testFast
-    - ls
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull
-    paths:
-      - build
-      - .gradle
-  artifacts:
-    reports:
-      junit:
-        - "**/**/build/test-results/*/TEST-*.xml"
-
-compile:testFast:testgen:
-  stage: ternary
-  image: wadoon/key-test-docker:jdk11
-  script:
-    - javac -version
-    - cd key
-    - gradle --build-cache --continue :key.core.testgen:testFast
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull
-    paths:
-      - build
-      - .gradle
-  artifacts:
-    reports:
-      junit:
-        - "**/**/build/test-results/*/TEST-*.xml"
-
-compile:testFast:interactionlog:
-  stage: ternary
-  image: wadoon/key-test-docker:jdk11
-  script:
-    - javac -version
-    - cd key
-    - gradle --build-cache --continue :keyex.interactionlog:testFast
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull
-    paths:
-      - build
-      - .gradle
-  artifacts:
-    reports:
-      junit:
-        - "**/**/build/test-results/*/TEST-*.xml"
-
-compile:testFast:ui:
-  stage: ternary
-  image: wadoon/key-test-docker:jdk11
-  script:
-    - javac -version
-    - cd key
-    - gradle --build-cache --continue :key.ui:testFast
-    - ls
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull
-    paths:
-      - build
-      - .gradle
-  artifacts:
-    reports:
-      junit:
-        - "**/**/build/test-results/*/TEST-*.xml"
-
-compile:testFast:removegenerics:
-  stage: ternary
-  image: wadoon/key-test-docker:jdk11
-  script:
-    - javac -version
-    - cd key
-    - gradle --build-cache --continue :key.removegenerics:testFast
-    - ls
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull
-    paths:
-      - build
-      - .gradle
-  artifacts:
-    reports:
-      junit:
-        - "**/**/build/test-results/*/TEST-*.xml"
-
-#
-#
-#compile:testFast:testRunAllProofs:
-#  stage: primary
-#  image: wadoon/key-test-docker:jdk11
-#  script:
-#    - javac -version
-#    - cd key
-#    - gradle --build-cache --continue :key.core:testRunAllProofs
-#    - ls
-#  cache:
-#    key: "$CI_COMMIT_REF_NAME"
-#    policy: pull
-#    paths:
-#      - build
-#      - .gradle
-#  artifacts:
-#    reports:
-#      junit:
-#        - "**/**/build/test-results/*/TEST-*.xml"
-#
-#
-#compile:testFast:testProofRules:
-#  stage: primary
-#  image: wadoon/key-test-docker:jdk11
-#  script:
-#    - javac -version
-#    - cd key
-#    - gradle --build-cache --continue :key.core:testProofRules
-#    - ls
-#  cache:
-#    key: "$CI_COMMIT_REF_NAME"
-#    policy: pull
-#    paths:
-#      - build
-#      - .gradle
-#  artifacts:
-#    reports:
-#      junit:
-#        - "**/**/build/test-results/*/TEST-*.xml"
 
 checkstyle:
   stage: primary
@@ -258,14 +102,3 @@ checkstyle:
     when: always
     paths:
     - report.txt
-
-sonarqube:
-  stage: primary
-  image: wadoon/key-test-docker:jdk11
-  allow_failure: true
-  script:
-    - cd key
-    - gradle --build-cache sonarqube -Dsonar.qualitygate.wait=true
-  only:
-    - merge_requests
-    - master

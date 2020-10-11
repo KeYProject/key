@@ -440,13 +440,16 @@ TOKEN :
 | < REAL: "\\real">
 | < BOOLEAN: "boolean" >
 | < BREAK: "break" >
+| < BREAKTYPE: "\\Break" >
 | < BYTE: "byte" >
 | < CASE: "case" >
+| < CCATCH: "ccatch" >
 | < CATCH: "catch" >
 | < CHAR: "char" >
 | < CLASS: "class" >
 | < CONST: "const" >
 | < CONTINUE: "continue" >
+| < CONTINUETYPE: "\\Continue" >
 | < _DEFAULT: "default" >
 | < DO: "do" >
 | < DOUBLE: "double" >
@@ -456,6 +459,7 @@ TOKEN :
 	  	matchedToken.kind = IDENTIFIER;
 	  }
 }
+| < EXEC: "exec" >
 | < EXTENDS: "extends" >
 | < FALSE: "false" >
 | < FINAL: "final" >
@@ -484,6 +488,7 @@ TOKEN :
 | < PROTECTED: "protected" >
 | < PUBLIC: "public" >
 | < RETURN: "return" >
+| < RETURNTYPE: "\\Return" >
 | < SEQ: "\\seq" >
 | < SET: "\\set" >
 | < SHORT: "short" >
@@ -3682,6 +3687,7 @@ Statement Statement() :
 | result = TryStatement()
 | result = AssertStatement()
 | result = KeYCatchAllStatement()
+| result = ExecStatement()
 )
   {
     checkConstruction(result);
@@ -4602,6 +4608,209 @@ Try TryStatement() :
 
 }
 
+Exec ExecStatement() :
+{
+    Exec result;
+    StatementBlock block;
+    ParameterDeclaration param;
+    ASTList<Branch> branches = new ASTArrayList<Branch>(1);
+    Ccatch cat;
+    Identifier id = null;
+}
+{
+    "exec"
+    {
+        result = factory.createExec();
+        setPrefixInfo(result);
+    }
+
+    block = Block()
+    {
+        result.setBody(block);
+    }
+        
+    // TODO: Wildcard continues & breaks
+
+    [
+        LOOKAHEAD("ccatch" "("  "\\Return" ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  "\\Return" ")"
+        
+        block = Block()
+        {
+            cat.setNonStdParameterDeclaration(factory.createCcatchReturnParameterDeclaration());
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    ]
+
+    (
+        LOOKAHEAD("ccatch" "("  "\\Return" param = FormalParameter() ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  "\\Return" param = FormalParameter() ")"
+        
+        block = Block()
+        {
+            cat.setNonStdParameterDeclaration(factory.createCcatchReturnValParameterDeclaration(param));
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    )*
+
+    [
+        LOOKAHEAD("ccatch" "("  "\\Break" ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  "\\Break" ")"
+        
+        block = Block()
+        {
+            cat.setNonStdParameterDeclaration(factory.createCcatchBreakParameterDeclaration());
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    ]
+
+    (
+        LOOKAHEAD("ccatch" "("  "\\Break" <IDENTIFIER> ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  "\\Break"
+        <IDENTIFIER>
+        {
+            id = factory.createIdentifier(token.image);
+            setPrefixInfo(id);
+            setPostfixInfo(id);
+        } ")"
+        
+        block = Block()
+        {
+            cat.setNonStdParameterDeclaration(factory.createCcatchBreakLabelParameterDeclaration(id));
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    )*
+
+    [
+        LOOKAHEAD("ccatch" "("  "\\Break" "*" ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  "\\Break" "*" ")"
+        
+        block = Block()
+        {
+            cat.setNonStdParameterDeclaration(factory.createCcatchBreakWildcardParameterDeclaration());
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    ]
+
+    [
+        LOOKAHEAD("ccatch" "("  "\\Continue" ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  "\\Continue" ")"
+        
+        block = Block()
+        {
+            cat.setNonStdParameterDeclaration(factory.createCcatchContinueParameterDeclaration());
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    ]
+
+    (
+        LOOKAHEAD("ccatch" "("  "\\Continue" <IDENTIFIER> ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  "\\Continue"
+        <IDENTIFIER>
+        {
+            id = factory.createIdentifier(token.image);
+            setPrefixInfo(id);
+            setPostfixInfo(id);
+        } ")"
+        
+        block = Block()
+        {
+            cat.setNonStdParameterDeclaration(factory.createCcatchContinueLabelParameterDeclaration(id));
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    )*
+
+    [
+        LOOKAHEAD("ccatch" "("  "\\Continue" "*" ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  "\\Continue" "*" ")"
+        
+        block = Block()
+        {
+            cat.setNonStdParameterDeclaration(factory.createCcatchContinueWildcardParameterDeclaration());
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    ]
+    
+    ( 
+        LOOKAHEAD("ccatch" "("  param = FormalParameter() ")")
+        "ccatch"
+        {
+            cat = factory.createCcatch();
+            setPrefixInfo(cat);
+        }
+        
+        "("  param = FormalParameter() ")"
+        
+        block = Block()
+        {
+            cat.setParameterDeclaration(param);
+            cat.setBody(block);
+            branches.add(cat);
+        }
+    )*
+    {
+        result.setBranchList(branches);
+        checkConstruction(result);
+        setPostfixInfo(result);
+        return result;
+    }
+}
 
 /**
    For partial parsing ONLY. Allows this()/super() calls, as in

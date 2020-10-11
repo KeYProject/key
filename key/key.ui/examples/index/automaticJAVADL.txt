@@ -926,6 +926,18 @@ group permissionHeap {
    # provable: ./heap/permissions/threads/Plotter_startTransfer_contract.key
 }
 
+# Completion scopes / Exec statement tests
+group completionScopes {
+   provable ./completionscopes/testCcatchReturnVal.key
+   provable ./completionscopes/testMultCcatchClauses.key
+   provable ./completionscopes/testNestedExec.key
+   provable ./completionscopes/testCcatchBreakLabel.key
+   provable ./completionscopes/testCcatchContinueLabel.key
+   provable ./completionscopes/testCcatchBreakLabelWildcard.key
+   provable ./completionscopes/testCcatchContinueLabelWildcard.key
+   provable ./completionscopes/testCcatchBreakLabelNonmatchingNested.key
+}
+
 # These are the proof files which can be loaded from the examples menu.
 # They must work with the current version.
 group reload_examples {
