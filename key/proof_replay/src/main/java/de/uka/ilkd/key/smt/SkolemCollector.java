@@ -5,10 +5,8 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.*;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * This visitor collects the definition of a variable introduced in a proof leaf by Z3's
@@ -41,32 +39,48 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
             SMTProofParser.NoprooftermContext ex = eqSat.noproofterm(1);
 
             DefCollector collector = new DefCollector(smtReplayer, services);
-            Term exTerm = collector.visit(ex);
-            if (exTerm.op() != Quantifier.EX) {
+            Term term = collector.visit(ex);
+
+            if (term.op() == Quantifier.EX) {
+                // TODO: check that we have the right variable (sk term may contain other skolem symbols as well!)
+
+                // TODO: how to get a collision free var name?
+                Name varName = new Name(skVariable);
+                // TODO: currently ifEx supports integer sort only!
+                IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
+                QuantifiableVariable qv = new LogicVariable(varName, intLDT.targetSort());
+
+                // as condition, we take the formula under the exists quantifier and replace the bound variable by qv
+                QuantifiableVariable exBoundVar = term.boundVars().get(0);
+                Term cond = replace(exBoundVar, qv, term.sub(0));
+                TermBuilder tb = services.getTermBuilder();
+                Term _then = tb.var(qv);
+                // TODO: error value
+                Term _else = tb.zTerm(-1);    // error value: -1
+                Term def = tb.ifEx(qv, cond, _then, _else);
+                // add to map
+                smtReplayer.putSkolemSymbol(skVariable, def);
+                //smtReplayer.translationToTermMap.putIfAbsent(skVariable, def);
+                smtReplayer.addTranslationToTerm(skVariable, def);
+            } else if (term.op() == Junctor.NOT
+                && term.sub(0).op() == Quantifier.ALL) {
+
+                Term all = term.sub(0);
+                Name varName = new Name(skVariable);
+                IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
+                QuantifiableVariable qv = new LogicVariable(varName, intLDT.targetSort());
+                QuantifiableVariable allBoundVar = all.boundVars().get(0);
+                Term cond = replace(allBoundVar, qv, all.sub(0));
+                TermBuilder tb = services.getTermBuilder();
+                Term _then = tb.var(qv);
+                // TODO: error value
+                Term _else = tb.zTerm(-1);
+                Term def = tb.ifEx(qv, cond, _then, _else);
+                smtReplayer.putSkolemSymbol(skVariable, def);
+                smtReplayer.addTranslationToTerm(skVariable, def);
+            } else {
                 throw new IllegalStateException("Invalid sk rule found (no existential quantifier)!");
             }
-
-            // TODO: check that we have the right variable (sk term may contain other skolem symbols as well!)
-
-            // TODO: how to get a collision free var name?
-            Name varName = new Name(skVariable);
-            // TODO: currently ifEx supports integer sort only!
-            IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
-            QuantifiableVariable qv = new LogicVariable(varName, intLDT.targetSort());
-
-            // as condition, we take the formula under the exists quantifier and replace the bound variable by qv
-            QuantifiableVariable exBoundVar = exTerm.boundVars().get(0);
-            Term cond = replace(exBoundVar, qv, exTerm.sub(0));
-            TermBuilder tb = services.getTermBuilder();
-            Term _then = tb.var(qv);
-            Term _else = tb.zTerm(-1);    // error value: -1
-
-            Term def = tb.ifEx(qv, cond, _then, _else);
-
-            // add to map
-            smtReplayer.putSkolemSymbol(skVariable, def);
-            //smtReplayer.translationToTermMap.putIfAbsent(skVariable, def);
-            smtReplayer.addTranslationToTerm(skVariable, def);
             return null;
         }
         // descend into rules that are not sk
@@ -78,7 +92,6 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
         // using OpReplacer does not replace the QuantifiableVariables (due to missing equals method?)
         //return OpReplacer.replace(tb.var(orig), tb.var(repl), t, tf);
         Operator newOp = in.op();
-        //if (newOp.name().equals(toReplace.name())) {
         if (newOp instanceof QuantifiableVariable
             && SMTReplayer.equalsOp((QuantifiableVariable) newOp, toReplace)) {
             newOp = with;
@@ -88,6 +101,7 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
         for (int i = 0; i < newTerms.length; i++) {
             newTerms[i] = replace(toReplace, with, in.subs().get(i));
         }
-        return services.getTermFactory().createTerm(newOp, newTerms);
+        // note: bound vars must be bound in new term again!
+        return services.getTermFactory().createTerm(newOp, newTerms, in.boundVars(), null);
     }
 }
