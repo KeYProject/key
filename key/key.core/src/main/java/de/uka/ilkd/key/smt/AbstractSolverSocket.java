@@ -83,7 +83,9 @@ class Z3Socket extends AbstractSolverSocket{
 
 	public void messageIncoming(Pipe<SolverCommunication> pipe, Message message) throws IOException {
 		SolverCommunication sc = pipe.getSession();
-		String msg = message.getContent().trim();
+		// do not trim (this would destroy the indentation)
+		//String msg = message.getContent().trim();
+		String msg = message.getContent();
 		if(message.getType() == MessageType.Error || msg.startsWith("(error")) {
 			sc.addMessage(msg);
 			if(msg.indexOf("WARNING:")>-1){

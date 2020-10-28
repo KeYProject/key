@@ -163,6 +163,7 @@ public class MasterHandler {
             }
             return new SExpr(res.getName(), res.getType(), newSubs);
         }
+        // TODO: maybe split quantifiers with multiple bound vars?
     }
 
     public SExpr translate(Term problem, Type type)  {
@@ -261,6 +262,7 @@ public class MasterHandler {
     }
 
     public HashSet<Sort> getSorts() {
+        // TODO: roll out typeof = instanceof axiom for all used sorts
         return sorts;
     }
 
