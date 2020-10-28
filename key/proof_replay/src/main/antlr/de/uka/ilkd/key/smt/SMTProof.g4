@@ -12,7 +12,7 @@ proofsexpr
     : LPAREN rulename=PROOFRULE proofsexpr+ RPAREN
     | LPAREN LPAREN UNDERSCORE rulename=PROOFRULE proofsexpr+ RPAREN proofsexpr+ RPAREN
     | LPAREN rulename=LET LPAREN var_binding+ RPAREN proofsexpr RPAREN          // shared subtree of proof
-    | LPAREN rulename='lambda' LPAREN sorted_var+ RPAREN proofsexpr+ RPAREN
+    | LPAREN rulename=LAMBDA LPAREN sorted_var+ RPAREN proofsexpr RPAREN     // TODO: single proofsexpr should be enough (originally had proofsexpr+)
     | LPAREN MATCH proofsexpr LPAREN match_case+ RPAREN RPAREN
     //| LPAREN EXCL proofsexpr attribute+ RPAREN
     | noproofterm
@@ -102,6 +102,8 @@ PROOFRULE
     | PR_NOT_OR_ELIM
     | PR_REWRITE
     | PR_REWRITE_STAR
+    | PR_PULL_QUANT
+    | PR_PUSH_QUANT
     | PR_QUANT_INST
     | PR_HYPOTHESIS
     | PR_LEMMA
@@ -178,6 +180,7 @@ UNDERSCORE : '_';
 EXCL : '!' ;
 AS : 'as' ;
 LET : 'let' ;
+LAMBDA : 'lambda' ;
 EXISTS : 'exists' ;
 FORALL : 'forall' ;
 MATCH : 'match' ;
