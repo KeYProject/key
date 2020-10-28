@@ -11,8 +11,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 import de.uka.ilkd.key.smt.SMTProofParser.NoprooftermContext;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static de.uka.ilkd.key.smt.SMTProofParser.*;
 
@@ -27,6 +26,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
     private final Services services;
     private final TermFactory tf;
     private final TermBuilder tb;
+    private final Deque<QuantifiableVariable> boundVars = new LinkedList<>();
 
     public DefCollector(SMTReplayer smtReplayer, Services services) {
         this.smtReplayer = smtReplayer;
@@ -79,6 +79,11 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         Term cached = smtReplayer.getTranslationToTerm(ctx.getText());
         if (cached != null) {
             return cached;
+        }
+
+        if (ctx.rulename != null && ctx.rulename.getText().equals("let")) {
+            // bindings have already been collected, so directly descend into noproofterm
+            return visit(ctx.noproofterm(0));
         }
 
         // otherwise: translate top level function or quantifier "by hand" and descend into children
@@ -211,10 +216,18 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
             // marker for instanceof uses w/o direct counterpart in the original sequent
             case "typeguard":
                 // TODO: better detect at and/implies or quantifier case?
-                return tb.tt();
+                t1 = visit(ctx.noproofterm(1));
+                // TODO: only int currently
+                Function typeguard = services.getNamespaces().functions().lookup("typeguard_int");
+                return tb.func(typeguard, t1);
+                //return tb.tt();
             case "length":
                 t1 = visit(ctx.noproofterm(1));
                 return tb.dotLength(t1);
+            case "instanceof":
+                t1 = visit(ctx.noproofterm(1));
+                t2 = visit(ctx.noproofterm(2));
+                return tb.instance(t2.sort(), t1);
             default:
                 // what about sorts and variables and other?
 
@@ -241,16 +254,26 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         } else if (ctx.quant != null) {
             // forall, exists
             if (ctx.quant.getText().equals("forall")) {
-                Term t = visit(ctx.noproofterm(0));
                 for (int i = ctx.sorted_var().size() - 1; i >= 0; i--) {
                     QuantifiableVariable qv = extractQV(ctx.sorted_var(i), ctx.noproofterm(0));
+                    boundVars.push(qv);
+                }
+                Term t = visit(ctx.noproofterm(0));
+                for (int i = ctx.sorted_var().size() - 1; i >= 0; i--) {
+                    QuantifiableVariable qv = boundVars.pop();
+                    //QuantifiableVariable qv = extractQV(ctx.sorted_var(i), ctx.noproofterm(0));
                     t = tb.all(qv, t);
                 }
                 return t;
             } else if (ctx.quant.getText().equals("exists")) {
-                Term t = visit(ctx.noproofterm(0));
                 for (int i = ctx.sorted_var().size() - 1; i >= 0; i--) {
                     QuantifiableVariable qv = extractQV(ctx.sorted_var(i), ctx.noproofterm(0));
+                    boundVars.push(qv);
+                }
+                Term t = visit(ctx.noproofterm(0));
+                for (int i = ctx.sorted_var().size() - 1; i >= 0; i--) {
+                    QuantifiableVariable qv = boundVars.pop();
+                    //QuantifiableVariable qv = extractQV(ctx.sorted_var(i), ctx.noproofterm(0));
                     t = tb.ex(qv, t);
                 }
                 return t;
@@ -279,8 +302,27 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                                            NoprooftermContext quantForm) {
         NamespaceSet nss = services.getNamespaces();
 
+        // fix: some sorts T/U and variables do not have prefixes
+        String origVarName = sortedVar.SYMBOL().getText();
+        String varName = origVarName;
+
         // cut the "var_" prefix
-        String varName = sortedVar.SYMBOL().getText().substring(4);
+        if (origVarName.startsWith("var_")) {
+            varName = origVarName.substring(4);
+        }
+
+        // TODO: this does only work with non-compound sorts, not arrays/functions
+        String origSortName = sortedVar.sort().identifier().getText();
+        /*
+        if (origSortName.equals("U")) {
+            return new LogicVariable(new Name(varName), Sort.ANY);
+        } else if (origSortName.equals("T")) {
+            // TODO: ?
+            //return new LogicVariable(new Name(origVarName), ???);
+            throw new IllegalStateException("Not yet implemented!");
+        }*/
+
+        //String varName = origVarName.substring(4);
         Term cached = smtReplayer.getTranslationToTerm(sortedVar.SYMBOL().getText());
         if (cached != null) {
             if (cached.op() instanceof QuantifiableVariable) {
@@ -299,7 +341,10 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         NoprooftermContext nameCtx = typeguard.noproofterm(1);
         NoprooftermContext sortCtx = typeguard.noproofterm(2);
         // cut the "sort_" prefix
-        String sortName = sortCtx.getText().substring(5);
+        String sortName = sortCtx.getText();
+        if (sortName.startsWith("sort_")) {
+            sortName = sortName.substring(5);
+        }
         Sort keySort = nss.sorts().lookup(sortName);
 
         // TODO: SMT quantifiers may have multiple quantified variables
@@ -331,12 +376,28 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         }
     }
 
+    private QuantifiableVariable getBoundVar(String varName) {
+        for (QuantifiableVariable qv : boundVars) {
+            if (qv.name().toString().equals(varName)) {
+                return qv;
+            }
+        }
+        return null;
+    }
+
+
+
     @Override
     public Term visitIdentifier(IdentifierContext ctx) {
         if (ctx.getText().equals("false")) {
             return tb.ff();
         } else if (ctx.getText().equals("true")) {
             return tb.tt();
+        }
+        QuantifiableVariable qv = getBoundVar(ctx.getText());
+        if (qv != null) {
+            // return the bound variable
+            return tb.var(qv);
         } else {
             // the symbol is a new skolem symbol introduced by an sk rule in a proof leaf
             Term skDef = smtReplayer.getSkolemSymbolDef(ctx.getText());
