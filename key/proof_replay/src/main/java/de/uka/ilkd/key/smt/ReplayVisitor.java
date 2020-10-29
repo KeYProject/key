@@ -22,6 +22,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import java.util.ArrayList;
 import java.util.List;
 
+import static de.uka.ilkd.key.smt.SMTProofParser.*;
+
 class ReplayVisitor extends SMTProofBaseVisitor<Void> {
     private final SMTReplayer smtReplayer;
     private Goal goal;
@@ -265,7 +267,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         // collect all positions of the quantified variable in ex term
         // <-> positions of ifEx term in right side formula
         ProofsexprContext equiSat = ctx.proofsexpr(0);
-        SMTProofParser.NoprooftermContext exCtx = equiSat.noproofterm().noproofterm(1);
+        NoprooftermContext exCtx = equiSat.noproofterm().noproofterm(1);
         Term ex = new DefCollector(smtReplayer, services).visit(exCtx);
         List<PosInTerm> pits = collectQvPositions(ex);
 
@@ -526,53 +528,92 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         replayRightSideHelper(ctx);
     }
 
+    // notLeft, orRight ..., notRight, ..., closeAntec
     private void replayNotOrElim(ProofsexprContext ctx) {
         Term cutTerm = extractRuleAntecedents(ctx);
         TacletApp app = createCutApp(goal, cutTerm);
         List<Goal> goals = goal.apply(app).toList();
         Goal left = goals.get(1);
-        SequentFormula orig = left.sequent().succedent().get(0);
+        SequentFormula rhs = left.sequent().succedent().get(0);
+        SequentFormula seqForm = getLastAddedAntec(left);
 
-        SequentFormula seqForm = left.sequent().antecedent().get(0);
-        PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-        app = createTacletApp("notLeft", pio, left);
-        left = left.apply(app).head();
+        // to avoid cases where a temporary formula is equal to the conclusion
+        // (and thus destroying all index calculations), we hide the original rhs here
+        left = applyNoSplitTopLevelSuc(left, "hide_right", rhs);
+        NoPosTacletApp insertRule = goal.node().getLocalIntroducedRules().iterator().next();
 
-        // orRight
-        seqForm = left.sequent().succedent().get(0);
-        // better count up to arity
-        for (int i = 0; i < ctx.proofsexpr().size(); i++) {
-            //while (seqForm.formula().op() == Junctor.OR) {
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-            app = createTacletApp("orRight", pio, left);
-            left = left.apply(app).head();
-            //seqForm = left.sequent().succedent().get(0);
-            SequentChangeInfo sci = left.node().getNodeInfo().getSequentChangeInfo();
-            // TODO: is the order of the added formulas deterministic?
-            seqForm = sci.addedFormulas().tail().head();
-            if (seqForm == null) {
-                // attention: the formula may be equal to the original one by chance
+        left = applyNoSplitTopLevelAntec(left, "notLeft", seqForm);
+
+        seqForm = getLastAddedSuc(left);
+
+        // TODO: better count up to arity, however, extracting the original SMT arity of or is
+        //  pretty difficult
+        //  pragmatic solution: will always find the searched literal
+        //int arity = extractOrArity(ctx.proofsexpr(0));
+        //for (int i = 0; i < arity; i++) {
+        while (seqForm.formula().op() == Junctor.OR) {
+
+            left = applyNoSplitTopLevelSuc(left, "orRight", seqForm);
+
+            seqForm = getLastAddedSuc(left, 1);
+            SequentFormula split = getLastAddedSuc(left, 0);
+
+            if (split.formula().op() == Junctor.NOT) {
+                left = applyNoSplitTopLevelSuc(left, "notRight", split);
+            } else {
+                left = applyNoSplitTopLevelSuc(left, "notElimRight", split);
+            }
+
+            // early close if possible
+            split = getLastAddedAntec(left);
+            if (split.formula().equals(rhs.formula())) {
+                // found the literal -> close
+                // reinsert original rhs
+                left = left.apply(insertRule).head();
+                left = applyNoSplitTopLevelAntec(left, "closeAntec", split);
                 break;
+            } else {
+                // additional checks necessary for pragmatic solution, see e.g. sequent
+                // !((p | q) | p) ==> !(p | q)
+                if (seqForm.formula().op() == Junctor.NOT) {
+                    left = left.apply(insertRule).head();
+                    left = applyNoSplitTopLevelAntec(left, "notRight", seqForm);
+                    seqForm = getLastAddedAntec(left);
+                    left = applyNoSplitTopLevelAntec(left, "closeAntec", seqForm);
+                } else if (rhs.formula().op() == Junctor.NOT) {
+                    left = left.apply(insertRule).head();
+                    left = applyNoSplitTopLevelAntec(left, "notElimRight", seqForm);
+                    seqForm = getLastAddedAntec(left);
+                    left = applyNoSplitTopLevelAntec(left, "closeAntec", seqForm);
+                }
             }
         }
 
-        pio = new PosInOccurrence(orig, PosInTerm.getTopLevel(), false);
-        if (orig.formula().op() == Junctor.NOT) {
-            app = createTacletApp("notRight", pio, left);
-        } else {
-            // TODO: additional rule (not in standard taclets!)
-            app = createTacletApp("notElimRight", pio, left);
+        if (!left.node().isClosed()) {
+            if (seqForm.formula().op() == Junctor.NOT) {
+                left = applyNoSplitTopLevelSuc(left, "notRight", seqForm);
+            } else {
+                left = applyNoSplitTopLevelSuc(left, "notElimRight", seqForm);
+            }
+            seqForm = getLastAddedAntec(left);
+            // now closing must be possible (or there is something wrong)
+            // reinsert original rhs
+            left = left.apply(insertRule).head();
+            left = applyNoSplitTopLevelAntec(left, "closeAntec", seqForm);
         }
-        left = left.apply(app).head();
-
-        seqForm = left.sequent().antecedent().get(0);
-        pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-        app = createTacletApp("closeAntec", pio, left);
-        left = left.apply(app).head();
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
         replayRightSideHelper(ctx);
+    }
+
+    private boolean eqDifferentPolarity(Term t1, Term t2) {
+        if (t1.op() == Junctor.NOT) {
+            return t1.sub(0).equals(t2);
+        } else if (t2.op() == Junctor.NOT) {
+            return t2.sub(0).equals(t1);
+        }
+        return false;
     }
 
     private void replayMonotonicity(ProofsexprContext ctx) {
@@ -958,10 +999,10 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
     }
 
     private Term lookupOrCreate(ProofsexprContext ctx) {
-        // child could be:
+        // ctx could be:
         // - symbol from KeY (is in translation map)
         // - symbol bound via let
-        // - a term with nested rule applications
+        // - a term with nested rule applications (descend into succedent of the rule)
         Term term = smtReplayer.getTranslationToTerm(ctx.getText());
         if (term == null) {
             // recursively descend into let definition
