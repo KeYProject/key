@@ -206,7 +206,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         List<Goal> goals = goal.apply(cutApp).toList();
         Goal left = goals.get(1);
 
-        runAutoMode(left);
+        runAutoModePropositional(left, 50);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
@@ -215,7 +215,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
 
     private void replayDistributivity(ProofsexprContext ctx) {
         // TODO: restrict to specific rules? better "manual" replay?
-        runAutoMode(goal);
+        runAutoModePropositional(goal, 50);
     }
 
     // this rule should not be used except with CONTEXT_SIMPLIFIER=true or BIT2BOOL=true
@@ -229,7 +229,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         Goal left = goals.get(1);
 
         // close this goal by auto mode
-        runAutoMode(left);
+        runAutoModePropositional(left, 50);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
@@ -291,7 +291,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         // quick and dirty solution: use auto mode (simple propositional steps)
         // TODO: implement schemas
         // TODO: run auto mode with specific ruleset?
-        runAutoMode(goal);
+        runAutoModePropositional(goal, 50);
     }
 
     private void replayBind(ProofsexprContext ctx) {
@@ -1244,7 +1244,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
 
         // trans* rule contains multiple transitivity and symmetry steps,
         // therefore we need auto mode here (however, should be really simple to close)
-        runAutoMode(goal);
+        runAutoModePropositional(goal, 50);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
@@ -1468,6 +1468,15 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
         // since all branches in addInstantiation return NoPosTacletApp, the cast should always be safe
         return (NoPosTacletApp) app.addInstantiation(sv, cutFormula, true, goal.proof().getServices());
+    }
+
+    private void runAutoModePropositional(Goal goal, int steps) {
+        PropositionalMacro prop = new PropositionalMacro(steps);
+        try {
+            prop.applyTo(null, goal.node(), null, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void runAutoMode(Goal goal) {
