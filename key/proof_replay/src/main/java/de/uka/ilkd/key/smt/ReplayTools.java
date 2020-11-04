@@ -1,9 +1,16 @@
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.TacletMatcher;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 
@@ -66,5 +73,102 @@ public final class ReplayTools {
     // TODO: replace by real equals method in QuantifiableVariable
     public static boolean equalsOp(QuantifiableVariable a, QuantifiableVariable b) {
         return a.name().equals(b.name()) && a.sort().equals(b.sort());
+    }
+
+    public static boolean eqDifferentPolarity(SequentFormula s1, SequentFormula s2) {
+        Term t1 = s1.formula();
+        Term t2 = s2.formula();
+        if (t1.op() == Junctor.NOT) {
+            return t1.sub(0).equals(t2);
+        } else if (t2.op() == Junctor.NOT) {
+            return t2.sub(0).equals(t1);
+        }
+        return false;
+    }
+
+    public static SequentFormula getLastModifiedAntec(Goal goal) {
+        SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
+        return sci.modifiedFormulas(true).head().getNewFormula();
+    }
+
+    public static SequentFormula getLastModifiedSuc(Goal goal) {
+        SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
+        return sci.modifiedFormulas(false).head().getNewFormula();
+    }
+
+    public static SequentFormula getLastAddedAntec(Goal goal) {
+        SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
+        return sci.addedFormulas(true).head();
+    }
+
+    public static SequentFormula getLastAddedAntec(Goal goal, int index) {
+        SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
+        return sci.addedFormulas(true).toList().get(index);
+    }
+
+    public static SequentFormula getLastAddedSuc(Goal goal) {
+        SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
+        return sci.addedFormulas(false).head();
+    }
+
+    public static SequentFormula getLastAddedSuc(Goal goal, int index) {
+        SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
+        return sci.addedFormulas(false).toList().get(index);
+    }
+
+    public static Goal applyNoSplitPosAntec(Goal goal, String tacletName, PosInTerm pit,
+                                             SequentFormula sf) {
+        PosInOccurrence pio = new PosInOccurrence(sf, pit, true);
+        TacletApp app = createTacletApp(tacletName, pio, goal);
+        return goal.apply(app).head();
+    }
+
+    public static Goal applyNoSplitTopLevelAntec(Goal goal, String tacletName, SequentFormula sf) {
+        PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), true);
+        TacletApp app = createTacletApp(tacletName, pio, goal);
+        return goal.apply(app).head();
+    }
+
+    public static Goal applyNoSplitTopLevelSuc(Goal goal, String tacletName, SequentFormula sf) {
+        PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
+        TacletApp app = createTacletApp(tacletName, pio, goal);
+        return goal.apply(app).head();
+    }
+
+
+    public static TacletApp createTacletApp(String tacletName, PosInOccurrence pos, Goal goal) {
+        TacletApp app = goal.indexOfTaclets().lookup(tacletName);
+        System.out.println("Creating TacletApp " + tacletName);
+        return autoInst(app, pos, goal);
+    }
+
+    // automatically instantiates taclet from PosInOccurrence, only works for taclets where all
+    // instantiations are determined by the position
+    public static TacletApp autoInst(TacletApp app, PosInOccurrence pos, Goal goal) {
+        Services services = goal.proof().getServices();
+        Term posTerm = pos.subTerm();
+        app = app.setPosInOccurrence(pos, services);
+
+        // automatically find instantiations for matching find term
+        TacletMatcher matcher = app.taclet().getMatcher();
+        // use app.matchConditions(): must not overwrite fixed instantiations
+        // (e.g. insert_hidden taclet)
+        MatchConditions current = app.matchConditions();
+        MatchConditions mc = matcher.matchFind(posTerm, current, services);
+        app = app.setMatchConditions(mc, services);
+
+        // automatically find formulas for matching assume
+        app = app.findIfFormulaInstantiations(goal.sequent(), services).head();
+
+        return app;
+    }
+
+    public static NoPosTacletApp createCutApp(Goal goal, Term cutFormula) {
+        NoPosTacletApp app = goal.indexOfTaclets().lookup("cut");
+        SchemaVariable sv = app.uninstantiatedVars().iterator().next();
+        // since all branches in addInstantiation return NoPosTacletApp,
+        // the cast should always be safe
+        Services services = goal.proof().getServices();
+        return (NoPosTacletApp) app.addInstantiation(sv, cutFormula, true, services);
     }
 }
