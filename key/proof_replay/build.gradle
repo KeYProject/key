@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'antlr'
+    id 'application'
 }
 
 group 'org.key_project'
@@ -30,3 +31,6 @@ sourceSets {
     }
 }
 
+application {
+    mainClassName = "de.uka.ilkd.key.smt.Main"
+}
