@@ -16,8 +16,8 @@ import java.util.*;
 import static de.uka.ilkd.key.smt.SMTProofParser.*;
 
 /**
- * This visitor converts a Z3 term to a KeY term, descending into the succedents of Z3 proof rule terms
- * if necessary.
+ * This visitor converts a Z3 term into a KeY term, descending into the succedents of Z3 proof rule
+ * terms if necessary.
  *
  * @author Wolfram Pfeifer
  */
@@ -38,6 +38,37 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
     @Override
     public Term visitProofsexpr(ProofsexprContext ctx) {
         if (ctx.rulename != null) {
+
+            // for (proof-bind (lambda ... we make the implicit quantification of free vars explicit
+            if (ctx.rulename.getText().equals("proof-bind")) {
+                // could be lambda or symbol (bound by let)
+                ProofsexprContext next = ctx.proofsexpr(0);
+                ParserRuleContext def = smtReplayer.getSymbolDef(next.getText(), next);
+                if (def != null) {      // bound by let
+                    next = (ProofsexprContext) def;
+                }
+                // now next must be a lambda term
+                if (next.rulename != null && next.rulename.getText().equals("lambda")) {
+                    // visit and wrap into (possibly multiple) forall
+                    Term result = visit(next.proofsexpr(0));
+                    for (int i = next.sorted_var().size() - 1; i >= 0; i--) {
+                        // we need to extract the actual type from the typeguard
+                        //TODO: search for typeguard
+                        String varName = next.sorted_var(i).SYMBOL().getText();
+                        if (varName.startsWith("var_")) {
+                            varName = varName.substring(4);
+                        }
+                        QuantifiableVariable qv = new TypeguardSortCollector(services, varName).visit(next);
+                        //QuantifiableVariable qv = extractQV(next.sorted_var(i), next);
+                        //QuantifiableVariable qv = extractQVSimple(next.sorted_var(i));
+                        result = tb.all(qv, result);
+                    }
+                    return result;
+                } else {
+                    throw new IllegalStateException("After proof-bind, lambda is expected!");
+                }
+            }
+
             // last proofsexpr holds the succedent of the rule application
             ParseTree succedent = ctx.proofsexpr(ctx.proofsexpr().size() - 1);
 
@@ -58,9 +89,23 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         throw new IllegalStateException("The subtree is neither a Proofsexpr nor a Noproofterm!");
     }
 
+    private QuantifiableVariable extractQVSimple(Sorted_varContext ctx) {
+        String varName = ctx.SYMBOL().getText();
+        String sortName = ctx.sort().identifier().getText();
+        if (varName.startsWith("var_")) {
+            varName = varName.substring(4);
+        }
+        if (sortName.startsWith("sort_")) {
+            sortName = sortName.substring(5);
+        }
+        // TODO: does only work for simple sorts!
+        Sort keySort = services.getNamespaces().sorts().lookup(sortName);
+        return new LogicVariable(new Name(varName), keySort);
+    }
+
     @Override
     public Term visitNoproofterm(NoprooftermContext ctx) {
-        System.out.println("Trying to translate " + SMTReplayer.getOriginalText(ctx) + " ...");
+        System.out.println("Trying to translate " + ReplayTools.getOriginalText(ctx) + " ...");
 
         // term may be a new symbol introduced by the let binder
         //ProofsexprContext proofsexpr = smtReplayer.getSymbolDef(ctx.getText());
@@ -219,7 +264,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                 t1 = visit(ctx.noproofterm(1));
                 // TODO: only int currently
                 Function typeguard = services.getNamespaces().functions().lookup("typeguard_int");
-                return tb.func(typeguard, t1);
+                return tb.equals(tb.func(typeguard, t1), tb.TRUE());
                 //return tb.tt();
             case "length":
                 t1 = visit(ctx.noproofterm(1));
@@ -228,6 +273,18 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                 t1 = visit(ctx.noproofterm(1));
                 t2 = visit(ctx.noproofterm(2));
                 return tb.instance(t2.sort(), t1);
+            case "subtype":
+                // TODO: does not work!
+                t1 = visit(ctx.noproofterm(1));
+                t2 = visit(ctx.noproofterm(2));
+                return tb.instance(t2.sort(), t1);
+            case "typeof":
+                // TODO: does not work!
+                t1 = visit(ctx.noproofterm(1));
+                tb.exactInstance(t1.sort(), t1);
+            case "cast":
+                t1 = visit(ctx.noproofterm(1));
+                return tb.cast(t1.sort(), t1);
             default:
                 // what about sorts and variables and other?
 
@@ -289,6 +346,17 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
             //throw new IllegalStateException("Currently not supported!");
             return visitChildren(ctx);
         }
+    }
+
+    private QuantifiableVariable extractQV(Sorted_varContext sortedVar,
+                                           ProofsexprContext ctx) {
+        NamespaceSet nss = services.getNamespaces();
+        String origVarName = sortedVar.SYMBOL().getText();
+
+        // TODO:
+        // we search ctx until we found a typeguard for the var with the given name
+        //for (ProofsexprContext child : ctx.proofsexpr()) ...
+        return null;
     }
 
     /**

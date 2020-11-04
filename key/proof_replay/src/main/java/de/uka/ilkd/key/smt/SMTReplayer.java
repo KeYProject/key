@@ -171,14 +171,10 @@ public class SMTReplayer {
 
         // do actual replay (starting from found proof root)
         ReplayVisitor replayVisitor = new ReplayVisitor(this, goal);
-        try {
-            proofStart.accept(replayVisitor);
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-            // prune back proof to original
-            // TODO: disabled for now (debugging)
-            // TODO: show error message in GUI
-            //goal.proof().pruneProof(original.node());
+        proofStart.accept(replayVisitor);
+        if (!replayVisitor.allHypothesesDischarged()) {
+            throw new IllegalStateException("Something went wrong with the proof: " +
+                "There are unproven hypotheses!");
         }
     }
 
@@ -218,20 +214,5 @@ public class SMTReplayer {
 
     public void addTranslationToTerm(String smtExpr, Term keyTerm) {
         translationToTermMap.put(smtExpr, keyTerm);
-    }
-
-    static String getOriginalText(ParserRuleContext ctx) {
-        if (ctx.start == null || ctx.start.getStartIndex() < 0 || ctx.stop == null || ctx.stop.getStopIndex() < 0) {
-            // fallback
-            return ctx.getText();
-        }
-        int start = ctx.start.getStartIndex();
-        int end = ctx.stop.getStopIndex();
-        return ctx.start.getInputStream().getText(Interval.of(start, end));
-    }
-
-    // TODO: replace by real equals method in QuantifiableVariable
-    static boolean equalsOp(QuantifiableVariable a, QuantifiableVariable b) {
-        return a.name().equals(b.name()) && a.sort().equals(b.sort());
     }
 }

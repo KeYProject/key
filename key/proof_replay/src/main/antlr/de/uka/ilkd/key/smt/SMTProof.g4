@@ -9,11 +9,11 @@ proof
     ;
 
 proofsexpr
-    : LPAREN rulename=PROOFRULE proofsexpr+ RPAREN
-    | LPAREN LPAREN UNDERSCORE rulename=PROOFRULE proofsexpr+ RPAREN proofsexpr+ RPAREN
+    : LPAREN rulename=PROOFRULE sub+=proofsexpr+ RPAREN
+    | LPAREN LPAREN UNDERSCORE rulename=PROOFRULE sub+=proofsexpr+ RPAREN proofsexpr+ RPAREN
     | LPAREN rulename=LET LPAREN var_binding+ RPAREN proofsexpr RPAREN          // shared subtree of proof
     | LPAREN rulename=LAMBDA LPAREN sorted_var+ RPAREN proofsexpr RPAREN     // TODO: single proofsexpr should be enough (originally had proofsexpr+)
-    | LPAREN MATCH proofsexpr LPAREN match_case+ RPAREN RPAREN
+    //| LPAREN MATCH proofsexpr LPAREN match_case+ RPAREN RPAREN            // TODO: implement
     //| LPAREN EXCL proofsexpr attribute+ RPAREN
     | noproofterm
     ;
@@ -26,7 +26,7 @@ noproofterm
     | LPAREN quant=FORALL LPAREN sorted_var+ RPAREN noproofterm RPAREN
     | LPAREN quant=EXISTS LPAREN sorted_var+ RPAREN noproofterm RPAREN
     | LPAREN rulename=LET LPAREN var_binding+ RPAREN noproofterm RPAREN         // shared formula/term
-    | LPAREN MATCH noproofterm LPAREN match_case+ RPAREN RPAREN
+    //| LPAREN MATCH noproofterm LPAREN match_case+ RPAREN RPAREN       // TODO: implement
     | LPAREN EXCL noproofterm attribute+ RPAREN
     ;
 
@@ -87,9 +87,10 @@ term
 LPAREN : '(' ;
 RPAREN : ')' ;
 
-// minimum proof rules for large proof example
 PROOFRULE
-    : PR_ASSERTED
+    : PR_TRUE
+    | PR_ASSERTED
+    | PR_GOAL
     | PR_MODUS_PONENS
     | PR_REFLEXIVITY
     | PR_SYMMETRY
@@ -98,6 +99,7 @@ PROOFRULE
     | PR_MONOTONICITY
     | PR_QUANT_INTRO
     | PR_BIND
+    | PR_DISTRIBUTIVITY
     | PR_AND_ELIM
     | PR_NOT_OR_ELIM
     | PR_REWRITE

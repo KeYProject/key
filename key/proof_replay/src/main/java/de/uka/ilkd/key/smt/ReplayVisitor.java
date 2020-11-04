@@ -1,26 +1,24 @@
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.macros.PropositionalMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
+import de.uka.ilkd.key.prover.ProverTaskListener;
+import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.smt.SMTProofParser.IdentifierContext;
 import de.uka.ilkd.key.smt.SMTProofParser.ProofsexprContext;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static de.uka.ilkd.key.smt.SMTProofParser.*;
 
@@ -28,11 +26,18 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
     private final SMTReplayer smtReplayer;
     private Goal goal;
     private final Services services;
+    private final Set<Term> hypotheses = new HashSet<>();
+    private final Set<Term> dischargedHypotheses = new HashSet<>();
 
     public ReplayVisitor(SMTReplayer smtReplayer, Goal goal) {
         this.smtReplayer = smtReplayer;
         this.goal = goal;
         this.services = goal.proof().getServices();
+    }
+
+
+    public boolean allHypothesesDischarged() {
+        return dischargedHypotheses.containsAll(hypotheses);
     }
 
     @Override
@@ -50,16 +55,22 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
 
         String rulename = ctx.rulename.getText();
         //System.out.println(rulename);
-        System.out.println(SMTReplayer.getOriginalText(ctx));
-        goal.node().getNodeInfo().setNotes(SMTReplayer.getOriginalText(ctx));
+        System.out.println(ReplayTools.getOriginalText(ctx));
+        goal.node().getNodeInfo().setNotes(ReplayTools.getOriginalText(ctx));
 
         switch (rulename) {
+        case "true-axiom":
+            replayTrue(ctx);
+            return null;
+        case "goal":            // goal is semantically equal to asserted
         case "asserted":
-            //runAutoMode(goal, true);
             replayAsserted(ctx);
             return null;
         case "rewrite":
             replayRewrite(ctx);
+            return null;
+        case "rewrite*":
+            replayRewriteStar(ctx);
             return null;
         case "monotonicity":
             replayMonotonicity(ctx);
@@ -76,13 +87,16 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         case "iff-false":
             replayIffFalse(ctx);
             return null;
+        case "commutativity":
+            replayCommutativity(ctx);
+            return null;
         case "not-or-elim":
             replayNotOrElim(ctx);
             return null;
         case "and-elim":
             replayAndElim(ctx);
             return null;
-        case "mp":
+        case "mp":      // since we replace ~ by <-> and eps, mp and mp~ can be treated the same
         case "mp~":
             replayMp(ctx);
             return null;
@@ -107,11 +121,23 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         case "proof-bind":
             replayBind(ctx);
             return null;
+        case "distributivity":
+            replayDistributivity(ctx);
+            return null;
         case "def-axiom":
             replayDefAxiom(ctx);
             return null;
+        case "iff~":
+            replayIffEquisat(ctx);
+            return null;
         case "quant-inst":
             replayQuantInst(ctx);
+            return null;
+        case "hypothesis":
+            replayHypothesis(ctx);
+            return null;
+        case "lemma":
+            replayLemma(ctx);
             return null;
         default:
             System.out.println("Replay for rule not yet implemented: " + rulename);
@@ -119,6 +145,100 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             return null;
         }
         //return super.visitProofsexpr(ctx);
+    }
+
+    private void replayHypothesis(ProofsexprContext ctx) {
+        Term hypothesis = extractRuleAntecedents(ctx);
+
+        // add term to hypothesis list (has to be discharged by lemma rule later)
+        hypotheses.add(hypothesis);
+
+        // TODO: better collect all hypotheses in a pre pass (while constructing namespaces?)
+        //  and add all hypotheses to antecedent globally (using insert taclets for not cluttering
+        //  the sequent)?
+        // add additional hypothesis to antecedent
+        SequentFormula hypoSF = new SequentFormula(hypothesis);
+        goal.sequent().antecedent().insertFirst(hypoSF);        // TODO: this looks unsound ...
+
+        // close
+        goal = applyNoSplitTopLevelAntec(goal, "closeAntec", hypoSF);
+    }
+
+    private void replayLemma(ProofsexprContext ctx) {
+        Term antecedent = extractRuleAntecedents(ctx);
+        TacletApp cutApp = createCutApp(goal, antecedent);
+        List<Goal> goals = goal.apply(cutApp).toList();
+
+
+        Term conclusion = extractRuleConclusion(ctx);
+        dischargedHypotheses.add(conclusion);
+        // TODO: there must be some scope where the hypothesis can be used / is discharged ...
+
+        SequentFormula seqForm = goal.sequent().succedent().getFirst();
+        int conclArity = getTopLevelArity(ctx.proofsexpr(ctx.proofsexpr().size() - 1));
+        for (int i = 0; i < conclArity - 1; i++) {
+            goal = applyNoSplitTopLevelSuc(goal, "orRight", seqForm);
+
+            seqForm = getLastAddedSuc(goal, 0);
+            SequentFormula li = getLastAddedSuc(goal, 1);
+            goal = applyNoSplitTopLevelSuc(goal, "notRight", li);
+        }
+        // all hypotheses are now in the antecedent
+
+        // TODO:
+        //goal = ...;
+        replayRightSideHelper(ctx);
+    }
+
+    private void replayIffEquisat(ProofsexprContext ctx) {
+        // TODO is this correct?
+        // nothing to do here, since we replace all ~ using <-> and epsilon
+        // directly descend into antecedent
+        replayRightSideHelper(ctx);
+    }
+
+    private void replayCommutativity(ProofsexprContext ctx) {
+        // to be safe here: cut with antecendent and run auto mode, since we do not know which
+        // operator is used
+        Term cutTerm = extractRuleAntecedents(ctx);
+
+        TacletApp cutApp = createCutApp(goal, cutTerm);
+        List<Goal> goals = goal.apply(cutApp).toList();
+        Goal left = goals.get(1);
+
+        runAutoMode(left);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        goal = goals.get(0);
+        replayRightSideHelper(ctx);
+    }
+
+    private void replayDistributivity(ProofsexprContext ctx) {
+        // TODO: restrict to specific rules? better "manual" replay?
+        runAutoMode(goal);
+    }
+
+    // this rule should not be used except with CONTEXT_SIMPLIFIER=true or BIT2BOOL=true
+    private void replayRewriteStar(ProofsexprContext ctx) {
+        Term cutTerm = extractRuleAntecedents(ctx);
+
+        Term conclusion = extractRuleConclusion(ctx);
+
+        TacletApp app = createCutApp(goal, cutTerm);
+        List<Goal> goals = goal.apply(app).toList();
+        Goal left = goals.get(1);
+
+        // close this goal by auto mode
+        runAutoMode(left);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        goal = goals.get(0);
+        replayRightSideHelper(ctx);
+    }
+
+    private void replayTrue(ProofsexprContext ctx) {
+        SequentFormula seqForm = goal.sequent().succedent().getFirst();
+        goal = applyNoSplitTopLevelSuc(goal, "closeTrue", seqForm);
     }
 
     private void replayQuantInst(ProofsexprContext ctx) {
@@ -224,35 +344,261 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
     private void replayQuantIntro(ProofsexprContext ctx) {
         // cut: forall x. phi(x) <-> psi(x)
         // TODO: on the right side there may be an ~ (which is converted to <->), <-> or =
-        Term cutTerm = extractRuleAntecedents(ctx);
-        TacletApp app = createCutApp(goal, cutTerm);
-        List<Goal> goals = goal.apply(app).toList();
+        Term expectedTerm = extractRuleAntecedents(ctx);
+        // we do not use the term here for a cut, since we need to introduce fresh skolem symbols,
+        // however, we can compare our skolemized term to that extracted from the rule antecedent
+
+        // TODO: we expect: quant-intro (lambda ((x S)(y T)...) phi)
+
+        SequentFormula conclusion = goal.sequent().succedent().getFirst();
+        Term t = conclusion.formula();
+
+        assert t.op() == Equality.EQV;
+
+        Term l = t.sub(0);
+        Term r = t.sub(1);
+
+        assert l.op() == Quantifier.EX || l.op() == Quantifier.ALL;
+        assert r.op() == Quantifier.EX || r.op() == Quantifier.ALL;
+        assert l.boundVars().size() == 1;
+        assert r.boundVars().size() == 1;
+
+        QuantifiableVariable qvL = l.boundVars().last();
+        QuantifiableVariable qvR = r.boundVars().last();
+        Term leftUnderQuant = l.sub(0);
+        Term rightUnderQuant = r.sub(0);
+
+        // replace to have same quantified variable
+        Term rightRepl = ReplayTools.replace(qvR, qvL, r, services);
+
+        // note that we always create forall!
+        TermBuilder tb = services.getTermBuilder();
+        TermFactory tf = services.getTermFactory();
+        Term cutTerm = tb.all(qvL, tf.createTerm(Equality.EQV, leftUnderQuant, rightRepl));
+        TacletApp cutApp = createCutApp(goal, cutTerm);
+        //assert cutTerm.equals(expectedTerm); // apart from renaming
+
+        List<Goal> goals = goal.apply(cutApp).toList();
+
+        // forall x. p(x) <-> q(x) ==> Q x. p(x) <-> Q x. q(x)
         Goal left = goals.get(1);
+        SequentFormula quantEquiv = getLastAddedAntec(left);
 
-        // equiv_right
-        SequentChangeInfo sci = left.node().getNodeInfo().getSequentChangeInfo();
-        SequentFormula seqForm = sci.addedFormulas(false).head();
-        PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-        app = createTacletApp("equiv_right", pio, left);
-        List<Goal> goalsEquiv = left.apply(app).toList();
-        ////////////////////////////////////////////////////////////////
-        Goal equivLeft = goalsEquiv.get(1);
+        PosInOccurrence pio = new PosInOccurrence(conclusion, PosInTerm.getTopLevel(), false);
+        TacletApp splitEquiv = createTacletApp("equiv_right", pio, left);
+        List<Goal> splitGoals = left.apply(splitEquiv).toList();
+        // forall x. p(x) <-> q(x), Q x. p(x) ==> Q x. q(x)
+        Goal splitLeft = splitGoals.get(0);
+        SequentFormula rhs = getLastAddedSuc(splitLeft);
+        if (rhs.formula().op() == Quantifier.ALL) {                                     // forall
+            // forall x. p(x) <-> q(x), forall x. p(x) ==> forall x. q(x)
+            // allRight
+            pio = new PosInOccurrence(rhs, PosInTerm.getTopLevel(), false);
+            TacletApp app = createTacletApp("allRight", pio, splitLeft);
+            splitLeft = splitLeft.apply(app).head();
 
-        // exLeft (skolemize)
-        sci = equivLeft.node().getNodeInfo().getSequentChangeInfo();
-        seqForm = sci.addedFormulas(true).head();
-        pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-        app = createTacletApp("exLeft", pio, equivLeft);
-        equivLeft = equivLeft.apply(app).head();
+            // get the new skolem constant from the last rule application
+            SVInstantiations svInsts = app.instantiations();
+            Iterator<SchemaVariable> iterator = svInsts.svIterator();
+            SchemaVariable skSv = null;
+            while (iterator.hasNext()) {
+                SchemaVariable sv = iterator.next();
+                if (sv instanceof SkolemTermSV) {
+                    skSv = sv;
+                    break;      // TODO: only works with single skolemSV
+                }
+            }
+            assert skSv != null;
+            final Term inst = (Term) svInsts.getInstantiation(skSv);
 
-        IProgramVariable pv = equivLeft.node().getLocalProgVars().head();
+            // instAll
+            SequentFormula seqForm = getLastAddedAntec(splitLeft);
+            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
+            app = createTacletApp("instAll", pio, splitLeft);
+            SchemaVariable qvSv = app.uninstantiatedVars().iterator().next();
+            app = app.addInstantiation(qvSv, inst, true, services);
+            splitLeft = splitLeft.apply(app).head();
 
-        ////////////////////////////////////////////////////////////////
+            // instAll
+            pio = new PosInOccurrence(quantEquiv, PosInTerm.getTopLevel(), true);
+            app = createTacletApp("instAll", pio, splitLeft);
+            qvSv = app.uninstantiatedVars().iterator().next();
+            app = app.addInstantiation(qvSv, inst, true, services);
+            splitLeft = splitLeft.apply(app).head();
+
+            // replace_known_left
+            seqForm = getLastAddedAntec(splitLeft);
+            PosInTerm pit = PosInTerm.getTopLevel().down(0);
+            splitLeft = applyNoSplitPosAntec(splitLeft, "replace_known_left", pit, seqForm);
+
+            // concrete_eq_1
+            seqForm = getLastAddedAntec(splitLeft);
+            splitLeft = applyNoSplitTopLevelAntec(splitLeft, "concrete_eq_1", seqForm);
+
+            // closeAntec
+            seqForm = getLastAddedAntec(splitLeft);
+            splitLeft = applyNoSplitTopLevelAntec(splitLeft, "closeAntec", seqForm);
+        } else {                                                                        // exists
+            // forall x. p(x) <-> q(x), exists x. p(x) ==> exists x. q(x)
+            // exLeft
+            SequentFormula seqForm = getLastAddedAntec(splitLeft);
+            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
+            TacletApp app = createTacletApp("exLeft", pio, splitLeft);
+            splitLeft = splitLeft.apply(app).head();
+
+            // get the new skolem constant from the last rule application
+            SVInstantiations svInsts = app.instantiations();
+            Iterator<SchemaVariable> iterator = svInsts.svIterator();
+            SchemaVariable skSv = null;
+            while (iterator.hasNext()) {
+                SchemaVariable sv = iterator.next();
+                if (sv instanceof SkolemTermSV) {
+                    skSv = sv;
+                    break;      // TODO: only works with single skolemSV
+                }
+            }
+            assert skSv != null;
+            final Term inst = (Term) svInsts.getInstantiation(skSv);
+
+            // instEx
+            pio = new PosInOccurrence(rhs, PosInTerm.getTopLevel(), false);
+            app = createTacletApp("instEx", pio, splitLeft);
+            SchemaVariable qvSv = app.uninstantiatedVars().iterator().next();
+            app = app.addInstantiation(qvSv, inst, true, services);
+            splitLeft = splitLeft.apply(app).head();
+
+            // instAll
+            pio = new PosInOccurrence(quantEquiv, PosInTerm.getTopLevel(), true);
+            app = createTacletApp("instAll", pio, splitLeft);
+            qvSv = app.uninstantiatedVars().iterator().next();
+            app = app.addInstantiation(qvSv, inst, true, services);
+            splitLeft = splitLeft.apply(app).head();
+
+            // replace_known_left
+            seqForm = getLastAddedAntec(splitLeft);
+            PosInTerm pit = PosInTerm.getTopLevel().down(0);
+            splitLeft = applyNoSplitPosAntec(splitLeft, "replace_known_left", pit, seqForm);
+
+            // concrete_eq_1
+            seqForm = getLastAddedAntec(splitLeft);
+            splitLeft = applyNoSplitTopLevelAntec(splitLeft, "concrete_eq_1", seqForm);
+
+            // closeAntec
+            seqForm = getLastAddedAntec(splitLeft);
+            splitLeft = applyNoSplitTopLevelAntec(splitLeft, "closeAntec", seqForm);
+        }
+
+        // in the other branch of the split, we have to do basically the same ...
+        // forall x. p(x) <-> q(x), Q x. q(x) ==> Q x. p(x)
+        Goal splitRight = splitGoals.get(1);
+        rhs = getLastAddedSuc(splitRight);
+        if (rhs.formula().op() == Quantifier.ALL) {                                     // forall
+            // forall x. p(x) <-> q(x), forall x. q(x) ==> forall x. p(x)
+            // allRight
+            pio = new PosInOccurrence(rhs, PosInTerm.getTopLevel(), false);
+            TacletApp app = createTacletApp("allRight", pio, splitRight);
+            splitRight = splitRight.apply(app).head();
+
+            // get the new skolem constant from the last rule application
+            SVInstantiations svInsts = app.instantiations();
+            Iterator<SchemaVariable> iterator = svInsts.svIterator();
+            SchemaVariable skSv = null;
+            while (iterator.hasNext()) {
+                SchemaVariable sv = iterator.next();
+                if (sv instanceof SkolemTermSV) {
+                    skSv = sv;
+                    break;      // TODO: only works with single skolemSV
+                }
+            }
+            assert skSv != null;
+            final Term inst = (Term) svInsts.getInstantiation(skSv);
+
+            // instAll
+            SequentFormula seqForm = getLastAddedAntec(splitRight);
+            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
+            app = createTacletApp("instAll", pio, splitRight);
+            SchemaVariable qvSv = app.uninstantiatedVars().iterator().next();
+            app = app.addInstantiation(qvSv, inst, true, services);
+            splitRight = splitRight.apply(app).head();
+
+            // instAll
+            pio = new PosInOccurrence(quantEquiv, PosInTerm.getTopLevel(), true);
+            app = createTacletApp("instAll", pio, splitRight);
+            qvSv = app.uninstantiatedVars().iterator().next();
+            app = app.addInstantiation(qvSv, inst, true, services);
+            splitRight = splitRight.apply(app).head();
+
+            // replace_known_left
+            seqForm = getLastAddedAntec(splitRight);
+            PosInTerm pit = PosInTerm.getTopLevel().down(1);
+            splitRight = applyNoSplitPosAntec(splitRight, "replace_known_left", pit, seqForm);
+
+            // concrete_eq_3
+            seqForm = getLastAddedAntec(splitRight);
+            splitRight = applyNoSplitTopLevelAntec(splitRight, "concrete_eq_3", seqForm);
+
+            // closeAntec
+            seqForm = getLastAddedAntec(splitRight);
+            splitRight = applyNoSplitTopLevelAntec(splitRight, "closeAntec", seqForm);
+        } else {                                                                        // exists
+            // forall x. p(x) <-> q(x), exists x. q(x) ==> exists x. p(x)
+            // exLeft
+            SequentFormula seqForm = getLastAddedAntec(splitRight);
+            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
+            TacletApp app = createTacletApp("exLeft", pio, splitRight);
+            // TODO: app is not complete here
+            splitRight = splitRight.apply(app).head();
+
+            // get the new skolem constant from the last rule application
+            SVInstantiations svInsts = app.instantiations();
+            Iterator<SchemaVariable> iterator = svInsts.svIterator();
+            SchemaVariable skSv = null;
+            while (iterator.hasNext()) {
+                SchemaVariable sv = iterator.next();
+                if (sv instanceof SkolemTermSV) {
+                    skSv = sv;
+                    break;      // TODO: only works with single skolemSV
+                }
+            }
+            assert skSv != null;
+            final Term inst = (Term) svInsts.getInstantiation(skSv);
+
+            // instEx
+            pio = new PosInOccurrence(rhs, PosInTerm.getTopLevel(), false);
+            app = createTacletApp("instEx", pio, splitRight);
+            SchemaVariable qvSv = app.uninstantiatedVars().iterator().next();
+            app = app.addInstantiation(qvSv, inst, true, services);
+            splitRight = splitRight.apply(app).head();
+
+            // instAll
+            pio = new PosInOccurrence(quantEquiv, PosInTerm.getTopLevel(), true);
+            app = createTacletApp("instAll", pio, splitRight);
+            qvSv = app.uninstantiatedVars().iterator().next();
+            app = app.addInstantiation(qvSv, inst, true, services);
+            splitRight = splitRight.apply(app).head();
+
+            // replace_known_left
+            seqForm = getLastAddedAntec(splitLeft);
+            PosInTerm pit = PosInTerm.getTopLevel().down(1);
+            splitRight = applyNoSplitPosAntec(splitRight, "replace_known_left", pit, seqForm);
+
+            // concrete_eq_3
+            seqForm = getLastAddedAntec(splitLeft);
+            splitRight = applyNoSplitTopLevelAntec(splitRight, "concrete_eq_3", seqForm);
+
+            // closeAntec
+            seqForm = getLastAddedAntec(splitLeft);
+            splitRight = applyNoSplitTopLevelAntec(splitRight, "closeAntec", seqForm);
+        }
 
         ////////////////////////////////////////////////////////////////////////////////////////////
-
         goal = goals.get(0);
-        visit(ctx.proofsexpr(0));
+
+        // skolemize formula with newly introduced top level forall
+        SequentFormula cutForm = getLastAddedSuc(goal);
+        goal = applyNoSplitTopLevelSuc(goal, "allRight", cutForm);
+
+        visit(ctx.proofsexpr(0));   // TODO: does this work?
     }
 
     private void replaySk(ProofsexprContext ctx) {
@@ -379,7 +725,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
                                                   Term subTerm, PosInTerm prefix) {
         List<PosInTerm> result = new ArrayList<>();
         if (subTerm.op() instanceof QuantifiableVariable
-            && SMTReplayer.equalsOp((QuantifiableVariable) subTerm.op(), qv)) {
+            && ReplayTools.equalsOp((QuantifiableVariable) subTerm.op(), qv)) {
             result.add(prefix);
         } else {
             for (int i = 0; i < subTerm.subs().size(); i++) {
@@ -447,6 +793,8 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             System.out.println("The formula " + seqForm.formula() + " is not found as assertion!");
             //System.out.println("Starting auto mode ...");
             // TODO: insert matching assertion (how to find?)
+            // Note: this is a problem if assertions are rewritten (we hope that this does not
+            // happpen, or else we will not be able to find them)
         }
     }
 
@@ -491,6 +839,8 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         SequentFormula seqForm = left.sequent().antecedent().get(0);
         PosInOccurrence pio;
 
+        // TODO: this line should be wrong!!!
+        //  should be ctx.proofsexpr(0).size(), however, this does not resolve symbols bound by let
         int arity = ctx.proofsexpr().size();
 
         // special case for typeguard
@@ -530,11 +880,11 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
 
     // notLeft, orRight ..., notRight, ..., closeAntec
     private void replayNotOrElim(ProofsexprContext ctx) {
-        Term cutTerm = extractRuleAntecedents(ctx);
+        final Term cutTerm = extractRuleAntecedents(ctx);
         TacletApp app = createCutApp(goal, cutTerm);
         List<Goal> goals = goal.apply(app).toList();
         Goal left = goals.get(1);
-        SequentFormula rhs = left.sequent().succedent().get(0);
+        final SequentFormula rhs = left.sequent().succedent().get(0);
         SequentFormula seqForm = getLastAddedAntec(left);
 
         // to avoid cases where a temporary formula is equal to the conclusion
@@ -572,8 +922,8 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
                 left = left.apply(insertRule).head();
                 left = applyNoSplitTopLevelAntec(left, "closeAntec", split);
                 break;
-            } else {
-                // additional checks necessary for pragmatic solution, see e.g. sequent
+            } else if (eqDifferentPolarity(seqForm, rhs)) {
+                // additional check necessary for pragmatic solution, see e.g. sequent
                 // !((p | q) | p) ==> !(p | q)
                 if (seqForm.formula().op() == Junctor.NOT) {
                     left = left.apply(insertRule).head();
@@ -607,7 +957,9 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         replayRightSideHelper(ctx);
     }
 
-    private boolean eqDifferentPolarity(Term t1, Term t2) {
+    private static boolean eqDifferentPolarity(SequentFormula s1, SequentFormula s2) {
+        Term t1 = s1.formula();
+        Term t2 = s2.formula();
         if (t1.op() == Junctor.NOT) {
             return t1.sub(0).equals(t2);
         } else if (t2.op() == Junctor.NOT) {
@@ -627,7 +979,9 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
 
         int params = 1;
 
-        // and left
+        // TODO: in at least one of my examples, some strange rewriting steps happened
+
+        // andLeft
         while (seqForm.formula().op() == Junctor.AND) {
             pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
             app = createTacletApp("andLeft", pio, left);
@@ -645,7 +999,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             //app = createTacletApp("applyEq", pio, left);
             //left = left.apply(app).head();
 
-            // TODO: <->
+            // <->
             seqForm = left.sequent().antecedent().get(i);
             pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
             app = createTacletApp("insert_eqv_once_lr", pio, left);
@@ -668,7 +1022,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         //app = createTacletApp("eqClose", pio, left);
         //left = left.apply(app).head();
 
-        // TODO: <->
+        // <->
         seqForm = left.sequent().succedent().get(0);
         pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
         app = createTacletApp("eq_eq", pio, left);
@@ -865,7 +1219,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
 
         // last is succedent, others are subterms
         int antecCount = ctx.proofsexpr().size() - 1;
-        System.out.println("Found " + SMTReplayer.getOriginalText(ctx));
+        System.out.println("Found " + ReplayTools.getOriginalText(ctx));
         System.out.println("  Arity is " + antecCount);
 
         for (int i = antecCount - 1; i > 0; i--) {
@@ -998,6 +1352,20 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         return null;
     }
 
+    /**
+     * Ensures that the top level symbol is not a symbol bound by let, but an actual context.
+     * @param ctx
+     * @return
+     */
+    private ParserRuleContext ensureLookup(ParserRuleContext ctx) {
+        ParserRuleContext def = smtReplayer.getSymbolDef(ctx.getText(), ctx);
+        if (def != null) {
+            return ensureLookup(def);
+        } else {
+            return ctx;
+        }
+    }
+
     private Term lookupOrCreate(ProofsexprContext ctx) {
         // ctx could be:
         // - symbol from KeY (is in translation map)
@@ -1015,6 +1383,26 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             }
         }
         return term;
+    }
+
+    private int getTopLevelArity(ProofsexprContext ctx) {
+        ParserRuleContext def = smtReplayer.getSymbolDef(ctx.getText(), ctx);
+        if (def != null) {
+            if (def instanceof NoprooftermContext) {
+                return getTopLevelArity((NoprooftermContext) def);
+            } else {
+                return getTopLevelArity((ProofsexprContext) def);
+            }
+        } else {
+            return ctx.sub.size() - 1;
+        }
+    }
+
+    private int getTopLevelArity(NoprooftermContext ctx) {
+        if (ctx.func != null) {
+            return ctx.noproofterm().size() - 1;
+        }
+        return 1;
     }
 
     private ProofsexprContext extractRuleConclusionCtx(ProofsexprContext ctx) {

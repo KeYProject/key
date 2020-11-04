@@ -52,7 +52,7 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
 
                 // as condition, we take the formula under the exists quantifier and replace the bound variable by qv
                 QuantifiableVariable exBoundVar = term.boundVars().get(0);
-                Term cond = replace(exBoundVar, qv, term.sub(0));
+                Term cond = ReplayTools.replace(exBoundVar, qv, term.sub(0), services);
                 TermBuilder tb = services.getTermBuilder();
                 Term _then = tb.var(qv);
                 // TODO: error value
@@ -70,7 +70,7 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
                 IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
                 QuantifiableVariable qv = new LogicVariable(varName, intLDT.targetSort());
                 QuantifiableVariable allBoundVar = all.boundVars().get(0);
-                Term cond = replace(allBoundVar, qv, all.sub(0));
+                Term cond = ReplayTools.replace(allBoundVar, qv, all.sub(0), services);
                 TermBuilder tb = services.getTermBuilder();
                 Term _then = tb.var(qv);
                 // TODO: error value
@@ -85,23 +85,5 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
         }
         // descend into rules that are not sk
         return super.visitProofsexpr(ctx);
-    }
-
-    // builds a new Term where orig has been replaced by repl
-    private Term replace(QuantifiableVariable toReplace, QuantifiableVariable with, Term in) {
-        // using OpReplacer does not replace the QuantifiableVariables (due to missing equals method?)
-        //return OpReplacer.replace(tb.var(orig), tb.var(repl), t, tf);
-        Operator newOp = in.op();
-        if (newOp instanceof QuantifiableVariable
-            && SMTReplayer.equalsOp((QuantifiableVariable) newOp, toReplace)) {
-            newOp = with;
-        }
-
-        Term[] newTerms = new Term[in.subs().size()];
-        for (int i = 0; i < newTerms.length; i++) {
-            newTerms[i] = replace(toReplace, with, in.subs().get(i));
-        }
-        // note: bound vars must be bound in new term again!
-        return services.getTermFactory().createTerm(newOp, newTerms, in.boundVars(), null);
     }
 }
