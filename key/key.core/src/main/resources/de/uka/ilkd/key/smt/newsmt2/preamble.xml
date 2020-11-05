@@ -8,16 +8,33 @@
     <entry key="types.auto">true</entry>
 
     <entry key="types.axioms">
-(assert (forall ((t1 T)) (subtype t1 t1)))
-(assert (forall ((t1 T) (t2 T)) (! (=> (and (subtype t1 t2) (subtype t2 t1)) (= t1 t2)) :pattern ((subtype t1 t2) (subtype t2 t1)))))
-(assert (forall ((t1 T) (t2 T) (t3 T)) (! (=> (and (subtype t1 t2) (subtype t2 t3)) (subtype t1 t3)) :pattern ((subtype t1 t2) (subtype t2 t3)))))
-(assert (forall ((x U) (t T)) (! (subtype (typeof (cast x t)) t) :pattern ((cast x t)))))
-(assert (forall ((x U) (t T)) (! (=> (subtype (typeof x) t) (= (cast x t) x)) :pattern ((cast x t)))))
+<!-- subtype is reflexive -->
+<!-- (assert (forall ((t1 T)) (subtype t1 t1)))-->
+<!-- not necessary: (assert (forall ((u U) (t T)) (=> (instanceof u t) (instanceof u t)))) -->
+
+<!-- subtype is antisymmetric -->
+<!-- (assert (forall ((t1 T) (t2 T)) (! (=> (and (subtype t1 t2) (subtype t2 t1)) (= t1 t2)) :pattern ((subtype t1 t2) (subtype t2 t1))))) -->
+<!-- naive version: -->
+<!-- (assert (forall ((u U) (t1 T) (t2 T)) (=> (and (=> (instanceof u t1) (instanceof u t2)) (=> (instanceof u t2) (instanceof u t1))) (= t1 t2))))-->
+<!-- simplified (both implications to equivalence/equality): -->
+(assert (forall ((u U) (t1 T) (t2 T)) (=> (= (instanceof u t1) (instanceof u t2)) (= t1 t2))))
+
+<!-- subtype is transitive -->
+<!--(assert (forall ((t1 T) (t2 T) (t3 T)) (! (=> (and (subtype t1 t2) (subtype t2 t3)) (subtype t1 t3)) :pattern ((subtype t1 t2) (subtype t2 t3)))))-->
+(assert (forall ((t1 T) (t2 T) (t3 T))
+        (=> (forall ((u U)) (and (=> (instanceof u t1) (instanceof u t2)) (=> (instanceof u t2) (instanceof u t3))))
+            (forall ((u U)) (=> (instanceof u t1) (instanceof u t3))))))
+
+<!--(assert (forall ((u U) (t T)) (! (subtype (typeof (cast u t)) t) :pattern ((cast u t)))))-->
+(assert (forall ((u U) (t T)) (instanceof (cast u t) t)))
+
+<!--(assert (forall ((u U) (t T)) (! (=> (subtype (typeof u) t) (= (cast u t) u)) :pattern ((cast u t)))))-->
+(assert (forall ((u U) (t T)) (! (=> (instanceof u t) (= (cast u t) u)) :pattern ((cast u t)))))
     </entry>
 
     <entry key="types.decls">
-(declare-fun subtype (T T) Bool)
-(declare-fun typeof (U) T)
+<!--(declare-fun subtype (T T) Bool)-->
+<!--(declare-fun typeof (U) T)-->
 (declare-fun cast (U T) U)
     </entry>
 
@@ -26,7 +43,8 @@
     <entry key="null.auto">true</entry>
 
     <entry key="null.axioms">
-(assert (= (typeof null) sort_Null))
+<!--(assert (= (typeof null) sort_Null))-->
+(assert (exactinstanceof null sort_Null))
     </entry>
 
     <entry key="null.decls">
@@ -64,8 +82,11 @@
 (declare-fun exactinstanceof (U T) Bool)
     </entry>
     <entry key="instanceof.axioms">
+<!--
 (assert (forall ((u U) (t T)) (! (= (instanceof u t) (subtype (typeof u) t)) :pattern ((instanceof u t)))))
 (assert (forall ((u U) (t T)) (! (= (exactinstanceof u t) (= (typeof u) t)) :pattern ((exactinstanceof u t)))))
+-->
+(assert (forall ((u U) (t T)) (=> (exactinstanceof u t) (instanceof u t))))
     </entry>
 
     <!-- This predicate is needed to distinguish between instanceof applications from the original sequent
@@ -74,9 +95,7 @@
 (declare-fun typeguard (U T) Bool)
     </entry>
     <entry key="typeguard.axioms">
-<!--(assert (forall ((u U) (t T)) (! (= (typeguard u t) (instanceof u t)) :pattern ((typeguard u t)))))-->
-<!--(assert (forall ((u U)) (forall ((t T)) (! (= (typeguard u t) (instanceof u t)) :pattern ((typeguard u t))))))-->
-(assert (forall ((u U)) (! (= (typeguard u sort_int) (instanceof u sort_int)) :pattern ((typeguard u sort_int)))))
+(assert (forall ((u U) (t T)) (! (= (typeguard u t) (instanceof u t)) :pattern ((typeguard u t)))))
     </entry>
 
 </properties>

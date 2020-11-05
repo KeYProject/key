@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static de.uka.ilkd.key.smt.newsmt2.SExpr.*;
+
 class TypeManager {
 
     /** A set of sorts that require special treatment in the type hierarchy,
@@ -27,12 +29,19 @@ class TypeManager {
             Set<Sort> children = directChildSorts(s, master.getSorts());
             for (Sort child : children) {
                 if (!isSpecialSort(s)) {
-                    master.addAxiom(new SExpr("assert", new SExpr("subtype", SExprs.sortExpr(child), SExprs.sortExpr(s))));
+                    // master.addAxiom(new SExpr("assert", new SExpr("subtype", SExprs.sortExpr(child), SExprs.sortExpr(s))));
+                    // (assert (subtype s0 s1)) could be replaced by:
+                    // (assert (forall ((u U)) (=> (instanceof u s0) (instanceof u s1))))
+                    master.addAxiom(new SExpr("assert", subtypeHelper(child, s)));
                 }
                 for (Sort otherChild : children) {
                     if (!(child.equals(otherChild)) && (!otherChild.name().toString().equals("Null"))
                             && (!child.name().toString().equals("Null"))) {
-                        SExpr st = new SExpr("subtype", SExprs.sortExpr(child), SExprs.sortExpr(otherChild));
+                        // SExpr st = new SExpr("subtype", SExprs.sortExpr(child), SExprs.sortExpr(otherChild));
+                        // master.addAxiom(new SExpr("assert", new SExpr("not", st)));
+                        // (assert (not (subtype s0 s1))) could be replaced by:
+                        // (assert (not (forall ((u U)) (=> (instanceof u s0) (instanceof u s1)))))
+                        SExpr st = subtypeHelper(child, otherChild);
                         master.addAxiom(new SExpr("assert", new SExpr("not", st)));
                     }
                 }
@@ -42,10 +51,23 @@ class TypeManager {
         for (Sort s : master.getSorts()) {
             if (!(s instanceof NullSort) && !(s.equals(Sort.ANY))) {
                 if (s.extendsSorts().isEmpty()) {
-                    master.addAxiom(new SExpr("assert", new SExpr("subtype", SExprs.sortExpr(s), SExprs.sortExpr(Sort.ANY))));
+                    // master.addAxiom(new SExpr("assert", new SExpr("subtype", SExprs.sortExpr(s), SExprs.sortExpr(Sort.ANY))));
+                    // (assert (subtype s0 sort_any)) could be replaced by
+                    // (assert (forall ((u U)) (=> (instanceof u s0) (instanceof u sort_any))))
+                    master.addAxiom(new SExpr("assert", subtypeHelper(s, Sort.ANY)));
                 }
             }
         }
+    }
+
+    private static SExpr subtypeHelper(Sort child, Sort otherChild) {
+        SExpr ante = new SExpr("instanceof", Type.BOOL, new SExpr("u"),
+            SExprs.sortExpr(child));
+        SExpr cons = new SExpr("instanceof", Type.BOOL, new SExpr("u"),
+            SExprs.sortExpr(otherChild));
+        SExpr impl = SExprs.imp(ante, cons);
+        SExpr vars = new SExpr(new SExpr("u", Type.NONE, "U"));
+        return new SExpr("forall", Type.BOOL, vars, impl);
     }
 
     /**

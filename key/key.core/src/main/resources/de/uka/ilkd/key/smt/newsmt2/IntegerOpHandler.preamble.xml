@@ -9,9 +9,12 @@
 
     <entry key="int.axioms">
 (assert (forall ((i Int)) (= (u2i (i2u i)) i)))
-(assert (forall ((x U)) (! (=> (= (typeof x) sort_int)  (= (i2u (u2i x)) x)) :pattern ((typeof x)))))
-(assert (forall ((x U)) (! (=> (instanceof x sort_int)  (= (typeof x ) sort_int)) :pattern ((instanceof x sort_int)))))
-(assert (forall ((i Int)) (! (= (typeof (i2u i)) sort_int) :pattern ((typeof (i2u i))))))
+<!--(assert (forall ((x U)) (! (=> (= (typeof x) sort_int)  (= (i2u (u2i x)) x)) :pattern ((typeof x)))))-->
+(assert (forall ((x U)) (=> (exactinstanceof x sort_int)  (= (i2u (u2i x)) x))))
+<!--(assert (forall ((x U)) (! (=> (instanceof x sort_int)  (= (typeof x ) sort_int)) :pattern ((instanceof x sort_int)))))-->
+(assert (forall ((x U)) (! (=> (instanceof x sort_int)  (exactinstanceof x sort_int)) :pattern ((instanceof x sort_int)))))
+<!--(assert (forall ((i Int)) (! (= (typeof (i2u i)) sort_int) :pattern ((typeof (i2u i))))))-->
+(assert (forall ((i Int)) (exactinstanceof (i2u i) sort_int)))
     </entry>
 
     <entry key="int.decls">

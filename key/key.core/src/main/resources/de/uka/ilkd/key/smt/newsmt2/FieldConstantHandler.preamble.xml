@@ -19,7 +19,8 @@
 
     <entry key="length.axioms">
         (assert (forall ((u U)) (! (&gt;= (u2i (length u)) 0) :pattern ((length u)))))
-        (assert (forall ((u U)) (! (= (typeof (length u)) sort_int) :pattern ((length u)))))
+        <!--(assert (forall ((u U)) (! (= (typeof (length u)) sort_int) :pattern ((length u)))))-->
+        (assert (forall ((u U)) (! (exactinstanceof (length u) sort_int) :pattern ((length u)))))
     </entry>
 
 </properties>
