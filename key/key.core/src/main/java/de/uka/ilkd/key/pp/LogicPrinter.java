@@ -1748,6 +1748,24 @@ public class LogicPrinter {
         layouter.end();
     }
 
+    public void printEpsilonTerm(String name, ImmutableArray<QuantifiableVariable> vars, Term phi) throws IOException {
+        layouter.beginC(2);
+        markStartKeyword();
+        layouter.print(name);
+        markEndKeyword();
+        layouter.print(" ");
+        printVariables(vars, quantifiableVariablePrintMode);
+        layouter.brk();
+        startTerm(1);
+
+        markStartSub();
+        printTerm(phi);
+        markEndSub();
+
+        layouter.end();
+    }
+
+
     /**
      * Print a constant. This just prints the string <code>s</code> and marks it as
      * a nullary term.

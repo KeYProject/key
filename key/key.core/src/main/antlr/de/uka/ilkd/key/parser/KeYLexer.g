@@ -279,6 +279,7 @@ lexer grammar KeYLexer;
 	IFEX   : '\\ifEx';
 	THEN : '\\then';
 	ELSE : '\\else';
+	EPS : '\\eps';
 
         // inclusion and stuff, things that (usually) come at the beginning
 	// of the file

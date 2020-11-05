@@ -144,6 +144,7 @@ public class KeYLexerTokens {
         names[KeYParser.IFEX] = "'\\ifEx'";
         names[KeYParser.THEN] = "'\\then'";
         names[KeYParser.ELSE] = "'\\else'";
+        names[KeYParser.EPS] = "'\\eps'";
         names[KeYParser.INCLUDE] = "'\\include'";
         names[KeYParser.INCLUDELDTS] = "'\\includeLDTs'";
         names[KeYParser.CLASSPATH] = "'\\classpath'";

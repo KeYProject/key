@@ -3160,6 +3160,7 @@ atom returns [Term _atom = null]
     |   FALSE { a = getTermFactory().createTerm(Junctor.FALSE); }
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
+    |   a = epsTerm
     |   literal=STRING_LITERAL
         {
             String s = unescapeString(literal.getText());
@@ -3285,7 +3286,38 @@ ifExThenElseTerm returns [Term _if_ex_then_else_term = null]
         catch [TermCreationException ex] {
               raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
-        }        
+        }
+
+epsTerm returns [Term _eps_term = null]
+@init{
+    exVar = null;
+    Namespace<QuantifiableVariable> orig = variables();
+    Term result = null;
+}
+@after{ _eps_term = result; }
+    :
+        // \eps S x; f(x)
+        EPS exVar = one_bound_variable SEMI
+        LPAREN condF = term RPAREN
+        {
+            if (condF.sort() != Sort.FORMULA) {
+                semanticError("Condition of an \\eps term has to be a formula.");
+            }
+
+            // must be wrapped in an array (TermFactory only provides methods with arrays of variables)
+            ImmutableArray<QuantifiableVariable> exVarArray = new ImmutableArray<QuantifiableVariable>(
+                     new QuantifiableVariable[] {exVar});
+
+            result = getTermFactory().createTerm ( new Epsilon(exVar.sort()), new Term[]{condF}, exVarArray, null );
+            if(!isGlobalDeclTermParser()) {
+                unbindVars(orig);
+            }
+        }
+ ;
+        catch [TermCreationException ex] {
+              raiseException
+		(new KeYSemanticException(input, getSourceName(), ex));
+        }
 
 
 argument returns [Term _argument = null]

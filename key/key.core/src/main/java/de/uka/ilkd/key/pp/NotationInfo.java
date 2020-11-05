@@ -195,6 +195,7 @@ public final class NotationInfo {
 	tbl.put(Modality.TOUT_TRANSACTION,new Notation.ModalityNotation("\\throughout_transaction","\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
 	tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\if"));
 	tbl.put(IfExThenElse.IF_EX_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\ifEx"));
+	tbl.put(Epsilon.class, new Notation.Epsilon("\\epsilon", PRIORITY_ATOM));
 	tbl.put(WarySubstOp.SUBST,new Notation.Subst());
 	tbl.put(UpdateApplication.UPDATE_APPLICATION, new Notation.UpdateApplicationNotation());
 	tbl.put(UpdateJunctor.PARALLEL_UPDATE, new Notation.ParallelUpdateNotation());	

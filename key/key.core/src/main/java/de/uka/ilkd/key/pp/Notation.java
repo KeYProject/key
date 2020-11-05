@@ -169,6 +169,20 @@ public abstract class Notation {
 	}
 
     }
+
+    public static final class Epsilon extends Notation {
+
+		private final String keyword;
+
+		public Epsilon(String keyw, int priority) {
+			super(priority);
+			keyword = keyw;
+		}
+
+		public void print(Term t, LogicPrinter sp) throws IOException {
+			sp.printEpsilonTerm(keyword, t.boundVars(), t.sub(0));
+		}
+	}
     
 
     /**

@@ -47,11 +47,12 @@ public final class IfExThenElse extends AbstractOperator {
 
     @Override
     protected boolean additionalValidTopLevel(Term term) {
+        /* ifEx is no longer restricted to int
         for(QuantifiableVariable var : term.varsBoundHere(0)) {
             if(!var.sort().name().toString().equals("int")) {
         	return false;
             }
-        }
+        }*/
 
         final Sort s0 = term.sub(0).sort();
         final Sort s1 = term.sub(1).sort();
