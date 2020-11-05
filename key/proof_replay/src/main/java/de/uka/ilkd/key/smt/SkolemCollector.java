@@ -6,7 +6,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
-import org.key_project.util.collection.ImmutableArray;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * This visitor collects the definition of a variable introduced in a proof leaf by Z3's
@@ -46,21 +46,19 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
 
                 // TODO: how to get a collision free var name?
                 Name varName = new Name(skVariable);
-                // TODO: currently ifEx supports integer sort only!
-                IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
-                QuantifiableVariable qv = new LogicVariable(varName, intLDT.targetSort());
 
                 // as condition, we take the formula under the exists quantifier and replace the bound variable by qv
                 QuantifiableVariable exBoundVar = term.boundVars().get(0);
+                Sort targetSort = exBoundVar.sort();
+                QuantifiableVariable qv = new LogicVariable(varName, targetSort);
                 Term cond = ReplayTools.replace(exBoundVar, qv, term.sub(0), services);
                 TermBuilder tb = services.getTermBuilder();
                 Term _then = tb.var(qv);
-                // TODO: error value
-                Term _else = tb.zTerm(-1);    // error value: -1
+                Term _else = getDefaultValueTerm(targetSort);
+
                 Term def = tb.ifEx(qv, cond, _then, _else);
                 // add to map
                 smtReplayer.putSkolemSymbol(skVariable, def);
-                //smtReplayer.translationToTermMap.putIfAbsent(skVariable, def);
                 smtReplayer.addTranslationToTerm(skVariable, def);
             } else if (term.op() == Junctor.NOT
                 && term.sub(0).op() == Quantifier.ALL) {
@@ -73,8 +71,7 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
                 Term cond = ReplayTools.replace(allBoundVar, qv, all.sub(0), services);
                 TermBuilder tb = services.getTermBuilder();
                 Term _then = tb.var(qv);
-                // TODO: error value
-                Term _else = tb.zTerm(-1);
+                Term _else = getDefaultValueTerm(allBoundVar.sort());
                 Term def = tb.ifEx(qv, cond, _then, _else);
                 smtReplayer.putSkolemSymbol(skVariable, def);
                 smtReplayer.addTranslationToTerm(skVariable, def);
@@ -85,5 +82,12 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
         }
         // descend into rules that are not sk
         return super.visitProofsexpr(ctx);
+    }
+
+    private Term getDefaultValueTerm(Sort targetSort) {
+        Function anyf = services.getNamespaces().functions().lookup("any::defaultValue");
+        SortDependingFunction genericF = (SortDependingFunction) anyf;
+        Function targetF = genericF.getInstanceFor(targetSort, services);
+        return services.getTermBuilder().func(targetF);
     }
 }
