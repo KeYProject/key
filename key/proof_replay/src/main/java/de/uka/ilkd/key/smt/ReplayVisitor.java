@@ -336,8 +336,18 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         // TODO: we assume there is only a single formula in succedent
         SequentFormula seqForm = goal.sequent().succedent().getFirst();
         PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-        TacletApp app = ReplayTools.createTacletApp("eqSymm", pio, goal);
+
+        TacletApp app;
+        Operator op = seqForm.formula().op();
+        if (op == Equality.EQUALS) {
+            app = ReplayTools.createTacletApp("eqSymm", pio, goal);
+        } else if (op == Equality.EQV) {
+            app = ReplayTools.createTacletApp("equivSymm", pio, goal);
+        } else {
+            throw new IllegalStateException("Operator not known to be symmetric: " + op);
+        }
         goal = goal.apply(app).head();
+        replayRightSideHelper(ctx);
     }
 
     // sequent: ==> Qx. phi(x) <-> Qx. psi(x)
@@ -1147,6 +1157,9 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
 
         SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
         SequentFormula cutFormula = sci.addedFormulas(false).head();
+        if (cutFormula == null) {
+            cutFormula = sci.modifiedFormulas(false).head().getNewFormula();
+        }
 
         goal = focus(cutFormula, goal, false);
 
