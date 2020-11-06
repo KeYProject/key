@@ -306,6 +306,28 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                     }
                     return tb.func(f, children.toArray(new Term[0]));
                 }
+
+                // Could still be a skolem function e.g. (var8!0 var7)
+                // In this case we use the function name (var8!0 w/o parameters as symbol name)
+                // the symbol is a new skolem symbol introduced by an sk rule in a proof leaf
+                // Note that we ignore the parameters (we do not visit them) here, since the
+                // correct definition is found by the SkolemCollector.
+                String skName = ctx.func.getText();
+                Term skDef = smtReplayer.getSkolemSymbolDef(skName);
+                if (skDef != null) {
+                    // found definition of skolem symbol (was already in map)
+                    return skDef;
+                } else {    // try to find definition of skolem symbol
+                    SkolemCollector skColl = new SkolemCollector(smtReplayer, skName, services);
+                    // collect all skolem symbols and their definitions using ifEx/eps terms
+                    skColl.visit(smtReplayer.getTree());
+                    skDef = smtReplayer.getSkolemSymbolDef(ctx.getText());
+                    if (skDef != null) {
+                        // found definition of skolem symbol
+                        return skDef;
+                    }
+                }
+
                 throw new IllegalStateException("Currently not supported: " + ctx.func.getText());
             }
         } else if (ctx.quant != null) {
