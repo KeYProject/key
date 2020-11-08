@@ -160,6 +160,15 @@ public final class ReplayTools {
         // automatically find formulas for matching assume
         app = app.findIfFormulaInstantiations(goal.sequent(), services).head();
 
+        // automatically create and register skolem symbols if required
+        if (!app.complete()) {
+            TacletApp skApp = app.tryToInstantiate(services);
+            if (skApp != null) {
+                // contains new skolem constants
+                return skApp;
+            }
+        }
+
         return app;
     }
 
