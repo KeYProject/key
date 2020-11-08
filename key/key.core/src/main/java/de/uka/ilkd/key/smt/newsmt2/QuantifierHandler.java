@@ -39,7 +39,9 @@ public class QuantifierHandler implements SMTHandler {
             typeGuards.add(new SExpr("typeguard", Type.BOOL,
                     new SExpr(varName), SExprs.sortExpr(bv.sort())));
         }
-        SExpr typeGuard = new SExpr("and", Type.BOOL, typeGuards);
+        // avoid additional and around single typeguard: (and (typeguard ...))
+        SExpr typeGuard = typeGuards.size() == 1 ? typeGuards.get(0)
+                                                 : new SExpr("and", Type.BOOL, typeGuards);
         SExpr typeGuardConnector;
         String smtOp;
         Operator op = term.op();
