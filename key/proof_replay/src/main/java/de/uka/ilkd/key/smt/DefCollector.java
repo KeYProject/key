@@ -150,6 +150,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                 assert ctx.noproofterm().size() == 3;
                 t1 = visit(ctx.noproofterm(1));
 
+                /*
                 // could be typeguard (special case):
                 if (ctx.noproofterm(1) != null) {
                     if (ctx.noproofterm(1).noproofterm(0) != null) {
@@ -160,6 +161,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                         }
                     }
                 }
+                */
 
                 t2 = visit(ctx.noproofterm(2));
                 return tf.createTerm(Junctor.IMP, t1, t2);
@@ -171,6 +173,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                 // important: or is n-ary in Z3!
                 // subtract 1: "or" token also is noProofTerm
                 arity = ctx.noproofterm().size() - 1;
+                // TODO: in Z3 arity == 1 is permitted!
                 t1 = visit(ctx.noproofterm(1));
                 for (int i = 2; i <= arity; i++) {
                     t2 = visit(ctx.noproofterm(i));
@@ -181,7 +184,9 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                 // important: and is n-ary in Z3!
                 // subtract 1: "and" token also is noProofTerm
                 arity = ctx.noproofterm().size() - 1;
+                // TODO: in Z3 arity == 1 is permitted!
 
+                /*
                 // could be typeguard (special case):
                 if (ctx.noproofterm(1) != null) {
                     if (ctx.noproofterm(1).noproofterm(0) != null) {
@@ -196,7 +201,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                             return t1;
                         }
                     }
-                }
+                }*/
 
                 t1 = visit(ctx.noproofterm(1));
 
@@ -258,6 +263,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                 t1 = visit(ctx.noproofterm(1));
                 smtReplayer.addTranslationToTerm(ctx.getText(), t1);
                 return t1;
+            /*
             // marker for instanceof uses w/o direct counterpart in the original sequent
             case "typeguard":
                 // TODO: better detect at and/implies or quantifier case?
@@ -265,14 +271,13 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                 // TODO: only int currently
                 Function typeguard = services.getNamespaces().functions().lookup("typeguard_int");
                 return tb.equals(tb.func(typeguard, t1), tb.TRUE());
-                //return tb.tt();
+                //return tb.tt();*/
             case "length":
                 t1 = visit(ctx.noproofterm(1));
                 return tb.dotLength(t1);
+            case "typeguard":
             case "instanceof":
-                t1 = visit(ctx.noproofterm(1));
-                t2 = visit(ctx.noproofterm(2));
-                return tb.instance(t2.sort(), t1);
+                return createInstanceof(ctx);
             case "subtype":
                 // TODO: does not work!
                 t1 = visit(ctx.noproofterm(1));
@@ -368,6 +373,19 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
             //throw new IllegalStateException("Currently not supported!");
             return visitChildren(ctx);
         }
+    }
+
+    private Term createInstanceof(NoprooftermContext ctx) {
+        // instanceof/typeguard has the following form: (instanceof/typeguard var_x sort_int)
+        Term term = visit(ctx.noproofterm(1));
+        NoprooftermContext sortCtx = ctx.noproofterm(2);
+        // cut the "sort_" prefix
+        String sortName = sortCtx.getText();
+        if (sortName.startsWith("sort_")) {
+            sortName = sortName.substring(5);
+        }
+        Sort keySort = services.getNamespaces().sorts().lookup(sortName);
+        return tb.instance(keySort, term);
     }
 
     private QuantifiableVariable extractQV(Sorted_varContext sortedVar,
