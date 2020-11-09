@@ -407,7 +407,8 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
      * @return a QuantifiableVariable (containing original KeY name and sort)
      */
     private QuantifiableVariable extractQV(Sorted_varContext sortedVar,
-                                           NoprooftermContext quantForm) {
+                                           NoprooftermContext quantForm)
+        throws NotReplayableException {
         NamespaceSet nss = services.getNamespaces();
 
         // fix: some sorts T/U and variables do not have prefixes
@@ -443,7 +444,8 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
 
         NoprooftermContext typeguard = extractTypeguard(quantForm);
         if (typeguard == null) {
-            throw new IllegalStateException("No typeguard found!");
+            throw new NotReplayableException("Can not be replayed due to unknown sort.");
+            //throw new IllegalStateException("No typeguard found!");
         }
         // typeguard has the following form: (typeguard var_x sort_int)
         NoprooftermContext nameCtx = typeguard.noproofterm(1);
