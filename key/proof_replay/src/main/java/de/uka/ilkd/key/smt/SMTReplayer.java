@@ -172,10 +172,6 @@ public class SMTReplayer {
         // do actual replay (starting from found proof root)
         ReplayVisitor replayVisitor = new ReplayVisitor(this, goal);
         proofStart.accept(replayVisitor);
-        if (!replayVisitor.allHypothesesDischarged()) {
-            throw new IllegalStateException("Something went wrong with the proof: " +
-                "There are unproven hypotheses!");
-        }
     }
 
     public NoPosTacletApp getInsertTacletForSF(SequentFormula sequentFormula) {

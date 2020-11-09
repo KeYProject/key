@@ -26,8 +26,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
     private final SMTReplayer smtReplayer;
     private Goal goal;
     private final Services services;
-    private final Set<Term> hypotheses = new HashSet<>();
-    private final Set<Term> dischargedHypotheses = new HashSet<>();
+    private final Map<Term, NoPosTacletApp> hypoTaclets = new HashMap<>();
 
     // used to carry last symbol introduced by quant-intro rule (needed for replaying rules inside
     // the scope of a quant-intro/proof-bind/lambda)
@@ -38,11 +37,6 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         this.smtReplayer = smtReplayer;
         this.goal = goal;
         this.services = goal.proof().getServices();
-    }
-
-
-    public boolean allHypothesesDischarged() {
-        return dischargedHypotheses.containsAll(hypotheses);
     }
 
     @Override
@@ -144,6 +138,12 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         case "lemma":
             replayLemma(ctx);
             return null;
+        case "nnf-pos":
+            replayNNFPos(ctx);
+            return null;
+        case "nnf-neg":
+            replayNNFNeg(ctx);
+            return null;
         default:
             System.out.println("Replay for rule not yet implemented: " + rulename);
             //throw new IllegalStateException("Replay for rule not yet implemented: " + rulename);
@@ -152,46 +152,121 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         //return super.visitProofsexpr(ctx);
     }
 
-    private void replayHypothesis(ProofsexprContext ctx) {
-        Term hypothesis = extractRuleAntecedents(ctx);
-
-        // add term to hypothesis list (has to be discharged by lemma rule later)
-        hypotheses.add(hypothesis);
-
-        // TODO: better collect all hypotheses in a pre pass (while constructing namespaces?)
-        //  and add all hypotheses to antecedent globally (using insert taclets for not cluttering
-        //  the sequent)?
-        // add additional hypothesis to antecedent
-        SequentFormula hypoSF = new SequentFormula(hypothesis);
-        goal.sequent().antecedent().insertFirst(hypoSF);        // TODO: this looks unsound ...
-
-        // close
-        goal = ReplayTools.applyNoSplitTopLevelAntec(goal, "closeAntec", hypoSF);
-    }
-
-    private void replayLemma(ProofsexprContext ctx) {
+    private void replayNNFPos(ProofsexprContext ctx) {
         Term antecedent = extractRuleAntecedents(ctx);
         TacletApp cutApp = ReplayTools.createCutApp(goal, antecedent);
         List<Goal> goals = goal.apply(cutApp).toList();
+        Goal left = goals.get(1);
 
-        Term conclusion = extractRuleConclusion(ctx);
-        dischargedHypotheses.add(conclusion);
-        // TODO: there must be some scope where the hypothesis can be used / is discharged ...
-
-        SequentFormula seqForm = goal.sequent().succedent().getFirst();
-        int conclArity = getTopLevelArity(ctx.proofsexpr(ctx.proofsexpr().size() - 1));
-        for (int i = 0; i < conclArity - 1; i++) {
-            goal = ReplayTools.applyNoSplitTopLevelSuc(goal, "orRight", seqForm);
-
-            seqForm = ReplayTools.getLastAddedSuc(goal, 0);
-            SequentFormula li = ReplayTools.getLastAddedSuc(goal, 1);
-            goal = ReplayTools.applyNoSplitTopLevelSuc(goal, "notRight", li);
-        }
-        // all hypotheses are now in the antecedent
-
-        // TODO:
-        //goal = ...;
+        // currently we run auto mode for converting to nnf
+        runAutoMode(left);
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        goal = goals.get(0);
         replayRightSideHelper(ctx);
+    }
+
+    private void replayNNFNeg(ProofsexprContext ctx) {
+        Term antecedent = extractRuleAntecedents(ctx);
+        TacletApp cutApp = ReplayTools.createCutApp(goal, antecedent);
+        List<Goal> goals = goal.apply(cutApp).toList();
+        Goal left = goals.get(1);
+
+        // currently we run auto mode for converting to nnf
+        runAutoMode(left);
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        goal = goals.get(0);
+        replayRightSideHelper(ctx);
+    }
+
+    private void replayHypothesis(ProofsexprContext ctx) {
+        Term hypothesis = extractRuleConclusion(ctx);
+
+        if (hypoTaclets.get(hypothesis) != null) {
+            throw new IllegalStateException("Hypothesis is not discharged by lemma rule: "
+                + hypothesis);
+        }
+        NoPosTacletApp t = hypoTaclets.get(hypothesis);
+        goal = goal.apply(t).head();
+
+        // TODO: similar to asserted rule: more reasoning steps included (i.e. auto mode needed)?
+        SequentFormula sf = ReplayTools.getLastAddedAntec(goal);
+        goal = ReplayTools.applyNoSplitTopLevelAntec(goal, "closeAntec", sf);
+    }
+
+    private void replayLemma(ProofsexprContext ctx) {
+
+        ProofsexprContext conclCtx = extractRuleConclusionCtx(ctx);
+        Term concl = extractRuleConclusion(ctx);
+        List<Term> hypotheses = extractHypotheses(ctx);
+
+        assert hypotheses.size() >= 1;
+
+        TermBuilder tb = services.getTermBuilder();
+        Term cutTerm = hypotheses.get(0);
+        for (int i = 1; i < hypotheses.size(); i++) {
+            Term h = hypotheses.get(i);
+            cutTerm = tb.and(cutTerm, h);
+        }
+
+        // apply cut
+        TacletApp cutApp = ReplayTools.createCutApp(goal, cutTerm);
+        List<Goal> goals = goal.apply(cutApp).toList();
+        Goal left = goals.get(1);
+
+        // todo: really simple steps on the original conlcusion
+        // orRight (n-1 times)
+        // notRight (n times)
+        // replace_known_left (n times)
+        // concrete_and_ (n-1 times)
+        // close
+        runAutoMode(left);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        goal = goals.get(0);
+
+        // split and (andRight n-1 times)
+        SequentFormula sf = ReplayTools.getLastAddedAntec(goal);
+        for (int i = 0; i < hypotheses.size() - 1; i++) {
+            goal = ReplayTools.applyNoSplitTopLevelAntec(goal, "andRight", sf);
+            sf = ReplayTools.getLastModifiedAntec(goal);
+        }
+
+        // hide hypotheses and remember the mapping to insert_taclets
+        for (Term h : hypotheses) {
+            SequentFormula hf = new SequentFormula(h);
+            PosInOccurrence pio = new PosInOccurrence(hf, PosInTerm.getTopLevel(), true);
+            TacletApp hide = ReplayTools.createTacletApp("hide_left", pio, goal);
+            goal = goal.apply(hide).head();
+            NoPosTacletApp insertRule = goal.node().getLocalIntroducedRules().iterator().next();
+            hypoTaclets.put(h, insertRule);
+        }
+        // no we have the hypotheses available as taclets and descend further
+        replayRightSideHelper(ctx);
+
+        // since we leave this subtree now, hypotheses are no longer available
+        for (Term h : hypotheses) {
+            hypoTaclets.remove(h);
+        }
+    }
+
+    private List<Term> extractHypotheses(ProofsexprContext ctx) {
+        // format: (or !h0 !h1 ... !hn)
+        List<Term> hypotheses = new ArrayList<>();
+        NoprooftermContext conclCtx = extractRuleConclusionCtx(ctx).noproofterm();
+        int hypoCount = conclCtx.noproofterm().size() - 1;
+        Term concl = extractRuleConclusion(ctx);
+        Term rest = concl;
+
+        for (int i = 0; i < hypoCount - 1; i++) {
+            Term notH = rest.sub(1);
+            // TODO: negation necessary if positive?
+            assert notH.op() == Junctor.NOT;
+            Term h = notH.sub(0);
+            hypotheses.add(h);
+            rest = rest.sub(0);
+        }
+        hypotheses.add(rest);
+        return hypotheses;
     }
 
     private void replayIffEquisat(ProofsexprContext ctx) {
