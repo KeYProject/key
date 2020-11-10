@@ -53,10 +53,12 @@
     </entry>
 
 
-    <!-- This is auto-loaded as it introduces U and T as the most important SMT sorts -->
-    <entry key="general.auto">true</entry>
+    <!-- This is auto-loaded as it introduces U and T as the most important SMT sorts.
+         Its name starts with "0" to make it be loaded first.
+    -->
+    <entry key="0general.auto">true</entry>
 
-    <entry key="general.decls">
+    <entry key="0general.decls">
 (declare-sort T 0)
 (declare-sort U 0)
 (declare-const sort_any T)
@@ -74,7 +76,9 @@
 (set-logic ALL)
     </entry>
 
-    <!-- These two predicates are used throught the preamble and are required to be present -->
+    <!-- These two predicates are used throughout the preamble and are required to be present.
+         They are rewritten to typeof expressions.
+     -->
     <entry key="instanceof.auto">true</entry>
 
     <entry key="instanceof.decls">

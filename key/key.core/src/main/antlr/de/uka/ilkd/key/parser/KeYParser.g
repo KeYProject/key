@@ -2066,7 +2066,7 @@ pred_decl
 	)?        
         
         
-        argSorts = arg_sorts[!skip_predicates]
+        argSorts = arg_sorts_or_formula[!skip_predicates]   // MU: "or_formula" is not really working in all cases ...
         {
             if (!skip_predicates) {
             

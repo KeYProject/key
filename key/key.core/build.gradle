@@ -49,6 +49,30 @@ compileJavacc {
     }
 }
 
+task generateSMTListings {
+    def pack = "de/uka/ilkd/key/smt/newsmt2"
+    def resourcesDir = "${project.projectDir}/src/main/resources"
+    def outputDir = resourcesDir // in the future that should be "${project.buildDir}/resources/main"
+    // ${project.buildDir}
+    doLast {
+        new File("$outputDir/$pack/DefinedSymbolsHandler.preamble.xml").withWriter { list ->
+            list.writeLine '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
+            list.writeLine '<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">'
+            list.writeLine '<properties>'
+            new File("$resourcesDir/$pack").eachFile {
+                if(it.name.endsWith('.DefinedSymbolsHandler.preamble.xml')) {
+                    // println it.name
+                    it.eachLine { list.writeLine it }
+                }
+            }
+            list.writeLine '</properties>'
+        }
+    }
+}
+
+classes.dependsOn << generateSMTListings
+ 
+
 tasks.withType(Test) {
     enableAssertions = true
 }
@@ -109,6 +133,14 @@ task testRunAllProofs(type: Test) {
     }
 }
 
+task testProveSMTLemmas(type: Test) {
+    description 'Prove (or load proofs for) lemmas used in the SMT translation'
+    group "verification"
+    filter {
+        includeTestsMatching "ProveSMTLemmasTest"
+    }
+}
+
 //Generation of the three version files within the resources by executing `git'.
 task generateVersionFiles() {
     def outputFolder = file("build/resources/main/de/uka/ilkd/key/util")
@@ -133,3 +165,4 @@ processResources.dependsOn generateVersionFiles
 
 // @AW: Delete? weigl: depends: If want that gradle check validates everything then not.
 // check.dependsOn << testProofRules << testRunAllProofs
+

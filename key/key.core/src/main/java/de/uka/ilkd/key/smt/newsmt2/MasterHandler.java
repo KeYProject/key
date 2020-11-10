@@ -1,17 +1,20 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -25,6 +28,7 @@ import org.key_project.util.collection.ImmutableList;
 
 public class MasterHandler {
 
+    private final Services services;
     /** Exceptions that occur during translation */
     private List<Throwable> exceptions = new ArrayList<>();
 
@@ -63,20 +67,16 @@ public class MasterHandler {
     public MasterHandler(Services services) throws IOException {
         this.services = services;
 
+        this.services = services;
+
+        snippets.loadFromXML(getClass().getResourceAsStream("preamble.xml"));
+
         for (SMTHandler smtHandler : ServiceLoader.load(SMTHandler.class)) {
-            smtHandler.init(services);
-            URL snippetResources = smtHandler.getSnippetResource();
-            if(snippetResources != null) {
-                try {
-                    snippets.loadFromXML(snippetResources.openStream());
-                } catch (IOException e) {
-                    throw new IOException("Error while reading snippet resource " + snippetResources, e);
-                }
-            }
+            smtHandler.init(this, services);
+            registerSnippets(smtHandler.getClass());
             handlers.add(smtHandler);
         }
 
-        snippets.loadFromXML(getClass().getResourceAsStream("preamble.xml"));
 
         // If there are options in the preamble pass them through verbatim.
         if (snippets.containsKey("opts")) {
@@ -84,7 +84,9 @@ public class MasterHandler {
             addOption(opts);
         }
 
-        for (Object k : snippets.keySet()) {
+        // sort the entries in the snippets to make this deterministic
+        SortedSet<Object> keys = new TreeSet<>(snippets.keySet());
+        for (Object k : keys) {
             String key = k.toString();
             if(key.endsWith(".auto")) {
                 // strip the ".auto" and add the snippet
@@ -190,7 +192,7 @@ public class MasterHandler {
             return unknownValues.get(problem);
         }
         int number = unknownValues.size();
-        SExpr abbr = new SExpr("unknown_", Integer.toString(number));
+        SExpr abbr = new SExpr("unknown_" + number, Type.UNIVERSE);
         SExpr e = new SExpr("declare-const", Type.UNIVERSE, abbr.toString(), "U");
         addAxiom(e);
         unknownValues.put(problem, abbr);
@@ -204,12 +206,22 @@ public class MasterHandler {
      * @return an expression with the name functionName and subterms as children
      */
     SExpr handleAsFunctionCall(String functionName, Term term) {
+        return handleAsFunctionCall(functionName, Type.UNIVERSE, term);
+    }
+
+    /**
+     * Treats the given term as a function call.
+     * @param functionName the name of the function
+     * @param term the term to be translated
+     * @return an expression with the name functionName and subterms as children
+     */
+    SExpr handleAsFunctionCall(String functionName, Type type, Term term) {
         addFromSnippets(functionName);
         List<SExpr> children = new ArrayList<>();
         for (int i = 0; i < term.arity(); i++) {
             children.add(translate(term.sub(i), Type.UNIVERSE));
         }
-        return new SExpr(functionName, Type.UNIVERSE, children);
+        return new SExpr(functionName, type, children);
     }
 
     /**
@@ -287,6 +299,9 @@ public class MasterHandler {
             return;
         }
 
+        // mark it known to avoid cyclic inclusion
+        addKnownSymbol(functionName);
+
         if (snippets.containsKey(functionName + ".decls")) {
             VerbatimSMT decl = new VerbatimSMT(snippets.getProperty(functionName + ".decls"));
             addDeclaration(decl);
@@ -296,8 +311,6 @@ public class MasterHandler {
             VerbatimSMT ax = new VerbatimSMT(snippets.getProperty(functionName + ".axioms"));
             addAxiom(ax);
         }
-
-        addKnownSymbol(functionName);
 
         String[] deps = snippets.getProperty(functionName + ".deps", "").trim().split(", *");
         for (String dep : deps) {
@@ -315,5 +328,44 @@ public class MasterHandler {
     @Deprecated
     public SExpr coerce(SExpr sExpr, Type type) throws SMTTranslationException {
         return SExprs.coerce(sExpr, type);
+    }
+
+    public void registerSnippets(Class<?> aClass) throws IOException {
+        String resourceName = aClass.getSimpleName() + ".preamble.xml";
+        URL resource = aClass.getResource(resourceName);
+        if (resource != null) {
+            registerSnippets(resource);
+        }
+    }
+
+    private void registerSnippets(URL resource) throws IOException {
+        try (InputStream is = resource.openStream()) {
+            snippets.loadFromXML(is);
+        }
+    }
+
+    public void registerSnippets(Properties props) {
+        snippets.putAll(props);
+    }
+
+    public String getSnippet(String s) {
+        return snippets.getProperty(s);
+    }
+
+    public String getSnippet(String s, String orElse) {
+        return snippets.getProperty(s, orElse);
+    }
+
+    public Writable getSnippet(String s, Writable orElse) {
+        String result = snippets.getProperty(s);
+        if (result == null) {
+            return orElse;
+        } else {
+            return new VerbatimSMT(result);
+        }
+    }
+
+    public boolean hasSnippet(String s) {
+        return snippets.containsKey(s);
     }
 }

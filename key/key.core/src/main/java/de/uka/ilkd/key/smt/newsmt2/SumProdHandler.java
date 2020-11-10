@@ -22,7 +22,7 @@ public class SumProdHandler implements SMTHandler {
     private final HashMap<Term, SExpr> usedBprodTerms = new LinkedHashMap();
 
     @Override
-    public void init(Services services) {
+    public void init(MasterHandler masterHandler, Services services) {
         bsumOp = services.getTypeConverter().getIntegerLDT().getBsum();
         bprodOp = services.getTypeConverter().getIntegerLDT().getBprod();
     }

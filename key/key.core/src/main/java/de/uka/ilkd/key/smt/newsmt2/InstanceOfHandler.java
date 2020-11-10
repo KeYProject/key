@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 public class InstanceOfHandler implements SMTHandler {
@@ -13,7 +14,7 @@ public class InstanceOfHandler implements SMTHandler {
     private SortDependingFunction instanceOfOp;
 
     @Override
-    public void init(Services services) {
+    public void init(MasterHandler masterHandler, Services services) {
         this.instanceOfOp = Sort.ANY.getInstanceofSymbol(services);
         this.exactInstanceOfOp = Sort.ANY.getExactInstanceofSymbol(services);
     }
@@ -29,7 +30,7 @@ public class InstanceOfHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term) {
+    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         SortDependingFunction op = (SortDependingFunction) term.op();
         SExpr inner = trans.translate(term.sub(0));
         if (exactInstanceOfOp.isSimilar(op)) {
@@ -40,10 +41,9 @@ public class InstanceOfHandler implements SMTHandler {
         } else if (instanceOfOp.isSimilar(op)) {
             trans.addFromSnippets("instanceof");
             trans.addSort(op.getSortDependingOn());
-            return new SExpr("instanceof", Type.BOOL, inner,
-                SExprs.sortExpr(op.getSortDependingOn()));
+            return SExprs.instanceOf(inner, SExprs.sortExpr(op.getSortDependingOn()));
         } else {
-            throw new RuntimeException("unexpected case in instanceof-handling");
+            throw new SMTTranslationException("unexpected case in instanceof-handling: " + term);
         }
     }
 }

@@ -11,7 +11,7 @@ public class LogicalVariableHandler implements SMTHandler {
     static final String VAR_PREFIX = "var_";
 
     @Override
-    public void init(Services services) {
+    public void init(MasterHandler masterHandler, Services services) {
         // nothing to be done
     }
 

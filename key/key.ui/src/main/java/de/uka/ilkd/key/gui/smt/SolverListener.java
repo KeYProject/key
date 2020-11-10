@@ -312,7 +312,7 @@ public class SolverListener implements SolverLauncherListener {
                         i++;
                 }
 
-                boolean problemContainsUpdOrDL = false;
+                boolean problemContainsModalityOrQuery = false;
                 String names[] = new String[smtproblems.size()]; //never read
                 int x = 0,y=0;
                 for (SMTProblem problem : smtproblems) {
@@ -324,8 +324,8 @@ public class SolverListener implements SolverLauncherListener {
                         }
                         names[x] = problem.getName();
                         x++;
-                        if (containsModalityOrQueryOrUpdate(problem.getTerm())) {
-                            problemContainsUpdOrDL = true;
+                        if (containsModalityOrQuery(problem.getTerm())) {
+                            problemContainsModalityOrQuery = true;
                         }
                 }
 
@@ -344,8 +344,8 @@ public class SolverListener implements SolverLauncherListener {
                 	}
                 }
 
-                if (problemContainsUpdOrDL) {
-                    progressDialog.addInformation("One or more proof goals contain heap updates, method calls," +
+                if (problemContainsModalityOrQuery) {
+                    progressDialog.addInformation("One or more proof goals contain method calls" +
                             " and/or modalities. The SMT translation of these will be incomplete," +
                                     " and the result will likely be unhelpful.",
                             new Color(200,150,0), null);
@@ -740,10 +740,10 @@ public class SolverListener implements SolverLauncherListener {
      * @param term The {@link Term} to check.
      * @return {@code true} contains at least one modality or query, {@code false} contains no modalities and no queries.
      */
-    public static boolean containsModalityOrQueryOrUpdate(Term term) {
+    public static boolean containsModalityOrQuery(Term term) {
         ContainsModalityOrQueryVisitor visitor = new ContainsModalityOrQueryVisitor();
         term.execPostOrder(visitor);
-        return visitor.isContainsModQueryOrUpd();
+        return visitor.containsModOrQuery();
     }
 
     /**
@@ -755,7 +755,7 @@ public class SolverListener implements SolverLauncherListener {
         /**
          * The result.
          */
-        boolean containsModQueryOrUpd = false;
+        boolean containsModQuery = false;
 
         /**
          * {@inheritDoc}
@@ -763,12 +763,8 @@ public class SolverListener implements SolverLauncherListener {
         @Override
         public void visit(Term visited) {
             if (visited.op() instanceof Modality
-                || visited.op() instanceof IProgramMethod
-                || visited.op() instanceof ElementaryUpdate
-                || visited.op() instanceof UpdateJunctor
-                || visited.op() instanceof UpdateSV
-                || visited.op() instanceof UpdateApplication) {
-                containsModQueryOrUpd = true;
+                || visited.op() instanceof IProgramMethod) {
+                containsModQuery = true;
             }
         }
 
@@ -777,8 +773,8 @@ public class SolverListener implements SolverLauncherListener {
          * @return {@code true} contains at least one modality, query, or update; {@code false} contains no modalities,
          * no queries, and no updates.
          */
-        public boolean isContainsModQueryOrUpd() {
-            return containsModQueryOrUpd;
+        public boolean containsModOrQuery() {
+            return containsModQuery;
         }
     }
 

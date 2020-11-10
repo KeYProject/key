@@ -27,7 +27,7 @@ public class BooleanConnectiveHandler implements SMTHandler {
     }
 
     @Override
-    public void init(Services services) {
+    public void init(MasterHandler masterHandler, Services services) {
         BooleanLDT ldt = services.getTypeConverter().getBooleanLDT();
         Operator logicFalse = ldt.getFalseConst();
         supportedOperators.put(logicFalse, "false");

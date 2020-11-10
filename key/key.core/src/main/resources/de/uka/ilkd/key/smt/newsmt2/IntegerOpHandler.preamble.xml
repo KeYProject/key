@@ -23,4 +23,10 @@
 (declare-const sort_int T)
     </entry>
 
+    <entry key="jdiv.decls">
+        (define-fun jdiv ((n Int)(d Int)) Int
+           (ite (>= n 0) (div n d) (div (* (- 1) n) (* (- 1) d))))
+    </entry>
+
+
 </properties>

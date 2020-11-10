@@ -70,7 +70,7 @@ public final class SeqLDT extends LDT {
     }
     
     
-    public Function getSeqGet(Sort instanceSort, TermServices services) {
+    public SortDependingFunction getSeqGet(Sort instanceSort, TermServices services) {
 	return seqGet.getInstanceFor(instanceSort, services);
     }
     

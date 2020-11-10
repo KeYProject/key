@@ -16,7 +16,7 @@ public class UpdateHandler implements SMTHandler {
     private Services services;
 
     @Override
-    public void init(Services services) {
+    public void init(MasterHandler masterHandler, Services services) {
         this.services = services;
     }
 
