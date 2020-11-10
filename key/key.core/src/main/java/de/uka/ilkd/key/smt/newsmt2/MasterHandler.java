@@ -28,7 +28,6 @@ import org.key_project.util.collection.ImmutableList;
 
 public class MasterHandler {
 
-    private final Services services;
     /** Exceptions that occur during translation */
     private List<Throwable> exceptions = new ArrayList<>();
 
@@ -65,8 +64,6 @@ public class MasterHandler {
     private final Services services;
 
     public MasterHandler(Services services) throws IOException {
-        this.services = services;
-
         this.services = services;
 
         snippets.loadFromXML(getClass().getResourceAsStream("preamble.xml"));
