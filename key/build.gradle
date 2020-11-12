@@ -46,7 +46,7 @@ static def getDate() {
 def build = System.env.BUILD_NUMBER == null ? "" : "-${System.env.BUILD_NUMBER}"
 
 group = "org.key_project"
-version = "2.7$build"
+version = "2.9$build"
 
 sonarqube {
     properties {
@@ -72,8 +72,8 @@ subprojects {
     }
 
     dependencies {
-        compile     'org.jetbrains:annotations:17.0.0'
-        testCompile 'junit:junit:4.12'
+        compile     'org.jetbrains:annotations:20.1.0'
+        testCompile 'junit:junit:4.13.1'
         testCompile project(':key.util')
     }
 
@@ -199,7 +199,7 @@ subprojects {
 
     publishing {
         publications {
-            mavenJava(MavenPublication) {
+            gpr(MavenPublication) {
                 from components.java
                 artifact sourcesJar
                 artifact javadocJar
@@ -231,8 +231,12 @@ subprojects {
         }
         repositories {
             maven {
-                name = "bintray-snapshots"
-                url = "https://dl.bintray.com/key/stable-snapshots"
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/KeYProject/key")
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                    password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+                }
             }
         }
     }
