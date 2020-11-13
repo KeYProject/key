@@ -2,51 +2,35 @@ package de.uka.ilkd.key.gui.smt.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.smt.SolverType;
+
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
 public class SMTSettingsProvider extends SettingsPanel implements SettingsProvider {
-    private static final long serialVersionUID = -5374124826295959483L;
-    public final static String PROGRESS_MODE_USER = "Progress dialog remains open after executing solvers.";
-    public final static String PROGRESS_MODE_CLOSE = "Close progress dialog after all solvers have finished.";
-    public final static String PROGRESS_MODE_CLOSE_FIRST = "Close progress dialog after the first solver has finished.";
-    private final static String infoBound = "Bitvector size for this type. Use a value larger than 0.";
-    private final static String infoSaveToFilePanel = "Activate this option to store the translations "
-            + "that are handed over to the externals solvers:\n"
-            + "1. Choose the folder.\n"
-            + "2. Specify the filename:\n"
-            + "\t%s: the solver's name\n"
-            + "\t%d: date\n"
-            + "\t%t: time\n"
-            + "\t%i: the goal's number\n"
-            + "\n\n"
-            + "Example: /home/translations/%d_%t_%i_%s.txt"
-            + "\n\n"
-            + "Remark: After every restart of KeY this option "
-            + "is deactivated.";
-    private final static String infoProgressModeBox = "1. Option: The progress dialog remains open "
-            + "after executing the solvers so that the user "
-            + "can decide whether he wants to accept the results.\n"
-            + "\n"
-            + "2. Option: The progress dialog is closed once the "
-            + "external provers have done their work or the time limit "
-            + "has been exceeded.\n";// +
-    private static final String infoCheckForSupport = "If this option is activated, each time before a solver is started" +
-            " it is checked whether the version of that solver is supported. If the version is not supported, a warning is" +
-            " presented in the progress dialog.";
-    private final static String infoMaxProcesses = "Maximal number or processes that are allowed to run concurrently.";
-    private final static String infoTimeoutField = "Timeout for the external solvers in seconds. Fractions of a second are allowed.\n"
-            + "Example: 6.5";
+    //de/uka/ilkd/key/gui/smt/settings/messages.xml
+    public static final ResourceBundle BUNDLE
+            = ResourceBundle.getBundle("de.uka.ilkd.key.gui.smt.settings.messages");
+
+    public static final String PROGRESS_MODE_USER = "PROGRESS_MODE_USER";
+    public static final String PROGRESS_MODE_CLOSE = "PROGRESS_MODE_CLOSE";
+    public static final String PROGRESS_MODE_CLOSE_FIRST = "PROGRESS_MODE_CLOSE_FIRST";
+    private static final String INFO_BOUND = "infoBound";
+    private static final String INFO_SAVE_TO_FILE_PANEL = "infoSaveToFilePanel";
+    private static final String INFO_PROGRESS_MODE_BOX = "infoProgressModeBox";
+    private static final String INFO_CHECK_FOR_SUPPORT = "infoCheckForSupport";
+    private static final String INFO_MAX_PROCESSES = "infoMaxProcesses";
+    private static final String INFO_TIMEOUT_FIELD = "infoTimeoutField";
 
     private final JTextField saveToFilePanel;
 
@@ -54,7 +38,6 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     private final JSpinner maxProcesses;
     private final JSpinner timeoutField;
     private final JSpinner intBoundField;
-    //private JTextField heapBoundField;
     private final JSpinner seqBoundField;
     private final JSpinner objectBoundField;
     private final JSpinner locsetBoundField;
@@ -77,8 +60,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
         getChildren().add(new TranslationOptions());
         getChildren().add(new TacletTranslationOptions());
-        //getChildren().add(new DefaultSettingsProvider("Selection",
-        //        new TacletTranslationSelection(smtSettings).getSelectionTree()));
+
         for (SolverType options : SolverType.ALL_SOLVERS) {
             getChildren().add(new SolverOptions(options));
         }
@@ -96,7 +78,6 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
     @Override
     public JComponent getPanel(MainWindow window) {
-        //ProofDependentSMTSettings pd = SettingsManager.getSmtPdSettings(window);
         ProofIndependentSMTSettings pi = SettingsManager.getSmtPiSettings();
         if (window.getMediator().getSelectedProof() == null) {
             //TODO maybe special handling
@@ -110,42 +91,43 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         ProofIndependentSMTSettings pi = SettingsManager.getSmtPiSettings();
         pi.copy(settings);
         pi.fireSettingsChanged();
+        setSmtSettings(pi.clone());
     }
 
     private JSpinner createLocSetBoundField() {
-        return addNumberField("Locset bound:", 0, Integer.MAX_VALUE, 1, infoBound,
+        return addNumberField("Locset bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
                 e -> settings.locsetBound = e);
     }
 
     private JSpinner createMaxProcesses() {
         return addNumberField("Concurrent processes:",
                 0, Integer.MAX_VALUE, 1,
-                infoMaxProcesses,
+                BUNDLE.getString(INFO_MAX_PROCESSES),
                 e -> settings.maxConcurrentProcesses = e);
     }
 
     private JSpinner createTimeoutField() {
-        return addNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, infoTimeoutField,
+        return addNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_TIMEOUT_FIELD),
                 e -> settings.timeout = e * 1000);
     }
 
     private JSpinner createIntBoundField() {
-        return addNumberField("Integer bound:", 0, Integer.MAX_VALUE, 1, infoBound,
+        return addNumberField("Integer bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
                 e -> settings.intBound = e);
     }
 
     private JSpinner createSeqBoundField() {
-        return addNumberField("Seq bound:", 0, Integer.MAX_VALUE, 1, infoBound,
+        return addNumberField("Seq bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
                 e -> settings.seqBound = e);
     }
 
     private JSpinner createObjectBoundField() {
-        return addNumberField("Object bound:", 0, Integer.MAX_VALUE, 1, infoBound,
+        return addNumberField("Object bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
                 e -> settings.objectBound = e);
     }
 
     private JComboBox<String> getProgressModeBox() {
-        return addComboBox(infoProgressModeBox, 0,
+        return addComboBox(BUNDLE.getString(INFO_PROGRESS_MODE_BOX), 0,
                 e -> settings.modeOfProgressDialog = progressModeBox.getSelectedIndex(),
                 getProgressMode(ProofIndependentSMTSettings.PROGRESS_MODE_USER),
                 getProgressMode(ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE));
@@ -153,14 +135,14 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
     private JCheckBox createSolverSupportCheck() {
         return addCheckBox("Check for support when a solver is started.",
-                infoCheckForSupport,
+                BUNDLE.getString(INFO_CHECK_FOR_SUPPORT),
                 false,
                 e -> settings.checkForSupport = solverSupportCheck.isSelected());
     }
 
     private JTextField getSaveToFilePanel() {
         return addFileChooserPanel("Store translation to file:",
-                "", infoSaveToFilePanel,
+                "", BUNDLE.getString(INFO_SAVE_TO_FILE_PANEL),
                 true, e -> {
                     settings.pathForSMTTranslation = saveToFilePanel.getText();
                     //TODO settings.storeSMTTranslationToFile = saveToFilePanel.isSelected();
@@ -170,11 +152,11 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     private String getProgressMode(int index) {
         switch (index) {
             case ProofIndependentSMTSettings.PROGRESS_MODE_USER:
-                return PROGRESS_MODE_USER;
+                return BUNDLE.getString(PROGRESS_MODE_USER);
             case ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE:
-                return PROGRESS_MODE_CLOSE;
+                return BUNDLE.getString(PROGRESS_MODE_CLOSE);
             case ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE_FIRST:
-                return PROGRESS_MODE_CLOSE_FIRST;
+                return BUNDLE.getString(PROGRESS_MODE_CLOSE_FIRST);
         }
         return "";
     }

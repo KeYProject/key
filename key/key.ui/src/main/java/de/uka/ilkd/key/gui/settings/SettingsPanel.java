@@ -20,6 +20,7 @@ import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -50,7 +51,6 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     }
 
     /**
-     *
      * @param info
      * @return
      */
@@ -64,7 +64,6 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     }
 
     /**
-     *
      * @param info
      * @param components
      */
@@ -96,7 +95,9 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         JComboBox<T> comboBox = new JComboBox<>(elements);
         comboBox.addActionListener(e -> {
             try {
-                validator.validate((T) comboBox.getSelectedItem());
+                if (validator != null) {
+                    validator.validate((T) comboBox.getSelectedItem());
+                }
                 demarkComponentAsErrornous(comboBox);
             } catch (Exception ex) {
                 markComponentAsErrornous(comboBox, ex.getMessage());
@@ -135,7 +136,9 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         JTextField textField = new JTextField(file);
         textField.addActionListener(e -> {
             try {
-                validator.validate(textField.getText());
+                if (validator != null) {
+                    validator.validate(textField.getText());
+                }
                 demarkComponentAsErrornous(textField);
             } catch (Exception ex) {
                 markComponentAsErrornous(textField, ex.getMessage());
@@ -177,12 +180,14 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @return
      */
     protected <T> JComboBox<T> addComboBox(String info, int selectionIndex,
-                                           final Validator<T> validator, T... items) {
+                                           @Nullable Validator<T> validator, T... items) {
         JComboBox<T> comboBox = new JComboBox<>(items);
         comboBox.setSelectedIndex(selectionIndex);
         comboBox.addActionListener(e -> {
             try {
-                validator.validate((T) comboBox.getSelectedItem());
+                if (validator != null) {
+                    validator.validate((T) comboBox.getSelectedItem());
+                }
                 demarkComponentAsErrornous(comboBox);
             } catch (Exception ex) {
                 markComponentAsErrornous(comboBox, ex.getMessage());
@@ -220,6 +225,15 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     protected JTextField addTextField(String title, String text, String info, final Validator<String> validator) {
         JTextField field = createTextField(text, validator);
         addTitledComponent(title, field, info);
+        return field;
+    }
+
+    protected JTextField addTextField(String title, String text, String info, final Validator<String> validator,
+                                      JComponent additionalActions) {
+        JTextField field = createTextField(text, validator);
+        JLabel label = new JLabel(title);
+        label.setLabelFor(field);
+        addRowWithHelp(info, label, field, additionalActions);
         return field;
     }
 
