@@ -46,7 +46,7 @@ static def getDate() {
 def build = System.env.BUILD_NUMBER == null ? "" : "-${System.env.BUILD_NUMBER}"
 
 group = "org.key_project"
-version = "2.9$build"
+version = "2.8.0$build"
 
 sonarqube {
     properties {
