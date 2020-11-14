@@ -52,6 +52,10 @@ class MainStatusLine extends JPanel {
 
         lblStatusText.setText(initialText);
         lblStatusText.setIcon(IconFactory.keyLogo(35, 20));
+        lblStatusText.setBorder(BorderFactory.createCompoundBorder(
+                lblStatusText.getBorder(),
+                BorderFactory.createEmptyBorder(0, 10, 0, 0)
+        ));
 
         //add(Box.createHorizontalGlue());
         add(lblStatusText);
