@@ -254,10 +254,10 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                 t2 = visit(ctx.noproofterm(2));
                 integerLDT = services.getTypeConverter().getIntegerLDT();
                 return tb.func(integerLDT.getDiv(), t1, t2);
-            // TODO: currently, u2i/i2u/sort_int are hardcoded into the translation
-            //  (see IntegerOpHandler.preamble.xml)
             case "u2i":     // TODO: hack
             case "i2u":
+            case "u2b":
+            case "b2u":
                 // just skip the additional function application
                 // for faster lookup additionally add it to map
                 t1 = visit(ctx.noproofterm(1));
@@ -278,6 +278,8 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
             case "typeguard":
             case "instanceof":
                 return createInstanceof(ctx);
+            case "exactinstanceof":
+                return createExactinstanceof(ctx);
             case "subtype":
                 // TODO: does not work!
                 t1 = visit(ctx.noproofterm(1));
@@ -388,6 +390,19 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         return tb.instance(keySort, term);
     }
 
+    private Term createExactinstanceof(NoprooftermContext ctx) {
+        // instanceof/typeguard has the following form: (instanceof/typeguard var_x sort_int)
+        Term term = visit(ctx.noproofterm(1));
+        NoprooftermContext sortCtx = ctx.noproofterm(2);
+        // cut the "sort_" prefix
+        String sortName = sortCtx.getText();
+        if (sortName.startsWith("sort_")) {
+            sortName = sortName.substring(5);
+        }
+        Sort keySort = services.getNamespaces().sorts().lookup(sortName);
+        return tb.exactInstance(keySort, term);
+    }
+
     private QuantifiableVariable extractQV(Sorted_varContext sortedVar,
                                            ProofsexprContext ctx) {
         NamespaceSet nss = services.getNamespaces();
@@ -444,7 +459,9 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
 
         NoprooftermContext typeguard = extractTypeguard(quantForm);
         if (typeguard == null) {
-            throw new NotReplayableException("Can not be replayed due to unknown sort.");
+            // translate to variable of sort any
+            return new LogicVariable(name, Sort.ANY);
+            //throw new NotReplayableException("Can not be replayed due to unknown sort.");
             //throw new IllegalStateException("No typeguard found!");
         }
         // typeguard has the following form: (typeguard var_x sort_int)
@@ -479,9 +496,18 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
     // does no boolean simplification as TermBuilder.equals() does,
     // returns <-> or = according to sort of terms
     private Term equals(Term t1, Term t2) {
-        if (t1.sort() == Sort.FORMULA) {
+        if (t1.sort() == Sort.FORMULA && t2.sort() == Sort.FORMULA) {
             return tf.createTerm(Equality.EQV, t1, t2);
+        } else if (t1.sort() == Sort.FORMULA) {
+            // only t1 is of Formula sort
+            Term t2Form = tf.createTerm(Equality.EQUALS, t2, tb.TRUE());
+            return tf.createTerm(Equality.EQV, t1, t2Form);
+        } else if (t2.sort() == Sort.FORMULA) {
+            // only t2 is of Formula sort
+            Term t1Form = tf.createTerm(Equality.EQUALS, t1, tb.TRUE());
+            return tf.createTerm(Equality.EQV, t1Form, t2);
         } else {
+            // both are not of Formula sort
             return tf.createTerm(Equality.EQUALS, t1, t2);
         }
     }
