@@ -73,7 +73,7 @@ subprojects {
 
     dependencies {
         compile     'org.jetbrains:annotations:20.1.0'
-        testCompile 'junit:junit:4.13.1'
+        testCompile 'junit:junit:4.12'
         testCompile project(':key.util')
     }
 
