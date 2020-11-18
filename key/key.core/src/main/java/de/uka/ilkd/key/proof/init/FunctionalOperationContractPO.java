@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import de.uka.ilkd.key.ldt.FinalHeapResolver;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -93,6 +94,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     public FunctionalOperationContractPO(InitConfig initConfig,
                                          FunctionalOperationContract contract) {
         super(initConfig, contract.getName());
+        if(FinalHeapResolver.isFinalEnabled(initConfig)) {
+            contract = new FinalHeapResolver(initConfig.getServices()).resolve(contract);
+        }
         this.contract = contract;
     }
 

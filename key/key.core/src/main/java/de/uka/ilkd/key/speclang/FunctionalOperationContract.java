@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
@@ -164,4 +165,5 @@ public interface FunctionalOperationContract extends OperationContract {
     public KeYJavaType getSpecifiedIn();
 
     public boolean hasResultVar();
+    public IProgramMethod getProgramMethod();
 }

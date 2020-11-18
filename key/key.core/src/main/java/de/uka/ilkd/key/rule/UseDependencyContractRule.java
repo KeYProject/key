@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.ldt.FinalHeapResolver;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -468,9 +469,14 @@ public final class UseDependencyContractRule implements BuiltInRule {
         }
 
         //configure contract
-        final DependencyContract contract =
+        DependencyContract contract =
         		(DependencyContract)((UseDependencyContractApp) ruleApp).getInstantiation();
         assert contract != null;
+
+		if(FinalHeapResolver.isFinalEnabled(goal.proof().getSettings())) {
+			contract = new FinalHeapResolver(services).resolve(contract);
+		}
+
 
         //get step
         final PosInOccurrence step =

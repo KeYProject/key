@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.ldt.FinalHeapResolver;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -656,9 +657,13 @@ public final class UseOperationContractRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
 
         // configure contract
-        final FunctionalOperationContract contract
+        FunctionalOperationContract contract
             = (FunctionalOperationContract) ((AbstractContractRuleApp) ruleApp).getInstantiation();
         assert contract.getTarget().equals(inst.pm);
+
+        if(FinalHeapResolver.isFinalEnabled(goal.proof().getSettings())) {
+            contract = new FinalHeapResolver(services).resolve(contract);
+        }
 
         final List<LocationVariable> heapContext = HeapContext
                 .getModHeaps(goal.proof().getServices(), inst.transaction);
