@@ -338,10 +338,15 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
  
       }
 
-@Override
-public void addSettingsListener(SettingsListener l) {
-        listeners.add(l);
-        
-  
-}
+      @Override
+      public void addSettingsListener(SettingsListener l) {
+          listeners.add(l);
+
+
+      }
+      
+      @Override
+      public void removeSettingsListener(SettingsListener l) {
+          listeners.remove(l);
+      }
 }

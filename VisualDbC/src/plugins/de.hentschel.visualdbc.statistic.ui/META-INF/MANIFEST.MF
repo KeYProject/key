@@ -7,8 +7,8 @@ Bundle-Activator: de.hentschel.visualdbc.statistic.ui.Activator
 Bundle-Vendor: Martin Hentschel
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.gmf.runtime.diagram.ui;bundle-version="1.4.1",
- org.eclipse.gmf.runtime.diagram.ui.resources.editor;bundle-version="1.4.1",
+ org.eclipse.gmf.runtime.diagram.ui,
+ org.eclipse.gmf.runtime.diagram.ui.resources.editor,
  org.key_project.util;bundle-version="1.0.0",
  de.hentschel.visualdbc.dbcmodel;bundle-version="1.0.0",
  de.hentschel.visualdbc.dbcmodel.diagram;bundle-version="1.0.0",

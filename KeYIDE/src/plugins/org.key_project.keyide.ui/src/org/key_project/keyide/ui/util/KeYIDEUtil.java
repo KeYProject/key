@@ -52,7 +52,7 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.nodeviews.TacletMenu;
+import de.uka.ilkd.key.gui.nodeviews.CurrentGoalViewMenu;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -253,10 +253,10 @@ public final class KeYIDEUtil {
       ImmutableList<TacletApp> rewriteList = ui.getProofControl().getRewriteTaclet(goal, pos != null ? pos.getPosInOccurrence() : null);
       ImmutableList<TacletApp> noFindList = ui.getProofControl().getNoFindTaclet(goal);
       
-      ImmutableList<TacletApp> find = TacletMenu.removeRewrites(findList).prepend(rewriteList);
+      ImmutableList<TacletApp> find = CurrentGoalViewMenu.removeRewrites(findList).prepend(rewriteList);
       
-      TacletMenu.TacletAppComparator comp = new TacletMenu.TacletAppComparator();
-      ImmutableList<TacletApp> allTaclets = TacletMenu.sort(find, comp);
+      CurrentGoalViewMenu.TacletAppComparator comp = new CurrentGoalViewMenu.TacletAppComparator();
+      ImmutableList<TacletApp> allTaclets = CurrentGoalViewMenu.sort(find, comp);
       
       if (pos != null && pos.isSequent()) {
          allTaclets = allTaclets.prepend(noFindList);
