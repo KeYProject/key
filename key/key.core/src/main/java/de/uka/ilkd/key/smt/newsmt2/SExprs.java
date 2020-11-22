@@ -50,6 +50,28 @@ public class SExprs {
         }
     }
 
+    public static SExpr and(SExpr ... clauses) {
+        switch (clauses.length) {
+        case 0:
+            return TRUE;
+        case 1:
+            return clauses[0];
+        default:
+            return new SExpr("and", Type.BOOL, clauses);
+        }
+    }
+
+    public static SExpr or(SExpr ... clauses) {
+        switch (clauses.length) {
+        case 0:
+            return TRUE;
+        case 1:
+            return clauses[0];
+        default:
+            return new SExpr("or", Type.BOOL, clauses);
+        }
+    }
+
     /**
      * Produce an implication from an assumption and a conclusion.
      * <p>

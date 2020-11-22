@@ -18,13 +18,10 @@ import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 
 public class MasterHandler {
 
@@ -62,6 +59,8 @@ public class MasterHandler {
     private Map<String, Term> translationToTermMap = new HashMap<>();
 
     private final Services services;
+
+    private boolean typeguardAxiomsNeeded = false;
 
     public MasterHandler(Services services) throws IOException {
         this.services = services;
@@ -268,6 +267,24 @@ public class MasterHandler {
 
     public void addSort(Sort s) {
         sorts.add(s);
+        // For the type hierarchy translation, we need parent sorts as well (e.g. for a sort
+        // implementing an interface, such as java.lang.Exception). The Null sort is an exception,
+        // since it has all object sorts as parents (which we most likely do not need all).
+        if (!(s instanceof NullSort)) {
+            Set<Sort> directParentSorts = s.extendsSorts(services).toSet();
+            for (Sort p : directParentSorts) {
+                // recursive call to get transitive supersorts as well
+                addSort(p);
+            }
+        }
+    }
+
+    public boolean isTypeguardAxiomsNeeded() {
+        return typeguardAxiomsNeeded;
+    }
+
+    public void setTypeguardAxiomsNeeded(boolean typeguardAxiomsNeeded) {
+        this.typeguardAxiomsNeeded = typeguardAxiomsNeeded;
     }
 
     public HashSet<Sort> getSorts() {

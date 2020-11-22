@@ -7,14 +7,11 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.IllegalFormulaException;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
-
-import javax.management.relation.RelationNotFoundException;
 
 /**
  * This class provides a translation from a KeY sequent to the SMT-LIB 2 language, a common input
@@ -73,7 +70,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         if (sequent.succedent().size() != 0 || sequent.antecedent().size() != 0) {
             master.addSort(Sort.ANY);
             for (Term t : sequentAsserts) {
-                addAllSorts(t, master);
+                addAllSorts(t, master, services);
             }
         }
 
@@ -90,8 +87,19 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
         sb.append("\n");
 
-        TypeManager tm = new TypeManager();
+        TypeManager tm = new TypeManager(services);
         tm.createSortTypeHierarchy(master);
+
+        // not modularly sound, since it makes a case distinction about all (known) sorts
+        //tm.amoTypeAxiom(master);
+
+        // add cast axioms for all types
+        tm.rollOutCastAxioms(master);
+
+        // add typeguard axioms for all types only if typeguard is used
+        if (master.isTypeguardAxiomsNeeded()) {
+            tm.rollOutTypeguardAxioms(master);
+        }
 
         for (Writable decl : master.getDeclarations()) {
             decl.appendTo(sb);
@@ -142,13 +150,19 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * Adds all sorts contained in the given problem to the master handler.
      * @param problem the given problem
      * @param master the master handler of the problem
+     * @param services needed for getting the boolean sort (via TypeConverter)
      */
     // TODO js: expressions within updates are not found by this, which leads to failures.
-    private void addAllSorts(Term problem, MasterHandler master) {
+    private void addAllSorts(Term problem, MasterHandler master, Services services) {
         Sort s = problem.sort();
-        master.addSort(s);
+        // formula sort is translated to boolean sort
+        if (s == Sort.FORMULA) {
+            master.addSort(services.getTypeConverter().getBooleanType().getSort());
+        } else {
+            master.addSort(s);
+        }
         for (Term t : problem.subs()) {
-            addAllSorts(t, master);
+            addAllSorts(t, master, services);
         }
     }
 

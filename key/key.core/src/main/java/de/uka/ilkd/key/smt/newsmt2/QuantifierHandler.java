@@ -74,6 +74,7 @@ public class QuantifierHandler implements SMTHandler {
         }
 
         trans.addFromSnippets("typeguard");
+        trans.setTypeguardAxiomsNeeded(true);
 
         matrix = new SExpr(typeGuardConnector, typeGuard, matrix);
         matrix = SExprs.patternSExpr(matrix, triggers);
