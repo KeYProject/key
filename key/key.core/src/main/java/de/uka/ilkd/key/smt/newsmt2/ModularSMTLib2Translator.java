@@ -82,7 +82,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         sb.append("\n");
 
         TypeManager tm = new TypeManager();
-        tm.createSortTypeHierarchy(master);
+        tm.createSortTypeHierarchy(master, services);
 
         for (Writable decl : master.getDeclarations()) {
             decl.appendTo(sb);

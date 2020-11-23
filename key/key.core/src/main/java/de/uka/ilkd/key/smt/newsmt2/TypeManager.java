@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -21,10 +22,10 @@ class TypeManager {
      * by asserting the subtype relationship (or its absence).
      * @param master the master handler
      */
-    void createSortTypeHierarchy(MasterHandler master) {
+    void createSortTypeHierarchy(MasterHandler master, Services services) {
 
         for (Sort s : master.getSorts()) {
-            Set<Sort> children = directChildSorts(s, master.getSorts());
+            Set<Sort> children = directChildSorts(s, master.getSorts(), services);
             for (Sort child : children) {
                 if (!isSpecialSort(s)) {
                     master.addAxiom(new SExpr("assert", new SExpr("subtype", SExprs.sortExpr(child), SExprs.sortExpr(s))));
@@ -53,12 +54,8 @@ class TypeManager {
      * @param child the (possible) child sort
      * @return true iff parent is a direct parent sort of child
      */
-    private boolean isDirectParentOf(Sort parent, Sort child) {
-        if (!(child instanceof NullSort)) {
-            return child.extendsSorts().contains(parent);
-        } else {
-            return true;
-        }
+    private boolean isDirectParentOf(Sort parent, Sort child, Services s) {
+        return child.extendsSorts(s).contains(parent);
     }
 
     /**
@@ -66,10 +63,10 @@ class TypeManager {
      * @param sorts the set of sorts to test
      * @return all direct child sorts of s in the set sorts
      */
-    private Set<Sort> directChildSorts(Sort s, Set<Sort> sorts) {
+    private Set<Sort> directChildSorts(Sort s, Set<Sort> sorts, Services services) {
         Set<Sort> res = new HashSet<>();
         for (Sort child : sorts) {
-            if (isDirectParentOf(s, child)) {
+            if (isDirectParentOf(s, child, services)) {
                 res.add(child);
             }
         }
