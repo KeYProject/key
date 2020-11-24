@@ -63,6 +63,10 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         if (sequent.succedent().size() != 0 || sequent.antecedent().size() != 0) {
             master.addSort(Sort.ANY);
+            // TODO: Sorts introduced by the DefinedSymbolsHandler are unfortunately not yet added automatically.
+            // To mitiage, at least add Null.
+//            master.addSort(services.getNamespaces().sorts().lookup("Null"));
+//            System.out.println(services.getNamespaces().sorts().lookup("Null"));
             for (Term t : sequentAsserts) {
                 addAllSorts(t, master);
             }

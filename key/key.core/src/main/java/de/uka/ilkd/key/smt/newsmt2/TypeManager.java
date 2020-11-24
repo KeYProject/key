@@ -15,7 +15,8 @@ class TypeManager {
      * e.g., the null sort or the int and bool sorts that also exist in smtlib.
      */
     private static final Set<String> SPECIAL_SORTS =
-            Stream.of("int", "boolean", "Null").collect(Collectors.toSet());
+            // FIXME
+            Stream.of("int", "boolean"/*, "Null"*/).collect(Collectors.toSet());
 
     /**
      * Creates a translated type hierarchy from the KeY sorts of the master handler

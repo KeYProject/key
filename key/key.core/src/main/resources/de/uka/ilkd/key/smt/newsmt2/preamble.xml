@@ -22,19 +22,6 @@
     </entry>
 
 
-    <!-- the theory for null is very small and hence always added -->
-    <entry key="null.auto">true</entry>
-
-    <entry key="null.axioms">
-(assert (= (typeof null) sort_Null))
-    </entry>
-
-    <entry key="null.decls">
-(declare-const null U)
-(declare-const sort_Null T)
-    </entry>
-
-
     <!-- This is auto-loaded as it introduces U and T as the most important SMT sorts.
          Its name starts with "0" to make it be loaded first.
     -->
