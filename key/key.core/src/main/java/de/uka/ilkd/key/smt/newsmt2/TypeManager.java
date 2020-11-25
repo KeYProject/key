@@ -14,10 +14,8 @@ import static de.uka.ilkd.key.smt.newsmt2.SExpr.*;
 class TypeManager {
 
     /** A set of sorts that require special treatment in the type hierarchy,
-     * e.g., the null sort or the int and bool sorts that also exist in smtlib.
+     * e.g. int and bool sorts that also exist in smtlib.
      */
-    private static final Set<String> SPECIAL_SORTS =
-            Stream.of("int", "boolean", "Null").collect(Collectors.toSet());
     private static final Set<String> EMBEDDED_SORTS =
         Stream.of("int", "boolean").collect(Collectors.toSet());
     private static final String NULL_SORT = "Null";
@@ -178,7 +176,8 @@ class TypeManager {
                     pairs.add(and);
                 }
             }
-            SExpr uEqNull = new SExpr("=", Type.BOOL, "u", "null");
+            // TODO: using hardcoded symbol k_null is a bad idea if null translation changes
+            SExpr uEqNull = new SExpr("=", Type.BOOL, "u", "k_null");
             SExpr imp = SExprs.imp(SExprs.or(pairs.toArray(new SExpr[0])), uEqNull);
             SExpr bindU = new SExpr("u", Type.NONE, "U");
             SExpr all = new SExpr("forall", new SExpr(bindU), imp);
@@ -341,13 +340,7 @@ class TypeManager {
      * @return true iff parent is a direct parent sort of child
      */
     private boolean isDirectParentOf(Sort parent, Sort child) {
-        //if (!(child instanceof NullSort)) {
-            return child.extendsSorts(services).contains(parent);
-            // this would throw an error for child instanceof NullSort
-            //return child.extendsSorts().contains(parent);
-        //} else {
-        //    return true;
-        //}
+        return child.extendsSorts(services).contains(parent);
     }
 
     /**

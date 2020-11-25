@@ -13,6 +13,8 @@ import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+import javax.management.relation.RelationNotFoundException;
+
 /**
  * This class provides a translation from a KeY sequent to the SMT-LIB 2 language, a common input
  * language for modern SMT solvers.
@@ -24,7 +26,6 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
  * @author Jonas Schiffl
  * @author Mattias Ulbrich
  */
-
 public class ModularSMTLib2Translator implements SMTTranslator {
 
     /**
@@ -76,7 +77,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         List<SExpr> sortExprs = new LinkedList<>();
         for (Sort s : master.getSorts()) {
-            if (s != Sort.ANY && !(TypeManager.isSpecialSort(s))) {
+            if (s != Sort.ANY && !(TypeManager.isEmbeddedSort(s))) {
                 master.addDeclaration(new SExpr("declare-const", SExprs.sortExpr(s).toString(), "T"));
             }
             sortExprs.add(SExprs.sortExpr(s));
@@ -206,7 +207,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         // remove (u2i (i2u x)) --->  x
         if(result.getName().equals("u2i") && result.getChildren().get(0).getName().equals("i2u")) {
             return postProcess(result.getChildren().get(0).getChildren().get(0));
-    }
+        }
 
         // remove (u2b (b2u x)) --->  x
         if(result.getName().equals("u2b") && result.getChildren().get(0).getName().equals("b2u")) {
@@ -215,7 +216,6 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         return result.map(this::postProcess);
     }
-
 
     @Override
     public ArrayList<StringBuffer> translateTaclets(Services services, SMTSettings settings) throws IllegalFormulaException {
