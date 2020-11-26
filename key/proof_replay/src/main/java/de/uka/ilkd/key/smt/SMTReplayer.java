@@ -20,9 +20,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SMTReplayer {
     private final String smtOutput;
@@ -56,8 +54,40 @@ public class SMTReplayer {
 
     // HashMap is linked to make debugging easier
     private final Map<String, ProofsexprContext> symbolTable = new LinkedHashMap<>();
-    private final Map<String, Term> translationToTermMap;
+    // translation needs to be aware of the context, i.e. the bound variables at the current
+    // translation context (contained in SMTExprInContext)!
+    private final Map<SMTExprInContext, Term> translationToTermMap;
     private final Map<String, Term> skMap = new HashMap<>();
+
+    public static class SMTExprInContext {
+        public final String smtExpr;
+        public final Deque<QuantifiableVariable> boundVars;
+
+        public SMTExprInContext(String smtExpr, Deque<QuantifiableVariable> boundVars) {
+            this.smtExpr = smtExpr;
+            this.boundVars = boundVars;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (this == other) {
+                return true;
+            }
+            if (!(other instanceof SMTExprInContext)) {
+                return false;
+            }
+            SMTExprInContext key = (SMTExprInContext) other;
+            return smtExpr.equals(key.smtExpr) && boundVars.equals(key.boundVars);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = smtExpr.hashCode();
+            result = 31 * result + boundVars.hashCode();
+            return result;
+        }
+
+    }
 
     public void putSkolemSymbol(String symbol, Term def) {
         skMap.put(symbol, def);
@@ -76,7 +106,13 @@ public class SMTReplayer {
         goal = problem.getGoal();
         original = goal;
         proof = problem.getGoal().proof();
-        translationToTermMap = problem.getTranslationToTermMap();
+        translationToTermMap = new LinkedHashMap<>();
+
+        // we wrap the original String keys in SMTExprInContext to be aware of the bound variables
+        for (Map.Entry<String, Term> e : problem.getTranslationToTermMap().entrySet()) {
+            // root: no bound variables
+            addTranslationToTerm(e.getKey(), e.getValue());
+        }
     }
 
     private SmtoutputContext parse(String s) {
@@ -205,10 +241,28 @@ public class SMTReplayer {
     }
 
     public Term getTranslationToTerm(String smtExpr) {
-        return translationToTermMap.get(smtExpr);
+        // get from root context, i.e. empty bound vars list
+        SMTExprInContext exprInContext = new SMTExprInContext(smtExpr, new LinkedList<>());
+        return translationToTermMap.get(exprInContext);
     }
 
     public void addTranslationToTerm(String smtExpr, Term keyTerm) {
-        translationToTermMap.put(smtExpr, keyTerm);
+        // root context -> empty list
+
+        // todo: caching disabled for now -> must be context depending!
+        //SMTExprInContext exprInContext = new SMTExprInContext(smtExpr, new LinkedList<>());
+        //translationToTermMap.put(exprInContext, keyTerm);
     }
+    /*
+    public Term getTranslationToTerm(String smtExpr, Deque<QuantifiableVariable> boundVars) {
+        SMTExprInContext exprInContext = new SMTExprInContext(smtExpr, boundVars);
+        return translationToTermMap.get(exprInContext);
+    }
+
+    public void addTranslationToTerm(String smtExpr, Deque<QuantifiableVariable> boundVars,
+                                     Term keyTerm) {
+        SMTExprInContext exprInContext = new SMTExprInContext(smtExpr, boundVars);
+        translationToTermMap.put(exprInContext, keyTerm);
+    }
+     */
 }
