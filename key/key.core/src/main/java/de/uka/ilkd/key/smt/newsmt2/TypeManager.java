@@ -33,9 +33,6 @@ class TypeManager {
      * @param master the master handler
      */
     void createSortTypeHierarchy(MasterHandler master) {
-        // ensure that Null sort is present (declaration is always added, see preamble.xml)
-        master.addSort(services.getJavaInfo().nullSort());
-
         // axioms common for special as well as object sorts
         createSortDefAxioms(master);
 
