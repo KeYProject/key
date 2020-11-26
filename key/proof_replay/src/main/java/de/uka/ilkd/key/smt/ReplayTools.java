@@ -88,31 +88,55 @@ public final class ReplayTools {
 
     public static SequentFormula getLastModifiedAntec(Goal goal) {
         SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
+        // formula could be redundant on the sequent
+        if (sci.modifiedFormulas(true).isEmpty()) {
+            return sci.rejectedFormulas(true).head();
+        }
         return sci.modifiedFormulas(true).head().getNewFormula();
     }
 
     public static SequentFormula getLastModifiedSuc(Goal goal) {
         SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
+        // formula could be redundant on the sequent
+        if (sci.modifiedFormulas(false).isEmpty()) {
+            return sci.rejectedFormulas(false).head();
+        }
         return sci.modifiedFormulas(false).head().getNewFormula();
     }
 
     public static SequentFormula getLastAddedAntec(Goal goal) {
         SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
+        // formula could be redundant on the sequent
+        if (sci.addedFormulas(true).isEmpty()) {
+            return sci.rejectedFormulas(true).head();
+        }
         return sci.addedFormulas(true).head();
     }
 
     public static SequentFormula getLastAddedAntec(Goal goal, int index) {
         SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
+        // formula could be redundant on the sequent
+        if (sci.addedFormulas(true).isEmpty()) {
+            return sci.rejectedFormulas(true).toList().get(index);
+        }
         return sci.addedFormulas(true).toList().get(index);
     }
 
     public static SequentFormula getLastAddedSuc(Goal goal) {
         SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
+        // formula could be redundant on the sequent
+        if (sci.addedFormulas(false).isEmpty()) {
+            return sci.rejectedFormulas(false).head();
+        }
         return sci.addedFormulas(false).head();
     }
 
     public static SequentFormula getLastAddedSuc(Goal goal, int index) {
         SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
+        // formula could be redundant on the sequent
+        if (sci.addedFormulas(false).isEmpty()) {
+            return sci.rejectedFormulas(false).toList().get(index);
+        }
         return sci.addedFormulas(false).toList().get(index);
     }
 
