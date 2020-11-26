@@ -333,8 +333,9 @@ public final class MainWindow extends JFrame {
 
         setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
         applyGnomeWorkaround();
+        setLocationByPlatform(true);
         setLaF();
-        setIconImage(IconFactory.keyLogo());
+        setIconImages(IconFactory.applicationLogos());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         proofListener = new MainProofListener();
         userInterface = new WindowUserInterfaceControl(this);
