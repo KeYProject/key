@@ -6,13 +6,13 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.macros.PropositionalMacro;
+import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.TacletMatcher;
+import de.uka.ilkd.key.rule.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Collection of static helper methods that are used in replay.
@@ -203,5 +203,54 @@ public final class ReplayTools {
         // the cast should always be safe
         Services services = goal.proof().getServices();
         return (NoPosTacletApp) app.addInstantiation(sv, cutFormula, true, services);
+    }
+
+    static void runAutoModePropositional(Goal goal, int steps) {
+        PropositionalMacro prop = new PropositionalMacro(steps);
+        try {
+            prop.applyTo(null, goal.node(), null, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void runAutoMode(Goal goal) {
+        // current notes could contain rule name -> append
+        addNotes(goal, "automatic proof search");
+
+        TryCloseMacro close = new TryCloseMacro(50);
+        try {
+            close.applyTo(null, goal.proof(), ImmutableSLList.<Goal>nil().append(goal), null, null);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void addNotes(Goal goal, String notes) {
+        String currentNotes = goal.node().getNodeInfo().getNotes();
+        String newNotes = "";
+        if (currentNotes != null && !currentNotes.isEmpty()) {
+            newNotes += currentNotes + " ";
+        }
+        newNotes += notes;
+        goal.node().getNodeInfo().setNotes(newNotes);
+    }
+
+    static NoPosTacletApp findLocalRule(String namePrefix, Goal goal) {
+        for (NoPosTacletApp app : goal.node().getLocalIntroducedRules()) {
+            // TODO: there may be multiple rules with this prefix
+            if (app.taclet().name().toString().startsWith(namePrefix)) {
+                return app;
+            }
+        }
+        return null;
+    }
+
+    static Goal focus(SequentFormula formula, Goal goal, boolean antec) {
+        FocusRule focusRule = FocusRule.INSTANCE;
+        PosInOccurrence pio = new PosInOccurrence(formula, PosInTerm.getTopLevel(), antec);
+        // services (2nd param) are not used/needed
+        RuleApp app = focusRule.createApp(pio, null);
+        return goal.apply(app).head();
     }
 }

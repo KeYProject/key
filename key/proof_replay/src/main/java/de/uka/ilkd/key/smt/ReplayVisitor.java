@@ -3,8 +3,6 @@ package de.uka.ilkd.key.smt;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.macros.PropositionalMacro;
-import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -16,22 +14,35 @@ import de.uka.ilkd.key.smt.SMTProofParser.ProofsexprContext;
 import de.uka.ilkd.key.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.key_project.util.collection.ImmutableSLList;
 
 import java.util.*;
 
 import static de.uka.ilkd.key.smt.SMTProofParser.*;
 
+/**
+ * This class is responsible for the actual replay of rules. For every rule there is a separate
+ * method. Replay of a rule is started when visiting the corresponding parser context.
+ *
+ * @author Wolfram Pfeifer
+ */
 class ReplayVisitor extends SMTProofBaseVisitor<Void> {
+    /** the replayer object (for looking up symbols) */
     private final SMTReplayer smtReplayer;
+
+    /** the goal the visitor is currently working on (changed by the replay methods!) */
     private Goal goal;
+
+    /** services used for building terms and looking up symbols */
     private final Services services;
+
+    /** Taclets for inserting hypotheses discharged by previously replayed lemma rules. The
+     * hypotheses are hidden in insert taclets (and can be re-introduced if needed) because the
+     * focus rule is applied for every rule, which would hide the hypotheses as well. */
     private final Map<Term, NoPosTacletApp> hypoTaclets = new HashMap<>();
 
-    // used to carry last symbol introduced by quant-intro rule (needed for replaying rules inside
-    // the scope of a quant-intro/proof-bind/lambda)
-    private Deque<Pair<QuantifiableVariable, Term>> skolemSymbols = new LinkedList<>();
-
+    /** used to carry symbols introduced by quant-intro rule (needed for replaying rules inside
+     * the scope of a quant-intro/proof-bind/lambda) */
+    private final Deque<Pair<QuantifiableVariable, Term>> skolemSymbols = new LinkedList<>();
 
     public ReplayVisitor(SMTReplayer smtReplayer, Goal goal) {
         this.smtReplayer = smtReplayer;
@@ -55,7 +66,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         String rulename = ctx.rulename.getText();
         //System.out.println(rulename);
         System.out.println(ReplayTools.getOriginalText(ctx));
-        addNotes(goal, ReplayTools.getOriginalText(ctx));
+        ReplayTools.addNotes(goal, ReplayTools.getOriginalText(ctx));
 
         switch (rulename) {
         case "true-axiom":
@@ -159,7 +170,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         Goal left = goals.get(1);
 
         // currently we run auto mode for converting to nnf
-        runAutoMode(left);
+        ReplayTools.runAutoMode(left);
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
         replayRightSideHelper(ctx);
@@ -172,7 +183,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         Goal left = goals.get(1);
 
         // currently we run auto mode for converting to nnf
-        runAutoMode(left);
+        ReplayTools.runAutoMode(left);
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
         replayRightSideHelper(ctx);
@@ -194,9 +205,6 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
     }
 
     private void replayLemma(ProofsexprContext ctx) {
-
-        ProofsexprContext conclCtx = extractRuleConclusionCtx(ctx);
-        Term concl = extractRuleConclusion(ctx);
         List<Term> hypotheses = extractHypotheses(ctx);
 
         assert hypotheses.size() >= 1;
@@ -219,7 +227,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         // replace_known_left (n times)
         // concrete_and_ (n-1 times)
         // close
-        runAutoMode(left);
+        ReplayTools.runAutoMode(left);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
@@ -254,8 +262,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         List<Term> hypotheses = new ArrayList<>();
         NoprooftermContext conclCtx = extractRuleConclusionCtx(ctx).noproofterm();
         int hypoCount = conclCtx.noproofterm().size() - 1;
-        Term concl = extractRuleConclusion(ctx);
-        Term rest = concl;
+        Term rest = extractRuleConclusion(ctx);
 
         for (int i = 0; i < hypoCount - 1; i++) {
             Term notH = rest.sub(1);
@@ -271,7 +278,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
 
     private void replayIffEquisat(ProofsexprContext ctx) {
         // TODO is this correct?
-        // nothing to do here, since we replace all ~ using <-> and epsilon
+        // nothing to do here, since we replace all ~ using <-> and epsilon when building terms
         // directly descend into antecedent
         replayRightSideHelper(ctx);
     }
@@ -285,7 +292,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         List<Goal> goals = goal.apply(cutApp).toList();
         Goal left = goals.get(1);
 
-        runAutoModePropositional(left, 50);
+        ReplayTools.runAutoModePropositional(left, 50);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
@@ -294,21 +301,18 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
 
     private void replayDistributivity(ProofsexprContext ctx) {
         // TODO: restrict to specific rules? better "manual" replay?
-        runAutoModePropositional(goal, 50);
+        ReplayTools.runAutoModePropositional(goal, 50);
     }
 
     // this rule should not be used except with CONTEXT_SIMPLIFIER=true or BIT2BOOL=true
     private void replayRewriteStar(ProofsexprContext ctx) {
         Term cutTerm = extractRuleAntecedents(ctx);
-
-        Term conclusion = extractRuleConclusion(ctx);
-
         TacletApp app = ReplayTools.createCutApp(goal, cutTerm);
         List<Goal> goals = goal.apply(app).toList();
         Goal left = goals.get(1);
 
         // close this goal by auto mode
-        runAutoModePropositional(left, 50);
+        ReplayTools.runAutoModePropositional(left, 50);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
@@ -334,10 +338,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         // TODO: does only work with quantifiers with single bound variable
         List<PosInTerm> qvPositions = collectQvPositions(quant.formula());
 
-        // may happen due to typeguard, which is skipped by the translation
         if (qvPositions.isEmpty()) {
-            // TODO: rule does not work if typeguard is not implemented
-            //  (typeguard <-> instanceof can not be proven)
             throw new IllegalStateException("Must not happen, error!");
         } else {
             PosInTerm qvPos = qvPositions.get(0);
@@ -369,8 +370,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         // closing rule (Tseitin axioms)
         // quick and dirty solution: use auto mode (simple propositional steps)
         // TODO: implement schemas
-        // TODO: run auto mode with specific ruleset?
-        runAutoModePropositional(goal, 50);
+        ReplayTools.runAutoModePropositional(goal, 50);
     }
 
     private void replayProofBind(ProofsexprContext ctx) {
@@ -384,17 +384,16 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             throw new IllegalStateException("Error! After 'proof-bind', 'lambda' is expected!");
         }
 
-        // could be a symbol bound by let
-        ProofsexprContext child = lambda;
-        ParserRuleContext letDef = smtReplayer.getSymbolDef(child.getText(), child);
+        // lambda could still be a symbol bound by let
+        ParserRuleContext letDef = smtReplayer.getSymbolDef(lambda.getText(), lambda);
         if (letDef != null) {
-            // child is var name, letDef is (lambda ...)
+            // lambda is var name, letDef is: (lambda ...)
             // TODO: check instanceof
             ProofsexprContext lambdaScope = ((ProofsexprContext)letDef).proofsexpr(0);
             skipLets(lambdaScope);
         } else {
-            // child is term (lambda ...)
-            ProofsexprContext lambdaScope = child.proofsexpr(0);
+            // lambda is term: (lambda ...)
+            ProofsexprContext lambdaScope = lambda.proofsexpr(0);
             skipLets(lambdaScope);
         }
     }
@@ -735,6 +734,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         skolemSymbols.pop();
     }
 
+    // TODO: Use the epsilon definition taclet, this should drastically shorten the code here!
     private void replaySk(ProofsexprContext ctx) {
         // equiv_right
         SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
@@ -890,9 +890,10 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             TacletApp app = ReplayTools.createCutApp(goal, cutTerm);
             List<Goal> goals = goal.apply(app).toList();
             // TODO: finish implementation
+            throw new IllegalStateException("Not yet implemented: th-lemma as non-closing rule!");
         } else {
             // leaf rule
-            runAutoMode(goal);
+            ReplayTools.runAutoMode(goal);
         }
     }
 
@@ -927,6 +928,8 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             System.out.println("The formula " + seqForm.formula() + " is not found as assertion!");
             //System.out.println("Starting auto mode ...");
             // TODO: insert matching assertion (how to find?)
+            // TODO: we need a more general solution here: what if the rule refers to an assertion
+            //  that does not stem from the sequent, but e.g. from the type axioms?
             // Note: this is a problem if assertions are rewritten (we hope that this does not
             // happpen, or else we will not be able to find them)
         }
@@ -940,10 +943,10 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             TacletApp app = ReplayTools.createTacletApp("equiv_right", pio, goal);
             List<Goal> goals = goal.apply(app).toList();
             // running automode separately on both goals increases success rate
-            runAutoMode(goals.get(0));
-            runAutoMode(goals.get(1));
+            ReplayTools.runAutoMode(goals.get(0));
+            ReplayTools.runAutoMode(goals.get(1));
         } else {
-            runAutoMode(goal);
+            ReplayTools.runAutoMode(goal);
         }
     }
 
@@ -985,11 +988,13 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         for (int i = 0; i < arity; i++) {
             pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
 
-            // TODO: this case may occur for other rules as well
+            // should not happen any more, since typeguard is now translated to instanceof
+            /*
             if (!pio.subTerm().op().equals(Junctor.AND)) {
                 // this may occur if a typeguard has been skipped by the translation
                 break;
             }
+             */
 
             app = ReplayTools.createTacletApp("andLeft", pio, left);
             left = left.apply(app).head();
@@ -1030,7 +1035,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
 
         seqForm = ReplayTools.getLastAddedSuc(left);
 
-        // TODO: better count up to arity, however, extracting the original SMT arity of or is
+        // TODO: better count up to arity, however, extracting the original SMT arity of "or" is
         //  pretty difficult
         //  pragmatic solution: will always find the searched literal
         //int arity = extractOrArity(ctx.proofsexpr(0));
@@ -1168,7 +1173,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             // revert the replay attempt and try to close automatically
             pruneTarget.proof().pruneProof(pruneTarget);
             goal = pruneTarget.proof().getGoal(pruneTarget);
-            runAutoMode(goal);
+            ReplayTools.runAutoMode(goal);
         }
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
@@ -1185,7 +1190,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             e.printStackTrace();
             // if this branch is not replayable due to sorts problems:
             // TODO: collect and insert all assertions/hypotheses used in this subtree
-            runAutoMode(goal);
+            ReplayTools.runAutoMode(goal);
             return;
         }
 
@@ -1320,7 +1325,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             cutFormula = sci.modifiedFormulas(false).head().getNewFormula();
         }
 
-        goal = focus(cutFormula, goal, false);
+        goal = ReplayTools.focus(cutFormula, goal, false);
 
         PosInOccurrence pio;
         TacletApp app;
@@ -1352,7 +1357,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
 
         // trans* rule contains multiple transitivity and symmetry steps,
         // therefore we need auto mode here (however, should be really simple to close)
-        runAutoModePropositional(goal, 50);
+        ReplayTools.runAutoModePropositional(goal, 50);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
@@ -1377,7 +1382,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         app = ReplayTools.createTacletApp("insert_eqv_once_lr", pio, left);
         left = left.apply(app).head();
 
-        NoPosTacletApp insertEqv = findLocalRule("insert_eqv", left);
+        NoPosTacletApp insertEqv = ReplayTools.findLocalRule("insert_eqv", left);
         seqForm = left.sequent().antecedent().get(0);
         pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel().down(1), true);
         app = ReplayTools.autoInst(insertEqv, pio, left);
@@ -1448,8 +1453,9 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
 
     /**
      * Ensures that the top level symbol is not a symbol bound by let, but an actual context.
-     * @param ctx
-     * @return
+     * @param ctx the context which may or may not be a symbol bound by let
+     * @return a context that is ensured not to be a symbol bound by let (however, subterms may
+     *  contain other symbols again!)
      */
     private ParserRuleContext ensureLookup(ParserRuleContext ctx) {
         ParserRuleContext def = smtReplayer.getSymbolDef(ctx.getText(), ctx);
@@ -1489,26 +1495,6 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         return term;
     }
 
-    private int getTopLevelArity(ProofsexprContext ctx) {
-        ParserRuleContext def = smtReplayer.getSymbolDef(ctx.getText(), ctx);
-        if (def != null) {
-            if (def instanceof NoprooftermContext) {
-                return getTopLevelArity((NoprooftermContext) def);
-            } else {
-                return getTopLevelArity((ProofsexprContext) def);
-            }
-        } else {
-            return ctx.sub.size() - 1;
-        }
-    }
-
-    private int getTopLevelArity(NoprooftermContext ctx) {
-        if (ctx.func != null) {
-            return ctx.noproofterm().size() - 1;
-        }
-        return 1;
-    }
-
     private ProofsexprContext extractRuleConclusionCtx(ProofsexprContext ctx) {
         return ctx.proofsexpr(ctx.proofsexpr().size() - 1);
     }
@@ -1539,53 +1525,5 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             }
             return result;
         }
-    }
-
-    private void runAutoModePropositional(Goal goal, int steps) {
-        PropositionalMacro prop = new PropositionalMacro(steps);
-        try {
-            prop.applyTo(null, goal.node(), null, null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void runAutoMode(Goal goal) {
-        // current notes could contain rule name -> append
-        addNotes(goal, "automatic proof search");
-
-        TryCloseMacro close = new TryCloseMacro(50);
-        try {
-            close.applyTo(null, goal.proof(), ImmutableSLList.<Goal>nil().append(goal), null, null);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void addNotes(Goal goal, String notes) {
-        String currentNotes = goal.node().getNodeInfo().getNotes();
-        String newNotes = "";
-        if (currentNotes != null && !currentNotes.isEmpty()) {
-            newNotes += currentNotes + " ";
-        }
-        newNotes += notes;
-        goal.node().getNodeInfo().setNotes(newNotes);
-    }
-
-    private NoPosTacletApp findLocalRule(String namePrefix, Goal goal) {
-        for (NoPosTacletApp app : goal.node().getLocalIntroducedRules()) {
-            // TODO: there may be multiple rules with this prefix
-            if (app.taclet().name().toString().startsWith(namePrefix)) {
-                return app;
-            }
-        }
-        return null;
-    }
-
-    private Goal focus(SequentFormula formula, Goal goal, boolean antec) {
-        FocusRule focusRule = FocusRule.INSTANCE;
-        PosInOccurrence pio = new PosInOccurrence(formula, PosInTerm.getTopLevel(), antec);
-        RuleApp app = focusRule.createApp(pio, services);
-        return goal.apply(app).head();
     }
 }
