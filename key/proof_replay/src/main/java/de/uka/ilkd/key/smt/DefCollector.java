@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTProofParser.Sorted_varContext;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -49,6 +50,9 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                 }
                 // now next must be a lambda term
                 if (next.rulename != null && next.rulename.getText().equals("lambda")) {
+                    // TODO: somewhere here the bound variable must be added to the list ...
+                    //  important: next step!!!
+
                     // visit and wrap into (possibly multiple) forall
                     Term result = visit(next.proofsexpr(0));
                     for (int i = next.sorted_var().size() - 1; i >= 0; i--) {
@@ -120,6 +124,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
             return visit(proofsexpr);
         }
 
+        // TODO: caching while ignoring bound vars leads to replacing bound vars by skolem constants
         // term may be in cache already
         Term cached = smtReplayer.getTranslationToTerm(ctx.getText());
         if (cached != null) {
@@ -135,7 +140,8 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         // Note: use TermFactory instead of TermBuilder to prevent from simplification!
         if (ctx.func != null) {
             System.out.println("    ctx.func: " + ctx.func.getText());
-            Term t1, t2;
+            Term t1;
+            Term t2;
             int arity;
             IntegerLDT integerLDT;
             switch (ctx.func.getText()) {
@@ -514,7 +520,12 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
 
     private QuantifiableVariable getBoundVar(String varName) {
         for (QuantifiableVariable qv : boundVars) {
+            // sometimes bound vars have not "var_" prefix
             if (qv.name().toString().equals(varName)) {
+                return qv;
+            // maybe varName still has "var_" prefix
+            } else if (varName.length() > 4
+                && qv.name().toString().equals(varName.substring(4))) {
                 return qv;
             }
         }
@@ -529,6 +540,9 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
             return tb.ff();
         } else if (ctx.getText().equals("true")) {
             return tb.tt();
+        } else if (ctx.getText().equals("k_null")) {
+            Function nullFun = services.getNamespaces().functions().lookup("null");
+            return tb.func(nullFun);
         }
         QuantifiableVariable qv = getBoundVar(ctx.getText());
         if (qv != null) {

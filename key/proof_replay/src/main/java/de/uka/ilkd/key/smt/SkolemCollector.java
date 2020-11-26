@@ -44,7 +44,7 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
             if (term.op() == Quantifier.EX) {
                 // TODO: check that we have the right variable (sk term may contain other skolem symbols as well!)
 
-                // TODO: how to get a collision free var name?
+                // TODO: how to get a collision free var name? do we need one?
                 Name varName = new Name(skVariable);
 
                 // as condition, we take the formula under the exists quantifier and replace the bound variable by qv
@@ -65,9 +65,9 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
 
                 Term all = term.sub(0);
                 Name varName = new Name(skVariable);
-                IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
-                QuantifiableVariable qv = new LogicVariable(varName, intLDT.targetSort());
                 QuantifiableVariable allBoundVar = all.boundVars().get(0);
+                Sort targetSort = allBoundVar.sort();
+                QuantifiableVariable qv = new LogicVariable(varName, targetSort);
                 Term cond = ReplayTools.replace(allBoundVar, qv, all.sub(0), services);
                 TermBuilder tb = services.getTermBuilder();
                 Term _then = tb.var(qv);
