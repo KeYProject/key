@@ -374,13 +374,18 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
     }
 
     private void replayProofBind(ProofsexprContext ctx) {
-        if (ctx.proofsexpr(0).rulename == null
-            || !ctx.proofsexpr(0).rulename.getText().equals("lambda")) {
+        ParserRuleContext lambdaPRC = ensureLookup(ctx.proofsexpr(0));
+        if (!(lambdaPRC instanceof ProofsexprContext)) {
+            throw new IllegalStateException("Error! After 'proof-bind', 'lambda' is expected!");
+        }
+        ProofsexprContext lambda = (ProofsexprContext) lambdaPRC;
+        if (lambda.rulename == null
+            || !lambda.rulename.getText().equals("lambda")) {
             throw new IllegalStateException("Error! After 'proof-bind', 'lambda' is expected!");
         }
 
         // could be a symbol bound by let
-        ProofsexprContext child = ctx.proofsexpr(0);
+        ProofsexprContext child = lambda;
         ParserRuleContext letDef = smtReplayer.getSymbolDef(child.getText(), child);
         if (letDef != null) {
             // child is var name, letDef is (lambda ...)
@@ -403,11 +408,20 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         }
     }
 
-    // sequent: ==> A = A
+    // sequent: ==> A = A     or     ==> A <-> A
     private void replayRefl(ProofsexprContext ctx) {
         SequentFormula seqForm = goal.sequent().succedent().getFirst();
         PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-        TacletApp app = ReplayTools.createTacletApp("eqClose", pio, goal);
+
+        TacletApp app = null;
+        if (seqForm.formula().op() == Equality.EQUALS) {
+            app = ReplayTools.createTacletApp("eqClose", pio, goal);
+        } else if (seqForm.formula().op() == Equality.EQV) {
+            app = ReplayTools.createTacletApp("eq_eq", pio, goal);
+        } else {
+            throw new IllegalStateException("Top level operator should be = or <-> but is "
+                + seqForm.formula().op());
+        }
         goal = goal.apply(app).head();
 
         seqForm = goal.sequent().succedent().getFirst();
@@ -487,6 +501,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         // forall x. p(x) <-> q(x), Q x. p(x) ==> Q x. q(x)
         Goal splitLeft = splitGoals.get(0);
         SequentFormula rhs = ReplayTools.getLastAddedSuc(splitLeft);
+        SequentFormula lhsQuant = ReplayTools.getLastAddedAntec(splitLeft);
         if (rhs.formula().op() == Quantifier.ALL) {                                     // forall
             // forall x. p(x) <-> q(x), forall x. p(x) ==> forall x. q(x)
             // allRight
@@ -509,8 +524,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             final Term inst = (Term) svInsts.getInstantiation(skSv);
 
             // allLeft
-            SequentFormula seqForm = ReplayTools.getLastAddedAntec(splitLeft);
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
+            pio = new PosInOccurrence(lhsQuant, PosInTerm.getTopLevel(), true);
             app = ReplayTools.createTacletApp("allLeft", pio, splitLeft);
             SchemaVariable qvSv = app.uninstantiatedVars().iterator().next();
             app = app.addInstantiation(qvSv, inst, true, services);
@@ -524,7 +538,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             splitLeft = splitLeft.apply(app).head();
 
             // replace_known_left
-            seqForm = ReplayTools.getLastAddedAntec(splitLeft);
+            SequentFormula seqForm = ReplayTools.getLastAddedAntec(splitLeft);
             PosInTerm pit = PosInTerm.getTopLevel().down(0);
             splitLeft = ReplayTools.applyNoSplitPosAntec(splitLeft, "replace_known_left", pit, seqForm);
 
@@ -589,6 +603,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         // forall x. p(x) <-> q(x), Q x. q(x) ==> Q x. p(x)
         Goal splitRight = splitGoals.get(1);
         rhs = ReplayTools.getLastAddedSuc(splitRight);
+        lhsQuant = ReplayTools.getLastAddedAntec(splitRight);
         if (rhs.formula().op() == Quantifier.ALL) {                                     // forall
             // forall x. p(x) <-> q(x), forall x. q(x) ==> forall x. p(x)
             // allRight
@@ -611,8 +626,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             final Term inst = (Term) svInsts.getInstantiation(skSv);
 
             // allLeft
-            SequentFormula seqForm = ReplayTools.getLastAddedAntec(splitRight);
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
+            pio = new PosInOccurrence(lhsQuant, PosInTerm.getTopLevel(), true);
             app = ReplayTools.createTacletApp("allLeft", pio, splitRight);
             SchemaVariable qvSv = app.uninstantiatedVars().iterator().next();
             app = app.addInstantiation(qvSv, inst, true, services);
@@ -626,7 +640,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             splitRight = splitRight.apply(app).head();
 
             // replace_known_left
-            seqForm = ReplayTools.getLastAddedAntec(splitRight);
+            SequentFormula seqForm = ReplayTools.getLastAddedAntec(splitRight);
             PosInTerm pit = PosInTerm.getTopLevel().down(1);
             splitRight = ReplayTools.applyNoSplitPosAntec(splitRight, "replace_known_left", pit, seqForm);
 
@@ -1162,7 +1176,8 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
     }
 
     private void replayUnitResolution(ProofsexprContext ctx) {
-        Term cutTerm, conclusion;
+        Term cutTerm;
+        Term conclusion;
         try {
             conclusion = extractRuleConclusion(ctx);
             cutTerm = extractRuleAntecedents(ctx);
@@ -1178,8 +1193,6 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         List<Goal> goals = goal.apply(app).toList();
         Goal left = goals.get(1);
 
-        SequentFormula seqForm = ReplayTools.getLastAddedAntec(left);    // = cut formula
-
         // first child is a | b | ...
         // last child is conclusion (maybe false)
         // others are unit clauses
@@ -1189,91 +1202,104 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         // 1. conclusion is false (in this case we derive false in the antecedent)
         // 2. conclusion is literal (in this case we derive the conclusion from the first clause)
         if (conclusion.equals(services.getTermBuilder().ff())) {
-            int literalCount = unitClauseCount;
-
-            // split unit clauses from cutTerm, store them in list to find them again later
-            List<SequentFormula> unitClauses = new ArrayList<>();
-            for (int i = 0; i < unitClauseCount; i++) {
-                left = ReplayTools.applyNoSplitTopLevelAntec(left, "andLeft", seqForm);
-                //unitClauses.add(ReplayTools.getLastAddedAntec(left));
-                unitClauses.add(ReplayTools.getLastAddedAntec(left, 0));
-                seqForm = ReplayTools.getLastAddedAntec(left, 1);      // = rest of cut formula
-            }
-
-            // rest of original cut formula is the clause a | b | ... (contains all unit clauses)
-            SequentFormula clause = seqForm;
-
-            for (SequentFormula unitClause : unitClauses) {
-                // bring unitClause to succedent
-                if (isPosLiteral(unitClause.formula())) {           // apply notElimLeft
-                    left = ReplayTools.applyNoSplitTopLevelAntec(left, "notElimLeft", unitClause);
-                } else {                                            // apply notLeft
-                    left = ReplayTools.applyNoSplitTopLevelAntec(left, "notLeft", unitClause);
-                }
-            }
-            // note: two separate loops since order may differ
-            for (int i = 0; i < unitClauseCount; i++) {
-                if (i == unitClauseCount - 1) {
-                    left = ReplayTools.applyNoSplitTopLevelAntec(left, "replace_known_right", clause);
-                } else {
-                    // replace last unit clause in clause
-                    PosInTerm secondParam = PosInTerm.getTopLevel().down(1);
-                    left = ReplayTools.applyNoSplitPosAntec(left, "replace_known_right", secondParam, clause);
-                }
-                clause = ReplayTools.getLastModifiedAntec(left);
-
-                if (i == unitClauseCount - 1) {
-                    // last unit clause: clause = false now -> close branch
-                    left = ReplayTools.applyNoSplitTopLevelAntec(left, "closeFalse", clause);
-                } else {
-                    left = ReplayTools.applyNoSplitTopLevelAntec(left, "concrete_or_4", clause);
-                    clause = ReplayTools.getLastModifiedAntec(left);
-                }
-            }
+            replayUnitResFalseHelper(left, unitClauseCount);
         } else {
-            int literalCount = unitClauseCount + 1; // unit clauses and conclusion
-
-            // split unit clauses from cutTerm, store them in list to find them again later
-            List<SequentFormula> unitClauses = new ArrayList<>();
-            for (int i = 0; i < unitClauseCount; i++) {
-                left = ReplayTools.applyNoSplitTopLevelAntec(left, "andLeft", seqForm);
-                // conclusion should not be added to unit clause list
-                if (!ReplayTools.getLastAddedAntec(left).formula().equals(conclusion)) {
-                    unitClauses.add(ReplayTools.getLastAddedAntec(left, 0));
-                }
-                seqForm = ReplayTools.getLastAddedAntec(left, 1);      // = rest of cut formula
-            }
-
-            // rest of original cut formula is the clause a | b | ... (contains all unit clauses)
-            SequentFormula clause = seqForm;
-
-            for (SequentFormula unitClause : unitClauses) {
-                // bring unitClause to succedent
-                if (isPosLiteral(unitClause.formula())) {           // apply notElimLeft
-                    left = ReplayTools.applyNoSplitTopLevelAntec(left, "notElimLeft", unitClause);
-                } else {                                            // apply notLeft
-                    left = ReplayTools.applyNoSplitTopLevelAntec(left, "notLeft", unitClause);
-                }
-            }
-
-            for (int i = 0; i < literalCount - 1; i++) {
-                PosInTerm secondParam = PosInTerm.getTopLevel().down(1);
-                left = ReplayTools.applyNoSplitPosAntec(left, "replace_known_right", secondParam, clause);
-                clause = ReplayTools.getLastModifiedAntec(left);
-                left = ReplayTools.applyNoSplitTopLevelAntec(left, "concrete_or_4", clause);
-                clause = ReplayTools.getLastModifiedAntec(left);
-            }
-
-            // replace last unit clause in clause
-            left = ReplayTools.applyNoSplitTopLevelAntec(left, "replace_known_right", clause);
-            clause = ReplayTools.getLastModifiedAntec(left);
-            // last literal: clause = false now -> close branch
-            left = ReplayTools.applyNoSplitTopLevelAntec(left, "closeFalse", clause);
+            replayUnitResLiteralHelper(left, unitClauseCount);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
         replayRightSideHelper(ctx);
+    }
+
+    // unit resolution where the succedent is "false"
+    private void replayUnitResFalseHelper(Goal left, int unitClauseCount) {
+        SequentFormula seqForm = ReplayTools.getLastAddedAntec(left);    // = cut formula
+
+        // split unit clauses from cutTerm, store them in list to find them again later
+        List<SequentFormula> unitClauses = new ArrayList<>();
+        for (int i = 0; i < unitClauseCount; i++) {
+            left = ReplayTools.applyNoSplitTopLevelAntec(left, "andLeft", seqForm);
+            //unitClauses.add(ReplayTools.getLastAddedAntec(left));
+            unitClauses.add(ReplayTools.getLastAddedAntec(left, 0));
+            seqForm = ReplayTools.getLastAddedAntec(left, 1);      // = rest of cut formula
+        }
+
+        // rest of original cut formula is the clause a | b | ... (contains all unit clauses)
+        SequentFormula clause = seqForm;
+
+        for (SequentFormula unitClause : unitClauses) {
+            // bring unitClause to succedent
+            if (isPosLiteral(unitClause.formula())) {           // apply notElimLeft
+                left = ReplayTools.applyNoSplitTopLevelAntec(left, "notElimLeft", unitClause);
+            } else {                                            // apply notLeft
+                left = ReplayTools.applyNoSplitTopLevelAntec(left, "notLeft", unitClause);
+            }
+        }
+        // note: two separate loops since order may differ
+        for (int i = 0; i < unitClauseCount; i++) {
+            if (i == unitClauseCount - 1) {
+                left = ReplayTools.applyNoSplitTopLevelAntec(left, "replace_known_right", clause);
+            } else {
+                // replace last unit clause in clause
+                PosInTerm secondParam = PosInTerm.getTopLevel().down(1);
+                left = ReplayTools.applyNoSplitPosAntec(left, "replace_known_right", secondParam,
+                    clause);
+            }
+            clause = ReplayTools.getLastModifiedAntec(left);
+
+            if (i == unitClauseCount - 1) {
+                // last unit clause: clause = false now -> close branch
+                left = ReplayTools.applyNoSplitTopLevelAntec(left, "closeFalse", clause);
+            } else {
+                left = ReplayTools.applyNoSplitTopLevelAntec(left, "concrete_or_4", clause);
+                clause = ReplayTools.getLastModifiedAntec(left);
+            }
+        }
+    }
+
+    // unit resolution where the succedent is a literal that is not "false"
+    private void replayUnitResLiteralHelper(Goal left, int unitClauseCount) {
+        SequentFormula seqForm = ReplayTools.getLastAddedAntec(left);    // = cut formula
+        int literalCount = unitClauseCount + 1; // unit clauses and conclusion
+
+        // split unit clauses from cutTerm, store them in list to find them again later
+        List<SequentFormula> unitClauses = new ArrayList<>();
+        for (int i = 0; i < unitClauseCount; i++) {
+            left = ReplayTools.applyNoSplitTopLevelAntec(left, "andLeft", seqForm);
+            // conclusion should not be added to unit clause list
+            //if (!ReplayTools.getLastAddedAntec(left).formula().equals(conclusion)) {
+                unitClauses.add(ReplayTools.getLastAddedAntec(left, 0));
+            //}
+            seqForm = ReplayTools.getLastAddedAntec(left, 1);      // = rest of cut formula
+        }
+
+        // rest of original cut formula is the clause a | b | ... (contains all unit clauses)
+        SequentFormula clause = seqForm;
+
+        for (SequentFormula unitClause : unitClauses) {
+            // bring unitClause to succedent
+            if (isPosLiteral(unitClause.formula())) {           // apply notElimLeft
+                left = ReplayTools.applyNoSplitTopLevelAntec(left, "notElimLeft", unitClause);
+            } else {                                            // apply notLeft
+                left = ReplayTools.applyNoSplitTopLevelAntec(left, "notLeft", unitClause);
+            }
+        }
+
+        for (int i = 0; i < literalCount - 1; i++) {
+            PosInTerm secondParam = PosInTerm.getTopLevel().down(1);
+            left = ReplayTools.applyNoSplitPosAntec(left, "replace_known_right", secondParam,
+                clause);
+            clause = ReplayTools.getLastModifiedAntec(left);
+            left = ReplayTools.applyNoSplitTopLevelAntec(left, "concrete_or_4", clause);
+            clause = ReplayTools.getLastModifiedAntec(left);
+        }
+
+        // replace last unit clause in clause
+        left = ReplayTools.applyNoSplitTopLevelAntec(left, "replace_known_right", clause);
+        clause = ReplayTools.getLastModifiedAntec(left);
+        // last literal: clause = false now -> close branch
+        left = ReplayTools.applyNoSplitTopLevelAntec(left, "closeFalse", clause);
     }
 
     private boolean isPosLiteral(Term formula) {
@@ -1376,20 +1402,15 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         // left: and_left, replace_known_left, concrete_impl, close
         Goal left = goals.get(1);
 
-        SequentFormula seqForm = left.sequent().antecedent().get(0);
-        PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-        app = ReplayTools.createTacletApp("andLeft", pio, left);
-        left = left.apply(app).head();
+        SequentFormula seqForm = ReplayTools.getLastAddedAntec(left);
+        left = ReplayTools.applyNoSplitTopLevelAntec(left, "andLeft", seqForm);
 
-        seqForm = left.sequent().antecedent().get(1);
-        pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel().down(0), true);
-        app = ReplayTools.createTacletApp("replace_known_left", pio, left);
-        left = left.apply(app).head();
+        seqForm = ReplayTools.getLastAddedAntec(left);
+        left = ReplayTools.applyNoSplitPosAntec(left, "replace_known_left",
+            PosInTerm.getTopLevel().down(0), seqForm);
 
-        seqForm = left.sequent().antecedent().get(1);
-        pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-        app = ReplayTools.createTacletApp("concrete_eq_1", pio, left);
-        left = left.apply(app).head();
+        seqForm = ReplayTools.getLastModifiedAntec(left);
+        left = ReplayTools.applyNoSplitTopLevelAntec(left, "concrete_eq_1", seqForm);
 
         // Two cases: Is the last changed formula "false" or not?
         SequentChangeInfo sci = left.node().getNodeInfo().getSequentChangeInfo();
@@ -1399,22 +1420,13 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         if (fci != null && fci.getNewFormula().formula().equals(services.getTermBuilder().ff())) {
             // 1. case: Gamma, false ==> Delta
             //   in this case apply closeFalse (used for final refutation of proof)
-            seqForm = left.sequent().antecedent().get(1);
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-            app = ReplayTools.createTacletApp("closeFalse", pio, left);
-            left = left.apply(app).head();
+            seqForm = ReplayTools.getLastModifiedAntec(left);
+            left = ReplayTools.applyNoSplitTopLevelAntec(left, "closeFalse", seqForm);
         } else {
             // 2. case: Gamma, f ==> Delta, f
             //   in this case apply closeAntec
-            //seqForm = left.sequent().antecedent().get(1);
-            seqForm = left.sequent().succedent().getFirst();
-
-            /*
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-            app = ReplayTools.createTacletApp("close", pio, left);
-            left = left.apply(app).head();*/
-
-            left = ReplayTools.applyNoSplitTopLevelSuc(left, "close", seqForm);
+            seqForm = ReplayTools.getLastModifiedAntec(left);
+            left = ReplayTools.applyNoSplitTopLevelAntec(left, "closeAntec", seqForm);
         }
 
         assert left.node().isClosed();
