@@ -28,14 +28,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>java</name>
+			<name>key.dist.lib</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core/src/main/java</locationURI>
-		</link>
-		<link>
-			<name>javaccGen</name>
-			<type>2</type>
-			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core/build/generated-src/javacc/main</locationURI>
+			<locationURI>PARENT-4-PROJECT_LOC/key/key.ui/build/distributions/key-2.8.0/lib</locationURI>
 		</link>
 		<link>
 			<name>key.lib</name>
@@ -46,11 +41,6 @@
 			<name>key.resources</name>
 			<type>2</type>
 			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core/src/main/resources</locationURI>
-		</link>
-		<link>
-			<name>main</name>
-			<type>2</type>
-			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.core/build/generated-src/antlr/main</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

@@ -6,12 +6,12 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: de.hentschel.visualdbc.datasource.ui.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
- org.eclipse.core.resources;bundle-version="3.6.1",
- org.eclipse.jdt.core;bundle-version="3.6.2",
- org.eclipse.jdt.ui;bundle-version="3.6.2",
- org.eclipse.emf.common.ui;bundle-version="2.6.0",
- org.key_project.util;bundle-version="1.0.0",
- de.hentschel.visualdbc.dataSource;bundle-version="1.0.0"
+ org.eclipse.core.resources,
+ org.eclipse.jdt.core,
+ org.eclipse.jdt.ui,
+ org.eclipse.emf.common.ui,
+ org.key_project.util,
+ de.hentschel.visualdbc.dataSource
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8, JavaSE-10, JavaSE-9
 Export-Package: de.hentschel.visualdbc.datasource.ui.composite,

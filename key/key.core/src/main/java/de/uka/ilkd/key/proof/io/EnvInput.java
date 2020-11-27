@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableSet;
 
