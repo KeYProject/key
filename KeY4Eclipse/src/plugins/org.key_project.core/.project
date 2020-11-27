@@ -30,7 +30,7 @@
 		<link>
 			<name>key.dist.lib</name>
 			<type>2</type>
-			<locationURI>PARENT-4-PROJECT_LOC/key/key.ui/build/distributions/key-2.8.0/lib</locationURI>
+			<locationURI>PARENT-4-PROJECT_LOC/key/key.ui/build/install/key.ui/lib</locationURI>
 		</link>
 		<link>
 			<name>key.lib</name>
