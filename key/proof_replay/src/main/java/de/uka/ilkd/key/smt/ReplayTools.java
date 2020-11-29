@@ -153,6 +153,13 @@ public final class ReplayTools {
         return goal.apply(app).head();
     }
 
+    public static Goal applyNoSplitPosSuc(Goal goal, String tacletName, PosInTerm pit,
+                                          SequentFormula sf) {
+        PosInOccurrence pio = new PosInOccurrence(sf, pit, false);
+        TacletApp app = createTacletApp(tacletName, pio, goal);
+        return goal.apply(app).head();
+    }
+
     public static Goal applyNoSplitTopLevelSuc(Goal goal, String tacletName, SequentFormula sf) {
         PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
         TacletApp app = createTacletApp(tacletName, pio, goal);

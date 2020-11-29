@@ -1222,7 +1222,35 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         }
     }
 
+    private void replaySk(ProofsexprContext ctx) {
+        SequentFormula conclusion = goal.sequent().succedent().getFirst();
+
+        // collect all positions of the quantified variable in ex term
+        // <-> positions of ifEx term in right side formula
+        ProofsexprContext equiSat = ctx.proofsexpr(0);
+        NoprooftermContext exCtx = equiSat.noproofterm().noproofterm(1);
+        Term ex = new DefCollector(smtReplayer, services).visit(exCtx);
+        List<PosInTerm> pits = collectQvPositions(ex);
+        assert !pits.isEmpty();
+        // right side of equiv
+        PosInTerm pit = pits.get(0);
+        // prepend 1 (i.e. select ride side of equiv) to found position
+        PosInTerm ifEx = PosInTerm.getTopLevel().down(1);
+        for (int i = 0; i < pit.depth(); i++) {
+            ifEx = ifEx.down(pit.getIndexAt(i));
+        }
+
+        // ifEx points to first ifEx term in conclusion now
+        goal = ReplayTools.applyNoSplitPosSuc(goal, "epsDefAdd", ifEx, conclusion);
+
+        // taclet epsDefAdd adds the same formula as conclusion on the right side -> close
+        SequentFormula sf = ReplayTools.getLastAddedAntec(goal);
+        goal = ReplayTools.applyNoSplitTopLevelAntec(goal, "closeAntec", sf);
+        // goal is closed now!
+    }
+
     // TODO: Use the epsilon definition taclet, this should drastically shorten the code here!
+    /*
     private void replaySk(ProofsexprContext ctx) {
         // equiv_right
         SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
@@ -1336,7 +1364,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
         app = ReplayTools.createTacletApp("close", pio, right);
         right = right.apply(app).head();
-    }
+    }*/
 
     private void replayAsserted(ProofsexprContext ctx) {
         // get sequentFormula, get corresponding insert_taclet from map, apply
