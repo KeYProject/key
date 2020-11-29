@@ -4,7 +4,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTProofParser.Sorted_varContext;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -27,6 +26,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
     private final Services services;
     private final TermFactory tf;
     private final TermBuilder tb;
+    private final SMTSymbolRetranslator retranslator;
     private final Deque<QuantifiableVariable> boundVars = new LinkedList<>();
 
     public DefCollector(SMTReplayer smtReplayer, Services services) {
@@ -34,6 +34,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         this.services = services;
         this.tf = services.getTermFactory();
         this.tb = services.getTermBuilder();
+        retranslator = new SMTSymbolRetranslator(services);
     }
 
     @Override
@@ -152,7 +153,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                 t2 = visit(ctx.noproofterm(2));
                 return equals(t1, t2);
             case "=>":
-            //case "implies":
+            case "implies":
                 assert ctx.noproofterm().size() == 3;
                 t1 = visit(ctx.noproofterm(1));
 
@@ -269,15 +270,6 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                 t1 = visit(ctx.noproofterm(1));
                 smtReplayer.addTranslationToTerm(ctx.getText(), t1);
                 return t1;
-            /*
-            // marker for instanceof uses w/o direct counterpart in the original sequent
-            case "typeguard":
-                // TODO: better detect at and/implies or quantifier case?
-                t1 = visit(ctx.noproofterm(1));
-                // TODO: only int currently
-                Function typeguard = services.getNamespaces().functions().lookup("typeguard_int");
-                return tb.equals(tb.func(typeguard, t1), tb.TRUE());
-                //return tb.tt();*/
             case "length":
                 t1 = visit(ctx.noproofterm(1));
                 return tb.dotLength(t1);
@@ -286,15 +278,6 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                 return createInstanceof(ctx);
             case "exactinstanceof":
                 return createExactinstanceof(ctx);
-            case "subtype":
-                // TODO: does not work!
-                t1 = visit(ctx.noproofterm(1));
-                t2 = visit(ctx.noproofterm(2));
-                return tb.instance(t2.sort(), t1);
-            case "typeof":
-                // TODO: does not work!
-                t1 = visit(ctx.noproofterm(1));
-                tb.exactInstance(t1.sort(), t1);
             case "cast":
                 t1 = visit(ctx.noproofterm(1));
                 return tb.cast(t1.sort(), t1);
@@ -387,12 +370,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         // instanceof/typeguard has the following form: (instanceof/typeguard var_x sort_int)
         Term term = visit(ctx.noproofterm(1));
         NoprooftermContext sortCtx = ctx.noproofterm(2);
-        // cut the "sort_" prefix
-        String sortName = sortCtx.getText();
-        if (sortName.startsWith("sort_")) {
-            sortName = sortName.substring(5);
-        }
-        Sort keySort = services.getNamespaces().sorts().lookup(sortName);
+        Sort keySort = retranslator.translateSort(sortCtx.getText());
         return tb.instance(keySort, term);
     }
 
@@ -400,12 +378,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         // instanceof/typeguard has the following form: (instanceof/typeguard var_x sort_int)
         Term term = visit(ctx.noproofterm(1));
         NoprooftermContext sortCtx = ctx.noproofterm(2);
-        // cut the "sort_" prefix
-        String sortName = sortCtx.getText();
-        if (sortName.startsWith("sort_")) {
-            sortName = sortName.substring(5);
-        }
-        Sort keySort = services.getNamespaces().sorts().lookup(sortName);
+        Sort keySort = retranslator.translateSort(sortCtx.getText());
         return tb.exactInstance(keySort, term);
     }
 
@@ -430,30 +403,19 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
     private QuantifiableVariable extractQV(Sorted_varContext sortedVar,
                                            NoprooftermContext quantForm)
         throws NotReplayableException {
-        NamespaceSet nss = services.getNamespaces();
+        //NamespaceSet nss = services.getNamespaces();
 
         // fix: some sorts T/U and variables do not have prefixes
         String origVarName = sortedVar.SYMBOL().getText();
-        String varName = origVarName;
+        //String varName = origVarName;
 
+        /*
         // cut the "var_" prefix
         if (origVarName.startsWith("var_")) {
             varName = origVarName.substring(4);
-        }
-
-        // TODO: this does only work with non-compound sorts, not arrays/functions
-        String origSortName = sortedVar.sort().identifier().getText();
-        /*
-        if (origSortName.equals("U")) {
-            return new LogicVariable(new Name(varName), Sort.ANY);
-        } else if (origSortName.equals("T")) {
-            // TODO: ?
-            //return new LogicVariable(new Name(origVarName), ???);
-            throw new IllegalStateException("Not yet implemented!");
         }*/
 
-        //String varName = origVarName.substring(4);
-        Term cached = smtReplayer.getTranslationToTerm(sortedVar.SYMBOL().getText());
+        Term cached = smtReplayer.getTranslationToTerm(origVarName);
         if (cached != null) {
             if (cached.op() instanceof QuantifiableVariable) {
                 System.out.println("Found QuantifiableVariable " + cached.op());
@@ -461,28 +423,22 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
             }
         }
 
-        Name name = new Name(varName);
+        //Name name = new Name(varName);
 
         NoprooftermContext typeguard = extractTypeguard(quantForm);
         if (typeguard == null) {
             // translate to variable of sort any
-            return new LogicVariable(name, Sort.ANY);
-            //throw new NotReplayableException("Can not be replayed due to unknown sort.");
-            //throw new IllegalStateException("No typeguard found!");
+            //return new LogicVariable(name, Sort.ANY);
+            return retranslator.translateLogicVariable(origVarName, Sort.ANY);
         }
         // typeguard has the following form: (typeguard var_x sort_int)
         NoprooftermContext nameCtx = typeguard.noproofterm(1);
         NoprooftermContext sortCtx = typeguard.noproofterm(2);
-        // cut the "sort_" prefix
-        String sortName = sortCtx.getText();
-        if (sortName.startsWith("sort_")) {
-            sortName = sortName.substring(5);
-        }
-        Sort keySort = nss.sorts().lookup(sortName);
+        Sort keySort = retranslator.translateSort(sortCtx.getText());
 
         // TODO: SMT quantifiers may have multiple quantified variables
-
-        return new LogicVariable(name, keySort);
+        return retranslator.translateLogicVariable(origVarName, keySort);
+        //return new LogicVariable(name, keySort);
     }
 
     private NoprooftermContext extractTypeguard(NoprooftermContext quantForm) {
@@ -532,10 +488,13 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         return null;
     }
 
-
-
     @Override
     public Term visitIdentifier(IdentifierContext ctx) {
+        Term t = retranslator.tryToTranslate(ctx.getText());
+        if (t != null) {
+            return t;
+        }
+
         if (ctx.getText().equals("false")) {
             return tb.ff();
         } else if (ctx.getText().equals("true")) {
