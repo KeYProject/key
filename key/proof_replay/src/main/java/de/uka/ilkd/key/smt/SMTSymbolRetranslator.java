@@ -51,7 +51,7 @@ public class SMTSymbolRetranslator {
         if (pv instanceof ProgramVariable) {
             return services.getTermBuilder().var((ProgramVariable)pv);
         }
-        throw new IllegalStateException("Uninterpreted symobl not found: " + symbol);
+        throw new IllegalStateException("Uninterpreted symbol not found: " + symbol);
     }
 
     public QuantifiableVariable translateLogicVariable(String symbol, Sort sort) {
@@ -60,6 +60,7 @@ public class SMTSymbolRetranslator {
         if (qv != null) {
             return qv;
         }
+        // TODO: creates wrong symbols! return null here?
         return new LogicVariable(new Name(origVarName), sort);
     }
 

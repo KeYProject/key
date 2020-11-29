@@ -598,50 +598,26 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
     }
 
     private void replayAndElim(ProofsexprContext ctx) {
-        Term cutTerm = extractRuleAntecedents(ctx);
-        TacletApp app = ReplayTools.createCutApp(goal, cutTerm);
+        final Term cutTerm = extractRuleAntecedents(ctx);
+        final TacletApp app = ReplayTools.createCutApp(goal, cutTerm);
         List<Goal> goals = goal.apply(app).toList();
         Goal left = goals.get(1);
-        SequentFormula orig = left.sequent().succedent().get(0);
+        final SequentFormula orig = left.sequent().succedent().get(0);
 
-        SequentFormula seqForm = left.sequent().antecedent().get(0);
-        PosInOccurrence pio;
+        SequentFormula rest = ReplayTools.getLastAddedAntec(left);
+        int arity = ensureLookup(ctx.proofsexpr(0)).getRuleContexts(ProofsexprContext.class).size();
 
-        // TODO: this line should be wrong!!!
-        //  should be ctx.proofsexpr(0).size(), however, this does not resolve symbols bound by let
-        int arity = ctx.proofsexpr().size();
+        for (int i = 0; i < arity - 1; i++) {
+            left = ReplayTools.applyNoSplitTopLevelAntec(left, "andLeft", rest);
+            rest = ReplayTools.getLastAddedAntec(left, 1);
 
-        // special case for typeguard
-
-        // this selects the text "typeguard" in the contraposition example
-        //smtReplayer.getSymbolDef(ctx.proofsexpr(0).proofsexpr(ctx.proofsexpr(0).proofsexpr().size()-1).getText()).noproofterm().noproofterm(1).noproofterm(0).getText()
-
-        for (int i = 0; i < arity; i++) {
-            pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-
-            // should not happen any more, since typeguard is now translated to instanceof
-            /*
-            if (!pio.subTerm().op().equals(Junctor.AND)) {
-                // this may occur if a typeguard has been skipped by the translation
-                break;
-            }
-             */
-
-            app = ReplayTools.createTacletApp("andLeft", pio, left);
-            left = left.apply(app).head();
-            SequentChangeInfo sci = left.node().getNodeInfo().getSequentChangeInfo();
-            // TODO: is the order of the added formulas deterministic?
-            seqForm = sci.addedFormulas().tail().head();
-            if (seqForm == null) {
+            if (rest == null) {
                 // attention: the formula may be equal to the original one by chance
                 break;
             }
         }
 
-        seqForm = left.sequent().succedent().get(0);
-        pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
-        app = ReplayTools.createTacletApp("close", pio, left);
-        left = left.apply(app).head();
+        left = ReplayTools.applyNoSplitTopLevelSuc(left, "close", orig);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
