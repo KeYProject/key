@@ -500,7 +500,6 @@ public final class IconFactory {
         return cache.computeIfAbsent(provider.getKey(size), d -> provider.load(size));
     }
 
-
     /**
      * Returns a list of the application logo (used in Frame, Taskbar, etc)
      * in various predefined sizes.
@@ -511,7 +510,7 @@ public final class IconFactory {
         int[] sizes = new int[]{16, 20, 32, 40, 64, 128};
         ArrayList<Image> images = new ArrayList<>(sizes.length);
         for (int sz : sizes) {
-            images.add(original.getScaledInstance(sz, sz, Image.SCALE_FAST));
+            images.add(original.getScaledInstance(sz, sz, Image.SCALE_SMOOTH));
         }
         return images;
      }
