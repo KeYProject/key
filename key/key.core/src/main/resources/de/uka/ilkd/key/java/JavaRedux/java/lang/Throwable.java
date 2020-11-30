@@ -59,7 +59,8 @@ public class Throwable extends java.lang.Object implements java.io.Serializable
      @    ensures \result == cause;
      @*/
    public java.lang.Throwable getCause();
-   
+
+   // TODO There should be "cause != this" as another precondition.
    /*@ public normal_behavior
      @    requires cause == null;
      @    ensures \result == this && cause == arg0;
@@ -68,6 +69,7 @@ public class Throwable extends java.lang.Object implements java.io.Serializable
      @*/
    public java.lang.Throwable initCause(java.lang.Throwable arg0) {
        //@ set cause = arg0;
+       return this;
    }
    
    public java.lang.String toString();
