@@ -488,7 +488,7 @@ public class SendFeedbackAction extends AbstractAction {
             }
         });
 
-        // Disabled for 2.8.0 buttonPanel.add(sendFeedbackReportButton);
+        buttonPanel.add(sendFeedbackReportButton);
         buttonPanel.add(cancelButton);
 
         Container container = dialog.getContentPane();
