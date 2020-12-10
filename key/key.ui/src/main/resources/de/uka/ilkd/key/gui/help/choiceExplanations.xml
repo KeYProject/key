@@ -35,6 +35,37 @@ on or off all taclets axiomatising JavaCard specific features like transac-
 tion.
 </entry>
 
+<entry key="javaLoopTreatment">
+Java loop invariant rules.
+
+* 'efficient': Uses the original loop scope method with two branches.
+  
+  Recommended for long and complicated loops, especially for real-world
+  problems.
+  
+* 'teaching': Loop Invariant treatment producing the well-known three
+  branch structure (base case ('Invariant Initially Valid'), step ('Body
+  Preserves Invariant'), Use Case).
+  
+  Recommended for teaching.
+
+Background:
+
+The loop scope method is an efficient way to apply loop invariants to
+loops in Java programs. It does not transform the body of a loop and
+handles irregular termination (exceptions, breaks, returns, continues)
+gracefully. In its pure variant, the preserved (step) and use case parts
+are combined to one single proof branch, which spares duplicate code
+execution, but is less easy to comprehend since the traditional three-step
+structure frequently used in teaching is not easy to see. Therefore,
+there is a loop-scope based loop invariant rule with three branches,
+which is less efficient (and thus not recommended for complex and long
+real-world programs), but more transparent: If a proof case in the 
+preserved branch cannot be closed, one can be sure that it is related to
+an invariant that cannot be proven (and not to the post condition), and
+vice versa for the use case.
+</entry>
+
 <entry key="mergeGenerateIsWeakeningGoal">
 Specifies whether a special goal "Joined node is weakening" should be
 generated as a child of the partner node of a join operation.

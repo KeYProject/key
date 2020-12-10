@@ -1218,7 +1218,7 @@ public class Proof implements Named {
     }
 
     public void removeRuleAppListener(RuleAppListener p) {
-        synchronized (ruleAppListenerList) {
+        synchronized (ruleAppListenerList) { // TODO (DS, 2019-03-19): Is null for SET tests!?!
             ruleAppListenerList.remove(p);
         }
     }

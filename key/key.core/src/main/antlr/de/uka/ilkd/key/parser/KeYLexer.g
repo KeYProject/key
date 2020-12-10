@@ -226,7 +226,13 @@ lexer grammar KeYLexer;
 
         // Keywords for varcond and related stuff
 	SAME_OBSERVER : '\\sameObserver';
+    STORE_STMT_IN : '\\storeStmtIn' ;
+    STORE_TERM_IN : '\\storeTermIn' ;
 	VARCOND : '\\varcond';
+	HAS_INVARIANT : '\\hasInvariant';
+	GET_INVARIANT : '\\getInvariant';
+	GET_FREE_INVARIANT : '\\getFreeInvariant';
+	GET_VARIANT : '\\getVariant';
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
         DEPENDINGON : '\\dependingOn';
 	DISJOINTMODULONULL  : '\\disjointModuloNull';
@@ -240,6 +246,7 @@ lexer grammar KeYLexer;
 	FINAL : '\\final';
 	ELEMSORT : '\\elemSort';
 	HASLABEL : '\\hasLabel';
+	IS_LABELED : '\\isLabeled';
 	HASSUBFORMULAS : '\\hasSubFormulas';
 	ISARRAY:'\\isArray';
 	ISARRAYLENGTH:'\\isArrayLength';

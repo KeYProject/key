@@ -21,32 +21,47 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipFile;
 
-import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
-import org.key_project.util.collection.*;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.KeYCollections;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
+import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
@@ -56,6 +71,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import recoder.io.ArchiveDataLocation;
 import recoder.io.DataFileLocation;
 import recoder.io.DataLocation;
@@ -75,6 +91,89 @@ public final class MiscTools {
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
+
+    /**
+     * Returns the {@link LoopSpecification} for the program in the given term,
+     * the active statement of which has to be a loop statement. Returns an
+     * empty {@link Optional} if there is no specification for that statement.
+     * Asserts that there is indeed a Java block in the term which has as active
+     * statement a loop statement, thus throws an {@link AssertionError} if not
+     * or otherwise results in undefined behavior in that case.
+     *
+     * @param loopTerm
+     *     The term for which to return the {@link LoopSpecification}.
+     * @param localSpecRepo TODO
+     * @return The {@link LoopSpecification} for the loop statement in the given
+     * term or an empty optional if there is no specified invariant for the
+     * loop.
+     */
+    public static Optional<LoopSpecification>
+            getSpecForTermWithLoopStmt(final Term loopTerm, final Services services) {
+        assert loopTerm.op() instanceof Modality;
+        assert loopTerm.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
+
+        final ProgramElement pe = loopTerm.javaBlock().program();
+        assert pe != null;
+        assert pe instanceof StatementBlock;
+        assert ((StatementBlock) pe).getFirstElement() instanceof LoopStatement;
+
+        final LoopStatement loop = //
+                (LoopStatement) ((StatementBlock) pe).getFirstElement();
+
+        return Optional.ofNullable(services.getSpecificationRepository().getLoopSpec(loop));
+    }
+
+    /**
+     * @param services
+     *     The {@link Services} object.
+     * @return true iff the given {@link Services} object is associated to a
+     * {@link Profile} with permissions.
+     */
+    public static boolean isPermissions(Services services) {
+        return services.getProfile() instanceof JavaProfile
+                && ((JavaProfile) services.getProfile()).withPermissions();
+    }
+
+    /**
+     * Checks whether the given {@link Modality} is a transaction modality.
+     *
+     * @param modality
+     *     The modality to check.
+     * @return true iff the given {@link Modality} is a transaction modality.
+     */
+    public static boolean isTransaction(final Modality modality) {
+        return modality == Modality.BOX_TRANSACTION
+                || modality == Modality.DIA_TRANSACTION;
+    }
+
+    /**
+     * Returns the applicable heap contexts out of the currently available set
+     * of three contexts: The normal heap, the saved heap (transaction), and the
+     * permission heap.
+     *
+     * @param modality
+     *     The current modality (checked for transaction).
+     * @param services
+     *     The {@link Services} object (for {@link HeapLDT} and for checking
+     *     whether we're in the permissions profile).
+     * @return The list of the applicable heaps for the given scenario.
+     */
+    public static List<LocationVariable>
+            applicableHeapContexts(Modality modality, Services services) {
+        final List<LocationVariable> result = new ArrayList<>();
+
+        result.add(services.getTypeConverter().getHeapLDT().getHeap());
+
+        if (isTransaction(modality)) {
+            result.add(services.getTypeConverter().getHeapLDT().getSavedHeap());
+        }
+
+        if (isPermissions(services)) {
+            result.add(services.getTypeConverter().getHeapLDT()
+                    .getPermissionHeap());
+        }
+        return result;
+    }
 
     // TODO Is rp always a program variable?
     public static ProgramVariable getSelf(MethodFrame mf) {

@@ -80,7 +80,6 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         }
         assert theApp != null;
 
-
         g.apply(theApp);
     }
 

@@ -14,8 +14,10 @@
 package de.uka.ilkd.key.gui.settings;
 
 
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -39,7 +41,9 @@ import java.text.Format;
  * @author weigl
  */
 public class SimpleSettingsPanel extends JPanel {
-    private static final long serialVersionUID = -6727362750311983463L;
+    private static final ColorSettings.ColorProperty COLOR_ERROR = ColorSettings.define("SETTINGS_TEXTFIELD_ERROR",
+            "Color for marking errornous textfields in settings dialog", new Color(200, 100, 100));
+
     protected Box pNorth = new Box(BoxLayout.Y_AXIS);
     protected JPanel pCenter = new JPanel();
     protected JLabel lblHead = new JLabel();
@@ -75,15 +79,17 @@ public class SimpleSettingsPanel extends JPanel {
     }
 
     protected void markComponentAsErrornous(JComponent component, String error) {
-        component.setBackground(Color.RED);
+        component.setBackground(COLOR_ERROR.get());
         component.setToolTipText(error);
     }
 
-    protected JCheckBox createCheckBox(String title, boolean value, final Validator<Boolean> validator) {
+    protected JCheckBox createCheckBox(String title, boolean value, final @Nullable Validator<Boolean> validator) {
         JCheckBox checkBox = new JCheckBox(title, value);
         checkBox.addActionListener(e -> {
             try {
-                validator.validate(checkBox.isSelected());
+                if (validator != null) {
+                    validator.validate(checkBox.isSelected());
+                }
                 demarkComponentAsErrornous(checkBox);
             } catch (Exception ex) {
                 markComponentAsErrornous(checkBox, ex.getMessage());
@@ -92,24 +98,24 @@ public class SimpleSettingsPanel extends JPanel {
         return checkBox;
     }
 
-    protected JTextField createTextField(String text, final Validator<String> validator) {
+    protected JTextField createTextField(String text, final @Nullable Validator<String> validator) {
         JTextField field = new JTextField(text);
         field.getDocument().addDocumentListener(new DocumentValidatorAdapter(field, validator));
         return field;
     }
 
-    protected JFormattedTextField createNumberFormattedTextField(Format format, final Validator<String> validator) {
+    protected JFormattedTextField createNumberFormattedTextField(Format format, final @Nullable Validator<String> validator) {
         JFormattedTextField field = new JFormattedTextField(format);
         field.getDocument().addDocumentListener(new DocumentValidatorAdapter(field, validator));
         return field;
     }
 
-    protected JSpinner createNumberTextField(int min, int max, int step, final Validator<Integer> validator) {
+    protected JSpinner createNumberTextField(int min, int max, int step, final @Nullable Validator<Integer> validator) {
         SpinnerModel spinnerModel = new SpinnerNumberModel(min, min, max, step);
         return createNumberTextField(spinnerModel, validator);
     }
 
-    protected <T> JSpinner createNumberTextField(SpinnerModel model, final Validator<T> validator) {
+    protected <T> JSpinner createNumberTextField(SpinnerModel model, final @Nullable Validator<T> validator) {
         JSpinner field = new JSpinner(model);
         field.addChangeListener(new ValidatorSpinnerAdapter<>(field, validator));
         return field;
@@ -140,7 +146,9 @@ public class SimpleSettingsPanel extends JPanel {
         public void stateChanged(ChangeEvent e) {
             Object current = model.getValue();
             try {
-                validator.validate((T) current);
+                if (validator != null) {
+                    validator.validate((T) current);
+                }
                 demarkComponentAsErrornous(model);
             } catch (Exception ex) {
                 markComponentAsErrornous(model, ex.getMessage());
@@ -150,9 +158,9 @@ public class SimpleSettingsPanel extends JPanel {
 
     private class DocumentValidatorAdapter implements DocumentListener {
         private final JTextField field;
-        private final Validator<String> validator;
+        private final @Nullable Validator<String> validator;
 
-        private DocumentValidatorAdapter(JTextField field, Validator<String> validator) {
+        private DocumentValidatorAdapter(JTextField field, @Nullable Validator<String> validator) {
             this.field = field;
             this.validator = validator;
         }
@@ -174,7 +182,9 @@ public class SimpleSettingsPanel extends JPanel {
 
         void update() {
             try {
-                validator.validate(field.getText());
+                if (validator != null) {
+                    validator.validate(field.getText());
+                }
                 demarkComponentAsErrornous(field);
             } catch (Exception ex) {
                 markComponentAsErrornous(field, ex.getMessage());

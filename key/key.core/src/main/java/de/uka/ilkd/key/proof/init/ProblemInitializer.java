@@ -15,11 +15,7 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -323,7 +319,14 @@ public final class ProblemInitializer {
             if(searchPathList.find(javaPath) == null) {
                 searchPathList.add(javaPath);
             }
-        Vector<String> var = getClasses(javaPath);
+        Collection<String> var = getClasses(javaPath);
+            if(envInput.isIgnoreOtherJavaFiles()) {
+                String file = envInput.getJavaFile();
+                if (var.contains(file)) {
+                    var = Collections.singletonList(file);
+                }
+            }
+            //support for single file loading
         final String[] cus = var.toArray(new String[var.size()]);
             try {
                 r2k.readCompilationUnitsAsFiles(cus, fileRepo);
