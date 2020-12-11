@@ -139,7 +139,7 @@ class TypeManager {
             List<Sort> directChildren = new ArrayList<>(directChildSorts(os, allSorts));
             directChildren.remove(nullSort);
 
-            /*
+            // fix: This is necessary since interfaces are children of java.lang.Object in KeY!
             // Since implementing multiple interfaces is allowed, we have to remove them here!
             Iterator<Sort> childIterator = directChildren.iterator();
             while (childIterator.hasNext()) {
@@ -148,7 +148,7 @@ class TypeManager {
                 if (services.getJavaInfo().isInterface(kjt)) {
                     childIterator.remove();
                 }
-            }*/
+            }
 
             // for each childSort c:
             // at most one of instanceof(c) or exactinstanceof(parent)
