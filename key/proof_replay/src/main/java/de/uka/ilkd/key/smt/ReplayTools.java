@@ -6,13 +6,16 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.macros.PropositionalMacro;
-import de.uka.ilkd.key.macros.TryCloseMacro;
+import de.uka.ilkd.key.macros.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 import org.key_project.util.collection.ImmutableSLList;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Collection of static helper methods that are used in replay.
@@ -213,9 +216,23 @@ public final class ReplayTools {
     }
 
     static void runAutoModePropositional(Goal goal, int steps) {
+        // TODO: could be replaced by more generic LimitedRulesMacro
         PropositionalMacro prop = new PropositionalMacro(steps);
         try {
             prop.applyTo(null, goal.node(), null, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void runAutoModeFirstOrder(Goal goal, int steps) {
+        Set<String> admittedRules = new HashSet<>();
+        admittedRules.addAll(Arrays.asList(RuleCategories.PROPOSITIONAL_RULES));
+        admittedRules.addAll(Arrays.asList(RuleCategories.FIRST_ORDER_RULES));
+        admittedRules.addAll(Arrays.asList(RuleCategories.BOOLEAN_RULES));
+        LimitedRulesMacro macro = new LimitedRulesMacro(steps, admittedRules);
+        try {
+            macro.applyTo(null, goal.node(), null, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -237,7 +254,7 @@ public final class ReplayTools {
         String currentNotes = goal.node().getNodeInfo().getNotes();
         String newNotes = "";
         if (currentNotes != null && !currentNotes.isEmpty()) {
-            newNotes += currentNotes + " ";
+            newNotes += currentNotes + System.lineSeparator();
         }
         newNotes += notes;
         goal.node().getNodeInfo().setNotes(newNotes);
