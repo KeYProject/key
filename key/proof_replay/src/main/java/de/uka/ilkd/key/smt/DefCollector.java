@@ -429,7 +429,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         if (typeguard == null) {
             // translate to variable of sort any
             //return new LogicVariable(name, Sort.ANY);
-            return retranslator.translateLogicVariable(origVarName, Sort.ANY);
+            return retranslator.translateOrCreateLogicVariable(origVarName, Sort.ANY);
         }
         // typeguard has the following form: (typeguard var_x sort_int)
         NoprooftermContext nameCtx = typeguard.noproofterm(1);
@@ -437,7 +437,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         Sort keySort = retranslator.translateSort(sortCtx.getText());
 
         // TODO: SMT quantifiers may have multiple quantified variables
-        return retranslator.translateLogicVariable(origVarName, keySort);
+        return retranslator.translateOrCreateLogicVariable(origVarName, keySort);
         //return new LogicVariable(name, keySort);
     }
 

@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -26,21 +27,18 @@ public class SMTSymbolRetranslator {
 
     public Term tryToTranslate(String symbol) {
         if (symbol.startsWith(UNINTERPRETED_PREFIX)) {
-            // symbol is constant (i.e. 0-ary) function or ProgramVariable
             return translateUninterpreted(symbol);
         } else if (symbol.startsWith(LOGICAL_VARIABLE_PREFIX)) {
-            // Sort.Any serves as fallback here
-            QuantifiableVariable qv = translateLogicVariable(symbol, Sort.ANY);
-            return services.getTermBuilder().var(qv);
+            return translateLogicVariable(symbol);
         } else if (symbol.startsWith(DEFINED_SYMBOL_PREFIX)) {
-            return translateDefinedSymbol(symbol);
+            return translateDefinedConstSymbol(symbol);
         }/* else if (symbol.startsWith(UNKNOWN_PREFIX)) {
             // TODO: what to do here?
         }*/
         return null;
     }
 
-    public Term translateUninterpreted(String symbol) {
+    private Term translateUninterpreted(String symbol) {
         String origSym = symbol.substring(UNINTERPRETED_PREFIX.length());
         Function f = services.getNamespaces().functions().lookup(origSym);
         // symbol could be constant (i.e. 0-ary) function or ProgramVariable
@@ -54,34 +52,70 @@ public class SMTSymbolRetranslator {
         throw new IllegalStateException("Uninterpreted symbol not found: " + symbol);
     }
 
-    public QuantifiableVariable translateLogicVariable(String symbol, Sort sort) {
+    private Term translateLogicVariable(String symbol) {
         String origVarName = symbol.substring(LOGICAL_VARIABLE_PREFIX.length());
         QuantifiableVariable qv = services.getNamespaces().variables().lookup(origVarName);
+        // note: can be null (will happen e.g. for skolem symbols)
         if (qv != null) {
-            return qv;
+            return services.getTermBuilder().var(qv);
         }
-        // TODO: creates wrong symbols! return null here?
-        return new LogicVariable(new Name(origVarName), sort);
+        return null;
     }
 
-    public Term translateDefinedSymbol(String symbol) {
+    // actually, defined symbol means function: here we handle only nullary functions!
+    private Term translateDefinedConstSymbol(String symbol) {
         String origName = symbol.substring(DEFINED_SYMBOL_PREFIX.length());
-        // symbol could be a function (e.g. null), TODO: what else?
         Function f = services.getNamespaces().functions().lookup(origName);
         if (f != null) {
-            // TODO: this only works for nullary functions!
+            // this only works for nullary functions!
             return services.getTermBuilder().func(f);
         }
         throw new IllegalStateException("Defined symbol not found: " + symbol);
     }
 
-    public Sort translateSort(String symbol) {
-        String origSortName = symbol.substring(SORT_PREFIX.length());
-        Sort keySort = services.getNamespaces().sorts().lookup(origSortName);
-
-        if (keySort == null) {
-            throw new IllegalStateException("No sort " + origSortName + " is known to KeY!");
+    // for n-ary functions
+    public Function translateDefinedSymbol(String symbol) {
+        String origName = symbol.substring(DEFINED_SYMBOL_PREFIX.length());
+        Function f = services.getNamespaces().functions().lookup(origName);
+        if (f != null) {
+            return f;
         }
-        return keySort;
+        throw new IllegalStateException("Defined symbol not found: " + symbol);
+    }
+
+    // creates a new variable of given sort if none is found
+    public QuantifiableVariable translateOrCreateLogicVariable(String symbol, Sort sort) {
+        String origVarName = symbol;
+        // cut prefix if present
+        if (symbol.startsWith(LOGICAL_VARIABLE_PREFIX)) {
+            origVarName = symbol.substring(LOGICAL_VARIABLE_PREFIX.length());
+        }
+        QuantifiableVariable qv = services.getNamespaces().variables().lookup(origVarName);
+        // note: can be null (will happen e.g. for skolem symbols)
+        if (qv != null) {
+            return qv;
+        }
+        return new LogicVariable(new Name(origVarName), sort);
+    }
+
+    public Sort translateSort(String symbol) {
+        // special sort, TODO: other special sorts?
+        if (symbol.equals("Bool")) {
+            return services.getTypeConverter().getBooleanType().getSort();
+        } else if (symbol.equals("U")) {
+            // special sort not existing in KeY; translate to any
+            return Sort.ANY;
+        }
+
+        // cut prefix if present
+        String origSortName = symbol;
+        if (symbol.startsWith(SORT_PREFIX)) {
+            origSortName = symbol.substring(SORT_PREFIX.length());
+        }
+        Sort keySort = services.getNamespaces().sorts().lookup(origSortName);
+        if (keySort != null) {
+            return keySort;
+        }
+        throw new IllegalStateException("No sort " + origSortName + " is known to KeY!");
     }
 }
