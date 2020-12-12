@@ -24,9 +24,14 @@ import java.util.*;
 
 public class SMTReplayer {
     private final String smtOutput;
-    /** the current "main goal" of the proof */
     private final Goal original;
+    /** the current "main goal" of the proof */
     private Goal goal;
+
+    public Collection<NoPosTacletApp> getAllAssertionInsertTaclets() {
+        return sf2InsertTaclet.values();
+    }
+
     private final Map<SequentFormula, NoPosTacletApp> sf2InsertTaclet = new HashMap<>();
     private final Proof proof;
     private SMTProofLexer lexer;
