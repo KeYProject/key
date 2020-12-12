@@ -27,6 +27,8 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
     private final TermFactory tf;
     private final TermBuilder tb;
     private final SMTSymbolRetranslator retranslator;
+
+    /** used to carry variables bound by a quantifier into nested contexts */
     private final Deque<QuantifiableVariable> boundVars = new LinkedList<>();
 
     public DefCollector(SMTReplayer smtReplayer, Services services) {
@@ -51,23 +53,32 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                 }
                 // now next must be a lambda term
                 if (next.rulename != null && next.rulename.getText().equals("lambda")) {
-                    // TODO: somewhere here the bound variable must be added to the list ...
-                    //  important: next step!!!
-
-                    // visit and wrap into (possibly multiple) forall
-                    Term result = visit(next.proofsexpr(0));
-                    for (int i = next.sorted_var().size() - 1; i >= 0; i--) {
+                    for (int i = 0; i < next.sorted_var().size(); i++) {
                         // we need to extract the actual type from the typeguard
-                        //TODO: search for typeguard
                         String varName = next.sorted_var(i).SYMBOL().getText();
                         if (varName.startsWith("var_")) {
                             varName = varName.substring(4);
                         }
-                        QuantifiableVariable qv = new TypeguardSortCollector(services, varName).visit(next);
+                        String sortName = next.sorted_var(i).sort().getText();
+                        Sort sort = retranslator.translateSort(sortName);
+                        QuantifiableVariable qv = new LogicVariable(new Name(varName), sort);
+                        /* TODO: lambda has no typeguard!
+                        // search for typeguard for current variable
+                        QuantifiableVariable qv = new TypeguardSortCollector(services,
+                            varName, retranslator).visit(next);
+                        */
+                        boundVars.push(qv);
                         //QuantifiableVariable qv = extractQV(next.sorted_var(i), next);
                         //QuantifiableVariable qv = extractQVSimple(next.sorted_var(i));
+                    }
+
+                    // visit and wrap into (possibly multiple) forall
+                    Term result = visit(next.proofsexpr(0));
+                    for (int i = 0; i < next.sorted_var().size(); i++) {
+                        QuantifiableVariable qv = boundVars.pop();
                         result = tb.all(qv, result);
                     }
+
                     return result;
                 } else {
                     throw new IllegalStateException("After proof-bind, lambda is expected!");
@@ -110,7 +121,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
 
     @Override
     public Term visitNoproofterm(NoprooftermContext ctx) {
-        System.out.println("Trying to translate " + ReplayTools.getOriginalText(ctx) + " ...");
+        //System.out.println("Trying to translate " + ReplayTools.getOriginalText(ctx) + " ...");
 
         // term may be a new symbol introduced by the let binder
         //ProofsexprContext proofsexpr = smtReplayer.getSymbolDef(ctx.getText());

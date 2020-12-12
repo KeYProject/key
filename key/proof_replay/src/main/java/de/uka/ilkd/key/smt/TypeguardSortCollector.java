@@ -11,10 +11,13 @@ import org.antlr.v4.runtime.tree.RuleNode;
 public class TypeguardSortCollector extends SMTProofBaseVisitor<QuantifiableVariable> {
     private final Services services;
     private final String varName;
+    private SMTSymbolRetranslator retranslator;
 
-    public TypeguardSortCollector(Services services, String varName) {
+    public TypeguardSortCollector(Services services, String varName,
+                                  SMTSymbolRetranslator retranslator) {
         this.services = services;
         this.varName = varName;
+        this.retranslator = retranslator;
     }
 
     @Override
@@ -29,15 +32,8 @@ public class TypeguardSortCollector extends SMTProofBaseVisitor<QuantifiableVari
             // typeguard has the following form: (typeguard var_x sort_int)
             SMTProofParser.NoprooftermContext nameCtx = ctx.noproofterm(1);
             SMTProofParser.NoprooftermContext sortCtx = ctx.noproofterm(2);
-            // cut the "sort_" prefix
-            String sortName = sortCtx.getText();
-            if (sortName.startsWith("sort_")) {
-                sortName = sortName.substring(5);
-            }
-            Sort keySort = services.getNamespaces().sorts().lookup(sortName);
-
+            Sort keySort = retranslator.translateSort(sortCtx.getText());
             // TODO: SMT quantifiers may have multiple quantified variables
-
             return new LogicVariable(new Name(varName), keySort);
         }
 
