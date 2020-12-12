@@ -1426,13 +1426,14 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             // recursively descend into let definition
             ParserRuleContext letDef = smtReplayer.getSymbolDef(ctx.getText(), ctx);
             if (letDef != null) {
-                term = letDef.accept(new DefCollector(smtReplayer, services));
+                term = letDef.accept(new DefCollector(smtReplayer, services, skolemSymbols));
             } else {
                 // could be a term containing nested rule applications again
-                term = ctx.accept(new DefCollector(smtReplayer, services));
+                term = ctx.accept(new DefCollector(smtReplayer, services, skolemSymbols));
             }
         }
 
+        // TODO: not sure if this is still needed
         // if we are within the scope of a lambda (i.e. skolemSymbols is not empty),
         // we replace the Z3 variable by our skolem constant
         if (!skolemSymbols.isEmpty()) {

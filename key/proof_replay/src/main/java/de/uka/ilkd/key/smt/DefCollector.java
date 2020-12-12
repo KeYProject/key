@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTProofParser.Sorted_varContext;
+import de.uka.ilkd.key.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -31,12 +32,32 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
     /** used to carry variables bound by a quantifier into nested contexts */
     private final Deque<QuantifiableVariable> boundVars = new LinkedList<>();
 
+    /** "free" variables, i.e. variables bound by lambda, but no quantifier, are carried here.
+     * When leaving the scope of the lambda, these variables must be replaced by there counterpart,
+     * i.e. the "real" variable bound by a quantifier. This ensures that skolemization can be done
+     * correctly. */
+    private final Deque<Pair<QuantifiableVariable, Term>> skolemSymbols;
+
     public DefCollector(SMTReplayer smtReplayer, Services services) {
         this.smtReplayer = smtReplayer;
         this.services = services;
         this.tf = services.getTermFactory();
         this.tb = services.getTermBuilder();
         retranslator = new SMTSymbolRetranslator(services);
+        // no symbols bound by proof-bind/lambda -> empty stack
+        skolemSymbols = new LinkedList<>();
+    }
+
+    public DefCollector(SMTReplayer smtReplayer, Services services,
+                        Deque<Pair<QuantifiableVariable, Term>> skolemSymbols) {
+        this.smtReplayer = smtReplayer;
+        this.services = services;
+        this.tf = services.getTermFactory();
+        this.tb = services.getTermBuilder();
+        retranslator = new SMTSymbolRetranslator(services);
+        // contains the current context, i.e. variables bound by lambda in the context that is to be
+        // visited
+        this.skolemSymbols = skolemSymbols;
     }
 
     @Override
@@ -272,15 +293,18 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                 t2 = visit(ctx.noproofterm(2));
                 integerLDT = services.getTypeConverter().getIntegerLDT();
                 return tb.func(integerLDT.getDiv(), t1, t2);
-            case "u2i":     // TODO: hack
-            case "i2u":
-            case "u2b":
-            case "b2u":
-                // just skip the additional function application
-                // for faster lookup additionally add it to map
+            case "u2i":     // this is effectively a cast to int
                 t1 = visit(ctx.noproofterm(1));
-                smtReplayer.addTranslationToTerm(ctx.getText(), t1);
-                return t1;
+                Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+                return tb.cast(intSort, t1);
+            case "u2b":     // this is effectively a cast to boolean
+                t1 = visit(ctx.noproofterm(1));
+                Sort booleanSort = services.getTypeConverter().getBooleanLDT().targetSort();
+                return tb.cast(booleanSort, t1);
+            case "i2u":
+            case "b2u":     // this is effectively a cast to any
+                t1 = visit(ctx.noproofterm(1));
+                return tb.cast(Sort.ANY, t1);
             case "length":
                 t1 = visit(ctx.noproofterm(1));
                 return tb.dotLength(t1);
@@ -293,10 +317,9 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                 t1 = visit(ctx.noproofterm(1));
                 return tb.cast(t1.sort(), t1);
             default:
-                // what about sorts and variables and other?
 
-                // translate KeY predicates/functions (cut "KeY_" prefix)
-                String origFuncName = ctx.func.getText().substring(4);
+                // translate KeY predicates/functions (cut "u_" prefix)
+                String origFuncName = ctx.func.getText().substring(2);
                 Function f = services.getNamespaces().functions().lookup(new Name(origFuncName));
 
                 if (f != null) {
@@ -499,42 +522,84 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         return null;
     }
 
+    private Term findBoundVar(String varName) {
+        for (Pair<QuantifiableVariable, Term> p : skolemSymbols) {
+            String skName = p.first.name().toString();
+            if (skName.equals(varName)) {
+                return p.second;
+            } else if (skName.startsWith("var_") && skName.substring(4).equals(varName)) {
+                return p.second;
+            } else if (varName.startsWith("var_") && skName.equals(varName.substring(4))) {
+                return p.second;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Term visitSpec_constant(Spec_constantContext ctx) {
+        if (ctx.NUM() != null) {
+            String num = ctx.NUM().getText();
+            return tb.zTerm(num);
+        }
+        throw new IllegalStateException("Translation of constant " + ctx.getText()
+            + " not yet implemented!");
+    }
+
     @Override
     public Term visitIdentifier(IdentifierContext ctx) {
+        // possible cases:
+        // - symbol that can be handled by retranslator (e.g. k_null)
+        // - special symbols (currently only: false, true)
+        // - lambda bound variable
+        // - bound variable (can be found on stack of bound variables)
+        // - skolem constant
+
         Term t = retranslator.tryToTranslate(ctx.getText());
         if (t != null) {
             return t;
         }
 
+        // special symbols that are not handled by the retranslator (translation to SMT is done in
+        // BooleanConnectiveHandler)
         if (ctx.getText().equals("false")) {
             return tb.ff();
         } else if (ctx.getText().equals("true")) {
             return tb.tt();
-        } else if (ctx.getText().equals("k_null")) {
-            Function nullFun = services.getNamespaces().functions().lookup("null");
-            return tb.func(nullFun);
         }
+
+        // TODO: this could probably be unified with bound variables list
+        // could be a variable bound by proof-bind/lamba
+        Term lambdaBoundVar = findBoundVar(ctx.getText());
+        if (lambdaBoundVar != null) {
+            return lambdaBoundVar;
+        }
+
+        // could be a bound variable
         QuantifiableVariable qv = getBoundVar(ctx.getText());
         if (qv != null) {
             // return the bound variable
             return tb.var(qv);
-        } else {
-            // the symbol is a new skolem symbol introduced by an sk rule in a proof leaf
-            Term skDef = smtReplayer.getSkolemSymbolDef(ctx.getText());
+        }
+
+        // if it is not found until now, the symbol could be a currently unknown skolem symbol
+        // introduced by an sk rule in a proof leaf
+        Term skDef = smtReplayer.getSkolemSymbolDef(ctx.getText());
+        if (skDef != null) {
+            // found definition of skolem symbol (was already in map)
+            return skDef;
+        } else {    // try to find definition of skolem symbol
+            SkolemCollector skColl = new SkolemCollector(smtReplayer, ctx.getText(), services);
+            // collect all skolem symbols and their definitions using ifEx/eps terms
+            skColl.visit(smtReplayer.getTree());
+            skDef = smtReplayer.getSkolemSymbolDef(ctx.getText());
             if (skDef != null) {
-                // found definition of skolem symbol (was already in map)
+                // found definition of skolem symbol
                 return skDef;
-            } else {    // try to find definition of skolem symbol
-                SkolemCollector skColl = new SkolemCollector(smtReplayer, ctx.getText(), services);
-                // collect all skolem symbols and their definitions using ifEx/eps terms
-                skColl.visit(smtReplayer.getTree());
-                skDef = smtReplayer.getSkolemSymbolDef(ctx.getText());
-                if (skDef != null) {
-                    // found definition of skolem symbol
-                    return skDef;
-                }
             }
         }
+
+        // still not found -> unknown
         throw new IllegalStateException("Unknown identifier: " + ctx.getText());
         //return super.visitIdentifier(ctx);
     }
