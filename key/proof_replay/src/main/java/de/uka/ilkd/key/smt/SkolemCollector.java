@@ -2,9 +2,7 @@ package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -36,15 +34,17 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
             if (!eqSat.func.getText().equals("~")) {
                 throw new IllegalStateException("Found sk rule that does not contain ~ top level!");
             }
-            SMTProofParser.NoprooftermContext ex = eqSat.noproofterm(1);
+            // could be: ex x. phi(x) or !all x. phi(x)
+            SMTProofParser.NoprooftermContext lhs = eqSat.noproofterm(1);
 
             DefCollector collector = new DefCollector(smtReplayer, services);
-            Term term = collector.visit(ex);
+            Term term = collector.visit(lhs);
 
             if (term.op() == Quantifier.EX) {
                 // TODO: check that we have the right variable (sk term may contain other skolem symbols as well!)
 
                 // TODO: how to get a collision free var name? do we need one?
+                //services.getVariableNamer().getTemporaryNameProposal(skVariable)
                 Name varName = new Name(skVariable);
 
                 // as condition, we take the formula under the exists quantifier and replace the bound variable by qv
@@ -68,7 +68,15 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
                 QuantifiableVariable allBoundVar = all.boundVars().get(0);
                 Sort targetSort = allBoundVar.sort();
                 QuantifiableVariable qv = new LogicVariable(varName, targetSort);
-                Term cond = ReplayTools.replace(allBoundVar, qv, all.sub(0), services);
+
+                Term cond = all.sub(0);
+                // we need an additional not
+
+                // use TermFactory to ensure no simplification happens
+                TermFactory tf = services.getTermFactory();
+                cond = tf.createTerm(Junctor.NOT, cond);
+                cond = ReplayTools.replace(allBoundVar, qv, cond, services);
+
                 TermBuilder tb = services.getTermBuilder();
                 Term _then = tb.var(qv);
                 Term _else = getDefaultValueTerm(allBoundVar.sort());
