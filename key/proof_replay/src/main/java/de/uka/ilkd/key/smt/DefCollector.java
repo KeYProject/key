@@ -298,13 +298,16 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                 Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
                 return tb.cast(intSort, t1);
             case "u2b":     // this is effectively a cast to boolean
+                return visit(ctx.noproofterm(1));
+                /*
                 t1 = visit(ctx.noproofterm(1));
                 Sort booleanSort = services.getTypeConverter().getBooleanLDT().targetSort();
-                return tb.cast(booleanSort, t1);
-            case "i2u":
-            case "b2u":     // this is effectively a cast to any
+                return tb.cast(booleanSort, t1);*/
+            case "i2u":     // this is effectively a cast to any
                 t1 = visit(ctx.noproofterm(1));
                 return tb.cast(Sort.ANY, t1);
+            case "b2u":
+                return visit(ctx.noproofterm(1));
             case "length":
                 t1 = visit(ctx.noproofterm(1));
                 return tb.dotLength(t1);
