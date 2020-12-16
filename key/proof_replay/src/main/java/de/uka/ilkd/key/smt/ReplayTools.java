@@ -216,7 +216,7 @@ public final class ReplayTools {
         return (NoPosTacletApp) app.addInstantiation(sv, cutFormula, true, services);
     }
 
-    static void runAutoModePropositional(Goal goal, int steps) {
+    public static void runAutoModePropositional(Goal goal, int steps) {
         // TODO: could be replaced by more generic LimitedRulesMacro
         PropositionalMacro prop = new PropositionalMacro(steps);
         try {
@@ -239,7 +239,7 @@ public final class ReplayTools {
         }
     }
 
-    static void runAutoMode(Goal goal) {
+    public static void runAutoMode(Goal goal) {
         // current notes could contain rule name -> append
         addNotes(goal, "automatic proof search");
 
@@ -261,7 +261,7 @@ public final class ReplayTools {
         goal.node().getNodeInfo().setNotes(newNotes);
     }
 
-    static NoPosTacletApp findLocalRule(String namePrefix, Goal goal) {
+    public static NoPosTacletApp findLocalRule(String namePrefix, Goal goal) {
         for (NoPosTacletApp app : goal.node().getLocalIntroducedRules()) {
             // TODO: there may be multiple rules with this prefix
             if (app.taclet().name().toString().startsWith(namePrefix)) {
@@ -271,7 +271,7 @@ public final class ReplayTools {
         return null;
     }
 
-    static Goal focus(SequentFormula formula, Goal goal, boolean antec) {
+    public static Goal focus(SequentFormula formula, Goal goal, boolean antec) {
         FocusRule focusRule = FocusRule.INSTANCE;
         PosInOccurrence pio = new PosInOccurrence(formula, PosInTerm.getTopLevel(), antec);
         // services (2nd param) are not used/needed
@@ -279,7 +279,7 @@ public final class ReplayTools {
         return goal.apply(app).head();
     }
 
-    static Term ensureFormula(Term t, Services services) {
+    public static Term ensureFormula(Term t, Services services) {
         if (t.sort() == Sort.FORMULA) {
             return t;
         } else if (t.sort() == services.getTypeConverter().getBooleanType().getSort()) {

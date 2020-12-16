@@ -22,7 +22,7 @@ import static de.uka.ilkd.key.smt.SMTProofParser.*;
  *
  * @author Wolfram Pfeifer
  */
-class DefCollector extends SMTProofBaseVisitor<Term> {
+public class DefCollector extends SMTProofBaseVisitor<Term> {
     private final SMTReplayer smtReplayer;
     private final Services services;
     private final TermFactory tf;
