@@ -1,10 +1,16 @@
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.Pair;
+
+import java.util.Deque;
+import java.util.LinkedList;
 
 /**
  * This visitor collects the definition of a variable introduced in a proof leaf by Z3's
@@ -16,11 +22,20 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
     private final SMTReplayer smtReplayer;
     private final String skVariable;
     private final Services services;
+    private final SMTSymbolRetranslator retranslator;
+
+    /** used to carry variables bound by a quantifier into nested contexts */
+    private final Deque<QuantifiableVariable> boundVars = new LinkedList<>();
+
+    /** used to carry symbols introduced by quant-intro rule (needed for replaying rules inside
+     * the scope of a quant-intro/proof-bind/lambda) */
+    private final Deque<Pair<QuantifiableVariable, Term>> skolemSymbols = new LinkedList<>();
 
     public SkolemCollector(SMTReplayer smtReplayer, String skVariable, Services services) {
         this.smtReplayer = smtReplayer;
         this.skVariable = skVariable;
         this.services = services;
+        this.retranslator = new SMTSymbolRetranslator(services);
     }
 
     @Override
@@ -37,7 +52,7 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
             // could be: ex x. phi(x) or !all x. phi(x)
             SMTProofParser.NoprooftermContext lhs = eqSat.noproofterm(1);
 
-            DefCollector collector = new DefCollector(smtReplayer, services);
+            DefCollector collector = new DefCollector(smtReplayer, boundVars, services);
             Term term = collector.visit(lhs);
 
             if (term.op() == Quantifier.EX) {
@@ -85,6 +100,35 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
                 smtReplayer.addTranslationToTerm(skVariable, def);
             } else {
                 throw new IllegalStateException("Invalid sk rule found (no existential quantifier)!");
+            }
+            return null;
+        } else if (ctx.rulename != null && ctx.rulename.getText().equals("lambda")) {
+
+            for (int i = 0; i < ctx.sorted_var().size(); i++) {
+                String varName = ctx.sorted_var(i).SYMBOL().getText();
+
+                // we try to extract the sort from a typeguard (otherwise the sorts when creating
+                // function terms will not match!)
+                TypeguardSortCollector sortCollector = new TypeguardSortCollector(services, varName,
+                                                                                  retranslator);
+                Sort sort = sortCollector.visit(ctx.proofsexpr(0));
+                if (sort == null) {
+                    // if no typeguard is present we use the sort from declaration
+                    String sortName = ctx.sorted_var(i).sort().getText();
+                    sort = retranslator.translateSort(sortName);
+
+                    if (sort == null) {
+                        sort = Sort.ANY;    // fallback sort
+                    }
+                }
+
+                QuantifiableVariable qv = retranslator.translateOrCreateLogicVariable(varName,
+                                                                                      sort);
+                boundVars.push(qv);
+            }
+            visit(ctx.proofsexpr(0));
+            for (int i = 0; i < ctx.sorted_var().size(); i++) {
+                boundVars.pop();
             }
             return null;
         }

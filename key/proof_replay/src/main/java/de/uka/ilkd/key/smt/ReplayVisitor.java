@@ -856,7 +856,8 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         // two cases:
         // 1. conclusion is false (in this case we derive false in the antecedent)
         // 2. conclusion is literal (in this case we derive the conclusion from the first clause)
-        if (conclusion.equals(services.getTermBuilder().ff())) {
+        if (conclusion.equals(services.getTermBuilder().ff())
+            || conclusion.equals(services.getTermBuilder().FALSE())) {
             replayUnitResFalseHelper(left, unitClauseCount);
         } else {
             replayUnitResLiteralHelper(left, unitClauseCount, conclusion);
@@ -1010,7 +1011,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
     }
 
     private boolean isPosLiteral(Term formula) {
-        return !formula.op().equals(Junctor.NOT);
+        return formula.op() != Junctor.NOT;
     }
     /**
      * Splits the formula at the right side of a cut into the different antecedents of a rule and
@@ -1018,12 +1019,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
      *
      * @param ctx
      */
-    private void replayRightSideHelper(ProofsexprContext ctx) {
-
-        SequentFormula cutFormula = ReplayTools.getLastAddedSuc(goal);
-        if (cutFormula == null) {
-            cutFormula = ReplayTools.getLastModifiedSuc(goal);
-        }
+    private void replayRightSideHelper(ProofsexprContext ctx, SequentFormula cutFormula) {
 
         goal = ReplayTools.focus(cutFormula, goal, false);
 
@@ -1047,6 +1043,14 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             cutFormula = ReplayTools.getLastAddedSuc(goal);
         }
         visit(ctx.proofsexpr(0));
+    }
+
+    private void replayRightSideHelper(ProofsexprContext ctx) {
+        SequentFormula cutFormula = ReplayTools.getLastAddedSuc(goal);
+        if (cutFormula == null) {
+            cutFormula = ReplayTools.getLastModifiedSuc(goal);
+        }
+        replayRightSideHelper(ctx, cutFormula);
     }
 
     private void replayTransStar(ProofsexprContext ctx) {
@@ -1145,12 +1149,16 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
 
         assert hypotheses.size() >= 1;
 
-        TermBuilder tb = services.getTermBuilder();
+        TermFactory tf = services.getTermFactory();
         Term cutTerm = hypotheses.get(0);
         for (int i = 1; i < hypotheses.size(); i++) {
             Term h = hypotheses.get(i);
-            cutTerm = tb.and(cutTerm, h);
+            h = ReplayTools.ensureFormula(h, services);
+            cutTerm = tf.createTerm(Junctor.AND, cutTerm, h);
         }
+        // while technically not necessary, the enclosing negation allows us to use rideSideHelper
+        cutTerm = ReplayTools.ensureFormula(cutTerm, services);
+        cutTerm = tf.createTerm(Junctor.NOT, cutTerm);
 
         // apply cut
         TacletApp cutApp = ReplayTools.createCutApp(goal, cutTerm);
@@ -1158,6 +1166,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         Goal left = goals.get(1);
 
         // todo: really simple steps on the original conlcusion
+        // notLeft
         // orRight (n-1 times)
         // notRight (n times)
         // replace_known_left (n times)
@@ -1167,19 +1176,34 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
+        SequentFormula cutFormula = ReplayTools.getLastAddedSuc(goal);
 
+        // notRight
+        SequentFormula seqForm = cutFormula;
+        goal = ReplayTools.applyNoSplitTopLevelSuc(goal, "notRight", seqForm);
+
+        // andLeft (n-1 times)
+        seqForm = ReplayTools.getLastAddedAntec(goal);
+        for (int i = 0; i < hypotheses.size() - 1; i++) {
+            goal = ReplayTools.applyNoSplitTopLevelAntec(goal, "andLeft", seqForm);
+            seqForm = ReplayTools.getLastModifiedSuc(goal);
+        }
+
+        /*
         // split and (andRight n-1 times)
         SequentFormula sf = ReplayTools.getLastAddedAntec(goal);
         for (int i = 0; i < hypotheses.size() - 1; i++) {
             goal = ReplayTools.applyNoSplitTopLevelAntec(goal, "andRight", sf);
             sf = ReplayTools.getLastModifiedAntec(goal);
         }
+        */
 
         // hide hypotheses and remember the mapping to insert_taclets
         for (Term h : hypotheses) {
             // fix: we need the exact SequentFormula instance!
             //SequentFormula hf = new SequentFormula(h);
             SequentFormula hf = findSequentFormulaForTerm(goal, h, true);
+            assert hf != null;
 
             PosInOccurrence pio = new PosInOccurrence(hf, PosInTerm.getTopLevel(), true);
             TacletApp hide = ReplayTools.createTacletApp("hide_left", pio, goal);
@@ -1187,8 +1211,12 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             NoPosTacletApp insertRule = goal.node().getLocalIntroducedRules().iterator().next();
             hypoTaclets.put(h, insertRule);
         }
+
         // no we have the hypotheses available as taclets and descend further
-        replayRightSideHelper(ctx);
+
+        // note: we can not use this, since hide taclets have no lastAdded/Modified formula
+        //replayRightSideHelper(ctx);
+        replayRightSideHelper(ctx, cutFormula);
 
         // since we leave this subtree now, hypotheses are no longer available
         for (Term h : hypotheses) {
@@ -1201,18 +1229,32 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         // format: (or !h0 !h1 ... !hn)
         List<Term> hypotheses = new ArrayList<>();
         NoprooftermContext conclCtx = extractRuleConclusionCtx(ctx).noproofterm();
-        int hypoCount = conclCtx.noproofterm().size() - 1;
+
         Term rest = extractRuleConclusion(ctx);
 
-        for (int i = 0; i < hypoCount - 1; i++) {
-            Term notH = rest.sub(1);
-            // TODO: negation necessary if positive?
-            assert notH.op() == Junctor.NOT;
-            Term h = notH.sub(0);
-            hypotheses.add(h);
-            rest = rest.sub(0);
+        int hypoCount = 0;
+        if (conclCtx.rulename != null && conclCtx.rulename.getText().equals("or")) {
+            hypoCount = conclCtx.noproofterm().size() - 1;  // "or" + params
+
+            for (int i = 0; i < hypoCount; i++) {
+                Term h = rest.sub(i);
+                assert h.op() == Junctor.NOT;
+                hypotheses.add(h.sub(0));
+
+                /*
+                Term notH = rest.sub(1);
+                // TODO: negation necessary if positive?
+                assert notH.op() == Junctor.NOT;
+                Term h = notH.sub(0);
+                hypotheses.add(h);
+                rest = rest.sub(0);
+                 */
+            }
+        } else {
+            hypoCount = 1;
+            assert rest.op() == Junctor.NOT;
+            hypotheses.add(rest.sub(0));
         }
-        hypotheses.add(rest);
         return hypotheses;
     }
 
@@ -1224,7 +1266,7 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         // note: connected to lemma rule, see method replayLemma()
         Term hypothesis = extractRuleConclusion(ctx);
 
-        if (hypoTaclets.get(hypothesis) != null) {
+        if (hypoTaclets.get(hypothesis) == null) {
             throw new IllegalStateException("Hypothesis is not discharged by lemma rule: "
                 + hypothesis);
         }
@@ -1609,11 +1651,12 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         if (term == null) {
             // recursively descend into let definition
             ParserRuleContext letDef = smtReplayer.getSymbolDef(ctx.getText(), ctx);
+            DefCollector defCollector = new DefCollector(smtReplayer, services, skolemSymbols);
             if (letDef != null) {
-                term = letDef.accept(new DefCollector(smtReplayer, services, skolemSymbols));
+                term = letDef.accept(defCollector);
             } else {
                 // could be a term containing nested rule applications again
-                term = ctx.accept(new DefCollector(smtReplayer, services, skolemSymbols));
+                term = ctx.accept(defCollector);
             }
         }
 
@@ -1656,7 +1699,9 @@ class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             }
             Term result = antecs.get(0);
             for (int i = 1; i < antecs.size(); i++) {
-                result = services.getTermFactory().createTerm(Junctor.AND, result, antecs.get(i));
+                result = ReplayTools.ensureFormula(result, services);
+                Term anteFormula = ReplayTools.ensureFormula(antecs.get(i), services);
+                result = services.getTermFactory().createTerm(Junctor.AND, result, anteFormula);
             }
             return result;
         }

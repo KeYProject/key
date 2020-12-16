@@ -30,7 +30,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
     private final SMTSymbolRetranslator retranslator;
 
     /** used to carry variables bound by a quantifier into nested contexts */
-    private final Deque<QuantifiableVariable> boundVars = new LinkedList<>();
+    private final Deque<QuantifiableVariable> boundVars;
 
     /** "free" variables, i.e. variables bound by lambda, but no quantifier, are carried here.
      * When leaving the scope of the lambda, these variables must be replaced by there counterpart,
@@ -39,17 +39,23 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
     private final Deque<Pair<QuantifiableVariable, Term>> skolemSymbols;
 
     public DefCollector(SMTReplayer smtReplayer, Services services) {
-        this.smtReplayer = smtReplayer;
-        this.services = services;
-        this.tf = services.getTermFactory();
-        this.tb = services.getTermBuilder();
-        retranslator = new SMTSymbolRetranslator(services);
         // no symbols bound by proof-bind/lambda -> empty stack
-        skolemSymbols = new LinkedList<>();
+        this(smtReplayer, services, new LinkedList<>(), new LinkedList<>());
+    }
+
+    public DefCollector(SMTReplayer smtReplayer, Deque<QuantifiableVariable> boundVars,
+                        Services services) {
+        this(smtReplayer, services, new LinkedList<>(), boundVars);
     }
 
     public DefCollector(SMTReplayer smtReplayer, Services services,
                         Deque<Pair<QuantifiableVariable, Term>> skolemSymbols) {
+        this(smtReplayer, services, skolemSymbols, new LinkedList<>());
+
+    }
+    public DefCollector(SMTReplayer smtReplayer, Services services,
+                        Deque<Pair<QuantifiableVariable, Term>> skolemSymbols,
+                        Deque<QuantifiableVariable> boundVars) {
         this.smtReplayer = smtReplayer;
         this.services = services;
         this.tf = services.getTermFactory();
@@ -58,6 +64,7 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         // contains the current context, i.e. variables bound by lambda in the context that is to be
         // visited
         this.skolemSymbols = skolemSymbols;
+        this.boundVars = boundVars;
     }
 
     @Override
@@ -77,20 +84,26 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                     for (int i = 0; i < next.sorted_var().size(); i++) {
                         // we need to extract the actual type from the typeguard
                         String varName = next.sorted_var(i).SYMBOL().getText();
-                        if (varName.startsWith("var_")) {
-                            varName = varName.substring(4);
+
+                        // we try to extract the sort from a typeguard (otherwise the sorts when
+                        // creating function terms will not match!)
+                        TypeguardSortCollector sortCollector = new TypeguardSortCollector(services,
+                            varName, retranslator);
+                        Sort sort = sortCollector.visit(next);
+
+                        if (sort == null) {
+                            // if no typeguard is present we use the sort from declaration
+                            String sortName = next.sorted_var(i).sort().getText();
+                            sort = retranslator.translateSort(sortName);
+
+                            if (sort == null) {
+                                sort = Sort.ANY;    // fallback sort
+                            }
                         }
-                        String sortName = next.sorted_var(i).sort().getText();
-                        Sort sort = retranslator.translateSort(sortName);
-                        QuantifiableVariable qv = new LogicVariable(new Name(varName), sort);
-                        /* TODO: lambda has no typeguard!
-                        // search for typeguard for current variable
-                        QuantifiableVariable qv = new TypeguardSortCollector(services,
-                            varName, retranslator).visit(next);
-                        */
+
+                        QuantifiableVariable qv =
+                            retranslator.translateOrCreateLogicVariable(varName, sort);
                         boundVars.push(qv);
-                        //QuantifiableVariable qv = extractQV(next.sorted_var(i), next);
-                        //QuantifiableVariable qv = extractQVSimple(next.sorted_var(i));
                     }
 
                     // visit and wrap into (possibly multiple) forall
@@ -354,7 +367,8 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
                     SkolemCollector skColl = new SkolemCollector(smtReplayer, skName, services);
                     // collect all skolem symbols and their definitions using ifEx/eps terms
                     skColl.visit(smtReplayer.getTree());
-                    skDef = smtReplayer.getSkolemSymbolDef(ctx.getText());
+                    //skDef = smtReplayer.getSkolemSymbolDef(ctx.getText());
+                    skDef = smtReplayer.getSkolemSymbolDef(skName);
                     if (skDef != null) {
                         // found definition of skolem symbol
                         return skDef;
@@ -417,17 +431,6 @@ class DefCollector extends SMTProofBaseVisitor<Term> {
         NoprooftermContext sortCtx = ctx.noproofterm(2);
         Sort keySort = retranslator.translateSort(sortCtx.getText());
         return tb.exactInstance(keySort, term);
-    }
-
-    private QuantifiableVariable extractQV(Sorted_varContext sortedVar,
-                                           ProofsexprContext ctx) {
-        NamespaceSet nss = services.getNamespaces();
-        String origVarName = sortedVar.SYMBOL().getText();
-
-        // TODO:
-        // we search ctx until we found a typeguard for the var with the given name
-        //for (ProofsexprContext child : ctx.proofsexpr()) ...
-        return null;
     }
 
     /**

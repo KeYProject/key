@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.macros.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
@@ -276,5 +277,16 @@ public final class ReplayTools {
         // services (2nd param) are not used/needed
         RuleApp app = focusRule.createApp(pio, null);
         return goal.apply(app).head();
+    }
+
+    static Term ensureFormula(Term t, Services services) {
+        if (t.sort() == Sort.FORMULA) {
+            return t;
+        } else if (t.sort() == services.getTypeConverter().getBooleanType().getSort()) {
+            TermBuilder tb = services.getTermBuilder();
+            return tb.equals(t, tb.TRUE());
+        } else {
+            throw new IllegalStateException("Can not be converted to Formula: " + t);
+        }
     }
 }
