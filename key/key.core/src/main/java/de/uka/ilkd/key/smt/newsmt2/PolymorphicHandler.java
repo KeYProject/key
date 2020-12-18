@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.List;
+import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -13,7 +14,7 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 public class PolymorphicHandler implements SMTHandler {
 
     @Override
-    public void init(MasterHandler masterHandler, Services services) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         // nothing to be done
     }
 

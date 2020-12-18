@@ -1,23 +1,19 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
-import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
+import java.util.Properties;
 
 /**
  * This SMT translation handler takes care of those sort-depending functions f whose return type is
  * coerced, i.e.
  * <pre>
- *     T::f(params) = T::cast(Any::f(params))
+ *     T::f(params) = T::cast(any::f(params))
  * </pre>
  *
  * Currently these are: seqGet and (heap-) select.
@@ -32,7 +28,7 @@ public class CastingFunctionsHandler implements SMTHandler {
     private SortDependingFunction select;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         this.services = services;
         this.seqGet = services.getTypeConverter().getSeqLDT().getSeqGet(Sort.ANY, services);
         this.select = services.getTypeConverter().getHeapLDT().getSelect(Sort.ANY, services);

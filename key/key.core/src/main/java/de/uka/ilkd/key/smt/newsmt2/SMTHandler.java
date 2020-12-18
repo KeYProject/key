@@ -5,7 +5,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
 import java.io.IOException;
-import java.net.URL;
+import java.util.Properties;
 
 /**
  * General interface for routines that translate particular KeY data structures
@@ -22,7 +22,7 @@ import java.net.URL;
  * They are always used within the same proof, but possibly for several proof
  * obligations.
  *
- * After creation, the {@link #init(MasterHandler, Services)} method is called that injects the
+ * After creation, the {@link #init(MasterHandler, Services, Properties)} method is called that injects the
  * {@link Services} object belonging to the proof.
  *
  * During translation, an SMT handler can be asked via {@link #canHandle(Term)}
@@ -49,10 +49,11 @@ public interface SMTHandler {
      * @param masterHandler
      * @param services the non-null services object which is relevant for
      *                 this handler
-     *
+     * @param handlerSnippets the snippets loaded for this handler, null if no
+     *                        snippet property file is available for this handler
      * @throws IOException if resources cannot be read.
      */
-    void init(MasterHandler masterHandler, Services services) throws IOException;
+    void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) throws IOException;
 
     /**
      * Query if this handler can translate a term.

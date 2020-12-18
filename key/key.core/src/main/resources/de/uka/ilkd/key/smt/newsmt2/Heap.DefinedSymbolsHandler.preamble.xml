@@ -30,3 +30,11 @@
          \then(TRUE)
          \else(any::select(h, o2, f))
 ]]></entry>
+
+<entry key="wellFormed.dl"><![CDATA[
+  \forall Heap h; \forall Object o; \forall Field f; (wellFormed(h) ->
+      boolean::select(h, (java.lang.Object::select(h, o, f))<<Trigger>>, java.lang.Object::<created>) = TRUE
+    | (java.lang.Object::select(h, o, f)) = null)
+]]></entry>
+
+<!-- to be done: all objects inside location sets in fields in wellFormed heaps are created or null -->

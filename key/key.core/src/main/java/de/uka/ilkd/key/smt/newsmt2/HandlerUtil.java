@@ -27,15 +27,30 @@ public class HandlerUtil {
      * function along with assertions as to parameter types.
      * "f : int -> boolean" will be translated as a function "ui_f (U) U" along
      * with the assertion that if x is an int, f(x) will be a boolean.
-     * @param term the term to translate
+     * @param op the operator to translate
      * @param name the name of the function
      * @param master the associated master handler
      * @return the function expression
      */
     static SExpr funTypeAxiom(SortedOperator op, String name, MasterHandler master) throws SMTTranslationException {
+        return funTypeAxiom(name, op.arity(), op.sort(), master);
+    }
+
+    /**
+     * Takes a term which represents a function with multiple parameters, and expresses this
+     * function along with assertions as to parameter types.
+     * "f : int -> boolean" will be translated as a function "ui_f (U) U" along
+     * with the assertion that if x is an int, f(x) will be a boolean.
+     * @param name the name of the function
+     * @param arity the number of parameters that the function accepts
+     * @param sort the result type of the function
+     * @param master the associated master handler
+     * @return the function expression
+     */
+    static SExpr funTypeAxiom(String name, int arity, Sort sort, MasterHandler master) throws SMTTranslationException {
         List<SExpr> vars_U = new ArrayList<>();
         List<SExpr> vars = new ArrayList<>();
-        for (int i = 0; i < op.arity(); ++i) {
+        for (int i = 0; i < arity; ++i) {
             vars_U.add(new SExpr(LogicalVariableHandler.VAR_PREFIX + i, Type.NONE, "U"));
             vars.add(new SExpr(LogicalVariableHandler.VAR_PREFIX + i));
         }
@@ -52,15 +67,14 @@ public class HandlerUtil {
 //        }
 
         SExpr ante = SExprs.and(tos);
-        master.addSort(op.sort());
+        master.addSort(sort);
         SExpr cons = SExprs.instanceOf(new SExpr(name, vars),
-                SExprs.sortExpr(op.sort()));
+                SExprs.sortExpr(sort));
         SExpr matrix = SExprs.imp(ante, cons);
         SExpr pattern = SExprs.patternSExpr(matrix, new SExpr(name, vars));
         SExpr axiom = SExprs.forall(vars_U, pattern);
         return SExprs.assertion(axiom);
     }
-
 
 
 }

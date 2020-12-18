@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -21,7 +22,7 @@ public class IntegerOpHandler implements SMTHandler {
     private Function jDivision;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         supportedOperators.clear();
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
 

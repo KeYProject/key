@@ -3,6 +3,7 @@ package de.uka.ilkd.key.smt.newsmt2;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.BooleanLDT;
@@ -27,7 +28,7 @@ public class BooleanConnectiveHandler implements SMTHandler {
     }
 
     @Override
-    public void init(MasterHandler masterHandler, Services services) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         BooleanLDT ldt = services.getTypeConverter().getBooleanLDT();
         Operator logicFalse = ldt.getFalseConst();
         supportedOperators.put(logicFalse, "false");

@@ -62,8 +62,11 @@ public class MasterHandler {
         snippets.loadFromXML(getClass().getResourceAsStream("preamble.xml"));
 
         for (SMTHandler smtHandler : ServiceLoader.load(SMTHandler.class)) {
-            smtHandler.init(this, services);
-            registerSnippets(smtHandler.getClass());
+            Properties handlerSnippets = loadSnippets(smtHandler.getClass());
+            smtHandler.init(this, services, handlerSnippets);
+            if (handlerSnippets != null) {
+                snippets.putAll(handlerSnippets);
+            }
             handlers.add(smtHandler);
         }
 
@@ -257,22 +260,17 @@ public class MasterHandler {
         return SExprs.coerce(sExpr, type);
     }
 
-    public void registerSnippets(Class<?> aClass) throws IOException {
+    private static Properties loadSnippets(Class<?> aClass) throws IOException {
         String resourceName = aClass.getSimpleName() + ".preamble.xml";
         URL resource = aClass.getResource(resourceName);
         if (resource != null) {
-            registerSnippets(resource);
+            Properties snippets = new Properties();
+            try (InputStream is = resource.openStream()) {
+                snippets.loadFromXML(is);
+            }
+            return snippets;
         }
-    }
-
-    private void registerSnippets(URL resource) throws IOException {
-        try (InputStream is = resource.openStream()) {
-            snippets.loadFromXML(is);
-        }
-    }
-
-    public void registerSnippets(Properties props) {
-        snippets.putAll(props);
+        return null;
     }
 
     public String getSnippet(String s) {

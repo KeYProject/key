@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 public class SumProdHandler implements SMTHandler {
 
@@ -22,7 +23,7 @@ public class SumProdHandler implements SMTHandler {
     private final HashMap<Term, SExpr> usedBprodTerms = new LinkedHashMap();
 
     @Override
-    public void init(MasterHandler masterHandler, Services services) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         bsumOp = services.getTypeConverter().getIntegerLDT().getBsum();
         bprodOp = services.getTypeConverter().getIntegerLDT().getBprod();
     }

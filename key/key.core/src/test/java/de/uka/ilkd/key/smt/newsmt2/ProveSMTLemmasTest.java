@@ -57,98 +57,99 @@ import static org.junit.Assert.*;
 @Category(Slow.class)
 public class ProveSMTLemmasTest {
 
-   private static String HEADER;
+    private static String HEADER;
 
-   @Parameter(0)
-   public String name;
+    @Parameter(0)
+    public String name;
 
-   @Parameter(1)
-   public String lemmaString;
+    @Parameter(1)
+    public String lemmaString;
 
-   @BeforeClass
-   public static void setUpPreamble() throws IOException {
-      HEADER = Streams.toString(ProveSMTLemmasTest.class.getResourceAsStream("smt-lemma-header.key"));
-   }
+    @BeforeClass
+    public static void setUpPreamble() throws IOException {
+        HEADER = Streams.toString(ProveSMTLemmasTest.class.
+                getResourceAsStream("smt-lemma-header.key"));
+    }
 
-   @AfterClass
-   public static void tearDownClass() {
-      HEADER = null;
-   }
+    @AfterClass
+    public static void tearDownClass() {
+        HEADER = null;
+    }
 
-   @Test
-   public void testSMTLemmaSoundness() throws Exception {
+    @Test
+    public void testSMTLemmaSoundness() throws Exception {
 
-      URL proofFile = getClass().getResource("SMT_lemma_" + name + ".proof");
+        URL proofFile = getClass().getResource("SMT_lemma_" + name + ".proof");
 
-      Path path;
-      if (proofFile != null) {
-         assert proofFile.getProtocol().equals("file");
-         path = Paths.get(proofFile.toURI());
-      } else {
-         path = Files.createTempFile("SMT_lemma_" + name + "_", ".key");
-         // TODO Use writeString in Java 11
-         Files.write(path, (HEADER + "\\problem { " + lemmaString + "}").getBytes());
-      }
+        Path path;
+        if (proofFile != null) {
+            assert proofFile.getProtocol().equals("file");
+            path = Paths.get(proofFile.toURI());
+        } else {
+            path = Files.createTempFile("SMT_lemma_" + name + "_", ".key");
+            // TODO Use writeString in Java 11
+            Files.write(path, (HEADER + "\\problem { " + lemmaString + "}").getBytes());
+        }
 
-      File file = path.toFile();
+        File file = path.toFile();
 
-      System.err.println("Now processing file " + file);
+        System.err.println("Now processing file " + file);
 
-      KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file);
-      try {
-         Proof loadedProof = env.getLoadedProof();
-         env.getProofControl().startAndWaitForAutoMode(loadedProof);
-         if (!loadedProof.closed()) {
-            File saveFile = new File(file.getAbsoluteFile() + ".proof");
-            ProofSaver saver = new ProofSaver(loadedProof, saveFile);
-            saver.save();
-            fail("Proof does not close. See " + file + " and " + saveFile);
-         } else {
-            if (proofFile == null) {
-               // delete temp files
-               file.delete();
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file);
+        try {
+            Proof loadedProof = env.getLoadedProof();
+            env.getProofControl().startAndWaitForAutoMode(loadedProof);
+            if (!loadedProof.closed()) {
+                File saveFile = new File(file.getAbsoluteFile() + ".proof");
+                ProofSaver saver = new ProofSaver(loadedProof, saveFile);
+                saver.save();
+                fail("Proof does not close. See " + file + " and " + saveFile);
             } else {
-               // and check if proofs are actually for the right theorem!
-               DefaultTermParser tp = new DefaultTermParser();
-               Term parsedLemma = tp.parse(new StringReader(lemmaString), Sort.FORMULA,
-                       loadedProof.getServices(), loadedProof.getNamespaces(), new AbbrevMap());
-               Term actual = loadedProof.root().sequent().succedent().get(0).formula();
-               if (!actual.equalsModRenaming(parsedLemma)) {
-                  System.out.println("Stored : " + parsedLemma);
-                  System.out.println("Proven : " + actual);
-                  fail("The proven lemma is different from the stored one.");
-               }
+                if (proofFile == null) {
+                    // delete temp files
+                    file.delete();
+                } else {
+                    // and check if proofs are actually for the right theorem!
+                    DefaultTermParser tp = new DefaultTermParser();
+                    Term parsedLemma = tp.parse(new StringReader(lemmaString), Sort.FORMULA,
+                            loadedProof.getServices(), loadedProof.getNamespaces(), new AbbrevMap());
+                    Term actual = loadedProof.root().sequent().succedent().get(0).formula();
+                    if (!actual.equalsModRenaming(parsedLemma)) {
+                        System.out.println("Stored : " + parsedLemma);
+                        System.out.println("Proven : " + actual);
+                        fail("The proven lemma is different from the stored one.");
+                    }
+                }
+
             }
+        } finally {
+            env.dispose();
+        }
+    }
 
-         }
-      } finally {
-         env.dispose();
-      }
-   }
+    @Parameters(name = "{0}")
+    public static List<String[]> data() throws IOException {
 
-   @Parameters(name = "{0}")
-   public static List<String[]> data() throws IOException {
+        URL url = DefinedSymbolsHandler.class.getResource("DefinedSymbolsHandler.preamble.xml");
+        if (url == null) {
+            throw new FileNotFoundException("Cannot find resource file which should have been generated by gradle");
+        }
 
-      URL url = DefinedSymbolsHandler.class.getResource("DefinedSymbolsHandler.preamble.xml");
-      if (url == null) {
-         throw new FileNotFoundException("Cannot find resource file which should have been generated by gradle");
-      }
+        Properties props = new Properties();
+        try (InputStream in = url.openStream()) {
+            props.loadFromXML(in);
+        }
 
-      Properties props = new Properties();
-      try (InputStream in = url.openStream()) {
-         props.loadFromXML(in);
-      }
+        List<String[]> result = new ArrayList<>();
 
-      List<String[]> result = new ArrayList<>();
+        for (String name : props.stringPropertyNames()) {
+            if (name.matches(".*\\.dl(\\.[0-9]+)?")) {
+                String[] params = { name, props.getProperty(name) };
+                result.add(params);
+            }
+        }
 
-      for (String name : props.stringPropertyNames()) {
-         if (name.matches(".*\\.dl(\\.[0-9]+)?")) {
-            String[] params = { name, props.getProperty(name) };
-            result.add(params);
-         }
-      }
-
-      return result;
-   }
+        return result;
+    }
 
 }

@@ -1,8 +1,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -22,7 +21,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
     public final static String PREFIX = "u_";
 
     @Override
-    public void init(MasterHandler masterHandler, Services services) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         // nothing to be done
     }
 

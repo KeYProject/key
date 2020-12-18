@@ -4,13 +4,14 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
-import java.io.IOException;
+import java.util.Properties;
 
+@Deprecated
 public class LocSetHandler extends SMTFunctionsHandler {
 
     @Override
-    public void init(MasterHandler masterHandler, Services services) {
-        super.init(masterHandler, services);
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
+        super.init(masterHandler, services, handlerSnippets);
 
         LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         addOperator(locSetLDT.getElementOf(), Type.BOOL);

@@ -6,12 +6,14 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+import java.util.Properties;
+
 public class LogicalVariableHandler implements SMTHandler {
 
     static final String VAR_PREFIX = "var_";
 
     @Override
-    public void init(MasterHandler masterHandler, Services services) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         // nothing to be done
     }
 

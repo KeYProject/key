@@ -7,6 +7,8 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+import java.util.Properties;
+
 public class NumberConstantsHandler implements SMTHandler {
 
     private Function numberSymbol;
@@ -14,7 +16,7 @@ public class NumberConstantsHandler implements SMTHandler {
     private Function negNumberSign;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         this.services = services;
         numberSymbol = services.getTypeConverter().getIntegerLDT().getNumberSymbol();
         negNumberSign = services.getTypeConverter().getIntegerLDT().getNegativeNumberSign();

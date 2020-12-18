@@ -10,14 +10,14 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.util.Pair;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * This abstract handler handles a collection of function symbols.
  *
- * The supported funtions can be registered in the overriden {@link SMTHandler#init(MasterHandler, Services)} function.
+ * The supported funtions can be registered in the overriden {@link SMTHandler#init(MasterHandler, Services, Properties)} function.
  *
  * It supports function symbols and sort-depending functions with casting.
  * (i.e. X::f(y) will be translated as(X)any::f(y)).
@@ -39,18 +39,18 @@ public abstract class SMTFunctionsHandler implements SMTHandler {
     private Map<Name, String> supportedCastingOperators = new HashMap<>();
 
     /**
-     * services obtained in {@link SMTHandler#init(MasterHandler, Services)}
+     * services obtained in {@link SMTHandler#init(MasterHandler, Services, Properties)}
      */
     protected Services services;
 
     /**
      * Can be and should be overridden in subclasses
-     *
-     * @param masterHandler
+     *  @param masterHandler
      * @param services the non-null services object which is relevant for
+     * @param handlerSnippets
      */
     @Override
-    public void init(MasterHandler masterHandler, Services services) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         this.services = services;
     }
 

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import java.util.Map;
+import java.util.Properties;
 
 public class FieldConstantHandler implements SMTHandler {
 
@@ -17,7 +18,7 @@ public class FieldConstantHandler implements SMTHandler {
     private Services services;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         this.services = services;
     }
 

@@ -10,13 +10,14 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class UpdateHandler implements SMTHandler {
 
     private Services services;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         this.services = services;
     }
 

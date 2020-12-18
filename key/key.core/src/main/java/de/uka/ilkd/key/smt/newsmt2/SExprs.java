@@ -256,4 +256,40 @@ public class SExprs {
     public static SExpr instanceOf(SExpr var, SExpr sortExpr) {
         return new SExpr("instanceof", Type.BOOL, var, sortExpr);
     }
+
+    public static SExpr greaterEqual(SExpr a, SExpr b) throws SMTTranslationException {
+        return new SExpr(">=", Type.BOOL,
+                SExprs.coerce(a, Type.INT), SExprs.coerce(b, Type.INT));
+    }
+
+    public static SExpr zero() {
+        return new SExpr("0", Type.INT);
+    }
+
+    public static SExpr lessEqual(SExpr a, SExpr b) throws SMTTranslationException {
+        return new SExpr("<=", Type.BOOL,
+                SExprs.coerce(a, Type.INT), SExprs.coerce(b, Type.INT));
+    }
+
+    public static SExpr lessThan(SExpr a, SExpr b) throws SMTTranslationException {
+        return new SExpr("<", Type.BOOL,
+                SExprs.coerce(a, Type.INT), SExprs.coerce(b, Type.INT));
+    }
+
+    public static SExpr eq(SExpr a, SExpr b) throws SMTTranslationException {
+        return new SExpr("=", Type.BOOL,
+                SExprs.coerce(a, Type.INT), SExprs.coerce(b, Type.INT));
+    }
+
+    public static SExpr minus(SExpr a, SExpr b) throws SMTTranslationException {
+        return new SExpr("-", Type.INT,
+                SExprs.coerce(a, Type.INT), SExprs.coerce(b, Type.INT));
+    }
+
+    public static SExpr ite(SExpr cond, SExpr _then, SExpr _else) throws SMTTranslationException {
+        return new SExpr("ite", Type.UNIVERSE,
+                SExprs.coerce(cond, Type.BOOL),
+                SExprs.coerce(_then, Type.UNIVERSE),
+                SExprs.coerce(_else, Type.UNIVERSE));
+    }
 }
