@@ -22,3 +22,10 @@
     ( elementOf(o,f, singleton(o2,f2))&lt;&lt;Trigger&gt;&gt; &lt;-&gt;
       o = o2 &amp; f = f2 )
 </entry>
+
+<entry key="allFields.dl"><![CDATA[
+  \forall Object o; \forall Field f; \forall Object o2;
+    ( elementOf(o,f, allFields(o2))<<Trigger>> <->
+       o = o2 )
+]]>
+</entry>
