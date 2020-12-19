@@ -29,8 +29,7 @@ public class SumProdHandler implements SMTHandler {
     }
 
     @Override
-    public boolean canHandle(Term term) {
-        Operator op = term.op();
+    public boolean canHandle(Operator op) {
         boolean isSum = op == bsumOp;
         boolean isProd = op == bprodOp;
         return isSum || isProd;

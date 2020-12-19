@@ -41,8 +41,8 @@ public class SeqDefHandler implements SMTHandler {
     }
 
     @Override
-    public boolean canHandle(Term term) {
-        return term.op() == seqLDT.getSeqDef();
+    public boolean canHandle(Operator op) {
+        return op == seqLDT.getSeqDef();
     }
 
     @Override

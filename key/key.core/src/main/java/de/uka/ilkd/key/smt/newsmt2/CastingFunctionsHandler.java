@@ -35,8 +35,7 @@ public class CastingFunctionsHandler implements SMTHandler {
     }
 
     @Override
-    public boolean canHandle(Term term) {
-        Operator op = term.op();
+    public boolean canHandle(Operator op) {
         if (op instanceof SortDependingFunction) {
             SortDependingFunction sdf = (SortDependingFunction) op;
             return seqGet.isSimilar(sdf) || select.isSimilar(sdf);

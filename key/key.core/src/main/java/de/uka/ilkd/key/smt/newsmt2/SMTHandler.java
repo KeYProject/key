@@ -2,6 +2,7 @@ package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
 import java.io.IOException;
@@ -36,6 +37,15 @@ import java.util.Properties;
  */
 public interface SMTHandler {
 
+    enum Capability {
+        /** This indicates that the handler cannot translate a term */
+        UNABLE,
+        /** This indicates that the handler can translate a term */
+        YES_THIS_INSTANCE,
+        /** This indicates that the handler can translate any term with the same operator */
+        YES_THIS_OPERATOR
+    }
+
     /**
      * Initialise this handler.
      *
@@ -58,14 +68,32 @@ public interface SMTHandler {
     /**
      * Query if this handler can translate a term.
      *
-     * Test if this term can translate the given argument.
+     * Test if this particular term can be translated.
      * Usually this requires checking whether the toplevel operator of the term
-     * is in the list of supported operators.
+     * is in the list of supported operators, but the handler can also choose
+     * to use other aspects of the term to decide.
      *
      * @param term a non-null term to translate
-     * @return true if this handler can successfully translate the term
+     * @return {@link Capability#YES_THIS_OPERATOR} if this handler can successfully translate any
+     *    term with the same toplevel operator, {@link Capability#YES_THIS_INSTANCE} if this
+     *    handler can successfully translate this particular term, {@link Capability#UNABLE}
+     *    if this handler cannot deal with the term.
      */
-    boolean canHandle(Term term);
+    default Capability canHandle(Term term) {
+        return canHandle(term.op()) ? Capability.YES_THIS_OPERATOR : Capability.UNABLE;
+    }
+
+    /**
+     * Query if this handler can translate an operator.
+     *
+     * Test if this handler can translate any term with the given
+     * argument top level operator.
+     *
+     * @param op a non-null operator to translate
+     * @return true if this handler can successfully translate all terms
+     * with op as toplevel operator
+     */
+    boolean canHandle(Operator op);
 
     /**
      * Translate the given term into an SMT SExpression.

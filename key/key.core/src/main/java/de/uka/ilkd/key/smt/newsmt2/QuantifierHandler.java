@@ -25,8 +25,7 @@ public class QuantifierHandler implements SMTHandler {
     }
 
     @Override
-    public boolean canHandle(Term term) {
-        Operator op = term.op();
+    public boolean canHandle(Operator op) {
         return op == Quantifier.ALL || op == Quantifier.EX;
     }
 

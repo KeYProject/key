@@ -3,6 +3,7 @@ package de.uka.ilkd.key.smt.newsmt2;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -22,8 +23,8 @@ public class UpdateHandler implements SMTHandler {
     }
 
     @Override
-    public boolean canHandle(Term term) {
-        return term.op() == UpdateApplication.UPDATE_APPLICATION;
+    public boolean canHandle(Operator op) {
+        return op == UpdateApplication.UPDATE_APPLICATION;
     }
 
     @Override

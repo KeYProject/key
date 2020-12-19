@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -18,9 +19,11 @@ import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+import de.uka.ilkd.key.smt.newsmt2.SMTHandler.Capability;
 
 public class MasterHandler {
 
@@ -31,10 +34,10 @@ public class MasterHandler {
     /** The different handlers */
     private List<SMTHandler> handlers = new ArrayList<>();
 
-    /** All declarations */
+    /** All declarations (declare-fun ...), (declare-const ...) */
     private List<Writable> declarations = new ArrayList<>();
 
-    /** All axioms */
+    /** All axioms (assert ...)*/
     private List<Writable> axioms = new ArrayList<>();
 
     /** All SMT options */
@@ -46,14 +49,25 @@ public class MasterHandler {
     /** A list of untranslatable values*/
     private Map<Term, SExpr> unknownValues  = new HashMap<>();
 
-    /** Properties files */
+    /** The collected content of the properties files that
+     * belong to the different handlers
+     */
     private Properties snippets = new Properties();
 
-    /** A set of sorts occurring in a problem */
+    /** The collected set of sorts occurring in the problem */
     private HashSet<Sort> sorts = new HashSet<>();
 
-    /** Global state, i.e. a counter for the number of distinct field variables */
+    /** Global state, e.g., a counter for the number of distinct field variables
+     * Handlers can make use of this to store translation-specific data.
+     */
     private Map<String, Object> translationState = new HashMap<>();
+
+    /**
+     * A map from a logic operator to the handler which can work on it.
+     * If a handler is in this map, it has promised to deal with all terms
+     * with the operator as toplevel operator.
+     */
+    private Map<Operator, SMTHandler> handlerMap = new IdentityHashMap<>();
 
     public MasterHandler(Services services) throws IOException {
 
@@ -90,12 +104,26 @@ public class MasterHandler {
     }
 
     public SExpr translate(Term problem) {
+
         try {
+            SMTHandler cached = handlerMap.get(problem.op());
+            if (cached != null) {
+                return cached.handle(this, problem);
+            }
+
             for (SMTHandler smtHandler : handlers) {
-                if(smtHandler.canHandle(problem)) {
-                    return smtHandler.handle(this, problem);
+                Capability response = smtHandler.canHandle(problem);
+                switch(response) {
+                    case YES_THIS_INSTANCE:
+                        // handle this but do not cache.
+                        return smtHandler.handle(this, problem);
+                    case YES_THIS_OPERATOR:
+                        // handle it and cache it for future instances of the op.
+                        handlerMap.put(problem.op(), smtHandler);
+                        return smtHandler.handle(this, problem);
                 }
             }
+
             return handleAsUnknownValue(problem);
         } catch(Exception ex) {
             exceptions.add(ex);

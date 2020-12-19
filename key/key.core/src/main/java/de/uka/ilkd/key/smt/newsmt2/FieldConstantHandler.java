@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+import org.key_project.util.collection.ImmutableArray;
 
 import java.util.Map;
 import java.util.Properties;
@@ -15,6 +16,7 @@ import java.util.Properties;
 public class FieldConstantHandler implements SMTHandler {
 
     private static final String CONSTANT_COUNTER_PROPERTY = "fieldConstant.counter";
+    private static final ImmutableArray<Term> NO_ARGS = new ImmutableArray<>();
     private Services services;
 
     @Override
@@ -23,12 +25,11 @@ public class FieldConstantHandler implements SMTHandler {
     }
 
     @Override
-    public boolean canHandle(Term term) {
+    public boolean canHandle(Operator op) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        Operator op = term.op();
-        return term.sort() == heapLDT.getFieldSort()
+        return op.arity() == 0
+                && op.sort(NO_ARGS) == heapLDT.getFieldSort()
                 && op instanceof Function
-                && term.arity() == 0
                 && (op.name().toString().contains("::$") || op.name().toString().contains("::<"))
                 || op == heapLDT.getArr() || op == heapLDT.getLength();
     }

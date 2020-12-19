@@ -26,10 +26,21 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
     }
 
     @Override
-    public boolean canHandle(Term term) {
-        Operator op = term.op();
-        return (op instanceof Function && term.boundVars().isEmpty())
+    public boolean canHandle(Operator op) {
+        return (op instanceof Function && !bindsVars(op))
             || op instanceof ProgramVariable;
+    }
+
+    /*
+     * return true if op binds in at least one argument.
+     */
+    private static boolean bindsVars(Operator op) {
+        for (int i = 0; i < op.arity(); i++) {
+            if (op.bindVarsAt(i)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
