@@ -1,0 +1,12 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <servers>
+    <server>
+      <id>gpr</id>
+      <username>wadoon</username>
+      <password>17f82842578a76ba27a29fd5f6f34a68b5a266ee</password>
+    </server>
+  </servers>
+</settings>

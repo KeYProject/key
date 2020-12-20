@@ -68,11 +68,11 @@ subprojects {
 
     repositories {
         mavenCentral()
-        flatDir { dirs "lib", "$rootDir/key.core/lib" }
+        flatDir { dirs "lib", "$rootDir/key.core/lib", "$rootDir/key.ui/lib" }
     }
 
     dependencies {
-        compile     'org.jetbrains:annotations:20.1.0'
+        compileOnly     'org.jetbrains:annotations:20.1.0'
         testCompile 'junit:junit:4.13.1'
         testCompile project(':key.util')
     }
