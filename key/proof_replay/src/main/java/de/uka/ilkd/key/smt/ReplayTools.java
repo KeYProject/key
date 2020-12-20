@@ -14,9 +14,9 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+
+import static de.uka.ilkd.key.smt.SMTProofParser.*;
 
 /**
  * Collection of static helper methods that are used in replay.
@@ -299,6 +299,74 @@ public final class ReplayTools {
             return tb.equals(t, tb.TRUE());
         } else {
             throw new IllegalStateException("Can not be converted to Formula: " + t);
+        }
+    }
+
+    // TODO: this could be better as visitor
+    public static List<Integer> extractPosition(String varName, NoprooftermContext ctx) {
+        // we have to skip patterns, since these can not be present in rhs term
+        if (ctx.EXCL() != null) {
+            return extractPosition(varName, ctx.noproofterm(0));
+        }
+
+        if (ctx.qual_identifier() != null) {
+            if (ctx.qual_identifier().identifier().SYMBOL().getText().equals(varName)) {
+                return new LinkedList<>();
+            }
+        }
+        for (int i = 0; i < ctx.noproofterm().size(); i++) {
+            NoprooftermContext child = ctx.noproofterm(i);
+            List<Integer> childPos = extractPosition(varName, child);
+            if (childPos != null) {
+                childPos.add(0, i);
+                return childPos;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Ensures that the top level symbol is not a symbol bound by let, but an actual context.
+     * @param ctx the context which may or may not be a symbol bound by let
+     * @param replayVisitor the visitor used to obain the symbol definitions
+     * @return a context that is ensured not to be a symbol bound by let (however, subterms may
+     *  contain other symbols again!)
+     */
+    public static ParserRuleContext ensureLookup(ParserRuleContext ctx,
+                                                 ReplayVisitor replayVisitor) {
+        return ensureLookup(ctx, replayVisitor.getSmtReplayer());
+    }
+
+    /**
+     * Ensures that the top level symbol is not a symbol bound by let, but an actual context.
+     * @param ctx the context which may or may not be a symbol bound by let
+     * @param replayer the replayer that stores the symbol definitions
+     * @return a context that is ensured not to be a symbol bound by let (however, subterms may
+     *  contain other symbols again!)
+     */
+    public static ParserRuleContext ensureLookup(ParserRuleContext ctx, SMTReplayer replayer) {
+        ParserRuleContext def = replayer.getSymbolDef(ctx.getText(), ctx);
+        if (def != null) {
+            return ensureLookup(def, replayer);
+        } else {
+            return ctx;
+        }
+    }
+
+    public static NoprooftermContext ensureNoproofLookUp(ParserRuleContext ctx,
+                                                         ReplayVisitor replayVisitor) {
+        return ensureNoproofLookUp(ctx, replayVisitor.getSmtReplayer());
+    }
+
+    public static NoprooftermContext ensureNoproofLookUp(ParserRuleContext ctx,
+                                                         SMTReplayer replayer) {
+        ParserRuleContext lookup = ensureLookup(ctx, replayer);
+        if (lookup instanceof NoprooftermContext) {
+            return (NoprooftermContext) lookup;
+        } else if (lookup instanceof ProofsexprContext) {
+            return ((ProofsexprContext) lookup).noproofterm();
+        } else {
+            throw new IllegalStateException("This should not happen!");
         }
     }
 }

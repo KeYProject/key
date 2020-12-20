@@ -26,8 +26,9 @@ public class AndElim extends ProofRule {
         final SequentFormula orig = left.sequent().succedent().get(0);
 
         SequentFormula rest = ReplayTools.getLastAddedAntec(left);
-        ProofsexprContext lookUp = (ProofsexprContext) ensureLookup(ctx.proofsexpr(0));
-        int arity = ensureNoproofLookUp(extractRuleConclusionCtx(lookUp)).noproofterm().size() - 1;
+        ProofsexprContext lookUp = (ProofsexprContext) ReplayTools
+            .ensureLookup(ctx.proofsexpr(0), replayVisitor);
+        int arity = ReplayTools.ensureNoproofLookUp(extractRuleConclusionCtx(lookUp), replayVisitor).noproofterm().size() - 1;
 
         for (int i = 0; i < arity - 1; i++) {
             left = ReplayTools.applyNoSplitTopLevelAntec(left, "andLeft", rest);

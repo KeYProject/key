@@ -1,12 +1,24 @@
 package de.uka.ilkd.key.smt.proofrules;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.smt.ReplayTools;
 import de.uka.ilkd.key.smt.ReplayVisitor;
+import de.uka.ilkd.key.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
+
+import java.util.Iterator;
+import java.util.List;
 
 import static de.uka.ilkd.key.smt.SMTProofParser.ProofsexprContext;
 
@@ -19,6 +31,8 @@ public class ProofBind extends ProofRule {
     public Goal replay(ProofsexprContext ctx) {
         SequentFormula all = goal.sequent().succedent().getFirst();
 
+        int localSkolemCount = 0;
+
         if (all != null && all.formula().op() == Quantifier.ALL) {
             // this is the case when surrounding rule is nnf-pos;
             // from previous translation, the top level formula has an additional top level all
@@ -26,13 +40,41 @@ public class ProofBind extends ProofRule {
             //assert all != null && all.formula().op() == Quantifier.ALL;
 
             // we replace variables bound by lambda/proof-bind by new skolem constants
-            goal = ReplayTools.applyNoSplitTopLevelSuc(goal, "allRight", all);
+
+            // skolemize formula with newly introduced top level forall
+            //SequentFormula all = ReplayTools.getLastAddedSuc(goal);
+            PosInOccurrence pio = new PosInOccurrence(all, PosInTerm.getTopLevel(), false);
+            TacletApp app = ReplayTools.createTacletApp("allRight", pio, goal);
+            goal = goal.apply(app).head();
+            //goal = ReplayTools.applyNoSplitTopLevelSuc(goal, "allRight", all);
+
+            // hide all other formulas
+            SequentFormula skolemized = ReplayTools.getLastAddedSuc(goal);
+            goal = ReplayTools.focus(skolemized, goal, false);
+
+            // get the new skolem symbol and push it to stack:
+            // it must be available when replaying any in this subtree
+            SVInstantiations svInsts = app.instantiations();
+            Iterator<SchemaVariable> iterator = svInsts.svIterator();
+            SchemaVariable skSv = null;
+            while (iterator.hasNext()) {
+                SchemaVariable sv = iterator.next();
+                if (sv instanceof SkolemTermSV) {
+                    skSv = sv;
+                    break;      // TODO: only works with single skolemSV
+                }
+            }
+            assert skSv != null;
+            final Term inst = (Term) svInsts.getInstantiation(skSv);
+            final QuantifiableVariable boundVar = all.formula().boundVars().get(0);
+            replayVisitor.getSkolemSymbols().push(new Pair<>(boundVar, inst));
+            localSkolemCount++;
         }
         // else {
         // in this case the surrounding rule was quant-intro
         //}
 
-        ParserRuleContext lambdaPRC = ensureLookup(ctx.proofsexpr(0));
+        ParserRuleContext lambdaPRC = ReplayTools.ensureLookup(ctx.proofsexpr(0), replayVisitor);
         if (!(lambdaPRC instanceof ProofsexprContext)) {
             throw new IllegalStateException("Error! After 'proof-bind', 'lambda' is expected!");
         }
@@ -53,6 +95,11 @@ public class ProofBind extends ProofRule {
             // lambda is term: (lambda ...)
             ProofsexprContext lambdaScope = lambda.proofsexpr(0);
             skipLetBindings(lambdaScope);
+        }
+
+        // in case of nnf-pos, skolem symbols had been added -> remove them now
+        for (int i = 0; i < localSkolemCount; i++) {
+            replayVisitor.getSkolemSymbols().pop();
         }
         return goal;
     }

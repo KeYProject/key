@@ -8,9 +8,13 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Pair;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
+
+import static de.uka.ilkd.key.smt.SMTProofParser.*;
 
 /**
  * This visitor collects the definition of a variable introduced in a proof leaf by Z3's
@@ -39,25 +43,78 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
     }
 
     @Override
-    public Void visitProofsexpr(SMTProofParser.ProofsexprContext ctx) {
+    public Void visitProofsexpr(ProofsexprContext ctx) {
         if (ctx.rulename != null && ctx.rulename.getText().equals("sk")) {
             // found sk rule -> create ifEx/epsilon term for skolem variable
 
-            SMTProofParser.ProofsexprContext succ = ctx.proofsexpr(0);
+            ProofsexprContext succ = ctx.proofsexpr(0);
             // inside of the sk rule there is always an equisatisfiability Noproofterm
-            SMTProofParser.NoprooftermContext eqSat = succ.noproofterm();
+            NoprooftermContext eqSat = succ.noproofterm();
             if (!eqSat.func.getText().equals("~")) {
                 throw new IllegalStateException("Found sk rule that does not contain ~ top level!");
             }
             // could be: ex x. phi(x) or !all x. phi(x)
-            SMTProofParser.NoprooftermContext lhs = eqSat.noproofterm(1);
+            NoprooftermContext lhs = eqSat.noproofterm(1);
+            NoprooftermContext rhs = eqSat.noproofterm(2);
+
+            // unwrap let if necessary
+            ParserRuleContext letDef = smtReplayer.getSymbolDef(lhs.getText(), lhs);
+            // TODO: there are helper methods to do this, but not visible here!
+            if (letDef != null) {
+                if (letDef instanceof NoprooftermContext) {
+                    lhs = (NoprooftermContext) letDef;
+                } else if (letDef instanceof ProofsexprContext) {
+                    lhs = ((ProofsexprContext) letDef).noproofterm();
+                } else {
+                    throw new IllegalStateException("Unknown context found!");
+                }
+            }
+
+            // look for position of bound variable in quantifier term
+            String boundVarName;
+            List<Integer> qvPos;
+            // TODO: only case with single bound var handled
+            if (lhs.quant.getText().equals("exists")) {                                 // ex
+                boundVarName = lhs.sorted_var(0).SYMBOL().getText();
+                qvPos = ReplayTools.extractPosition(boundVarName, lhs.noproofterm(0));
+            } else if (lhs.func != null && lhs.func.getText().equals("not")
+                && lhs.noproofterm() != null && lhs.noproofterm(0).quant != null
+                && lhs.noproofterm(0).quant.getText().equals("forall")) {               // not all
+                boundVarName = lhs.noproofterm(0).sorted_var(0).SYMBOL().getText();
+                qvPos = ReplayTools.extractPosition(boundVarName, lhs.noproofterm(0).noproofterm(0));
+            } else {
+                throw new IllegalStateException("Collecting skolem symbol failed!");
+            }
+
+            if (qvPos == null || qvPos.isEmpty()) {
+                throw new IllegalStateException("Skolem symbol not found!");
+            }
+
+            // look for the skolem symbol name
+            SMTProofParser.NoprooftermContext skSymbol = rhs;
+            for (Integer i : qvPos) {
+                skSymbol = ReplayTools.ensureNoproofLookUp(skSymbol, smtReplayer).noproofterm(i);
+            }
+
+
+            if (skSymbol.func != null) {
+                // case 1: searched variable is a skolem function: (var_a8!0 ...)
+                // TODO: is it sufficient to only look at the function name?
+                if (!skVariable.equals(skSymbol.func.getText())) {
+                    return null;
+                }
+            } else {
+                // case 2: searched variable is a skolem constant: var_a8!0
+                if (!skVariable.equals(skSymbol.getText())) {
+                    // wrong sk rule -> abort
+                    return null;
+                }
+            }
 
             DefCollector collector = new DefCollector(smtReplayer, boundVars, services);
             Term term = collector.visit(lhs);
 
             if (term.op() == Quantifier.EX) {
-                // TODO: check that we have the right variable (sk term may contain other skolem symbols as well!)
-
                 // TODO: how to get a collision free var name? do we need one?
                 //services.getVariableNamer().getTemporaryNameProposal(skVariable)
                 Name varName = new Name(skVariable);

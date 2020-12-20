@@ -178,29 +178,4 @@ public abstract class ProofRule {
         return null;
     }
 
-    /**
-     * Ensures that the top level symbol is not a symbol bound by let, but an actual context.
-     * @param ctx the context which may or may not be a symbol bound by let
-     * @return a context that is ensured not to be a symbol bound by let (however, subterms may
-     *  contain other symbols again!)
-     */
-    protected ParserRuleContext ensureLookup(ParserRuleContext ctx) {
-        ParserRuleContext def = replayVisitor.getSmtReplayer().getSymbolDef(ctx.getText(), ctx);
-        if (def != null) {
-            return ensureLookup(def);
-        } else {
-            return ctx;
-        }
-    }
-
-    protected NoprooftermContext ensureNoproofLookUp(ParserRuleContext ctx) {
-        ParserRuleContext lookup = ensureLookup(ctx);
-        if (lookup instanceof NoprooftermContext) {
-            return (NoprooftermContext) lookup;
-        } else if (lookup instanceof ProofsexprContext) {
-            return ((ProofsexprContext) lookup).noproofterm();
-        } else {
-            throw new IllegalStateException("This should not happen!");
-        }
-    }
 }

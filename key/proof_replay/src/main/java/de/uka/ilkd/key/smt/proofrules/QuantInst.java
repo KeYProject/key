@@ -107,13 +107,17 @@ public class QuantInst extends ProofRule {
     private Term extractQuantifierInstantiation(ProofsexprContext quantInstCtx) {
         ProofsexprContext conclusionCtx = extractRuleConclusionCtx(quantInstCtx);
         // conclusionCtx should be: (or (not (forall (x) (P x))) (P a))
-        SMTProofParser.NoprooftermContext or = ensureNoproofLookUp(conclusionCtx.noproofterm());
-        SMTProofParser.NoprooftermContext notAll = ensureNoproofLookUp(or.noproofterm(1));
-        SMTProofParser.NoprooftermContext all = ensureNoproofLookUp(notAll.noproofterm(1));
-        SMTProofParser.NoprooftermContext matrix = ensureNoproofLookUp(all.noproofterm(0));
+        SMTProofParser.NoprooftermContext or = ReplayTools
+            .ensureNoproofLookUp(conclusionCtx.noproofterm(), replayVisitor);
+        SMTProofParser.NoprooftermContext notAll = ReplayTools
+            .ensureNoproofLookUp(or.noproofterm(1), replayVisitor);
+        SMTProofParser.NoprooftermContext all = ReplayTools
+            .ensureNoproofLookUp(notAll.noproofterm(1), replayVisitor);
+        SMTProofParser.NoprooftermContext matrix = ReplayTools
+            .ensureNoproofLookUp(all.noproofterm(0), replayVisitor);
 
         String varName = all.sorted_var(0).SYMBOL().getText();
-        List<Integer> pos = extractPosition(varName, matrix);
+        List<Integer> pos = ReplayTools.extractPosition(varName, matrix);
 
         assert pos != null && pos.size() >= 1;
 
@@ -133,34 +137,10 @@ public class QuantInst extends ProofRule {
         SMTProofParser.NoprooftermContext inst = or;
         for (Integer i : pos) {
             // fix: each subterm could be a symbol bound by let -> lookup first
-            inst = ensureNoproofLookUp(inst).noproofterm(i);
+            inst = ReplayTools.ensureNoproofLookUp(inst, replayVisitor).noproofterm(i);
         }
 
         // now convert instantiation to KeY term
         return inst.accept(new DefCollector(replayVisitor.getSmtReplayer(), services));
-    }
-
-
-    // TODO: this could be better as visitor
-    private List<Integer> extractPosition(String varName, SMTProofParser.NoprooftermContext ctx) {
-        // we have to skip patterns, since these can not be present in rhs term
-        if (ctx.EXCL() != null) {
-            return extractPosition(varName, ctx.noproofterm(0));
-        }
-
-        if (ctx.qual_identifier() != null) {
-            if (ctx.qual_identifier().identifier().SYMBOL().getText().equals(varName)) {
-                return new LinkedList<>();
-            }
-        }
-        for (int i = 0; i < ctx.noproofterm().size(); i++) {
-            SMTProofParser.NoprooftermContext child = ctx.noproofterm(i);
-            List<Integer> childPos = extractPosition(varName, child);
-            if (childPos != null) {
-                childPos.add(0, i);
-                return childPos;
-            }
-        }
-        return null;
     }
 }
