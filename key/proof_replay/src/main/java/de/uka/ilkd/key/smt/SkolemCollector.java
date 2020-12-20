@@ -99,7 +99,7 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
                 smtReplayer.putSkolemSymbol(skVariable, def);
                 smtReplayer.addTranslationToTerm(skVariable, def);
             } else {
-                throw new IllegalStateException("Invalid sk rule found (no existential quantifier)!");
+                throw new IllegalStateException("Invalid sk rule found!");
             }
             return null;
         } else if (ctx.rulename != null && ctx.rulename.getText().equals("lambda")) {

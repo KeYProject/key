@@ -62,7 +62,11 @@ public class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         String rulename = ctx.rulename.getText();
         //System.out.println(rulename);
         System.out.println(ReplayTools.getOriginalText(ctx));
-        ReplayTools.addNotes(goal, ReplayTools.getOriginalText(ctx));
+        //ReplayTools.addNotes(goal, ReplayTools.getOriginalText(ctx));
+        TextCollector tc = new TextCollector(smtReplayer, ctx);
+        tc.visit(ctx);
+        String unsharedText = tc.getResult();
+        ReplayTools.addNotes(goal, unsharedText);
 
         switch (rulename) {
         case "true-axiom":

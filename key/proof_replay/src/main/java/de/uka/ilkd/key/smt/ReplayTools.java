@@ -255,10 +255,22 @@ public final class ReplayTools {
         String currentNotes = goal.node().getNodeInfo().getNotes();
         String newNotes = "";
         if (currentNotes != null && !currentNotes.isEmpty()) {
-            newNotes += currentNotes + System.lineSeparator();
+            newNotes += currentNotes + "<br>";
         }
-        newNotes += notes;
+        // TODO: escaping should be done in GUI
+        newNotes += escapeHTML(notes);
         goal.node().getNodeInfo().setNotes(newNotes);
+    }
+
+    private static final String[] HTML_ORIGINAL = {"&", "\"", "<", ">", "\r\n", "\n"};
+    private static final String[] HTML_REPLACEMENTS = {"&amp;", "&quot;", "&lt;", "&gt;", "<br>", "<br>"};
+
+    // quick and dirty, does replace in comments ...
+    private static String escapeHTML(String input) {
+        for (int i = 0; i < HTML_ORIGINAL.length; i++) {
+            input = input.replace(HTML_ORIGINAL[i], HTML_REPLACEMENTS[i]);
+        }
+        return input;
     }
 
     public static NoPosTacletApp findLocalRule(String namePrefix, Goal goal) {
