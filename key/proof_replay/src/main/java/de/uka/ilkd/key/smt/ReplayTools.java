@@ -226,7 +226,7 @@ public final class ReplayTools {
         }
     }
 
-    static void runAutoModeFirstOrder(Goal goal, int steps) {
+    public static void runAutoModeFirstOrder(Goal goal, int steps) {
         Set<String> admittedRules = new HashSet<>();
         admittedRules.addAll(Arrays.asList(RuleCategories.PROPOSITIONAL_RULES));
         admittedRules.addAll(Arrays.asList(RuleCategories.FIRST_ORDER_RULES));
