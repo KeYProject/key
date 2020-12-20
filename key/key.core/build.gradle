@@ -39,7 +39,7 @@ compileJavacc {
     doLast {
         // Some manual overwriting of Token files needed
         copy {
-            from("src/main/javacc/de/uka/ilkd//parser/schemajava/Token.java")
+            from("src/main/javacc/de/uka/ilkd/key/parser/schemajava/Token.java")
             into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/schemajava/"
         }
         copy {
