@@ -18,8 +18,8 @@ dependencies {
 
     compile 'com.miglayout:miglayout-swing:5.2'
 
-    compile files('lib/docking-frames-common.jar',
-                'lib/docking-frames-core.jar')
+    compile group: group, name: 'docking-frames-common', version: '1.0'
+    compile group: group, name: 'docking-frames-core', version: '1.0'
 
     runtimeOnly project(":keyext.interactionlog")
     //runtimeOnly project(":keyext.script.ui")
