@@ -5,7 +5,7 @@ plugins {
 
 dependencies {
     compile project(':key.util')
-    compile name: 'recoderKey'
+    compile group: group, name: 'recoderkey', version: '1.0'
     compile group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
     compile group: 'org.antlr', name:'antlr-runtime', version:'3.5.2'
     compile group: 'antlr', name: 'antlr', version: '2.7.7'
