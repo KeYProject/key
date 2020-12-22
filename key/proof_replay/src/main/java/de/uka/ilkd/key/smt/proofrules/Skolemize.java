@@ -4,7 +4,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IfExThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -31,7 +30,10 @@ public class Skolemize extends ProofRule {
         // collect all positions of the quantified variable in lhs term
         // <-> positions of ifEx term in right hand side formula
         SMTProofParser.NoprooftermContext lhsCtx = equiSat.noproofterm().noproofterm(1);
-        Term lhs = new DefCollector(replayVisitor.getSmtReplayer(), services).visit(lhsCtx);
+        DefCollector defCollector = new DefCollector(replayVisitor.getSmtReplayer(), services,
+                                                     replayVisitor.getSkolemSymbols());
+        Term lhs = defCollector.visit(lhsCtx);
+
         // lhs is either ex ... or !all ... now
         List<PosInTerm> pits;
         PosInTerm pit;
@@ -98,14 +100,15 @@ public class Skolemize extends ProofRule {
                 // TODO: fix: we must not descend if there is a binder binding a variable with the
                 //  same name and sort (this variable is shadowing qv)
                 Term sub = subTerm.sub(i);
+                /* what was the purpose of this?
                 if (sub.op().equals(IfExThenElse.IF_EX_THEN_ELSE)) {
                     System.out.println();
                     //continue;
                 } else if (sub.op() instanceof Quantifier) {
                     System.out.println();
                     //continue;
-                }
-                List<PosInTerm> subPos = collectQvPositionsRec(qv, subTerm.sub(i), prefix.down(i));
+                }*/
+                List<PosInTerm> subPos = collectQvPositionsRec(qv, sub, prefix.down(i));
                 result.addAll(subPos);
             }
         }

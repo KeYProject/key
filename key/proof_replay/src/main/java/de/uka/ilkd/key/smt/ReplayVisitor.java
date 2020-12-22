@@ -34,7 +34,15 @@ public class ReplayVisitor extends SMTProofBaseVisitor<Void> {
     /** Taclets for inserting hypotheses discharged by previously replayed lemma rules. The
      * hypotheses are hidden in insert taclets (and can be re-introduced if needed) because the
      * focus rule is applied for every rule, which would hide the hypotheses as well. */
-    private final Map<Term, NoPosTacletApp> hypoTaclets = new HashMap<>();
+    //private final Map<Term, NoPosTacletApp> hypoTaclets = new HashMap<>();
+    private final Map<Term, NoPosTacletApp> hypoTaclets = new TreeMap<>((o1, o2) -> {
+        // bound variables may be renamed!
+        if (o1.equalsModRenaming(o2)) {
+            return 0;
+        }
+        // default to String comparison (since we need a welldefined order)
+        return o1.toString().compareTo(o2.toString());
+    });
 
     /** used to carry symbols introduced by quant-intro rule (needed for replaying rules inside
      * the scope of a quant-intro/proof-bind/lambda) */

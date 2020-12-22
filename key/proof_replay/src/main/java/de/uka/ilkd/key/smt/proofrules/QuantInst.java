@@ -128,6 +128,9 @@ public class QuantInst extends ProofRule {
         if (or.noproofterm().size() > 3) {  // 3: "or" + notAll + a
             //if (matrix.func != null && matrix.func.getText().equals("or")) {
             pos.set(0, pos.get(0) + 2);     // + 2: skip "or" and skip notAll subterm
+
+            // position in the top level "or" has been merged into pos[0]
+            pos.remove(1);
         } else {
             // (or (not (all a))) a')
             pos.add(0, 2);      // descend into a'

@@ -80,6 +80,7 @@ public class QuantIntro extends ProofRule {
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
 
+        // TODO: for uniform treatment of nnf and qintro rules, skolemization should be in bind rule
         // skolemize formula with newly introduced top level forall
         SequentFormula all = ReplayTools.getLastAddedSuc(goal);
         pio = new PosInOccurrence(all, PosInTerm.getTopLevel(), false);

@@ -18,7 +18,7 @@ public class ModusPonens extends ProofRule {
 
     @Override
     public Goal replay(ProofsexprContext ctx) {
-       Term cutTerm = extractRuleAntecedents(ctx);
+        Term cutTerm = extractRuleAntecedents(ctx);
         TacletApp app = ReplayTools.createCutApp(goal, cutTerm);
         List<Goal> goals = goal.apply(app).toList();
 

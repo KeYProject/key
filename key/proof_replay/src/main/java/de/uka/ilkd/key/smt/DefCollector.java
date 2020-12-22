@@ -5,6 +5,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.smt.SMTProofParser.Sorted_varContext;
 import de.uka.ilkd.key.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -185,7 +186,7 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
         // otherwise: translate top level function or quantifier "by hand" and descend into children
         // Note: use TermFactory instead of TermBuilder to prevent from simplification!
         if (ctx.func != null) {
-            System.out.println("    ctx.func: " + ctx.func.getText());
+            //System.out.println("    ctx.func: " + ctx.func.getText());
             Term t1;
             Term t2;
             int arity;
@@ -366,11 +367,29 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
                 } else {    // try to find definition of skolem symbol
                     SkolemCollector skColl = new SkolemCollector(smtReplayer, skName, services);
                     // collect all skolem symbols and their definitions using ifEx/eps terms
-                    skColl.visit(smtReplayer.getTree());
+                    skColl.visit(smtReplayer.getProofStart());
+                    skDef = skColl.getRawTerm();
                     //skDef = smtReplayer.getSkolemSymbolDef(ctx.getText());
-                    skDef = smtReplayer.getSkolemSymbolDef(skName);
+                    //skDef = smtReplayer.getSkolemSymbolDef(skName);
                     if (skDef != null) {
-                        // found definition of skolem symbol
+                        // found definition of skolem function:
+                        // collected term may contain free variables -> replace with bound ones
+                        // from current ctx
+                        List<NoprooftermContext> params = skColl.getParams();
+
+                        assert params.size() == ctx.noproofterm().size() - 1;
+
+                        for (int i = 1; i < ctx.noproofterm().size(); i++) {
+                            // should all be bound variables
+                            Term p = visitNoproofterm(ctx.noproofterm(i));
+
+                            String freeVarName = params.get(i - 1).getText();
+                            // cut "var_" prefix
+                            String origFreeVarName = freeVarName.substring(4);
+                            Term toReplace = findQVSubterm(skDef, origFreeVarName);
+                            skDef = OpReplacer.replace(toReplace, p, skDef, tf);
+                        }
+
                         return skDef;
                     }
                 }
@@ -415,6 +434,21 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
             //throw new IllegalStateException("Currently not supported!");
             return visitChildren(ctx);
         }
+    }
+
+    private static Term findQVSubterm(Term term, String varName) {
+        if (term.op() instanceof QuantifiableVariable) {
+            if (term.op().name().toString().equals(varName)) {
+                return term;
+            }
+        }
+        for (Term s : term.subs()) {
+            Term found = findQVSubterm(s, varName);
+            if (found != null) {
+                return found;
+            }
+        }
+        return null;
     }
 
     private Term createInstanceof(NoprooftermContext ctx) {
@@ -594,11 +628,13 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
         if (skDef != null) {
             // found definition of skolem symbol (was already in map)
             return skDef;
-        } else {    // try to find definition of skolem symbol
+        } else {    // try to find definition of skolem symbol  -> skolem constant here!
             SkolemCollector skColl = new SkolemCollector(smtReplayer, ctx.getText(), services);
             // collect all skolem symbols and their definitions using ifEx/eps terms
-            skColl.visit(smtReplayer.getTree());
-            skDef = smtReplayer.getSkolemSymbolDef(ctx.getText());
+            //skColl.visit(smtReplayer.getTree());
+            skColl.visit(smtReplayer.getProofStart());
+            skDef = skColl.getRawTerm();
+            //skDef = smtReplayer.getSkolemSymbolDef(ctx.getText());
             if (skDef != null) {
                 // found definition of skolem symbol
                 return skDef;
@@ -607,6 +643,5 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
 
         // still not found -> unknown
         throw new IllegalStateException("Unknown identifier: " + ctx.getText());
-        //return super.visitIdentifier(ctx);
     }
 }

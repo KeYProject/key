@@ -7,8 +7,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.RuleNode;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -17,8 +17,8 @@ import java.util.List;
 import static de.uka.ilkd.key.smt.SMTProofParser.*;
 
 /**
- * This visitor collects the definition of a variable introduced in a proof leaf by Z3's
- * skolemization rule (sk).
+ * This visitor collects the definition of a skolem constant/function introduced in a proof leaf by
+ * Z3's skolemization rule (sk).
  *
  * @author Wolfram Pfeifer
  */
@@ -28,12 +28,16 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
     private final Services services;
     private final SMTSymbolRetranslator retranslator;
 
+    /** used to store the resulting epsilon term. May be changed if lambda bound variables have to
+     * be replaced! */
+    private Term foundDef = null;
+
+    /** used to store skolem function params (lambda bound variables; have to be replaced later
+     * depending on the context where the skolem function is used). Empty for skolem constants! */
+    private final List<NoprooftermContext> params = new LinkedList<>();
+
     /** used to carry variables bound by a quantifier into nested contexts */
     private final Deque<QuantifiableVariable> boundVars = new LinkedList<>();
-
-    /** used to carry symbols introduced by quant-intro rule (needed for replaying rules inside
-     * the scope of a quant-intro/proof-bind/lambda) */
-    private final Deque<Pair<QuantifiableVariable, Term>> skolemSymbols = new LinkedList<>();
 
     public SkolemCollector(SMTReplayer smtReplayer, String skVariable, Services services) {
         this.smtReplayer = smtReplayer;
@@ -58,17 +62,7 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
             NoprooftermContext rhs = eqSat.noproofterm(2);
 
             // unwrap let if necessary
-            ParserRuleContext letDef = smtReplayer.getSymbolDef(lhs.getText(), lhs);
-            // TODO: there are helper methods to do this, but not visible here!
-            if (letDef != null) {
-                if (letDef instanceof NoprooftermContext) {
-                    lhs = (NoprooftermContext) letDef;
-                } else if (letDef instanceof ProofsexprContext) {
-                    lhs = ((ProofsexprContext) letDef).noproofterm();
-                } else {
-                    throw new IllegalStateException("Unknown context found!");
-                }
-            }
+            lhs = ReplayTools.ensureNoproofLookUp(lhs, smtReplayer);
 
             // look for position of bound variable in quantifier term
             String boundVarName;
@@ -81,7 +75,8 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
                 && lhs.noproofterm() != null && lhs.noproofterm(0).quant != null
                 && lhs.noproofterm(0).quant.getText().equals("forall")) {               // not all
                 boundVarName = lhs.noproofterm(0).sorted_var(0).SYMBOL().getText();
-                qvPos = ReplayTools.extractPosition(boundVarName, lhs.noproofterm(0).noproofterm(0));
+                qvPos = ReplayTools.extractPosition(boundVarName,
+                                                    lhs.noproofterm(0).noproofterm(0));
             } else {
                 throw new IllegalStateException("Collecting skolem symbol failed!");
             }
@@ -96,12 +91,17 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
                 skSymbol = ReplayTools.ensureNoproofLookUp(skSymbol, smtReplayer).noproofterm(i);
             }
 
-
+            // abort if the name of the found skolem symbol does not equal the searched one
             if (skSymbol.func != null) {
                 // case 1: searched variable is a skolem function: (var_a8!0 ...)
                 // TODO: is it sufficient to only look at the function name?
                 if (!skVariable.equals(skSymbol.func.getText())) {
                     return null;
+                }
+                // collect the list of params to be able to replace them later
+                // (noproofterm(0) is skolem function name)
+                for (int i = 1; i < skSymbol.noproofterm().size(); i++) {
+                    params.add(skSymbol.noproofterm(i));
                 }
             } else {
                 // case 2: searched variable is a skolem constant: var_a8!0
@@ -128,10 +128,11 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
                 Term _then = tb.var(qv);
                 Term _else = getDefaultValueTerm(targetSort);
 
-                Term def = tb.ifEx(qv, cond, _then, _else);
-                // add to map
-                smtReplayer.putSkolemSymbol(skVariable, def);
-                smtReplayer.addTranslationToTerm(skVariable, def);
+                foundDef = tb.ifEx(qv, cond, _then, _else);
+                // IMPORTANT: the resulting term depends on whether we need it inside or outside
+                //  of a lambda!
+                //smtReplayer.putSkolemSymbol(skVariable, def);
+                //smtReplayer.addTranslationToTerm(skVariable, def);
             } else if (term.op() == Junctor.NOT
                 && term.sub(0).op() == Quantifier.ALL) {
 
@@ -152,9 +153,12 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
                 TermBuilder tb = services.getTermBuilder();
                 Term _then = tb.var(qv);
                 Term _else = getDefaultValueTerm(allBoundVar.sort());
-                Term def = tb.ifEx(qv, cond, _then, _else);
-                smtReplayer.putSkolemSymbol(skVariable, def);
-                smtReplayer.addTranslationToTerm(skVariable, def);
+                foundDef = tb.ifEx(qv, cond, _then, _else);
+                // IMPORTANT: the resulting term depends on whether we need it inside or outside
+                //  of a lambda, we need to store the parameters (in the correct order) that have
+                //  to be replaced depending on the context, where the skolem function is used!
+                //smtReplayer.putSkolemSymbol(skVariable, def);
+                //smtReplayer.addTranslationToTerm(skVariable, def);
             } else {
                 throw new IllegalStateException("Invalid sk rule found!");
             }
@@ -185,7 +189,12 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
             }
             visit(ctx.proofsexpr(0));
             for (int i = 0; i < ctx.sorted_var().size(); i++) {
-                boundVars.pop();
+                QuantifiableVariable qv = boundVars.pop();
+                Term varTerm = services.getTermBuilder().var(qv);
+                TermFactory tf = services.getTermFactory();
+                // since we are outside of the lambda now, we have to use the corresponding variable
+                // bound by a quantifier
+                //foundDef = OpReplacer.replace(varTerm, , foundDef, tf);
             }
             return null;
         }
@@ -193,10 +202,46 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
         return super.visitProofsexpr(ctx);
     }
 
+    @Override
+    public Void visitIdentifier(IdentifierContext ctx) {
+        ParserRuleContext letDef = smtReplayer.getSymbolDef(ctx.getText(), ctx);
+        if (letDef != null) {
+            visit(letDef);
+        }
+        return super.visitIdentifier(ctx);
+    }
+
+    @Override
+    protected boolean shouldVisitNextChild(RuleNode node, Void currentResult) {
+        return foundDef == null;
+    }
+
     private Term getDefaultValueTerm(Sort targetSort) {
         Function anyf = services.getNamespaces().functions().lookup("any::defaultValue");
         SortDependingFunction genericF = (SortDependingFunction) anyf;
         Function targetF = genericF.getInstanceFor(targetSort, services);
         return services.getTermBuilder().func(targetF);
+    }
+
+    /**
+     * Returns the epsilon term as found by the SkolemCollector. If the searched symbol is a skolem
+     * function, this term still contains free variables. These can be be obtained via
+     * {@link #getParams()} and have to be replaced dependent on the context where the skolem
+     * function is used.
+     * @return the definition found by the SkolemCollector
+     */
+    public Term getRawTerm() {
+        return foundDef;
+    }
+
+    /**
+     * If the symbol the SkolemCollector searched is a skolem function, the returned list contains
+     * the parameters the function had while collecting (these are free variables in the Term
+     * obtained by {@link #getRawTerm()}). The parameters have to be replaced dependent on the
+     * context where the skolem function shall be used.
+     * @return the parameters of the skolem function
+     */
+    public List<NoprooftermContext> getParams() {
+        return params;
     }
 }
