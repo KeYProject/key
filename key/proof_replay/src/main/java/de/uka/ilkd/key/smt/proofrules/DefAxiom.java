@@ -17,7 +17,7 @@ public class DefAxiom extends ProofRule {
         // closing rule (Tseitin axioms)
         // quick and dirty solution: use auto mode (simple propositional steps)
         // TODO: implement schemas
-        ReplayTools.runAutoModePropositional(goal, 50);
+        ReplayTools.runAutoModePropositional(goal, 1000);
         return goal;
     }
 }

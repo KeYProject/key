@@ -25,7 +25,7 @@ public class RewriteStar extends ProofRule {
         Goal left = goals.get(1);
 
         // close this goal by auto mode
-        ReplayTools.runAutoModePropositional(left, 50);
+        ReplayTools.runAutoModePropositional(left, 1000);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);

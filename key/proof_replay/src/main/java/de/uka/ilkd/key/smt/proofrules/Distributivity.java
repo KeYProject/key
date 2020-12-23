@@ -15,7 +15,7 @@ public class Distributivity extends ProofRule {
     @Override
     public Goal replay(ProofsexprContext ctx) {
         // TODO: restrict to specific rules? better "manual" replay?
-        ReplayTools.runAutoModePropositional(goal, 50);
+        ReplayTools.runAutoModePropositional(goal, 1000);
         return goal;
     }
 }

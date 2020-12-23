@@ -73,12 +73,12 @@ public class QuantInst extends ProofRule {
 
                     // in this case, the formulas have different structures -> first order auto mode,
                     // closeable without additional quantifier instantiation
-                    ReplayTools.runAutoModeFirstOrder(goal, 50);
+                    ReplayTools.runAutoModeFirstOrder(goal, 1000);
                     // goal is closed now
                     return goal;
                 }
                 // TODO: don't know what to do better here
-                ReplayTools.runAutoModeFirstOrder(goal, 50);
+                ReplayTools.runAutoModeFirstOrder(goal, 1000);
                 // hopefully, the goal is closed now
                 return goal;
             }

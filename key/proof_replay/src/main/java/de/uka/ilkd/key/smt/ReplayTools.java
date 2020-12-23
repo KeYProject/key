@@ -243,7 +243,7 @@ public final class ReplayTools {
         // current notes could contain rule name -> append
         addNotes(goal, "automatic proof search");
 
-        TryCloseMacro close = new TryCloseMacro(50);
+        TryCloseMacro close = new TryCloseMacro(1000);
         try {
             close.applyTo(null, goal.proof(), ImmutableSLList.<Goal>nil().append(goal), null, null);
         } catch (InterruptedException e) {

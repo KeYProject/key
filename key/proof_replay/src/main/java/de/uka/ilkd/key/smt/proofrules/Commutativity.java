@@ -27,7 +27,7 @@ public class Commutativity extends ProofRule {
         List<Goal> goals = goal.apply(cutApp).toList();
         Goal left = goals.get(1);
 
-        ReplayTools.runAutoModePropositional(left, 50);
+        ReplayTools.runAutoModePropositional(left, 1000);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
