@@ -39,36 +39,43 @@ public class ProofBind extends ProofRule {
             // quantifier that binds the lambda variable
             //assert all != null && all.formula().op() == Quantifier.ALL;
 
-            // we replace variables bound by lambda/proof-bind by new skolem constants
+            int freeVarCount = extractFreeVarCount(ctx);
+            for (int i = 0; i < freeVarCount; i++) {
+                // we replace variables bound by lambda/proof-bind by new skolem constants
+                // TODO: same as quant-intro implementation: handle multiple lambda bound vars
 
-            // skolemize formula with newly introduced top level forall
-            //SequentFormula all = ReplayTools.getLastAddedSuc(goal);
-            PosInOccurrence pio = new PosInOccurrence(all, PosInTerm.getTopLevel(), false);
-            TacletApp app = ReplayTools.createTacletApp("allRight", pio, goal);
-            goal = goal.apply(app).head();
-            //goal = ReplayTools.applyNoSplitTopLevelSuc(goal, "allRight", all);
+                // skolemize formula with newly introduced top level forall
+                //SequentFormula all = ReplayTools.getLastAddedSuc(goal);
+                PosInOccurrence pio = new PosInOccurrence(all, PosInTerm.getTopLevel(), false);
+                TacletApp app = ReplayTools.createTacletApp("allRight", pio, goal);
+                goal = goal.apply(app).head();
+                //goal = ReplayTools.applyNoSplitTopLevelSuc(goal, "allRight", all);
 
-            // hide all other formulas
-            SequentFormula skolemized = ReplayTools.getLastAddedSuc(goal);
-            goal = ReplayTools.focus(skolemized, goal, false);
+                SequentFormula skolemized = ReplayTools.getLastAddedSuc(goal);
 
-            // get the new skolem symbol and push it to stack:
-            // it must be available when replaying any in this subtree
-            SVInstantiations svInsts = app.instantiations();
-            Iterator<SchemaVariable> iterator = svInsts.svIterator();
-            SchemaVariable skSv = null;
-            while (iterator.hasNext()) {
-                SchemaVariable sv = iterator.next();
-                if (sv instanceof SkolemTermSV) {
-                    skSv = sv;
-                    break;      // TODO: only works with single skolemSV
+                // get the new skolem symbol and push it to stack:
+                // it must be available when replaying any in this subtree
+                SVInstantiations svInsts = app.instantiations();
+                Iterator<SchemaVariable> iterator = svInsts.svIterator();
+                SchemaVariable skSv = null;
+                while (iterator.hasNext()) {
+                    SchemaVariable sv = iterator.next();
+                    if (sv instanceof SkolemTermSV) {
+                        skSv = sv;
+                        break;
+                    }
                 }
+                assert skSv != null;
+                final Term inst = (Term) svInsts.getInstantiation(skSv);
+                final QuantifiableVariable boundVar = all.formula().boundVars().get(0);
+                replayVisitor.getSkolemSymbols().push(new Pair<>(boundVar, inst));
+                localSkolemCount++;
+
+                all = ReplayTools.getLastAddedSuc(goal);
+
+                // hide all other formulas
+                goal = ReplayTools.focus(skolemized, goal, false);
             }
-            assert skSv != null;
-            final Term inst = (Term) svInsts.getInstantiation(skSv);
-            final QuantifiableVariable boundVar = all.formula().boundVars().get(0);
-            replayVisitor.getSkolemSymbols().push(new Pair<>(boundVar, inst));
-            localSkolemCount++;
         }
         // else {
         // in this case the surrounding rule was quant-intro
@@ -111,5 +118,11 @@ public class ProofBind extends ProofRule {
         } else {
             continueReplay(ctx);
         }
+    }
+
+    private int extractFreeVarCount(ProofsexprContext ctx) {
+        ProofsexprContext lambda =
+            (ProofsexprContext) ReplayTools.ensureLookup(ctx.proofsexpr(0), replayVisitor);
+        return lambda.sorted_var().size();
     }
 }

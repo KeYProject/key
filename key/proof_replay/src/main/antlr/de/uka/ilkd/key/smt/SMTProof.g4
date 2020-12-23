@@ -22,7 +22,7 @@ proofsexpr
 noproofterm
     : spec_constant
     | qual_identifier
-    | LPAREN func=noproofterm noproofterm+ RPAREN
+    | LPAREN func=noproofterm noproofterm+ RPAREN       // TODO: func should be qual_identifier, but this probably breaks something
     | LPAREN quant=FORALL LPAREN sorted_var+ RPAREN noproofterm RPAREN
     | LPAREN quant=EXISTS LPAREN sorted_var+ RPAREN noproofterm RPAREN
     | LPAREN rulename=LET LPAREN var_binding+ RPAREN noproofterm RPAREN         // shared formula/term
