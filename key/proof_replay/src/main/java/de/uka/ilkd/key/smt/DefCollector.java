@@ -399,26 +399,24 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
         } else if (ctx.quant != null) {
             // forall, exists
             if (ctx.quant.getText().equals("forall")) {
-                for (int i = ctx.sorted_var().size() - 1; i >= 0; i--) {
+                for (int i = 0; i < ctx.sorted_var().size(); i++) {
                     QuantifiableVariable qv = extractQV(ctx.sorted_var(i), ctx.noproofterm(0));
                     boundVars.push(qv);
                 }
                 Term t = visit(ctx.noproofterm(0));
-                for (int i = ctx.sorted_var().size() - 1; i >= 0; i--) {
+                for (int i = 0; i < ctx.sorted_var().size(); i++) {
                     QuantifiableVariable qv = boundVars.pop();
-                    //QuantifiableVariable qv = extractQV(ctx.sorted_var(i), ctx.noproofterm(0));
                     t = tb.all(qv, t);
                 }
                 return t;
             } else if (ctx.quant.getText().equals("exists")) {
-                for (int i = ctx.sorted_var().size() - 1; i >= 0; i--) {
+                for (int i = 0; i < ctx.sorted_var().size(); i++) {
                     QuantifiableVariable qv = extractQV(ctx.sorted_var(i), ctx.noproofterm(0));
                     boundVars.push(qv);
                 }
                 Term t = visit(ctx.noproofterm(0));
-                for (int i = ctx.sorted_var().size() - 1; i >= 0; i--) {
+                for (int i = 0; i < ctx.sorted_var().size(); i++) {
                     QuantifiableVariable qv = boundVars.pop();
-                    //QuantifiableVariable qv = extractQV(ctx.sorted_var(i), ctx.noproofterm(0));
                     t = tb.ex(qv, t);
                 }
                 return t;
