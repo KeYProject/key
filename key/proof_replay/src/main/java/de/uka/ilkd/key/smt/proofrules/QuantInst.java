@@ -32,7 +32,7 @@ public class QuantInst extends ProofRule {
         SequentFormula seqForm = goal.sequent().succedent().getFirst();
 
         // TODO: real problem is n-ary vs nested or here
-        // TODO: "conclusion" (right side of quantifier) may be of following form:,
+        // TODO: "conclusion" (right side of quantifier) may be of following form,
         //  where | is left-associative!
         // !(forall ...) | a | b | c
 
@@ -50,37 +50,42 @@ public class QuantInst extends ProofRule {
         SequentFormula all = ReplayTools.getLastAddedSuc(goal, 1);
         goal = ReplayTools.applyNoSplitTopLevelSuc(goal, "notRight", all);
 
-        // allLeft
-        seqForm = ReplayTools.getLastAddedAntec(goal);
-        PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-        System.out.println("Creating TacletApp allLeft");
-        TacletApp app = ReplayTools.createTacletApp("allLeft", pio, goal);
-        SchemaVariable qvSv = app.uninstantiatedVars().iterator().next();
-        Term allInst = extractQuantifierInstantiation(ctx);
+        int instVarCount = extractInstVarCount(ctx);
 
-        // fix: allInst may have formula sort (with = TRUE)
-        if (allInst.sort() == Sort.FORMULA) {
-            if (allInst.op() == Equality.EQUALS) {
-                Term subL = allInst.sub(0);
-                Term subR = allInst.sub(1);
-                allInst = (subL.op() == Junctor.TRUE) ? subR : subL;
-                app = app.addInstantiation(qvSv, allInst, true, services);
-                goal = goal.apply(app).head();
+        for (int i = 0; i < instVarCount; i++) {
+            // allLeft
+            seqForm = ReplayTools.getLastAddedAntec(goal);
+            PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
+            System.out.println("Creating TacletApp allLeft");
+            TacletApp app = ReplayTools.createTacletApp("allLeft", pio, goal);
+            SchemaVariable qvSv = app.uninstantiatedVars().iterator().next();
+            Term allInst = extractQuantifierInstantiation(ctx, i);
 
-                // in this case, the formulas have different structures -> first order auto mode,
-                // closeable without additional quantifier instantiation
+            // TODO: hopefully, these lines are never needed...
+            // fix: allInst may have formula sort (with = TRUE)
+            if (allInst.sort() == Sort.FORMULA) {
+                if (allInst.op() == Equality.EQUALS) {
+                    Term subL = allInst.sub(0);
+                    Term subR = allInst.sub(1);
+                    allInst = (subL.op() == Junctor.TRUE) ? subR : subL;
+                    app = app.addInstantiation(qvSv, allInst, true, services);
+                    goal = goal.apply(app).head();
+
+                    // in this case, the formulas have different structures -> first order auto mode,
+                    // closeable without additional quantifier instantiation
+                    ReplayTools.runAutoModeFirstOrder(goal, 50);
+                    // goal is closed now
+                    return goal;
+                }
+                // TODO: don't know what to do better here
                 ReplayTools.runAutoModeFirstOrder(goal, 50);
-                // goal is closed now
+                // hopefully, the goal is closed now
                 return goal;
             }
-            // TODO: don't know what to do better here
-            ReplayTools.runAutoModeFirstOrder(goal, 50);
-            // hopefully, the goal is closed now
-            return goal;
-        }
 
-        app = app.addInstantiation(qvSv, allInst, true, services);
-        goal = goal.apply(app).head();
+            app = app.addInstantiation(qvSv, allInst, true, services);
+            goal = goal.apply(app).head();
+        }
 
         // replace_known_right + concrete_or_4 on a, b, c
         seqForm = ReplayTools.getLastAddedAntec(goal);
@@ -103,8 +108,21 @@ public class QuantInst extends ProofRule {
         return goal;
     }
 
+    private int extractInstVarCount(ProofsexprContext ctx) {
+        ProofsexprContext conclusionCtx = extractRuleConclusionCtx(ctx);
+        // conclusionCtx should be: (or (not (forall (x) (P x))) (P a))
+        SMTProofParser.NoprooftermContext or = ReplayTools
+            .ensureNoproofLookUp(conclusionCtx.noproofterm(), replayVisitor);
+        SMTProofParser.NoprooftermContext notAll = ReplayTools
+            .ensureNoproofLookUp(or.noproofterm(1), replayVisitor);
+        SMTProofParser.NoprooftermContext all = ReplayTools
+            .ensureNoproofLookUp(notAll.noproofterm(1), replayVisitor);
+        SMTProofParser.NoprooftermContext matrix = ReplayTools
+            .ensureNoproofLookUp(all.noproofterm(0), replayVisitor);
+        return all.sorted_var().size();
+    }
 
-    private Term extractQuantifierInstantiation(ProofsexprContext quantInstCtx) {
+    private Term extractQuantifierInstantiation(ProofsexprContext quantInstCtx, int varIndex) {
         ProofsexprContext conclusionCtx = extractRuleConclusionCtx(quantInstCtx);
         // conclusionCtx should be: (or (not (forall (x) (P x))) (P a))
         SMTProofParser.NoprooftermContext or = ReplayTools
@@ -116,7 +134,7 @@ public class QuantInst extends ProofRule {
         SMTProofParser.NoprooftermContext matrix = ReplayTools
             .ensureNoproofLookUp(all.noproofterm(0), replayVisitor);
 
-        String varName = all.sorted_var(0).SYMBOL().getText();
+        String varName = all.sorted_var(varIndex).SYMBOL().getText();
         List<Integer> pos = ReplayTools.extractPosition(varName, matrix);
 
         assert pos != null && pos.size() >= 1;
