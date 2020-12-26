@@ -156,8 +156,6 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
 
     @Override
     public Term visitNoproofterm(NoprooftermContext ctx) {
-        //System.out.println("Trying to translate " + ReplayTools.getOriginalText(ctx) + " ...");
-
         // term may be a new symbol introduced by the let binder
         //ProofsexprContext proofsexpr = smtReplayer.getSymbolDef(ctx.getText());
         /*Namespace<NamedParserRuleContext> ctxNS = smtReplayer.getNamespaces().get(ctx);
@@ -186,7 +184,6 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
         // otherwise: translate top level function or quantifier "by hand" and descend into children
         // Note: use TermFactory instead of TermBuilder to prevent from simplification!
         if (ctx.func != null) {
-            //System.out.println("    ctx.func: " + ctx.func.getText());
             Term t1;
             Term t2;
             int arity;
@@ -490,7 +487,6 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
         Term cached = smtReplayer.getTranslationToTerm(origVarName);
         if (cached != null) {
             if (cached.op() instanceof QuantifiableVariable) {
-                System.out.println("Found QuantifiableVariable " + cached.op());
                 return (QuantifiableVariable) cached.op();
             }
         }

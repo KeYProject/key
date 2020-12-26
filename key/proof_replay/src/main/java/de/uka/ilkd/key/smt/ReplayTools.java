@@ -173,7 +173,6 @@ public final class ReplayTools {
 
     public static TacletApp createTacletApp(String tacletName, PosInOccurrence pos, Goal goal) {
         TacletApp app = goal.indexOfTaclets().lookup(tacletName);
-        System.out.println("Creating TacletApp " + tacletName);
         return autoInst(app, pos, goal);
     }
 

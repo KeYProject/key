@@ -56,7 +56,6 @@ public class QuantInst extends ProofRule {
             // allLeft
             seqForm = ReplayTools.getLastAddedAntec(goal);
             PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
-            System.out.println("Creating TacletApp allLeft");
             TacletApp app = ReplayTools.createTacletApp("allLeft", pio, goal);
             SchemaVariable qvSv = app.uninstantiatedVars().iterator().next();
             Term allInst = extractQuantifierInstantiation(ctx, i);

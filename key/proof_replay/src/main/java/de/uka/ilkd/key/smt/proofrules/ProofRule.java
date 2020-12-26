@@ -73,8 +73,6 @@ public abstract class ProofRule {
 
         // last is succedent, others are subterms
         int antecCount = ctx.proofsexpr().size() - 1;
-        System.out.println("Found " + ReplayTools.getOriginalText(ctx));
-        System.out.println("  Arity is " + antecCount);
 
         for (int i = antecCount - 1; i > 0; i--) {
             pio = new PosInOccurrence(cutFormula, PosInTerm.getTopLevel(), false);

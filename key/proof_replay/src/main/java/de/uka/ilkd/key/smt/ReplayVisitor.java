@@ -67,15 +67,13 @@ public class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             return super.visitProofsexpr(ctx);
         }
 
-        String rulename = ctx.rulename.getText();
-        //System.out.println(rulename);
-        System.out.println(ReplayTools.getOriginalText(ctx));
-        //ReplayTools.addNotes(goal, ReplayTools.getOriginalText(ctx));
+        // add (inlined) context to node in proof tree
         TextCollector tc = new TextCollector(smtReplayer, ctx);
         tc.visit(ctx);
         String unsharedText = tc.getResult();
         ReplayTools.addNotes(goal, unsharedText);
 
+        String rulename = ctx.rulename.getText();
         switch (rulename) {
         case "true-axiom":
             goal = new True(services, goal, this).replay(ctx);
@@ -164,9 +162,9 @@ public class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             goal = new NNFNeg(services, goal, this).replay(ctx);
             return null;
         default:
-            System.out.println("Replay for rule not yet implemented: " + rulename);
-            //throw new IllegalStateException("Replay for rule not yet implemented: " + rulename);
-            return null;
+            //System.out.println("Replay for rule not yet implemented: " + rulename);
+            throw new IllegalStateException("Replay for rule not yet implemented: " + rulename);
+            //return null;
         }
         // TODO: factor out method call:
         //ProofRule p;
