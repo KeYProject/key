@@ -298,7 +298,8 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
                 t2 = visit(ctx.noproofterm(2));
                 integerLDT = services.getTypeConverter().getIntegerLDT();
                 return tb.func(integerLDT.getMul(), t1, t2);
-            case "/":
+            case "/":       // Z3 does probably not use this
+            case "div":
                 t1 = visit(ctx.noproofterm(1));
                 t2 = visit(ctx.noproofterm(2));
                 integerLDT = services.getTypeConverter().getIntegerLDT();
