@@ -54,7 +54,13 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         List<SExpr> results = new LinkedList<>();
         for (Term t : sequentAsserts) {
-            results.add(master.translate(t, Type.BOOL));
+            // put sequent asserts (and their normalized version) to translation map
+            SExpr translated = master.translate(t, Type.BOOL);
+            SExpr normalized = MasterHandler.normalize(translated);
+            translationToTermMap.put(translated.toString(), t);
+            translationToTermMap.put(normalized.toString(), t);
+
+            results.add(translated);
         }
 
         // result = postProcess(result);
@@ -142,7 +148,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             throw new RuntimeException(exceptions.get(0));
         }
 
-        translationToTermMap = master.getTranslationToTermMap();
+        //translationToTermMap = master.getTranslationToTermMap();
 
         return sb;
     }

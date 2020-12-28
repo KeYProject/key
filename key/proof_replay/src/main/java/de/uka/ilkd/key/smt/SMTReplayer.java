@@ -253,10 +253,8 @@ public class SMTReplayer {
 
     public void addTranslationToTerm(String smtExpr, Term keyTerm) {
         // root context -> empty list
-
-        // todo: caching disabled for now -> must be context depending!
-        //SMTExprInContext exprInContext = new SMTExprInContext(smtExpr, new LinkedList<>());
-        //translationToTermMap.put(exprInContext, keyTerm);
+        SMTExprInContext exprInContext = new SMTExprInContext(smtExpr, new LinkedList<>());
+        translationToTermMap.put(exprInContext, keyTerm);
     }
     /*
     public Term getTranslationToTerm(String smtExpr, Deque<QuantifiableVariable> boundVars) {

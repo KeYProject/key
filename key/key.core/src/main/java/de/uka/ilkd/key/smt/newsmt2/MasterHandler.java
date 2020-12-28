@@ -97,20 +97,20 @@ public class MasterHandler {
             for (SMTHandler smtHandler : handlers) {
                 if(smtHandler.canHandle(problem)) {
                     SExpr res = smtHandler.handle(this, problem);
-                    translationToTermMap.put(res.toString(), problem);
+                    //translationToTermMap.put(res.toString(), problem);
                     // put the normalized term to map, too
                     // hopefully this helps for proof replay
-                    SExpr normalized = normalize(res);
-                    translationToTermMap.put(normalized.toString(), problem);
+                    //SExpr normalized = normalize(res);
+                    //translationToTermMap.put(normalized.toString(), problem);
                     return res;
                 }
             }
             SExpr res = handleAsUnknownValue(problem);
-            translationToTermMap.put(res.toString(), problem);
+            //translationToTermMap.put(res.toString(), problem);
             // put the normalized term to map, too
             // hopefully this helps for proof replay
-            SExpr normalized = normalize(res);
-            translationToTermMap.put(normalized.toString(), problem);
+            //SExpr normalized = normalize(res);
+            //translationToTermMap.put(normalized.toString(), problem);
             return res;
         } catch(Exception ex) {
             exceptions.add(ex);
@@ -123,7 +123,7 @@ public class MasterHandler {
      * @param res original term which may contain nested and/or terms
      * @return SExpr with n-ary and/or terms and no more nested ones.
      */
-    private SExpr normalize(SExpr res) {
+    static SExpr normalize(SExpr res) {
         if (res.getName().equals("and")) {
             List<SExpr> normChildren = new ArrayList<>();
             for (SExpr child : res.getChildren()) {
@@ -161,7 +161,6 @@ public class MasterHandler {
             }
             return new SExpr(res.getName(), res.getType(), newSubs);
         }
-        // TODO: maybe split quantifiers with multiple bound vars?
     }
 
     public SExpr translate(Term problem, Type type)  {
