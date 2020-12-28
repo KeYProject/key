@@ -328,8 +328,7 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
             case "exactinstanceof":
                 return createExactinstanceof(ctx);
             case "cast":
-                t1 = visit(ctx.noproofterm(1));
-                return tb.cast(t1.sort(), t1);
+                return createCast(ctx);
             default:
 
                 // translate KeY predicates/functions (cut "u_" prefix)
@@ -444,6 +443,14 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
             }
         }
         return null;
+    }
+
+    private Term createCast(NoprooftermContext ctx) {
+        // cast has the following form: (cast var_x sort_int)
+        Term term = visit(ctx.noproofterm(1));
+        NoprooftermContext sortCtx = ctx.noproofterm(2);
+        Sort keySort = retranslator.translateSort(sortCtx.getText());
+        return tb.cast(keySort, term);
     }
 
     private Term createInstanceof(NoprooftermContext ctx) {
@@ -600,6 +607,10 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
             return tb.ff();
         } else if (ctx.getText().equals("true")) {
             return tb.tt();
+        } else if (ctx.getText().equals("FALSE")) {
+            return tb.FALSE();
+        } else if (ctx.getText().equals("TRUE")) {
+            return tb.TRUE();
         }
 
         // TODO: this could probably be unified with bound variables list
