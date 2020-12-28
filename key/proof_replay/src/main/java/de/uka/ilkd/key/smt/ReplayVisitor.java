@@ -161,6 +161,9 @@ public class ReplayVisitor extends SMTProofBaseVisitor<Void> {
         case "nnf-neg":
             goal = new NNFNeg(services, goal, this).replay(ctx);
             return null;
+        case "elim-unused":
+            goal = new ElimUnused(services, goal, this).replay(ctx);
+            return null;
         default:
             //System.out.println("Replay for rule not yet implemented: " + rulename);
             throw new IllegalStateException("Replay for rule not yet implemented: " + rulename);

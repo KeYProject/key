@@ -110,7 +110,7 @@ public class SMTReplayer {
         smtOutput = solver.getSolverOutput();
         goal = problem.getGoal();
         original = goal;
-        proof = problem.getGoal().proof();
+        proof = goal.proof();
         translationToTermMap = new LinkedHashMap<>();
 
         // we wrap the original String keys in SMTExprInContext to be aware of the bound variables

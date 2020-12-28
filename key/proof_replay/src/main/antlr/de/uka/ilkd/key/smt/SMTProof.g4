@@ -1,5 +1,7 @@
 grammar SMTProof;
 
+// TODO: everything besides the usual proof syntax is untested!
+
 smtoutput : ('Result: valid' 'unsat')? proof;
 
 proof
@@ -12,7 +14,7 @@ proofsexpr
     : LPAREN rulename=PROOFRULE sub+=proofsexpr+ RPAREN
     | LPAREN LPAREN UNDERSCORE rulename=PROOFRULE sub+=proofsexpr+ RPAREN proofsexpr+ RPAREN
     | LPAREN rulename=LET LPAREN var_binding+ RPAREN proofsexpr RPAREN          // shared subtree of proof
-    | LPAREN rulename=LAMBDA LPAREN sorted_var+ RPAREN proofsexpr RPAREN     // TODO: single proofsexpr should be enough (originally had proofsexpr+)
+    | LPAREN rulename=LAMBDA LPAREN sorted_var+ RPAREN proofsexpr RPAREN
     //| LPAREN MATCH proofsexpr LPAREN match_case+ RPAREN RPAREN            // TODO: implement
     //| LPAREN EXCL proofsexpr attribute+ RPAREN
     | noproofterm
@@ -106,6 +108,7 @@ PROOFRULE
     | PR_REWRITE_STAR
     | PR_PULL_QUANT
     | PR_PUSH_QUANT
+    | PR_ELIM_UNUSED_VARS
     | PR_QUANT_INST
     | PR_HYPOTHESIS
     | PR_LEMMA
@@ -114,6 +117,7 @@ PROOFRULE
     | PR_IFF_FALSE
     | PR_COMMUTATIVITY
     | PR_DEF_AXIOM
+    | PR_IFF_OEQ
     | PR_NNF_POS
     | PR_NNF_NEG
     | PR_SKOLEMIZE
@@ -121,7 +125,7 @@ PROOFRULE
     | PR_TH_LEMMA
     ;
 
-PR_UNDEF :              'undef';
+//PR_UNDEF :              'undef';
 PR_TRUE :               'true-axiom';
 PR_ASSERTED :           'asserted' ;
 PR_GOAL :               'goal';
@@ -141,7 +145,7 @@ PR_REWRITE_STAR :       'rewrite*' ;
 PR_PULL_QUANT :         'pull-quant';
 PR_PUSH_QUANT :         'push-quant';
 PR_ELIM_UNUSED_VARS :   'elim-unused';
-PR_DER :                'der';
+//PR_DER :                'der';
 PR_QUANT_INST :         'quant-inst';
 PR_HYPOTHESIS :         'hypothesis';
 PR_LEMMA :              'lemma';
@@ -150,22 +154,21 @@ PR_IFF_TRUE :           'iff-true';
 PR_IFF_FALSE :          'iff-false';
 PR_COMMUTATIVITY :      'commutativity';
 PR_DEF_AXIOM :          'def-axiom';
-PR_ASSUMPTION_ADD :     'add-assume';
-PR_LEMMA_ADD :          'add-lemma';
-PR_REDUNDANT_DEL :      'del-redundant';
-PR_CLAUSE_TRAIL :       'proof-trail';
-PR_DEF_INTRO :          'intro-def';
-PR_APPLY_DEF :          'apply-def';
+//PR_ASSUMPTION_ADD :     'add-assume';
+//PR_LEMMA_ADD :          'add-lemma';
+//PR_REDUNDANT_DEL :      'del-redundant';
+//PR_CLAUSE_TRAIL :       'proof-trail';
+//PR_DEF_INTRO :          'intro-def';
+//PR_APPLY_DEF :          'apply-def';
 PR_IFF_OEQ :            'iff~';
 PR_NNF_POS :            'nnf-pos';
 PR_NNF_NEG :            'nnf-neg';
 PR_SKOLEMIZE :          'sk';
 PR_MODUS_PONENS_OEQ :   'mp~';
 PR_TH_LEMMA :           'th-lemma' ;
-PR_HYPER_RESOLVE :      'hyper-res';
+//PR_HYPER_RESOLVE :      'hyper-res';
 
 // commands
-// TODO: missing commands
 ASSERT :        'assert' ;
 CHECK_SAT :     'check-sat' ;
 DECL_CONST :    'declare-const' ;
