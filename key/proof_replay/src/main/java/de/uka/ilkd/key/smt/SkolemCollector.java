@@ -68,15 +68,24 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
             String boundVarName;
             List<Integer> qvPos;
             // TODO: only case with single bound var handled
-            if (lhs.quant.getText().equals("exists")) {                                 // ex
+            if (lhs.quant != null && lhs.quant.getText().equals("exists")) {            // ex
                 boundVarName = lhs.sorted_var(0).SYMBOL().getText();
                 qvPos = ReplayTools.extractPosition(boundVarName, lhs.noproofterm(0));
             } else if (lhs.func != null && lhs.func.getText().equals("not")
-                && lhs.noproofterm() != null && lhs.noproofterm(0).quant != null
-                && lhs.noproofterm(0).quant.getText().equals("forall")) {               // not all
-                boundVarName = lhs.noproofterm(0).sorted_var(0).SYMBOL().getText();
-                qvPos = ReplayTools.extractPosition(boundVarName,
-                                                    lhs.noproofterm(0).noproofterm(0));
+                && lhs.noproofterm() != null && lhs.noproofterm().size() > 1) {
+
+                // lhs.noproofterm(0) is 'not'
+                NoprooftermContext lookup = ReplayTools.ensureNoproofLookUp(lhs.noproofterm(1),
+                                                                            smtReplayer);
+                if (lookup.quant != null && lookup.quant.getText().equals("forall")) {  // not all
+                    boundVarName = lookup.sorted_var(0).SYMBOL().getText();
+                    qvPos = ReplayTools.extractPosition(boundVarName, lookup.noproofterm(0));
+
+                    // for skipping additional 'not' top level in rhs
+                    qvPos.add(0, 1);
+                } else {
+                    throw new IllegalStateException("Collecting skolem symbol failed!");
+                }
             } else {
                 throw new IllegalStateException("Collecting skolem symbol failed!");
             }
