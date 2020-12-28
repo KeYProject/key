@@ -286,8 +286,7 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
                 t1 = visit(ctx.noproofterm(1));
                 integerLDT = services.getTypeConverter().getIntegerLDT();
                 if (arity == 1) {
-                    throw new IllegalStateException("Negative term not yet implemented!");
-                    //return tb.func(integerLDT.getNegativeNumberSign(), t1);
+                    return tb.func(integerLDT.getNeg(), t1);
                 } else if (arity == 2) {
                     t2 = visit(ctx.noproofterm(2));
                     return tb.func(integerLDT.getSub(), t1, t2);
