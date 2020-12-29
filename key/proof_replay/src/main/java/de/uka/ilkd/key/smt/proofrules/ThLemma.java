@@ -20,9 +20,9 @@ public class ThLemma extends ProofRule {
     public Goal replay(ProofsexprContext ctx) {
         int arity = ctx.proofsexpr().size();
 
-        // two cases: leaf rule or final rule in proof
+        // two cases: leaf rule or intermediate rule in proof
         if (ctx.proofsexpr(arity - 1).getText().equals("false")) {
-            // final rule
+            // intermediate rule (works together with lemma/hypothesis)
             Term cutTerm = extractRuleAntecedents(ctx);
             TacletApp app = ReplayTools.createCutApp(goal, cutTerm);
             List<Goal> goals = goal.apply(app).toList();
