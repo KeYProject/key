@@ -51,12 +51,13 @@ public class Asserted extends ProofRule {
         } else {
             //throw new IllegalStateException("The formula " + seqForm.formula() + " is not an assertion!");
             System.out.println("The formula " + seqForm.formula() + " is not found as assertion!");
+
             //System.out.println("Starting auto mode ...");
             // TODO: insert matching assertion (how to find?)
             // TODO: we need a more general solution here: what if the rule refers to an assertion
             //  that does not stem from the sequent, but e.g. from the type axioms?
-            // Note: this is a problem if assertions are rewritten (we hope that this does not
-            // happpen, or else we will not be able to find them)
+            // Note: this is a problem if assertions are rewritten (it may happen that additional
+            //  instanceof/typeguards and casts are introduced)
 
             // there is no taclet app found (e.g. for type hierarchy axioms)
             ReplayTools.runAutoMode(goal);

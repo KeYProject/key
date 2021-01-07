@@ -158,8 +158,9 @@ public abstract class ProofRule {
         for (SequentFormula current : semi.asList()) {
             // TODO: for some strange reason, even if the formulas are equal when written to String,
             //  their equal method may sometimes return false ...
-            if (current.toString().equals(searchedSF.toString())) {
-            //if (current.equals(searchedSF)) {
+            if (current.equals(searchedSF)) {
+                return current;
+            } else if (current.toString().equals(searchedSF.toString())) {
                 return current;
             }
         }
@@ -172,7 +173,11 @@ public abstract class ProofRule {
         // we search for a SF that is equal to this one
         SequentFormula searchedSF = new SequentFormula(term);
         for (SequentFormula current : goal.sequent().asList()) {
+            // TODO: for some strange reason, even if the formulas are equal when written to String,
+            //  their equal method may sometimes return false ...
             if (current.equals(searchedSF)) {
+                return current;
+            } else if (current.toString().equals(searchedSF.toString())) {
                 return current;
             }
         }

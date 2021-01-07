@@ -102,7 +102,7 @@ public class QuantInst extends ProofRule {
 
         // closeFalse
         seqForm = ReplayTools.getLastModifiedAntec(goal);
-        goal = ReplayTools.applyNoSplitTopLevelSuc(goal, "closeFalse", seqForm);
+        goal = ReplayTools.applyNoSplitTopLevelAntec(goal, "closeFalse", seqForm);
         // goal is closed now!
         return goal;
     }

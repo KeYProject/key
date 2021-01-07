@@ -29,9 +29,13 @@ public class Skolemize extends ProofRule {
         ProofsexprContext equiSat = ctx.proofsexpr(0);
         // collect all positions of the quantified variable in lhs term
         // <-> positions of ifEx term in right hand side formula
+        // TODO: probably could produce NPE (should use ReplayTools.ensureNoproofLookup())
         SMTProofParser.NoprooftermContext lhsCtx = equiSat.noproofterm().noproofterm(1);
         DefCollector defCollector = new DefCollector(replayVisitor.getSmtReplayer(), services,
                                                      replayVisitor.getSkolemSymbols());
+        // TODO: currently only works for single skolem symbol
+        assert ReplayTools.ensureNoproofLookUp(lhsCtx, replayVisitor).sorted_var().size() == 1;
+
         Term lhs = defCollector.visit(lhsCtx);
 
         // lhs is either ex ... or !all ... now
