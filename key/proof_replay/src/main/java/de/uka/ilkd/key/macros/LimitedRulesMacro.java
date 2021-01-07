@@ -5,10 +5,14 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
+import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
+import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
+import de.uka.ilkd.key.strategy.Strategy;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -16,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+// TODO: rules with no heuristics can not be executed even if they are in the addmittedRules set!
 public class LimitedRulesMacro extends AbstractPropositionalExpansionMacro {
     private final int numSteps;
     private final Set<String> admittedRules;
@@ -26,53 +31,73 @@ public class LimitedRulesMacro extends AbstractPropositionalExpansionMacro {
         this.admittedRules = admittedRules;
     }
 
-    @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-                                          ImmutableList<Goal> goals, PosInOccurrence posInOcc,
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+                                          Proof proof,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
         if (goals == null || goals.isEmpty()) {
-            // should not happen, because in this case canApplyTo returns false
+            // should not happen, because in this case canApplyTo returns
+            // false
             return null;
         }
 
-        // create the rule application engine
-        final ProverCore applyStrategy =
-            new ApplyStrategy(proof.getServices().getProfile().getSelectedGoalChooserBuilder().create());
-        // assert: all goals have the same proof
-
-        final ImmutableList<Goal> ignoredOpenGoals = setDifference(proof.openGoals(), goals);
-        ProofMacroFinishedInfo info =
-            new ProofMacroFinishedInfo(this, goals, proof, 0, 0, 0, false);
+        final GoalChooser
+            goalChooser = proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create();
+        final ProverCore applyStrategy = new ApplyStrategy(goalChooser);
+        final ImmutableList<Goal> ignoredOpenGoals =
+            setDifference(proof.openGoals(), goals);
 
         //
-        // start actual autoprove
+        // The observer to handle the progress bar
+        final ProofMacroListener pml =  new ProgressBarListener(goals.size(),
+            getMaxSteps(proof), listener);
+        applyStrategy.addProverTaskObserver(pml);
+        // add a focus manager if there is a focus
+        if(posInOcc != null && goals != null) {
+            AutomatedRuleApplicationManager realManager = null;
+            FocussedRuleApplicationManager manager = null;
+            for (Goal goal: goals) {
+                realManager = goal.getRuleAppManager();
+                realManager.clearCache();
+                manager = new FocussedRuleApplicationManager(realManager, goal, posInOcc);
+                goal.setRuleAppManager(manager);
+            }
+        }
+
+        // set a new strategy.
+        Strategy oldStrategy = proof.getActiveStrategy();
+        proof.setActiveStrategy(createStrategy(proof, posInOcc));
+
+        ProofMacroFinishedInfo info =
+            new ProofMacroFinishedInfo(this, goals, proof, false);
         try {
-            for (final Goal goal : goals) {
-                Node node = goal.node();
-                int maxSteps = numSteps > 0 ? numSteps : proof.getSettings().getStrategySettings().getMaxSteps();
-                final ApplyStrategyInfo result =
-                    applyStrategy.start(proof, ImmutableSLList.<Goal>nil().prepend(goal),
-                        maxSteps, -1, false);
-                //final Goal closedGoal;
-
-                // retreat if not closed
-                if(!node.isClosed()) {
-                    proof.pruneProof(node);
-                    //closedGoal = null;
-                } else {
-                    //closedGoal = goal;
-                }
-
-                synchronized(applyStrategy) { // wait for applyStrategy to finish its last rule application
-                    info = new ProofMacroFinishedInfo(info, result);
-                    if(applyStrategy.hasBeenInterrupted()) { // only now reraise the interruption exception
-                        throw new InterruptedException();
-                    }
+            // find the relevant goals
+            // and start
+            applyStrategy.start(proof, goals, numSteps, -1, false);
+            synchronized(applyStrategy) { // wait for applyStrategy to finish its last rule application
+                if(applyStrategy.hasBeenInterrupted()) { // reraise interrupted exception if necessary
+                    throw new InterruptedException();
                 }
             }
         } finally {
-            final ImmutableList<Goal> resultingGoals = setDifference(proof.openGoals(), ignoredOpenGoals);
-            info = new ProofMacroFinishedInfo(this, info, resultingGoals);
+            // this resets the proof strategy and the managers after the automation
+            // has run
+            for (final Goal openGoal : proof.openGoals()) {
+                AutomatedRuleApplicationManager manager = openGoal.getRuleAppManager();
+                // touch the manager only if necessary
+                if(manager instanceof FocussedRuleApplicationManager) {
+                    manager = ((FocussedRuleApplicationManager) manager).rootManager;
+                    manager.clearCache();
+                    openGoal.setRuleAppManager(manager);
+                }
+            }
+            final ImmutableList<Goal> resultingGoals =
+                setDifference(proof.openGoals(), ignoredOpenGoals);
+            info = new ProofMacroFinishedInfo(this, resultingGoals);
+            proof.setActiveStrategy(oldStrategy);
+            doPostProcessing(proof);
+            applyStrategy.removeProverTaskObserver(pml);
         }
         return info;
     }
