@@ -102,6 +102,8 @@ public class SMTSymbolRetranslator {
         // special sort, TODO: other special sorts?
         if (symbol.equals("Bool")) {
             return services.getTypeConverter().getBooleanType().getSort();
+        } else if (symbol.equals("Int")) {
+            return services.getTypeConverter().getIntegerLDT().targetSort();
         } else if (symbol.equals("U")) {
             // special sort not existing in KeY; translate to any
             return Sort.ANY;
@@ -112,6 +114,7 @@ public class SMTSymbolRetranslator {
         if (symbol.startsWith(SORT_PREFIX)) {
             origSortName = symbol.substring(SORT_PREFIX.length());
         }
+
         Sort keySort = services.getNamespaces().sorts().lookup(origSortName);
         if (keySort != null) {
             return keySort;
