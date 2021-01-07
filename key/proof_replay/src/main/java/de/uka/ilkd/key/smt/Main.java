@@ -3,6 +3,8 @@ package de.uka.ilkd.key.smt;
 import de.uka.ilkd.key.api.KeYApi;
 import de.uka.ilkd.key.api.ProofApi;
 import de.uka.ilkd.key.api.ProofManagementApi;
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -22,24 +24,27 @@ public class Main {
 
     private static final Set<Path> VALID_SET = new HashSet<>();
 
-    private static final List<StatEntry> STATS = new ArrayList<>();
+    private static final Map<Path, StatEntry> STATS = new HashMap<>();
 
     private static final PrintStream STDOUT = System.out;
     private static final PrintStream STDERR = System.err;
 
-    private static class StatEntry {
-        final long replayTime;
-        final Path p;
-        final ProofState state;
+    private static Path outDir;
 
-        StatEntry(long replayTime, Path p, ProofState state) {
-            this.replayTime = replayTime;
-            this.p = p;
-            this.state = state;
-        }
+    private static class StatEntry {
+        Path p;
+        long keyTime;
+        int keyNodes;
+        long z3TranslationLines;
+        long translationAndZ3Time;
+        long z3ProofLines;
+        long replayTime;
+        int replayNodes;
+        ProofState replayState = ProofState.UNKOWN;
     }
 
     private enum ProofState {
+        UNKOWN,
         ERROR,
         OPEN,
         CLOSED
@@ -55,8 +60,12 @@ public class Main {
     }
 
     private static void run() {
+        outDir = Paths.get("C:\\Users\\Banach\\Desktop\\MA\\experiments\\benchmark"
+            + System.currentTimeMillis());
+
         List<String> pathStrings = null;
         try {
+            Files.createDirectories(outDir);
             pathStrings = Files.readAllLines(VALID_LIST_PATH);
         } catch (IOException e) {
             e.printStackTrace();
@@ -76,18 +85,42 @@ public class Main {
         System.setErr(STDERR);
 
         System.out.print("filename");
-        System.out.print("            ");
-        System.out.print("state");
-        System.out.print("            ");
+        System.out.print("                 ");
+        System.out.print("KeY time");
+        System.out.print("                 ");
+        System.out.print("KeY proof nodes");
+        System.out.print("                 ");
+        System.out.print("SMT translation lines");
+        System.out.print("                 ");
+        System.out.print("transl + Z3 time");
+        System.out.print("                 ");
+        System.out.print("Z3 proof lines");
+        System.out.print("                 ");
         System.out.print("replay time");
+        System.out.print("                 ");
+        System.out.print("replayed proof nodes");
+        System.out.print("                 ");
+        System.out.print("replay state");
         System.out.println();
 
-        for (StatEntry statEntry : STATS) {
+        for (StatEntry statEntry : STATS.values()) {
             System.out.print(statEntry.p.getFileName());
-            System.out.print("            ");
-            System.out.print(statEntry.state);
-            System.out.print("            ");
+            System.out.print("                 ");
+            System.out.print(statEntry.keyTime);
+            System.out.print("                 ");
+            System.out.print(statEntry.keyNodes);
+            System.out.print("                 ");
+            System.out.print(statEntry.z3TranslationLines);
+            System.out.print("                 ");
+            System.out.print(statEntry.translationAndZ3Time);
+            System.out.print("                 ");
+            System.out.print(statEntry.z3ProofLines);
+            System.out.print("                 ");
             System.out.print(statEntry.replayTime);
+            System.out.print("                 ");
+            System.out.print(statEntry.replayNodes);
+            System.out.print("                 ");
+            System.out.print(statEntry.replayState);
             System.out.println();
         }
     }
@@ -148,26 +181,45 @@ public class Main {
         }
     }
 
-    private static void processFile(Path file) {
-        if (file.toString().endsWith(".key")) {
+    private static void processFile(Path input) {
+        if (input.toString().endsWith(".key")) {
             try {
-                System.out.println("Processing " + file.toString());
-                Path outPath = Paths
-                    .get("C:\\Users\\Banach\\Desktop\\MA\\experiments\\benchmark\\",
-                        file.getName(file.getNameCount() - 2) +
-                            file.getFileName().toString() + "_output.smt2");
-                runZ3ToFile(file.toFile(), outPath.toFile());
-            } catch (ProblemLoaderException e) {
+                System.out.println("Processing " + input.toString());
+                Path outPath = outDir.resolve(input.getName(input.getNameCount() - 2) + "_" +
+                            input.getFileName().toString() + "_output.smt2");
+                runeWithKeYAuto(input);
+                runZ3ToFile(input);
+            } catch (ProblemLoaderException | IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private static void runZ3ToFile(File input, File outPath) throws ProblemLoaderException {
-
-        ProofManagementApi pm = KeYApi.loadFromKeyFile(input);
+    private static void runeWithKeYAuto(Path input) throws ProblemLoaderException {
+        ProofManagementApi pm = KeYApi.loadFromKeyFile(input.toFile());
         ProofApi papi = pm.getLoadedProof();
+        Proof proof = papi.getProof();
 
+        UserInterfaceControl uic = new DefaultUserInterfaceControl();
+        uic.getProofControl().startAndWaitForAutoMode(proof);
+
+        int nodes = proof.getStatistics().nodes;
+        updateKeYNodes(input, nodes);
+
+        long keyTime = proof.getStatistics().autoModeTimeInMillis;
+        if (proof.closed()) {
+            updateKeYTime(input, keyTime);
+        } else {
+            updateKeYTime(input, -keyTime);
+        }
+        papi.getEnv().dispose();
+    }
+
+    private static void runZ3ToFile(Path input)
+        throws ProblemLoaderException, IOException {
+
+        ProofManagementApi pm = KeYApi.loadFromKeyFile(input.toFile());
+        ProofApi papi = pm.getLoadedProof();
 
         if (papi == null || papi.getProof() == null || papi.getProof().closed() || papi.getFirstOpenGoal() == null) {
             return;
@@ -189,24 +241,46 @@ public class Main {
         SolverLauncher launcher = new SolverLauncher(settings);
 
         launcher.addListener(new SolverLauncherListener() {
+            long translationAndZ3Time = 0;
+
             @Override
             public void launcherStopped(SolverLauncher launcher,
                                         Collection<SMTSolver> finishedSolvers) {
                 System.out.println("Z3 finished (" + finishedSolvers.size() + " solvers).");
+
+                translationAndZ3Time = System.currentTimeMillis() - translationAndZ3Time;
+                updateZ3Time(input, translationAndZ3Time);
+
                 // we exactly have that single solver
                 if (finishedSolvers.size() != 1) {
                     return;
                 }
                 SMTSolver z3 = finishedSolvers.iterator().next();
-                String output = z3.getSolverOutput();
+
+                String smtTranslation = z3.getTranslation();
+                updateZ3TtranslationLines(input, countLines(smtTranslation));
+                try {
+                    Files.write(replaceExtension(input, "_translation.smt2"), smtTranslation.getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                String z3Proof = z3.getSolverOutput();
 
                 if (z3.getFinalResult().isValid() == SMTSolverResult.ThreeValuedTruth.VALID) {
                     try {
-                        appendValid(input.toPath());
-                        Files.write(outPath.toPath(), output.getBytes());
-                        tryReplay(problem, input.toPath(), outPath.toPath());
+                        appendValid(input);
+
+                        Path outPath = replaceExtension(input, "_proof.smt2");
+                        updateZ3ProofLines(input, countLines(z3Proof));
+                        Files.write(outPath, z3Proof.getBytes());
+
+                        tryReplay(problem, input);
                     } catch (IOException e) {
                         e.printStackTrace();
+                    } finally {
+                        // try to avoid memory leaks
+                        papi.getEnv().dispose();
                     }
                     System.setOut(STDOUT);
                     System.setErr(STDERR);
@@ -218,6 +292,7 @@ public class Main {
                                         Collection<SolverType> solverTypes,
                                         SolverLauncher launcher) {
                 System.out.println("Running Z3 ...");
+                translationAndZ3Time = System.currentTimeMillis();
             }
         });
         launcher.launch(problem, proof.getServices(), SolverType.Z3_NEW_TL_SOLVER);
@@ -234,16 +309,25 @@ public class Main {
         }
     }
 
-    private static void tryReplay(SMTProblem problem, Path inPath, Path outPath) {
+    private static long countLines(String input) {
+        return input.chars().filter(ch -> ch == '\n').count();
+    }
+
+    private static Path replaceExtension(Path path, String newExt) {
+        //Path dir = path.getParent();
+        Path fileName = path.getFileName();
+        String name = fileName.toString().substring(0, fileName.toString().lastIndexOf('.'));
+        String newName = name + newExt;
+        return outDir.resolve(newName);
+    }
+
+    private static void tryReplay(SMTProblem problem, Path inPath) {
         try {
             SMTReplayer replayer = new SMTReplayer(problem);
 
             // prepare logging stdout to file
-            Path dir = outPath.getParent();
-            Path fileName = outPath.getFileName();
-            String name = fileName.toString().substring(0, fileName.toString().lastIndexOf('.'));
-            Path log = dir.resolve(name + ".log");
-            Path proofPath = dir.resolve(name + ".proof");
+            Path log = replaceExtension(inPath, ".log");
+            Path proofPath = replaceExtension(inPath, ".proof");
 
             PrintStream printStream = new PrintStream(log.toFile());
             System.setOut(printStream);
@@ -252,7 +336,9 @@ public class Main {
             long time = System.currentTimeMillis();
             replayer.replay();
             Proof proof = replayer.getProof();
-            long timeDiff = System.currentTimeMillis() - time;
+            long replayTime = System.currentTimeMillis() - time;
+            updateReplayTime(inPath, replayTime);
+            updateReplayNodes(inPath, proof.getStatistics().nodes);
 
             if (proof.closed()) {
                 System.out.println("Proof is closed!");
@@ -260,16 +346,89 @@ public class Main {
                 ProofSaver saver = new ProofSaver(proof, proofPath.toFile());
                 saver.save();
 
-                STATS.add(new StatEntry(timeDiff, inPath, ProofState.CLOSED));
+                updateReplayState(inPath, ProofState.CLOSED);
             } else {
                 System.out.println("Proof is still open (" + proof.openGoals().size() + " goals)!");
-                STATS.add(new StatEntry(timeDiff, inPath, ProofState.OPEN));
+                updateReplayState(inPath, ProofState.OPEN);
             }
-
         } catch (Throwable e) {
             // error in replay -> log to file
             e.printStackTrace();
-            STATS.add(new StatEntry(-1, inPath, ProofState.ERROR));
+            updateReplayState(inPath, ProofState.ERROR);
         }
+    }
+
+    private static void updateReplayTime(Path p, long replayTime) {
+        StatEntry stats = STATS.get(p);
+        if (stats == null) {
+            stats = new StatEntry();
+        }
+        stats.replayTime = replayTime;
+        STATS.put(p, stats);
+    }
+
+
+    private static void updateReplayNodes(Path p, int replayNodes) {
+        StatEntry stats = STATS.get(p);
+        if (stats == null) {
+            stats = new StatEntry();
+        }
+        stats.replayNodes = replayNodes;
+        STATS.put(p, stats);
+    }
+
+    private static void updateReplayState(Path p, ProofState replayState) {
+        StatEntry stats = STATS.get(p);
+        if (stats == null) {
+            stats = new StatEntry();
+        }
+        stats.replayState = replayState;
+        STATS.put(p, stats);
+    }
+
+    private static void updateZ3Time(Path p, long z3Time) {
+        StatEntry stats = STATS.get(p);
+        if (stats == null) {
+            stats = new StatEntry();
+        }
+        stats.translationAndZ3Time = z3Time;
+        STATS.put(p, stats);
+    }
+
+    private static void updateZ3TtranslationLines(Path p, long z3TranslationLines) {
+        StatEntry stats = STATS.get(p);
+        if (stats == null) {
+            stats = new StatEntry();
+        }
+        stats.z3TranslationLines = z3TranslationLines;
+        STATS.put(p, stats);
+    }
+
+    private static void updateZ3ProofLines(Path p, long z3ProofLines) {
+        StatEntry stats = STATS.get(p);
+        if (stats == null) {
+            stats = new StatEntry();
+        }
+        stats.z3ProofLines = z3ProofLines;
+        STATS.put(p, stats);
+    }
+
+    private static void updateKeYNodes(Path p, int keyNodes) {
+        StatEntry stats = STATS.get(p);
+        if (stats == null) {
+            stats = new StatEntry();
+        }
+        stats.keyNodes = keyNodes;
+        STATS.put(p, stats);
+    }
+
+
+    private static void updateKeYTime(Path p, long keyTime) {
+        StatEntry stats = STATS.get(p);
+        if (stats == null) {
+            stats = new StatEntry();
+        }
+        stats.keyTime = keyTime;
+        STATS.put(p, stats);
     }
 }
