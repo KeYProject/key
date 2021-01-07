@@ -3,12 +3,14 @@ package de.uka.ilkd.key.smt.proofrules;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.smt.ReplayTools;
 import de.uka.ilkd.key.smt.ReplayVisitor;
 import de.uka.ilkd.key.smt.SMTProofParser;
+import org.key_project.util.collection.ImmutableList;
 
 import java.util.Map;
 
@@ -60,17 +62,23 @@ public class Asserted extends ProofRule {
             //  instanceof/typeguards and casts are introduced)
 
             // there is no taclet app found (e.g. for type hierarchy axioms)
-            ReplayTools.runAutoMode(goal);
+            ProofMacroFinishedInfo pmfi = ReplayTools.runAutoMode(goal);
 
-            if (!goal.node().isClosed()) {
+            //if (!goal.node().isClosed()) {
+            if (pmfi != null && pmfi.getClosedGoals() == 0) {
+
+                Goal g = ((ImmutableList<Goal>) pmfi.getResult()).head();
+                goal = g;
+
                 // still not closed -> seems to be an assertion from sequent which we did not find,
                 // to be sure we add all assertions and hypotheses and run TryCloseMacro again
 
                 goal = insertAllAssertions(goal);
                 goal = insertAllHypotheses(goal);
-                ReplayTools.runAutoMode(goal);
+                pmfi = ReplayTools.runAutoMode(goal);
 
                 // goal should be closed now; if not, something really has gone wrong!
+                assert pmfi != null && pmfi.getClosedGoals() > 0;
             }
         }
         return goal;

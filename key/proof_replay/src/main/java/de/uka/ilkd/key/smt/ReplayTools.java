@@ -238,15 +238,16 @@ public final class ReplayTools {
         }
     }
 
-    public static void runAutoMode(Goal goal) {
+    public static ProofMacroFinishedInfo runAutoMode(Goal goal) {
         // current notes could contain rule name -> append
         addNotes(goal, "automatic proof search");
 
         TryCloseMacro close = new TryCloseMacro(1000);
         try {
-            close.applyTo(null, goal.proof(), ImmutableSLList.<Goal>nil().append(goal), null, null);
+            return close.applyTo(null, goal.proof(), ImmutableSLList.<Goal>nil().append(goal), null, null);
         } catch (InterruptedException e) {
             e.printStackTrace();
+            return null;
         }
     }
 
@@ -305,6 +306,11 @@ public final class ReplayTools {
     public static List<Integer> extractPosition(String varName, NoprooftermContext ctx) {
         // we have to skip patterns, since these can not be present in rhs term
         if (ctx.EXCL() != null) {
+            return extractPosition(varName, ctx.noproofterm(0));
+        }
+
+        // in the same way, we skip lets
+        if (ctx.rulename != null && ctx.rulename.getText().equals("let")) {
             return extractPosition(varName, ctx.noproofterm(0));
         }
 

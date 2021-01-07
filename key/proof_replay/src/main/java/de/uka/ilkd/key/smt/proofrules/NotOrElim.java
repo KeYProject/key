@@ -91,7 +91,10 @@ public class NotOrElim extends ProofRule {
             // now closing must be possible (or there is something wrong)
             // reinsert original rhs
             left = left.apply(insertRule).head();
-            left = ReplayTools.applyNoSplitTopLevelAntec(left, "closeAntec", seqForm);
+
+            seqForm = ReplayTools.getLastAddedSuc(left);
+            left = ReplayTools.applyNoSplitTopLevelSuc(left, "close", seqForm);
+            //left = ReplayTools.applyNoSplitTopLevelAntec(left, "closeAntec", seqForm);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////

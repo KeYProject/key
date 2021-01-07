@@ -33,8 +33,6 @@ public class Skolemize extends ProofRule {
         SMTProofParser.NoprooftermContext lhsCtx = equiSat.noproofterm().noproofterm(1);
         DefCollector defCollector = new DefCollector(replayVisitor.getSmtReplayer(), services,
                                                      replayVisitor.getSkolemSymbols());
-        // TODO: currently only works for single skolem symbol
-        assert ReplayTools.ensureNoproofLookUp(lhsCtx, replayVisitor).sorted_var().size() == 1;
 
         Term lhs = defCollector.visit(lhsCtx);
 
@@ -43,6 +41,10 @@ public class Skolemize extends ProofRule {
         PosInTerm pit;
         PosInTerm ifEx;
         if (lhs.op() == Quantifier.EX) {
+
+            // TODO: currently only works for single skolem symbol
+            assert ReplayTools.ensureNoproofLookUp(lhsCtx, replayVisitor).sorted_var().size() == 1;
+
             pits = collectQvPositions(lhs);
             assert !pits.isEmpty();
             // right side of equiv
@@ -61,6 +63,12 @@ public class Skolemize extends ProofRule {
             // goal is closed now!
         } else if (lhs.op() == Junctor.NOT && !lhs.subs().isEmpty()
             && lhs.sub(0).op() == Quantifier.ALL) {
+
+            // TODO: currently only works for single skolem symbol
+            assert ReplayTools.ensureNoproofLookUp(
+                ReplayTools.ensureNoproofLookUp(lhsCtx, replayVisitor)
+                    .noproofterm(1), replayVisitor).sorted_var().size() == 1;
+
             pits = collectQvPositions(lhs.sub(0));
             assert !pits.isEmpty();
             // right side of equiv
