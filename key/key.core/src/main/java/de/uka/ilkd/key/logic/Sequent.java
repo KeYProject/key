@@ -321,7 +321,9 @@ public class Sequent implements Iterable<SequentFormula> {
                 : succedent.iterator();
         while (formIter.hasNext()) {
             n++;
-            if (formIter.next().equals(cfma)) {
+            SequentFormula next = formIter.next();
+            // TODO: Comparing strings here is a workaround for replay!
+            if (next.equals(cfma) || next.toString().equals(cfma.toString())) {
                 return n;
             }
         }
