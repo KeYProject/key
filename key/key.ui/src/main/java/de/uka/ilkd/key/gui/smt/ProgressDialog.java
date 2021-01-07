@@ -200,7 +200,12 @@ public class ProgressDialog extends JDialog{
                 replayButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        listener.replayButtonClicked();
+                        try {
+                            listener.replayButtonClicked();
+                        } catch(Exception exception) {
+                            // There may be exceptions during replay that should not be lost.
+                            ExceptionDialog.showDialog(ProgressDialog.this, exception);
+                        }
                     }
                 });
             }

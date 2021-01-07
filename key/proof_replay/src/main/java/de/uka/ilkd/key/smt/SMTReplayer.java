@@ -106,6 +106,13 @@ public class SMTReplayer {
         if (problem.getSolvers().size() != 1) {
             throw new IllegalStateException("Proof can only be replayed from single solver!");
         }
+        if (problem.getFinalResult().isValid() != SMTSolverResult.ThreeValuedTruth.VALID) {
+            throw new IllegalStateException("The SMT solver could not find a proof!");
+        }
+        if (problem.getSolvers().iterator().next().getType() != SolverType.Z3_NEW_TL_SOLVER) {
+            throw new IllegalStateException("Only Z3 proofs using the new modular translation " +
+                " can be replayed currently!");
+        }
         SMTSolver solver = problem.getSolvers().iterator().next();
         smtOutput = solver.getSolverOutput();
         goal = problem.getGoal();
