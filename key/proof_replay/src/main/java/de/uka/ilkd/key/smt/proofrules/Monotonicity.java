@@ -28,6 +28,12 @@ public class Monotonicity extends ProofRule {
         List<Goal> goals = goal.apply(app).toList();
 
         Goal left = goals.get(1);
+
+        // run auto mode directly, implementation below does not work
+        ReplayTools.runAutoMode(left);
+        assert left.node().isClosed();
+
+        /*
         Node pruneTarget = left.node();
         try {
             // monotonicity currently is very fragile and only partly implemented
@@ -102,7 +108,7 @@ public class Monotonicity extends ProofRule {
             left = pruneTarget.proof().getGoal(pruneTarget);
             ReplayTools.runAutoModePropositional(left, 1000);
             assert left.node().isClosed();
-        }
+        }*/
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
         replayRightSideHelper(ctx);
