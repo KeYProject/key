@@ -24,7 +24,7 @@ public class TransitivityStar extends ProofRule {
 
         // trans* rule contains multiple transitivity and symmetry steps,
         // therefore we need auto mode here (however, should be really simple to close)
-        ReplayTools.runAutoModePropositional(goal, 1000);
+        ReplayTools.runAutoMode(goal);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
