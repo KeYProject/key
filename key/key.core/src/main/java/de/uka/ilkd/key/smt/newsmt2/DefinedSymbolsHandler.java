@@ -196,7 +196,13 @@ public class DefinedSymbolsHandler implements SMTHandler {
             DefaultTermParser tp = new DefaultTermParser();
             try {
                 NamespaceSet nss = services.getNamespaces().copy();
-                Term axiom = tp.parse(new StringReader(dl), Sort.FORMULA, services,
+                Services localServices = services.getOverlay(nss);
+                // The parser may add new symbols (instantiations of sort-dep symbols).
+                // Since the SMT machine runs in parallel, this may cause
+                // ConcurrentModificationExceptions. To avoid such exceptions,
+                // a wrapper services object is used.
+                Term axiom = tp.parse(new StringReader(dl), Sort.FORMULA,
+                        localServices,
                         nss, new AbbrevMap());
                 trans.addAxiom(SExprs.assertion(trans.translate(axiom)));
             } catch (ParserException e) {
