@@ -15,6 +15,13 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+/**
+ * This SMT translation handler takes care of integer expressions.
+ *
+ * This includes the unary and binary integer operations and relational operations.
+ *
+ * @author Jonas Schiffl
+ */
 public class IntegerOpHandler implements SMTHandler {
 
     private final Map<Operator, String> supportedOperators = new HashMap<>();

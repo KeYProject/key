@@ -13,6 +13,29 @@ import org.key_project.util.collection.ImmutableArray;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * This SMT translation handler takes care of field constants.
+ *
+ * Field constants have a name that follows the scheme {@code ClassName::$fieldName}.
+ * This handler treats any unique function symbol of sort {@code Field} that follows this
+ * scheme as a function constant.
+ *
+ * It is made sure that different symbols do not map to the field entity.
+ *
+ * To this end a function fieldIdentifier is used and an assertion like the following
+ * is added which states for C::$f
+ *   (assert (= (fieldIdentifier |field_C::$f|) -42)
+ *
+ * Each function symbol gets a new unique negative integer.
+ * Positive integers are kept for the arr() function to make sure that is an injection.
+ *
+ * The integer constants are obtained via a counter stored in the state.
+ * The key is {@link #CONSTANT_COUNTER_PROPERTY}.
+ *
+ * TODO It seems that this could be extended to a general "UniqueHandler" if required.
+ *
+ * @author Mattias Ulbrich
+ */
 public class FieldConstantHandler implements SMTHandler {
 
     private static final String CONSTANT_COUNTER_PROPERTY = "fieldConstant.counter";
@@ -30,6 +53,7 @@ public class FieldConstantHandler implements SMTHandler {
         return op.arity() == 0
                 && op.sort(NO_ARGS) == heapLDT.getFieldSort()
                 && op instanceof Function
+                && ((Function)op).isUnique()
                 && (op.name().toString().contains("::$") || op.name().toString().contains("::<"))
                 || op == heapLDT.getArr() || op == heapLDT.getLength();
     }

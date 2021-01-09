@@ -15,6 +15,16 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import org.key_project.util.collection.ImmutableArray;
 
+/**
+ * This SMT translation handler takes care of quantifier formulas using existential
+ * or universal quantifiers.
+ *
+ * It is non-trivial because triggers need to be dealt with and
+ * type guards must be added.
+ *
+ * @author Jonas Schiffl
+ * @author Mattias Ulbrich
+ */
 public class QuantifierHandler implements SMTHandler {
 
     private Services services;

@@ -10,6 +10,13 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import java.util.Properties;
 
+/**
+ * This SMT translation handler takes care of
+ * instanceof and exactinstanceof functions.
+ *
+ * @author Jonas Schiffl
+ * @author Mattias Ulbrich
+ */
 public class InstanceOfHandler implements SMTHandler {
 
     private SortDependingFunction exactInstanceOfOp;

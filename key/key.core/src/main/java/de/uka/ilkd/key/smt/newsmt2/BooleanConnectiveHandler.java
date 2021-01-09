@@ -14,6 +14,12 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+/**
+ * This SMT translation handler takes care of
+ * the builtin Boolean connectives.
+ *
+ * @author Jonas Schiffl
+ */
 public class BooleanConnectiveHandler implements SMTHandler {
 
     private final Map<Operator, String> supportedOperators = new HashMap<>();

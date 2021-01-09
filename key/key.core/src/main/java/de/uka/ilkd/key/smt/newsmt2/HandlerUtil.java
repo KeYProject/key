@@ -12,15 +12,31 @@ import java.util.List;
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
 
+/**
+ * A collection of static methods that {@link SMTHandler}s are likely to use.
+ *
+ * @author Mattias Ulbrich
+ * @author Jonas Schiffl
+ */
 public class HandlerUtil {
 
-    // also for predicates
-    static SExpr funDeclaration(SortedOperator op, String name) {
+    private HandlerUtil() {
+        throw new Error("do not instantiate");
+    }
+
+    /**
+     * Generate a smtlib expression for the smtlib declaration that
+     * represents the operator op.
+     *
+     * @param op the operator to be declared in smtlib
+     * @param name the name to use on the smt lib side.
+     * @return an SExpr of type {@code (declare-fun ...)}
+     */
+    public static SExpr funDeclaration(SortedOperator op, String name) {
         String sortString = op.sort() == Sort.FORMULA ? "Bool" : "U";
         SExpr signature = new SExpr(Collections.nCopies(op.arity(), new SExpr("U")));
         return new SExpr("declare-fun", new SExpr(name), signature, new SExpr(sortString));
     }
-
 
     /**
      * Takes a term which represents a function with multiple parameters, and expresses this

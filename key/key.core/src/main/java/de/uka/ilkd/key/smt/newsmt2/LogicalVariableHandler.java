@@ -8,6 +8,13 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import java.util.Properties;
 
+/**
+ * This simple SMT translation handler takes care of logical variables.
+ *
+ * It merely adds "var_" in front of the variable name.
+ *
+ * @author Jonas Schiffl
+ */
 public class LogicalVariableHandler implements SMTHandler {
 
     static final String VAR_PREFIX = "var_";
