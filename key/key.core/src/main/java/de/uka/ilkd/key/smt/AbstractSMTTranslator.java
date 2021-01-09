@@ -307,8 +307,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return buildComplText(services, hb, settings);
         }
 
-
-        @Override
         public Collection<Throwable> getExceptionsOfTacletTranslation() {
                  return exceptionsForTacletTranslation;
         }
@@ -2795,7 +2793,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * translate a bsum function. Alos add the created functionsymbol created depending on the term.
-         * @param iterterm The term used as third argument of the bsum function.
+         * @param bsumterm The term used as third argument of the bsum function.
          * @pram sub The two terms used as first and second argument of the bsum operator.
          * @return
          */
@@ -2830,7 +2828,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /**
          * translate a bprod function. Alos add the created functionsymbol created depending on the term.
-         * @param iterterm The term used as third argument of the bsum function.
+         * @param bprodterm The term used as third argument of the bsum function.
          * @pram sub The two terms used as first and second argument of the bsum operator.
          * @return
          */
@@ -3035,7 +3033,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * @param services
          *                used for <code>translateTerm</code>
          */
-        @Override
         public ArrayList<StringBuffer> translateTaclets(Services services,
                         SMTSettings settings) throws IllegalFormulaException {
                 Collection<Taclet> taclets = settings.getTaclets();

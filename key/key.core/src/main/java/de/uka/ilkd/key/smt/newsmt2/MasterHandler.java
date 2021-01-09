@@ -27,47 +27,49 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandler.Capability;
 
 public class MasterHandler {
 
+    /** the services object associated with this particular translation */
     private final Services services;
+
     /** Exceptions that occur during translation */
-    private List<Throwable> exceptions = new ArrayList<>();
+    private final List<Throwable> exceptions = new ArrayList<>();
 
     /** The different handlers */
-    private List<SMTHandler> handlers = new ArrayList<>();
+    private final List<SMTHandler> handlers = new ArrayList<>();
 
     /** All declarations (declare-fun ...), (declare-const ...) */
-    private List<Writable> declarations = new ArrayList<>();
+    private final List<Writable> declarations = new ArrayList<>();
 
     /** All axioms (assert ...)*/
-    private List<Writable> axioms = new ArrayList<>();
+    private final List<Writable> axioms = new ArrayList<>();
 
     /** All SMT options */
-    private List<Writable> options = new ArrayList<>();
+    private final List<Writable> options = new ArrayList<>();
 
     /** A list of known symbols */
-    private Set<String> knownSymbols  = new HashSet<>();
+    private final Set<String> knownSymbols = new HashSet<>();
 
     /** A list of untranslatable values*/
-    private Map<Term, SExpr> unknownValues  = new HashMap<>();
+    private final Map<Term, SExpr> unknownValues = new HashMap<>();
 
     /** The collected content of the properties files that
      * belong to the different handlers
      */
-    private Properties snippets = new Properties();
+    private final Properties snippets = new Properties();
 
     /** The collected set of sorts occurring in the problem */
-    private HashSet<Sort> sorts = new HashSet<>();
+    private final Set<Sort> sorts = new HashSet<>();
 
     /** Global state, e.g., a counter for the number of distinct field variables
      * Handlers can make use of this to store translation-specific data.
      */
-    private Map<String, Object> translationState = new HashMap<>();
+    private final Map<String, Object> translationState = new HashMap<>();
 
     /**
      * A map from a logic operator to the handler which can work on it.
      * If a handler is in this map, it has promised to deal with all terms
      * with the operator as toplevel operator.
      */
-    private Map<Operator, SMTHandler> handlerMap = new IdentityHashMap<>();
+    private final Map<Operator, SMTHandler> handlerMap = new IdentityHashMap<>();
 
     public MasterHandler(Services services) throws IOException {
 
@@ -103,11 +105,25 @@ public class MasterHandler {
 
     }
 
+    /**
+     * Translate a single term to an SMTLib S-Expression.
+     *
+     * This method may modify the state of the handler (by adding symbols e.g.).
+     *
+     * It tries to find a {@link SMTHandler} that can deal with the argument
+     * and delegates to that.
+     *
+     * A default translation is triggered if no handler can be found.
+     *
+     * @param problem the non-null term to translate
+     * @return the S-Expression representing the translation
+     */
     public SExpr translate(Term problem) {
 
         try {
             SMTHandler cached = handlerMap.get(problem.op());
             if (cached != null) {
+                // There is a handler that promised to handle this operator ...
                 return cached.handle(this, problem);
             }
 
@@ -131,6 +147,23 @@ public class MasterHandler {
         }
     }
 
+    /**
+     * Translate a single term to an SMTLib S-Expression.
+     *
+     * The result is ensured to have the SExpr-Type given as argument.
+     * If the type coercion fails, then the translation falls back to
+     * translating the argument as an unknown function.
+     *
+     * This method may modify the state of the handler (by adding symbols e.g.).
+     *
+     * It tries to find a {@link SMTHandler} that can deal with the argument
+     * and delegates to that.
+     *
+     * A default translation is triggered if no handler can be found.
+     *
+     * @param problem the non-null term to translate
+     * @return the S-Expression representing the translation
+     */
     public SExpr translate(Term problem, Type type)  {
         try {
             return SExprs.coerce(translate(problem), type);
@@ -236,7 +269,7 @@ public class MasterHandler {
         sorts.add(s);
     }
 
-    public HashSet<Sort> getSorts() {
+    public Set<Sort> getSorts() {
         return sorts;
     }
 

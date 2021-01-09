@@ -484,18 +484,6 @@ public class SMTObjTranslator implements SMTTranslator {
 		return new StringBuffer(s);
 	}
 
-    /**
-     * Js: Architecturally, translation of taclets should be moved here at some point.
-     * @param services The current proof services
-     * @param settings The current SMT settings
-     * @return
-     * @throws IllegalFormulaException
-     */
-    @Override
-    public ArrayList<StringBuffer> translateTaclets(Services services, SMTSettings settings) throws IllegalFormulaException {
-        return null;
-    }
-
     public ModelExtractor getQuery() {
 		for (String str : functions.keySet()) {
 			SMTFunction f = functions.get(str);
@@ -2090,12 +2078,7 @@ public class SMTObjTranslator implements SMTTranslator {
 		return o.equals(s.getTypeConverter().getBooleanLDT().getFalseConst());
 	}
 
-	@Override
-	public Collection<Throwable> getExceptionsOfTacletTranslation() {
-		return new LinkedList<Throwable>();
-	}
-
-	/**
+    /**
 	 * Class for counting constants of different types appearing in the proof
 	 * obligation.
 	 * 

@@ -22,12 +22,13 @@ import de.uka.ilkd.key.logic.Term;
 
 
 /**
- * Classes that implement this interface provide a translation of a KeY-problem into a specific format.
- * It is recommended not to implement this interface directly, but to extend the class AbstractSMTTranslator,
- * which implements SMTTranslator.
+ * Classes that implement this interface provide a translation of
+ * a KeY-problem into a specific format.
+ *
+ * Consider not implementing this interface directly, but to extend
+ * the class {@link AbstractSMTTranslator}.
  */
 public interface SMTTranslator {
-
 
     /**
      * Translates a problem into the given syntax. The only difference to
@@ -40,20 +41,5 @@ public interface SMTTranslator {
      */
     public CharSequence translateProblem(Sequent sequent, Services services, SMTSettings settings)
            throws IllegalFormulaException;
-
-    /**
-     *
-     * @param services The current proof services
-     * @param settings The current SMT settings
-     * @return a StringBuffer representing the translated taclets
-     * @throws IllegalFormulaException
-     */
-    public ArrayList<StringBuffer> translateTaclets(Services services, SMTSettings settings)
-        throws IllegalFormulaException;
-
-    /**
-     * Returns all exceptions that have occurred while translating the taclets.
-     */
-    public Collection<Throwable> getExceptionsOfTacletTranslation();
 
 }

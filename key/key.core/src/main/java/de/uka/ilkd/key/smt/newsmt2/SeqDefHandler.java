@@ -113,7 +113,7 @@ public class SeqDefHandler implements SMTHandler {
         SExpr app = new SExpr(function, params);
         SExpr seqLen = new SExpr("seqLen", app);
         SExpr len = SExprs.minus(trans.translate(term.sub(1)), trans.translate(term.sub(0)));
-        SExpr ite = SExprs.ite(SExprs.greaterEqual(len, SExprs.zero()), len, SExprs.zero());
+        SExpr ite = SExprs.ite(SExprs.greaterEqual(len, SExprs.ZERO), len, SExprs.ZERO);
         SExpr eq = SExprs.eq(seqLen, ite);
         SExpr forall = SExprs.forall(qvars, eq);
         return SExprs.assertion(forall);
@@ -136,7 +136,7 @@ public class SeqDefHandler implements SMTHandler {
         SExpr app = makeApplication(function, vars);
         SExpr i = new SExpr(term.boundVars().last().name().toString(), Type.UNIVERSE);
         qvars.add(new SExpr(i, new SExpr("U")));
-        guards.add(SExprs.lessEqual(SExprs.zero(), i));
+        guards.add(SExprs.lessEqual(SExprs.ZERO, i));
         guards.add(SExprs.lessThan(i, new SExpr("seqLen", Type.UNIVERSE, app)));
         SExpr smtTerm = trans.translate(term.sub(2));
         SExpr seqGet = new SExpr("seqGet", Type.UNIVERSE, app, i);

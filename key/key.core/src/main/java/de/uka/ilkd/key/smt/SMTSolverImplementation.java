@@ -285,30 +285,6 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 ex.printStackTrace();
                 return string;
             }
-            /*
-            StringBuilder sb = new StringBuilder();
-            int indention = 0;
-
-            for (int i = 0; i < string.length(); i++) {
-                char c = string.charAt(i);
-                switch (c) {
-                case '(':
-                    sb.append("\n");
-                    for (int j = 0; j < indention; j++)
-                        sb.append(" ");
-                    sb.append("(");
-                    indention++;
-                    break;
-                case ')':
-                    indention--;
-                    // fall through
-                default:
-                    sb.append(c);
-                }
-            }
-
-            return sb.toString();
-            */
         }
 
 
@@ -338,13 +314,17 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
             getSocket().setQuery(query);
             tacletTranslation = null;
 
-            exceptionsForTacletTranslation.addAll(objTrans.getExceptionsOfTacletTranslation());
         } else {
             SMTTranslator trans = getType().createTranslator(services);
             //instantiateTaclets(trans);
             problemString = indent(trans.translateProblem(sequent, services, smtSettings).toString());
 //            tacletTranslation = ((AbstractSMTTranslator) trans).getTacletSetTranslation();
-            exceptionsForTacletTranslation.addAll(trans.getExceptionsOfTacletTranslation());
+            if(trans instanceof AbstractSMTTranslator) {
+                // Since taclet translation in the old form is no longer used,
+                // this will likely disappear.
+                exceptionsForTacletTranslation.addAll(
+                        ((AbstractSMTTranslator) trans).getExceptionsOfTacletTranslation());
+            }
         }
 
         String parameters [] = this.type.getSolverParameters().split(" ");

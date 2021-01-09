@@ -8,12 +8,9 @@ import java.util.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.smt.IllegalFormulaException;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
-
-import javax.management.relation.RelationNotFoundException;
 
 /**
  * This class provides a translation from a KeY sequent to the SMT-LIB 2 language, a common input
@@ -28,11 +25,6 @@ import javax.management.relation.RelationNotFoundException;
  */
 public class ModularSMTLib2Translator implements SMTTranslator {
 
-    /**
-     * The string prefix used for sort names in SMT,
-     */
-    public static final String SORT_PREFIX = "sort_";
-
     @Override
     public CharSequence translateProblem(Sequent sequent, Services services, SMTSettings settings) {
 
@@ -44,13 +36,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
 
         List<Term> sequentAsserts = getTermsFromSequent(sequent, services);
-
-        List<SExpr> results = new LinkedList<>();
-        for (Term t : sequentAsserts) {
-            results.add(master.translate(t, Type.BOOL));
-        }
-
-        // result = postProcess(result);
+        List<SExpr> sequentSMTAsserts = makeSMTAsserts(master, sequentAsserts);
 
         StringBuilder sb = new StringBuilder();
 
@@ -59,34 +45,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             w.appendTo(sb);
         }
 
-        sb.append("; --- Declarations");
-
-        if (sequent.succedent().size() != 0 || sequent.antecedent().size() != 0) {
-            master.addSort(Sort.ANY);
-            // TODO: Sorts introduced by the DefinedSymbolsHandler are unfortunately not yet added automatically.
-            // To mitiage, at least add Null.
-//            master.addSort(services.getNamespaces().sorts().lookup("Null"));
-//            System.out.println(services.getNamespaces().sorts().lookup("Null"));
-            for (Term t : sequentAsserts) {
-                addAllSorts(t, master);
-            }
-        }
-
-        List<SExpr> sortExprs = new LinkedList<>();
-        for (Sort s : master.getSorts()) {
-            if (s != Sort.ANY && !(TypeManager.isSpecialSort(s))) {
-                master.addDeclaration(new SExpr("declare-const", SExprs.sortExpr(s).toString(), "T"));
-            }
-            sortExprs.add(SExprs.sortExpr(s));
-        }
-        if (master.getSorts().size() > 1) {
-            master.addDeclaration(new SExpr("assert", Type.BOOL,
-                    new SExpr("distinct", Type.BOOL, sortExprs)));
-        }
-        sb.append("\n");
-
-        TypeManager tm = new TypeManager();
-        tm.createSortTypeHierarchy(master, services);
+        sb.append("; --- Declarations\n");
+        extractSortDeclarations(sequent, services, master, sequentAsserts);
 
         for (Writable decl : master.getDeclarations()) {
             decl.appendTo(sb);
@@ -100,7 +60,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
 
         sb.append("\n; --- Sequent\n");
-        for (SExpr ass : results) {
+        for (SExpr ass : sequentSMTAsserts) {
             SExpr assertion = new SExpr("assert", ass);
             assertion.appendTo(sb);
             sb.append("\n");
@@ -127,8 +87,49 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             throw new RuntimeException(exceptions.get(0));
         }
 
-
         return sb;
+    }
+
+    /*
+     * precompute the information on the required sources from the translation.
+     */
+    private void extractSortDeclarations(Sequent sequent, Services services, MasterHandler master, List<Term> sequentAsserts) {
+        if (!sequentAsserts.isEmpty()) {
+            master.addSort(Sort.ANY);
+            for (Term t : sequentAsserts) {
+                addAllSorts(t, master);
+            }
+        }
+
+        // turn all known sorts into sort constants ...
+        List<SExpr> sortExprs = new LinkedList<>();
+        for (Sort s : master.getSorts()) {
+            if (s != Sort.ANY && !(TypeManager.isSpecialSort(s))) {
+                master.addDeclaration(new SExpr("declare-const", SExprs.sortExpr(s).toString(), "T"));
+            }
+            sortExprs.add(SExprs.sortExpr(s));
+        }
+
+        // ... which are distinct
+        if (master.getSorts().size() > 1) {
+            master.addDeclaration(new SExpr("assert", Type.BOOL,
+                    new SExpr("distinct", Type.BOOL, sortExprs)));
+        }
+
+        // and have a type hierarchy.
+        TypeManager tm = new TypeManager();
+        tm.createSortTypeHierarchy(master, services);
+    }
+
+    /*
+     * extract a sequent into an SMT collection
+     */
+    private List<SExpr> makeSMTAsserts(MasterHandler master, List<Term> sequentAsserts) {
+        List<SExpr> sequentSMTAsserts = new LinkedList<>();
+        for (Term t : sequentAsserts) {
+            sequentSMTAsserts.add(master.translate(t, Type.BOOL));
+        }
+        return sequentSMTAsserts;
     }
 
     /**
@@ -137,9 +138,14 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * @param master the master handler of the problem
      */
     // TODO js: expressions within updates are not found by this, which leads to failures.
+    // TODO: Ideally this method can be removed if all sorts are detected on-the-fly.
+    // Once there no more "XXX" printlns, remove this method (and its calling loop)
     private void addAllSorts(Term problem, MasterHandler master) {
         Sort s = problem.sort();
-        master.addSort(s);
+        if(!master.getSorts().contains(s)) {
+            System.err.println("XXX smt2 translation: Missing sort " + s);
+            master.addSort(s);
+        }
         for (Term t : problem.subs()) {
             addAllSorts(t, master);
         }
@@ -164,7 +170,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     }
 
     /*
-     * Turn a sequent to collection of formuls. Antecedent positive, succedent negated.
+     * Turn a sequent to a collection of formulas. Antecedent positive, succedent negated.
      */
     private List<Term> getTermsFromSequent(Sequent seq, Services serv) {
         TermBuilder tb = serv.getTermBuilder();
@@ -193,18 +199,6 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
 
         return result.map(this::postProcess);
-    }
-
-    @Override
-    public ArrayList<StringBuffer> translateTaclets(Services services, SMTSettings settings) throws IllegalFormulaException {
-        // not yet implemented. maybe adapt the existing method from abstractsmttranslator
-        return null;
-    }
-
-    @Override
-    public Collection<Throwable> getExceptionsOfTacletTranslation() {
-        // Currently, no taclets are translated, we return an empty list.
-        return Collections.emptyList();
     }
 
 }

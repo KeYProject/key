@@ -20,6 +20,11 @@ import java.util.Set;
 public class SExprs {
 
     /**
+     * The string prefix used for sort names in SMT,
+     */
+    public static final String SORT_PREFIX = "sort_";
+
+    /**
      * The constant "true" of type Bool
      */
     public static final SExpr TRUE = new SExpr("true", Type.BOOL);
@@ -28,6 +33,11 @@ public class SExprs {
      * The constant "false" of type Bool
      */
     public static final SExpr FALSE = new SExpr("false", Type.BOOL);
+
+    /**
+     * The constant "0" of type Int
+     */
+    public static final SExpr ZERO = new SExpr("0", Type.INT);
 
     /**
      * Produce a conjunction of SExprs.
@@ -195,13 +205,13 @@ public class SExprs {
 
     /**
      * Turn a KeY sort into an SMT sort (by prefixing
-     * {@link ModularSMTLib2Translator#SORT_PREFIX}.
+     * {@link #SORT_PREFIX}.
      *
      * @param sort the sort to translate to SMT
      * @return an SEXpr representing the sort (of type T)
      */
     public static SExpr sortExpr(Sort sort) {
-        return new SExpr(ModularSMTLib2Translator.SORT_PREFIX + sort.toString());
+        return new SExpr(SORT_PREFIX + sort.toString());
     }
 
     /**
@@ -260,10 +270,6 @@ public class SExprs {
     public static SExpr greaterEqual(SExpr a, SExpr b) throws SMTTranslationException {
         return new SExpr(">=", Type.BOOL,
                 SExprs.coerce(a, Type.INT), SExprs.coerce(b, Type.INT));
-    }
-
-    public static SExpr zero() {
-        return new SExpr("0", Type.INT);
     }
 
     public static SExpr lessEqual(SExpr a, SExpr b) throws SMTTranslationException {
