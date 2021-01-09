@@ -283,8 +283,7 @@ public class SExprs {
     }
 
     public static SExpr eq(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr("=", Type.BOOL,
-                SExprs.coerce(a, Type.INT), SExprs.coerce(b, Type.INT));
+        return new SExpr("=", Type.BOOL, a, b);
     }
 
     public static SExpr minus(SExpr a, SExpr b) throws SMTTranslationException {

@@ -134,7 +134,8 @@ public class SeqDefHandler implements SMTHandler {
 
         // \forall i; \forall params and(guards, i_range) -> seqGet(function(params), i) = term
         SExpr app = makeApplication(function, vars);
-        SExpr i = new SExpr(term.boundVars().last().name().toString(), Type.UNIVERSE);
+        String name = LogicalVariableHandler.VAR_PREFIX + term.boundVars().last().name().toString();
+        SExpr i = new SExpr(name, Type.UNIVERSE);
         qvars.add(new SExpr(i, new SExpr("U")));
         guards.add(SExprs.lessEqual(SExprs.ZERO, i));
         guards.add(SExprs.lessThan(i, new SExpr("seqLen", Type.UNIVERSE, app)));
