@@ -26,8 +26,15 @@ public class ThLemma extends ProofRule {
             Term cutTerm = extractRuleAntecedents(ctx);
             TacletApp app = ReplayTools.createCutApp(goal, cutTerm);
             List<Goal> goals = goal.apply(app).toList();
-            // TODO: finish implementation
-            throw new IllegalStateException("Not yet implemented: th-lemma as non-closing rule!");
+
+            Goal left = goals.get(1);
+            ReplayTools.runAutoMode(left);
+            //assert left.node().isClosed();
+
+            ////////////////////////////////////////////////////////////////////////////////////////
+
+            goal = goals.get(0);
+            replayRightSideHelper(ctx);
         } else {
             // leaf rule
             ReplayTools.runAutoMode(goal);

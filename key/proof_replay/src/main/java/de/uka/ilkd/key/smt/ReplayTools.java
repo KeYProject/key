@@ -314,6 +314,8 @@ public final class ReplayTools {
             return extractPosition(varName, ctx.noproofterm(0));
         }
 
+        // TODO: IMPORTANT: implement descending into symbols bound by let!!!
+
         if (ctx.qual_identifier() != null) {
             if (ctx.qual_identifier().identifier().SYMBOL().getText().equals(varName)) {
                 return new LinkedList<>();
@@ -373,5 +375,23 @@ public final class ReplayTools {
         } else {
             throw new IllegalStateException("This should not happen!");
         }
+    }
+
+    public static Sort extractSort(Services services, SMTSymbolRetranslator retranslator,
+                                   String varName, ProofsexprContext ctx, String fallbackSortName) {
+        // we try to extract the sort from a typeguard (otherwise the sorts when creating
+        // function terms will not match!)
+        TypeguardSortCollector sortCollector = new TypeguardSortCollector(services, varName,
+            retranslator);
+        Sort sort = sortCollector.visit(ctx.proofsexpr(0));
+        if (sort == null) {
+            // if no typeguard is present we use the sort from declaration
+            sort = retranslator.translateSort(fallbackSortName);
+
+            if (sort == null) {
+                sort = Sort.ANY;    // fallback sort
+            }
+        }
+        return sort;
     }
 }

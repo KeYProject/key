@@ -34,3 +34,7 @@ sourceSets {
 application {
     mainClassName = "de.uka.ilkd.key.smt.Main"
 }
+
+run {
+    enableAssertions = true
+}

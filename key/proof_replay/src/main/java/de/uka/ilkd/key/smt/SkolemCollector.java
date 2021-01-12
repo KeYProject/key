@@ -176,21 +176,9 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
 
             for (int i = 0; i < ctx.sorted_var().size(); i++) {
                 String varName = ctx.sorted_var(i).SYMBOL().getText();
-
-                // we try to extract the sort from a typeguard (otherwise the sorts when creating
-                // function terms will not match!)
-                TypeguardSortCollector sortCollector = new TypeguardSortCollector(services, varName,
-                                                                                  retranslator);
-                Sort sort = sortCollector.visit(ctx.proofsexpr(0));
-                if (sort == null) {
-                    // if no typeguard is present we use the sort from declaration
-                    String sortName = ctx.sorted_var(i).sort().getText();
-                    sort = retranslator.translateSort(sortName);
-
-                    if (sort == null) {
-                        sort = Sort.ANY;    // fallback sort
-                    }
-                }
+                String fallbackSortName = ctx.sorted_var(i).sort().getText();
+                Sort sort = ReplayTools.extractSort(services, retranslator, varName, ctx,
+                    fallbackSortName);
 
                 QuantifiableVariable qv = retranslator.translateOrCreateLogicVariable(varName,
                                                                                       sort);

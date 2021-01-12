@@ -78,6 +78,7 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
                 ProofsexprContext next = ctx.proofsexpr(0);
                 ParserRuleContext def = smtReplayer.getSymbolDef(next.getText(), next);
                 if (def != null) {      // bound by let
+                    System.out.println(next.getText() + " (shared noproofterm)");
                     next = (ProofsexprContext) def;
                 }
                 // now next must be a lambda term
@@ -85,22 +86,10 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
                     for (int i = 0; i < next.sorted_var().size(); i++) {
                         // we need to extract the actual type from the typeguard
                         String varName = next.sorted_var(i).SYMBOL().getText();
+                        String fallbackSortName = next.sorted_var(i).sort().getText();
 
-                        // we try to extract the sort from a typeguard (otherwise the sorts when
-                        // creating function terms will not match!)
-                        TypeguardSortCollector sortCollector = new TypeguardSortCollector(services,
-                            varName, retranslator);
-                        Sort sort = sortCollector.visit(next);
-
-                        if (sort == null) {
-                            // if no typeguard is present we use the sort from declaration
-                            String sortName = next.sorted_var(i).sort().getText();
-                            sort = retranslator.translateSort(sortName);
-
-                            if (sort == null) {
-                                sort = Sort.ANY;    // fallback sort
-                            }
-                        }
+                        Sort sort = ReplayTools.extractSort(services, retranslator, varName, next,
+                            fallbackSortName);
 
                         QuantifiableVariable qv =
                             retranslator.translateOrCreateLogicVariable(varName, sort);
@@ -125,6 +114,7 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
 
             ParserRuleContext def = smtReplayer.getSymbolDef(succedent.getText(), ctx);
             if (def != null) {
+                System.out.println(succedent.getText() + " (shared noproofterm)");
                 // descend further if this still is a symbol bound by let
                 return visit(def);
             } else if (smtReplayer.getTranslationToTerm(succedent.getText()) != null) {
@@ -166,6 +156,7 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
 
         if (proofsexpr != null) {
             // descend into nested let term
+            System.out.println(ctx.getText() + " (shared noproofterm)");
             return visit(proofsexpr);
         }
 
@@ -298,12 +289,16 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
                 t2 = visit(ctx.noproofterm(2));
                 integerLDT = services.getTypeConverter().getIntegerLDT();
                 return tb.func(integerLDT.getMul(), t1, t2);
-            case "/":       // Z3 does probably not use this
             case "div":
                 t1 = visit(ctx.noproofterm(1));
                 t2 = visit(ctx.noproofterm(2));
                 integerLDT = services.getTypeConverter().getIntegerLDT();
                 return tb.func(integerLDT.getDiv(), t1, t2);
+            case "mod":
+                t1 = visit(ctx.noproofterm(1));
+                t2 = visit(ctx.noproofterm(2));
+                integerLDT = services.getTypeConverter().getIntegerLDT();
+                return tb.func(integerLDT.getMod(), t1, t2);
             case "u2i":     // this is effectively a cast to int
                 t1 = visit(ctx.noproofterm(1));
                 Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
@@ -502,9 +497,9 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
 
         NoprooftermContext typeguard = extractTypeguard(quantForm);
         if (typeguard == null) {
-            // translate to variable of sort any
-            //return new LogicVariable(name, Sort.ANY);
-            return retranslator.translateOrCreateLogicVariable(origVarName, Sort.ANY);
+            // this is not always Any here! For int, the translation is done to Int
+            Sort sort = retranslator.translateSort(sortedVar.sort().getText());
+            return retranslator.translateOrCreateLogicVariable(origVarName, sort);
         }
         // typeguard has the following form: (typeguard var_x sort_int)
         NoprooftermContext nameCtx = typeguard.noproofterm(1);

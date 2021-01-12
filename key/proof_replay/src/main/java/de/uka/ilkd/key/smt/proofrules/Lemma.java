@@ -132,6 +132,7 @@ public class Lemma extends ProofRule {
         } else {
             hypoCount = 1;
             assert rest.op() == Junctor.NOT;
+            // TODO: negate if positive!
             hypotheses.add(rest.sub(0));
         }
         return hypotheses;

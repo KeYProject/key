@@ -191,6 +191,7 @@ public class ReplayVisitor extends SMTProofBaseVisitor<Void> {
     public Void visitIdentifier(IdentifierContext ctx) {
         ParserRuleContext def = smtReplayer.getSymbolDef(ctx.getText(), ctx);
         if (def != null) {
+            System.out.println(ctx.getText() + " (proof term)");
             // continue proof replay with the partial tree from the symbol table
             visit(def);
         }

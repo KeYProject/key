@@ -7,10 +7,15 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import java.io.*;
 import java.nio.file.*;
@@ -32,7 +37,7 @@ public class Main {
     private static Path outDir;
 
     private static class StatEntry {
-        Path p;
+        final Path p;
         long keyTime;
         int keyNodes;
         long z3TranslationLines;
@@ -41,6 +46,10 @@ public class Main {
         long replayTime;
         int replayNodes;
         ProofState replayState = ProofState.UNKOWN;
+
+        StatEntry(Path p) {
+            this.p = p;
+        }
     }
 
     private enum ProofState {
@@ -185,33 +194,49 @@ public class Main {
         if (input.toString().endsWith(".key")) {
             try {
                 System.out.println("Processing " + input.toString());
-                Path outPath = outDir.resolve(input.getName(input.getNameCount() - 2) + "_" +
-                            input.getFileName().toString() + "_output.smt2");
                 runeWithKeYAuto(input);
-                runZ3ToFile(input);
+                //runZ3ToFile(input);
             } catch (ProblemLoaderException | IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private static void runeWithKeYAuto(Path input) throws ProblemLoaderException {
+    private static void runeWithKeYAuto(Path input) throws ProblemLoaderException, IOException {
         ProofManagementApi pm = KeYApi.loadFromKeyFile(input.toFile());
         ProofApi papi = pm.getLoadedProof();
         Proof proof = papi.getProof();
-
         UserInterfaceControl uic = new DefaultUserInterfaceControl();
+
+        long manualTime = System.currentTimeMillis();
         uic.getProofControl().startAndWaitForAutoMode(proof);
+        manualTime = System.currentTimeMillis() - manualTime;
 
         int nodes = proof.getStatistics().nodes;
         updateKeYNodes(input, nodes);
 
+        // this should initialize with the default propertiese,
+        // necessary to enable quantifier instantiation
+        StrategyProperties properties = new StrategyProperties();
+
+        Strategy strategy = new JavaCardDLStrategyFactory().create(proof, properties);
+        proof.setActiveStrategy(strategy);
+        proof.getSettings().getStrategySettings().setMaxSteps(20000);
+        proof.getSettings().getStrategySettings().setTimeout(60000);
+
         long keyTime = proof.getStatistics().autoModeTimeInMillis;
+        System.out.println("   KeY statistics: " + keyTime);
+        System.out.println("   Manual logging: " + manualTime);
+
         if (proof.closed()) {
             updateKeYTime(input, keyTime);
         } else {
             updateKeYTime(input, -keyTime);
         }
+        Path proofPath = getOutPath(input, "_key.proof");
+        ProofSaver saver = new ProofSaver(proof, proofPath.toFile());
+        saver.save();
+
         papi.getEnv().dispose();
     }
 
@@ -260,7 +285,7 @@ public class Main {
                 String smtTranslation = z3.getTranslation();
                 updateZ3TtranslationLines(input, countLines(smtTranslation));
                 try {
-                    Files.write(replaceExtension(input, "_translation.smt2"), smtTranslation.getBytes());
+                    Files.write(getOutPath(input, "_translation.smt2"), smtTranslation.getBytes());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -271,7 +296,7 @@ public class Main {
                     try {
                         appendValid(input);
 
-                        Path outPath = replaceExtension(input, "_proof.smt2");
+                        Path outPath = getOutPath(input, "_proof.smt2");
                         updateZ3ProofLines(input, countLines(z3Proof));
                         Files.write(outPath, z3Proof.getBytes());
 
@@ -313,11 +338,13 @@ public class Main {
         return input.chars().filter(ch -> ch == '\n').count();
     }
 
-    private static Path replaceExtension(Path path, String newExt) {
-        //Path dir = path.getParent();
-        Path fileName = path.getFileName();
-        String name = fileName.toString().substring(0, fileName.toString().lastIndexOf('.'));
-        String newName = name + newExt;
+    private static Path getOutPath(Path input, String newExt) {
+        String origFileName = input.getFileName().toString();
+        String name = origFileName.substring(0, origFileName.lastIndexOf('.'));
+        String prefixedName = input.getName(input.getNameCount() - 3)
+                + "_" + input.getName(input.getNameCount() - 2)
+                + "_" + name;
+        String newName = prefixedName + newExt;
         return outDir.resolve(newName);
     }
 
@@ -326,8 +353,8 @@ public class Main {
             SMTReplayer replayer = new SMTReplayer(problem);
 
             // prepare logging stdout to file
-            Path log = replaceExtension(inPath, ".log");
-            Path proofPath = replaceExtension(inPath, ".proof");
+            Path log = getOutPath(inPath, ".log");
+            Path proofPath = getOutPath(inPath, ".proof");
 
             PrintStream printStream = new PrintStream(log.toFile());
             System.setOut(printStream);
@@ -361,7 +388,7 @@ public class Main {
     private static void updateReplayTime(Path p, long replayTime) {
         StatEntry stats = STATS.get(p);
         if (stats == null) {
-            stats = new StatEntry();
+            stats = new StatEntry(p);
         }
         stats.replayTime = replayTime;
         STATS.put(p, stats);
@@ -371,7 +398,7 @@ public class Main {
     private static void updateReplayNodes(Path p, int replayNodes) {
         StatEntry stats = STATS.get(p);
         if (stats == null) {
-            stats = new StatEntry();
+            stats = new StatEntry(p);
         }
         stats.replayNodes = replayNodes;
         STATS.put(p, stats);
@@ -380,7 +407,7 @@ public class Main {
     private static void updateReplayState(Path p, ProofState replayState) {
         StatEntry stats = STATS.get(p);
         if (stats == null) {
-            stats = new StatEntry();
+            stats = new StatEntry(p);
         }
         stats.replayState = replayState;
         STATS.put(p, stats);
@@ -389,7 +416,7 @@ public class Main {
     private static void updateZ3Time(Path p, long z3Time) {
         StatEntry stats = STATS.get(p);
         if (stats == null) {
-            stats = new StatEntry();
+            stats = new StatEntry(p);
         }
         stats.translationAndZ3Time = z3Time;
         STATS.put(p, stats);
@@ -398,7 +425,7 @@ public class Main {
     private static void updateZ3TtranslationLines(Path p, long z3TranslationLines) {
         StatEntry stats = STATS.get(p);
         if (stats == null) {
-            stats = new StatEntry();
+            stats = new StatEntry(p);
         }
         stats.z3TranslationLines = z3TranslationLines;
         STATS.put(p, stats);
@@ -407,7 +434,7 @@ public class Main {
     private static void updateZ3ProofLines(Path p, long z3ProofLines) {
         StatEntry stats = STATS.get(p);
         if (stats == null) {
-            stats = new StatEntry();
+            stats = new StatEntry(p);
         }
         stats.z3ProofLines = z3ProofLines;
         STATS.put(p, stats);
@@ -416,7 +443,7 @@ public class Main {
     private static void updateKeYNodes(Path p, int keyNodes) {
         StatEntry stats = STATS.get(p);
         if (stats == null) {
-            stats = new StatEntry();
+            stats = new StatEntry(p);
         }
         stats.keyNodes = keyNodes;
         STATS.put(p, stats);
@@ -426,7 +453,7 @@ public class Main {
     private static void updateKeYTime(Path p, long keyTime) {
         StatEntry stats = STATS.get(p);
         if (stats == null) {
-            stats = new StatEntry();
+            stats = new StatEntry(p);
         }
         stats.keyTime = keyTime;
         STATS.put(p, stats);

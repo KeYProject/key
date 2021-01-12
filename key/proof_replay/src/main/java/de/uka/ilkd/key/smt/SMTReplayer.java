@@ -246,6 +246,7 @@ public class SMTReplayer {
         if (ctxNS != null) {
             NamedParserRuleContext nprc = ctxNS.lookup(symbol);
             if (nprc != null) {
+                //System.out.println(symbol + " (shared proof or noproofterm)");
                 return nprc.getCtx();
             }
         }
