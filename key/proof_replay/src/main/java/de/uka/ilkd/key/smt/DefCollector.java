@@ -52,8 +52,8 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
     public DefCollector(SMTReplayer smtReplayer, Services services,
                         Deque<Pair<QuantifiableVariable, Term>> skolemSymbols) {
         this(smtReplayer, services, skolemSymbols, new LinkedList<>());
-
     }
+
     public DefCollector(SMTReplayer smtReplayer, Services services,
                         Deque<Pair<QuantifiableVariable, Term>> skolemSymbols,
                         Deque<QuantifiableVariable> boundVars) {
@@ -66,6 +66,25 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
         // visited
         this.skolemSymbols = skolemSymbols;
         this.boundVars = boundVars;
+    }
+
+    public static Term convertToKeY(SMTReplayer smtReplayer, Services services,
+                                    ParserRuleContext ctx) {
+        DefCollector collector = new DefCollector(smtReplayer, services);
+        return collector.visit(ctx);
+    }
+
+    public static Term convertToKeY(SMTReplayer smtReplayer, Deque<QuantifiableVariable> boundVars,
+                                    Services services, ParserRuleContext ctx) {
+        DefCollector collector = new DefCollector(smtReplayer, boundVars, services);
+        return collector.visit(ctx);
+    }
+
+    public static Term convertToKeY(SMTReplayer smtReplayer, Services services,
+                                    Deque<Pair<QuantifiableVariable, Term>> skolemSymbols,
+                                    ParserRuleContext ctx) {
+        DefCollector collector = new DefCollector(smtReplayer, services, skolemSymbols);
+        return collector.visit(ctx);
     }
 
     @Override

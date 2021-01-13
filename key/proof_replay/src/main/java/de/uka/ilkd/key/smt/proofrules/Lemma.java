@@ -6,13 +6,14 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.smt.ReplayTools;
-import de.uka.ilkd.key.smt.ReplayVisitor;
-import de.uka.ilkd.key.smt.SMTProofParser;
+import de.uka.ilkd.key.smt.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import static de.uka.ilkd.key.smt.SMTProofParser.*;
 import static de.uka.ilkd.key.smt.SMTProofParser.ProofsexprContext;
 
 public class Lemma extends ProofRule {
@@ -22,15 +23,29 @@ public class Lemma extends ProofRule {
 
     @Override
     public Goal replay(ProofsexprContext ctx) {
-        // note: connected to hypothesis rule, see method replayHypothesis()
-        List<Term> hypotheses = extractHypotheses(ctx);
+        // note: connected to hypothesis rule, see class Hypothesis
+        //List<Term> hypotheses = extractHypotheses(ctx);
+        SMTReplayer replayer = replayVisitor.getSmtReplayer();
+        Set<NoprooftermContext> hypotheses = HypothesisExtractor.extractHypotheses(replayer, ctx);
 
         assert hypotheses.size() >= 1;
 
+        List<Term> hypothesisTerms = new ArrayList<>();
+
         TermFactory tf = services.getTermFactory();
-        Term cutTerm = hypotheses.get(0);
-        for (int i = 1; i < hypotheses.size(); i++) {
-            Term h = hypotheses.get(i);
+        //Term cutTerm = hypotheses.get(0);
+        Iterator<NoprooftermContext> it = hypotheses.iterator();
+
+        // TODO: bound vars/skolem symbols?
+        Term cutTerm = DefCollector.convertToKeY(replayer, services, it.next());
+        hypothesisTerms.add(cutTerm);
+        //for (int i = 1; i < hypotheses.size(); i++) {
+        while (it.hasNext()) {
+            //Term h = hypotheses.get(i);
+
+            // TODO: bound vars/skolem symbols?
+            Term h = DefCollector.convertToKeY(replayer, services, it.next());
+            hypothesisTerms.add(h);
             h = ReplayTools.ensureFormula(h, services);
             cutTerm = tf.createTerm(Junctor.AND, cutTerm, h);
         }
@@ -77,7 +92,7 @@ public class Lemma extends ProofRule {
         */
 
         // hide hypotheses and remember the mapping to insert_taclets
-        for (Term h : hypotheses) {
+        for (Term h : hypothesisTerms) {
             // fix: we need the exact SequentFormula instance!
             //SequentFormula hf = new SequentFormula(h);
             SequentFormula hf = findSequentFormulaForTerm(goal, h, true);
@@ -97,22 +112,26 @@ public class Lemma extends ProofRule {
         replayRightSideHelper(ctx, cutFormula);
 
         // since we leave this subtree now, hypotheses are no longer available
-        for (Term h : hypotheses) {
+        for (Term h : hypothesisTerms) {
             replayVisitor.getHypoTaclets().remove(h);
         }
         return goal;
     }
 
+    // Note: it is not sufficient to look only at the at the lemma rule only:
+    //  One can not decide if a term (!l1 | ... | !ln) are n hypotheses or a single one.
+    //  Therefore, HypothesisExtractor visitor should be used, which walks the proof tree and
+    //  the used hypotheses directly from "hypothesis" rules.
     // helper method for replayLemma()
     private List<Term> extractHypotheses(ProofsexprContext ctx) {
         // format: (or !h0 !h1 ... !hn)
         List<Term> hypotheses = new ArrayList<>();
-        SMTProofParser.NoprooftermContext conclCtx = extractRuleConclusionCtx(ctx).noproofterm();
+        NoprooftermContext conclCtx = extractRuleConclusionCtx(ctx).noproofterm();
 
         Term rest = extractRuleConclusion(ctx);
 
         int hypoCount = 0;
-        if (conclCtx.rulename != null && conclCtx.rulename.getText().equals("or")) {
+        if (conclCtx.func != null && conclCtx.func.getText().equals("or")) {
             hypoCount = conclCtx.noproofterm().size() - 1;  // "or" + params
 
             for (int i = 0; i < hypoCount; i++) {
