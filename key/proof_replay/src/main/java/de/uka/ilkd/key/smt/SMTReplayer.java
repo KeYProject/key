@@ -9,6 +9,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.smt.SMTProofParser.ProofsexprContext;
 import de.uka.ilkd.key.smt.SMTProofParser.SmtoutputContext;
 import de.uka.ilkd.key.smt.SMTProofParser.Var_bindingContext;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import org.antlr.v4.runtime.CharStream;
@@ -118,6 +119,15 @@ public class SMTReplayer {
         goal = problem.getGoal();
         original = goal;
         proof = goal.proof();
+
+        // make sure quantifier handling is enabled (otherwise automatic proof search, for example
+        // for nnf-pos/-neg, will not be able to close some goals)
+        // TODO: this could be set locally for only the relevant sub-goals
+        // set to default Java strategy
+        StrategyProperties properties = new StrategyProperties();
+        Strategy strategy = new JavaCardDLStrategyFactory().create(proof, properties);
+        proof.setActiveStrategy(strategy);
+
         translationToTermMap = new LinkedHashMap<>();
 
         // we wrap the original String keys in SMTExprInContext to be aware of the bound variables
