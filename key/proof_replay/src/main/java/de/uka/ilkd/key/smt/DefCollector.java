@@ -514,35 +514,42 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
 
         //Name name = new Name(varName);
 
-        NoprooftermContext typeguard = extractTypeguard(quantForm);
-        if (typeguard == null) {
+        //NoprooftermContext typeguard = extractTypeguard(quantForm);
+        Sort keySort = TypeguardSortCollector.collect(services, origVarName, retranslator,
+            quantForm);
+        //NoprooftermContext typeguard = extractTypeguard(quantForm);
+        //if (typeguard == null) {
+        if (keySort == null) {
             // this is not always Any here! For int, the translation is done to Int
             Sort sort = retranslator.translateSort(sortedVar.sort().getText());
             return retranslator.translateOrCreateLogicVariable(origVarName, sort);
         }
+        /*
         // typeguard has the following form: (typeguard var_x sort_int)
         NoprooftermContext nameCtx = typeguard.noproofterm(1);
         NoprooftermContext sortCtx = typeguard.noproofterm(2);
         Sort keySort = retranslator.translateSort(sortCtx.getText());
+         */
 
         // TODO: SMT quantifiers may have multiple quantified variables
         return retranslator.translateOrCreateLogicVariable(origVarName, keySort);
         //return new LogicVariable(name, keySort);
     }
 
-    private NoprooftermContext extractTypeguard(NoprooftermContext quantForm) {
-        if (quantForm.func != null && quantForm.func.getText().equals("typeguard")) {
-            return quantForm;
-        } else {
-            for (NoprooftermContext child : quantForm.noproofterm()) {
-                NoprooftermContext res = extractTypeguard(child);
-                if (res != null) {
-                    return res;
-                }
-            }
-            return null;
-        }
-    }
+// TODO: does not find all typeguards, use TypeguardSortCollector instead!
+//    private NoprooftermContext extractTypeguard(NoprooftermContext quantForm) {
+//        if (quantForm.func != null && quantForm.func.getText().equals("typeguard")) {
+//            return quantForm;
+//        } else {
+//            for (NoprooftermContext child : quantForm.noproofterm()) {
+//                NoprooftermContext res = extractTypeguard(child);
+//                if (res != null) {
+//                    return res;
+//                }
+//            }
+//            return null;
+//        }
+//    }
 
     // does no boolean simplification as TermBuilder.equals() does,
     // returns <-> or = according to sort of terms

@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 
@@ -18,6 +19,13 @@ public class TypeguardSortCollector extends SMTProofBaseVisitor<Sort> {
         this.services = services;
         this.varName = varName;
         this.retranslator = retranslator;
+    }
+
+    public static Sort collect(Services services, String varName,
+                                   SMTSymbolRetranslator retranslator,
+                                   ParserRuleContext ctx) {
+        TypeguardSortCollector tsc = new TypeguardSortCollector(services, varName, retranslator);
+        return tsc.visit(ctx);
     }
 
     @Override
