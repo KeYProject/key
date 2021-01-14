@@ -343,6 +343,11 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
                 return createExactinstanceof(ctx);
             case "cast":
                 return createCast(ctx);
+            case "ite":
+                t1 = visit(ctx.noproofterm(1));
+                t2 = visit(ctx.noproofterm(2));
+                Term t3 = visit(ctx.noproofterm(3));
+                return tb.ife(t1, t2, t3);
             default:
 
                 // translate KeY predicates/functions (cut "u_" prefix)

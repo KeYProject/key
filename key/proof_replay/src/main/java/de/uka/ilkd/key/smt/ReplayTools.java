@@ -121,6 +121,8 @@ public final class ReplayTools {
     public static SequentFormula getLastAddedAntec(Goal goal, int index) {
         SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
         // formula could be redundant on the sequent
+        // TODO: does not cover the case that only some of the formulas are rejected!
+        //  in this case the index calculation has to be adapted (how is unclear)!
         if (sci.addedFormulas(true).isEmpty()) {
             return sci.rejectedFormulas(true).toList().get(index);
         }
@@ -139,6 +141,8 @@ public final class ReplayTools {
     public static SequentFormula getLastAddedSuc(Goal goal, int index) {
         SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
         // formula could be redundant on the sequent
+        // TODO: does not cover the case that only some of the formulas are rejected!
+        //  in this case the index calculation has to be adapted (how is unclear)!
         if (sci.addedFormulas(false).isEmpty()) {
             return sci.rejectedFormulas(false).toList().get(index);
         }

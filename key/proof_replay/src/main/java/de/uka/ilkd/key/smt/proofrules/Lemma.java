@@ -79,7 +79,9 @@ public class Lemma extends ProofRule {
         seqForm = ReplayTools.getLastAddedAntec(goal);
         for (int i = 0; i < hypotheses.size() - 1; i++) {
             goal = ReplayTools.applyNoSplitTopLevelAntec(goal, "andLeft", seqForm);
-            seqForm = ReplayTools.getLastModifiedSuc(goal);
+            if (i < hypotheses.size() - 2) {
+                seqForm = ReplayTools.getLastAddedAntec(goal, 1);
+            }
         }
 
         /*

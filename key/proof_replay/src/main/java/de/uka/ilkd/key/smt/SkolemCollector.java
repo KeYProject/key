@@ -54,7 +54,7 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
             ProofsexprContext succ = ctx.proofsexpr(0);
             // inside of the sk rule there is always an equisatisfiability Noproofterm
             NoprooftermContext eqSat = succ.noproofterm();
-            if (!eqSat.func.getText().equals("~")) {
+            if (eqSat.func == null || !eqSat.func.getText().equals("~")) {
                 throw new IllegalStateException("Found sk rule that does not contain ~ top level!");
             }
             // could be: ex x. phi(x) or !all x. phi(x)
