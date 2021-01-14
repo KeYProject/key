@@ -37,4 +37,5 @@ application {
 
 run {
     enableAssertions = true
+    //args = ["--create-provable-list"]
 }
