@@ -66,16 +66,17 @@ public class FocusRule implements BuiltInRule {
         final Goal resultGoal = result.head();
         Sequent sequent = resultGoal.sequent();
 
+        // TODO: we need to compare Strings here since equals for Terms does not work as expected!
         // irreversible: we do not create insert_hidden_... taclets for the deleted formulas!
         for (SequentFormula sf : sequent.antecedent()) {
-            if (!sf.equals(focus)) {
+            if (!sf.equals(focus) && !sf.toString().equals(focus.toString())) {
                 // delete
                 resultGoal.removeFormula(new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));
             }
         }
 
         for (SequentFormula sf : sequent.succedent()) {
-            if (!sf.equals(focus)) {
+            if (!sf.equals(focus) && !sf.toString().equals(focus.toString())) {
                 // delete
                 resultGoal.removeFormula(new PosInOccurrence(sf, PosInTerm.getTopLevel(), false));
             }
