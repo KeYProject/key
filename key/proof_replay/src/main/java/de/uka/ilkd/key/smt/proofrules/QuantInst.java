@@ -68,7 +68,7 @@ public class QuantInst extends ProofRule {
                     Term subR = allInst.sub(1);
                     allInst = (subL.op() == Junctor.TRUE) ? subR : subL;
                     app = app.addInstantiation(qvSv, allInst, true, services);
-                    goal = goal.apply(app).head();
+                    goal = ReplayTools.applyInteractive(goal, app).head();
 
                     // in this case, the formulas have different structures -> first order auto mode,
                     // closeable without additional quantifier instantiation
@@ -83,7 +83,7 @@ public class QuantInst extends ProofRule {
             }
 
             app = app.addInstantiation(qvSv, allInst, true, services);
-            goal = goal.apply(app).head();
+            goal = ReplayTools.applyInteractive(goal, app).head();
         }
 
         // replace_known_right + concrete_or_4 on a, b, c

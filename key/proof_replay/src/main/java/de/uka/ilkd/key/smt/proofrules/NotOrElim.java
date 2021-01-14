@@ -24,7 +24,7 @@ public class NotOrElim extends ProofRule {
         // notLeft, orRight ..., notRight, ..., closeAntec
         final Term cutTerm = extractRuleAntecedents(ctx);
         TacletApp app = ReplayTools.createCutApp(goal, cutTerm);
-        List<Goal> goals = goal.apply(app).toList();
+        List<Goal> goals = ReplayTools.applyInteractive(goal, app).toList();
         Goal left = goals.get(1);
         final SequentFormula rhs = left.sequent().succedent().get(0);
         SequentFormula seqForm = ReplayTools.getLastAddedAntec(left);
@@ -61,19 +61,19 @@ public class NotOrElim extends ProofRule {
             if (split.formula().equals(rhs.formula())) {
                 // found the literal -> close
                 // reinsert original rhs
-                left = left.apply(insertRule).head();
+                left = ReplayTools.applyInteractive(left, insertRule).head();
                 left = ReplayTools.applyNoSplitTopLevelAntec(left, "closeAntec", split);
                 break;
             } else if (ReplayTools.eqDifferentPolarity(seqForm, rhs)) {
                 // additional check necessary for pragmatic solution, see e.g. sequent
                 // !((p | q) | p) ==> !(p | q)
                 if (seqForm.formula().op() == Junctor.NOT) {
-                    left = left.apply(insertRule).head();
+                    left = ReplayTools.applyInteractive(left, insertRule).head();
                     left = ReplayTools.applyNoSplitTopLevelAntec(left, "notRight", seqForm);
                     seqForm = ReplayTools.getLastAddedAntec(left);
                     left = ReplayTools.applyNoSplitTopLevelAntec(left, "closeAntec", seqForm);
                 } else if (rhs.formula().op() == Junctor.NOT) {
-                    left = left.apply(insertRule).head();
+                    left = ReplayTools.applyInteractive(left, insertRule).head();
                     left = ReplayTools.applyNoSplitTopLevelAntec(left, "notElimRight", seqForm);
                     seqForm = ReplayTools.getLastAddedAntec(left);
                     left = ReplayTools.applyNoSplitTopLevelAntec(left, "closeAntec", seqForm);
@@ -90,7 +90,7 @@ public class NotOrElim extends ProofRule {
             seqForm = ReplayTools.getLastAddedAntec(left);
             // now closing must be possible (or there is something wrong)
             // reinsert original rhs
-            left = left.apply(insertRule).head();
+            left = ReplayTools.applyInteractive(left, insertRule).head();
 
             seqForm = ReplayTools.getLastAddedSuc(left);
             left = ReplayTools.applyNoSplitTopLevelSuc(left, "close", seqForm);

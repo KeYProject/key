@@ -38,7 +38,7 @@ public class UnitResolution extends ProofRule {
         }
 
         TacletApp app = ReplayTools.createCutApp(goal, cutTerm);
-        List<Goal> goals = goal.apply(app).toList();
+        List<Goal> goals = ReplayTools.applyInteractive(goal, app).toList();
         Goal left = goals.get(1);
 
         // first child is a | b | ...

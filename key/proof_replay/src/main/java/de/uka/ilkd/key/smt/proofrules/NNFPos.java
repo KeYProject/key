@@ -24,7 +24,7 @@ public class NNFPos extends ProofRule {
     public Goal replay(ProofsexprContext ctx) {
         Term antecedent = extractRuleAntecedents(ctx);
         TacletApp cutApp = ReplayTools.createCutApp(goal, antecedent);
-        List<Goal> goals = goal.apply(cutApp).toList();
+        List<Goal> goals = ReplayTools.applyInteractive(goal, cutApp).toList();
         Goal left = goals.get(1);
 
         // currently we run auto mode for converting to nnf

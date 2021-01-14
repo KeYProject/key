@@ -24,7 +24,7 @@ public class Commutativity extends ProofRule {
         Term cutTerm = extractRuleAntecedents(ctx);
 
         TacletApp cutApp = ReplayTools.createCutApp(goal, cutTerm);
-        List<Goal> goals = goal.apply(cutApp).toList();
+        List<Goal> goals = ReplayTools.applyInteractive(goal, cutApp).toList();
         Goal left = goals.get(1);
 
         ReplayTools.runAutoModePropositional(left, 1000);

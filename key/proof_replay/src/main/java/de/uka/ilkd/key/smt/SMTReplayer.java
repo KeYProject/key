@@ -215,14 +215,14 @@ public class SMTReplayer {
         for (SequentFormula sf : goal.sequent().antecedent().asList()) {
             PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), true);
             TacletApp hide = ReplayTools.createTacletApp("hide_left", pio, goal);
-            goal = goal.apply(hide).head();
+            goal = ReplayTools.applyInteractive(goal, hide).head();
             NoPosTacletApp insertRule = goal.node().getLocalIntroducedRules().iterator().next();
             sf2InsertTaclet.put(sf, insertRule);
         }
         for (SequentFormula sf : goal.sequent().succedent().asList()) {
             PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
             TacletApp hide = ReplayTools.createTacletApp("hide_right", pio, goal);
-            goal = goal.apply(hide).head();
+            goal = ReplayTools.applyInteractive(goal, hide).head();
             NoPosTacletApp insertRule = goal.node().getLocalIntroducedRules().iterator().next();
             sf2InsertTaclet.put(sf, insertRule);
         }

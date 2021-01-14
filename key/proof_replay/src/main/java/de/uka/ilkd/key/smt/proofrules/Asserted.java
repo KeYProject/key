@@ -36,19 +36,19 @@ public class Asserted extends ProofRule {
         TacletApp notApp = replayVisitor.getSmtReplayer().getInsertTacletForSF(negForm);
 
         if (app != null) {
-            goal = goal.apply(app).head();
+            goal = ReplayTools.applyInteractive(goal, app).head();
         } else if (notApp != null) {
-            goal = goal.apply(notApp).head();
+            goal = ReplayTools.applyInteractive(goal, notApp).head();
 
             if (seqForm.formula().op() == Junctor.NOT) {
                 app = ReplayTools.createTacletApp("notRight", pio, goal);
-                goal = goal.apply(app).head();
+                goal = ReplayTools.applyInteractive(goal, app).head();
 
                 SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
                 SequentFormula addedAntec = sci.addedFormulas(true).head();
                 pio = new PosInOccurrence(addedAntec, PosInTerm.getTopLevel(), true);
                 app = ReplayTools.createTacletApp("closeAntec", pio, goal);
-                goal = goal.apply(app).head();
+                goal = ReplayTools.applyInteractive(goal, app).head();
             }
         } else {
             //throw new IllegalStateException("The formula " + seqForm.formula() + " is not an assertion!");
@@ -86,14 +86,14 @@ public class Asserted extends ProofRule {
 
     private Goal insertAllAssertions(Goal goal) {
         for (NoPosTacletApp t : replayVisitor.getSmtReplayer().getAllAssertionInsertTaclets()) {
-            goal = goal.apply(t).head();
+            goal = ReplayTools.applyInteractive(goal, t).head();
         }
         return goal;
     }
 
     private Goal insertAllHypotheses(Goal goal) {
         for (Map.Entry<Term, NoPosTacletApp> h : replayVisitor.getHypoTaclets().entrySet()) {
-            goal = goal.apply(h.getValue()).head();
+            goal = ReplayTools.applyInteractive(goal, h.getValue()).head();
         }
         return goal;
     }

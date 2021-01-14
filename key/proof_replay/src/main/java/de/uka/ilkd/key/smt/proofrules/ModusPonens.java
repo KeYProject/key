@@ -20,7 +20,7 @@ public class ModusPonens extends ProofRule {
     public Goal replay(ProofsexprContext ctx) {
         Term cutTerm = extractRuleAntecedents(ctx);
         TacletApp app = ReplayTools.createCutApp(goal, cutTerm);
-        List<Goal> goals = goal.apply(app).toList();
+        List<Goal> goals = ReplayTools.applyInteractive(goal, app).toList();
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         // left: and_left, replace_known_left, concrete_impl, close

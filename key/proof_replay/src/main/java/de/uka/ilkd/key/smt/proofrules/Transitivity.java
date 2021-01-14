@@ -24,31 +24,31 @@ public class Transitivity extends ProofRule {
     public Goal replay(ProofsexprContext ctx) {
         Term cutTerm = extractRuleAntecedents(ctx);
         TacletApp app = ReplayTools.createCutApp(goal, cutTerm);
-        List<Goal> goals = goal.apply(app).toList();
+        List<Goal> goals = ReplayTools.applyInteractive(goal, app).toList();
 
         Goal left = goals.get(1);
         SequentFormula seqForm = goal.sequent().antecedent().get(0);
         PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
         app = ReplayTools.createTacletApp("andLeft", pio, left);
-        left = left.apply(app).head();
+        left = ReplayTools.applyInteractive(left, app).head();
 
         seqForm = left.sequent().antecedent().get(1);
         // TODO: other operators
         //if (seqForm.formula().op().equals(Junctor.IMP)) { ... }
         pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
         app = ReplayTools.createTacletApp("insert_eqv_once_lr", pio, left);
-        left = left.apply(app).head();
+        left = ReplayTools.applyInteractive(left, app).head();
 
         NoPosTacletApp insertEqv = ReplayTools.findLocalRule("insert_eqv", left);
         seqForm = left.sequent().antecedent().get(0);
         pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel().down(1), true);
         app = ReplayTools.autoInst(insertEqv, pio, left);
-        left = left.apply(app).head();
+        left = ReplayTools.applyInteractive(left, app).head();
 
         seqForm = left.sequent().antecedent().get(0);
         pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
         app = ReplayTools.createTacletApp("closeAntec", pio, left);
-        left = left.apply(app).head();
+        left = ReplayTools.applyInteractive(left, app).head();
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);

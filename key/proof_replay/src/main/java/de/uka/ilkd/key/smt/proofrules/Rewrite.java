@@ -26,7 +26,7 @@ public class Rewrite extends ProofRule {
             SequentFormula seqForm = goal.sequent().succedent().get(0);
             PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
             TacletApp app = ReplayTools.createTacletApp("equiv_right", pio, goal);
-            List<Goal> goals = goal.apply(app).toList();
+            List<Goal> goals = ReplayTools.applyInteractive(goal, app).toList();
             // running automode separately on both goals increases success rate
             ReplayTools.runAutoMode(goals.get(0));
             ReplayTools.runAutoMode(goals.get(1));

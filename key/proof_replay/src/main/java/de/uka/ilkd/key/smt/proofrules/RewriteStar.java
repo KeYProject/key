@@ -21,7 +21,7 @@ public class RewriteStar extends ProofRule {
         // this rule should not be used except with CONTEXT_SIMPLIFIER=true or BIT2BOOL=true
         Term cutTerm = extractRuleAntecedents(ctx);
         TacletApp app = ReplayTools.createCutApp(goal, cutTerm);
-        List<Goal> goals = goal.apply(app).toList();
+        List<Goal> goals = ReplayTools.applyInteractive(goal, app).toList();
         Goal left = goals.get(1);
 
         // close this goal by auto mode

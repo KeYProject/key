@@ -25,7 +25,7 @@ public class Monotonicity extends ProofRule {
     public Goal replay(SMTProofParser.ProofsexprContext ctx) {
         Term cutTerm = extractRuleAntecedents(ctx);
         TacletApp app = ReplayTools.createCutApp(goal, cutTerm);
-        List<Goal> goals = goal.apply(app).toList();
+        List<Goal> goals = ReplayTools.applyInteractive(goal, app).toList();
 
         Goal left = goals.get(1);
 
@@ -52,7 +52,7 @@ public class Monotonicity extends ProofRule {
             while (seqForm.formula().op() == Junctor.AND) {
                 pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
                 app = ReplayTools.createTacletApp("andLeft", pio, left);
-                left = left.apply(app).head();
+                left = ReplayTools.applyInteractive(left, app).head();
                 seqForm = left.sequent().antecedent().get(0);
                 params++;
             }
@@ -64,13 +64,13 @@ public class Monotonicity extends ProofRule {
                 //seqForm = left.sequent().succedent().get(0);
                 //pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel().down(0).down(i), false);
                 //app = ReplayTools.createTacletApp("applyEq", pio, left);
-                //left = left.apply(app).head();
+                //left = ReplayTools.applyInteractive(left, app).head();
 
                 // <->
                 seqForm = left.sequent().antecedent().get(i);
                 pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), true);
                 app = ReplayTools.createTacletApp("insert_eqv_once_lr", pio, left);
-                left = left.apply(app).head();
+                left = ReplayTools.applyInteractive(left, app).head();
 
 
                 seqForm = left.sequent().succedent().get(0);
@@ -80,25 +80,25 @@ public class Monotonicity extends ProofRule {
                 Iterable<NoPosTacletApp> localRules = left.node().getLocalIntroducedRules();
                 app = localRules.iterator().next();
                 app = ReplayTools.autoInst(app, pio, left);
-                left = left.apply(app).head();
+                left = ReplayTools.applyInteractive(left, app).head();
             }
 
             // TODO: =
             //seqForm = left.sequent().succedent().get(0);
             //pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
             //app = ReplayTools.createTacletApp("eqClose", pio, left);
-            //left = left.apply(app).head();
+            //left = ReplayTools.applyInteractive(left, app).head();
 
             // <->
             seqForm = left.sequent().succedent().get(0);
             pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
             app = ReplayTools.createTacletApp("eq_eq", pio, left);
-            left = left.apply(app).head();
+            left = ReplayTools.applyInteractive(left, app).head();
 
             seqForm = left.sequent().succedent().get(0);
             pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
             app = ReplayTools.createTacletApp("closeTrue", pio, left);
-            left = left.apply(app).head();
+            left = ReplayTools.applyInteractive(left, app).head();
         } catch (Exception e) {
             // we show the exception, but only on cli
             e.printStackTrace();

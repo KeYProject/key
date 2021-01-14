@@ -21,7 +21,7 @@ public class AndElim extends ProofRule {
     public Goal replay(ProofsexprContext ctx) {
         final Term cutTerm = extractRuleAntecedents(ctx);
         final TacletApp app = ReplayTools.createCutApp(goal, cutTerm);
-        List<Goal> goals = goal.apply(app).toList();
+        List<Goal> goals = ReplayTools.applyInteractive(goal, app).toList();
         Goal left = goals.get(1);
         final SequentFormula orig = left.sequent().succedent().get(0);
 

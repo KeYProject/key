@@ -25,7 +25,7 @@ public class Hypothesis extends ProofRule {
                 + hypothesis);
         }
         NoPosTacletApp t = replayVisitor.getHypoTaclets().get(hypothesis);
-        goal = goal.apply(t).head();
+        goal = ReplayTools.applyInteractive(goal, t).head();
 
         // TODO: similar to asserted rule: more reasoning steps included (i.e. auto mode needed)?
         SequentFormula sf = ReplayTools.getLastAddedAntec(goal);

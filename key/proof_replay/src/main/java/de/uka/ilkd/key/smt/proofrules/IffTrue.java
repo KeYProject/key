@@ -21,7 +21,7 @@ public class IffTrue extends ProofRule {
         SequentFormula seqForm = goal.sequent().succedent().get(0);
         PosInOccurrence pio = new PosInOccurrence(seqForm, PosInTerm.getTopLevel(), false);
         TacletApp concreteEq3 = ReplayTools.createTacletApp("concrete_eq_3", pio, goal);
-        goal = goal.apply(concreteEq3).head();
+        goal = ReplayTools.applyInteractive(goal, concreteEq3).head();
         continueReplay(ctx.proofsexpr(0));
         return goal;
     }

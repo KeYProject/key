@@ -20,7 +20,7 @@ public class TransitivityStar extends ProofRule {
     public Goal replay(ProofsexprContext ctx) {
         Term cutTerm = extractRuleAntecedents(ctx);
         TacletApp app = ReplayTools.createCutApp(goal, cutTerm);
-        List<Goal> goals = goal.apply(app).toList();
+        List<Goal> goals = ReplayTools.applyInteractive(goal, app).toList();
 
         // trans* rule contains multiple transitivity and symmetry steps,
         // therefore we need auto mode here (however, should be really simple to close)

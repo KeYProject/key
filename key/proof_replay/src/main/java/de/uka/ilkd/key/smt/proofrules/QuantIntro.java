@@ -66,7 +66,7 @@ public class QuantIntro extends ProofRule {
         TacletApp cutApp = ReplayTools.createCutApp(goal, cutTerm);
         //assert cutTerm.equals(expectedTerm); // apart from renaming
 
-        List<Goal> goals = goal.apply(cutApp).toList();
+        List<Goal> goals = ReplayTools.applyInteractive(goal, cutApp).toList();
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         // forall x. forall y. ... p(x,y,...) <-> q(x,y,...)
@@ -77,7 +77,7 @@ public class QuantIntro extends ProofRule {
 
         PosInOccurrence pio = new PosInOccurrence(conclusion, PosInTerm.getTopLevel(), false);
         TacletApp splitEquiv = ReplayTools.createTacletApp("equiv_right", pio, left);
-        List<Goal> splitGoals = left.apply(splitEquiv).toList();
+        List<Goal> splitGoals = ReplayTools.applyInteractive(left, splitEquiv).toList();
         // forall x. p(x) <-> q(x), Q x. p(x) ==> Q x. q(x)
         Goal splitLeft = splitGoals.get(0);
         SequentFormula rhs = ReplayTools.getLastAddedSuc(splitLeft);
@@ -99,7 +99,7 @@ public class QuantIntro extends ProofRule {
         for (int i = 0; i < freeVarCount; i++) {
             pio = new PosInOccurrence(all, PosInTerm.getTopLevel(), false);
             TacletApp app = ReplayTools.createTacletApp("allRight", pio, goal);
-            goal = goal.apply(app).head();
+            goal = ReplayTools.applyInteractive(goal, app).head();
 
             // hide all other formulas
             SequentFormula skolemized = ReplayTools.getLastAddedSuc(goal);
@@ -155,7 +155,7 @@ public class QuantIntro extends ProofRule {
             // allRight
             PosInOccurrence pio = new PosInOccurrence(rhs, PosInTerm.getTopLevel(), false);
             TacletApp app = ReplayTools.createTacletApp("allRight", pio, goal);
-            goal = goal.apply(app).head();
+            goal = ReplayTools.applyInteractive(goal, app).head();
 
             rhs = ReplayTools.getLastAddedSuc(goal);
 
@@ -178,7 +178,7 @@ public class QuantIntro extends ProofRule {
             app = ReplayTools.createTacletApp("allLeft", pio, goal);
             SchemaVariable qvSv = app.uninstantiatedVars().iterator().next();
             app = app.addInstantiation(qvSv, inst, true, services);
-            goal = goal.apply(app).head();
+            goal = ReplayTools.applyInteractive(goal, app).head();
 
             lhs = ReplayTools.getLastAddedAntec(goal);
 
@@ -187,7 +187,7 @@ public class QuantIntro extends ProofRule {
             app = ReplayTools.createTacletApp("allLeft", pio, goal);
             qvSv = app.uninstantiatedVars().iterator().next();
             app = app.addInstantiation(qvSv, inst, true, services);
-            goal = goal.apply(app).head();
+            goal = ReplayTools.applyInteractive(goal, app).head();
 
             seqForm = ReplayTools.getLastAddedAntec(goal);
         }
@@ -252,7 +252,7 @@ public class QuantIntro extends ProofRule {
             // exLeft
             PosInOccurrence pio = new PosInOccurrence(lhs, PosInTerm.getTopLevel(), true);
             TacletApp app = ReplayTools.createTacletApp("exLeft", pio, goal);
-            goal = goal.apply(app).head();
+            goal = ReplayTools.applyInteractive(goal, app).head();
 
             lhs = ReplayTools.getLastAddedAntec(goal);
 
@@ -275,7 +275,7 @@ public class QuantIntro extends ProofRule {
             app = ReplayTools.createTacletApp("exRight", pio, goal);
             SchemaVariable qvSv = app.uninstantiatedVars().iterator().next();
             app = app.addInstantiation(qvSv, inst, true, services);
-            goal = goal.apply(app).head();
+            goal = ReplayTools.applyInteractive(goal, app).head();
 
             rhs = ReplayTools.getLastAddedSuc(goal);
 
@@ -284,7 +284,7 @@ public class QuantIntro extends ProofRule {
             app = ReplayTools.createTacletApp("allLeft", pio, goal);
             qvSv = app.uninstantiatedVars().iterator().next();
             app = app.addInstantiation(qvSv, inst, true, services);
-            goal = goal.apply(app).head();
+            goal = ReplayTools.applyInteractive(goal, app).head();
 
             seqForm = ReplayTools.getLastAddedAntec(goal);
         }

@@ -55,7 +55,7 @@ public class Lemma extends ProofRule {
 
         // apply cut
         TacletApp cutApp = ReplayTools.createCutApp(goal, cutTerm);
-        List<Goal> goals = goal.apply(cutApp).toList();
+        List<Goal> goals = ReplayTools.applyInteractive(goal, cutApp).toList();
         Goal left = goals.get(1);
 
         // todo: really simple steps on the original conlcusion
@@ -100,7 +100,7 @@ public class Lemma extends ProofRule {
 
             PosInOccurrence pio = new PosInOccurrence(hf, PosInTerm.getTopLevel(), true);
             TacletApp hide = ReplayTools.createTacletApp("hide_left", pio, goal);
-            goal = goal.apply(hide).head();
+            goal = ReplayTools.applyInteractive(goal, hide).head();
             NoPosTacletApp insertRule = goal.node().getLocalIntroducedRules().iterator().next();
             replayVisitor.getHypoTaclets().put(h, insertRule);
         }

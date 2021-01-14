@@ -48,7 +48,7 @@ public class ProofBind extends ProofRule {
                 //SequentFormula all = ReplayTools.getLastAddedSuc(goal);
                 PosInOccurrence pio = new PosInOccurrence(all, PosInTerm.getTopLevel(), false);
                 TacletApp app = ReplayTools.createTacletApp("allRight", pio, goal);
-                goal = goal.apply(app).head();
+                goal = ReplayTools.applyInteractive(goal, app).head();
                 //goal = ReplayTools.applyNoSplitTopLevelSuc(goal, "allRight", all);
 
                 SequentFormula skolemized = ReplayTools.getLastAddedSuc(goal);

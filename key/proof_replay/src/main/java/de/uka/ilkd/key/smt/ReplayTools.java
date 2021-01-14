@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import java.util.*;
@@ -144,16 +145,23 @@ public final class ReplayTools {
         return sci.addedFormulas(false).toList().get(index);
     }
 
+    public static ImmutableList<Goal> applyInteractive(Goal goal, TacletApp app) {
+        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
+        return goal.apply(app);
+    }
+
     public static Goal applyNoSplitPosAntec(Goal goal, String tacletName, PosInTerm pit,
                                              SequentFormula sf) {
         PosInOccurrence pio = new PosInOccurrence(sf, pit, true);
         TacletApp app = createTacletApp(tacletName, pio, goal);
+        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
         return goal.apply(app).head();
     }
 
     public static Goal applyNoSplitTopLevelAntec(Goal goal, String tacletName, SequentFormula sf) {
         PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), true);
         TacletApp app = createTacletApp(tacletName, pio, goal);
+        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
         return goal.apply(app).head();
     }
 
@@ -161,12 +169,14 @@ public final class ReplayTools {
                                           SequentFormula sf) {
         PosInOccurrence pio = new PosInOccurrence(sf, pit, false);
         TacletApp app = createTacletApp(tacletName, pio, goal);
+        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
         return goal.apply(app).head();
     }
 
     public static Goal applyNoSplitTopLevelSuc(Goal goal, String tacletName, SequentFormula sf) {
         PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
         TacletApp app = createTacletApp(tacletName, pio, goal);
+        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
         return goal.apply(app).head();
     }
 
@@ -288,6 +298,7 @@ public final class ReplayTools {
         PosInOccurrence pio = new PosInOccurrence(formula, PosInTerm.getTopLevel(), antec);
         // services (2nd param) are not used/needed
         RuleApp app = focusRule.createApp(pio, null);
+        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
         return goal.apply(app).head();
     }
 

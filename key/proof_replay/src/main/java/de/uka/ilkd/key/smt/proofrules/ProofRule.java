@@ -77,7 +77,7 @@ public abstract class ProofRule {
         for (int i = antecCount - 1; i > 0; i--) {
             pio = new PosInOccurrence(cutFormula, PosInTerm.getTopLevel(), false);
             app = ReplayTools.createTacletApp("andRight", pio, goal);
-            List<Goal> antecs = goal.apply(app).toList();
+            List<Goal> antecs = ReplayTools.applyInteractive(goal, app).toList();
 
             goal = antecs.get(0);
             continueReplay(ctx.proofsexpr(i));
