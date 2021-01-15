@@ -26,7 +26,7 @@ public class Lemma extends ProofRule {
         // note: connected to hypothesis rule, see class Hypothesis
         //List<Term> hypotheses = extractHypotheses(ctx);
         SMTReplayer replayer = replayVisitor.getSmtReplayer();
-        Set<NoprooftermContext> hypotheses = HypothesisExtractor.extractHypotheses(replayer, ctx);
+        Set<NoprooftermContext> hypotheses = HypothesesCollector.extractHypotheses(replayer, ctx);
 
         assert hypotheses.size() >= 1;
 

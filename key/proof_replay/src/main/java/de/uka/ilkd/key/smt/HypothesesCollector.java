@@ -6,16 +6,16 @@ import java.util.*;
 
 import static de.uka.ilkd.key.smt.SMTProofParser.*;
 
-public class HypothesisExtractor extends SMTProofBaseVisitor<Set<NoprooftermContext>> {
+public class HypothesesCollector extends SMTProofBaseVisitor<Set<NoprooftermContext>> {
     private final SMTReplayer smtReplayer;
 
-    public HypothesisExtractor(SMTReplayer smtReplayer) {
+    public HypothesesCollector(SMTReplayer smtReplayer) {
         this.smtReplayer = smtReplayer;
     }
 
     public static Set<NoprooftermContext> extractHypotheses(SMTReplayer smtReplayer,
                                                              ParserRuleContext ctx) {
-        HypothesisExtractor extractor = new HypothesisExtractor(smtReplayer);
+        HypothesesCollector extractor = new HypothesesCollector(smtReplayer);
         return extractor.visit(ctx);
     }
 
