@@ -11,9 +11,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
-import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.*;
 
 import java.io.*;
 import java.nio.file.*;
@@ -236,21 +234,20 @@ public class Main {
         Proof proof = papi.getProof();
         UserInterfaceControl uic = new DefaultUserInterfaceControl();
 
+        // this should initialize with the default properties,
+        // necessary to enable quantifier instantiation
+        StrategyProperties properties = new StrategyProperties();
+        Strategy strategy = new JavaCardDLStrategyFactory().create(proof, properties);
+        proof.setActiveStrategy(strategy);
+        proof.getSettings().getStrategySettings().setMaxSteps(1000000);
+        proof.getSettings().getStrategySettings().setTimeout(300000);
+
         long manualTime = System.currentTimeMillis();
         uic.getProofControl().startAndWaitForAutoMode(proof);
         manualTime = System.currentTimeMillis() - manualTime;
 
         int nodes = proof.getStatistics().nodes;
         updateKeYNodes(input, nodes);
-
-        // this should initialize with the default propertiese,
-        // necessary to enable quantifier instantiation
-        StrategyProperties properties = new StrategyProperties();
-
-        Strategy strategy = new JavaCardDLStrategyFactory().create(proof, properties);
-        proof.setActiveStrategy(strategy);
-        proof.getSettings().getStrategySettings().setMaxSteps(-1);
-        proof.getSettings().getStrategySettings().setTimeout(300000);
 
         long keyTime = proof.getStatistics().autoModeTimeInMillis;
         System.out.println("   KeY statistics: " + keyTime);
@@ -308,7 +305,7 @@ public class Main {
                 SMTSolver z3 = finishedSolvers.iterator().next();
 
                 String smtTranslation = z3.getTranslation();
-                updateZ3TtranslationLines(input, countLines(smtTranslation));
+                updateZ3TranslationLines(input, countLines(smtTranslation));
                 try {
                     Files.write(getOutPath(input, "_translation.smt2"), smtTranslation.getBytes());
                 } catch (IOException e) {
@@ -469,7 +466,7 @@ public class Main {
         STATS.put(p, stats);
     }
 
-    private static void updateZ3TtranslationLines(Path p, long z3TranslationLines) {
+    private static void updateZ3TranslationLines(Path p, long z3TranslationLines) {
         StatEntry stats = STATS.get(p);
         if (stats == null) {
             stats = new StatEntry(p);
