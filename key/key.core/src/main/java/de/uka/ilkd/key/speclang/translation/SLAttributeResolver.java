@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
+import de.uka.ilkd.key.ldt.FinalHeapResolver;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -155,12 +156,15 @@ public final class SLAttributeResolver extends SLExpressionResolver {
         	    		                       services);
         	    Term attributeTerm;
         	    if(attribute.isStatic()) {
-        		attributeTerm = services.getTermBuilder().staticDot(attribute.sort(), 
-        					     fieldSymbol);
-        	    } else {
-        		attributeTerm = services.getTermBuilder().dot(attribute.sort(), 
-        				       recTerm, 
-        				       fieldSymbol);
+					attributeTerm = services.getTermBuilder().staticDot(attribute.sort(),
+							fieldSymbol);
+				} else if (attribute.isFinal() &&
+				        FinalHeapResolver.recallIsFinalEnabled()) {
+					attributeTerm = services.getTermBuilder().finalDot(attribute.sort(),
+							recTerm, fieldSymbol);
+				} else {
+					attributeTerm = services.getTermBuilder().dot(attribute.sort(),
+							recTerm, fieldSymbol);
         	    }
         	    return new SLExpression(attributeTerm, 
         		    		    attribute.getKeYJavaType());

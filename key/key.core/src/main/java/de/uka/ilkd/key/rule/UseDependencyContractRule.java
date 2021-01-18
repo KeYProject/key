@@ -473,11 +473,6 @@ public final class UseDependencyContractRule implements BuiltInRule {
         		(DependencyContract)((UseDependencyContractApp) ruleApp).getInstantiation();
         assert contract != null;
 
-		if(FinalHeapResolver.isFinalEnabled(goal.proof().getSettings())) {
-			contract = new FinalHeapResolver(services).resolve(contract);
-		}
-
-
         //get step
         final PosInOccurrence step =
                 ((UseDependencyContractApp)ruleApp).step(goal.sequent(), services);

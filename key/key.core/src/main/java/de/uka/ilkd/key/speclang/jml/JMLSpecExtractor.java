@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.ldt.FinalHeapResolver;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -106,8 +108,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
     // constructors
     // -------------------------------------------------------------------------
 
-    public JMLSpecExtractor(Services services) {
-        this.services = services;
+    public JMLSpecExtractor(InitConfig initConfig) {
+        FinalHeapResolver.rememberIfFinalEnabled(initConfig);
+        this.services = initConfig.getServices();
         this.jsf = new JMLSpecFactory(services);
     }
 

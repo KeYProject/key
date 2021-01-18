@@ -94,9 +94,6 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     public FunctionalOperationContractPO(InitConfig initConfig,
                                          FunctionalOperationContract contract) {
         super(initConfig, contract.getName());
-        if(FinalHeapResolver.isFinalEnabled(initConfig)) {
-            contract = new FinalHeapResolver(initConfig.getServices()).resolve(contract);
-        }
         this.contract = contract;
     }
 

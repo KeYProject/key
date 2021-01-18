@@ -661,10 +661,6 @@ public final class UseOperationContractRule implements BuiltInRule {
             = (FunctionalOperationContract) ((AbstractContractRuleApp) ruleApp).getInstantiation();
         assert contract.getTarget().equals(inst.pm);
 
-        if(FinalHeapResolver.isFinalEnabled(goal.proof().getSettings())) {
-            contract = new FinalHeapResolver(services).resolve(contract);
-        }
-
         final List<LocationVariable> heapContext = HeapContext
                 .getModHeaps(goal.proof().getServices(), inst.transaction);
 
