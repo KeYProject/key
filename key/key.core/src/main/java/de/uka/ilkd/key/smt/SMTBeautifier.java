@@ -42,6 +42,7 @@ public class SMTBeautifier {
                 for (Element child : children) {
                     result += child.length();
                 }
+                result += 2 + children.size(); // "(", ")" and spaces
             }
             return result;
         }
@@ -55,6 +56,10 @@ public class SMTBeautifier {
             }
         }
 
+        public boolean hasComments() {
+            return (head != null && head.startsWith(";")) ||
+                   (children != null && children.stream().anyMatch(Element::hasComments));
+        }
     }
 
     /**
@@ -89,9 +94,10 @@ public class SMTBeautifier {
     public static String indent(String smtCode, int lineLength) {
         MutableInt pos = new MutableInt();
         StringBuilder sb = new StringBuilder();
-        while (pos.val < smtCode.length()) {
-            Element element = parse(smtCode, pos);
+        Element element = parse(smtCode, pos);
+        while (element != null) {
             sb.append(prettyPrint(element, 1, lineLength)).append("\n");
+            element = parse(smtCode, pos);
         }
         return sb.toString();
     }
@@ -126,8 +132,8 @@ public class SMTBeautifier {
                         pos.val++;
                     }
                     result = new Element();
+                    result.head = s.substring(start, pos.val);
                     pos.val++;
-                    result.head = s.substring(start, Math.min(s.length() - 1, pos.val));
                     return result;
 
                 default:
@@ -142,7 +148,8 @@ public class SMTBeautifier {
             }
             pos.val ++;
         }
-        return new Element();
+        // no further element
+        return null;
     }
 
     private static Element parseParen(String s, MutableInt pos) {
@@ -163,13 +170,13 @@ public class SMTBeautifier {
     private static CharSequence prettyPrint(Element element, int indent, int lineLength) {
         if (element.head == null) {
             StringBuilder sb = new StringBuilder("(");
-            boolean breakLines = (element.length() < lineLength);
+            boolean oneLine = (element.length() < lineLength) && !element.hasComments();
             boolean first = true;
             for (Element child : element.children) {
                 if (first) {
                     first = false;
                 } else {
-                    if(breakLines) {
+                    if(oneLine) {
                         sb.append(" ");
                     } else {
                         sb.append("\n");
@@ -184,6 +191,7 @@ public class SMTBeautifier {
             return sb;
 
         } else {
+            assert element.children == null : "Either head or children";
             return element.head;
         }
 
