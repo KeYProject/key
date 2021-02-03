@@ -49,6 +49,11 @@ public class IntegerOpHandler implements SMTHandler {
         predicateOperators.add(integerLDT.getGreaterOrEquals());
         supportedOperators.put(integerLDT.getGreaterThan(), ">");
         predicateOperators.add(integerLDT.getGreaterThan());
+
+        masterHandler.addDeclarationsAndAxioms(handlerSnippets);
+
+        // sort_int is defined here, declare it as already defined
+        masterHandler.addKnownSymbol("sort_int");
     }
 
     @Override
@@ -64,7 +69,7 @@ public class IntegerOpHandler implements SMTHandler {
         assert smtOp != null;
 
         if(op == jDivision) {
-            trans.addFromSnippets("jdiv");
+            trans.introduceSymbol("jdiv");
         }
 
         Type resultType;

@@ -42,12 +42,10 @@ public class InstanceOfHandler implements SMTHandler {
         SortDependingFunction op = (SortDependingFunction) term.op();
         SExpr inner = trans.translate(term.sub(0));
         if (exactInstanceOfOp.isSimilar(op)) {
-            trans.addFromSnippets("instanceof");
             trans.addSort(op.getSortDependingOn());
             return new SExpr("exactinstanceof", Type.BOOL, inner,
                 SExprs.sortExpr(op.getSortDependingOn()));
         } else if (instanceOfOp.isSimilar(op)) {
-            trans.addFromSnippets("instanceof");
             trans.addSort(op.getSortDependingOn());
             return SExprs.instanceOf(inner, SExprs.sortExpr(op.getSortDependingOn()));
         } else {

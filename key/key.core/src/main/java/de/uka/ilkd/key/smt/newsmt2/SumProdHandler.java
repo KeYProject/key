@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
+// W I P
 public class SumProdHandler implements SMTHandler {
 
     private Function bsumOp, bprodOp;

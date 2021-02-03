@@ -15,12 +15,11 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTTranslationException;
+import de.uka.ilkd.key.smt.newsmt2.MasterHandler.SymbolIntroducer;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -88,27 +87,92 @@ public class DefinedSymbolsHandler implements SMTHandler {
 
     public static final TermLabel TRIGGER_LABEL =
             new ParameterlessTermLabel(new Name("Trigger"));
+    
+    private Properties snippets;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) throws IOException {
         this.services = services;
+        this.snippets = handlerSnippets;
 
+        // extract the list of supported suffixes from the keys in the
+        // properties.
         for (String prop : handlerSnippets.stringPropertyNames()) {
             int dot = prop.lastIndexOf('.');
             if (dot < 0) {
                 continue;
             }
             String ext = prop.substring(dot);
+            SymbolIntroducer introduceSymbol = this::introduceSymbol;
             if (SUPPORTED_SUFFIXES.contains(ext)) {
                 String fct = prop.substring(0, dot);
                 supportedFunctions.add(fct);
+                masterHandler.getTranslationState().put(fct + ".intro",
+                        introduceSymbol);
             }
         }
     }
 
+
     @Override
     public boolean canHandle(Operator op) {
         return op instanceof Function && supportedFunctions.contains(op.name().toString());
+    }
+
+    private void introduceSymbol(MasterHandler trans, String name) throws SMTTranslationException {
+        introduceSymbol(trans, name, services.getNamespaces().functions().lookup(name));
+    }
+
+    private boolean introduceSymbol(MasterHandler trans, String name, SortedOperator op) throws SMTTranslationException {
+        if(trans.isKnownSymbol(name)) {
+            return true;
+        }
+
+        // Now ... this is the first encounter of name.
+        // We have to add axioms and typing and declaration ...
+
+        String prefixedname = PREFIX + name;
+
+        // Lookup a declaration in the snippets or use default if not present
+        Writable decls;
+        if (snippets.contains(name + DECLS_SUFFIX)) {
+            decls = new VerbatimSMT(snippets.getProperty(name + DECLS_SUFFIX));
+        } else {
+            decls = HandlerUtil.funDeclaration(op, prefixedname);
+        }
+        trans.addDeclaration(decls);
+
+        if (op.sort() != Sort.FORMULA) {
+            // Lookup a typing axiom in the snippets or use default if not present
+            Writable typing;
+            if (snippets.contains(name + TYPING_SUFFIX)) {
+                typing = new VerbatimSMT(name + TYPING_SUFFIX);
+            } else {
+                typing = HandlerUtil.funTypeAxiom(op, prefixedname, trans);
+            }
+            trans.addAxiom(typing);
+        }
+
+        trans.addKnownSymbol(name);
+
+        // Add the axioms from the various possible sources. ...
+        if (snippets.containsKey(name + AXIOMS_SUFFIX)) {
+            handleSMTAxioms(trans, name);
+            return true;
+        }
+
+        if (snippets.containsKey(name + DL_SUFFIX)) {
+            handleDLAxioms(name, trans);
+            return true;
+        }
+
+        if (snippets.containsKey(name + TACLETS_SUFFIX)) {
+            // handle taclets
+            handleTacletAxioms(name, trans);
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -121,50 +185,15 @@ public class DefinedSymbolsHandler implements SMTHandler {
         SExpr.Type exprType = term.sort() == Sort.FORMULA ? BOOL : UNIVERSE;
         SExpr result = new SExpr(prefixedname, exprType, children);
 
-        if(trans.isKnownSymbol(name)) {
-            return result;
+        if(!introduceSymbol(trans, name, op)) {
+            throw new SMTTranslationException("I thought I would handle this term, but cannot: " + term);
         }
 
-        // Now ... this is the first encounter of name.
-        // We have to add axioms and typing and declaration ...
-
-        // Lookup a declaration in the snippets or use default if not present
-        Writable decls = trans.getSnippet(name + DECLS_SUFFIX,
-                HandlerUtil.funDeclaration(op, prefixedname));
-        trans.addDeclaration(decls);
-
-        if (op.sort() != Sort.FORMULA) {
-            // Lookup a typing axiom in the snippets or use default if not present
-            Writable typing = trans.getSnippet(name + TYPING_SUFFIX,
-                    HandlerUtil.funTypeAxiom(op, prefixedname, trans));
-            trans.addAxiom(typing);
-        }
-
-        trans.addKnownSymbol(name);
-
-        // Add the axioms from the various possible sources. ...
-        if (trans.hasSnippet(name + AXIOMS_SUFFIX)) {
-            handleSMTAxioms(trans, name);
-            return result;
-        }
-
-        if (trans.hasSnippet(name + DL_SUFFIX)) {
-            handleDLAxioms(name, trans);
-            return result;
-        }
-
-        if (trans.hasSnippet(name + TACLETS_SUFFIX)) {
-            // handle taclets
-            handleTacletAxioms(name, trans);
-            return result;
-        }
-
-        throw new SMTTranslationException("I thought I would handle this term, but cannot: " + term);
-
+        return result;
     }
 
     private void handleTacletAxioms(String name, MasterHandler trans) throws SMTTranslationException {
-        String[] strTaclets = trans.getSnippet(name + TACLETS_SUFFIX).trim().split(" *, *");
+        String[] strTaclets = snippets.getProperty(name + TACLETS_SUFFIX).trim().split(" *, *");
         for (String str : strTaclets) {
             Taclet taclet = services.getProof().getInitConfig().lookupActiveTaclet(new Name(str));
             if(taclet == null) {
@@ -177,20 +206,20 @@ public class DefinedSymbolsHandler implements SMTHandler {
         }
     }
 
-    private void handleSMTAxioms(MasterHandler trans, String name) {
+    private void handleSMTAxioms(MasterHandler trans, String name) throws SMTTranslationException {
         // well ... if that is defined by axioms use the general purpose mechanism.
-        String axioms = trans.getSnippet(name + AXIOMS_SUFFIX);
+        String axioms = snippets.getProperty(name + AXIOMS_SUFFIX);
         trans.addAxiom(new VerbatimSMT(axioms));
-        String[] deps = trans.getSnippet(name + ".deps", "").trim().split(", *");
+        String[] deps = snippets.getProperty(name + ".deps", "").trim().split(", *");
         for (String dep : deps) {
-            trans.addFromSnippets(dep);
+            trans.introduceSymbol(dep);
         }
     }
 
     private void handleDLAxioms(String name, MasterHandler trans) throws SMTTranslationException {
         int cnt = 2;
         String snipName = name + DL_SUFFIX;
-        String dl = trans.getSnippet(snipName);
+        String dl = snippets.getProperty(snipName);
         System.err.println("DL TEXT FOR " + snipName + " WAS: " + dl);
         do {
             DefaultTermParser tp = new DefaultTermParser();
@@ -198,7 +227,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
                 NamespaceSet nss = services.getNamespaces().copy();
                 Services localServices = services.getOverlay(nss);
                 // The parser may add new symbols (instantiations of sort-dep symbols).
-                // Since the SMT machine runs in parallel, this may cause
+                // Since the SMT machines run in parallel, this may cause
                 // ConcurrentModificationExceptions. To avoid such exceptions,
                 // a wrapper services object is used.
                 Term axiom = tp.parse(new StringReader(dl), Sort.FORMULA,
@@ -210,7 +239,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
                 throw new SMTTranslationException("Error while translating snippet " + snipName, e);
             }
             snipName = name + DL_SUFFIX + "." + cnt;
-            dl = trans.getSnippet(snipName);
+            dl = snippets.getProperty(snipName);
             cnt ++;
         } while(dl != null);
     }

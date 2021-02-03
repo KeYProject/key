@@ -67,6 +67,9 @@ public class SeqDefHandler implements SMTHandler {
         Set<ParsableVariable> vars = Collections.newSetFromMap(new LinkedHashMap<>());
         collectVars(term, vars, DefaultImmutableSet.nil());
 
+        trans.introduceSymbol("seqGet");
+        trans.introduceSymbol("seqLen");
+
         trans.addDeclaration(makeFunctionDeclaration(name, vars));
         trans.addAxiom(makeTyping(name, vars, trans));
         trans.addAxiom(makeSeqGetDefinition(name, vars, term, trans));
@@ -111,7 +114,7 @@ public class SeqDefHandler implements SMTHandler {
 
         // \forall i; \forall params and(guards, i_range) -> seqGet(function(params), i) = term
         SExpr app = new SExpr(function, params);
-        SExpr seqLen = new SExpr("seqLen", app);
+        SExpr seqLen = new SExpr("k_seqLen", app);
         SExpr len = SExprs.minus(trans.translate(term.sub(1)), trans.translate(term.sub(0)));
         SExpr ite = SExprs.ite(SExprs.greaterEqual(len, SExprs.ZERO), len, SExprs.ZERO);
         SExpr eq = SExprs.eq(seqLen, ite);
@@ -128,6 +131,7 @@ public class SeqDefHandler implements SMTHandler {
         for (ParsableVariable var : vars) {
             String name = var.name().toString();
             qvars.add(new SExpr(name, new SExpr("U")));
+            trans.addSort(var.sort());
             guards.add(SExprs.instanceOf(new SExpr(name), SExprs.sortExpr(var.sort())));
             params.add(new SExpr(name));
         }

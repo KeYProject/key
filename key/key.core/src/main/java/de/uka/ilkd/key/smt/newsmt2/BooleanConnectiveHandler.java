@@ -41,6 +41,10 @@ public class BooleanConnectiveHandler implements SMTHandler {
 
         Operator logicTrue = ldt.getTrueConst();
         supportedOperators.put(logicTrue, "true");
+
+        masterHandler.addDeclaration(new VerbatimSMT(handlerSnippets.getProperty("bool.decls")));
+        masterHandler.addAxiom(new VerbatimSMT(handlerSnippets.getProperty("bool.axioms")));
+        masterHandler.addKnownSymbol("sort_boolean");
     }
 
     @Override

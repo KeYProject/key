@@ -27,5 +27,11 @@
   \forall Object o; \forall Field f; \forall Object o2;
     ( elementOf(o,f, allFields(o2))<<Trigger>> <->
        o = o2 )
-]]>
-</entry>
+]]></entry>
+
+<entry key="arrayRange.dl"><![CDATA[
+  \forall Object o; \forall Object o2; \forall Field f; \forall int lo; \forall int hi;
+    (elementOf(o,f, arrayRange(o2, lo, hi))<<Trigger>> <->
+      o = o2 & \exists int iv; (f = arr(iv) & lo <= iv & iv <= hi))
+]]></entry>
+

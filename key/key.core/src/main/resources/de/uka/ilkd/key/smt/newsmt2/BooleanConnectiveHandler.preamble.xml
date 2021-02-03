@@ -4,9 +4,6 @@
 
 <comment>These are the preamble snippets needed for handling the boolean sort.</comment>
 
-    <!-- This theory is always included. -->
-    <entry key="bool.auto">true</entry>
-
     <entry key="bool.decls">
 (declare-fun u2b (U) Bool)
 (declare-fun b2u (Bool) U)

@@ -37,6 +37,10 @@ import java.util.Properties;
  */
 public interface SMTHandler {
 
+    /**
+     * An enumeration of the possible answers of an handler to the
+     * {@link #canHandle(Term)} method.
+     */
     enum Capability {
         /** This indicates that the handler cannot translate a term */
         UNABLE,

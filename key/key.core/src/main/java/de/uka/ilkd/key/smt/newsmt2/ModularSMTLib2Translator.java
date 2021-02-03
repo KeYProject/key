@@ -7,7 +7,6 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
@@ -41,13 +40,10 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         StringBuilder sb = new StringBuilder();
 
         sb.append("; --- Preamble");
-        for (Writable w : master.getOptions()) {
-            w.appendTo(sb);
-        }
+        sb.append(SMTHandlerServices.getInstance().getPreamble());
 
         sb.append("; --- Declarations\n");
         extractSortDeclarations(sequent, services, master, sequentAsserts);
-
         for (Writable decl : master.getDeclarations()) {
             decl.appendTo(sb);
             sb.append("\n");
@@ -80,7 +76,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             t.printStackTrace();
         }
 
-        // TODO . Find a concept for exceptions here
+        // TODO Find a concept for exceptions here
         if(!exceptions.isEmpty()) {
             System.err.println("Exception while translating:");
             System.err.println(sb);
@@ -94,35 +90,15 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * precompute the information on the required sources from the translation.
      */
     private void extractSortDeclarations(Sequent sequent, Services services, MasterHandler master, List<Term> sequentAsserts) {
-        if (!sequentAsserts.isEmpty()) {
-            master.addSort(Sort.ANY);
-            for (Term t : sequentAsserts) {
-                addAllSorts(t, master);
-            }
-        }
-
-        // turn all known sorts into sort constants ...
-        List<SExpr> sortExprs = new LinkedList<>();
-        for (Sort s : master.getSorts()) {
-            if (s != Sort.ANY && !(TypeManager.isSpecialSort(s))) {
-                master.addDeclaration(new SExpr("declare-const", SExprs.sortExpr(s).toString(), "T"));
-            }
-            sortExprs.add(SExprs.sortExpr(s));
-        }
-
-        // ... which are distinct
-        if (master.getSorts().size() > 1) {
-            master.addDeclaration(new SExpr("assert", Type.BOOL,
-                    new SExpr("distinct", Type.BOOL, sortExprs)));
-        }
-
-        // and have a type hierarchy.
-        TypeManager tm = new TypeManager();
-        tm.createSortTypeHierarchy(master, services);
+        TypeManager tm = new TypeManager(services);
+        tm.handle(master);
     }
 
     /*
-     * extract a sequent into an SMT collection
+     * extract a sequent into an SMT collection.
+     *
+     * The translation adds elements to the lists in the master handler
+     * on the way.
      */
     private List<SExpr> makeSMTAsserts(MasterHandler master, List<Term> sequentAsserts) {
         List<SExpr> sequentSMTAsserts = new LinkedList<>();
@@ -132,24 +108,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         return sequentSMTAsserts;
     }
 
-    /**
-     * Adds all sorts contained in the given problem to the master handler.
-     * @param problem the given problem
-     * @param master the master handler of the problem
-     */
-    // TODO js: expressions within updates are not found by this, which leads to failures.
-    // TODO: Ideally this method can be removed if all sorts are detected on-the-fly.
-    // Once there no more "XXX" printlns, remove this method (and its calling loop)
-    private void addAllSorts(Term problem, MasterHandler master) {
-        Sort s = problem.sort();
-        if(!master.getSorts().contains(s)) {
-            System.err.println("XXX smt2 translation: Missing sort " + s);
-            master.addSort(s);
-        }
-        for (Term t : problem.subs()) {
-            addAllSorts(t, master);
-        }
-    }
+
 
     private static String readResource(String s) {
         BufferedReader r = new BufferedReader(
@@ -184,8 +143,11 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         return res;
     }
 
-    /*
-     * That would be so nice to code in Scala ...
+    /**
+     * remove obvious identities from SMT code.
+     *
+     * @param result, a non-null SExpr
+     * @return an equivalent smt code with some simplifications
      */
     private SExpr postProcess(SExpr result) {
         // remove (u2i (i2u x)) --->  x

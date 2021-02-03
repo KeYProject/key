@@ -23,15 +23,14 @@ import java.util.Properties;
  */
 public class CastingFunctionsHandler implements SMTHandler {
 
-    private Services services;
     private SortDependingFunction seqGet;
     private SortDependingFunction select;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
-        this.services = services;
         this.seqGet = services.getTypeConverter().getSeqLDT().getSeqGet(Sort.ANY, services);
         this.select = services.getTypeConverter().getHeapLDT().getSelect(Sort.ANY, services);
+        masterHandler.addDeclarationsAndAxioms(handlerSnippets);
     }
 
     @Override
@@ -49,12 +48,13 @@ public class CastingFunctionsHandler implements SMTHandler {
         SortDependingFunction sdf = (SortDependingFunction) op;
         String name = sdf.getKind().toString();
         String prefixedName = DefinedSymbolsHandler.PREFIX + name;
-        trans.addFromSnippets(name);
+        trans.introduceSymbol(name);
         SExpr result = trans.handleAsFunctionCall(prefixedName, term);
         Sort dep = sdf.getSortDependingOn();
         if (dep == Sort.ANY) {
             return result;
         } else {
+            trans.addSort(dep);
             return SExprs.castExpr(SExprs.sortExpr(dep), result);
         }
     }

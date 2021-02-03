@@ -23,6 +23,7 @@ public class CastHandler implements SMTHandler {
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) throws IOException {
         this.anyCast = Sort.ANY.getCastSymbol(services);
+        masterHandler.addDeclarationsAndAxioms(handlerSnippets);
     }
 
     @Override
@@ -35,7 +36,10 @@ public class CastHandler implements SMTHandler {
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         SortDependingFunction op = (SortDependingFunction) term.op();
         SExpr inner = trans.translate(term.sub(0));
-        return SExprs.castExpr(SExprs.sortExpr(op.getSortDependingOn()), inner);
+        Sort depSort = op.getSortDependingOn();
+        trans.addSort(depSort);
+        trans.introduceSymbol("cast");
+        return SExprs.castExpr(SExprs.sortExpr(depSort), inner);
     }
 
 }

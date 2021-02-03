@@ -1,9 +1,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.net.URL;
+import java.lang.invoke.CallSite;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,11 +9,9 @@ import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -34,7 +30,7 @@ public class MasterHandler {
     private final List<Throwable> exceptions = new ArrayList<>();
 
     /** The different handlers */
-    private final List<SMTHandler> handlers = new ArrayList<>();
+    private final List<SMTHandler> handlers;
 
     /** All declarations (declare-fun ...), (declare-const ...) */
     private final List<Writable> declarations = new ArrayList<>();
@@ -42,19 +38,11 @@ public class MasterHandler {
     /** All axioms (assert ...)*/
     private final List<Writable> axioms = new ArrayList<>();
 
-    /** All SMT options */
-    private final List<Writable> options = new ArrayList<>();
-
     /** A list of known symbols */
     private final Set<String> knownSymbols = new HashSet<>();
 
     /** A list of untranslatable values*/
     private final Map<Term, SExpr> unknownValues = new HashMap<>();
-
-    /** The collected content of the properties files that
-     * belong to the different handlers
-     */
-    private final Properties snippets = new Properties();
 
     /** The collected set of sorts occurring in the problem */
     private final Set<Sort> sorts = new HashSet<>();
@@ -71,38 +59,33 @@ public class MasterHandler {
      */
     private final Map<Operator, SMTHandler> handlerMap = new IdentityHashMap<>();
 
+    public void addDeclarationsAndAxioms(Properties snippets) {
+        String decls = snippets.getProperty("decls");
+        if (decls != null) {
+            addDeclaration(new VerbatimSMT(decls));
+        }
+
+        String axioms = snippets.getProperty("axioms");
+        if (axioms != null) {
+            addAxiom(new VerbatimSMT(axioms));
+        }
+
+        for (Entry<Object, Object> en : snippets.entrySet()) {
+            String key = (String) en.getKey();
+            if(key.endsWith(".decls") || key.endsWith(".axioms")) {
+                translationState.put(key, en.getValue());
+            }
+        }
+    }
+
+    @FunctionalInterface
+    public interface SymbolIntroducer {
+        void introduce(MasterHandler masterHandler, String name) throws SMTTranslationException;
+    }
+
     public MasterHandler(Services services) throws IOException {
-
         this.services = services;
-
-        snippets.loadFromXML(getClass().getResourceAsStream("preamble.xml"));
-
-        for (SMTHandler smtHandler : ServiceLoader.load(SMTHandler.class)) {
-            Properties handlerSnippets = loadSnippets(smtHandler.getClass());
-            smtHandler.init(this, services, handlerSnippets);
-            if (handlerSnippets != null) {
-                snippets.putAll(handlerSnippets);
-            }
-            handlers.add(smtHandler);
-        }
-
-
-        // If there are options in the preamble pass them through verbatim.
-        if (snippets.containsKey("opts")) {
-            VerbatimSMT opts = new VerbatimSMT(snippets.getProperty("opts"));
-            addOption(opts);
-        }
-
-        // sort the entries in the snippets to make this deterministic
-        SortedSet<Object> keys = new TreeSet<>(snippets.keySet());
-        for (Object k : keys) {
-            String key = k.toString();
-            if(key.endsWith(".auto")) {
-                // strip the ".auto" and add the snippet
-                addFromSnippets(key.substring(0, key.length() - 5));
-            }
-        }
-
+        handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, this);
     }
 
     /**
@@ -168,6 +151,8 @@ public class MasterHandler {
         try {
             return SExprs.coerce(translate(problem), type);
         }  catch(Exception ex) {
+            // Fall back to an unknown value despite the exception.
+            // The result will still be valid SMT code then.
             exceptions.add(ex);
             try {
                 return SExprs.coerce(handleAsUnknownValue(problem), type);
@@ -197,6 +182,14 @@ public class MasterHandler {
 
     /**
      * Treats the given term as a function call.
+     *
+     * This means that an expression of the form
+     * <pre>
+     *     (functionName t1 ... tn)
+     * </pre>
+     * is returned where t1, ..., tn are the smt-translations of the subterms of
+     * term.
+     *
      * @param functionName the name of the function
      * @param term the term to be translated
      * @return an expression with the name functionName and subterms as children
@@ -207,12 +200,19 @@ public class MasterHandler {
 
     /**
      * Treats the given term as a function call.
+     *
+     * This means that an expression of the form
+     * <pre>
+     *     (functionName t1 ... tn)
+     * </pre>
+     * is returned where t1, ..., tn are the smt-translations of the subterms of
+     * term.
+     *
      * @param functionName the name of the function
      * @param term the term to be translated
      * @return an expression with the name functionName and subterms as children
      */
     SExpr handleAsFunctionCall(String functionName, Type type, Term term) {
-        addFromSnippets(functionName);
         List<SExpr> children = new ArrayList<>();
         for (int i = 0; i < term.arity(); i++) {
             children.add(translate(term.sub(i), Type.UNIVERSE));
@@ -222,7 +222,7 @@ public class MasterHandler {
 
     /**
      * Decides whether a symbol is already known to the master handler.
-     * @param pr the string to test
+     * @param pr the SMT symbol name to test
      * @return true iff the name is already known
      */
     boolean isKnownSymbol(String pr) {
@@ -230,6 +230,7 @@ public class MasterHandler {
     }
 
     void addKnownSymbol(String symbol) {
+        assert !knownSymbols.contains(symbol) : symbol + " already known";
         knownSymbols.add(symbol);
     }
 
@@ -277,15 +278,7 @@ public class MasterHandler {
         return unknownValues;
     }
 
-    public List<Writable> getOptions() {
-        return options;
-    }
-
-    public void addOption(Writable w) {
-        options.add(w);
-    }
-
-    void addFromSnippets(String functionName) {
+    void introduceSymbol(String functionName) throws SMTTranslationException {
         if (isKnownSymbol(functionName)) {
             return;
         }
@@ -293,19 +286,30 @@ public class MasterHandler {
         // mark it known to avoid cyclic inclusion
         addKnownSymbol(functionName);
 
-        if (snippets.containsKey(functionName + ".decls")) {
-            VerbatimSMT decl = new VerbatimSMT(snippets.getProperty(functionName + ".decls"));
+        if (translationState.containsKey(functionName + ".decls")) {
+            String decls = (String) translationState.get(functionName + ".decls");
+            VerbatimSMT decl = new VerbatimSMT(decls);
             addDeclaration(decl);
         }
 
-        if (snippets.containsKey(functionName + ".axioms")) {
-            VerbatimSMT ax = new VerbatimSMT(snippets.getProperty(functionName + ".axioms"));
+        if (translationState.containsKey(functionName + ".axioms")) {
+            String axioms = (String) translationState.get(functionName + ".axioms");
+            VerbatimSMT ax = new VerbatimSMT(axioms);
             addAxiom(ax);
         }
 
-        String[] deps = snippets.getProperty(functionName + ".deps", "").trim().split(", *");
-        for (String dep : deps) {
-            addFromSnippets(dep);
+        if (translationState.containsKey(functionName + ".deps")) {
+            String entry = (String) translationState.get(functionName + ".deps");
+            String[] deps = entry.trim().split(", *");
+            for (String dep : deps) {
+                introduceSymbol(dep);
+            }
+        }
+
+        if (translationState.containsKey(functionName + ".intro")) {
+            SymbolIntroducer introducer =
+                    (SymbolIntroducer) translationState.get(functionName + ".intro");
+            introducer.introduce(this, functionName);
         }
     }
 
@@ -319,39 +323,5 @@ public class MasterHandler {
     @Deprecated
     public SExpr coerce(SExpr sExpr, Type type) throws SMTTranslationException {
         return SExprs.coerce(sExpr, type);
-    }
-
-    private static Properties loadSnippets(Class<?> aClass) throws IOException {
-        String resourceName = aClass.getSimpleName() + ".preamble.xml";
-        URL resource = aClass.getResource(resourceName);
-        if (resource != null) {
-            Properties snippets = new Properties();
-            try (InputStream is = resource.openStream()) {
-                snippets.loadFromXML(is);
-            }
-            return snippets;
-        }
-        return null;
-    }
-
-    public String getSnippet(String s) {
-        return snippets.getProperty(s);
-    }
-
-    public String getSnippet(String s, String orElse) {
-        return snippets.getProperty(s, orElse);
-    }
-
-    public Writable getSnippet(String s, Writable orElse) {
-        String result = snippets.getProperty(s);
-        if (result == null) {
-            return orElse;
-        } else {
-            return new VerbatimSMT(result);
-        }
-    }
-
-    public boolean hasSnippet(String s) {
-        return snippets.containsKey(s);
     }
 }

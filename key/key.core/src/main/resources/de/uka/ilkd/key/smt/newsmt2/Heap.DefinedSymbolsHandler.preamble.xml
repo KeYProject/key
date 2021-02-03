@@ -6,6 +6,10 @@
          \else(any::select(h, o2, f2))
 ]]></entry>
 
+<entry key="length.dl"><![CDATA[
+    \forall Object o; length(o) >= 0
+]]></entry>
+
 <entry key="anon.dl"><![CDATA[
     \forall Heap h; \forall Object o; \forall Field f; \forall Heap h2; \forall LocSet ls;
       any::select(anon(h, ls, h2), o, f)<<Trigger>> =
