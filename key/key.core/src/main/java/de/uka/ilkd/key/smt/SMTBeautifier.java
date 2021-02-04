@@ -65,6 +65,11 @@ public class SMTBeautifier {
         public boolean isComment() {
             return (head != null && head.startsWith(";"));
         }
+
+        public boolean lastChildIsComment() {
+            return children != null && !children.isEmpty() &&
+                    children.get(children.size() - 1).isComment();
+        }
     }
 
     /**
@@ -100,10 +105,13 @@ public class SMTBeautifier {
         MutableInt pos = new MutableInt();
         StringBuilder sb = new StringBuilder();
         Element element = parse(smtCode, pos);
+//        System.err.println(smtCode);
         while (element != null) {
+//            System.err.println(element);
             sb.append(prettyPrint(element, 1, lineLength)).append("\n");
             element = parse(smtCode, pos);
         }
+//        System.err.println(sb);
         return sb.toString();
     }
 
@@ -164,7 +172,7 @@ public class SMTBeautifier {
         pos.val ++;
         while (pos.val < s.length() && s.charAt(pos.val) != ')') {
             result.children.add(parse(s, pos));
-            while(pos.val < s.length() && Character.isSpaceChar(s.charAt(pos.val))) {
+            while(pos.val < s.length() && Character.isWhitespace(s.charAt(pos.val))) {
                 pos.val ++;
             }
         }
@@ -190,7 +198,7 @@ public class SMTBeautifier {
                 }
                 sb.append(prettyPrint(child, indent + 1, lineLength));
             }
-            if (element.children.get(element.children.size()-1).isComment()) {
+            if (element.lastChildIsComment()) {
                 // was a bug: if comment at end of SExpr, the ")" would be in comment
                 sb.append("\n").append("  ".repeat(indent));
             }

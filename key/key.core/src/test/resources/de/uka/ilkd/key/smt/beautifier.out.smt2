@@ -91,3 +91,17 @@
   (last is comment)
   ; end of smt problem declaration
   )
+
+; --------
+; Problem: New line before ')'
+(a b c d)
+
+; --------
+; From a bug:
+(assert
+  (not
+    ; The formula to be proved:
+    (=> (and (and (= 6 a_2) (= 3 b_3)) (= 2 c_4)) (= c_4 (div a_2 b_3)))))
+; End of assert.
+(check-sat)
+; end of smt problem declaration
