@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -57,8 +58,12 @@ public class SMTBeautifier {
         }
 
         public boolean hasComments() {
-            return (head != null && head.startsWith(";")) ||
+            return isComment() ||
                    (children != null && children.stream().anyMatch(Element::hasComments));
+        }
+
+        public boolean isComment() {
+            return (head != null && head.startsWith(";"));
         }
     }
 
@@ -180,18 +185,20 @@ public class SMTBeautifier {
                         sb.append(" ");
                     } else {
                         sb.append("\n");
-                        for (int i = 0; i < indent; i++) {
-                            sb.append("  ");
-                        }
+                        sb.append("  ".repeat(indent));
                     }
                 }
                 sb.append(prettyPrint(child, indent + 1, lineLength));
+            }
+            if (element.children.get(element.children.size()-1).isComment()) {
+                // was a bug: if comment at end of SExpr, the ")" would be in comment
+                sb.append("\n").append("  ".repeat(indent));
             }
             sb.append(")");
             return sb;
 
         } else {
-            assert element.children == null : "Either head or children";
+            assert element.children == null : "Either head or children must be null";
             return element.head;
         }
 

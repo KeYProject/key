@@ -34,3 +34,8 @@ after))
 
 (assert (f x ; inline comments break lines
 (after 42)))
+
+; ----------
+
+(assert (last is comment) ; end of smt problem declaration
+)
