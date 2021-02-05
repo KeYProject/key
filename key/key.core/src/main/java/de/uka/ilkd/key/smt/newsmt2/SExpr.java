@@ -18,8 +18,6 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.logic.sort.Sort;
-
 /**
  * This class models s-expressions to be used for the SMT translation.
  *
@@ -35,17 +33,32 @@ public class SExpr implements Writable {
     /**
      * An enumeration of the types that an {@link SExpr} can assume.
      */
-    public enum Type {
-        /** to indicate that this expression holds a value of type Int */
-        INT,
-        /** to indicate that this expression holds a value of type Bool */
-        BOOL,
+    public static class Type {
+
         /** to indicate that this expression holds a value of type U */
-        UNIVERSE,
-        /** to indicate that this expression has an other type different from the above */
-        NONE,
+        public static final Type UNIVERSE = new Type("Universe", null, null);
+        /** to indicate that this expression has other or unknown type */
+        public static final Type NONE = new Type("None", null, null);
         /** to indicate that this element needs no escaping despite its name */
-        VERBATIM
+        public static final Type VERBATIM = new Type("Verbatim", null, null);
+
+        /** to indicate that an expression holds a value of type Bool */
+        public static final Type BOOL = new Type("Bool", "b2u", "u2b");
+
+        public final String name;
+        public final String injection;
+        public final String projection;
+
+        public Type(String name, String injection, String projection) {
+            this.name = name;
+            this.injection = injection;
+            this.projection = projection;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
     /** The regular expression used to check if |...| escapes are needed. */

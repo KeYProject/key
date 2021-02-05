@@ -11,12 +11,10 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +22,16 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- *  W O R K   I N   P R O G R E S S ! ! !
- *
  * This handler handles the seqDef binder function specially.
+ *
+ * For every applicatin of seqDef a new function symbol is introduced
+ * which captures its meaning.
+ *
+ * If there are variables used inside the seqDef expression, the symbol is
+ * a function and these variables are used as its arguments.
+ *
+ * Two axioms are added: One defining the length of the defined sequence,
+ * and one defining the entries of the sequence.
  *
  * @author Mattias Ulbrich
  */
@@ -118,8 +123,8 @@ public class SeqDefHandler implements SMTHandler {
         // \forall freevars; seqLen(function(params)) = \if(up-lo>=0) \then(up-lo) \else 0
         SExpr app = new SExpr(function, params);
         SExpr seqLen = new SExpr(SEQLEN, app);
-        SExpr len = SExprs.minus(trans.translate(term.sub(1), Type.INT),
-                trans.translate(term.sub(0), Type.INT));
+        SExpr len = SExprs.minus(trans.translate(term.sub(1), IntegerOpHandler.INT),
+                trans.translate(term.sub(0), IntegerOpHandler.INT));
         SExpr ite = SExprs.ite(SExprs.greaterEqual(len, SExprs.ZERO), len, SExprs.ZERO);
         SExpr eq = SExprs.eq(seqLen, ite);
         SExpr forall = SExprs.forall(qvars, eq);
@@ -148,8 +153,8 @@ public class SeqDefHandler implements SMTHandler {
         SExpr i = new SExpr(name, Type.UNIVERSE);
         qvars.add(new SExpr(i, new SExpr("U")));
         guards.add(SExprs.lessEqual(SExprs.ZERO, i));
-        SExpr upper = trans.translate(term.sub(1), Type.INT);
-        SExpr lower = trans.translate(term.sub(0), Type.INT);
+        SExpr upper = trans.translate(term.sub(1), IntegerOpHandler.INT);
+        SExpr lower = trans.translate(term.sub(0), IntegerOpHandler.INT);
         SExpr len = SExprs.minus(upper, lower);
         guards.add(SExprs.lessThan(i, len));
         SExpr smtTerm = trans.translate(term.sub(2), Type.UNIVERSE);

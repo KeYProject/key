@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 
 /**
@@ -37,7 +36,7 @@ public class SExprs {
     /**
      * The constant "0" of type Int
      */
-    public static final SExpr ZERO = new SExpr("0", Type.INT);
+    public static final SExpr ZERO = new SExpr("0", IntegerOpHandler.INT);
 
     /**
      * Produce a conjunction of SExprs.
@@ -126,39 +125,34 @@ public class SExprs {
      * @throws SMTTranslationException if an impossible conversion is attempted
      */
     public static SExpr coerce(SExpr exp, Type type) throws SMTTranslationException {
-        switch(type) {
-            case BOOL:
-                switch(exp.getType()) {
-                    case BOOL:
-                        return exp;
-                    case UNIVERSE:
-                        return new SExpr("u2b", Type.BOOL, exp);
-                    default:
-                        throw new SMTTranslationException("Cannot convert to bool: " + exp);
-                }
-            case INT:
-                switch(exp.getType()) {
-                    case INT:
-                        return exp;
-                    case UNIVERSE:
-                        return new SExpr("u2i", Type.INT, exp);
-                    default:
-                        throw new SMTTranslationException("Cannot convert to int: " + exp);
-                }
-            case UNIVERSE:
-                switch(exp.getType()) {
-                    case UNIVERSE:
-                        return exp;
-                    case INT:
-                        return new SExpr("i2u", Type.UNIVERSE, exp);
-                    case BOOL:
-                        return new SExpr("b2u", Type.UNIVERSE, exp);
-                    default:
-                        throw new SMTTranslationException("Cannot convert to universe: " + exp);
-                }
-            default:
-                throw new SMTTranslationException("Cannot convert into " + type);
+        assert type != null;
+        assert exp != null;
+
+        Type orgType = exp.getType();
+
+        if (type == orgType) {
+            // already of right type;
+            return exp;
         }
+
+        if (type == Type.UNIVERSE) {
+            // Use the injection to go to universe
+            if (orgType.injection == null) {
+                throw new SMTTranslationException("Cannot inject from " + orgType + " into U: " + exp);
+            }
+            return new SExpr(orgType.injection, type, exp);
+        }
+
+        if (orgType == Type.UNIVERSE) {
+            // Use the projection to go to other type
+            if (type.projection == null) {
+                throw new SMTTranslationException("Cannot project from U to " + type + ": " + exp);
+            }
+            return new SExpr(type.projection, type, exp);
+        }
+
+        throw new SMTTranslationException("Cannot coerce from " + orgType +
+                " to " + type + ": " + exp);
     }
 
     public static List<SExpr> coerce(List<SExpr> exprs, Type type) throws SMTTranslationException {
@@ -269,17 +263,17 @@ public class SExprs {
 
     public static SExpr greaterEqual(SExpr a, SExpr b) throws SMTTranslationException {
         return new SExpr(">=", Type.BOOL,
-                SExprs.coerce(a, Type.INT), SExprs.coerce(b, Type.INT));
+                SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr lessEqual(SExpr a, SExpr b) throws SMTTranslationException {
         return new SExpr("<=", Type.BOOL,
-                SExprs.coerce(a, Type.INT), SExprs.coerce(b, Type.INT));
+                SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr lessThan(SExpr a, SExpr b) throws SMTTranslationException {
         return new SExpr("<", Type.BOOL,
-                SExprs.coerce(a, Type.INT), SExprs.coerce(b, Type.INT));
+                SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr eq(SExpr a, SExpr b) throws SMTTranslationException {
@@ -287,13 +281,13 @@ public class SExprs {
     }
 
     public static SExpr minus(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr("-", Type.INT,
-                SExprs.coerce(a, Type.INT), SExprs.coerce(b, Type.INT));
+        return new SExpr("-", IntegerOpHandler.INT,
+                SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr plus(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr("+", Type.INT,
-                SExprs.coerce(a, Type.INT), SExprs.coerce(b, Type.INT));
+        return new SExpr("+", IntegerOpHandler.INT,
+                SExprs.coerce(a, IntegerOpHandler.INT), SExprs.coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr ite(SExpr cond, SExpr _then, SExpr _else) throws SMTTranslationException {

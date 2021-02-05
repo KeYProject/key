@@ -24,6 +24,9 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
  */
 public class IntegerOpHandler implements SMTHandler {
 
+    /** to indicate that an expression holds a value of type Int. */
+    public static final Type INT = new Type("Int", "i2u", "u2i");
+
     private final Map<Operator, String> supportedOperators = new HashMap<>();
     private final Set<Operator> predicateOperators = new HashSet<>();
     private Function jDivision;
@@ -63,7 +66,7 @@ public class IntegerOpHandler implements SMTHandler {
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
-        List<SExpr> children = trans.translate(term.subs(), Type.INT);
+        List<SExpr> children = trans.translate(term.subs(), IntegerOpHandler.INT);
         Operator op = term.op();
         String smtOp = supportedOperators.get(op);
         assert smtOp != null;
@@ -76,7 +79,7 @@ public class IntegerOpHandler implements SMTHandler {
         if(predicateOperators.contains(op)) {
             resultType = Type.BOOL;
         } else {
-            resultType = Type.INT;
+            resultType = IntegerOpHandler.INT;
         }
 
         return new SExpr(smtOp, resultType, children);

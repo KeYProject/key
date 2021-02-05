@@ -11,7 +11,6 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import org.key_project.util.collection.ImmutableArray;
 
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 
 /**
@@ -86,7 +85,7 @@ public class FieldConstantHandler implements SMTHandler {
             trans.addAxiom(new SExpr("assert",
                     new SExpr("=",
                             new SExpr("fieldIdentifier", smtName),
-                            new SExpr("-", Type.INT, curVal.toString()))));
+                            new SExpr("-", IntegerOpHandler.INT, curVal.toString()))));
 
             state.put(CONSTANT_COUNTER_PROPERTY, curVal + 1);
             trans.addKnownSymbol(smtName);
