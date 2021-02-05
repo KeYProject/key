@@ -32,6 +32,9 @@ import java.util.Set;
  */
 public class SeqDefHandler implements SMTHandler {
 
+    private static final String SEQLEN = DefinedSymbolsHandler.PREFIX + "seqLen";
+    private static final String SEQGET = DefinedSymbolsHandler.PREFIX + "seqGet";
+
     public static final String SEQ_DEF_PREFIX = "seqDef";
     private SeqLDT seqLDT;
 
@@ -108,14 +111,15 @@ public class SeqDefHandler implements SMTHandler {
         List<SExpr> params = new ArrayList<>();
         for (ParsableVariable var : vars) {
             String name = var.name().toString();
-            qvars.add(new SExpr(name, new SExpr("U")));
-            params.add(new SExpr(name));
+            qvars.add(new SExpr(LogicalVariableHandler.VAR_PREFIX + name, new SExpr("U")));
+            params.add(new SExpr(LogicalVariableHandler.VAR_PREFIX + name));
         }
 
-        // \forall i; \forall params and(guards, i_range) -> seqGet(function(params), i) = term
+        // \forall freevars; seqLen(function(params)) = \if(up-lo>=0) \then(up-lo) \else 0
         SExpr app = new SExpr(function, params);
-        SExpr seqLen = new SExpr("k_seqLen", app);
-        SExpr len = SExprs.minus(trans.translate(term.sub(1)), trans.translate(term.sub(0)));
+        SExpr seqLen = new SExpr(SEQLEN, app);
+        SExpr len = SExprs.minus(trans.translate(term.sub(1), Type.INT),
+                trans.translate(term.sub(0), Type.INT));
         SExpr ite = SExprs.ite(SExprs.greaterEqual(len, SExprs.ZERO), len, SExprs.ZERO);
         SExpr eq = SExprs.eq(seqLen, ite);
         SExpr forall = SExprs.forall(qvars, eq);
@@ -130,22 +134,30 @@ public class SeqDefHandler implements SMTHandler {
         List<SExpr> params = new ArrayList<>();
         for (ParsableVariable var : vars) {
             String name = var.name().toString();
-            qvars.add(new SExpr(name, new SExpr("U")));
+            qvars.add(new SExpr(LogicalVariableHandler.VAR_PREFIX + name, new SExpr("U")));
             trans.addSort(var.sort());
-            guards.add(SExprs.instanceOf(new SExpr(name), SExprs.sortExpr(var.sort())));
-            params.add(new SExpr(name));
+            SExpr smtVar = new SExpr(LogicalVariableHandler.VAR_PREFIX + name);
+            guards.add(SExprs.instanceOf(smtVar, SExprs.sortExpr(var.sort())));
+            params.add(smtVar);
         }
 
-        // \forall i; \forall params and(guards, i_range) -> seqGet(function(params), i) = term
+        // \forall i; \forall params;
+        //     and(guards, i_range) -> seqGet(function(params), i+lo) = term
         SExpr app = makeApplication(function, vars);
         String name = LogicalVariableHandler.VAR_PREFIX + term.boundVars().last().name().toString();
         SExpr i = new SExpr(name, Type.UNIVERSE);
         qvars.add(new SExpr(i, new SExpr("U")));
         guards.add(SExprs.lessEqual(SExprs.ZERO, i));
-        guards.add(SExprs.lessThan(i, new SExpr("seqLen", Type.UNIVERSE, app)));
-        SExpr smtTerm = trans.translate(term.sub(2));
-        SExpr seqGet = new SExpr("seqGet", Type.UNIVERSE, app, i);
-        SExpr imp = SExprs.imp(SExprs.and(guards), SExprs.eq(seqGet, smtTerm));
+        SExpr upper = trans.translate(term.sub(1), Type.INT);
+        SExpr lower = trans.translate(term.sub(0), Type.INT);
+        SExpr len = SExprs.minus(upper, lower);
+        guards.add(SExprs.lessThan(i, len));
+        SExpr smtTerm = trans.translate(term.sub(2), Type.UNIVERSE);
+        SExpr replacedSMTTerm = SExprs.let(name,
+                SExprs.coerce(SExprs.plus(i, lower), Type.UNIVERSE),
+                smtTerm);
+        SExpr seqGet = new SExpr(SEQGET, Type.UNIVERSE, app, i);
+        SExpr imp = SExprs.imp(SExprs.and(guards), SExprs.eq(seqGet, replacedSMTTerm));
         SExpr forall = SExprs.forall(qvars, imp);
         return SExprs.assertion(forall);
     }
@@ -163,7 +175,7 @@ public class SeqDefHandler implements SMTHandler {
     private SExpr makeApplication(String name, Set<ParsableVariable> vars) {
         List<SExpr> args = new ArrayList<>();
         for (ParsableVariable var : vars) {
-            args.add(new SExpr(var.name().toString()));
+            args.add(new SExpr(LogicalVariableHandler.VAR_PREFIX + var.name().toString()));
         }
         return new SExpr(name, Type.UNIVERSE, args);
     }

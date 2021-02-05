@@ -6,5 +6,8 @@
   CastingFunctionsHandler in this package</comment>
 
   <entry key="seqGet.decls">(declare-fun k_seqGet (U U) U)</entry>
+  <!-- trigger the axioms in DefinedSymbolsHeader (bound to the extra value) -->
+  <entry key="seqGet.deps">seqGetOutside</entry>
+
   <entry key="select.decls">(declare-fun k_select (U U U) U)</entry>
 </properties>

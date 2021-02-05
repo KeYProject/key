@@ -291,10 +291,20 @@ public class SExprs {
                 SExprs.coerce(a, Type.INT), SExprs.coerce(b, Type.INT));
     }
 
+    public static SExpr plus(SExpr a, SExpr b) throws SMTTranslationException {
+        return new SExpr("+", Type.INT,
+                SExprs.coerce(a, Type.INT), SExprs.coerce(b, Type.INT));
+    }
+
     public static SExpr ite(SExpr cond, SExpr _then, SExpr _else) throws SMTTranslationException {
         return new SExpr("ite", Type.UNIVERSE,
                 SExprs.coerce(cond, Type.BOOL),
                 SExprs.coerce(_then, Type.UNIVERSE),
                 SExprs.coerce(_else, Type.UNIVERSE));
     }
+
+    public static SExpr let(String var, SExpr val, SExpr in) {
+        return new SExpr("let", new SExpr(new SExpr(var, val)), in);
+    }
+
 }

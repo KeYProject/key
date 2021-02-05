@@ -14,12 +14,13 @@
 
 ### contains.3
 
-(assert (forall ((var_i U)) (=> (and (<= 0 (u2i var_i)) (< (u2i var_i) (u2i (seqLen seqDef1)))) (= (seqGet seqDef1 var_i) (* (u2i var_i) (u2i var_i))))))
+(assert (forall ((var_i U)) (=> (and (<= 0 (u2i var_i)) (< (u2i var_i) (- 10 1))) (= (k_seqGet seqDef1 var_i) (let ((var_i (i2u (+ (u2i var_i) 1)))) (i2u (* (u2i var_i) (u2i var_i))))))))
 
 ### contains.4
 
-(assert (= (seqLen seqDef1) (ite (>= (- 10 1) 0) (i2u (- 10 1)) (i2u 0))))
+(assert (= (k_seqLen seqDef1) (ite (>= (- 10 1) 0) (i2u (- 10 1)) (i2u 0))))
 
 ### expected
 
 valid
+

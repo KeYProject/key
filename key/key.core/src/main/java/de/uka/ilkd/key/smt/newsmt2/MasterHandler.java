@@ -283,8 +283,17 @@ public class MasterHandler {
             return;
         }
 
-        // mark it known to avoid cyclic inclusion
-        addKnownSymbol(functionName);
+        if (translationState.containsKey(functionName + ".intro")) {
+            SymbolIntroducer introducer =
+                    (SymbolIntroducer) translationState.get(functionName + ".intro");
+            introducer.introduce(this, functionName);
+        }
+
+        // Handle it locally.
+        // mark it known to avoid cyclic inclusion (if not already registered)
+        if(!isKnownSymbol(functionName)) {
+            addKnownSymbol(functionName);
+        }
 
         if (translationState.containsKey(functionName + ".decls")) {
             String decls = (String) translationState.get(functionName + ".decls");
@@ -306,11 +315,6 @@ public class MasterHandler {
             }
         }
 
-        if (translationState.containsKey(functionName + ".intro")) {
-            SymbolIntroducer introducer =
-                    (SymbolIntroducer) translationState.get(functionName + ".intro");
-            introducer.introduce(this, functionName);
-        }
     }
 
     Map<String, Object> getTranslationState() {

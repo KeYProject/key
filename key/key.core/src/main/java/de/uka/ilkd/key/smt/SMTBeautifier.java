@@ -193,14 +193,21 @@ public class SMTBeautifier {
                         sb.append(" ");
                     } else {
                         sb.append("\n");
-                        sb.append("  ".repeat(indent));
+                        // newer Java verion: sb.append("  ".repeat(indent));
+                        for (int i = 0; i < indent; i++) {
+                            sb.append("  ");
+                        }
                     }
                 }
                 sb.append(prettyPrint(child, indent + 1, lineLength));
             }
             if (element.lastChildIsComment()) {
                 // was a bug: if comment at end of SExpr, the ")" would be in comment
-                sb.append("\n").append("  ".repeat(indent));
+                sb.append("\n");
+                // new Java version: sb.append("  ".repeat(indent));
+                for (int i = 0; i < indent; i++) {
+                    sb.append("  ");
+                }
             }
             sb.append(")");
             return sb;

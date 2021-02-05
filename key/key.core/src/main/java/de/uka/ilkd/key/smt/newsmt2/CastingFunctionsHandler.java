@@ -55,6 +55,7 @@ public class CastingFunctionsHandler implements SMTHandler {
             return result;
         } else {
             trans.addSort(dep);
+            trans.introduceSymbol("cast");
             return SExprs.castExpr(SExprs.sortExpr(dep), result);
         }
     }

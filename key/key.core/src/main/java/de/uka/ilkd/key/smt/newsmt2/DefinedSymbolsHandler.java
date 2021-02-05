@@ -135,7 +135,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
 
         // Lookup a declaration in the snippets or use default if not present
         Writable decls;
-        if (snippets.contains(name + DECLS_SUFFIX)) {
+        if (snippets.containsKey(name + DECLS_SUFFIX)) {
             decls = new VerbatimSMT(snippets.getProperty(name + DECLS_SUFFIX));
         } else {
             decls = HandlerUtil.funDeclaration(op, prefixedname);
