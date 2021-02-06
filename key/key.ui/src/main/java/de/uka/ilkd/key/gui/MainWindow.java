@@ -13,56 +13,6 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.GraphicsEnvironment;
-import java.awt.GridBagLayout;
-import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.util.Collection;
-import java.util.EventObject;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-import java.util.stream.Stream;
-
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
-import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import javax.swing.event.MouseInputAdapter;
-
 import bibliothek.gui.dock.StackDockStation;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.SingleCDockable;
@@ -73,59 +23,7 @@ import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
-import de.uka.ilkd.key.gui.actions.AboutAction;
-import de.uka.ilkd.key.gui.actions.AutoModeAction;
-import de.uka.ilkd.key.gui.actions.AutoSave;
-import de.uka.ilkd.key.gui.actions.CounterExampleAction;
-import de.uka.ilkd.key.gui.actions.DecreaseFontSizeAction;
-import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
-import de.uka.ilkd.key.gui.actions.EnsureSourceConsistencyToggleAction;
-import de.uka.ilkd.key.gui.actions.ExitMainAction;
-import de.uka.ilkd.key.gui.actions.GoalBackAction;
-import de.uka.ilkd.key.gui.actions.GoalSelectAboveAction;
-import de.uka.ilkd.key.gui.actions.GoalSelectBelowAction;
-import de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction;
-import de.uka.ilkd.key.gui.actions.IncreaseFontSizeAction;
-import de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
-import de.uka.ilkd.key.gui.actions.LicenseAction;
-import de.uka.ilkd.key.gui.actions.MacroKeyBinding;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.actions.MenuSendFeedackAction;
-import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
-import de.uka.ilkd.key.gui.actions.OpenExampleAction;
-import de.uka.ilkd.key.gui.actions.OpenFileAction;
-import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
-import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
-import de.uka.ilkd.key.gui.actions.ProofManagementAction;
-import de.uka.ilkd.key.gui.actions.PruneProofAction;
-import de.uka.ilkd.key.gui.actions.QuickLoadAction;
-import de.uka.ilkd.key.gui.actions.QuickSaveAction;
-import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
-import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
-import de.uka.ilkd.key.gui.actions.SaveBundleAction;
-import de.uka.ilkd.key.gui.actions.SaveFileAction;
-import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
-import de.uka.ilkd.key.gui.actions.SearchInSequentAction;
-import de.uka.ilkd.key.gui.actions.SearchModeChangeAction;
-import de.uka.ilkd.key.gui.actions.SearchNextAction;
-import de.uka.ilkd.key.gui.actions.OpenSingleJavaFileAction;
-import de.uka.ilkd.key.gui.actions.SearchPreviousAction;
-import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
-import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
-import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
-import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
-import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
-import de.uka.ilkd.key.gui.actions.SyntaxHighlightingToggleAction;
-import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
-import de.uka.ilkd.key.gui.actions.TermLabelMenu;
-import de.uka.ilkd.key.gui.actions.TestGenerationAction;
-import de.uka.ilkd.key.gui.actions.ToggleConfirmExitAction;
-import de.uka.ilkd.key.gui.actions.ToggleSequentViewTooltipAction;
-import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
-import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
+import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -134,12 +32,7 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.help.HelpFacade;
 import de.uka.ilkd.key.gui.help.HelpInfo;
-import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
-import de.uka.ilkd.key.gui.nodeviews.EmptySequent;
-import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
-import de.uka.ilkd.key.gui.nodeviews.MainFrame;
-import de.uka.ilkd.key.gui.nodeviews.SequentView;
-import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
+import de.uka.ilkd.key.gui.nodeviews.*;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
@@ -162,12 +55,23 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.KeYResourceManager;
-import de.uka.ilkd.key.util.PreferenceSaver;
-import de.uka.ilkd.key.util.ThreadUtilities;
+import de.uka.ilkd.key.util.*;
 import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.swing.event.MouseInputAdapter;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.*;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
+import java.util.stream.Stream;
 
 @HelpInfo()
 public final class MainWindow extends JFrame {
@@ -332,9 +236,15 @@ public final class MainWindow extends JFrame {
                 HelpFacade.ACTION_OPEN_HELP);
 
         setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
+        setLocationByPlatform(true);
         applyGnomeWorkaround();
+        if (!applyTaskbarIcon()) {
+            applyMacOsWorkaround();
+        }
         setLaF();
-        setIconImage(IconFactory.keyLogo());
+        setIconImages(IconFactory.applicationLogos());
+
+
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         proofListener = new MainProofListener();
         userInterface = new WindowUserInterfaceControl(this);
@@ -368,6 +278,44 @@ public final class MainWindow extends JFrame {
 
         KeYGuiExtensionFacade.getStartupExtensions()
                 .forEach(it -> it.init(this, mediator));
+    }
+
+    /**
+     *
+     */
+    private boolean applyTaskbarIcon() {
+        //https://stackoverflow.com/questions/50403677/changing-the-default-java-coffee-dock-icon-to-something-else
+        try {
+            Image image = IconFactory.keyLogo();
+            Class<?> appClass = Class.forName("java.awt.Taskbar");
+            Method getTaskbar = appClass.getMethod("getTaskbar");
+            Method setIconImage = appClass.getMethod("setIconImage", Image.class);
+            Object taskbar = getTaskbar.invoke(null);//static method
+            setIconImage.invoke(taskbar, image);
+            return true;
+        } catch (ClassNotFoundException | NoSuchMethodException
+                | IllegalAccessException | InvocationTargetException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Set the dock image on MacOS <=10.6.
+     */
+    private boolean applyMacOsWorkaround() {
+        //https://stackoverflow.com/questions/50403677/changing-the-default-java-coffee-dock-icon-to-something-else
+        try {
+            Class<?> appClass = Class.forName("com.apple.eawt.Application");
+            Class<?>[] params = new Class[]{Image.class};
+            Method getApplication = appClass.getMethod("getApplication");
+            Object application = getApplication.invoke(appClass);
+            Method setDockIconImage = appClass.getMethod("setDockIconImage", params);
+            setDockIconImage.invoke(application, IconFactory.keyLogo());
+            return true;
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException | ClassNotFoundException ignored) {
+            return false;
+        }
     }
 
     public static MainWindow getInstance() {
@@ -1276,6 +1224,7 @@ public final class MainWindow extends JFrame {
 
     /**
      * A file to the menu of recent opened files.
+     *
      * @see RecentFileMenu#addRecentFile(String)
      */
     public void addRecentFile(@NotNull String absolutePath) {
@@ -1296,9 +1245,10 @@ public final class MainWindow extends JFrame {
 
     /**
      * Loads the proof with the given path from the proof bundle.
+     *
      * @param proofBundle the path of the proof bundle
-     * @param proofPath the path of the proof to load
-     *                  (relative to the root of the bundle -> filename only)
+     * @param proofPath   the path of the proof to load
+     *                    (relative to the root of the bundle -> filename only)
      */
     public void loadProofFromBundle(File proofBundle, File proofPath) {
         getUserInterface().loadProofFromBundle(proofBundle, proofPath);

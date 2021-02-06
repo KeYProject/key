@@ -133,7 +133,7 @@ public class ExceptionDialog extends JDialog {
 //        bPanel.add(reloadButton); // XXX useful for debugging
 
         JButton sendFeedbackButton = new JButton(new SendFeedbackAction(this, exception));
-           bPanel.add(sendFeedbackButton);
+        bPanel.add(sendFeedbackButton);
 
         JButton editSourceFileButton = new JButton("Edit Source File");
         EditSourceFileAction action = new EditSourceFileAction(this, exception);

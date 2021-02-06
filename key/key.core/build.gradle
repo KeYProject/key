@@ -9,14 +9,13 @@ configurations { antlr4 }
 
 dependencies {
     compile project(':key.util')
-
-    compile name: 'recoderKey'
-    compile group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
-    compile group: 'org.antlr', name: 'antlr-runtime', version: '3.5.2'
+    compile group: group, name: 'recoderkey', version: '1.0'
+    compile group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
+    compile group: 'org.antlr', name:'antlr-runtime', version:'3.5.2'
     compile group: 'antlr', name: 'antlr', version: '2.7.7'
 
-    javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
-    antlr group: 'org.antlr', name: 'antlr', version: '3.5.2'   // use ANTLR version 3
+    javacc  group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
+    antlr   group: 'org.antlr', name:'antlr', version:'3.5.2'   // use ANTLR version 3
 
     antlr4 "org.antlr:antlr4:4.7.1"
     compile "org.antlr:antlr4-runtime:4.7.1"
@@ -112,7 +111,7 @@ task testProveRules(type: Test) {
 task testRunAllProofs(type: Test) {
     description 'Proof/reload all keyfiles tagged for regression testing'
     group "verification"
-    filter {
+    filter { 
         // TODO does not exist any more: includeTestsMatching "RunAllProofsTestSuite"
         includeTestsMatching "RunAllProofsInfFlow"
         includeTestsMatching "RunAllProofsFunctional"

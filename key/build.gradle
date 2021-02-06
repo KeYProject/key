@@ -46,7 +46,7 @@ static def getDate() {
 def build = System.env.BUILD_NUMBER == null ? "" : "-${System.env.BUILD_NUMBER}"
 
 group = "org.key_project"
-version = "2.7$build"
+version = "2.9$build"
 
 sonarqube {
     properties {
@@ -68,11 +68,11 @@ subprojects {
 
     repositories {
         mavenCentral()
-        flatDir { dirs "lib", "$rootDir/key.core/lib" }
+        flatDir { dirs "lib", "$rootDir/key.core/lib", "$rootDir/key.ui/lib" }
     }
 
     dependencies {
-        compile     'org.jetbrains:annotations:17.0.0'
+        compile     'org.jetbrains:annotations:20.1.0'
         testCompile 'junit:junit:4.12'
         testCompile project(':key.util')
     }
@@ -199,7 +199,7 @@ subprojects {
 
     publishing {
         publications {
-            mavenJava(MavenPublication) {
+            gpr(MavenPublication) {
                 from components.java
                 artifact sourcesJar
                 artifact javadocJar
@@ -231,8 +231,15 @@ subprojects {
         }
         repositories {
             maven {
-                name = "bintray-snapshots"
-                url = "https://dl.bintray.com/key/stable-snapshots"
+                name = "GitlabPackages"
+		        url "https://git.key-project.org/api/v4/projects/35/packages/maven"
+		        credentials(HttpHeaderCredentials) {
+			        name = 'Private-Token'
+			        value = System.getenv("TOKEN")
+		        }
+		        authentication {
+			        header(HttpHeaderAuthentication)
+		        }           
             }
         }
     }
