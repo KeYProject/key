@@ -2935,7 +2935,7 @@ Choices: {programRules:Java}}
 == compound_assignment_2 (compound_assignment) =========================================
 compound_assignment_2 {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=!#nseBool; ... }\] (post))
-\varcond(\new(#v (program Variable), boolean))
+\varcond(\new(#v (program Variable), (type, sort): (boolean,boolean)))
 \replacewith(#allmodal ( (modal operator))\[{ .. boolean #v = #nseBool;#lhs=!#v; ... }\] (post))
 \heuristics(simplify_expression)
 Choices: {programRules:Java}}
@@ -2943,7 +2943,7 @@ Choices: {programRules:Java}}
 == compound_assignment_3_mixed (compound_assignment) =========================================
 compound_assignment_3_mixed {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=#nseBool0&&#seBool1; ... }\] (post))
-\varcond(\new(#v0 (program Variable), boolean))
+\varcond(\new(#v0 (program Variable), (type, sort): (boolean,boolean)))
 \replacewith(#allmodal ( (modal operator))\[{ .. boolean #v0 = #nseBool0;#lhs=#v0&&#seBool1; ... }\] (post))
 \heuristics(simplify_expression)
 Choices: {programRules:Java}}
@@ -2969,7 +2969,7 @@ Choices: {programRules:Java}}
 == compound_assignment_4_nonsimple (compound_assignment) =========================================
 compound_assignment_4_nonsimple {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=#nseBool0&#exBool1; ... }\] (post))
-\varcond(\new(#v1 (program Variable), boolean), \new(#v0 (program Variable), boolean))
+\varcond(\new(#v1 (program Variable), (type, sort): (boolean,boolean)), \new(#v0 (program Variable), (type, sort): (boolean,boolean)))
 \replacewith(#allmodal ( (modal operator))\[{ .. boolean #v0 = #nseBool0;boolean #v1 = #exBool1;#lhs=#v0&#v1; ... }\] (post))
 \heuristics(simplify_expression)
 Choices: {programRules:Java}}
@@ -2984,7 +2984,7 @@ Choices: {programRules:Java}}
 == compound_assignment_5_mixed (compound_assignment) =========================================
 compound_assignment_5_mixed {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=#nseBool0||#seBool1; ... }\] (post))
-\varcond(\new(#v0 (program Variable), boolean))
+\varcond(\new(#v0 (program Variable), (type, sort): (boolean,boolean)))
 \replacewith(#allmodal ( (modal operator))\[{ .. boolean #v0 = #nseBool0;#lhs=#v0||#seBool1; ... }\] (post))
 \heuristics(simplify_expression)
 Choices: {programRules:Java}}
@@ -3010,7 +3010,7 @@ Choices: {programRules:Java}}
 == compound_assignment_6_nonsimple (compound_assignment) =========================================
 compound_assignment_6_nonsimple {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=#nseBool0|#exBool1; ... }\] (post))
-\varcond(\new(#v1 (program Variable), boolean), \new(#v0 (program Variable), boolean))
+\varcond(\new(#v1 (program Variable), (type, sort): (boolean,boolean)), \new(#v0 (program Variable), (type, sort): (boolean,boolean)))
 \replacewith(#allmodal ( (modal operator))\[{ .. boolean #v0 = #nseBool0;boolean #v1 = #exBool1;#lhs=#v0|#v1; ... }\] (post))
 \heuristics(simplify_expression)
 Choices: {programRules:Java}}
@@ -3278,7 +3278,7 @@ Choices: {programRules:Java}}
 == compound_assignment_xor_nonsimple (compound_assignment) =========================================
 compound_assignment_xor_nonsimple {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=#nseBool0^#exBool1; ... }\] (post))
-\varcond(\new(#v1 (program Variable), boolean), \new(#v0 (program Variable), boolean))
+\varcond(\new(#v1 (program Variable), (type, sort): (boolean,boolean)), \new(#v0 (program Variable), (type, sort): (boolean,boolean)))
 \replacewith(#allmodal ( (modal operator))\[{ .. boolean #v0 = #nseBool0;boolean #v1 = #exBool1;#lhs=#v0^#v1; ... }\] (post))
 \heuristics(simplify_expression)
 Choices: {programRules:Java}}
@@ -5037,14 +5037,14 @@ Choices: {integerSimplificationRules:full}}
 elim_double_block {
 \find(#allmodal ( (modal operator))\[{ {#slist}}\] (post))
 \replacewith(#allmodal ( (modal operator))\[{#slist}\] (post))
-
+\heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
 == elim_double_block_2 (elim_double_block) =========================================
 elim_double_block_2 {
 \find(#allmodal ( (modal operator))\[{ ..  { {#slist}} ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..  {#slist} ... }\] (post))
-
+\heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
 == elim_double_block_3 (elim_double_block) =========================================
@@ -5056,7 +5056,7 @@ elim_double_block_3 {
 \replacewith(#allmodal ( (modal operator))\[{ .. while ( #e )
     #s
  ... }\] (post))
-
+\heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
 == elim_double_block_4 (elim_double_block) =========================================
@@ -5068,7 +5068,7 @@ elim_double_block_4 {
 \replacewith(#allmodal ( (modal operator))\[{ .. for ( #loopInit; #guard; #forupdates )
     #s
  ... }\] (post))
-
+\heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
 == elim_double_block_5 (elim_double_block) =========================================
@@ -5080,7 +5080,7 @@ elim_double_block_5 {
 \replacewith(#allmodal ( (modal operator))\[{ .. for ( ; #guard; #forupdates )
     #s
  ... }\] (post))
-
+\heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
 == elim_double_block_6 (elim_double_block) =========================================
@@ -5092,7 +5092,7 @@ elim_double_block_6 {
 \replacewith(#allmodal ( (modal operator))\[{ .. for ( #loopInit; #guard;  )
     #s
  ... }\] (post))
-
+\heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
 == elim_double_block_7 (elim_double_block) =========================================
@@ -5104,7 +5104,7 @@ elim_double_block_7 {
 \replacewith(#allmodal ( (modal operator))\[{ .. for ( ; #guard;  )
     #s
  ... }\] (post))
-
+\heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
 == elim_double_block_8 (elim_double_block) =========================================
@@ -5114,7 +5114,7 @@ elim_double_block_8 {
  ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ .. do#swhile ( #e );
  ... }\] (post))
-
+\heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
 == elim_exists0 (elim_exists0) =========================================
@@ -6935,7 +6935,7 @@ ifElseUnfold {
   else
     #s1
  ... }\] (post))
-\varcond(\new(#boolv (program Variable), boolean))
+\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)))
 \replacewith(#allmodal ( (modal operator))\[{ .. boolean #boolv;#boolv=#nse;if (#boolv)
     #s0
   else  {
@@ -7193,7 +7193,7 @@ ifUnfold {
 \find(#allmodal ( (modal operator))\[{ .. if (#nse)
     #s0
  ... }\] (post))
-\varcond(\new(#boolv (program Variable), boolean))
+\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)))
 \replacewith(#allmodal ( (modal operator))\[{ .. boolean #boolv;#boolv=#nse;if (#boolv)
     #s0
  ... }\] (post))
