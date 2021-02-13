@@ -156,7 +156,9 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
 		    // unique representation of the replaced return
 		    Statement assignExpr = KeYJavaASTFactory.assign(returnExpr,
 			    x.getExpression(), x.getPositionInfo());
-		    stmnts = KeYJavaASTFactory.block(assignFlag, assignExpr,
+
+		    // changed order of statements to fix #991 (MT-1579)
+		    stmnts = KeYJavaASTFactory.block(assignExpr, assignFlag,
 			    breakInnerLabel);
                 } else
 		    // Keep the PositionInfo because it is required for symbolic
