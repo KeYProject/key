@@ -93,12 +93,13 @@ checkstyle:
   image: wadoon/key-test-docker:jdk11
   allow_failure: true
   script:
-    - echo "**** Check the commit's gitlab page for a readable checkstyle report ****"
     - (key/scripts/tools/checkstyle/runIncrementalCheckstyle.sh | tee report.txt) || true
-    - key/scripts/tools/checkstyle/publishAudit.py report.txt
+    - key/scripts/tools/checkstyle/translateAudit.py report.txt > report.json
   artifacts:
     name: "checkstyle-report-$CI_JOB_ID"
-    expire_in: 1 year
+    paths: report.txt
     when: always
-    paths:
-    - report.txt
+    reports:
+      codequality: report.json
+    expire_in: 1 year
+
