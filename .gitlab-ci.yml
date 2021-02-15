@@ -97,7 +97,8 @@ checkstyle:
     - key/scripts/tools/checkstyle/translateAudit.py report.txt > report.json
   artifacts:
     name: "checkstyle-report-$CI_JOB_ID"
-    paths: report.txt
+    paths: 
+      - report.txt
     when: always
     reports:
       codequality: report.json
