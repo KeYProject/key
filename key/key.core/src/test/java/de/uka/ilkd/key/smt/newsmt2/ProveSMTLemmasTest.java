@@ -36,10 +36,10 @@ import java.util.Properties;
 import static org.junit.Assert.*;
 
 /**
- * TODO
+ * This test case makes sure that all KeY formulas which are translated
+ * to axioms in SMT can actually be proved in KeY.
  *
  * @author Mattias Ulbrich
- *
  */
 @RunWith(Parameterized.class)
 @Category(Slow.class)
