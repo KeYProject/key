@@ -4,8 +4,11 @@ import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,6 +22,23 @@ import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
  * @author Jonas Schiffl
  */
 public class HandlerUtil {
+
+    public static final SMTHandlerProperty.BooleanProperty PROPERTY_NOBINDERS =
+            new SMTHandlerProperty.BooleanProperty("NoBinders",
+                    "Disable binder translation",
+                    "To translate binders (like seqDef or bsum)," +
+                            "a new function symbol must be introduced for every term." +
+                            "This may make the translation slow.");
+
+    public static final SMTHandlerProperty.BooleanProperty PROPERTY_TYPE_HIERARCHY =
+            new BooleanProperty("NoTypeHierarchy",
+                    "Disable type hierarchy encoding",
+                    "Type hierarchy is encoded with a number of quantified " +
+                            "axioms. They make the translation more precise, but may " +
+                            "also cost efficiency.");
+
+    public static final List<? extends SMTHandlerProperty<?>> GLOBAL_PROPERTIES =
+            Arrays.asList(PROPERTY_TYPE_HIERARCHY);
 
     private HandlerUtil() {
         throw new Error("do not instantiate");

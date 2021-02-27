@@ -24,8 +24,6 @@ import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
 
 public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Settings, Cloneable {
-	
-
 
         private static final String EXPLICIT_TYPE_HIERARCHY = "[SMTSettings]explicitTypeHierarchy";
 
@@ -48,10 +46,9 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
         
         private static final String INVARIANT_FORALL = "[SMTSettings]invariantForall";
 
-        private static final String LEGACY_TRANSLATION = "[SMTSettings]legacyTranslation";
-
         private Collection<SettingsListener> listeners = new LinkedHashSet<SettingsListener>();
 
+        // FIXME Why are these fields public?!
         public boolean useExplicitTypeHierarchy     = false;
         public boolean useNullInstantiation         = true;
         public boolean useBuiltInUniqueness          = false;

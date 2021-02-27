@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +15,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
 
 /**
  * This SMT translation handler takes care of integer expressions.
@@ -27,9 +29,17 @@ public class IntegerOpHandler implements SMTHandler {
     /** to indicate that an expression holds a value of type Int. */
     public static final Type INT = new Type("Int", "i2u", "u2i");
 
+    public static final SMTHandlerProperty.BooleanProperty PROPERTY_PRESBURGER =
+            new BooleanProperty("Presburger",
+                    "Limit arithmetics to Presburger arithmetic (LIA)",
+                    "Some tools only support linear arithmetic, others " +
+                            "may handle this more efficiently.");
+
     private final Map<Operator, String> supportedOperators = new HashMap<>();
     private final Set<Operator> predicateOperators = new HashSet<>();
     private Function jDivision;
+    private Function mul;
+    private boolean limitedToPresbuger;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
@@ -37,7 +47,8 @@ public class IntegerOpHandler implements SMTHandler {
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
 
         supportedOperators.put(integerLDT.getAdd(), "+");
-        supportedOperators.put(integerLDT.getMul(), "*");
+        mul = integerLDT.getMul();
+        supportedOperators.put(mul, "*");
         supportedOperators.put(integerLDT.getSub(), "-");
         supportedOperators.put(integerLDT.getDiv(), "div");
         supportedOperators.put(integerLDT.getNeg(), "-");
@@ -57,11 +68,31 @@ public class IntegerOpHandler implements SMTHandler {
 
         // sort_int is defined here, declare it as already defined
         masterHandler.addKnownSymbol("sort_int");
+
+        this.limitedToPresbuger = PROPERTY_PRESBURGER.get(masterHandler.getTranslationState());
     }
 
     @Override
     public boolean canHandle(Operator op) {
         return supportedOperators.containsKey(op);
+    }
+
+    @Override
+    public Capability canHandle(Term term) {
+        Operator op = term.op();
+        if (!supportedOperators.containsKey(op)) {
+            return Capability.UNABLE;
+        }
+        if(!limitedToPresbuger || op != mul) {
+            return Capability.YES_THIS_OPERATOR;
+        }
+
+        // TODO CHECK THAT ONE FACTOR IS A CONST
+        if(1 == 0+1) {
+            return Capability.YES_THIS_INSTANCE;
+        }
+
+        return Capability.YES_THIS_INSTANCE;
     }
 
     @Override
@@ -83,6 +114,14 @@ public class IntegerOpHandler implements SMTHandler {
         }
 
         return new SExpr(smtOp, resultType, children);
+    }
+
+    /*
+     * There is a switch for limiting to presburger arithmetic.
+     */
+    @Override
+    public List<SMTHandlerProperty<?>> getProperties() {
+        return Arrays.asList(PROPERTY_PRESBURGER);
     }
 
 }

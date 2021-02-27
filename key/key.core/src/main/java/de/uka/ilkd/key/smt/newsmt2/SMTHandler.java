@@ -6,6 +6,8 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -115,4 +117,17 @@ public interface SMTHandler {
      */
     SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException;
 
+    /**
+     * Any handler can offer a collection of properties that can be set
+     * in the GUI/script to control the translation.
+     *
+     * The returned list is used in {@link SMTHandlerServices} and will
+     * not be modified.
+     *
+     * @return the non-null list of properties that this handler
+     * supports and reads.
+     */
+    default List<SMTHandlerProperty<?>> getProperties() {
+        return Collections.emptyList();
+    }
 }

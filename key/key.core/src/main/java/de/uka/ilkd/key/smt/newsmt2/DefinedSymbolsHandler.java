@@ -17,10 +17,13 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandler.SymbolIntroducer;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -81,6 +84,12 @@ public class DefinedSymbolsHandler implements SMTHandler {
     private static final String TYPING_SUFFIX = ".typing";
     private static final Set<String> SUPPORTED_SUFFIXES =
             new HashSet<>(Arrays.asList(AXIOMS_SUFFIX, DL_SUFFIX, TACLETS_SUFFIX));
+    private static final SMTHandlerProperty.BooleanProperty PROPERTY_AXIOMATISATION =
+            new BooleanProperty("Axiomatisations",
+                    "Exclude axiomatisations",
+                    "SMT axioms may be present for symbols and included in the translation. " +
+                            "These axioms make the translation more powerful, but may also lead the " +
+                            "solver astray.");
 
     private final Set<String> supportedFunctions = new HashSet<>();
     private Services services;
@@ -89,6 +98,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
             new ParameterlessTermLabel(new Name("Trigger"));
     
     private Properties snippets;
+    private boolean enabled;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) throws IOException {
@@ -111,6 +121,8 @@ public class DefinedSymbolsHandler implements SMTHandler {
                         introduceSymbol);
             }
         }
+
+        this.enabled = PROPERTY_AXIOMATISATION.get(masterHandler.getTranslationState());
     }
 
 
@@ -190,6 +202,11 @@ public class DefinedSymbolsHandler implements SMTHandler {
         }
 
         return result;
+    }
+
+    @Override
+    public List<SMTHandlerProperty<?>> getProperties() {
+        return Arrays.asList(PROPERTY_AXIOMATISATION);
     }
 
     private void handleTacletAxioms(String name, MasterHandler trans) throws SMTTranslationException {

@@ -14,6 +14,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,15 +43,17 @@ public class SeqDefHandler implements SMTHandler {
 
     public static final String SEQ_DEF_PREFIX = "seqDef";
     private SeqLDT seqLDT;
+    private boolean enabled;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
+        enabled = !HandlerUtil.PROPERTY_NOBINDERS.get(masterHandler.getTranslationState());
         seqLDT = services.getTypeConverter().getSeqLDT();
     }
 
     @Override
     public boolean canHandle(Operator op) {
-        return op == seqLDT.getSeqDef();
+        return enabled && op == seqLDT.getSeqDef();
     }
 
     @Override
@@ -184,4 +187,13 @@ public class SeqDefHandler implements SMTHandler {
         }
         return new SExpr(name, Type.UNIVERSE, args);
     }
+
+    /*
+     * This handler should not go to work if binders have been deactivated.
+     */
+    @Override
+    public List<SMTHandlerProperty<?>> getProperties() {
+        return Arrays.asList(HandlerUtil.PROPERTY_NOBINDERS);
+    }
+
 }

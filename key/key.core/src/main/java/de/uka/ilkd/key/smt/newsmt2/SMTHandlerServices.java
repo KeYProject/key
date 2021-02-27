@@ -1,25 +1,31 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.ReplacementMap.NoIrrelevantLabelsReplacementMap;
 import org.key_project.util.Streams;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
+import java.util.logging.Handler;
 
 public class SMTHandlerServices {
 
     private static SMTHandlerServices theInstance;
     private List<SMTHandler> handlers;
-    private Map<SMTHandler, Properties> snippetMap = new IdentityHashMap<>();
+    private final Map<SMTHandler, Properties> snippetMap = new IdentityHashMap<>();
     private String preamble;
-    private Object theCreationLock = new Object();
+    private final Object theCreationLock = new Object();
+    private List<SMTHandlerProperty<?>> smtProperties = makeBuiltinProperties();
 
     public static SMTHandlerServices getInstance() {
         if (theInstance == null) {
@@ -51,6 +57,7 @@ public class SMTHandlerServices {
             if (handlerSnippets != null) {
                 snippetMap.put(smtHandler,  handlerSnippets);
             }
+            smtProperties.addAll(smtHandler.getProperties());
             result.add(smtHandler);
         }
         return result;
@@ -62,7 +69,7 @@ public class SMTHandlerServices {
 
         for (SMTHandler originalHandler : getOriginalHandlers()) {
             try {
-                SMTHandler copy = originalHandler.getClass().newInstance();
+                SMTHandler copy = originalHandler.getClass().getConstructor().newInstance();
                 copy.init(mh, services, snippetMap.get(originalHandler));
                 result.add(copy);
             } catch (Exception e) {
@@ -106,4 +113,15 @@ public class SMTHandlerServices {
         }
     }
 
+    private List<SMTHandlerProperty<?>> makeBuiltinProperties() {
+        List<SMTHandlerProperty<?>> result = new ArrayList<>();
+        result.addAll(HandlerUtil.GLOBAL_PROPERTIES);
+        return result;
+    }
+
+    public Collection<SMTHandlerProperty<?>> getSMTProperties() throws IOException {
+        // trigger the translation ...
+        getOriginalHandlers();
+        return Collections.unmodifiableCollection(smtProperties);
+    }
 }
