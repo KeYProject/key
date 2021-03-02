@@ -24,6 +24,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
+import java.util.Arrays;
 
 /**
  * Extension of {@link SimpleSettingsPanel} which uses {@link MigLayout} to
@@ -194,7 +196,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
             }
         });
         if (info != null && !info.isEmpty()) {
-            pCenter.add(new JLabel());
+            pCenter.add(new JLabel(info));
             pCenter.add(comboBox);
             JLabel infoButton = createHelpLabel(info);
             pCenter.add(infoButton, new CC().wrap());
@@ -251,6 +253,22 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         JSpinner field = createNumberTextField(min, max, step, validator);
         addTitledComponent(title, field, info);
         return field;
+    }
+
+    protected void addRadioButtons(String heading, Object[] alternatives, String description) {
+        addRadioButtons(heading, Arrays.asList(alternatives), description);
+    }
+
+    protected void addRadioButtons(String title, List<?> alternatives, String description) {
+        JPanel items = new JPanel(new GridLayout(alternatives.size(), 1));
+        ButtonGroup bg = new ButtonGroup();
+        for (Object alt : alternatives) {
+            JRadioButton radioButton = new JRadioButton(alt.toString());
+            radioButton.putClientProperty("object", alt);
+            bg.add(radioButton);
+            items.add(radioButton);
+        }
+        addTitledComponent(title, items, description);
     }
 
     /**

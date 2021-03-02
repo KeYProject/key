@@ -63,7 +63,7 @@ public class SimpleSettingsPanel extends JPanel {
 
 
         add(pNorth, BorderLayout.NORTH);
-        add(pCenter, BorderLayout.CENTER);
+        add(new JScrollPane(pCenter), BorderLayout.CENTER);
     }
 
     public void setHeaderText(String text) {
