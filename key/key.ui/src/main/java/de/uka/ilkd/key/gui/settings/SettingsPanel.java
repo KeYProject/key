@@ -181,7 +181,8 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @param <T>
      * @return
      */
-    protected <T> JComboBox<T> addComboBox(String info, int selectionIndex,
+    protected <T> JComboBox<T> addComboBox(String title,
+                                           String info, int selectionIndex,
                                            @Nullable Validator<T> validator, T... items) {
         JComboBox<T> comboBox = new JComboBox<>(items);
         comboBox.setSelectedIndex(selectionIndex);
@@ -196,7 +197,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
             }
         });
         if (info != null && !info.isEmpty()) {
-            pCenter.add(new JLabel(info));
+            pCenter.add(new JLabel(title));
             pCenter.add(comboBox);
             JLabel infoButton = createHelpLabel(info);
             pCenter.add(infoButton, new CC().wrap());
