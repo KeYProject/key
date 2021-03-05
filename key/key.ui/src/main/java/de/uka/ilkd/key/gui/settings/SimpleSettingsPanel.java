@@ -75,10 +75,14 @@ public class SimpleSettingsPanel extends JPanel {
     }
 
     protected void demarkComponentAsErrornous(JComponent component) {
-        component.setBackground(Color.white);//find color
+        Object col = component.getClientProperty("saved_background_color");
+        if (col instanceof Color) {
+            component.setBackground((Color) col);
+        }
     }
 
     protected void markComponentAsErrornous(JComponent component, String error) {
+        component.putClientProperty("saved_background_color", component.getBackground());
         component.setBackground(COLOR_ERROR.get());
         component.setToolTipText(error);
     }
