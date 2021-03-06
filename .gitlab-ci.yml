@@ -74,6 +74,7 @@ sonarqube:
   script:
     - cd key
     - gradle --build-cache --continue -Dsonar.qualitygate.wait=true -DjacocoEnabled=true testFast sonarqube
+    - ./scripts/tools/sonarqube_hint.py
   only:
     - merge_requests
     - master
@@ -97,10 +98,9 @@ checkstyle:
     - key/scripts/tools/checkstyle/translateAudit.py report.txt > report.json
   artifacts:
     name: "checkstyle-report-$CI_JOB_ID"
-    paths: 
+    paths:
       - report.txt
     when: always
     reports:
       codequality: report.json
     expire_in: 1 year
-
