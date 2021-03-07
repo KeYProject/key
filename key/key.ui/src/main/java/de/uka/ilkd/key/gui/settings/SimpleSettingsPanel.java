@@ -24,6 +24,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.text.Format;
 
@@ -102,6 +103,13 @@ public class SimpleSettingsPanel extends JPanel {
         return checkBox;
     }
 
+    protected JTextArea createTextArea(String text, Validator<String> validator) {
+        JTextArea area = new JTextArea(text);
+        area.getDocument().addDocumentListener(new DocumentValidatorAdapter(area, validator));
+        return area;
+    }
+
+
     protected JTextField createTextField(String text, final @Nullable Validator<String> validator) {
         JTextField field = new JTextField(text);
         field.getDocument().addDocumentListener(new DocumentValidatorAdapter(field, validator));
@@ -161,10 +169,10 @@ public class SimpleSettingsPanel extends JPanel {
     }
 
     private class DocumentValidatorAdapter implements DocumentListener {
-        private final JTextField field;
+        private final JTextComponent field;
         private final @Nullable Validator<String> validator;
 
-        private DocumentValidatorAdapter(JTextField field, @Nullable Validator<String> validator) {
+        private DocumentValidatorAdapter(JTextComponent field, @Nullable Validator<String> validator) {
             this.field = field;
             this.validator = validator;
         }

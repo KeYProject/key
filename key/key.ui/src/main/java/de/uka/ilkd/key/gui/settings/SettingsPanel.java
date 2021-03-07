@@ -23,9 +23,11 @@ import net.miginfocom.swing.MigLayout;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Extension of {@link SimpleSettingsPanel} which uses {@link MigLayout} to
@@ -218,6 +220,14 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         addRowWithHelp(helpText, label, component);
     }
 
+
+    protected JTextArea addTextArea(String title, String text, String info, final Validator<String> validator) {
+        JTextArea field = createTextArea(text, validator);
+        addTitledComponent(title, field, info);
+        return field;
+    }
+
+
     /**
      * @param title
      * @param text
@@ -230,6 +240,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         addTitledComponent(title, field, info);
         return field;
     }
+
 
     protected JTextField addTextField(String title, String text, String info, final Validator<String> validator,
                                       JComponent additionalActions) {
