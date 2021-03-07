@@ -109,6 +109,16 @@ task testRunAllProofs(type: Test) {
     }
 }
 
+
+task generateRunAllProofs(type: JavaExec) {
+    //Test runtime
+    classpath = sourceSets.test.runtimeClasspath
+    main = "de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests"
+    args "$buildDir/generated-src/rap-unittests/test"
+}
+sourceSets.test.java.srcDir "$buildDir/generated-src/rap-unittests/test"
+
+
 //Generation of the three version files within the resources by executing `git'.
 task generateVersionFiles() {
     def outputFolder = file("build/resources/main/de/uka/ilkd/key/util")
