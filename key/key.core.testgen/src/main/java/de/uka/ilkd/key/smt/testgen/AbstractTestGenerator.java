@@ -1,11 +1,7 @@
 package de.uka.ilkd.key.smt.testgen;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
+import java.io.IOException;
+import java.util.*;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -59,23 +55,22 @@ public abstract class AbstractTestGenerator {
    private final Proof originalProof;
    private SolverLauncher launcher;
    private List<Proof> proofs;
-   
+
    /**
     * Constructor.
     * @param ui The {@link UserInterfaceControl} to use.
     * @param originalProof The {@link Proof} to generate test cases for.
     */
-   public AbstractTestGenerator(UserInterfaceControl ui, Proof originalProof) {
+   protected AbstractTestGenerator(UserInterfaceControl ui, Proof originalProof) {
       this.ui = ui;
       this.originalProof = originalProof;
    }
 
    public void generateTestCases(final StopRequest stopRequest,
                                  final TestGenerationLog log) {
-	   
-	         
-      TestGenerationSettings settings =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
+
+
+      TestGenerationSettings settings = TestGenerationSettings.getInstance();
 
 
     if (!SolverType.Z3_CE_SOLVER.isInstalled(true)) {
@@ -93,38 +88,31 @@ public abstract class AbstractTestGenerator {
     			+ "\nInclude Postcondition option activated. Aborting.");
     	return;
     }
-    
+
     if(settings.getApplySymbolicExecution()){
         log.writeln("Applying TestGen Macro (bounded symbolic execution)...");
         try {
-            TestGenMacro macro = new TestGenMacro();        
-            //Strategy backupStrategy = originalProof.getActiveStrategy();
-            //ProofSettings backupSettings = originalProof.getSettings();
-            
+            TestGenMacro macro = new TestGenMacro();
             macro.applyTo(ui, originalProof, originalProof.openEnabledGoals(), null, null);
-
-            //now restore the strategy and settings.
-            //originalProof.setActiveStrategy(backupStrategy);
-            //originalProof.getInitConfig().setSettings(backupSettings);
             log.writeln("Finished symbolic execution.");
         }
-        catch(Throwable ex) {
+        catch(Exception ex) {
             log.writeException(ex);
-        }        
+        }
     }
-    
+
     log.writeln("Extracting test data constraints (path conditions).");
     proofs = createProofsForTesting(settings.removeDuplicates(), ! settings.includePostCondition());
     if (stopRequest != null && stopRequest.shouldStop()) {
        return;
     }
-    if (proofs.size() > 0) {
+    if (!proofs.isEmpty()) {
        log.writeln("Extracted " + proofs.size()
              + " test data constraints.");
     } else {
        log.writeln("No test data constraints were extracted.");
     }
-    final Collection<SMTProblem> problems = new LinkedList<SMTProblem>();
+    final Collection<SMTProblem> problems = new LinkedList<>();
     log.writeln("Test data generation: appling semantic blasting macro on proofs");
     try {
        for (final Proof proof : proofs) {
@@ -139,16 +127,11 @@ public abstract class AbstractTestGenerator {
              if (stopRequest != null && stopRequest.shouldStop()) {
                 return;
              }
-             
-            // System.out.println("Proof before:"+proof.toString());
-             
+
              selectProof(ui, proof);
 
              ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
-             synchronized(macro) {
                           info = macro.applyTo(ui, proof, proof.openEnabledGoals(), null, ptl);
-             }           
-           //  System.out.println("Proof after:"+proof.toString());
              problems.addAll(SMTProblem.createSMTProblems(proof));
           } catch (final InterruptedException e) {
              Debug.out("Semantics blasting interrupted");
@@ -167,8 +150,6 @@ public abstract class AbstractTestGenerator {
     }
     log.writeln("\nDone applying semantic blasting.");
     selectProof(ui, originalProof);
-    // getMediator().setInteractive(true);
-    // getMediator().startInterface(true);
     final Proof proof = originalProof;
 
     //create special smt settings for test case generation
@@ -187,14 +168,13 @@ public abstract class AbstractTestGenerator {
        public void launcherStopped(SolverLauncher launcher, Collection<SMTSolver> finishedSolvers) {
           handleLauncherStopped(launcher, finishedSolvers, log);
        }
-       
+
        @Override
        public void launcherStarted(Collection<SMTProblem> problems, Collection<SolverType> solverTypes, SolverLauncher launcher) {
           handleLauncherStarted(problems, solverTypes, launcher, log);
        }
     });
-    // launcher.addListener(new SolverListener(settings));
-    final List<SolverType> solvers = new LinkedList<SolverType>();
+    final List<SolverType> solvers = new LinkedList<>();
     solvers.add(SolverType.Z3_CE_SOLVER);
     SolverType.Z3_CE_SOLVER.checkForSupport();
     if (stopRequest != null && stopRequest.shouldStop()) {
@@ -202,11 +182,8 @@ public abstract class AbstractTestGenerator {
     }
     if (Thread.interrupted()) {
        return;
-    }    
+    }
     launcher.launch(solvers, problems, proof.getServices());
-    //    ModelGenerator mg = new ModelGenerator(proofs.get(0).root().sequent(), 3, getMediator());
-    //    mg.launch();
-    return;
    }
 
    protected void handleAllProofsPerformed(UserInterfaceControl ui) {
@@ -232,7 +209,7 @@ public abstract class AbstractTestGenerator {
     * Creates a proof for each open node if the selected proof is open and a
     * proof for each node on which the emptyModality rules was applied if the
     * selected proof is closed.
-    * 
+    *
     * @param removeDuplicatePathConditions
     *            - if true no identical proofs will be created
     * @param removePostCondition
@@ -240,8 +217,8 @@ public abstract class AbstractTestGenerator {
     * @return a list of proofs
     */
    private List<Proof> createProofsForTesting(boolean removeDuplicatePathConditions, boolean removePostCondition) {
-      final List<Proof> res = new LinkedList<Proof>();
-      final List<Node> nodes = new LinkedList<Node>();
+      final List<Proof> res = new LinkedList<>();
+      final List<Node> nodes = new LinkedList<>();
       final ImmutableList<Goal> oldGoals = originalProof.openGoals();
       if (originalProof.closed()) {
          getNodesWithEmptyModalities(
@@ -254,12 +231,12 @@ public abstract class AbstractTestGenerator {
       final Iterator<Node> oldGoalIter = nodes.iterator();
       while (oldGoalIter.hasNext()) {
          try {
-            Proof p = null;
+            Proof p;
             if (removeDuplicatePathConditions) {
-               p = createProofForTesting_noDuplicate(oldGoalIter.next(),
+               p = createProofForTestingNoDuplicate(oldGoalIter.next(),
                      res, removePostCondition);
             } else {
-               p = createProofForTesting_noDuplicate(oldGoalIter.next(),
+               p = createProofForTestingNoDuplicate(oldGoalIter.next(),
                      null, removePostCondition);
             }
             if (p != null) {
@@ -274,7 +251,7 @@ public abstract class AbstractTestGenerator {
 
    /**
     * Adds all nodes on which the emptyModality rule was applied to the list.
-    * 
+    *
     * @param root the root node
     * @param nodes the nodes to be added
     */
@@ -293,19 +270,19 @@ public abstract class AbstractTestGenerator {
    /**
     * Creates a proof with the specified node as its root. If an identical
     * proof is found in otherProofs than null will be returned instead.
-    * 
+    *
     * @param node the new root node
     * @param otherProofs a list of proofs as described above
     * @param removePostCondition if true, then remove post condition
     * @return the new proof with the specified root node
     * @throws ProofInputException exception for proof input
     */
-   private Proof createProofForTesting_noDuplicate(Node node, List<Proof> otherProofs, boolean removePostCondition) throws ProofInputException {
-      // System.out.println("Create proof for test case from Node:"+node.serialNr());
+   private Proof createProofForTestingNoDuplicate(Node node, List<Proof> otherProofs, boolean removePostCondition)
+           throws ProofInputException {
       final Proof oldProof = node.proof();
       final Sequent oldSequent = node.sequent();
       Sequent newSequent = Sequent.createSequent(
-            Semisequent.EMPTY_SEMISEQUENT, Semisequent.EMPTY_SEMISEQUENT);
+              Semisequent.EMPTY_SEMISEQUENT, Semisequent.EMPTY_SEMISEQUENT);
       Iterator<SequentFormula> it = oldSequent.antecedent().iterator();
       while (it.hasNext()) {
          final SequentFormula sf = it.next();
@@ -327,32 +304,30 @@ public abstract class AbstractTestGenerator {
       if (otherProofs != null) {
          for (final Proof otherProof : otherProofs) {
             if (otherProof.root().sequent().equals(newSequent)) {
-               // System.out.println("Found and skip duplicate proof for node:"+node.serialNr());
+               // Found and skip duplicate proof for node
                return null;
             }
          }
-      }  
+      }
       return createProof(ui, oldProof, "Test Case for NodeNr: " + node.serialNr(), newSequent);
    }
-   
+
    protected Proof createProof(UserInterfaceControl ui, Proof oldProof, String newName, Sequent newSequent) throws ProofInputException {
       ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(oldProof,
               new Choice("ban", "runtimeExceptions"));
       ProofStarter starter = SideProofUtil.createSideProof(env, newSequent, newName);
       Proof proof = starter.getProof();
       proof.getServices().getSpecificationRepository().registerProof(proof.getServices().getSpecificationRepository().getProofOblInput(oldProof), proof);
-      OneStepSimplifier.refreshOSS(proof);      
+      OneStepSimplifier.refreshOSS(proof);
       return proof;
    }
 
    private boolean hasModalities(Term t, boolean checkUpdates) {
       final JavaBlock jb = t.javaBlock();
       if (jb != null && !jb.isEmpty()) {
-         // System.out.println("Excluded javablock");
          return true;
       }
       if (t.op() == UpdateApplication.UPDATE_APPLICATION && checkUpdates) {
-         // System.out.println("Exclude update application.");
          return true;
       }
       boolean res = false;
@@ -371,8 +346,8 @@ public abstract class AbstractTestGenerator {
       try {
          log.writeln("Finished solving SMT problems: " + problemSolvers.size());
          problemSolvers = filterSolverResultsAndShowSolverStatistics(problemSolvers, log);
-         if (problemSolvers.size() > 0) {
-            generateFiles(launcher, problemSolvers, log, originalProof);
+         if (!problemSolvers.isEmpty()) {
+            generateFiles(problemSolvers, log, originalProof);
          } else {
             log.writeln("No test data was generated.");
             informAboutNoTestResults(launcher, problemSolvers, log, originalProof);
@@ -384,10 +359,11 @@ public abstract class AbstractTestGenerator {
       }
    }
 
-   protected void generateFiles(SolverLauncher launcher, Collection<SMTSolver> problemSolvers, TestGenerationLog log, Proof originalProof) throws Exception {
+   protected void generateFiles(Collection<SMTSolver> problemSolvers, TestGenerationLog log, Proof originalProof)
+           throws IOException {
       final TestCaseGenerator tg = new TestCaseGenerator(originalProof);
       tg.setLogger(log);
-            
+
       tg.generateJUnitTestSuite(problemSolvers);
       if (tg.isJunit()) {
          log.writeln("Compile the generated files using a Java compiler.");
@@ -407,7 +383,7 @@ public abstract class AbstractTestGenerator {
       int infeasiblePaths = 0;
       int solvedPaths = 0;
       int problem = 0;
-      final Vector<SMTSolver> output = new Vector<SMTSolver>();
+      final List<SMTSolver> output = new ArrayList<>();
       for (final SMTSolver solver : problemSolvers) {
          try {
             final SMTSolverResult.ThreeValuedTruth res = solver
@@ -416,7 +392,7 @@ public abstract class AbstractTestGenerator {
                unknown++;
                if(solver.getException() != null){
             	   solver.getException().printStackTrace();
-               }               
+               }
             } else if (res == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) {
                solvedPaths++;
                if (solver.getSocket().getQuery() != null) {
@@ -449,7 +425,7 @@ public abstract class AbstractTestGenerator {
       log.writeln("----------------------");
       return output;
    }
-   
+
    public void stopSMTLauncher() {
       if (launcher != null) {
          launcher.stop();
@@ -463,7 +439,7 @@ public abstract class AbstractTestGenerator {
    protected List<Proof> getProofs() {
       return proofs;
    }
-   
+
    protected UserInterfaceControl getUI () {
       return ui;
    }
