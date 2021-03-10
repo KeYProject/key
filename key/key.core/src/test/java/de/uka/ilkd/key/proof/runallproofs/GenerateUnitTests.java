@@ -6,23 +6,37 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Generation of test cases (JUnit) for given proof collection files.
+ * <p>
+ * This class is intended to be called from gradle. See the gradle task
+ * {@code generateRunAllProofs}.
+ * <p>
+ * The considered proof collections files are configured
+ * statically in {@link #collections}.
+ *
  * @author Alexander Weigl
  * @version 1 (6/14/20)
  */
 public class GenerateUnitTests {
-    static String outputFolder;
+    /**
+     * Output folder. Set on command line.
+     */
+    private static String outputFolder;
 
-    static String[] collections = new String[]{
+    /**
+     * List of considered proofs collections.
+     */
+    private final static String[] collections = new String[]{
             RunAllProofsFunctional.INDEX_FILE,
             RunAllProofsInfFlow.INDEX_FILE
     };
@@ -48,7 +62,7 @@ public class GenerateUnitTests {
         }
     }
 
-    static final String TEMPLATE_CONTENT = "package $packageName;\n" +
+    private static final String TEMPLATE_CONTENT = "package $packageName;\n" +
             "\n" +
             "import org.junit.*;\n" +
             //"import de.uka.ilkd.key.util.NamedRunner;\n" +
@@ -77,29 +91,23 @@ public class GenerateUnitTests {
             "\n" +
             "}\n";
 
-    private static String readAll(InputStream stream) {
-        byte[] buffer = new byte[1024 * 1024];
-        try {
-            int len = stream.read(buffer);
-            return new String(buffer, 0, len, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
+    /**
+     * Generates the test classes for the given proof collection,
+     * and writes the java files.
+     *
+     * @param col
+     * @param unit
+     * @throws IOException if the file is not writable
+     */
     private static void createUnitClass(ProofCollection col, RunAllProofsTestUnit unit) throws IOException {
-        String packageName = "de.uka.ilkd.key.proof.runallproofs.units";
+        String packageName = "de.uka.ilkd.key.proof.runallproofs";
         String name = unit.getTestName();
         String className = name
                 .replaceAll("\\.java", "")
                 .replaceAll("\\.key", "")
                 .replaceAll("[^a-zA-Z0-9]+", "_");
 
-        Path tmpDir = unit.getTempDir();
-        List<TestFile> files = unit.getTestFiles();
         ProofCollectionSettings settings = unit.getSettings();
-
         Map<String, String> vars = new TreeMap<>();
         vars.put("className", className);
         vars.put("packageName", packageName);
@@ -117,7 +125,7 @@ public class GenerateUnitTests {
 
         vars.put("timeout", "");
 
-        if (false) {
+        if (false) {// disabled
             int globalTimeout = 0;
             if (globalTimeout > 0)
                 vars.put("timeout", "@Rule public Timeout globalTimeout = Timeout.seconds(" + globalTimeout + ");");
@@ -127,7 +135,7 @@ public class GenerateUnitTests {
         Set<String> usedMethodNames = new TreeSet<>();
         int clashCounter = 0;
 
-        for (TestFile file : unit.getTestFiles()) {
+        for (TestFile<?> file : unit.getTestFiles()) {
             File keyFile = file.getKeYFile();
             String testName = keyFile.getName()
                     .replaceAll("\\.java", "")
@@ -139,24 +147,23 @@ public class GenerateUnitTests {
             }
             usedMethodNames.add(testName);
 
-            int timeout = 0;// (timeout <= 0 ? parent.timeout : 0)
-            String to = timeout > 0 ? "timeout=${1000 * timeout}" : "";
+            //int timeout = 0; (timeout <= 0 ? parent.timeout : 0)
+            String to = ""; //timeout > 0 ? "timeout=${1000 * timeout}" : "";
             methods.append("\n");
             methods.append("@Test(").append(to).append(")")
                     //.append("@TestName(\"").append(keyFile.getName()).append("\")")
                     .append("public void test").append(testName).append("() throws Exception {\n");
             //        "// This tests is based on").append(keyFile.getAbsolutePath()).append("\n");
 
-            String path = keyFile.getAbsolutePath().replace("\\", "/");
             switch (file.getTestProperty()) {
                 case PROVABLE:
-                    methods.append("assertProvability(\"").append(path).append("\");");
+                    methods.append("assertProvability(\"").append(keyFile.getAbsolutePath()).append("\");");
                     break;
                 case NOTPROVABLE:
-                    methods.append("assertUnProvability(\"").append(path).append("\");");
+                    methods.append("assertUnProvability(\"").append(keyFile.getAbsolutePath()).append("\");");
                     break;
                 case LOADABLE:
-                    methods.append("assertLoadability(\"").append(path).append("\");");
+                    methods.append("assertLoadability(\"").append(keyFile.getAbsolutePath()).append("\");");
                     break;
             }
             methods.append("}");

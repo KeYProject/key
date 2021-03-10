@@ -20,8 +20,22 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
+ * This class provides an API for running proves in JUnit test cases.
+ * <p>
+ * It is not intended to use this class outside of JUnit tests.
+ * The API mimics the same behavior as run-all-proves.
+ * So {@link #assertLoadability(String)}, {@link #assertLoadability(String)},
+ * and {@link #assertUnProvability(String)}
+ * correspond to the commands in the proof collection file.
+ * <p>
+ * Use the the member variables to configure the execution. Their meaning is identical to the variable in
+ * {@link de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection}.
+ * <p>
+ * This class is used by generated unit tests from the proof collections.
+ *
  * @author Alexander Weigl
  * @version 1 (12.07.19)
+ * @see GenerateUnitTests
  */
 public class ProveTest {
     protected boolean verbose = Boolean.getBoolean("prooftests.verbose");
@@ -46,8 +60,7 @@ public class ProveTest {
         runKey(file, TestProperty.LOADABLE);
     }
 
-    public void runKey(String file, TestProperty testProperty) throws Exception {
-
+    private void runKey(String file, TestProperty testProperty) throws Exception {
         // Initialize KeY settings.
         ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(globalSettings);
         if (localSettings != null && !"".equals(localSettings)) {
@@ -104,37 +117,21 @@ public class ProveTest {
             }
         }
 
-        String message = (success ? "pass: " : "FAIL: ")
-                + "Verifying property \"" + testProperty.toString().toLowerCase()
-                + "\"" + (success ? " was successful " : " failed ") + "for file: "
-                + keyFile.toString();
+        String message = String.format("%sVerifying property \"%s\"%sfor file: %s",
+                success ? "pass: " : "FAIL: ",
+                testProperty.toString().toLowerCase(),
+                success ? " was successful " : " failed ",
+                keyFile.toString());
+
         if (!success) {
             fail(message);
-        }
-    }
-
-    private void debugOut(String format, Object... args) {
-        if (verbose) {
-            System.err.format(format, args);
-        }
-    }
-
-    private void appendStatistics(Proof loadedProof, File keyFile) {
-        // Write statistics.
-        StatisticsFile statisticsFile = getStatisticsFile();
-        if (statisticsFile != null) {
-            try {
-                statisticsFile.appendStatistics(loadedProof, keyFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
     /**
      * Override this method in order to change reload behaviour.
      */
-    protected void reload(File proofFile, Proof loadedProof) throws Exception {
+    private void reload(File proofFile, Proof loadedProof) throws Exception {
         if (reloadEnabled) {
             System.err.println("Test reloadability.");
             // Save the available proof to a temporary file.
@@ -151,8 +148,8 @@ public class ProveTest {
      * By overriding this method we can change the way how we invoke automode,
      * for instance if we want to use a different strategy.
      */
-    protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-                            Pair<String, Location> script) throws Exception {
+    private void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
+                          Pair<String, Location> script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
@@ -222,4 +219,21 @@ public class ProveTest {
         return null;
     }
 
+    private void appendStatistics(Proof loadedProof, File keyFile) {
+        // Write statistics.
+        StatisticsFile statisticsFile = getStatisticsFile();
+        if (statisticsFile != null) {
+            try {
+                statisticsFile.appendStatistics(loadedProof, keyFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void debugOut(String format, Object... args) {
+        if (verbose) {
+            System.err.format(format, args);
+        }
+    }
 }
