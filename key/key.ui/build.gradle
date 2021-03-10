@@ -13,13 +13,14 @@ dependencies {
 
     compile project(":key.core.proof_references")
     compile project(":key.core.symbolic_execution")
-    compile project(":key.core.testgen")
     compile project(":key.removegenerics")
 
     compile 'com.miglayout:miglayout-swing:5.2'
 
     compile group: group, name: 'docking-frames-common', version: '1.0'
     compile group: group, name: 'docking-frames-core', version: '1.0'
+
+    runtimeOnly project(":keyext.ui.testgen")
 
     runtimeOnly project(":keyext.interactionlog")
     //runtimeOnly project(":keyext.script.ui")

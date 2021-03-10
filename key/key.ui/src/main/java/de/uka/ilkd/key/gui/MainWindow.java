@@ -585,9 +585,6 @@ public final class MainWindow extends JFrame {
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();
-        toolBar.add(new CounterExampleAction(this));
-        toolBar.add(new TestGenerationAction(this));
-        toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this));
         toolBar.addSeparator();
@@ -871,10 +868,6 @@ public final class MainWindow extends JFrame {
         proof.add(showActiveSettingsAction);
         proof.add(new ShowProofStatistics(this));
         proof.add(new ShowKnownTypesAction(this));
-        proof.addSeparator();
-        proof.add(new CounterExampleAction(this));
-        proof.add(new TestGenerationAction(this));
-
         return proof;
     }
 

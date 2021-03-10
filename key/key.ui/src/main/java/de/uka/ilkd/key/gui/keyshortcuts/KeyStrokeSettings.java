@@ -54,7 +54,6 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
             defineDefault(FinishSymbolicExecutionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F6, 0));
             defineDefault(OneStepProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0));
             defineDefault(HeapSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F9, 0));
-            defineDefault(TestGenMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
             defineDefault(UpdateSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F10, 0));
             defineDefault(IntegerSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0));
             defineDefault(QuickSaveAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyStrokeManager.MULTI_KEY_MASK));
@@ -68,7 +67,6 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
             defineDefault(TryCloseMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyStrokeManager.MULTI_KEY_MASK));
             defineDefault(FinishSymbolicExecutionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyStrokeManager.MULTI_KEY_MASK));
             defineDefault(OneStepProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyStrokeManager.MULTI_KEY_MASK));
-            defineDefault(TestGenMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyStrokeManager.MULTI_KEY_MASK));
             defineDefault(HeapSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyStrokeManager.MULTI_KEY_MASK));
             defineDefault(UpdateSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyStrokeManager.MULTI_KEY_MASK));
             defineDefault(IntegerSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyStrokeManager.MULTI_KEY_MASK));
@@ -103,11 +101,11 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
 
-    private static <T> void defineDefault(T any, KeyStroke ks) {
+    public static <T> void defineDefault(T any, KeyStroke ks) {
         defineDefault(any.getClass(), ks);
     }
 
-    private static <T> void defineDefault(Class<T> clazz, KeyStroke ks) {
+    public static <T> void defineDefault(Class<T> clazz, KeyStroke ks) {
         DEFAULT_KEYSTROKES.setProperty(clazz.getName(), ks.toString());
     }
 
