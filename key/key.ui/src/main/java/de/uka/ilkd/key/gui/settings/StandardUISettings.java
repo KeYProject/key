@@ -35,8 +35,8 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     private final JCheckBox chkMinimizeInteraction;
     private final JComboBox<String> spFontSizeTreeSequent;
     private final JCheckBox chkEnsureSourceConsistency;
-    private final JTextField txtClutterRules;
-    private final JTextField txtClutterRuleSets;
+    private final JTextArea txtClutterRules;
+    private final JTextArea txtClutterRuleSets;
 
     public StandardUISettings() {
         setHeaderText(getDescription());
@@ -59,15 +59,15 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
 
         chkShowWholeTacletCB =
                 addCheckBox("Show whole taclet", "Pretty-print whole Taclet including \n" +
-                            "'name', 'find', 'varCond' and 'heuristics'", false, emptyValidator());
+                        "'name', 'find', 'varCond' and 'heuristics'", false, emptyValidator());
 
         chkShowUninstantiatedTaclet =
                 addCheckBox("Show uninstantiated taclet", "recommended for unexperienced users",
-                            false, emptyValidator());
+                        false, emptyValidator());
 
-        txtClutterRules = addTextField("Clutter rules", "", INFO_CLUTTER_RULE, emptyValidator());
-        txtClutterRuleSets =
-                addTextField("Clutter Rulesets", "", INFO_CLUTTER_RULESET, emptyValidator());
+            txtClutterRules = addTextArea("Clutter rules", "", INFO_CLUTTER_RULE, emptyValidator());
+
+        txtClutterRuleSets = addTextArea("Clutter Rulesets", "", INFO_CLUTTER_RULESET, emptyValidator());
 
         chkPrettyPrint = addCheckBox("Pretty print terms", "", false, emptyValidator());
         chkUseUnicode = addCheckBox("Use unicode", "", false, emptyValidator());
@@ -96,8 +96,8 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         GeneralSettings generalSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
 
-        txtClutterRules.setText(vs.clutterRules().value());
-        txtClutterRuleSets.setText(vs.clutterRuleSets().value());
+        txtClutterRules.setText(vs.clutterRules().value().replace(',', '\n'));
+        txtClutterRuleSets.setText(vs.clutterRuleSets().value().replace(',', '\n'));
 
         spFontSizeGlobal.setValue(vs.getUIFontSizeFactor());
         txtMaxTooltipLines.setValue(vs.getMaxTooltipLines());
@@ -130,9 +130,8 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         vs.setUIFontSizeFactor((Double) spFontSizeGlobal.getValue());
         vs.setMaxTooltipLines((Integer) txtMaxTooltipLines.getValue());
 
-        vs.clutterRules().set(txtClutterRules.getText());
-        vs.clutterRuleSets().set(txtClutterRuleSets.getText());
-
+        vs.clutterRules().set(txtClutterRules.getText().replace('\n',','));
+        vs.clutterRuleSets().set(txtClutterRuleSets.getText().replace('\n',','));
 
         vs.setShowWholeTaclet(chkShowWholeTacletCB.isSelected());
         vs.setShowUninstantiatedTaclet(chkShowUninstantiatedTaclet.isSelected());

@@ -35,12 +35,6 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
 
     public TacletOptionsSettings() {
         setHeaderText(getDescription());
-        JScrollPane root = new JScrollPane();
-        root.getVerticalScrollBar().setUnitIncrement(10);
-        root.getHorizontalScrollBar().setUnitIncrement(10);
-        root.setViewportView(pCenter);
-        add(root, BorderLayout.CENTER);
-
         pCenter.setLayout(new MigLayout(
                 new LC().fillX(),
                 new AC().fill().grow().gap("3mm")

@@ -23,7 +23,11 @@ import net.miginfocom.swing.MigLayout;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Extension of {@link SimpleSettingsPanel} which uses {@link MigLayout} to
@@ -179,7 +183,8 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @param <T>
      * @return
      */
-    protected <T> JComboBox<T> addComboBox(String info, int selectionIndex,
+    protected <T> JComboBox<T> addComboBox(String title,
+                                           String info, int selectionIndex,
                                            @Nullable Validator<T> validator, T... items) {
         JComboBox<T> comboBox = new JComboBox<>(items);
         comboBox.setSelectedIndex(selectionIndex);
@@ -194,7 +199,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
             }
         });
         if (info != null && !info.isEmpty()) {
-            pCenter.add(new JLabel());
+            pCenter.add(new JLabel(title));
             pCenter.add(comboBox);
             JLabel infoButton = createHelpLabel(info);
             pCenter.add(infoButton, new CC().wrap());
@@ -215,6 +220,14 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         addRowWithHelp(helpText, label, component);
     }
 
+
+    protected JTextArea addTextArea(String title, String text, String info, final Validator<String> validator) {
+        JScrollPane field = createTextArea(text, validator);
+        addTitledComponent(title, field, info);
+        return (JTextArea) field.getViewport().getView();
+    }
+
+
     /**
      * @param title
      * @param text
@@ -227,6 +240,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         addTitledComponent(title, field, info);
         return field;
     }
+
 
     protected JTextField addTextField(String title, String text, String info, final Validator<String> validator,
                                       JComponent additionalActions) {
@@ -251,6 +265,22 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         JSpinner field = createNumberTextField(min, max, step, validator);
         addTitledComponent(title, field, info);
         return field;
+    }
+
+    protected void addRadioButtons(String heading, Object[] alternatives, String description) {
+        addRadioButtons(heading, Arrays.asList(alternatives), description);
+    }
+
+    protected void addRadioButtons(String title, List<?> alternatives, String description) {
+        JPanel items = new JPanel(new GridLayout(alternatives.size(), 1));
+        ButtonGroup bg = new ButtonGroup();
+        for (Object alt : alternatives) {
+            JRadioButton radioButton = new JRadioButton(alt.toString());
+            radioButton.putClientProperty("object", alt);
+            bg.add(radioButton);
+            items.add(radioButton);
+        }
+        addTitledComponent(title, items, description);
     }
 
     /**
