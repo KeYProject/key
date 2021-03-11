@@ -222,9 +222,9 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
 
 
     protected JTextArea addTextArea(String title, String text, String info, final Validator<String> validator) {
-        JTextArea field = createTextArea(text, validator);
+        JScrollPane field = createTextArea(text, validator);
         addTitledComponent(title, field, info);
-        return field;
+        return (JTextArea) field.getViewport().getView();
     }
 
 
