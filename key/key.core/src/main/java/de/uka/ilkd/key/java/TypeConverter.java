@@ -110,9 +110,6 @@ public final class TypeConverter {
     }
 
     public SeqLDT getSeqLDT() {
-        if (!LDTs.containsKey(SeqLDT.NAME)) {
-            LDTs.put(SeqLDT.NAME, new SeqLDT(services));
-        }
         return (SeqLDT) getLDT(SeqLDT.NAME);
     }
 
