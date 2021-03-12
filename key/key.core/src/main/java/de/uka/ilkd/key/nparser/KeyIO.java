@@ -212,7 +212,13 @@ public class KeyIO {
             if (ctx.isEmpty()) parseFile();
             loadDeclarations();
             loadSndDegreeDeclarations();
+            activateLDT();
             return loadTaclets();
+        }
+
+        private void activateLDT() {
+            services.getTypeConverter().init();
+
         }
 
         public ProblemFinder loadCompleteProblem() throws IOException {

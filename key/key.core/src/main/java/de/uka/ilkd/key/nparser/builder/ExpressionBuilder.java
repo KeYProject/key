@@ -1330,7 +1330,8 @@ public class ExpressionBuilder extends DefaultBuilder {
             } else if (ctxSuffix instanceof KeYParser.Attribute_simpleContext) {
                 KeYParser.Attribute_simpleContext attrid = (KeYParser.Attribute_simpleContext) ctxSuffix;
                 String memberName = attrid.id.getText();
-                if (current.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
+                Sort seqSort = lookupSort("Seq");
+                if (current.sort() == seqSort) {
                     if ("length".equals(memberName)) {
                         return getServices().getTermBuilder().seqLen(current);
                     } else {
