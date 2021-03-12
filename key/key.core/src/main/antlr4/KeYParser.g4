@@ -331,11 +331,8 @@ funcpred_name
  * non-terminal will recognize a term or a formula.  The `formula'
  * reads a formula/term and throws an error if it wasn't a formula.
  * This gives a rather late error message. */
-//region terms and formulas
 
-//(i0=1 & i1=1| i0=Z(neglit(1(#))) & i1=Z(neglit(1(#))))
-// {\subst uSub; 0}!b
-//((geq(sk,0) & {\subst uSub; sk}!b)-> {\subst uSub; (sk + 1)}!b)
+//region terms and formulas
 
 termEOF: term EOF; // toplevel
 
@@ -357,7 +354,7 @@ disjunction_term: a=conjunction_term (OR b+=conjunction_term)*;
 conjunction_term: a=term60 (AND b+=term60)*;
 term60: unary_formula | equality_term;
 unary_formula:
-    NOT sub=term60                         #negation_term
+    NOT sub=term60                                #negation_term
   | (FORALL | EXISTS) bound_variables sub=term60  #quantifierterm
   | MODALITY sub=term60                           #modality_term
 ;
@@ -500,24 +497,6 @@ location_term
     LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN
 ;
 
-
-/*
-staticAttributeOrQueryReference
-:
-  id=IDENT
-  (EMPTYBRACKETS )*
-;*/
-
-/**
-  instead, one can write o.(packagename.Classname::f)
-attrid
-:
-    id = simple_ident
-  | LPAREN clss = sortId DOUBLECOLON id2 = simple_ident RPAREN
-;
-*/
-
-
 ifThenElseTerm
 :
   IF LPAREN condF = term RPAREN
@@ -641,7 +620,7 @@ varexp
 ;
 
 
-varexpId:
+varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier. Only for backwards compatibility.
     APPLY_UPDATE_ON_RIGID
   | SAME_OBSERVER
   | DROP_EFFECTLESS_ELEMENTARIES
@@ -691,9 +670,6 @@ varexpId:
   | GET_VARIANT
   | IS_LABELED
 ;
-
-
-// ELEMSORT flag for hassort
 
 varexp_argument
 :
@@ -831,104 +807,5 @@ proofScript
   PROOFSCRIPT ps = STRING_LITERAL
 ;
 
+// PROOF
 proof: PROOF EOF;
-// Parsing ends at PROOF token, rest is handled on the lexer level
-//proofBody;
-
-/*proofBody
-:
-  LBRACE
-      ( pseudosexpr )+
-  RBRACE
-;
-
-pseudosexpr
-:
-  LPAREN
-    (proofElementId=expreid
-      (str=string_literal)?
-      (pseudosexpr)*
-    )?
-  RPAREN
-;
-
-expreid: id=simple_ident;
-
-/*
-
-formula
-    :
-      NOT formula  #negatedFormula
-    | programFml   #programFormula
-    | LBRACE SUBST logicalVariableDeclaration SEMI replacement=term RBRACE in=formula  #substitutionFormula
-    | LBRACE parallelUpdate RBRACE formula                                             #updateFormula
-    | IF LPAREN condition=formula RPAREN THEN LPAREN thenFml=formula RPAREN ELSE LPAREN elseFml=formula RPAREN #ifThenElseFormula
-    | quantifier=(FORALL | EXISTS) logicalVariableDeclaration SEMI formula #quantifiedFormula
-    | formula AND formula  #conjunctiveFormula
-    | formula OR formula   #disjunctiveFormula
-    |<assoc=right> formula IMP formula  #implicationFormula
-    | formula EQV formula  #equivalenceFormula
-    | term op=(LESS | LESSEQUAL | EQUALS | NOT_EQUALS | GREATER | GREATEREQUAL) term #comparisonFormula
-    | sym=funcpred_name arguments? #predicateFormula
-    | LPAREN formula RPAREN        #parenthesizedFormula
-    ;
-
-programFml
-   :
-       BOX_BEGIN BOX_END formula
-     | DIAMOND_BEGIN  DIAMOND_END formula
-     | MODALITY_BEGIN MODALITY_END formula
-   ;
-
-logicalVariableDeclaration
-    :
-    sort_name simple_ident
-    ;
-
-term
-    :
-      MINUS term  #unaryMinusTerm
-    | LBRACE SUBST logicalVariableDeclaration SEMI replacement=term RBRACE in=term                       #substitutionTerm
-    | LBRACE parallelUpdate RBRACE term                                                                  #updateTerm
-    | IF LPAREN condition=formula RPAREN THEN LPAREN thenTrm=term RPAREN ELSE LPAREN elseTrm=term RPAREN #ifThenElseTerm
-    | term op=(STAR | SLASH) term   #mulDivTerm
-    | term op=(PLUS | MINUS) term   #addSubTerm
-    | literal=digit                 #numberLiteralTerm
-    | sym=funcpred_name arguments?  #functionTerm
-    | funcpred_name (DOT funcpred_name)+ (AT funcpred_name)?   #attributeTerm
-    | funcpred_name (LBRACKET elementaryUpdate RBRACKET)+      #heapStoreTerm
-    | LPAREN term RPAREN                                       #parenthesizedTerm
-    ;
-
-arguments
-    :
-      LPAREN argumentList? RPAREN
-    ;
-
-argumentList
-   :
-     term (COMMA term)*
-   ;
-
-parallelUpdate
-   :
-     update (PARALLEL parallelUpdate)*
-   ;
-
-update
-   :
-     elementaryUpdate
-   | updateOnUpdateApplication
-   | LPAREN parallelUpdate RPAREN
-   ;
-
-elementaryUpdate
-   :
-     loc=simple_ident ASSIGN value=term
-   ;
-
-updateOnUpdateApplication
-   :
-    LBRACE update RBRACE update
-   ;
- */
