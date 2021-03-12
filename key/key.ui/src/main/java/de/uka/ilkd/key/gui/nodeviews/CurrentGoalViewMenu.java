@@ -240,7 +240,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
     private void createSMTMenu(MenuControl control) {
         Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE
-                .getSMTSettings().getSolverUnions();
+                .getSMTSettings().getSolverUnions(Main.isExperimentalMode());
         if (!solverUnions.isEmpty()) {
             addSeparator();
         }

@@ -151,7 +151,7 @@ public interface SolverType  {
 
             @Override
             public String getName() {
-                    return "Z3";
+                    return "Z3 (Legacy Translation)";
             }
 
             @Override
@@ -238,7 +238,7 @@ public interface SolverType  {
 
 		@Override
 		public String getName() {
-			return "Z3_NEW_TL";
+			return "Z3";
 		}
 
 		@Override
@@ -377,7 +377,7 @@ public interface SolverType  {
 
 	    @Override
 	    public String getName() {
-	        return "CVC3";
+	        return "CVC3 (Legacy Translation)";
 	    }
 
 	    @Override
@@ -472,7 +472,7 @@ public interface SolverType  {
 
         @Override
         public String getName() {
-            return "CVC4";
+            return "CVC4 (Legacy Translation)";
         }
 
         @Override
@@ -527,7 +527,7 @@ public interface SolverType  {
 
 		@Override
 		public String getName() {
-			return "Yices";
+			return "Yices (Legacy Translation)";
 		}
 
 		@Override
@@ -599,7 +599,7 @@ public interface SolverType  {
 
 		@Override
 		public String getName() {
-			return "Simplify";
+			return "Simplify (Legacy Translation)";
 		}
 
 		@Override
