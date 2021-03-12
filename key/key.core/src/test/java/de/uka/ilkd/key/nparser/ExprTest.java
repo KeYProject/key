@@ -8,10 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.key_project.util.testcategories.Interactive;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -52,7 +50,7 @@ public class ExprTest {
         KeyIO io = getIo();
         @NotNull Term actual = io.parseExpression(expr);
         if (actual == null) {
-            ParseAllKeyFilesTest.debugLexer(ParsingFacade.lex(CharStreams.fromString(expr)));
+            ParseAllKeyFilesTest.debugLexer(ParsingFacade.createLexer(CharStreams.fromString(expr)));
         }
         Assert.assertNotNull(actual);
         System.out.println(actual);

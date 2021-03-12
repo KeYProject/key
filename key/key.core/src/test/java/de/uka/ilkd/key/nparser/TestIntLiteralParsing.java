@@ -169,7 +169,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
 
     @Test
     public void testLex() {
-        KeYLexer lexer = ParsingFacade.lex(CharStreams.fromString(input));
+        KeYLexer lexer = ParsingFacade.createLexer(CharStreams.fromString(input));
         List<? extends Token> toks = lexer.getAllTokens();
         System.out.println(toks);
         assertEquals(1, toks.size());

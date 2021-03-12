@@ -39,7 +39,7 @@ public class DebugKeyLexer {
         stream = System.out;
         lexer = files.stream().map(it -> {
             try {
-                return ParsingFacade.lex(it.toPath());
+                return ParsingFacade.createLexer(it.toPath());
             } catch (IOException e) {
                 e.printStackTrace(stream);
             }
@@ -73,7 +73,7 @@ public class DebugKeyLexer {
     }
 
     public static void debug(String content) {
-        debug(ParsingFacade.lex(CharStreams.fromString(content)));
+        debug(ParsingFacade.createLexer(CharStreams.fromString(content)));
     }
 
     public static void debug(KeYLexer lexer) {

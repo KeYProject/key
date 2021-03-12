@@ -59,7 +59,7 @@ public class ProofReplayer {
      * @param startLine the starting of the sexpr needed for {@code prl}
      */
     public static void run(CharStream input, IProofFileParser prl, final int startLine) {
-        KeYLexer lexer = ParsingFacade.lex(input);
+        KeYLexer lexer = ParsingFacade.createLexer(input);
         CommonTokenStream stream = new CommonTokenStream(lexer);
         Stack<IProofFileParser.ProofElementID> stack = new Stack<>(); //currently open proof elements
         Stack<Integer> posStack = new Stack<>(); // stack of opened commands position

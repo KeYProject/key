@@ -74,7 +74,7 @@ public abstract class ParsingFacade {
     }
 
     private static KeYParser createParser(CharStream stream) {
-        KeYParser p = new KeYParser(new CommonTokenStream(lex(stream)));
+        KeYParser p = new KeYParser(new CommonTokenStream(createLexer(stream)));
         p.removeErrorListeners();
         p.addErrorListener(p.getErrorReporter());
         p.addErrorListener(new ANTLRErrorListener() {
@@ -102,11 +102,11 @@ public abstract class ParsingFacade {
         return p;
     }
 
-    public static KeYLexer lex(Path file) throws IOException {
-        return lex(CharStreams.fromPath(file));
+    public static KeYLexer createLexer(Path file) throws IOException {
+        return createLexer(CharStreams.fromPath(file));
     }
 
-    public static KeYLexer lex(CharStream stream) {
+    public static KeYLexer createLexer(CharStream stream) {
         return new KeYLexer(stream);
     }
 

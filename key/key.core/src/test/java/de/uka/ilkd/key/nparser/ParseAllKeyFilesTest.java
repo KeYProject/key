@@ -74,7 +74,7 @@ public class ParseAllKeyFilesTest {
 
     @Test
     public void lex() throws IOException {
-        KeYLexer toks = ParsingFacade.lex(file);
+        KeYLexer toks = ParsingFacade.createLexer(file);
         debugLexer(toks);
     }
 }
