@@ -404,6 +404,15 @@ primitive_term:
 ;
 
 /*
+weigl, 2021-03-12:
+   It would be nice if the following left-recursion would work.
+   ANTLR4 supports left-recursion, but their implementated resolution  of left-recursion
+   does not resolve a working grammar, that adheres the term precedence of KeY.
+
+   We are using the old grammar rules of the KeYParser.g (ANTLR3).
+   Maybe someone with more understanding of ANTLR4 could solve the problem and
+   write a more readable grammar.
+
 term
 :
     term (LGUILLEMETS labels = label RGUILLEMETS)   #termLabeled
