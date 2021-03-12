@@ -58,9 +58,7 @@ public class InitConfig {
     private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
 
 
-    private List<Taclet> taclets = new ArrayList<>();
-
-    //private ImmutableList<Taclet> taclets = ImmutableSLList.<Taclet>nil();
+    private ImmutableList<Taclet> taclets = ImmutableSLList.nil();
 
     /**
      * maps categories to their default choice (both represented as Strings),
@@ -228,28 +226,25 @@ public class InitConfig {
 
 
     public void addTaclets(Collection<Taclet> tacs) {
-        this.taclets.addAll(tacs);
+        taclets = taclets.append(tacs);
         this.activatedTacletCache = null;
     }
 
     public void setTaclets(ImmutableList<Taclet> tacs) {
-        this.taclets.clear();
-        for (Taclet t : tacs) {
-            this.taclets.add(t);
-        }
+        taclets = tacs;
         // invalidate active taclet cache
         this.activatedTacletCache = null;
     }
 
     public void setTaclets(Collection<Taclet> tacs){
-        this.taclets.clear();
+        taclets = ImmutableSLList.nil();
         addTaclets(tacs);
         // invalidate active taclet cache
         this.activatedTacletCache = null;
     }
 
     public ImmutableList<Taclet> getTaclets(){
-        return ImmutableList.fromList(taclets);
+        return taclets;
     }
 
     public Taclet lookupActiveTaclet(Name name) {
@@ -449,7 +444,7 @@ public class InitConfig {
         ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
         ic.setTaclet2Builder(
                 (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
-        ic.taclets = new ArrayList<>(taclets);//weigl: making a copy fixes a bug in loadTacletProofs
+        ic.taclets = taclets;
         ic.originalKeYFileName = originalKeYFileName;
         ic.justifInfo = justifInfo.copy();
         ic.fileRepo = fileRepo;     // TODO: copy instead? delete via dispose method?
