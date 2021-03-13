@@ -76,7 +76,10 @@ public class TestDeclParser {
     private void evaluateDeclarations(String s) {
         try {
             KeyIO.Loader l = io.load(s);
-            l.parseFile().loadComplete();
+            l.parseFile()
+                    .loadDeclarations()
+                    .loadSndDegreeDeclarations()
+                    .loadTaclets();
             parsedSchemaVars = l.getSchemaNamespace();
         } catch (Exception e) {
             throw new RuntimeException("'" + s + "' was not parseable and evaluatable", e);

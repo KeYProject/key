@@ -212,19 +212,20 @@ public class KeyIO {
             if (ctx.isEmpty()) parseFile();
             loadDeclarations();
             loadSndDegreeDeclarations();
-            activateLDT();
+            activateLDTs();
             return loadTaclets();
         }
 
-        private void activateLDT() {
+        public Loader activateLDTs() {
             services.getTypeConverter().init();
-
+            return this;
         }
 
         public ProblemFinder loadCompleteProblem() throws IOException {
             if (ctx.isEmpty()) parseFile();
             loadDeclarations();
             loadSndDegreeDeclarations();
+            activateLDTs();
             loadTaclets();
             return loadProblem();
         }
