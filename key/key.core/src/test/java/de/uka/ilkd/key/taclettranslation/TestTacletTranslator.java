@@ -69,7 +69,10 @@ public class TestTacletTranslator extends TestCase {
     private Taclet parseTaclet(String s) {
         try{
             KeyIO.Loader load = io.load(s);
-            List<Taclet> taclets = load.parseFile().loadComplete();
+            List<Taclet> taclets = load.parseFile()
+                    .loadDeclarations()
+                    .loadSndDegreeDeclarations()
+                    .loadTaclets();
             lastSchemaNamespace = load.getSchemaNamespace();
             return taclets.get(0);
         }
