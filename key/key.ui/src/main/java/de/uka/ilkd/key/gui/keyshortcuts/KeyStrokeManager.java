@@ -49,13 +49,13 @@ public final class KeyStrokeManager {
     /**
      * If true, F keys are used for macros, otherwise CTRL+SHIFT+letter.
      */
-    static final boolean FKEY_MACRO_SCHEME = Boolean.getBoolean("key.gui.fkeyscheme");
+    public static final boolean FKEY_MACRO_SCHEME = Boolean.getBoolean("key.gui.fkeyscheme");
 
     /**
      * This constant holds the typical key combination to be used for auxiliary shortcuts
      * ({@link KeyEvent#SHIFT_MASK} plus usually {@link KeyEvent#CTRL_MASK})
      */
-    static final int MULTI_KEY_MASK = SHORTCUT_KEY_MASK | KeyEvent.SHIFT_DOWN_MASK;
+    public static final int MULTI_KEY_MASK = SHORTCUT_KEY_MASK | KeyEvent.SHIFT_DOWN_MASK;
 
 
     /**

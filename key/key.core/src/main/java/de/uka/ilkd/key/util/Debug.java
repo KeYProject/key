@@ -27,8 +27,9 @@ public final class Debug implements DebugMBean {
             Boolean.valueOf(System.getProperty("KeyAssertionFlag", "true"));
 
     /** has to be set in order to enable debugging */
-    public static boolean ENABLE_DEBUG = "on".equals(System
-	    .getProperty("KeyDebugFlag"));
+    public static boolean ENABLE_DEBUG =
+			"on".equals(System.getProperty("KeyDebugFlag"))
+			|| "on".equals(System.getenv("KeyDebugFlag"));
 
     /**
      * Using the command line switch "-Dkey.debug.prefix" one can choose

@@ -23,6 +23,7 @@ import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
@@ -207,6 +208,8 @@ public final class MainWindow extends JFrame {
     private LemmaGenerationAction loadUserDefinedTacletsForProvingAction;
     private LemmaGenerationAction loadKeYTaclets;
     private LemmaGenerationBatchModeAction lemmaGenerationBatchModeAction;
+
+
     /**
      * actions for changing the selection on the proof tree
      */
@@ -585,9 +588,6 @@ public final class MainWindow extends JFrame {
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();
-        toolBar.add(new CounterExampleAction(this));
-        toolBar.add(new TestGenerationAction(this));
-        toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this));
         toolBar.addSeparator();
@@ -751,7 +751,6 @@ public final class MainWindow extends JFrame {
         fileMenu.add(quickLoadAction);
         fileMenu.addSeparator();
         fileMenu.add(proofManagementAction);
-
         fileMenu.add(loadUserDefinedTacletsAction);
         JMenu submenu = new JMenu("Prove");
         fileMenu.add(submenu);
@@ -759,6 +758,10 @@ public final class MainWindow extends JFrame {
         submenu.add(loadUserDefinedTacletsForProvingAction);
         submenu.add(loadKeYTaclets);
         submenu.add(lemmaGenerationBatchModeAction);
+        if(Main.isExperimentalMode()) {
+            RunAllProofsAction runAllProofsAction = new RunAllProofsAction(this);
+            submenu.add(runAllProofsAction);
+        }
         fileMenu.addSeparator();
         fileMenu.add(recentFileMenu.getMenu());
         fileMenu.addSeparator();
@@ -871,10 +874,6 @@ public final class MainWindow extends JFrame {
         proof.add(showActiveSettingsAction);
         proof.add(new ShowProofStatistics(this));
         proof.add(new ShowKnownTypesAction(this));
-        proof.addSeparator();
-        proof.add(new CounterExampleAction(this));
-        proof.add(new TestGenerationAction(this));
-
         return proof;
     }
 

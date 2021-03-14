@@ -10,12 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.gui.actions;
-
-import java.awt.event.ActionEvent;
-
-import javax.swing.Icon;
-import javax.swing.SwingWorker;
+package de.uka.ilkd.key.gui.testgen;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -24,23 +19,22 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.ExceptionDialog;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.SingleProof;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.counterexample.AbstractCounterExampleGenerator;
 import de.uka.ilkd.key.smt.counterexample.AbstractSideProofCounterExampleGenerator;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 public class CounterExampleAction extends MainWindowAction {
     private static final long serialVersionUID = -1931682474791981751L;
@@ -54,6 +48,7 @@ public class CounterExampleAction extends MainWindowAction {
         setTooltip(TOOLTIP);
         Icon icon = IconFactory.counterExample(MainWindow.TOOLBAR_ICON_SIZE);
         putValue(SMALL_ICON, icon);
+        setMenuPath("Proof");
         init();
         lookupAcceleratorKey();
     }
@@ -63,8 +58,8 @@ public class CounterExampleAction extends MainWindowAction {
      * fashion. This method has to be invoked after the Main class has been
      * initialized with the KeYMediator.
      * <p>
-     * <b>This class provides only the user interface and no counter example 
-     * generation logic which is implemented by the 
+     * <b>This class provides only the user interface and no counter example
+     * generation logic which is implemented by the
      * {@link AbstractCounterExampleGenerator}</b>.
      */
     public void init() {
@@ -79,9 +74,8 @@ public class CounterExampleAction extends MainWindowAction {
                 } else {
                     final Node selNode = getMediator().getSelectedNode();
                     //Can be applied only to root nodes
-                    
-                    
-                    
+
+
                     setEnabled(selNode.childrenCount() == 0 && !selNode.isClosed());
                 }
             }
@@ -93,140 +87,140 @@ public class CounterExampleAction extends MainWindowAction {
         };
         getMediator().addKeYSelectionListener(selListener);
         // This method delegates the request only to the UserInterfaceControl which implements the functionality.
-      // No functionality is allowed in this method body!
-      getMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
-                  @Override
-                  public void autoModeStarted(ProofEvent e) {
-                      getMediator().removeKeYSelectionListener(selListener);
-                      setEnabled(false);
-                  }
-      
-                  @Override
-                  public void autoModeStopped(ProofEvent e) {
-                      getMediator().addKeYSelectionListener(selListener);
-                      selListener.selectedNodeChanged(null);
-                  }
-              });
+        // No functionality is allowed in this method body!
+        getMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
+            @Override
+            public void autoModeStarted(ProofEvent e) {
+                getMediator().removeKeYSelectionListener(selListener);
+                setEnabled(false);
+            }
+
+            @Override
+            public void autoModeStopped(ProofEvent e) {
+                getMediator().addKeYSelectionListener(selListener);
+                selListener.selectedNodeChanged(null);
+            }
+        });
         selListener.selectedNodeChanged(new KeYSelectionEvent(getMediator().getSelectionModel()));
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-       try {
-          // Get required information
-          Goal goal = getMediator().getSelectedGoal();
-          Node node = goal.node();
-          Proof oldProof = node.proof();
-          Sequent oldSequent = node.sequent();
-          // Start SwingWorker (CEWorker) in which counter example search is performed.
-          getMediator().stopInterface(true);
-          getMediator().setInteractive(false);
-          CEWorker worker = new CEWorker(oldProof, oldSequent);
-          getMediator().addInterruptedListener(worker);
-          worker.execute();
-       }
-       catch (Exception exc) {
-          ExceptionDialog.showDialog(mainWindow, exc);
-       }
+        try {
+            // Get required information
+            Goal goal = getMediator().getSelectedGoal();
+            Node node = goal.node();
+            Proof oldProof = node.proof();
+            Sequent oldSequent = node.sequent();
+            // Start SwingWorker (CEWorker) in which counter example search is performed.
+            getMediator().stopInterface(true);
+            getMediator().setInteractive(false);
+            CEWorker worker = new CEWorker(oldProof, oldSequent);
+            getMediator().addInterruptedListener(worker);
+            worker.execute();
+        } catch (Exception exc) {
+            ExceptionDialog.showDialog(mainWindow, exc);
+        }
     }
 
     /**
-     * Performs the {@link SemanticsBlastingMacro} in a side proof hidden to the 
+     * Performs the {@link SemanticsBlastingMacro} in a side proof hidden to the
      * user and shows the result with help of the {@link SolverListener}.
      */
     public static class NoMainWindowCounterExampleGenerator extends AbstractSideProofCounterExampleGenerator {
-       /**
-        * {@inheritDoc}
-        */
-       @Override
-       protected SolverLauncherListener createSolverListener(SMTSettings settings, Proof proof) {
-          return new SolverListener(settings, proof);
-       }
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected SolverLauncherListener createSolverListener(SMTSettings settings, Proof proof) {
+            return new SolverListener(settings, proof);
+        }
     }
-    
+
     /**
      * Performs the {@link SemanticsBlastingMacro} in a {@link Proof} registered
-     * in the {@link MainWindow} and thus visible to the user. 
+     * in the {@link MainWindow} and thus visible to the user.
      * Results are shown with help of the {@link SolverListener}.
      * <p>
-     * <b>This class provides only the user interface and no counter example 
-     * generation logic which is implemented by the 
+     * <b>This class provides only the user interface and no counter example
+     * generation logic which is implemented by the
      * {@link AbstractCounterExampleGenerator}</b>.
      */
     public static class MainWindowCounterExampleGenerator extends AbstractCounterExampleGenerator {
-       /**
-        * The {@link KeYMediator} to use.
-        */
-       private final KeYMediator mediator;
-       
-       /**
-        * Constructor.
-        * @param mediator The {@link KeYMediator} to use.
-        */
-       public MainWindowCounterExampleGenerator(KeYMediator mediator) {
-          this.mediator = mediator;
-       }
+        /**
+         * The {@link KeYMediator} to use.
+         */
+        private final KeYMediator mediator;
 
-      /**
-        * {@inheritDoc}
-        */
-       @Override
-       protected Proof createProof(UserInterfaceControl ui, Proof oldProof, Sequent oldSequent, String proofName) {
-          Sequent newSequent = createNewSequent(oldSequent);
-          InitConfig newInitConfig = oldProof.getInitConfig().deepCopy();
-          Proof proof = new Proof(proofName,
-                  newSequent, "",
-                  newInitConfig.createTacletIndex(),
-                  newInitConfig.createBuiltInRuleIndex(),
-                  newInitConfig );
+        /**
+         * Constructor.
+         *
+         * @param mediator The {@link KeYMediator} to use.
+         */
+        public MainWindowCounterExampleGenerator(KeYMediator mediator) {
+            this.mediator = mediator;
+        }
 
-          proof.setEnv(oldProof.getEnv());
-          proof.setNamespaces(oldProof.getNamespaces());
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected Proof createProof(UserInterfaceControl ui, Proof oldProof, Sequent oldSequent, String proofName) {
+            Sequent newSequent = createNewSequent(oldSequent);
+            InitConfig newInitConfig = oldProof.getInitConfig().deepCopy();
+            Proof proof = new Proof(proofName,
+                    newSequent, "",
+                    newInitConfig.createTacletIndex(),
+                    newInitConfig.createBuiltInRuleIndex(),
+                    newInitConfig);
 
-          ProofAggregate pa = new SingleProof(proof, "XXX");
+            proof.setEnv(oldProof.getEnv());
+            proof.setNamespaces(oldProof.getNamespaces());
 
-          ui.registerProofAggregate(pa);
+            ProofAggregate pa = new SingleProof(proof, "XXX");
 
-          SpecificationRepository spec = proof.getServices().getSpecificationRepository();
-          spec.registerProof(spec.getProofOblInput(oldProof), proof);
-          
-          mediator.goalChosen(proof.getGoal(proof.root()));
+            ui.registerProofAggregate(pa);
 
-          return proof;
-       }
+            SpecificationRepository spec = proof.getServices().getSpecificationRepository();
+            spec.registerProof(spec.getProofOblInput(oldProof), proof);
 
-       /**
-        * {@inheritDoc}
-        */
-       @Override
-       protected void semanticsBlastingCompleted(UserInterfaceControl ui) {
-          mediator.setInteractive(true);
-          mediator.startInterface(true);
-       }
-       
-       /**
-        * {@inheritDoc}
-        */
-       @Override
-       protected SolverLauncherListener createSolverListener(SMTSettings settings, Proof proof) {
-          return new SolverListener(settings, proof);
-       }
+            mediator.goalChosen(proof.getGoal(proof.root()));
+
+            return proof;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void semanticsBlastingCompleted(UserInterfaceControl ui) {
+            mediator.setInteractive(true);
+            mediator.startInterface(true);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected SolverLauncherListener createSolverListener(SMTSettings settings, Proof proof) {
+            return new SolverListener(settings, proof);
+        }
     }
-    
+
     private class CEWorker extends SwingWorker<Void, Void> implements InterruptListener {
-        private final Proof oldProof; 
+        private final Proof oldProof;
         private final Sequent oldSequent;
 
         public CEWorker(Proof oldProof, Sequent oldSequent) {
-           this.oldProof = oldProof;
-           this.oldSequent = oldSequent;
+            this.oldProof = oldProof;
+            this.oldSequent = oldSequent;
         }
 
         @Override
         protected Void doInBackground() throws Exception {
-//           new MainWindowCounterExampleGenerator(getMediator()).searchCounterExample(getMediator().getUI(), oldProof, oldSequent);
-           new NoMainWindowCounterExampleGenerator().searchCounterExample(getMediator().getUI(), oldProof, oldSequent);
-           return null;
+            final NoMainWindowCounterExampleGenerator generator = new NoMainWindowCounterExampleGenerator();
+            generator.searchCounterExample(getMediator().getUI(), oldProof, oldSequent);
+            return null;
         }
 
         @Override

@@ -65,8 +65,8 @@ public class SettingsTreeModel extends DefaultTreeModel {
         independentSettingsNode.add(generateTableNode("Lemma Generator", lemmaSettings));
         Settings indSMTSettings =independentSettings.getSMTSettings();
         independentSettingsNode.add(generateTableNode("SMT", indSMTSettings));
-        Settings testgenSettings =independentSettings.getTestGenerationSettings();
-        independentSettingsNode.add(generateTableNode("Testcase Generation", testgenSettings));
+        //Settings testgenSettings =independentSettings.getTestGenerationSettings();
+        //independentSettingsNode.add(generateTableNode("Testcase Generation", testgenSettings));
         Settings viewSettings =independentSettings.getViewSettings();
         independentSettingsNode.add(generateTableNode("View", viewSettings));
         Settings termLabelSettings = independentSettings.getTermLabelSettings();

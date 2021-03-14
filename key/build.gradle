@@ -56,6 +56,14 @@ sonarqube {
     }
 }
 
+sonarqube {
+    properties {
+        property "sonar.projectKey", "key-main"
+        property "sonar.organization", "keyproject"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
+}
+
 subprojects {
     apply plugin: "java"
     apply plugin: "java-library"
