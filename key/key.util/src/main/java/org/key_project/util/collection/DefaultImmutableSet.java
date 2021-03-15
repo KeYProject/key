@@ -13,6 +13,10 @@
 
 package org.key_project.util.collection;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -306,7 +310,9 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      * @param set a non-null mutable set
      * @return a fresh immutable set with all the elements in set
      */
-    public static <T> ImmutableSet<T> fromSet(Set<T> set) {
+    @Contract("null -> null")
+    public static <T> ImmutableSet<T> fromSet(@Nullable Set<T> set) {
+        if(set == null) return null;
         if (set.isEmpty()) {
             return nil();
         } else {
@@ -317,6 +323,14 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
             return new DefaultImmutableSet<T>(backerList);
         }
     }
+
+
+    @Contract("null -> null")
+    public static <T> ImmutableSet<T> fromCollection(@Nullable Collection<T> seq) {
+        if(seq == null) return null;
+        return fromSet(new HashSet<>(seq));
+    }
+
 
     @Override
     public String toString() {

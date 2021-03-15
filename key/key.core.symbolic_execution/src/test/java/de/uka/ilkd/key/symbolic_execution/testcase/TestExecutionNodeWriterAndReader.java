@@ -50,6 +50,10 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodeWriter;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
+import static org.junit.Assert.*;
+import org.junit.Test;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests {@link ExecutionNodeWriter} and {@link ExecutionNodeReader}
@@ -59,56 +63,56 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
    /**
     * Tests the reading and writing process without variables and without call stack.
     */
-   public void testWritingAndReading_withoutVariables_and_withoutCallStack_withReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+   @Test public void testWritingAndReading_withoutVariables_and_withoutCallStack_withReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
       doTestWritingAndReading(false, false, true, true);
    }
    
    /**
     * Tests the reading and writing process without call stack.
     */
-   public void testWritingAndReading_withoutCallStack_withReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+   @Test public void testWritingAndReading_withoutCallStack_withReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
       doTestWritingAndReading(true, false, true, true);
    }
    
    /**
     * Tests the reading and writing process without variables.
     */
-   public void testWritingAndReading_withoutVariables_withReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+   @Test public void testWritingAndReading_withoutVariables_withReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
       doTestWritingAndReading(false, true, true, true);
    }
 
    /**
     * Tests the reading and writing process.
     */
-   public void testWritingAndReading_withReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+   @Test public void testWritingAndReading_withReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
       doTestWritingAndReading(true, true, true, true);
    }
    
    /**
     * Tests the reading and writing process without variables and without call stack.
     */
-   public void testWritingAndReading_withoutVariables_and_withoutCallStack_noReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+   @Test public void testWritingAndReading_withoutVariables_and_withoutCallStack_noReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
       doTestWritingAndReading(false, false, false, true);
    }
    
    /**
     * Tests the reading and writing process without call stack.
     */
-   public void testWritingAndReading_withoutCallStack_noReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+   @Test public void testWritingAndReading_withoutCallStack_noReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
       doTestWritingAndReading(true, false, false, false);
    }
    
    /**
     * Tests the reading and writing process without variables.
     */
-   public void testWritingAndReading_withoutVariables_noReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+   @Test public void testWritingAndReading_withoutVariables_noReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
       doTestWritingAndReading(false, true, false, true);
    }
 
    /**
     * Tests the reading and writing process.
     */
-   public void testWritingAndReading_noReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+   @Test public void testWritingAndReading_noReturnValues() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
       doTestWritingAndReading(true, true, false, false);
    }
    

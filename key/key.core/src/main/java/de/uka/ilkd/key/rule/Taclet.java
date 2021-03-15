@@ -13,11 +13,9 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
+import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -46,6 +44,8 @@ import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
+import javax.annotation.Nullable;
 
 
 /** 
@@ -90,7 +90,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
  * {@link de.uka.ilkd.key.rule.TacletApp TacletApp} </p>
  */
 public abstract class Taclet implements Rule, Named {
-   
+
    protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
 
    public RuleJustification getRuleJustification() {
@@ -917,4 +917,25 @@ public abstract class Taclet implements Rule, Named {
     }
     
     public abstract Taclet setName(String s);
+
+
+    private @NotNull ImmutableSet<Choice> tacletOptions = DefaultImmutableSet.nil();
+    public @NotNull ImmutableSet<Choice> getTacletOptions() {
+        return tacletOptions;
+    }
+    public void setTacletOptions(@NotNull ImmutableSet<Choice> tacletOptions) {
+        this.tacletOptions = tacletOptions;
+    }
+
+    /**
+     * Information about the origin of the taclet. Should be a location where the user can find the
+     * declaration of the taclet.
+     *
+     * This field is set by the parser with [url]:[lineNumber]
+     */
+    private @Nullable String origin;
+    @Override @Nullable public String getOrigin() { return origin; }
+    public void setOrigin(@Nullable String origin) { this.origin = origin; }
 }
+
+

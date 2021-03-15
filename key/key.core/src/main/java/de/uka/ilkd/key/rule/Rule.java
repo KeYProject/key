@@ -21,6 +21,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 
+import javax.annotation.Nullable;
+
 
 public interface Rule {
 
@@ -47,4 +49,12 @@ public interface Rule {
      */
     String displayName();
 
+    /**
+     * Information about the origin of the rule.
+     *
+     * Should be a human-readable location where the user can find the declaration of the rule.
+     *
+     * This field is set by the parser with [url]:[lineNumber]
+     */
+    @Nullable public default String getOrigin() { return null;}
 }

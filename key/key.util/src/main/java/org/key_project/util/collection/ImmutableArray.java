@@ -13,11 +13,10 @@
 
 package org.key_project.util.collection;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -54,6 +53,18 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     public ImmutableArray(List<S> list) {
         content = (S[]) list.toArray();
     }
+
+    /**
+     * creates a new immutable array with the contents of the given collection.
+     *
+     * The order of elements is defined by the collection
+     *
+     * @param seq non-null
+     */
+    public ImmutableArray(@NotNull Collection<S> seq) {
+        this(new ArrayList<>(seq));
+    }
+
 
     /** gets the element at the specified position
      * @param pos an int describing the position

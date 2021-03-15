@@ -1,6 +1,13 @@
 package de.uka.ilkd.key.proof.io;
 
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+
 import java.io.*;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -31,6 +38,19 @@ public class GZipFileRuleSource extends FileRuleSource {
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Error while reading rules.", e);
+        }
+    }
+
+    @Override
+    public CharStream getCharStream() throws IOException {
+        try (ReadableByteChannel channel = Channels.newChannel(getNewStream())) {
+            return CharStreams.fromChannel(
+                    channel,
+                    StandardCharsets.UTF_8,
+                    4096,
+                    CodingErrorAction.REPLACE,
+                    file().toString(),
+                    -1);
         }
     }
 }

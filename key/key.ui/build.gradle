@@ -52,5 +52,7 @@ application {
 
 run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
+    //systemProperties["KeyDebugFlag"] = "on"
+    //args << "--experimental"
 }
 

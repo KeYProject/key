@@ -13,33 +13,27 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Stack;
-
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.KeYLexerF;
-import de.uka.ilkd.key.parser.KeYParserF;
-import de.uka.ilkd.key.parser.ParserMode;
-import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.parser.AbstractTestTermParser;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.key_project.util.collection.ImmutableSLList;
 
-public class TestClashFreeSubst extends TestCase {
+import java.io.IOException;
+import java.util.Stack;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
+public class TestClashFreeSubst extends AbstractTestTermParser {
 
     TermFactory tf;
 
@@ -56,32 +50,18 @@ public class TestClashFreeSubst extends TestCase {
 
     ProgramVariable pv0;
 
-    public TestClashFreeSubst(String name) {
-	super(name);
-    }
+    @Before
+	public void setUp() throws IOException {
+		services = new Services(AbstractProfile.getDefaultProfile());
+		nss = services.getNamespaces();
+		tf = services.getTermFactory();
+		io = new KeyIO(services, nss);
+		String sorts = "\\sorts{boolean;int;LocSet;Seq;}";
+		parseDecls(sorts);
+		Assert.assertNotNull(nss.sorts().lookup("boolean"));
 
-    public void setUp() {
-	services = new Services(AbstractProfile.getDefaultProfile());
-	nss = services.getNamespaces();
-	tf = services.getTermFactory();
-
-	// This must contain all basic sorts used in the JavaRedux libraries
-	// and the files for these test cases.
-	String sorts = "\\sorts{boolean;int;LocSet;Seq;}";
-
-	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION,
-		new KeYLexerF(sorts,
-			"No file. Call of parser from logic/TestClashFreeSubst.java"),
-		services, nss);
-	try {
-	    basicSortsParser.parseSorts();
-	} catch(Exception e) {
-	    throw new RuntimeException(e);
-	}
-
-	Recoder2KeY r2k = new Recoder2KeY(services, nss);
-	r2k.parseSpecialClasses();
-
+		Recoder2KeY r2k = new Recoder2KeY(services, nss);
+		r2k.parseSpecialClasses();
 
 	parseDecls("\\sorts { srt; }\n" +
 		   "\\functions {\n" +
@@ -111,7 +91,7 @@ public class TestClashFreeSubst extends TestCase {
 	z = declareVar("z",srt);   t_z = tf.createTerm(z);
     }
 
-    Sort lookup_sort(String name) {
+    public Sort lookup_sort(String name) {
 	Sort s = nss.sorts().lookup(new Name(name));
  	if ( s == null ) {
 	    throw new RuntimeException("Sort named "+name+" not found");
@@ -119,7 +99,7 @@ public class TestClashFreeSubst extends TestCase {
 	return s;
     }
 
-    Function lookup_func(String name) {
+    public Function lookup_func(String name) {
 	Function f = nss.functions().lookup(new Name(name));
  	if ( f == null ) {
 	    throw new RuntimeException("Function named "+name+" not found");
@@ -127,71 +107,10 @@ public class TestClashFreeSubst extends TestCase {
 	return f;
     }
 
-    LogicVariable declareVar(String name,Sort sort) {
+    public LogicVariable declareVar(String name, Sort sort) {
 	LogicVariable v = new LogicVariable(new Name(name),sort);
 	nss.variables().add(v);
 	return v;
-    }
-
-
-    private KeYParserF stringDeclParser(String s) {
-
-	return new KeYParserF(ParserMode.DECLARATION,
-		new KeYLexerF(s,
-			"No file. Call of parser from logic/TestClashFreeSubst.java"),
-		services, nss);
-    }
-
-    public void parseDecls(String s) {
-	try {
-	    KeYParserF p = stringDeclParser(s);
-	    p.decls();
-	} catch (Exception e) {
-	    StringWriter sw = new StringWriter();
-	    PrintWriter pw = new PrintWriter(sw);
-	    e.printStackTrace(pw);
-	    throw new RuntimeException("Exc while Parsing:\n" + sw );
-	}
-    }
-
-    private KeYParserF stringTermParser(String s) {
-	return new KeYParserF(ParserMode.GLOBALDECL,
-		new KeYLexerF(s,
-			"No file. Call of parser from logic/TestClashFreeSubst.java"),
-		new Recoder2KeY(services,
-			new KeYCrossReferenceServiceConfiguration(new KeYRecoderExcHandler()),
-			services.getJavaInfo().rec2key(),
-			new NamespaceSet(),
-			services.getTypeConverter()),
-		services,
-		nss,
-		new AbbrevMap());
-    }
-
-    public Term parseTerm(String s) {
-	try {
-	    KeYParserF p = stringTermParser(s);
- 	    return p.term();
-	} catch (Exception e) {
-	    StringWriter sw = new StringWriter();
-	    PrintWriter pw = new PrintWriter(sw);
-	    e.printStackTrace(pw);
-	    throw new RuntimeException("Exc while Parsing:\n" + sw );
-	}
-    }
-
-
-    public Term parseFma(String s) {
-	try {
-	    KeYParserF p = stringTermParser(s);
-
-	    return p.formula();
-	} catch (Exception e) {
-	    StringWriter sw = new StringWriter();
-	    PrintWriter pw = new PrintWriter(sw);
-	    e.printStackTrace(pw);
-	    throw new RuntimeException("Exc while Parsing:\n" + sw );
-	}
     }
 
 
@@ -234,7 +153,7 @@ public class TestClashFreeSubst extends TestCase {
 	    }
 	    Term[] sub = new Term[arity];
 	    for ( int i = arity-1; i>=0; i-- ) {
-		sub[i] = (subStack.pop());
+		sub[i] = subStack.pop();
 	    }
 	    subStack.push(tf.createTerm(op, sub, visited.boundVars(), null));
 	}
@@ -246,7 +165,8 @@ public class TestClashFreeSubst extends TestCase {
 
     // Test Cases
 
-    public void testSubst() {
+	@Test
+    public void testSubst() throws Exception {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("g(v,x)");
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
@@ -255,7 +175,8 @@ public class TestClashFreeSubst extends TestCase {
 		     cfs.apply(t));
     }
 
-    public void testSubstWary() {
+	@Test
+	public void testSubstWary() throws Exception {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("q(v,x)");
 	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services.getTermBuilder());
@@ -264,7 +185,8 @@ public class TestClashFreeSubst extends TestCase {
 		     cfs.apply(t));
     }
 
-    public void testShare() {
+	@Test
+    public void testShare() throws Exception {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("g(v,f(x))");
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
@@ -272,7 +194,8 @@ public class TestClashFreeSubst extends TestCase {
 		   t.sub(1), cfs.apply(t).sub(1));
     }
 
-    public void testShareWary() {
+	@Test
+    public void testShareWary() throws Exception {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("q(v,f(x))");
 	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services.getTermBuilder());
@@ -298,7 +221,8 @@ public class TestClashFreeSubst extends TestCase {
     }
     */
 
-    public void testClash() {
+	@Test
+    public void testClash() throws Exception {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("\\exists x; q(x,v)");
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
@@ -314,7 +238,8 @@ public class TestClashFreeSubst extends TestCase {
 	nss.setVariables(nss.variables().parent());
     }
 
-    public void testSubstInSubstTerm() {
+	@Test
+    public void testSubstInSubstTerm() throws Exception {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("{\\subst y; f(v)}g(y,v)");
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
@@ -323,7 +248,8 @@ public class TestClashFreeSubst extends TestCase {
 		     cfs.apply(t));
     }
 
-    public void testClashInSubstTerm() {
+	@Test
+    public void testClashInSubstTerm() throws Exception {
 	Term s = parseTerm("f(x)");
 	Term t = parseTerm("{\\subst x; f(v)}g(x,v)");
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
@@ -340,7 +266,8 @@ public class TestClashFreeSubst extends TestCase {
     }
 
 
-    public void testMultiSubst() {
+	@Test
+    public void testMultiSubst() throws Exception {
 	Term s = parseTerm("f(x)");
 	Term t = toMulti(parseFma("\\forall y; \\forall z; q(y,g(v,z))"));
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
@@ -349,7 +276,10 @@ public class TestClashFreeSubst extends TestCase {
 		     cfs.apply(t));
     }
 
-    public void testMultiShareBound() {
+	private Term parseFma(String s) throws Exception { return parseTerm(s); }
+
+	@Test
+    public void testMultiShareBound() throws Exception {
 	Term s = parseTerm("f(x)");
 	Term t = toMulti(parseFma("\\forall y; \\forall v; \\forall z; q(y,g(v,z))"));
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
@@ -359,7 +289,7 @@ public class TestClashFreeSubst extends TestCase {
 
     // disabled. multi vars at quantifier currently not supported by
     // KeY and feature of data structures suppressed by TermFactory. /AR 040420
-    public void xtestMultiClash() {
+    public void xtestMultiClash() throws Exception {
 	Term s = parseTerm("f(x)");
 	Term t = toMulti(parseFma("\\forall y; \\forall x; \\forall z; q(g(x,y),g(v,z))"));
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
@@ -378,7 +308,7 @@ public class TestClashFreeSubst extends TestCase {
 
     // disabled. multi vars at quantifier currently not supported by
     // KeY and feature of data structures suppressed by TermFactory. /AR 040420
-    public void xtestMultiClash1() {
+    public void xtestMultiClash1() throws Exception {
 	Term s = parseTerm("f(x)");
 	Term t = toMulti(parseFma("\\forall y; \\forall x;\\forall z; q(g(x,y),g(v,z))"));
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s, services.getTermBuilder());
@@ -396,7 +326,8 @@ public class TestClashFreeSubst extends TestCase {
     }
 
 
-    public void testWary0() {
+	@Test
+    public void testWary0() throws Exception {
 	Term s = parseTerm("f(pv0)");
 	Term t = parseTerm("q(v,x)");
 	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services.getTermBuilder());
@@ -405,7 +336,8 @@ public class TestClashFreeSubst extends TestCase {
 		     cfs.apply(t));
     }
 
-    public void testWary1() {
+	@Test
+    public void testWary1() throws Exception {
 	Term s = parseTerm("f(pv0)");
 	Term t = parseTerm("q(v,x) & {pv0:=v}q(x,x)");
 	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services.getTermBuilder());
@@ -414,7 +346,8 @@ public class TestClashFreeSubst extends TestCase {
 		     cfs.apply(t));
     }
 
-    public void testWary2() {
+	@Test
+    public void testWary2() throws Exception {
 	Term s = parseTerm("f(pv0)");
 	Term t = parseTerm("q(v,x) & {pv0:=v}q(x,v)");
 	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s, services.getTermBuilder());

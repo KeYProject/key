@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 
 public class FileRuleSource extends RuleSource {
 
@@ -14,15 +15,14 @@ public class FileRuleSource extends RuleSource {
      * The non-<code>null</code> reference to the file from which rules are
      * read.
      */
-    protected final File ruleFile;
+    protected @NotNull
+    final File ruleFile;
 
     private long numberOfChars;
 
-    FileRuleSource(final File ruleFile) {
-        this.ruleFile = ruleFile;
-        if (ruleFile != null) {
-            numberOfChars = ruleFile.length();
-        }
+    FileRuleSource(File ruleFile) {
+        this.ruleFile = Objects.requireNonNull(ruleFile);
+        numberOfChars = ruleFile.length();
     }
 
     @Override
@@ -31,10 +31,7 @@ public class FileRuleSource extends RuleSource {
     }
 
     @Override
-    public File file() {
-        if(ruleFile == null) {
-            throw new NullPointerException();
-        }
+    public @NotNull File file() {
         return ruleFile;
     }
 
@@ -51,19 +48,24 @@ public class FileRuleSource extends RuleSource {
             // should not be thrown
             throw new RuntimeException(exception);
         }
-    }   
+    }
 
     @Override
     public InputStream getNewStream() {
         try {
-            return new FileInputStream(ruleFile);
+            return new BufferedInputStream(new FileInputStream(ruleFile));
         } catch (final FileNotFoundException exception) {
-            throw new RuntimeException("Error while reading rules.", exception);
+            throw new RuntimeException("Error while opening a file stream to " + ruleFile, exception);
         }
     }
 
     @Override
     public String toString() {
         return ruleFile.toString();
+    }
+
+    @Override
+    public CharStream getCharStream() throws IOException {
+        return CharStreams.fromFileName(ruleFile.getAbsolutePath());
     }
 }

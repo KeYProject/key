@@ -86,12 +86,14 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.KeYConstants;
 import junit.framework.TestCase;
 
+import static org.junit.Assert.*;
+
 /**
  * Provides the basic functionality of {@link TestCase}s which tests
  * the symbolic execution features.
  * @author Martin Hentschel
  */
-public abstract class AbstractSymbolicExecutionTestCase extends TestCase {
+public abstract class AbstractSymbolicExecutionTestCase {
    /**
     * <p>
     * If this constant is {@code true} a temporary directory is created with
@@ -2049,15 +2051,15 @@ public abstract class AbstractSymbolicExecutionTestCase extends TestCase {
     * @return The original settings which are overwritten.
     */
    public static HashMap<String, String> setDefaultTacletOptions() {
-	   HashMap<String,String> original = HelperClassForTests.setDefaultTacletOptions();
-	   // set non modular reasoning
-	   System.out.println(ProofSettings.DEFAULT_SETTINGS);
-	   ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-	   System.out.println(choiceSettings);
-	   ImmutableSet<Choice> cs = DefaultImmutableSet.nil();
-	   cs = cs.add(new Choice("noRestriction", "methodExpansion"));
-	   choiceSettings.updateWith(cs);
-	   return original;
+      HashMap<String, String> original = HelperClassForTests.setDefaultTacletOptions();
+      // set non modular reasoning
+      //System.out.println(ProofSettings.DEFAULT_SETTINGS);
+      ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+      //System.out.println(choiceSettings);
+      ImmutableSet<Choice> cs = DefaultImmutableSet.nil();
+      cs = cs.add(new Choice("noRestriction", "methodExpansion"));
+      choiceSettings.updateWith(cs);
+      return original;
    }
 
    /**
