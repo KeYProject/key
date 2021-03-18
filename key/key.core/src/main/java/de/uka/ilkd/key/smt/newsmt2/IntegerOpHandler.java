@@ -40,11 +40,12 @@ public class IntegerOpHandler implements SMTHandler {
     private Function jDivision;
     private Function mul;
     private boolean limitedToPresbuger;
+    private IntegerLDT integerLDT;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         supportedOperators.clear();
-        IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        this.integerLDT = services.getTypeConverter().getIntegerLDT();
 
         supportedOperators.put(integerLDT.getAdd(), "+");
         mul = integerLDT.getMul();
@@ -83,16 +84,21 @@ public class IntegerOpHandler implements SMTHandler {
         if (!supportedOperators.containsKey(op)) {
             return Capability.UNABLE;
         }
+
         if(!limitedToPresbuger || op != mul) {
             return Capability.YES_THIS_OPERATOR;
         }
 
-        // TODO CHECK THAT ONE FACTOR IS A CONST
-        if(1 == 0+1) {
+        if(op == mul &&
+                (isIntLiteral(term.sub(0)) || isIntLiteral(term.sub(1)))) {
             return Capability.YES_THIS_INSTANCE;
         }
 
         return Capability.YES_THIS_INSTANCE;
+    }
+
+    private boolean isIntLiteral(Term term) {
+        return term.op() == integerLDT.getNumberSymbol();
     }
 
     @Override

@@ -105,6 +105,7 @@ public class MasterHandlerTest {
         SMTSettings settings = new SMTSettings(
                 proof.getSettings().getSMTSettings(),
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                proof.getSettings().getNewSMTSettings(),
                 proof);
 
         ModularSMTLib2Translator translator = new ModularSMTLib2Translator();

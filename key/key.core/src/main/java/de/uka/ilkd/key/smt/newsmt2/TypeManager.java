@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
@@ -10,8 +9,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * This class contains the outsourced routines for KeY sort definitions and axioms
@@ -38,7 +35,7 @@ class TypeManager {
      * by asserting the subtype relationship (or its absence).
      * @param master the master handler
      */
-    void createSortTypeHierarchy(MasterHandler master, Services services) {
+    private void createSortTypeHierarchy(MasterHandler master, Services services) {
 
         for (Sort s : master.getSorts()) {
             Set<Sort> children = directChildSorts(s, master.getSorts(), services);
@@ -166,6 +163,8 @@ class TypeManager {
         }
 
         // and have a type hierarchy.
-        createSortTypeHierarchy(master, services);
+        if(!HandlerUtil.PROPERTY_NO_TYPE_HIERARCHY.get(services)) {
+            createSortTypeHierarchy(master, services);
+        }
     }
 }

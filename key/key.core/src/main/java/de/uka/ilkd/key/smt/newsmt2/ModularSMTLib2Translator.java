@@ -29,7 +29,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         MasterHandler master;
         try {
-            master = new MasterHandler(services);
+            master = new MasterHandler(services, settings);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }

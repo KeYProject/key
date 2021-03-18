@@ -258,6 +258,10 @@ public class ProofSettings {
         return smtSettings;
     }
 
+    public NewSMTTranslationSettings getNewSMTSettings() {
+        return newSMTSettings;
+    }
+
     /**
      * Checks if the choice settings are initialized.
      *

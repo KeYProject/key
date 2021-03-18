@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandler.Capability;
@@ -83,8 +84,9 @@ public class MasterHandler {
         void introduce(MasterHandler masterHandler, String name) throws SMTTranslationException;
     }
 
-    public MasterHandler(Services services) throws IOException {
+    public MasterHandler(Services services, SMTSettings settings) throws IOException {
         this.services = services;
+        getTranslationState().putAll(settings.getNewSettings().getMap());
         handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, this);
     }
 

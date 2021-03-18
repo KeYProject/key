@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
+import de.uka.ilkd.key.java.Services;
+
 import java.util.Map;
 
 public abstract class SMTHandlerProperty<T> {
@@ -17,9 +19,19 @@ public abstract class SMTHandlerProperty<T> {
 
     public abstract boolean verify(String value);
 
-    public abstract T get(Map<String, Object> properties);
+    public abstract T fromString(String s);
 
     public abstract T defaultValue();
+
+    public abstract <A,R> R accept(SMTHandlerPropertyVisitor<A, R> visitor, A arg);
+
+    public T get(Map<String, Object> properties) {
+        Object val = properties.get(getIdentifier());
+        if (val == null) {
+            return defaultValue();
+        }
+        return fromString(val.toString());
+    }
 
     public String getIdentifier() {
         return identifier;
@@ -33,6 +45,14 @@ public abstract class SMTHandlerProperty<T> {
         return description;
     }
 
+    public T get(Services services) {
+        String val = services.getProof().getSettings().getNewSMTSettings().get(getIdentifier());
+        if (val == null) {
+            return defaultValue();
+        }
+        return fromString(val);
+    }
+
     public static class StringProperty extends SMTHandlerProperty<String> {
 
         public StringProperty(String identifier, String heading, String description) {
@@ -41,21 +61,22 @@ public abstract class SMTHandlerProperty<T> {
 
         @Override
         public boolean verify(String value) {
-            return false;
+            return true;
         }
 
         @Override
-        public String get(Map<String, Object> properties) {
-            Object val = properties.get(getIdentifier());
-            if (val == null) {
-                return defaultValue();
-            }
-            return val.toString();
+        public String fromString(String s) {
+            return s;
         }
 
         @Override
         public String defaultValue() {
             return "";
+        }
+
+        @Override
+        public <A, R> R accept(SMTHandlerPropertyVisitor<A, R> visitor, A arg) {
+            return visitor.visit(this, arg);
         }
     }
 
@@ -81,12 +102,8 @@ public abstract class SMTHandlerProperty<T> {
         }
 
         @Override
-        public Integer get(Map<String, Object> properties) {
-            Object prop = properties.get(getIdentifier());
-            if (prop == null) {
-                return defaultValue();
-            }
-            return Integer.parseInt(prop.toString());
+        public Integer fromString(String s) {
+            return Integer.parseInt(s);
         }
 
         @Override
@@ -105,6 +122,11 @@ public abstract class SMTHandlerProperty<T> {
         public int getMaximum() {
             return max;
         }
+
+        @Override
+        public <A, R> R accept(SMTHandlerPropertyVisitor<A, R> visitor, A arg) {
+            return visitor.visit(this, arg);
+        }
     }
 
     public static class BooleanProperty extends SMTHandlerProperty<Boolean> {
@@ -120,17 +142,18 @@ public abstract class SMTHandlerProperty<T> {
         }
 
         @Override
-        public Boolean get(Map<String, Object> properties) {
-            Object prop = properties.get(getIdentifier());
-            if (prop == null) {
-                return defaultValue();
-            }
-            return Boolean.parseBoolean(prop.toString());
+        public Boolean fromString(String s) {
+            return Boolean.valueOf(s);
         }
 
         @Override
         public Boolean defaultValue() {
             return Boolean.FALSE;
+        }
+
+        @Override
+        public <A, R> R accept(SMTHandlerPropertyVisitor<A, R> visitor, A arg) {
+            return visitor.visit(this, arg);
         }
     }
 
@@ -142,7 +165,7 @@ public abstract class SMTHandlerProperty<T> {
             this.enumType = enumType;
         }
 
-        private E getConstant(String value) {
+        public E fromString(String value) {
             for (E enumConstant : enumType.getEnumConstants()) {
                 if(value.equalsIgnoreCase(enumConstant.toString())) {
                     return enumConstant;
@@ -153,22 +176,21 @@ public abstract class SMTHandlerProperty<T> {
 
         @Override
         public boolean verify(String value) {
-            return getConstant(value) != null;
-        }
-
-        @Override
-        public E get(Map<String, Object> properties) {
-            Object prop = properties.get(getIdentifier());
-            if (prop == null) {
-                return defaultValue();
-            }
-            String val = prop.toString();
-            return getConstant(val);
+            return fromString(value) != null;
         }
 
         @Override
         public E defaultValue() {
             return enumType.getEnumConstants()[0];
+        }
+
+        public Class<E> getEnumType() {
+            return enumType;
+        }
+
+        @Override
+        public <A, R> R accept(SMTHandlerPropertyVisitor<A, R> visitor, A arg) {
+            return visitor.visit(this, arg);
         }
     }
 

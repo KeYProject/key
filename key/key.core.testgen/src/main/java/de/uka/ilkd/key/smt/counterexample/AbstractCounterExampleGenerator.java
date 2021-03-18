@@ -77,7 +77,8 @@ public abstract class AbstractCounterExampleGenerator {
 
       //invoke z3 for counterexamples
       SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
-              ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), proof);
+              ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+              proof.getSettings().getNewSMTSettings(), proof);
       SolverLauncher launcher = new SolverLauncher(settings);
       launcher.addListener(createSolverListener(settings, proof));
 

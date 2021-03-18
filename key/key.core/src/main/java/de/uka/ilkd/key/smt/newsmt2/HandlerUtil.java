@@ -2,18 +2,16 @@ package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
+import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.EnumProperty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
-import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
 
 /**
  * A collection of static methods that {@link SMTHandler}s are likely to use.
@@ -30,15 +28,27 @@ public class HandlerUtil {
                             "a new function symbol must be introduced for every term." +
                             "This may make the translation slow.");
 
-    public static final SMTHandlerProperty.BooleanProperty PROPERTY_TYPE_HIERARCHY =
+    /**
+     * A user SMT property to decide whether the type hierarchy is translated
+     * at all. It introduces a lot of quantifiers that are often not needed.
+     */
+    public static final SMTHandlerProperty.BooleanProperty PROPERTY_NO_TYPE_HIERARCHY =
             new BooleanProperty("NoTypeHierarchy",
                     "Disable type hierarchy encoding",
                     "Type hierarchy is encoded with a number of quantified " +
                             "axioms. They make the translation more precise, but may " +
                             "also cost efficiency.");
 
+    /**
+     * This lists the handler properties that do not belong to a particular
+     * SMT handler.
+     */
     public static final List<? extends SMTHandlerProperty<?>> GLOBAL_PROPERTIES =
-            Arrays.asList(PROPERTY_TYPE_HIERARCHY);
+            Arrays.asList(PROPERTY_NO_TYPE_HIERARCHY,
+                    new EnumProperty<>("identifier",
+                            "Smt some heading",
+                            "lorem ipsim lorem ipsim lorem ipsim lorem ipsim lorem ipsim lorem ipsim ",
+                            ProofStatus.class));
 
     private HandlerUtil() {
         throw new Error("do not instantiate");

@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.settings;
 
 
+import java.util.Collections;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -57,6 +58,10 @@ public class NewSMTTranslationSettings implements Settings, Cloneable {
         }
     }
 
+    public Map<String, String> getMap() {
+        return Collections.unmodifiableMap(map);
+    }
+
     public String get(String key) {
         return map.get(key);
     }
@@ -72,5 +77,10 @@ public class NewSMTTranslationSettings implements Settings, Cloneable {
     @Override
     public void addSettingsListener(SettingsListener l) {
         listeners.add(l);
+    }
+
+    public void copy(NewSMTTranslationSettings newTranslationSettings) {
+        this.map.clear();
+        this.map.putAll(newTranslationSettings.map);
     }
 }
