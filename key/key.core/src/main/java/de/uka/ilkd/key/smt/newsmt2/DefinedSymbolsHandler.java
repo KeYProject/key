@@ -237,7 +237,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
         int cnt = 2;
         String snipName = name + DL_SUFFIX;
         String dl = snippets.getProperty(snipName);
-        System.err.println("DL TEXT FOR " + snipName + " WAS: " + dl);
+        // System.err.println("DL TEXT FOR " + snipName + " WAS: " + dl);
         do {
             DefaultTermParser tp = new DefaultTermParser();
             try {

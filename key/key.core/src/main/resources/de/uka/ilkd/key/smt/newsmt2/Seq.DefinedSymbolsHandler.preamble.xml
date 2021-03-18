@@ -32,3 +32,22 @@
     \forall any x; seqLen(seqSingleton(x)<<Trigger>>) = 1
 ]]>
 </entry>
+
+<entry key="seqSub.dl"><![CDATA[
+    \forall Seq seq;
+    \forall int from;
+    \forall int to;
+    \forall int idx;
+        any::seqGet(seqSub(seq, from, to)<<Trigger>>, idx)
+      = \if(0 <= idx & idx < (to - from))
+        \then(any::seqGet(seq, idx + from))
+        \else(seqGetOutside)
+]]></entry>
+
+<entry key="seqSub.dl.2"><![CDATA[
+    \forall Seq seq;
+    \forall int from;
+    \forall int to;
+        seqLen(seqSub(seq, from, to)<<Trigger>>)
+      = \if(from < to)\then(to - from)\else(0)
+]]></entry>
