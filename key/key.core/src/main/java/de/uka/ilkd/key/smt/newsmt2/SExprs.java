@@ -185,7 +185,7 @@ public class SExprs {
      * @param patterns a possibly empty collection of expressions
      * @return the expanded pattern with the same type as e
      */
-    public static SExpr patternSExpr(SExpr e, Collection<SExpr> patterns) {
+    public static SExpr patternSExpr(SExpr e, List<SExpr> patterns) {
         if (patterns.isEmpty()) {
             return e;
         }
@@ -193,7 +193,7 @@ public class SExprs {
         ArrayList<SExpr> children = new ArrayList<>();
         children.add(e);
         children.add(new SExpr(":pattern", Type.VERBATIM));
-        children.addAll(patterns);
+        children.add(new SExpr(patterns));
         return new SExpr("!", e.getType(), children);
     }
 

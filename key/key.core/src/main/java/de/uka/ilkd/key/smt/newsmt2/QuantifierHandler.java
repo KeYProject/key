@@ -77,7 +77,7 @@ public class QuantifierHandler implements SMTHandler {
         }
 
         matrix = new SExpr(typeGuardConnector, typeGuard, matrix);
-        matrix = SExprs.patternSExpr(matrix, triggers);
+        matrix = SExprs.patternSExpr(matrix, new ArrayList<>(triggers));
 
         return new SExpr(smtOp, Type.BOOL, new SExpr(vars), matrix);
     }
