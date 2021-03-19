@@ -9,7 +9,13 @@
  */
 package de.uka.ilkd.key.smt.newsmt2;
 
-public class VerbatimSMT implements Writable {
+/**
+ * Objects of this class are writable (like {@link SExpr}s), but are not
+ * really structured as such. They are just arbitrary strings.
+ *
+ * Writing them is obvious.
+ */
+class VerbatimSMT implements Writable {
 
     private String string;
 

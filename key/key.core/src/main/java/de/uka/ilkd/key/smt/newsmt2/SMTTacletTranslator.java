@@ -22,6 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class uses the existing taclet translation technology to translate
+ * taclets to smt axioms.
+ *
+ * @author Mattias Ulbrich
+ */
 public class SMTTacletTranslator {
 
     private SkeletonGenerator tacletTranslator =

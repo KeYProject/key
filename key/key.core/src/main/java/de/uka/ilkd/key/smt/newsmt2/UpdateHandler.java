@@ -13,6 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+/**
+ * This handler treats KeY updated terms ({x:=5}x>4).
+ *
+ * Updates are replaced by let-expressions.
+ */
 public class UpdateHandler implements SMTHandler {
 
     private Services services;

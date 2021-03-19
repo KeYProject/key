@@ -11,6 +11,12 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+/**
+ * This handler treats polymorphic symbols, in particular if-then-else and
+ * equals.
+ *
+ * @author Jonas Schiffl
+ */
 public class PolymorphicHandler implements SMTHandler {
 
     @Override

@@ -21,6 +21,10 @@ import java.util.List;
  */
 public class HandlerUtil {
 
+    /**
+     * A property that can be used by various handlers that deal with
+     * binders.
+     */
     public static final SMTHandlerProperty.BooleanProperty PROPERTY_NOBINDERS =
             new SMTHandlerProperty.BooleanProperty("NoBinders",
                     "Disable binder translation",

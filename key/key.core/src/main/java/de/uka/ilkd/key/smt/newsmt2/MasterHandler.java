@@ -22,6 +22,20 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandler.Capability;
 
+/**
+ * Instances of this class are the controlling units of the translation. They
+ * control how the translation is delegated to different {@link SMTHandler}s and
+ * collects the translations.
+ *
+ * It keeps track of the actual translation of an expression but collects also
+ * the declarations and axioms that occur during the translation.
+ *
+ * It has measures to ensure that symbols are defined and axiomatized at most
+ * once. This allows us to add these entries on the fly and on demand.
+ *
+ * @author Mattias Ulbrich
+ * @author Jonas Schiffl
+ */
 public class MasterHandler {
 
     /** the services object associated with this particular translation */
@@ -60,6 +74,13 @@ public class MasterHandler {
      */
     private final Map<Operator, SMTHandler> handlerMap = new IdentityHashMap<>();
 
+    /**
+     * Copy toplevel declarations and axioms from a collection of snippets
+     * directly and make all named declarations (name.decl) and axioms
+     * (name.axioms)
+     *
+     * @param snippets
+     */
     public void addDeclarationsAndAxioms(Properties snippets) {
         String decls = snippets.getProperty("decls");
         if (decls != null) {
@@ -79,11 +100,26 @@ public class MasterHandler {
         }
     }
 
+    /**
+     * This interface is used for routines that can be used to flexibly
+     * introduce function symbols.
+     *
+     * An instance can be stored in the {@link #translationState} with a key
+     * suffixed with ".intro". It is then invoked when a symbol is to be
+     * introduced.
+     */
     @FunctionalInterface
     public interface SymbolIntroducer {
         void introduce(MasterHandler masterHandler, String name) throws SMTTranslationException;
     }
 
+    /**
+     * Create a new handler.
+     *
+     * @param services non-null services
+     * @param settings settings from the proof for the property settings.
+     * @throws IOException
+     */
     public MasterHandler(Services services, SMTSettings settings) throws IOException {
         this.services = services;
         getTranslationState().putAll(settings.getNewSettings().getMap());
@@ -93,10 +129,11 @@ public class MasterHandler {
     /**
      * Translate a single term to an SMTLib S-Expression.
      *
-     * This method may modify the state of the handler (by adding symbols e.g.).
+     * This method may modify the state of the handler (by adding symbols
+     * e.g.).
      *
-     * It tries to find a {@link SMTHandler} that can deal with the argument
-     * and delegates to that.
+     * It tries to find a {@link SMTHandler} that can deal with the argument and
+     * delegates to that.
      *
      * A default translation is triggered if no handler can be found.
      *
@@ -135,14 +172,15 @@ public class MasterHandler {
     /**
      * Translate a single term to an SMTLib S-Expression.
      *
-     * The result is ensured to have the SExpr-Type given as argument.
-     * If the type coercion fails, then the translation falls back to
-     * translating the argument as an unknown function.
+     * The result is ensured to have the SExpr-Type given as argument. If the
+     * type coercion fails, then the translation falls back to translating the
+     * argument as an unknown function.
      *
-     * This method may modify the state of the handler (by adding symbols e.g.).
+     * This method may modify the state of the handler (by adding symbols
+     * e.g.).
      *
-     * It tries to find a {@link SMTHandler} that can deal with the argument
-     * and delegates to that.
+     * It tries to find a {@link SMTHandler} that can deal with the argument and
+     * delegates to that.
      *
      * A default translation is triggered if no handler can be found.
      *
@@ -167,6 +205,7 @@ public class MasterHandler {
 
     /**
      * If no handler can handle a term, it is taken care of here.
+     *
      * @param problem the problematic term
      * @return a generic translation as unknown value
      */
@@ -240,10 +279,23 @@ public class MasterHandler {
         return exceptions;
     }
 
+    /**
+     * Translate a list of terms into a list of SExprs.
+     *
+     * @param terms non-null list of terms.
+     * @param type the non-null smt type to coerce to
+     * @return a list of translations
+     */
     public List<SExpr> translate(Iterable<Term> terms, Type type) throws SMTTranslationException {
         return SExprs.coerce(translate(terms), type);
     }
 
+    /**
+     * Translate a list of terms into a list of SExprs without coercion.
+     *
+     * @param terms non-null list of terms.
+     * @return a list of translations
+     */
     public List<SExpr> translate(Iterable<Term> terms) {
         List<SExpr> result = new LinkedList<>();
         for (Term term : terms) {
@@ -321,13 +373,5 @@ public class MasterHandler {
 
     Map<String, Object> getTranslationState() {
         return translationState;
-    }
-
-    /**
-     * @deprecated Use SExprs.coerce
-     */
-    @Deprecated
-    public SExpr coerce(SExpr sExpr, Type type) throws SMTTranslationException {
-        return SExprs.coerce(sExpr, type);
     }
 }

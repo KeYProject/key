@@ -16,6 +16,12 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
 
+/**
+ * This handler is a fallback handler that introduces a new uninterpreted
+ * function symbol with prefix "u_".
+ *
+ * According declarations are added.
+ */
 public class UninterpretedSymbolsHandler implements SMTHandler {
 
     public final static String PREFIX = "u_";

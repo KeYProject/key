@@ -83,14 +83,14 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
     private class ComCreationVisitor implements SMTHandlerPropertyVisitor<Void, JComponent> {
         @Override
         public JComponent visit(EnumProperty<?> eprop, Void unit) {
-            return addComboBox(eprop.getHeading(), eprop.getDescription(),
+            return addComboBox(eprop.getLabel(), eprop.getDescription(),
                     0, null,
                     eprop.getEnumType().getEnumConstants());
         }
 
         @Override
         public JComponent visit(IntegerProperty iprop, Void unit) {
-            return addNumberField(iprop.getHeading(),
+            return addNumberField(iprop.getLabel(),
                     iprop.getMinimum(), iprop.getMaximum(), 1,
                     iprop.getDescription(),
                     emptyValidator());
@@ -98,14 +98,14 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
 
         @Override
         public JComponent visit(BooleanProperty bprop, Void unit) {
-            return addCheckBox(bprop.getHeading(),
+            return addCheckBox(bprop.getLabel(),
                     bprop.getDescription(),
                     false, emptyValidator());
         }
 
         @Override
         public JComponent visit(StringProperty sprop, Void unit) {
-            return  addTextField(sprop.getHeading(),
+            return  addTextField(sprop.getLabel(),
                     sprop.getDescription(),
                     "", emptyValidator());
         }
