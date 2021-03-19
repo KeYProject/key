@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.logic;
 
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 

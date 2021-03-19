@@ -13,8 +13,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.net.URL;
 
@@ -31,10 +31,10 @@ import java.net.URL;
  * @version 1 (5.12.19)
  */
 public abstract class KeyAst<T extends ParserRuleContext> {
-    @NotNull
+    @Nonnull
     final T ctx;
 
-    protected KeyAst(@NotNull T ctx) {
+    protected KeyAst(@Nonnull T ctx) {
         this.ctx = ctx;
     }
 

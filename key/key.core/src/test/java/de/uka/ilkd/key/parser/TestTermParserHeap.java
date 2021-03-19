@@ -2,7 +2,7 @@ package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -199,7 +199,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     public void testVerifyExceptionIfAtOperatorNotPreceededBySelectTerm() {
         try {
-            @NotNull Term t = io.parseExpression("(a.f + a.f)@h2");
+            @Nonnull Term t = io.parseExpression("(a.f + a.f)@h2");
             System.out.println(t);
             fail();
         } catch (Exception e) {

@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.nparser.KeyIO;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -192,7 +192,7 @@ public class MergeRuleUtils {
     public static Term translateToFormula(final Services services,
             final String toTranslate) {
         try {
-            @NotNull Term result = new KeyIO(services).parseExpression(toTranslate);
+            @Nonnull Term result = new KeyIO(services).parseExpression(toTranslate);
             return result.sort() == Sort.FORMULA ? result : null;
         } catch (Throwable e) {
             return null;

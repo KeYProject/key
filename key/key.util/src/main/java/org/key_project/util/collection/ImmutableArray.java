@@ -13,7 +13,7 @@
 
 package org.key_project.util.collection;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -61,7 +61,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
      *
      * @param seq non-null
      */
-    public ImmutableArray(@NotNull Collection<S> seq) {
+    public ImmutableArray(@Nonnull Collection<S> seq) {
         this(new ArrayList<>(seq));
     }
 

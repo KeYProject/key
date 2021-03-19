@@ -2,7 +2,7 @@ package de.uka.ilkd.key.nparser;
 
 import com.google.common.base.Strings;
 import org.antlr.v4.runtime.*;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;

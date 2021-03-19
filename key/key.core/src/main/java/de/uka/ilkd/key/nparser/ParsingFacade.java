@@ -5,7 +5,7 @@ import de.uka.ilkd.key.proof.io.RuleSource;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -35,7 +35,7 @@ public abstract class ParsingFacade {
      * @param <T> parse tree type
      * @return the {@link ParserRuleContext} inside the given ast object.
      */
-    public static <T extends ParserRuleContext> @NotNull T getParseRuleContext(@NotNull KeyAst<T> ast) {
+    public static <T extends ParserRuleContext> @Nonnull T getParseRuleContext(@Nonnull KeyAst<T> ast) {
         return ast.ctx;
     }
 
@@ -66,7 +66,7 @@ public abstract class ParsingFacade {
      * @param ctxs non-null list
      * @return
      */
-    public static @NotNull ChoiceInformation getChoices(@NotNull List<KeyAst.File> ctxs) {
+    public static @Nonnull ChoiceInformation getChoices(@Nonnull List<KeyAst.File> ctxs) {
         ChoiceInformation ci = new ChoiceInformation();
         ChoiceFinder finder = new ChoiceFinder(ci);
         ctxs.forEach(it -> it.accept(finder));
@@ -161,7 +161,7 @@ public abstract class ParsingFacade {
      * @param ctx non-null context
      * @return non-null string
      */
-    public static @NotNull String getValue(@NotNull KeYParser.String_valueContext ctx) {
+    public static @Nonnull String getValue(@Nonnull KeYParser.String_valueContext ctx) {
         return ctx.getText().substring(1, ctx.getText().length() - 1)
                 .replace("\\\"", "\"")
                 .replace("\\\\", "\\");

@@ -4,8 +4,8 @@ import de.uka.ilkd.key.nparser.BuildingIssue;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -112,7 +112,7 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
                 .collect(Collectors.toList());
     }
 
-    public @NotNull List<BuildingIssue> getBuildingIssues() {
+    public @Nonnull List<BuildingIssue> getBuildingIssues() {
         if (buildingIssues == null) buildingIssues = new LinkedList<>();
         return buildingIssues;
     }

@@ -4,7 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import org.antlr.v4.runtime.CharStreams;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class ExprTest {
     @Test
     public void parseAndVisit() throws IOException {
         KeyIO io = getIo();
-        @NotNull Term actual = io.parseExpression(expr);
+        @Nonnull Term actual = io.parseExpression(expr);
         if (actual == null) {
             ParseAllKeyFilesTest.debugLexer(ParsingFacade.createLexer(CharStreams.fromString(expr)));
         }

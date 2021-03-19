@@ -17,7 +17,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.util.Debug;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;

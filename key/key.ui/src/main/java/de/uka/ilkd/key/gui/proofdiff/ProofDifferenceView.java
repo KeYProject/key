@@ -10,8 +10,8 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.help.HelpFacade;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -37,7 +37,7 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
     private Box rootPanel = new Box(BoxLayout.Y_AXIS);
     private Node left, right;
 
-    public ProofDifferenceView(@NotNull Node left, @NotNull Node right, Services services) {
+    public ProofDifferenceView(@Nonnull Node left, @Nonnull Node right, Services services) {
         super(NullMultipleCDockableFactory.NULL);
         this.services = services;
         setCloseable(true);
@@ -129,7 +129,7 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         return services;
     }
 
-    @NotNull
+    @Nonnull
     public Node getLeft() {
         return left;
     }
@@ -141,7 +141,7 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         propertyChangeSupport.firePropertyChange(PROPERTY_LEFT_NODE, oldLeft, left);
     }
 
-    @NotNull
+    @Nonnull
     public Node getRight() {
         return right;
     }

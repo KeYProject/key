@@ -5,7 +5,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.nparser.ChoiceInformation;
 import de.uka.ilkd.key.nparser.KeYParser;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.*;
 
@@ -18,14 +18,14 @@ import java.util.*;
  * @see ChoiceInformation
  */
 public class ChoiceFinder extends AbstractBuilder<Object> {
-    @NotNull
+    @Nonnull
     private final ChoiceInformation choiceInformation;
 
     public ChoiceFinder() {
         choiceInformation = new ChoiceInformation();
     }
 
-    public ChoiceFinder(@NotNull ChoiceInformation choiceInformation) {
+    public ChoiceFinder(@Nonnull ChoiceInformation choiceInformation) {
         this.choiceInformation = choiceInformation;
     }
 
@@ -80,7 +80,7 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
         return c;
     }
 
-    @NotNull
+    @Nonnull
     public ChoiceInformation getChoiceInformation() {
         return choiceInformation;
     }

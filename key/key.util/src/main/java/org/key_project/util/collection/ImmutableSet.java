@@ -13,7 +13,7 @@
 
 package org.key_project.util.collection;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -63,7 +63,7 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
     /**
      * Builds a single set with the given obj.
      */
-    static <T> @NotNull ImmutableSet<T> singleton(T obj) {
+    static <T> ImmutableSet<T> singleton(T obj) {
         ImmutableSet<T> result = DefaultImmutableSet.nil();
         return result.add(obj);
     }
@@ -73,7 +73,7 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
     }
 
 
-    static <T> @NotNull ImmutableSet<T> fromCollection(@NotNull Collection<T> seq) {
+    static <T> ImmutableSet<T> fromCollection(@Nonnull Collection<T> seq) {
         return fromSet(new HashSet<>(seq));
     }
 
@@ -137,7 +137,7 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
      * adds an element, barfs if the element is already present
      *
      * @param element of type <T> that has to be added to this set
-     * @throws org.key_project.utils.collection.NotUniqueException if the element is already present
+     * @throws NotUniqueException if the element is already present
      */
     ImmutableSet<T> addUnique(T element) throws NotUniqueException;
 

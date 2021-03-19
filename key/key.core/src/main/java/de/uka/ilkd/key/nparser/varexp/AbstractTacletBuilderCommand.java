@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.nparser.varexp;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 /**
  * Simple default implementation for {@link TacletBuilderCommand}.
@@ -9,8 +9,8 @@ import org.jetbrains.annotations.NotNull;
  * @version 1 (12/9/19)
  */
 public abstract class AbstractTacletBuilderCommand implements TacletBuilderCommand {
-    private final @NotNull String triggerName;
-    private final @NotNull ArgumentType[] argumentsTypes;
+    private final @Nonnull String triggerName;
+    private final @Nonnull ArgumentType[] argumentsTypes;
 
     /**
      * Construct this class with the parameters for {@link #isSuitableFor(String)} and {@link #getArgumentTypes()}.
@@ -18,14 +18,14 @@ public abstract class AbstractTacletBuilderCommand implements TacletBuilderComma
      * @param triggerName    the name of this command.
      * @param argumentsTypes the argument type of this command.
      */
-    public AbstractTacletBuilderCommand(@NotNull String triggerName,
-                                        @NotNull ArgumentType... argumentsTypes) {
+    public AbstractTacletBuilderCommand(@Nonnull String triggerName,
+                                        @Nonnull ArgumentType... argumentsTypes) {
         this.triggerName = triggerName;
         this.argumentsTypes = argumentsTypes;
     }
 
     @Override
-    public boolean isSuitableFor(@NotNull String name) {
+    public boolean isSuitableFor(@Nonnull String name) {
         if (triggerName.equalsIgnoreCase(name)) {
             return true;
         }

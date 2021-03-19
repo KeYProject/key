@@ -15,7 +15,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.*;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -919,11 +919,11 @@ public abstract class Taclet implements Rule, Named {
     public abstract Taclet setName(String s);
 
 
-    private @NotNull ImmutableSet<Choice> tacletOptions = DefaultImmutableSet.nil();
-    public @NotNull ImmutableSet<Choice> getTacletOptions() {
+    private @Nonnull ImmutableSet<Choice> tacletOptions = DefaultImmutableSet.nil();
+    public @Nonnull ImmutableSet<Choice> getTacletOptions() {
         return tacletOptions;
     }
-    public void setTacletOptions(@NotNull ImmutableSet<Choice> tacletOptions) {
+    public void setTacletOptions(@Nonnull ImmutableSet<Choice> tacletOptions) {
         this.tacletOptions = tacletOptions;
     }
 
