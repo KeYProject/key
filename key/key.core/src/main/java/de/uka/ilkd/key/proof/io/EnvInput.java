@@ -74,7 +74,7 @@ public interface EnvInput {
     /**
      * gets the classpath elements to be considered here.
      */
-    List<File> readClassPath() throws ProofInputException;
+    @NotNull List<@NotNull File> readClassPath() throws ProofInputException;
 
     /**
      * gets the boot classpath element, null if none set.

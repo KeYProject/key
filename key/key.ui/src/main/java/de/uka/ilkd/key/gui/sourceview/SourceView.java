@@ -1071,6 +1071,10 @@ public final class SourceView extends JComponent {
 
             symbExHighlights.clear();
 
+            if (lines == null) {
+                return;
+            }
+
             try {
                 int mostRecentLine = -1;
 

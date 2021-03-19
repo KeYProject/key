@@ -1,4 +1,4 @@
-// This file is part of KeY - Integrated Deductive Software Design
+    // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
@@ -13,64 +13,36 @@
 
 package de.uka.ilkd.key.control.instantiation_model;
 
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import javax.swing.table.AbstractTableModel;
-
-import org.antlr.runtime.RecognitionException;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
+import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.parser.IdDeclaration;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.inst.*;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.util.Pair;
+import org.antlr.v4.runtime.CharStreams;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.parser.IdDeclaration;
-import de.uka.ilkd.key.parser.KeYLexerF;
-import de.uka.ilkd.key.parser.KeYParserF;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.parser.ParserMode;
-import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.InstantiationProposerCollection;
-import de.uka.ilkd.key.proof.MissingInstantiationException;
-import de.uka.ilkd.key.proof.MissingSortException;
-import de.uka.ilkd.key.proof.SVInstantiationException;
-import de.uka.ilkd.key.proof.SVInstantiationParserException;
-import de.uka.ilkd.key.proof.SVRigidnessException;
-import de.uka.ilkd.key.proof.SortMismatchException;
-import de.uka.ilkd.key.proof.VariableNameProposer;
-import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
-import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.rule.inst.RigidnessException;
-import de.uka.ilkd.key.rule.inst.SortException;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.util.Pair;
+import javax.swing.table.AbstractTableModel;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class TacletFindModel extends AbstractTableModel {
 
@@ -224,14 +196,9 @@ public class TacletFindModel extends AbstractTableModel {
      * skolem function)
      */
     private IdDeclaration parseIdDeclaration(String s) throws ParserException {
-        KeYParserF parser = null;
-        try {
-            parser = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s, ""), services, nss);
-            return parser.id_declaration();
-        } catch (RecognitionException re) {
-            // parser cannot be null
-            throw new ParserException(parser.getErrorMessage(re), Location.create(re));
-        }
+        KeYParser.Id_declarationContext ctx = ParsingFacade.parseIdDeclaration(CharStreams.fromString(s));
+        Sort sort = ctx.s != null ? services.getNamespaces().sorts().lookup(ctx.s.getText()) : null;
+        return new IdDeclaration(ctx.id.getText(), sort);
     }
 
     /**

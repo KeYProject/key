@@ -27,6 +27,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests for {@link TruthValueTracingUtil}.
@@ -37,7 +39,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueWeakeningTest
     */
-	public void testJoinTestAfterBranchConditionWithWeakeningGoal() throws Exception {
+	@Test public void testJoinTestAfterBranchConditionWithWeakeningGoal() throws Exception {
       // Create expected results
       ExpectedBranchResult seGoal = new ExpectedBranchResult();
       ExpectedBranchResult weakeningGoal = new ExpectedBranchResult(new ExpectedTruthValueResult("13.0", TruthValue.FALSE),
@@ -65,7 +67,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueLabelBelowUpdatesDifferentToApplicationTerm
     */
-   public void testTruthValueLabelBelowUpdatesDifferentToApplicationTerm() throws Exception {
+   @Test public void testTruthValueLabelBelowUpdatesDifferentToApplicationTerm() throws Exception {
       // Create expected results
       ExpectedBranchResult goal15 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE),
                                                              new ExpectedTruthValueResult("2.0", TruthValue.TRUE),
@@ -88,7 +90,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueExceptinalAssignableNothingTest
     */
-   public void testExceptinalAssignableNothingTest_OSS() throws Exception {
+   @Test public void testExceptinalAssignableNothingTest_OSS() throws Exception {
       // Create expected results
       ExpectedBranchResult goal374 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
                                                               new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
@@ -138,7 +140,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueExceptinalAssignableNothingTest
     */
-   public void testExceptinalAssignableNothingTest() throws Exception {
+   @Test public void testExceptinalAssignableNothingTest() throws Exception {
       // Create expected results
       ExpectedBranchResult goal374 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
                                                               new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
@@ -231,7 +233,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueRejectedFormula
     */
-   public void testValueRejectedFormula() throws Exception {
+   @Test public void testValueRejectedFormula() throws Exception {
       // Create expected results
       ExpectedBranchResult goal31 = new ExpectedBranchResult(new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
                                                              new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
@@ -350,7 +352,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueAnd
     */
-   public void testAnd3_replaceKnown() throws Exception {
+   @Test public void testAnd3_replaceKnown() throws Exception {
       // Create expected results
       ExpectedBranchResult goal13 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
                                                              new ExpectedTruthValueResult("5.0", TruthValue.TRUE),
@@ -379,7 +381,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueUnderstandingProofsMyInteger
     */
-   public void testUnderstandingProofs_MyInteger() throws Exception {
+   @Test public void testUnderstandingProofs_MyInteger() throws Exception {
       // Create expected results
       ExpectedBranchResult goal131 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE),
                                                               new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
@@ -413,7 +415,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueUnderstandingProofsArrayUtil
     */
-   public void testUnderstandingProofs_ArrayUtil() throws Exception {
+   @Test public void testUnderstandingProofs_ArrayUtil() throws Exception {
       // Create expected results
       ExpectedBranchResult goal87 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
                                                              new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
@@ -534,7 +536,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueUnderstandingProofsAccount
     */
-   public void testUnderstandingProofs_Account() throws Exception {
+   @Test public void testUnderstandingProofs_Account() throws Exception {
       // Create expected results
       ExpectedBranchResult goal246 = new ExpectedBranchResult(new ExpectedTruthValueResult("9.0", TruthValue.TRUE),
                                                               new ExpectedTruthValueResult("10.0", TruthValue.TRUE),
@@ -596,7 +598,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueUnderstandingProofsCalendar
     */
-   public void testUnderstandingProofs_Calendar() throws Exception {
+   @Test public void testUnderstandingProofs_Calendar() throws Exception {
       // Create expected results
       ExpectedBranchResult goal369 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE),
                                                               new ExpectedTruthValueResult("1.0", TruthValue.TRUE),
@@ -640,7 +642,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueMyInteger
     */
-   public void testMyInteger() throws Exception {
+   @Test public void testMyInteger() throws Exception {
       // Create expected results
       ExpectedBranchResult goal131 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("6.0", TruthValue.TRUE));
       ExpectedBranchResult goal133 = new ExpectedBranchResult(new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.FALSE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.FALSE), new ExpectedTruthValueResult("6.0", TruthValue.FALSE));
@@ -658,7 +660,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueEquivExample
     */
-   public void testEquivExample_NoOneStepSimplification() throws Exception {
+   @Test public void testEquivExample_NoOneStepSimplification() throws Exception {
       // Create expected results
       ExpectedBranchResult goal79 = new ExpectedBranchResult(new ExpectedTruthValueResult("2.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.TRUE));
       ExpectedBranchResult goal91 = new ExpectedBranchResult(new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE));
@@ -677,7 +679,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueEquivExample
     */
-   public void testEquivExample() throws Exception {
+   @Test public void testEquivExample() throws Exception {
       // Create expected results
       ExpectedBranchResult goal39 = new ExpectedBranchResult(new ExpectedTruthValueResult("2.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.TRUE));
       ExpectedBranchResult goal50 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), 
@@ -697,7 +699,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueIfThenElseIntegerTest
     */
-   public void testIfThenElseInteger() throws Exception {
+   @Test public void testIfThenElseInteger() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult thenResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult elseResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
@@ -715,7 +717,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueIfThenElseNotFormulaTest
     */
-   public void testIfThenElseNotFormula() throws Exception {
+   @Test public void testIfThenElseNotFormula() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult thenResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult elseResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
@@ -733,7 +735,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueIfThenElseFormulaTest
     */
-   public void testIfThenElseFormula() throws Exception {
+   @Test public void testIfThenElseFormula() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult thenResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("4.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult elseResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("4.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.FALSE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE)));
@@ -751,7 +753,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueNotLastEvaluationGivesTruthValue
     */
-   public void testNotLastEvaluationGivesTruthValue() throws Exception {
+   @Test public void testNotLastEvaluationGivesTruthValue() throws Exception {
       // Create expected results
       ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("6.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("8.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.12", TruthValue.FALSE), new ExpectedTruthValueResult("1.13", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE));
       ExpectedBranchResult goal41 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.TRUE));
@@ -770,7 +772,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueArraySumWhile
     */
-   public void testArraySumWhile_NoOneStepSimplification() throws Exception {
+   @Test public void testArraySumWhile_NoOneStepSimplification() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult initialResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("14.0", TruthValue.TRUE), new ExpectedTruthValueResult("15.0", TruthValue.TRUE), new ExpectedTruthValueResult("16.0", TruthValue.TRUE), new ExpectedTruthValueResult("17.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult preservesResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("18.0", TruthValue.TRUE), new ExpectedTruthValueResult("19.0", TruthValue.TRUE), new ExpectedTruthValueResult("20.0", TruthValue.TRUE), new ExpectedTruthValueResult("21.0", TruthValue.TRUE), new ExpectedTruthValueResult("22.0", TruthValue.TRUE), new ExpectedTruthValueResult("23.0", TruthValue.TRUE), new ExpectedTruthValueResult("24.0", TruthValue.TRUE)));
@@ -789,7 +791,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueArraySumWhile
     */
-   public void testArraySumWhile() throws Exception {
+   @Test public void testArraySumWhile() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult initialResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("14.0", TruthValue.TRUE), new ExpectedTruthValueResult("15.0", TruthValue.TRUE), new ExpectedTruthValueResult("16.0", TruthValue.TRUE), new ExpectedTruthValueResult("17.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult preservesResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("18.0", TruthValue.TRUE), new ExpectedTruthValueResult("19.0", TruthValue.TRUE), new ExpectedTruthValueResult("20.0", TruthValue.TRUE), new ExpectedTruthValueResult("21.0", TruthValue.TRUE), new ExpectedTruthValueResult("22.0", TruthValue.TRUE), new ExpectedTruthValueResult("23.0", TruthValue.TRUE), new ExpectedTruthValueResult("24.0", TruthValue.TRUE)));
@@ -860,7 +862,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueSimpleInstanceMethodContractApplication
     */
-   public void testSimpleInstanceMethodContractApplication_NoOneStepSimplification() throws Exception {
+   @Test public void testSimpleInstanceMethodContractApplication_NoOneStepSimplification() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult preResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("12.0", TruthValue.TRUE), new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE), new ExpectedTruthValueResult("11.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE)));
@@ -877,7 +879,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueSimpleInstanceMethodContractApplication
     */
-   public void testSimpleInstanceMethodContractApplication() throws Exception {
+   @Test public void testSimpleInstanceMethodContractApplication() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult preResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("12.0", TruthValue.TRUE), new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE), new ExpectedTruthValueResult("11.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE)));
@@ -894,7 +896,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueSimpleMethodContractApplication
     */
-   public void testSimpleMethodContractApplication_NoOneStepSimplification() throws Exception {
+   @Test public void testSimpleMethodContractApplication_NoOneStepSimplification() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult preResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE), new ExpectedTruthValueResult("11.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE)));
@@ -911,7 +913,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueSimpleMethodContractApplication
     */
-   public void testSimpleMethodContractApplication() throws Exception {
+   @Test public void testSimpleMethodContractApplication() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult preResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE), new ExpectedTruthValueResult("11.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE)));
@@ -928,7 +930,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueDifferentBranchesTest
     */
-   public void testDifferentBranchesTest() throws Exception {
+   @Test public void testDifferentBranchesTest() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult firstResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult secondResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
@@ -949,7 +951,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    /**
     * Tests example: /set/truthValueMultiplePredicateResults
     */
-   public void testMultiplePredicateResultsTest() throws Exception {
+   @Test public void testMultiplePredicateResultsTest() throws Exception {
       // Create expected results
       ExpectedBranchResult goal102 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE));
       ExpectedBranchResult goal95 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE));

@@ -1626,7 +1626,8 @@ public class TermBuilder {
     }
 
     public Term getBaseHeap() {
-        return var(services.getTypeConverter().getHeapLDT().getHeap());
+        return var((ProgramVariable) services.getNamespaces().programVariables().lookup(HeapLDT.BASE_HEAP_NAME));
+        //return var(services.getTypeConverter().getHeapLDT().getHeap());
     }
 
     public Term dot(Sort asSort, Term o, Function f) {
@@ -1654,7 +1655,8 @@ public class TermBuilder {
     }
 
     public Term arr(Term idx) {
-        return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
+        return func(services.getNamespaces().functions().lookup("arr"), idx);
+        //return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
     }
 
     /**
@@ -1813,9 +1815,10 @@ public class TermBuilder {
         if (ref.sort() instanceof ArraySort) {
             elementSort = ((ArraySort) ref.sort()).elementSort();
         } else {
-            throw new TermCreationException("Tried to build an array access "
-                    + "on an inacceptable sort: " + ref.sort().getClass() + "\n"
-                    + "(" + ref + "[" + idx + "])");
+            throw new TermCreationException(
+                    String.format("Tried to build an array access on an inacceptable sort: " +
+                            "Sort: %s : %s with %s[%s] ",
+                            ref.sort(), ref.sort().getClass().getSimpleName(), ref, idx));
         }
 
         return select(elementSort, getBaseHeap(), ref, arr(idx));

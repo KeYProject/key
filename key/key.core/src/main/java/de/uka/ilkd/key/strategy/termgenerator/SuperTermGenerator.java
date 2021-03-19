@@ -15,6 +15,7 @@ package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.logic.TermCreationException;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
@@ -115,9 +116,11 @@ public abstract class SuperTermGenerator implements TermGenerator {
                 	return true;
                     }
 
-                    public boolean validTopLevel(Term term) {
-                	return term.arity() == 2
-                	       && term.sub(1).sort().extendsTrans(numbers.getNumberSymbol ().sort ());
+                    @Override
+                    public void validTopLevelException(Term term) throws TermCreationException {
+                        if (!(term.arity() == 2 && term.sub(1).sort().extendsTrans(numbers.getNumberSymbol().sort()))) {
+                            throw new TermCreationException(this, term);
+                        }
                     }
 
                 };

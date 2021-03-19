@@ -21,7 +21,7 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
 	private static final long serialVersionUID = 4187650510339169399L;
 	// the original rule name
     private final String altName;
-    private final String description;
+    private String description;
 
     private Rule rule;
 
@@ -59,7 +59,7 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
         altName = taclet.name().toString();
         LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
         lp.printTaclet(taclet);
-        description = lp.toString();
+        description = lp.toString() +  "\n\n Defined at:" + taclet.getOrigin() + "\n\n under options:" + taclet.getChoices();
     }
 
     InfoTreeNode(String title, String description) {
@@ -71,6 +71,7 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
     public InfoTreeNode(BuiltInRule br, Properties ruleExplanations) {
         this(br.displayName(), ruleExplanations);
         rule = br;
+        description = "Defined at: " + br.getOrigin();
     }
 
     String getTitle() {

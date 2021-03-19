@@ -18,12 +18,14 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import org.jetbrains.annotations.Nullable;
+import org.key_project.util.java.StringUtil;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.text.Format;
 
@@ -60,10 +62,11 @@ public class SimpleSettingsPanel extends JPanel {
         pNorth.add(lblHead);
         pNorth.add(lblSubhead);
         pNorth.add(new JSeparator());
-
-
         add(pNorth, BorderLayout.NORTH);
-        add(new JScrollPane(pCenter), BorderLayout.CENTER);
+        JScrollPane scrollPane = new JScrollPane(pCenter);
+        scrollPane.getHorizontalScrollBar().setUnitIncrement(10);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(10);
+        add(scrollPane, BorderLayout.CENTER);
     }
 
     public void setHeaderText(String text) {
@@ -102,6 +105,15 @@ public class SimpleSettingsPanel extends JPanel {
         return checkBox;
     }
 
+    protected JScrollPane createTextArea(String text, Validator<String> validator) {
+        JTextArea area = new JTextArea(text);
+        area.setRows(5);
+        area.getDocument().addDocumentListener(new DocumentValidatorAdapter(area, validator));
+        JScrollPane scrollArea = new JScrollPane(area);
+        return scrollArea;
+    }
+
+
     protected JTextField createTextField(String text, final @Nullable Validator<String> validator) {
         JTextField field = new JTextField(text);
         field.getDocument().addDocumentListener(new DocumentValidatorAdapter(field, validator));
@@ -128,8 +140,14 @@ public class SimpleSettingsPanel extends JPanel {
     public static JLabel createHelpLabel(String s) {
         if (s == null || s.isEmpty())
             s = "";
-        else
-            s = "<html>" + s.replaceAll("\n", "<br>");
+        else {
+            String brokenLines = StringUtil.wrapLines(s);
+            s = "<html>" +
+                brokenLines.replace("<", "&lt;").
+                            replace(">", "&gt;").
+                            replace("\n", "<br>");
+        }
+
         JLabel infoButton = new JLabel(
                 IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
         infoButton.setToolTipText(s);
@@ -161,10 +179,10 @@ public class SimpleSettingsPanel extends JPanel {
     }
 
     private class DocumentValidatorAdapter implements DocumentListener {
-        private final JTextField field;
+        private final JTextComponent field;
         private final @Nullable Validator<String> validator;
 
-        private DocumentValidatorAdapter(JTextField field, @Nullable Validator<String> validator) {
+        private DocumentValidatorAdapter(JTextComponent field, @Nullable Validator<String> validator) {
             this.field = field;
             this.validator = validator;
         }

@@ -71,9 +71,12 @@ public class ExceptionDialog extends JDialog {
 
     public static void showDialog(Window parent, Throwable exception) {
         ExceptionDialog dlg = new ExceptionDialog(parent, exception);
-            dlg.setVisible(true);
-            dlg.dispose();
+        if(parent!=null) {
+            dlg.setLocationRelativeTo(parent);
         }
+        dlg.setVisible(true);
+        dlg.dispose();
+    }
 
     private ExceptionDialog(Window parent, Throwable exception) {
         super(parent, "Parser Messages", Dialog.ModalityType.DOCUMENT_MODAL);
@@ -130,7 +133,7 @@ public class ExceptionDialog extends JDialog {
 //        bPanel.add(reloadButton); // XXX useful for debugging
 
         JButton sendFeedbackButton = new JButton(new SendFeedbackAction(this, exception));
-           bPanel.add(sendFeedbackButton);
+        bPanel.add(sendFeedbackButton);
 
         JButton editSourceFileButton = new JButton("Edit Source File");
         EditSourceFileAction action = new EditSourceFileAction(this, exception);

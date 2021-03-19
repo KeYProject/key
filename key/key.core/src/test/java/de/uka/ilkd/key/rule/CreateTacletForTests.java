@@ -14,42 +14,27 @@
 package de.uka.ilkd.key.rule;
 
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.parser.KeYLexerF;
-import de.uka.ilkd.key.parser.KeYParserF;
-import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.parser.AbstractTestTermParser;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
-import static org.junit.Assert.*;
+import org.key_project.util.collection.ImmutableSLList;
+
+import java.io.IOException;
+
+import static org.junit.Assert.fail;
 
 
 /** 
  * create Taclet for test cases.
  */
-public class CreateTacletForTests {
+public class CreateTacletForTests extends AbstractTestTermParser {
 	private Sort nat;
 
     public static AntecTaclet impleft;
@@ -117,14 +102,18 @@ public class CreateTacletForTests {
 	contradiction = (RewriteTaclet) parseTaclet
 	    ("contracdiction{\\find(b->b0) \\replacewith(!b0 -> !b)}");
 	allright = (SuccTaclet) parseTaclet
-	    ("all_right{\\find (==> \\forall z; b) \\varcond ( \\new(x,\\dependingOn(b)) ) \\replacewith (==> {\\subst z; x}b)}");
+	    ("all_right{\\find (==> \\forall z; b) \\varcond ( \\newDependingOn(x, b) ) \\replacewith (==> {\\subst z; x}b)}");
 	allleft = (AntecTaclet) parseTaclet
 	    ("all_left{\\find(\\forall z; b==>) \\add({\\subst z; x}b==>)}");
 
     }
 
+	private Taclet parseTaclet(String tacletString) {
+		return io.load(tacletString).loadTaclets().get(0);
+	}
 
-    public void createNatTaclets() {
+
+	public void createNatTaclets() {
 	//decls for nat
 	func_0=new Function(new Name("zero"),nat,new Sort[]{});
 	func_eq=new Function(new Name("="),Sort.FORMULA,
@@ -142,17 +131,17 @@ public class CreateTacletForTests {
 	SchemaVariable var_rn = SchemaVariableFactory.createTermSV(new Name("rn"),nat);
 	SchemaVariable var_rm = SchemaVariableFactory.createTermSV(new Name("rm"),nat);
 
-	Term t_rn = tf.createTerm(var_rn,new Term[]{});
-	Term t_rm = tf.createTerm(var_rm,new Term[]{});
-	Term t_0 = tf.createTerm(func_0,new Term[]{});	
-	Term t_rnminus1=tf.createTerm(func_min1,new Term[]{t_rn});
+	Term t_rn = tf.createTerm(var_rn);
+	Term t_rm = tf.createTerm(var_rm);
+	Term t_0 = tf.createTerm(func_0);
+	Term t_rnminus1=tf.createTerm(func_min1, t_rn);
 	Term t_rnminus1plus1=tf.createTerm(func_plus1,
-						   new Term[]{t_rnminus1});
-	Term t_rneq0=tf.createTerm(func_eq,new Term[]{t_rn,t_0});
+			t_rnminus1);
+	Term t_rneq0=tf.createTerm(func_eq, t_rn,t_0);
 	//	Term t_0minus1=tf.createTerm(func_min1,
 	//		     new Term[]{t_0});
 	Term t_0plus1=tf.createTerm(func_plus1,
-						new Term[]{t_0});
+			t_0);
 
 	// help rule r1: find(rn) replacewith(0) replacewith(0)
 	RewriteTacletBuilder<RewriteTaclet> rwb1=new RewriteTacletBuilder<RewriteTaclet>();	
@@ -160,7 +149,7 @@ public class CreateTacletForTests {
 	rwb1.setFind(t_rn);
 	rwb1.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    ImmutableSLList.<Taclet>nil(),
+				    ImmutableSLList.nil(),
 				    t_0));
 
 	
@@ -171,7 +160,7 @@ public class CreateTacletForTests {
 	rwbuilder.setFind(t_rnminus1plus1);
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    ImmutableSLList.<Taclet>nil(),
+				    ImmutableSLList.nil(),
 				    t_rn));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -185,10 +174,10 @@ public class CreateTacletForTests {
 	// find(rn + 0) replacewith(rn)
 	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
 	rwbuilder.setFind(tf.createTerm(func_plus,
-						new Term[]{t_rn, t_0}));
+			t_rn, t_0));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    ImmutableSLList.<Taclet>nil(),
+				    ImmutableSLList.nil(),
 				    t_rn));
 	rwbuilder.setName(new Name("plus-zero-elim"));
        	predsuccelim=rwbuilder.getRewriteTaclet();
@@ -197,10 +186,10 @@ public class CreateTacletForTests {
 	// find(0 + rn) replacewith(rn)
 	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
 	rwbuilder.setFind(tf.createTerm(func_plus,
-						new Term[]{t_0, t_rn}));
+			t_0, t_rn));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    ImmutableSLList.<Taclet>nil(),
+				    ImmutableSLList.nil(),
 				    t_rn));
 	rwbuilder.setName(new Name("zero-plus-elim"));
        	zeropluselim=rwbuilder.getRewriteTaclet();
@@ -210,7 +199,7 @@ public class CreateTacletForTests {
 	// find(=> rn=rn)
 	SuccTacletBuilder sbuilder=new SuccTacletBuilder();
 	Term t_rneqrn=tf.createTerm(func_eq,
-					    new Term[]{t_rn, t_rn});
+			t_rn, t_rn);
 	sbuilder.setFind( t_rneqrn);
 	sbuilder.setName(new Name("close-with-eq"));
        	closewitheq=sbuilder.getSuccTaclet();
@@ -218,21 +207,21 @@ public class CreateTacletForTests {
 
 	//switch first succ
 	// find((rn +1) + rm) replacewith((rn + rm) +1)
-	Term t_rnplus1=tf.createTerm(func_plus1, 
-					   new Term[]{t_rn});
-	Term t_rnplus1plusrm=tf.createTerm(func_plus, 
-					   new Term[]{t_rnplus1, t_rm});
+	Term t_rnplus1=tf.createTerm(func_plus1,
+			t_rn);
+	Term t_rnplus1plusrm=tf.createTerm(func_plus,
+			t_rnplus1, t_rm);
 
-	Term t_rnplusrm=tf.createTerm(func_plus, 
-					   new Term[]{t_rn, t_rm});
-	Term t_rnplusrmplus1=tf.createTerm(func_plus1, 
-					   new Term[]{t_rnplusrm});
+	Term t_rnplusrm=tf.createTerm(func_plus,
+			t_rn, t_rm);
+	Term t_rnplusrmplus1=tf.createTerm(func_plus1,
+			t_rnplusrm);
 
 	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
 	rwbuilder.setFind(t_rnplus1plusrm);
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    ImmutableSLList.<Taclet>nil(),
+				    ImmutableSLList.nil(),
 				    t_rnplusrmplus1));
 	rwbuilder.setName(new Name("switch-first-succ"));
        	switchfirstsucc=rwbuilder.getRewriteTaclet();
@@ -241,15 +230,15 @@ public class CreateTacletForTests {
 
 	//switch second succ
 	// find(rn + (rm +1)) replacewith((rn + rm) +1)
-	Term t_rmplus1=tf.createTerm(func_plus1, 
-					   new Term[]{t_rm});
-	Term t_rnplus_rmplus1=tf.createTerm(func_plus, 
-					   new Term[]{t_rn, t_rmplus1});
+	Term t_rmplus1=tf.createTerm(func_plus1,
+			t_rm);
+	Term t_rnplus_rmplus1=tf.createTerm(func_plus,
+			t_rn, t_rmplus1);
 	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
 	rwbuilder.setFind(t_rnplus_rmplus1);
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    ImmutableSLList.<Taclet>nil(),
+				    ImmutableSLList.nil(),
 				    t_rnplusrmplus1));
 	rwbuilder.setName(new Name("switch-second-succ"));
        	switchsecondsucc=rwbuilder.getRewriteTaclet();
@@ -257,21 +246,21 @@ public class CreateTacletForTests {
 	//elim-succ
 	// find(rn +1 = rm +1) replacewith(rn=rm)
 	Term t_rneqrm=tf.createTerm(func_eq,
-					    new Term[]{t_rn, t_rm});
+			t_rn, t_rm);
 	rwbuilder=new RewriteTacletBuilder<RewriteTaclet>();
 	rwbuilder.setFind(tf.createTerm(func_eq,
-						new Term[]{t_rnplus1,
-							   t_rmplus1}));
+			t_rnplus1,
+			t_rmplus1));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    ImmutableSLList.<Taclet>nil(),
+				    ImmutableSLList.nil(),
 				    t_rneqrm));
 	rwbuilder.setName(new Name("succ-elim"));
        	succelim=rwbuilder.getRewriteTaclet();
 
     }
 
-    public void setUp() {
+    public void setUp() throws IOException {
 	nss = new NamespaceSet();
 
 	parseDecls("\\sorts { Nat; testSort1; }\n"+
@@ -282,8 +271,8 @@ public class CreateTacletForTests {
 		   "}\n"
 		   );
 
-	sort1 = (Sort)nss.sorts().lookup(new Name("testSort1"));
-	nat = (Sort)nss.sorts().lookup(new Name("Nat"));
+	sort1 = nss.sorts().lookup(new Name("testSort1"));
+	nat = nss.sorts().lookup(new Name("Nat"));
 
 	b = (SchemaVariable)nss.variables().lookup(new Name("b"));
 
@@ -296,10 +285,7 @@ public class CreateTacletForTests {
 	String test1="\\predicates {A; B; } (A -> B) -> (!(!(A -> B)))";
 	Term t_test1=null;
 	try{
-	    KeYParserF parser=
-		new KeYParserF(ParserMode.PROBLEM,new KeYLexerF(test1,
-			"No file. CreateTacletForTests.setUp(" + test1 + ")"));
-	    t_test1=parser.problem();
+		t_test1 = io.load(test1).loadDeclarations().loadProblem().getProblemTerm();
 	} catch (Exception e) {
 	    System.err.println("Parser Error or Input Error");
 	    fail("Parser Error");
@@ -326,26 +312,26 @@ public class CreateTacletForTests {
 	Function const_d=new Function(new Name("d"),nat,new SortImpl[0]);
 	nss.functions().add(const_d);
 
-	Term t_c=tf.createTerm(const_c,new Term[]{});
-	Term t_d=tf.createTerm(const_d,new Term[]{});
-	Term t_cplusd=tf.createTerm(func_plus,new Term[]{t_c,t_d});	
-	Term t_dminus1=tf.createTerm(func_min1,new Term[]{t_d});
+	Term t_c=tf.createTerm(const_c);
+	Term t_d=tf.createTerm(const_d);
+	Term t_cplusd=tf.createTerm(func_plus, t_c,t_d);
+	Term t_dminus1=tf.createTerm(func_min1, t_d);
 	Term t_dminus1plus1=tf.createTerm(func_plus1,
-						  new Term[]{t_dminus1});	
+			t_dminus1);
 	Term t_dminus1plus1plusc=tf.createTerm
-	    (func_plus,new Term[]{t_dminus1plus1,t_c});
+	    (func_plus, t_dminus1plus1,t_c);
 	Term t_eq1=tf.createTerm
-	    (func_eq,new Term[]{t_cplusd, t_dminus1plus1plusc});
+	    (func_eq, t_cplusd, t_dminus1plus1plusc);
 	
 
-	Term t_cplus1=tf.createTerm(func_plus1,new Term[]{t_c});
+	Term t_cplus1=tf.createTerm(func_plus1, t_c);
 	Term t_cplus1plusd=tf.createTerm(func_plus,
-						 new Term[]{t_cplus1,
-							    t_d});
+			t_cplus1,
+			t_d);
 	Term t_dpluscplus1=tf.createTerm(func_plus,
-						 new Term[]{t_d,t_cplus1});
+			t_d,t_cplus1);
 	Term t_eq2=tf.createTerm
-	    (func_eq,new Term[]{ t_cplus1plusd, t_dpluscplus1});
+	    (func_eq, t_cplus1plusd, t_dpluscplus1);
 	Term tnat=tf.createTerm(Junctor.IMP, t_eq1, t_eq2);
 
 	// => (c+d) = ((d -1 +1) +c) -> (c +1)+d = (d+c) +1
@@ -356,8 +342,8 @@ public class CreateTacletForTests {
 
 
 	z = new LogicVariable(new Name("z"),sort1);
-       	Term t_z=tf.createTerm(z,new Term[0]);
-	Term t_allzpz=services.getTermBuilder().all(z, tf.createTerm(func_p,new Term[]{t_z}));
+       	Term t_z=tf.createTerm(z);
+	Term t_allzpz=services.getTermBuilder().all(z, tf.createTerm(func_p, t_z));
  	SequentFormula cf3=new SequentFormula(t_allzpz);
  	seq_testAll=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, 
  					  Semisequent.EMPTY_SEMISEQUENT
@@ -366,43 +352,4 @@ public class CreateTacletForTests {
 
 
     }
-    
-    private KeYParserF stringDeclParser(String s) {
-	return new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s,
-			"No file. CreateTacletForTests.stringDeclParser(" + s + ")"),
-		services, nss);
-    }
-
-    public void parseDecls(String s) {
-	try {
-	    KeYParserF p = stringDeclParser(s);
-	    p.decls();
-	} catch (Exception e) {
-	    StringWriter sw = new StringWriter();
-	    PrintWriter pw = new PrintWriter(sw);
-	    e.printStackTrace(pw);
-	    throw new RuntimeException("Exc while Parsing:\n" + sw );
-	}
-    }
-     
-    private KeYParserF stringTacletParser(String s) {
-	return new KeYParserF(ParserMode.TACLET, new KeYLexerF(s,
-			"No file. CreateTacletForTests.stringTacletParser(" + s + ")"),
-		services,
-		nss);
-    }
-    
-    Taclet parseTaclet(String s) {
-   	try {
-	    KeYParserF p = stringTacletParser(s);
-	    
-	    return p.taclet(DefaultImmutableSet.<Choice>nil());
-	} catch (Exception e) {
-	    StringWriter sw = new StringWriter();
-	    PrintWriter pw = new PrintWriter(sw);
-	    e.printStackTrace(pw);
-	    throw new RuntimeException("Exc while Parsing:\n" + sw );
-	}
-    }
-
 }

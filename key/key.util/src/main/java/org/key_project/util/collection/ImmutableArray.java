@@ -13,12 +13,15 @@
 
 package org.key_project.util.collection;
 
+
 import java.lang.reflect.Array;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -48,8 +51,12 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     }
 
 
-    /** creates a new <S>Array
-     * @param list a LinkedList (order is preserved)
+    /**
+     * creates a new immutable array with the contents of the given collection.
+     *
+     * The order of elements is defined by the collection.
+     *
+     * @param list a non-null collection (order is preserved)
      */
     @SuppressWarnings("unchecked")
     public ImmutableArray(Collection<? extends S> list) {

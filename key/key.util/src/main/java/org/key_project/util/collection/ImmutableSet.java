@@ -13,9 +13,8 @@
 
 package org.key_project.util.collection;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
+
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
@@ -66,6 +65,15 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
     static <T> ImmutableSet<T> singleton(T obj) {
         ImmutableSet<T> result = DefaultImmutableSet.nil();
         return result.add(obj);
+    }
+
+    static <T> ImmutableSet<T> empty() {
+        return DefaultImmutableSet.nil();
+    }
+
+
+    static <T> ImmutableSet<T> fromCollection(Collection<? extends T> seq) {
+        return fromSet(new HashSet<>(seq));
     }
 
     /**
@@ -137,4 +145,11 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
      */
     <S> S[] toArray(S[] array);
 
+    default ImmutableSet<T> add(Iterable<T> seq) {
+        ImmutableSet<T> cur = this;
+        for (T item : seq) {
+            cur = cur.add(item);
+        }
+        return cur;
+    }
 }

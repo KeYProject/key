@@ -6,6 +6,8 @@ import de.uka.ilkd.key.logic.Term;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+
 import static org.junit.Assert.*;
 /**
  * Testing pretty-printing and parsing of seqGet terms in this class.
@@ -14,7 +16,7 @@ import static org.junit.Assert.*;
  */
 public class TestTermParserSorts extends AbstractTestTermParser {
     @Before
-    public void setUp() throws RecognitionException {
+    public void setUp() throws IOException {
         parseDecls("\\programVariables {Seq s;}");
         parseDecls("\\programVariables {int i;}");
         parseDecls("\\programVariables {"
@@ -72,6 +74,7 @@ public class TestTermParserSorts extends AbstractTestTermParser {
      *
      * Such a case is not considered here.
      */
+    @Test
     public void testParseIntegerArgs() throws Exception {
         String s = "testTermParserSorts.IntegerMethods::queryByte(heap,a,Z(0(#)))";
         Term t = parseTerm("a.queryByte(0)");
@@ -125,5 +128,4 @@ public class TestTermParserSorts extends AbstractTestTermParser {
         t = parseTerm("testTermParserSorts.IntegerMethods.queryMixedStatic(0,ca,0,ia,0)");
         assertEquals(s, t.toString());
     }
-
 }

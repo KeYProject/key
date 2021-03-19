@@ -149,6 +149,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
         for (int i = 0; i < testData.length / 2; i++) {
             String input = testData[i * 2];
             String expected = testData[i * 2 + 1];
+            System.err.println("Input: " + input);
             String actual = parseTerm(input).toString();
             assertEquals(expected, actual);
         }

@@ -58,7 +58,7 @@ public class NewDependingOn {
     }
 
     public String toString() {
-	return "\\new("+first()+", \\dependingOn("+second()+"))";
+	return "\\newDependingOn("+first()+", "+second()+")";
     }
 
     public boolean equals(Object o) {

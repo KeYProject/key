@@ -37,6 +37,8 @@ import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.KeYlessObject;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.KeYlessState;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.KeYlessValue;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests {@link SymbolicLayoutWriter} and {@link SymbolicLayoutReader}
@@ -46,7 +48,7 @@ public class TestSymbolicLayoutWriterAndReader extends TestCase {
    /**
     * Tests the writing and reading of an {@link ISymbolicLayout}.
     */
-   public void testWritingAndReading() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+   @Test public void testWritingAndReading() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
       // Create model
       ISymbolicLayout expectedNode = createModel();
       // Serialize model to XML string

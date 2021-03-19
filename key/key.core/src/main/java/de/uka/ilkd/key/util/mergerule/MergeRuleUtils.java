@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.nparser.KeyIO;
+import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -66,8 +68,6 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.parser.KeYLexerF;
-import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.Goal;
@@ -192,10 +192,7 @@ public class MergeRuleUtils {
     public static Term translateToFormula(final Services services,
             final String toTranslate) {
         try {
-            final KeYParserF parser = new KeYParserF(ParserMode.TERM,
-                    new KeYLexerF(new StringReader(toTranslate), ""), services,
-                    services.getNamespaces());
-            final Term result = parser.term();
+            @NotNull Term result = new KeyIO(services).parseExpression(toTranslate);
             return result.sort() == Sort.FORMULA ? result : null;
         } catch (Throwable e) {
             return null;

@@ -35,8 +35,9 @@ public class RuleJustificationInfo {
             // always an exception will be thrown
             for (RuleKey key : rule2justif.keySet()) {
                 if (key.equals(ruleKey) && r != key.r) {
-                    throw new IllegalArgumentException("A rule named " + r.name()
-                            + "has already been registered.");
+                    //FIXME weigl: hack
+                    //throw new IllegalArgumentException("A rule named " + r.name()
+                    //        + "has already been registered.");
 
                 }
             }

@@ -17,6 +17,7 @@ import java.util.Iterator;
 
 import junit.framework.TestCase;
 
+import org.junit.Assert;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -927,7 +928,9 @@ public class TestApplyTaclet extends TestCase{
      */
     public void testTacletVariableCollector () {
         TacletSchemaVariableCollector coll = new TacletSchemaVariableCollector();
-        Taclet t = TacletForTests.getRules ().lookup ( "testUninstantiatedSVCollector" ).taclet();
+		NoPosTacletApp tacletApp = TacletForTests.getRules().lookup("testUninstantiatedSVCollector");
+		Assert.assertNotNull(tacletApp);
+		Taclet t = tacletApp.taclet();
         coll.visit(t, false);
         ImmutableSet<SchemaVariable> collSet = DefaultImmutableSet.<SchemaVariable>nil();
         Iterator<SchemaVariable> it = coll.varIterator();
@@ -1013,6 +1016,8 @@ public class TestApplyTaclet extends TestCase{
                         "int i=17; } catch (Exception e) { return null;}}");
 
         ProgramElement is = goals.head().sequent().getFormulabyNr(1).formula().javaBlock().program();
+        //FIXME weigl: This test case is spurious:
+		// actual.toString() == expected.toString() but internally there is a difference.
         assertTrue("Expected:"+expected+"\n but was:"+is, expected.equalsModRenaming(is, new NameAbstractionTable()));
     }
 
@@ -1033,12 +1038,12 @@ public class TestApplyTaclet extends TestCase{
         ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
             getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
 
-        assertTrue("Expected one rule application.",rApplist.size()==1);
+		assertEquals("Expected one rule application.", 1, rApplist.size());
         assertTrue("Rule App should be complete", rApplist.head().complete());
 
         ImmutableList<Goal> goals=rApplist.head ().execute(goal, TacletForTests.services());
 
-        assertTrue("Expected one goal.",goals.size()==1);
+		assertEquals("Expected one goal.", 1, goals.size());
 
         // the content of the diamond must not have changed
         ProgramElement expected = TacletForTests.parsePrg("{try{while (1==1) {if (1==2) {break;}} return 1==3; " +
@@ -1067,16 +1072,16 @@ public class TestApplyTaclet extends TestCase{
         
         ImmutableList<Goal> goals=rApplist.head ().execute(goal, TacletForTests.services());
 
-        assertTrue("Expected two goals.",goals.size()==2);
+		assertEquals("Expected two goals.", 2, goals.size());
 
-        assertTrue("Goal should be: ==> false, A", goals.head().sequent().antecedent().size() == 0);
-        assertTrue("Goal should be: ==> false, A", goals.head().sequent().succedent().size() == 2);
+		assertEquals("Goal should be: ==> false, A", 0, goals.head().sequent().antecedent().size());
+		assertEquals("Goal should be: ==> false, A", 2, goals.head().sequent().succedent().size());
         assertEquals("Goal should be: ==> A, false", "A", goals.head().sequent().succedent().get(0).toString());
         assertEquals("Goal should be: ==> A, false", "false", goals.head().sequent().succedent().get(1).toString());
 
-        
-        assertTrue("Goal should be: A ==> true", goals.tail().head().sequent().antecedent().size() == 1);
-        assertTrue("Goal should be: A ==> true", goals.tail().head().sequent().succedent().size() == 1);
+
+		assertEquals("Goal should be: A ==> true", 1, goals.tail().head().sequent().antecedent().size());
+		assertEquals("Goal should be: A ==> true", 1, goals.tail().head().sequent().succedent().size());
         assertEquals("Goal should be: A ==> true", "A", goals.tail().head().sequent().antecedent().getFirst().toString());
         assertEquals("Goal should be: A ==> true", "true", goals.tail().head().sequent().succedent().getFirst().toString());
 
@@ -1096,20 +1101,20 @@ public class TestApplyTaclet extends TestCase{
         ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
             getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
 
-        assertTrue("Expected one rule application.",rApplist.size()==1);
+		assertEquals("Expected one rule application.", 1, rApplist.size());
         assertTrue("Rule App should be complete", rApplist.head().complete());
         
         ImmutableList<Goal> goals=rApplist.head ().execute(goal, TacletForTests.services());
 
-        assertTrue("Expected two goals.",goals.size()==2);
-        
-        assertTrue("Goal should be: true, A ==> ", goals.tail().head().sequent().antecedent().size() == 2);
-        assertTrue("Goal should be: true, A ==> ", goals.tail().head().sequent().succedent().size() == 0);
+		assertEquals("Expected two goals.", 2, goals.size());
+
+		assertEquals("Goal should be: true, A ==> ", 2, goals.tail().head().sequent().antecedent().size());
+		assertEquals("Goal should be: true, A ==> ", 0, goals.tail().head().sequent().succedent().size());
         assertEquals("Goal should be: true, A ==> ", "A", goals.tail().head().sequent().antecedent().get(0).toString());
         assertEquals("Goal should be: true, A ==> ", "true", goals.tail().head().sequent().antecedent().get(1).toString());
 
-        assertTrue("Goal should be: false ==> A", goals.head().sequent().antecedent().size() == 1);
-        assertTrue("Goal should be: false ==> A", goals.head().sequent().succedent().size() == 1);
+		assertEquals("Goal should be: false ==> A", 1, goals.head().sequent().antecedent().size());
+		assertEquals("Goal should be: false ==> A", 1, goals.head().sequent().succedent().size());
         assertEquals("Goal should be: false ==> A", "false", goals.head().sequent().antecedent().get(0).toString());
         assertEquals("Goal should be: false ==> A", "A", goals.head().sequent().succedent().get(0).toString());
     }
@@ -1151,23 +1156,23 @@ public class TestApplyTaclet extends TestCase{
 
         rApplist=goal.ruleAppIndex().
         getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
-    
-        assertTrue("Expected one rule application.",rApplist.size()==1);
+
+		assertEquals("Expected one rule application.", 1, rApplist.size());
         assertTrue("Rule App should be complete", rApplist.head().complete());
         
         goals=rApplist.head ().execute(goal, TacletForTests.services());
 
-        assertTrue("Expected two goals.",goals.size()==2);
-        
-        assertTrue("Goal should be: ==> B, false, A", goals.head().sequent().antecedent().size() == 0);
-        assertTrue("Goal should be: ==> B, false, A", goals.head().sequent().succedent().size() == 3);
+		assertEquals("Expected two goals.", 2, goals.size());
+
+		assertEquals("Goal should be: ==> B, false, A", 0, goals.head().sequent().antecedent().size());
+		assertEquals("Goal should be: ==> B, false, A", 3, goals.head().sequent().succedent().size());
         assertEquals("Goal should be:  ==> B, false, A", "B", goals.head().sequent().succedent().get(0).toString());
         assertEquals("Goal should be:  ==> B, false, A", "false", goals.head().sequent().succedent().get(1).toString());
         assertEquals("Goal should be:  ==> B, false, A", "A", goals.head().sequent().succedent().get(2).toString());
 
-        
-        assertTrue("Goal should be: B ==> true, A", goals.tail().head().sequent().antecedent().size() == 1);
-        assertTrue("Goal should be: B ==> true, A", goals.tail().head().sequent().succedent().size() == 2);
+
+		assertEquals("Goal should be: B ==> true, A", 1, goals.tail().head().sequent().antecedent().size());
+		assertEquals("Goal should be: B ==> true, A", 2, goals.tail().head().sequent().succedent().size());
         assertEquals("Goal should be:B  ==> true, A", "B", goals.tail().head().sequent().antecedent().get(0).toString());
         assertEquals("Goal should be:B  ==> true, A", "true", goals.tail().head().sequent().succedent().get(0).toString());
         assertEquals("Goal should be:B  ==> true, A", "A", goals.tail().head().sequent().succedent().get(1).toString());
@@ -1206,21 +1211,21 @@ public class TestApplyTaclet extends TestCase{
         rApplist=goal.ruleAppIndex().
                 getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
 
-        assertTrue("Expected one rule application.",rApplist.size()==1);
+		assertEquals("Expected one rule application.", 1, rApplist.size());
         assertTrue("Rule App should be complete", rApplist.head().complete());
 
         goals=rApplist.head ().execute(goal, TacletForTests.services());
 
-        assertTrue("Expected two goals.",goals.size()==2);
-        assertTrue("Goal should be: ==> B, A, false", goals.head().sequent().antecedent().size() == 0);
-        assertTrue("Goal should be: ==> B, A, false", goals.head().sequent().succedent().size() == 3);
+		assertEquals("Expected two goals.", 2, goals.size());
+		assertEquals("Goal should be: ==> B, A, false", 0, goals.head().sequent().antecedent().size());
+		assertEquals("Goal should be: ==> B, A, false", 3, goals.head().sequent().succedent().size());
         assertEquals("Goal should be:  ==> B, A, false", "B", goals.head().sequent().succedent().get(0).toString());
         assertEquals("Goal should be:  ==> B, A, false", "A", goals.head().sequent().succedent().get(1).toString());
         assertEquals("Goal should be:  ==> B, A, false", "false", goals.head().sequent().succedent().get(2).toString());
 
 
-        assertTrue("Goal should be: A ==> B, true", goals.tail().head().sequent().antecedent().size() == 1);
-        assertTrue("Goal should be: A ==> B, true", goals.tail().head().sequent().succedent().size() == 2);
+		assertEquals("Goal should be: A ==> B, true", 1, goals.tail().head().sequent().antecedent().size());
+		assertEquals("Goal should be: A ==> B, true", 2, goals.tail().head().sequent().succedent().size());
         assertEquals("Goal should be:A ==> B, true", "A", goals.tail().head().sequent().antecedent().get(0).toString());
         assertEquals("Goal should be:A ==> B, true", "B", goals.tail().head().sequent().succedent().get(0).toString());
         assertEquals("Goal should be:A ==> B, true", "true", goals.tail().head().sequent().succedent().get(1).toString());
@@ -1259,22 +1264,22 @@ public class TestApplyTaclet extends TestCase{
         rApplist=goal.ruleAppIndex().
                 getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
 
-        assertTrue("Expected one rule application.",rApplist.size()==1);
+		assertEquals("Expected one rule application.", 1, rApplist.size());
         assertTrue("Rule App should be complete", rApplist.head().complete());
 
         goals=rApplist.head ().execute(goal, TacletForTests.services());
 
-        assertTrue("Expected two goals.",goals.size()==2);
+		assertEquals("Expected two goals.", 2, goals.size());
 
-        assertTrue("Goal should be: false, A ==> B ", goals.head().sequent().antecedent().size() == 2);
-        assertTrue("Goal should be: false, A ==> B", goals.head().sequent().succedent().size() == 1);
+		assertEquals("Goal should be: false, A ==> B ", 2, goals.head().sequent().antecedent().size());
+		assertEquals("Goal should be: false, A ==> B", 1, goals.head().sequent().succedent().size());
         assertEquals("Goal should be:  false, A ==> B", "false", goals.head().sequent().antecedent().get(0).toString());
         assertEquals("Goal should be:  false, A ==> B", "A", goals.head().sequent().antecedent().get(1).toString());
         assertEquals("Goal should be:  false, A ==> B", "B", goals.head().sequent().succedent().get(0).toString());
 
 
-        assertTrue("Goal should be: B, true, A ==>", goals.tail().head().sequent().antecedent().size() == 3);
-        assertTrue("Goal should be:  B, true, A ==>", goals.tail().head().sequent().succedent().size() == 0);
+		assertEquals("Goal should be: B, true, A ==>", 3, goals.tail().head().sequent().antecedent().size());
+		assertEquals("Goal should be:  B, true, A ==>", 0, goals.tail().head().sequent().succedent().size());
         assertEquals("Goal should be: B, true, A ==>", "B", goals.tail().head().sequent().antecedent().get(0).toString());
         assertEquals("Goal should be: B, true, A ==>", "true", goals.tail().head().sequent().antecedent().get(1).toString());
         assertEquals("Goal should be: B, true, A ==>", "A", goals.tail().head().sequent().antecedent().get(2).toString());
@@ -1313,22 +1318,22 @@ public class TestApplyTaclet extends TestCase{
         rApplist=goal.ruleAppIndex().
                 getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);
 
-        assertTrue("Expected one rule application.",rApplist.size()==1);
+		assertEquals("Expected one rule application.", 1, rApplist.size());
         assertTrue("Rule App should be complete", rApplist.head().complete());
 
         goals=rApplist.head ().execute(goal, TacletForTests.services());
 
-        assertTrue("Expected two goals.",goals.size()==2);
+		assertEquals("Expected two goals.", 2, goals.size());
 
-        assertTrue("Goal should be: B, false ==> A ", goals.head().sequent().antecedent().size() == 2);
-        assertTrue("Goal should be: B, false  ==> A", goals.head().sequent().succedent().size() == 1);
+		assertEquals("Goal should be: B, false ==> A ", 2, goals.head().sequent().antecedent().size());
+		assertEquals("Goal should be: B, false  ==> A", 1, goals.head().sequent().succedent().size());
         assertEquals("Goal should be:  B, false  ==> A", "B", goals.head().sequent().antecedent().get(0).toString());
         assertEquals("Goal should be:  B, false  ==> A", "false", goals.head().sequent().antecedent().get(1).toString());
         assertEquals("Goal should be:  B, false  ==> A", "A", goals.head().sequent().succedent().get(0).toString());
 
 
-        assertTrue("Goal should be: B, A, true  ==> ", goals.tail().head().sequent().antecedent().size() == 3);
-        assertTrue("Goal should be:   B, A, true  ==> ", goals.tail().head().sequent().succedent().size() == 0);
+		assertEquals("Goal should be: B, A, true  ==> ", 3, goals.tail().head().sequent().antecedent().size());
+		assertEquals("Goal should be:   B, A, true  ==> ", 0, goals.tail().head().sequent().succedent().size());
         assertEquals("Goal should be:  B, A, true  ==> ", "B", goals.tail().head().sequent().antecedent().get(0).toString());
         assertEquals("Goal should be:  B, A, true  ==> ", "A", goals.tail().head().sequent().antecedent().get(1).toString());
         assertEquals("Goal should be:  B, A, true  ==> ", "true", goals.tail().head().sequent().antecedent().get(2).toString());

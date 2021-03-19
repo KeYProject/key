@@ -13,9 +13,6 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import de.uka.ilkd.key.parser.KeYLexerTokens;
-
-
 /**
  * This class provides better literals to the tokens in the jml preparser.
  *
@@ -60,7 +57,6 @@ import de.uka.ilkd.key.parser.KeYLexerTokens;
  * will light up here. Just remove the corresponding line.
  *
  * @author mulbrich
- * @see KeYLexerTokens
  */
 
 public class KeYJMLPreLexerTokens {

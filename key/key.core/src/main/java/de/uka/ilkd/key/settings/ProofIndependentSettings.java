@@ -44,7 +44,6 @@ public class ProofIndependentSettings {
     private final TermLabelSettings termLabelSettings = new TermLabelSettings();
     private final String filename;
 
-    private final TestGenerationSettings testGenSettings = new TestGenerationSettings();
 
     private final List<Settings> settings = new LinkedList<>();
 
@@ -56,7 +55,6 @@ public class ProofIndependentSettings {
         addSettings(lemmaGeneratorSettings);
         addSettings(generalSettings);
         addSettings(viewSettings);
-        addSettings(testGenSettings);
         this.filename = filename;
         loadSettings();
     }
@@ -133,10 +131,6 @@ public class ProofIndependentSettings {
 
     public ProofIndependentSMTSettings getSMTSettings() {
         return smtSettings;
-    }
-
-    public TestGenerationSettings getTestGenerationSettings() {
-        return testGenSettings;
     }
 
     /**
