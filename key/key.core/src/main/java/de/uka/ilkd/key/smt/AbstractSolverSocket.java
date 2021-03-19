@@ -63,6 +63,9 @@ public abstract class AbstractSolverSocket {
         else if(type == SolverType.CVC4_SOLVER){
             return new CVC4Socket(name, query);
         }
+        else if(type == SolverType.CVC4_NEW_TL_SOLVER){
+            return new CVC4Socket(name, query);
+        }
 
 		return null;
 	}

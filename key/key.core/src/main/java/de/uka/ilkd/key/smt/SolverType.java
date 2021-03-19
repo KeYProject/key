@@ -519,6 +519,67 @@ public interface SolverType  {
 
 	};
 
+	/**
+	 * CVC4 with the new translation
+	 */
+	static public final SolverType CVC4_NEW_TL_SOLVER = new AbstractSolverType() {
+
+	    // TODO move to AbstractSolverType?
+        @Override
+        public SMTSolver createSolver(SMTProblem problem,
+                        SolverListener listener, Services services) {
+            return new SMTSolverImplementation(problem, listener,
+                            services, this);
+        }
+
+        @Override
+        public String getName() {
+            return "CVC4";
+        }
+
+        @Override
+        public String getInfo() {
+            // todo Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public String getDefaultSolverParameters() {
+            return "--no-print-success -m --interactive --lang smt2";
+        }
+
+        @Override
+        public String getDefaultSolverCommand() {
+            return "cvc4";
+        }
+
+        @Override
+        public SMTTranslator createTranslator(Services services) {
+            return new ModularSMTLib2Translator();
+        }
+
+        @Override
+        public String[] getDelimiters() {
+            return new String[]{"CVC4>"};
+        }
+
+        @Override
+        public boolean supportsIfThenElse() {
+            return true;
+        }
+
+        @Override
+        public String getVersionParameter() {
+            return "--version";
+        }
+
+        @Override
+        public String[] getSupportedVersions() {
+            return new String[]{"version 1.3"};
+        }
+
+	};
+
 
 	/**
 	 * Class for the Yices solver. It makes use of the SMT1-format.
