@@ -727,6 +727,7 @@ public interface SolverType  {
 	public static List<SolverType> ALL_SOLVERS =
                 Collections.unmodifiableList(Arrays.asList(
                         Z3_SOLVER,
+                        CVC4_NEW_TL_SOLVER,
                         CVC3_SOLVER,
                         CVC4_SOLVER,
                         SIMPLIFY_SOLVER,
