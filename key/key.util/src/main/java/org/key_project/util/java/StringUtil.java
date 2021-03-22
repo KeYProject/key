@@ -177,33 +177,9 @@ public final class StringUtil {
     * @author Mattias Ulbrich (under GPL)
     */
    public static String wrapLines(String string, int length) {
-      assert length > 0;
-      StringBuilder sb = new StringBuilder(string);
-
-      int lastChange = -1;
-      int lastSpace = -1;
-      int nextSpace = string.indexOf(' ');
-      while(nextSpace >= 0) {
-         int nextNewLine = string.indexOf('\n', lastSpace + 1);
-         if(0 <= nextNewLine && nextNewLine < nextSpace) {
-            lastChange = lastSpace = nextNewLine;
-         } else if(nextSpace - lastChange >= length) {
-            // wrap needed!
-            if(lastChange == lastSpace) {
-               // but can't break any earlier.
-               sb.setCharAt(nextSpace, '\n');
-               lastChange = lastSpace = nextSpace;
-            } else {
-               sb.setCharAt(lastSpace, '\n');
-               lastChange = lastSpace;
-            }
-         } else {
-            lastSpace = nextSpace;
-         }
-         nextSpace = sb.indexOf(" ", lastSpace + 1);
-      }
-
-      return sb.toString();
+      char[] c = string.toCharArray();
+      WrapUtils.wrapLines(c, length);
+      return new String(c);
    }
 
    /**
