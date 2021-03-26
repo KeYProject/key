@@ -1,9 +1,13 @@
 package de.uka.ilkd.key.nparser;
 
 import com.google.common.base.Strings;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.v4.runtime.*;
 import org.jetbrains.annotations.Nullable;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -146,6 +150,25 @@ public class SyntaxErrorReporter extends BaseErrorListener {
             return errors.stream()
                     .map(it -> it.getBeatifulErrorMessage(lines))
                     .collect(Collectors.joining(delimter));
+        }
+
+
+        @Override
+        public String getMessage() {
+            StringBuilder s = new StringBuilder();
+            for (SyntaxError error : errors) {
+                s.append("line ").append(error.line).append(":").append(error.charPositionInLine).append(" ").append(error.msg)
+                        .append("\n");
+            }
+            return s.toString();
+        }
+
+        public Location getLocation() throws MalformedURLException {
+            if (!errors.isEmpty()) {
+                SyntaxError e = errors.get(0);
+                return new Location(MiscTools.parseURL(e.source), e.line, e.charPositionInLine);
+            }
+            return null;
         }
     }
 }

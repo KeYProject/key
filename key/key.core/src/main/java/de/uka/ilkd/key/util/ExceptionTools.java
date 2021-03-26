@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.util;
 
+import de.uka.ilkd.key.nparser.SyntaxErrorReporter;
 import org.antlr.runtime.RecognitionException;
 
 import de.uka.ilkd.key.java.ParseExceptionInFile;
@@ -98,7 +99,9 @@ public final class ExceptionTools {
             }
             location = new Location(file, ((PosConvertException) exc).getLine(),
                                         ((PosConvertException) exc).getColumn());
-        } 
+        } else if(exc instanceof SyntaxErrorReporter.ParserException) {
+            location = ((SyntaxErrorReporter.ParserException) exc).getLocation();
+        }
     
         if (location == null && exc.getCause() != null) {
             location = getLocation(exc.getCause());
