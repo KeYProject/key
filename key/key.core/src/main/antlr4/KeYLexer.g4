@@ -252,9 +252,9 @@ IS_ABSTRACT_OR_INTERFACE : '\\isAbstractOrInterface';
 CONTAINERTYPE : '\\containerType';
 
 // types that need to be declared as keywords
-LOCSET : '\\locset';
-SEQ : '\\seq';
-BIGINT : '\\bigint';
+//LOCSET : '\\locset';
+//SEQ : '\\seq';
+//BIGINT : '\\bigint';
 
 // Unicode symbols for special functions/predicates
 UTF_PRECEDES : '\u227A';

@@ -77,28 +77,6 @@ public abstract class ParsingFacade {
         KeYParser p = new KeYParser(new CommonTokenStream(createLexer(stream)));
         p.removeErrorListeners();
         p.addErrorListener(p.getErrorReporter());
-        p.addErrorListener(new ANTLRErrorListener() {
-            @Override
-            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-                System.out.println(((CommonToken) offendingSymbol).getTokenSource().getInputStream().toString());
-                throw e;
-            }
-
-            @Override
-            public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
-
-            }
-
-            @Override
-            public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, ATNConfigSet configs) {
-
-            }
-
-            @Override
-            public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, ATNConfigSet configs) {
-
-            }
-        });
         return p;
     }
 
@@ -139,6 +117,7 @@ public abstract class ParsingFacade {
     public static KeyAst.File parseFile(CharStream stream) {
         KeYParser p = createParser(stream);
         KeYParser.FileContext ctx = p.file();
+        p.getErrorReporter().throwException();
         return new KeyAst.File(ctx);
     }
 
@@ -151,7 +130,9 @@ public abstract class ParsingFacade {
 
     public static KeyAst.Seq parseSequent(CharStream stream) {
         KeYParser p = createParser(stream);
-        return new KeyAst.Seq(p.seqEOF().seq());
+        KeyAst.Seq seq = new KeyAst.Seq(p.seqEOF().seq());
+        p.getErrorReporter().throwException();
+        return seq;
     }
 
     /**
