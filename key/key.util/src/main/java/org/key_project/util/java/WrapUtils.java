@@ -8,19 +8,33 @@ package org.key_project.util.java;
  * It is an interesting class since it is the first algorithm in KeY that has
  * been proved correct with KeY.
  *
+ * It has been verified with KeY 3d4189d9107dc7df50d0fce8f45cfd02cb20ba22.
+ * Required heavy use of the (then) new SMT translation.
+ * (Z3 version 4.8.8)
+ *
  * @author Mattias Ulbrich, Mar 2021
  */
 public class WrapUtils {
     
     /*@ public normal_behaviour
       @  requires length > 0;
+      @
+      @  // This method only replaces ' ' by '\n'.
       @  ensures (\forall int i; 0 <= i && i < s.length;
       @    s[i] == \old(s[i]) || \old(s[i]) == ' ' && s[i] == '\n');
       @
-      @  // If there are more than length characters w/o linebreak, then they are all different from space
+      @  // If there are more than length characters w/o linebreak, 
+      @  // then they are all different from space
       @  ensures (\forall int i; 0 <= i && i < s.length - length;
-      @             (\forall int j; i <= j && j < i + length; s[j] != '\n')
-      @         ==> (\forall int j; i <= j && j < i + length; s[j] != ' '));
+      @             (\forall int j; i <= j && j <= i + length; s[j] != '\n')
+      @         ==> (\forall int j; i <= j && j <= i + length; s[j] != ' '));
+      @
+      @  // Any line but the last line cannot be made any longer
+      @  ensures (\forall int a,b,c; 0 <= a && a < b && b < c && c < s.length &&
+      @      (a == -1 || s[a] == '\n') &&
+      @      s[b] == '\n' && \old(s[b]) == ' ' && 
+      @      (s[c] == ' ' || s[c] == '\n');
+      @          c - a > length);
       @
       @  assignable s[*];
       @*/    
@@ -31,35 +45,45 @@ public class WrapUtils {
 
         /*@ loop_invariant -1 <= lastSpace && lastSpace < s.length;
           @ loop_invariant -1 <= lastChange && lastChange <= lastSpace;
+          @ loop_invariant lastSpace <= lastChange + length + 1;
           @ loop_invariant lastSpace >= 0 ==> 
           @    \old(s[lastSpace]) == ' ' || \old(s[lastSpace]) == '\n';
           @ loop_invariant (\forall int i; 0 <= i && i < s.length;
           @    s[i] == \old(s[i]) || \old(s[i]) == ' ' && s[i] == '\n');
-          @ loop_invariant lastSpace - lastChange < length ||
-          @    (\forall int l; lastChange < l && l < lastSpace; s[l] != ' ');
           @ loop_invariant (\forall int i; 0 <= i && i < lastChange && i < s.length - length;
-          @             (\forall int j; i <= j && j < i + length; s[j] != '\n')
-          @         ==> (\forall int j; i <= j && j < i + length; s[j] != ' '));
+          @             (\forall int j; i <= j && j <= i + length; s[j] != '\n')
+          @         ==> (\forall int j; i <= j && j <= i + length; s[j] != ' '));
+          @ loop_invariant (\forall int a,b,c; 0 <= a && a < b && b < c && c < s.length &&
+          @      b <= lastChange &&
+          @      (a == -1 || s[a] == '\n') &&
+          @      s[b] == '\n' && \old(s[b]) == ' ' && 
+          @      (s[c] == ' ' || s[c] == '\n');
+          @          c - a > length);
+          @ loop_invariant (\forall int x; lastChange < x && x <= lastSpace; s[x] != '\n');
+          @ loop_invariant (\forall int x; lastChange < x && x < s.length; s[x] == \old(s[x]));
           @ loop_invariant lastChange == -1 || s[lastChange] == '\n';
-          @ decreases s.length - lastSpace;
+          @ decreases 2*s.length - lastSpace - lastChange;
           @ assignable s[*];
           @*/
         while(true) {
             int nextSpace = indexOf(s, ' ', lastSpace + 1);
+            int nextNewLine = indexOf(s, '\n', lastSpace + 1);
             if(nextSpace == -1) {
-                if(s.length - lastChange >= length && lastSpace >= 0) {
+                if(s.length - lastChange > length &&
+                   (nextNewLine - lastChange > length || nextNewLine == -1) &&
+                   lastSpace >= 0) {
                     s[lastSpace] = '\n';
                 }
                 return;
             }
-            int nextNewLine = indexOf(s, '\n', lastSpace + 1);
+
             if(0 <= nextNewLine && nextNewLine < nextSpace) {
-                if(nextNewLine - lastChange >= length && lastSpace >= 0) {
+                if(nextNewLine - lastChange > length && lastSpace >= 0) {
                     s[lastSpace] = '\n';
                 }
                 lastChange = lastSpace = nextNewLine;
             } else {
-                if(nextSpace - lastChange >= length) {
+                if(nextSpace - lastChange > length) {
                     if(lastChange == lastSpace) {
                         s[nextSpace] = '\n';
                         lastChange = lastSpace = nextSpace;
@@ -67,8 +91,9 @@ public class WrapUtils {
                         s[lastSpace] = '\n';
                         lastChange = lastSpace;
                     }
+                } else {
+                    lastSpace = nextSpace;
                 } 
-                lastSpace = nextSpace;
             }
         }
     }
