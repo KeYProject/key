@@ -13,8 +13,8 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.rule.Taclet;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -44,7 +44,7 @@ public class KeyIO {
     private @Nullable List<BuildingIssue> warnings;
     private AbbrevMap abbrevMap;
 
-    public KeyIO(@NotNull Services services, @NotNull NamespaceSet nss) {
+    public KeyIO(@Nonnull Services services, @Nonnull NamespaceSet nss) {
         this.services = services;
         this.nss = nss;
     }
@@ -65,7 +65,7 @@ public class KeyIO {
      * @return a valid term
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
-    public @NotNull Term parseExpression(@NotNull String expr) {
+    public @Nonnull Term parseExpression(@Nonnull String expr) {
         return parseExpression(CharStreams.fromString(expr));
     }
 
@@ -76,7 +76,7 @@ public class KeyIO {
      * @return a valid term
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
-    public @NotNull Term parseExpression(@NotNull CharStream stream) {
+    public @Nonnull Term parseExpression(@Nonnull CharStream stream) {
         KeyAst.Term ctx = ParsingFacade.parseExpression(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         visitor.setAbbrevMap(abbrevMap);
@@ -95,7 +95,7 @@ public class KeyIO {
      * @return a valid sequent
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
-    public @NotNull Sequent parseSequence(@NotNull CharStream stream) {
+    public @Nonnull Sequent parseSequence(@Nonnull CharStream stream) {
         KeyAst.Seq ctx = ParsingFacade.parseSequent(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         if (schemaNamespace != null)

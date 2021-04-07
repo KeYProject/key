@@ -14,7 +14,7 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +27,8 @@ import java.util.List;
  */
 public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     private final DeclarationBuilder declarationBuilder;
-    private final List<@NotNull Contract> contracts = new ArrayList<>();
-    private final List<@NotNull ClassInvariant> invariants = new ArrayList<>();
+    private final List<Contract> contracts = new ArrayList<>();
+    private final List<ClassInvariant> invariants = new ArrayList<>();
 
 
     private ParsableVariable selfVar;
@@ -38,11 +38,11 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
         declarationBuilder = new DeclarationBuilder(services, nss);
     }
 
-    public @NotNull List<@NotNull Contract> getContracts() {
+    public @Nonnull List<Contract> getContracts() {
         return contracts;
     }
 
-    public @NotNull List<@NotNull ClassInvariant> getInvariants() {
+    public @Nonnull List<ClassInvariant> getInvariants() {
         return invariants;
     }
 

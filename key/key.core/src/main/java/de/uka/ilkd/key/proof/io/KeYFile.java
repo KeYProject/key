@@ -29,8 +29,8 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -254,7 +254,7 @@ public class KeYFile implements EnvInput {
 
     @Override
     public File readBootClassPath() {
-        @NotNull ProblemInformation pi = getProblemInformation();
+        @Nonnull ProblemInformation pi = getProblemInformation();
         String bootClassPath = pi.getBootClassPath();
         if (bootClassPath == null) return null;
         File bootClassPathFile = new File(bootClassPath);
@@ -267,7 +267,7 @@ public class KeYFile implements EnvInput {
         return bootClassPathFile;
     }
 
-    protected @NotNull ProblemInformation getProblemInformation() {
+    protected @Nonnull ProblemInformation getProblemInformation() {
         if (problemInformation == null) {
             KeyAst.File ctx = getParseContext();
             problemInformation = ctx.getProblemInformation();
@@ -276,10 +276,10 @@ public class KeYFile implements EnvInput {
     }
 
 
-    @NotNull
+    @Nonnull
     @Override
-    public List<@NotNull File> readClassPath() {
-        @NotNull ProblemInformation pi = getProblemInformation();
+    public List<File> readClassPath() {
+        @Nonnull ProblemInformation pi = getProblemInformation();
         String parentDirectory = file.file().getParent();
         List<File> fileList = new ArrayList<>();
         for (String cp : pi.getClasspath()) {
@@ -298,7 +298,7 @@ public class KeYFile implements EnvInput {
 
     @Override
     public String readJavaPath() throws ProofInputException {
-        @NotNull ProblemInformation pi = getProblemInformation();
+        @Nonnull ProblemInformation pi = getProblemInformation();
         String javaPath = pi.getJavaSource();
         if (javaPath != null) {
             File absFile = new File(javaPath);
@@ -341,7 +341,7 @@ public class KeYFile implements EnvInput {
         return warnings;
     }
 
-    @NotNull
+    @Nonnull
     protected ProblemFinder getProblemFinder() {
         if (problemFinder == null) {
             problemFinder = new ProblemFinder(initConfig.getServices(), initConfig.namespaces());

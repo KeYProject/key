@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.logic;
 
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.List;
 import java.util.Objects;
@@ -29,8 +29,8 @@ import java.util.Objects;
  * @see de.uka.ilkd.key.nparser.ParsingFacade#getChoices(List)
  */
 public class Choice implements Named {
-    private final @NotNull Name name;
-    private final @NotNull String category;
+    private final @Nonnull Name name;
+    private final @Nonnull String category;
 
     /**
      * Creates a choice object with name &lt;category&gt:&lt;choice&gt;.
@@ -39,18 +39,18 @@ public class Choice implements Named {
         this(new Name(category + ":" + choice), category);
     }
 
-    public Choice(@NotNull Name name, @NotNull String category) {
+    public Choice(@Nonnull Name name, @Nonnull String category) {
         this.name = name;
         this.category = category;
     }
 
 
     @Override
-    public @NotNull Name name() {
+    public @Nonnull Name name() {
         return name;
     }
 
-    public @NotNull String category() {
+    public @Nonnull String category() {
         return category;
     }
 

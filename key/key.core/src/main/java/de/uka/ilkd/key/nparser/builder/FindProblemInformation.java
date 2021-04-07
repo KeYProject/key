@@ -3,7 +3,7 @@ package de.uka.ilkd.key.nparser.builder;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.ProblemInformation;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.List;
 import java.util.Objects;
@@ -17,7 +17,7 @@ import static de.uka.ilkd.key.nparser.builder.BuilderHelpers.trim;
  * @see #getProblemInformation()
  */
 public class FindProblemInformation extends AbstractBuilder<Object> {
-    private final @NotNull ProblemInformation information = new ProblemInformation();
+    private final @Nonnull ProblemInformation information = new ProblemInformation();
 
     @Override
     public Object visitFile(KeYParser.FileContext ctx) {
@@ -94,7 +94,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
     /**
      * The found problem information.
      */
-    public @NotNull ProblemInformation getProblemInformation() {
+    public @Nonnull ProblemInformation getProblemInformation() {
         return information;
     }
 }

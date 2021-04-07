@@ -2,7 +2,7 @@ package de.uka.ilkd.key.nparser;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 
 public class BuildingIssue {
     private final String message;

@@ -9,7 +9,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
@@ -97,7 +97,7 @@ public class TestTacletEquality {
         );
     }
 
-    @NotNull
+    @Nonnull
     private String normalise(String expected) {
         return expected.replaceAll("\\s+", "\n")
                 .replaceAll("Choices:\\s*\\{.*?\\}", "");

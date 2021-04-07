@@ -7,8 +7,8 @@ import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.ui.MediatorProofControl;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.awt.event.ActionEvent;
 import java.io.*;
@@ -39,7 +39,7 @@ public class RunAllProofsAction extends MainWindowAction {
      * If the content of {@link #ENV_VARIABLE} ({@link #RUN_ALL_PROOFS_UI}) is null,
      * then {@link #DEFAULT_FILE} is used.
      */
-    private @NotNull  List<File> loadFiles() throws IOException {
+    private @Nonnull  List<File> loadFiles() throws IOException {
         System.out.format("INFO: Use 'export %s=<...>' to set the input file for %s.\n",
                 ENV_VARIABLE, getClass().getSimpleName());
 

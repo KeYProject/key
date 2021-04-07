@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.v4.runtime.*;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 
 import java.net.MalformedURLException;
 import java.net.URL;

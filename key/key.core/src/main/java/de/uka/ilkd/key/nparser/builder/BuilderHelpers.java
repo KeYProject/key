@@ -3,7 +3,7 @@ package de.uka.ilkd.key.nparser.builder;
 import com.google.common.base.CharMatcher;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * @author Alexander Weigl

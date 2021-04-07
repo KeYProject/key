@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.nparser.varexp;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 /**
  * @author Alexander Weigl
@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class AbstractConditionBuilder
         extends AbstractTacletBuilderCommand
         implements ConditionBuilder {
-    public AbstractConditionBuilder(@NotNull String triggerName, @NotNull ArgumentType... argumentsTypes) {
+    public AbstractConditionBuilder(@Nonnull String triggerName, @Nonnull ArgumentType... argumentsTypes) {
         super(triggerName, argumentsTypes);
     }
 }

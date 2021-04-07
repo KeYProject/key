@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.nparser.varexp;
 
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public interface TacletBuilderCommand {
      * Checks if this command is responsible for the given command name.
      * For example, for {@code \varcond(\newType(t))} the name would be "newType".
      */
-    boolean isSuitableFor(@NotNull String name);
+    boolean isSuitableFor(@Nonnull String name);
 
     /**
      * Defines the amount and type of expected arguments.

@@ -31,7 +31,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.Triple;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -253,7 +253,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @throws Exception Occurred Exception.
      */
     protected Profile readProfileFromFile() throws Exception {
-        @NotNull ProblemInformation pi = getProblemInformation();
+        @Nonnull ProblemInformation pi = getProblemInformation();
         String profileName = pi.getProfile();
         if (profileName != null && !profileName.isEmpty()) {
             return ProofInitServiceUtil.getDefaultProfile(profileName);

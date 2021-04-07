@@ -57,7 +57,7 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
@@ -1226,7 +1226,7 @@ public final class MainWindow extends JFrame {
      *
      * @see RecentFileMenu#addRecentFile(String)
      */
-    public void addRecentFile(@NotNull String absolutePath) {
+    public void addRecentFile(@Nonnull String absolutePath) {
         recentFileMenu.addRecentFile(absolutePath);
     }
 

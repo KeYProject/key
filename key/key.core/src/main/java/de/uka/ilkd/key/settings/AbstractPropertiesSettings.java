@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.settings;
 
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -55,7 +55,7 @@ public abstract class AbstractPropertiesSettings implements Settings {
      * @return a possible empty, list of strings
      * @see #stringListToString(List)
      */
-    private static @NotNull List<String> parseStringList(@NotNull String str) {
+    private static @Nonnull List<String> parseStringList(@Nonnull String str) {
         return new ArrayList<>(Arrays.asList(str.split(SET_DELIMITER)));
     }
 
@@ -63,7 +63,7 @@ public abstract class AbstractPropertiesSettings implements Settings {
      * @param seq a string list
      * @return the strings concatenated with {@link #SET_DELIMITER}
      */
-    private static @NotNull String stringListToString(@NotNull List<String> seq) {
+    private static @Nonnull String stringListToString(@Nonnull List<String> seq) {
         return String.join(SET_DELIMITER, seq);
     }
 
@@ -147,7 +147,7 @@ public abstract class AbstractPropertiesSettings implements Settings {
      * @param defValue a default value
      * @return returns a {@link PropertyEntry}
      */
-    protected PropertyEntry<List<String>> createStringListProperty(@NotNull String key,
+    protected PropertyEntry<List<String>> createStringListProperty(@Nonnull String key,
                                                                    @Nullable String defValue) {
         PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key,
                 parseStringList(defValue),
