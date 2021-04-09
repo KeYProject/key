@@ -97,7 +97,7 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
                 ProofsexprContext next = ctx.proofsexpr(0);
                 ParserRuleContext def = smtReplayer.getSymbolDef(next.getText(), next);
                 if (def != null) {      // bound by let
-                    System.out.println(next.getText() + " (shared noproofterm)");
+                    //System.out.println(next.getText() + " (shared noproofterm)");
                     next = (ProofsexprContext) def;
                 }
                 // now next must be a lambda term
@@ -133,7 +133,7 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
 
             ParserRuleContext def = smtReplayer.getSymbolDef(succedent.getText(), ctx);
             if (def != null) {
-                System.out.println(succedent.getText() + " (shared noproofterm)");
+                //System.out.println(succedent.getText() + " (shared noproofterm)");
                 // descend further if this still is a symbol bound by let
                 return visit(def);
             } else if (smtReplayer.getTranslationToTerm(succedent.getText()) != null) {
@@ -175,7 +175,7 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
 
         if (proofsexpr != null) {
             // descend into nested let term
-            System.out.println(ctx.getText() + " (shared noproofterm)");
+            //System.out.println(ctx.getText() + " (shared noproofterm)");
             return visit(proofsexpr);
         }
 
