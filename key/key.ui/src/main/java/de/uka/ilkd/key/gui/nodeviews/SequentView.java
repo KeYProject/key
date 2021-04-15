@@ -42,6 +42,7 @@ import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLDocument;
 
+import de.uka.ilkd.key.pp.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -59,14 +60,6 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.InitialPositionTable;
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
-import de.uka.ilkd.key.pp.SequentPrintFilterEntry;
-import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
-import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
@@ -191,6 +184,11 @@ public abstract class SequentView extends JEditorPane {
 
         KeYGuiExtensionFacade.installKeyboardShortcuts(getMainWindow().getMediator(),
                 this, KeYGuiExtension.KeyboardShortcuts.SEQUENT_VIEW);
+
+        printer = new SequentViewLogicPrinter(new ProgramPrinter(null),
+                mainWindow.getMediator().getNotationInfo(),
+                mainWindow.getMediator().getServices(),
+                getVisibleTermLabels());
     }
 
     public final void setFont() {
@@ -959,8 +957,11 @@ public abstract class SequentView extends JEditorPane {
             return false;
         }
 
+        int filteredAntecSize = filter.getFilteredAntec() == null ? 0 : filter.getFilteredAntec().size();
+        int filteredSuccSize = filter.getFilteredSucc() == null ? 0 : filter.getFilteredSucc().size();
+
         int orgSize = originalSequent.size();
-        int newSize = filter.getFilteredAntec().size() + filter.getFilteredSucc().size();
+        int newSize = filteredAntecSize + filteredSuccSize;
         return orgSize != newSize;
     }
 
