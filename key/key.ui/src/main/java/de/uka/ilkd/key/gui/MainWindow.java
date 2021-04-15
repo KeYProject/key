@@ -252,10 +252,10 @@ public final class MainWindow extends JFrame {
         proofListener = new MainProofListener();
         userInterface = new WindowUserInterfaceControl(this);
         mediator = getMainWindowMediator(userInterface);
+        termLabelMenu = new TermLabelMenu(this);
         currentGoalView = new CurrentGoalView(this);
         emptySequent = new EmptySequent(this);
         sequentViewSearchBar = new SequentViewSearchBar(emptySequent);
-        termLabelMenu = new TermLabelMenu(this);
         proofListView = new JScrollPane();
         autoModeAction = new AutoModeAction(this);
         //mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
