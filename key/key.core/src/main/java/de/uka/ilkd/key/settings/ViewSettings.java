@@ -52,6 +52,11 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private static final String MAX_TOOLTIP_LINES_KEY = "[View]MaxTooltipLines";
 
     /**
+     * Show the Load examples dialog window on startup by default
+     */
+    private static final String SHOW_LOAD_EXAMPLES_DIALOG = "[View]ShowLoadExamplesDialog";
+
+    /**
      * do not print the find, varcond and heuristics part of taclets in
      * the TacletMenu by default
      */
@@ -180,6 +185,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private PropertyEntry<Boolean> hidePackagePrefix =
             createBooleanProperty(HIDE_PACKAGE_PREFIX, false);
     private PropertyEntry<Boolean> confirmExit = createBooleanProperty(CONFIRM_EXIT, true);
+    private PropertyEntry<Boolean> showLoadExamplesDialog =
+            createBooleanProperty(SHOW_LOAD_EXAMPLES_DIALOG, true);
     private PropertyEntry<Boolean> showWholeTaclet =
             createBooleanProperty(SHOW_WHOLE_TACLET, false);
     private PropertyEntry<Integer> sizeIndex = createIntegerProperty(FONT_INDEX, 2);
@@ -239,6 +246,24 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     public void setMaxTooltipLines(int b) {
         maxTooltipLines.set(b);
+    }
+
+    /**
+     * returns whether the "load examples" dialog should be shown on startup
+     *
+     * @return true iff "Load Examples" dialog should be shown
+     */
+    public boolean getShowLoadExamplesDialog() {
+        return showLoadExamplesDialog.get();
+    }
+
+    /**
+     * Sets whether the "Load Examples" dialog window should be shown on startup
+     *
+     * @param b indicates whether the "Load Examples" dialog window should be shown on startup or not
+     */
+    public void setShowLoadExamplesDialog(boolean b) {
+        showLoadExamplesDialog.set(b);
     }
 
     /**
