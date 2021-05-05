@@ -18,7 +18,8 @@ public abstract class AbstractSolverSocket {
 	protected static final int WAIT_FOR_DETAILS =1;
 	protected static final int WAIT_FOR_QUERY = 2;
 	protected static final int WAIT_FOR_MODEL = 3;
-	protected static final int FINISH = 4;
+	protected static final int WAIT_FOR_PROOF = 4;
+	protected static final int FINISH = 5;
 
     static final String UNKNOWN = "unknown";
     static final String SAT = "sat";
@@ -94,7 +95,7 @@ class Z3Socket extends AbstractSolverSocket{
 			throw new IOException("Error while executing Z3: " + msg);
 		}
 
-		if (!msg.equals("success")) {
+		if (!msg.equals("success") && !msg.equals("endproof")) {
 			sc.addMessage(msg);
 		}
 
@@ -104,9 +105,9 @@ class Z3Socket extends AbstractSolverSocket{
 					sc.setFinalResult(SMTSolverResult.createValidResult(name));
 					// One cannot ask for proofs and models at one time
 					// rather have modesl than proofs (MU, 2013-07-19)
-					// pipe.sendMessage("(get-proof)\n");
-					pipe.sendMessage("(exit)");
-					sc.setState(WAIT_FOR_DETAILS);
+					pipe.sendMessage("(get-proof)");
+					pipe.sendMessage("(echo \"endproof\")");
+					sc.setState(WAIT_FOR_PROOF);
 				}
 				if(msg.equals("sat")){
 					sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
@@ -125,6 +126,12 @@ class Z3Socket extends AbstractSolverSocket{
 			case WAIT_FOR_DETAILS:
 				if(msg.equals("success")){
 					pipe.close();
+				}
+				break;
+			case WAIT_FOR_PROOF:
+				if(msg.equals("endproof")){
+					pipe.sendMessage("(exit)\n");
+					sc.setState(WAIT_FOR_DETAILS);
 				}
 				break;
 		}

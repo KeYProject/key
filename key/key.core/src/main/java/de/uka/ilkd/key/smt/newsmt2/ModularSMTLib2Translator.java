@@ -127,7 +127,6 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
 
         sb.append("\n(check-sat)");
-        sb.append("\n(get-proof)");
 
         sb.append("\n\n; --- Translation of unknown values\n");
         for (Term t : master.getUnknownValues().keySet()) {
