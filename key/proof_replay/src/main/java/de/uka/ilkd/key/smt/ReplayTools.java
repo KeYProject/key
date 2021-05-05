@@ -272,7 +272,8 @@ public final class ReplayTools {
             newNotes += currentNotes + "<br>";
         }
         // TODO: escaping should be done in GUI
-        newNotes += escapeHTML(notes);
+        //newNotes += escapeHTML(notes);        // this does not retain the indentation currently
+        newNotes += "<pre>" + notes + "</pre>";
         goal.node().getNodeInfo().setNotes(newNotes);
     }
 

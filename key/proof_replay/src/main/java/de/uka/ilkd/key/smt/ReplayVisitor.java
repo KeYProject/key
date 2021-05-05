@@ -67,11 +67,15 @@ public class ReplayVisitor extends SMTProofBaseVisitor<Void> {
             return super.visitProofsexpr(ctx);
         }
 
+        /* this looses all line breaks and indentations and thus leads to broken tooltips in GUI
         // add (inlined) context to node in proof tree
         TextCollector tc = new TextCollector(smtReplayer, ctx);
         tc.visit(ctx);
         String unsharedText = tc.getResult();
         ReplayTools.addNotes(goal, unsharedText);
+        */
+
+        ReplayTools.addNotes(goal, ReplayTools.getOriginalText(ctx));
 
         String rulename = ctx.rulename.getText();
         switch (rulename) {
