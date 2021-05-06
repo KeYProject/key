@@ -15,6 +15,7 @@ import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.parser.NotDeclException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.util.Debug;
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import javax.annotation.Nullable;
@@ -332,7 +333,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term t = accept(ctx.primitive_labeled_term());
         for (int i = 0; i < ctx.bracket_suffix_heap().size(); i++) {
             KeYParser.Brace_suffixContext brace_suffix = ctx.bracket_suffix_heap(i).brace_suffix();
-            KeYParser.TermContext heap = ctx.bracket_suffix_heap(i).heap;
+            ParserRuleContext heap = ctx.bracket_suffix_heap(i).heap;
             t = accept(brace_suffix, t);
             if (heap != null) {
                 t = replaceHeap(t, accept(heap), heap);
@@ -1262,7 +1263,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 if (attrib instanceof KeYParser.Attribute_simpleContext) {
                     KeYParser.Attribute_simpleContext simpleContext = (KeYParser.Attribute_simpleContext) attrib;
                     boolean isCall = simpleContext.call() != null;
-                    KeYParser.TermContext heap = simpleContext.heap; //TODO?
+                    ParserRuleContext heap = simpleContext.heap; //TODO?
                     String attributeName = accept(simpleContext.id);
                     ProgramVariable maybeAttr = getJavaInfo().getAttribute(attributeName, kjt);
                     if (maybeAttr != null) {
