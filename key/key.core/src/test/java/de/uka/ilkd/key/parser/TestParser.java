@@ -13,13 +13,18 @@
 
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.init.Includes;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.util.HelperClassForTests;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.Assert;
@@ -72,5 +77,12 @@ public class TestParser {
         KeyIO.Loader loader = io.load(content);
         loader.parseFile().loadComplete();
         loader.loadProblem();
+    }
+
+
+    @Test
+    public void testIssue1566() throws ProblemLoaderException {
+        File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1566/a.key");
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file);
     }
 }
