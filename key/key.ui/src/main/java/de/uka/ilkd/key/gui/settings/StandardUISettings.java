@@ -23,6 +23,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
 
     private final JSpinner spFontSizeGlobal;
     private final JSpinner txtMaxTooltipLines;
+    private final JCheckBox chkShowLoadExamplesDialog;
     private final JCheckBox chkShowWholeTacletCB;
     private final JCheckBox chkShowUninstantiatedTaclet;
     private final JCheckBox chkRightClickMacros;
@@ -56,6 +57,10 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
                 + "In case of longer <br>tooltips the instantiation will be suppressed.\n";
         txtMaxTooltipLines = addNumberField("Maximum line number for tooltips",
                 1, 100, 5, info, emptyValidator());
+
+
+        chkShowLoadExamplesDialog =
+                addCheckBox("Show load examples dialog", "Show the load example dialog on startup", true, emptyValidator());
 
         chkShowWholeTacletCB =
                 addCheckBox("Show whole taclet", "Pretty-print whole Taclet including \n" +
@@ -101,6 +106,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
 
         spFontSizeGlobal.setValue(vs.getUIFontSizeFactor());
         txtMaxTooltipLines.setValue(vs.getMaxTooltipLines());
+        chkShowLoadExamplesDialog.setSelected(vs.getShowLoadExamplesDialog());
         chkShowWholeTacletCB.setSelected(vs.getShowWholeTaclet());
         chkShowUninstantiatedTaclet.setSelected(vs.getShowUninstantiatedTaclet());
         chkHidePackagePrefix.setSelected(vs.isHidePackagePrefix());
@@ -133,6 +139,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         vs.clutterRules().set(txtClutterRules.getText().replace('\n',','));
         vs.clutterRuleSets().set(txtClutterRuleSets.getText().replace('\n',','));
 
+        vs.setShowLoadExamplesDialog(chkShowLoadExamplesDialog.isSelected());
         vs.setShowWholeTaclet(chkShowWholeTacletCB.isSelected());
         vs.setShowUninstantiatedTaclet(chkShowUninstantiatedTaclet.isSelected());
         vs.setHidePackagePrefix(chkHidePackagePrefix.isSelected());
