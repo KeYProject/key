@@ -1,4 +1,4 @@
 dependencies {
-    compile project(":key.core")
-    compile project(":key.core.symbolic_execution")
+    implementation project(":key.core")
+    implementation project(":key.core.symbolic_execution")
 }

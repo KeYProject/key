@@ -8,18 +8,18 @@ repositories { jcenter() }
 configurations { antlr4 }
 
 dependencies {
-    compile project(':key.util')
-    compile group: group, name: 'recoderkey', version: '1.0'
-    compile group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
-    compile group: 'org.antlr', name:'antlr-runtime', version:'3.5.2'
-    compile group: 'antlr', name: 'antlr', version: '2.7.7'
+    api project(':key.util')
+    api group: group, name: 'recoderkey', version: '1.0'
+    implementation group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
+    implementation group: 'org.antlr', name:'antlr-runtime', version:'3.5.2'
+    implementation group: 'antlr', name: 'antlr', version: '2.7.7'
 
     javacc  group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
     antlr   group: 'org.antlr', name:'antlr', version:'3.5.2'   // use ANTLR version 3
 
     antlr4 "org.antlr:antlr4:4.7.1"
-    compile "org.antlr:antlr4-runtime:4.7.1"
-    compile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
+    implementation "org.antlr:antlr4-runtime:4.7.1"
+    implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
 }
 
 // The target directory for JavaCC (parser generation)
