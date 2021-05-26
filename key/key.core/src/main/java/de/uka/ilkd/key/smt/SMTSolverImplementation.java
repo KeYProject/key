@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -30,7 +28,6 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
-import org.omg.Messaging.SyncScopeHelper;
 
 interface SolverListener {
         void processStarted(SMTSolver solver, SMTProblem problem);
@@ -218,60 +215,43 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 String commands[];
                 try {
                         commands = translateToCommand(problem.getSequent());
-                        // JS: debug start
-                    String filename = "/tmp/SMTLIB-TL_" + problem.getName().replaceAll(" ", "");
-                    System.out.println("SMTLIB translation has been written to file: " + filename);
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
-                    writer.write(problemString);
-                    writer.close();
-                    // JS: debug end
                 } catch (Throwable e) {
-                    interruptionOccurred(e);
-                    listener.processInterrupted(this, problem, e);
-                    setSolverState(SolverState.Stopped);
-                    solverTimeout.cancel();
-                    return;
+                        interruptionOccurred(e);
+                        listener.processInterrupted(this, problem, e);
+                        setSolverState(SolverState.Stopped);
+                        solverTimeout.cancel();
+                        return;
                 }
+     
 
+        // Thirdly: start the external process.
+                try {
+            processLauncher.launch(commands);
+            processLauncher.sendMessage(type.modifyProblem(problemString));
+                 
+            Message msg = processLauncher.getPipe().readMessage();
+            while(msg != null) {
+                socket.messageIncoming(processLauncher.getPipe(), msg);
+                msg = processLauncher.readMessage();
+                        }
+                                      
+                        // uncomment for testing
+                      //  Thread.sleep(3000);
+                        // uncomment for testing
+                       // Random random = new Random();
+                        //Thread.sleep(random.nextInt(3000)+1000);
+                        //throw new RuntimeException("Test exception");
+                } catch (Throwable e) {
+                        interruptionOccurred(e);
+                } finally {
+            // Close everything.
+            // System.out.println(name() + " : " + solverCommunication.getFinalResult());
 
-            // Thirdly: start the external process.
-            try {
-                processLauncher.launch(commands);
-                processLauncher.sendMessage(type.modifyProblem(problemString));
-
-                //JS: Debug start
-                String filename = "/tmp/SolverOutput_" + socket.name + "_" + problem.getName().replaceAll(" ", "");
-                BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
-                writer.write(socket.name + " says: \n");
-                Message msg = processLauncher.getPipe().readMessage();
-                //JS: Debug end
-                while (msg != null) {
-                    writer.append(msg.getContent() + "\n");
-                    socket.messageIncoming(processLauncher.getPipe(), msg);
-                    msg = processLauncher.readMessage();
+                        solverTimeout.cancel();
+                        setSolverState(SolverState.Stopped);
+                        listener.processStopped(this, problem);
+            processLauncher.stop();
                 }
-                //JS: Debug start
-                writer.close();
-                System.out.println("Solver answer has been written to file: " + filename);
-                //JS: Debug end
-
-                // uncomment for testing
-                //  Thread.sleep(3000);
-                // uncomment for testing
-                // Random random = new Random();
-                //Thread.sleep(random.nextInt(3000)+1000);
-                //throw new RuntimeException("Test exception");
-            } catch (Throwable e) {
-                interruptionOccurred(e);
-            } finally {
-                // Close everything.
-                // System.out.println(name() + " : " + solverCommunication.getFinalResult());
-
-                solverTimeout.cancel();
-                setSolverState(SolverState.Stopped);
-                listener.processStopped(this, problem);
-                processLauncher.stop();
-            }
 
         }
 
