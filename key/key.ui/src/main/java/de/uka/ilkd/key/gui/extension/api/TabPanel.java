@@ -2,8 +2,8 @@ package de.uka.ilkd.key.gui.extension.api;
 
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.intern.DefaultCDockable;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import javax.swing.*;
 import java.util.Collection;
@@ -14,7 +14,7 @@ import java.util.Collections;
  * @version 1 (23.04.19)
  */
 public interface TabPanel {
-    @NotNull
+    @Nonnull
     String getTitle();
 
     default @Nullable
@@ -22,13 +22,13 @@ public interface TabPanel {
         return null;
     }
 
-    @NotNull
+    @Nonnull
     JComponent getComponent();
 
     /**
      * @return non-null
      */
-    default @NotNull
+    default @Nonnull
     Collection<Action> getTitleActions() {
         return Collections.emptyList();
     }
@@ -36,7 +36,7 @@ public interface TabPanel {
     /**
      * @return
      */
-    default @NotNull
+    default @Nonnull
     Collection<CAction> getTitleCActions() {
         return Collections.emptyList();
     }

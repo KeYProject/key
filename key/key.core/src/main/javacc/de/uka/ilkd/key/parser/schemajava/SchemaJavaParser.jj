@@ -520,15 +520,18 @@ TOKEN :
   }
 | < BOOLEAN: "boolean" >
 | < BREAK: "break" >
+| < BREAKTYPE: "\\Break" >
 | < BIGINT: "\\bigint" >
 | < REAL: "\\real" >
 | < BYTE: "byte" >
 | < CASE: "case" >
 | < CATCH: "catch" >
+| < CCATCH: "ccat" >
 | < CHAR: "char" >
 | < CLASS: "class" >
 | < CONST: "const" >
 | < CONTINUE: "continue" >
+| < CONTINUETYPE: "\\Continue" >
 | < _DEFAULT: "default" >
 | < DO: "do" >
 | < DOUBLE: "double" >
@@ -539,6 +542,7 @@ TOKEN :
 	  }
 }
 		    | < EXTENDS: "extends" >
+            | < EXEC: "exec" >
 		    | < FALSE: "false" >
 		    | < FINAL: "final" >
 		    | < FINALLY: "finally" >
@@ -566,6 +570,7 @@ TOKEN :
 		    | < PROTECTED: "protected" >
 		    | < PUBLIC: "public" >
 		    | < RETURN: "return" >
+            | < RETURNTYPE: "\\Return" >
 		    | < SHORT: "short" >
 		    | < STATIC: "static" >
 		    | < SUPER: "super" >
@@ -2378,8 +2383,15 @@ CatchSVWrapper CatchSV() :
 	}
 }
 
-
-
+CcatchSVWrapper CcatchSV() :
+{
+}
+{
+    <SVIDENTIFIER>
+    {
+        return factory.getCcatchSV(token.image);
+    }
+}
 
 Assignment AssignmentOperator() :
 {
@@ -3608,6 +3620,7 @@ Statement Statement() :
      | result = ThrowStatement()
      | result = SynchronizedStatement()
      | result = TryStatement()
+     | result = ExecStatement()
      | result = AssertStatement()
      | result = StatementSV()
      )
@@ -4841,7 +4854,7 @@ Try TryStatement() :
     /*
      * Semantic check required here to make sure that at least one
      * finally/catch is present.
- */
+     */
 {
     Try result;
     StatementBlock block;
@@ -4852,52 +4865,370 @@ Try TryStatement() :
 }
 {
     "try"
-	{
-	    result = factory.createTry();
-	    setPrefixInfo(result);
-	}
+    {
+        result = factory.createTry();
+        setPrefixInfo(result);
+    }
     block = Block()
     {
-	result.setBody(block);
+        result.setBody(block);
     }
 
-    (( {CatchSVWrapper cfsv;} cfsv=CatchSV()
-	{branches.add(cfsv); } )
-     |
-     (
-      ( "catch"
-	( ( {
-	    cat = factory.createCatch();
-	    setPrefixInfo(cat);
-	}
-	    "("  param = FormalParameter() ")"
-	    block = Block()
-	    {
-		cat.setParameterDeclaration(param);
-		cat.setBody(block);
-		branches.add(cat);
-	    } )
-	  |
-	  ( {CatchSVWrapper cfsv2;} cfsv2=CatchSV()
-	      {branches.add(cfsv2); } ) )
-	)*
-      [ "finally"
-      {
-	  fin = factory.createFinally();
-	  setPrefixInfo(fin);
-      }
-      block = Block()
-	  {
-	      fin.setBody(block);
-	      branches.add(fin);
-	  }
-      ]))
-	{
-	    result.setBranchList(branches);
-	    checkConstruction(result);
-	    return result;
-	}
+    (
+        (
+            { CatchSVWrapper cfsv; } cfsv=CatchSV()
+            { branches.add(cfsv); } 
+        )
+        |
+        (
+            ( 
+                "catch"
+                (
+                    (
+                        {
+                            cat = factory.createCatch();
+                            setPrefixInfo(cat);
+                        }
+                        "("  param = FormalParameter() ")"
+                        block = Block()
+                        {
+                            cat.setParameterDeclaration(param);
+                            cat.setBody(block);
+                            branches.add(cat);
+                        } 
+                    )
+                    |
+                    (
+                        { CatchSVWrapper cfsv2; } cfsv2=CatchSV()
+                        { branches.add(cfsv2); } 
+                    ) 
+                )
+            )*
+            [
+                "finally"
+                {
+                    fin = factory.createFinally();
+                    setPrefixInfo(fin);
+                }
+                block = Block()
+                {
+                    fin.setBody(block);
+                    branches.add(fin);
+                }
+            ]
+        )
+    )
+    {
+        result.setBranchList(branches);
+        checkConstruction(result);
+        return result;
+    }
+}
 
+/*
+Exec ExecStatement() :
+{
+    Exec result;
+    StatementBlock block;
+    ParameterDeclaration param;
+    ASTList<Branch> branches = new ASTArrayList<Branch>(1);
+    Ccatch cat;
+}
+{
+    "exec"
+    {
+        result = factory.createExec();
+        setPrefixInfo(result);
+    }
+    block = Block()
+    {
+        result.setBody(block);
+    }
+
+    (
+        (
+            { CcatchSVWrapper cfsv; } cfsv=CcatchSV()
+            { branches.add(cfsv); } 
+        )
+        |
+        (
+            ( 
+                "ccat"
+                (
+                    (
+                        {
+                            cat = factory.createCcatch();
+                            setPrefixInfo(cat);
+                        }
+                        "("  param = FormalParameter() ")"
+                        block = Block()
+                        {
+                            cat.setParameterDeclaration(param);
+                            cat.setBody(block);
+                            branches.add(cat);
+                        } 
+                    )
+                    |
+                    (
+                        { CcatchSVWrapper cfsv2; } cfsv2=CcatchSV()
+                        { branches.add(cfsv2); } 
+                    ) 
+                )
+            )*
+        )
+    )
+    {
+        result.setBranchList(branches);
+        checkConstruction(result);
+        return result;
+    }
+}
+*/
+
+Exec ExecStatement() :
+{
+    Exec result;
+    StatementBlock block;
+    ParameterDeclaration param;
+    ASTList<Branch> branches = new ASTArrayList<Branch>(1);
+    Ccatch cat;
+    Identifier id = null;
+}
+{
+    "exec"
+    {
+        result = factory.createExec();
+        setPrefixInfo(result);
+    }
+    block = Block()
+    {
+        result.setBody(block);
+    }
+        
+    // TODO: Wildcard continues & breaks
+
+    (
+        (
+            { CcatchSVWrapper cfsv; } cfsv=CcatchSV()
+            { branches.add(cfsv); } 
+        )
+        |
+        (
+            [
+                LOOKAHEAD(4)
+                "ccat"
+                (
+                    {
+                        cat = factory.createCcatch();
+                        setPrefixInfo(cat);
+                    }
+                    "(" <RETURNTYPE> ")"
+                    block = Block()
+                    {
+                        cat.setNonStdParameterDeclaration(factory.createCcatchReturnParameterDeclaration());
+                        cat.setBody(block);
+                        branches.add(cat);
+                    } 
+                )
+            ]
+
+            [
+                LOOKAHEAD("ccat" "("  "\\Return" param = FormalParameter() ")")
+                "ccat"
+                {
+                    cat = factory.createCcatch();
+                    setPrefixInfo(cat);
+                }
+                
+                "("  "\\Return" param = FormalParameter() ")"
+                
+                block = Block()
+                {
+                    cat.setNonStdParameterDeclaration(factory.createCcatchReturnValParameterDeclaration(param));
+                    cat.setBody(block);
+                    branches.add(cat);
+                }
+            ]
+            
+            [
+                LOOKAHEAD(6)
+                "ccat"
+                (
+                    {
+                        cat = factory.createCcatch();
+                        setPrefixInfo(cat);
+                    }
+                    "(" <BREAKTYPE> ")"
+                    block = Block()
+                    {
+                        cat.setNonStdParameterDeclaration(factory.createCcatchBreakParameterDeclaration());
+                        cat.setBody(block);
+                        branches.add(cat);
+                    } 
+                )
+            ]
+            
+            (
+                LOOKAHEAD(6)
+                "ccat"
+                (
+                    {
+                        cat = factory.createCcatch();
+                        setPrefixInfo(cat);
+                    }
+                    
+                    "(" <BREAKTYPE>
+                    
+                    (
+                        (
+                            <IDENTIFIER>
+                            {
+                                id = factory.createIdentifier(token.image);
+                                setPrefixInfo(id);
+                            }
+                        )
+                        |
+                        (
+                            <SVIDENTIFIER>
+                            {
+                                id = factory.getLabelSV(token.image);
+                                setPrefixInfo(id);
+                            }
+                        )
+                    )
+                    ")"
+                    block = Block()
+                    {
+                        cat.setNonStdParameterDeclaration(factory.createCcatchBreakLabelParameterDeclaration(id));
+                        cat.setBody(block);
+                        branches.add(cat);
+                    } 
+                )
+            )*
+            
+            [
+                LOOKAHEAD(6)
+                "ccat"
+                (
+                    {
+                        cat = factory.createCcatch();
+                        setPrefixInfo(cat);
+                    }
+                    "(" <BREAKTYPE> "*" ")"
+                    block = Block()
+                    {
+                        cat.setNonStdParameterDeclaration(factory.createCcatchBreakWildcardParameterDeclaration());
+                        cat.setBody(block);
+                        branches.add(cat);
+                    } 
+                )
+            ]
+            
+            [
+                LOOKAHEAD(6)
+                "ccat"
+                (
+                    {
+                        cat = factory.createCcatch();
+                        setPrefixInfo(cat);
+                    }
+                    "(" <CONTINUETYPE> ")"
+                    block = Block()
+                    {
+                        cat.setNonStdParameterDeclaration(factory.createCcatchContinueParameterDeclaration());
+                        cat.setBody(block);
+                        branches.add(cat);
+                    } 
+                )
+            ]
+            
+            (
+                LOOKAHEAD(6)
+                "ccat"
+                (
+                    {
+                        cat = factory.createCcatch();
+                        setPrefixInfo(cat);
+                    }
+                    
+                    "(" <CONTINUETYPE>
+                    
+                    (
+                        (
+                            <IDENTIFIER>
+                            {
+                                id = factory.createIdentifier(token.image);
+                                setPrefixInfo(id);
+                            }
+                        )
+                        |
+                        (
+                            <SVIDENTIFIER>
+                            {
+                                id = factory.getLabelSV(token.image);
+                                setPrefixInfo(id);
+                            }
+                        )
+                    )
+                    ")"
+                    block = Block()
+                    {
+                        cat.setNonStdParameterDeclaration(factory.createCcatchContinueLabelParameterDeclaration(id));
+                        cat.setBody(block);
+                        branches.add(cat);
+                    } 
+                )
+            )*
+            
+            [
+                LOOKAHEAD(6)
+                "ccat"
+                (
+                    {
+                        cat = factory.createCcatch();
+                        setPrefixInfo(cat);
+                    }
+                    "(" <CONTINUETYPE> "*" ")"
+                    block = Block()
+                    {
+                        cat.setNonStdParameterDeclaration(factory.createCcatchContinueWildcardParameterDeclaration());
+                        cat.setBody(block);
+                        branches.add(cat);
+                    } 
+                )
+            ]
+            
+            (
+                LOOKAHEAD(4)
+                "ccat"
+                (
+                    (
+                        {
+                            cat = factory.createCcatch();
+                            setPrefixInfo(cat);
+                        }
+                        "("  param = FormalParameter() ")"
+                        block = Block()
+                        {
+                            cat.setParameterDeclaration(param);
+                            cat.setBody(block);
+                            branches.add(cat);
+                        } 
+                    )
+                    |
+                    (
+                        { CcatchSVWrapper cfsv2; } cfsv2 = CcatchSV()
+                        { branches.add(cfsv2); } 
+                    ) 
+                )
+            )*
+        )
+    )
+    {
+        result.setBranchList(branches);
+        checkConstruction(result);
+        return result;
+    }
 }
 
 Expression ADTConstructor() :

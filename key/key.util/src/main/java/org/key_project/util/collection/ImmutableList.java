@@ -13,10 +13,7 @@
 
 package org.key_project.util.collection;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
@@ -48,7 +45,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @param list a List.
      * @return an ImmutableList containing the same elements as the specified list.
      */
-    public static <T> ImmutableList<T> fromList(List<T> list) {
+    public static <T> ImmutableList<T> fromList(Collection<T> list) {
         ImmutableList<T> result = ImmutableSLList.nil();
 
         for (T el : list) {

@@ -163,6 +163,43 @@ public final class StringUtil {
    }
 
    /**
+    * Wrap lines in a string. It replaces ' ' by '\n' such that (in general)
+    * every line is at most {@code length} characters long. If there are no
+    * spaces within {@code length} characters, then the long strings will not
+    * be broken and lines may be longer.
+    *
+    * @param string the string to break. May contain spaces and newline
+    *               characters
+    * @param length a positive number
+    * @return a string of the same length as the input in which some ' ' have
+    * been replaced by '\n'
+    *
+    * @author Mattias Ulbrich (under GPL)
+    */
+   public static String wrapLines(String string, int length) {
+      char[] c = string.toCharArray();
+      WrapUtils.wrapLines(c, length);
+      return new String(c);
+   }
+
+   /**
+    * Wrap lines in a string. It replaces ' ' by '\n' such that (in general)
+    * every line is at most 100 characters long. If there are no
+    * spaces within 100 characters, then the long strings will not
+    * be broken and lines may be longer.
+    *
+    * @param string the string to break. May contain spaces and newline
+    *               characters
+    * @return a string of the same length as the input in which some ' ' have
+    * been replaced by '\n'
+    *
+    * @author Mattias Ulbrich (under GPL)
+    */
+   public static String wrapLines(String string) {
+      return wrapLines(string, 100);
+   }
+
+   /**
     * Converts the optional multi lined {@link String} in a single lined {@link String}
     * by replacing all line breaks and tabs with a space.
     * @param text The text to convert.

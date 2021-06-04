@@ -1,5 +1,5 @@
 dependencies {
-    compile project(":key.core")
+    implementation project(":key.core")
 }
 
 /*test {

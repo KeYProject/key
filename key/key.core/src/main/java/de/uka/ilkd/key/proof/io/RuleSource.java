@@ -12,6 +12,8 @@
 //
 package de.uka.ilkd.key.proof.io;
 
+import org.antlr.v4.runtime.CharStream;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,4 +65,6 @@ public abstract class RuleSource {
 
     @Override
     public abstract String toString();
+
+    public abstract CharStream getCharStream() throws IOException;
 }

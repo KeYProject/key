@@ -17,9 +17,9 @@ def getenv(*args):
 
 rawReport = sys.argv[1]
 SERVER = "https://git.key-project.org/"
-URL, PID, TOKEN, SHA, BID, JID = getenv("CI_PROJECT_URL", "CI_PROJECT_ID",
+URL, PID, TOKEN, SHA, BID, JID, MR_IID = getenv("CI_PROJECT_URL", "CI_PROJECT_ID",
                                         "CI_COMMENT_TOKEN", "CI_COMMIT_SHA",
-                                        "CI_BUILD_ID", "CI_JOB_ID")
+                                        "CI_BUILD_ID", "CI_JOB_ID", "CI_MERGE_REQUEST_IID")
 
 everythingIsFine = True
 
@@ -65,7 +65,14 @@ You can produce a report locally by executing `key/key/scripts/tools/checkstyle/
 print(note)
 
 import requests
-reportUrl = "%s/api/v4/projects/%s/repository/commits/%s/comments" % (SERVER,PID,SHA)
+commitReportUrl = "%s/api/v4/projects/%s/repository/commits/%s/comments" % (SERVER,PID,SHA)
+mergeRequestReportUrl = "%s/api/v4/projects/%s/merge_requests/%s/notes" %(SERVER, PID, MR_IID)
+
+if MR_IID != "":
+  reportUrl = mergeRequestReportUrl
+else:
+  reportUrl = commitReportUrl
+
 print("Send report to", reportUrl)
 resp = requests.post(reportUrl, data={ b'private_token': TOKEN, b'note':note })
 print(note)

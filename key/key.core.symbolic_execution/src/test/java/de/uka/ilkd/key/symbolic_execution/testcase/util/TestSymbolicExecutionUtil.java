@@ -32,6 +32,8 @@ import org.junit.runners.MethodSorters;
 
 import java.io.File;
 import java.util.HashMap;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests for {@link SymbolicExecutionUtil}
@@ -43,7 +45,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
     /**
      * Tests {@link SymbolicExecutionUtil#improveReadability(de.uka.ilkd.key.logic.Term)}
      */
-    public void test1ImproveReadability() throws ProblemLoaderException {
+    @Test public void test1ImproveReadability() throws ProblemLoaderException {
         File location = new File(testCaseDirectory,
                 "/readability/InnerAndAnonymousTypeTest/InnerAndAnonymousTypeTest.java")
                 .getAbsoluteFile();
@@ -122,7 +124,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
      * {@link SymbolicExecutionUtil#setChoiceSetting(String, String)} and
      * {@link SymbolicExecutionUtil#isChoiceSettingInitialised()}.
      */
-    public void test2GetAndSetChoiceSetting() throws Exception {
+    @Test public void test2GetAndSetChoiceSetting() throws Exception {
         String originalValue = null;
         try {
             //weigl: disable, no clue why the choice settings should be initialised

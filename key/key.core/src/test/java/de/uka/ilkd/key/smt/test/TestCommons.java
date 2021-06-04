@@ -106,7 +106,7 @@ public abstract class TestCommons extends TestCase {
 	   try {
 	      Proof proof = p.getLoadedProof();
 	      Assert.assertNotNull(proof);
-	      Assert.assertTrue(proof.openGoals().size() == 1);
+		  Assert.assertEquals(1, proof.openGoals().size());
 	      Goal g = proof.openGoals().iterator().next();
 	      return checkGoal(g);
 	   }

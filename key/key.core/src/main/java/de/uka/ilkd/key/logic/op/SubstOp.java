@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.logic.TermCreationException;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.Name;
@@ -55,13 +56,15 @@ public abstract class SubstOp extends AbstractOperator {
      * for the 0th subterm and 1 for the 1st subterm.
      */
     @Override
-    protected boolean additionalValidTopLevel(Term term){
+    protected void additionalValidTopLevel(Term term){
         if(term.varsBoundHere(1).size() != 1) {
-            return false;
+            throw new TermCreationException(this, term);
         }
         Sort substSort = term.sub(0).sort();
         Sort varSort = term.varsBoundHere(1).get(0).sort();
-        return substSort.extendsTrans(varSort);
+        if(!substSort.extendsTrans(varSort)) {
+            throw new TermCreationException(this, term);
+        }
     }
 
 

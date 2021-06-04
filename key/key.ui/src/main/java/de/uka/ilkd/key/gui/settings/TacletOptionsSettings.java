@@ -8,7 +8,7 @@ import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import org.key_project.util.java.ObjectUtil;
 
 import javax.swing.*;
@@ -35,12 +35,6 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
 
     public TacletOptionsSettings() {
         setHeaderText(getDescription());
-        JScrollPane root = new JScrollPane();
-        root.getVerticalScrollBar().setUnitIncrement(10);
-        root.getHorizontalScrollBar().setUnitIncrement(10);
-        root.setViewportView(pCenter);
-        add(root, BorderLayout.CENTER);
-
         pCenter.setLayout(new MigLayout(
                 new LC().fillX(),
                 new AC().fill().grow().gap("3mm")
@@ -231,7 +225,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         pCenter.add(p, new CC().span().newline());
     }
 
-    @NotNull
+    @Nonnull
     private JPanel createCollapsibleTitlePane(String titleText, JComponent child) {
         JPanel p = new JPanel(new BorderLayout());
         JPanel north = new JPanel(new BorderLayout());

@@ -151,4 +151,12 @@ public final class RunAllProofsTestUnit implements Serializable {
       }
       return tempDir;
    }
+
+    public List<TestFile> getTestFiles() {
+        return testFiles;
+    }
+
+    public ProofCollectionSettings getSettings() {
+        return settings;
+    }
 }

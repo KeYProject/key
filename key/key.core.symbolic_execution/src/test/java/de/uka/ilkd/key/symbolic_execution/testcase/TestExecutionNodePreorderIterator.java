@@ -30,6 +30,8 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.impl.TreeSettings;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests for {@link ExecutionNodePreorderIterator}.
@@ -39,7 +41,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
    /**
     * Tests a tree of {@link IExecutionNode}s with three levels after root.
     */
-   public void testNodesThreeLevel() throws ProofInputException {
+   @Test public void testNodesThreeLevel() throws ProofInputException {
       // Create tree to test
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);
@@ -84,7 +86,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
    /**
     * Tests a tree of {@link IExecutionNode}s with two levels after root.
     */
-   public void testNodesTwoLevel() throws ProofInputException {
+   @Test public void testNodesTwoLevel() throws ProofInputException {
       // Create tree to test
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);
@@ -121,7 +123,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
    /**
     * Tests a tree of {@link IExecutionNode}s with one level after root.
     */
-   public void testNodesOneLevel() throws ProofInputException {
+   @Test public void testNodesOneLevel() throws ProofInputException {
       // Create tree to test
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);
@@ -155,7 +157,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
    /**
     * Tests only a root {@link IExecutionNode}.
     */
-   public void testEmptyRoot() throws ProofInputException {
+   @Test public void testEmptyRoot() throws ProofInputException {
       // Create tree to test
       Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);

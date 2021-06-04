@@ -25,13 +25,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
+import de.uka.ilkd.key.nparser.KeYLexer;
 import org.antlr.runtime.MismatchedTokenException;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -76,6 +76,13 @@ import de.uka.ilkd.key.util.Triple;
  * @author Martin Hentschel
  */
 public abstract class AbstractProblemLoader {
+    /**
+     * If set to true, only the given Java file will be parsed and loaded.
+     *
+     * @see EnvInput#isIgnoreOtherJavaFiles()
+     */
+    private boolean loadSingleJavaFile = false;
+
     public static class ReplayResult {
 
 		private Node node;
@@ -381,12 +388,16 @@ public abstract class AbstractProblemLoader {
 
         if (filename.endsWith(".java")) {
             // java file, probably enriched by specifications
+            SLEnvInput ret = null;
             if (file.getParentFile() == null) {
-                return new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs, includes);
+                ret = new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs, includes);
             } else {
-                return new SLEnvInput(file.getParentFile().getAbsolutePath(),
+                ret = new SLEnvInput(file.getParentFile().getAbsolutePath(),
                                 classPath, bootClassPath, profileOfNewProofs, includes);
             }
+            ret.setJavaFile(file.getAbsolutePath());
+            ret.setIgnoreOtherJavaFiles(loadSingleJavaFile);
+            return ret;
         } else if (filename.endsWith(".zproof")) {            // zipped proof package
             /* TODO: Currently it is not possible to load proof bundles with multiple proofs.
              *  This feature is still pending, since the functionality to save multiple proofs in
@@ -573,8 +584,8 @@ public abstract class AbstractProblemLoader {
      * @throws ProofInputException Occurred Exception.
      */
     protected ProofAggregate createProof(LoadedPOContainer poContainer) throws ProofInputException {
-    	
-        ProofAggregate proofList = 
+
+        ProofAggregate proofList =
         		problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
 
         for (Proof p : proofList.getProofs()) {
@@ -645,14 +656,14 @@ public abstract class AbstractProblemLoader {
         ReplayResult result;
         try {
         	assert envInput instanceof KeYUserProblemFile;
-        	    
+
                 parser = new IntermediatePresentationProofFileParser(proof);
                 problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
                 parserResult = ((IntermediatePresentationProofFileParser) parser).getResult();
-                
+
                 // Parser is no longer needed, set it to null to free memory.
                 parser = null;
-                
+
                 // For loading, we generally turn on one step simplification to be
                 // able to load proofs that used it even if the user has currently
                 // turned OSS off.
@@ -662,10 +673,10 @@ public abstract class AbstractProblemLoader {
                         StrategyProperties.OSS_ON);
                 Strategy.updateStrategySettings(proof, newProps);
                 OneStepSimplifier.refreshOSS(proof);
-                
+
                 replayer = new IntermediateProofReplayer(this, proof, parserResult);
                 replayResult = replayer.replay();
-                
+
                 lastTouchedNode = replayResult.getLastSelectedGoal() != null ? replayResult.getLastSelectedGoal().node() : proof.root();
 
         } catch (Exception e) {
@@ -683,19 +694,19 @@ public abstract class AbstractProblemLoader {
             if (replayResult != null) {
                 errors.addAll(replayResult.getErrors());
             }
-            
-            StrategyProperties newProps = 
+
+            StrategyProperties newProps =
                 proof.getSettings().getStrategySettings()
                         .getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
                             ossStatus);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
-            
+
             result = new ReplayResult(status, errors, lastTouchedNode);
         }
-        	
-        
+
+
         return result;
     }
 
@@ -765,5 +776,13 @@ public abstract class AbstractProblemLoader {
 
     public void setProofPath(File proofFilename) {
         this.proofFilename = proofFilename;
+    }
+
+    public boolean isLoadSingleJavaFile() {
+        return loadSingleJavaFile;
+    }
+
+    public void setLoadSingleJavaFile(boolean loadSingleJavaFile) {
+        this.loadSingleJavaFile = loadSingleJavaFile;
     }
 }

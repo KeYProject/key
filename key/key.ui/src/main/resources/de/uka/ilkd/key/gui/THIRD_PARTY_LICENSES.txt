@@ -1,80 +1,71 @@
 ===============================================================================
-  Font Awesome 5.9
-  Icons — CC BY 4.0 License
-  https://fontawesome.com/license/free
+Font Awesome 5.9
+Icons — CC BY 4.0 License
+https://fontawesome.com/license/free
 
 ===============================================================================
-  Docking Frames 1.1.3p1
-  Project URL: http://www.docking-frames.org/
-  License: LGPL 2.1 - https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
+Docking Frames 1.1.3p1
+Project URL: http://www.docking-frames.org/
+License: LGPL 2.1 - https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
 
 ===============================================================================
-  Group: antlr Name: antlr Version: 2.7.7
-  Project URL: http://www.antlr.org/
-  License:  BSD License - http://www.antlr.org/license.html
+Group: antlr  Name: antlr  Version: 2.7.7
+POM Project URL: http://www.antlr.org/
+POM License: BSD License - http://www.antlr.org/license.html
 
 ===============================================================================
-  Group: com.atlassian.commonmark Name: commonmark Version: 0.12.1
-  License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
-  License: Atlassian Customer Agreement - https://www.atlassian.com/legal/customer-agreement
-  License: BSD 2-Clause License - http://opensource.org/licenses/BSD-2-Clause
+Group: com.atlassian.commonmark  Name: commonmark  Version: 0.15.2
+POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+POM License: Atlassian Customer Agreement - https://www.atlassian.com/legal/customer-agreement
+POM License: BSD 2-Clause License - http://opensource.org/licenses/BSD-2-Clause
 
 ===============================================================================
-  Group: com.atlassian.commonmark Name: commonmark-ext-gfm-tables Version: 0.12.1
-  License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
-  License: Atlassian Customer Agreement - https://www.atlassian.com/legal/customer-agreement
-  License: BSD 2-Clause License - http://opensource.org/licenses/BSD-2-Clause
+4. Group: com.atlassian.commonmark  Name: commonmark-ext-gfm-tables  Version: 0.15.2
+POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+POM License: Atlassian Customer Agreement - https://www.atlassian.com/legal/customer-agreement
+POM License: BSD 2-Clause License - http://opensource.org/licenses/BSD-2-Clause
 
 ===============================================================================
-  Group: com.miglayout Name: miglayout-core Version: 5.2
-  License: BSD - http://www.debian.org/misc/bsd.license
+Group: com.miglayout  Name: miglayout-core  Version: 5.2
+POM License: BSD - http://www.debian.org/misc/bsd.license
 
 ===============================================================================
-  Group: com.miglayout Name: miglayout-swing Version: 5.2
-  License: BSD - http://www.debian.org/misc/bsd.license
+Group: com.miglayout  Name: miglayout-swing  Version: 5.2
+POM License: BSD - http://www.debian.org/misc/bsd.license
 
 ===============================================================================
-  Group: javax.activation Name: javax.activation-api Version: 1.2.0
-  Project URL: http://www.oracle.com
-  License: CDDL/GPLv2+CE - https://github.com/javaee/activation/blob/master/LICENSE.txt
+Group: javax.activation  Name: javax.activation-api  Version: 1.2.0
+Manifest Project URL: http://www.oracle.com
+POM License: CDDL/GPLv2+CE - https://github.com/javaee/activation/blob/master/LICENSE.txt
 
 ===============================================================================
-  Group: javax.xml.bind Name: jaxb-api Version: 2.4.0-b180830.0359
-  Project URL: http://www.oracle.com/
-  License: CDDL 1.1 - https://oss.oracle.com/licenses/CDDL+GPL-1.1
-  License: GPL2 w/ CPE - https://oss.oracle.com/licenses/CDDL+GPL-1.1
+Group: javax.xml.bind  Name: jaxb-api  Version: 2.4.0-b180830.0359
+Manifest Project URL: http://www.oracle.com/
+POM License: CDDL 1.1 - https://oss.oracle.com/licenses/CDDL+GPL-1.1
+POM License: GPL2 w/ CPE - https://oss.oracle.com/licenses/CDDL+GPL-1.1
 
 ===============================================================================
-  Group: junit Name: junit Version: 4.12
-  POM Project URL: http://junit.org
-  POM License: Eclipse Public License 1.0 - http://www.eclipse.org/legal/epl-v10.html
+Group: net.java.dev.javacc  Name: javacc  Version: 4.0
+POM Project URL: http://javacc.dev.java.net/
+POM License: The BSD License - http://www.opensource.org/licenses/bsd-license.html
 
 ===============================================================================
-  Group: net.java.dev.javacc Name: javacc Version: 4.0
-  POM Project URL: http://javacc.dev.java.net/
-  POM License: The BSD License - http://www.opensource.org/licenses/bsd-license.html
+Group: org.antlr  Name: ST4  Version: 4.0.8
+POM Project URL: http://www.stringtemplate.org
+POM License: BSD licence - http://antlr.org/license.html
 
 ===============================================================================
-  Group: org.antlr Name: ST4 Version: 4.0.8
-  POM Project URL: http://www.stringtemplate.org
-  POM License: BSD licence - http://antlr.org/license.html
+Group: org.antlr  Name: antlr  Version: 3.5.2
+POM License: BSD licence - http://antlr.org/license.html
 
 ===============================================================================
-  Group: org.antlr Name: antlr Version: 3.5.2
-  POM License: BSD licence - http://antlr.org/license.html
+Group: org.antlr  Name: antlr-runtime  Version: 3.5.2
+POM Project URL: http://www.antlr.org
+POM License: BSD licence - http://antlr.org/license.html
 
 ===============================================================================
-  Group: org.antlr Name: antlr-runtime Version: 3.5.2
-  POM Project URL: http://www.antlr.org
-  POM License: BSD licence - http://antlr.org/license.html
+Group: org.jetbrains  Name: annotations  Version: 20.1.0
+POM Project URL: https://github.com/JetBrains/java-annotations
+POM License: The Apache Software License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
 
-===============================================================================
-  Group: org.hamcrest Name: hamcrest-core Version: 1.3
-  POM License: New BSD License - http://www.opensource.org/licenses/bsd-license.php
-  Embedded license files: hamcrest-core-1.3.jar/LICENSE.txt
 
-===============================================================================
-  Group: org.jetbrains Name: annotations Version: 17.0.0
-  POM Project URL: https://github.com/JetBrains/java-annotations
-  POM License: The Apache Software License, Version 2.0
-    - https://www.apache.org/licenses/LICENSE-2.0.txt

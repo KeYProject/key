@@ -13,15 +13,14 @@
 
 package de.uka.ilkd.key.gui.fonticons;
 
-import java.awt.Color;
-import java.awt.Image;
-import java.net.URL;
-import java.util.HashMap;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-
 import de.uka.ilkd.key.util.Debug;
+
+import javax.swing.*;
+import java.awt.*;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public final class IconFactory {
     public static final IconFontProvider QUIT =
@@ -191,9 +190,11 @@ public final class IconFactory {
     private static Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
     private static Image keyHoleInteractive = getImage("images/keyinteractive.gif");
     private static Image keyHoleLinked = getImage("images/keylinked.gif");
-    private static Image keyLogo = getImage("images/key-color.gif");
-    private static Image keyLogo22 = getImage("images/key22.gif");
-    private static Image keyLogoSmall = getImage("images/key-color-icon-square.png");
+    private static Image keyLogo = getImage("images/key-color.png");
+    private static final Image keyLogoShadow = getImage("images/key-shadow.png");
+    // The following should be updated with every major version step.
+    private static final Image keyVersionLogo = getImage("images/key-shadow-2.8.png");
+    private static Image keyLogoSmall = getImage("images/key-color-icon-square.gif");
     private static Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
 
     private static Image junit = getImage("images/toolbar/junit_logo.png");
@@ -369,8 +370,12 @@ public final class IconFactory {
         return scaleIcon(keyLogo, x, y);
     }
 
-    public static ImageIcon key22Logo(int x, int y) {
-        return scaleIcon(keyLogo22, x, y);
+    public static Icon keyVersionLogo() {
+        return new ImageIcon(keyVersionLogo);
+    }
+
+    public static Icon keyVersionLogo(int x, int y) {
+        return scaleIcon(keyVersionLogo, x, y);
     }
 
     public static Icon autoModeStartLogo(int size) {
@@ -495,7 +500,20 @@ public final class IconFactory {
         return cache.computeIfAbsent(provider.getKey(size), d -> provider.load(size));
     }
 
-
+    /**
+     * Returns a list of the application logo (used in Frame, Taskbar, etc)
+     * in various predefined sizes.
+     */
+    public static List<? extends Image> applicationLogos() {
+        // https://stackoverflow.com/questions/18224184/sizes-of-frame-icons-used-in-swing
+        Image original = keyLogo();
+        int[] sizes = new int[]{16, 20, 32, 40, 64, 128};
+        ArrayList<Image> images = new ArrayList<>(sizes.length);
+        for (int sz : sizes) {
+            images.add(original.getScaledInstance(sz, sz, Image.SCALE_SMOOTH));
+        }
+        return images;
+     }
 }
 
 
