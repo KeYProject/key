@@ -13,15 +13,7 @@
 
 package org.key_project.util.java;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.math.BigInteger;
 import java.net.*;
 import java.nio.charset.Charset;
@@ -30,11 +22,7 @@ import java.nio.file.Path;
 import java.security.CodeSource;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -434,6 +422,15 @@ public final class IOUtil {
         }
     }
 
+    public static InputStream openStream(String fileName) throws IOException {
+        try {
+            URL url = new URL(fileName);
+            return url.openStream();
+        } catch (MalformedURLException e) {
+            return new FileInputStream(fileName);
+        }
+    }
+
     /**
      * A line information returned from {@link IOUtil#computeLineInformation(File)} and
      * {@link IOUtil#computeLineInformation(InputStream)}.
@@ -827,36 +824,36 @@ public final class IOUtil {
                 }
             }
             return new String(content);
-      }
-      else {
-         return name;
-      }
-   }
-
-   /**
-    * Extracts a ZIP archive to the given target directory.
-    * @param archive the ZIP archive to extract
-    * @param targetDir the directory the extracted files will be located in
-    * @throws ZipException if a ZIP format error occurs
-    * @throws IOException if an I/O error occurs
-    */
-   public static void extractZip(Path archive, Path targetDir) throws ZipException, IOException {
-       if (archive != null && targetDir != null) {
-           ZipFile zipFile = new ZipFile(archive.toFile());
-           Enumeration<? extends ZipEntry> entries = zipFile.entries();
-           while (entries.hasMoreElements()) {
-               ZipEntry entry = entries.nextElement();
-               if (entry.isDirectory()) {
-                   /* we use createDirectories instead of createDirectory in case the parent
-                    * directory does not exist */
-                   Files.createDirectories(targetDir.resolve(entry.getName()));
         } else {
-                   // create nonexistent parent directories and then extract the file
-                   Files.createDirectories(targetDir.resolve(entry.getName()).getParent());
-                   Files.copy(zipFile.getInputStream(entry), targetDir.resolve(entry.getName()));
-               }
-           }
-           zipFile.close();
+            return name;
+        }
+    }
+
+    /**
+     * Extracts a ZIP archive to the given target directory.
+     *
+     * @param archive   the ZIP archive to extract
+     * @param targetDir the directory the extracted files will be located in
+     * @throws ZipException if a ZIP format error occurs
+     * @throws IOException  if an I/O error occurs
+     */
+    public static void extractZip(Path archive, Path targetDir) throws ZipException, IOException {
+        if (archive != null && targetDir != null) {
+            ZipFile zipFile = new ZipFile(archive.toFile());
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
+                if (entry.isDirectory()) {
+                    /* we use createDirectories instead of createDirectory in case the parent
+                     * directory does not exist */
+                    Files.createDirectories(targetDir.resolve(entry.getName()));
+                } else {
+                    // create nonexistent parent directories and then extract the file
+                    Files.createDirectories(targetDir.resolve(entry.getName()).getParent());
+                    Files.copy(zipFile.getInputStream(entry), targetDir.resolve(entry.getName()));
+                }
+            }
+            zipFile.close();
         }
     }
 
