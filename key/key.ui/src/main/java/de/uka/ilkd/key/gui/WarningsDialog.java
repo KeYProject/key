@@ -7,6 +7,8 @@ import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 import sun.swing.DefaultLookup;
@@ -195,4 +197,22 @@ class PositionedStringRenderer implements ListCellRenderer<PositionedString> {
 
         return panel;
     }
+
+    /* mockup
+    public static void main(String[] args) {
+        PositionedString a = new PositionedString("Multiline text\nTest\n",
+                "/home/weigl/work/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/TaskTree.java",
+                new Position(20, 25));
+        PositionedString b = new PositionedString("Multiline text\nTest\n",
+                "/home/weigl/work/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java",
+                new Position(35, 69));
+
+        ImmutableSet<PositionedString> warnings =
+                DefaultImmutableSet.fromImmutableList(ImmutableSLList.singleton(a).append(b));
+        WarningsDialog warningsDialog = new WarningsDialog(null, warnings);
+        warningsDialog.pack();
+
+        warningsDialog.setVisible(true);
+    }
+     */
 }
