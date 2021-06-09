@@ -31,7 +31,7 @@ import java.util.Map;
  */
 public class WarningsDialog extends JDialog {
     private final Map<String, String> fileContentsCache = new HashMap<>();
-    private final JTextArea txtSource = new JTextArea(10, 69);
+    private final JTextPane txtSource = new JTextPane();
     private final JList<PositionedString> listWarnings;
 
     public WarningsDialog(Frame owner, ImmutableSet<PositionedString> warnings) {
