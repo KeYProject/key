@@ -1,42 +1,68 @@
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.sourceview.JavaDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
+import de.uka.ilkd.key.gui.utilities.BracketMatchingTextArea;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.Debug;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
-import sun.swing.DefaultLookup;
 
+import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.SimpleAttributeSet;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URI;
+import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
+ * A dialog for showing multiple warnings with a preview window.
+ * <p>
+ * This dialog has support to:
+ * <ul>
+ *     <li>hide listed warnings for the current session</li>
+ *     <li>show the warning in a little preview window (with syntax highlighting)</li>
+ *     <li>if an URL is in the description, it is possible to open this web page</li>
+ *     <li>if a file name is associated with the warning, the user can open its editor</li>
+ * </ul>
+ *
  * @author Alexander Weigl
  * @version 1 (6/8/21)
  */
 public class WarningsDialog extends JDialog {
+    private static final Set<PositionedString> ignoredWarnings = new HashSet<>();
+
+    private final List<PositionedString> warnings;
     private final Map<String, String> fileContentsCache = new HashMap<>();
     private final JTextPane txtSource = new JTextPane();
     private final JList<PositionedString> listWarnings;
+    private final JButton btnFurtherInformation = new JButton("Further Information", IconFactory.help(16));
+    private final JButton btnOpenFile = new JButton("Edit File", IconFactory.editFile(16));
 
-    public WarningsDialog(Frame owner, ImmutableSet<PositionedString> warnings) {
+    @Nullable
+    private String urlFurtherInformation;
+
+    public WarningsDialog(Frame owner, Set<PositionedString> warnings) {
         super(owner, SLEnvInput.getLanguage() + " warning(s)", true);
+
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        this.warnings = new ArrayList<>(warnings);
+        this.warnings.sort(Comparator.comparing(o -> o.fileName));
 
         setLayout(new BorderLayout());
         JSplitPane splitCenter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false);
@@ -51,8 +77,11 @@ public class WarningsDialog extends JDialog {
         label.setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 5));
         add(label, BorderLayout.NORTH);
 
-        listWarnings = new JList<>(warnings.toArray(new PositionedString[warnings.size()]));
+        listWarnings = new JList<>(this.warnings.toArray(new PositionedString[0]));
         listWarnings.addListSelectionListener(e -> updatePreview());
+        listWarnings.addListSelectionListener(e -> updateFurtherInformation(listWarnings.getSelectedValue().text));
+        listWarnings.addListSelectionListener(e ->
+                btnOpenFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
         listWarnings.setCellRenderer(new PositionedStringRenderer());
         listWarnings.setBorder(BorderFactory.createLoweredBevelBorder());
 
@@ -70,15 +99,48 @@ public class WarningsDialog extends JDialog {
         txtSource.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
         txtSource.setEditable(false);
 
+
         final JButton btnOk = new JButton("OK");
-        btnOk.addActionListener(e -> setVisible(false));
+        btnOk.addActionListener(e -> accept());
         Dimension buttonDim = new Dimension(100, 27);
         btnOk.setPreferredSize(buttonDim);
         btnOk.setMinimumSize(buttonDim);
-        JPanel pButtons = new JPanel();
+
+
+        Box pSouth = new Box(BoxLayout.Y_AXIS);
+        JPanel pButtons = new JPanel(new FlowLayout(FlowLayout.CENTER));
         pButtons.add(btnOk);
-        add(pButtons, BorderLayout.SOUTH);
+        pButtons.add(btnFurtherInformation);
+        pButtons.add(btnOpenFile);
+
+        JCheckBox chkIgnoreWarnings = new JCheckBox("Ignore these warnings for the current session");
+        pSouth.add(chkIgnoreWarnings);
+        pSouth.add(pButtons);
+        add(pSouth, BorderLayout.SOUTH);
         getRootPane().setDefaultButton(btnOk);
+
+        btnFurtherInformation.addActionListener(e -> {
+            if (urlFurtherInformation != null && !urlFurtherInformation.isEmpty()) {
+                try {
+                    Objects.requireNonNull(Desktop.getDesktop())
+                            .browse(URI.create(urlFurtherInformation));
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(WarningsDialog.this, ex.getMessage());
+                }
+            }
+        });
+
+        btnOpenFile.addActionListener(e -> {
+            final PositionedString selectedValue = listWarnings.getSelectedValue();
+            if (selectedValue.hasFilename()) {
+                try {
+                    Objects.requireNonNull(Desktop.getDesktop())
+                            .open(new File(selectedValue.fileName));
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(WarningsDialog.this, ex.getMessage());
+                }
+            }
+        });
 
         btnOk.registerKeyboardAction(
                 event -> {
@@ -90,7 +152,24 @@ public class WarningsDialog extends JDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        splitCenter.setDividerLocation(.5);
+        setSize(700, 500);
+        splitCenter.setDividerLocation(250);
+        if (owner != null) {
+            setLocationRelativeTo(owner);
+        }
+    }
+
+    private void accept() {
+        ignoredWarnings.addAll(warnings);
+        setVisible(false);
+    }
+
+    public static void showIfNecessary(MainWindow mainWindow, ImmutableSet<PositionedString> warnings) {
+        Set<PositionedString> warn = warnings.toSet();
+        warn.removeAll(ignoredWarnings);
+        WarningsDialog dialog = new WarningsDialog(mainWindow, warn);
+        dialog.setVisible(true);
+        dialog.dispose();
     }
 
     private void updatePreview() {
@@ -103,12 +182,16 @@ public class WarningsDialog extends JDialog {
                 return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
             }
         });
+        int offset = getOffsetFromLineColumn(source, ps.pos);
 
         if (isJava(ps.fileName)) {
             try {
                 JavaDocument doc = new JavaDocument();
                 txtSource.setDocument(doc);
                 doc.insertString(0, source, new SimpleAttributeSet());
+                DefaultHighlighter dh = new DefaultHighlighter();
+                txtSource.setHighlighter(dh);
+                addWarnings(dh, ps.fileName);
             } catch (BadLocationException e) {
                 throw new AssertionError();
             }
@@ -116,10 +199,42 @@ public class WarningsDialog extends JDialog {
             txtSource.setText(source);
         }
 
-
         txtSource.setEditable(false);
-        int offset = getOffsetFromLineColumn(source, ps.pos);
         txtSource.setCaretPosition(offset);
+    }
+
+    private void addWarnings(DefaultHighlighter dh, String fileName) {
+        warnings.stream()
+                .filter(ps -> fileName.equals(ps.fileName))
+                .forEach(ps -> {
+                    addWarnings(dh, ps);
+                });
+    }
+
+    private void addWarnings(DefaultHighlighter dh, PositionedString ps) {
+        String source = txtSource.getText();
+        int offset = getOffsetFromLineColumn(source, ps.pos);
+        int end = offset;
+        for (; end < source.length() && !Character.isWhitespace(source.charAt(end)); end++) {
+        }
+        try {
+            dh.addHighlight(offset, end,
+                    new BracketMatchingTextArea.BorderPainter(Color.RED));
+        } catch (BadLocationException ignore) {
+            // ignore
+        }
+    }
+
+
+    private void updateFurtherInformation(String text) {
+        Pattern regex = Pattern.compile("https?://[^\\s]+");
+        Matcher m = regex.matcher(text);
+        if (m.find()) {
+            this.urlFurtherInformation = m.group();
+            btnFurtherInformation.setEnabled(true);
+        } else {
+            btnFurtherInformation.setEnabled(false);
+        }
     }
 
     private boolean isJava(String fileName) {
@@ -167,10 +282,8 @@ class PositionedStringRenderer implements ListCellRenderer<PositionedString> {
                                                   int index, boolean isSelected, boolean cellHasFocus) {
         final String text = String.format("%s\n\nFilename: %s@%d:%d",
                 value.text, value.fileName, value.pos.getLine(), value.pos.getColumn());
-        //int newlines = (int) text.chars().filter(it -> it == '\n').count();
         area.setText(text);
-        //area.setRows(newlines);
-
+        area.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         if (isSelected) {
             area.setBackground(list.getSelectionBackground());
             area.setForeground(list.getSelectionForeground());
@@ -185,34 +298,38 @@ class PositionedStringRenderer implements ListCellRenderer<PositionedString> {
         Border border = null;
         if (cellHasFocus) {
             if (isSelected) {
-                border = DefaultLookup.getBorder(area, area.getUI(), "List.focusSelectedCellHighlightBorder");
+                border = UIManager.getBorder("List.focusSelectedCellHighlightBorder");
             }
             if (border == null) {
-                border = DefaultLookup.getBorder(area, area.getUI(), "List.focusCellHighlightBorder");
+                border = UIManager.getBorder("List.focusCellHighlightBorder");
             }
         } else {
             border = new EmptyBorder(1, 1, 1, 1);
         }
-        area.setBorder(border);
+        panel.setBorder(border);
 
         return panel;
     }
 
-    /* mockup
+    /*
     public static void main(String[] args) {
         PositionedString a = new PositionedString("Multiline text\nTest\n",
                 "/home/weigl/work/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/TaskTree.java",
                 new Position(20, 25));
-        PositionedString b = new PositionedString("Multiline text\nTest\n",
+        PositionedString b = new PositionedString("Multiline text\nTest\n More information: https://google.de",
                 "/home/weigl/work/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java",
-                new Position(35, 69));
+                new Position(35, 10));
+        PositionedString c = new PositionedString("Blubb",
+                "/home/weigl/work/key/key/key.ui/src/main/java/de/uka/ilkd/key/gui/SearchBar.java",
+                new Position(36, 0));
 
-        ImmutableSet<PositionedString> warnings =
-                DefaultImmutableSet.fromImmutableList(ImmutableSLList.singleton(a).append(b));
+        HashSet<PositionedString> warnings = new HashSet<>();
+        warnings.add(a);
+        warnings.add(b);
+        warnings.add(c);
         WarningsDialog warningsDialog = new WarningsDialog(null, warnings);
-        warningsDialog.pack();
-
+        warningsDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         warningsDialog.setVisible(true);
     }
-     */
+    */
 }

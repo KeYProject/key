@@ -605,11 +605,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void reportWarnings(ImmutableSet<PositionedString> warnings) {
-        WarningsDialog dialog = new WarningsDialog(mainWindow, warnings);
-        dialog.setSize(700, 500);
-        dialog.setLocationRelativeTo(MainWindow.getInstance());
-        dialog.setVisible(true);
-        dialog.dispose();
+        WarningsDialog.showIfNecessary(mainWindow, warnings);
     }
 
    /**
