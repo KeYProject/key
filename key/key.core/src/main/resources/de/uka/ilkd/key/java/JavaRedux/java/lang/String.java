@@ -107,7 +107,36 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public int codePointBefore(int arg0);
    public int codePointCount(int arg0, int arg1);
    public int offsetByCodePoints(int arg0, int arg1);
-   public void getChars(int arg0, int arg1, char[] arg2, int arg3);
+   /*@
+   public normal_behavior
+      requires dst != null && srcBegin >= 0 && srcBegin <= srcEnd
+               && srcEnd <= \dl_seqLen(\dl_strContent(s))
+               && dstBegin >= 0
+               && dstBegin + (srcEnd - srcBegin) <= dst.length;
+      ensures (\forall int i;
+               (0 <= i < (srcEnd - srcBegin) ->
+                  (int) \dl_seqGet(\dl_strContent(this), srcBegin + i) == dst[dstBegin + i])
+               && (0 <= i < dstBegin -> dst[i] == \old(dst[i]))
+			   && (dstBegin + (srcEnd - srcBegin) <= i < dst.length)
+			         -> dst[i] == \old(dst[i]));
+      assignable dst[*];
+   also
+   public exceptional_behavior
+      requires dst != null && (  srcBegin < 0
+             || srcBegin > srcEnd
+             || srcEnd > \dl_seqLen(\dl_strContent(this))
+             || dstBegin < 0
+             || dstBegin + (srcEnd - srcBegin) > dst.length);
+      signals (java.lang.IndexOutOfBoundsException) true;
+      assignable \strictly_nothing;
+   also
+   public exceptional_behavior
+      requires dst == null;
+      signals (java.lang.NullPointerException) true;
+      assignable \strictly_nothing;
+    */
+   public void getChars(int srcBegin, int srcEnd, char[] dst, int dstBegin);
+
    public void getBytes(int arg0, int arg1, byte[] arg2, int arg3);
 // public byte[] getBytes(java.lang.String arg0) throws java.io.UnsupportedEncodingException;
 // public byte[] getBytes(java.nio.charset.Charset arg0);
@@ -121,22 +150,14 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public byte[] getBytes();
 
    /*@
-     stringEqualsNormal {
-      \programVariables {
-          java.lang.String s;
-          java.lang.Object obj;
-          boolean \result;
-      }
-      true ->
-      \<{
-          \result = s.equals(obj);
-      }\>( \result = TRUE <-> (  obj != null
+   public normal_behavior
+   requires true;
+   ensures \result <==> obj != null
           && java.lang.String::instance(obj) = TRUE
-          && \dl_strContent(s) = \dl_strContent((java.lang.String)obj) ))
-      assignable \strictly_nothing;
-  };
-    */
-   public boolean equals(java.lang.Object arg0);
+          && \dl_strContent(s) = \dl_strContent((java.lang.String)obj)));
+   assignable \strictly_nothing;
+   */
+   public boolean equals(java.lang.Object obj);
 // public boolean contentEquals(java.lang.StringBuffer arg0);
 // public boolean contentEquals(java.lang.CharSequence arg0);
    public boolean equalsIgnoreCase(java.lang.String arg0);
@@ -241,19 +262,6 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public int indexOf(java.lang.String t, int from);
 
    /*@
-   stringIndexOfStringNormal {
-      \programVariables {
-         java.lang.String s, t;
-         int \result;
-      }
-      (t != null) ->
-      \<{
-          \result = s.indexOf(t);
-      }\>(\result = clIndexOfCl(\dl_strContent(s), 0, \dl_strContent(t)))
-      assignable \strictly_nothing;
-   };
-   TODO
-
    public normal_behavior
       requires t != null;
       ensures \result ==
@@ -263,11 +271,11 @@ public final class String extends java.lang.Object implements java.io.Serializab
       assignable \strictly_nothing;
    also
    public exceptional_behavior
-      requires t == null;
+      requires other == null;
       signals (java.lang.NullPointerException) true;
       assignable \strictly_nothing;
    */
-   public int lastIndexOf(java.lang.String arg0);
+   public int lastIndexOf(java.lang.String other);
 
    /*@
    public normal_behavior
@@ -412,11 +420,128 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public char[] toCharArray();
    public static java.lang.String format(java.lang.String arg0, java.lang.Object[] arg1);
 // public static java.lang.String format(java.util.Locale arg0, java.lang.String arg1, java.lang.Object[] arg2);
+
+   /*@
+   public normal_behavior
+      requires obj == null
+      ensures \dl_strContent(\result) == "null";
+      ensures \result != null;
+      //       && boolean::select(heapAtPre, \result, java.lang.Object::<created>) = FALSE
+      assignable \strictly_nothing;
+   also
+   public normal_behavior
+      requires obj != null;
+      ensures \result = obj.toString();
+      assignable \strictly_nothing;
+   also
+   public normal_behavior
+      requires java.lang.Boolean::instance(obj) = TRUE;
+      ensures \dl_strContent(\result) == obj == true ? "true" : "else";
+      ensures \result != null;
+      //&& boolean::select(heapAtPre, \result, java.lang.Object::<created>) = FALSE
+      assignable \strictly_nothing;
+   also
+   public normal_behavior
+      requires java.lang.Character::instance(obj) = TRUE;
+      ensures \dl_strContent(\result) == seqSingleton((char) obj);
+      ensures \result != null;
+      assignable \strictly_nothing;
+   also
+   public normal_behavior
+      requires java.lang.Integer::instance(obj) = TRUE;
+      ensures \dl_strContent(\result) = \dl_clRemoveZeros(\dl_clTranslateInt((int) obj));
+      ensures \result != null;
+      assignable \strictly_nothing;
+   also
+   public normal_behavior
+      requires java.lang.Long::instance(obj) = TRUE;
+      ensures \dl_strContent(\result) = \dl_clRemoveZeros(\dl_clTranslateInt((long) obj));
+      ensures \result != null;
+      assignable \strictly_nothing;
+      assignable \strictly_nothing;
+  */
    public static java.lang.String valueOf(java.lang.Object arg0);
+
+   /*@
+   public normal_behavior
+      requires (data != null);
+      ensures (\forall int i; 0<= i < data.length;
+                  (int) \dl_seqGet(\dl_strContent(\result), i) = data[i]));
+      ensures \dl_seqLen(\dl_strContent(\result)) = data.length;
+      ensures \result != null;
+      assignable \strictly_nothing;
+   also
+   public exceptional_behavior
+      requires data == null;
+      signals (java.lang.NullPointerException::instance(exc) = TRUE )
+      assignable \strictly_nothing;
+   */
    public static java.lang.String valueOf(char[] arg0);
-   public static java.lang.String valueOf(char[] arg0, int arg1, int arg2);
-   public static java.lang.String copyValueOf(char[] arg0, int arg1, int arg2);
+
+   /*@
+   public normal_behavior
+      requires data != null && offset >= 0 && count >= 0
+               && offset + count <= data.length;
+      ensures (\forall int i; 0<= i && i < count;
+                  (int) \dl_seqGet(\dl_strContent(\result), i) = data[offset + i]));
+      ensures \dl_seqLen(\dl_strContent(\result)) = count;
+      ensures \result != null;
+      assignable \strictly_nothing;
+   also
+   public exceptional_behavior
+      requires data != null;
+      requires offset < 0 || count < 0 || offset+count > data.length;
+      signals (java.lang.IndexOutOfBoundsException) true;
+      assignable \strictly_nothing;
+   also
+   public exceptional_behavior
+      requires data == null;
+      signals (java.lang.NullPointerException) true;
+      assignable \strictly_nothing;
+   */
+   public static java.lang.String valueOf(char[] data, int offset, int count);
+
+
+   /*@
+    public normal_behavior
+      requires data != null;
+      requires offset >= 0 && count >= 0 && offset+count <= data.length;
+      ensures \dl_seqLen(\dl_strContent(\result)) == count;
+      ensurs (\forall int i; 0 <= i < count;
+                         (int) \dl_seqGet(\dl_strContent(\result), i) == data[i+offset]);
+      //    && boolean::select(heapAtPre, \result, java.lang.Object::<created>) = FALSE
+      ensures \result != null;
+      assignable \strictly_nothing;
+   also
+   public exceptional_behavior
+      requires data != null;
+      requires offset < 0 || count < 0 || offset+count > data.length;
+      signals (java.lang.IndexOutOfBoundsException) true;
+      assignable \strictly_nothing;
+   also
+   public exceptional_behavior
+      requires data == null;
+      signals (java.lang.NullPointerException) true;
+      assignable \strictly_nothing;
+    */
+   public static java.lang.String copyValueOf(char[] data, int offset, int count);
+
+   /*@
+   public normal_behavior
+      requires data != null;
+      ensures \dl_seqLen(\dl_strContent(\result)) == data.length;
+      ensures (\forall int i; 0 <= i < data.length;
+                  (int) \dl_seqGet(\dl_strContent(\result), i) == data[i]);
+      ensures \result != null;
+      //    && boolean::select(heapAtPre, \result, java.lang.Object::<created>) = FALSE
+      assignable \strictly_nothing;
+   also exceptional_behavior
+      requires data == null;
+      signals (java.lang.NullPointerException) true;
+      assignable \strictly_nothing;
+    */
    public static java.lang.String copyValueOf(char[] arg0);
+
    public static java.lang.String valueOf(boolean arg0);
    public static java.lang.String valueOf(char arg0);
    public static java.lang.String valueOf(int arg0);
