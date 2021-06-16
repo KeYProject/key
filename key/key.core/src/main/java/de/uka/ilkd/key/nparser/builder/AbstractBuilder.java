@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nparser.builder;
 
-import de.uka.ilkd.key.nparser.BuildingIssue;
+import de.uka.ilkd.key.util.parsing.BuildingException;
+import de.uka.ilkd.key.util.parsing.BuildingIssue;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;

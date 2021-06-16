@@ -523,12 +523,11 @@ public class TermImpl implements Term {
         final TermImpl t = (TermImpl) o;
 
         if (!(op.equals(t.op)
-                && subs.equals(t.subs)
                 && boundVars.equals(t.boundVars)
                 && javaBlock.equals(t.javaBlock))) {
             return false;
         }
-
+        
         Term other = (Term) o;
 
         for (TermLabel label : getLabels()) {
@@ -541,6 +540,12 @@ public class TermImpl implements Term {
             if (label.isProofRelevant() && !getLabels().contains(label)) {
                 return false;
             }
+        }
+
+        for (int i = 0; i < subs.size(); ++i) {
+        	if (!subs.get(i).equalsModIrrelevantTermLabels(t.subs.get(i))) {
+        		return false;
+        	}
         }
 
         return true;

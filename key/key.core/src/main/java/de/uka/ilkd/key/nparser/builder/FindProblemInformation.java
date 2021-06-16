@@ -3,12 +3,11 @@ package de.uka.ilkd.key.nparser.builder;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.ProblemInformation;
-import javax.annotation.Nonnull;
+import org.key_project.util.java.StringUtil;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Objects;
-
-import static de.uka.ilkd.key.nparser.builder.BuilderHelpers.trim;
 
 /**
  * The visitor for extracting the {@link ProblemInformation}.
@@ -17,7 +16,8 @@ import static de.uka.ilkd.key.nparser.builder.BuilderHelpers.trim;
  * @see #getProblemInformation()
  */
 public class FindProblemInformation extends AbstractBuilder<Object> {
-    private final @Nonnull ProblemInformation information = new ProblemInformation();
+    private final @Nonnull
+    ProblemInformation information = new ProblemInformation();
 
     @Override
     public Object visitFile(KeYParser.FileContext ctx) {
@@ -78,7 +78,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
 
     @Override
     public String visitOneJavaSource(KeYParser.OneJavaSourceContext ctx) {
-        return trim(ctx.getText(), '"');
+        return StringUtil.trim(ctx.getText(), '"');
     }
 
     @Override
@@ -94,7 +94,8 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
     /**
      * The found problem information.
      */
-    public @Nonnull ProblemInformation getProblemInformation() {
+    public @Nonnull
+    ProblemInformation getProblemInformation() {
         return information;
     }
 }

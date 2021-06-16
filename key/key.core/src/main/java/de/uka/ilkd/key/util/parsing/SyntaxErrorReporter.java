@@ -1,13 +1,12 @@
-package de.uka.ilkd.key.nparser;
+package de.uka.ilkd.key.util.parsing;
 
-import com.google.common.base.Strings;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.v4.runtime.*;
-import javax.annotation.Nullable;
+import org.key_project.util.java.StringUtil;
 
+import javax.annotation.Nullable;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +15,7 @@ import java.util.stream.Collectors;
 
 /**
  * An ANTLR4 error listener that stores the errors internally.
- * You can disable the additional  printing of message on the console {@link #print} flag.
+ * You can disable the additional  printing of message on the console {@link #printOnConsole} flag.
  * <p>
  * It supports beautiful error message via {@link SyntaxError#getBeatifulErrorMessage(String[])}.
  *
@@ -25,7 +24,24 @@ import java.util.stream.Collectors;
  */
 public class SyntaxErrorReporter extends BaseErrorListener {
     private final List<SyntaxError> errors = new ArrayList<>();
-    private boolean print = true;
+    /**
+     * if true, errors are printed directly on System.err
+     */
+    private final boolean printOnConsole;
+
+    /**
+     * if true, exception is thrown directly when an error is hit
+     */
+    private final boolean throwDirect;
+
+    public SyntaxErrorReporter() {
+        this(true, false);
+    }
+
+    public SyntaxErrorReporter(boolean printOnConsole, boolean throwDirect) {
+        this.printOnConsole = printOnConsole;
+        this.throwDirect = throwDirect;
+    }
 
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer, @Nullable Object offendingSymbol,
@@ -44,10 +60,14 @@ public class SyntaxErrorReporter extends BaseErrorListener {
                 charPositionInLine,
                 msg, tok.getTokenSource().getSourceName(), stack);
 
-        if (print) {
+        if (printOnConsole) {
             System.err.printf("[syntax-error] %s:%d:%d: %s %s (%s)%n", se.source, line, charPositionInLine, msg, tok, stack);
         }
         errors.add(se);
+
+        if (throwDirect) {
+            throwException();
+        }
     }
 
     /**
@@ -129,8 +149,8 @@ public class SyntaxErrorReporter extends BaseErrorListener {
             String line = lines[this.line];
             return line +
                     "\n" +
-                    Strings.repeat(" ", (charPositionInLine - 1)) +
-                    Strings.repeat("^", (offendingSymbol.getText().length()));
+                    StringUtil.repeat(" ", (charPositionInLine - 1)) +
+                    StringUtil.repeat("^", (offendingSymbol.getText().length()));
         }
 
         public String positionAsUrl() {
@@ -138,7 +158,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         }
     }
 
-    public static class ParserException extends RuntimeException {
+    public static class ParserException extends RuntimeException implements HasLocation {
         private final List<SyntaxError> errors;
 
         public ParserException(String msg, List<SyntaxError> errors) {
@@ -163,6 +183,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
             return s.toString();
         }
 
+        @Override
         public Location getLocation() throws MalformedURLException {
             if (!errors.isEmpty()) {
                 SyntaxError e = errors.get(0);

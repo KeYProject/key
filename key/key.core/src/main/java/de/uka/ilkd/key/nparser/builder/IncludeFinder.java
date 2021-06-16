@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.nparser.builder;
 
-import com.google.common.base.CharMatcher;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
+import de.uka.ilkd.key.util.parsing.BuildingException;
+import org.key_project.util.java.StringUtil;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -37,7 +38,7 @@ public class IncludeFinder extends AbstractBuilder<Void> {
 
     @Override
     public Void visitOne_include(KeYParser.One_includeContext ctx) {
-        String value = CharMatcher.anyOf("\"\'").trimFrom(ctx.getText());
+        String value = StringUtil.trim(ctx.getText(), "\"'");
         try {
             addInclude(value, ctx.relfile != null);
         } catch (MalformedURLException e) {
