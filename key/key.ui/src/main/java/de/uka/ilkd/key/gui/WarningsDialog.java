@@ -266,54 +266,53 @@ public class WarningsDialog extends JDialog {
         throw new ArrayIndexOutOfBoundsException("Given position is out of bounds.");
     }
 
-}
 
-class PositionedStringRenderer implements ListCellRenderer<PositionedString> {
-    private final JTextArea area = new JTextArea(5, 69);
-    private final JPanel panel = new JPanel();
+    private static class PositionedStringRenderer implements ListCellRenderer<PositionedString> {
+        private final JTextArea area = new JTextArea(5, 69);
+        private final JPanel panel = new JPanel();
 
-    PositionedStringRenderer() {
-        area.setLineWrap(true);
-        area.setWrapStyleWord(true);
-        BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
-        panel.setLayout(layout);
-        panel.add(area);
-    }
-
-
-    @Override
-    public Component getListCellRendererComponent(JList<? extends PositionedString> list, PositionedString value,
-                                                  int index, boolean isSelected, boolean cellHasFocus) {
-        final String text = String.format("%s\n\nFilename: %s@%d:%d",
-                value.text, value.fileName, value.pos.getLine(), value.pos.getColumn());
-        area.setText(text);
-        area.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        if (isSelected) {
-            area.setBackground(list.getSelectionBackground());
-            area.setForeground(list.getSelectionForeground());
-        } else {
-            area.setBackground(list.getBackground());
-            area.setForeground(list.getForeground());
+        PositionedStringRenderer() {
+            area.setLineWrap(true);
+            area.setWrapStyleWord(true);
+            BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
+            panel.setLayout(layout);
+            panel.add(area);
         }
 
-        area.setEnabled(list.isEnabled());
-        area.setFont(list.getFont());
 
-        Border border = null;
-        if (cellHasFocus) {
+        @Override
+        public Component getListCellRendererComponent(JList<? extends PositionedString> list, PositionedString value,
+                                                      int index, boolean isSelected, boolean cellHasFocus) {
+            final String text = String.format("%s\n\nFilename: %s@%d:%d",
+                    value.text, value.fileName, value.pos.getLine(), value.pos.getColumn());
+            area.setText(text);
+            area.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             if (isSelected) {
-                border = UIManager.getBorder("List.focusSelectedCellHighlightBorder");
+                area.setBackground(list.getSelectionBackground());
+                area.setForeground(list.getSelectionForeground());
+            } else {
+                area.setBackground(list.getBackground());
+                area.setForeground(list.getForeground());
             }
-            if (border == null) {
-                border = UIManager.getBorder("List.focusCellHighlightBorder");
-            }
-        } else {
-            border = new EmptyBorder(1, 1, 1, 1);
-        }
-        panel.setBorder(border);
 
-        return panel;
-    }
+            area.setEnabled(list.isEnabled());
+            area.setFont(list.getFont());
+
+            Border border = null;
+            if (cellHasFocus) {
+                if (isSelected) {
+                    border = UIManager.getBorder("List.focusSelectedCellHighlightBorder");
+                }
+                if (border == null) {
+                    border = UIManager.getBorder("List.focusCellHighlightBorder");
+                }
+            } else {
+                border = new EmptyBorder(1, 1, 1, 1);
+            }
+            panel.setBorder(border);
+
+            return panel;
+        }
 
     /*
     public static void main(String[] args) {
@@ -336,4 +335,5 @@ class PositionedStringRenderer implements ListCellRenderer<PositionedString> {
         warningsDialog.setVisible(true);
     }
     */
+    }
 }
