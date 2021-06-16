@@ -96,8 +96,12 @@ public class WarningsDialog extends JDialog {
         TextLineNumber lineNumbers = new TextLineNumber(txtSource, 2);
         scrPreview.setRowHeaderView(lineNumbers);
 
-        txtSource.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
-        txtSource.setEditable(false);
+        Font font = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
+        if (font == null) {
+            // make sure a monospaced font is used
+            font = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+        }
+        txtSource.setFont(font);
 
 
         final JButton btnOk = new JButton("OK");
