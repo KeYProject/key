@@ -18,6 +18,10 @@
 
 parser grammar KeYParser;
 
+@header {
+  import de.uka.ilkd.key.util.parsing.*;
+}
+
 @members {
 private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
 public SyntaxErrorReporter getErrorReporter() { return errorReporter;}

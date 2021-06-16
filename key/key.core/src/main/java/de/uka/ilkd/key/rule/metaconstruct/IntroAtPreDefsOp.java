@@ -459,10 +459,12 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                         = new LinkedHashMap<LocationVariable, Term>();
                 for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                         .getAllHeaps()) {
+                    final Term term = spec.getInternalModifies()
+                            //.get(services.getTypeConverter().getHeapLDT().getHeap());
+                            //weigl: prevent NPE
+                            .getOrDefault(services.getTypeConverter().getHeapLDT().getHeap(), tb.strictlyNothing());
                     if (heap == services.getTypeConverter().getHeapLDT().getSavedHeap()
-                            && spec.getInternalModifies()
-                                    .get(services.getTypeConverter().getHeapLDT().getHeap())
-                                    .equalsModIrrelevantTermLabels(tb.strictlyNothing())) {
+                            && tb.strictlyNothing().equalsModIrrelevantTermLabels(term)) {
                         continue;
                     }
                     final Term m = spec.getModifies(heap, selfTerm, atPres, services);

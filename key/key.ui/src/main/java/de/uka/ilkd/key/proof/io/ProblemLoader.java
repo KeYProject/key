@@ -77,7 +77,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
       try {
           load();
           return null;
-      } catch (Throwable exception) {
+      } catch (Exception exception) {
           final String errorMessage = "Failed to load "
                   + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
           mediator.notify(new ExceptionFailureEvent(errorMessage, exception));

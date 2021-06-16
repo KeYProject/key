@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
@@ -9,14 +9,17 @@
  *
  * Contributors:
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
- *******************************************************************************/
+ */
 
 package org.key_project.util.java;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.function.Predicate;
 
+import javax.annotation.Nonnull;
 import javax.swing.JFileChooser;
+
 
 /**
  * Provides static methods to work with strings.
@@ -32,47 +35,47 @@ public final class StringUtil {
     * Constant for a line break.
     */
    public static final String NEW_LINE = System.getProperty("line.separator");
-   
+
    /**
     * The latin alphabet with big capitals.
     */
    public static final String LATIN_ALPHABET_BIG = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-   
+
    /**
     * The latin alphabet with small capitals.
     */
    public static final String LATIN_ALPHABET_SMALL = LATIN_ALPHABET_BIG.toLowerCase();
-   
+
    /**
     * Additional characters allowed in file systems.
     * <p>
-    * It is important that {@code ':'} is not contained because {@code "::"} is replaced with a {@code '/'} by the {@link JFileChooser} under Mac OS.
+    * It is important that {@code ':'} is not contained because {@code "::"}
+    * is replaced with a {@code '/'} by the {@link JFileChooser} under Mac OS.
     */
-   public static final char[] ADDITIONAL_ALLOWED_FILE_NAME_SYSTEM_CHARACTERS = {'(', ')', '[', ']', '-', '+', '_', '$', ',', '%'};
- 
+   public static final char[] ADDITIONAL_ALLOWED_FILE_NAME_SYSTEM_CHARACTERS =
+           {'(', ')', '[', ']', '-', '+', '_', '$', ',', '%'};
+
    /**
     * The numerals.
     */
    public static final String NUMERALS = "0123456789";
-   
+
    /**
     * All characters representing whitespace.
     */
    public static final String WHITESPACE = " \n\r\t";
-   
-   /**
-    * Static constructor.
-    */
+
+
    static {
       Arrays.sort(ADDITIONAL_ALLOWED_FILE_NAME_SYSTEM_CHARACTERS);
    }
-   
+
    /**
     * Forbid instances by this private constructor.
     */
    private StringUtil() {
    }
-   
+
    /**
     * Checks if the {@link String} is empty.
     * @param text The text to check.
@@ -108,39 +111,40 @@ public final class StringUtil {
    public static String toLowerCase(String text) {
        return text != null ? text.toLowerCase() : null;
    }
-   
+
    /**
     * Creates a {@link Comparator} that can be used to compute the
     * equality of two given {@link String}s ignoring the case
     * via {@link String#compareToIgnoreCase(String)}. If both values
-    * are {@code null} also {@code 0} is returned in 
+    * are {@code null} also {@code 0} is returned in
     * {@link Comparator#compare(Object, Object)}. If only one value
     * is {@code null} {@link Comparator#compare(Object, Object)} will
     * return a value different to {@code 0}.
     * @return The created {@link Comparator}.
     */
    public static Comparator<String> createIgnoreCaseComparator() {
-      return new Comparator<String>() {
-         @Override
-         public int compare(String o1, String o2) {
-            if (o1 != null && o2 != null) {
-               return o1.compareToIgnoreCase(o2);
-            }
-            else {
-               return o1 == null && o2 == null ? 0 : 1;
-            }
+      return (o1, o2) -> {
+         if (o1 != null && o2 != null) {
+            return o1.compareToIgnoreCase(o2);
+         }
+         else {
+            return o1 == null && o2 == null ? 0 : 1;
          }
       };
    }
-   
+
    /**
     * Creates a line which consists of the given text.
     * @param text The text to repeate.
     * @param repetitions The number of repetitions.
     * @return The created line.
     */
-   public static String createLine(String text, int repetitions) {
-      StringBuffer sb = new StringBuffer();
+   public static String repeat(String text, int repetitions) {
+      //fast paths
+      if(repetitions==0) return "";
+      if(repetitions==1) return text;
+
+      StringBuilder sb = new StringBuilder();
       for (int i = 0; i < repetitions; i++) {
          sb.append(text);
       }
@@ -152,14 +156,15 @@ public final class StringUtil {
     * Checks if the given string contains the substring.
     * </p>
     * <p>
-    * <b>Attention:</b> The empty string is contained in every string. 
+    * <b>Attention:</b> The empty string is contained in every string.
     * </p>
     * @param string The string that should contain the substring.
     * @param substring The substring to check.
-    * @return {@code true} strings are not {@code null} and the string contains the substring, {@code false} if at least one string is {@code null} or the string does not contain the substring.
+    * @return {@code true} strings are not {@code null} and the string contains the substring,
+    * {@code false} if at least one string is {@code null} or the string does not contain the substring.
     */
    public static boolean contains(String string, CharSequence substring) {
-      return string != null && substring != null ? string.contains(substring) : false;
+      return string != null && substring != null && string.contains(substring);
    }
 
    /**
@@ -234,7 +239,7 @@ public final class StringUtil {
          return text;
       }
    }
-   
+
    /**
     * Checks the equality of the given {@link String}s ignoring whitespace.
     * @param first The first {@link String}.
@@ -283,8 +288,9 @@ public final class StringUtil {
                   secondIndex++;
                }
             }
-            return equal &&
-                   firstIndex >= firstContent.length && secondIndex >= secondContent.length; // Complete content of both texts compared
+            return equal
+                    && firstIndex >= firstContent.length
+                    && secondIndex >= secondContent.length; // Complete content of both texts compared
          }
          else {
             return false;
@@ -304,10 +310,11 @@ public final class StringUtil {
     * @throws IllegalArgumentException If the text is already longer as the given length
     */
    public static String fillString(String text, char leadingCharacter, int length) throws IllegalArgumentException {
-      StringBuffer sb = new StringBuffer();
+      StringBuilder sb = new StringBuilder();
       if (text != null) {
          if (text.length() > length) {
-            throw new IllegalArgumentException("Text \"" + text + "\" with length " + text.length() + " is longer as " + length + ".");
+            throw new IllegalArgumentException(
+                    String.format("Text \"%s\" with length %d is longer as %d.", text, text.length(), length));
          }
          else {
             for (int i = 0; i < length - text.length(); i++) {
@@ -371,7 +378,7 @@ public final class StringUtil {
          return text;
       }
    }
-   
+
    /**
     * Checks if the given {@link Object} is a {@link String} which starts with the given prefix.
     * @param obj The {@link Object} to check.
@@ -379,8 +386,8 @@ public final class StringUtil {
     * @return {@code true} {@link Object} is {@link String} with given prefix, {@code false} otherwise.
     */
    public static boolean startsWith(Object obj, String prefix) {
-      return obj instanceof String 
-             && prefix != null 
+      return obj instanceof String
+             && prefix != null
              && ((String) obj).startsWith(prefix);
    }
 
@@ -391,5 +398,48 @@ public final class StringUtil {
            return false;
        }
        return true;
+   }
+
+
+   /**
+    * Returns a string that first and last characters violates the given predicate.
+    * Works similar to {@link String#trim()} but allows to specify the characters
+    * that should be consider for removal.
+    *
+    * The given predicate test the characters, if true the character is removed.
+    */
+   @Nonnull
+   public static String trim(@Nonnull String text, @Nonnull Predicate<Character> predicate) {
+      int first = 0;
+      int last = text.length() - 1;
+      char[] value = text.toCharArray();
+
+      while (first < last && predicate.test(value[first])) {
+         ++first;
+      }
+      while (first <= last && predicate.test(value[last])) {
+         --last;
+      }
+      return (first < last) ?
+              new String(Arrays.copyOfRange(value, first, last+1)) :
+              "";
+   }
+
+   /**
+    * Removes the given character {@code c} from the prefix/suffix of the given string.
+    * @see #trim(String, Predicate)
+    */
+   @Nonnull
+   public static String trim(String text, char c) {
+      return trim(text, it -> it == c);
+   }
+
+   /**
+    * Removes the given characters (in {@code chars}) from the prefix/suffix of the given string.
+    * @see #trim(String, Predicate)
+    */
+   @Nonnull
+   public static String trim(String text, String chars) {
+      return trim(text, it -> chars.indexOf(it) >= 0);
    }
 }

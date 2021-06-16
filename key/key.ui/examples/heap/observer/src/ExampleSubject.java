@@ -1,8 +1,8 @@
 public class ExampleSubject extends Subject {
     private int value;
     
-    //@ represents footprint = value;
-    
+    //@ represents footprint = \locset( value );
+
     /*@ public normal_behaviour
       @   ensures \fresh(footprint);
       @   ensures observers != null && \fresh(observers) && observers.length == 0;

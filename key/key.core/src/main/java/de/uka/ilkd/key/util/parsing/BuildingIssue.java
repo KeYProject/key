@@ -1,12 +1,16 @@
-package de.uka.ilkd.key.nparser;
+package de.uka.ilkd.key.util.parsing;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
 import javax.annotation.Nullable;
 
 public class BuildingIssue {
     private final String message;
-    private final int lineNumber, posInLine, startOffset, endOffset;
+    private final int lineNumber;
+    private final int posInLine;
+    private final int startOffset;
+    private final int endOffset;
     private final @Nullable Throwable cause;
     private final boolean isWarning;
 

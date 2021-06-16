@@ -640,12 +640,14 @@ public final class JavaInfo {
             ImmutableList<KeYJavaType> sig,
             KeYJavaType context) {
 
-	for(KeYJavaType sup : getAllSupertypes(kjt).removeAll(kjt)) {
+        ImmutableList<KeYJavaType> allSupertypes = getAllSupertypes(kjt);
+        ImmutableList<KeYJavaType> removed = allSupertypes.removeAll(kjt);
+        for(KeYJavaType sup : removed) {
             final IProgramMethod result = findToplevelPM(sup, methodName, sig, context);
-	    if(result != null) {
-		return result;
-	    }
-	}
+            if(result != null) {
+                return result;
+            }
+        }
         return getProgramMethod(kjt, methodName, sig, context);
     }
 
