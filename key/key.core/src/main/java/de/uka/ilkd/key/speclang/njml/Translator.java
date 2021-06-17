@@ -1265,10 +1265,15 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitPrimaryCreateLocsetSingleton(JmlParser.PrimaryCreateLocsetSingletonContext ctx) {
         SLExpression e = accept(ctx.expression());
         assert e != null;
-        Term t = e.getTerm();
-        final Term objTerm = t.sub(1);
-        final Term fieldTerm = t.sub(2);
-        return new SLExpression(tb.singleton(objTerm, fieldTerm));
+        try {
+            Term t = e.getTerm();
+            final Term objTerm = t.sub(1);
+            final Term fieldTerm = t.sub(2);
+            return new SLExpression(tb.singleton(objTerm, fieldTerm));
+        }catch (IndexOutOfBoundsException e1) {
+            raiseError(ctx, "The given expression %s is not a valid reference.", e);
+        }
+        return null;
     }
 
     @Override
